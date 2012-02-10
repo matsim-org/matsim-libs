@@ -58,7 +58,7 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(new MyMoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(this.agentStuckScore));
 		scoringFunctionAccumulator.addScoringFunction(new PtLegScoringFunction(plan, inVehWaitHandler.getPersonId2InVehicleTime(), inVehWaitHandler.getPersonId2WaitingTime(), this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING));
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new MyActivityScoringFunction(params));
 		return scoringFunctionAccumulator;
 	}
 

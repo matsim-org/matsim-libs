@@ -42,22 +42,22 @@ public class ExternalControler {
 	private final static Logger log = Logger.getLogger(ExternalControler.class);
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/network80links.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/config_busline_withoutTimeChoice.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/populationBusCorridor80linksCar.xml";
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/withoutTimeChoice_busNumber+10";
-	static int lastExternalIteration = 10;
-	static int lastInternalIteration = 100;
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/config_busline.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/population1agent.xml";
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/withTimeChoice_test";
+	static int lastExternalIteration = 0;
+	static int lastInternalIteration = 1;
 	
 	// settings for first iteration or if values not changed for all iterations
-	TimePeriod p1 = new TimePeriod(1, "DAY", 15, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
+	TimePeriod p1 = new TimePeriod(1, "DAY", 1, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
 //	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 12, 6*3600, 12*3600);
 //	TimePeriod p3 = new TimePeriod(3, "NVZ", 8, 12*3600, 15*3600);
 //	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 12, 15*3600, 21*3600);
 //	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 4, 21*3600, 23*3600);
 
 	private final double MONEY_UTILS = 0.14026; // has to be positive, because costs are negative!
-	private double fare = -4.0; // negative!
-	private int capacity = 30; // standing room + seats (realistic values between 19 and 101!)
+	private double fare = -3.2; // negative!
+	private int capacity = 50; // standing room + seats (realistic values between 19 and 101!)
 
 	private int extItNr;
 	private String directoryExtIt;
@@ -151,7 +151,7 @@ public class ExternalControler {
 			// settings for next external iteration	
 			if (this.getExtItNr() < lastExternalIteration){
 				
-				this.setDay(increaseNumberOfBusesAllTimePeriods(10));
+//				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
 //				
 //				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
 //				this.setDay(increaseBuses("HVZ_2", 1)); // id, number of buses
@@ -159,7 +159,7 @@ public class ExternalControler {
 //				this.setDay(extend("HVZ_1", 60 * 60));
 //				this.setDay(extend("HVZ_2", 60 * 60));
 				
-//				this.setFare(operator.increaseFare(this.getFare(), -1.5)); // absolute value
+//				this.setFare(operator.increaseFare(this.getFare(), -10.5)); // absolute value
 //				this.setCapacity(operator.increaseCapacity(10)); // absolute value
 			}
 			

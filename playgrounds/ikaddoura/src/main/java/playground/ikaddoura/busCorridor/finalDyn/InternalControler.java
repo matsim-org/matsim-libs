@@ -127,11 +127,11 @@ public class InternalControler {
 			writeInterval = this.lastInternalIteration;
 		}
 		
-//		controlerConfGroup.setWriteEventsInterval(writeInterval);
-//		controlerConfGroup.setWritePlansInterval(writeInterval);
+		controlerConfGroup.setWriteEventsInterval(writeInterval);
+		controlerConfGroup.setWritePlansInterval(writeInterval);
 		
-		controlerConfGroup.setWriteEventsInterval(1);
-		controlerConfGroup.setWritePlansInterval(1);
+//		controlerConfGroup.setWriteEventsInterval(1);
+//		controlerConfGroup.setWritePlansInterval(1);
 		
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt+"/internalIterations");
 		
