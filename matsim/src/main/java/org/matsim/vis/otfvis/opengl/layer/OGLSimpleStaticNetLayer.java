@@ -56,7 +56,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	
 	private static int nItems = 0;
 	
-	private static float basicLineWidth_m = 30.f;
+	private static float cachedLinkWidth = 30.f;
 
 	@Override
 	public void addItem(OTFDrawable item) {
@@ -110,8 +110,8 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	}
 
 	private void checkNetList(GL gl) {
-		float cellWidthAct_m = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
-		if (getBasicLineWidth_m() != cellWidthAct_m || items.size() > nItems) {
+		float currentLinkWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
+		if (cachedLinkWidth != currentLinkWidth || items.size() > nItems) {
 			// If the line width has changed (reason for redrawing)
 			// or if the number of visible links is bigger than last time
 			// (i.e. the user has zoomed out)
@@ -120,7 +120,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 			netDisplList = -2;
 		}
 		if (netDisplList < 0) {
-			basicLineWidth_m = cellWidthAct_m;
+			cachedLinkWidth = currentLinkWidth;
 			netDisplList = gl.glGenLists(1);
 			gl.glNewList(netDisplList, GL.GL_COMPILE);
 			for (OTFDrawable item : items) {
@@ -131,17 +131,14 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 		}
 	}
 
-	public static float getBasicLineWidth_m() {
-		return basicLineWidth_m;
-	}
 	
 	public static float getBasicLaneWidth_m() {
 		Double effectiveLaneWidth = OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth() ;
 		if ( effectiveLaneWidth != null ) {
-			return (float) ( basicLineWidth_m * effectiveLaneWidth / 3.75 ) ;
+			return (float) ( cachedLinkWidth * effectiveLaneWidth / 3.75 ) ;
 			// "3.75" seems to make sense in terms of retrofitting
 		}
-		return basicLineWidth_m ;
+		return cachedLinkWidth ;
 	}
 	
 }
