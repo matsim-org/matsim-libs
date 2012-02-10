@@ -36,14 +36,7 @@ public class LanesBasedWidthCalculator implements WidthCalculator {
 	 */
 	public LanesBasedWidthCalculator(final NetworkImpl network, final Double coef) {
 		double w = network.getEffectiveLaneWidth();
-		if (w == 3.75) {
-			this.effectiveLaneWidth = 1.0;
-			log.warn("Effective lane with in network is set to the default value 3.75. Instead this tool uses 1.0 in order to maintain backwards compatibility " +
-					"to a version of MATSim that used Double.NaN as default in Java while in the network_v1.dtd the default is 3.75");
-		}
-		else {
-			this.effectiveLaneWidth = w;
-		}
+		this.effectiveLaneWidth = w;
 		this.widthCoefficient = coef;
 	}
 
