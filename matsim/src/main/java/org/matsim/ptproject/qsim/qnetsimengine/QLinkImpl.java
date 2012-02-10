@@ -205,9 +205,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		double earliestExitTime = now + this.freespeedTravelTime;
 		earliestExitTime = Math.floor(earliestExitTime);
 		veh.setEarliestLinkExitTime(earliestExitTime);
-
-		this.linkEnterTimeMap.put(veh, now);
-		// (yyyyyy why calling this twice?  kai, jan'11)
 	}
 
 	@Override
