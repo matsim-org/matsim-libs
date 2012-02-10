@@ -15,7 +15,8 @@ import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
-import playground.sergioo.AddressLocator.BadAddressException;
+import others.sergioo.AddressLocator.BadAddressException;
+
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.WebClient;

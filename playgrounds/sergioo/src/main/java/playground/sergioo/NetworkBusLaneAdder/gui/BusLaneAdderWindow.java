@@ -25,24 +25,22 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.client.ClientProtocolException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -57,10 +55,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.xml.sax.SAXException;
 
-import playground.sergioo.NetworkBusLaneAdder.kernel.AddressLocator;
-import playground.sergioo.NetworkBusLaneAdder.kernel.BadAddressException;
 import playground.sergioo.Visualizer2D.LayersWindow;
 
 
@@ -129,12 +124,11 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 		setTitle(title);
 		this.finalNetworkFile = finalNetworkFile;
 		this.network = network;
-		this.coordinateTransformation = coordinateTransformation;
 		NetworkTwoNodesPainter networkPainter = new NetworkTwoNodesPainter(network, Color.BLACK);
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout()); 
-		layersPanels.put(PanelIds.ONE, new BusLaneAdderPanel(this, networkPainter, imageFile, upLeft, downRight));
+		layersPanels.put(PanelIds.ONE, new BusLaneAdderPanel(this, networkPainter, imageFile, upLeft, downRight, coordinateTransformation));
 		this.add(layersPanels.get(PanelIds.ONE), BorderLayout.CENTER);
 		option = Options.ZOOM;
 		JPanel toolsPanel = new JPanel();
@@ -194,34 +188,7 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 		return network;
 	}
 	public void findAddress() {
-		AddressLocator ad1 = new AddressLocator(JOptionPane.showInputDialog("Insert the desired address"));
-		try {
-			ad1.locate();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (BadAddressException e) {
-			e.printStackTrace();
-		}
-		if(ad1.getNumResults()>1)
-			JOptionPane.showMessageDialog(this, "Many results: "+ad1.getNumResults()+".");
-		try {
-			JOptionPane.showMessageDialog(this, ad1.getLocation().toString());
-			((BusLaneAdderPanel)layersPanels.get(PanelIds.ONE)).centerCamera(coordinateTransformation.transform(ad1.getLocation()));
-		} catch (HeadlessException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		((BusLaneAdderPanel)layersPanels.get(PanelIds.ONE)).findAddress();
 	}
 	public void select() {
 		((BusLaneAdderPanel)layersPanels.get(PanelIds.ONE)).selectLinks();
@@ -232,37 +199,50 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 	public void exitSave() {
 		new NetworkWriter(network).write(finalNetworkFile+"l");
 	}
-	public void add() throws Exception {
+	public void add() {
 		List<Link> links = ((BusLaneAdderPanel)layersPanels.get(PanelIds.ONE)).getLinks();
 		Node prevNode = links.get(0).getFromNode();
 		for(Link link:links)
 			if(!link.getAllowedModes().contains("bus")) {
 				exitSave();
-				throw new Exception("Wrong path, network saved");
+				JOptionPane.showMessageDialog(this, "Wrong path, network saved");
 			}
 		for(int i=0; i<links.size(); i++) {
 			Link link = links.get(i);
 			Node node = null;
-			if(i==links.size()-1)
-				node = link.getToNode(); 
-			else {
-				node = network.getFactory().createNode(new IdImpl("n"+link.getToNode().getId().toString()), link.getToNode().getCoord());
-				network.addNode(node);
+			if(link.getNumberOfLanes()==1) {
+				Set<String> modes = new HashSet<String>();
+				modes.add("bus");
+				link.setAllowedModes(modes);
+				node = link.getToNode();
 			}
-			LinkImpl newLink = (LinkImpl) network.getFactory().createLink(new IdImpl("c"+link.getId().toString()), prevNode, node);
-			newLink.getAllowedModes().clear();
-			newLink.getAllowedModes().add("car");
-			newLink.setCapacity(link.getCapacity());
-			newLink.setFreespeed(link.getFreespeed());
-			newLink.setLength(link.getLength());
-			newLink.setNumberOfLanes(link.getNumberOfLanes()-1);
-			newLink.setOrigId(((LinkImpl)link).getOrigId());
-			newLink.setType(((LinkImpl)link).getType());
-			network.addLink(newLink);
-			link.getAllowedModes().remove("car");
-			link.setCapacity(900);
+			else {
+				if(i==links.size()-1)
+					node = link.getToNode();
+				else {
+					node = network.getFactory().createNode(new IdImpl("n"+link.getToNode().getId().toString()), link.getToNode().getCoord());
+					network.addNode(node);
+				}
+				LinkImpl newLink = (LinkImpl) network.getFactory().createLink(new IdImpl("c"+link.getId().toString()), prevNode, node);
+				Set<String> modes = new HashSet<String>();
+				modes.add("car");
+				newLink.setAllowedModes(modes);
+				newLink.setCapacity(link.getCapacity());
+				newLink.setFreespeed(link.getFreespeed());
+				newLink.setLength(link.getLength());
+				newLink.setNumberOfLanes(link.getNumberOfLanes()-1);
+				newLink.setOrigId(((LinkImpl)link).getOrigId());
+				newLink.setType(((LinkImpl)link).getType());
+				network.addLink(newLink);
+				Set<String> modes2 = new HashSet<String>();
+				modes2.add("bus");
+				link.setAllowedModes(modes2);
+				link.setCapacity(900);
+				link.setNumberOfLanes(1);
+			}
 			prevNode=node;
 		}
+		((BusLaneAdderPanel)layersPanels.get(PanelIds.ONE)).clearSelection();
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

@@ -17,7 +17,8 @@ public class ImagePainter extends Painter {
 	//Attributes
 	private final Image image;
 	private int[] imagePosition;
-	private double[] imageCoordinates;
+	private Coord upLeft;
+	private Coord downRight;
 	               
 	//Constructors
 	public ImagePainter(Image image, LayersPanel layersPanel) {
@@ -35,14 +36,22 @@ public class ImagePainter extends Painter {
 		if(imagePosition!=null)
 			g.drawImage(image, imagePosition[0], imagePosition[1], imagePosition[2], imagePosition[3], imagePosition[4], imagePosition[5], imagePosition[6], imagePosition[7], layersPanel);
 		else
-			g.drawImage(image, layersPanel.getScreenX(imageCoordinates[0]), layersPanel.getScreenY(imageCoordinates[1]), layersPanel.getScreenX(imageCoordinates[2]), layersPanel.getScreenY(imageCoordinates[3]), 0, 0, image.getWidth(layersPanel), image.getHeight(layersPanel), layersPanel);
+			g.drawImage(image, layersPanel.getScreenX(upLeft.getX()), layersPanel.getScreenY(upLeft.getY()), layersPanel.getScreenX(downRight.getX()), layersPanel.getScreenY(downRight.getY()), 0, 0, image.getWidth(layersPanel), image.getHeight(layersPanel), layersPanel);
+	}
+	public Coord getUpLeft() {
+		return upLeft;
+	}
+	public Coord getDownRight() {
+		return downRight;
 	}
 	public void setImagePosition(int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2) {
 		imagePosition = new int[]{dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2};
-		imageCoordinates = null;
+		upLeft = null;
+		downRight = null;
 	}
 	public void setImageCoordinates(Coord upLeft, Coord downRight) {
 		imagePosition = null;
-		imageCoordinates = new double[]{upLeft.getX(), upLeft.getY(), downRight.getX(), downRight.getY()};
+		this.upLeft = upLeft;
+		this.downRight = downRight;
 	}
 }

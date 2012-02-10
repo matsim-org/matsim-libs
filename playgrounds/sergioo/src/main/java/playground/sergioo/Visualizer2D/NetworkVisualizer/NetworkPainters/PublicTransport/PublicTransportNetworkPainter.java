@@ -40,7 +40,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 	private static final String OTHER_COLOR = "other";
 	
 	//Attributes
-	private Color networkColor = Color.LIGHT_GRAY;
+	private Color networkColor = Color.DARK_GRAY;
 	private Stroke networkStroke = new BasicStroke(0.1f);
 	private Map<RouteTypes, Map<String, Color>> colors;
 	private Map<Id, LinkDrawInformation> linksDrawInformation;
@@ -62,7 +62,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 		mrtColorsMap.put("NS", new Color(217,29,7));
 		mrtColorsMap.put("NE", new Color(145,17,162));
 		mrtColorsMap.put("CC", new Color(250,155,16));
-		mrtColorsMap.put(OTHER_COLOR, Color.DARK_GRAY);
+		mrtColorsMap.put(OTHER_COLOR, Color.LIGHT_GRAY);
 		colors.put(RouteTypes.SUBWAY, mrtColorsMap);
 		Map<String, Color> tramColorsMap = new HashMap<String, Color>();
 		tramColorsMap.put(OTHER_COLOR, Color.YELLOW);

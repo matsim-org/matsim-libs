@@ -2,7 +2,8 @@ package playground.sergioo.RoutesAlternatives;
 
 import java.util.List;
 
-import playground.sergioo.AddressLocator.Location;
+import org.matsim.api.core.v01.Coord;
+
 
 public class PublicTransitRoute extends Route {
 	
@@ -11,7 +12,7 @@ public class PublicTransitRoute extends Route {
 	 * @param distance
 	 * @param totalTime
 	 */
-	public PublicTransitRoute(Location origin, Location destination, double totalTime) {
+	public PublicTransitRoute(Coord origin, Coord destination, double totalTime) {
 		super(origin, destination, totalTime);
 	}
 	/**

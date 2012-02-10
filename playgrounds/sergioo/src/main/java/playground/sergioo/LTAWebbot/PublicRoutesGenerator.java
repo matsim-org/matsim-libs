@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -34,11 +35,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import others.sergioo.AddressLocator.AddressLocator;
+import others.sergioo.AddressLocator.BadAddressException;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 
-import playground.sergioo.AddressLocator.AddressLocator;
-import playground.sergioo.AddressLocator.BadAddressException;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -123,7 +124,7 @@ public class PublicRoutesGenerator {
 		webClient.closeAllWindows();
 		dba.close();
 	}
-	public static void mergeBusStops() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException, ParserConfigurationException, SAXException, BadAddressException, InterruptedException {
+	public static void mergeBusStops() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException, ParserConfigurationException, SAXException, BadAddressException, InterruptedException, IllegalStateException, URISyntaxException {
 		DataBaseAdmin dba = new DataBaseAdmin(new File("./data/DataBase.properties"));
 		ResultSet rsLTA = dba.executeQuery("SELECT * FROM BusStops");
 		while(rsLTA.next()) {
@@ -148,6 +149,7 @@ public class PublicRoutesGenerator {
 		BufferedReader reader = new BufferedReader(new FileReader(busStopsFile));
 		reader.readLine();
 		String line = reader.readLine();
+		AddressLocator addressLocator = new AddressLocator();
 		while(line!=null) {
 			String[] busStopParts = line.split(",");
 			String code = null;
@@ -159,9 +161,9 @@ public class PublicRoutesGenerator {
 			String nameAddress = busStopParts[1].replaceAll("'","''");
 			ResultSet rs = dba.executeQuery("SELECT * FROM BusStopsMerge WHERE Code='"+code+"'");
 			if(!rs.next()) {
-				AddressLocator addressLocator = new AddressLocator(busStopParts[1]+", Singapore");
+				addressLocator.locate(busStopParts[1]+", Singapore");
 				Thread.sleep(400);
-				dba.executeStatement("INSERT INTO BusStopsMerge (Code,AddressName,LatitudeTransit,LongitudeTransit) VALUES('"+code+"','"+nameAddress+"',"+addressLocator.getLocation().getLatitude()+","+addressLocator.getLocation().getLongitude()+")");
+				dba.executeStatement("INSERT INTO BusStopsMerge (Code,AddressName,LatitudeTransit,LongitudeTransit) VALUES('"+code+"','"+nameAddress+"',"+addressLocator.getLocation(0).getY()+","+addressLocator.getLocation(0).getX()+")");
 			}
 			else
 				dba.executeUpdate("UPDATE BusStopsMerge SET AddressName='"+nameAddress+"' WHERE Code='"+code+"'");

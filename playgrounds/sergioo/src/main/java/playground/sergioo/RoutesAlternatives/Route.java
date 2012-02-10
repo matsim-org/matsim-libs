@@ -3,7 +3,8 @@ package playground.sergioo.RoutesAlternatives;
 import java.util.ArrayList;
 import java.util.List;
 
-import playground.sergioo.AddressLocator.Location;
+import org.matsim.api.core.v01.Coord;
+
 
 public class Route {
 	
@@ -11,11 +12,11 @@ public class Route {
 	/**
 	 * The initial location
 	 */
-	private Location origin;
+	private Coord origin;
 	/**
 	 * The end location
 	 */
-	private Location destination;
+	private Coord destination;
 	/**
 	 * The legs
 	 */
@@ -32,7 +33,7 @@ public class Route {
 	 * @param distance
 	 * @param totalTime
 	 */
-	public Route(Location origin, Location destination, double totalTime) {
+	public Route(Coord origin, Coord destination, double totalTime) {
 		super();
 		this.origin = origin;
 		this.destination = destination;

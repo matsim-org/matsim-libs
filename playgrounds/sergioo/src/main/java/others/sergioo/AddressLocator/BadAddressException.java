@@ -1,5 +1,6 @@
-package playground.sergioo.NetworkBusLaneAdder.kernel;
+package others.sergioo.AddressLocator;
 
+@SuppressWarnings("serial")
 public class BadAddressException extends Exception {
 	
 	//Methods

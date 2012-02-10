@@ -7,9 +7,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import others.sergioo.AddressLocator.BadAddressException;
 import others.sergioo.util.dataBase.NoConnectionException;
 
-import playground.sergioo.AddressLocator.BadAddressException;
 
 
 

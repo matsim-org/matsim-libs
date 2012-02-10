@@ -78,5 +78,8 @@ public class NetworkTwoNodesPainterManager extends NetworkPainterManager {
 	public void clearNodesSelection() {
 		selectedNodesId.clear();
 	}
+	public void clearLinksSelection() {
+		selectedLinks.clear();
+	}
 
 }

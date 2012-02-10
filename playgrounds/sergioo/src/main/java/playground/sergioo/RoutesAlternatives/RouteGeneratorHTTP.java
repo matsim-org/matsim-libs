@@ -25,13 +25,15 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import playground.sergioo.AddressLocator.BadAddressException;
-import playground.sergioo.AddressLocator.Location;
+import others.sergioo.AddressLocator.BadAddressException;
+
 
 /**
  * Hello world!
@@ -147,8 +149,8 @@ public class RouteGeneratorHTTP {
 		String markersText=allResponse.split("markers:")[1];
 		markersText=markersText.substring(0,markersText.indexOf("]}"));
 		String[] markersParts=markersText.split("latlng:\\{lat:");
-		Location originLocation = new Location(Double.parseDouble(markersParts[1].substring(0,markersParts[1].indexOf(",lng:"))),Double.parseDouble(markersParts[1].substring(markersParts[1].indexOf(",lng:")+5,markersParts[1].indexOf("}"))));
-		Location destinationLocation = new Location(Double.parseDouble(markersParts[2].substring(0,markersParts[2].indexOf(",lng:"))),Double.parseDouble(markersParts[2].substring(markersParts[2].indexOf(",lng:")+5,markersParts[2].indexOf("}"))));
+		Coord originLocation = new CoordImpl(Double.parseDouble(markersParts[1].substring(0,markersParts[1].indexOf(",lng:"))),Double.parseDouble(markersParts[1].substring(markersParts[1].indexOf(",lng:")+5,markersParts[1].indexOf("}"))));
+		Coord destinationLocation = new CoordImpl(Double.parseDouble(markersParts[2].substring(0,markersParts[2].indexOf(",lng:"))),Double.parseDouble(markersParts[2].substring(markersParts[2].indexOf(",lng:")+5,markersParts[2].indexOf("}"))));
 		NodeList results=null;
 		switch(modeOption) {
 		case DRIVING:

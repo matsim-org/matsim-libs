@@ -20,6 +20,7 @@
 
 package playground.sergioo.NetworkBusLaneAdder.gui;
 
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -31,16 +32,26 @@ import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.http.client.ClientProtocolException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.xml.sax.SAXException;
+
+import others.sergioo.AddressLocator.AddressLocator;
+import others.sergioo.AddressLocator.BadAddressException;
 
 import playground.sergioo.NetworkBusLaneAdder.gui.BusLaneAdderWindow.Labels;
 import playground.sergioo.NetworkBusLaneAdder.gui.BusLaneAdderWindow.Options;
@@ -64,10 +75,13 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 	private int iniX;
 	private int iniY;
 	private AStarLandmarks aStarLandmarks;
+	private int posLocation = 0;
+	private AddressLocator addressLocator;
 	
 	//Methods
-	public BusLaneAdderPanel(BusLaneAdderWindow busLaneAdderWindow, NetworkPainter networkPainter, File imageFile, Coord upLeft, Coord downRight) throws IOException {
+	public BusLaneAdderPanel(BusLaneAdderWindow busLaneAdderWindow, NetworkPainter networkPainter, File imageFile, Coord upLeft, Coord downRight, CoordinateTransformation coordinateTransformation) throws IOException {
 		super();
+		addressLocator = new AddressLocator(coordinateTransformation);
 		this.busLaneAdderWindow = busLaneAdderWindow;
 		ImagePainter imagePainter = new ImagePainter(imageFile, this);
 		imagePainter.setImageCoordinates(upLeft, downRight);
@@ -115,8 +129,9 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 		}
 		super.calculateBoundaries(coords);
 	}
-	public void clearNodesSelection() {
+	public void clearSelection() {
 		((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).clearNodesSelection();
+		((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).clearLinksSelection();
 	}
 	public void selectLinks() {
 		((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectLinks(aStarLandmarks);
@@ -206,6 +221,22 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 		case 'v':
 			viewAll();
 			break;
+		case '+':
+			if(addressLocator.getNumResults()>0) {
+				posLocation++;
+				if(posLocation==addressLocator.getNumResults())
+					posLocation = 0;
+				centerCamera(addressLocator.getLocation(posLocation));
+			}
+			break;
+		case '-':
+			if(addressLocator.getNumResults()>0) {
+				posLocation--;
+				if(posLocation<0)
+					posLocation = addressLocator.getNumResults()-1;
+				centerCamera(addressLocator.getLocation(posLocation));
+			}
+			break;
 		}
 		repaint();
 	}
@@ -222,6 +253,37 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 	@Override
 	public void keyReleased(KeyEvent e) {
 		
+	}
+	public void findAddress() {
+		requestFocus();
+		try {
+			addressLocator.locate(JOptionPane.showInputDialog("Insert the desired address")+" Singapore");
+			posLocation = 0;
+			if(addressLocator.getNumResults()>1)
+				JOptionPane.showMessageDialog(this, "Many results: "+addressLocator.getNumResults()+".");
+			try {
+				JOptionPane.showMessageDialog(this, addressLocator.getLocation(posLocation).toString());
+				centerCamera(addressLocator.getLocation(posLocation));
+			} catch (HeadlessException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (BadAddressException e) {
+			JOptionPane.showMessageDialog(this, "No results");
+		}
 	}
 	
 }

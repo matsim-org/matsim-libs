@@ -1,4 +1,4 @@
-package playground.sergioo.NetworkBusLaneAdder.kernel;
+package others.sergioo.AddressLocator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -44,66 +45,46 @@ public class AddressLocator {
 	
 	//Attributes
 	/**
-	 * The address to locate
+	 * Found locations
 	 */
-	private String address;
+	private final List<Coord> locations;
 	/**
-	 * The found location
+	 * The transformation
 	 */
-	private Coord location;
-	/**
-	 * The number of results
-	 */
-	private int numResults;
-	/**
-	 * If the address is already located
-	 */
-	private boolean located;
+	private CoordinateTransformation coordinateTransformation;
 	
 	//Methods
 	/**
 	 * Constructs an address locator given the address
 	 * @param address
+	 * @throws BadAddressException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws IOException 
 	 */
-	public AddressLocator(String address) {
+	public AddressLocator() {
 		super();
-		this.address = address;
-		located = false;
+		locations = new ArrayList<Coord>();
 	}
-	/**
-	 * @return the address
-	 */
-	public String getAddress() {
-		return address;
-	}
-	/**
-	 * @param address the address to set
-	 */
-	public void setAddress(String address) {
-		this.address = address;
-		located = false;
+	public AddressLocator(CoordinateTransformation coordinateTransformation) {
+		super();
+		this.coordinateTransformation = coordinateTransformation;
+		locations = new ArrayList<Coord>();
 	}
 	/**
 	 * @return the coordinates
-	 * @throws Exception if the address is not located yet
 	 */
-	public Coord getLocation() throws Exception {
-		if(located)
-			return location;
+	public Coord getLocation(int pos) {
+		if(coordinateTransformation!=null)
+			return coordinateTransformation.transform(locations.get(pos));
 		else
-			throw new Exception("The address is not located yet.");
+			return locations.get(pos);
 	}
 	/**
-	 * @return the numResults
+	 * @return the numResults or -1 if it's not located yet
 	 */
 	public int getNumResults() {
-		return numResults;
-	}
-	/**
-	 * @return the located
-	 */
-	public boolean isLocated() {
-		return located;
+		return locations.size();
 	}
 	/**
 	 * Locates the address
@@ -115,24 +96,25 @@ public class AddressLocator {
 	 * @throws IllegalStateException 
 	 * @throws BadAddressException 
 	 */
-	public void locate() throws URISyntaxException, ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException, BadAddressException {
-		Document response = getResponse(getRequest());
+	public void locate(String address) throws URISyntaxException, ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException, BadAddressException {
+		Document response = getResponse(getRequest(address));
 		String status = ((Element)response.getElementsByTagName("status").item(0)).getChildNodes().item(0).getNodeValue();
 		if(!status.equals(ADDRESS_STATUS_OK))
 			throw new BadAddressException(status);
 		NodeList results = response.getElementsByTagName("result");
-		numResults = results.getLength();
-		Element coords=((Element)((Element)((Element)results.item(0)).getElementsByTagName("geometry").item(0)).getElementsByTagName("location").item(0));
-		double latitude=Double.parseDouble(coords.getElementsByTagName("lat").item(0).getChildNodes().item(0).getNodeValue());
-		double longitude=Double.parseDouble(coords.getElementsByTagName("lng").item(0).getChildNodes().item(0).getNodeValue());
-		location = new CoordImpl(longitude, latitude);
-		located=true;
+		locations.clear();
+		for(int i=0; i<results.getLength(); i++) {
+			Element coords=((Element)((Element)((Element)results.item(i)).getElementsByTagName("geometry").item(0)).getElementsByTagName("location").item(0));
+			double latitude=Double.parseDouble(coords.getElementsByTagName("lat").item(0).getChildNodes().item(0).getNodeValue());
+			double longitude=Double.parseDouble(coords.getElementsByTagName("lng").item(0).getChildNodes().item(0).getNodeValue());
+			locations.add(new CoordImpl(longitude, latitude));
+		}
 	}
 	/**
 	 * @return The get HTTP protocol request
 	 * @throws URISyntaxException 
 	 */
-	public HttpGet getRequest() throws URISyntaxException {
+	private HttpGet getRequest(String address) throws URISyntaxException {
 		List<NameValuePair> qParams = new ArrayList<NameValuePair>();
 		qParams.add(new BasicNameValuePair("address", address));
 		qParams.add(new BasicNameValuePair("sensor", "false"));
@@ -149,7 +131,7 @@ public class AddressLocator {
 	 * @throws IllegalStateException
 	 * @throws SAXException
 	 */
-	public Document getResponse(HttpGet request) throws ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException {
+	private Document getResponse(HttpGet request) throws ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException {
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpResponse response = httpClient.execute(request);
 		if(response.getStatusLine().getStatusCode()!=HTTP_STATUS_OK)
@@ -169,16 +151,15 @@ public class AddressLocator {
 	 * @throws ParseException 
 	 * @throws Exception 
 	 */
-	public static void main( String[] args ) throws ParseException, ClientProtocolException, IOException {
+	public static void main( String[] args ) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 			System.out.println("Insert the required address:");
-			String address = reader.readLine();
-			AddressLocator ad1 = new AddressLocator(address);
-			ad1.locate();
+			AddressLocator ad1 = new AddressLocator();
+			ad1.locate(reader.readLine());
 			if(ad1.getNumResults()>1)
 				System.out.println("Many results: "+ad1.getNumResults()+".");
-			System.out.println(ad1.getLocation());
+			System.out.println(ad1.getLocation(0));
 		} catch (Exception e) {
 			System.out.println("Error: "+e.getMessage());
 		}

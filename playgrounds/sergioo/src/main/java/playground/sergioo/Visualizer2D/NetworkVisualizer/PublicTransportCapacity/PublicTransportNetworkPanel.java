@@ -29,8 +29,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import javax.swing.JOptionPane;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -38,6 +42,7 @@ import org.matsim.api.core.v01.network.Link;
 import playground.sergioo.Visualizer2D.Camera;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.ImagePainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.PublicTransport.PublicTransportNetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransportCapacity.PublicTransportNetworkWindow.Option;
@@ -70,16 +75,37 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 		addKeyListener(this);
 		setFocusable(true);
 	}
+	public PublicTransportNetworkPanel(PublicTransportNetworkWindow window, NetworkPainter networkPainter, File imageFile, Coord upLeft, Coord downRight) throws IOException {
+		super();
+		this.window = window;
+		ImagePainter imagePainter = new ImagePainter(imageFile, this);
+		imagePainter.setImageCoordinates(upLeft, downRight);
+		addLayer(new Layer(imagePainter, false));
+		addLayer(new Layer(networkPainter), true);
+		this.setBackground(backgroundColor);
+		calculateBoundaries();
+		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		addMouseWheelListener(this);
+		addKeyListener(this);
+		setFocusable(true);
+	}
 	public Camera getCamera() {
 		return camera;
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
-		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
-			if(link!=null) {
-				coords.add(link.getFromNode().getCoord());
-				coords.add(link.getToNode().getCoord());
+		if(getNumLayers()<2)
+			for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
+				if(link!=null) {
+					coords.add(link.getFromNode().getCoord());
+					coords.add(link.getToNode().getCoord());
+				}
 			}
+		else {
+			coords.add(((ImagePainter)getLayer(0).getPainter()).getUpLeft());
+			coords.add(((ImagePainter)getLayer(0).getPainter()).getDownRight());
 		}
 		super.calculateBoundaries(coords);
 	}
@@ -146,6 +172,9 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 			break;
 		case 'g':
 			((PublicTransportNetworkPainter)getPrincipalLayer().getPainter()).setWeight(((PublicTransportNetworkPainter)getPrincipalLayer().getPainter()).getWeight()*1.5f);
+			break;
+		case 'i':
+			saveImage("bmp", new File(JOptionPane.showInputDialog("File location", "./data/test1.bmp")), Integer.parseInt(JOptionPane.showInputDialog("Width", "12040")),  Integer.parseInt(JOptionPane.showInputDialog("Height", "6012")));
 			break;
 		}
 		repaint();
