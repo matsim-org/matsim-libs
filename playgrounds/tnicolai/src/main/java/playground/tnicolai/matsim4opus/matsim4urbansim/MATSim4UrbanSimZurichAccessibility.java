@@ -33,10 +33,8 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
-import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesIVTCHNetwork;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 
 import com.vividsolutions.jts.geom.Geometry;

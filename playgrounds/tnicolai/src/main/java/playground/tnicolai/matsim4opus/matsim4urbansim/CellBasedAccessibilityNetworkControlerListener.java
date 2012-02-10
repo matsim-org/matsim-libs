@@ -115,7 +115,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 	
 	private String fileExtension = "networkBoundary";
 	
-	private int csvID = -1;
+//	private int csvID = -1;
 	
 	/**
 	 * constructor

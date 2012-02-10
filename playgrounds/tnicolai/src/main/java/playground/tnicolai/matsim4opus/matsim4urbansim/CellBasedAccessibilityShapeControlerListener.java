@@ -115,7 +115,7 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 	
 	private String fileExtension = "shapeFileBoundary";
 	
-	private int csvID = -1;
+//	private int csvID = -1;
 	
 	/**
 	 * constructor
