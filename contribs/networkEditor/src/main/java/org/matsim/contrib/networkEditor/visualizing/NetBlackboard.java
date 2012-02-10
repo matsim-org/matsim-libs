@@ -250,55 +250,69 @@ public class NetBlackboard extends javax.swing.JPanel {
         setBackground(java.awt.Color.white);
         setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         addMouseWheelListener(new java.awt.event.MouseWheelListener() {
-            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+            @Override
+						public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
                 formMouseWheelMoved(evt);
             }
         });
         addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            @Override
+						public void mouseClicked(java.awt.event.MouseEvent evt) {
                 clickEvent(evt);
             }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
+            @Override
+						public void mouseEntered(java.awt.event.MouseEvent evt) {
                 formMouseEntered(evt);
             }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
+            @Override
+						public void mouseExited(java.awt.event.MouseEvent evt) {
                 formMouseExited(evt);
             }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
+            @Override
+						public void mousePressed(java.awt.event.MouseEvent evt) {
                 formMousePressed(evt);
             }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
+            @Override
+						public void mouseReleased(java.awt.event.MouseEvent evt) {
                 formMouseReleased(evt);
             }
         });
         addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
+            @Override
+						public void componentResized(java.awt.event.ComponentEvent evt) {
                 formComponentResized(evt);
             }
         });
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
+            @Override
+						public void mouseDragged(java.awt.event.MouseEvent evt) {
                 formMouseDragged(evt);
             }
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
+            @Override
+						public void mouseMoved(java.awt.event.MouseEvent evt) {
                 formMouseMoved(evt);
             }
         });
         addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
-            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
+            @Override
+						public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
             }
-            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
+            @Override
+						public void ancestorResized(java.awt.event.HierarchyEvent evt) {
                 antecestorResized(evt);
             }
         });
         addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
+            @Override
+						public void keyPressed(java.awt.event.KeyEvent evt) {
                 formKeyPressed(evt);
             }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
+            @Override
+						public void keyReleased(java.awt.event.KeyEvent evt) {
                 formKeyReleased(evt);
             }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
+            @Override
+						public void keyTyped(java.awt.event.KeyEvent evt) {
                 formKeyTyped(evt);
             }
         });
@@ -308,7 +322,8 @@ public class NetBlackboard extends javax.swing.JPanel {
         capacityToggle.setToolTipText("Show Capacities");
         capacityToggle.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         capacityToggle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 capacityToggleActionPerformed(evt);
             }
         });
@@ -324,7 +339,8 @@ public class NetBlackboard extends javax.swing.JPanel {
         nameLabel.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
         nameLabel.setText(" ");
         nameLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            @Override
+						public void mouseClicked(java.awt.event.MouseEvent evt) {
                 nameLabelMouseClicked(evt);
             }
         });
@@ -337,7 +353,8 @@ public class NetBlackboard extends javax.swing.JPanel {
         btnTolerance.setMinimumSize(new java.awt.Dimension(15, 15));
         btnTolerance.setPreferredSize(new java.awt.Dimension(15, 15));
         btnTolerance.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnToleranceActionPerformed(evt);
             }
         });
@@ -350,7 +367,8 @@ public class NetBlackboard extends javax.swing.JPanel {
         jButton2.setMinimumSize(new java.awt.Dimension(15, 15));
         jButton2.setPreferredSize(new java.awt.Dimension(15, 15));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
@@ -443,18 +461,18 @@ public class NetBlackboard extends javax.swing.JPanel {
 			} else if(actualMode == Mode.PAINTING) {
 				if(line.active == false) {
 					Coord c = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
-					LinkNodeCoord lnc = setLinePointForceNode(c);
+					LinkNodeCoord lnc = setLinePoint(c);
 					line.start = inverseTransform(lnc.coord);
-					line.linkClosestToStart = lnc.link;
+					line.linkClosestToStart = null;//lnc.link;
 					line.nodeClosestToStart = lnc.node;
 					//System.out.println(line.start);
 					line.active = true;
 				} else {
 					Coord c = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
-					LinkNodeCoord lnc = setLinePointForceNode(c);
+					LinkNodeCoord lnc = setLinePoint(c);
 					line.end = lnc.coord;
 					line.start = transform(line.start);
-					line.linkClosestToEnd = lnc.link;
+					line.linkClosestToEnd = null;//lnc.link;
 					line.nodeClosestToEnd = lnc.node;
 					createLink(line);
 					line = new LineOnBoard();
