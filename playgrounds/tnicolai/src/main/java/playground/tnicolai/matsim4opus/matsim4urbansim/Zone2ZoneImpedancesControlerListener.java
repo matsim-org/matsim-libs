@@ -147,7 +147,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					double travelCost_util = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getCost();
 					if(travelCost_util < 1.2)
 						travelCost_util = 1.2;
-					// get travel distance (link lengths in meter)
+					// get walk travel time (link lengths in meter)
 					double walkTravelTime_min = lcptWalkTime.getTree().get( toNode.getId() ).getCost() / 60.;
 					if(walkTravelTime_min < 1.2)
 						walkTravelTime_min = 1.2;

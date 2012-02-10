@@ -166,11 +166,11 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 					double freespeedTravelTime_min = lcptFreespeedTravelTime.getTree().get( nodeID ).getCost() / 60.;
 					// walk travel times in minutes
 					double walkTravelTime_min = lcptWalkTime.getTree().get( nodeID ).getCost() / 60.;
-					
+
 					// sum congested travel times
-					congestedTravelTimesCarSum += Math.exp( betaCarMin * (congestedTravelTime_min + walkTimeOffset_min) ) * jobWeight;
+					congestedTravelTimesCarSum += Math.exp( (betaCarMin * congestedTravelTime_min) + (betaWalkMin * walkTimeOffset_min) ) * jobWeight;
 					// sum freespeed travel times
-					freespeedTravelTimesCarSum += Math.exp( betaCarMin * (freespeedTravelTime_min + walkTimeOffset_min) ) * jobWeight;
+					freespeedTravelTimesCarSum += Math.exp( (betaCarMin * freespeedTravelTime_min) + (betaWalkMin * walkTimeOffset_min) ) * jobWeight;
 					// sum walk travel times (substitute for distances)
 					travelTimesWalkSum 		   += Math.exp( betaWalkMin * (walkTravelTime_min + walkTimeOffset_min) ) * jobWeight;
 				}
