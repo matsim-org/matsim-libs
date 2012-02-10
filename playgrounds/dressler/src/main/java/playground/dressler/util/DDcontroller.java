@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -39,8 +38,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.run.OTFVis;
-import org.matsim.vis.otfvis.OTFEvent2MVI;
 
 
 public class DDcontroller {
@@ -65,8 +62,6 @@ public class DDcontroller {
 
 		boolean testplans = false; // FIXME !
 		boolean dosim = true;
-		boolean otfvis = true;
-		boolean netvis = false & (!otfvis);
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -130,19 +125,6 @@ public class DDcontroller {
 
 			eventWriter.closeFile();
 			System.out.println("Simulation done.");
-		}
-
-		if (otfvis) {
-			String eventFile = "./output/events.txt";
-			OTFEvent2MVI.convert(new QSimConfigGroup(), scenario.getNetwork(), eventFile, "./output/otfvis.mvi", 60);
-
-			String[] visargs = {"./output/otfvis.mvi"};
-			OTFVis.main(visargs);
-		}
-
-		if (netvis) {
-			String[] visargs = {"./output/simout"};
-			// NetVis.main(visargs);
 		}
 
 		System.out.println("Done.");

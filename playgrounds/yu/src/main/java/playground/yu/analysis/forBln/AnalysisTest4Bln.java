@@ -216,8 +216,11 @@ public class AnalysisTest4Bln implements Analysis4Bln {
 			sr.close();
 			sw2.close();
 
+			if (sc.getConfig().getQSimConfigGroup() == null) {
+				sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+			}
 
-			OTFEvent2MVI.convert(new QSimConfigGroup(), sc.getNetwork(), eventsOutputFilename,
+			OTFEvent2MVI.convert(sc, eventsOutputFilename,
 					eventsFilename.split("events.txt.gz")[0]
 					          							+ (scenario.equals("normal") ? "" : scenario + ".")
 					          							+ "otfvis.mvi", Integer

@@ -49,8 +49,11 @@ public class CommuterGenerator {
 	public static void main(String[] args) throws Exception {
 		
 		String networkFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
+//		String populationOutputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/" 
+//				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage_landuse/";
 		String populationOutputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/" 
-				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage_landuse/";
+				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage/";
+
 		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_car_only.xml.gz";
 //		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_all_modes.xml.gz";
 		IOUtils.initOutputDirLogging(populationOutputDirectory, null);
@@ -77,9 +80,9 @@ public class CommuterGenerator {
 		CommuterDemandWriter cdw = new CommuterDemandWriter(gemeindenFeatures, gemeindenReader.getCoordinateSystem(), 
 				cdr.getCommuterRelations(), MGC.getCRS(TransformationFactory.WGS84_UTM33N));
 		//landuse
-		cdw.addLanduse("home", homeLanduse);
-		cdw.addLanduse("work", workLanduse);
-		
+//		cdw.addLanduse("home", homeLanduse);
+//		cdw.addLanduse("work", workLanduse);
+//		
 		cdw.setScalefactor(1.0); // all modes
 		cdw.setScalefactor(0.55); //car mode share
 //		cdw.setScalefactor(0.1); //testing
