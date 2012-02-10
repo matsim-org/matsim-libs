@@ -773,11 +773,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
-//			snapshotInfoBuilder.addVehiclePositions(QLinkImpl.this, positions, QLinkImpl.this.buffer, QLinkImpl.this.vehQueue,
-//					QLinkImpl.this.holes, QLinkImpl.this.getLink().getLength(), 0.0, null);
-
-			
-			//new code
 			double numberOfVehiclesDriving = QLinkImpl.this.buffer.size() + QLinkImpl.this.vehQueue.size();
 			if (numberOfVehiclesDriving > 0) {
 				double now = QLinkImpl.this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
@@ -797,8 +792,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				}
 			}
 			
-			
-			//old code to keep
 			
 			int cnt2 = 10 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// initialize a bit away from the lane
