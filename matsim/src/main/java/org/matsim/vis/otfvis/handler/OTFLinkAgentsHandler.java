@@ -57,10 +57,6 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 
 		private static final long serialVersionUID = -7916541567386865404L;
 
-		private static OTFVisConfigGroup otfVisConfig = null ;
-		private static boolean first = true ;
-
-
 
 		/** 
 		 * Hui, warum ist das denn statisch? Damit nicht fuer jeden Writer und damit fuer jeden Link eine eigene
@@ -74,17 +70,6 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-			if ( first ) {
-				// there is sometimes a null pointer exception (e.g. in testConvert in OTFVisTest), and I don't know
-				// when and where this is set and when not.  Thus this hack ...  Please do better if you know better. 
-				// kai, jun'11
-				first = false ;
-				if ( OTFClientControl.getInstance()!=null ) {
-					if ( OTFClientControl.getInstance().getOTFVisConfig()!=null ) {
-						otfVisConfig = OTFClientControl.getInstance().getOTFVisConfig() ;
-					}
-				}
-			}
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
 			//subtract minEasting/Northing somehow!
@@ -95,21 +80,15 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 			out.putFloat((float) linkStart.y);
 			out.putFloat((float) linkEnd.x); 
 			out.putFloat((float) linkEnd.y);
-			if ( otfVisConfig != null ) {
-				if ( OTFVisConfigGroup.NUMBER_OF_LANES.equals(otfVisConfig.getLinkWidthIsProportionalTo()) ) {
+				if ( OTFVisConfigGroup.NUMBER_OF_LANES.equals(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidthIsProportionalTo()) ) {
 					out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
-				} else if ( OTFVisConfigGroup.CAPACITY.equals(otfVisConfig.getLinkWidthIsProportionalTo()) ) {
+				} else if ( OTFVisConfigGroup.CAPACITY.equals(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidthIsProportionalTo()) ) {
 					out.putInt( 1 + (int)(2.*this.src.getLink().getCapacity()/3600.) ) ;
 					// yyyyyy 3600. is a magic number but I cannot get to the network (where "capacityPeriod" resides).  
 					// Please do better if you know better.  kai, jun'11
 				} else {
 					throw new RuntimeException("I do not understand.  Aborting ..." ) ;
 				}
-			} else {
-				out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
-			}
-
-
 		}
 
 		@Override

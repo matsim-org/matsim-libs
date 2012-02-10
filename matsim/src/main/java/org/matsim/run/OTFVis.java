@@ -59,6 +59,7 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
@@ -264,6 +265,7 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		OTFClientControl.getInstance().setOTFVisConfig(scenario.getConfig().otfVis());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		OTFEvent2MVI.convert(new QSimConfigGroup(), scenario.getNetwork(), eventFile, mviFile, snapshotPeriod);
 	}

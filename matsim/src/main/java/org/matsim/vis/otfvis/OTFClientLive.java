@@ -90,7 +90,7 @@ public class OTFClientLive {
 				if (visconf == null) {
 					visconf = server.getOTFVisConfig();
 				}
-				OTFClientControl.getInstance().setOTFVisConfig(visconf);
+				OTFClientControl.getInstance().setOTFVisConfig(visconf); // has to be set before OTFClientQuadTree.getConstData() is invoked!
 				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
 				clientQuadTree.setConnectionManager(connectionManager);
@@ -125,6 +125,7 @@ public class OTFClientLive {
 				256, true, true,
 				"http://tile.openstreetmap.org",
 				"x","y","z") {
+			@Override
 			public String getTileUrl(int x, int y, int zoom) {
 				zoom = max-zoom;
 				String url = this.baseURL +"/"+zoom+"/"+x+"/"+y+".png";
