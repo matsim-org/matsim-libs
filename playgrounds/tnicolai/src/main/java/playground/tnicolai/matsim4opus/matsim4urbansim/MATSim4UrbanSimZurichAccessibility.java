@@ -163,7 +163,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 		
 		// tnicolai: make this configurable 
 		boolean computeGridBasedAccessibilitiesShapeFile = true;
-		boolean computeGridBasedAccessibilitiesNetwork 	 = true;
+		boolean computeGridBasedAccessibilitiesNetwork 	 = false; // tnicolai: this leads to an "out of memory" issue even with moderate resolutions with 1000meter and -Xmx5000m
 		
 		// The following lines register what should be done _after_ the iterations are done:
 		
