@@ -41,12 +41,12 @@ public class ExternalControler {
 	
 	private final static Logger log = Logger.getLogger(ExternalControler.class);
 	
-	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/network80links.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/population1agent.xml";
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/withTimeChoice_test";
-	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 1;
+	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network80links.xml";
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/populationBusCorridor80linksCar.xml";
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/withTimeChoice_busNumber_fare2";
+	static int lastExternalIteration = 20;
+	static int lastInternalIteration = 100;
 	
 	// settings for first iteration or if values not changed for all iterations
 	TimePeriod p1 = new TimePeriod(1, "DAY", 1, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
@@ -56,7 +56,7 @@ public class ExternalControler {
 //	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 4, 21*3600, 23*3600);
 
 	private final double MONEY_UTILS = 0.14026; // has to be positive, because costs are negative!
-	private double fare = -3.2; // negative!
+	private double fare = -2; // negative!
 	private int capacity = 50; // standing room + seats (realistic values between 19 and 101!)
 
 	private int extItNr;
@@ -151,7 +151,7 @@ public class ExternalControler {
 			// settings for next external iteration	
 			if (this.getExtItNr() < lastExternalIteration){
 				
-//				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
+				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
 //				
 //				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
 //				this.setDay(increaseBuses("HVZ_2", 1)); // id, number of buses
