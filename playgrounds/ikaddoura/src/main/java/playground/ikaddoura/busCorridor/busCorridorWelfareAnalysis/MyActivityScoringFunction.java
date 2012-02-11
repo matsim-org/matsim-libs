@@ -184,10 +184,10 @@ public class MyActivityScoringFunction implements ActivityScoring, BasicScoring 
 						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration());
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;	
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-				log.info("Activity: "+act+" / Duration: "+Time.writeTime(duration, Time.TIMEFORMAT_HHMMSS)+" / Score: "+utilPerf);
+//				log.info("Activity: "+act+" / Duration: "+Time.writeTime(duration, Time.TIMEFORMAT_HHMMSS)+" / Score: "+utilPerf);
 				
 			} else {
-				log.info("Not scored: "+act);
+//				log.info("Not scored: "+act);
 			}
 				
 		} else {
