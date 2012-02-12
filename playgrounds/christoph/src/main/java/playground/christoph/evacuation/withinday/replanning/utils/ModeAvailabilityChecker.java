@@ -21,64 +21,38 @@
 package playground.christoph.evacuation.withinday.replanning.utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.households.Household;
+
+import playground.christoph.evacuation.mobsim.VehiclesTracker;
 
 /**
  * Checks whether a car is available for an agent or not.
- * The position of each agent's car is logged.
  * 
  * @author cdobler
  */
-public class ModeAvailabilityChecker implements AgentDepartureEventHandler, 
-	PersonEntersVehicleEventHandler, ActivityStartEventHandler, SimulationInitializedListener {
+public class ModeAvailabilityChecker {
 
 	private final Scenario scenario;
-	private final double maxDistance;
-	private final Set<Id> drivers;
-	private final Map<Id, Id> driverVehicleMapping;		// <PersonId, VehicleId>
-	private final Map<Id, Coord> vehicleCoordinates;	// <VehicleId, Coordinate>
+	private final VehiclesTracker vehiclesTracker;
 	
 	/**
 	 * @param scenario the simulated scenario
-	 * @param maxDistance the maximum distance [m] that we allow to be between an agent and its car
 	 */
-	public ModeAvailabilityChecker(Scenario scenario, double maxDistance) {
+	public ModeAvailabilityChecker(Scenario scenario, VehiclesTracker vehiclesTracker) {
 		this.scenario = scenario;
-		this.maxDistance = maxDistance;
-		
-		this.drivers = new HashSet<Id>();
-		this.vehicleCoordinates = new HashMap<Id, Coord>();
-		this.driverVehicleMapping = new HashMap<Id, Id>();
-	}
+		this.vehiclesTracker = vehiclesTracker;
+ 	}
 	
 	/**
 	 * Returns true, if the given person has a driving license, otherwise false.
@@ -109,16 +83,15 @@ public class ModeAvailabilityChecker implements AgentDepartureEventHandler,
 	 */
 	public List<Id> getAvailableCars(Household household, Id facilityId) {
 		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
-		Coord facilityCoord = facility.getCoord();
 		
 		List<Id> vehicles = household.getVehicleIds();
 				
 		List<Id> availableVehicles = new ArrayList<Id>();
 		
 		for (Id vehicleId : vehicles) {
-			Coord carCoord = this.vehicleCoordinates.get(vehicleId);
-			if (carCoord == null) continue;
-			else if (CoordUtils.calcDistance(facilityCoord, carCoord) <= this.maxDistance) {
+			Id carLinkId = this.vehiclesTracker.getParkedVehicles().get(vehicleId);
+			if (carLinkId == null) continue;
+			else if (carLinkId.equals(facility.getLinkId())) {
 				availableVehicles.add(vehicleId);
 			}
 		}
@@ -129,35 +102,31 @@ public class ModeAvailabilityChecker implements AgentDepartureEventHandler,
 	/**
 	 * @param personId Id of the person to check
 	 * @param facilityId Id of the facility where the person performs an activity
-	 * @return true if the person has a car available within the pre-defined maxDistance, otherwise false
+	 * @return true if the person has a car available on the same link where the activity is performed, otherwise false
 	 */
-	public boolean isCarAvailable(Id personId, Id facilityId) {
-		
-		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
-		if (facility == null) return false;
-		else return this.isCarAvailable(personId, facility.getCoord());
-	}
+//	public boolean isCarAvailable(Id personId, Id facilityId) {
+//		
+//		Id vehicleId = this.driverVehicleMapping.get(personId);
+//		if (vehicleId == null) return false;
+//		
+//		Id vehicleLinkId = this.vehiclePositions.get(vehicleId);
+//		if (vehicleLinkId == null) return false;
+//				
+//		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+//		if (facility == null) return false;
+//		else return vehicleId.equals(facility.getLinkId());
+//	}
 	
-	/**
-	 * @param personId Id of the person to check
-	 * @param coord current position of the person
-	 * @return true if the person has a car available within the pre-defined maxDistance, otherwise false
-	 */
-	public boolean isCarAvailable(Id personId, Coord coord) {
-		Id vehicleId = this.driverVehicleMapping.get(personId);
-		Coord carCoord = this.vehicleCoordinates.get(vehicleId);
-		if (carCoord == null) return false;
-		else return CoordUtils.calcDistance(coord, carCoord) <= this.maxDistance;
-	}
-	
-	/**
-	 * @param personId
-	 * @return the coordinates of the car of the given person or false if the person has no car available
-	 */
-	public Coord getCarCoord(Id personId) {
-		Id vehicleId = this.driverVehicleMapping.get(personId);
-		return vehicleCoordinates.get(vehicleId);
-	}
+//	/**
+//	 * @param personId Id of the person to check
+//	 * @param facility ActivityFacility where the person currently performs an Activity
+//	 * @return true if the person has a car available on the link where the ActivityFacility is attached to, otherwise false
+//	 */
+//	public boolean isCarAvailable(Id personId, ActivityFacility facility) {
+//		Id vehicleId = this.driverVehicleMapping.get(personId);
+//		Id linkId = facility.getLinkId();
+//		return vehicleId.equals(linkId);
+//	}
 	
 	/**
 	 * By default we try to use a car. We can do this, if the previous or the next 
@@ -167,16 +136,27 @@ public class ModeAvailabilityChecker implements AgentDepartureEventHandler,
 	 * 
 	 * @param currentActivityIndex index of an activity
 	 * @param plan an agents plan plan
+	 * @param possibleVehicleId id of a vehicle that the agent might use
 	 */
-	public String identifyTransportMode(int currentActivityIndex, Plan plan) {
-
+	public String identifyTransportMode(int currentActivityIndex, Plan plan, Id possibleVehicleId) {
 		/*
 		 * check whether the agent has a car available.
 		 */
 		Activity currentActivity = (Activity) plan.getPlanElements().get(currentActivityIndex);
-		Coord coord = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(currentActivity.getFacilityId()).getCoord();
-		boolean carAvilable = this.isCarAvailable(plan.getPerson().getId(), coord);
-		if (carAvilable) return TransportMode.car;
+		boolean carAvailable = false;
+
+		// Check whether a vehicleId was found.
+		if (possibleVehicleId != null) {
+			// Check whether the vehicle is currently parked.
+			Id linkId = this.vehiclesTracker.getParkedVehicles().get(possibleVehicleId);
+			
+			if (linkId != null) {
+				// Check whether the vehicle is parked at the same link where the agent performs its activity.
+				if (linkId.equals(currentActivity.getLinkId())) carAvailable = true;
+			}
+		}
+//		boolean carAvilable = this.isCarAvailable(plan.getPerson().getId(), currentActivity.getFacilityId());
+		if (carAvailable) return TransportMode.car;
 		
 		/*
 		 * Otherwise check for the other modes 
@@ -205,71 +185,6 @@ public class ModeAvailabilityChecker implements AgentDepartureEventHandler,
 		else if (hasPt) return TransportMode.pt;
 		else if (hasBike) return TransportMode.bike;
 		else return TransportMode.walk;
-	}
-	
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		Id vehicleId = driverVehicleMapping.get(event.getPersonId());
-		if (event.getLegMode().equals(TransportMode.car)) {
-			this.vehicleCoordinates.remove(vehicleId);
-			this.drivers.add(event.getPersonId());
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (drivers.contains(event.getPersonId())) {
-			driverVehicleMapping.put(event.getPersonId(), event.getVehicleId());		
-		}
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		/*
-		 * If the agent has just arrived from a car trip (and was the car's driver),
-		 * we set the car's position to  the position of the agent's current facility.
-		 */
-		if (drivers.remove(event.getPersonId())) {	
-			driverVehicleMapping.remove(event.getPersonId());
-			vehicleCoordinates.put(event.getPersonId(), ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord());
-		}
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		this.drivers.clear();
-		this.vehicleCoordinates.clear();
-		this.driverVehicleMapping.clear();
-	}
-
-	/*
-	 * Get the initial coordinates of the agents cars.
-	 */
-	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
-		Coord activityCoord = null;
-		
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
-				if (planElement instanceof Activity) {
-					Id facilityId = ((Activity) planElement).getFacilityId();
-					activityCoord = facilities.getFacilities().get(facilityId).getCoord();
-				} else if (planElement instanceof Leg) {
-					/*
-					 * If its a car leg, then we assume that the car is located
-					 * at the coordinate of the previous activity.
-					 */
-					Leg leg = (Leg) planElement;
-					if (leg.getMode().equals(TransportMode.car)) {
-						NetworkRoute route = (NetworkRoute) leg.getRoute();
-						vehicleCoordinates.put(route.getVehicleId(), activityCoord);
-						break;
-					}
-				}
-			}
-		}
 	}
 
 }

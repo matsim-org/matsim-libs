@@ -86,6 +86,11 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	/*package*/ double personFactor = 1.0;	// includes scatter, age and gender
 	private double personWalkSpeed;
 	
+	private boolean warnLinkLength;
+	private boolean warnGender;
+	private boolean warnSlope;
+	private boolean warnAge;
+	
 	private int linkLengthWarnCount = 0;
 	private int genderWarnCount = 0;
 	private int slopeWarnCount = 0;
@@ -150,22 +155,34 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	
 	private void incLinkLengthWarnCount(String text) {
 		linkLengthWarnCount++;
-		printWarning(text, linkLengthWarnCount);
+		if (warnLinkLength) {
+			printWarning(text, linkLengthWarnCount);
+			if (linkLengthWarnCount >= 10) warnLinkLength = false;
+		}
 	}
 
 	private void incGendereWarnCount(String text) {
 		genderWarnCount++;
-		printWarning(text, genderWarnCount);
+		if (warnLinkLength) {
+			printWarning(text, genderWarnCount);
+			if (genderWarnCount >= 10) warnLinkLength = false;
+		}
 	}
 	
 	private void incSlopeWarnCount(String text) {
 		slopeWarnCount++;
-		printWarning(text, slopeWarnCount);
+		if (warnLinkLength) {
+			printWarning(text, slopeWarnCount);
+			if (slopeWarnCount >= 10) warnLinkLength = false;
+		}
 	}
 	
 	private void incAgeWarnCount(String text) {
 		ageWarnCount++;
-		printWarning(text, ageWarnCount);
+		if (warnLinkLength) {
+			printWarning(text, ageWarnCount);
+			if (ageWarnCount >= 10) warnLinkLength = false;
+		}
 	}
 	
 	private void printWarning(String text, int count) {

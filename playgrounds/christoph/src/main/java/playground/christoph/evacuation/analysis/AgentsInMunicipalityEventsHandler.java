@@ -285,7 +285,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		Id linkId = event.getLinkId();
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		
-		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
+		boolean isInside = coordAnalyzer.isLinkAffected(link);
 		
 		if (isInside) insideAgents.remove(event.getPersonId());
 	}
@@ -297,7 +297,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		Id linkId = event.getLinkId();
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		
-		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
+		boolean isInside = coordAnalyzer.isLinkAffected(link);
 		
 		if (isInside) insideAgents.add(event.getPersonId());
 	}
@@ -322,7 +322,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		Id linkId = event.getLinkId();
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		
-		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
+		boolean isInside = coordAnalyzer.isLinkAffected(link);
 		
 		if (isInside) insideAgents.add(event.getPersonId());
 	}

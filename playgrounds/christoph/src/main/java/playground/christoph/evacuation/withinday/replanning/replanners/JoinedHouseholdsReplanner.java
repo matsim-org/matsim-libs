@@ -53,7 +53,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsReplanner.class);
 	
-	private static final String activityType = "rescue";
+	public static final String activityType = "rescue";
 	
 	private final HouseholdsUtils householdsUtils;
 	private final JoinedHouseholdsIdentifier identifier;

@@ -43,7 +43,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  * Based on a random number it is decided whether the car or non-car trips are replaced.
  * The maxDistance parameter defines how far a agent is willing to walk to reach its
- * parked car. 
+ * parked car.
  * 
  * It is assumed that cars are parked at an agents home location at the beginning of each day.
  * 

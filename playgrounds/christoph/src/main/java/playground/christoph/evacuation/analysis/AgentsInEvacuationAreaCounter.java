@@ -162,7 +162,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			passengerSet = legAgentsInEvacuationArea.get(PassengerDepartureHandler.passengerTransportMode);
 		}
 		
-		if (this.coordAnalyzer.isCoordAffected(link.getCoord())) {
+		if (this.coordAnalyzer.isLinkAffected(link)) {
 			set.add(event.getPersonId());
 			if (passengers != null) {
 				for (Id passengerId : passengers) passengerSet.add(passengerId);
@@ -223,7 +223,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 		Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
 		Set<Id> set = legAgentsInEvacuationArea.get(transportMode);
-		if (this.coordAnalyzer.isCoordAffected(link.getCoord())) {
+		if (this.coordAnalyzer.isLinkAffected(link)) {
 			set.add(event.getPersonId());
 		}
 	}

@@ -24,7 +24,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 
-import playground.christoph.evacuation.mobsim.PassengerTracker;
+import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
@@ -35,22 +35,22 @@ public class JoinedHouseholdsIdentifierFactory implements DuringActivityIdentifi
 	private final HouseholdsUtils householdUtils;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
-	private final PassengerTracker passengerTracker;
+	private final VehiclesTracker vehiclesTracker;
 	
 	public JoinedHouseholdsIdentifierFactory(Vehicles vehicles, HouseholdsUtils householdUtils, 
 			SelectHouseholdMeetingPoint selectHouseholdMeetingPoint, ModeAvailabilityChecker modeAvailabilityChecker, 
-			PassengerTracker passengerTracker) {
+			VehiclesTracker vehiclesTracker) {
 		this.vehicles = vehicles;
 		this.householdUtils = householdUtils;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
-		this.passengerTracker = passengerTracker;
+		this.vehiclesTracker = vehiclesTracker;
 	}
 	
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(vehicles, householdUtils, selectHouseholdMeetingPoint, 
-				modeAvailabilityChecker, passengerTracker);
+				modeAvailabilityChecker, vehiclesTracker);
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}

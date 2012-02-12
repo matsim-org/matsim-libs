@@ -105,7 +105,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, Activi
 	 */
 	private void getAffectedLinksAndFacilities() {
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			if (coordAnalyzer.isCoordAffected(link.getCoord())) affectedLinks.add(link.getId());
+			if (coordAnalyzer.isLinkAffected(link)) affectedLinks.add(link.getId());
 		}
 		log.info("Found " + affectedLinks.size() + " links in affected area.");
 		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {

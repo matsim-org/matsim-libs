@@ -20,29 +20,28 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
+
 public class InsecureLegPerformingIdentifierFactory implements DuringLegIdentifierFactory {
 
-	private LinkReplanningMap linkReplanningMap;
-	private Coord centerCoord;
-	private double secureDistance;
-	private Network network;
+	private final LinkReplanningMap linkReplanningMap;
+	private final Network network;
+	private final CoordAnalyzer coordAnalyzer;
 	
-	public InsecureLegPerformingIdentifierFactory(LinkReplanningMap linkReplanningMap, Network network, Coord centerCoord, double secureDistance) {
+	public InsecureLegPerformingIdentifierFactory(LinkReplanningMap linkReplanningMap, Network network, CoordAnalyzer coordAnalyzer) {
 		this.linkReplanningMap = linkReplanningMap;
 		this.network = network;
-		this.centerCoord = centerCoord;
-		this.secureDistance = secureDistance;
+		this.coordAnalyzer = coordAnalyzer;
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new InsecureLegPerformingIdentifier(linkReplanningMap, network, centerCoord, secureDistance);
+		DuringLegIdentifier identifier = new InsecureLegPerformingIdentifier(linkReplanningMap, network, coordAnalyzer);
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}

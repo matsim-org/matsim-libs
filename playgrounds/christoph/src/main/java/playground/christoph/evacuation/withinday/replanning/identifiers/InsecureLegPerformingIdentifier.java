@@ -24,54 +24,43 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 
 public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 	
 	private static final Logger log = Logger.getLogger(InsecureLegPerformingIdentifier.class);
 	
-	protected LinkReplanningMap linkReplanningMap;
-	protected Coord centerCoord;
-	protected double secureDistance;
-	protected Network network;
+	private final LinkReplanningMap linkReplanningMap;
+	private final CoordAnalyzer coordAnalyzer;
+	private final Network network;	
 	
-	
-	/*package*/ InsecureLegPerformingIdentifier(LinkReplanningMap linkReplanningMap, Network network, Coord centerCoord, double secureDistance) {
+	/*package*/ InsecureLegPerformingIdentifier(LinkReplanningMap linkReplanningMap, Network network, CoordAnalyzer coordAnalyzer) {
 		this.linkReplanningMap = linkReplanningMap;
 		this.network = network;
-		this.centerCoord = centerCoord;
-		this.secureDistance = secureDistance;
+		this.coordAnalyzer = coordAnalyzer;
 	}
 	
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 		Set<PlanBasedWithinDayAgent> legPerformingAgents =  linkReplanningMap.getLegPerformingAgents();
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
-		for (MobsimAgent personAgent : legPerformingAgents) {			
-			/*
-			 * Remove the Agent from the list, if the current Link is in an secure Area.
-			 */
+		for (MobsimAgent personAgent : legPerformingAgents) {
 			Link currentLink = this.network.getLinks().get(personAgent.getCurrentLinkId());
-			double distanceToStartNode = CoordUtils.calcDistance(currentLink.getFromNode().getCoord(), centerCoord);
-			double distanceToEndNode = CoordUtils.calcDistance(currentLink.getToNode().getCoord(), centerCoord);
-			if (distanceToStartNode > secureDistance && distanceToEndNode > secureDistance) {
-				continue;
-			}
+			boolean isAffected = this.coordAnalyzer.isLinkAffected(currentLink);
 			
 			/*
-			 * Add the Agent to the Replanning List
+			 * If the agent is affected, add it to the replanning list.
 			 */
-			agentsToReplan.add((PlanBasedWithinDayAgent)personAgent);
+			if (isAffected) agentsToReplan.add((PlanBasedWithinDayAgent) personAgent);
 		}
 		if (time == EvacuationConfig.evacuationTime) log.info("Found " + agentsToReplan.size() + " Agents performing a Leg in an insecure area.");
 		

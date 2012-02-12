@@ -31,11 +31,11 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	public final static String passengerTransportMode = "ride_passenger";
 	
 	private final EventsManager eventsManager;
-	private final PassengerTracker passengerTracker;
+	private final VehiclesTracker vehiclesTracker;
 	
-	public PassengerDepartureHandler(EventsManager eventsManager, PassengerTracker passengerTracker) {
+	public PassengerDepartureHandler(EventsManager eventsManager, VehiclesTracker vehiclesTracker) {
 		this.eventsManager = eventsManager;
-		this.passengerTracker = passengerTracker;
+		this.vehiclesTracker = vehiclesTracker;
 	}
 	
 	@Override
@@ -44,10 +44,31 @@ public class PassengerDepartureHandler implements DepartureHandler {
 			if (agent instanceof MobsimDriverAgent) {
 				
 				// create PersonEntersVehicleEvent
-				Id vehicleId = passengerTracker.getPassengersVehicle(agent.getId());
+				Id vehicleId = null;
+				Id passengerVehicleId = vehiclesTracker.getPassengersVehicle(agent.getId());
+				Id plannedVehicleId = vehiclesTracker.getPlannedPickupVehicles().remove(agent.getId());
+				
+				if (passengerVehicleId != null && plannedVehicleId != null) {
+					throw new RuntimeException("Person was registered as Passenger in a vehicle AND had " +
+							"an entry in the planned vehicles map. This should not happen...");
+				}
+				
+				if (plannedVehicleId != null) {
+					vehicleId = plannedVehicleId;
+					vehiclesTracker.addPassengerToVehicle(agent.getId(), plannedVehicleId);	
+				} else if (passengerVehicleId != null) {
+					vehicleId = passengerVehicleId;
+				} else {
+					throw new RuntimeException("Person was registered as Passenger in a vehicle and also " +
+							"no entry in the planned vehicles map was found. This should not happen...");
+				}
+//				Id vehicleId = vehiclesTracker.getPassengersVehicle(agent.getId());
+//				vehicleId might be null!!!
+//				if it is null, get get planned vehicle :?
+				
+//				vehiclesTracker.addEnrouteAgent(agent);
 				eventsManager.processEvent(eventsManager.getFactory().createPersonEntersVehicleEvent(now, agent.getId(), vehicleId));
 				
-				passengerTracker.addEnrouteAgent(agent);
 				
 				return true;
 			} else {

@@ -21,22 +21,32 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
+import playground.christoph.evacuation.mobsim.VehiclesTracker;
 
 public class AgentsToPickupIdentifierFactory implements DuringLegIdentifierFactory {
 
 	private final Scenario scenario;
-	private final InsecureLegPerformingIdentifier insecureLegPerformingIdentifier;
+	private final CoordAnalyzer coordAnalyzer;
+	private final VehiclesTracker vehiclesTracker;
+	private final PersonalizableTravelTimeFactory travelTimeFactory;
 	
-	public AgentsToPickupIdentifierFactory(Scenario scenario, InsecureLegPerformingIdentifier insecureLegPerformingIdentifier) {
+	public AgentsToPickupIdentifierFactory(Scenario scenario,  CoordAnalyzer coordAnalyzer,
+			VehiclesTracker vehiclesTracker, PersonalizableTravelTimeFactory travelTimeFactory) {
 		this.scenario = scenario;
-		this.insecureLegPerformingIdentifier = insecureLegPerformingIdentifier;
+		this.coordAnalyzer = coordAnalyzer;
+		this.vehiclesTracker = vehiclesTracker;
+		this.travelTimeFactory = travelTimeFactory;
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, insecureLegPerformingIdentifier);
+		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, coordAnalyzer,
+				vehiclesTracker, travelTimeFactory.createTravelTime());
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}

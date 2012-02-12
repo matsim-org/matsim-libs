@@ -20,19 +20,24 @@
 
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
-import org.matsim.withinday.utils.ReplacePlanElements;
 
-import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
+import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
 
 /**
  * 
@@ -40,13 +45,16 @@ import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtil
  */
 public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 
-	private static final String activityType = "meetHousehold";
+	private static final String activityType = "pickup";
 	
-	protected final HouseholdsUtils householdsUtils;
+	private final AgentsToPickupIdentifier identifier;
+	private final VehiclesTracker vehiclesTracker;
 	
-	/*package*/ PickupAgentReplanner(Id id, Scenario scenario, HouseholdsUtils householdsUtils) {
+	/*package*/ PickupAgentReplanner(Id id, Scenario scenario, AgentsToPickupIdentifier identifier,
+			VehiclesTracker vehiclesTracker) {
 		super(id, scenario);
-		this.householdsUtils = householdsUtils;
+		this.identifier = identifier;
+		this.vehiclesTracker = vehiclesTracker;
 	}
 
 	@Override
@@ -62,44 +70,98 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
-
+		
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
-		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
+		Id currentLinkId = withinDayAgent.getCurrentLinkId();
+		Leg currentLeg = withinDayAgent.getCurrentLeg();
 		
 		/*
-		 * Create new Activity at the meeting point.
+		 * Create new pickup activity.
 		 */
-		Id meetingPointId = householdsUtils.getMeetingPointId(withinDayAgent.getId());
-		ActivityFacility meetingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(meetingPointId);
-		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
-		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);
-		((ActivityImpl)meetingActivity).setCoord(meetingFacility.getCoord());
-		meetingActivity.setEndTime(Double.POSITIVE_INFINITY);
-	
-		new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, meetingActivity);
+		Activity waitForPickupActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
+		waitForPickupActivity.setType("pickup");
+		waitForPickupActivity.setStartTime(this.time);
+		waitForPickupActivity.setEndTime(this.time);
+		String idString = currentLinkId.toString() + "_pickup";
+		((ActivityImpl) waitForPickupActivity).setFacilityId(scenario.createId(idString));
+		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
+				
+		/*
+		 * Create new ride_passenger leg to the rescue facility.
+		 * Set mode to ride, then create route for the leg, then
+		 * set the mode to the correct value (ride_passenger).
+		 */
+		Leg ridePassengerLeg = scenario.getPopulation().getFactory().createLeg(TransportMode.ride);
+		ridePassengerLeg.setDepartureTime(this.time);
 		
 		/*
-		 * If the agent has just departed from its home facility (currentLegIndex = 0), then
-		 * the simulation does not allow stops again at the same link (queue logic). Therefore
-		 * we increase the currentLegIndex by one which means that the agent will drive a loop
-		 * and then return to this link again.
-		 * TODO: remove this, if the queue logic is adapted...
+		 * Insert pickup activity and ride_passenger leg into agent's plan.
 		 */
-		if (currentLinkIndex == 0) currentLinkIndex++;
+		executedPlan.getPlanElements().add(currentLegIndex + 1, waitForPickupActivity);
+		executedPlan.getPlanElements().add(currentLegIndex + 2, ridePassengerLeg);
 		
-		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
+		/*
+		 * End agent's current leg at the current link.
+		 */
+		NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
+		List<Id> subRoute = new ArrayList<Id>(route.getLinkIds().subList(0, currentLinkIndex));
+		route.setLinkIds(route.getStartLinkId(), subRoute, currentLinkId);
+		currentLeg.setTravelTime(this.time - currentLeg.getDepartureTime());
+
+		/*
+		 * Create a new route for the ride_passenger leg
+		 * and set correct mode afterwards.
+		 */
+		new EditRoutes().replanFutureLegRoute(executedPlan, currentLegIndex + 2, this.routeAlgo);
+		ridePassengerLeg.setMode(PassengerDepartureHandler.passengerTransportMode);
 		
-		// Remove all legs and activities after the next activity.
-		int nextActivityIndex = executedPlan.getActLegIndex(meetingActivity);
-		
-		while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
-			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
-		}			
+//		/*
+//		 * Create new Activity at the meeting point.
+//		 */
+//		Id meetingPointId = householdsUtils.getMeetingPointId(withinDayAgent.getId());
+//		ActivityFacility meetingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(meetingPointId);
+//		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
+//		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);
+//		((ActivityImpl)meetingActivity).setCoord(meetingFacility.getCoord());
+//		meetingActivity.setEndTime(Double.POSITIVE_INFINITY);
+//	
+//		new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, meetingActivity);
+//		
+//		/*
+//		 * If the agent has just departed from its home facility (currentLegIndex = 0), then
+//		 * the simulation does not allow stops again at the same link (queue logic). Therefore
+//		 * we increase the currentLegIndex by one which means that the agent will drive a loop
+//		 * and then return to this link again.
+//		 * TODO: remove this, if the queue logic is adapted...
+//		 */
+//		if (currentLinkIndex == 0) currentLinkIndex++;
+//		
+//		// new Route for current Leg
+//		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
+//		
+//		// Remove all legs and activities after the next activity.
+//		int nextActivityIndex = executedPlan.getActLegIndex(meetingActivity);
+//		
+//		while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
+//			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+//		}			
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();
+		
+		/*
+		 * TODO: try to get rid of this and let the mobsim call this methods...
+		 */
+		// end agent's walk leg
+//		withinDayAgent.endLegAndAssumeControl(time);
+		
+		// end agent's pickup activity
+//		withinDayAgent.endActivityAndAssumeControl(time);
+
+		// inform vehiclesTracker that the agent enters a vehicle
+//		Id vehicleId = this.identifier.getPassengerVehicleMap().get(withinDayAgent.getId());
+//		this.vehiclesTracker.addPassengerToVehicle(withinDayAgent.getId(), vehicleId);
 		
 		return true;
 	}

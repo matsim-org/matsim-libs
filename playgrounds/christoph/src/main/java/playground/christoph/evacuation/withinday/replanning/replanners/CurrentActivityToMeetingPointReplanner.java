@@ -23,12 +23,16 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
@@ -115,7 +119,8 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			 * Create Leg from the current Activity to the Meeting Point
 			 */		
 			// identify the TransportMode
-			String transportMode = modeAvailabilityChecker.identifyTransportMode(currentActivityIndex, executedPlan);
+			Id vehicleId = getVehicleId(executedPlan);
+			String transportMode = modeAvailabilityChecker.identifyTransportMode(currentActivityIndex, executedPlan, vehicleId);
 			
 			Leg legToMeeting = scenario.getPopulation().getFactory().createLeg(transportMode);
 			
@@ -145,8 +150,14 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
 			
 			meetingActivity.setStartTime(legToMeeting.getDepartureTime() + legToMeeting.getTravelTime());
+			
+			/*
+			 * If it is a car leg, set the vehicleId.
+			 */
+			if (transportMode.equals(TransportMode.car)) {
+				((NetworkRoute) legToMeeting.getRoute()).setVehicleId(vehicleId);
+			}
 		}
-		
 		
 		/*
 		 * Reschedule the currently performed Activity in the Mobsim - there
@@ -167,6 +178,28 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			log.warn("PersonAgent is no PersonDriverAgentImpl - the new departure time cannot be calculated!");
 			return false;
 		}	
+	}
+	
+	/**
+	 * Return the id of the first vehicle used by the agent.
+	 * Without Within-Day Replanning, an agent will use the same
+	 * vehicle during the whole day. When Within-Day Replanning
+	 * is enabled, this method should not be called anymore...
+	 */
+	private Id getVehicleId(Plan plan) {
+		for (PlanElement planElement : plan.getPlanElements()) {
+			if (planElement instanceof Leg) {
+				Leg leg = (Leg) planElement;
+				if (leg.getMode().equals(TransportMode.car)) {
+					Route route = leg.getRoute();
+					if (route instanceof NetworkRoute) {
+						NetworkRoute networkRoute = (NetworkRoute) route;
+						return networkRoute.getVehicleId();
+					}					
+				}
+			}
+		}
+		return null;
 	}
 	
 }

@@ -31,6 +31,10 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
@@ -41,7 +45,16 @@ import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 public class EvacuationQSimFactory implements MobsimFactory {
 
     private final static Logger log = Logger.getLogger(EvacuationQSimFactory.class);
-        
+    
+    private MultiModalTravelTimeWrapperFactory timeFactory;
+    
+    public EvacuationQSimFactory() {
+    }
+    
+    public EvacuationQSimFactory(MultiModalTravelTimeWrapperFactory timeFactory) {
+    	this.timeFactory = timeFactory;
+    }
+    
     @Override
     public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
@@ -64,6 +77,20 @@ public class EvacuationQSimFactory implements MobsimFactory {
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim);
         qSim.addAgentSource(agentSource);
+        
+        if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
+        	if (timeFactory == null) timeFactory = new MultiModalTravelTimeWrapperFactory();
+        	
+        	// create MultiModalSimEngine
+        	MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, timeFactory);
+        	
+        	// add MultiModalSimEngine to qSim
+        	qSim.addMobsimEngine(multiModalEngine);
+        	
+        	// add MultiModalDepartureHandler
+        	qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalEngine, sc.getConfig().multiModal()));        	
+        }
+        
         return qSim;
 
     }

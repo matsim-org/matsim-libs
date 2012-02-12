@@ -70,7 +70,7 @@ import playground.christoph.evacuation.events.handler.HouseholdLeaveMeetingPoint
 import playground.christoph.evacuation.events.handler.HouseholdSeparatedEventHandler;
 import playground.christoph.evacuation.events.handler.HouseholdSetMeetingPointEventHandler;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
-import playground.christoph.evacuation.mobsim.PassengerTracker;
+import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdInfo;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
@@ -96,7 +96,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final HouseholdsUtils householdUtils;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
-	private final PassengerTracker passengerTracker;
+	private final VehiclesTracker vehiclesTracker;
 	private final Map<Id, PlanBasedWithinDayAgent> agentMapping;
 	private final Map<Id, String> transportModeMapping;
 	private final Map<Id, Id> driverVehicleMapping;
@@ -107,12 +107,12 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	
 	public JoinedHouseholdsIdentifier(Vehicles vehicles, HouseholdsUtils householdUtils, 
 			SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
-			ModeAvailabilityChecker modeAvailabilityChecker, PassengerTracker passengerTracker) {
+			ModeAvailabilityChecker modeAvailabilityChecker, VehiclesTracker vehiclesTracker) {
 		this.vehicles = vehicles;
 		this.householdUtils = householdUtils;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
-		this.passengerTracker = passengerTracker;
+		this.vehiclesTracker = vehiclesTracker;
 		
 		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.transportModeMapping = new ConcurrentHashMap<Id, String>();
@@ -151,7 +151,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				// identify potential drivers and passengers
 				for (Id personId : household.getMemberIds()) {
 					if (modeAvailabilityChecker.hasDrivingLicense(personId)) possibleDrivers.add(personId);
-					else possiblePassengers.add(personId);
+					else possiblePassengers.add(personId);					
 				}
 				
 				/*
@@ -189,7 +189,10 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 						seats--;
 					}
 					
-					passengerTracker.addVehicleAllocation(vehicle.getId(), driverId, passengers);
+					// register person as passenger in the vehicle
+					for (Id passengerId : passengers) {
+						vehiclesTracker.addPassengerToVehicle(passengerId, vehicle.getId());
+					}
 				}
 				
 				// if vehicle capacity is exceeded, remaining agents have to walk

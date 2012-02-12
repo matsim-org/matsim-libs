@@ -27,7 +27,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -36,10 +38,15 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -73,8 +80,9 @@ import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
+import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
-import playground.christoph.evacuation.mobsim.PassengerTracker;
+import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeDataCollector;
@@ -84,15 +92,19 @@ import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
+import playground.christoph.population.PlansLinkReferenceDumping;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -104,7 +116,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected boolean adaptOriginalPlans = false;
 //	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
 	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer10km.shp"};
-	protected double maxCarAvailableDistance = 250.0;
 	
 	protected String[] householdVehicleFiles = new String[]{
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AG.txt",
@@ -148,12 +159,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected DuringActivityIdentifier joinedHouseholdsIdentifier;
 	protected DuringActivityIdentifier activityPerformingIdentifier;
 	protected DuringLegIdentifier legPerformingIdentifier;
-//	protected InitialIdentifier initialIdentifier;
-//	protected DuringActivityIdentifier duringSecureActivityIdentifier;
-//	protected DuringActivityIdentifier duringInsecureActivityIdentifier;
-//	protected DuringLegIdentifier duringSecureLegIdentifier;
-//	protected DuringLegIdentifier duringInsecureLegIdentifier;
-//	protected DuringLegIdentifier currentInsecureLegIdentifier;
+	protected DuringLegIdentifier agentsToPickupIdentifier;
 	
 	/*
 	 * Replanners
@@ -161,13 +167,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected WithinDayDuringActivityReplanner currentActivityToMeetingPointReplanner;
 	protected WithinDayDuringActivityReplanner joinedHouseholdsReplanner;
 	protected WithinDayDuringLegReplanner currentLegToMeetingPointReplanner;
-//	protected WithinDayInitialReplanner initialReplanner;
-//	protected WithinDayDuringActivityReplanner duringSecureActivityReplanner;
-//	protected WithinDayDuringActivityReplanner duringInsecureActivityReplanner;
-//	protected WithinDayDuringLegReplanner duringSecureLegReplanner;
-//	protected WithinDayDuringLegReplanner duringInsecureLegReplanner;
-//	protected WithinDayDuringLegReplanner currentInsecureLegReplanner;
-	
+	protected WithinDayDuringLegReplanner pickupAgentsReplanner;
+
 	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected HouseholdsUtils householdsUtils;
 	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
@@ -179,10 +180,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	protected PassengerDepartureHandler passengerDepartureHandler;
-	protected PassengerTracker passengerTracker;
+	protected VehiclesTracker vehiclesTracker;
 	protected CoordAnalyzer coordAnalyzer;
 	protected Geometry affectedArea;
 
+	protected PersonalizableTravelTimeFactory walkTravelTimeFactory;
+	protected PersonalizableTravelTimeFactory bikeTravelTimeFactory;
+	
 	/*
 	 * Analysis modules
 	 */
@@ -224,9 +228,16 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.numReplanningThreads = this.config.global().getNumberOfThreads();
 		
 //		PlansLinkReferenceDumping planAlgo = new PlansLinkReferenceDumping();
-//		for (Person person : population.getPersons().values()) {
-//			planAlgo.run(person);
-//		}
+//		planAlgo.run(population);
+		
+		/*
+		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
+		 */
+		LegModeChecker legModeChecker = new LegModeChecker(this.createRoutingAlgorithm());
+		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
+		legModeChecker.setToCarProbability(0.5);
+		legModeChecker.run(this.scenarioData.getPopulation());
+		legModeChecker.printStatistics();
 		
 		/*
 		 * If a SimStepParallelEventsManagerImpl is used, we ensure that it it
@@ -247,6 +258,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		// Add secure Facilities to secure Links.
 //		new AddSecureFacilitiesToNetwork(this.scenarioData).createSecureFacilities();
 		
+		// Add pickup facilities to Links.
+		addPickupFacilities();
 		
 		/*
 		 * Adding z-coordinates to the network
@@ -258,8 +271,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		/*
 		 * Use advanced walk- and bike travel time calculators
 		 */
-		PersonalizableTravelTimeFactory walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
-		PersonalizableTravelTimeFactory bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
+		this.walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
+		this.bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
 		
@@ -270,10 +283,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		super.createAndInitReplanningManager(numReplanningThreads);
 		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
-		
-		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, this.maxCarAvailableDistance);
-		this.getEvents().addHandler(modeAvailabilityChecker);
-		this.getFixedOrderSimulationListener().addSimulationListener(modeAvailabilityChecker);
 		
 		this.householdsUtils = new HouseholdsUtils(this.scenarioData, this.getEvents());
 		this.getEvents().addHandler(householdsUtils);
@@ -292,11 +301,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.getEvents(), householdsUtils, coordAnalyzer);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		
-		this.passengerTracker = new PassengerTracker(this.getEvents());
-		this.getEvents().addHandler(passengerTracker);
-		this.getFixedOrderSimulationListener().addSimulationListener(passengerTracker);
+		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
+		this.getEvents().addHandler(vehiclesTracker);
+		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
-		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), passengerTracker);
+		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
+		
+		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, vehiclesTracker);
 		
 		/*
 		 * Read household-vehicles-assignment files.
@@ -334,7 +345,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory();
+		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.getMultiModalTravelTimeWrapperFactory());
 		this.setMobsimFactory(mobsimFactory);
 		
 		/*
@@ -391,7 +402,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 * Need to do this since this does not only create events, but also behaves 
 		 * like a Mobsim Engine by ending (passenger) legs.  kai, dec'11 
 		 */
-		((QSim)e.getQueueSimulation()).addMobsimEngine(this.passengerTracker);
+		((QSim)e.getQueueSimulation()).addMobsimEngine(this.vehiclesTracker);
 			
 		this.initReplanners((QSim)e.getQueueSimulation());
 		
@@ -434,7 +445,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.activityPerformingIdentifier = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap()).createIdentifier();
 		
 		this.joinedHouseholdsIdentifier = new JoinedHouseholdsIdentifierFactory(this.scenarioData.getVehicles(), this.householdsUtils, 
-				this.selectHouseholdMeetingPoint, this.modeAvailabilityChecker, this.passengerTracker).createIdentifier();
+				this.selectHouseholdMeetingPoint, this.modeAvailabilityChecker, this.vehiclesTracker).createIdentifier();
 		this.getEvents().addHandler((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		
@@ -442,6 +453,10 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 * During Leg Identifiers
 		 */
 		this.legPerformingIdentifier = new LegPerformingIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
+		
+		this.agentsToPickupIdentifier = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, walkTravelTimeFactory).createIdentifier();
+		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
+		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 	}
 	
 	/*
@@ -469,16 +484,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
-		
-		/*
-		 * Intial Replanners
-		 */
-//		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
-//		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
-//		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
-//		this.initialReplanner.setReplanner(router);
-//		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-//		this.replanningManager.addIntialReplanner(this.initialReplanner);
 
 		/*
 		 * During Activity Replanners
@@ -490,20 +495,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.joinedHouseholdsReplanner = new JoinedHouseholdsReplannerFactory(this.scenarioData, router, 1.0, householdsUtils, (JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier).createReplanner();
 		this.joinedHouseholdsReplanner.addAgentsToReplanIdentifier(joinedHouseholdsIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplanner(this.joinedHouseholdsReplanner, EvacuationConfig.evacuationTime + 1, Double.MAX_VALUE);
-		
-//		this.duringSecureActivityIdentifier = new SecureActivityPerformingIdentifierFactory(this.getActivityReplanningMap(), EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
-//		this.selector.addIdentifier(this.duringSecureActivityIdentifier, this.pDuringActivityReplanning);
-//		this.duringSecureActivityReplanner = new ExtendCurrentActivityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-//		this.duringSecureActivityReplanner.addAgentsToReplanIdentifier(this.duringSecureActivityIdentifier);
-//		this.duringSecureActivityReplanner.setReplanningProbability(pReplanning);
-//		this.getReplanningManager().addDuringActivityReplanner(this.duringSecureActivityReplanner);
-
-//		this.duringInsecureActivityIdentifier = new InsecureActivityPerformingIdentifierFactory(this.getActivityReplanningMap(), EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
-//		this.selector.addIdentifier(this.duringInsecureActivityIdentifier, this.pDuringActivityReplanning);
-//		this.duringInsecureActivityReplanner = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-//		this.duringInsecureActivityReplanner.addAgentsToReplanIdentifier(this.duringInsecureActivityIdentifier);
-//		this.duringInsecureActivityReplanner.setReplanningProbability(pReplanning);
-//		this.getReplanningManager().addDuringActivityReplanner(this.duringInsecureActivityReplanner);
 
 		/*
 		 * During Leg Replanners
@@ -512,28 +503,27 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.currentLegToMeetingPointReplanner.addAgentsToReplanIdentifier(this.legPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.currentLegToMeetingPointReplanner, EvacuationConfig.evacuationTime, EvacuationConfig.evacuationTime + 1);
 		
-//		this.duringSecureLegIdentifier = new SecureLegPerformingIdentifierFactory(this.getLinkReplanningMap(), network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
-//		this.selector.addIdentifier(this.duringSecureLegIdentifier, this.pDuringLegReplanning);
-//		this.duringSecureLegReplanner = new CurrentLegToSecureFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-//		this.duringSecureLegReplanner.addAgentsToReplanIdentifier(this.duringSecureLegIdentifier);
-//		this.duringSecureLegReplanner.setReplanningProbability(pReplanning);
-//		this.getReplanningManager().addDuringLegReplanner(this.duringSecureLegReplanner);
-
-//		this.duringInsecureLegIdentifier = new InsecureLegPerformingIdentifierFactory(this.getLinkReplanningMap(), network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
-//		this.selector.addIdentifier(this.duringInsecureLegIdentifier, this.pDuringLegReplanning);
-//		this.duringInsecureLegReplanner = new CurrentLegToRescueFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-//		this.duringInsecureLegReplanner.addAgentsToReplanIdentifier(this.duringInsecureLegIdentifier);
-//		this.duringInsecureLegReplanner.setReplanningProbability(pReplanning);
-//		this.getReplanningManager().addDuringLegReplanner(this.duringInsecureLegReplanner);
-
-//		this.currentInsecureLegIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
-//		this.selector.addIdentifier(this.currentInsecureLegIdentifier, this.pDuringLegReplanning);
-//		this.currentInsecureLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-//		this.currentInsecureLegReplanner.addAgentsToReplanIdentifier(this.currentInsecureLegIdentifier);
-//		this.currentInsecureLegReplanner.setReplanningProbability(pReplanning);
-//		this.getReplanningManager().addDuringLegReplanner(this.currentInsecureLegReplanner);
+		this.pickupAgentsReplanner = new PickupAgentReplannerFactory(this.scenarioData, router, 1.0, 
+				(AgentsToPickupIdentifier) this.agentsToPickupIdentifier, this.vehiclesTracker).createReplanner();
+		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
+		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 	}
 
+	private void addPickupFacilities() {
+		for (Link link : scenarioData.getNetwork().getLinks().values()) {
+			/*
+			 * Create and add the pickup facility and add activity option ("pickup")
+			 */
+			String idString = link.getId().toString() + "_pickup";
+			ActivityFacility secureFacility = scenarioData.getActivityFacilities().createFacility(scenarioData.createId(idString), link.getCoord());
+			((ActivityFacilityImpl)secureFacility).setLinkId(((LinkImpl)link).getId());
+			
+			ActivityOption activityOption = ((ActivityFacilityImpl)secureFacility).createActivityOption("pickup");
+			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			activityOption.setCapacity(Double.MAX_VALUE);
+		}
+	}
+	
 	/*
 	 * ===================================================================
 	 * main
