@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
@@ -42,8 +43,8 @@ import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 	private double stuckTime = 100;
 	private final Operator operator;
 	private boolean simStarted = false;
-	
-  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
   
 	public QueueNetwork(final TimestepMobsimEngine simEngine, final Operator operator) {
 		this.simEngine = simEngine;
