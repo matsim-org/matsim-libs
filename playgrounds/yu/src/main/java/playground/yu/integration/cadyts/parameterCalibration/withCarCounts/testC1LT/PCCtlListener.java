@@ -79,8 +79,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private int paramDim;
 
-	static final String PARAM_NAME_INDEX = "parameterName_",
-			PARAM_STDDEV_INDEX = "paramStddev_";
 	static String[] paramNames/* in configfile */;
 
 	private double[][] paramArrays/* performing, traveling and so on */;
