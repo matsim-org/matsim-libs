@@ -34,6 +34,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
@@ -44,6 +45,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.otfvis.io.OTFLane;
@@ -802,29 +804,39 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 				double freespeedTraveltime = QLane.this.freespeedTravelTime;
 				
 				for (QVehicle veh : QLane.this.buffer){
-					double travelTime = now - QLane.this.laneEnterTimeMap.get(veh);
-					lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(QLane.this.length, spacing, 
-							lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
-					double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLane.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
-//					log.error("  speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane + " flow cap: " + QLane.this.simulatedFlowCapacity);
-					snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.visLane.getStartCoord(), this.visLane.getEndCoord(), 
-							QLane.this.length, this.visLane.getEuklideanDistance(), veh, 
-							lastDistanceFromFromNode, null, speedValue);
+					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
 				}
 				for (QVehicle veh : QLane.this.vehQueue) {
-					double travelTime = now - QLane.this.laneEnterTimeMap.get(veh);
-//					log.error("  travel time: " + travelTime);
-					lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(QLane.this.length, spacing, 
-							lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
-					double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLane.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
-//					log.error("  speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane + " flow cap: " + QLane.this.simulatedFlowCapacity);
-					snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.visLane.getStartCoord(), this.visLane.getEndCoord(), 
-							QLane.this.length, this.visLane.getEuklideanDistance(), veh, 
-							lastDistanceFromFromNode, null, speedValue);
+					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
 				}
 			}
 			return positions;
 		}
+		
+		private double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
+				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
+				double spacing, double freespeedTraveltime, QVehicle veh){
+			double travelTime = now - QLane.this.laneEnterTimeMap.get(veh);
+			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(QLane.this.length, spacing, 
+					lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
+			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLane.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
+//			log.error("  speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane + " flow cap: " + QLane.this.simulatedFlowCapacity);
+			if (this.visLane.getNumberOfLanes() < 2.0){
+				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.visLane.getStartCoord(), this.visLane.getEndCoord(), 
+						QLane.this.length, this.visLane.getEuklideanDistance(), veh, 
+						lastDistanceFromFromNode, null, speedValue);
+			}
+			else {
+				int noLanes = (int) this.visLane.getNumberOfLanes();
+				int lane = snapshotInfoBuilder.guessLane(veh, noLanes);
+				Tuple<Coord, Coord> startEndCoord = this.visLane.getDrivingLaneStartEndCoord(lane);
+				snapshotInfoBuilder.createAndAddVehiclePosition(positions, startEndCoord.getFirst(), startEndCoord.getSecond(), 
+						QLane.this.length, this.visLane.getEuklideanDistance(), veh, 
+						lastDistanceFromFromNode, null, speedValue);
+			}
+			return lastDistanceFromFromNode;
+		}
+		
 	};
 
 	static class FromLinkEndComparator implements Comparator<QLane>, Serializable, MatsimComparator {

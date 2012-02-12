@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -54,7 +55,7 @@ public class OTFLane implements Serializable {
 	private double euklideanDistance;
 	private CoordImpl startCoord;
 	private Coord endCoord; 
-	
+	private Map<Integer, Tuple<Coord, Coord>> drivingLaneMap = null;
 	
 	public OTFLane(String id) {
 		this.id = id;
@@ -145,6 +146,19 @@ public class OTFLane implements Serializable {
 		this.endCoord = new CoordImpl(endPoint.x, endPoint.y);
 		this.euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
 	}
+
+	public void addDrivingLane(int laneNumber, Point2D.Double  drivingLaneStart, Point2D.Double drivingLaneEnd) {
+		if (this.drivingLaneMap == null){
+			this.drivingLaneMap = new HashMap<Integer, Tuple<Coord, Coord>>();
+		}
+		Tuple<Coord, Coord> tuple = new Tuple<Coord, Coord>(new CoordImpl(drivingLaneStart.x, drivingLaneStart.y), new CoordImpl(drivingLaneEnd.x, drivingLaneEnd.y));
+		this.drivingLaneMap.put(laneNumber, tuple);
+	}
+	
+	public Tuple<Coord, Coord> getDrivingLaneStartEndCoord(int laneNumber){
+		return this.drivingLaneMap.get(laneNumber);
+	}
+
 	
 	public Coord getStartCoord() {
 		return this.startCoord;
@@ -188,6 +202,7 @@ public class OTFLane implements Serializable {
 	public double getEuklideanDistance() {
 		return euklideanDistance;
 	}
+
 
 
 }

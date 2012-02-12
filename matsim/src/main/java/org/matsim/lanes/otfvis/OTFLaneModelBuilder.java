@@ -44,7 +44,6 @@ public class OTFLaneModelBuilder {
 	public void recalculatePositions(OTFLinkWLanes linkData, SnapshotLinkWidthCalculator linkWidthCalculator) {
 		double linkWidth = linkWidthCalculator.calculateLinkWidth(linkData.getNumberOfLanes()) ;
 		linkData.setLinkWidth(linkWidth);
-		double numberOfLinkParts = (2 * linkData.getMaximalAlignment()) + 2;
 		Point2D.Double linkStartCenter = this.calculatePointOnLink(linkData, 0.0, 0.5);
 		linkData.setLinkStartCenterPoint(linkStartCenter);
 		if (linkData.getLaneData() == null || linkData.getLaneData().isEmpty()){
@@ -54,11 +53,25 @@ public class OTFLaneModelBuilder {
 			linkData.setLinkEndCenterPoint(new Point2D.Double(x, y));
 		}
 		else {
+			double numberOfLinkParts = (2 * linkData.getMaximalAlignment()) + 2;
 			for (OTFLane lane : linkData.getLaneData().values()){
-				double horizontalFraction = this.calculateWidthFraction(lane.getAlignment(), numberOfLinkParts);
+				double horizontalFraction = 0.5 - (lane.getAlignment() / numberOfLinkParts);
 				Point2D.Double laneStart = calculatePointOnLink(linkData, lane.getStartPosition(), horizontalFraction);
 				Point2D.Double laneEnd = calculatePointOnLink(linkData, lane.getEndPosition(), horizontalFraction);
 				lane.setStartEndPoint(laneStart, laneEnd);
+				if (lane.getNumberOfLanes() >= 2.0){
+					double noLanesFloor = Math.floor(lane.getNumberOfLanes());
+					double laneOffset = - noLanesFloor / 2 * linkWidthCalculator.getLaneWidth();
+					if (noLanesFloor % 2 == 0){
+						laneOffset = laneOffset + (linkWidthCalculator.getLaneWidth()/2);
+					}
+					for (int i = 1; i <= noLanesFloor; i++){
+						Point2D.Double drivingLaneStart = this.calcPoint(laneStart, linkData.getLinkOrthogonalVector(), laneOffset);
+						Point2D.Double drivingLaneEnd = this.calcPoint(laneEnd, linkData.getLinkOrthogonalVector(), laneOffset);
+						lane.addDrivingLane(i, drivingLaneStart, drivingLaneEnd);
+						laneOffset = laneOffset + linkWidthCalculator.getLaneWidth();
+					}
+				}
 			}
 		}
 	}
@@ -74,9 +87,6 @@ public class OTFLaneModelBuilder {
 		return new Point2D.Double(x, y);
 	}
 	
-	private double calculateWidthFraction(int alignment, double numberOfLinkParts){
-		return 0.5 - (alignment / numberOfLinkParts);
-}
 	
 	private OTFLane createOTFLane(Lane laneData, QLane qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
 		String id = laneData.getId().toString();
