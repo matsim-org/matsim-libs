@@ -554,7 +554,7 @@ public class PoznanNetwork
     {
         Population pop = scenario.getPopulation();
         PopulationFactory pf = pop.getFactory();
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= 1000; i++) {
             Person person = pf.createPerson(scenario.createId(Integer.toString(i)));
             pop.addPerson(person);
             Plan plan = pf.createPlan();
@@ -581,6 +581,8 @@ public class PoznanNetwork
         config.getQSimConfigGroup().setSnapshotStyle("queue");
         config.scenario().setUseLanes(true);
         config.scenario().setUseSignalSystems(true);
+        config.otfVis().setAgentSize(70.0f);
+        config.otfVis().setNodeOffset(30);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
         scenario.addScenarioElement(new SignalsDataImpl());
 

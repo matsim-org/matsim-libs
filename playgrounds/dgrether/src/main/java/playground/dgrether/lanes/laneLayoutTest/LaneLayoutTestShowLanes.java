@@ -50,8 +50,11 @@ public class LaneLayoutTestShowLanes {
 		sc.getConfig().plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
 		sc.getConfig().scenario().setUseLanes(true);
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-//		sc.getConfig().otfVis().setLinkWidth(50.0f);
+//		sc.getConfig().otfVis().setLinkWidth(150.0f);
 		sc.getConfig().otfVis().setDrawLinkIds(true);
+		sc.getConfig().otfVis().setNodeOffset(30);
+
+
 		sc.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 
 		
