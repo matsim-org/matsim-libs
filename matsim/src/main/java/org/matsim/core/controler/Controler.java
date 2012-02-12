@@ -1406,8 +1406,8 @@ public class Controler {
 						 */
 						if (c.multiModal().isMultiModalSimulationEnabled()) {
 							MobsimFactory factory = event.getControler().getMobsimFactory();
-
-							MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
+							
+							MultiModalTravelTimeWrapperFactory timeFactory = event.getControler().getMultiModalTravelTimeWrapperFactory();
 
 							MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, timeFactory);
 							event.getControler().setMobsimFactory(multiModalFactory);

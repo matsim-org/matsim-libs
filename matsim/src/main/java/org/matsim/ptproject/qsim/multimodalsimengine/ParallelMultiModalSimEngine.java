@@ -24,6 +24,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
@@ -56,7 +57,22 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		this.timeFactory = multiModalTravelTimeFactory;
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
-
+	
+	@Override
+	public void setInternalInterface( InternalInterface internalInterface ) {
+		super.setInternalInterface(internalInterface);
+		
+		/*
+		 * If the engines have already been created, hand the internalinterface
+		 * over to them.
+		 */
+		if (this.engines != null) {
+			for (MultiModalSimEngineRunner engine : engines) {
+				engine.setInternalInterface(internalInterface);
+			}
+		}
+	}
+	
 	@Override
 	public void onPrepareSim() {
 		super.onPrepareSim();
@@ -183,6 +199,8 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, reactivateLinksBarrier, 
 					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTime);
 
+			engine.setInternalInterface(this.internalInterface);
+			
 			Thread thread = new Thread(engine);
 			thread.setName("MultiModalSimEngineRunner" + i);
 
