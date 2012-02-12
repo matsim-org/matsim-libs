@@ -36,6 +36,7 @@ import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * OTFAgentsListHandler is responsible for the IO of the
@@ -74,11 +75,11 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			out.putFloat((float)agInfo.getColorValueBetweenZeroAndOne());
 		}
 
-	}
+	};
 
 	private static AgentState[] al = AgentState.values();
-
-	private AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory();
+	private SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+	private AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 	
 	private void readAgent(ByteBuffer in, SceneGraph graph) {
 		String id = ByteBufferUtils.getString(in);

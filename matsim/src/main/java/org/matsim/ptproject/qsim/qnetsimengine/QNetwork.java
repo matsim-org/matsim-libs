@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -48,8 +49,8 @@ class QNetwork implements VisNetwork, NetsimNetwork {
 	private final Network network;
 
 	private final NetsimNetworkFactory<QNode, AbstractQLink> queueNetworkFactory;
-
-	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 	
 	QNetsimEngine simEngine;
@@ -59,7 +60,7 @@ class QNetwork implements VisNetwork, NetsimNetwork {
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, AbstractQLink>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<Id, QNode>((int)(network.getLinks().size()*1.1), 0.95f);
-		this.snapshotInfoFactory.setLaneWidth(network.getEffectiveLaneWidth());
+		this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 	}
 
 
@@ -74,6 +75,10 @@ class QNetwork implements VisNetwork, NetsimNetwork {
 		for (QNode n : this.nodes.values()) {
 			n.init();
 		}
+	}
+	
+	/*package*/ SnapshotLinkWidthCalculator getLinkWidthCalculator(){
+		return this.linkWidthCalculator;
 	}
 
 	@Override

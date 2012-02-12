@@ -32,6 +32,7 @@ import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.ptproject.qsim.qnetsimengine.QLane;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
@@ -40,7 +41,44 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  */
 public class OTFLaneModelBuilder {
 
-	public OTFLane createOTFLane(Lane laneData, QLane qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
+	public void recalculatePositions(OTFLinkWLanes linkData, SnapshotLinkWidthCalculator linkWidthCalculator) {
+		double linkWidth = linkWidthCalculator.calculateLinkWidth(linkData.getNumberOfLanes()) ;
+		linkData.setLinkWidth(linkWidth);
+		double numberOfLinkParts = (2 * linkData.getMaximalAlignment()) + 2;
+		Point2D.Double linkStartCenter = this.calculatePointOnLink(linkData, 0.0, 0.5);
+		linkData.setLinkStartCenterPoint(linkStartCenter);
+		if (linkData.getLaneData() == null || linkData.getLaneData().isEmpty()){
+			//Calculate end point center
+			double x = linkData.getLinkEnd().x + (0.5 * linkWidth * linkData.getLinkOrthogonalVector().x);
+			double y = linkData.getLinkEnd().y + (0.5 * linkWidth * linkData.getLinkOrthogonalVector().y);
+			linkData.setLinkEndCenterPoint(new Point2D.Double(x, y));
+		}
+		else {
+			for (OTFLane lane : linkData.getLaneData().values()){
+				double horizontalFraction = this.calculateWidthFraction(lane.getAlignment(), numberOfLinkParts);
+				Point2D.Double laneStart = calculatePointOnLink(linkData, lane.getStartPosition(), horizontalFraction);
+				Point2D.Double laneEnd = calculatePointOnLink(linkData, lane.getEndPosition(), horizontalFraction);
+				lane.setStartEndPoint(laneStart, laneEnd);
+			}
+		}
+	}
+	
+	private Point2D.Double calculatePointOnLink(final OTFLinkWLanes laneLinkData, final double position, final double horizontalFraction) {
+		Point2D.Double lenghtPoint = this.calcPoint(laneLinkData.getLinkStart(), laneLinkData.getNormalizedLinkVector(), position);
+		return this.calcPoint(lenghtPoint, laneLinkData.getLinkOrthogonalVector(), horizontalFraction * laneLinkData.getLinkWidth());
+	}
+	
+	public Point2D.Double calcPoint(Point2D.Double start, Point2D.Double vector, double distance){
+		double x = start.getX() + (distance * vector.x);
+		double y = start.getY() + (distance * vector.y);
+		return new Point2D.Double(x, y);
+	}
+	
+	private double calculateWidthFraction(int alignment, double numberOfLinkParts){
+		return 0.5 - (alignment / numberOfLinkParts);
+}
+	
+	private OTFLane createOTFLane(Lane laneData, QLane qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
 		String id = laneData.getId().toString();
 		double startPosition = (linkLength -  laneData.getStartsAtMeterFromLinkEnd()) * linkScale * linkLengthCorrectionFactor;
 //		log.error("lane " + qLane.getId() + " starts at: " + startPoint);
@@ -77,7 +115,7 @@ public class OTFLaneModelBuilder {
 		}
 	}
 
-	public OTFLinkWLanes createOTFLinkWLanesWithOTFLanes(VisLink link, double nodeOffsetMeter, LanesToLinkAssignment l2l) {
+	public OTFLinkWLanes createOTFLinkWLanes(VisLink link, double nodeOffsetMeter, LanesToLinkAssignment l2l) {
 		Point2D.Double linkStart = OTFServerQuadTree.transform(link.getLink().getFromNode().getCoord());
 		Point2D.Double linkEnd = OTFServerQuadTree.transform(link.getLink().getToNode().getCoord());
 
@@ -90,7 +128,13 @@ public class OTFLaneModelBuilder {
 		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
 		
 		//first calculate the scale of the link based on the node offset, i.e. the link will be shortened at the beginning and the end 
-		double linkScale = (euclideanLinkLength - 2.0 * nodeOffsetMeter) / euclideanLinkLength;
+		double linkScale = 1.0;
+		if ((euclideanLinkLength * 0.2) > (2.0 * nodeOffsetMeter)){ // 2* nodeoffset is more than 20%
+			linkScale = (euclideanLinkLength - (2.0 * nodeOffsetMeter)) / euclideanLinkLength;
+		}
+		else { // use 80 % as euclidean length
+			linkScale = euclideanLinkLength * 0.8 / euclideanLinkLength;
+		}
 		
 		//scale the link 
 		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
@@ -98,8 +142,7 @@ public class OTFLaneModelBuilder {
 		Point2D.Double scaledLinkStart = scaledLink.getFirst();
 		
 		OTFLinkWLanes lanesLinkData = new OTFLinkWLanes(link.getLink().getId().toString());
-		lanesLinkData.setLinkStart(scaledLinkStart);
-		lanesLinkData.setLinkEnd(scaledLinkEnd);
+		lanesLinkData.setLinkStartEndPoint(scaledLinkStart, scaledLinkEnd);
 		lanesLinkData.setNormalizedLinkVector(deltaLinkNorm);
 		lanesLinkData.setLinkOrthogonalVector(normalizedOrthogonal);
 		lanesLinkData.setNumberOfLanes(link.getLink().getNumberOfLanes());

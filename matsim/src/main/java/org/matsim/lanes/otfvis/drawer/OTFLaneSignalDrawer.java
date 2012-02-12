@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
+import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -34,7 +35,7 @@ import org.matsim.signalsystems.otfvis.io.OTFSignalSystem;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
 public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
@@ -44,10 +45,10 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	private static final int glListName = 2342;
 	
 	private static final double zCoord = 1.0;
-	private static final double quadSizeLinkEnd = 6.0;
+	private static final double quadSizeLinkEnd = 5.0;
 	private static final double quadSizeLinkStart = 3.5;
 	private static final double quadSizeLaneStart = 3.5;
-	private static final double quadSizeLaneEnd = 4.5;
+	private static final double quadSizeLaneEnd = 4;
 
 	private Map<String, OTFLinkWLanes> lanesLinkData =  new HashMap<String, OTFLinkWLanes>();
 	
@@ -58,6 +59,8 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	private double currentLinkWidthCorrection = java.lang.Double.NEGATIVE_INFINITY;
 	
 	private int glNetList = -1;
+	
+	private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
 	
 	@Override
 	public void onDraw(GL gl) {
@@ -112,10 +115,10 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 			else {
 				this.setColor(gl, Color.LANECOLOR);
 				this.drawQuad(gl, link.getLinkEndCenterPoint(), quadSizeLinkEnd);
+				this.drawToLinks(gl, link.getLinkEndCenterPoint(), link.getToLinks());
 			}
 		}
 	}
-
 
 	private void drawLink(GL gl, OTFLinkWLanes link){
 		//draw a rect around linkStart
@@ -133,7 +136,7 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	
 	private void drawSignals(GL gl, Map<String, OTFSignal> signals, Point2D.Double point, Point2D.Double ortho, List<OTFLinkWLanes> toLinks){
 		double dist = signals.size() - 1;
-		Point2D.Double startPoint = this.calcPoint(point, ortho, (quadSizeLinkEnd * -dist));
+		Point2D.Double startPoint = this.laneModelBuilder.calcPoint(point, ortho, (quadSizeLinkEnd * -dist));
 		int i = 0;
 		for (OTFSignal signal : signals.values()){
 			i++;
@@ -159,43 +162,16 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 			else{
 				this.drawToLinks(gl, startPoint, toLinks);
 			}
-			startPoint = this.calcPoint(point, ortho, (quadSizeLinkEnd * i));
+			startPoint = this.laneModelBuilder.calcPoint(point, ortho, (quadSizeLinkEnd * i));
 		}
 	}
 
-	private Point2D.Double calcPoint(Point2D.Double start, Point2D.Double vector, double distance){
-		double x = start.getX() + (distance * vector.x);
-		double y = start.getY() + (distance * vector.y);
-		return new Point2D.Double(x, y);
-	}
-
-	
 	private void recalculatePositions() {
-		AgentSnapshotInfoFactory tempFac = new AgentSnapshotInfoFactory();
-		tempFac.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
-		tempFac.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
-		
+		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+		linkWidthCalculator.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
+		linkWidthCalculator.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 		for (OTFLinkWLanes linkData : this.lanesLinkData.values()){
-			double linkWidth = tempFac.calculateLinkWidth(linkData.getNumberOfLanes()) ;
-			linkData.setLinkWidth(linkWidth);
-			double numberOfLinkParts = (2 * linkData.getMaximalAlignment()) + 2;
-			Point2D.Double linkStartCenter = this.calculatePointOnLink(linkData, 0.0, 0.5);
-			linkData.setLinkStartCenterPoint(linkStartCenter);
-			if (linkData.getLaneData() == null || linkData.getLaneData().isEmpty()){
-				//Calculate end point center
-				double x = linkData.getLinkEnd().x + (0.5 * linkWidth * linkData.getLinkOrthogonalVector().x);
-				double y = linkData.getLinkEnd().y + (0.5 * linkWidth * linkData.getLinkOrthogonalVector().y);
-				linkData.setLinkEndCenterPoint(new Point2D.Double(x, y));
-			}
-			else {
-				for (OTFLane lane : linkData.getLaneData().values()){
-					double horizontalFraction = this.calculateWidthFraction(lane.getAlignment(), numberOfLinkParts);
-					Point2D.Double laneStart = calculatePointOnLink(linkData, lane.getStartPosition(), horizontalFraction);
-					Point2D.Double laneEnd = calculatePointOnLink(linkData, lane.getEndPosition(), horizontalFraction);
-					lane.setStartPoint(laneStart);
-					lane.setEndPoint(laneEnd);
-				}
-			}
+			this.laneModelBuilder.recalculatePositions(linkData, linkWidthCalculator);
 		}
 	}
 
@@ -246,16 +222,6 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		gl.glEnd();
 	}
 	
-	private double calculateWidthFraction(int alignment, double numberOfLinkParts){
-			return 0.5 - (alignment / numberOfLinkParts);
-	}
-	
-	
-	
-	private Point2D.Double calculatePointOnLink(OTFLinkWLanes laneLinkData, double position, double horizontalFraction) {
-		Point2D.Double lenghtPoint = this.calcPoint(laneLinkData.getLinkStart(), laneLinkData.getNormalizedLinkVector(), position);
-		return this.calcPoint(lenghtPoint, laneLinkData.getLinkOrthogonalVector(), horizontalFraction * laneLinkData.getLinkWidth());
-	}
 	
 	private void setColor(GL gl, Color color){
 		switch (color) {

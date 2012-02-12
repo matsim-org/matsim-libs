@@ -26,6 +26,7 @@ import java.util.ListIterator;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -58,8 +59,6 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
 		this.snapshotInfoFactory = agentSnapshotInfoFactory;
 	}
-	
-	  
 	
 	/**
 	 * Put the vehicles from the waiting list in positions. Their actual position doesn't matter, PositionInfo provides a
@@ -132,17 +131,17 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 
 		}
 	}
-	
-	public void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Link link, QVehicle veh, 
-			double distanceFromFromNode,	int lane, double speedValueBetweenZeroAndOne){
+
+	public void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, double lengthOfCurve, double euclideanLength, QVehicle veh, 
+			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
 		MobsimDriverAgent driverAgent = veh.getDriver();
-		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), link, 
-				distanceFromFromNode, lane);
+		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), startCoord, endCoord, 
+				distanceFromFromNode, lane, lengthOfCurve, euclideanLength);
 		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 		if (driverAgent instanceof TransitDriverAgent){
 			pos.setAgentState(AgentState.TRANSIT_DRIVER);
 			TransitVehicle transitVehicle = (TransitVehicle) veh; //currently only TransitVehicles are able to have passengers
-			this.createAndAddSnapshotInfoForPassengers(positions, transitVehicle.getPassengers(), distanceFromFromNode, link, 
+			this.createAndAddSnapshotInfoForPassengers(positions, transitVehicle.getPassengers(), distanceFromFromNode, startCoord, endCoord, lengthOfCurve, euclideanLength, 
 					lane, speedValueBetweenZeroAndOne);
 		}
 		else {
@@ -164,8 +163,8 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return speed;
 	}
 	
-	public  int guessLane(QVehicle veh, int numberOfLanes){
-		int tmpLane;
+	public Integer guessLane(QVehicle veh, int numberOfLanes){
+		Integer tmpLane;
 		try {
 			tmpLane = Integer.parseInt(veh.getId().toString()) ;
 		} catch ( NumberFormatException ee ) {
@@ -176,12 +175,12 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	}
 	
 	protected void createAndAddSnapshotInfoForPassengers(Collection<AgentSnapshotInfo> positions,
-			Collection<PassengerAgent> passengers, double distanceOnLink, Link link, int lane, double speedValueBetweenZeroAndOne)
+			Collection<PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord, double lengthOfCurve, double euclideanLength, int lane, double speedValueBetweenZeroAndOne)
 	{
 		int cnt = passengers.size();
 		for (PassengerAgent passenger : passengers) {
-			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 
-					distanceOnLink, lane+2*cnt);
+			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), startCoord, endCoord, 
+					distanceOnLink, lane+2*cnt, lengthOfCurve, euclideanLength);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
 			positions.add(passengerPosition);

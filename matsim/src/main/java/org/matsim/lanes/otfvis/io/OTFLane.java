@@ -26,7 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
 
@@ -48,6 +51,10 @@ public class OTFLane implements Serializable {
 	private Map<String, OTFSignal> signals = null;
 	private List<Id> toLinkIds;
 	private transient List<OTFLinkWLanes> toLinksData = null;
+	private double euklideanDistance;
+	private CoordImpl startCoord;
+	private Coord endCoord; 
+	
 	
 	public OTFLane(String id) {
 		this.id = id;
@@ -123,18 +130,28 @@ public class OTFLane implements Serializable {
 	}
 
 	
-	public void setStartPoint(Point2D.Double startPoint) {
+	public void setStartEndPoint(Point2D.Double startPoint, Point2D.Double endPoint) {
 		this.startPoint = startPoint;
+		this.endPoint = endPoint;
+		this.calcCoords();
 	}
-
 	
 	public Point2D.Double getEndPoint() {
 		return endPoint;
 	}
-
 	
-	public void setEndPoint(Point2D.Double endPoint) {
-		this.endPoint = endPoint;
+	private void calcCoords(){
+		this.startCoord = new CoordImpl(startPoint.x, startPoint.y);
+		this.endCoord = new CoordImpl(endPoint.x, endPoint.y);
+		this.euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
+	}
+	
+	public Coord getStartCoord() {
+		return this.startCoord;
+	}
+
+	public Coord getEndCoord() {
+		return this.endCoord;
 	}
 
 	public void addSignal(OTFSignal signal) {
@@ -166,6 +183,12 @@ public class OTFLane implements Serializable {
 	public List<OTFLane> getToLanes() {
 		return toLanes;
 	}
+
+	
+	public double getEuklideanDistance() {
+		return euklideanDistance;
+	}
+
 
 }
 

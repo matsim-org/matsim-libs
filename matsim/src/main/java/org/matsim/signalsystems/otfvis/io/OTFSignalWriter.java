@@ -33,6 +33,7 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
@@ -44,8 +45,8 @@ public class OTFSignalWriter extends OTFLaneWriter {
 	private transient SignalGroupsData signalGroups;
 	private transient SignalSystemsData signalSystems;
 
-	public OTFSignalWriter(VisNetwork visNetwork, LaneDefinitions lanes, SignalSystemsData signalSystemsData, SignalGroupsData signalGroupsData, SignalGroupStateChangeTracker signalTracker) {
-		super(visNetwork, lanes);
+	public OTFSignalWriter(VisNetwork visNetwork, LaneDefinitions lanes, OTFVisConfigGroup otfVisConfigGroup, SignalSystemsData signalSystemsData, SignalGroupsData signalGroupsData, SignalGroupStateChangeTracker signalTracker) {
+		super(visNetwork, lanes, otfVisConfigGroup);
 		this.signalTracker = signalTracker;
 		this.signalSystems = signalSystemsData;
 		this.signalGroups = signalGroupsData;

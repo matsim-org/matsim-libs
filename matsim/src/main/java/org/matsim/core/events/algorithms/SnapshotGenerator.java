@@ -48,6 +48,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
@@ -65,7 +66,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private final double storageCapFactor;
 	private final String snapshotStyle;
 	private double skipUntil = 0.0;
-  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 	public SnapshotGenerator(final Network network, final double snapshotPeriod, final MobsimConfigGroupI config) {
 		this.network = network;
@@ -77,7 +79,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		this.capCorrectionFactor = config.getFlowCapFactor() / network.getCapacityPeriod();
 		this.storageCapFactor = config.getStorageCapFactor();
 		this.snapshotStyle = config.getSnapshotStyle();
-		this.snapshotInfoFactory.setLaneWidth(network.getEffectiveLaneWidth());
+		this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		reset(-1);
 	}
 

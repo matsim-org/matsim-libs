@@ -43,6 +43,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
+import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
@@ -50,6 +52,7 @@ import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
@@ -763,7 +766,18 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 */
 	class VisDataImpl implements VisData {
 
+		private OTFLaneModelBuilder laneModelBuilder = null;
+		private OTFLinkWLanes otfLink = null;
+		
 		private VisDataImpl() {
+			double nodeOffset = QLinkImpl.this.network.simEngine.getMobsim().getScenario().getConfig().otfVis().getNodeOffset(); 
+			if (nodeOffset != 0.0) {
+				 nodeOffset = nodeOffset - 6.0; // -6.0: eventually we need a bit space for the signal
+				 laneModelBuilder = new OTFLaneModelBuilder();
+				 otfLink = laneModelBuilder.createOTFLinkWLanes(QLinkImpl.this, nodeOffset, null);
+				 SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.network.getLinkWidthCalculator();
+				 laneModelBuilder.recalculatePositions(otfLink, linkWidthCalculator);
+			}
 		}
 
 		@Override
@@ -818,11 +832,19 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			}
 			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(link.getLength(), spacing, 
 					lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
-			int lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+			Integer lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 
 					QLinkImpl.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
 //					log.error("speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane);
-			snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, lastDistanceFromFromNode, lane, speedValue);
+			if (this.otfLink != null){
+				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
+						QLinkImpl.this.length, this.otfLink.getEuklideanDistance(), veh, 
+						lastDistanceFromFromNode, lane, speedValue);
+			}
+			else {
+				snapshotInfoBuilder.createAndAddVehiclePosition(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
+						link.getLength(), ((LinkImpl)link).getEuklideanDistance() , veh, lastDistanceFromFromNode, lane, speedValue);
+			}
 			return lastDistanceFromFromNode;
 		}
 	}

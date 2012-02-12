@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QLanesNetworkFactory
+ * LinkWidthCalculator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.ptproject.qsim.qnetsimengine;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.lanes.data.v20.LaneDefinitions;
+package org.matsim.vis.snapshotwriters;
 
 
-public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
+/**
+ * @author dgrether
+ *
+ */
+public class SnapshotLinkWidthCalculator {
+	/**
+	 * Distance (in m) between the two innermost opposing lanes. Setting this to a larger number (e.g. 30) lets you see the
+	 * direction in which cars are going. (Setting this to a negative number probably gives you "driving on the left", but lanes
+	 * will be wrong (could be fixed), and, more importantly, the simulation still assumes "driving on the right" when locations
+	 * (with coordinates) are connected to links.) TODO should be configurable
+	 */
+	private double widthOfMedian = 30. ; // default
 
-	private NetsimNetworkFactory<QNode, AbstractQLink> delegate;
-	private LaneDefinitions laneDefinitions;
-
-	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, AbstractQLink> delegate, LaneDefinitions laneDefintions){
-		this.delegate = delegate;
-		this.laneDefinitions = laneDefintions;
+	private double laneWidth = 3.75; //default in NetworkImpl and network_v1.dtd
+	
+	public void setLaneWidth( double dd ) {
+		laneWidth = dd ;
 	}
-
-	@Override
-	public AbstractQLink createNetsimLink(Link link, QNetwork network, QNode queueNode) {
-		AbstractQLink ql = null;
-		if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
-			ql = new QLinkLanesImpl(link, network, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()));
-		}
-		else {
-			ql = this.delegate.createNetsimLink(link, network, queueNode);
-		}
-		return ql;
+	
+	public double getLaneWidth(){
+		return laneWidth;
 	}
-
-	@Override
-	public QNode createNetsimNode(Node node, QNetwork network) {
-		return this.delegate.createNetsimNode(node, network);
+	
+	public void setLinkWidth(double linkWidthCorrectionFactor){
+		this.widthOfMedian = linkWidthCorrectionFactor;
 	}
-
+	
+	public double calculateLinkWidth(double nrOfLanes){
+		return widthOfMedian + laneWidth * nrOfLanes; 
+	}
+	
+	double calculateLanePosition(double lane){
+		return 0.5 * widthOfMedian + laneWidth * lane;
+	}
+	
 }

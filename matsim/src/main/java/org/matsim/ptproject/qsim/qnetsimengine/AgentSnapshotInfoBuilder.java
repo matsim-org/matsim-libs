@@ -22,6 +22,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.Collection;
 import java.util.Queue;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -45,19 +46,21 @@ interface AgentSnapshotInfoBuilder {
 			Collection<MobsimAgent> values, int cnt2);
 
 	/**
- 	 *  Adds AgentSnapshotInfo instances to the Collection given as parameter for a queue-logic object located on a specific link. A queue-logic object
-	 * can be a QueueLinkImpl or a QueueLane instance or something else.
+ 	 *  Adds AgentSnapshotInfo instances to the Collection given as parameter for a queue-logic object, e.g. located on a specific link - the curve. A queue-logic object
+	 * can be a QueueLinkImpl or a QueueLane instance or something else. The length of the link/curve can be longer than the euclidean distance between the 
+	 * start and the end coordinate of the curve. 
 	 * @param positions The Collection in that the AgentSnapshotInfo instances are inserted.
 	 */
-	void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Link link, QVehicle veh, 
-			double distanceFromFromNode,	int lane, double speedValueBetweenZeroAndOne);
+	void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, double lengthOfCurve, double eucledianLength, QVehicle veh, 
+			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne);
 	
 	double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double storageCapacity, double bufferStorageCapacity);
 
 	double calculateDistanceOnVectorFromFromNode( double length, double spacing,
 			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double travelTime);
 	
-	int guessLane(QVehicle veh, int numberOfLanes);
+	Integer guessLane(QVehicle veh, int numberOfLanes);
 
 	double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed);
+
 }

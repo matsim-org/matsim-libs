@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -53,7 +54,8 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 
 	private final Network networkLayer;
 	
-  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 
 	/*package*/ QueueNetwork(final Network networkLayer, QueueSimulation qSim2) {
@@ -62,7 +64,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 
 		this.queuelinks = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.queuenodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-		snapshotInfoFactory.setLaneWidth(networkLayer.getEffectiveLaneWidth());
+		linkWidthCalculator.setLaneWidth(networkLayer.getEffectiveLaneWidth());
 		for (Node n : networkLayer.getNodes().values()) {
 			this.queuenodes.put(n.getId(), new QueueNode(n, this));
 		}

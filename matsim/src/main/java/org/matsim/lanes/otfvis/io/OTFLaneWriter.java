@@ -27,6 +27,7 @@ import org.matsim.lanes.data.v20.LaneDefinitions;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -37,18 +38,19 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  */
 public class OTFLaneWriter extends OTFDataWriter<Void> {
 
-	private static final double nodeOffsetMeter = 10.0;
-
 	private final transient VisNetwork network;
 
 	private final transient LaneDefinitions lanes;
 	
 	
 	private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
+
+	private OTFVisConfigGroup otfVisConfig;
 	
-	public OTFLaneWriter(VisNetwork visNetwork, LaneDefinitions laneDefinitions){
+	public OTFLaneWriter(VisNetwork visNetwork, LaneDefinitions laneDefinitions, OTFVisConfigGroup otfVisConfigGroup){
 		this.network = visNetwork;
 		this.lanes = laneDefinitions;
+		this.otfVisConfig = otfVisConfigGroup;
 	}
 	
 	@Override
@@ -57,7 +59,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 		out.putInt(this.network.getVisLinks().size());
 		for (VisLink visLink : this.network.getVisLinks().values()) {
 			LanesToLinkAssignment l2l = this.lanes.getLanesToLinkAssignments().get(visLink.getLink().getId());
-			OTFLinkWLanes otfLink = this.laneModelBuilder.createOTFLinkWLanesWithOTFLanes(visLink, nodeOffsetMeter, l2l);
+			OTFLinkWLanes otfLink = this.laneModelBuilder.createOTFLinkWLanes(visLink, otfVisConfig.getNodeOffset(), l2l);
 			//write link data
 			ByteBufferUtils.putObject(out, otfLink);
 		}

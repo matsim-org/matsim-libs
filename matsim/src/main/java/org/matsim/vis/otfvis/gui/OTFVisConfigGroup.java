@@ -103,6 +103,10 @@ public class OTFVisConfigGroup extends Module {
 	
 	private String linkWidthIsProportionalTo = NUMBER_OF_LANES ;
 	
+	private static final String NODE_OFFSET = "nodeOffset";
+	
+	private double nodeOffset = 0;
+	
 	// ---
 
 	public OTFVisConfigGroup() {
@@ -220,6 +224,9 @@ public class OTFVisConfigGroup extends Module {
 		else if (MAP_OVERLAY_MODE.equalsIgnoreCase(key)) {
 			this.mapOverlayMode = Boolean.parseBoolean(value);
 		}
+		else if (NODE_OFFSET.equalsIgnoreCase(key)){
+			this.nodeOffset = Double.parseDouble(value);
+		}
 //		else if ( SHOW_PARKING.equalsIgnoreCase(key) ) {
 //			this.setShowParking( Boolean.parseBoolean(value) ) ;
 //			// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
@@ -243,6 +250,7 @@ public class OTFVisConfigGroup extends Module {
 		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()));
 		map.put(COLORING, this.getColoringScheme());
 		map.put(MAP_OVERLAY_MODE, Boolean.toString(this.isMapOverlayMode()));
+		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
 //		map.put(SHOW_PARKING, Boolean.toString( this.isShowParking() ) ) ;
 		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
 
@@ -258,7 +266,8 @@ public class OTFVisConfigGroup extends Module {
 		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'." );
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''");
 		map.put(MAP_OVERLAY_MODE, "Render everything on top of OpenStreetMap tiles.");
-//		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
+		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization. ");
+		//		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
 //				"May affect all non-moving items.") ;
 		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
 		return map ;
@@ -509,6 +518,16 @@ public class OTFVisConfigGroup extends Module {
 
 	public void setMapOverlayMode(boolean mapOverlayMode) {
 		this.mapOverlayMode = mapOverlayMode;
+	}
+
+	
+	public double getNodeOffset() {
+		return nodeOffset;
+	}
+
+	
+	public void setNodeOffset(double nodeOffset) {
+		this.nodeOffset = nodeOffset;
 	}
 
 

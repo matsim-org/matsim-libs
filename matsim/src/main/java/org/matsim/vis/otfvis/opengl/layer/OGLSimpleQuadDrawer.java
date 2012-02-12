@@ -13,7 +13,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import com.sun.opengl.util.texture.TextureCoords;
 
@@ -26,14 +26,14 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 	protected float coloridx = 0;
 	protected char[] id;
 	protected int nrLanes;
-	private AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory();
+	private SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 
 	@Override
 	public void onDraw( GL gl) {
-		snapshotFactory.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
-		snapshotFactory.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
+		linkWidthCalculator.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
+		linkWidthCalculator.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 		final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, 
-				snapshotFactory.calculateLinkWidth(this.nrLanes));
+				linkWidthCalculator.calculateLinkWidth(this.nrLanes));
 		// (yy this is where the width of the links for drawing is set)
 
 		this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);

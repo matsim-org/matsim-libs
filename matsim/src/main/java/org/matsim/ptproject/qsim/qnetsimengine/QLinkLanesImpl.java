@@ -35,8 +35,13 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneMeterFromLinkEndComparator;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
+import org.matsim.lanes.otfvis.io.OTFLane;
+import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
@@ -128,7 +133,9 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	private boolean active = false;
 
-	private VisData visdata = this.new VisDataImpl();
+	private VisData visdata = null; 
+
+	private LanesToLinkAssignment lanesToLinkAssignment;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -137,12 +144,14 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 * @param toNode
 	 * @see NetsimLink#createLanes(List)
 	 */
-	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, Map<Id, Lane> laneMap) {
+	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, LanesToLinkAssignment lanesToLinkAssignment) {
 		super(link2, network) ;
 		this.toQueueNode = toNode;
 		this.queueLanes = new ArrayList<QLane>();
 		this.toNodeQueueLanes = new ArrayList<QLane>();
-		this.createLanes(laneMap);
+		this.lanesToLinkAssignment = lanesToLinkAssignment;
+		this.createLanes(lanesToLinkAssignment.getLanes());
+		this.visdata = this.new VisDataImpl();
 	}
 
 
@@ -433,7 +442,23 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 *
 	 */
 	class VisDataImpl implements VisData {
+		private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
+		private OTFLinkWLanes otfLink;
 
+		VisDataImpl(){
+			double nodeOffset = QLinkLanesImpl.this.network.simEngine.getMobsim().getScenario().getConfig().otfVis().getNodeOffset();
+			if (nodeOffset != 0){
+				 nodeOffset = nodeOffset - 6.0; // -6.0: eventually we need a bit space for the signal
+			}
+			otfLink = laneModelBuilder.createOTFLinkWLanes(QLinkLanesImpl.this, nodeOffset, QLinkLanesImpl.this.lanesToLinkAssignment);
+			SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.network.getLinkWidthCalculator();
+			laneModelBuilder.recalculatePositions(otfLink, linkWidthCalculator);
+			for (QLane  ql : QLinkLanesImpl.this.queueLanes){
+				OTFLane otfLane = otfLink.getLaneData().get(ql.getId().toString());
+				ql.setOTFLane(otfLane);
+			}
+		}
+		
 		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 
@@ -442,7 +467,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 				lane.visdata.getVehiclePositions(positions);
 			}
-			int cnt2 = 0;
+			int cnt2 = 10;
 			// treat vehicles from waiting list:
 			agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkLanesImpl.this.link, cnt2,
 					QLinkLanesImpl.this.waitingList);

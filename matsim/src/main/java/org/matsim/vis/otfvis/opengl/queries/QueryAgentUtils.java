@@ -18,12 +18,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 public class QueryAgentUtils {
 
 	private static final Logger log = Logger.getLogger(QueryAgentUtils.class);
-
-	private static AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+	
+	private static SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+	private static AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 	enum Level { ROUTES, PLANELEMENTS } 
 	static private Level myLevel ;

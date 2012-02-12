@@ -42,6 +42,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 
 
@@ -51,7 +52,8 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 
 	private OGLSimpleQuadDrawer quadReceiver = new OGLSimpleQuadDrawer();
 
-	private AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory();
+	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+	private final AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 	
 	static public class Writer extends OTFDataWriter<VisLink> implements OTFWriterFactory<VisLink> {
 

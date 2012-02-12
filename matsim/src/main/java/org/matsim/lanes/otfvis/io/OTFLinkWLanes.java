@@ -27,7 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
 
 
@@ -51,6 +54,9 @@ public class OTFLinkWLanes implements Serializable{
 	private Map<String, OTFSignal> signals = null;
 	private ArrayList<Id> toLinkIds;
 	private transient List<OTFLinkWLanes> toLinks = null;
+	private CoordImpl startCoord;
+	private CoordImpl endCoord;
+	private double euklideanDistance;
 	
 	public OTFLinkWLanes(String id){
 		this.id = id;
@@ -60,14 +66,6 @@ public class OTFLinkWLanes implements Serializable{
 		return this.id;
 	}
 	
-	public void setLinkStart(Point2D.Double v) {
-		this.linkStart = v;
-	}
-
-	public void setLinkEnd(Point2D.Double v) {
-		this.linkEnd = v;
-	}
-
 	public void setNormalizedLinkVector(Point2D.Double v) {
 		this.normalizedLinkVector = v;
 	}
@@ -140,17 +138,40 @@ public class OTFLinkWLanes implements Serializable{
 	public double getLinkWidth(){
 		return this.linkWidth;
 	}
+	public void setLinkStartEndPoint(Double linkStart, Double linkEnd) {
+		this.linkStart = linkStart;
+		this.linkEnd = linkEnd;
+		this.calcCoords();
+	}
 
-	public void setLinkStartCenterPoint(Point2D.Double linkStartCenter) {
+	public void setLinkStartCenterPoint(Double linkStartCenter) {
 		this.linkStartCenterPoint = linkStartCenter;
+	}
+
+	public void setLinkEndCenterPoint(Double linkEndCenter) {
+		this.linkEndCenterPoint = linkEndCenter;
+	}
+
+	public Coord getLinkStartCoord(){
+		return this.startCoord;
+	}
+	
+	public Coord getLinkEndCoord(){
+		return this.endCoord;
+	}
+	
+	private void calcCoords(){
+		this.startCoord = new CoordImpl(linkStart.x, linkStart.y);
+		this.endCoord = new CoordImpl(linkEnd.x, linkEnd.y);
+		this.euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
+	}
+	
+	public double getEuklideanDistance() {
+		return euklideanDistance;
 	}
 	
 	public Point2D.Double getLinkStartCenterPoint() {
 		return this.linkStartCenterPoint;
-	}
-	
-	public void setLinkEndCenterPoint(Point2D.Double linkStartCenter) {
-		this.linkEndCenterPoint = linkStartCenter;
 	}
 	
 	public Point2D.Double getLinkEndCenterPoint() {
@@ -177,5 +198,5 @@ public class OTFLinkWLanes implements Serializable{
 	public List<Id> getToLinkIds() {
 		return toLinkIds ;
 	}
-	
+
 }

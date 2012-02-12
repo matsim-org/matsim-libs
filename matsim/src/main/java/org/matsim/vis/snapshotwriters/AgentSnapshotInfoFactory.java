@@ -34,32 +34,13 @@ public class AgentSnapshotInfoFactory {
 
 	private static final double TWO_PI = 2.0 * Math.PI;
 	private static final double PI_HALF = Math.PI / 2.0;
-	/**
-	 * Distance (in m) between the two innermost opposing lanes. Setting this to a larger number (e.g. 30) lets you see the
-	 * direction in which cars are going. (Setting this to a negative number probably gives you "driving on the left", but lanes
-	 * will be wrong (could be fixed), and, more importantly, the simulation still assumes "driving on the right" when locations
-	 * (with coordinates) are connected to links.) TODO should be configurable
-	 */
-	private double widthOfMedian = 30. ; // default
+	private SnapshotLinkWidthCalculator linkWidthCalculator;
 
-	private double laneWidth = 3.75; //default in NetworkImpl and network_v1.dtd
 
-	public AgentSnapshotInfoFactory() {
+	public AgentSnapshotInfoFactory(SnapshotLinkWidthCalculator widthCalculator) {
+		this.linkWidthCalculator = widthCalculator;
 	}
 
-	public void setLaneWidth( double dd ) {
-		laneWidth = dd ;
-	}
-	
-	public void setLinkWidth(double linkWidthCorrectionFactor){
-		this.widthOfMedian = linkWidthCorrectionFactor;
-	}
-	
-	public double calculateLinkWidth(double nrOfLanes){
-		return widthOfMedian + laneWidth * nrOfLanes;
-	}
-
-	
 	// creators based on x/y
 
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth) {
@@ -73,33 +54,40 @@ public class AgentSnapshotInfoFactory {
 
 	// static creators based on link
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane) {
+		PositionInfo info = new PositionInfo() ;
+		info.setId(agentId) ;
+		double euklidean;
 		if (link instanceof LinkImpl){ //as for LinkImpl instances the euklidean distance is already computed we can safe computing time but have a cast instead
-			PositionInfo info = new PositionInfo() ;
-			info.setId(agentId) ;
-			calculateAndSetPosition(info, link.getFromNode().getCoord(), link.getToNode().getCoord(),
-					distanceOnLink, link.getLength(), ((LinkImpl)link).getEuklideanDistance(), lane);
-			return info;
+			euklidean = ((LinkImpl)link).getEuklideanDistance();
 		}
-		return createAgentSnapshotInfo(agentId, link.getFromNode().getCoord(), link.getToNode().getCoord(), distanceOnLink, lane, link.getLength());
+		else {
+			euklidean = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+		}
+		calculateAndSetPosition(info, link.getFromNode().getCoord(), link.getToNode().getCoord(),
+				distanceOnLink, link.getLength(), euklidean, lane);
+		return info;
 	}
 	
 	/**
 	 * Static creator based on Coord
-	 * @param lengthOfVector lengths are usually different (usually longer) than the Euklidean distances between the startCoord and endCoord
+	 * @param curveLength lengths are usually different (usually longer) than the euclidean distances between the startCoord and endCoord
 	 */
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Coord startCoord, Coord endCoord, double distanceOnLink, 
-			int lane, double lengthOfVector) {
+			Integer lane, double curveLength, double euclideanLength) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
-		double euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
 		calculateAndSetPosition(info, startCoord, endCoord,
-				distanceOnLink, lengthOfVector, euklideanDistance, lane) ;
+				distanceOnLink, curveLength, euclideanLength, lane) ;
 		return info;
 	}
 	
 	
-
-	private final void calculateAndSetPosition(PositionInfo info, Coord startCoord, Coord endCoord, double distanceOnVector, double lengthOfVector, double euklideanDistance, int lane){
+	/**
+	 * 
+	 * @param lane may be null
+	 */
+	private final void calculateAndSetPosition(PositionInfo info, Coord startCoord, Coord endCoord, double distanceOnVector, 
+			double lengthOfCurve, double euclideanLength, Integer lane){
 		double dx = -startCoord.getX() + endCoord.getX();
 		double dy = -startCoord.getY() + endCoord.getY();
 		double theta = 0.0;
@@ -121,17 +109,21 @@ public class AgentSnapshotInfoFactory {
 		// Since the simulation, on the other hand, reports odometer distances, this needs to be corrected.  kai, apr'10
 		// The same correction can be used for the orthogonal offsets.  kai, aug'10
 		double correction = 0. ;
-		if ( lengthOfVector != 0 ){
-			correction = euklideanDistance / lengthOfVector;
+		if ( lengthOfCurve != 0 ){
+			correction = euclideanLength / lengthOfCurve;
+		}
+		double lanePosition = 0;
+		if (lane != null){
+			lanePosition = this.linkWidthCalculator.calculateLanePosition(lane);
 		}
 
 		info.setEasting( startCoord.getX() 
 				+ (Math.cos(theta) * distanceOnVector * correction)
-				+ (Math.sin(theta) * (0.5 * widthOfMedian + laneWidth * lane) * correction) ) ;
+				+ (Math.sin(theta) * lanePosition * correction) ) ;
 		
 		info.setNorthing( startCoord.getY() 
 				+ Math.sin(theta) * distanceOnVector  * correction 
-				- Math.cos(theta) * (0.5 * widthOfMedian + laneWidth * lane) * correction );
+				- Math.cos(theta) * lanePosition  * correction );
 		
 		info.setAzimuth( theta / TWO_PI * 360. ) ;
 	}
