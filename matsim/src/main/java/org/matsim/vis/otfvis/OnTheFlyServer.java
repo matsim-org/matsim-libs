@@ -90,7 +90,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
 
 	private enum Status {
-		PAUSE, PLAY, STEP;
+		PAUSE, PLAY, STEP, FINISHED;
 	}
 
 	private volatile Status status = Status.PAUSE;
@@ -120,7 +120,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private final OTFAgentsListHandler.Writer teleportationWriter;
 
 	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
-	
+
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
 
 	private Semaphore accessToQNetwork = new Semaphore(1);
@@ -170,7 +170,9 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	@Override
 	public boolean requestNewTime(final int time, final TimePreference searchDirection) {
-		if( ((searchDirection == TimePreference.RESTART) && (time < localTime))) { 
+		if (status == Status.FINISHED) {
+			return true;
+		} else if( ((searchDirection == TimePreference.RESTART) && (time < localTime))) { 
 			doStep(time);
 			return true;
 		} else if (time < localTime) {
@@ -206,16 +208,20 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	@Override
 	public void pause(){
-		synchronized (updateFinished) {
-			status = Status.PAUSE;
+		if (status != Status.FINISHED) {
+			synchronized (updateFinished) {
+				status = Status.PAUSE;
+			}
 		}
 	}
 
 	@Override
 	public void play() {
-		synchronized(paused) {
-			status = Status.PLAY;
-			paused.notifyAll();
+		if (status != Status.FINISHED) {
+			synchronized(paused) {
+				status = Status.PLAY;
+				paused.notifyAll();
+			}
 		}
 	}
 
@@ -390,7 +396,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 			@Override
 			public void finish() {
-
+				status = Status.FINISHED;
 			}
 
 		};

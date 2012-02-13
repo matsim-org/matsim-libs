@@ -84,7 +84,7 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 
 	@Override
 	public void notifySimulationBeforeCleanup( SimulationBeforeCleanupEvent ev ) {
-		// Nothing to do.
+		this.server.getSnapshotReceiver().finish();
 	}
 
 	@Override
