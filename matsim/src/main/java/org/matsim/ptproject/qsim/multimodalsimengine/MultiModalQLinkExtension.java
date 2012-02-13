@@ -106,7 +106,7 @@ public class MultiModalQLinkExtension {
 	}
 
 	protected boolean moveLink(double now) {
-		boolean isActive = moveAgents(now);
+		isActive = moveAgents(now);
 
 		moveWaitingAfterActivityAgents();
 
