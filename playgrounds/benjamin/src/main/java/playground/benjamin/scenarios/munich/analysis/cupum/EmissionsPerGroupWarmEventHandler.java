@@ -30,6 +30,7 @@ import playground.benjamin.emissions.events.WarmEmissionEvent;
 import playground.benjamin.emissions.events.WarmEmissionEventHandler;
 import playground.benjamin.emissions.types.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author benjamin
@@ -37,43 +38,42 @@ import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
  */
 public class EmissionsPerGroupWarmEventHandler implements WarmEmissionEventHandler {
 	private static final Logger logger = Logger.getLogger(EmissionsPerGroupWarmEventHandler.class);
-	
-	Map<String, Map<WarmPollutant, Double>> group2Emissions = new HashMap<String, Map<WarmPollutant, Double>>();
+
+	Map<UserGroup, Map<WarmPollutant, Double>> group2Emissions = new HashMap<UserGroup, Map<WarmPollutant, Double>>();
 	PersonFilter filter = new PersonFilter();
-	
+
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
 		Id personId = event.getVehicleId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 
-		String group = null;
-		if(filter.isPersonFromMID(personId)) group = "MID";
-		else if(filter.isPersonOutCommuter(personId)) group = "outCommuter";
-		else if(filter.isPersonInnCommuter(personId)) group = "innCommuter";
-		else if(filter.isPersonFreight(personId)) group = "freight";
-		else logger.warn("person " + personId + " cannot be put in one of the defined groups!");
-		
-		if(group2Emissions.get(group) != null){
-			Map<WarmPollutant, Double> warmEmissionsSoFar = group2Emissions.get(group);
-			for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
-				WarmPollutant pollutant = entry.getKey();
-				Double eventValue = entry.getValue();
+		for(UserGroup userGroup : UserGroup.values()){
+			if(!filter.isPersonIdFromUserGroup(personId, userGroup)){
+				// person is not from this user group
+			} else {
+				if(group2Emissions.get(userGroup) != null){
+					Map<WarmPollutant, Double> warmEmissionsSoFar = group2Emissions.get(userGroup);
+					for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
+						WarmPollutant pollutant = entry.getKey();
+						Double eventValue = entry.getValue();
 
-				Double previousValue = warmEmissionsSoFar.get(pollutant);
-				Double newValue = previousValue + eventValue;
-				warmEmissionsSoFar.put(pollutant, newValue);
+						Double previousValue = warmEmissionsSoFar.get(pollutant);
+						Double newValue = previousValue + eventValue;
+						warmEmissionsSoFar.put(pollutant, newValue);
+					}
+					group2Emissions.put(userGroup, warmEmissionsSoFar);
+				} else {
+					group2Emissions.put(userGroup, warmEmissionsOfEvent);
+				}
 			}
-			group2Emissions.put(group, warmEmissionsSoFar);
-		} else {
-			group2Emissions.put(group, warmEmissionsOfEvent);
 		}
 	}
-	
-	public Map<String, Map<String, Double>> getWarmEmissionsPerGroup() {
-		Map<String, Map<String, Double>> group2warmEmissionsAsString = new HashMap<String, Map<String, Double>>();
 
-		for (Entry<String, Map<WarmPollutant, Double>> entry1: this.group2Emissions.entrySet()){
-			String group = entry1.getKey();
+	public Map<UserGroup, Map<String, Double>> getWarmEmissionsPerGroup() {
+		Map<UserGroup, Map<String, Double>> group2warmEmissionsAsString = new HashMap<UserGroup, Map<String, Double>>();
+
+		for (Entry<UserGroup, Map<WarmPollutant, Double>> entry1: this.group2Emissions.entrySet()){
+			UserGroup group = entry1.getKey();
 			Map<WarmPollutant, Double> pollutant2Values = entry1.getValue();
 			Map<String, Double> pollutantString2Values = new HashMap<String, Double>();
 			for (Entry<WarmPollutant, Double> entry2: pollutant2Values.entrySet()){
@@ -89,7 +89,5 @@ public class EmissionsPerGroupWarmEventHandler implements WarmEmissionEventHandl
 	@Override
 	public void reset(int iteration) {
 		this.group2Emissions.clear();
-		
 	}
-
 }

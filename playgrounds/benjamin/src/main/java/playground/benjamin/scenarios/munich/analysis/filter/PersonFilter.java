@@ -20,11 +20,10 @@
 package playground.benjamin.scenarios.munich.analysis.filter;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -33,9 +32,42 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class PersonFilter {
 	
+	public Population getPopulation(Population population, UserGroup userGroup) {
+		Population filteredPopulation = null;
+		
+		if(userGroup.equals(UserGroup.MID)) filteredPopulation = getMiDPopulation(population);
+		else if(userGroup.equals(UserGroup.INN_COMMUTER)) filteredPopulation = getInnCommuter(population);
+		else if(userGroup.equals(UserGroup.OUT_COMMUTER)) filteredPopulation = getOutCommuter(population);
+		else if(userGroup.equals(UserGroup.FREIGHT)) filteredPopulation = getFreightPopulation(population);
+		
+		return filteredPopulation;
+	}
+	
+	public boolean isPersonFromUserGroup(Person person, UserGroup userGroup) {
+		boolean isFromUserGroup = false;
+		
+		if(isPersonFromMID(person) && userGroup.equals(UserGroup.MID)) isFromUserGroup = true;
+		else if(isPersonInnCommuter(person) && userGroup.equals(UserGroup.INN_COMMUTER)) isFromUserGroup = true;
+		else if(isPersonOutCommuter(person) && userGroup.equals(UserGroup.OUT_COMMUTER)) isFromUserGroup = true;
+		else if(isPersonFreight(person) && userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;
+		
+		return isFromUserGroup;
+	}
+	
+	public boolean isPersonIdFromUserGroup(Id personId, UserGroup userGroup) {
+		boolean isFromUserGroup = false;
+		
+		if(isPersonFromMID(personId) && userGroup.equals(UserGroup.MID)) isFromUserGroup = true;
+		else if(isPersonInnCommuter(personId) && userGroup.equals(UserGroup.INN_COMMUTER)) isFromUserGroup = true;
+		else if(isPersonOutCommuter(personId) && userGroup.equals(UserGroup.OUT_COMMUTER)) isFromUserGroup = true;
+		else if(isPersonFreight(personId) && userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;
+		
+		return isFromUserGroup;
+	}
+
 	public Population getMiDPopulation(Population population) {
-		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population filteredPopulation = new PopulationImpl(emptyScenario);
+		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
 			if(isPersonFromMID(person)){
 				filteredPopulation.addPerson(person);
@@ -44,9 +76,20 @@ public class PersonFilter {
 		return filteredPopulation;
 	}
 	
+	public Population getMunichPopulation(Population population){
+		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = emptyScenario.getPopulation();
+		for(Person person : population.getPersons().values()){
+			if(isPersonFromMunich(person)){
+				filteredPopulation.addPerson(person);
+			}
+		}
+		return filteredPopulation;
+	}
+
 	public Population getInnCommuter(Population population){
-		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population filteredPopulation = new PopulationImpl(emptyScenario);
+		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
 			if(isPersonInnCommuter(person)){
 				filteredPopulation.addPerson(person);
@@ -56,8 +99,8 @@ public class PersonFilter {
 	}
 	
 	public Population getOutCommuter(Population population){
-		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population filteredPopulation = new PopulationImpl(emptyScenario);
+		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
 			if(isPersonOutCommuter(person)){
 				filteredPopulation.addPerson(person);
@@ -66,26 +109,58 @@ public class PersonFilter {
 		return filteredPopulation;
 	}
 	
-	public Population getMunichPopulation(Population population){
-		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population filteredPopulation = new PopulationImpl(emptyScenario);
+	public Population getFreightPopulation(Population population){
+		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
-			if(isPersonFromMID(person) || isPersonOutCommuter(person)){
+			if(isPersonFreight(person)){
 				filteredPopulation.addPerson(person);
 			}
 		}
 		return filteredPopulation;
 	}
-	
+
 	public Population getNonFreightPopulation(Population population){
-		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population filteredPopulation = new PopulationImpl(emptyScenario);
+		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
 			if(!isPersonFreight(person)){
 				filteredPopulation.addPerson(person);
 			}
 		}
 		return filteredPopulation;
+	}
+	
+	public boolean isPersonFromMID(Person person) {
+		boolean isFromMID = false;
+		if(!person.getId().toString().startsWith("gv_") && !person.getId().toString().startsWith("pv_")){
+			isFromMID = true;
+		}
+		return isFromMID;
+	}
+
+	public boolean isPersonFromMID(Id personId) {
+		boolean isFromMID = false;
+		if(!personId.toString().startsWith("gv_") && !personId.toString().startsWith("pv_")){
+			isFromMID = true;
+		}
+		return isFromMID;
+	}
+	
+	public boolean isPersonFromMunich(Person person) {
+		boolean isFromMunich = false;
+		if(isPersonFromMID(person) || isPersonOutCommuter(person)){
+			isFromMunich = true;
+		}
+		return isFromMunich;
+	}
+	
+	public boolean isPersonFromMunich(Id personId) {
+		boolean isFromMunich = false;
+		if(isPersonFromMID(personId) || isPersonOutCommuter(personId)){
+			isFromMunich = true;
+		}
+		return isFromMunich;
 	}
 
 	public boolean isPersonInnCommuter(Person person) {
@@ -122,22 +197,6 @@ public class PersonFilter {
 			isOutCommuter = true;
 		}
 		return isOutCommuter;
-	}
-
-	public boolean isPersonFromMID(Person person) {
-		boolean isFromMID = false;
-		if(!person.getId().toString().startsWith("gv_") && !person.getId().toString().startsWith("pv_")){
-			isFromMID = true;
-		}
-		return isFromMID;
-	}
-	
-	public boolean isPersonFromMID(Id personId) {
-		boolean isFromMID = false;
-		if(!personId.toString().startsWith("gv_") && !personId.toString().startsWith("pv_")){
-			isFromMID = true;
-		}
-		return isFromMID;
 	}
 
 	public boolean isPersonFreight(Person person) {

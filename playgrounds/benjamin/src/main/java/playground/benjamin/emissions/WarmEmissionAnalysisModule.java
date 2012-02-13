@@ -21,7 +21,6 @@
  * *********************************************************************** */
 package playground.benjamin.emissions;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +42,7 @@ import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactor;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
 import playground.benjamin.emissions.types.WarmPollutant;
+import playground.benjamin.utils.BkNumberUtils;
 
 /**
  * @author benjamin
@@ -297,25 +297,19 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	public double getKmCounter() {
-		return roundDouble((kmCounter / WarmPollutant.values().length), 3);
+		return BkNumberUtils.roundDouble((kmCounter / WarmPollutant.values().length), 3);
 	}
 
 	public double getFreeFlowKmCounter() {
-		return roundDouble((freeFlowKmCounter / WarmPollutant.values().length), 3);
+		return BkNumberUtils.roundDouble((freeFlowKmCounter / WarmPollutant.values().length), 3);
 	}
 
 	public double getStopGoKmCounter() {
-		return roundDouble((stopGoKmCounter / WarmPollutant.values().length), 3);
+		return BkNumberUtils.roundDouble((stopGoKmCounter / WarmPollutant.values().length), 3);
 	}
 
 	public int getWarmEmissionEventCounter() {
 		return emissionEventCounter;
-	}
-
-	public static double roundDouble(double dd, int decimalPlace){
-	BigDecimal bd = new BigDecimal(Double.toString(dd));
-	bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-	return bd.doubleValue();
 	}
 	
 }

@@ -21,9 +21,9 @@ package playground.benjamin.scenarios.munich.analysis.cupum;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -34,6 +34,7 @@ import org.matsim.core.events.EventsUtils;
 import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author benjamin
@@ -57,20 +58,20 @@ public class EmissionsPerGroupAnalysis {
 		processEmissions();
 		defineListOfPollutants();
 		
-		Map<String, Map<String, Double>> group2WarmEmissions = warmHandler.getWarmEmissionsPerGroup();
-		Map<String, Map<String, Double>> group2ColdEmissions = coldHandler.getColdEmissionsPerGroup();
+		Map<UserGroup, Map<String, Double>> group2WarmEmissions = warmHandler.getWarmEmissionsPerGroup();
+		Map<UserGroup, Map<String, Double>> group2ColdEmissions = coldHandler.getColdEmissionsPerGroup();
 		
-		Map<String, Map<String, Double>> group2TotalEmissions = sumUpEmissions(group2WarmEmissions, group2ColdEmissions);
+		Map<UserGroup, Map<String, Double>> group2TotalEmissions = sumUpEmissions(group2WarmEmissions, group2ColdEmissions);
 		
-		for(String group : group2TotalEmissions.keySet()){
+		for(UserGroup group : group2TotalEmissions.keySet()){
 			System.out.println(group + " population exhausts: " + group2TotalEmissions.get(group));
 		}
 	}
 
-	private static Map<String, Map<String, Double>> sumUpEmissions(Map<String, Map<String, Double>> warmEmissions, Map<String, Map<String, Double>> coldEmissions) {
-		Map<String, Map<String, Double>> totalEmissions = new HashMap<String, Map<String, Double>>();
-		for(Entry<String, Map<String, Double>> entry : warmEmissions.entrySet()){
-			String group = entry.getKey();
+	private static Map<UserGroup, Map<String, Double>> sumUpEmissions(Map<UserGroup, Map<String, Double>> warmEmissions, Map<UserGroup, Map<String, Double>> coldEmissions) {
+		Map<UserGroup, Map<String, Double>> totalEmissions = new HashMap<UserGroup, Map<String, Double>>();
+		for(Entry<UserGroup, Map<String, Double>> entry : warmEmissions.entrySet()){
+			UserGroup group = entry.getKey();
 			Map<String, Double> individualWarmEmissions = entry.getValue();
 
 			if(coldEmissions.containsKey(group)){

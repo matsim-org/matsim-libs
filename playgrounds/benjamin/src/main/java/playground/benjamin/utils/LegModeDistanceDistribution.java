@@ -55,9 +55,9 @@ public class LegModeDistanceDistribution {
 	private static final Logger logger = Logger.getLogger(LegModeDistanceDistribution.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase/";
-	private static String initialPlansFile = runDirectory + "ITERS/it.0/0.plans.xml.gz";
-//	private static String initialPlansFile = runDirectory + "ITERS/it.1000/1000.plans.xml.gz";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/short/";
+//	private static String initialPlansFile = runDirectory + "ITERS/it.0/0.plans.xml.gz";
+	private static String initialPlansFile = runDirectory + "ITERS/it.1000/1000.plans.xml.gz";
 	private static String finalPlansFile = runDirectory + "output_plans.xml.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
 //	private static String finalPlansFile = runDirectory + "ITERS/it.300/300.plans.xml.gz";
