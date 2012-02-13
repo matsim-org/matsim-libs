@@ -108,6 +108,7 @@
 		<param name="writePlansInterval" value="500" />
 
 		<param name="mobsim" value="qsim" />
+		<param name="writeSnapshotsInterval" value="0" />
 	</module>
 
 	<module name="counts">
@@ -148,7 +149,6 @@
 		<!-- Use number of threads > 1 for parallel version using the specified 
 			number of threads -->
 		<!--param name="numberOfThreads" value="8" / -->
-		<param name="writeSnapshotsInterval" value="0" />
 	</module>
 	<!-- ====================================================================== -->
 
