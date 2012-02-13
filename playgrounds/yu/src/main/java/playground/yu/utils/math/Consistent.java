@@ -15,7 +15,7 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class Consistent {
 	/**
-	 * @param amplitudeCriterion
+	 * @param criterion
 	 *            double criterion for consistency, the absolute value of the
 	 *            current/second element in {@code Tuple} should stay in a range
 	 *            of +/-amplitudeCriterion* absolute value of the last/first
@@ -27,12 +27,11 @@ public class Consistent {
 	 * @return whether the 2 elements in a {@code Tuple} could show the
 	 *         consistency
 	 */
-	public static boolean wouldBe(double amplitudeCriterion,
-			Tuple<Double, Double> values) {
+	public static boolean wouldBe(double criterion, Tuple<Double, Double> values) {
 		double vLast = values.getFirst(), vCurrent = values.getSecond();
 		if (vLast != 0d) {
-			return Math.abs((vCurrent - vLast) / vLast) <= amplitudeCriterion;
+			return Math.abs((vCurrent - vLast) / vLast) <= criterion;
 		}
-		return Math.abs(vCurrent) <= amplitudeCriterion;
+		return Math.abs(vCurrent) <= criterion;
 	}
 }

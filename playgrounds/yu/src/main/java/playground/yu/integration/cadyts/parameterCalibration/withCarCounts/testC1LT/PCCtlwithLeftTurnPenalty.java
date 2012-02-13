@@ -82,4 +82,10 @@ public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler
 
 		return manager;
 	}
+
+	@Override
+	public void shutdown(boolean unexpected) {
+		super.shutdown(unexpected);
+	}
+
 }

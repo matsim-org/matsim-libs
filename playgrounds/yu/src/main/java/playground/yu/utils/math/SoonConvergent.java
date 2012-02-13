@@ -18,12 +18,13 @@ public class SoonConvergent {
 	 *            criterion for the difference between the highest and lowest
 	 *            value in each half of the array, the absolute value of the
 	 *            second difference may be smaller than the absolute value of
-	 *            the first difference * this amplitudeCriterion.
+	 *            the first difference * this amplitudeCriterion, z.B. 0.7, 0.6
+	 *            ...
 	 * @param avgValueCriterion
 	 *            the average value of the second half of the array may not
 	 *            exceed a rang of +/- avgValueCriterion with the average value
 	 *            of the first half as the center, should stand in the range of
-	 *            (0,1), should be a positive value <0.2
+	 *            (0,1), should be a positive value <0.2, e.g. 0.1, 0.05
 	 * @param values
 	 *            a double array, please had better ensure that the array length
 	 *            is a even number
@@ -35,9 +36,9 @@ public class SoonConvergent {
 		int size1 = values.length / 2;
 
 		double min1 = SimpleStatistics.min(values, 0, size1 - 1)//
-				, max1 = SimpleStatistics.max(values, 0, size1 - 1)//
-				, min2 = SimpleStatistics.min(values, size1, values.length - 1)//
-				, max2 = SimpleStatistics.max(values, size1, values.length - 1);
+		, max1 = SimpleStatistics.max(values, 0, size1 - 1)//
+		, min2 = SimpleStatistics.min(values, size1, values.length - 1)//
+		, max2 = SimpleStatistics.max(values, size1, values.length - 1);
 
 		boolean firstCondition = Math.abs(max2 - min2) <= amplitudeCriterion
 				* Math.abs(max1 - min1);
@@ -46,7 +47,7 @@ public class SoonConvergent {
 			return true;
 		} else {
 			double avg1 = SimpleStatistics.average(values, 0, size1 - 1)//
-					, avg2 = SimpleStatistics.average(values, size1, values.length - 1);
+			, avg2 = SimpleStatistics.average(values, size1, values.length - 1);
 
 			boolean secondCondition = false;
 			if (avg1 != 0d) {
