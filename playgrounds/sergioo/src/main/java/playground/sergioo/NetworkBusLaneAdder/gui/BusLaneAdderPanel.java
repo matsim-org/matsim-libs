@@ -43,8 +43,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.http.client.ClientProtocolException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.AStarLandmarks;
-import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -74,7 +74,7 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 	private final BusLaneAdderWindow busLaneAdderWindow;
 	private int iniX;
 	private int iniY;
-	private AStarLandmarks aStarLandmarks;
+	private Dijkstra dijkstra;
 	private int posLocation = 0;
 	private AddressLocator addressLocator;
 	
@@ -115,9 +115,9 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 					return Double.MAX_VALUE;
 			}
 		};
-		PreProcessLandmarks preProcessData = new PreProcessLandmarks(travelMinCost);
+		PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 		preProcessData.run(busLaneAdderWindow.getNetwork());
-		aStarLandmarks = new AStarLandmarks(busLaneAdderWindow.getNetwork(), preProcessData, timeFunction);
+		dijkstra = new Dijkstra(busLaneAdderWindow.getNetwork(), travelMinCost, timeFunction, preProcessData);
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
@@ -134,7 +134,7 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 		((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).clearLinksSelection();
 	}
 	public void selectLinks() {
-		((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectLinks(aStarLandmarks);
+		((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectLinks(dijkstra);
 	}
 	public List<Link> getLinks() {
 		return ((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).getSelectedLinks();

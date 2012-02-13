@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.AStarLandmarks;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -39,10 +39,10 @@ public class NetworkTwoNodesPainterManager extends NetworkPainterManager {
 	public List<Link> getSelectedLinks() {
 		return selectedLinks;
 	}
-	public void selectLinks(AStarLandmarks aStarLandmarks) {
+	public void selectLinks(Dijkstra dijkstra) {
 		selectedLinks.clear();
 		if(selectedNodesId.size()==2) {
-			Path path=aStarLandmarks.calcLeastCostPath(network.getNodes().get(selectedNodesId.get(0)), network.getNodes().get(selectedNodesId.get(1)), 0);
+			Path path=dijkstra.calcLeastCostPath(network.getNodes().get(selectedNodesId.get(0)), network.getNodes().get(selectedNodesId.get(1)), 0);
 			for(Link link:path.links)
 				selectedLinks.add(link);
 		}

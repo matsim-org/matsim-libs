@@ -125,7 +125,7 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 		this.finalNetworkFile = finalNetworkFile;
 		this.network = network;
 		NetworkTwoNodesPainter networkPainter = new NetworkTwoNodesPainter(network, Color.BLACK);
-		setDefaultCloseOperation(HIDE_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout()); 
 		layersPanels.put(PanelIds.ONE, new BusLaneAdderPanel(this, networkPainter, imageFile, upLeft, downRight, coordinateTransformation));
@@ -217,13 +217,14 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 				node = link.getToNode();
 			}
 			else {
-				if(i==links.size()-1)
-					node = link.getToNode();
+				Node oldNode = link.getToNode();
+				if(i==links.size()-1 || oldNode.getInLinks().size()+oldNode.getOutLinks().size()>2)
+					node = oldNode;
 				else {
-					node = network.getFactory().createNode(new IdImpl("n"+link.getToNode().getId().toString()), link.getToNode().getCoord());
+					node = network.getFactory().createNode(new IdImpl("fl"+oldNode.getId().toString()), oldNode.getCoord());
 					network.addNode(node);
 				}
-				LinkImpl newLink = (LinkImpl) network.getFactory().createLink(new IdImpl("c"+link.getId().toString()), prevNode, node);
+				LinkImpl newLink = (LinkImpl) network.getFactory().createLink(new IdImpl("fl"+link.getId().toString()), prevNode, node);
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
 				newLink.setAllowedModes(modes);
