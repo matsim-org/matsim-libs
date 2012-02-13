@@ -58,9 +58,8 @@ public class SHPFileUtil {
 			if (geometry == null) {
 				geometry = (Geometry) feature.getDefaultGeometry().clone();
 				continue;
-			} else geometry.union(feature.getDefaultGeometry());
+			} else geometry = geometry.union(feature.getDefaultGeometry());
 		}
-		
 		return geometry;
 	}
 }
