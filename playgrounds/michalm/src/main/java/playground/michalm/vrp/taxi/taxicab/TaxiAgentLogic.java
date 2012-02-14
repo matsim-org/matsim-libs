@@ -232,7 +232,7 @@ public class TaxiAgentLogic
                         agent.getId()));
 
                 passenger.notifyTeleportToLink(passenger.getDestinationLinkId());
-                passenger.endLegAndAssumeControl(now);
+                passenger.endLegAndComputeNextState(now);
                 TaxiAgentLogic.this.taxiSimEngine.internalInterface.arrangeNextAgentState(passenger) ;
             }
         };

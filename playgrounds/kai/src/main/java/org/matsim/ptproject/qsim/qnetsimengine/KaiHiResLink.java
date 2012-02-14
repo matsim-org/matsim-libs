@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: kai
- * MyHybridNode.java
+ * KaiHiResLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,45 +20,13 @@
 
 package org.matsim.ptproject.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Link;
 
-/**
- * @author nagel
- */
-public class KaiHybridNode extends QNode {
+public class KaiHiResLink extends QLinkImpl {
 
-	public KaiHybridNode(Node n, QNetwork network) {
-		super(n, network);
-	}
-	
-	@Override
-	/*package*/ void clearLinkBuffer(final AbstractQLink inLink, final double now){
-		if (inLink instanceof QLinkImpl){
-			while (!inLink.bufferIsEmpty()) {
-				QVehicle veh = inLink.getFirstFromBuffer();
-				if (!moveVehicleFromQLinkOverNode(veh, inLink, now)) {
-					break;
-				}
-			}
-			
-		} else {
-			while (!inLink.bufferIsEmpty()) {
-				QVehicle veh = inLink.getFirstFromBuffer();
-				if (!moveVehicleFromOtherLinkOverNode(veh, inLink, now)) {
-					break;
-				}
-			}
-		}
-	}
-
-	private boolean moveVehicleFromOtherLinkOverNode(QVehicle veh, AbstractQLink inLink, double now) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
-	private boolean moveVehicleFromQLinkOverNode(QVehicle veh, AbstractQLink inLink, double now) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+	public KaiHiResLink(Link link2, QNetwork network, QNode toNode) {
+		super(link2, network, toNode);
+		// TODO Auto-generated constructor stub
 	}
 
 }

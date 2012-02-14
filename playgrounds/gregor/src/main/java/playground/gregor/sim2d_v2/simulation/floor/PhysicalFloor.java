@@ -287,7 +287,7 @@ public class PhysicalFloor implements Floor {
 
 			// end of route
 			if (id == null) {
-				agent.endLegAndAssumeControl(time);
+				agent.endLegAndComputeNextState(time);
 
 				return true;
 				// (returning "true" removes (or should remove) the Agent2D "wrapper" since endLegAndAssumeControl only moves

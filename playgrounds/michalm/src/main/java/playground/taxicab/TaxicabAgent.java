@@ -161,7 +161,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	
 	//@SuppressWarnings("null")
 	@Override
-	public void endLegAndAssumeControl(double now) {
+	public void endLegAndComputeNextState(double now) {
 		
 		EventsManager events = this.netsim.getEventsManager() ;
 		EventsFactoryImpl evFac = (EventsFactoryImpl) events.getFactory() ;
@@ -217,7 +217,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	}
 
 	@Override
-	public void endActivityAndAssumeControl(double now) {
+	public void endActivityAndComputeNextState(double now) {
 		// this should, in theory, only happen at simulation start.
 
 //		this.netsim.arrangeAgentDeparture(this) ;
@@ -227,6 +227,13 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 		
 	}
+	
+    @Override
+    public void abort(double now) {
+    	this.state = MobsimAgent.State.ABORT ;
+    }
+
+
 
 
 	// things that should never happen with the random taxicab agent:

@@ -262,7 +262,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 	}
 
 	@Override
-	public void endActivityAndAssumeControl(double now) {
+	public void endActivityAndComputeNextState(double now) {
 		// The simulation tells me when the time has come to end my activity.
 		// This may be later than the time I told it I wanted to end my activity, 
 		// because it may already have been later then.
@@ -278,7 +278,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 	}
 
 	@Override
-	public void endLegAndAssumeControl(double now) {
+	public void endLegAndComputeNextState(double now) {
 		// The simulation tells me I have arrived.
 		// Interestingly, I have to throw the event myself. mz
 		//
@@ -292,6 +292,13 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 		eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id, currentLinkId, this.mode));
 		teleportationBehavior = null;
 		drivingBehavior = null;
+	}
+	
+	@Override
+	public void abort(double now) {
+		this.state = MobsimAgent.State.ABORT ;
+		// yy this is not necessarily the most meaningful implementation.  It is, however, consistent with what happened before ...
+		// which was that the Mobsim ejected the agent from the simulation without asking.  kai, feb'12
 	}
 	
 	@Override

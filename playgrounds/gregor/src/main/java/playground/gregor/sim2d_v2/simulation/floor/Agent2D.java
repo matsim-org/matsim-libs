@@ -199,8 +199,8 @@ public class Agent2D implements MobsimAgent {
 	}
 
 	@Override
-	public void endLegAndAssumeControl(double time) {
-		this.pda.endLegAndAssumeControl(time);
+	public void endLegAndComputeNextState(double time) {
+		this.pda.endLegAndComputeNextState(time);
 	}
 
 	public Id chooseNextLinkId() {
@@ -259,8 +259,8 @@ public class Agent2D implements MobsimAgent {
 	}
 
 	@Override
-	public void endActivityAndAssumeControl(double now) {
-		this.pda.endActivityAndAssumeControl(now);
+	public void endActivityAndComputeNextState(double now) {
+		this.pda.endActivityAndComputeNextState(now);
 	}
 
 	@Override

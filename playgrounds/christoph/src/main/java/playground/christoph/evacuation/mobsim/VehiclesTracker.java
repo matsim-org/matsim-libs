@@ -367,7 +367,7 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 					 */
 					MobsimAgent passenger = this.agents.get(passengerId);
 					passenger.notifyTeleportToLink(event.getLinkId());	// use drivers position
-					passenger.endLegAndAssumeControl(event.getTime());	
+					passenger.endLegAndComputeNextState(event.getTime());	
 					this.internalInterface.arrangeNextAgentState(passenger);
 
 					// remove passenger from map

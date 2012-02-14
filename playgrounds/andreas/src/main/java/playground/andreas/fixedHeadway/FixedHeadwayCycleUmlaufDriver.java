@@ -49,8 +49,8 @@ public class FixedHeadwayCycleUmlaufDriver extends UmlaufDriver {
 	}
 	
 	@Override
-	public void endActivityAndAssumeControl(final double now) {
-		super.endActivityAndAssumeControl(now);
+	public void endActivityAndComputeNextState(final double now) {
+		super.endActivityAndComputeNextState(now);
 		this.additionalDelayAtNextStop = 0.0;
 	}
 }

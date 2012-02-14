@@ -113,7 +113,7 @@ public class DynAgent
 
 
     @Override
-    public void endActivityAndAssumeControl(double now)
+    public void endActivityAndComputeNextState(double now)
     {
         eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id,
                 currentLinkId, null, vrpActivity.getActivityType()));
@@ -127,7 +127,7 @@ public class DynAgent
 
 
     @Override
-    public void endLegAndAssumeControl(double now)
+    public void endLegAndComputeNextState(double now)
     {
         eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id,
                 currentLinkId, TransportMode.car));
@@ -137,6 +137,11 @@ public class DynAgent
         state = null;// !!! this is important
 
         agentLogic.endLegAndAssumeControl(oldLeg, now);
+    }
+    
+    @Override
+    public void abort(double now) {
+    	this.state = MobsimAgent.State.ABORT ;
     }
 
 

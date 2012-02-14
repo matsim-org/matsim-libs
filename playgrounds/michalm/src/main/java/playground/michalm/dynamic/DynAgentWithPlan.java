@@ -34,17 +34,23 @@ public class DynAgentWithPlan
 
 
     @Override
-    public void endActivityAndAssumeControl(double now)
+    public void endActivityAndComputeNextState(double now)
     {
-        dynAgent.endActivityAndAssumeControl(now);
+        dynAgent.endActivityAndComputeNextState(now);
     }
 
 
     @Override
-    public void endLegAndAssumeControl(double now)
+    public void endLegAndComputeNextState(double now)
     {
-        dynAgent.endLegAndAssumeControl(now);
+        dynAgent.endLegAndComputeNextState(now);
     }
+
+    @Override
+    public void abort(double now) {
+    	dynAgent.abort(now) ;
+    }
+
 
 
     @Override

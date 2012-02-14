@@ -64,7 +64,7 @@ public class MobsimFacility implements Updateable {
 		MobsimAgent person = agentsAtActivities.peek();
 		if ( person.getActivityEndTime() <= now() ) {
 			agentsAtActivities.remove();
-			person.endActivityAndAssumeControl(now()) ;
+			person.endActivityAndComputeNextState(now()) ;
 //			throw new RuntimeException("this is deprecated") ;
 			// call departure handler
 			// how does the departure handler get access to the vehicle?
