@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.qnetsimengine.HybridNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.KaiHybridNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 
@@ -41,7 +41,7 @@ public class KaiController {
 			@Override
 			public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
 //				return new QNetsimEngine( (QSim) sim, random ) ;
-				return new QNetsimEngine( (QSim)sim, random, new HybridNetworkFactory() ) ;
+				return new QNetsimEngine( (QSim)sim, random, new KaiHybridNetworkFactory() ) ;
 			}
 		} ;
 		MobsimFactory mobsimFactory = new MobsimFactory() {

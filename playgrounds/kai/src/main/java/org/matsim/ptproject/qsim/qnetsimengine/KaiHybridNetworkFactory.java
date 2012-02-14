@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Node;
  * <li> It would probably be much better to have this in a separate package.  But this means to move a lot of scopes from
  * "package" to protedted.  Worse, the interfaces are not sorted out.  So I remain here for the time being.  kai, jan'11
  */
-public final class HybridNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
+public final class KaiHybridNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
 
 	@Override
 	public AbstractQLink createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
@@ -37,7 +37,7 @@ public final class HybridNetworkFactory implements NetsimNetworkFactory<QNode, A
 
 	@Override
 	public QNode createNetsimNode(final Node node, QNetwork network) {
-		return new MyHybridNode(node, network);
+		return new KaiHybridNode(node, network);
 	}
 
 }
