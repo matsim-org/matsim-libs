@@ -25,27 +25,20 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
-
 public class PickupAgentReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
-	private final AgentsToPickupIdentifier identifier;
-	private final VehiclesTracker vehiclesTracker;
 	
 	public PickupAgentReplannerFactory(Scenario scenario,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
-			 AgentsToPickupIdentifier identifier, VehiclesTracker vehiclesTracker) {
+			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
 		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
-		this.identifier = identifier;
-		this.vehiclesTracker = vehiclesTracker;
+
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
-		WithinDayDuringLegReplanner replanner = new PickupAgentReplanner(super.getId(), scenario, identifier, vehiclesTracker);
+		WithinDayDuringLegReplanner replanner = new PickupAgentReplanner(super.getId(), scenario);
 		super.initNewInstance(replanner);
 		return replanner;
 	}

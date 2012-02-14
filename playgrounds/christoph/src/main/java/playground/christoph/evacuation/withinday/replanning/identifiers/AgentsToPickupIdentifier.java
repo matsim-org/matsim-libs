@@ -86,6 +86,8 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	private final PersonalizableTravelTime walkTravelTime;
 
 	private final Map<Id, MobsimAgent> agents;
+	private final Map<Id, Double> earliestLinkLeaveTime;
+	private final Set<Id> carLegPerformingAgents;
 	private final Set<Id> walkLegPerformingAgents;
 	private final Set<Id> insecureWalkLegPerformingAgents;
 	
@@ -102,6 +104,8 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 		this.walkTravelTime = walkTravelTime;
 
 		this.agents = new HashMap<Id, MobsimAgent>();
+		this.earliestLinkLeaveTime = new HashMap<Id, Double>();
+		this.carLegPerformingAgents= new HashSet<Id>();
 		this.walkLegPerformingAgents = new HashSet<Id>();
 		this.insecureWalkLegPerformingAgents = new HashSet<Id>();
 	}
@@ -143,8 +147,19 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				 */
 				List<Id> vehicleIds = vehiclesTracker.getEnrouteVehiclesOnLink(personAgent.getCurrentLinkId());
 				for (Id vehicleId : vehicleIds) {
+					Id driverId = this.vehiclesTracker.getVehicleDriverId(vehicleId);
+					
+					/*
+					 * If the vehicle could leave the link before the agent has entered it skip 
+					 * the vehicle and try the next one.
+					 * Add two seconds because the walk agent has to stop and perform the pickup
+					 * activity which takes some time.
+					 */
+					double leaveLinkTime = this.earliestLinkLeaveTime.get(driverId);
+					if (time + 2 > leaveLinkTime) continue;
+					
 					int capacity = this.vehiclesTracker.getFreeVehicleCapacity(vehicleId);
-
+					
 					/*
 					 * If already other agents have reserved a place in that vehicle, reduce
 					 * the vehicle's available capacity.
@@ -185,9 +200,10 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 
 	@Override
 	public void reset(int iteration) {
-		this.insecureWalkLegPerformingAgents.clear();
-		this.walkLegPerformingAgents.clear();
 		this.agentsLeaveLinkQueue.clear();
+		this.carLegPerformingAgents.clear();
+		this.walkLegPerformingAgents.clear();
+		this.insecureWalkLegPerformingAgents.clear();
 	}
 
 	@Override
@@ -217,6 +233,10 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				departureTime = Math.round(departureTime);
 				this.agentsLeaveLinkQueue.add(new Tuple<Double, MobsimAgent>(departureTime, agent));
 			}
+		} else if (this.carLegPerformingAgents.contains(event.getPersonId())) {
+			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+			double time = link.getLength() / link.getFreespeed(event.getTime());
+			this.earliestLinkLeaveTime.put(event.getPersonId(), time);
 		}
 	}
 
@@ -227,6 +247,8 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
+		this.earliestLinkLeaveTime.remove(event.getPersonId());
+		this.carLegPerformingAgents.remove(event.getPersonId());
 		this.walkLegPerformingAgents.remove(event.getPersonId());
 		this.insecureWalkLegPerformingAgents.remove(event.getPersonId());
 	}
@@ -236,6 +258,9 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 		if (event.getLegMode().equals(TransportMode.walk)) {
 			this.walkLegPerformingAgents.remove(event.getPersonId());
 			this.insecureWalkLegPerformingAgents.remove(event.getPersonId());
+		} else if (event.getLegMode().equals(TransportMode.car)) {
+			this.carLegPerformingAgents.remove(event.getPersonId());
+			this.earliestLinkLeaveTime.remove(event.getPersonId());
 		}
 	}
 
@@ -247,6 +272,11 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 			boolean affected = this.coordAnalyzer.isLinkAffected(link);
 			if (affected) this.insecureWalkLegPerformingAgents.add(event.getPersonId());
+		} else if (event.getLegMode().equals(TransportMode.car)) {
+			this.carLegPerformingAgents.add(event.getPersonId());
+
+			// the agent might leave the current link immediately
+			this.earliestLinkLeaveTime.put(event.getPersonId(), event.getTime());
 		}
 	}
 

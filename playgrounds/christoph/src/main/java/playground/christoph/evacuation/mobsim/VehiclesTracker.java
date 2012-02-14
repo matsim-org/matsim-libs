@@ -46,7 +46,6 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -131,9 +130,6 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	public Id getVehicleDestination(Id vehicleId) {
 		Id driverId = vehicleDriverMap.get(vehicleId);
 		if (driverId == null) {
-			log.info(this.enrouteVehicles.contains(vehicleId));
-			List<Id> vehicleIds = this.getEnrouteVehiclesOnLink(new IdImpl("113352"));
-			log.info(vehicleIds.contains(vehicleIds));
 			return null;
 		}
 		
@@ -196,6 +192,10 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 		if (driver == null) return null;
 		
 		return driver.getCurrentLinkId();
+	}
+	
+	public Id getVehicleDriverId(Id vehicleId) {
+		return this.vehicleDriverMap.get(vehicleId);
 	}
 	
 	public Id getPassengerLinkId(Id passengerId) {
@@ -268,6 +268,11 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		this.vehicleCapacities.get(event.getVehicleId()).decrementAndGet();
 		
+		/*
+		 * Passengers have to be registered as passengers before they enter a vehicle.
+		 * If they are not, we assume that its the driver who enters the vehicle.
+		 * TODO: this is NOT safe, so find a better solution...
+		 */
 		boolean isPassenger = passengerVehicleMap.containsKey(event.getPersonId());
 		if (!isPassenger) {
 			driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
@@ -276,17 +281,13 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 		
 		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
 		if (isDriver) {
-			if (event.getVehicleId().toString().equals("2110188_veh1")) {
-				log.info("Entering vehicle..." + event.getTime());
-			}
 			this.driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
 			this.enrouteVehicles.add(event.getVehicleId());
 			this.parkedVehicles.remove(event.getVehicleId());
 			
 			Id linkId = this.agents.get(event.getPersonId()).getCurrentLinkId();
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(linkId);
-			vehicleIds.add(event.getVehicleId());			
-//			log.info("Add person " + event.getPersonId().toString() + " using vehicle " + event.getVehicleId().toString() + " to link " + linkId.toString());
+			vehicleIds.add(event.getVehicleId());
 		} 
 		
 		// consistency checks
@@ -330,22 +331,14 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 		
 		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
 		if (isDriver) {
-			if (event.getVehicleId().toString().equals("2110188_veh1")) {
-				log.info("Leaving vehicle..." + event.getTime());
-			}
 			Id linkId = this.agents.get(event.getPersonId()).getCurrentLinkId();
 
 			this.enrouteVehicles.remove(event.getVehicleId());
 			this.parkedVehicles.put(event.getVehicleId(), linkId);
 			
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(linkId);
-//			log.info("Remove person " + event.getPersonId().toString() + " using vehicle " + event.getVehicleId().toString() + " from link " + linkId.toString());
-			if(!vehicleIds.remove(event.getVehicleId())) {
-				log.warn("Tried to remove vehicle from enrouteVehiclesOnLink map but failed!");
-				log.warn("Vehicle " + event.getVehicleId());
-				log.warn("Link " + linkId);
-			}
-			
+			vehicleIds.remove(event.getVehicleId());
+
 			List<Id> passengers = vehiclePassengerMap.get(event.getVehicleId());
 			if (passengers != null) {
 				for (Id passengerId : passengers) {
@@ -358,7 +351,6 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 		
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-//		if (!checkTime(event)) return;
 		
 		// If it is the vehicles driver, there is an entry in the driverVehicleMap
 		Id vehicleId = driverVehicleMap.remove(event.getPersonId());
@@ -373,7 +365,6 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 					 * within the endLegAndAssumeControl method. Moreover,
 					 * the currently performed leg of the agent is ended.
 					 */
-//					MobsimAgent passenger = enroutePassengers.remove(passengerId);
 					MobsimAgent passenger = this.agents.get(passengerId);
 					passenger.notifyTeleportToLink(event.getLinkId());	// use drivers position
 					passenger.endLegAndAssumeControl(event.getTime());	
@@ -392,9 +383,8 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	public void handleEvent(LinkEnterEvent event) {
 		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
 		if (isDriver) {
-//		log.info("Add person " + event.getPersonId().toString() + " using vehicle " + event.getVehicleId().toString() + " to link " + event.getLinkId().toString());
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(event.getLinkId());
-			vehicleIds.add(event.getVehicleId());		
+			vehicleIds.add(event.getVehicleId());
 		}
 	}
 	
@@ -402,9 +392,8 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	public void handleEvent(LinkLeaveEvent event) {
 		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
 		if (isDriver) {
-//		log.info("Remove person " + event.getPersonId().toString() + " using vehicle " + event.getVehicleId().toString() + " from link " + event.getLinkId().toString());
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(event.getLinkId());
-			vehicleIds.add(event.getVehicleId());
+			vehicleIds.remove(event.getVehicleId());
 		}
 	}
 	
@@ -414,7 +403,6 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 		this.passengerVehicleMap.clear();
 		this.vehicleDriverMap.clear();
 		this.vehiclePassengerMap.clear();
-//		this.enroutePassengers.clear();
 		this.enrouteVehicles.clear();
 		this.enrouteVehiclesOnLink.clear();
 		this.parkedVehicles.clear();
