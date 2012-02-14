@@ -105,7 +105,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public final void endActivityAndAssumeControl(final double now) {
+	public final void endActivityAndComputeNextState(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
 		this.simulation.getEventsManager().processEvent(
 				this.simulation.getEventsManager().getFactory().createActivityEndEvent(
@@ -116,7 +116,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public final void endLegAndAssumeControl(final double now) {
+	public final void endLegAndComputeNextState(final double now) {
 		this.simulation.getEventsManager().processEvent(
 				this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
@@ -128,6 +128,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 			advancePlan() ;
 		}
+	}
+	
+	@Override
+	public final void abort(final double now) {
+		this.state = MobsimAgent.State.ABORT ;
 	}
 	
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -291,10 +296,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 		Route route = currentLeg.getRoute();
 		if (route == null) {
-			log.error("The agent " + this.getId() + " has no route in its leg. Removing the agent from the simulation.\n" +
-			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
-			this.simulation.getAgentCounter().decLiving();
-			this.simulation.getAgentCounter().incLost();
+			log.error("The agent " + this.getId() + " has no route in its leg. Removing the agent from the simulation." );
+//			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
+//			this.simulation.getAgentCounter().decLiving();
+//			this.simulation.getAgentCounter().incLost();
+			this.state = MobsimAgent.State.ABORT ;
 			return;
 		}
 		this.cachedDestinationLinkId = route.getEndLinkId();

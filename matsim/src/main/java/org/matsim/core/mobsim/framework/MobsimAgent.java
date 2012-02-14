@@ -104,14 +104,14 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	 *
 	 * @param now
 	 */
-	public void endActivityAndAssumeControl(final double now);
+	public void endActivityAndComputeNextState(final double now);
 
 	/**
 	 * Informs the agent that the leg has ended.  The agent is responsible for what comes next.
 	 *
 	 * @param now the current time in the simulation
 	 */
-	public void endLegAndAssumeControl(final double now);
+	public void endLegAndComputeNextState(final double now);
 
 //	public PlanElement getCurrentPlanElement() ;
 	// if this does not make sense for a class, then the class is maybe not a "Plan"Agent.  kai, may'10

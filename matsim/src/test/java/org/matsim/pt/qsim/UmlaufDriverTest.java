@@ -119,7 +119,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
-		driver.endActivityAndAssumeControl(0);
+		driver.endActivityAndComputeNextState(0);
 		trEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
@@ -390,10 +390,10 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		driver.setVehicle(queueVehicle);
 
 		assertTrue(driver.getCurrentPlanElement() instanceof Activity);
-		driver.endActivityAndAssumeControl(0);
+		driver.endActivityAndComputeNextState(0);
 		trEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(driver.getCurrentPlanElement() instanceof Leg);
-		driver.endLegAndAssumeControl(1);
+		driver.endLegAndComputeNextState(1);
 		trEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(driver.getCurrentPlanElement() instanceof Activity);
 	}

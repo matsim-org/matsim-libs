@@ -236,10 +236,13 @@ public class QNode implements NetsimNode {
 				 */
 				if (network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
 					fromLaneBuffer.popFirstFromBuffer();
-					network.simEngine.getMobsim().getAgentCounter().decLiving();
-					network.simEngine.getMobsim().getAgentCounter().incLost();
-					network.simEngine.getMobsim().getEventsManager().processEvent(
-							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
+					veh.getDriver().abort(now) ;
+					network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
+//					
+//					network.simEngine.getMobsim().getAgentCounter().decLiving();
+//					network.simEngine.getMobsim().getAgentCounter().incLost();
+//					network.simEngine.getMobsim().getEventsManager().processEvent(
+//							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
 				} else {
 					fromLaneBuffer.popFirstFromBuffer();
 					veh.getDriver().notifyMoveOverNode(nextLinkId);
@@ -252,12 +255,14 @@ public class QNode implements NetsimNode {
 
 		// --> nextLink == null
 		fromLaneBuffer.popFirstFromBuffer();
-		network.simEngine.getMobsim().getAgentCounter().decLiving();
-		network.simEngine.getMobsim().getAgentCounter().incLost();
+//		network.simEngine.getMobsim().getAgentCounter().decLiving();
+//		network.simEngine.getMobsim().getAgentCounter().incLost();
 		log.error(
 				"Agent has no or wrong route! agentId=" + veh.getDriver().getId()
 				+ " currentLink=" + currentLink.getId().toString()
 				+ ". The agent is removed from the simulation.");
+		veh.getDriver().abort(now) ;
+		network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
 		return true;
 	}
 

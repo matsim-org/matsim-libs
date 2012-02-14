@@ -71,7 +71,11 @@ public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void endActivityAndAssumeControl(final double now) {
+	public void endActivityAndComputeNextState(final double now) {
+	}
+	
+	@Override
+	public void abort(final double now){
 	}
 
 	@Override
@@ -133,7 +137,7 @@ public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 //	}
 
 	@Override
-	public void endLegAndAssumeControl(final double now) {
+	public void endLegAndComputeNextState(final double now) {
 	}
 
 	@Override

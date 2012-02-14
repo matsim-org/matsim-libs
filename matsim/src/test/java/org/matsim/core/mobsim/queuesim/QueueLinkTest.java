@@ -101,7 +101,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		MobsimDriverAgent driver = createQueuePersonAgent(p, f.qSim);
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
-		driver.endActivityAndAssumeControl(0);
+		driver.endActivityAndComputeNextState(0);
 		
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -158,7 +158,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		MobsimDriverAgent driver = createQueuePersonAgent(p, qsim);
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
-		driver.endActivityAndAssumeControl(0);
+		driver.endActivityAndComputeNextState(0);
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -222,13 +222,13 @@ public class QueueLinkTest extends MatsimTestCase {
 		MobsimDriverAgent pa1 = createQueuePersonAgent(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
-		pa1.endActivityAndAssumeControl(0.0);
+		pa1.endActivityAndComputeNextState(0.0);
 
 		QueueVehicle v2 = new QueueVehicle(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		MobsimDriverAgent pa2 = createQueuePersonAgent(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
-		pa2.endActivityAndAssumeControl(0.0);
+		pa2.endActivityAndComputeNextState(0.0);
 
 		// start test
 		assertTrue(qlink.bufferIsEmpty());
@@ -286,15 +286,15 @@ public class QueueLinkTest extends MatsimTestCase {
 		QueueVehicle veh1 = new QueueVehicle(new VehicleImpl(new IdImpl(1), vehType));
 		MobsimDriverAgent agent1 = createQueuePersonAgent( p , f.qSim);
 		veh1.setDriver(agent1);
-		agent1.endActivityAndAssumeControl(0.0);
+		agent1.endActivityAndComputeNextState(0.0);
 		QueueVehicle veh25 = new QueueVehicle(new VehicleImpl(new IdImpl(2), vehType), 2.5);
 		MobsimDriverAgent agent25 = createQueuePersonAgent( p , f.qSim);
 		veh25.setDriver(agent25);
-		agent25.endActivityAndAssumeControl(0.0);
+		agent25.endActivityAndComputeNextState(0.0);
 		QueueVehicle veh5 = new QueueVehicle(new VehicleImpl(new IdImpl(3), vehType), 5);
 		MobsimDriverAgent agent5 = createQueuePersonAgent( p , f.qSim);
 		veh5.setDriver(agent5);
-		agent5.endActivityAndAssumeControl(0.0);
+		agent5.endActivityAndComputeNextState(0.0);
 		
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getStorageCapacity(), EPSILON);
 		f.qlink2.addFromIntersection(veh5, 0.0);  // used vehicle equivalents: 5

@@ -500,7 +500,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
         // time 120: normalVeh2 departs, cannot be blocked from waitingQueue, so moved to buffer
         f.qsim.getSimTimer().setTime(120);
-        f.normalVehicle2.getDriver().endActivityAndAssumeControl(120);
+        f.normalVehicle2.getDriver().endActivityAndComputeNextState(120);
         f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver()) ;
         f.simEngine.doSimStep(120);
 
@@ -552,7 +552,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
         // time 120: normalVeh2 departs, moved to buffer
         f.qsim.getSimTimer().setTime(124);
-        f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+        f.normalVehicle2.getDriver().endActivityAndComputeNextState(124);
         f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver());
         f.simEngine.doSimStep(124);
 
@@ -654,7 +654,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
         // time 124: normalVeh2 departs, moved to buffer
         f.qsim.getSimTimer().setTime(124);
-        f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+        f.normalVehicle2.getDriver().endActivityAndComputeNextState(124);
         f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver()) ;
         f.simEngine.doSimStep(124);
 
@@ -768,7 +768,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
         // time 124: normalVeh2 departs, moved to qlink1.buffer
         f.qsim.getSimTimer().setTime(124);
-        f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+        f.normalVehicle2.getDriver().endActivityAndComputeNextState(124);
         f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver()) ;
         f.simEngine.doSimStep(124);
         assertEquals(2, f.qlink2.getAllVehicles().size());
@@ -881,7 +881,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
         // time 120: normalVeh2 departs, moved to qlink1.buffer
         f.qsim.getSimTimer().setTime(120);
-        f.normalVehicle2.getDriver().endActivityAndAssumeControl(120);
+        f.normalVehicle2.getDriver().endActivityAndComputeNextState(120);
         f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver());
         f.simEngine.doSimStep(120);
         assertEquals(2, f.qlink2.getAllVehicles().size());
@@ -1087,7 +1087,7 @@ public class TransitQueueNetworkTest extends TestCase {
             this.transitVehicle.setDriver(tDriver);
             this.transitVehicle.setStopHandler(new SimpleTransitStopHandler());
             tDriver.setVehicle(this.transitVehicle);
-            tDriver.endActivityAndAssumeControl(100);
+            tDriver.endActivityAndComputeNextState(100);
             // (might be better to officially insert the driver into the mobsim. kai, dec'11)
             this.qsim.internalInterface.arrangeNextAgentState(tDriver) ;
             // (not great, but is a test. kai, dec'11)
@@ -1099,7 +1099,7 @@ public class TransitQueueNetworkTest extends TestCase {
             PersonDriverAgentImpl nDriver = createAndInsertPersonDriverAgentImpl(person);
             this.normalVehicle.setDriver(nDriver);
             nDriver.setVehicle(this.normalVehicle);
-            nDriver.endActivityAndAssumeControl(100);
+            nDriver.endActivityAndComputeNextState(100);
             this.qsim.internalInterface.arrangeNextAgentState(nDriver) ;
             // (not great, but is a test. kai, dec'11)
 

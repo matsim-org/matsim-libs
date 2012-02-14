@@ -57,7 +57,13 @@ public interface DriverAgent extends NetworkAgent, Identifiable {
 	
 	public Id getPlannedVehicleId() ;
 	
-	
+	/**
+	 * This is another method besides endLeg... and endActivity... .  Seems to be necessary to abort agents
+	 * in states where they should not be.  Arguably, this should be on the agent level.  But in practice,
+	 * at this point it only occurs at the driver level, so I am putting it there to minimize implementation 
+	 * effort.  kai, feb'12
+	 */
+	public void abort(final double now) ;
 
 	
 }

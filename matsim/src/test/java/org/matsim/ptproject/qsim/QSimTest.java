@@ -828,7 +828,7 @@ public class QSimTest {
 		sim.getSimTimer().setTime(100.0);
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, person.getSelectedPlan(), sim);
 		sim.insertAgentIntoMobsim(agent); 
-		agent.endActivityAndAssumeControl(100.0);
+		agent.endActivityAndComputeNextState(100.0);
 		sim.internalInterface.arrangeNextAgentState(agent);
 		sim.getSimTimer().setTime(101.0);
 		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer

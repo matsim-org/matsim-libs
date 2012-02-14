@@ -150,7 +150,7 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
 			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
 
-			agent.endLegAndAssumeControl(now);
+			agent.endLegAndComputeNextState(now);
 			this.addParkedVehicle(vehicle);
 			this.network.simEngine.internalInterface.arrangeNextAgentState(agent) ;
 			// yyyyyy I think this neither works this way nor when I exchange the last two lines. kai, dec'11

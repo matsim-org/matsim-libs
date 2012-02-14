@@ -148,7 +148,7 @@ public class MultiModalQLinkExtension {
 			// Check if PersonAgent has reached destination:
 			MobsimDriverAgent driver = (MobsimDriverAgent) tuple.getSecond();
 			if ((qLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-				driver.endLegAndAssumeControl(now);
+				driver.endLegAndComputeNextState(now);
 				this.simEngine.internalInterface.arrangeNextAgentState(driver);
 			}
 			/*

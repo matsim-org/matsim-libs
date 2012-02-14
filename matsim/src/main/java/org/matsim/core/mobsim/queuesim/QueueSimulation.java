@@ -292,7 +292,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			Collection<QueueVehicle> arrivingVehicles) {
 		for (QueueVehicle queueVehicle : arrivingVehicles) {
 			MobsimDriverAgent driver = queueVehicle.getDriver();
-			driver.endLegAndAssumeControl(time) ;
+			driver.endLegAndComputeNextState(time) ;
 			arrangeNextAgentAction(driver) ;
 		}
 	}
@@ -319,7 +319,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 				this.teleportationList.poll();
 				MobsimAgent person = entry.getSecond();
 				person.notifyTeleportToLink(person.getDestinationLinkId());
-				person.endLegAndAssumeControl(now) ;
+				person.endLegAndComputeNextState(now) ;
 				this.arrangeNextAgentAction(person) ;
 			} else break;
 		}
@@ -370,7 +370,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			MobsimAgent agent = this.activityEndsList.peek();
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
-				agent.endActivityAndAssumeControl(time);
+				agent.endActivityAndComputeNextState(time);
 				this.arrangeNextAgentAction(agent) ;
 			} else {
 				return;
@@ -397,7 +397,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			QueueLink qlink = this.network.getQueueLink(linkId);
 			QueueVehicle vehicle = (QueueVehicle) driverAgent.getVehicle();
 			if (driverAgent.chooseNextLinkId() == null) {
-				driverAgent.endLegAndAssumeControl(now) ;
+				driverAgent.endLegAndComputeNextState(now) ;
 				this.arrangeNextAgentAction(agent) ;
 			} else {
 				qlink.addDepartingVehicle(vehicle);

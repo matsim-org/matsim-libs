@@ -72,7 +72,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	@Override
-	public abstract void endLegAndAssumeControl(final double now);
+	public abstract void endLegAndComputeNextState(final double now);
 	public abstract NetworkRoute getCarRoute();
 	public abstract TransitLine getTransitLine();
 	public abstract TransitRoute getTransitRoute();
@@ -113,6 +113,11 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			return netR.getEndLinkId();
 		}
 		return null;
+	}
+	
+	@Override
+	public void abort( final double now ) {
+		this.state = MobsimAgent.State.ABORT ;
 	}
 
 	@Override
@@ -278,7 +283,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId()));
 			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
-			agent.endLegAndAssumeControl(time);
+			agent.endLegAndComputeNextState(time);
 			((TransitQSimEngine)this.trEngine).internalInterface.arrangeNextAgentState(agent) ;
 			// (cannot set trEngine to TransitQSimEngine because there are tests where this will not work. kai, dec'11)
 		}

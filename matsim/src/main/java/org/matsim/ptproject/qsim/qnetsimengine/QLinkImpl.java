@@ -371,7 +371,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 						// so allow them to return some non-null link id in chooseNextLink() in order to be
 						// placed on the link, and here we'll remove them again if needed...
 						// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
-						trDriver.endLegAndAssumeControl(now);
+						trDriver.endLegAndComputeNextState(now);
 						this.addParkedVehicle(veh);
 						this.network.simEngine.internalInterface.arrangeNextAgentState(trDriver) ;
 						this.makeVehicleAvailableToNextDriver(veh, now);

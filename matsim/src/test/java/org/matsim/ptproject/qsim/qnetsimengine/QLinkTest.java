@@ -205,7 +205,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
-		driver.endActivityAndAssumeControl(0);
+		driver.endActivityAndComputeNextState(0);
 		f.queueNetwork.simEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());

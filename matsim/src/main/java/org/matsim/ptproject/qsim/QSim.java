@@ -392,7 +392,7 @@ public final class QSim implements VisMobsim, Netsim {
 				MobsimAgent personAgent = entry.getSecond();
 				personAgent.notifyTeleportToLink(personAgent
 						.getDestinationLinkId());
-				personAgent.endLegAndAssumeControl(now);
+				personAgent.endLegAndComputeNextState(now);
 				this.internalInterface.arrangeNextAgentState(personAgent) ;
 			} else {
 				break;
@@ -508,7 +508,7 @@ public final class QSim implements VisMobsim, Netsim {
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
-				agent.endActivityAndAssumeControl(time);
+				agent.endActivityAndComputeNextState(time);
 				this.internalInterface.arrangeNextAgentState(agent) ;
 			} else {
 				return;
@@ -548,7 +548,7 @@ public final class QSim implements VisMobsim, Netsim {
 						//					events.processEvent(events.getFactory().createAgentArrivalEvent(now, agent.getId(), linkId, mode)) ;
 						// (arrival event currently in agent.  kai, dec'11)
 
-						agent.endLegAndAssumeControl(now) ;
+						agent.endLegAndComputeNextState(now) ;
 						this.internalInterface.arrangeNextAgentState(agent) ;
 						return ;
 					}

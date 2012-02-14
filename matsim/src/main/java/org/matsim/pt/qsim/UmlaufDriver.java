@@ -108,7 +108,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public void endActivityAndAssumeControl(final double now) {
+	public void endActivityAndComputeNextState(final double now) {
 		this.currentPlanElement = iPlanElement.next();
 		sendTransitDriverStartsEvent(now);	
 		
@@ -120,7 +120,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public void endLegAndAssumeControl(final double now) {
+	public void endLegAndComputeNextState(final double now) {
 		this.getSimulation().getEventsManager().processEvent(
 				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));

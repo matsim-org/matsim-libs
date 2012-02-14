@@ -79,13 +79,13 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public void endActivityAndAssumeControl(double now) {
+	public void endActivityAndComputeNextState(double now) {
 		sendTransitDriverStartsEvent(now);
 		this.state = MobsimAgent.State.LEG ;
 	}
 
 	@Override
-	public void endLegAndAssumeControl(final double now) {
+	public void endLegAndComputeNextState(final double now) {
 		this.getSimulation().getEventsManager().processEvent(
 				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
