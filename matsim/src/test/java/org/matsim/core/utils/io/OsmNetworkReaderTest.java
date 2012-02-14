@@ -252,6 +252,6 @@ public class OsmNetworkReaderTest {
 		Assert.assertNotNull("Could not find converted link 5", link5);
 		Assert.assertEquals(50.0/3.6, link1.getFreespeed(), 1e-8);
 		Assert.assertEquals(40.0/3.6, link3.getFreespeed(), 1e-8);
-		Assert.assertEquals(50.0/3.6, link5.getFreespeed(), 1e-8); // only use maxspeed if its lower, see comment in OsmNetworkReader
+		Assert.assertEquals(60.0/3.6, link5.getFreespeed(), 1e-8);
 	}
 }

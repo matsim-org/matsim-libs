@@ -485,12 +485,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
 		if (maxspeedTag != null) {
 			try {
-				double maxspeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
-				if (maxspeed < freespeed) {
-					// freespeed doesn't always mean it's the maximum speed allowed.
-					// thus only correct freespeed if maxspeed is lower than freespeed.
-					freespeed = maxspeed;
-				}
+				freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
 			} catch (NumberFormatException e) {
 				if (!this.unknownMaxspeedTags.contains(maxspeedTag)) {
 					this.unknownMaxspeedTags.add(maxspeedTag);
