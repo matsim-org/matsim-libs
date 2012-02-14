@@ -117,8 +117,12 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
 	}
+	
+	public QNetsimEngine(final QSim sim, final Random random ) {
+		this( sim, random, null ) ;
+	}
 
-	public QNetsimEngine(final QSim sim, final Random random) {
+	public QNetsimEngine(final QSim sim, final Random random, NetsimNetworkFactory<QNode, AbstractQLink> netsimNetworkFactory ) {
 		this.random = random;
 		this.qsim = sim;
 
@@ -147,16 +151,25 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
 		}
+		
+		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
+		// first in ctors calling each other.  kai, feb'12
 		if (sim.getScenario().getConfig().scenario().isUseLanes()) {
 			if (sim.getScenario().getScenarioElement(LaneDefinitionsV2.class) == null) {
 				throw new IllegalStateException(
 						"Lane definitions in v2.0 format have to be set if feature is enabled!");
 			}
 			log.info("Lanes enabled...");
+			if ( netsimNetworkFactory != null ) {
+				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;
+			}
 			network = new QNetwork(sim.getScenario().getNetwork(), new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getScenarioElement(LaneDefinitionsV2.class)));
+		} else if ( netsimNetworkFactory != null ){
+			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
+		
 		network.getLinkWidthCalculator().setLinkWidth(sim.getScenario().getConfig().otfVis().getLinkWidth());
 		network.initialize(this);
 		
