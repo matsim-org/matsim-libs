@@ -34,6 +34,8 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import javax.swing.SwingUtilities;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -441,7 +443,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}//GEN-LAST:event_formComponentResized
 
 	private void clickEvent(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clickEvent
-		if(evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+		if (SwingUtilities.isRightMouseButton(evt)) {
 			if(this.line.active) {
 				line.active = false;
 			} else {
@@ -449,7 +451,10 @@ public class NetBlackboard extends javax.swing.JPanel {
 				this.zoom(0.05);
 			}
 			this.repaint();
-		}else if(evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
+		} else if (SwingUtilities.isLeftMouseButton(evt)) {
+			if (this.net == null) {
+				return;
+			}
 			if(actualMode == Mode.NONE)
 				return;
 			else if(actualMode == Mode.SELECTION) {
@@ -590,12 +595,12 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}//GEN-LAST:event_formMousePressed
 
 	private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
-		if(actualMode == Mode.MOVING && move.active == true) {
+		if (actualMode == Mode.MOVING && move.active == true) {
 			move.end = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
 			this.moveViewBox(-(move.end.getX()-move.start.getX()), -(move.end.getY()-move.start.getY()));
 			move.active = false;
 			this.repaint();
-		} else if(actualMode == Mode.SELECTION && selectionSquare.active == true) {
+		} else if(actualMode == Mode.SELECTION && (this.net != null) && selectionSquare.active == true) {
 			Point p = this.getMousePosition();
 			if(p != null) {
 				selectionSquare.end = new CoordImpl(p.x, p.y);
