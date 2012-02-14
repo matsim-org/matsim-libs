@@ -22,6 +22,8 @@ package playground.benjamin.scenarios.munich.analysis.cupum;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +41,8 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class EmissionsPerGroupWarmEventHandler implements WarmEmissionEventHandler {
 	private static final Logger logger = Logger.getLogger(EmissionsPerGroupWarmEventHandler.class);
 
-	Map<UserGroup, Map<WarmPollutant, Double>> group2Emissions = new HashMap<UserGroup, Map<WarmPollutant, Double>>();
+	SortedMap<UserGroup, Map<WarmPollutant, Double>> group2WarmEmissions = new TreeMap<UserGroup, Map<WarmPollutant, Double>>();
+	SortedMap<WarmPollutant, Double> overallWarmEmissions = new TreeMap<WarmPollutant, Double>();
 	PersonFilter filter = new PersonFilter();
 
 	@Override
@@ -51,8 +54,8 @@ public class EmissionsPerGroupWarmEventHandler implements WarmEmissionEventHandl
 			if(!filter.isPersonIdFromUserGroup(personId, userGroup)){
 				// person is not from this user group
 			} else {
-				if(group2Emissions.get(userGroup) != null){
-					Map<WarmPollutant, Double> warmEmissionsSoFar = group2Emissions.get(userGroup);
+				if(group2WarmEmissions.get(userGroup) != null){
+					Map<WarmPollutant, Double> warmEmissionsSoFar = group2WarmEmissions.get(userGroup);
 					for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
 						WarmPollutant pollutant = entry.getKey();
 						Double eventValue = entry.getValue();
@@ -61,18 +64,30 @@ public class EmissionsPerGroupWarmEventHandler implements WarmEmissionEventHandl
 						Double newValue = previousValue + eventValue;
 						warmEmissionsSoFar.put(pollutant, newValue);
 					}
-					group2Emissions.put(userGroup, warmEmissionsSoFar);
+					group2WarmEmissions.put(userGroup, warmEmissionsSoFar);
+					overallWarmEmissions.putAll(warmEmissionsSoFar);
 				} else {
-					group2Emissions.put(userGroup, warmEmissionsOfEvent);
+					group2WarmEmissions.put(userGroup, warmEmissionsOfEvent);
+					overallWarmEmissions.putAll(warmEmissionsOfEvent);
 				}
 			}
 		}
 	}
 
-	public Map<UserGroup, Map<String, Double>> getWarmEmissionsPerGroup() {
-		Map<UserGroup, Map<String, Double>> group2warmEmissionsAsString = new HashMap<UserGroup, Map<String, Double>>();
+	public SortedMap<String, Double> getOverallWarmEmissions() {
+		SortedMap<String, Double> pollutantString2Values = new TreeMap<String, Double>();
+		for (Entry<WarmPollutant, Double> entry2: overallWarmEmissions.entrySet()){
+			String pollutant = entry2.getKey().toString();
+			Double value = entry2.getValue();
+			pollutantString2Values.put(pollutant, value);
+		}
+		return pollutantString2Values;
+	}
 
-		for (Entry<UserGroup, Map<WarmPollutant, Double>> entry1: this.group2Emissions.entrySet()){
+	public SortedMap<UserGroup, Map<String, Double>> getWarmEmissionsPerGroup() {
+		SortedMap<UserGroup, Map<String, Double>> group2warmEmissionsAsString = new TreeMap<UserGroup, Map<String, Double>>();
+
+		for (Entry<UserGroup, Map<WarmPollutant, Double>> entry1: this.group2WarmEmissions.entrySet()){
 			UserGroup group = entry1.getKey();
 			Map<WarmPollutant, Double> pollutant2Values = entry1.getValue();
 			Map<String, Double> pollutantString2Values = new HashMap<String, Double>();
@@ -88,6 +103,7 @@ public class EmissionsPerGroupWarmEventHandler implements WarmEmissionEventHandl
 
 	@Override
 	public void reset(int iteration) {
-		this.group2Emissions.clear();
+		this.group2WarmEmissions.clear();
+		this.overallWarmEmissions.clear();
 	}
 }

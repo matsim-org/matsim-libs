@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.filter;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -31,6 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  *
  */
 public class PersonFilter {
+	private static final Logger logger = Logger.getLogger(PersonFilter.class);
 	
 	public Population getPopulation(Population population, UserGroup userGroup) {
 		Population filteredPopulation = null;
@@ -57,10 +59,26 @@ public class PersonFilter {
 	public boolean isPersonIdFromUserGroup(Id personId, UserGroup userGroup) {
 		boolean isFromUserGroup = false;
 		
-		if(isPersonFromMID(personId) && userGroup.equals(UserGroup.MID)) isFromUserGroup = true;
-		else if(isPersonInnCommuter(personId) && userGroup.equals(UserGroup.INN_COMMUTER)) isFromUserGroup = true;
-		else if(isPersonOutCommuter(personId) && userGroup.equals(UserGroup.OUT_COMMUTER)) isFromUserGroup = true;
-		else if(isPersonFreight(personId) && userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;
+		if(isPersonFromMID(personId)){
+			if(userGroup.equals(UserGroup.MID)) isFromUserGroup = true ;
+		}
+		else if(isPersonInnCommuter(personId)){
+			if(userGroup.equals(UserGroup.INN_COMMUTER)) isFromUserGroup = true;
+		}
+		else if(isPersonOutCommuter(personId)){
+			if(userGroup.equals(UserGroup.OUT_COMMUTER)) isFromUserGroup = true;
+		}
+		else if(isPersonFreight(personId)){
+			if(userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;
+		}
+		else{
+			logger.warn("Cannot match person " + personId + " to any user group.");
+		}
+		
+//		if(isPersonFromMID(personId) && userGroup.equals(UserGroup.MID)) isFromUserGroup = true ;
+//		else if(isPersonInnCommuter(personId) && userGroup.equals(UserGroup.INN_COMMUTER)) isFromUserGroup = true;
+//		else if(isPersonOutCommuter(personId) && userGroup.equals(UserGroup.OUT_COMMUTER)) isFromUserGroup = true;
+//		else if(isPersonFreight(personId) && userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;
 		
 		return isFromUserGroup;
 	}
@@ -133,17 +151,17 @@ public class PersonFilter {
 	
 	public boolean isPersonFromMID(Person person) {
 		boolean isFromMID = false;
-		if(!person.getId().toString().startsWith("gv_") && !person.getId().toString().startsWith("pv_")){
-			isFromMID = true;
-		}
+		if(person.getId().toString().startsWith("gv_")); //do nothing
+		else if(person.getId().toString().startsWith("pv_")); //do nothing
+		else isFromMID = true;
 		return isFromMID;
 	}
 
 	public boolean isPersonFromMID(Id personId) {
 		boolean isFromMID = false;
-		if(!personId.toString().startsWith("gv_") && !personId.toString().startsWith("pv_")){
-			isFromMID = true;
-		}
+		if(personId.toString().startsWith("gv_")); //do nothing
+		else if(personId.toString().startsWith("pv_")); //do nothing
+		else isFromMID = true;
 		return isFromMID;
 	}
 	
@@ -166,9 +184,9 @@ public class PersonFilter {
 	public boolean isPersonInnCommuter(Person person) {
 		boolean isInnCommuter = false;
 		if(person.getId().toString().startsWith("pv_")){
-			if(!person.getId().toString().startsWith("pv_car_9162") || !person.getId().toString().startsWith("pv_pt_9162")){
-				isInnCommuter = true;
-			}
+			if(person.getId().toString().startsWith("pv_car_9162")); //do nothing
+			else if(person.getId().toString().startsWith("pv_pt_9162")); //do nothing
+			else isInnCommuter = true;
 		}
 		return isInnCommuter;
 	}
@@ -176,9 +194,9 @@ public class PersonFilter {
 	public boolean isPersonInnCommuter(Id personId) {
 		boolean isInnCommuter = false;
 		if(personId.toString().startsWith("pv_")){
-			if(!personId.toString().startsWith("pv_car_9162") || !personId.toString().startsWith("pv_pt_9162")){
-				isInnCommuter = true;
-			}
+			if(personId.toString().startsWith("pv_car_9162")); //do nothing
+			else if(personId.toString().startsWith("pv_pt_9162")); //do nothing
+			else isInnCommuter = true;
 		}
 		return isInnCommuter;
 	}

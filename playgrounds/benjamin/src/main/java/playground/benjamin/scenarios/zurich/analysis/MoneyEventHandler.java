@@ -40,14 +40,15 @@ public class MoneyEventHandler implements AgentMoneyEventHandler{
 	public void handleEvent(AgentMoneyEvent event) {
 		
 		Id id = event.getPersonId();
-		Double toll = event.getAmount();
+		Double tollByEvent = event.getAmount();
+		Double tollSoFar = id2Toll.get(id);
 		
-		if(id2Toll.containsKey(id)){
-			double sumToll = id2Toll.get(id).doubleValue() + toll;
-			id2Toll.put(id, sumToll);
+		if(tollSoFar == null){
+			id2Toll.put(id, tollByEvent);
 		}
 		else{
-			id2Toll.put(id, toll);
+			tollSoFar += tollByEvent;
+			id2Toll.put(id, tollSoFar);
 		}	
 	}
 

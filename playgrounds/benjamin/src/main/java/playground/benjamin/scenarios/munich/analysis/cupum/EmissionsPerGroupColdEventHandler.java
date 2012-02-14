@@ -22,6 +22,8 @@ package playground.benjamin.scenarios.munich.analysis.cupum;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +41,8 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class EmissionsPerGroupColdEventHandler implements ColdEmissionEventHandler {
 	private static final Logger logger = Logger.getLogger(EmissionsPerGroupColdEventHandler.class);
 	
-	Map<UserGroup, Map<ColdPollutant, Double>> group2Emissions = new HashMap<UserGroup, Map<ColdPollutant, Double>>();
+	SortedMap<UserGroup, Map<ColdPollutant, Double>> group2Emissions = new TreeMap<UserGroup, Map<ColdPollutant, Double>>();
+	SortedMap<ColdPollutant, Double> overallColdEmissions = new TreeMap<ColdPollutant, Double>();
 	PersonFilter filter = new PersonFilter();
 	
 	@Override
@@ -62,15 +65,27 @@ public class EmissionsPerGroupColdEventHandler implements ColdEmissionEventHandl
 						coldEmissionsSoFar.put(pollutant, newValue);
 					}
 					group2Emissions.put(userGroup, coldEmissionsSoFar);
+					overallColdEmissions.putAll(coldEmissionsSoFar);
 				} else {
 					group2Emissions.put(userGroup, coldEmissionsOfEvent);
+					overallColdEmissions.putAll(coldEmissionsOfEvent);
 				}
 			}
 		}
 	}
 	
-	public Map<UserGroup, Map<String, Double>> getColdEmissionsPerGroup() {
-		Map<UserGroup, Map<String, Double>> group2coldEmissionsAsString = new HashMap<UserGroup, Map<String, Double>>();
+	public SortedMap<String, Double> getOverallColdEmissions() {
+		SortedMap<String, Double> pollutantString2Values = new TreeMap<String, Double>();
+		for (Entry<ColdPollutant, Double> entry2: overallColdEmissions.entrySet()){
+			String pollutant = entry2.getKey().toString();
+			Double value = entry2.getValue();
+			pollutantString2Values.put(pollutant, value);
+		}
+		return pollutantString2Values;
+	}
+	
+	public SortedMap<UserGroup, Map<String, Double>> getColdEmissionsPerGroup() {
+		SortedMap<UserGroup, Map<String, Double>> group2coldEmissionsAsString = new TreeMap<UserGroup, Map<String, Double>>();
 
 		for (Entry<UserGroup, Map<ColdPollutant, Double>> entry1: this.group2Emissions.entrySet()){
 			UserGroup group = entry1.getKey();
@@ -89,6 +104,7 @@ public class EmissionsPerGroupColdEventHandler implements ColdEmissionEventHandl
 	@Override
 	public void reset(int iteration) {
 		this.group2Emissions.clear();
+		this.overallColdEmissions.clear();
 	}
 
 }

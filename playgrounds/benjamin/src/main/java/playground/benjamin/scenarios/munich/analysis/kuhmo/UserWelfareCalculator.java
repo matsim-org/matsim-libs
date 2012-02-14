@@ -41,7 +41,7 @@ public class UserWelfareCalculator {
 	private int minusScore = 0;
 	private int noValidPlanScore = 0;
 	private final int maxWarnCnt = 3;
-	
+
 	public UserWelfareCalculator(String configFile) {
 		Config config = ConfigUtils.loadConfig(configFile);
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
@@ -54,7 +54,7 @@ public class UserWelfareCalculator {
 		minusScore = 0;
 		noValidPlanScore = 0;
 	}
-	
+
 	public double calculateLogsum(Population pop) {
 		double logsum = 0.0;
 
@@ -69,23 +69,30 @@ public class UserWelfareCalculator {
 		double logsumOfPerson = 0.0;
 		double sumOfExpScore = 0.0;
 
+		double bestScore = Double.NEGATIVE_INFINITY;
+		
 		for(Plan plan : person.getPlans()){
 			if(plan.getScore() == null){
 				nullScore++;
 				if(nullScore <= maxWarnCnt) {
 					logger.warn("Score for person " + person.getId() + " is " + plan.getScore() 
-						+ ". The score cannot be used for utility calculation.");
-						if(nullScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+							+ ". The score cannot be used for utility calculation.");
+					if(nullScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
 			} else if(plan.getScore() <= 0.0){
 				minusScore++;
 				if(minusScore <= maxWarnCnt) {
 					logger.warn("Score for person " + person.getId() + " is " + plan.getScore() 
 							+ ". The score cannot be used for utility calculation.");
-						if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+					if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
 			} else{
+				/* my version: */
 				double expScoreOfPlan = Math.exp(betaLogit * plan.getScore());
+				/* Kais version: */
+//				bestScore = getBestScore(person);
+//				double expScoreOfPlan = Math.exp(betaLogit * (plan.getScore() - bestScore));
+				
 				sumOfExpScore += expScoreOfPlan;
 			}
 		}
@@ -94,10 +101,13 @@ public class UserWelfareCalculator {
 			if(noValidPlanScore <= maxWarnCnt) {
 				logger.warn("Person " + person.getId() + " has no valid plans. " +
 						"This person is not considered for utility calculations.");
-					if(noValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+				if(noValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 			}
 		} else{
+			/* my version: */
 			logsumOfPerson = (1. / (betaLogit * marginalUtlOfMoney)) * Math.log(sumOfExpScore);
+			/* Kais version: */
+//			logsumOfPerson = bestScore + (1. / (betaLogit * marginalUtlOfMoney)) * Math.log(sumOfExpScore);
 		}
 		return logsumOfPerson;
 	}
@@ -106,27 +116,13 @@ public class UserWelfareCalculator {
 		return noValidPlanScore;
 	}
 
+	private static double getBestScore(Person person) {
+		double bestScore = Double.NEGATIVE_INFINITY ;
+		for ( Plan plan : person.getPlans() ) {
+			if ( plan.getScore() > bestScore ) {
+				bestScore = plan.getScore() ;
+			}
+		}
+		return bestScore ;
+	}
 }
-
-//TODO: what is the difference to Kai's version???
-//
-//private static double logsum(Person person) {
-//	double bestScore = bestScore(person) ;
-//	
-//	double beta = 2.0 ;
-//	double sum = 0. ;
-//	for ( Plan plan : person.getPlans() ) {
-//		sum += Math.exp( beta*(plan.getScore()-bestScore) ) ;
-//	}
-//	return bestScore + (1./beta) * Math.log( sum ) ;
-//}
-//
-//private static double bestScore(Person person) {
-//	double bestScore = Double.NEGATIVE_INFINITY ;
-//	for ( Plan plan : person.getPlans() ) {
-//		if ( plan.getScore() > bestScore ) {
-//			bestScore = plan.getScore() ;
-//		}
-//	}
-//	return bestScore ;
-//}
