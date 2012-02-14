@@ -55,6 +55,10 @@ public class StrategyConfigGroup extends Module {
 	private long externalExeTimeOut = 3600;
 
 	private final LinkedHashMap<Id, StrategySettings> settings = new LinkedHashMap<Id, StrategySettings>();
+	
+	private static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
+	private String planSelectorForRemoval = null ; 
+	// default is configured in StrategyManager; one may wish to change where the default is defined.  kai, feb'12
 
 	public StrategyConfigGroup() {
 		super(GROUP_NAME);
@@ -102,6 +106,9 @@ public class StrategyConfigGroup extends Module {
 		if (EXTERNAL_EXE_TIME_OUT.equals(key)) {
 			return Long.toString(getExternalExeTimeOut());
 		}
+		if ( PLAN_SELECTOR_FOR_REMOVAL.equals(key)) {
+			throw new RuntimeException("please use direct getter") ;
+		}
 		throw new IllegalArgumentException(key);
 	}
 
@@ -127,6 +134,8 @@ public class StrategyConfigGroup extends Module {
 			setExternalExeTmpFileRootDir(value);
 		} else if (EXTERNAL_EXE_TIME_OUT.equals(key)) {
 			setExternalExeTimeOut(Long.parseLong(value));
+		} else if (PLAN_SELECTOR_FOR_REMOVAL.equals(key)) {
+			setPlanSelectorForRemoval(value) ;
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -149,6 +158,7 @@ public class StrategyConfigGroup extends Module {
 		this.addParameterToMap(map, EXTERNAL_EXE_CONFIG_TEMPLATE);
 		this.addParameterToMap(map, EXTERNAL_EXE_TMP_FILE_ROOT_DIR);
 		this.addParameterToMap(map, EXTERNAL_EXE_TIME_OUT);
+		map.put(PLAN_SELECTOR_FOR_REMOVAL, this.getPlanSelectorForRemoval() ) ;
 		return map;
 	}
 
@@ -162,6 +172,10 @@ public class StrategyConfigGroup extends Module {
 			map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), "iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
 			map.put(MODULE_EXE_PATH + entry.getKey().toString(), "path to external executable (if applicable)" ) ;
 		}
+		map.put(PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal.  If not full class name, resolved in " +
+				"StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good " +
+				"choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically " +
+				"tested. kai, feb'12") ;
 		return map ;
 	}
 
@@ -301,5 +315,13 @@ public class StrategyConfigGroup extends Module {
 			this.id = id;
 		}
 
+	}
+
+	public String getPlanSelectorForRemoval() {
+		return planSelectorForRemoval;
+	}
+
+	public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
+		this.planSelectorForRemoval = planSelectorForRemoval;
 	}
 }

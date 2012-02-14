@@ -47,7 +47,9 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -108,6 +110,28 @@ public final class StrategyManagerConfigLoader {
 					manager.changeWeightOfStrategy(strategy, 0.0);
 				}
 			}
+		}
+		String name = config.strategy().getPlanSelectorForRemoval() ;
+		if ( name != null ) {
+			// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
+			// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
+			PlanSelector planSelector = null ;
+			if ( name.equals("WorstPlanSelector") ) { 
+				planSelector = new WorstPlanForRemovalSelector() ; 
+			} else if ( name.equals("RandomPlanSelector") ) {
+				planSelector = new RandomPlanSelector() ;
+			} else if ( name.equals("SelectExpBeta") ) {
+				planSelector = new ExpBetaPlanSelector(config.planCalcScore() ) ;
+			} else if ( name.equals("ChangeExpBeta") ) {
+				planSelector = new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()) ;
+			} else if ( name.equals("BestPlanSelector") ) {
+				planSelector = new BestPlanSelector() ;
+			} else if ( name.equals("PathSizeLogitSelector") ) {
+				planSelector = new PathSizeLogitSelector(controler.getNetwork(), config.planCalcScore() ) ;
+			} else {
+				planSelector = tryToLoadPlanSelectorByName(controler, name);
+			}
+			manager.setPlanSelectorForRemoval(planSelector) ;
 		}
 	}
 
@@ -216,13 +240,13 @@ public final class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 			} else {
-				strategy = tryToLoadClassByName(controler, name);
+				strategy = tryToLoadPlanStrategyByName(controler, name);
 			}
 		}
 		return strategy;
 	}
 
-	private static PlanStrategy tryToLoadClassByName(final Controler controler, final String name) {
+	private static PlanStrategy tryToLoadPlanStrategyByName(final Controler controler, final String name) {
 		PlanStrategy strategy = null;
 		//classes loaded by name must not be part of the matsim core
 		if (name.startsWith("org.matsim")) {
@@ -243,6 +267,58 @@ public final class StrategyManagerConfigLoader {
 					"single argument is recommended!" );
 					log.info("(People who need access to events should ignore this warning.)") ;
 					// I think that one needs events fairly often. kai, sep'10
+				}
+				if (c == null){
+					args[0] = Controler.class;
+					c = klas.getConstructor(args);
+					strategy = c.newInstance(controler);
+				}
+				log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+		return strategy;
+	}
+	private static PlanSelector tryToLoadPlanSelectorByName(final Controler controler, final String name) {
+		PlanSelector strategy = null;
+		//classes loaded by name must not be part of the matsim core
+		if (name.startsWith("org.matsim")) {
+			log.error("PlanSelectors in the org.matsim package must not be loaded by name!");
+		}
+		else {
+			try {
+				Class<? extends PlanSelector> klas = (Class<? extends PlanSelector>) Class.forName(name);
+				Class[] args = new Class[1];
+				args[0] = Scenario.class;
+				Constructor<? extends PlanSelector> c = null;
+				try{
+					c = klas.getConstructor(args);
+					strategy = c.newInstance(controler.getScenario());
+				} catch(NoSuchMethodException e){
+					log.info("Cannot find Constructor in PlanSelector " + name + " with single argument of type Scenario. " +
+							"This is not fatal, trying to find other constructor ...\n" ) ;
+				}
+				if ( c == null ) {
+					try{
+						c = klas.getConstructor(args);
+						strategy = c.newInstance(controler.getScenario(),controler.getEvents()); 
+					} catch(NoSuchMethodException e){
+						log.info("Cannot find Constructor in PlanSelector " + name + " with argument of type (Scenario, EventsManager). " +
+						"This is not fatal, trying to find other constructor ...\n" ) ;
+					}
 				}
 				if (c == null){
 					args[0] = Controler.class;
