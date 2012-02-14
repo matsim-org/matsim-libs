@@ -36,8 +36,8 @@ public class IllustrationFictiveExamplePVwithoutOldUsers {
 
 		runBVWP2003();
 		runBVWP2010();
-		runBVWP2015();
 		runRoH();
+		runBVWP2015();
 	}
 
 	private static void runRoH() {
