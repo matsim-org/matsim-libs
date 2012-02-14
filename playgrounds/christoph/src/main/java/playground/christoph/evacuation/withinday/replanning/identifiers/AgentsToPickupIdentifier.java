@@ -21,7 +21,6 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,14 +49,8 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -67,7 +60,6 @@ import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
@@ -79,58 +71,44 @@ import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHou
  * Identifies agents that perform a walk leg in the insecure area. They might be
  * picked up by a vehicle coming by.
  * 
- * Collect vehicles that have just entered a link in the previous time step. If
- * they have free capacity, they might pick up additional agents.
+ * Use a PriorityQueue that contains all AgentLeaveLink times. Whenever an agent
+ * is going to leave a link it is checked whether there is a vehicle on the same
+ * link available that has the same destination and available capacity.
  * 
  * @author cdobler
  */
-public class AgentsToPickupIdentifier extends DuringLegIdentifier implements LinkEnterEventHandler, 
-		LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, 
-		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler,
-		SimulationInitializedListener, SimulationAfterSimStepListener {
-	
+public class AgentsToPickupIdentifier extends DuringLegIdentifier implements LinkEnterEventHandler, LinkLeaveEventHandler,
+		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler, SimulationInitializedListener {
+
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
 	private final PersonalizableTravelTime walkTravelTime;
 
-	/*
-	 * Queue that contains information on when agents are going to 
-	 * leave one link and enter another one.
-	 */
-	private final Queue<Tuple<Double, MobsimAgent>> agentsLeaveLinkQueue = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
-	
-	private Map<Id, MobsimAgent> agents;
-	private Map<Id, List<Id>> lastTimeStepLinkEnteredVehicles;
-	private Map<Id, List<Id>> recentLinkEnteredVehicles;
-	private final Map<Id, AtomicInteger> vehicleCapacities;
+	private final Map<Id, MobsimAgent> agents;
 	private final Set<Id> walkLegPerformingAgents;
 	private final Set<Id> insecureWalkLegPerformingAgents;
-	private final Set<Id> enrouteDrivers;
 	
-	/*package*/ AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer,  VehiclesTracker vehiclesTracker,
-			PersonalizableTravelTime walkTravelTime) {
+	/*
+	 * Queue that contains information on when agents are going to leave one
+	 * link and enter another one.
+	 */
+	private final Queue<Tuple<Double, MobsimAgent>> agentsLeaveLinkQueue = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
+
+	/* package */AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, PersonalizableTravelTime walkTravelTime) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.walkTravelTime = walkTravelTime;
-		
-		this.enrouteDrivers = new HashSet<Id>();
-		this.vehicleCapacities = new HashMap<Id, AtomicInteger>();
+
+		this.agents = new HashMap<Id, MobsimAgent>();
 		this.walkLegPerformingAgents = new HashSet<Id>();
 		this.insecureWalkLegPerformingAgents = new HashSet<Id>();
-		
-		this.lastTimeStepLinkEnteredVehicles = new HashMap<Id, List<Id>>();
-		this.recentLinkEnteredVehicles = new HashMap<Id, List<Id>>();
 	}
-	
+
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		
 		Set<PlanBasedWithinDayAgent> insecureLegPerformingAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-//		for (Id agentId : this.insecureWalkLegPerformingAgents) {
-//			insecureLegPerformingAgents.add((PlanBasedWithinDayAgent) this.agents.get(agentId));
-//		}
-		
+
 		Tuple<Double, MobsimAgent> tuple = null;
 		while ((tuple = agentsLeaveLinkQueue.peek()) != null) {
 			if (tuple.getFirst() > time) {
@@ -142,130 +120,93 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				insecureLegPerformingAgents.add((PlanBasedWithinDayAgent) tuple.getSecond());
 			}
 		}
-		
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());		
 
-		/*
-		 * Create a map with all vehicles that have just entered
-		 * a new link and use it to check whether one of them 
-		 * has free capacity.
-		 */
-		Map<Id, AtomicInteger> availableVehicles = new HashMap<Id, AtomicInteger>();
-		for (List<Id> vehicleIds : lastTimeStepLinkEnteredVehicles.values()) {
-			for (Id vehicleId : vehicleIds) {
-				int capacity = this.vehicleCapacities.get(vehicleId).get();
-				availableVehicles.put(vehicleId, new AtomicInteger(capacity));
-			}
-		}
+		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();		
+		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		Map<Id, AtomicInteger> reservedCapacities = new HashMap<Id, AtomicInteger>();
 		
 		for (MobsimAgent personAgent : insecureLegPerformingAgents) {
+			
 			/*
-			 * The agent wants to be picked up if its leg mode is walk and if its
-			 * activity is not from type rescue.
+			 * The agent wants to be picked up if its leg mode is walk and if
+			 * its activity is not from type rescue.
 			 */
 			if (personAgent.getMode().equals(TransportMode.walk)) {
-				
+
 				// check whether next activity types match
-				Activity acivity = (Activity)((PlanBasedWithinDayAgent) personAgent).getNextPlanElement();
+				Activity acivity = (Activity) ((PlanBasedWithinDayAgent) personAgent).getNextPlanElement();
 				if (!acivity.getType().equals(JoinedHouseholdsReplanner.activityType)) continue;
-				
+
 				/*
-				 * Check whether there are vehicle available on the link
+				 * Check whether there are vehicle available on the link.
+				 * If vehicles are found, check whether one of them has free capacity.
 				 */
-//				List<Id> vehicleIds = lastTimeStepLinkEnteredVehicles.get(personAgent.getCurrentLinkId());
 				List<Id> vehicleIds = vehiclesTracker.getEnrouteVehiclesOnLink(personAgent.getCurrentLinkId());
-//				if (vehicleIds == null) continue;
-
 				for (Id vehicleId : vehicleIds) {
+					int capacity = this.vehiclesTracker.getFreeVehicleCapacity(vehicleId);
 
-					if (vehicleId.toString().equals("807518_veh1")) {
-						System.out.println("Found!");
-					}
-					
-					AtomicInteger capacity = availableVehicles.get(vehicleId);
+					/*
+					 * If already other agents have reserved a place in that vehicle, reduce
+					 * the vehicle's available capacity.
+					 */
+					AtomicInteger reservedCapacity = reservedCapacities.get(vehicleId);			
+					if (reservedCapacity != null) capacity -= reservedCapacity.get();
 					
 					/*
-					 * If the vehicle in on the link but has not entered it in the previous time step
-					 * we ignore it and continue with the next vehicle.
+					 * Check whether the available capacity equals the total
+					 * capacity. If true, the vehicle is parked and therefore not
+					 * available.
 					 */
-					if (capacity == null) continue;
-					else if (capacity.get() > 0) {
-						
-						/*
-						 * Check whether the vehicle has the same destination
-						 * as the agent has.
-						 */
-						Id vehicleDestinationLinkId = this.vehiclesTracker.getVehicleDestination(vehicleId);
-						Id agentDestinationLinkId = ((ExperimentalBasicWithindayAgent) personAgent).getCurrentLeg().getRoute().getEndLinkId();
-						if (!vehicleDestinationLinkId.equals(agentDestinationLinkId)) continue;
-						
-						/*
-						 * decrement the remaining capacity by one
-						 */
-						capacity.decrementAndGet();
-						
-						/*
-						 * mark the agent as to be replanned and
-						 * add an entry in the map which connects
-						 * the agent and the car that will pick him up.
-						 */
-						agentsToReplan.add((PlanBasedWithinDayAgent) personAgent);
-						
-						// inform vehiclesTracker
-//						this.vehiclesTracker.addPassengerToVehicle(personAgent.getId(), vehicleId);
-//						this.passengerVehiclesMap.put(personAgent.getId(), vehicleId);
-						this.vehiclesTracker.addPlannedPickupVehicle(personAgent.getId(), vehicleId);
-						break;
-					}
+					int seats = vehicles.getVehicles().get(vehicleId).getType().getCapacity().getSeats();
+					if (seats == capacity) continue;
+					
+					/*
+					 * Check whether the vehicle has the same destination as
+					 * the agent has.
+					 */
+					Id vehicleDestinationLinkId = this.vehiclesTracker.getVehicleDestination(vehicleId);
+					Id agentDestinationLinkId = ((ExperimentalBasicWithindayAgent) personAgent).getCurrentLeg().getRoute().getEndLinkId();
+					if (!vehicleDestinationLinkId.equals(agentDestinationLinkId)) continue;
+					
+					/*
+					 * mark the agent as to be replanned and add an entry in the map which 
+					 * connects the agent and the vehicle that will pick him up.
+					 */
+					agentsToReplan.add((PlanBasedWithinDayAgent) personAgent);
+					
+					// inform vehiclesTracker
+					this.vehiclesTracker.addPlannedPickupVehicle(personAgent.getId(), vehicleId);
+					break;
 				}
 			}
 		}
 		return agentsToReplan;
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		this.insecureWalkLegPerformingAgents.clear();
-		this.lastTimeStepLinkEnteredVehicles.clear();
-		this.recentLinkEnteredVehicles.clear();
 		this.walkLegPerformingAgents.clear();
-		this.vehicleCapacities.clear();
 		this.agentsLeaveLinkQueue.clear();
-		this.enrouteDrivers.clear();
-		
-		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
-		for (Vehicle vehicle : vehicles.getVehicles().values()) {
-			int capacity = vehicle.getType().getCapacity().getSeats();
-			this.vehicleCapacities.put(vehicle.getId(), new AtomicInteger(capacity));
-		}	
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (enrouteDrivers.contains(event.getPersonId())) {
-			List<Id> list = recentLinkEnteredVehicles.get(event.getLinkId());
-			if (list == null) {
-				list = new ArrayList<Id>();
-				recentLinkEnteredVehicles.put(event.getLinkId(), list);
-			}
-			list.add(event.getVehicleId());			
-		}
-		
 		if (this.walkLegPerformingAgents.contains(event.getPersonId())) {
 			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 			boolean affected = this.coordAnalyzer.isLinkAffected(link);
 			if (affected) {
 				this.insecureWalkLegPerformingAgents.add(event.getPersonId());
 
-				/* 
-				 * Check whether the agent ends its leg on the current link.
-				 * If yes, skip the agent.
+				/*
+				 * Check whether the agent ends its leg on the current link. If
+				 * yes, skip the agent.
 				 */
 				MobsimAgent agent = this.agents.get(event.getPersonId());
 				Leg leg = ((ExperimentalBasicWithindayAgent) agent).getCurrentLeg();
 				Id destinationLinkId = leg.getRoute().getEndLinkId();
 				if (destinationLinkId.equals(event.getLinkId())) return;
-				
+
 				/*
 				 * Otherwise add the agent to the agentsLeaveLinkQueue.
 				 */
@@ -285,34 +226,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	}
 
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		int capacity = this.vehicleCapacities.get(event.getVehicleId()).incrementAndGet();
-		
-		/*
-		 * Check whether the vehicle has as many free seats as seats in total.
-		 * If true, the vehicle has been parked and is not available anymore
-		 * to pickup agents.
-		 */
-		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
-		int seats = vehicles.getVehicles().get(event.getVehicleId()).getType().getCapacity().getSeats();
-		if (seats == capacity) {
-			Id linkId = this.vehiclesTracker.getVehicleLinkId(event.getVehicleId());
-			if (linkId == null) return;
-			
-			List<Id> vehicleIds = this.recentLinkEnteredVehicles.get(linkId);
-			if (vehicleIds == null) return;
-			else vehicleIds.remove(event.getVehicleId());			
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.vehicleCapacities.get(event.getVehicleId()).decrementAndGet();
-	}
-	
-	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		this.enrouteDrivers.remove(event.getPersonId());
 		this.walkLegPerformingAgents.remove(event.getPersonId());
 		this.insecureWalkLegPerformingAgents.remove(event.getPersonId());
 	}
@@ -322,8 +236,6 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 		if (event.getLegMode().equals(TransportMode.walk)) {
 			this.walkLegPerformingAgents.remove(event.getPersonId());
 			this.insecureWalkLegPerformingAgents.remove(event.getPersonId());
-		} else if (event.getLegMode().equals(TransportMode.car)) {			
-			this.enrouteDrivers.remove(event.getPersonId());
 		}
 	}
 
@@ -331,38 +243,33 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	public void handleEvent(AgentDepartureEvent event) {
 		if (event.getLegMode().equals(TransportMode.walk)) {
 			this.walkLegPerformingAgents.add(event.getPersonId());
-			
+
 			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 			boolean affected = this.coordAnalyzer.isLinkAffected(link);
 			if (affected) this.insecureWalkLegPerformingAgents.add(event.getPersonId());
-		} else if (event.getLegMode().equals(TransportMode.car)) {
-			this.enrouteDrivers.add(event.getPersonId());
 		}
-	}	
-	
+	}
+
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		QSim sim = (QSim) e.getQueueSimulation();
-		
-		agents = new HashMap<Id, MobsimAgent>();
+
+		agents.clear();
 		for (MobsimAgent agent : (sim).getAgents()) {
 			agents.put(agent.getId(), agent);
 		}
 	}
-	
-	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
-		lastTimeStepLinkEnteredVehicles = recentLinkEnteredVehicles;
-		recentLinkEnteredVehicles = new HashMap<Id, List<Id>>();
-	}
-	
+
 	private static class TravelTimeComparator implements Comparator<Tuple<Double, MobsimAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
+
 		@Override
 		public int compare(final Tuple<Double, MobsimAgent> o1, final Tuple<Double, MobsimAgent> o2) {
-			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+			// first compare time information
+			int ret = o1.getFirst().compareTo(o2.getFirst());
 			if (ret == 0) {
-				ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+				// if they're equal, compare the Ids: the one with the larger Id should be first
+				ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); 
 			}
 			return ret;
 		}

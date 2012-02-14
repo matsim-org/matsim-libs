@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -45,6 +46,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -59,8 +61,8 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-
-import playground.christoph.evacuation.config.EvacuationConfig;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * Class that tracks vehicles and agents that travel as passengers within them.
@@ -98,9 +100,13 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	// vehicles currently parked <vehicleId, linkId>
 	private final Map<Id, Id> parkedVehicles;
 	
+	// available capacity in the vehicles
+	private final Map<Id, AtomicInteger> vehicleCapacities;
+	
+	// agents that should be picked up by a defined vehicle
 	private final Map<Id, Id> plannedPickupVehicles;
 	
-	private Map<Id, MobsimAgent> agents;
+	private final Map<Id, MobsimAgent> agents;
 	private InternalInterface internalInterface;
 	
 	public VehiclesTracker(EventsManager eventsManager) {
@@ -117,17 +123,29 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 		
 		this.parkedVehicles = new HashMap<Id, Id>();
 		this.plannedPickupVehicles = new HashMap<Id, Id>();
+
+		this.agents = new HashMap<Id, MobsimAgent>();
+		this.vehicleCapacities = new HashMap<Id, AtomicInteger>();		
 	}
 	
 	public Id getVehicleDestination(Id vehicleId) {
 		Id driverId = vehicleDriverMap.get(vehicleId);
-		if (driverId == null) return null;
+		if (driverId == null) {
+			log.info(this.enrouteVehicles.contains(vehicleId));
+			List<Id> vehicleIds = this.getEnrouteVehiclesOnLink(new IdImpl("113352"));
+			log.info(vehicleIds.contains(vehicleIds));
+			return null;
+		}
 		
 		MobsimAgent driver = agents.get(driverId);
-		if (driver == null) return null;
+		if (driver == null) {
+			return null;
+		}
 		
 		Leg currentLeg = ((ExperimentalBasicWithindayAgent) driver).getCurrentLeg();
-		if (currentLeg == null) return null;
+		if (currentLeg == null) {
+			return null;
+		}
 		else return currentLeg.getRoute().getEndLinkId();
 	}
 
@@ -137,9 +155,6 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	
 	public void addPlannedPickupVehicle(Id personId, Id vehicleId) {
 		this.plannedPickupVehicles.put(personId, vehicleId);
-		if (vehicleId.toString().equals("807518_veh1")) {
-			log.info("Planned pickup added...");
-		}
 	}
 	
 	public boolean isVehicleEnroute(Id vehicleId) {
@@ -152,6 +167,10 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	
 	public List<Id> getEnrouteVehiclesOnLink(Id linkId) {
 		return this.enrouteVehiclesOnLink.get(linkId);
+	}
+	
+	public int getFreeVehicleCapacity(Id vehicleId) {
+		return this.vehicleCapacities.get(vehicleId).get();
 	}
 	
 	/*
@@ -190,23 +209,12 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	public Id getPassengersVehicle(Id passengerId) {
 		return passengerVehicleMap.get(passengerId);
 	}
-	
-	/**
-	 * If the given event occurred after the evacuation has started,
-	 * true is returned. Otherwise false.
-	 * @param e Event
-	 * @return
-	 */
-	private boolean afterEvacuationStart(Event e) {
-		if (e.getTime() < EvacuationConfig.evacuationTime) return false;
-		else return true;
-	}
-	
+		
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		QSim sim = (QSim) e.getQueueSimulation();
 		
-		agents = new HashMap<Id, MobsimAgent>();
+		agents.clear();
 		for (MobsimAgent agent : (sim).getAgents()) {
 			agents.put(agent.getId(), agent);
 		}
@@ -236,6 +244,15 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 			}
 		}
 		
+		/*
+		 * Get the initial capacities of all vehicles used by agents.
+		 */
+		this.vehicleCapacities.clear();
+		Vehicles vehicles = ((ScenarioImpl) sim.getScenario()).getVehicles();
+		for (Vehicle vehicle : vehicles.getVehicles().values()) {
+			int capacity = vehicle.getType().getCapacity().getSeats();
+			this.vehicleCapacities.put(vehicle.getId(), new AtomicInteger(capacity));
+		}
 		
 		/* 
 		 * Initialize some maps 
@@ -249,20 +266,8 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-
-		if (event.getPersonId().toString().equals("173488")) {
-			log.info("Found missing agent???");
-		}
+		this.vehicleCapacities.get(event.getVehicleId()).decrementAndGet();
 		
-		/*
-		 * Before the evacuation starts, only the driver enters the vehicle.
-		 * Moreover, this.addVehicleAllocation is not called externally.
-		 */
-//		if (!afterEvacuationStart(event)) {
-//			this.addVehicleAllocation(event.getVehicleId(), event.getPersonId(), new ArrayList<Id>());
-//		}
-//		driverVehicleMap.put(driverId, vehicleId);
-//		vehicleDriverMap.put(vehicleId, driverId);
 		boolean isPassenger = passengerVehicleMap.containsKey(event.getPersonId());
 		if (!isPassenger) {
 			driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
@@ -271,22 +276,18 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 		
 		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
 		if (isDriver) {
+			if (event.getVehicleId().toString().equals("2110188_veh1")) {
+				log.info("Entering vehicle..." + event.getTime());
+			}
 			this.driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
 			this.enrouteVehicles.add(event.getVehicleId());
 			this.parkedVehicles.remove(event.getVehicleId());
 			
 			Id linkId = this.agents.get(event.getPersonId()).getCurrentLinkId();
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(linkId);
-			vehicleIds.add(event.getVehicleId());
-			
-			if (event.getVehicleId().toString().equals("807518_veh1")) {
-				log.info("Vehicle departs on link " + linkId);
-			}
+			vehicleIds.add(event.getVehicleId());			
 //			log.info("Add person " + event.getPersonId().toString() + " using vehicle " + event.getVehicleId().toString() + " to link " + linkId.toString());
 		} 
-//		else {
-//			this.enroutePassengers.put(event.getPersonId(), this.agents.get(event.getPersonId()));
-//		}
 		
 		// consistency checks
 		Id expectedId;
@@ -325,22 +326,25 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	 */
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-//		if (!checkTime(event)) return;
+		this.vehicleCapacities.get(event.getVehicleId()).incrementAndGet();
 		
 		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
 		if (isDriver) {
+			if (event.getVehicleId().toString().equals("2110188_veh1")) {
+				log.info("Leaving vehicle..." + event.getTime());
+			}
 			Id linkId = this.agents.get(event.getPersonId()).getCurrentLinkId();
 
-			if (event.getVehicleId().toString().equals("807518_veh1")) {
-				log.info("Vehicle is parked on link " + linkId);
-			}
-			
 			this.enrouteVehicles.remove(event.getVehicleId());
 			this.parkedVehicles.put(event.getVehicleId(), linkId);
 			
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(linkId);
 //			log.info("Remove person " + event.getPersonId().toString() + " using vehicle " + event.getVehicleId().toString() + " from link " + linkId.toString());
-			vehicleIds.remove(event.getVehicleId());
+			if(!vehicleIds.remove(event.getVehicleId())) {
+				log.warn("Tried to remove vehicle from enrouteVehiclesOnLink map but failed!");
+				log.warn("Vehicle " + event.getVehicleId());
+				log.warn("Link " + linkId);
+			}
 			
 			List<Id> passengers = vehiclePassengerMap.get(event.getVehicleId());
 			if (passengers != null) {
@@ -364,9 +368,6 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 			
 			if (passengers != null) {
 				for (Id passengerId : passengers) {
-					if (passengerId.toString().equals("4462570")) {
-						System.out.println("Found!");
-					}
 					/*
 					 * The AgentArrivalEvent for the passenger is created 
 					 * within the endLegAndAssumeControl method. Moreover,
@@ -393,9 +394,7 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 		if (isDriver) {
 //		log.info("Add person " + event.getPersonId().toString() + " using vehicle " + event.getVehicleId().toString() + " to link " + event.getLinkId().toString());
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(event.getLinkId());
-			vehicleIds.add(event.getVehicleId());
-//			if (vehicleIds == null) return;
-//			else vehicleIds.add(event.getVehicleId());			
+			vehicleIds.add(event.getVehicleId());		
 		}
 	}
 	
@@ -406,8 +405,6 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 //		log.info("Remove person " + event.getPersonId().toString() + " using vehicle " + event.getVehicleId().toString() + " from link " + event.getLinkId().toString());
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(event.getLinkId());
 			vehicleIds.add(event.getVehicleId());
-//			if (vehicleIds == null) return;
-//			else vehicleIds.remove(event.getVehicleId());
 		}
 	}
 	

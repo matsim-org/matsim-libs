@@ -163,7 +163,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 
 	private void incGendereWarnCount(String text) {
 		genderWarnCount++;
-		if (warnLinkLength) {
+		if (warnGender) {
 			printWarning(text, genderWarnCount);
 			if (genderWarnCount >= 10) warnLinkLength = false;
 		}
@@ -171,7 +171,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	
 	private void incSlopeWarnCount(String text) {
 		slopeWarnCount++;
-		if (warnLinkLength) {
+		if (warnSlope) {
 			printWarning(text, slopeWarnCount);
 			if (slopeWarnCount >= 10) warnLinkLength = false;
 		}

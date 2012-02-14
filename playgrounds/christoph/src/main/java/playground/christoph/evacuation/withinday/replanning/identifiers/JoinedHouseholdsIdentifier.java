@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -52,6 +53,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.households.Household;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
@@ -130,7 +132,8 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		transportModeMapping.clear();
 		driverVehicleMapping.clear();
 		
-		Set<PlanBasedWithinDayAgent> set = new HashSet<PlanBasedWithinDayAgent>();
+//		Set<PlanBasedWithinDayAgent> set = new HashSet<PlanBasedWithinDayAgent>();
+		Set<PlanBasedWithinDayAgent> set = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 	
 		while (this.householdDepartures.peek() != null) {
 			
@@ -228,37 +231,19 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	public Map<Id, Id> getDriverVehicleMapping() {
 		return this.driverVehicleMapping;
 	}
-	
-//	private Map<Id, String> getTransportModes(HouseholdInfo householdInfo, Id facilityId) {
-//		Map<Id, String> transportModes = new TreeMap<Id, String>();
-//				
-//		for (Id personId : householdInfo.getHousehold().getMemberIds()) {
-//			if (modeAvailabilityChecker.isCarAvailable(personId, facilityId)) transportModes.put(personId, TransportMode.car);
-//			else transportModes.put(personId, TransportMode.walk);
-//		}
-//				
-//		return transportModes;
-//	}
-	
+		
 	/*
-	 * Find the vehicles with the largest number of seats among a
-	 * household's available vehicles.
+	 * Return a queue containing a households vehicles ordered by the number
+	 * of seats, starting with the car with the highest number.
 	 */
 	private Queue<Vehicle> getAvailableVehicles(Household household, Id facilityId) {
 		List<Id> availableVehicles = modeAvailabilityChecker.getAvailableCars(household, facilityId);
 		
 		Queue<Vehicle> queue = new PriorityQueue<Vehicle>(2, new VehicleSeatsComparator());
 		
-//		Id vehicleId = null;
-//		int maxSeats = 0;
 		for (Id id : availableVehicles) {
 			Vehicle vehicle = vehicles.getVehicles().get(id);
 			queue.add(vehicle);
-//			int seats = vehicle.getType().getCapacity().getSeats();
-//			if (seats > maxSeats) {
-//				maxSeats = seats;
-//				vehicleId = id;
-//			}
 		}
 		
 		return queue;

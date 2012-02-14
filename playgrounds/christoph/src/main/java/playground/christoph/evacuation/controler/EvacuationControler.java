@@ -68,10 +68,12 @@ import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTrave
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
+import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
@@ -114,8 +116,20 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	public static final String FILENAME_VEHICLES = "output_vehicles.xml.gz";
 	
 	protected boolean adaptOriginalPlans = false;
-//	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
-	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer10km.shp"};
+//	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
+
+//	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp",
+//																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 2.shp"};
+	
+	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp",
+																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 1.shp",
+																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 2.shp",
+																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 3.shp",
+																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 4.shp",
+																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 5.shp",
+																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 6.shp"};
+	
+//	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer10km.shp"};
 	
 	protected String[] householdVehicleFiles = new String[]{
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AG.txt",
@@ -160,6 +174,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected DuringActivityIdentifier activityPerformingIdentifier;
 	protected DuringLegIdentifier legPerformingIdentifier;
 	protected DuringLegIdentifier agentsToPickupIdentifier;
+	protected DuringLegIdentifier duringLegRerouteIdentifier;
 	
 	/*
 	 * Replanners
@@ -168,6 +183,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected WithinDayDuringActivityReplanner joinedHouseholdsReplanner;
 	protected WithinDayDuringLegReplanner currentLegToMeetingPointReplanner;
 	protected WithinDayDuringLegReplanner pickupAgentsReplanner;
+	protected WithinDayDuringLegReplanner duringLegRerouteReplanner;
 
 	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected HouseholdsUtils householdsUtils;
@@ -295,6 +311,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 			features.addAll(util.readFile(file));		
 		}
 		affectedArea = util.mergeGeomgetries(features);
+		log.info("Size of affected area: " + affectedArea.getArea());
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
 		
@@ -457,6 +474,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.agentsToPickupIdentifier = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, walkTravelTimeFactory).createIdentifier();
 		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
+		
+//		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
 	}
 	
 	/*
@@ -502,11 +521,15 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.currentLegToMeetingPointReplanner = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsUtils).createReplanner();
 		this.currentLegToMeetingPointReplanner.addAgentsToReplanIdentifier(this.legPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.currentLegToMeetingPointReplanner, EvacuationConfig.evacuationTime, EvacuationConfig.evacuationTime + 1);
-		
+				
 		this.pickupAgentsReplanner = new PickupAgentReplannerFactory(this.scenarioData, router, 1.0, 
 				(AgentsToPickupIdentifier) this.agentsToPickupIdentifier, this.vehiclesTracker).createReplanner();
 		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+//		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+//		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
+//		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 	}
 
 	private void addPickupFacilities() {
