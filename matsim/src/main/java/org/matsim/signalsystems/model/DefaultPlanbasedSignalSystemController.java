@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.model;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -130,7 +131,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	}
 
 	
-	private static class SignalPlanStartTimeComparator implements Comparator<SignalPlan>{
+	private static class SignalPlanStartTimeComparator implements Comparator<SignalPlan>, Serializable {
 
 		@Override
 		public int compare(SignalPlan p1, SignalPlan p2) {

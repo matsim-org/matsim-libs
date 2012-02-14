@@ -42,8 +42,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 
 	private final transient LaneDefinitionsV2 lanes;
 	
-	
-	private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
+	private transient OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
 
 	private OTFVisConfigGroup otfVisConfig;
 	

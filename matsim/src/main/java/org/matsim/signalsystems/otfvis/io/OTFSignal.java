@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.otfvis.io;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ import org.matsim.signalsystems.model.SignalGroupState;
  * @author dgrether
  *
  */
-public class OTFSignal {
+public class OTFSignal implements Serializable {
 
 	private String id;
 	private SignalGroupState state;
