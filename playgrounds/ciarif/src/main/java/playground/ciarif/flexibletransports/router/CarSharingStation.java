@@ -8,6 +8,7 @@ public class CarSharingStation
 {
   private final Id id;
   private final Coord coord;
+  private int cars = 0;
   private LinkImpl link;
 
   CarSharingStation(Id id, Coord coord, LinkImpl link)
@@ -15,6 +16,14 @@ public class CarSharingStation
     this.id = id;
     this.coord = coord;
     this.link = link;
+  }
+  
+  CarSharingStation(Id id, Coord coord, LinkImpl link, int cars)
+  {
+    this.id = id;
+    this.coord = coord;
+    this.link = link;
+    this.cars = cars;
   }
 
   public Id getId() {
@@ -27,5 +36,9 @@ public class CarSharingStation
 
   public LinkImpl getLink() {
     return this.link;
+  }
+  
+  public int getCars() {
+	    return this.cars;
   }
 }

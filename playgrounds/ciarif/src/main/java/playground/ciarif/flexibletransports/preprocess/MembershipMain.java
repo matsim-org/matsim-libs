@@ -20,11 +20,13 @@
 package playground.ciarif.flexibletransports.preprocess;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -36,6 +38,11 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
+
+import playground.ciarif.flexibletransports.config.FtConfigGroup;
+import playground.ciarif.flexibletransports.router.CarSharingStations;
+import playground.ciarif.flexibletransports.utils.MembershipUtils;
 
 public class MembershipMain {
 	
@@ -49,19 +56,20 @@ public class MembershipMain {
 		private String facilitiesfilePath;
 		private String networkfilePath;
 		
+	
 		private final static Logger log = Logger.getLogger(MembershipMain.class);
 
 		public static void main(String [] args) {
 			Gbl.startMeasurement();
-			final MembershipMain membershipAssigner = new MembershipMain();
-			membershipAssigner.run(args [0]);
+			final MembershipMain membershipMain = new MembershipMain();
+			membershipMain.run(args [0]);
 			Gbl.printElapsedTime();
 		}
 
 		public void run(String inputFile) {
 			this.init(inputFile);
-			MembershipModel membershipModel = new MembershipModel(this.scenario);
-			membershipModel.run();
+			MembershipAssigner membershipAssigner = new MembershipAssigner(this.scenario);
+			membershipAssigner.run();
 			this.writePlans();
 		}
 
@@ -73,7 +81,6 @@ public class MembershipMain {
 				this.networkfilePath = bufferedReader.readLine();
 				this.facilitiesfilePath = bufferedReader.readLine();
 				this.plansfilePath = bufferedReader.readLine();
-
 				bufferedReader.close();
 				fileReader.close();
 
