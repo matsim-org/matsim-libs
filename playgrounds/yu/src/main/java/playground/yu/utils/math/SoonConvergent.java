@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.utils.math;
 
@@ -8,9 +8,9 @@ package playground.yu.utils.math;
  * convergent a foreseeable while, this class might be used after preparatory
  * iterations (warm up). Only the necessary conditions for convergence is
  * described here.
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class SoonConvergent {
 	/**
@@ -51,7 +51,14 @@ public class SoonConvergent {
 
 			boolean secondCondition = false;
 			if (avg1 != 0d) {
+				if (Math.abs(avg1) < 0.5 || Math.abs(avg2) < 0.5) {
+					avgValueCriterion *= 2d / (Math.abs(avg1) + Math.abs(avg2));
+				}
 				secondCondition = Math.abs((avg2 - avg1) / avg1) <= avgValueCriterion;
+				if (Math.abs((avg2 - avg1) / avg1) > 0.7) {
+					System.err
+							.println("Math.abs((avg2 - avg1) / avg1)>0.7 --> 1. maybe the proparatoryIteration too short, or 2. the initialStepSize to small, or 3 the calibrated parameter stands next to 0.");
+				}
 			} else {
 				secondCondition = Math.abs(avg2) <= avgValueCriterion;
 			}

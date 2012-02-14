@@ -11,6 +11,7 @@ import java.util.TreeSet;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.collections.Tuple;
@@ -23,9 +24,9 @@ import playground.yu.utils.math.SoonConvergent;
  * seeks fitting step size setting, i.e. the combination of initialStepSize and
  * msaExponent in cadyts (s. section 3.5.1 im Cadyts-manual {@link http
  * ://transp-or.epfl.ch/cadyts/Cadyts_manual_1-1-0.pdf})
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class StepSizeSettingSeeker implements CalibrationConfig {
 	public static class StepSizeSettingSeekerControlerListener implements
@@ -33,10 +34,10 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 		private final double preparatoryIteration;
 		private final Map<String/* paramName */, TreeMap<Integer
 		/* array index e.g. iteration/interval */, double[]>> values;
-		private int convergencyCheckInterval = 200/* default */, iteration;
+		private int convergencyCheckInterval = 100/* default */, iteration;
 		private double amplitudeCriterion = 0.7, avgValueCriterion = 0.1;
 		private double consistentCriterion = 0.1;
-		private boolean goahead = true;
+		private String goAhead = null;
 
 		// private final String[] toCalibratedParameterNames;
 
@@ -56,10 +57,6 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 			for (String paramName : toCalibratedParameterNames) {
 				values.put(paramName, new TreeMap<Integer, double[]>());
 			}
-		}
-
-		public boolean isGoahead() {
-			return goahead;
 		}
 
 		private boolean judgeConsistency() {
@@ -170,7 +167,7 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 					}
 					if (Double.parseDouble(msaExponentStr) < 1) {
 						System.out.println("we need bigger msaExponent!");
-						goahead = false;
+						goAhead = "msaExponent";
 						((PCCtlwithLeftTurnPenalty) event.getControler())
 								.shutdown(true);
 					}
@@ -180,8 +177,8 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 					if (!judgeConvergency()) {
 						// if false, immediately ends this turn of step size
 						// setting trying
-						System.out.println("we need bigger stepSize!");
-						goahead = false;
+						System.out.println("we need bigger step size!");
+						goAhead = "initialStepSize";
 						((PCCtlwithLeftTurnPenalty) event.getControler())
 								.shutdown(true);
 					}
@@ -219,6 +216,10 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 			}
 		}
 
+		public String getGoAhead() {
+			return goAhead;
+		}
+
 		public void setAmplitudeCriterion(double amplitudeCriterion) {
 			this.amplitudeCriterion = amplitudeCriterion;
 		}
@@ -241,10 +242,19 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 	 */
 	public static void main(String[] args) {
 
-		int preparatoryIteration = 200,
-		/* !!!it is NOT the preparatoryIteration in cadyts */convergenceCheckInterval = 100;
+		int preparatoryIteration = 200
+		/* !!!it is NOT the preparatoryIteration in cadyts */;
 
 		Config config = ConfigUtils.loadConfig(args[0]);
+		int covergencyCheckInterval = 100;
+		double amplitudeCriterion = 0.7, avgValueCriterion = 0.1, consistentCriterion = 0.1;
+		if (args.length > 2) {
+			preparatoryIteration = Integer.parseInt(args[1]);
+			covergencyCheckInterval = Integer.parseInt(args[2]);
+			amplitudeCriterion = Double.parseDouble(args[3]);
+			avgValueCriterion = Double.parseDouble(args[4]);
+			consistentCriterion = Double.parseDouble(args[5]);
+		}
 
 		String msaExponentStr = config.findParam(BSE_CONFIG_MODULE_NAME,
 				"msaExponent");
@@ -275,22 +285,48 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 						+ " muss be set!!");
 			}
 		}
-		// TODO while
-		StepSizeSettingSeekerControlerListener sssscl;
-		do {
-			msaExponent = (msaExponent + 1d) / 2d;
-			initialStepSize *= 5d;
-			config.setParam(BSE_CONFIG_MODULE_NAME, "msaExponent",
-					Double.toString(msaExponent));
-			config.setParam(BSE_CONFIG_MODULE_NAME, "initialStepSize",
-					Double.toString(initialStepSize));
 
+		StepSizeSettingSeekerControlerListener sssscl;
+		String goAhead = null;
+
+		ControlerConfigGroup ctlCfg = config.controler();
+		String initialOutputDirectory = ctlCfg.getOutputDirectory();
+		do {
+			if (goAhead != null) {
+				if (goAhead.equals("msaExponent")) {
+					msaExponent = (msaExponent + 1d) / 2d;
+					config.setParam(BSE_CONFIG_MODULE_NAME, "msaExponent",
+							Double.toString(msaExponent));
+				} else if (goAhead.equals("initialStepSize")) {
+					initialStepSize *= 5d;
+					config.setParam(BSE_CONFIG_MODULE_NAME, "initialStepSize",
+							Double.toString(initialStepSize));
+				}
+
+				ctlCfg.setOutputDirectory(initialOutputDirectory
+						+ "_msaExponent" + msaExponent + "_initialStepSize"
+						+ initialStepSize);
+			}
+			System.out.println("+++++Run with msaExponent\t" + msaExponent
+					+ "\tinitialStepSize\t" + initialStepSize
+					+ "\twas started!");
 			PCCtlwithLeftTurnPenalty controler = new PCCtlwithLeftTurnPenalty(
 					config);
 			sssscl = new StepSizeSettingSeekerControlerListener(paramNames,
 					preparatoryIteration);
+			if (args.length > 1) {
+				sssscl.setConvergencyCheckInterval(covergencyCheckInterval);
+				sssscl.setAmplitudeCriterion(amplitudeCriterion);
+				sssscl.setAvgValueCriterion(avgValueCriterion);
+				sssscl.setConsistentCriterion(consistentCriterion);
+			}
+
 			controler.addControlerListener(sssscl);
+			controler.setOverwriteFiles(true);
 			controler.run();
-		} while (!sssscl.isGoahead());
+			System.out.println("+++++Run with msaExponent\t" + msaExponent
+					+ "\tinitialStepSize\t" + initialStepSize + "\tended!");
+			goAhead = sssscl.getGoAhead();
+		} while (goAhead != null);
 	}
 }
