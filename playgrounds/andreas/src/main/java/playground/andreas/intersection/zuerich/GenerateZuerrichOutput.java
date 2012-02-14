@@ -7,14 +7,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -55,7 +54,7 @@ public class GenerateZuerrichOutput {
 	private 	boolean removeDuplicates = false;
 	
 	public GenerateZuerrichOutput() {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(DgPaths.IVTCHNET);
@@ -66,6 +65,7 @@ public class GenerateZuerrichOutput {
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
 
 		
+		LaneDefinitionsV2 lanes20 = null;
 		//lane generation
 		if (generateLanes){
 			//knotennummer -> (vonspur 1->n nachspur)
@@ -77,16 +77,15 @@ public class GenerateZuerrichOutput {
 			laneGeneratior.setNetwork(net);
 			laneDefs = laneGeneratior.processLaneDefinitions(knotenVonSpurNachSpurMap, knotenSpurLinkMap);
 			
-			new LanesConsistencyChecker(net, laneDefs).checkConsistency();
+      lanes20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(
+          laneDefs, scenario.getNetwork());
+
+			
+			new LanesConsistencyChecker(net, lanes20).checkConsistency();
 			
 			//write data
-			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(laneDefs);
-			laneWriter.writeFile(lanesOutputFile);
-		}
-		else {
-			laneDefs = new LaneDefinitionsImpl();
-			MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(laneDefs);
-			laneReader.readFile(lanesOutputFile);
+			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter();
+			laneWriter.writeFileV20(lanesOutputFile, lanes20);
 		}
 
 		if (generateSignalSystems){
@@ -104,7 +103,7 @@ public class GenerateZuerrichOutput {
 			Map<Integer, Map<Integer,  List<Integer>>> knotenLsaSpurMap = LSASpurMappingReader.readBasicLightSignalSystemDefinition(lsaSpurMappingFile);
 			
 			//create the signals
-			SignalSystemsGenerator signalsGenerator = new SignalSystemsGenerator(net, laneDefs, signalSystems);
+			SignalSystemsGenerator signalsGenerator = new SignalSystemsGenerator(net, lanes20, signalSystems);
 			signalsGenerator.processSignalSystems(knotenLsaSpurMap, knotenSpurLinkMap);
 			
 			//TODO refactor consistency checker

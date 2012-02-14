@@ -33,9 +33,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDataV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
@@ -90,7 +90,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	}
 
 	public DgNetwork convertNetworkLanesAndSignals(ScenarioImpl sc) {
-		this.dgNetwork = this.createNetwork(sc.getNetwork(), sc.getLaneDefinitions(), sc.getScenarioElement(SignalsData.class));
+		this.dgNetwork = this.createNetwork(sc.getNetwork(), sc.getScenarioElement(LaneDefinitionsV2.class), sc.getScenarioElement(SignalsData.class));
 		return this.dgNetwork ;
 	}
 
@@ -98,7 +98,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	 * codierung:
 	 *   fromLink -> toLink zwei nodes + 1 light
 	 */
-	private DgNetwork createNetwork(Network net, LaneDefinitions lanes, SignalsData signalsData) {
+	private DgNetwork createNetwork(Network net, LaneDefinitionsV2 lanes, SignalsData signalsData) {
 		
 		DgNetwork dgnet = new DgNetwork();
 		
@@ -121,7 +121,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 			Link backLink = this.getBackLink(link);
 			Id backLinkId = (backLink == null) ?  null : backLink.getId();
 			DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(link.getId()));
-			LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
+			LanesToLinkAssignmentV2 l2l = lanes.getLanesToLinkAssignments().get(link.getId());
 			//create crossing layout
 			if (signalizedLinks.contains(link.getId())){
 				log.debug("link: " + link.getId() + " is signalized...");
@@ -205,7 +205,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	 * the input data:  thus the programs/plans for the signal might be ambiguous, an exception is thrown.
 	 * 
 	 */
-	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment l2l, SignalSystemData system, SignalsData signalsData) {
+	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignmentV2 l2l, SignalSystemData system, SignalsData signalsData) {
 		List<SignalData> signals4Link = this.getSignals4LinkId(system, link.getId());
 		DgProgram program = crossing.getPrograms().get(this.programId);
 		//first get the outlinks that are controlled by the signal
@@ -238,7 +238,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 			}
 			else { //link with lanes
 				for (Id laneId : signal.getLaneIds()){
-					Lane lane = l2l.getLanes().get(laneId);
+					LaneDataV2 lane = l2l.getLanes().get(laneId);
 					if (signal.getTurningMoveRestrictions() == null || signal.getTurningMoveRestrictions().isEmpty()){ //no turning move restrictions for signal -> outlinks come from lane
 						for (Id outLinkId : lane.getToLinkIds()){
 							log.debug("    outLinkId: " + outLinkId);
@@ -270,7 +270,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	}
 	
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
-			DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment l2l) {
+			DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignmentV2 l2l) {
 		DgProgram program = crossing.getPrograms().get(this.programId);
 		if (l2l == null){
 			List<Id> toLinks = this.getTurningMoves4LinkWoLanes(link);
@@ -282,7 +282,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 			}
 		}
 		else {
-			for (Lane lane : l2l.getLanes().values()){
+			for (LaneDataV2 lane : l2l.getLanes().values()){
 				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){ // check for outlanes
 					for (Id outLinkId : lane.getToLinkIds()){
 						Id lightId = this.createLights(link.getId(), lane.getId(), outLinkId, backLinkId, inLinkToNode, crossing);

@@ -21,7 +21,7 @@ package playground.dgrether.signalsystems.data.consistency;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 
 import playground.dgrether.designdrafts.consistency.ConsistencyChecker;
 
@@ -36,7 +36,7 @@ public class SignalSystems11ConsistencyChecker implements ConsistencyChecker {
 	private static final Logger log = Logger.getLogger(SignalSystems11ConsistencyChecker.class);
 	
 	private Network network;
-	private LaneDefinitions lanes;
+	private LaneDefinitionsV2 lanes;
 	private boolean removeMalformed = false;
 	
 	@Override

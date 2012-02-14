@@ -43,10 +43,13 @@ import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.v11.Lane;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
@@ -78,7 +81,10 @@ public class DgCalculateSignalGroupsTest {
 	
 	@Test
 	public void test3WayCrossing1Signal(){
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseSignalSystems(true);
+		Scenario sc = ScenarioUtils.createScenario(config);
+		
 		this.create3WayNetwork(sc);
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		this.create1SignalOn3WayCrossing(signalSystems);
@@ -107,13 +113,17 @@ public class DgCalculateSignalGroupsTest {
 
 	@Test
 	public void test3WayCrossingManySignals(){
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(true);
+		config.scenario().setUseSignalSystems(true);
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+
 		this.create3WayNetwork(sc);
 		this.createLanesFor3WayNetwork(sc);
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		this.createManySignalsOn3WayCrossing(signalSystems);
 
-		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalSystems, sc.getNetwork(), sc.getLaneDefinitions());
+		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalSystems, sc.getNetwork(), sc.getScenarioElement(LaneDefinitionsV2.class));
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 
 		Assert.assertNotNull(signalGroups);
@@ -157,16 +167,15 @@ public class DgCalculateSignalGroupsTest {
 
 	@Test
 	public void test4WayCrossing1Signal(){
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Config conf = scenario.getConfig();
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseSignalSystems(true);
 		File f = new File("a");
 		System.err.println(f.getAbsolutePath());
 		//network
 		String inputDirectory = this.testUtils.getClassInputDirectory();
-		conf.network().setInputFile(inputDirectory + "network.xml.gz");
+		config.network().setInputFile(inputDirectory + "network.xml.gz");
 
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		this.create1SignalOn4WayCrossing(signalSystems);
@@ -222,16 +231,18 @@ public class DgCalculateSignalGroupsTest {
 
 	@Test
 	public void test4WayCrossingManySignals() throws JAXBException, SAXException, ParserConfigurationException, IOException{
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Config conf = scenario.getConfig();
+		Config conf = ConfigUtils.createConfig();
+		conf.scenario().setUseLanes(true);
 		//network
 		String inputDirectory = this.testUtils.getClassInputDirectory();
 				conf.network().setInputFile(inputDirectory + "network.xml.gz");
 		String laneDefinitions = inputDirectory	+ "testLaneDefinitions_v1.1.xml";
-		conf.network().setLaneDefinitionsFile(laneDefinitions);
-		conf.scenario().setUseLanes(true);
+		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
+		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions, lanes20, conf.network().getInputFile());
+		conf.network().setLaneDefinitionsFile(lanes20);
 
 		//load the network
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		//load the signals
@@ -242,7 +253,7 @@ public class DgCalculateSignalGroupsTest {
 		signalsReader.readFile(signalSystemsFile);
 		
 		//calculate the signal groups
-		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalsData.getSignalSystemsData(), scenario.getNetwork(), scenario.getLaneDefinitions());
+		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalsData.getSignalSystemsData(), scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitionsV2.class));
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 		//test them
 		Assert.assertNotNull(signalGroups);
@@ -350,8 +361,8 @@ public class DgCalculateSignalGroupsTest {
 	 * @param sc 
 	 */
 	private void createLanesFor3WayNetwork(ScenarioImpl sc) {
-		sc.getConfig().scenario().setUseLanes(true);
-		LaneDefinitions lanes = sc.getLaneDefinitions();
+		LaneDefinitions lanes = sc.getLaneDefinitionsV11();
+		
 		LaneDefinitionsFactory fac = lanes.getFactory();
 		//link 13
 		LanesToLinkAssignment l2l = fac.createLanesToLinkAssignment(this.getId(13));
@@ -380,6 +391,7 @@ public class DgCalculateSignalGroupsTest {
 		lane = fac.createLane(this.getId(2));
 		l2l.addLane(lane);
 		lane.addToLinkId(this.getId(32));
+		sc.addScenarioElement(new LaneDefinitionsV11ToV20Conversion().convertTo20(lanes, sc.getNetwork()));
 	}
 	
 	/**

@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsDataFactory;
@@ -84,7 +84,7 @@ public class DgCalculateSignalGroups {
 	private static final Logger log = Logger.getLogger(DgCalculateSignalGroups.class);
 
 	private Network net;
-	private LaneDefinitions lanes;
+	private LaneDefinitionsV2 lanes;
 	private SignalSystemsData signalSystems;
 	
 	private double right = -Math.PI/4;
@@ -98,7 +98,7 @@ public class DgCalculateSignalGroups {
 	}
 	
 	public DgCalculateSignalGroups(SignalSystemsData signalSystems2, Network network,
-			LaneDefinitions laneDefinitions) {
+			LaneDefinitionsV2 laneDefinitions) {
 		this(signalSystems2, network);
 		this.lanes = laneDefinitions;
 	}
@@ -116,7 +116,7 @@ public class DgCalculateSignalGroups {
 		//get the toLinks of a signal
 		List<Id> toLinkIds = new ArrayList<Id>();
 		if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()){ //the signal is on one or several lanes -> the toLinks are retrieved from there
-			LanesToLinkAssignment l2l = this.lanes.getLanesToLinkAssignments().get(signal.getLinkId());
+			LanesToLinkAssignmentV2 l2l = this.lanes.getLanesToLinkAssignments().get(signal.getLinkId());
 			for (Id laneId : signal.getLaneIds()){
 				toLinkIds.addAll(l2l.getLanes().get(laneId).getToLinkIds());
 			}

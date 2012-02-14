@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -43,10 +43,10 @@ public class SignalSystemsGenerator {
 	private static final Logger log = Logger.getLogger(SignalSystemsGenerator.class);
 
 	private Network network;
-	private LaneDefinitions laneDefinitions;
+	private LaneDefinitionsV2 laneDefinitions;
 	private SignalSystemsData signalSystems;
 
-	public SignalSystemsGenerator(Network net, LaneDefinitions laneDefs, SignalSystemsData signalSystems2) {
+	public SignalSystemsGenerator(Network net, LaneDefinitionsV2 laneDefs, SignalSystemsData signalSystems2) {
 		this.network = net;
 		this.laneDefinitions = laneDefs;
 		this.signalSystems = signalSystems2;
@@ -155,7 +155,7 @@ public class SignalSystemsGenerator {
 						for (Integer spurIdInteger : spuren) {
 							//lanes 
 							Id spurId = new IdImpl(spurIdInteger);
-							LanesToLinkAssignment l2lAssignment = this.laneDefinitions.getLanesToLinkAssignments().get(linkId);
+							LanesToLinkAssignmentV2 l2lAssignment = this.laneDefinitions.getLanesToLinkAssignments().get(linkId);
 							if ((l2lAssignment != null) 
 									&& l2lAssignment.getLanes().containsKey(spurId)){
 								signal.addLaneId(spurId);

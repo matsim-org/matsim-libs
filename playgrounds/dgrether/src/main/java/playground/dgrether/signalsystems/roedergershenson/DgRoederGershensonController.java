@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDataV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.model.Signal;
@@ -118,7 +118,7 @@ public class DgRoederGershensonController implements SignalController {
 	}
 
 	
-	public void initSignalGroupMetadata(Network net, LaneDefinitions lanedefs){
+	public void initSignalGroupMetadata(Network net, LaneDefinitionsV2 lanedefs){
 		this.signalGroupIdMetadataMap = new HashMap<Id, SignalGroupMetadata>();
 		SignalSystemData systemData = this.system.getSignalSystemsManager().getSignalsData().getSignalSystemsData().getSignalSystemData().get(this.system.getId());
 		
@@ -138,9 +138,9 @@ public class DgRoederGershensonController implements SignalController {
 						this.addOutLinksWithoutBackLinkToMetadata(inLink, metadata);
 					}
 					else { // there are lanes
-						LanesToLinkAssignment lanes4link = lanedefs.getLanesToLinkAssignments().get(signalData.getLinkId());
+						LanesToLinkAssignmentV2 lanes4link = lanedefs.getLanesToLinkAssignments().get(signalData.getLinkId());
 						for (Id  laneId : signalData.getLaneIds()){
-							Lane lane = lanes4link.getLanes().get(laneId);
+							LaneDataV2 lane = lanes4link.getLanes().get(laneId);
 							if (lane.getToLinkIds() == null || lane.getToLinkIds().isEmpty()){
 								this.addOutLinksWithoutBackLinkToMetadata(inLink, metadata);
 							}

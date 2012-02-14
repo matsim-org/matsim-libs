@@ -7,6 +7,7 @@
                 <toLink refId="35"/>
             </leadsTo>
             <representedLanes number="2.0"/>
+            <capacity vehiclesPerHour="7200.0"/>
             <startsAt meterFromLinkEnd="200.0"/>
             <alignment>-1</alignment>
         </lane>
@@ -16,6 +17,7 @@
                 <toLane refId="1"/>
             </leadsTo>
             <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="3600.0"/>
             <startsAt meterFromLinkEnd="500.0"/>
             <alignment>0</alignment>
         </lane>
@@ -24,6 +26,7 @@
                 <toLink refId="32"/>
             </leadsTo>
             <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="3600.0"/>
             <startsAt meterFromLinkEnd="200.0"/>
             <alignment>1</alignment>
         </lane>
@@ -34,6 +37,7 @@
                 <toLink refId="57"/>
             </leadsTo>
             <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="60.0"/>
             <startsAt meterFromLinkEnd="200.0"/>
             <alignment>-1</alignment>
         </lane>
@@ -42,6 +46,7 @@
                 <toLink refId="58"/>
             </leadsTo>
             <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="60.0"/>
             <startsAt meterFromLinkEnd="200.0"/>
             <alignment>0</alignment>
         </lane>
@@ -50,6 +55,7 @@
                 <toLink refId="56"/>
             </leadsTo>
             <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="60.0"/>
             <startsAt meterFromLinkEnd="200.0"/>
             <alignment>1</alignment>
         </lane>
@@ -60,6 +66,7 @@
                 <toLane refId="1"/>
             </leadsTo>
             <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="3600.0"/>
             <startsAt meterFromLinkEnd="500.0"/>
             <alignment>0</alignment>
         </lane>

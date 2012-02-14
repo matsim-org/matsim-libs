@@ -23,6 +23,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
@@ -55,12 +56,12 @@ public class SylviaOTFVisMain {
 	public void playCottbus(ScenarioImpl scenario){
 		DgOTFVisUtils.preparePopulation4Simulation(scenario);
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 
 		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
-		sensorManager.setLaneDefinitions(scenario.getLaneDefinitions());
+		sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitionsV2.class));
 		events.addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, 

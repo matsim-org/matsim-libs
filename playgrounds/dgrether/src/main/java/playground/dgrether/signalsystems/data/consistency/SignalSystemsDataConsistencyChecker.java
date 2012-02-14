@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
@@ -46,12 +46,12 @@ public class SignalSystemsDataConsistencyChecker implements ConsistencyChecker {
 
 	private SignalsData signalsData;
 
-	private LaneDefinitions lanes;
+	private LaneDefinitionsV2 lanes;
 
 	public SignalSystemsDataConsistencyChecker(ScenarioImpl scenario) {
 		this.scenario = scenario;
 		this.signalsData = scenario.getScenarioElement(SignalsData.class);
-		this.lanes = scenario.getLaneDefinitions();
+		this.lanes = scenario.getScenarioElement(LaneDefinitionsV2.class);
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class SignalSystemsDataConsistencyChecker implements ConsistencyChecker {
 							+ " is located at some lanes of Link Id: " + signal.getLinkId() + " but there is no LanesToLinkAssignemt existing in the LaneDefinitions.");
 					}
 					else {
-						LanesToLinkAssignment l2l = this.lanes.getLanesToLinkAssignments().get(signal.getLinkId());
+						LanesToLinkAssignmentV2 l2l = this.lanes.getLanesToLinkAssignments().get(signal.getLinkId());
 						for (Id laneId : signal.getLaneIds()) {
 							if (! l2l.getLanes().containsKey(laneId)) {
 								log.error("Error: No Lane for Signal: "); 

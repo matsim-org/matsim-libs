@@ -34,12 +34,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDataV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2Impl;
+import org.matsim.lanes.data.v20.LaneDefinitionsReaderV20;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.xml.sax.SAXException;
 
 import playground.jbischoff.BAsignals.JbBaPaths;
@@ -79,11 +79,11 @@ public class LinkLengths {
 			System.out.println(lid + " length is "+scenario.getNetwork().getLinks().get(lid).getLength());
 			
 		}
-		LaneDefinitions ldf = new LaneDefinitionsImpl();
-		LaneDefinitionsReader20 ldr = new LaneDefinitionsReader20(ldf, "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd");
+		LaneDefinitionsV2 ldf = new LaneDefinitionsV2Impl();
+		LaneDefinitionsReaderV20 ldr = new LaneDefinitionsReaderV20(ldf, "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd");
 		ldr.readFile("/Users/JB/Desktop/BA-Arbeit/sim/scenario/scenario-lsa/lanes_cottbus_v20_jbol.xml");
-		for (LanesToLinkAssignment ltla : ldf.getLanesToLinkAssignments().values()){
-			for (Lane la : ltla.getLanes().values()){
+		for (LanesToLinkAssignmentV2 ltla : ldf.getLanesToLinkAssignments().values()){
+			for (LaneDataV2 la : ltla.getLanes().values()){
 				if (la.getId().toString().endsWith(".ol")){
 				String[] a = la.getId().toString().split(".ol");
 				
@@ -104,7 +104,7 @@ public class LinkLengths {
 		
 		}
 	
-		LaneDefinitionsWriter20 ldw = new LaneDefinitionsWriter20(ldf);
+		LaneDefinitionsWriterV20 ldw = new LaneDefinitionsWriterV20(ldf);
 		ldw.write("/Users/JB/Desktop/BA-Arbeit/sim/scenario/scenario-lsa/lanes_cottbus_v20_jbol_c.xml");
 	}
 }

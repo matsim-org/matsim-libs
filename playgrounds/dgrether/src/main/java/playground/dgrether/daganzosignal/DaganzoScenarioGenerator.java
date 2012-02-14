@@ -48,11 +48,12 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.Lane;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.DgPlaygroundJobfileCreator;
@@ -245,8 +246,8 @@ public class DaganzoScenarioGenerator {
 			config.scenario().setUseLanes(true);
 			config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
 			//create the lanes and write them
-			LaneDefinitions lanes = createLanes(scenario);
-			LaneDefinitionsWriter20 laneWriter = new LaneDefinitionsWriter20(lanes);
+			LaneDefinitionsV2 lanes = createLanes(scenario);
+			LaneDefinitionsWriterV20 laneWriter = new LaneDefinitionsWriterV20(lanes);
 			laneWriter.write(LANESOUTPUTFILE);
 		}
 		if (isUseSignalSystems) {
@@ -449,8 +450,8 @@ public class DaganzoScenarioGenerator {
 	}
 
 
-	private LaneDefinitions createLanes(ScenarioImpl scenario) {
-		LaneDefinitions lanes = scenario.getLaneDefinitions();
+	private LaneDefinitionsV2 createLanes(ScenarioImpl scenario) {
+		LaneDefinitions lanes = scenario.getLaneDefinitionsV11();
 		LaneDefinitionsFactory factory = lanes.getFactory();
 		//lanes for link 4
 		LanesToLinkAssignment lanesForLink4 = factory.createLanesToLinkAssignment(id4);
@@ -469,8 +470,8 @@ public class DaganzoScenarioGenerator {
 		lanesForLink5.addLane(link5lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink5);
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-		lanes = conversion.convertTo20(lanes, scenario.getNetwork());
-		return lanes;
+		LaneDefinitionsV2 lanesv2 = conversion.convertTo20(lanes, scenario.getNetwork());
+		return lanesv2;
 	}
 
 

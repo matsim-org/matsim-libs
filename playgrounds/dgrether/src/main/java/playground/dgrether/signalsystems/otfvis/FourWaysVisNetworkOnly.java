@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v20.LaneDefinitions;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -42,24 +39,21 @@ public class FourWaysVisNetworkOnly {
 		String netFile = FourWaysVis.TESTINPUTDIR+ "network.xml.gz";
 		String lanesFile  = FourWaysVis.TESTINPUTDIR + "testLaneDefinitions_v2.0.xml";
 		
-		
 		String[] netArray = {netFile};
-		
+
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(true);
+		config.network().setLaneDefinitionsFile(lanesFile);
+
 		//this is run
 //		OTFVis.playNetwork(netArray);
 		//this is hack
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
     scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		scenario.getConfig().scenario().setUseLanes(true);
-		LaneDefinitions laneDefs = scenario.getLaneDefinitions();
 		
-		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
-		lanesReader.readFile(lanesFile);
 		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);

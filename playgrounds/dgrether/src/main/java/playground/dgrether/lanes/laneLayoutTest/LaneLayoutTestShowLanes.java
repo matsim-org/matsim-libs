@@ -21,10 +21,10 @@ package playground.dgrether.lanes.laneLayoutTest;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
@@ -44,27 +44,23 @@ public class LaneLayoutTestShowLanes {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().network().setInputFile(LaneLayoutTestFileNames.NETWORK);
-		sc.getConfig().network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONSV2);
-		sc.getConfig().plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
-		sc.getConfig().scenario().setUseLanes(true);
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-//		sc.getConfig().otfVis().setLinkWidth(150.0f);
-		sc.getConfig().otfVis().setDrawLinkIds(true);
-		sc.getConfig().otfVis().setNodeOffset(30);
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(LaneLayoutTestFileNames.NETWORK);
+		config.network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONSV2);
+		config.plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
+		config.scenario().setUseLanes(true);
+		config.addQSimConfigGroup(new QSimConfigGroup());
+//		config.otfVis().setLinkWidth(150.0f);
+		config.otfVis().setDrawLinkIds(true);
+		config.otfVis().setNodeOffset(30);
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
 
-
-		sc.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
-
-		
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
-		loader.loadScenario();
+		Scenario sc = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new LogOutputEventHandler());
 		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(sc, events);
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, otfVisQSim);
-		OTFClientLive.run(sc.getConfig(), server);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, sc, events, otfVisQSim);
+		OTFClientLive.run(config, server);
 		otfVisQSim.run();
 	
 	}
