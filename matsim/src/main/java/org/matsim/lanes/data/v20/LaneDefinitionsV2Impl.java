@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneMeterFromLinkEndComparator
+ * BasicLaneDefinitions
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,28 +19,34 @@
  * *********************************************************************** */
 package org.matsim.lanes.data.v20;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import org.matsim.core.api.internal.MatsimComparator;
+import org.matsim.api.core.v01.Id;
+
 
 /**
- * Comparator which implements a comparision function for the Lane.getStartsAtMeterFromLinkEnd()
- * attribute.
  * @author dgrether
  */
-public class LaneMeterFromLinkEndComparator implements Comparator<Lane>, Serializable, MatsimComparator {
+public class LaneDefinitionsV2Impl implements LaneDefinitionsV2 {
 
-	private static final long serialVersionUID = 1L;
+	private SortedMap<Id, LanesToLinkAssignmentV2> lanesToLinkAssignments =  new TreeMap<Id, LanesToLinkAssignmentV2>();
+
+	private final LaneDefinitionsFactoryV2 builder = new LaneDefinitionsFactoryV2Impl();
 
 	@Override
-	public int compare(Lane o1, Lane o2) {
-    if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
-      return -1;
-    } else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
-      return 1;
-    } else {
-      return 0;
-    }
+	public SortedMap<Id, LanesToLinkAssignmentV2> getLanesToLinkAssignments() {
+		return this.lanesToLinkAssignments;
 	}
+
+	@Override
+	public void addLanesToLinkAssignment(LanesToLinkAssignmentV2 assignment) {
+		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
+	}
+
+	@Override
+	public LaneDefinitionsFactoryV2 getFactory(){
+		return this.builder;
+	}
+
 }

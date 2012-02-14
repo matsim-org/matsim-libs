@@ -8,6 +8,7 @@
 								<toLink refId="1" />
 						</leadsTo>
 						<representedLanes number="1.0" />
+						<capacity vehiclesPerHour="0.725" />
 						<startsAt meterFromLinkEnd="45.0" />
 						<alignment>2</alignment>
 				</lane>
@@ -16,6 +17,7 @@
 								<toLink refId="1" />
 						</leadsTo>
 						<representedLanes number="2.5" />
+						<capacity vehiclesPerHour="2" />	
 						<startsAt meterFromLinkEnd="60.0" />
 						<alignment>2</alignment>
 				</lane>
@@ -25,6 +27,7 @@
 						<leadsTo>
 								<toLink refId="1" />
 						</leadsTo>
+						<capacity vehiclesPerHour="1900.0" />
 						<alignment>2</alignment>
 				</lane>
 		</lanesToLinkAssignment>

@@ -46,18 +46,18 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements MatsimSomeReader {
+public class LaneDefinitionsReaderV20 extends MatsimJaxbXmlParser implements MatsimSomeReader {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsReader20.class);
+			.getLogger(LaneDefinitionsReaderV20.class);
 
-	private LaneDefinitions laneDefinitions;
+	private LaneDefinitionsV2 laneDefinitions;
 
-	private LaneDefinitionsFactory builder;
+	private LaneDefinitionsFactoryV2 builder;
 	/**
 	 * @param schemaLocation
 	 */
-	public LaneDefinitionsReader20(LaneDefinitions laneDefs, String schemaLocation) {
+	public LaneDefinitionsReaderV20(LaneDefinitionsV2 laneDefs, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();
@@ -93,8 +93,8 @@ public class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements Mats
 			}
 			
 			//convert the parsed xml-instances to basic instances
-			LanesToLinkAssignment l2lAssignment;
-			Lane lane = null;
+			LanesToLinkAssignmentV2 l2lAssignment;
+			LaneDataV2 lane = null;
 			for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
 					.getLanesToLinkAssignment()) {
 				l2lAssignment = builder.createLanesToLinkAssignment(new IdImpl(lldef
@@ -112,6 +112,12 @@ public class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements Mats
 							lane.addToLinkId(new IdImpl(toLinkId.getRefId()));
 						}
 					}
+					
+					if (laneType.getCapacity() == null){
+						log.warn("Capacity not set in lane definition, using default...");
+						laneType.setCapacity(fac.createXMLLaneTypeXMLCapacity());
+					}
+					lane.setCapacityVehiclesPerHour(laneType.getCapacity().getVehiclesPerHour());
 					
 					if (laneType.getRepresentedLanes() == null) {
 						laneType.setRepresentedLanes(fac

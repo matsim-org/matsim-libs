@@ -127,7 +127,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.VspPlansCleaner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -554,8 +555,8 @@ public class Controler {
 							.writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
 				}
 				if (this.config.scenario().isUseLanes()) {
-					new LaneDefinitionsWriter20(
-							this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
+					new LaneDefinitionsWriterV20(
+							this.scenarioData.getScenarioElement(LaneDefinitionsV2.class)).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
 				}
 				if (!unexpected	&& this.getConfig().vspExperimental().isWritingOutputEvents()) {
 					File toFile = new File(	this.controlerIO.getOutputFilename("output_events.xml.gz"));

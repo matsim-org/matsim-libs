@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
-import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimEngine;
@@ -225,14 +225,14 @@ public class OTFVis {
 
 		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
 			config.otfVis().setScaleQuadTreeRect(true);
-			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), ((ScenarioImpl) scenario).getLaneDefinitions(), scenario.getConfig().otfVis());
+			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), scenario.getScenarioElement(LaneDefinitionsV2.class), scenario.getConfig().otfVis());
 			server.addAdditionalElement(otfLaneWriter);
 		} else if (config.scenario().isUseSignalSystems()) {
 			config.otfVis().setScaleQuadTreeRect(true);
 			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
 			events.addHandler(signalTracker);
 			SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
-			LaneDefinitions laneDefs = ((ScenarioImpl)scenario).getLaneDefinitions();
+			LaneDefinitionsV2 laneDefs = scenario.getScenarioElement(LaneDefinitionsV2.class);
 			SignalSystemsData systemsData = signalsData.getSignalSystemsData();
 			SignalGroupsData groupsData = signalsData.getSignalGroupsData();
 			OTFSignalWriter otfSignalWriter = new OTFSignalWriter(qSim.getVisNetwork(), laneDefs, scenario.getConfig().otfVis(), systemsData, groupsData , signalTracker);

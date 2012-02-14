@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
@@ -148,12 +148,12 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
 		}
 		if (sim.getScenario().getConfig().scenario().isUseLanes()) {
-			if (((ScenarioImpl) sim.getScenario()).getLaneDefinitions() == null) {
+			if (sim.getScenario().getScenarioElement(LaneDefinitionsV2.class) == null) {
 				throw new IllegalStateException(
-						"Lane definitions have to be set if feature is enabled!");
+						"Lane definitions in v2.0 format have to be set if feature is enabled!");
 			}
 			log.info("Lanes enabled...");
-			network = new QNetwork(sim.getScenario().getNetwork(), new QLanesNetworkFactory(new DefaultQNetworkFactory(), ((ScenarioImpl) sim.getScenario()).getLaneDefinitions()));
+			network = new QNetwork(sim.getScenario().getNetwork(), new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getScenarioElement(LaneDefinitionsV2.class)));
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}

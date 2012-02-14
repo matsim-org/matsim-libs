@@ -27,10 +27,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
+import org.matsim.lanes.data.v11.Lane;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
@@ -58,16 +60,6 @@ public class CreateTrafficSignalScenarioWithLanes {
 	private int cycle = 120;
 
 	
-	public Scenario loadScenario(){
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
-		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
-		config.scenario().setUseLanes(true);
-		config.scenario().setUseSignalSystems(true);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
-
 	private void createGroupsAndSystem2(Scenario scenario, SignalSystemsData systems, SignalGroupsData groups){
 		//signal system 2
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(scenario.createId("2"));
@@ -202,9 +194,9 @@ public class CreateTrafficSignalScenarioWithLanes {
 		settings4.setDropping(this.dropping2);
 	}
 
-	private LaneDefinitions createLanes(ScenarioImpl scenario) {
+	private LaneDefinitionsV2 createLanes(ScenarioImpl scenario) {
 		double laneLenght = 50.0;
-		LaneDefinitions lanes = scenario.getLaneDefinitions();
+		LaneDefinitions lanes = scenario.getLaneDefinitionsV11();
 		LaneDefinitionsFactory factory = lanes.getFactory();
 		//lanes for link 12
 		LanesToLinkAssignment lanesForLink12 = factory.createLanesToLinkAssignment(scenario.createId("12"));
@@ -234,9 +226,21 @@ public class CreateTrafficSignalScenarioWithLanes {
 		
 		//convert to 2.0 format and return
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-		lanes = conversion.convertTo20(lanes, scenario.getNetwork());
-		return lanes;
+		LaneDefinitionsV2 l2 = conversion.convertTo20(lanes, scenario.getNetwork());
+		scenario.addScenarioElement(l2);
+		return l2;
 	}
+	
+	public Scenario loadScenario(){
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
+		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
+		config.scenario().setUseLanes(true);
+		config.scenario().setUseSignalSystems(true);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
+	}
+
 	
 	private void run() {
 		Scenario scenario = this.loadScenario();
@@ -256,6 +260,8 @@ public class CreateTrafficSignalScenarioWithLanes {
 		}
 		
 		//write to file
+		new MatsimLaneDefinitionsWriter().writeFileV20("output/example90/TrafficLights/lane_definitions_v2.0.xml", scenario.getScenarioElement(LaneDefinitionsV2.class));
+		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
 		signalsWriter.setSignalSystemsOutputFilename("output/example90TrafficLights/signal_systems.xml");
 		signalsWriter.setSignalGroupsOutputFilename("output/example90TrafficLights/signal_groups.xml");

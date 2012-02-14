@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicLaneDefinitionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,36 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.lanes.data.v20;
 
-import java.util.SortedMap;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.api.internal.MatsimFactory;
+
 
 /**
- * Top level container for lanes within MATSim. See package-info for documentation.
+ * Builder for the content of BasicLaneDefinitions
  * @author dgrether
- *
  */
-public interface LaneDefinitions extends MatsimToplevelContainer {
+public interface LaneDefinitionsFactoryV2 extends MatsimFactory {
 
 	/**
-	 *
-	 * @return Map with Link Ids as keys and assignments as values
+	 * 
+	 * @param linkIdReference id of the links the lanes of the created object belong to
+	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
 	 */
-	public SortedMap<Id, LanesToLinkAssignment> getLanesToLinkAssignments();
-
+	public LanesToLinkAssignmentV2 createLanesToLinkAssignment(Id linkIdReference);
 	/**
-	 * Adds a LanesToLinkAssignment to the container.
-	 * @param assignment
+	 * Creates an instance of BasicLane with the id given as parameter.
+	 * @param laneId
+	 * @return
 	 */
-	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment);
-	/**
-	 * Get the factory to create container content.
-	 */
-	@Override
-	public LaneDefinitionsFactory getFactory();
-
+	public LaneDataV2 createLane(Id laneId);
 }

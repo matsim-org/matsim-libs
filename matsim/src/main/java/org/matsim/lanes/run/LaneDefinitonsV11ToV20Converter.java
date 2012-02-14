@@ -27,16 +27,18 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitionsReaderV11;
+import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
 import org.xml.sax.SAXException;
 
 
@@ -64,17 +66,18 @@ public class LaneDefinitonsV11ToV20Converter {
 	
 	public void convert(String laneDefs11Filename, String laneDefs20Filename, String networkFilename){
 		this.checkFileTypes(laneDefs11Filename, laneDefs20Filename);
-		
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(true);
+		Scenario sc = ScenarioUtils.createScenario(config);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
 		netReader.readFile(networkFilename);
 		Network net = sc.getNetwork();
 		LaneDefinitions lanedefs11 = new LaneDefinitionsImpl();
-		LaneDefinitionsReader11 reader11 = new LaneDefinitionsReader11(lanedefs11, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
+		LaneDefinitionsReaderV11 reader11 = new LaneDefinitionsReaderV11(lanedefs11, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
 		try {
 			reader11.readFile(laneDefs11Filename);
-			LaneDefinitions lanedefs20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(lanedefs11, net);
-			LaneDefinitionsWriter20 writer20 = new LaneDefinitionsWriter20(lanedefs20);
+			LaneDefinitionsV2 lanedefs20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(lanedefs11, net);
+			LaneDefinitionsWriterV20 writer20 = new LaneDefinitionsWriterV20(lanedefs20);
 			writer20.write(laneDefs20Filename);
 		} catch (JAXBException e) {
 			e.printStackTrace();

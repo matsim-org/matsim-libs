@@ -26,8 +26,8 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -54,14 +54,6 @@ import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
  */
 public class CreateSimpleTrafficSignalScenario {
 
-	public Scenario loadScenario(){
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
-		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
-		config.scenario().setUseSignalSystems(true);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
 
 	
 	private void createSignalSystemsAndGroups(Scenario scenario, SignalsData signalsData){
@@ -163,9 +155,19 @@ public class CreateSimpleTrafficSignalScenario {
 		return control;
 	}
 	
+	public Scenario createConfigAndLoadScenario(){
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
+		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
+		config.scenario().setUseSignalSystems(true);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
+	}
+
+	
 	
 	private void run() {
-		Scenario scenario = this.loadScenario();
+		Scenario scenario = this.createConfigAndLoadScenario();
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		this.createSignalSystemsAndGroups(scenario, signalsData);
 		this.createSignalControl(scenario, signalsData);

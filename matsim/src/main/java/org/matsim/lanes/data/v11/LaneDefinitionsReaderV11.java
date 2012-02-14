@@ -37,10 +37,6 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 import org.xml.sax.SAXException;
 
 
@@ -50,10 +46,10 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements MatsimSomeReader {
+public class LaneDefinitionsReaderV11 extends MatsimJaxbXmlParser implements MatsimSomeReader {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsReader11.class);
+			.getLogger(LaneDefinitionsReaderV11.class);
 
 	private LaneDefinitions laneDefinitions;
 
@@ -61,7 +57,7 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 	/**
 	 * @param schemaLocation
 	 */
-	public LaneDefinitionsReader11(LaneDefinitions laneDefs, String schemaLocation) {
+	public LaneDefinitionsReaderV11(LaneDefinitions laneDefs, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();

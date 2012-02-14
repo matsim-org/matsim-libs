@@ -37,6 +37,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -70,7 +71,9 @@ public class TravelTimeOneWayTest {
 		String signalSystemsFile = null;
 		if (useLanes){
 				String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-				conf.network().setLaneDefinitionsFile(laneDefinitions);
+				String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
+				new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
+				conf.network().setLaneDefinitionsFile(lanes20);
 				conf.scenario().setUseLanes(true);
 				signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
 		}

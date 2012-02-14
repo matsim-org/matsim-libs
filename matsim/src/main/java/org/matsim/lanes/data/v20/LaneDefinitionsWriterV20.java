@@ -45,12 +45,12 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
  * @author dgrether
  *
  */
-public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
+public class LaneDefinitionsWriterV20 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsWriter20.class);
+			.getLogger(LaneDefinitionsWriterV20.class);
 
-	private LaneDefinitions laneDefinitions;
+	private LaneDefinitionsV2 laneDefinitions;
 
 	private XMLLaneDefinitions xmlLaneDefinitions;
 
@@ -60,7 +60,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 	 * @param lanedefs
 	 *
 	 */
-	public LaneDefinitionsWriter20(LaneDefinitions lanedefs) {
+	public LaneDefinitionsWriterV20(LaneDefinitionsV2 lanedefs) {
 		log.info("Using LaneDefinitionWriter20...");
 		this.laneDefinitions = lanedefs;
 	}
@@ -95,11 +95,11 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 		ObjectFactory fac = new ObjectFactory();
 		XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
 
-		for (LanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
+		for (LanesToLinkAssignmentV2 ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 
-			for (Lane bl : ltla.getLanes().values()) {
+			for (LaneDataV2 bl : ltla.getLanes().values()) {
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 
@@ -126,6 +126,10 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 						xmllane.getLeadsTo().getToLane().add(xmlToLink);
 					}
 				}
+				
+				XMLLaneType.XMLCapacity capacity = new XMLLaneType.XMLCapacity();
+				capacity.setVehiclesPerHour(bl.getCapacityVehiclesPerHour());
+				xmllane.setCapacity(capacity);
 
 				XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
 				lanes.setNumber(Double.valueOf(bl.getNumberOfRepresentedLanes()));

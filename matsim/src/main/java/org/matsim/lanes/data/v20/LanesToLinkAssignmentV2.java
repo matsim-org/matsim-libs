@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-public interface LanesToLinkAssignment {
+public interface LanesToLinkAssignmentV2 {
 
-	public SortedMap<Id, Lane> getLanes();
+	public SortedMap<Id, LaneDataV2> getLanes();
 
-	public void addLane(Lane lane);
+	public void addLane(LaneDataV2 lane);
 
 	public Id getLinkId();
 

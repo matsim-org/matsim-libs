@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitionsBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +16,72 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data.v20;
+
+package org.matsim.lanes.data.v11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
-
 /**
- * 
  * @author dgrether
- * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory
  */
-public class LaneDefinitionsFactoryImpl implements LaneDefinitionsFactory {
+public class LaneImpl implements Lane {
+
+	private Id id;
 	/**
-	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
+	 * the default according to the xml schema, never change the value if schema is not changed
 	 */
-	@Override
-	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
-		return new LanesToLinkAssignmentImpl(linkIdReference);
+	private double numberOfRepresentedLanes = 1;
+	/**
+	 * the default according to the xml schema, never change the value if schema is not changed
+	 */
+	private double startsAtMeterFromLinkEnd = 45.0;
+	
+	private List<Id> toLinkIds = null;
+
+	public LaneImpl(Id id) {
+		this.id = id;
 	}
-	/**
-	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory#createLane(org.matsim.api.core.v01.Id)
-	 */
+
 	@Override
-	public Lane createLane(Id id) {
-		return new LaneImpl(id);
+	public void setNumberOfRepresentedLanes(double number) {
+		this.numberOfRepresentedLanes = number;
+	}
+
+	@Override
+	public void setStartsAtMeterFromLinkEnd(double meter) {
+		this.startsAtMeterFromLinkEnd = meter;
+	}
+
+	@Override
+	public Id getId() {
+		return id;
+	}
+
+	
+	@Override
+	public double getNumberOfRepresentedLanes() {
+		return numberOfRepresentedLanes;
+	}
+
+	
+	@Override
+	public double getStartsAtMeterFromLinkEnd() {
+		return startsAtMeterFromLinkEnd;
+	}
+
+	@Override
+	public void addToLinkId(Id id) {
+		if (this.toLinkIds == null) {
+			this.toLinkIds = new ArrayList<Id>();
+		}
+		this.toLinkIds.add(id);
+	}
+	
+	@Override
+	public List<Id> getToLinkIds() {
+		return this.toLinkIds;
 	}
 }

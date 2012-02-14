@@ -37,8 +37,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -74,20 +74,20 @@ public class SignalSystemsOneAgentTest implements
 	
 	private Scenario createAndLoadTestScenario(){
 		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";
-		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Config conf = scenario.getConfig();
+		Config conf = ConfigUtils.createConfig();
 		conf.controler().setMobsim("qsim");
 		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
-		conf.network().setLaneDefinitionsFile(laneDefinitions);
+		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
+		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
+		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
+		conf.network().setLaneDefinitionsFile(lanes20);
 		conf.plans().setInputFile(plansFile);
 		conf.scenario().setUseLanes(true);
-		//as signals are configured below we don't need signals on
 		conf.scenario().setUseSignalSystems(false);
+		//as signals are configured below we don't need signals on
 		conf.addQSimConfigGroup(new QSimConfigGroup());
 		conf.getQSimConfigGroup().setStuckTime(1000);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
 		return scenario;
 	}
 	

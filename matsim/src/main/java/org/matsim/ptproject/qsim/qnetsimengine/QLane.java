@@ -47,7 +47,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDataV2;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -150,7 +150,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 */
 	private final Set<Id> destinationLinkIds = new LinkedHashSet<Id>();
 
-	private final Lane laneData;
+	private final LaneDataV2 laneData;
 
 	private boolean thisTimeStepGreen = true;
 	/**
@@ -169,7 +169,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
-	/*package*/ QLane(final NetsimLink ql, Lane laneData, boolean isFirstLaneOnLink) {
+	/*package*/ QLane(final NetsimLink ql, LaneDataV2 laneData, boolean isFirstLaneOnLink) {
 		this.qLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.isFirstLane = isFirstLaneOnLink;
 		this.laneData = laneData;
@@ -214,9 +214,10 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			 * of the Lane definition. The flow of a lane is scaled by this number.
 			 *
 			 */
-			double queueLinksNumberOfRepresentedLanes = this.qLink.getLink().getNumberOfLanes(time);
-			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
-			* this.laneData.getNumberOfRepresentedLanes();
+//			double queueLinksNumberOfRepresentedLanes = this.qLink.getLink().getNumberOfLanes(time);
+//			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
+//			* this.laneData.getNumberOfRepresentedLanes();
+			this.simulatedFlowCapacity = this.laneData.getCapacityVehiclesPerHour() /  3600.0;
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
 		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
@@ -754,7 +755,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return true; //the lane is not signalized and thus always green
 	}
 
-	 Lane getLaneData() {
+	 LaneDataV2 getLaneData() {
 		return this.laneData;
 	}
 

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimLaneDefinitionWriter
+ * LaneDataV1
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+package org.matsim.lanes.data.v11;
 
-import org.matsim.core.api.internal.MatsimSomeWriter;
-import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsWriterV11;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
 
 
 /**
- * Writes the lane definitions according to
- * the http://www.matsim.org/files/dtd/laneDefinitions_v*.xsd
- * grammar.
+ * Models a lane that ends at the downstream node of a link.
+ * 
+ * The position is specified via the distance the lane starts measured from the downstream node
+ * of the link. The 'starts at meter from link end' attribute corresponds to the 'length' attribute in
+ * the laneDefinitions_v1.1.xsd.
+ * 
+ * All downstream links that can be reached by vehicles leaving this lane must be completely given
+ * by their id.
+ * 
+ * If a lane shall model more than one lane existing in the reality to be modeled, increase the number of represented lanes attribute.
+ * 
  * @author dgrether
  *
  */
-public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
-	
-	
-	 
-	/**
-	 * Writes the file with the default format for 
-	 * LaneDefinitions within MATSim.
-	 * @param lanedefs
-	 */
-	public MatsimLaneDefinitionsWriter(){
-	}
-	
-	
-	public void writeFileV20(String filename, LaneDefinitionsV2 lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriterV20(lanedefs);
-		writerDelegate.write(filename);
-	}
-	
-	public void writeFileV11(String filename, LaneDefinitions lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriterV11(lanedefs);
-		writerDelegate.write(filename);
-	}
-	
+public interface Lane {
+
+	public Id getId();
+
+	public void setNumberOfRepresentedLanes(double number);
+
+	public double getNumberOfRepresentedLanes();
+
+	public void setStartsAtMeterFromLinkEnd(double meter);
+
+	public double getStartsAtMeterFromLinkEnd();
+
+	public void addToLinkId(Id id);
+
+	public List<Id> getToLinkIds();
+
 	
 }

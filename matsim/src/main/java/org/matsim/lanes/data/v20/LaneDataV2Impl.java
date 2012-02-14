@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author dgrether
  */
-public class LaneImpl implements Lane {
+public class LaneDataV2Impl implements LaneDataV2 {
 
 	private Id id;
 	/**
@@ -42,9 +42,13 @@ public class LaneImpl implements Lane {
   private List<Id> toLaneIds;
   private int alignment = 0;
 	/**
+	 * the default according to the xml schema, never change the value if schema is not changed
+	 */
+	private double capacity = 3600.0;
+	/**
 	 * @param id
 	 */
-	public LaneImpl(Id id) {
+	public LaneDataV2Impl(Id id) {
 		this.id = id;
 	}
 
@@ -112,6 +116,16 @@ public class LaneImpl implements Lane {
 	@Override
 	public void setAlignment(int alignment) {
 		this.alignment = alignment;
+	}
+
+	@Override
+	public double getCapacityVehiclesPerHour() {
+		return this.capacity ;
+	}
+
+	@Override
+	public void setCapacityVehiclesPerHour(double capacity) {
+		this.capacity = capacity;
 	}
 	
 }

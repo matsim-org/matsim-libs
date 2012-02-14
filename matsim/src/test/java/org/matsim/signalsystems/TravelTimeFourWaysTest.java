@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -33,7 +34,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -55,15 +56,17 @@ public class TravelTimeFourWaysTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	private Scenario createTestScenario(){
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Config conf = scenario.getConfig();
+		Config conf = ConfigUtils.createConfig();
 		conf.controler().setMobsim("qsim");
 		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
 		String laneDefinitions = this.testUtils.getClassInputDirectory()
 				+ "testLaneDefinitions_v1.1.xml";
-		conf.network().setLaneDefinitionsFile(laneDefinitions);
+		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
+		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
+		conf.network().setLaneDefinitionsFile(lanes20);
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(false);
+		Scenario scenario = ScenarioUtils.createScenario(conf);
 
 		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
 		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
@@ -97,7 +100,7 @@ public class TravelTimeFourWaysTest {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		
@@ -118,7 +121,7 @@ public class TravelTimeFourWaysTest {
 		loader.loadScenario();
 
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		

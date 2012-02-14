@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimLaneDefinitionWriter
+ * BasicLaneDefinitionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+package org.matsim.lanes.data.v11;
 
-import org.matsim.core.api.internal.MatsimSomeWriter;
-import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsWriterV11;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
- * Writes the lane definitions according to
- * the http://www.matsim.org/files/dtd/laneDefinitions_v*.xsd
- * grammar.
+ * Builder for the content of BasicLaneDefinitions
  * @author dgrether
- *
  */
-public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
-	
-	
-	 
+public interface LaneDefinitionsFactory extends MatsimFactory {
+
 	/**
-	 * Writes the file with the default format for 
-	 * LaneDefinitions within MATSim.
-	 * @param lanedefs
+	 * 
+	 * @param linkIdReference id of the links the lanes of the created object belong to
+	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
 	 */
-	public MatsimLaneDefinitionsWriter(){
-	}
-	
-	
-	public void writeFileV20(String filename, LaneDefinitionsV2 lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriterV20(lanedefs);
-		writerDelegate.write(filename);
-	}
-	
-	public void writeFileV11(String filename, LaneDefinitions lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriterV11(lanedefs);
-		writerDelegate.write(filename);
-	}
-	
-	
+	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference);
+	/**
+	 * Creates an instance of BasicLane with the id given as parameter.
+	 * @param laneId
+	 * @return
+	 */
+	public Lane createLane(Id laneId);
 }

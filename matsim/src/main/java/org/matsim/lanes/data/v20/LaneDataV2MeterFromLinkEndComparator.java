@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * LaneMeterFromLinkEndComparator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,45 +19,28 @@
  * *********************************************************************** */
 package org.matsim.lanes.data.v20;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.Comparator;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimComparator;
+
 /**
- * 
+ * Comparator which implements a comparision function for the Lane.getStartsAtMeterFromLinkEnd()
+ * attribute.
  * @author dgrether
- *
  */
-public interface Lane {
+public class LaneDataV2MeterFromLinkEndComparator implements Comparator<LaneDataV2>, Serializable, MatsimComparator {
 
-	/**
-	 * @param number
-	 */
-	public void setNumberOfRepresentedLanes(double number);
+	private static final long serialVersionUID = 1L;
 
-	public void setStartsAtMeterFromLinkEnd(double meter);
-
-	public Id getId();
-
-	public double getNumberOfRepresentedLanes();
-
-	public double getStartsAtMeterFromLinkEnd();
-
-	public void addToLinkId(Id id);
-	
-	public void addToLaneId(Id id);
-	/**
-	 * 
-	 * @return List may be null if nothing is set
-	 */
-	public List<Id> getToLinkIds();
-	/**
-	 * 
-	 * @return List may be null if nothing is set
-	 */
-	public List<Id> getToLaneIds();
-
-	public void setAlignment(int alignment);
-
-	public int getAlignment();
-	
+	@Override
+	public int compare(LaneDataV2 o1, LaneDataV2 o2) {
+    if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
+      return -1;
+    } else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
+      return 1;
+    } else {
+      return 0;
+    }
+	}
 }

@@ -49,10 +49,11 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.Lane;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
@@ -138,7 +139,7 @@ public class MixedLaneTest extends TestCase {
 		link3.setNumberOfLanes(2.0);
 		n.addLink(link3);
 		//create lanes
-		LaneDefinitions lanes = this.sc.getLaneDefinitions();
+		LaneDefinitions lanes = this.sc.getLaneDefinitionsV11();
 		LaneDefinitionsFactory lb = lanes.getFactory();
 		Lane lane = lb.createLane(id1);
 		lane.setStartsAtMeterFromLinkEnd(50.0);
@@ -148,9 +149,8 @@ public class MixedLaneTest extends TestCase {
 		l2l.addLane(lane);
 		lanes.addLanesToLinkAssignment(l2l);
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-		lanes = conversion.convertTo20(lanes, this.sc.getNetwork());
-		this.sc.setLaneDefinitions(lanes);
-		
+		LaneDefinitionsV2 lanesV2 = conversion.convertTo20(lanes, this.sc.getNetwork());
+		this.sc.addScenarioElement(lanesV2);
 
 		//create signalsystems
 		SignalsData signalsData = new SignalsDataImpl();
@@ -234,12 +234,12 @@ public class MixedLaneTest extends TestCase {
 
 	public void testMixedLanes() {
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 //		events.addHandler(new LogOutputEventHandler());
 
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
-		((EventsManager)events).addHandler(handler);
+		events.addHandler(handler);
 
 		QSim qsim = QSim.createQSimAndAddAgentSource(this.sc, events);
 		qsim.run();
@@ -250,11 +250,11 @@ public class MixedLaneTest extends TestCase {
 
 	public void testMixedLanesAndSignals() {
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 //		((EventsImpl)events).addHandler(new LogOutputEventHandler());
 
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
-		((EventsManager)events).addHandler(handler);
+		events.addHandler(handler);
 
 		QSim qsim = QSim.createQSimAndAddAgentSource(this.sc, events);
 		qsim.run();

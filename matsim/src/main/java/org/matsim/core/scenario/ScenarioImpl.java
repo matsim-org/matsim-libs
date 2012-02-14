@@ -40,8 +40,9 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -127,6 +128,7 @@ public class ScenarioImpl implements Scenario {
 
 	protected void createLaneDefinitionsContainer() {
 		this.laneDefinitions = new LaneDefinitionsImpl();
+		this.addScenarioElement(new LaneDefinitionsV2Impl());
 	}
 
 	protected void createTransit() {
@@ -168,7 +170,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 
-	public LaneDefinitions getLaneDefinitions() {
+	public LaneDefinitions getLaneDefinitionsV11() {
 		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
 		}

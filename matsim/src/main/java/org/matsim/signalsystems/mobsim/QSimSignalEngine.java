@@ -72,7 +72,9 @@ public class QSimSignalEngine implements SignalEngine {
 				}
 				else {
 					QLinkLanesImpl l = (QLinkLanesImpl) link;
+//					log.debug("  signal is on lanes: ");
 					for (Id laneId : signal.getLaneIds()){
+//						log.debug("    lane id: " + laneId);
 						QLane lane = getQLane(laneId, l);
 						lane.setSignalized(true);
 						signal.addSignalizeableItem(lane);

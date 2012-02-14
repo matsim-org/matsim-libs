@@ -35,11 +35,11 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
@@ -250,20 +250,23 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadLanes() {
-		LaneDefinitions laneDefinitions;
-		if ((this.scenario.getLaneDefinitions() != null)
-				&& (this.config.network().getLaneDefinitionsFile() != null)) {
-			laneDefinitions = this.scenario.getLaneDefinitions();
-			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(laneDefinitions);
-			reader.readFile(this.config.network().getLaneDefinitionsFile());
-			this.getScenario().addScenarioElement(laneDefinitions);
-			if (!MatsimLaneDefinitionsReader.SCHEMALOCATIONV20.equals(reader.getLastReadFileFormat())){
-				log.warn("No laneDefinitions_v2.0 file specified in scenario. Trying to convert the v1.1 format to " +
-				"the v2.0 format. For details see LaneDefinitionsV11ToV20Conversion.java.");
-				LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-				laneDefinitions = conversion.convertTo20(laneDefinitions, scenario.getNetwork());
-				this.scenario.setLaneDefinitions(laneDefinitions);
+		LaneDefinitionsV2 laneDefinitions = this.scenario.getScenarioElement(LaneDefinitionsV2.class);
+		String filename = this.config.network().getLaneDefinitionsFile();
+		if (filename != null){
+			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
+			if (!MatsimLaneDefinitionsReader.SCHEMALOCATIONV20.equalsIgnoreCase(fileTypeGuesser
+					.getSystemId())) {
+				log.error("Lanes: Wrong file format. With the 0.5 version of matsim the scenario only accepts lane definitions in the "
+						+ "file format version 2.0, i.e. "
+						+ MatsimLaneDefinitionsReader.SCHEMALOCATIONV20
+						+ ". An automatic conversion of the 1.1 file format is no longer provided, please call the "
+						+ "LaneDefinitonsV11ToV20Converter manually in the preprocessing phase.");
+				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
 			}
+		}
+		if ((laneDefinitions != null) && (filename != null)) {
+			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(scenario);
+			reader.readFile(filename);
 		}
 		else {
 			log.info("no lane definition file set in config or feature disabled, not able to load anything");

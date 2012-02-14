@@ -48,6 +48,16 @@ the simulation -->
             </xs:attribute>
           </xs:complexType>
         </xs:element>
+        <xs:element name="capacity" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:attribute name="vehiclesPerHour" type="xs:double" use="optional" default="3600">
+              <xs:annotation>
+                <xs:appinfo>
+                  </xs:appinfo>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="startsAt" minOccurs="0" maxOccurs="1">
           <xs:complexType>
             <xs:attribute name="meterFromLinkEnd" type="xs:double" use="optional" default="45.0"></xs:attribute>

@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -49,14 +50,20 @@ public class SignalSystemsIntegrationTest {
 	@Test
 	public void testSignalSystems() {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
+		config.controler().setOutputDirectory(controlerOutputDir);
 		config.addQSimConfigGroup(new QSimConfigGroup());
+		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
+		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
+		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFile());
+		config.network().setLaneDefinitionsFile(lanes20);
+		
 		Controler c = new Controler(config);
 		c.setCreateGraphs(false);
 		c.run();
 		
 			//iteration 0 
-		String iterationOutput = testUtils.getOutputDirectory() + "ITERS/it.0/";
+		String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 		String inputDirectory = testUtils.getInputDirectory();
 		
 		Assert.assertEquals("different events files after iteration 0 ", 
@@ -68,7 +75,7 @@ public class SignalSystemsIntegrationTest {
 				CRCChecksum.getCRCFromFile(iterationOutput + "0.plans.xml.gz"));
 
 		//iteration 10 
-		iterationOutput = testUtils.getOutputDirectory() + "ITERS/it.10/";
+		iterationOutput = controlerOutputDir + "ITERS/it.10/";
 		
 		Assert.assertEquals("different events files after iteration 10 ", 
 				CRCChecksum.getCRCFromFile(inputDirectory + "10.events.xml.gz"), 

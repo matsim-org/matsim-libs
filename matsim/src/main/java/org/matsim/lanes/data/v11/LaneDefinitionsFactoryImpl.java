@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimLaneDefinitionWriter
+ * LaneDefinitionsFactoryV1Impl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+package org.matsim.lanes.data.v11;
 
-import org.matsim.core.api.internal.MatsimSomeWriter;
-import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsWriterV11;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
+import org.matsim.api.core.v01.Id;
 
 
 /**
- * Writes the lane definitions according to
- * the http://www.matsim.org/files/dtd/laneDefinitions_v*.xsd
- * grammar.
  * @author dgrether
  *
  */
-public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
-	
-	
-	 
-	/**
-	 * Writes the file with the default format for 
-	 * LaneDefinitions within MATSim.
-	 * @param lanedefs
-	 */
-	public MatsimLaneDefinitionsWriter(){
+public class LaneDefinitionsFactoryImpl implements LaneDefinitionsFactory {
+
+	@Override
+	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkId) {
+		return new LanesToLinkAssignmentV1Impl(linkId);
 	}
-	
-	
-	public void writeFileV20(String filename, LaneDefinitionsV2 lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriterV20(lanedefs);
-		writerDelegate.write(filename);
+
+	@Override
+	public Lane createLane(Id laneId) {
+		return new LaneImpl(laneId);
 	}
-	
-	public void writeFileV11(String filename, LaneDefinitions lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriterV11(lanedefs);
-		writerDelegate.write(filename);
-	}
-	
-	
+
 }

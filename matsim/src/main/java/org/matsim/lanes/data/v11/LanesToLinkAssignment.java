@@ -1,6 +1,7 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
+/* **********************************import java.util.List;
+
+import org.matsim.interfaces.basic.v01.Id;
+                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2008 by the members listed in the COPYING,        *
@@ -17,39 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lanes.data.v20;
+package org.matsim.lanes.data.v11;
 
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-
 /**
+ *
  * @author dgrether
+ *
  */
-public class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
+public interface LanesToLinkAssignment {
 
-	private final Id linkId;
+	public SortedMap<Id, Lane> getLanes();
 
-	private final SortedMap<Id, Lane> lanes = new TreeMap<Id, Lane>();
+	public void addLane(Lane lane);
 
-	public LanesToLinkAssignmentImpl(Id linkId) {
-		this.linkId = linkId;
-	}
-
-	@Override
-	public void addLane(Lane lane) {
-		this.lanes.put(lane.getId(), lane);
-	}
-
-	@Override
-	public Id getLinkId() {
-		return linkId;
-	}
-
-	@Override
-	public SortedMap<Id, Lane> getLanes() {
-		return this.lanes;
-	}
+	public Id getLinkId();
 
 }

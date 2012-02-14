@@ -25,12 +25,17 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.Lane;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDataV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -56,70 +61,114 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 
 	private Id id42 = new IdImpl("42");
 
+	private static final class Fixture{
+		ScenarioImpl scenario;
+
+		Fixture(){
+			Config config = ConfigUtils.createConfig();
+			config.scenario().setUseLanes(true);
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		}
+	}
+	
 	public void testReader11() {
-		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
-		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(laneDefs);
+		Fixture f = new Fixture();
+		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(f.scenario);
 		reader.readFile(this.getClassInputDirectory() + TESTXMLV11);
-		checkContent(laneDefs);
+		checkContentV11(f.scenario.getLaneDefinitionsV11());
 	}
 
 	public void testReader20() {
-		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
-		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(laneDefs);
+		Fixture f = new Fixture();
+		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(f.scenario);
 		reader.readFile(this.getClassInputDirectory() + TESTXMLV20);
-		checkContent(laneDefs);
+		checkContent(f.scenario.getScenarioElement(LaneDefinitionsV2.class));
 	}
 	
 	public void testWriter20() {
+		Fixture f = new Fixture();
 		String testoutput = this.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
 		log.debug("reading file...");
 		// read the test file
-		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
 		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(
-				laneDefs);
+				f.scenario);
 		reader.readFile(this.getClassInputDirectory() + TESTXMLV20);
 
 		// write the test file
 		log.debug("write the test file...");
-		MatsimLaneDefinitionsWriter writer = new MatsimLaneDefinitionsWriter(laneDefs);
-		writer.writeFile(testoutput);
+		MatsimLaneDefinitionsWriter writer = new MatsimLaneDefinitionsWriter();
+		writer.writeFileV20(testoutput, f.scenario.getScenarioElement(LaneDefinitionsV2.class));
 
+		f = new Fixture();
 		log.debug("and read it again");
-		laneDefs = new LaneDefinitionsImpl();
 		reader = new MatsimLaneDefinitionsReader(
-				laneDefs);
+				f.scenario);
 		reader.readFile(testoutput);
-		checkContent(laneDefs);
+		checkContent(f.scenario.getScenarioElement(LaneDefinitionsV2.class));
 	}
 	
 
 	
 	public void testWriter11() {
+		Fixture f = new Fixture();
 		String testoutput = this.getOutputDirectory() + "testLssOutput.xml.gz";
 		log.debug("reading file...");
 		// read the test file
-		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
 		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(
-				laneDefs);
+				f.scenario);
 		reader.readFile(this.getClassInputDirectory() + TESTXMLV11);
 
 		// write the test file
 		log.debug("write the test file...");
-		MatsimLaneDefinitionsWriter writer = new MatsimLaneDefinitionsWriter(laneDefs);
-		writer.writeFile(testoutput);
+		MatsimLaneDefinitionsWriter writer = new MatsimLaneDefinitionsWriter();
+		writer.writeFileV11(testoutput, f.scenario.getLaneDefinitionsV11());
 
 		log.debug("and read it again");
-		laneDefs = new LaneDefinitionsImpl();
 		reader = new MatsimLaneDefinitionsReader(
-				laneDefs);
+				f.scenario);
 		reader.readFile(testoutput);
-		checkContent(laneDefs);
+		checkContentV11(f.scenario.getLaneDefinitionsV11());
 	}
 
-	private void checkContent(LaneDefinitions lanedefs) {
+	private void checkContent(LaneDefinitionsV2 lanedefs) {
 		assertEquals(2, lanedefs.getLanesToLinkAssignments().size());
-		LanesToLinkAssignment l2la;
-		List<LanesToLinkAssignment> assignments = new ArrayList<LanesToLinkAssignment>();
+		LanesToLinkAssignmentV2 l2la;
+		List<LanesToLinkAssignmentV2> assignments = new ArrayList<LanesToLinkAssignmentV2>();
+		assignments.addAll(lanedefs.getLanesToLinkAssignments().values());
+		l2la = assignments.get(0);
+		assertNotNull(l2la);
+		assertEquals(id23, l2la.getLinkId());
+		List<LaneDataV2> lanes = new ArrayList<LaneDataV2>();
+		lanes.addAll(l2la.getLanes().values());
+		LaneDataV2 lane = lanes.get(0);
+		assertEquals(id3, lane.getId());
+		assertEquals(id1, lane.getToLinkIds().get(0));
+		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
+		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
+		assertEquals(0.725, lane.getCapacityVehiclesPerHour(), EPSILON);
+		lane = lanes.get(1);
+		assertEquals(id5, lane.getId());
+		assertEquals(60.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
+		assertEquals(2.5, lane.getNumberOfRepresentedLanes());
+		assertEquals(2, lane.getCapacityVehiclesPerHour(), EPSILON);
+		//check a lanes2linkassignment using default values
+		l2la = assignments.get(1);
+		assertNotNull(l2la);
+		assertEquals(id42, l2la.getLinkId());
+		lanes.clear();
+		lanes.addAll(l2la.getLanes().values());
+		lane = lanes.get(0);
+		assertEquals(id1, lane.getId());
+		assertEquals(id1, lane.getToLinkIds().get(0));
+		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
+		assertEquals(1900.0, lane.getCapacityVehiclesPerHour(), EPSILON);
+		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
+	}
+	
+	private void checkContentV11(LaneDefinitions lanedefs) {
+		assertEquals(2, lanedefs.getLanesToLinkAssignments().size());
+		org.matsim.lanes.data.v11.LanesToLinkAssignment l2la;
+		List<org.matsim.lanes.data.v11.LanesToLinkAssignment> assignments = new ArrayList<org.matsim.lanes.data.v11.LanesToLinkAssignment>();
 		assignments.addAll(lanedefs.getLanesToLinkAssignments().values());
 		l2la = assignments.get(0);
 		assertNotNull(l2la);
@@ -146,8 +195,6 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		assertEquals(id1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
 		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
-
-
-
 	}
+
 }

@@ -24,16 +24,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneDataV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactoryV2;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -67,55 +68,61 @@ public class QLaneTest extends MatsimTestCase {
 		return network;
   }
   
-	private LaneDefinitions createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
+	private LaneDefinitionsV2 createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().scenario().setUseLanes(true);
-		LaneDefinitions lanes = scenario.getLaneDefinitions();
-		LaneDefinitionsFactory builder = lanes.getFactory();
+		LaneDefinitionsV2 lanes = scenario.getScenarioElement(LaneDefinitionsV2.class);
+		LaneDefinitionsFactoryV2 builder = lanes.getFactory();
 		//lanes for link 1
-		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
-		Lane link1FirstLane = builder.createLane(new IdImpl("1.ol"));
+		LanesToLinkAssignmentV2 lanesForLink1 = builder.createLanesToLinkAssignment(id1);
+		LaneDataV2 link1FirstLane = builder.createLane(new IdImpl("1.ol"));
 		link1FirstLane.addToLaneId(id1);
 		link1FirstLane.setNumberOfRepresentedLanes(2.0);
 		link1FirstLane.setStartsAtMeterFromLinkEnd(1005.0);
+		link1FirstLane.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1FirstLane);
 		
-		Lane link1lane1 = builder.createLane(id1);
+		LaneDataV2 link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
 		link1lane1.setNumberOfRepresentedLanes(numberOfRepresentedLanes);
+		link1lane1.setCapacityVehiclesPerHour(numberOfRepresentedLanes * 900.0);
 		lanesForLink1.addLane(link1lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink1);
 		return lanes;
 	}
   
-	private LaneDefinitions createLanes(ScenarioImpl scenario) {
+	private LaneDefinitionsV2 createLanes(ScenarioImpl scenario) {
 		scenario.getConfig().scenario().setUseLanes(true);
-		LaneDefinitions lanes = scenario.getLaneDefinitions();
-		LaneDefinitionsFactory builder = lanes.getFactory();
+		LaneDefinitionsV2 lanes = scenario.getScenarioElement(LaneDefinitionsV2.class);
+		LaneDefinitionsFactoryV2 builder = lanes.getFactory();
 		//lanes for link 1
-		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(id1);
+		LanesToLinkAssignmentV2 lanesForLink1 = builder.createLanesToLinkAssignment(id1);
 		
-		Lane link1FirstLane = builder.createLane(new IdImpl("1.ol"));
+		LaneDataV2 link1FirstLane = builder.createLane(new IdImpl("1.ol"));
 		link1FirstLane.addToLaneId(id1);
 		link1FirstLane.addToLaneId(id2);
 		link1FirstLane.addToLaneId(id3);
 		link1FirstLane.setNumberOfRepresentedLanes(2.0);
 		link1FirstLane.setStartsAtMeterFromLinkEnd(1005.0);
+		link1FirstLane.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1FirstLane);
 		
-		Lane link1lane1 = builder.createLane(id1);
+		LaneDataV2 link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
+		link1lane1.setCapacityVehiclesPerHour(900.0);
 		lanesForLink1.addLane(link1lane1);
 		
-		Lane link1lane2 = builder.createLane(id2);
+		LaneDataV2 link1lane2 = builder.createLane(id2);
 		link1lane2.addToLinkId(id2);
 		link1lane2.setNumberOfRepresentedLanes(2);
 		link1lane2.setStartsAtMeterFromLinkEnd(105.0);
+		link1lane2.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1lane2);
 
-		Lane link1lane3 = builder.createLane(id3);
+		LaneDataV2 link1lane3 = builder.createLane(id3);
 		link1lane3.addToLinkId(id2);
+		link1lane3.setCapacityVehiclesPerHour(900.0);
 		link1lane3.setStartsAtMeterFromLinkEnd(105.0);
 		lanesForLink1.addLane(link1lane3);
 		
@@ -125,7 +132,8 @@ public class QLaneTest extends MatsimTestCase {
   	
   
 	public void testCapacityWoLanes() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		this.initNetwork(scenario.getNetwork());
@@ -139,9 +147,10 @@ public class QLaneTest extends MatsimTestCase {
 	}
 	
 	public void testCapacityWithOneLaneOneLane() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(true);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 1);
 		
@@ -170,7 +179,10 @@ public class QLaneTest extends MatsimTestCase {
 	}
 
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(true);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
@@ -203,9 +215,10 @@ public class QLaneTest extends MatsimTestCase {
 	
 	
 	public void testCapacityWithLanes() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(true);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
 		this.createLanes(scenario);
 		

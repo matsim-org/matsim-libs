@@ -38,19 +38,16 @@ import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 /**
  * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd
  * file format.
  * @author dgrether
  *
  */
-public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
+public class LaneDefinitionsWriterV11 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsWriter11.class);
+			.getLogger(LaneDefinitionsWriterV11.class);
 
 	private LaneDefinitions laneDefinitions;
 
@@ -62,7 +59,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 	 * @param lanedefs
 	 *
 	 */
-	public LaneDefinitionsWriter11(LaneDefinitions lanedefs) {
+	public LaneDefinitionsWriterV11(LaneDefinitions lanedefs) {
 		log.info("Using LaneDefinitionWriter11...");
 		this.laneDefinitions = lanedefs;
 		this.xmlLaneDefinitions = convertBasicToXml();

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data.v20;
+
+package org.matsim.lanes.data.v11;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
-
 
 /**
- * Builder for the content of BasicLaneDefinitions
  * @author dgrether
  */
-public interface LaneDefinitionsFactory extends MatsimFactory {
+public class LanesToLinkAssignmentV1Impl implements LanesToLinkAssignment {
 
-	/**
-	 * 
-	 * @param linkIdReference id of the links the lanes of the created object belong to
-	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
-	 */
-	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference);
-	/**
-	 * Creates an instance of BasicLane with the id given as parameter.
-	 * @param laneId
-	 * @return
-	 */
-	public Lane createLane(Id laneId);
+	private final Id linkId;
+
+	private final SortedMap<Id, Lane> lanes = new TreeMap<Id, Lane>();
+
+	public LanesToLinkAssignmentV1Impl(Id linkId) {
+		this.linkId = linkId;
+	}
+
+	@Override
+	public void addLane(Lane lane) {
+		this.lanes.put(lane.getId(), lane);
+	}
+
+	@Override
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	@Override
+	public SortedMap<Id, Lane> getLanes() {
+		return this.lanes;
+	}
+
 }

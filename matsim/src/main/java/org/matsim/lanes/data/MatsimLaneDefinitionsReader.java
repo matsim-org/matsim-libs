@@ -25,12 +25,15 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
+import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitionsReaderV11;
+import org.matsim.lanes.data.v20.LaneDefinitionsReaderV20;
+import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.xml.sax.SAXException;
 
 /**
@@ -45,32 +48,36 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 
 	public static final String SCHEMALOCATIONV20 = "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd";
 	
-	private LaneDefinitions laneDefinitions;
-	
-	private String lastReadFileFormat = null;
+	private LaneDefinitionsV2 laneDefinitions;
 
-	public MatsimLaneDefinitionsReader(LaneDefinitions laneDefs) {
-		this.laneDefinitions = laneDefs;
+	private LaneDefinitions laneDefinitionsV1;
+	
+	public MatsimLaneDefinitionsReader(Scenario scenario) {
+		this.laneDefinitionsV1 = ((ScenarioImpl)scenario).getLaneDefinitionsV11();
+		this.laneDefinitions = scenario.getScenarioElement(LaneDefinitionsV2.class);
 	}
 
+	/**
+	 * Reads both file formats, 1.1 and 2.0.
+	 */
 	public void readFile(final String filename) {
-		this.lastReadFileFormat = null;
 		try {
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
 			String sid = fileTypeGuesser.getSystemId();
 			MatsimJaxbXmlParser reader = null;
 			if (sid != null) {
 				log.debug("creating parser for system id: " + sid);
-				this.lastReadFileFormat = sid;
 				if (sid.compareTo(SCHEMALOCATIONV11) == 0) {
-					reader = new LaneDefinitionsReader11(this.laneDefinitions, sid);
+					reader = new LaneDefinitionsReaderV11(this.laneDefinitionsV1, sid);
 					log.info("Using LaneDefinitionReader11...");
 					log.warn("The laneDefinitions_v1.1.xsd file format is used. For the use within the mobility simulation it is strongly recommended to" +
-							"convert the read data to the v2.0.xsd format using the LaneDefinitionsV11ToV20Conversion class. If the data is read by the " +
-							"Controler or ScenarioLoader this will be done automatically and noticed by a separate message.");
+							"convert the read data to the v2.0.xsd format using the LaneDefinitionsV11ToV20Conversion class. " +
+							"With the 0.5 release of MATSim the automatic conversion is switched off. Simulation will not run if the 1.1 file format" +
+							"is given as input. Please convert manually.");
+					reader = new LaneDefinitionsReaderV11(this.laneDefinitionsV1, sid);
 				}
 				else if (sid.compareTo(SCHEMALOCATIONV20) == 0){
-					reader = new LaneDefinitionsReader20(this.laneDefinitions, sid);
+					reader = new LaneDefinitionsReaderV20(this.laneDefinitions, sid);
 					log.info("Using LaneDefinitionReader20...");
 				}
 				else {
@@ -95,11 +102,5 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 
 	}
 
-	/**
-	 * @return the schema location of the last file read by this reader.
-	 */
-	public String getLastReadFileFormat() {
-		return lastReadFileFormat;
-	}
 
 }
