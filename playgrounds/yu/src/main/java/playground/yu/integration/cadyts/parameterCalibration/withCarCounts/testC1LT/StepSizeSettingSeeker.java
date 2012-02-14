@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * StepSizeSettingSeeker.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testC1LT;
 
 import java.util.HashMap;
@@ -24,9 +40,9 @@ import playground.yu.utils.math.SoonConvergent;
  * seeks fitting step size setting, i.e. the combination of initialStepSize and
  * msaExponent in cadyts (s. section 3.5.1 im Cadyts-manual {@link http
  * ://transp-or.epfl.ch/cadyts/Cadyts_manual_1-1-0.pdf})
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class StepSizeSettingSeeker implements CalibrationConfig {
 	public static class StepSizeSettingSeekerControlerListener implements
@@ -57,6 +73,10 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 			for (String paramName : toCalibratedParameterNames) {
 				values.put(paramName, new TreeMap<Integer, double[]>());
 			}
+		}
+
+		public String getGoAhead() {
+			return goAhead;
 		}
 
 		private boolean judgeConsistency() {
@@ -216,10 +236,6 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 			}
 		}
 
-		public String getGoAhead() {
-			return goAhead;
-		}
-
 		public void setAmplitudeCriterion(double amplitudeCriterion) {
 			this.amplitudeCriterion = amplitudeCriterion;
 		}
@@ -303,13 +319,13 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 							Double.toString(initialStepSize));
 				}
 
-				ctlCfg.setOutputDirectory(initialOutputDirectory
-						+ "_msaExponent" + msaExponent + "_initialStepSize"
-						+ initialStepSize);
 			}
 			System.out.println("+++++Run with msaExponent\t" + msaExponent
 					+ "\tinitialStepSize\t" + initialStepSize
 					+ "\twas started!");
+			ctlCfg.setOutputDirectory(initialOutputDirectory + "_msaExponent"
+					+ msaExponent + "_initialStepSize" + initialStepSize);
+
 			PCCtlwithLeftTurnPenalty controler = new PCCtlwithLeftTurnPenalty(
 					config);
 			sssscl = new StepSizeSettingSeekerControlerListener(paramNames,
@@ -323,6 +339,7 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 
 			controler.addControlerListener(sssscl);
 			controler.setOverwriteFiles(true);
+			controler.setCreateGraphs(false);
 			controler.run();
 			System.out.println("+++++Run with msaExponent\t" + msaExponent
 					+ "\tinitialStepSize\t" + initialStepSize + "\tended!");
