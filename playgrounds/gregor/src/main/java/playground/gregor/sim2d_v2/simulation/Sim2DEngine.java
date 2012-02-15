@@ -86,6 +86,7 @@ public class Sim2DEngine implements MobsimEngine {
 	 */
 	@Override
 	public void doSimStep(double time) {
+//		long start = System.currentTimeMillis();
 		double sim2DTime = time;
 		while (sim2DTime < time + this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize()) {
 			handleDepartures(sim2DTime);
@@ -96,6 +97,9 @@ public class Sim2DEngine implements MobsimEngine {
 			
 			sim2DTime += this.sim2DStepSize;
 		}
+//		long stop = System.currentTimeMillis();
+//		long timet = (stop - start)/25;
+//		System.out.println(1000/timet + "fps    " + this.floor.getAgents().size() +"agents" );
 	}
 
 	private void handleDepartures(double time) {

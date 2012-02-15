@@ -29,8 +29,8 @@ public abstract class Algorithms {
 		double dx = (point.x - circleCenter.x)/2;
 		double dy = (point.y - circleCenter.y)/2;
 		
-		
-		double d = Math.hypot(dx, dy); // hypot avoids underflow/overflow  
+//		double d = Math.hypot(dx, dy); // hypot avoids underflow/overflow  ... but it is to slow
+		double d = Math.sqrt(dx*dx + dy*dy); // hypot avoids underflow/overflow  ... but it is to slow
 		
 		double a = (radius*radius) / (2.0 *d);
 		
@@ -319,7 +319,7 @@ public abstract class Algorithms {
 
 	public static Coordinate[] getEllipse(double a, double b) {
 		//create agentGeometry
-		final int numOfParts = 4;
+		final int numOfParts = 8;
 		Coordinate[] c = new Coordinate[numOfParts + 1];
 		double incr = 2*a/(numOfParts/2+1);
 		double x = -a+incr;

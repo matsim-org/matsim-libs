@@ -24,6 +24,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -48,8 +49,9 @@ public class ScenarioGenerator {
 		createPop(sc,inputDir);
 
 
-		c.controler().setLastIteration(10);
+		c.controler().setLastIteration(0);
 		c.controler().setOutputDirectory(scDir + "output/");
+		c.controler().setMobsim("hybridQ2D");
 
 		c.strategy().setMaxAgentPlanMemorySize(3);
 
@@ -58,7 +60,22 @@ public class ScenarioGenerator {
 		c.strategy().addParam("ModuleProbability_1", "0.1");
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", "0.9");
+		//
+		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
+		//		s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
+		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 
+		s2d.setEnableCircularAgentInterActionModule("false");
+		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+		s2d.setEnableDrivingForceModule("false");
+		s2d.setEnableEnvironmentForceModule("false");
+		s2d.setEnablePathForceModule("false");
+		s2d.setEnableVelocityObstacleModule("true");
+		s2d.setEnablePhysicalEnvironmentForceModule("false");
+
+
+		c.addModule("sim2d", s2d);
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
 
@@ -73,7 +90,7 @@ public class ScenarioGenerator {
 		for (int i = 0; i < 20; i++) {
 
 			for (double y = 10; y <= 10; y++) {
-				Person pers = pb.createPerson(sc.createId(Integer.toString(persId++)));
+				Person pers = pb.createPerson(sc.createId("r"+Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
 				NetworkImpl net = (NetworkImpl) sc.getNetwork();
@@ -92,7 +109,7 @@ public class ScenarioGenerator {
 				pers.addPlan(plan);
 			}
 			for (double y = 10; y <= 10; y++) {
-				Person pers = pb.createPerson(sc.createId(Integer.toString(persId++)));
+				Person pers = pb.createPerson(sc.createId("g"+Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
 				NetworkImpl net = (NetworkImpl) sc.getNetwork();
@@ -145,7 +162,7 @@ public class ScenarioGenerator {
 		int persId = 0;
 		for (int i = 0; i < 30; i ++) {
 			for (double y = 2.5; y <= 17.5; y++) {
-				Person pers = pb.createPerson(sc.createId(Integer.toString(persId++)));
+				Person pers = pb.createPerson(sc.createId("r"+Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
 				NetworkImpl net = (NetworkImpl) sc.getNetwork();
@@ -165,7 +182,7 @@ public class ScenarioGenerator {
 			}
 
 			for (double y = 2.5; y <= 17.5; y++) {
-				Person pers = pb.createPerson(sc.createId(Integer.toString(persId++)));
+				Person pers = pb.createPerson(sc.createId("g"+Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
 				NetworkImpl net = (NetworkImpl) sc.getNetwork();

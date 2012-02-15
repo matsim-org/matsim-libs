@@ -11,6 +11,7 @@ public class CCWPolygon {
 	private final Coordinate refCoord;
 
 	//Testing only
+	@Deprecated // remove this!!!
 	public double d;
 
 	public CCWPolygon(Coordinate [] coords, Coordinate refCoord, double d) {

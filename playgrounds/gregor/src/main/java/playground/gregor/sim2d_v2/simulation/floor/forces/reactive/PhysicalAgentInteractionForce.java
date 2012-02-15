@@ -54,7 +54,7 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 		double fx = 0;
 		double fy = 0;
 
-		Collection<Agent2D> l = this.coordsQuad.get(agent.getPosition().x, agent.getPosition().y, 5*PhysicalAgentRepresentation.AGENT_DIAMETER);
+		Collection<Agent2D> l = this.coordsQuad.get(agent.getPosition().x, agent.getPosition().y, 2*PhysicalAgentRepresentation.AGENT_DIAMETER);
 
 		for (Agent2D other : l) {
 			if (other == agent) {

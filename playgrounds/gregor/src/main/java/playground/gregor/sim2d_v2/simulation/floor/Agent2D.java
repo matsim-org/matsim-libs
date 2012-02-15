@@ -29,7 +29,6 @@ import org.matsim.signalsystems.model.SignalGroupState;
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
-import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -64,17 +63,18 @@ public class Agent2D implements MobsimAgent {
 	private final LinkSwitcher mentalLinkSwitcher;
 
 
-	private double sensingRange = 5;
+	private double sensingRange = 20;
 	
 	public final double kindness = MatsimRandom.getRandom().nextDouble();
-	private final VelocityDependentEllipse par;
+	private final PhysicalAgentRepresentation par;
+	private double[] oldBest = new double[2];
 
 
 	/**
 	 * @param p
 	 * @param sim2d
 	 */
-	public Agent2D(MobsimDriverAgent pda, Scenario sc, LinkSwitcher mlsw, VelocityDependentEllipse par) {
+	public Agent2D(MobsimDriverAgent pda, Scenario sc, LinkSwitcher mlsw, PhysicalAgentRepresentation par) {
 
 		this.pda = pda;
 		this.sc = sc;
@@ -96,7 +96,7 @@ public class Agent2D implements MobsimAgent {
 
 	public void setPostion(Coordinate pos) {
 		this.currentPosition = pos;
-		this.par.getGeometry().translate(pos);
+		this.par.translate(pos);
 	}
 
 	public Force getForce() {
@@ -218,8 +218,8 @@ public class Agent2D implements MobsimAgent {
 
 
 	public void setSensingRange(double sens) {
-		if (sens > 15) {
-			this.sensingRange = 15;
+		if (sens > 50) {
+			this.sensingRange = 50;
 		} else if (sens < .1) {
 			this.sensingRange = .1;
 		} else {
@@ -284,14 +284,24 @@ public class Agent2D implements MobsimAgent {
 
 
 
-	public CCWPolygon getGeometry() {
-		return this.par.getGeometry();
-	}
+//	public CCWPolygon getGeometry() {
+//		return this.par.getGeometry();
+//	}
 
 
 
 	public PhysicalAgentRepresentation getPhysicalAgentRepresentation() {
 		return this.par;
+	}
+
+
+
+	public void setOldBest(double[] df) {
+		this.oldBest = df;
+		
+	}
+	public double[] getOldBest() {
+		return this.oldBest;
 	}
 
 

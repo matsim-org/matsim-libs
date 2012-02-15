@@ -29,14 +29,14 @@ public class VelocityDependentEllipse extends PhysicalAgentRepresentation {
 	QuadTree<CCWPolygon> geometryQuad;
 	
 	CCWPolygon geometry;
-//	private final double a_min = .18;
-//	private final double b_min = .2;
-//	private final double b_max = .25;
-//	private final double tau_a = .53;
-	double a_min = .18;
-	double b_min = .2;
-	double b_max = .25;
-	double tau_a = .3;
+	private final double a_min = .18;
+	private final double b_min = .2;
+	private final double b_max = .25;
+	private final double tau_a = .53;
+//	double a_min = .18;
+//	double b_min = .2;
+//	double b_max = .25;
+//	double tau_a = .3;
 	
 	public VelocityDependentEllipse() {
 		initGeometry();
@@ -74,6 +74,11 @@ public class VelocityDependentEllipse extends PhysicalAgentRepresentation {
 		this.geometry = this.geometryQuad.get(v, alpha);
 		this.geometry.translate(pos);
 		
+	}
+
+	@Override
+	public void translate(Coordinate pos) {
+		this.geometry.translate(pos);
 	}
 	
 	public CCWPolygon getGeometry(){

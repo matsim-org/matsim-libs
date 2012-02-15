@@ -127,7 +127,7 @@ public class ScenarioGeneratorIV {
 
 
 		double time = 0;
-		for (double rho = .5; rho < 7; rho+=.5) {
+		for (double rho = .5; rho < 7; rho+=2) {
 			double timeSteps = 10;
 			createPersons(sc,pb,pop,time,timeSteps,rho);
 

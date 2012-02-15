@@ -59,6 +59,7 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.SignalsPe
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForceII;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
+import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalAgentInteractionForce;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -120,7 +121,7 @@ public class PhysicalFloor implements Floor {
 		
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
 			this.dynamicForceModules.add(new VelocityObstacleForceII(this, this.scenario));
-//			this.dynamicForceModules.add(new PhysicalAgentInteractionForce(this, this.scenario));
+			this.dynamicForceModules.add(new PhysicalAgentInteractionForce(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){
@@ -265,8 +266,8 @@ public class PhysicalFloor implements Floor {
 	}
 	private void validateVelocity(Force f, double v0) {
 		double v = Math.sqrt(Math.pow(f.getVx(), 2)+Math.pow(f.getVy(), 2));
-		if (v > 1.25*v0) {
-			double scale = (1.25*v0)/v;
+		if (v > 2*v0) {
+			double scale = (2*v0)/v;
 			f.setVx(f.getVx()*scale);
 			f.setVy(f.getVy()*scale);
 		}

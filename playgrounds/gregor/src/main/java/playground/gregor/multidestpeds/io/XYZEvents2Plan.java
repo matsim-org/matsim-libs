@@ -40,6 +40,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -88,6 +89,8 @@ public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHan
 			p.dep = event.getTime();
 			p.orig = event.getCoordinate();
 			p.id = id;
+			p.vx = event.getVX();
+			p.vy = event.getVY();
 			this.lastPosition.put(id, p);
 		} else {
 			this.lastPosition.get(id).dest = event.getCoordinate();
@@ -127,10 +130,14 @@ public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHan
 		plan.addLeg(leg);
 		plan.addActivity(actE);
 		pers.addPlan(plan);
+		((PersonImpl)pers).setLicence(Double.toString(p.vx));
+		((PersonImpl)pers).setSex(Double.toString(p.vy));
 		this.sc.getPopulation().addPerson(pers);
 	}
 
 	private static class P {
+		public double vx;
+		public double vy;
 		Coordinate orig;
 		double dep;
 		Coordinate dest;

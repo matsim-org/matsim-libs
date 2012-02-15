@@ -170,7 +170,7 @@ public class Loader {
 		net.setNetworkChangeEvents(events);
 	}
 
-	protected void loadData() {
+	public void loadData() {
 
 		Module m = this.config.getModule("evacuation");
 		this.ec = new EvacuationConfigGroup(m);

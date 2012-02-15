@@ -11,9 +11,11 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
-import playground.gregor.sim2d_v2.simulation.floor.VelocityDependentEllipse;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.MentalLinkSwitcher;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class Sim2DAgentFactory implements AgentFactory {
 
@@ -46,7 +48,18 @@ public class Sim2DAgentFactory implements AgentFactory {
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
 		MobsimDriverAgent pda = this.defaultAgentFactory.createMobsimAgentFromPerson(p);
-		VelocityDependentEllipse par = new VelocityDependentEllipse();
+//		PhysicalAgentRepresentation par = new VelocityDependentEllipse();
+		PhysicalAgentRepresentation par = new PhysicalAgentRepresentation() {
+			@Override
+			public void update(double v, double alpha, Coordinate pos) {
+				// TODO Auto-generated method stub
+			}
+			@Override
+			public void translate(Coordinate pos) {
+				// TODO Auto-generated method stub
+			}
+		};
+		
 		Agent2D agent = new Agent2D(pda, this.sc, this.mlsw,par);
 		return agent;
 	}

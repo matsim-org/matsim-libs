@@ -12,6 +12,7 @@ import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
+import playground.gregor.sim2d_v2.simulation.floor.VelocityDependentEllipse;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
@@ -60,8 +61,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		double minY = -1000 + this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinNorthing();
 		this.agentsQuad = new QuadTree<Agent2D>(minX, minY, maxX, maxY);
 
-//		this.velocityChooser = new RandomAlternativeVelocityChooser();
-		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
+		this.velocityChooser = new RandomAlternativeVelocityChooser();
+//		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
 	}
 
 
@@ -79,7 +80,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//		}
 
 
-		CCWPolygon aGeo = agent.getGeometry();
+		CCWPolygon aGeo = ((VelocityDependentEllipse)agent.getPhysicalAgentRepresentation()).getGeometry();
 
 
 
@@ -150,7 +151,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			double collTime = Double.POSITIVE_INFINITY;
 			if (Algorithms.contains(agent.getPosition(),envObst)) {
 				//TODO no magic numbers here!!
-				double move = agent.getGeometry().d;
+				double move = aGeo.d;
 				Coordinate cobst = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().get(agent.getPosition().x, agent.getPosition().y);
 
 				double x = move*(cobst.x - agent.getPosition().x);
@@ -204,11 +205,11 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 		Collection<Agent2D> l = this.agentsQuad.get(agent.getPosition().x, agent.getPosition().y, sensingRange);
 
-		if (l.size() > 32) {
-			agent.setSensingRange(sensingRange*.9);
-		} else if (l.size() < 16) {
-			agent.setSensingRange(sensingRange *1.2);
-		}
+//		if (l.size() > 32) {
+//			agent.setSensingRange(sensingRange*.9);
+//		} else if (l.size() < 16) {
+//			agent.setSensingRange(sensingRange *1.2);
+//		}
 
 		for (Agent2D other : l) {
 			if (other == agent) {
@@ -217,7 +218,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 
 
-			CCWPolygon oGeo = other.getGeometry();
+			CCWPolygon oGeo = ((VelocityDependentEllipse)other.getPhysicalAgentRepresentation()).getGeometry();
 
 			//			//DEBUG
 			//			LineString lrO = geofac.createLineString(oGeo.getCCWRing());
@@ -241,14 +242,14 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			double collTime = Double.POSITIVE_INFINITY;
 			Coordinate agPos = agent.getPosition();
 			double dist = other.getPosition().distance(agent.getPosition());
-			if (dist < (other.getGeometry().d+agent.getGeometry().d) && Algorithms.contains(agent.getPosition(), cso)) {
+			if (dist < (oGeo.d+aGeo.d) && Algorithms.contains(agent.getPosition(), cso)) {
 				//				//DEBUG
 				//				LineString lrO = geofac.createLineString(oGeo.getCCWRing());
 				//				GisDebugger.addGeometry(lrO,"B");
 				//				LineString lrCso = geofac.createLineString(cso);
 				//				GisDebugger.addGeometry(lrCso,"A(+)-B");
 
-				double move = other.getGeometry().d + agent.getGeometry().d;
+				double move = oGeo.d + aGeo.d;
 				double x = move*(other.getPosition().x - agent.getPosition().x)/dist;
 				double y = move*(other.getPosition().y - agent.getPosition().y)/dist;
 				agPos = new Coordinate(agent.getPosition().x-x,agent.getPosition().y-y);

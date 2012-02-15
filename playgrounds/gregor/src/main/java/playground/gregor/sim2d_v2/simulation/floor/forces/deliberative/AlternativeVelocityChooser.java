@@ -21,6 +21,9 @@ private static final double EPSILON = 0.000001;
 			Coordinate c1) {
 		double ret = Double.POSITIVE_INFINITY;
 		for (VelocityObstacle  info : vOs) {
+			if (info.getCollTime() == 0) {
+				return 0;
+			}
 			double tmpTime = Double.POSITIVE_INFINITY;
 			if (Algorithms.testForCollision(info, c1)) {
 //				if (info.getCollTime() == 0) {
@@ -96,7 +99,7 @@ private static final double EPSILON = 0.000001;
 		}
 		
 		double dist = (-b + Math.sqrt(dd)) / (2 * a);
-		double relV = Math.hypot(relVx, relVy);
+		double relV = Math.sqrt(relVx*relVx + relVy*relVy);
 		
 		double time = dist / relV;
 //		GisDebugger.dump("/Users/laemmel/tmp/tangents.shp");
