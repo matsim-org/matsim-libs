@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ciarif.flexibletransports.preprocess;
+package playground.ciarif.flexibletransports.preprocess.membership;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -51,8 +51,8 @@ public class MembershipMain {
 		private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		private final Network network = scenario.getNetwork();
 		private String plansfilePath;
-		private final String outpath = "../../matsim/output/preprocess/";
-		//private final String outpath = "/data/matsim/ciarif/output/preprocess/";
+		private final String outpath = "../../matsim/output/preprocess/"; // @burgess
+		//private final String outpath = "/data/matsim/ciarif/output/preprocess/"; //@satawal
 		private String facilitiesfilePath;
 		private String networkfilePath;
 		

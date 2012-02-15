@@ -64,7 +64,7 @@ public class Retailer
       return true;
     }
     if (strategyName.contains("gravityModelRetailerStrategy")) {
-      //log.info("Controler =" + controler);
+    	
       this.strategy = new GravityModelRetailerStrategy(controler);
       return true;
     }

@@ -1,4 +1,4 @@
-package playground.ciarif.flexibletransports.preprocess;
+package playground.ciarif.flexibletransports.preprocess.membership;
 
 
 import java.io.FileNotFoundException;
@@ -47,7 +47,8 @@ public class MembershipAssigner {
 
 	private CarSharingStations carStations;
 	private String stationfilePath = "../../matsim/input/triangle/CS_Stations.txt";//input @burgess
-	//private String stationfilePath = "/data/matsim/ciarif/input/zurich_10pc/Stationen.txt";//input @satawal
+	private QuadTree<Person> personsQuadTree;
+	//private String stationfilePath = "/data/matsim/ciarif/input/zurich_10pc/CarSharing/Stationen_7.dat";//input @satawal
 	//private final FtConfigGroup ftConfigGroup = new FtConfigGroup();
 	
 	//////////////////////////////////////////////////////////////////////
@@ -56,7 +57,9 @@ public class MembershipAssigner {
 
 	public MembershipAssigner(ScenarioImpl scenario) {
 		this.scenario = scenario;
+		this.init();
 	}
+	
 
 
 	
@@ -81,11 +84,9 @@ public class MembershipAssigner {
 		closestStations =  this.carStations.getClosestStations(c, 3, 5000);
 		for (CarSharingStation station:closestStations) {
 			
-			log.info("TEST");
 			access += station.getCars() * Math.exp(-2 * (CoordUtils.calcDistance(station.getCoord(), c))/1000);
 		
 		}
-		log.info("access = " + access);
 		return access;
 	}
 
@@ -111,14 +112,12 @@ public class MembershipAssigner {
 		}
 		
 		closestStations =  this.carStations.getClosestStations(c, 3, 5000);
-		log.info("TEST");
 		for (CarSharingStation station:closestStations) {
         	
 			access += station.getCars() * Math.exp(-2 * (CoordUtils.calcDistance(station.getCoord(), c))/1000);
 			
 			
-		}
-		log.info("access = " + access);  
+		} 
 		return access;
 	}
 
@@ -126,9 +125,9 @@ public class MembershipAssigner {
 
 
 	public void run() {
-		this.init();
 		this.modifyPlans();		
 	}
+	
 
 	private void init() {
 		
@@ -142,7 +141,7 @@ public class MembershipAssigner {
 	      throw new RuntimeException(e);
 	    }
 	    log.info("Reading car stations...done.");
-		
+		this.personsQuadTree = MembershipUtils.createPersonQuadTree (this.scenario);
 	}
 
 
@@ -167,6 +166,7 @@ public class MembershipAssigner {
 		}
 		
 	}
+	
 
 	private void assignCarSharingMembership(PersonImpl pi) {
 		log.info("Processing person " + pi.getId());
@@ -186,10 +186,10 @@ public class MembershipAssigner {
 
 
 	private void addFTAttributes(FlexTransPersonImpl ftPerson) {
-		log.info("finding out home cs accessibility for person " + ftPerson.getId());
+		//log.info("finding out home cs accessibility for person " + ftPerson.getId());
 		ftPerson.setAccessHome(this.computeAccessCSHome(ftPerson));
 		//Look if it works using to call the set method at the end of the compute method (putting void as return)
-		log.info("finding out work cs accessibility for person " + ftPerson.getId());
+		//log.info("finding out work cs accessibility for person " + ftPerson.getId());
 		ftPerson.setAccessWork(this.computeAccessCSWork(ftPerson));
 		
 		ftPerson.setDensityHome(this.computeDensityHome(ftPerson));
@@ -202,7 +202,7 @@ public class MembershipAssigner {
 	private double computeDensityHome(FlexTransPersonImpl pi) {
 		
 		Coord c = new CoordImpl (1.0D / 0.0D, 1.0D / 0.0D );
-		QuadTree<Person> personsQuadTree = MembershipUtils.createPersonQuadTree (this.scenario);
+		//QuadTree<Person> personsQuadTree = MembershipUtils.createPersonQuadTree (this.scenario);
 		for (PlanElement pe : pi.getSelectedPlan().getPlanElements()) {
 			
 			if (pe instanceof Activity) {
@@ -216,7 +216,7 @@ public class MembershipAssigner {
 			
 			}
 		}
-		int density =  (personsQuadTree.get(c.getX(),c.getY(), 0.05)).size();
+		int density =  (this.personsQuadTree.get(c.getX(),c.getY(), 0.05)).size();
 		log.info("density " + density);
 		return density;
 	}	

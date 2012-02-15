@@ -22,9 +22,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
+
+import playground.ciarif.data.FacilitiesPortfolio;
 import playground.ciarif.flexibletransports.network.MyLinkUtils;
 
-public class CarSharingStations
+public class CarSharingStations implements FacilitiesPortfolio
 {
   private final QuadTree<CarSharingStation> stations;
   private Network network;
@@ -69,42 +71,42 @@ public class CarSharingStations
 	  Vector<CarSharingStation> orderedClosestStations = new Vector<CarSharingStation> ();
 	  //orderedClosestStations.add(0, this.stations.get(coord.getX(),coord.getY()));
 	  Collection<CarSharingStation> allClosestStations = this.stations.get(coord.getX(), coord.getY(), distance);
-	  log.info("number of all cs stations = " + allClosestStations.size());
+	  //log.info("number of all cs stations = " + allClosestStations.size());
 	  for (CarSharingStation station:allClosestStations){
 		  int i = 0;
 		  if (orderedClosestStations.isEmpty()) {
 			  
 			  orderedClosestStations.add(0,station);
-			  log.info("The station n. " + station.getId() + " has been added at position " + orderedClosestStations.indexOf(station));
+			  //log.info("The station n. " + station.getId() + " has been added at position " + orderedClosestStations.indexOf(station));
 		  
 		  }
 		  else {
 			  if (!orderedClosestStations.contains(station)){
 			  	while (CoordUtils.calcDistance(coord, station.getCoord()) > (CoordUtils.calcDistance(coord, orderedClosestStations.get(i).getCoord()))  ) {
 					  
-						  log.info("station " + station.getId() + " is " + CoordUtils.calcDistance(coord, station.getCoord()) + " distant, further away than station " + orderedClosestStations.get(i).getId() + " which is " + CoordUtils.calcDistance(coord, orderedClosestStations.get(i).getCoord()) + "distant");
+						  //log.info("station " + station.getId() + " is " + CoordUtils.calcDistance(coord, station.getCoord()) + " distant, further away than station " + orderedClosestStations.get(i).getId() + " which is " + CoordUtils.calcDistance(coord, orderedClosestStations.get(i).getCoord()) + "distant");
 						  i++;
-						  log.info("i = " + i);
+						  //log.info("i = " + i);
 						  if (i==orderedClosestStations.size()) { break;}
 				}
 				  	  
 				
 				  orderedClosestStations.add(i,station);
-				  log.info("The station n. " + station.getId() + " has been added at position " + i);
+				  //log.info("The station n. " + station.getId() + " has been added at position " + i);
 				
 			  }
 		  }
 		  
 	  }
 	  if (orderedClosestStations.size()<=number) {
-		  log.info("final number of cs stations = " + orderedClosestStations.size());
+		  //log.info("final number of cs stations = " + orderedClosestStations.size());
 		  return orderedClosestStations;
 	  }
 	  else {
 		  List<CarSharingStation> oCS = orderedClosestStations.subList(0,number);
 		  Vector <CarSharingStation> finalOrderedClosestStations = new Vector <CarSharingStation> ();
 		  finalOrderedClosestStations.addAll(oCS);
-		  log.info("final number of cs stations = " + finalOrderedClosestStations.size());
+		  //log.info("final number of cs stations = " + finalOrderedClosestStations.size());
 		  return finalOrderedClosestStations;
 	  }
 	  

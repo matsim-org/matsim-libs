@@ -10,6 +10,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 
 import playground.ciarif.retailers.data.FacilityRetailersImpl;
 import playground.ciarif.retailers.data.LinkRetailersImpl;

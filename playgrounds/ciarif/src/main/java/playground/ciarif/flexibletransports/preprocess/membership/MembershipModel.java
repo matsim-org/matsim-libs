@@ -1,4 +1,4 @@
-package playground.ciarif.flexibletransports.preprocess;
+package playground.ciarif.flexibletransports.preprocess.membership;
 
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
@@ -70,8 +70,8 @@ public class MembershipModel {
 		protected final double calcNoUtil(FlexTransPersonImpl pi) {
 			double util = 0.0;
 			util += KONST_NO * 1.0;
-			log.info("age = " + pi.getAge());
-			if (pi.getAge() <= 30 & pi.getAge() >= 18 ) { util += B_No_18_30 * 1.0; log.info("added util = " + B_No_18_30 * 1.0 );}
+			//log.info("age = " + pi.getAge());
+			if (pi.getAge() <= 30 & pi.getAge() >= 18 ) { util += B_No_18_30 * 1.0;}
 			if (pi.getAge() >= 60 ) { util += B_No_60 * 1.0; }
 			log.info("no util = " + util);
 			return util;
@@ -83,7 +83,7 @@ public class MembershipModel {
 			util += B_Yes_Access_Home * pi.getAccessHome();
 			util += B_Yes_Access_Work * pi.getAccessWork();
 			util += B_Yes_Density * pi.getDensityHome();
-			log.info("age = " + pi.getCarAvail());
+			//log.info("car av = " + pi.getCarAvail());
 			if (pi.getAge() <= 45 & pi.getAge() >= 31 ) { util += B_Yes_31_45 * 1.0; }
 			if (pi.getCarAvail()=="never") { util += B_yes_CAR_NEV * 1.0; }
 			if (pi.getCarAvail()=="sometimes") { util += B_yes_CAR_SOM * 1.0; }

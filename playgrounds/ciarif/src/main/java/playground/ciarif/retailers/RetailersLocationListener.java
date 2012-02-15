@@ -105,7 +105,7 @@ public class RetailersLocationListener
     int modelIter = 0;
     String modelIterParam = this.controler.getConfig().findParam("Retailers", "modelIteration");
     if (modelIterParam == null) {
-      log.warn("The iteration in which the model should be run has not been set, the model will be performed at the last iteration");
+      log.warn("The iteration in which the model should be run has not been set, the model run will be performed at the last iteration");
       modelIter = this.controler.getLastIteration();
     }
     else {

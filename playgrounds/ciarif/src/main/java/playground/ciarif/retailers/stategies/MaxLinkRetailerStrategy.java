@@ -16,6 +16,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
@@ -131,6 +132,5 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }	
