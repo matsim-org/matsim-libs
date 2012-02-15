@@ -316,7 +316,7 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 					config.setParam(BSE_CONFIG_MODULE_NAME, "msaExponent",
 							Double.toString(msaExponent));
 				} else if (goAhead.equals("initialStepSize")) {
-					initialStepSize *= 5d;
+					initialStepSize *= 2d;
 					config.setParam(BSE_CONFIG_MODULE_NAME, "initialStepSize",
 							Double.toString(initialStepSize));
 				}
