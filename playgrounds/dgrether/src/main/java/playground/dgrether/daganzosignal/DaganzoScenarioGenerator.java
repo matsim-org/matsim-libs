@@ -254,7 +254,7 @@ public class DaganzoScenarioGenerator {
 			//enable lanes and signal system feature in config
 			config.scenario().setUseSignalSystems(true);
 			config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
-			config.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
+			config.signalSystems().setSignalControlFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 			//create the signal systems and write them
 //			SignalSystems signalSystems = createSignalSystems(scenario);
 //			MatsimSignalSystemsWriter ssWriter = new MatsimSignalSystemsWriter(signalSystems);
@@ -378,7 +378,7 @@ public class DaganzoScenarioGenerator {
 		}
 		if (isUseSignalSystems){
 			config.signalSystems().setSignalSystemFile(signalInputFile);
-			config.signalSystems().setSignalSystemConfigFile(this.signalConfigInputFile);
+			config.signalSystems().setSignalControlFile(this.signalConfigInputFile);
 		}
 
 		if (runId != null) {

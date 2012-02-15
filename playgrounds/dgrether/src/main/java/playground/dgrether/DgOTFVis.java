@@ -22,7 +22,6 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.utils.DgOTFVisUtils;
-import playground.dgrether.utils.LogOutputEventHandler;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -63,7 +62,7 @@ public class DgOTFVis {
 			scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		}
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(new LogOutputEventHandler());
+//		events.addHandler(new LogOutputEventHandler());
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
