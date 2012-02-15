@@ -56,6 +56,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 	private static final String NETWORK_MODES = "networkModes";
 	private static final String TELEPORTED_MODES = "teleportedModes";
 	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeeds";
+	private static final String TELEPORTED_MODES_BASED_ON_FREESPEED = "teleportedModesBasedOnFreespeed";
+	private static final String TELEPORTED_MODE_FREESPEED_FACTORS = "teleportedModeFreespeedFactors";
 
 	private PtSpeedMode ptSpeedMode = PtSpeedMode.freespeed;
 	private double ptSpeedFactor = 2.0;
@@ -67,6 +69,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 	private String[] networkModes = {TransportMode.car, TransportMode.ride}; 
 	private String[] teleportedModes = {TransportMode.bike, TransportMode.walk};
 	private Double[] teleportedModeSpeeds = {bikeSpeed, walkSpeed};
+	private String[] teleportedModesBasedOnFreespeed = {TransportMode.pt};
+	private Double[] teleportedModeFreespeedFactors = {2.0};
 	
 	public PlansCalcRouteConfigGroup() {
 		super(GROUP_NAME);
@@ -99,6 +103,10 @@ public class PlansCalcRouteConfigGroup extends Module {
 			setTeleportedModes(CollectionUtils.stringToArray(value));
 		} else if (TELEPORTED_MODE_SPEEDS.equals(key)) {
 			setTeleportedModeSpeeds(stringArrayToDoubleArray(CollectionUtils.stringToArray(value)));
+		} else if (TELEPORTED_MODES_BASED_ON_FREESPEED.equals(key)) {
+			setTeleportedModesBasedOnFreespeed(CollectionUtils.stringToArray(value));
+		} else if (TELEPORTED_MODE_FREESPEED_FACTORS.equals(key)) {
+			setTeleportedModeFreespeedFactors(stringArrayToDoubleArray(CollectionUtils.stringToArray(value)));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -117,6 +125,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes) );
 		map.put( TELEPORTED_MODES, CollectionUtils.arrayToString(this.teleportedModes) );
 		map.put( TELEPORTED_MODE_SPEEDS, CollectionUtils.arrayToString(doubleArrayToStringArray(this.teleportedModeSpeeds)));
+		map.put( TELEPORTED_MODES_BASED_ON_FREESPEED, CollectionUtils.arrayToString(this.teleportedModesBasedOnFreespeed));
+		map.put( TELEPORTED_MODE_FREESPEED_FACTORS, CollectionUtils.arrayToString(doubleArrayToStringArray(this.teleportedModeSpeeds)));
 		return map;
 	}
 
@@ -150,6 +160,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
 		map.put(TELEPORTED_MODES, "All the modes which are not routed through the network but get speed estimates based on beeline distance.");
 		map.put(TELEPORTED_MODE_SPEEDS, "Speeds for all teleportationModes, in order.");
+		map.put(TELEPORTED_MODES_BASED_ON_FREESPEED, "All the modes which get their speed estimate based on free-speed travel times.");
+		map.put(TELEPORTED_MODE_FREESPEED_FACTORS, "Free-speed factors for all teleportedModesBasedOnFreesoeed, in order.");
 		return map ;
 	}
 
@@ -231,6 +243,24 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 	public void setTeleportedModeSpeeds(Double[] teleportedModeSpeeds) {
 		this.teleportedModeSpeeds = teleportedModeSpeeds;
+	}
+
+	public String[] getTeleportedModesBasedOnFreespeed() {
+		return teleportedModesBasedOnFreespeed;
+	}
+
+	public void setTeleportedModesBasedOnFreespeed(
+			String[] teleportedModesBasedOnFreespeed) {
+		this.teleportedModesBasedOnFreespeed = teleportedModesBasedOnFreespeed;
+	}
+
+	public Double[] getTeleportedModeFreespeedFactors() {
+		return teleportedModeFreespeedFactors;
+	}
+
+	public void setTeleportedModeFreespeedFactors(
+			Double[] teleportedModeFreespeedFactors) {
+		this.teleportedModeFreespeedFactors = teleportedModeFreespeedFactors;
 	}
 	
 }

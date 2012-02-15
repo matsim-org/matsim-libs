@@ -156,15 +156,15 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		for (String mode : networkModes) {
 			this.addLegHandler(mode, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
 		}
-		if (this.configGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.freespeed) {
-			this.addLegHandler(TransportMode.pt, new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, this.configGroup.getPtSpeedFactor(), this.configGroup.getBeelineDistanceFactor(), this.routeFactory));
-		} else if (this.configGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.beeline) {
-			this.addLegHandler(TransportMode.pt, new TeleportationLegRouter(this.routeFactory, this.configGroup.getPtSpeed(), this.configGroup.getBeelineDistanceFactor()));
-		}
 		String[] teleportedModes = this.configGroup.getTeleportedModes();
 		Double[] teleportedModeSpeeds = this.configGroup.getTeleportedModeSpeeds();
-		for (int i=0; i< teleportedModes.length; ++i) {
+		for (int i=0; i<teleportedModes.length; ++i) {
 			this.addLegHandler(teleportedModes[i], new TeleportationLegRouter(this.routeFactory, teleportedModeSpeeds[i], this.configGroup.getBeelineDistanceFactor()));
+		}
+		String[] teleportedModesBasedOnFreespeed = this.configGroup.getTeleportedModesBasedOnFreespeed();
+		Double[] teleportedModeFreespeedFactors = this.configGroup.getTeleportedModeFreespeedFactors();
+		for (int i=0; i<teleportedModesBasedOnFreespeed.length; ++i) {
+			this.addLegHandler(teleportedModesBasedOnFreespeed[i], new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, teleportedModeFreespeedFactors[i], this.configGroup.getBeelineDistanceFactor(), this.routeFactory));
 		}
 	}
 
