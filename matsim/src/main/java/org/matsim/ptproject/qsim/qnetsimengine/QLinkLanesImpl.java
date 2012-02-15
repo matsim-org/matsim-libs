@@ -448,7 +448,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 		VisDataImpl(){
 			double nodeOffset = QLinkLanesImpl.this.network.simEngine.getMobsim().getScenario().getConfig().otfVis().getNodeOffset();
 			if (nodeOffset != 0){
-				 nodeOffset = nodeOffset - 6.0; // -6.0: eventually we need a bit space for the signal
+				 nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 			}
 			otfLink = laneModelBuilder.createOTFLinkWLanes(QLinkLanesImpl.this, nodeOffset, QLinkLanesImpl.this.lanesToLinkAssignment);
 			SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.network.getLinkWidthCalculator();
