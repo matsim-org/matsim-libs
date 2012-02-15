@@ -36,7 +36,6 @@ public class SignalSystemsConfigGroup extends Module {
 	private static final long serialVersionUID = 2346649035049406334L;
 
 	public  static final String SIGNALSYSTEM_FILE = "signalsystems";
-	public  static final String SIGNALSYSTEMCONFIG_FILE = "signalsystemsconfiguration";
 	public  static final String SIGNALCONTROL_FILE = "signalcontrol";
 	public  static final String SIGNALGROUPS_FILE = "signalgroups";
 	public  static final String USE_AMBER_TIMES = "useAmbertimes";
@@ -78,7 +77,7 @@ public class SignalSystemsConfigGroup extends Module {
 		if (SIGNALSYSTEM_FILE.equalsIgnoreCase(key)){
 			this.signalSystemFile = value.replace("\\", "/").trim();
 		}
-		else if (SIGNALSYSTEMCONFIG_FILE.equalsIgnoreCase(key) || SIGNALCONTROL_FILE.equalsIgnoreCase(key)) {
+		else if (SIGNALCONTROL_FILE.equalsIgnoreCase(key)) {
 			this.signalControlFile = value.replace("\\", "/").trim();
 		}
 		else if (SIGNALGROUPS_FILE.equalsIgnoreCase(key)){
@@ -116,7 +115,7 @@ public class SignalSystemsConfigGroup extends Module {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(SIGNALSYSTEM_FILE, this.getSignalSystemFile());
-		map.put(SIGNALCONTROL_FILE, this.getSignalSystemConfigFile());
+		map.put(SIGNALCONTROL_FILE, this.getSignalControlFile());
 		map.put(SIGNALGROUPS_FILE, this.getSignalGroupsFile());
 		map.put(USE_AMBER_TIMES, Boolean.toString(this.isUseAmbertimes()));
 		map.put(AMBERTIMES_FILE, this.getAmberTimesFile());
@@ -142,22 +141,6 @@ public class SignalSystemsConfigGroup extends Module {
 		this.signalSystemFile = signalSystemFile;
 	}
 
-
-	/**
-	 * 
-	 * @deprecated use getSignalControlFile instead
-	 */
-	@Deprecated
-	public String getSignalSystemConfigFile() {
-		return this.signalControlFile;
-	}
-	/**
-	 * @deprecated use setSignalControlFile instead
-	 */
-	@Deprecated
-	public void setSignalSystemConfigFile(final String signalSystemConfigFile) {
-		this.signalControlFile = signalSystemConfigFile;
-	}
 
 	public String getSignalGroupsFile() {
 		return this.signalGroupsFile;
