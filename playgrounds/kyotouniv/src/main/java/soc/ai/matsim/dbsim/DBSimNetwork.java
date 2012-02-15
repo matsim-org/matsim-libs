@@ -55,7 +55,9 @@ public class DBSimNetwork{
 	
 	public DBSimNetwork(final Network networkLayer2) {
 		this(networkLayer2, new DefaultDBSimNetworkFactory());
-		this.linkWidthCalculator.setLaneWidth(networkLayer2.getEffectiveLaneWidth());
+		if (! Double.isNaN(networkLayer2.getEffectiveLaneWidth())){
+			this.linkWidthCalculator.setLaneWidth(networkLayer2.getEffectiveLaneWidth());
+		}
 	}
 
 	public DBSimNetwork(final Network networkLayer, final DBSimNetworkFactory<DBSimNode, DBSimLink> factory) {
