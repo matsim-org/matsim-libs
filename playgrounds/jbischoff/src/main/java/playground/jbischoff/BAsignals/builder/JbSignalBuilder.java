@@ -21,6 +21,7 @@ package playground.jbischoff.BAsignals.builder;
 
 import org.apache.log4j.Logger;
 import org.matsim.signalsystems.builder.FromDataBuilder;
+import org.matsim.signalsystems.builder.SignalModelFactory;
 import org.matsim.signalsystems.builder.SignalSystemsModelBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
@@ -102,7 +103,15 @@ public class JbSignalBuilder implements SignalSystemsModelBuilder {
 		return collh;
 	}
 
+	@Override
+	public SignalModelFactory getSignalModelFactory() {
+		return this.dataBuilder.getSignalModelFactory();
+	}
 
+	@Override
+	public void setSignalModelFactory(SignalModelFactory factory) {
+		this.dataBuilder.setSignalModelFactory(factory);
+	}
 
 
 }
