@@ -46,6 +46,7 @@ import org.matsim.lanes.data.v20.LaneDefinitionsV2Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
@@ -108,6 +109,9 @@ public class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseTransit()) {
 			this.createTransit();
 		}
+		if (this.config.scenario().isUseSignalSystems()){
+			this.createSignals();
+		}
 	}
 
 	protected void createVehicleContainer(){
@@ -133,6 +137,10 @@ public class ScenarioImpl implements Scenario {
 
 	protected void createTransit() {
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+	}
+	
+	protected void createSignals(){
+		this.addScenarioElement(new SignalsDataImpl(this.config.signalSystems()));
 	}
 
 	public ActivityFacilitiesImpl getActivityFacilities() {

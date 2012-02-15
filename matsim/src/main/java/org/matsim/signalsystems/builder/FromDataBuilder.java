@@ -22,6 +22,7 @@ package org.matsim.signalsystems.builder;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
@@ -32,6 +33,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.model.AmberLogic;
 import org.matsim.signalsystems.model.AmberLogicImpl;
 import org.matsim.signalsystems.model.DatabasedSignal;
+import org.matsim.signalsystems.model.IntergreensLogic;
 import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
@@ -49,15 +51,17 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	private SignalsData signalsData;
 	private SignalModelFactory factory;
 	private EventsManager events;
+	private Scenario scenario;
 
-	public FromDataBuilder(SignalsData data, SignalModelFactory factory, EventsManager events){
-		this.signalsData = data;
+	public FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
+		this.signalsData = scenario.getScenarioElement(SignalsData.class);
+		this.scenario = scenario;
 		this.factory = factory;
 		this.events = events;
 	}
 	
-	public FromDataBuilder(SignalsData data, EventsManager events){
-		this(data, new DefaultSignalModelFactory(), events);
+	public FromDataBuilder(Scenario scenario, EventsManager events){
+		this(scenario, new DefaultSignalModelFactory(), events);
 	}
 	
 	public void createAndAddSignals(SignalSystem system){
@@ -105,7 +109,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	
 	public void createAndAddAmberLogic(SignalSystemsManager manager){
 		//process information of AmberTimesData object
-		if (this.signalsData.getAmberTimesData() != null){
+		if (this.scenario.getConfig().signalSystems().isUseAmbertimes()){
 			AmberLogic amberLogic = new AmberLogicImpl(this.signalsData.getAmberTimesData());
 			manager.setAmberLogic(amberLogic);
 		}
@@ -118,6 +122,12 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		return manager;
 	}
 	
+	public void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
+		if (this.scenario.getConfig().signalSystems().isUseIntergreenTimes()){
+			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), this.scenario.getConfig().signalSystems());
+			this.events.addHandler(intergreensLogic);
+		}
+	}
 	
 	@Override
 	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
@@ -133,10 +143,8 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 		//4.) AmberLogic
 		this.createAndAddAmberLogic(manager);
-		//5.) StateLogic ?? perhaps in 3.)?
-//		if (this.signalsData.getIntergreenTimesData() != null){
-//			
-//		}
+		//5.) IntergreenTimesLogic 
+		this.createAndAddIntergreenTimesLogic(manager);
 		return manager;
 	}
 	

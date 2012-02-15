@@ -35,13 +35,18 @@ public class SignalSystemsConfigGroup extends Module {
 
 	private static final long serialVersionUID = 2346649035049406334L;
 
-	private static final String SIGNALSYSTEM_FILE = "signalsystems";
-	private static final String SIGNALSYSTEMCONFIG_FILE = "signalsystemsconfiguration";
-	private static final String SIGNALCONTROL_FILE = "signalcontrol";
-	private static final String SIGNALGROUPS_FILE = "signalgroups";
-	private static final String AMBERTIMES_FILE = "ambertimes";
-	private static final String INTERGREENTIMES_FILE = "intergreentimes";
-
+	public  static final String SIGNALSYSTEM_FILE = "signalsystems";
+	public  static final String SIGNALSYSTEMCONFIG_FILE = "signalsystemsconfiguration";
+	public  static final String SIGNALCONTROL_FILE = "signalcontrol";
+	public  static final String SIGNALGROUPS_FILE = "signalgroups";
+	public  static final String USE_AMBER_TIMES = "useAmbertimes";
+	public  static final String AMBERTIMES_FILE = "ambertimes";
+	public  static final String INTERGREENTIMES_FILE = "intergreentimes";
+	public  static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
+	public  static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
+	public static final String WARN_ON_INTERGREEN_VIOLATION = "warn";
+	public static final String EXCEPTION_ON_INTERGREEN_VIOLATION = "exception";
+	
 	public static final String GROUPNAME = "signalsystems";
 
 	private String signalSystemFile;
@@ -52,6 +57,12 @@ public class SignalSystemsConfigGroup extends Module {
 	private String amberTimesFile;
 	
 	private String intergreenTimesFile;
+
+	private boolean useIntergreens = false;
+	
+	private boolean useAmbertimes = false;
+	
+	private String actionOnIntergreenViolation = WARN_ON_INTERGREEN_VIOLATION;
 
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
@@ -79,6 +90,23 @@ public class SignalSystemsConfigGroup extends Module {
 		else if (INTERGREENTIMES_FILE.equalsIgnoreCase(key)){
 			this.intergreenTimesFile = value.replace("\\", "/").trim();
 		}
+		else if (USE_INTERGREEN_TIMES.equalsIgnoreCase(key)){
+			this.setUseIntergreenTimes(Boolean.parseBoolean(value.trim()));
+		}
+		else if (USE_AMBER_TIMES.equalsIgnoreCase(key)){
+			this.setUseAmbertimes(Boolean.parseBoolean(value.trim()));
+		}
+		else if (ACTION_ON_INTERGREEN_VIOLATION.equalsIgnoreCase(key)){
+			if (WARN_ON_INTERGREEN_VIOLATION.equalsIgnoreCase(value.trim())){
+				this.setActionOnIntergreenViolation(WARN_ON_INTERGREEN_VIOLATION);
+			}
+			else if (EXCEPTION_ON_INTERGREEN_VIOLATION.equalsIgnoreCase(value.trim())){
+				this.setActionOnIntergreenViolation(EXCEPTION_ON_INTERGREEN_VIOLATION);
+			}
+			else {
+				throw new IllegalArgumentException("The value " + value.trim() + " for key : " + key + " is not supported by this config group");
+			}
+		}
 		else {
 			throw new IllegalArgumentException("The key : " + key + " is not supported by this config group");
 		}
@@ -90,7 +118,9 @@ public class SignalSystemsConfigGroup extends Module {
 		map.put(SIGNALSYSTEM_FILE, this.getSignalSystemFile());
 		map.put(SIGNALCONTROL_FILE, this.getSignalSystemConfigFile());
 		map.put(SIGNALGROUPS_FILE, this.getSignalGroupsFile());
+		map.put(USE_AMBER_TIMES, Boolean.toString(this.isUseAmbertimes()));
 		map.put(AMBERTIMES_FILE, this.getAmberTimesFile());
+		map.put(USE_INTERGREEN_TIMES, Boolean.toString(this.isUseIntergreenTimes()));
 		map.put(INTERGREENTIMES_FILE, this.getIntergreenTimesFile());
 		return map;
 	}
@@ -159,6 +189,34 @@ public class SignalSystemsConfigGroup extends Module {
 	
 	public void setSignalControlFile(String filename){
 		this.signalControlFile = filename;
+	}
+
+	public boolean isUseIntergreenTimes() {
+		return this.useIntergreens;
+	}
+	
+	public void setUseIntergreenTimes(boolean useIntergreens){
+		this.useIntergreens = useIntergreens;
+	}
+
+	
+	public String getActionOnIntergreenViolation() {
+		return actionOnIntergreenViolation;
+	}
+
+	
+	public void setActionOnIntergreenViolation(String actionOnIntergreenViolation) {
+		this.actionOnIntergreenViolation = actionOnIntergreenViolation;
+	}
+
+	
+	public boolean isUseAmbertimes() {
+		return useAmbertimes;
+	}
+
+	
+	public void setUseAmbertimes(boolean useAmbertimes) {
+		this.useAmbertimes = useAmbertimes;
 	}
 
 }

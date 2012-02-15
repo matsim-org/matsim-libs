@@ -40,7 +40,6 @@ public class SignalSystemImpl implements SignalSystem {
 	private static final Logger log = Logger.getLogger(SignalSystemImpl.class);
 	
 	private SignalController controller;
-	private StateLogic stateLogic;
 	private Map<Id, SignalGroup> signalGroups = new HashMap<Id, SignalGroup>();
 	private SignalSystemsManager manager;
 	
@@ -79,9 +78,6 @@ public class SignalSystemImpl implements SignalSystem {
 	@Override
 	public void scheduleOnset(double timeSeconds, Id signalGroupId){
 //		log.debug("onset at time " + timeSeconds + " of  group " + signalGroupId);
-		if (this.stateLogic != null){
-			this.stateLogic.checkOnset(timeSeconds, signalGroupId);
-		}
 		Set<SignalGroupStateChangeRequest> rqs = this.manager.getAmberLogic().processOnsets(timeSeconds, this.getId(), signalGroupId);
 		requests.addAll(rqs);
 	}

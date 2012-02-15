@@ -23,20 +23,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalgroups20.XMLIdRefType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
@@ -60,25 +58,22 @@ public class SignalGroupsReader20 extends MatsimJaxbXmlParser {
 	}
 
 	@Override
-	public void readFile(String filename) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
+	public void readFile(String filename) {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLSignalGroups xmlsgdefs = null;
-		jc = JAXBContext.newInstance(org.matsim.jaxb.signalgroups20.ObjectFactory.class);
-		Unmarshaller u = jc.createUnmarshaller();
-		// validate XML file
-		log.info("starting to validate " + filename);
-		super.validateFile(filename, u);
-		log.info("starting unmarshalling " + filename);
 		InputStream stream = null;
 		try {
+			jc = JAXBContext.newInstance(org.matsim.jaxb.signalgroups20.ObjectFactory.class);
+			Unmarshaller u = jc.createUnmarshaller();
+			// validate XML file
+			log.info("starting to validate " + filename);
+			super.validateFile(filename, u);
+			log.info("starting unmarshalling " + filename);
 			stream = IOUtils.getInputstream(filename);
 			xmlsgdefs = (XMLSignalGroups) u.unmarshal(stream);
-//		} catch (Exception ex) {
-//			ex.printStackTrace();
-			// do not generically catch (and swallow) exception, but let it escalate
-			// if it is just printed out here, a NullPointerException will happen a few lines later, which is not really better.
+		} catch (Exception e) {
+			throw new UncheckedIOException(e);
 		} finally {
 			try {
 				if (stream != null) {

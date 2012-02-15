@@ -52,4 +52,8 @@ public interface SignalSystemsManager {
 	
 	public void setSignalsData(SignalsData signalsData);
 	
+	public IntergreensLogic getIntergreensLogic();
+	
+	public void setIntergreensLogic(IntergreensLogic logic);
+	
 }

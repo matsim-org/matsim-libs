@@ -26,6 +26,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
@@ -41,7 +42,7 @@ public class SignalUtilsTest {
 	public final void testCreateAndAddSignalGroups4Signals() {
 		Id id1 = new IdImpl("1");
 		Id id3 = new IdImpl("3");
-		SignalsData signals = new SignalsDataImpl();
+		SignalsData signals = new SignalsDataImpl(ConfigUtils.createConfig().signalSystems());
 		SignalSystemsDataFactory fac = signals.getSignalSystemsData().getFactory();
 		SignalSystemData system = fac.createSignalSystemData(id1);
 		SignalData signal = fac.createSignalData(id1);

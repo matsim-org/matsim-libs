@@ -58,7 +58,6 @@ import org.matsim.lanes.data.v20.LaneDefinitionsFactoryV2;
 import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
@@ -222,7 +221,6 @@ public class InvertedNetworkRoutingTest {
 				createLanes();
 			}
 			if (config.scenario().isUseSignalSystems()){
-				this.scenario.addScenarioElement(new SignalsDataImpl());
 				createSignals();
 			}
 			if (doCreateModes){

@@ -113,13 +113,13 @@ public class SignalSystemsOneAgentTest implements
 		this.setSignalSystemConfigValues(signalsConfig);
 		
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
-		SignalsData signalsData = signalsLoader.loadSignalsData();
+		scenario.addScenarioElement(signalsLoader.loadSignalsData());
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		this.link2EnterTime = 38.0;
 		
-		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		
@@ -141,6 +141,7 @@ public class SignalSystemsOneAgentTest implements
 		
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
+		scenario.addScenarioElement(signalsData);
 		
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
@@ -155,13 +156,57 @@ public class SignalSystemsOneAgentTest implements
 		events.addHandler(this);
 		this.link2EnterTime = 100.0;
 		
-		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		
 		QSim qsim = QSim.createQSimAndAddAgentSource(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		qsim.run();
+	}
+	
+	/**
+	 * Tests the setup with a traffic light that shows all the time green
+	 */
+	@Test
+	public void testIntergreensAbortOneAgentDriving() {
+		//configure and load standard scenario
+		Scenario scenario = this.createAndLoadTestScenario();
+		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
+		this.setSignalSystemConfigValues(signalsConfig);
+		signalsConfig.setIntergreenTimesFile(testUtils.getClassInputDirectory() + "testIntergreenTimes_v1.0.xml");
+		signalsConfig.setUseIntergreenTimes(true);
+		signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.EXCEPTION_ON_INTERGREEN_VIOLATION);
+		
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsData signalsData = signalsLoader.loadSignalsData();
+		scenario.addScenarioElement(signalsData);
+		
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
+		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
+		planData.setStartTime(0.0);
+		planData.setEndTime(0.0);
+		planData.setCycleTime(60);
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(id100);
+		groupData.setDropping(0);
+		groupData.setOnset(30);
+		
+		EventsManager events = EventsUtils.createEventsManager();
+
+		FromDataBuilder builder = new FromDataBuilder(scenario, events);
+		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
+		SignalEngine engine = new QSimSignalEngine(manager);
+		
+		QSim qsim = QSim.createQSimAndAddAgentSource(scenario, events);
+		qsim.addQueueSimulationListeners(engine);
+		Exception ex = null;
+		try{
+			qsim.run();
+		} catch (Exception e){
+			log.info(e.getMessage());
+			ex = e;
+		}
+		Assert.assertNotNull(ex);
 	}
 
 	

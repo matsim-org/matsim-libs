@@ -23,6 +23,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesWriter10;
+import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesData;
+import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesWriter10;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
@@ -92,6 +94,12 @@ public class SignalsScenarioWriter {
 		else {
 			log.info("No AmberTimesData object set to write!");
 		}
+		if (signalsData.getIntergreenTimesData() != null){
+			writeIntergreenTimesData(signalsData.getIntergreenTimesData());
+		}
+		else{
+			log.info("No IntergreenTimesData object set to write!");
+		}
 	}
 	
 	public void writeSignalSystemsData(SignalSystemsData signalSystemsData){
@@ -134,9 +142,15 @@ public class SignalsScenarioWriter {
 		}
 	}
 	
-//	public void writeIntergreenTimesData(IntergreenTimesData intergreenTimesData){
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
+	public void writeIntergreenTimesData(IntergreenTimesData intergreenTimesData){
+		if (this.pathToIntergreenTimesOutputFilename != null){
+			IntergreenTimesWriter10 writer = new IntergreenTimesWriter10(intergreenTimesData);
+			writer.write(this.pathToIntergreenTimesOutputFilename);
+		}
+		else {
+			log.warn("No path to intergreen times output file set!");
+		}
+	}
 
 	
 	public String getSignalSystemsOutputFilename() {

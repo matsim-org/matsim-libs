@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.data.intergreens.v10;
 
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
@@ -38,5 +39,7 @@ public interface IntergreensForSignalSystemData {
 	public void setIntergreenTime(Integer timeSeconds, Id endingSignalGroupId, Id beginningSignalGroupId);
 
 	public List<Tuple<Id, Id>> getEndingBeginningSignalGroupKeys();
+
+	public Map<Id, Integer> getEndSignalGroupTimesForBeginningGroup(Id id);
 	
 }

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
@@ -57,11 +58,12 @@ public class IntergreenTimesReader10 extends MatsimJaxbXmlParser {
 	
 	
 	@Override
-	public void readFile(final String filename) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
+	public void readFile(final String filename) throws UncheckedIOException {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLIntergreenTimes xmlIntergreenTimes = null;
+		InputStream stream = null;
+		try {
 
 		jc = JAXBContext.newInstance(org.matsim.jaxb.intergreenTimes10.ObjectFactory.class);
 		Unmarshaller u = jc.createUnmarshaller();
@@ -69,8 +71,6 @@ public class IntergreenTimesReader10 extends MatsimJaxbXmlParser {
 		log.info("starting to validate " + filename);
 		super.validateFile(filename, u);
 		log.info("starting unmarshalling " + filename);
-		InputStream stream = null;
-		try {
 			stream = IOUtils.getInputstream(filename);
 			xmlIntergreenTimes = (XMLIntergreenTimes) u.unmarshal(stream);
 			IntergreenTimesDataFactory factory = this.intergreensData.getFactory();
@@ -87,6 +87,14 @@ public class IntergreenTimesReader10 extends MatsimJaxbXmlParser {
 				}
 			}
 			
+		} catch (JAXBException e) {
+			throw new UncheckedIOException(e);
+		} catch (SAXException e) {
+			throw new UncheckedIOException(e);
+		} catch (ParserConfigurationException e) {
+			throw new UncheckedIOException(e);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);			
 		} finally {
 			try {
 				if (stream != null) {

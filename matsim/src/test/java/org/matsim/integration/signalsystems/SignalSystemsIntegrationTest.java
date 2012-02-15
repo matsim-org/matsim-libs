@@ -94,6 +94,8 @@ public class SignalSystemsIntegrationTest {
 		Assert.assertTrue(file.exists());
 		file = new File(writer.getAmberTimesOutputFilename());
 		Assert.assertTrue(file.exists());
+		file = new File(writer.getIntergreenTimesOutputFilename());
+		Assert.assertTrue(file.exists());
 		
 	}
 	

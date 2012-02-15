@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.data;
 
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
+import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -39,6 +40,6 @@ public interface SignalsData {
 	
 	public AmberTimesData getAmberTimesData();
 	
-//	public IntergreenTimesData getIntergreenTimesData();
+	public IntergreenTimesData getIntergreenTimesData();
 	
 }

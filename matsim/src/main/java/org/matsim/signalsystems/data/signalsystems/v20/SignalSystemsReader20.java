@@ -23,14 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalsystems20.XMLIdRefType;
 import org.matsim.jaxb.signalsystems20.XMLSignalSystemType;
 import org.matsim.jaxb.signalsystems20.XMLSignalSystems;
@@ -38,7 +37,6 @@ import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLTurningMoveRestrictions;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -46,7 +44,7 @@ import org.xml.sax.SAXException;
  *
  */
 public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
-	
+
 	private static final Logger log = Logger.getLogger(SignalSystemsReader20.class);
 
 	private SignalSystemsData signalSystemsData;
@@ -62,28 +60,24 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 	}
 
 	@Override
-	public void readFile(final String filename) throws JAXBException,
-			SAXException, ParserConfigurationException, IOException {
+	public void readFile(final String filename) throws UncheckedIOException {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLSignalSystems xmlssdefs = null;
-		jc = JAXBContext
-				.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
-		Unmarshaller u = jc.createUnmarshaller();
-		// validate XML file
-		log.info("starting to validate " + filename);
-		super.validateFile(filename, u);
-		log.info("starting unmarshalling " + filename);
 		InputStream stream = null;
 		try {
-		  stream = IOUtils.getInputstream(filename);
-		  xmlssdefs = (XMLSignalSystems) u.unmarshal(stream);
+			jc = JAXBContext
+					.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
+			Unmarshaller u = jc.createUnmarshaller();
+			// validate XML file
+			log.info("starting to validate " + filename);
+			super.validateFile(filename, u);
+			log.info("starting unmarshalling " + filename);
+			stream = IOUtils.getInputstream(filename);
+			xmlssdefs = (XMLSignalSystems) u.unmarshal(stream);
+		} catch (Exception e){
+			throw new UncheckedIOException(e);
 		}
-//		catch (Exception ex){
-//			ex.printStackTrace();
-//		}
-		// do not generically catch (and swallow) exception, but let it escalate
-		// if it is just printed out here, a NullPointerException will happen a few lines later, which is not really better.
 		finally {
 			try {
 				if (stream != null) { stream.close();	}
@@ -91,7 +85,7 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 				log.warn("Could not close stream.", e);
 			}
 		}
-		
+
 		//convert from Jaxb types to MATSim-API conform types
 		SignalSystemsDataFactory builder = this.signalSystemsData.getFactory();
 		for (XMLSignalSystemType xmlss : xmlssdefs.getSignalSystem()){
@@ -114,7 +108,7 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 				}
 			}
 		}
-		
+
 	}
 
 }

@@ -35,13 +35,11 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
@@ -83,7 +81,7 @@ public class TravelTimeOneWayTest {
 		conf.addQSimConfigGroup(new QSimConfigGroup());
 		conf.getQSimConfigGroup().setStuckTime(1000);
 		conf.getQSimConfigGroup().setRemoveStuckVehicles(false);
-		conf.scenario().setUseSignalSystems(false);
+		conf.scenario().setUseSignalSystems(true);
 
 		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
 		signalsConfig.setSignalSystemFile(signalSystemsFile);
@@ -94,17 +92,12 @@ public class TravelTimeOneWayTest {
 		signalsConfig.setSignalControlFile(signalControlFile);
 		signalsConfig.setAmberTimesFile(amberTimesFile);
 		
-		ScenarioImpl data = (ScenarioImpl) ScenarioUtils.createScenario(conf);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
-		loader.loadScenario();
+		ScenarioImpl data = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
 		return data;
 	}
 
-	private SignalEngine initSignalEngine(SignalSystemsConfigGroup signalsConfig, EventsManager events) {
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
-		SignalsData signalsData = signalsLoader.loadSignalsData();
-
-		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+	private SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
+		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		return engine;
@@ -120,9 +113,7 @@ public class TravelTimeOneWayTest {
 		Id id2 = new IdImpl(2);
 		Id id100 = new IdImpl(100);
 
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(scenario.getConfig().signalSystems());
-		SignalsData signalsData = signalsLoader.loadSignalsData();
-
+		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
 		for (int dropping = 10; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
@@ -135,7 +126,7 @@ public class TravelTimeOneWayTest {
 			signalPlan.setEndTime(0.0);
 
 			//build the signal model
-			FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+			FromDataBuilder builder = new FromDataBuilder(scenario, events);
 			SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 			SignalEngine signalEngine = new QSimSignalEngine(manager);
 			//run the qsim
@@ -174,7 +165,7 @@ public class TravelTimeOneWayTest {
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 
-		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
+		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
 		
 		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);

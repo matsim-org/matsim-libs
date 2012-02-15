@@ -34,11 +34,13 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 
 	private SortedMap<Id, SignalSystem> signalSystems = new TreeMap<Id, SignalSystem>();
 	
-	private AmberLogic amberLogic;
+	private AmberLogic amberLogic = new EmptyAmberLogicImpl();
 
-	private EventsManager eventsManager;
+	private EventsManager eventsManager = null;
 
-	private SignalsData signalData;
+	private SignalsData signalData = null;
+
+	private IntergreensLogic intergreensLogic = null;;
 	
 	public SignalSystemsManagerImpl(){
 		
@@ -101,6 +103,16 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	@Override
 	public SignalsData getSignalsData() {
 		return this.signalData;
+	}
+
+	@Override
+	public IntergreensLogic getIntergreensLogic() {
+		return this.intergreensLogic;
+	}
+
+	@Override
+	public void setIntergreensLogic(IntergreensLogic logic) {
+		this.intergreensLogic = logic;
 	}
 
 }

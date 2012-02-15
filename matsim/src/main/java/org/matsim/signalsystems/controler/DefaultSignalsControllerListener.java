@@ -45,10 +45,8 @@ public class DefaultSignalsControllerListener implements SignalsControllerListen
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		//load data
-		SignalsData signalsData = event.getControler().getScenario().getScenarioElement(SignalsData.class);
 		//build model
-		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, event.getControler().getEvents());
+		FromDataBuilder modelBuilder = new FromDataBuilder(event.getControler().getScenario(), event.getControler().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		//init mobility simulation
 		QSimSignalEngine signalEngie = new QSimSignalEngine(this.signalManager);

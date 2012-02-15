@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.data;
 
+import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesDataImpl;
+import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesData;
+import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesDataImpl;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
@@ -39,16 +42,18 @@ public class SignalsDataImpl implements SignalsData {
 	private AmberTimesData ambertimesdata;
 	private SignalGroupsData signalgroupsdata;
 	private SignalControlData signalcontroldata;
+	private IntergreenTimesData intergreensdata;
 	
-	public SignalsDataImpl(){
-		this.initContainers();
+	public SignalsDataImpl(SignalSystemsConfigGroup signalConfig){
+		this.initContainers(signalConfig);
 	}
 	
-	private void initContainers(){
+	private void initContainers(SignalSystemsConfigGroup signalConfig){
 		this.signalsystemsdata = new SignalSystemsDataImpl();
 		this.signalgroupsdata = new SignalGroupsDataImpl();
 		this.signalcontroldata = new SignalControlDataImpl();
 		this.ambertimesdata = new AmberTimesDataImpl();
+		this.intergreensdata = new IntergreenTimesDataImpl();
 	}
 	
 	
@@ -57,10 +62,10 @@ public class SignalsDataImpl implements SignalsData {
 		return this.ambertimesdata;
 	}
 
-//	@Override
-//	public IntergreenTimesData getIntergreenTimesData() {
-//		return null;
-//	}
+	@Override
+	public IntergreenTimesData getIntergreenTimesData() {
+		return this.intergreensdata;
+	}
 
 	@Override
 	public SignalGroupsData getSignalGroupsData() {

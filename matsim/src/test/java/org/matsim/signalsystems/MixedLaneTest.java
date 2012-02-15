@@ -56,7 +56,6 @@ import org.matsim.lanes.data.v11.LanesToLinkAssignment;
 import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -84,13 +83,15 @@ public class MixedLaneTest extends TestCase {
 	}
 
 	private void initScenario() {
-		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(true);
+		config.scenario().setUseSignalSystems(true);
+		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+
 		this.c = this.sc.getConfig();
 		this.c.controler().setMobsim("qsim");
 		this.c.addQSimConfigGroup(new QSimConfigGroup());
 		this.c.addCoreModules();
-		this.sc.getConfig().scenario().setUseLanes(true);
-		this.sc.getConfig().scenario().setUseSignalSystems(true);
 		id0 = sc.createId("0");
 		id1 = sc.createId("1");
 		id2 = sc.createId("2");
@@ -153,8 +154,7 @@ public class MixedLaneTest extends TestCase {
 		this.sc.addScenarioElement(lanesV2);
 
 		//create signalsystems
-		SignalsData signalsData = new SignalsDataImpl();
-		this.sc.addScenarioElement(signalsData);
+		SignalsData signalsData = this.sc.getScenarioElement(SignalsData.class);
 		SignalSystemsData signals = signalsData.getSignalSystemsData();
 		SignalSystemsDataFactory signalsFactory = signals.getFactory();
 		SignalSystemData system = signalsFactory.createSignalSystemData(id1);

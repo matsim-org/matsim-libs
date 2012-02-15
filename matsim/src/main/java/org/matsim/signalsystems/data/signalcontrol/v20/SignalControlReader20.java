@@ -23,22 +23,20 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalcontrol20.XMLSignalControl;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -47,38 +45,40 @@ import org.xml.sax.SAXException;
  */
 public class SignalControlReader20 extends MatsimJaxbXmlParser {
 
-	
+
 	private static final Logger log = Logger.getLogger(SignalControlReader20.class);
-	
+
 	private SignalControlData signalControlData;
-	
-	
+
+
 	public SignalControlReader20(SignalControlData signalControlData){
 		super(MatsimSignalSystemsReader.SIGNALCONTROL20);
 		this.signalControlData = signalControlData;
 	}
-	
+
 	public SignalControlReader20(SignalControlData signalControlData, String schemaLocation) {
 		super(schemaLocation);
 		this.signalControlData = signalControlData;
 	}
 
-	public XMLSignalControl readSignalControl20File(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException{
+	public XMLSignalControl readSignalControl20File(String filename) {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLSignalControl xmlSignalControl;
-		jc = JAXBContext
-				.newInstance(org.matsim.jaxb.signalcontrol20.ObjectFactory.class);
-		Unmarshaller u = jc.createUnmarshaller();
-		// validate XML file
-		super.validateFile(filename, u);
-		log.info("starting unmarshalling " + filename);
 		InputStream stream = null;
 		try {
-//			stream = new FileInputStream(filename);
-		  stream = IOUtils.getInputstream(filename);
-		  xmlSignalControl = (XMLSignalControl) u.unmarshal(stream);
+			jc = JAXBContext
+					.newInstance(org.matsim.jaxb.signalcontrol20.ObjectFactory.class);
+			Unmarshaller u = jc.createUnmarshaller();
+			// validate XML file
+			super.validateFile(filename, u);
+			log.info("starting unmarshalling " + filename);
+			//			stream = new FileInputStream(filename);
+			stream = IOUtils.getInputstream(filename);
+			xmlSignalControl = (XMLSignalControl) u.unmarshal(stream);
 			log.info("unmarshalling complete");
+		} catch (Exception e){
+			throw new UncheckedIOException(e);
 		}
 		finally {
 			try {
@@ -90,11 +90,10 @@ public class SignalControlReader20 extends MatsimJaxbXmlParser {
 		return xmlSignalControl;
 	}
 
-	
-	
+
+
 	@Override
-	public void readFile(String filename) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
+	public void readFile(String filename) {
 		SignalControlDataFactory factory = this.signalControlData.getFactory();
 
 		XMLSignalControl xmlSignalControl = this.readSignalControl20File(filename);
@@ -135,5 +134,5 @@ public class SignalControlReader20 extends MatsimJaxbXmlParser {
 		return sec;
 	}
 
-	
+
 }

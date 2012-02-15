@@ -19,23 +19,19 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.data;
 
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesReader10;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesWriter10;
+import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesReader10;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsReader20;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
-import org.xml.sax.SAXException;
 
 
 /**
+ * Loads all data files related to the traffic signal systems model.
  * 
  * @author dgrether
  *
@@ -43,7 +39,7 @@ import org.xml.sax.SAXException;
 public class SignalsScenarioLoader {
 
 	private static final Logger log = Logger.getLogger(SignalsScenarioLoader.class);
-	
+
 	private SignalSystemsConfigGroup signalConfig;
 
 	public SignalsScenarioLoader(SignalSystemsConfigGroup config){
@@ -51,58 +47,42 @@ public class SignalsScenarioLoader {
 	}
 
 	public SignalsData loadSignalsData() {
-		SignalsData data = new SignalsDataImpl();
+		SignalsData data = new SignalsDataImpl(this.signalConfig);
 		this.loadSystems(data);
 		this.loadGroups(data);
 		this.loadControl(data);
-		this.loadAmberTimes(data);
-		this.loadIntergreenTimes(data);
+		if (this.signalConfig.isUseAmbertimes()){
+			this.loadAmberTimes(data);
+		}
+		if (this.signalConfig.isUseIntergreenTimes()){
+			this.loadIntergreenTimes(data);
+		}
 		return data;
 	}
-	
-	
+
+
 	private void loadIntergreenTimes(SignalsData data){
 		if (this.signalConfig.getIntergreenTimesFile() != null) {
-			//TODO read/write when reader/writer is available
-			throw new UnsupportedOperationException("not implemented yet");
+			IntergreenTimesReader10 reader = new IntergreenTimesReader10(data.getIntergreenTimesData());
+			reader.readFile(this.signalConfig.getIntergreenTimesFile());
 		}
 	}
-	
+
 
 	private void loadAmberTimes(SignalsData data) {
 		if (this.signalConfig.getAmberTimesFile() != null){
 			AmberTimesReader10 reader = new AmberTimesReader10(data.getAmberTimesData(), AmberTimesWriter10.AMBERTIMES10);
-			try {
-				reader.readFile(this.signalConfig.getAmberTimesFile());
-			} catch (JAXBException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			reader.readFile(this.signalConfig.getAmberTimesFile());
 		}
 		else {
 			log.info("Signals: No amber times file set, can't load amber times!");
 		}
 	}
-	
+
 	private void loadControl(SignalsData data){
 		if (this.signalConfig.getSignalControlFile() != null){
 			SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData(), MatsimSignalSystemsReader.SIGNALCONTROL20);
-			try {
-				controlReader.readFile(this.signalConfig.getSignalControlFile());
-			} catch (JAXBException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			controlReader.readFile(this.signalConfig.getSignalControlFile());
 		}
 		else {
 			log.info("Signals: No signal control file set, can't load signal control data!");
@@ -112,17 +92,7 @@ public class SignalsScenarioLoader {
 	private void loadGroups(SignalsData data) {
 		if (this.signalConfig.getSignalGroupsFile() != null){
 			SignalGroupsReader20 groupsReader = new SignalGroupsReader20(data.getSignalGroupsData(), MatsimSignalSystemsReader.SIGNALGROUPS20);
-			try {
-				groupsReader.readFile(this.signalConfig.getSignalGroupsFile());
-			} catch (JAXBException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			groupsReader.readFile(this.signalConfig.getSignalGroupsFile());
 		}
 		else {
 			log.info("Signals: No signal groups file set, can't load signal groups!");
@@ -132,22 +102,12 @@ public class SignalsScenarioLoader {
 	private void loadSystems(SignalsData data){
 		if (this.signalConfig.getSignalSystemFile() != null){
 			SignalSystemsReader20 systemsReader = new SignalSystemsReader20(data.getSignalSystemsData(), MatsimSignalSystemsReader.SIGNALSYSTEMS20);
-			try {
-				systemsReader.readFile(this.signalConfig.getSignalSystemFile());
-			} catch (JAXBException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			systemsReader.readFile(this.signalConfig.getSignalSystemFile());
 		}
 		else {
 			log.info("Signals: No signal systems file set, can't load signal system base information!");
 		}
 	}
-	
-	
+
+
 }

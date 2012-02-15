@@ -76,17 +76,20 @@ public class TravelTimeFourWaysTest {
 		signalsConfig.setSignalSystemFile(signalSystemsFile);
 		signalsConfig.setSignalGroupsFile(signalGroupsFile);
 		signalsConfig.setSignalControlFile(signalControlFile);
+		signalsConfig.setUseAmbertimes(true);
 		signalsConfig.setAmberTimesFile(amberTimesFile);
 		conf.addQSimConfigGroup(new QSimConfigGroup());
 
 		return scenario;
 	}
 	
-	private SignalEngine initSignalEngine(SignalSystemsConfigGroup signalsConfig, EventsManager events) {
+	private SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
+		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
-
-		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		scenario.addScenarioElement(signalsData);
+		
+		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		return engine;
@@ -104,7 +107,7 @@ public class TravelTimeFourWaysTest {
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		
-		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
+		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
 		
 		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
@@ -125,7 +128,7 @@ public class TravelTimeFourWaysTest {
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		
-		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
+		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
 		
 		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);

@@ -36,7 +36,8 @@ import org.matsim.core.utils.collections.Tuple;
 public class IntergreensForSignalSystemDataImpl implements IntergreensForSignalSystemData {
 
 	private Id signalSystemId;
-	private Map<Id, Map<Id, Integer>> intergreenTimesMap = new HashMap<Id, Map<Id, Integer>>();
+	private Map<Id, Map<Id, Integer>> endingGroupToBeginningGroupTimeMap = new HashMap<Id, Map<Id, Integer>>();
+	private Map<Id, Map<Id, Integer>> beginningGroupToEndingGroupTimeMap = new HashMap<Id, Map<Id, Integer>>();
 	
 	public IntergreensForSignalSystemDataImpl(Id signalSystemId) {
 		this.signalSystemId = signalSystemId;
@@ -44,7 +45,7 @@ public class IntergreensForSignalSystemDataImpl implements IntergreensForSignalS
 
 	public List<Tuple<Id, Id>> getEndingBeginningSignalGroupKeys(){
 		List<Tuple<Id, Id>> list = new ArrayList<Tuple<Id, Id>>();
-		for (Entry<Id, Map<Id, Integer>> e : this.intergreenTimesMap.entrySet()){
+		for (Entry<Id, Map<Id, Integer>> e : this.endingGroupToBeginningGroupTimeMap.entrySet()){
 			for (Id beginningId : e.getValue().keySet()){
 				list.add( new Tuple<Id, Id>(e.getKey(), beginningId));
 			}
@@ -54,7 +55,7 @@ public class IntergreensForSignalSystemDataImpl implements IntergreensForSignalS
 	
 	@Override
 	public Integer getIntergreenTime(Id endingSignalGroupId, Id beginningSignalGroupId) {
-		Map<Id, Integer> beginningSgMap = this.intergreenTimesMap.get(endingSignalGroupId);
+		Map<Id, Integer> beginningSgMap = this.endingGroupToBeginningGroupTimeMap.get(endingSignalGroupId);
 		if (beginningSgMap != null){
 			return beginningSgMap.get(beginningSignalGroupId);
 		}
@@ -64,17 +65,31 @@ public class IntergreensForSignalSystemDataImpl implements IntergreensForSignalS
 	@Override
 	public void setIntergreenTime(Integer timeSeconds, Id endingSignalGroupId,
 			Id beginningSignalGroupId) {
-		Map<Id, Integer> endingSgMap = this.intergreenTimesMap.get(endingSignalGroupId);
+		Map<Id, Integer> endingSgMap = this.endingGroupToBeginningGroupTimeMap.get(endingSignalGroupId);
 		if (endingSgMap == null){
 			endingSgMap = new HashMap<Id, Integer>();
-			this.intergreenTimesMap.put(endingSignalGroupId, endingSgMap);
+			this.endingGroupToBeginningGroupTimeMap.put(endingSignalGroupId, endingSgMap);
 		}
 		endingSgMap.put(beginningSignalGroupId, timeSeconds);
+		
+		Map<Id, Integer> beginningSgMap = this.beginningGroupToEndingGroupTimeMap.get(beginningSignalGroupId);
+		if (beginningSgMap == null){
+			beginningSgMap = new HashMap<Id, Integer>();
+			this.beginningGroupToEndingGroupTimeMap.put(endingSignalGroupId, beginningSgMap);
+		}
+		beginningSgMap.put(beginningSignalGroupId, timeSeconds);
 	}
 
 	@Override
 	public Id getSignalSystemId() {
 		return this.signalSystemId;
 	}
+
+
+	@Override
+	public Map<Id, Integer> getEndSignalGroupTimesForBeginningGroup(Id id) {
+		return this.beginningGroupToEndingGroupTimeMap.get(id);
+	}
+
 
 }
