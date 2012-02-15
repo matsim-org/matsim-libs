@@ -71,10 +71,10 @@ public class DgOsmJunctionsPostprocessing {
 		
 		Map<Id, Set<Id>> removedLinkIdToLinkIdsMap = this.removeJunctions(network, signalSystemId2NodesMap);
 		
-		LaneDefinitions lanes = this.handleLanes(scenario.getLaneDefinitionsV11(), removedLinkIdToLinkIdsMap);
+		LaneDefinitions lanes = this.handleLanes(scenario.getLaneDefinitions11(), removedLinkIdToLinkIdsMap);
 		
 		new NetworkWriter(network).write(networkOutFile);
-		new MatsimLaneDefinitionsWriter().writeFileV11(lanesOutFile, lanes);
+		new MatsimLaneDefinitionsWriter().writeFile11(lanesOutFile, lanes);
 		log.info("done!");
 	}
 	

@@ -39,8 +39,8 @@ import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.data.v20.LaneDataV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 
 
 /**
@@ -62,7 +62,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 
 	private Network network;
 
-	private LaneDefinitionsV2 laneDefinitions = null;
+	private LaneDefinitions20 laneDefinitions = null;
 	
 	public DgSensorManager(Network network){
 		this.network = network;
@@ -109,7 +109,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 			this.linkIdLaneIdSensorMap.put(linkId, new HashMap<Id, DgLaneSensor>());
 		}
 		if (! this.linkIdLaneIdSensorMap.get(linkId).containsKey(laneId)){
-			LaneDataV2 lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
+			LaneData20 lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
 			this.linkIdLaneIdSensorMap.get(linkId).put(laneId, new DgLaneSensor(link, lane));
 		}
 	
@@ -202,7 +202,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 		this.linkFirstSecondDistanceMeterMap.clear();
 	}
 
-	public void setLaneDefinitions(LaneDefinitionsV2 laneDefinitions) {
+	public void setLaneDefinitions(LaneDefinitions20 laneDefinitions) {
 		this.laneDefinitions  = laneDefinitions;
 	}
 

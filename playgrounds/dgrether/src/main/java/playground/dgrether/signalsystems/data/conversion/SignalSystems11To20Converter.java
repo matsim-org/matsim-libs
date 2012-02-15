@@ -45,7 +45,7 @@ import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.v11.Lane;
 import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsReaderV11;
+import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
 import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
@@ -76,7 +76,7 @@ public class SignalSystems11To20Converter {
 	
 	private LaneDefinitions readLaneDefinitions11(String laneDefinitions11) {
 		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
-		LaneDefinitionsReaderV11 reader = new LaneDefinitionsReaderV11(laneDefs, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
+		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(laneDefs, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
 		try {
 			reader.readFile(laneDefinitions11);
 		} catch (JAXBException e) {

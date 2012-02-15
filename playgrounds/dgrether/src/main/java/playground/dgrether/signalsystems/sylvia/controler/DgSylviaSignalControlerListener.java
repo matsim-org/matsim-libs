@@ -26,7 +26,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.controler.SignalsControllerListener;
@@ -55,7 +55,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		
 		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
 		if (scenario.getConfig().scenario().isUseLanes()){
-			this.sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitionsV2.class));
+			this.sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitions20.class));
 		}
 		event.getControler().getEvents().addHandler(sensorManager);
 		

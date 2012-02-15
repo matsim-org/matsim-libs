@@ -14,7 +14,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
@@ -68,7 +68,7 @@ public class GenerateZuerrichOutput {
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
 
 		
-		LaneDefinitionsV2 lanes20 = null;
+		LaneDefinitions20 lanes20 = null;
 		//lane generation
 		if (generateLanes){
 			//knotennummer -> (vonspur 1->n nachspur)
@@ -88,7 +88,7 @@ public class GenerateZuerrichOutput {
 			
 			//write data
 			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter();
-			laneWriter.writeFileV20(lanesOutputFile, lanes20);
+			laneWriter.writeFile20(lanesOutputFile, lanes20);
 		}
 
 		if (generateSignalSystems){

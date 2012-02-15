@@ -34,9 +34,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v20.LaneDataV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 import playground.dgrether.designdrafts.consistency.ConsistencyChecker;
 
@@ -49,10 +49,10 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
   
 	private static final Logger log = Logger.getLogger(LanesConsistencyChecker.class);
 	private Network network;
-	private LaneDefinitionsV2 lanes;
+	private LaneDefinitions20 lanes;
 	private boolean removeMalformed = false;
 	
-	public LanesConsistencyChecker(Network net, LaneDefinitionsV2 laneDefs) {
+	public LanesConsistencyChecker(Network net, LaneDefinitions20 laneDefs) {
 		this.network = net;
 		this.lanes = laneDefs;
 	}
@@ -61,7 +61,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 	public void checkConsistency() {
 		log.info("checking consistency...");
 		List<Id> malformedLinkIds = new ArrayList<Id>();
-		for (LanesToLinkAssignmentV2 l2l : this.lanes.getLanesToLinkAssignments().values()){
+		for (LanesToLinkAssignment20 l2l : this.lanes.getLanesToLinkAssignments().values()){
 			//check if link exists for each assignment of one or more lanes to a link
 			if (this.network.getLinks().get(l2l.getLinkId()) == null) {
 				log.error("No link found for lanesToLinkAssignment on link Id(linkIdRef): "  + l2l.getLinkId());
@@ -70,7 +70,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 			//check length
 			else {
 				Link link = this.network.getLinks().get(l2l.getLinkId());
-				for (LaneDataV2 l : l2l.getLanes().values()){
+				for (LaneData20 l : l2l.getLanes().values()){
 					if (link.getLength() < l.getStartsAtMeterFromLinkEnd()) {
 						log.error("Link Id " + link.getId() + " is shorter than an assigned lane with id " + l.getId());
 						malformedLinkIds.add(l2l.getLinkId());
@@ -79,7 +79,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 			}
 			
 			//check toLinks or toLanes specified in the lanes 
-			for (LaneDataV2 lane : l2l.getLanes().values()) {
+			for (LaneData20 lane : l2l.getLanes().values()) {
 				if (lane.getToLaneIds() != null) {
 					for (Id toLaneId : lane.getToLaneIds()){
 						if (! l2l.getLanes().containsKey(toLaneId)){
@@ -105,7 +105,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 			log.info("Link id: " + l2l.getLinkId());
 			Map<Id, ? extends Link> outLinksMap = link.getToNode().getOutLinks();
 			Set<Id> linkLanes2LinkIdSet = new HashSet<Id>();
-			for (LaneDataV2 lane : l2l.getLanes().values()){
+			for (LaneData20 lane : l2l.getLanes().values()){
 				if (lane.getToLinkIds() != null){
 					linkLanes2LinkIdSet.addAll(lane.getToLinkIds());
 				}
@@ -118,7 +118,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 					log.error("Error: Lane Outlink: ");
 					log.error("\t\tThe lanes of link " + link.getId() + " do not lead to all of the outlinks of the links toNode " + link.getToNode().getId() + " . The outlink " + outLink.getId()
 					+ " is not reachable from the lanes of this link. ");
-					for (LaneDataV2 lane : l2l.getLanes().values()){
+					for (LaneData20 lane : l2l.getLanes().values()){
 						log.error("\t\tLane id: " + lane.getId());
 						if (lane.getToLinkIds() != null){
 							for (Id id : lane.getToLinkIds()){
@@ -170,7 +170,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 		MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(scenario);
 	  laneReader.readFile(lanesFile);
 	  
-	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, scenario.getScenarioElement(LaneDefinitionsV2.class));
+	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, scenario.getScenarioElement(LaneDefinitions20.class));
 		lcc.setRemoveMalformed(false);
 		lcc.checkConsistency();
 		

@@ -23,7 +23,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
@@ -61,7 +61,7 @@ public class DgGershensonRoederLiveVisStarter {
 		for (SignalSystem ss : signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
 				((DgRoederGershensonController)ss.getSignalController()).setStorageCapFactor(scenario.getConfig().getQSimConfigGroup().getStorageCapFactor());
-				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitionsV2.class));
+				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitions20.class));
 				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
 			}
 		}

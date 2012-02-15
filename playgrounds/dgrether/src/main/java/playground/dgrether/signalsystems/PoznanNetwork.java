@@ -44,9 +44,9 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v11.Lane;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v11.LaneDefinitionsWriterV11;
+import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
@@ -192,7 +192,7 @@ public class PoznanNetwork
         // === 92<->90
         Link l90_92 = createAndAddLink(n90, n92, 2);
 
-        lanes = scenario.getLaneDefinitionsV11();
+        lanes = scenario.getLaneDefinitions11();
         laneFactory = lanes.getFactory();
 
         LanesToLinkAssignment l2l = laneFactory.createLanesToLinkAssignment(l12_10.getId());
@@ -587,8 +587,8 @@ public class PoznanNetwork
 
         // create network lanes and signals
         createPhysics();
-        LaneDefinitionsV2 lanes20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(
-                scenario.getLaneDefinitionsV11(), scenario.getNetwork());
+        LaneDefinitions20 lanes20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(
+                scenario.getLaneDefinitions11(), scenario.getNetwork());
         LanesConsistencyChecker lcc = new LanesConsistencyChecker(scenario.getNetwork(), lanes20);
         lcc.checkConsistency();
         SignalSystemsDataConsistencyChecker sscc = new SignalSystemsDataConsistencyChecker(scenario);
@@ -629,12 +629,12 @@ public class PoznanNetwork
 
         String lanesOutputFile = baseDir + "lanes.xml";
         // String lanesOutputFile = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\lanes.xml";
-        new LaneDefinitionsWriterV11(scenario.getLaneDefinitionsV11()).write(lanesOutputFile);
+        new LaneDefinitionsWriter11(scenario.getLaneDefinitions11()).write(lanesOutputFile);
         // config.network().setLaneDefinitionsFile(lanesOutputFile);
 
         String lanes20OutputFile = baseDir + "lanes20.xml";
         // String lanes20OutputFile = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\lanes20.xml";
-        new MatsimLaneDefinitionsWriter().writeFileV20(lanes20OutputFile, lanes20);
+        new MatsimLaneDefinitionsWriter().writeFile20(lanes20OutputFile, lanes20);
         config.network().setLaneDefinitionsFile(lanes20OutputFile);
 
         String popFilename = baseDir + "population.xml";

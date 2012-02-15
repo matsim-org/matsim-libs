@@ -41,8 +41,8 @@ import org.matsim.lanes.data.v11.Lane;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
@@ -109,8 +109,8 @@ public class DgFigure9ScenarioGenerator {
 		this.writeMatsimNetwork(net, networkOutfile);
 		log.info("network written to " + networkOutfile);
 		//lanes
-		LaneDefinitionsV2 lanes = createLanes((ScenarioImpl)scenario);
-		LaneDefinitionsWriterV20 laneWriter = new LaneDefinitionsWriterV20(lanes);
+		LaneDefinitions20 lanes = createLanes((ScenarioImpl)scenario);
+		LaneDefinitionsWriter20 laneWriter = new LaneDefinitionsWriter20(lanes);
 		laneWriter.write(lanesOutfile);
 		log.info("lanes written to " + lanesOutfile);
 		//signals
@@ -364,9 +364,9 @@ public class DgFigure9ScenarioGenerator {
 		return systems;
 	}
 
-	private LaneDefinitionsV2 createLanes(ScenarioImpl scenario) {
+	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
 		double laneLenght = 50.0;
-		LaneDefinitions lanes = scenario.getLaneDefinitionsV11();
+		LaneDefinitions lanes = scenario.getLaneDefinitions11();
 		LaneDefinitionsFactory factory = lanes.getFactory();
 		//lanes for link 12
 		LanesToLinkAssignment lanesForLink12 = factory.createLanesToLinkAssignment(id12);
@@ -396,7 +396,7 @@ public class DgFigure9ScenarioGenerator {
 		
 		//convert to 2.0 format and return
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-		LaneDefinitionsV2 lanesv2 = conversion.convertTo20(lanes, scenario.getNetwork());
+		LaneDefinitions20 lanesv2 = conversion.convertTo20(lanes, scenario.getNetwork());
 		return lanesv2;
 	}
 

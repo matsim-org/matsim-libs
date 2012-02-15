@@ -46,7 +46,7 @@ import org.matsim.lanes.data.v11.Lane;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
@@ -118,7 +118,7 @@ public class DgCalculateSignalGroupsTest {
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		this.createManySignalsOn3WayCrossing(signalSystems);
 
-		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalSystems, sc.getNetwork(), sc.getScenarioElement(LaneDefinitionsV2.class));
+		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalSystems, sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class));
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 
 		Assert.assertNotNull(signalGroups);
@@ -244,7 +244,7 @@ public class DgCalculateSignalGroupsTest {
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 //		
 		//calculate the signal groups
-		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalsData.getSignalSystemsData(), scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitionsV2.class));
+		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalsData.getSignalSystemsData(), scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitions20.class));
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 		//test them
 		Assert.assertNotNull(signalGroups);
@@ -352,7 +352,7 @@ public class DgCalculateSignalGroupsTest {
 	 * @param sc 
 	 */
 	private void createLanesFor3WayNetwork(ScenarioImpl sc) {
-		LaneDefinitions lanes = sc.getLaneDefinitionsV11();
+		LaneDefinitions lanes = sc.getLaneDefinitions11();
 		
 		LaneDefinitionsFactory fac = lanes.getFactory();
 		//link 13
