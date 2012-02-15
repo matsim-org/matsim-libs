@@ -30,12 +30,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v11.Lane;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.utils.LanesUtils;
 import org.matsim.run.OTFVis;
+import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
@@ -47,6 +48,7 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
 
 
@@ -67,14 +69,13 @@ public class CreateTrafficSignalScenarioWithLanes {
 		//signal system 2
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(scenario.createId("2"));
 		systems.addSignalSystemData(sys);
-		SignalData signal = systems.getFactory().createSignalData(scenario.createId("1"));
-		sys.addSignalData(signal);
-		signal.setLinkId(scenario.createId("12"));
-		signal.addLaneId(scenario.createId("1"));
-		signal = systems.getFactory().createSignalData(scenario.createId("2"));
-		sys.addSignalData(signal);
-		signal.setLinkId(scenario.createId("12"));
-		signal.addLaneId(scenario.createId("2"));
+		SignalSystemsDataFactory factory = systems.getFactory();
+		SignalUtils.createAndAddSignal(sys, factory, scenario.createId("1"), 
+				scenario.createId("12"), scenario.createId("1"));
+
+		SignalUtils.createAndAddSignal(sys, factory, scenario.createId("2"), 
+				scenario.createId("12"), scenario.createId("2"));
+
 		//create the groups TODO reconsider if this would be better done by utils
 		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(sys.getId(), scenario.createId("1"));
 		groups.addSignalGroupData(group4signal);
@@ -84,7 +85,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		groups.addSignalGroupData(group4signal);
 		group4signal.addSignalId(scenario.createId("2"));
 
-		signal = systems.getFactory().createSignalData(scenario.createId("3"));
+		SignalData signal = systems.getFactory().createSignalData(scenario.createId("3"));
 		sys.addSignalData(signal);
 		signal.setLinkId(scenario.createId("32"));
 		group4signal = groups.getFactory().createSignalGroupData(scenario.createId("2"), scenario.createId("3"));
@@ -104,14 +105,14 @@ public class CreateTrafficSignalScenarioWithLanes {
 		//signal system 5
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(scenario.createId("5"));
 		systems.addSignalSystemData(sys);
-		SignalData signal = systems.getFactory().createSignalData(scenario.createId("1"));
-		sys.addSignalData(signal);
-		signal.setLinkId(scenario.createId("65"));
-		signal.addLaneId(scenario.createId("1"));
-		signal = systems.getFactory().createSignalData(scenario.createId("2"));
-		sys.addSignalData(signal);
-		signal.setLinkId(scenario.createId("65"));
-		signal.addLaneId(scenario.createId("2"));
+		SignalSystemsDataFactory factory = systems.getFactory();
+		
+		SignalUtils.createAndAddSignal(sys, factory, scenario.createId("1"), 
+				scenario.createId("65"), scenario.createId("1"));
+
+		SignalUtils.createAndAddSignal(sys, factory, scenario.createId("2"), 
+				scenario.createId("65"), scenario.createId("2"));
+
 		//create the groups
 		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(sys.getId(), scenario.createId("1"));
 		groups.addSignalGroupData(group4signal);
@@ -121,7 +122,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		groups.addSignalGroupData(group4signal);
 		group4signal.addSignalId(scenario.createId("2"));
 		//signals 3 and 4
-		signal = systems.getFactory().createSignalData(scenario.createId("3"));
+		SignalData signal = systems.getFactory().createSignalData(scenario.createId("3"));
 		sys.addSignalData(signal);
 		signal.setLinkId(scenario.createId("45"));
 		//creates a separate group for signal 3 
@@ -198,34 +199,27 @@ public class CreateTrafficSignalScenarioWithLanes {
 	}
 
 	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
-		double laneLenght = 50.0;
+		double laneLenght = 150.0;
 		LaneDefinitions lanes = scenario.getLaneDefinitions11();
 		LaneDefinitionsFactory factory = lanes.getFactory();
 		//lanes for link 12
 		LanesToLinkAssignment lanesForLink12 = factory.createLanesToLinkAssignment(scenario.createId("12"));
 		lanes.addLanesToLinkAssignment(lanesForLink12);
-		Lane link12lane1 = factory.createLane(scenario.createId("1"));
-		lanesForLink12.addLane(link12lane1);
-		link12lane1.addToLinkId(scenario.createId("23"));
-		link12lane1.setStartsAtMeterFromLinkEnd(laneLenght);
+		LanesUtils.createAndAddLane(lanesForLink12, factory, scenario.createId("1"), 
+				laneLenght, 1, scenario.createId("23"));
 
-		Lane link12lane2 = factory.createLane(scenario.createId("2"));
-		lanesForLink12.addLane(link12lane2);
-		link12lane2.addToLinkId(scenario.createId("27"));
-		link12lane2.setStartsAtMeterFromLinkEnd(laneLenght);
-		
+		LanesUtils.createAndAddLane(lanesForLink12, factory, scenario.createId("2"), 
+				laneLenght, 1, scenario.createId("27"));
+
 		//lanes for link 65
 		LanesToLinkAssignment lanesForLink65 = factory.createLanesToLinkAssignment(scenario.createId("65"));
 		lanes.addLanesToLinkAssignment(lanesForLink65);
-		Lane link65lane1 = factory.createLane(scenario.createId("1"));
-		lanesForLink65.addLane(link65lane1);
-		link65lane1.addToLinkId(scenario.createId("54"));
-		link65lane1.setStartsAtMeterFromLinkEnd(laneLenght);
 
-		Lane link65lane2 = factory.createLane(scenario.createId("2"));
-		lanesForLink65.addLane(link65lane2);
-		link65lane2.addToLinkId(scenario.createId("58"));
-		link65lane2.setStartsAtMeterFromLinkEnd(laneLenght);
+		LanesUtils.createAndAddLane(lanesForLink65, factory, scenario.createId("1"), 
+				laneLenght, 1, scenario.createId("54"));
+
+		LanesUtils.createAndAddLane(lanesForLink65, factory, scenario.createId("2"), 
+				laneLenght, 1, scenario.createId("58"));
 		
 		//convert to 2.0 format and return
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();

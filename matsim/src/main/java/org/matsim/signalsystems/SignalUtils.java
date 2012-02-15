@@ -19,10 +19,12 @@
  * *********************************************************************** */
 package org.matsim.signalsystems;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 
 
 /**
@@ -51,6 +53,21 @@ public class SignalUtils {
 		}
 	}
 	
+	/**
+	 * Convenience method to create a signal with the given Id on the link with the given Id on the lanes
+	 * with the given Ids. The signal is added to the SignalSystemData. 
+	 */
+	public static void createAndAddSignal(SignalSystemData sys, SignalSystemsDataFactory factory, 
+			Id signalId, Id linkId, Id... laneIds){
+		SignalData signal = factory.createSignalData(signalId);
+		sys.addSignalData(signal);
+		signal.setLinkId(linkId);
+		if (laneIds != null){
+			for (Id laneId : laneIds){
+				signal.addLaneId(laneId);
+			}
+		}
+	}
 	
 	
 }
