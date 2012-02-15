@@ -35,7 +35,7 @@ import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.events.AgentStuckEventImpl;
 
 /**
- * Represents a node in the QueueSimulation.
+ * Represents a node in the QSimulation.
  */
 public class QNode implements NetsimNode {
 
