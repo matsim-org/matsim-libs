@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Time;
 
 public class TextFileWriter {
@@ -47,5 +48,60 @@ public class TextFileWriter {
 	    log.info("Analysis Textfile written to "+file.toString());
     
 	    } catch (IOException e) {}
+	}
+
+	public void writeWaitingTimes(String outputExternalIterationDirPath, int extItNr, Map<Id, Double> map) {
+		File file = new File(outputExternalIterationDirPath+"/extITERS/extIt."+extItNr+"/personId2waitingTime.txt");	
+		double sumWork = 0;
+		double sumOther = 0;
+		int anzahlWork = 0;
+		int anzahlOther = 0;
+		for (Id id : map.keySet()){
+			double waitingTime = map.get(id)/2; // (the map gives you the sum of waiting time for both directions)
+			
+			if(id.toString().contains("Work")){
+				sumWork = sumWork + waitingTime;
+				anzahlWork++;
+			}
+			else if(id.toString().contains("Other")){
+				sumOther = sumOther + waitingTime;
+				anzahlOther++;
+			}
+			else {
+				System.out.println("unknown personId");
+			}
+		}
+		double meanWaitingTimeWork = sumWork/anzahlWork;
+		double meanWaitingTimeOther = sumOther/anzahlOther;
+		
+		try {
+		    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		    String zeile0 = "mean waitingTime Work: "+Time.writeTime(meanWaitingTimeWork, Time.TIMEFORMAT_HHMMSS);
+		    bw.write(zeile0);
+		    bw.newLine();
+		    
+		    String zeile01 = "mean waitingTime Other: "+Time.writeTime(meanWaitingTimeOther, Time.TIMEFORMAT_HHMMSS);
+		    bw.write(zeile01);
+		    bw.newLine();
+		    
+		    String zeile1 = "personId ; waitingTime";
+		    bw.write(zeile1);
+		    bw.newLine();
+		
+		    for (Id id : map.keySet()){
+		    	
+		    	Double waitingTime = map.get(id);
+		
+		    	String zeile = id+ " ; "+waitingTime;
+		
+		    	bw.write(zeile);
+		        bw.newLine();
+		    }
+		
+		    bw.flush();
+		    bw.close();
+		    log.info("WaitingTimes written to "+file.toString());
+	    
+		    } catch (IOException e) {}
 	}
 }

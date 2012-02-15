@@ -61,7 +61,6 @@ public class InternalControler {
 	private final double TRAVEL_PT_WAITING = -3.6822; // Utils per Hour
 	
 	private final double PERFORMING = 1.8534;
-//	private final double PERFORMING = 0;
 
 	private final double LATE_ARRIVAL = 0;
 	
@@ -69,7 +68,7 @@ public class InternalControler {
 	
 	private final double agentStuckScore = -100;
 	
-	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare, double MONEY_UTILS) {
+	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare, double MONEY_UTILS, PtLegHandler ptLegHandler) {
 		this.configFile = configFile;
 		this.directoryExtIt = directoryExtIt;
 		this.lastInternalIteration = lastInternalIteration;
@@ -78,7 +77,7 @@ public class InternalControler {
 		this.outputExternalIterationDirPath = outputExternalIterationDirPath;
 		this.networkFile = networkFile;
 		this.fare = fare;
-		this.ptLegHandler = new PtLegHandler();
+		this.ptLegHandler = ptLegHandler;
 		this.MONEY_UTILS = MONEY_UTILS;
 	}
 	

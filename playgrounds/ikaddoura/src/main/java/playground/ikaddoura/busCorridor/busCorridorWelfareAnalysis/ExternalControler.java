@@ -31,6 +31,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author Ihab
@@ -43,27 +45,28 @@ public class ExternalControler {
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network80links.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/populationBusCorridor80linksCar.xml";
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/withTimeChoice_busNumber_fare2";
-	static int lastExternalIteration = 20;
-	static int lastInternalIteration = 100;
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/output_plans_withTimeChoice_9min.xml";
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
+	static int lastExternalIteration = 0;
+	static int lastInternalIteration = 0;
 	
 	// settings for first iteration or if values not changed for all iterations
-	TimePeriod p1 = new TimePeriod(1, "DAY", 1, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
+	TimePeriod p1 = new TimePeriod(1, "DAY", 8, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
 //	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 12, 6*3600, 12*3600);
 //	TimePeriod p3 = new TimePeriod(3, "NVZ", 8, 12*3600, 15*3600);
 //	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 12, 15*3600, 21*3600);
 //	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 4, 21*3600, 23*3600);
 
 	private final double MONEY_UTILS = 0.14026; // has to be positive, because costs are negative!
-	private double fare = -2; // negative!
-	private int capacity = 50; // standing room + seats (realistic values between 19 and 101!)
+	private double fare = -2.0; // negative!
+	private int capacity = 100; // standing room + seats (realistic values between 19 and 101!)
 
 	private int extItNr;
 	private String directoryExtIt;
 	private int maxNumberOfBuses;
 	
 	private Map<Integer, TimePeriod> day = new HashMap<Integer, TimePeriod>();
+	PtLegHandler ptLegHandler = new PtLegHandler();
 
 	private SortedMap<Integer, Double> iteration2operatorProfit = new TreeMap<Integer, Double>();
 	private SortedMap<Integer, Double> iteration2operatorCosts = new TreeMap<Integer, Double>();
@@ -78,6 +81,7 @@ public class ExternalControler {
 	private SortedMap<Integer, Integer> iteration2numberOfWalkLegs = new TreeMap<Integer, Integer>();
 	private SortedMap<Integer, Double> iteration2fare = new TreeMap<Integer, Double>();
 	private SortedMap<Integer, Double> iteration2capacity = new TreeMap<Integer, Double>();
+	private SortedMap<Integer, Map<Id, Double>> iteration2personId2waitTime = new TreeMap<Integer, Map<Id, Double>>();
 
 	public static void main(final String[] args) throws IOException {
 		ExternalControler simulation = new ExternalControler();
@@ -110,7 +114,7 @@ public class ExternalControler {
 			this.setDay(transitWriter.getNewDay());
 			this.setMaxNumberOfBuses(this.day);
 
-			InternalControler internalControler = new InternalControler(configFile, this.extItNr, this.getDirectoryExtIt(), lastInternalIteration, populationFile, outputExternalIterationDirPath, this.getMaxNumberOfBuses(), networkFile, fare, MONEY_UTILS);
+			InternalControler internalControler = new InternalControler(configFile, this.extItNr, this.getDirectoryExtIt(), lastInternalIteration, populationFile, outputExternalIterationDirPath, this.getMaxNumberOfBuses(), networkFile, fare, MONEY_UTILS, ptLegHandler);
 			internalControler.run();
 
 			Operator operator = new Operator(this.getMaxNumberOfBuses(), this.getCapacity());
@@ -135,9 +139,11 @@ public class ExternalControler {
 			this.iteration2numberOfWalkLegs.put(this.getExtItNr(), users.getNumberOfWalkLegs());
 			this.iteration2fare.put(this.getExtItNr(), this.getFare());
 			this.iteration2capacity.put(this.getExtItNr(),(double) this.getCapacity());
+			this.iteration2personId2waitTime.put(this.getExtItNr(), ptLegHandler.getPersonId2WaitingTime());
 			
 			stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2day, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorRevenue, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
-						
+			stats.writeWaitingTimes(outputExternalIterationDirPath, this.extItNr, this.iteration2personId2waitTime.get(this.extItNr));
+			
 			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
 			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
 			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
@@ -159,7 +165,7 @@ public class ExternalControler {
 //				this.setDay(extend("HVZ_1", 60 * 60));
 //				this.setDay(extend("HVZ_2", 60 * 60));
 				
-//				this.setFare(operator.increaseFare(this.getFare(), -10.5)); // absolute value
+//				this.setFare(operator.increaseFare(this.getFare(), -1.0)); // absolute value
 //				this.setCapacity(operator.increaseCapacity(10)); // absolute value
 			}
 			
