@@ -40,6 +40,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -64,7 +65,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * </ul>
  * */
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
-
+	
 	private static final Logger log = Logger.getLogger(PlansCalcRoute.class);
 
 	private static final String NO_CONFIGGROUP_SET_WARNING = "No PlansCalcRouteConfigGroup"
@@ -151,16 +152,20 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private void initDefaultLegHandlers() {
 		legHandlers = new HashMap<String, LegRouter>();
-		this.addLegHandler(TransportMode.car, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
-		this.addLegHandler(TransportMode.ride, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
+		String[] networkModes = this.configGroup.getNetworkModes();
+		for (String mode : networkModes) {
+			this.addLegHandler(mode, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
+		}
 		if (this.configGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.freespeed) {
 			this.addLegHandler(TransportMode.pt, new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, this.configGroup.getPtSpeedFactor(), this.configGroup.getBeelineDistanceFactor(), this.routeFactory));
 		} else if (this.configGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.beeline) {
 			this.addLegHandler(TransportMode.pt, new TeleportationLegRouter(this.routeFactory, this.configGroup.getPtSpeed(), this.configGroup.getBeelineDistanceFactor()));
 		}
-		this.addLegHandler(TransportMode.bike, new TeleportationLegRouter(this.routeFactory, this.configGroup.getBikeSpeed(), this.configGroup.getBeelineDistanceFactor()));
-		this.addLegHandler(TransportMode.walk, new TeleportationLegRouter(this.routeFactory, this.configGroup.getWalkSpeed(), this.configGroup.getBeelineDistanceFactor()));
-		this.addLegHandler("undefined", new TeleportationLegRouter(this.routeFactory, this.configGroup.getUndefinedModeSpeed(), this.configGroup.getBeelineDistanceFactor()));
+		String[] teleportedModes = this.configGroup.getTeleportedModes();
+		Double[] teleportedModeSpeeds = this.configGroup.getTeleportedModeSpeeds();
+		for (int i=0; i< teleportedModes.length; ++i) {
+			this.addLegHandler(teleportedModes[i], new TeleportationLegRouter(this.routeFactory, teleportedModeSpeeds[i], this.configGroup.getBeelineDistanceFactor()));
+		}
 	}
 
 	public final void addLegHandler(String transportMode, LegRouter legHandler) {
