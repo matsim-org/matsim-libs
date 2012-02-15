@@ -33,9 +33,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.lanes.data.v20.LaneDataV2;
-import org.matsim.lanes.data.v20.LaneDataV2MeterFromLinkEndComparator;
-import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
@@ -135,7 +135,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	private VisData visdata = null; 
 
-	private LanesToLinkAssignmentV2 lanesToLinkAssignment;
+	private LanesToLinkAssignment20 lanesToLinkAssignment;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -144,7 +144,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 * @param toNode
 	 * @see NetsimLink#createLanes(List)
 	 */
-	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, LanesToLinkAssignmentV2 lanesToLinkAssignment) {
+	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, LanesToLinkAssignment20 lanesToLinkAssignment) {
 		super(link2, network) ;
 		this.toQueueNode = toNode;
 		this.queueLanes = new ArrayList<QLane>();
@@ -159,13 +159,13 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 * Initialize the QueueLink with more than one QueueLane
 	 * @param map
 	 */
-	private void createLanes(Map<Id, LaneDataV2> map) {
-		List<LaneDataV2> sortedLanes =  new ArrayList<LaneDataV2>(map.values());
-		Collections.sort(sortedLanes, new LaneDataV2MeterFromLinkEndComparator());
+	private void createLanes(Map<Id, LaneData20> map) {
+		List<LaneData20> sortedLanes =  new ArrayList<LaneData20>(map.values());
+		Collections.sort(sortedLanes, new LaneData20MeterFromLinkEndComparator());
 		Collections.reverse(sortedLanes);
 
 		List<QLane> laneList = new LinkedList<QLane>();
-		LaneDataV2 firstLane = sortedLanes.remove(0);
+		LaneData20 firstLane = sortedLanes.remove(0);
 		if (firstLane.getStartsAtMeterFromLinkEnd() != this.link.getLength()) {
 			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + this.link.getId() +
 			"isn't starting at the beginning of the link!");
@@ -186,7 +186,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 			double laneLength = 0.0;
 			if (toLaneIds != null 	&& (!toLaneIds.isEmpty())) {
 				for (Id toLaneId : toLaneIds){
-					LaneDataV2 currentLane = map.get(toLaneId);
+					LaneData20 currentLane = map.get(toLaneId);
 					nextMetersFromLinkEnd = currentLane.getStartsAtMeterFromLinkEnd();
 					QLane currentQLane = new QLane(this, currentLane, false);
 					laneList.add(currentQLane);

@@ -44,10 +44,10 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
  * @author dgrether
  *
  */
-public class LaneDefinitionsWriterV11 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
+public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsWriterV11.class);
+			.getLogger(LaneDefinitionsWriter11.class);
 
 	private LaneDefinitions laneDefinitions;
 
@@ -59,7 +59,7 @@ public class LaneDefinitionsWriterV11 extends MatsimJaxbXmlWriter implements Mat
 	 * @param lanedefs
 	 *
 	 */
-	public LaneDefinitionsWriterV11(LaneDefinitions lanedefs) {
+	public LaneDefinitionsWriter11(LaneDefinitions lanedefs) {
 		log.info("Using LaneDefinitionWriter11...");
 		this.laneDefinitions = lanedefs;
 		this.xmlLaneDefinitions = convertBasicToXml();

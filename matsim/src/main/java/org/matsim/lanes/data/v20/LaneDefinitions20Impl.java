@@ -1,10 +1,10 @@
-/* **********************************import java.util.List;
-
-import org.matsim.interfaces.basic.v01.Id;
-                                                                         *
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * BasicLaneDefinitions
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,36 @@ import org.matsim.interfaces.basic.v01.Id;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.lanes.data.v20;
 
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+
+
 /**
- *
  * @author dgrether
- *
  */
-public interface LanesToLinkAssignmentV2 {
+public class LaneDefinitions20Impl implements LaneDefinitions20 {
 
-	public SortedMap<Id, LaneDataV2> getLanes();
+	private SortedMap<Id, LanesToLinkAssignment20> lanesToLinkAssignments =  new TreeMap<Id, LanesToLinkAssignment20>();
 
-	public void addLane(LaneDataV2 lane);
+	private final LaneDefinitionsFactory20 builder = new LaneDefinitionsFactory20Impl();
 
-	public Id getLinkId();
+	@Override
+	public SortedMap<Id, LanesToLinkAssignment20> getLanesToLinkAssignments() {
+		return this.lanesToLinkAssignments;
+	}
+
+	@Override
+	public void addLanesToLinkAssignment(LanesToLinkAssignment20 assignment) {
+		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
+	}
+
+	@Override
+	public LaneDefinitionsFactory20 getFactory(){
+		return this.builder;
+	}
 
 }

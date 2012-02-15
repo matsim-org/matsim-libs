@@ -34,7 +34,7 @@ import org.matsim.lanes.data.v11.Lane;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -197,9 +197,9 @@ public class CreateTrafficSignalScenarioWithLanes {
 		settings4.setDropping(this.dropping2);
 	}
 
-	private LaneDefinitionsV2 createLanes(ScenarioImpl scenario) {
+	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
 		double laneLenght = 50.0;
-		LaneDefinitions lanes = scenario.getLaneDefinitionsV11();
+		LaneDefinitions lanes = scenario.getLaneDefinitions11();
 		LaneDefinitionsFactory factory = lanes.getFactory();
 		//lanes for link 12
 		LanesToLinkAssignment lanesForLink12 = factory.createLanesToLinkAssignment(scenario.createId("12"));
@@ -229,7 +229,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		
 		//convert to 2.0 format and return
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-		LaneDefinitionsV2 l2 = conversion.convertTo20(lanes, scenario.getNetwork());
+		LaneDefinitions20 l2 = conversion.convertTo20(lanes, scenario.getNetwork());
 		scenario.addScenarioElement(l2);
 		return l2;
 	}
@@ -269,7 +269,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		String signalGroupsFile = "output/example90TrafficLights/signal_groups.xml";
 		String signalControlFile = "output/example90TrafficLights/signal_control.xml";
 
-		new MatsimLaneDefinitionsWriter().writeFileV20(lanesFile, scenario.getScenarioElement(LaneDefinitionsV2.class));
+		new MatsimLaneDefinitionsWriter().writeFile20(lanesFile, scenario.getScenarioElement(LaneDefinitions20.class));
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
 		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);

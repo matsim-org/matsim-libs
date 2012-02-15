@@ -47,7 +47,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.LaneDataV2;
+import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -150,7 +150,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 */
 	private final Set<Id> destinationLinkIds = new LinkedHashSet<Id>();
 
-	private final LaneDataV2 laneData;
+	private final LaneData20 laneData;
 
 	private boolean thisTimeStepGreen = true;
 	/**
@@ -169,7 +169,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
-	/*package*/ QLane(final NetsimLink ql, LaneDataV2 laneData, boolean isFirstLaneOnLink) {
+	/*package*/ QLane(final NetsimLink ql, LaneData20 laneData, boolean isFirstLaneOnLink) {
 		this.qLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.isFirstLane = isFirstLaneOnLink;
 		this.laneData = laneData;
@@ -755,7 +755,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return true; //the lane is not signalized and thus always green
 	}
 
-	 LaneDataV2 getLaneData() {
+	 LaneData20 getLaneData() {
 		return this.laneData;
 	}
 

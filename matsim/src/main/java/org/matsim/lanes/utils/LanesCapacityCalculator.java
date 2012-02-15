@@ -26,9 +26,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v20.LaneDataV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 
 /**
@@ -45,7 +45,7 @@ public class LanesCapacityCalculator {
 	 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes of
 	 * the Lane definition. The flow of a lane is scaled by this number.
 	 */
-	public void calculateAndSetCapacity(LaneDataV2 lane, boolean isLaneAtLinkEnd, Link link, Network network){
+	public void calculateAndSetCapacity(LaneData20 lane, boolean isLaneAtLinkEnd, Link link, Network network){
 		if (isLaneAtLinkEnd){
 			double noLanesLink = link.getNumberOfLanes();
 			double linkFlowCapPerSecondPerLane = link.getCapacity() / network.getCapacityPeriod()
@@ -70,10 +70,10 @@ public class LanesCapacityCalculator {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 		LanesCapacityCalculator calc = new LanesCapacityCalculator();
-		LaneDefinitionsV2 lanes = scenario.getScenarioElement(LaneDefinitionsV2.class);
-		for (LanesToLinkAssignmentV2 l2l : lanes.getLanesToLinkAssignments().values()){
+		LaneDefinitions20 lanes = scenario.getScenarioElement(LaneDefinitions20.class);
+		for (LanesToLinkAssignment20 l2l : lanes.getLanesToLinkAssignments().values()){
 			Link link = network.getLinks().get(l2l.getLinkId());
-			for (LaneDataV2 lane : l2l.getLanes().values()){
+			for (LaneData20 lane : l2l.getLanes().values()){
 				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){
 					calc.calculateAndSetCapacity(lane, true, link, network);
 				}
@@ -83,7 +83,7 @@ public class LanesCapacityCalculator {
 			}
 		}
 		MatsimLaneDefinitionsWriter writer = new MatsimLaneDefinitionsWriter();
-		writer.writeFileV20(lanes20OutputFilename, lanes);
+		writer.writeFile20(lanes20OutputFilename, lanes);
 	}
 	
 	

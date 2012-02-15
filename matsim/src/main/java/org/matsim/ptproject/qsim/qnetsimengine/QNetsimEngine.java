@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
@@ -155,7 +155,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
 		// first in ctors calling each other.  kai, feb'12
 		if (sim.getScenario().getConfig().scenario().isUseLanes()) {
-			if (sim.getScenario().getScenarioElement(LaneDefinitionsV2.class) == null) {
+			if (sim.getScenario().getScenarioElement(LaneDefinitions20.class) == null) {
 				throw new IllegalStateException(
 						"Lane definitions in v2.0 format have to be set if feature is enabled!");
 			}
@@ -163,7 +163,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			if ( netsimNetworkFactory != null ) {
 				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;
 			}
-			network = new QNetwork(sim.getScenario().getNetwork(), new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getScenarioElement(LaneDefinitionsV2.class)));
+			network = new QNetwork(sim.getScenario().getNetwork(), new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getScenarioElement(LaneDefinitions20.class)));
 		} else if ( netsimNetworkFactory != null ){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
 		} else {

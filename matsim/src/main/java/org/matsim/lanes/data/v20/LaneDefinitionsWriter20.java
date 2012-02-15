@@ -45,12 +45,12 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
  * @author dgrether
  *
  */
-public class LaneDefinitionsWriterV20 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
+public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsWriterV20.class);
+			.getLogger(LaneDefinitionsWriter20.class);
 
-	private LaneDefinitionsV2 laneDefinitions;
+	private LaneDefinitions20 laneDefinitions;
 
 	private XMLLaneDefinitions xmlLaneDefinitions;
 
@@ -60,7 +60,7 @@ public class LaneDefinitionsWriterV20 extends MatsimJaxbXmlWriter implements Mat
 	 * @param lanedefs
 	 *
 	 */
-	public LaneDefinitionsWriterV20(LaneDefinitionsV2 lanedefs) {
+	public LaneDefinitionsWriter20(LaneDefinitions20 lanedefs) {
 		log.info("Using LaneDefinitionWriter20...");
 		this.laneDefinitions = lanedefs;
 	}
@@ -95,11 +95,11 @@ public class LaneDefinitionsWriterV20 extends MatsimJaxbXmlWriter implements Mat
 		ObjectFactory fac = new ObjectFactory();
 		XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
 
-		for (LanesToLinkAssignmentV2 ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
+		for (LanesToLinkAssignment20 ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 
-			for (LaneDataV2 bl : ltla.getLanes().values()) {
+			for (LaneData20 bl : ltla.getLanes().values()) {
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 

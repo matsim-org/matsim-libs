@@ -22,15 +22,15 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 
 
 public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
 
 	private NetsimNetworkFactory<QNode, AbstractQLink> delegate;
-	private LaneDefinitionsV2 laneDefinitions;
+	private LaneDefinitions20 laneDefinitions;
 
-	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, AbstractQLink> delegate, LaneDefinitionsV2 laneDefintions){
+	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, AbstractQLink> delegate, LaneDefinitions20 laneDefintions){
 		this.delegate = delegate;
 		this.laneDefinitions = laneDefintions;
 	}

@@ -53,7 +53,7 @@ import org.matsim.lanes.data.v11.Lane;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
@@ -140,7 +140,7 @@ public class MixedLaneTest extends TestCase {
 		link3.setNumberOfLanes(2.0);
 		n.addLink(link3);
 		//create lanes
-		LaneDefinitions lanes = this.sc.getLaneDefinitionsV11();
+		LaneDefinitions lanes = this.sc.getLaneDefinitions11();
 		LaneDefinitionsFactory lb = lanes.getFactory();
 		Lane lane = lb.createLane(id1);
 		lane.setStartsAtMeterFromLinkEnd(50.0);
@@ -150,7 +150,7 @@ public class MixedLaneTest extends TestCase {
 		l2l.addLane(lane);
 		lanes.addLanesToLinkAssignment(l2l);
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-		LaneDefinitionsV2 lanesV2 = conversion.convertTo20(lanes, this.sc.getNetwork());
+		LaneDefinitions20 lanesV2 = conversion.convertTo20(lanes, this.sc.getNetwork());
 		this.sc.addScenarioElement(lanesV2);
 
 		//create signalsystems

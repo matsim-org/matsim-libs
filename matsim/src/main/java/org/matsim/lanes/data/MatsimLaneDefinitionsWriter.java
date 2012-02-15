@@ -22,9 +22,9 @@ package org.matsim.lanes.data;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsWriterV11;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
+import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 
 /**
@@ -47,13 +47,13 @@ public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
 	}
 	
 	
-	public void writeFileV20(String filename, LaneDefinitionsV2 lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriterV20(lanedefs);
+	public void writeFile20(String filename, LaneDefinitions20 lanedefs){
+		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriter20(lanedefs);
 		writerDelegate.write(filename);
 	}
 	
-	public void writeFileV11(String filename, LaneDefinitions lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriterV11(lanedefs);
+	public void writeFile11(String filename, LaneDefinitions lanedefs){
+		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriter11(lanedefs);
 		writerDelegate.write(filename);
 	}
 	

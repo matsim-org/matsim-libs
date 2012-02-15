@@ -39,7 +39,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
@@ -250,7 +250,7 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadLanes() {
-		LaneDefinitionsV2 laneDefinitions = this.scenario.getScenarioElement(LaneDefinitionsV2.class);
+		LaneDefinitions20 laneDefinitions = this.scenario.getScenarioElement(LaneDefinitions20.class);
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);

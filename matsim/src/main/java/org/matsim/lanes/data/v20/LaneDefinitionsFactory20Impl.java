@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicLaneDefinitionsBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,40 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.lanes.data.v20;
-
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
+
 /**
+ * 
  * @author dgrether
+ * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20
  */
-public class LanesToLinkAssignmentV2Impl implements LanesToLinkAssignmentV2 {
-
-	private final Id linkId;
-
-	private final SortedMap<Id, LaneDataV2> lanes = new TreeMap<Id, LaneDataV2>();
-
-	public LanesToLinkAssignmentV2Impl(Id linkId) {
-		this.linkId = linkId;
-	}
-
+public class LaneDefinitionsFactory20Impl implements LaneDefinitionsFactory20 {
+	/**
+	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
+	 */
 	@Override
-	public void addLane(LaneDataV2 lane) {
-		this.lanes.put(lane.getId(), lane);
+	public LanesToLinkAssignment20 createLanesToLinkAssignment(Id linkIdReference) {
+		return new LanesToLinkAssignment20Impl(linkIdReference);
 	}
-
+	/**
+	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20#createLane(org.matsim.api.core.v01.Id)
+	 */
 	@Override
-	public Id getLinkId() {
-		return linkId;
+	public LaneData20 createLane(Id id) {
+		return new LaneData20Impl(id);
 	}
-
-	@Override
-	public SortedMap<Id, LaneDataV2> getLanes() {
-		return this.lanes;
-	}
-
 }

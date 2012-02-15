@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitionsBuilderImpl
+ * BasicLaneDefinitionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,26 +20,25 @@
 package org.matsim.lanes.data.v20;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
- * 
+ * Builder for the content of BasicLaneDefinitions
  * @author dgrether
- * @see org.matsim.lanes.data.v20.LaneDefinitionsFactoryV2
  */
-public class LaneDefinitionsFactoryV2Impl implements LaneDefinitionsFactoryV2 {
+public interface LaneDefinitionsFactory20 extends MatsimFactory {
+
 	/**
-	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactoryV2#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
+	 * 
+	 * @param linkIdReference id of the links the lanes of the created object belong to
+	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
 	 */
-	@Override
-	public LanesToLinkAssignmentV2 createLanesToLinkAssignment(Id linkIdReference) {
-		return new LanesToLinkAssignmentV2Impl(linkIdReference);
-	}
+	public LanesToLinkAssignment20 createLanesToLinkAssignment(Id linkIdReference);
 	/**
-	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactoryV2#createLane(org.matsim.api.core.v01.Id)
+	 * Creates an instance of BasicLane with the id given as parameter.
+	 * @param laneId
+	 * @return
 	 */
-	@Override
-	public LaneDataV2 createLane(Id id) {
-		return new LaneDataV2Impl(id);
-	}
+	public LaneData20 createLane(Id laneId);
 }

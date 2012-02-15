@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,32 +20,36 @@
 package org.matsim.lanes.data.v20;
 
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
- * Top level container for lanes within MATSim. See package-info for documentation.
  * @author dgrether
- *
  */
-public interface LaneDefinitionsV2 extends MatsimToplevelContainer {
+public class LanesToLinkAssignment20Impl implements LanesToLinkAssignment20 {
 
-	/**
-	 *
-	 * @return Map with Link Ids as keys and assignments as values
-	 */
-	public SortedMap<Id, LanesToLinkAssignmentV2> getLanesToLinkAssignments();
+	private final Id linkId;
 
-	/**
-	 * Adds a LanesToLinkAssignment to the container.
-	 * @param assignment
-	 */
-	public void addLanesToLinkAssignment(LanesToLinkAssignmentV2 assignment);
-	/**
-	 * Get the factory to create container content.
-	 */
+	private final SortedMap<Id, LaneData20> lanes = new TreeMap<Id, LaneData20>();
+
+	public LanesToLinkAssignment20Impl(Id linkId) {
+		this.linkId = linkId;
+	}
+
 	@Override
-	public LaneDefinitionsFactoryV2 getFactory();
+	public void addLane(LaneData20 lane) {
+		this.lanes.put(lane.getId(), lane);
+	}
+
+	@Override
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	@Override
+	public SortedMap<Id, LaneData20> getLanes() {
+		return this.lanes;
+	}
 
 }

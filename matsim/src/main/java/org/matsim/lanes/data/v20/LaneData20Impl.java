@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author dgrether
  */
-public class LaneDataV2Impl implements LaneDataV2 {
+public class LaneData20Impl implements LaneData20 {
 
 	private Id id;
 	/**
@@ -48,7 +48,7 @@ public class LaneDataV2Impl implements LaneDataV2 {
 	/**
 	 * @param id
 	 */
-	public LaneDataV2Impl(Id id) {
+	public LaneData20Impl(Id id) {
 		this.id = id;
 	}
 

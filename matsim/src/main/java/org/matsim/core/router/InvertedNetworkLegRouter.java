@@ -50,7 +50,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimesInvertedNetProxy;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.utils.LanesTurnInfoBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -121,7 +121,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		netTurnInfoBuilder.createAndAddTurnInfo(allowedInLinkTurnInfoMap, this.network);
 
 		if (sc.getConfig().scenario().isUseLanes()) {
-			LaneDefinitionsV2 ld =  sc.getScenarioElement(LaneDefinitionsV2.class);
+			LaneDefinitions20 ld =  sc.getScenarioElement(LaneDefinitions20.class);
 			Map<Id, List<TurnInfo>> lanesTurnInfoMap = new LanesTurnInfoBuilder().createTurnInfos(ld);
 			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, lanesTurnInfoMap);
 		}

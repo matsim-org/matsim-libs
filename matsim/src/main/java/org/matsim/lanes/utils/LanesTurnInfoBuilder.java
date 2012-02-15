@@ -28,9 +28,9 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
-import org.matsim.lanes.data.v20.LaneDataV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 /**
  * Creates TurnInfo objects from lanes data.
@@ -40,12 +40,12 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
  */
 public class LanesTurnInfoBuilder {
 
-	public Map<Id, List<TurnInfo>> createTurnInfos(LaneDefinitionsV2 laneDefs) {
+	public Map<Id, List<TurnInfo>> createTurnInfos(LaneDefinitions20 laneDefs) {
 		Map<Id, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id, List<TurnInfo>>();
 		Set<Id> toLinkIds = new HashSet<Id>();
-		for (LanesToLinkAssignmentV2 l2l : laneDefs.getLanesToLinkAssignments().values()) {
+		for (LanesToLinkAssignment20 l2l : laneDefs.getLanesToLinkAssignments().values()) {
 			toLinkIds.clear();
-			for (LaneDataV2 lane : l2l.getLanes().values()) {
+			for (LaneData20 lane : l2l.getLanes().values()) {
 				if (lane.getToLinkIds() != null
 						&& (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty())) { // make sure that it is a lane at the
 																																									// end of a link

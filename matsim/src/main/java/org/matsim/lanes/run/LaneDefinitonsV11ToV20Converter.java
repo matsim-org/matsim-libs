@@ -35,10 +35,10 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsReaderV11;
+import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
 import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.xml.sax.SAXException;
 
 
@@ -73,11 +73,11 @@ public class LaneDefinitonsV11ToV20Converter {
 		netReader.readFile(networkFilename);
 		Network net = sc.getNetwork();
 		LaneDefinitions lanedefs11 = new LaneDefinitionsImpl();
-		LaneDefinitionsReaderV11 reader11 = new LaneDefinitionsReaderV11(lanedefs11, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
+		LaneDefinitionsReader11 reader11 = new LaneDefinitionsReader11(lanedefs11, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
 		try {
 			reader11.readFile(laneDefs11Filename);
-			LaneDefinitionsV2 lanedefs20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(lanedefs11, net);
-			LaneDefinitionsWriterV20 writer20 = new LaneDefinitionsWriterV20(lanedefs20);
+			LaneDefinitions20 lanedefs20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(lanedefs11, net);
+			LaneDefinitionsWriter20 writer20 = new LaneDefinitionsWriter20(lanedefs20);
 			writer20.write(laneDefs20Filename);
 		} catch (JAXBException e) {
 			e.printStackTrace();

@@ -53,10 +53,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.LaneDataV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactoryV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataFactory;
@@ -260,11 +260,11 @@ public class InvertedNetworkRoutingTest {
 		}
 
 		private void createLanes() {
-			LaneDefinitionsV2 ld = this.scenario.getScenarioElement(LaneDefinitionsV2.class);
-			LaneDefinitionsFactoryV2 f = ld.getFactory();
-			LanesToLinkAssignmentV2 l2l = f.createLanesToLinkAssignment(getId(12));
+			LaneDefinitions20 ld = this.scenario.getScenarioElement(LaneDefinitions20.class);
+			LaneDefinitionsFactory20 f = ld.getFactory();
+			LanesToLinkAssignment20 l2l = f.createLanesToLinkAssignment(getId(12));
 			ld.addLanesToLinkAssignment(l2l);
-			LaneDataV2 l = f.createLane(getId(121));
+			LaneData20 l = f.createLane(getId(121));
 			l.setStartsAtMeterFromLinkEnd(300);
 			l.addToLaneId(getId(122));
 			l2l.addLane(l);

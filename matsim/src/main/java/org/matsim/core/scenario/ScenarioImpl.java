@@ -42,7 +42,7 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2Impl;
+import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -132,7 +132,7 @@ public class ScenarioImpl implements Scenario {
 
 	protected void createLaneDefinitionsContainer() {
 		this.laneDefinitions = new LaneDefinitionsImpl();
-		this.addScenarioElement(new LaneDefinitionsV2Impl());
+		this.addScenarioElement(new LaneDefinitions20Impl());
 	}
 
 	protected void createTransit() {
@@ -178,7 +178,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 
-	public LaneDefinitions getLaneDefinitionsV11() {
+	public LaneDefinitions getLaneDefinitions11() {
 		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
 		}

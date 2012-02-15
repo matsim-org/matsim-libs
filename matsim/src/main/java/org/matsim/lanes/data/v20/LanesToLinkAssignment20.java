@@ -1,10 +1,10 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * LaneMeterFromLinkEndComparator
- *                                                                         *
+/* **********************************import java.util.List;
+
+import org.matsim.interfaces.basic.v01.Id;
+                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.lanes.data.v20;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import java.util.SortedMap;
 
-import org.matsim.core.api.internal.MatsimComparator;
-
+import org.matsim.api.core.v01.Id;
 /**
- * Comparator which implements a comparision function for the Lane.getStartsAtMeterFromLinkEnd()
- * attribute.
+ *
  * @author dgrether
+ *
  */
-public class LaneDataV2MeterFromLinkEndComparator implements Comparator<LaneDataV2>, Serializable, MatsimComparator {
+public interface LanesToLinkAssignment20 {
 
-	private static final long serialVersionUID = 1L;
+	public SortedMap<Id, LaneData20> getLanes();
 
-	@Override
-	public int compare(LaneDataV2 o1, LaneDataV2 o2) {
-    if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
-      return -1;
-    } else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
-      return 1;
-    } else {
-      return 0;
-    }
-	}
+	public void addLane(LaneData20 lane);
+
+	public Id getLinkId();
+
 }

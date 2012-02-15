@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitionBuilder
+ * LaneMeterFromLinkEndComparator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,26 +19,28 @@
  * *********************************************************************** */
 package org.matsim.lanes.data.v20;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
+import java.io.Serializable;
+import java.util.Comparator;
 
+import org.matsim.core.api.internal.MatsimComparator;
 
 /**
- * Builder for the content of BasicLaneDefinitions
+ * Comparator which implements a comparision function for the Lane.getStartsAtMeterFromLinkEnd()
+ * attribute.
  * @author dgrether
  */
-public interface LaneDefinitionsFactoryV2 extends MatsimFactory {
+public class LaneData20MeterFromLinkEndComparator implements Comparator<LaneData20>, Serializable, MatsimComparator {
 
-	/**
-	 * 
-	 * @param linkIdReference id of the links the lanes of the created object belong to
-	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
-	 */
-	public LanesToLinkAssignmentV2 createLanesToLinkAssignment(Id linkIdReference);
-	/**
-	 * Creates an instance of BasicLane with the id given as parameter.
-	 * @param laneId
-	 * @return
-	 */
-	public LaneDataV2 createLane(Id laneId);
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public int compare(LaneData20 o1, LaneData20 o2) {
+    if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
+      return -1;
+    } else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
+      return 1;
+    } else {
+      return 0;
+    }
+	}
 }

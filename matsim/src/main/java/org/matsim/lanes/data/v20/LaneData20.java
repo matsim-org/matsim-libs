@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  * 
  */
-public interface LaneDataV2 {
+public interface LaneData20 {
 
 	public Id getId();
 

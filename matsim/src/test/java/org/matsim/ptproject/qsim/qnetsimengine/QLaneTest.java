@@ -31,10 +31,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.lanes.data.v20.LaneDataV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactoryV2;
-import org.matsim.lanes.data.v20.LaneDefinitionsV2;
-import org.matsim.lanes.data.v20.LanesToLinkAssignmentV2;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -68,20 +68,20 @@ public class QLaneTest extends MatsimTestCase {
 		return network;
   }
   
-	private LaneDefinitionsV2 createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
+	private LaneDefinitions20 createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().scenario().setUseLanes(true);
-		LaneDefinitionsV2 lanes = scenario.getScenarioElement(LaneDefinitionsV2.class);
-		LaneDefinitionsFactoryV2 builder = lanes.getFactory();
+		LaneDefinitions20 lanes = scenario.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
-		LanesToLinkAssignmentV2 lanesForLink1 = builder.createLanesToLinkAssignment(id1);
-		LaneDataV2 link1FirstLane = builder.createLane(new IdImpl("1.ol"));
+		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(id1);
+		LaneData20 link1FirstLane = builder.createLane(new IdImpl("1.ol"));
 		link1FirstLane.addToLaneId(id1);
 		link1FirstLane.setNumberOfRepresentedLanes(2.0);
 		link1FirstLane.setStartsAtMeterFromLinkEnd(1005.0);
 		link1FirstLane.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1FirstLane);
 		
-		LaneDataV2 link1lane1 = builder.createLane(id1);
+		LaneData20 link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
 		link1lane1.setNumberOfRepresentedLanes(numberOfRepresentedLanes);
@@ -91,14 +91,14 @@ public class QLaneTest extends MatsimTestCase {
 		return lanes;
 	}
   
-	private LaneDefinitionsV2 createLanes(ScenarioImpl scenario) {
+	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
 		scenario.getConfig().scenario().setUseLanes(true);
-		LaneDefinitionsV2 lanes = scenario.getScenarioElement(LaneDefinitionsV2.class);
-		LaneDefinitionsFactoryV2 builder = lanes.getFactory();
+		LaneDefinitions20 lanes = scenario.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
-		LanesToLinkAssignmentV2 lanesForLink1 = builder.createLanesToLinkAssignment(id1);
+		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(id1);
 		
-		LaneDataV2 link1FirstLane = builder.createLane(new IdImpl("1.ol"));
+		LaneData20 link1FirstLane = builder.createLane(new IdImpl("1.ol"));
 		link1FirstLane.addToLaneId(id1);
 		link1FirstLane.addToLaneId(id2);
 		link1FirstLane.addToLaneId(id3);
@@ -107,20 +107,20 @@ public class QLaneTest extends MatsimTestCase {
 		link1FirstLane.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1FirstLane);
 		
-		LaneDataV2 link1lane1 = builder.createLane(id1);
+		LaneData20 link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
 		link1lane1.setCapacityVehiclesPerHour(900.0);
 		lanesForLink1.addLane(link1lane1);
 		
-		LaneDataV2 link1lane2 = builder.createLane(id2);
+		LaneData20 link1lane2 = builder.createLane(id2);
 		link1lane2.addToLinkId(id2);
 		link1lane2.setNumberOfRepresentedLanes(2);
 		link1lane2.setStartsAtMeterFromLinkEnd(105.0);
 		link1lane2.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1lane2);
 
-		LaneDataV2 link1lane3 = builder.createLane(id3);
+		LaneData20 link1lane3 = builder.createLane(id3);
 		link1lane3.addToLinkId(id2);
 		link1lane3.setCapacityVehiclesPerHour(900.0);
 		link1lane3.setStartsAtMeterFromLinkEnd(105.0);
