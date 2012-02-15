@@ -37,9 +37,13 @@ public interface SignalsData {
 	public SignalControlData getSignalControlData();
 
 	public SignalGroupsData getSignalGroupsData();
-	
+	/**
+	 * @return null if feature is not enabled
+	 */
 	public AmberTimesData getAmberTimesData();
-	
+	/**
+	 * @return null if feature is not enabled
+	 */
 	public IntergreenTimesData getIntergreenTimesData();
 	
 }

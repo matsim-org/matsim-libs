@@ -39,10 +39,10 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
 public class SignalsDataImpl implements SignalsData {
 
 	private SignalSystemsData signalsystemsdata;
-	private AmberTimesData ambertimesdata;
 	private SignalGroupsData signalgroupsdata;
 	private SignalControlData signalcontroldata;
-	private IntergreenTimesData intergreensdata;
+	private AmberTimesData ambertimesdata = null;
+	private IntergreenTimesData intergreensdata = null;
 	
 	public SignalsDataImpl(SignalSystemsConfigGroup signalConfig){
 		this.initContainers(signalConfig);
@@ -52,8 +52,12 @@ public class SignalsDataImpl implements SignalsData {
 		this.signalsystemsdata = new SignalSystemsDataImpl();
 		this.signalgroupsdata = new SignalGroupsDataImpl();
 		this.signalcontroldata = new SignalControlDataImpl();
-		this.ambertimesdata = new AmberTimesDataImpl();
-		this.intergreensdata = new IntergreenTimesDataImpl();
+		if (signalConfig.isUseAmbertimes()){
+			this.ambertimesdata = new AmberTimesDataImpl();
+		}
+		if (signalConfig.isUseIntergreenTimes()) {
+			this.intergreensdata = new IntergreenTimesDataImpl();
+		}
 	}
 	
 	
