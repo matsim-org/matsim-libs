@@ -186,7 +186,8 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 								"\"msaExpont\" can NOT be found in configfile!!");
 					}
 					if (Double.parseDouble(msaExponentStr) < 1) {
-						System.out.println("we need bigger msaExponent!");
+						System.out
+								.println("+++++BSE:\twe need bigger msaExponent!");
 						goAhead = "msaExponent";
 						((PCCtlwithLeftTurnPenalty) event.getControler())
 								.shutdown(true);
@@ -197,7 +198,8 @@ public class StepSizeSettingSeeker implements CalibrationConfig {
 					if (!judgeConvergency()) {
 						// if false, immediately ends this turn of step size
 						// setting trying
-						System.out.println("we need bigger step size!");
+						System.out
+								.println("+++++BSE:\twe need bigger step size!");
 						goAhead = "initialStepSize";
 						((PCCtlwithLeftTurnPenalty) event.getControler())
 								.shutdown(true);

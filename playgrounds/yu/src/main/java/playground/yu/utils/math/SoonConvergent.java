@@ -62,18 +62,39 @@ public class SoonConvergent {
 		if (firstCondition) {
 			return true;
 		} else {
+			System.out
+					.println("+++++BSE:\tfirst convergency condition -\tfalse\n+++++BSE:\tMath.abs(\t"
+							+ max2
+							+ "\t-\t"
+							+ min2
+							+ "\t) <=\t"
+							+ amplitudeCriterion
+							+ "\t* Math.abs(\t"
+							+ max1
+							+ "\t-\t" + min1 + "\t)");
 			double avg1 = SimpleStatistics.average(values, 0, size1 - 1)//
 			, avg2 = SimpleStatistics.average(values, size1, values.length - 1);
 
 			boolean secondCondition = false;
 			if (avg1 != 0d) {
 				if (Math.abs(avg1) < 0.5 || Math.abs(avg2) < 0.5) {
-					avgValueCriterion *= 2d / (Math.abs(avg1) + Math.abs(avg2));
+					// avgValueCriterion *= 2d / (Math.abs(avg1) +
+					// Math.abs(avg2));
+					return true;
 				}
 				secondCondition = Math.abs((avg2 - avg1) / avg1) <= avgValueCriterion;
 				if (Math.abs((avg2 - avg1) / avg1) > 0.7) {
 					System.err
-							.println("Math.abs((avg2 - avg1) / avg1)>0.7 --> 1. maybe the proparatoryIteration too short, or 2. the initialStepSize to small, or 3 the calibrated parameter stands next to 0.");
+							.println("\n+++++BSE:\tMath.abs((avg2 - avg1) / avg1)>0.7-->"
+									+ "\n+++++BSE:\t1. maybe the proparatoryIteration too short, or"
+									+ "\n+++++BSE:\t2. the initialStepSize to small, so it converges too slowly or"
+									+ "\n+++++BSE:\t3. the calibrated parameter stands too next to 0, so e.g. the abs(avg1) is very small."
+									+ "\n+++++BSE:\tavg1 =\t"
+									+ avg1
+									+ "\n+++++BSE:\tavg2 =\t"
+									+ avg2
+									+ "\n+++++BSE:\tMath.abs((avg2 - avg1) / avg1) =\t"
+									+ Math.abs((avg2 - avg1) / avg1));
 				}
 			} else {
 				secondCondition = Math.abs(avg2) <= avgValueCriterion;
