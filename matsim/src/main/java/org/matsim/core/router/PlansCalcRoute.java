@@ -20,8 +20,10 @@
 
 package org.matsim.core.router;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -152,19 +154,17 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private void initDefaultLegHandlers() {
 		legHandlers = new HashMap<String, LegRouter>();
-		String[] networkModes = this.configGroup.getNetworkModes();
+		Collection<String> networkModes = this.configGroup.getNetworkModes();
 		for (String mode : networkModes) {
 			this.addLegHandler(mode, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
 		}
-		String[] teleportedModes = this.configGroup.getTeleportedModes();
-		Double[] teleportedModeSpeeds = this.configGroup.getTeleportedModeSpeeds();
-		for (int i=0; i<teleportedModes.length; ++i) {
-			this.addLegHandler(teleportedModes[i], new TeleportationLegRouter(this.routeFactory, teleportedModeSpeeds[i], this.configGroup.getBeelineDistanceFactor()));
+		Map<String, Double> teleportedModeSpeeds = this.configGroup.getTeleportedModeSpeeds();
+		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
+			this.addLegHandler(entry.getKey(), new TeleportationLegRouter(this.routeFactory, entry.getValue(), this.configGroup.getBeelineDistanceFactor()));
 		}
-		String[] teleportedModesBasedOnFreespeed = this.configGroup.getTeleportedModesBasedOnFreespeed();
-		Double[] teleportedModeFreespeedFactors = this.configGroup.getTeleportedModeFreespeedFactors();
-		for (int i=0; i<teleportedModesBasedOnFreespeed.length; ++i) {
-			this.addLegHandler(teleportedModesBasedOnFreespeed[i], new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, teleportedModeFreespeedFactors[i], this.configGroup.getBeelineDistanceFactor(), this.routeFactory));
+		Map<String, Double> teleportedModeFreespeedFactors = this.configGroup.getTeleportedModeFreespeedFactors();
+		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
+			this.addLegHandler(entry.getKey(), new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, entry.getValue(), this.configGroup.getBeelineDistanceFactor(), this.routeFactory));
 		}
 	}
 

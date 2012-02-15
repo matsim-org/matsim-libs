@@ -19,7 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
@@ -36,6 +41,8 @@ import org.matsim.core.utils.collections.CollectionUtils;
  */
 public class PlansCalcRouteConfigGroup extends Module {
 
+	private static final String UNDEFINED = "undefined";
+
 	public enum PtSpeedMode {freespeed, beeline}
 
 	private static final long serialVersionUID = 1L;
@@ -48,32 +55,30 @@ public class PlansCalcRouteConfigGroup extends Module {
 	private static final String PT_SPEED = "ptSpeed";
 	private static final String WALK_SPEED = "walkSpeed";
 	private static final String BIKE_SPEED = "bikeSpeed";
+	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 
 	private static final String BEELINE_DISTANCE_FACTOR = "beelineDistanceFactor";
 
-	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
-	
 	private static final String NETWORK_MODES = "networkModes";
-	private static final String TELEPORTED_MODES = "teleportedModes";
-	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeeds";
-	private static final String TELEPORTED_MODES_BASED_ON_FREESPEED = "teleportedModesBasedOnFreespeed";
-	private static final String TELEPORTED_MODE_FREESPEED_FACTORS = "teleportedModeFreespeedFactors";
+	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeed_";
+	private static final String TELEPORTED_MODE_FREESPEED_FACTORS = "teleportedModeFreespeedFactor_";
 
-	private PtSpeedMode ptSpeedMode = PtSpeedMode.freespeed;
-	private double ptSpeedFactor = 2.0;
+	private boolean defaultsCleared = false;
 	private double beelineDistanceFactor = 1.3;
-	private double walkSpeed = 3.0 / 3.6; // 3.0 km/h --> m/s
-	private double bikeSpeed = 15.0 / 3.6; // 15.0 km/h --> m/s
-	private double ptSpeed = 25.0 / 3.6; // 25.0 km/h --> m/s
-	private double undefinedModeSpeed = 50.0 / 3.6; // 50.0 km/h --> m/s
-	private String[] networkModes = {TransportMode.car, TransportMode.ride}; 
-	private String[] teleportedModes = {TransportMode.bike, TransportMode.walk};
-	private Double[] teleportedModeSpeeds = {bikeSpeed, walkSpeed};
-	private String[] teleportedModesBasedOnFreespeed = {TransportMode.pt};
-	private Double[] teleportedModeFreespeedFactors = {2.0};
-	
+	// private double ptSpeed = 25.0 / 3.6; // 25.0 km/h --> m/s
+
+	private Collection<String> networkModes = Arrays.asList(TransportMode.car, TransportMode.ride); 
+	private Map<String, Double> teleportedModeSpeeds = new HashMap<String, Double>();
+	private Map<String, Double> teleportedModeFreespeedFactors = new HashMap<String, Double>();
+
 	public PlansCalcRouteConfigGroup() {
 		super(GROUP_NAME);
+		teleportedModeSpeeds.put(TransportMode.bike, 15.0 / 3.6); // 15.0 km/h --> m/s
+		teleportedModeSpeeds.put(TransportMode.walk, 3.0 / 3.6); // 3.0 km/h --> m/s
+		// I'm not sure if anyone needs the "undefined" mode. In particular, it doesn't do anything for modes which are
+		// really unknown, it is just a mode called "undefined". michaz 02-2012
+		teleportedModeSpeeds.put(UNDEFINED, 50.0 / 3.6); 
+		teleportedModeFreespeedFactors.put(TransportMode.pt, 2.0);
 	}
 
 	@Override
@@ -83,9 +88,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 	@Override
 	public void addParam(final String key, final String value) {
-		if (PT_SPEED_MODE.equals(key)) {
-			setPtSpeedMode(PtSpeedMode.valueOf(value));
-		} else if (PT_SPEED_FACTOR.equals(key)) {
+		if (PT_SPEED_FACTOR.equals(key)) {
 			setPtSpeedFactor(Double.parseDouble(value));
 		} else if (BEELINE_DISTANCE_FACTOR.equals(key)) {
 			setBeelineDistanceFactor(Double.parseDouble(value));
@@ -98,54 +101,38 @@ public class PlansCalcRouteConfigGroup extends Module {
 		} else if (UNDEFINED_MODE_SPEED.equals(key)) {
 			setUndefinedModeSpeed(Double.parseDouble(value));
 		} else if (NETWORK_MODES.equals(key)) {
-			setNetworkModes(CollectionUtils.stringToArray(value));
-		} else if (TELEPORTED_MODES.equals(key)) {
-			setTeleportedModes(CollectionUtils.stringToArray(value));
-		} else if (TELEPORTED_MODE_SPEEDS.equals(key)) {
-			setTeleportedModeSpeeds(stringArrayToDoubleArray(CollectionUtils.stringToArray(value)));
-		} else if (TELEPORTED_MODES_BASED_ON_FREESPEED.equals(key)) {
-			setTeleportedModesBasedOnFreespeed(CollectionUtils.stringToArray(value));
-		} else if (TELEPORTED_MODE_FREESPEED_FACTORS.equals(key)) {
-			setTeleportedModeFreespeedFactors(stringArrayToDoubleArray(CollectionUtils.stringToArray(value)));
+			setNetworkModes(Arrays.asList(CollectionUtils.stringToArray(value)));
+		} else if (key.startsWith(TELEPORTED_MODE_SPEEDS)) {
+			clearDefaults();
+			setTeleportedModeSpeed(key.substring(TELEPORTED_MODE_SPEEDS.length()), Double.parseDouble(value));
+		} else if (key.startsWith(TELEPORTED_MODE_FREESPEED_FACTORS)) {
+			clearDefaults();
+			setTeleportedModeFreespeedFactor(key.substring(TELEPORTED_MODE_FREESPEED_FACTORS.length()), Double.parseDouble(value));
 		} else {
 			throw new IllegalArgumentException(key);
+		}
+	}
+
+	private void clearDefaults() {
+		if (!defaultsCleared) {
+			teleportedModeSpeeds.clear();
+			teleportedModeFreespeedFactors.clear();
+			defaultsCleared = true;
 		}
 	}
 
 	@Override
 	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
-		map.put( PT_SPEED_MODE, this.getPtSpeedMode().toString() );
-		map.put( PT_SPEED_FACTOR, Double.toString(this.getPtSpeedFactor()) );
 		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
-		map.put( PT_SPEED, Double.toString(this.getPtSpeed()) );
-		map.put( WALK_SPEED, Double.toString(this.getWalkSpeed()) );
-		map.put( BIKE_SPEED, Double.toString(this.getBikeSpeed()) );
-		map.put( UNDEFINED_MODE_SPEED, Double.toString(this.getUndefinedModeSpeed()) );
-		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes) );
-		map.put( TELEPORTED_MODES, CollectionUtils.arrayToString(this.teleportedModes) );
-		map.put( TELEPORTED_MODE_SPEEDS, CollectionUtils.arrayToString(doubleArrayToStringArray(this.teleportedModeSpeeds)));
-		map.put( TELEPORTED_MODES_BASED_ON_FREESPEED, CollectionUtils.arrayToString(this.teleportedModesBasedOnFreespeed));
-		map.put( TELEPORTED_MODE_FREESPEED_FACTORS, CollectionUtils.arrayToString(doubleArrayToStringArray(this.teleportedModeSpeeds)));
+		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray(new String[]{})));
+		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
+			map.put( TELEPORTED_MODE_SPEEDS + entry.getKey(), String.valueOf(entry.getValue()));
+		}
+		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
+			map.put( TELEPORTED_MODE_FREESPEED_FACTORS + entry.getKey(), String.valueOf(entry.getValue()));
+		}
 		return map;
-	}
-
-	private static String[] doubleArrayToStringArray(Double[] doubles) {
-		// I want a less verbose programming language.
-		String[] strings = new String[doubles.length];
-		for (int i=0; i<doubles.length; ++i) {
-			strings[i] = String.valueOf(doubles[i]);
-		}
-		return strings;
-	}
-
-	private Double[] stringArrayToDoubleArray(String[] strings) {
-		Double[] doubles = new Double[strings.length];
-		for (int i=0; i<strings.length; ++i) {
-			doubles[i] = Double.parseDouble(strings[i]);
-		}
-		return doubles;
-		// My brain hurts.
 	}
 
 	@Override
@@ -158,43 +145,45 @@ public class PlansCalcRouteConfigGroup extends Module {
 		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
-		map.put(TELEPORTED_MODES, "All the modes which are not routed through the network but get speed estimates based on beeline distance.");
-		map.put(TELEPORTED_MODE_SPEEDS, "Speeds for all teleportationModes, in order.");
-		map.put(TELEPORTED_MODES_BASED_ON_FREESPEED, "All the modes which get their speed estimate based on free-speed travel times.");
-		map.put(TELEPORTED_MODE_FREESPEED_FACTORS, "Free-speed factors for all teleportedModesBasedOnFreesoeed, in order.");
-		return map ;
+		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) { 
+			map.put(TELEPORTED_MODE_SPEEDS + entry.getKey(), "Speed for a teleported mode based on beeline-distance: (<beeline distance> * beelineDistanceFactor) / speed. Insert a line like this for every such mode.");
+		}
+		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) { 
+			map.put(TELEPORTED_MODE_FREESPEED_FACTORS + entry.getKey(), "Free-speed factor for a teleported mode based on freespeed: freespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode.");
+		}
+		return map;
 	}
 
 	public double getPtSpeedFactor() {
-		return this.ptSpeedFactor;
+		return getTeleportedModeFreespeedFactors().get(TransportMode.pt);
 	}
 
 	public double getWalkSpeed() {
-		return this.walkSpeed;
+		return getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 	public void setWalkSpeed(final double walkSpeed) {
-		this.walkSpeed = walkSpeed;
+		setTeleportedModeSpeed(TransportMode.walk, walkSpeed);
 	}
 
 	public double getBikeSpeed() {
-		return this.bikeSpeed;
+		return getTeleportedModeSpeeds().get(TransportMode.bike);
 	}
 
 	public void setBikeSpeed(final double bikeSpeed) {
-		this.bikeSpeed = bikeSpeed;
+		setTeleportedModeSpeed(TransportMode.bike, bikeSpeed);
 	}
 
 	public double getUndefinedModeSpeed() {
-		return this.undefinedModeSpeed;
+		return getTeleportedModeSpeeds().get(UNDEFINED);
 	}
 
 	public void setUndefinedModeSpeed(final double undefinedModeSpeed) {
-		this.undefinedModeSpeed = undefinedModeSpeed;
+		setTeleportedModeSpeed(UNDEFINED, undefinedModeSpeed);
 	}
 
 	public void setPtSpeedFactor(final double ptSpeedFactor) {
-		this.ptSpeedFactor = ptSpeedFactor;
+		setTeleportedModeFreespeedFactor(TransportMode.pt, ptSpeedFactor);
 	}
 
 	public double getBeelineDistanceFactor() {
@@ -205,62 +194,36 @@ public class PlansCalcRouteConfigGroup extends Module {
 		this.beelineDistanceFactor = beelineDistanceFactor;
 	}
 
-	public PtSpeedMode getPtSpeedMode() {
-		return this.ptSpeedMode;
-	}
-
-	public void setPtSpeedMode(PtSpeedMode ptSpeedMode) {
-		this.ptSpeedMode = ptSpeedMode;
-	}
-
 	public double getPtSpeed() {
-		return this.ptSpeed;
+		return getTeleportedModeSpeeds().get(TransportMode.pt);
 	}
 
 	public void setPtSpeed(double ptSpeed) {
-		this.ptSpeed = ptSpeed;
+		setTeleportedModeSpeed(TransportMode.pt, ptSpeed);
 	}
 
-	public String[] getNetworkModes() {
+	public Collection<String> getNetworkModes() {
 		return this.networkModes;
 	}
-	
-	public void setNetworkModes(String[] networkModes) {
+
+	public void setNetworkModes(Collection<String> networkModes) {
 		this.networkModes = networkModes;
 	}
 
-	public String[] getTeleportedModes() {
-		return this.teleportedModes;
-	}
-	
-	public void setTeleportedModes(String[] teleportedModes) {
-		this.teleportedModes = teleportedModes;
+	public Map<String, Double> getTeleportedModeSpeeds() {
+		return Collections.unmodifiableMap(this.teleportedModeSpeeds);
 	}
 
-	public Double[] getTeleportedModeSpeeds() {
-		return this.teleportedModeSpeeds;
-	}
-
-	public void setTeleportedModeSpeeds(Double[] teleportedModeSpeeds) {
-		this.teleportedModeSpeeds = teleportedModeSpeeds;
-	}
-
-	public String[] getTeleportedModesBasedOnFreespeed() {
-		return teleportedModesBasedOnFreespeed;
-	}
-
-	public void setTeleportedModesBasedOnFreespeed(
-			String[] teleportedModesBasedOnFreespeed) {
-		this.teleportedModesBasedOnFreespeed = teleportedModesBasedOnFreespeed;
-	}
-
-	public Double[] getTeleportedModeFreespeedFactors() {
+	public Map<String, Double> getTeleportedModeFreespeedFactors() {
 		return teleportedModeFreespeedFactors;
 	}
 
-	public void setTeleportedModeFreespeedFactors(
-			Double[] teleportedModeFreespeedFactors) {
-		this.teleportedModeFreespeedFactors = teleportedModeFreespeedFactors;
+	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
+		teleportedModeFreespeedFactors.put(mode, freespeedFactor);
 	}
-	
+
+	public void setTeleportedModeSpeed(String mode, double speed) {
+		teleportedModeSpeeds.put(mode, speed);
+	}
+
 }
