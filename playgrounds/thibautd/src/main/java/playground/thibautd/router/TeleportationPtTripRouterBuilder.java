@@ -66,7 +66,7 @@ public class TeleportationPtTripRouterBuilder implements TripRouterBuilder {
 		LeastCostPathCalculator routeAlgoPtFreeFlow = leastCostPathAlgoFactory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 		ModeRouteFactory routeFactory = routerFactory.getModeRouteFactory();
 
-		if (routeConfigGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.freespeed) {
+		if (routeConfigGroup.getTeleportedModeFreespeedFactors().containsKey(TransportMode.pt)) {
 			tripRouter.setModeHandler(
 					TransportMode.pt,
 					new LegRouterWrapper(
@@ -80,7 +80,7 @@ public class TeleportationPtTripRouterBuilder implements TripRouterBuilder {
 						travelCost,
 						travelTime));
 		}
-		else if (routeConfigGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.beeline) {
+		else if (routeConfigGroup.getTeleportedModeSpeeds().containsKey(TransportMode.pt)) {
 			tripRouter.setModeHandler(
 					TransportMode.pt,
 					new LegRouterWrapper(

@@ -37,12 +37,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.PtSpeedMode;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * if a {@code Plan} with pseudo pt {@code Leg} does NOT contain @{@code Leg}
@@ -57,9 +56,6 @@ import org.matsim.core.config.ConfigUtils;
 public class CheckPseudoPtPlanIntegrity {
 	public static Plan check(Network network, Plan plan, Config config) {
 		PlansCalcRouteConfigGroup pcrcg = config.plansCalcRoute();
-		if (!pcrcg.getPtSpeedMode().equals(PtSpeedMode.beeline)) {
-			throw new RuntimeException("Only beeline can be used here.");
-		}
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
@@ -87,7 +83,6 @@ public class CheckPseudoPtPlanIntegrity {
 		Config config = ConfigUtils.createConfig();
 
 		PlansCalcRouteConfigGroup pcrcg = config.plansCalcRoute();
-		pcrcg.setPtSpeedMode(PtSpeedMode.beeline);
 		pcrcg.setBeelineDistanceFactor(1.3);
 		pcrcg.setPtSpeed(25d / 3.6);// 25 [km/h]
 
