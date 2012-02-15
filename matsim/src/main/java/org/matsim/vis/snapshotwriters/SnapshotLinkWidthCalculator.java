@@ -48,6 +48,7 @@ public class SnapshotLinkWidthCalculator {
 	}
 	
 	public double calculateLinkWidth(double nrOfLanes){
+//		System.err.println(widthOfMedian + " "  + laneWidth + " " + nrOfLanes);
 		return widthOfMedian + laneWidth * nrOfLanes; 
 	}
 	

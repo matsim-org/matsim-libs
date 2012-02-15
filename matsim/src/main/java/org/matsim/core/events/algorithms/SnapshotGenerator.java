@@ -79,7 +79,10 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		this.capCorrectionFactor = config.getFlowCapFactor() / network.getCapacityPeriod();
 		this.storageCapFactor = config.getStorageCapFactor();
 		this.snapshotStyle = config.getSnapshotStyle();
-		this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
+		if (! Double.isNaN(network.getEffectiveLaneWidth())){
+			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
+		}
+
 		reset(-1);
 	}
 

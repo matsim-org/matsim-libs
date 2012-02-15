@@ -488,7 +488,7 @@ public class OTFVisConfigGroup extends Module {
 	 * configurable in the sense that it tries to find a useful value either from network or from config or from
 	 * the saved config.  this is, however, not implemented.  kai, jan'11
 	 */
-	private Double effectiveLaneWidth = null ;
+	private Double effectiveLaneWidth = 3.75 ;
 	public void setEffectiveLaneWidth(Double effectiveLaneWidth) {
 		this.effectiveLaneWidth = effectiveLaneWidth ;
 	}

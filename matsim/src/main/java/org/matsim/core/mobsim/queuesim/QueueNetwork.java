@@ -64,7 +64,9 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 
 		this.queuelinks = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.queuenodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-		linkWidthCalculator.setLaneWidth(networkLayer.getEffectiveLaneWidth());
+		if (! Double.isNaN(networkLayer.getEffectiveLaneWidth())){
+			linkWidthCalculator.setLaneWidth(networkLayer.getEffectiveLaneWidth());
+		}
 		for (Node n : networkLayer.getNodes().values()) {
 			this.queuenodes.put(n.getId(), new QueueNode(n, this));
 		}

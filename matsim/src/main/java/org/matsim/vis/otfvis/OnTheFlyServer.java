@@ -359,7 +359,9 @@ public class OnTheFlyServer implements OTFLiveServer {
 			otfVisConfig = new OTFVisConfigGroup();
 		}
 		double effLaneWidth = this.scenario.getNetwork().getEffectiveLaneWidth() ;
-		otfVisConfig.setEffectiveLaneWidth( effLaneWidth ) ;
+		if (! Double.isNaN(effLaneWidth)){
+			otfVisConfig.setEffectiveLaneWidth( effLaneWidth ) ;
+		}
 		return otfVisConfig ;
 	}
 

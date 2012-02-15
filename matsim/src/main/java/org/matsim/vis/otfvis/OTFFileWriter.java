@@ -70,7 +70,7 @@ public final class OTFFileWriter implements SnapshotWriter {
 		this.quad.initQuadTree(connect);
 		this.writer = new OTFAgentsListHandler.Writer();
 		this.writer.setSrc(this.positions);
-		if (scenario.getConfig().otfVis() == null) {
+		if (scenario.getConfig().otfVis() != null) {
 			scenario.getConfig().otfVis().setEffectiveLaneWidth(scenario.getNetwork().getEffectiveLaneWidth());
 		}
 		OTFClientControl.getInstance().setOTFVisConfig(scenario.getConfig().otfVis());
