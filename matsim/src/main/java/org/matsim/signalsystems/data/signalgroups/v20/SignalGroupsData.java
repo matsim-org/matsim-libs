@@ -34,12 +34,12 @@ public interface SignalGroupsData extends MatsimToplevelContainer {
 	@Override
 	public SignalGroupsDataFactory getFactory();
 	
+	public void setFactory(SignalGroupsDataFactory factory);
+	
 	public Map<Id, SignalGroupData> getSignalGroupDataBySystemId(Id signalSystemId);
 	
 	public void addSignalGroupData(SignalGroupData signalGroupData);
 	
 	public Map<Id,Map<Id,SignalGroupData>> getSignalGroupDataBySignalSystemId();
 	
-	public void setFactory(SignalGroupsDataFactory factory);
-
 }

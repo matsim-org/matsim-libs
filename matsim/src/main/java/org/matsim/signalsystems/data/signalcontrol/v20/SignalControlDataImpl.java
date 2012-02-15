@@ -49,4 +49,9 @@ public class SignalControlDataImpl implements SignalControlData {
 		return this.signalControllerDataBySystemId;
 	}
 
+	@Override
+	public void setFactory(SignalControlDataFactory factory) {
+		this.factory = factory;		
+	}
+
 }

@@ -34,6 +34,8 @@ public interface SignalControlData extends MatsimToplevelContainer {
 	@Override
 	public SignalControlDataFactory getFactory();
 	
+	public void setFactory(SignalControlDataFactory factory);
+	
 	public Map<Id, SignalSystemControllerData> getSignalSystemControllerDataBySystemId();
 	
 	public void addSignalSystemControllerData(SignalSystemControllerData controllerData);

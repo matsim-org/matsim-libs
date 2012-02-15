@@ -30,4 +30,7 @@ public interface SignalSystemsModelBuilder {
 
 	public SignalSystemsManager createAndInitializeSignalSystemsManager();
 	
+	public SignalModelFactory getSignalModelFactory();
+	
+	public void setSignalModelFactory(SignalModelFactory factory);
 }

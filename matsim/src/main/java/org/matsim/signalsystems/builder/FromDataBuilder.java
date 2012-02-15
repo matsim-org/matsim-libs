@@ -49,7 +49,7 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 public class FromDataBuilder implements SignalSystemsModelBuilder{
 
 	private SignalsData signalsData;
-	private SignalModelFactory factory;
+	private SignalModelFactory factory = new DefaultSignalModelFactory();
 	private EventsManager events;
 	private Scenario scenario;
 
@@ -146,6 +146,16 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		//5.) IntergreenTimesLogic 
 		this.createAndAddIntergreenTimesLogic(manager);
 		return manager;
+	}
+
+	@Override
+	public SignalModelFactory getSignalModelFactory() {
+		return this.factory;
+	}
+
+	@Override
+	public void setSignalModelFactory(SignalModelFactory factory) {
+		this.factory = factory;
 	}
 	
 	

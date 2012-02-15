@@ -40,7 +40,6 @@ public interface AmberTimesData extends MatsimToplevelContainer {
 	
 	public Integer getDefaultAmber();
 	
-	
 	public Map<Id, AmberTimeData> getAmberTimeDataBySystemId();
 	
 	public void addAmberTimeData(AmberTimeData amberTimeData);

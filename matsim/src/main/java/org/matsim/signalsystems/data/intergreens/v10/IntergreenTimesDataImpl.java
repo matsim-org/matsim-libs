@@ -51,4 +51,9 @@ public class IntergreenTimesDataImpl implements IntergreenTimesData {
 		return this.factory;
 	}
 
+	@Override
+	public void setFactory(IntergreenTimesDataFactory factory) {
+		this.factory = factory;
+	}
+
 }

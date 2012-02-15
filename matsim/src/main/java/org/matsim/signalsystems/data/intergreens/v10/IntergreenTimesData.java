@@ -38,4 +38,6 @@ public interface IntergreenTimesData extends MatsimToplevelContainer  {
 	
 	public IntergreenTimesDataFactory getFactory() ;
 	
+	public void setFactory(IntergreenTimesDataFactory factory);
+	
 }

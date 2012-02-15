@@ -33,7 +33,7 @@ public class LaneDefinitionsImpl implements LaneDefinitions {
 
 	private SortedMap<Id, LanesToLinkAssignment> lanesToLinkAssignments  =  new TreeMap<Id, LanesToLinkAssignment>();
 
-	private final LaneDefinitionsFactory factory = new LaneDefinitionsFactoryImpl();
+	private LaneDefinitionsFactory factory = new LaneDefinitionsFactoryImpl();
 	
 	@Override
 	public SortedMap<Id, LanesToLinkAssignment> getLanesToLinkAssignments() {
@@ -50,4 +50,8 @@ public class LaneDefinitionsImpl implements LaneDefinitions {
 		return factory;
 	}
 
+	@Override
+	public void setFactory(LaneDefinitionsFactory factory) {
+		this.factory = factory;
+	}
 }

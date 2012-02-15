@@ -48,4 +48,5 @@ public interface LaneDefinitions20 extends MatsimToplevelContainer {
 	@Override
 	public LaneDefinitionsFactory20 getFactory();
 
+	public void setFactory(LaneDefinitionsFactory20 factory);
 }
