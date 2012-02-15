@@ -43,6 +43,7 @@ import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.network.NetworkRemoveUnusedNodes;
 
 
 /**
@@ -304,9 +305,10 @@ public class MATSim4UrbanSimV2 {
 	void cleanNetwork(Network network){
 		log.info("") ;
 		log.info("Cleaning network ...");
-		( new NetworkCleaner() ).run(network);
+		(new NetworkCleaner() ).run(network);
 		log.info("... finished cleaning network.");
 		log.info("");
+		// (new NetworkRemoveUnusedNodes()).run(network); // tnicolai feb'12 not necessary for ivtch-network
 	}
 	
 	/**

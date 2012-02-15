@@ -52,6 +52,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.io.FileCopy;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.network.NetworkRemoveUnusedNodes;
 
 
 /**
@@ -245,7 +246,7 @@ public class MATSim4UrbanSim {
 	void cleanNetwork(Network network){
 		log.info("") ;
 		log.info("Cleaning network ...");
-		( new NetworkCleaner() ).run(network);
+		(new NetworkCleaner() ).run(network);
 		log.info("... finished cleaning network.");
 		log.info(""); 
 	}
