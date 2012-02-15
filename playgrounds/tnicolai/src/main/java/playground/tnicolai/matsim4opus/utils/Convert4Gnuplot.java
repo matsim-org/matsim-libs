@@ -512,10 +512,60 @@ public class Convert4Gnuplot {
 		// stores unsorted array as a map of <YEAR, INDEX>
 		Map<Integer,Integer> idxFromKey = HeaderParser.createIdxFromKey( unsortedHeaderArray );
 		// sorted array in chronological order. The zone id is stored as -1 and should be the first value
-		UtilityCollection.ArrayQuicksort( sortedHeaderArray );
+		ArrayQuicksort( sortedHeaderArray );
 		
 		return new HeaderObject(idxFromKey, sortedHeaderArray);
 	}
+	
+	/**
+	 * sorts a given array
+	 * 
+	 * @param array
+	 * 
+	 * @author thomas
+	 */
+	public static int[] ArrayQuicksort(int array[]){
+	    int i;
+	
+	    System.out.println("Values Before the sort:\n");
+	    for(i = 0; i < array.length; i++)
+	      System.out.print( array[i]+"  ");
+	    System.out.println();
+	    quick_srt(array,0,array.length-1);
+	    System.out.print("Values after the sort:\n");
+	    for(i = 0; i <array.length; i++)
+	      System.out.print(array[i]+"  ");
+	    return array;
+	}
+	
+	private static void quick_srt(int array[],int low, int n){
+	    int lo = low;
+	    int hi = n;
+	    if (lo >= n) {
+	      return;
+	    }
+	    int mid = array[(lo + hi) / 2];
+	    while (lo < hi) {
+	      while (lo<hi && array[lo] < mid) {
+	        lo++;
+	      }
+	      while (lo<hi && array[hi] > mid) {
+	        hi--;
+	      }
+	      if (lo < hi) {
+	        int T = array[lo];
+	        array[lo] = array[hi];
+	        array[hi] = T;
+	      }
+	    }
+	    if (hi < lo) {
+	      int T = hi;
+	      hi = lo;
+	      lo = T;
+	    }
+	    quick_srt(array, low, lo);
+	    quick_srt(array, lo == low ? lo+1 : lo, n);
+	  }
 	
 //	/**
 //	 * creates a file with values from the given zone id row

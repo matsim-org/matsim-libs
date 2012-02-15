@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.utils;
+package playground.tnicolai.matsim4opus.utils.network;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;

@@ -47,9 +47,9 @@ import org.matsim.matrices.Matrix;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 
 /**
@@ -110,7 +110,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			log.info("Computing and writing zone2zone impedance matrix ..." );
 
 			// init array with zone informations
-			ZoneObject[] zones = UtilityCollection.assertZoneCentroid2NearestNode(this.zones, network);
+			ZoneObject[] zones = ZoneMapper.mapZoneCentroid2NearestNode(this.zones, network);
 			// init progress bar
 			ProgressBar bar = new ProgressBar( zones.length );
 			log.info("Processing " + zones.length + " UrbanSim zones ...");

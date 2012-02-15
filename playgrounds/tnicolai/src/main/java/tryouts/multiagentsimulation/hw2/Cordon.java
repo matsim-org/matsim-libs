@@ -107,7 +107,7 @@ public class Cordon {
 			if (contained(link.getFromNode()) && !contained(link.getToNode())) {
 				outLinks.add(link);	
 			}
-			// add incomming link to collection
+			// add incoming link to collection
 			else if (!contained(link.getFromNode()) && contained(link.getToNode())) {
 				inLinks.add(link);
 			}

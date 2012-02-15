@@ -62,7 +62,7 @@ public class GettingStarted {
 		Scenario sc = GettingStarted.controller.getScenario() ;
 		Config cf = sc.getConfig() ;
 		String dir = cf.controler().getOutputDirectory();	// get output directory
-		int iterNumber = cf.controler().getLastIteration();	// get itaration number
+		int iterNumber = cf.controler().getLastIteration();	// get iteration number
 		String otfFileLocation = dir + "/ITERS/it."+iterNumber+"/"+iterNumber+".otfvis.mvi";
 		log.info("Loding file " + otfFileLocation + " into OTFVis...");
 		// init and run OTFVis

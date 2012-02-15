@@ -15,10 +15,10 @@ import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.EuclideanDistance;
+import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
@@ -121,7 +121,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			log.info("Beta walk traveling per min: " + betaWalkMin);
 			
 			// gather zone information like zone id, nearest node and coordinate (zone centroid)
-			ZoneObject[] zones = UtilityCollection.assertZoneCentroid2NearestNode(this.zones, network);
+			ZoneObject[] zones = ZoneMapper.mapZoneCentroid2NearestNode(this.zones, network);
 			assert( zones != null );
 			log.info("Calculating " + zones.length + " zones ...");
 			

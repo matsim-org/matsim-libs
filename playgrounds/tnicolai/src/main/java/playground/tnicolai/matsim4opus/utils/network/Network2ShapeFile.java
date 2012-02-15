@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.tnicolai.matsim4opus.utils;
+package playground.tnicolai.matsim4opus.utils.network;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
