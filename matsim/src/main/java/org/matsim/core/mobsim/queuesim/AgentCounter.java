@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim.helpers;
+package org.matsim.core.mobsim.queuesim;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,7 +50,7 @@ import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
  * @author dgrether
  *
  */
-public class AgentCounter implements AgentCounterI {
+class AgentCounter implements AgentCounterI {
 	/**
 	 * Number of agents that have not yet reached their final activity location
 	 */
@@ -61,8 +61,7 @@ public class AgentCounter implements AgentCounterI {
 	 */
 	private AtomicInteger lost = new AtomicInteger(0);
 
-	@Override
-	public void reset() {
+	void reset() {
 		setLiving(0);
 		resetLost();
 	}
@@ -81,14 +80,14 @@ public class AgentCounter implements AgentCounterI {
 	public final void incLost(final int count) {lost.addAndGet(count);}
 	private final void resetLost() { lost.set(0); }
 
-	@Override
-	public final void incLiving() {living.incrementAndGet();}
-	@Override
-	public final void incLiving(final int count) {living.addAndGet(count);}
+	final void incLiving() {living.incrementAndGet();}
+
+	 final void incLiving(final int count) {living.addAndGet(count);}
 	@Override
 	public final void decLiving() {living.decrementAndGet();}
 	@Override
 	public final void decLiving(final int count) {living.decrementAndGet();}
+	// yyyyyy does this work (`count' never used)??? kai, feb'12
 
 
 }

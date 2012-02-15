@@ -60,7 +60,6 @@ import org.matsim.ptproject.qsim.agents.TransitAgentFactory;
 import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
-import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
@@ -147,7 +146,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private final SimulationListenerManager listenerManager;
 	private final Scenario scenario;
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
-	private AgentCounterI agentCounter;
+	private AgentCounter agentCounter;
 	private Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
     private TransitQSimEngine transitEngine;
@@ -406,7 +405,7 @@ public final class QSim implements VisMobsim, Netsim {
 			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
 		}
 		agents.add(agent);
-		this.getAgentCounter().incLiving();
+		this.agentCounter.incLiving();
 		arrangeNextAgentAction(agent);
 	}
 	
@@ -475,7 +474,7 @@ public final class QSim implements VisMobsim, Netsim {
 				// newTime != Double.POSITIVE_INFINITY - re-activate the agent
 				this.activityEndsList.add(agent);
 				this.netEngine.registerAdditionalAgentOnLink(agent);
-				this.getAgentCounter().incLiving();				
+				this.agentCounter.incLiving();				
 			}
 		} 
 		/*

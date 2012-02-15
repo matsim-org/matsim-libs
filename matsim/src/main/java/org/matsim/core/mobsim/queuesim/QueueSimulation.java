@@ -51,7 +51,6 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
-import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -110,7 +109,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 	private Scenario scenario = null;
 
-	private AgentCounterI agentCounter = new AgentCounter() ;
+	private AgentCounter agentCounter = new AgentCounter() ;
 	private MobsimTimer simTimer ;
 
 	public QueueSimulation(final Scenario sc, final EventsManager events) {
@@ -327,7 +326,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 	@Override
 	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
-		this.getAgentCounter().incLiving();
+		this.agentCounter.incLiving();
 		this.arrangeNextAgentAction(agent) ;
 	}
 
