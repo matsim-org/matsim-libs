@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -44,7 +45,6 @@ import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriterV20;
 import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
@@ -97,19 +97,23 @@ public class DgFigure9ScenarioGenerator {
 	
 	private void createScenario() {
 		this.initIds();
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseLanes(true);
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(true);
+		config.scenario().setUseSignalSystems(true);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		
 		//network
-		Network net = this.createNetwork(sc);
+		Network net = this.createNetwork(scenario);
 		this.writeMatsimNetwork(net, networkOutfile);
 		log.info("network written to " + networkOutfile);
 		//lanes
-		LaneDefinitionsV2 lanes = createLanes((ScenarioImpl)sc);
+		LaneDefinitionsV2 lanes = createLanes((ScenarioImpl)scenario);
 		LaneDefinitionsWriterV20 laneWriter = new LaneDefinitionsWriterV20(lanes);
 		laneWriter.write(lanesOutfile);
 		log.info("lanes written to " + lanesOutfile);
 		//signals
-		SignalsData signalsData = new SignalsDataImpl();
 		createSignalSystemsAndGroups(signalsData);
 		
 		createSignalControl(signalsData);

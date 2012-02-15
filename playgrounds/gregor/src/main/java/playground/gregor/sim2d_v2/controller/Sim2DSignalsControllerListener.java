@@ -51,10 +51,8 @@ public class Sim2DSignalsControllerListener implements SignalsControllerListener
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		//load data
-		SignalsData signalsData = event.getControler().getScenario().getScenarioElement(SignalsData.class);
 		//build model
-		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, event.getControler().getEvents());
+		FromDataBuilder modelBuilder = new FromDataBuilder(event.getControler().getScenario(), event.getControler().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		//init mobility simulation
 		Sim2DSignalEngine signalEngie = new Sim2DSignalEngine(this.signalManager,this.hQ2DFac);

@@ -28,7 +28,6 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystem;
@@ -54,9 +53,8 @@ public class DgGershensonRoederLiveVisStarter {
 		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
 		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
-		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
+		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
 		events.addHandler(sensorManager);

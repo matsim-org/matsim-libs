@@ -19,7 +19,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 
@@ -89,7 +88,7 @@ public class HybridVis {
 		ControlerIO controlerIO = new ControlerIO(config.controler().getOutputDirectory());
 		QSim qSim = (QSim) new HybridQ2DMobsimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
-			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
+			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim, scenario, qSim.getEventsManager());

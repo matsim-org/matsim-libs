@@ -24,7 +24,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
@@ -124,7 +123,7 @@ public class DgOTFVisReplayLastIteration {
 		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(sc, events);
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
 			SignalEngine engine = new QSimSignalEngine(
-					new FromDataBuilder(sc.getScenarioElement(SignalsData.class), events)
+					new FromDataBuilder(sc, events)
 							.createAndInitializeSignalSystemsManager());
 			otfVisQSim.addQueueSimulationListeners(engine);
 		}

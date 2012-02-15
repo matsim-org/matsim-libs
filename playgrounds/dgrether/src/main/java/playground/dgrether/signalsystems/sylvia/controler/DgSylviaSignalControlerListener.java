@@ -30,7 +30,6 @@ import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.controler.SignalsControllerListener;
-import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -53,7 +52,6 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		ScenarioImpl scenario = event.getControler().getScenario();
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
 		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
 		if (scenario.getConfig().scenario().isUseLanes()){
@@ -61,7 +59,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		}
 		event.getControler().getEvents().addHandler(sensorManager);
 		
-		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, 
+		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
 				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getControler().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		

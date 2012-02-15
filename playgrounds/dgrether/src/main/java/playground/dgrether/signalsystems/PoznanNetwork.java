@@ -48,7 +48,6 @@ import org.matsim.lanes.data.v11.LaneDefinitionsWriterV11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
 import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
@@ -585,7 +584,6 @@ public class PoznanNetwork
         config.otfVis().setAgentSize(70.0f);
         config.otfVis().setNodeOffset(30);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
-        scenario.addScenarioElement(new SignalsDataImpl());
 
         // create network lanes and signals
         createPhysics();

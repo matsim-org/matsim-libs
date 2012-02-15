@@ -28,7 +28,6 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -58,13 +57,12 @@ public class SylviaOTFVisMain {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 
 		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
 		sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitionsV2.class));
 		events.addHandler(sensorManager);
 		
-		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, 
+		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
 				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , events);
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		

@@ -39,9 +39,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.Lane;
@@ -50,9 +48,7 @@ import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
 import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
-import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
@@ -60,7 +56,6 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -235,23 +230,19 @@ public class DgCalculateSignalGroupsTest {
 		conf.scenario().setUseLanes(true);
 		//network
 		String inputDirectory = this.testUtils.getClassInputDirectory();
-				conf.network().setInputFile(inputDirectory + "network.xml.gz");
+		conf.network().setInputFile(inputDirectory + "network.xml.gz");
 		String laneDefinitions = inputDirectory	+ "testLaneDefinitions_v1.1.xml";
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
 		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions, lanes20, conf.network().getInputFile());
 		conf.network().setLaneDefinitionsFile(lanes20);
+		conf.scenario().setUseSignalSystems(true);
+		String signalSystemsFile = inputDirectory + "testSignalSystems_v2.0.xml";
+		conf.signalSystems().setSignalSystemFile(signalSystemsFile);
 
 		//load the network
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
-		//load the signals
-		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
-		String signalSystemsFile = inputDirectory + "testSignalSystems_v2.0.xml";
-		SignalsData signalsData = new SignalsDataImpl();
-		SignalSystemsReader20 signalsReader = new SignalSystemsReader20(signalsData.getSignalSystemsData(), MatsimSignalSystemsReader.SIGNALSYSTEMS20);
-		signalsReader.readFile(signalSystemsFile);
-		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
+		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+//		
 		//calculate the signal groups
 		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalsData.getSignalSystemsData(), scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitionsV2.class));
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();

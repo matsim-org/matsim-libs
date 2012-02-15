@@ -26,7 +26,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -40,7 +39,7 @@ import playground.dgrether.DgOTFVis;
 public class DgFigure9OtfVis {
 	
 	private void runFromConfig() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 //		String conf = DgKoehlerStrehler2010Runner.signalsConfigSol800;
 //		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario2/config_signals_coordinated.xml";
 		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario5/config_signals_coordinated.xml";
@@ -48,7 +47,7 @@ public class DgFigure9OtfVis {
 		Scenario scenario = loader.loadScenario();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
 		
-		FromDataBuilder builder = new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		

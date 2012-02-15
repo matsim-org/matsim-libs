@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -60,7 +59,7 @@ public class CottbusLiveVis {
 		loader.loadScenario();
 		Scenario scenario = loader.getScenario();
 		
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links((NetworkImpl) scenario.getNetwork()));
+		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links(scenario.getNetwork()));
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new AStarLandmarksFactory(scenario.getNetwork(), timeCostCalc), routeFactory));
@@ -73,7 +72,7 @@ public class CottbusLiveVis {
 			AdaptiveControllHead adaptiveControllHead = new AdaptiveControllHead();
 			CarsOnLaneHandler carsOnLaneHandler = new CarsOnLaneHandler();
 			carsOnLaneHandler.setAdaptiveControllHead(adaptiveControllHead);
-			JbSignalBuilder jbBuilder = new JbSignalBuilder(scenario.getScenarioElement(SignalsData.class), new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events), carsOnLaneHandler, adaptiveControllHead);
+			JbSignalBuilder jbBuilder = new JbSignalBuilder(scenario.getScenarioElement(SignalsData.class), new FromDataBuilder(scenario, events), carsOnLaneHandler, adaptiveControllHead);
 			SignalEngine engine = new QSimSignalEngine(jbBuilder.createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}

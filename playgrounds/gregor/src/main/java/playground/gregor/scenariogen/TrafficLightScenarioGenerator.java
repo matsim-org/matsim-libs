@@ -31,7 +31,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
@@ -61,6 +60,7 @@ public class TrafficLightScenarioGenerator {
 
 
 		Config c = ConfigUtils.createConfig();
+		c.scenario().setUseSignalSystems(true);
 
 		Scenario sc = ScenarioUtils.createScenario(c);
 
@@ -70,9 +70,7 @@ public class TrafficLightScenarioGenerator {
 
 		createPop(sc,inputDir, links);
 		
-		c.scenario().setUseSignalSystems(true);
 		
-		sc.addScenarioElement(new SignalsDataImpl());
 		
 		createTrafficLights(sc,inputDir);
 

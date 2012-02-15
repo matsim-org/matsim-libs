@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -15,7 +16,6 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v20.LaneDefinitionsV2;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
@@ -54,7 +54,10 @@ public class GenerateZuerrichOutput {
 	private 	boolean removeDuplicates = false;
 	
 	public GenerateZuerrichOutput() {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(generateLanes);
+		config.scenario().setUseSignalSystems(generateSignalSystems);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network net = scenario.getNetwork();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(DgPaths.IVTCHNET);
@@ -89,7 +92,7 @@ public class GenerateZuerrichOutput {
 		}
 
 		if (generateSignalSystems){
-			SignalsData signalsData = new SignalsDataImpl();
+			SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 			//first generate the signal systems itself 
 			SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 			//read the mappings

@@ -80,7 +80,7 @@ public class FourWaysVis {
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(scenario.getConfig().signalSystems());
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement(signalsData);
-		FromDataBuilder builder = new FromDataBuilder(signalsData, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 

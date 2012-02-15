@@ -33,7 +33,6 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
 import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
-import playground.jbischoff.BAsignals.CottbusMain;
 import playground.jbischoff.BAsignals.analysis.TimeCalcHandler;
 import playground.jbischoff.BAsignals.builder.JbSignalBuilder;
 import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
@@ -75,7 +74,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		// this.loadData(signalsConfig, scenario);
-		FromDataBuilder builder = new FromDataBuilder(signalsData, c.getEvents());
+		FromDataBuilder builder = new FromDataBuilder(scenario, c.getEvents());
 		jbBuilder = new JbSignalBuilder(signalsData, builder, this.collh, this.ach);
 		this.manager = jbBuilder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
