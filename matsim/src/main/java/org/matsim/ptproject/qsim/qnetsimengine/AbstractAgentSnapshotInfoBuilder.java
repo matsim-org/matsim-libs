@@ -169,6 +169,9 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 			tmpLane = Integer.parseInt(veh.getId().toString()) ;
 		} catch ( NumberFormatException ee ) {
 			tmpLane = veh.getId().hashCode() ;
+			if (tmpLane < 0 ){
+				tmpLane = -tmpLane;
+			}
 		}
 		int lane = 1 + (tmpLane % numberOfLanes);
 		return lane;
