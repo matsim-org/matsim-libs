@@ -22,22 +22,31 @@ Changes:
   - Major memory improvements in OsmNetworkReader by using Long instead of String for osm-ids (r14944)
   - dump of configuration to logfile now uses os-specific line endings, making the dump reabable on Windows (r14945, #168)
   - transit router now exposes additional attributes for configuration to config-file (r14860)
-  - improved OTFVis visualization of traffic signals (r18143 & r18129)
+  - improved OTFVis visualization of traffic signals and lanes (r18143, r18129, r18387, r18390)
+  - improved traffic light implementation: added a data model for intergreen times and a default implementation that checks if the minimum intergreen time between two signal groups is not violated 
 
 - BugFixes:
   - The link to link routing feature could not be enabled via controler config module in xml config. Fixed (r15002)
 
 - Changes for developers:
 	- package org.matsim.lanes:
-		- moved classes of packate: The classes mapping the XML data structures are moved to org.matsim.lanes.data.* (r18160)
+		- moved classes of package: The classes mapping the XML data structures are moved to org.matsim.lanes.data.* (r18160)
+		- provided some additional factories for better extensibility of the packages
+		- provided convenience method in LanesUtils
+	- package org.matsim.signalsystems
+		- provided some additional factories for better extensibility of the packages
+		- provided convenience method in SignalUtils
 
   API-Changes:
   - 
   
   Non-API Changes:
-  - 
-
-
+	- org.matsim.lanes.* was split into two subpackages, one for each model: 
+		1. org.matsim.lanes.data.v11.*: A model written to simplify creation and modelling of lanes
+		2. org.matsim.lanes.data.v20.*: A model that is used as input for the simulation. 
+	- dtd/laneDefinitions_v2.0.xsd: added additional element to laneType in order to allow the user to calibrate the lanes model via the capacity of the lane. The capacity must be set explicitly in the xml otherwise the model will use some defaults with probably too high capacities. In order to avoid the usage of the defaults use LanesCapacityCalculator to preprocess the data using the same semantics that have been used on the fly in previous releases. The capacity calculation is done automaticall if the lane layout is modelled via the org.matsim.lanes.data.v11 package classes and then converted to with the LaneDefinitionsV11ToV20Conversion class into the 2.0 model. 
+	- config module signalsystems: added to parameters to switch on and off ambertimes and intergreen usage
+	- org.matsim.lanes & signalsystems can deal with not available turning moves
 
 
 Release Spring 2011 (version 0.3.0)
