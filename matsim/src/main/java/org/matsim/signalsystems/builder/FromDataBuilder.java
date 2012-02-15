@@ -34,6 +34,7 @@ import org.matsim.signalsystems.model.AmberLogic;
 import org.matsim.signalsystems.model.AmberLogicImpl;
 import org.matsim.signalsystems.model.DatabasedSignal;
 import org.matsim.signalsystems.model.IntergreensLogic;
+import org.matsim.signalsystems.model.IntergreensLogicImpl;
 import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;

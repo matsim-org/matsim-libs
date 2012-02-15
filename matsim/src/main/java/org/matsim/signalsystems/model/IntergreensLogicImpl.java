@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.builder;
+package org.matsim.signalsystems.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +29,6 @@ import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.signalsystems.data.intergreens.v10.IntergreensForSignalSystemData;
-import org.matsim.signalsystems.model.IntergreensLogic;
-import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**
