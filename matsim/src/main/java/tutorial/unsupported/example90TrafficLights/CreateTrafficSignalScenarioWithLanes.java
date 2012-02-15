@@ -24,6 +24,8 @@ import java.io.File;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
@@ -33,6 +35,7 @@ import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
 import org.matsim.lanes.data.v20.LaneDefinitionsV2;
+import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
@@ -231,19 +234,19 @@ public class CreateTrafficSignalScenarioWithLanes {
 		return l2;
 	}
 	
-	public Scenario loadScenario(){
+
+	
+	private void run() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
 		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
 		config.scenario().setUseLanes(true);
 		config.scenario().setUseSignalSystems(true);
+		config.otfVis().setNodeOffset(20.0);
+		config.controler().setMobsim("qsim");
+		config.addQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
-
-	
-	private void run() {
-		Scenario scenario = this.loadScenario();
 		
 		this.createLanes((ScenarioImpl) scenario);
 		
@@ -260,13 +263,29 @@ public class CreateTrafficSignalScenarioWithLanes {
 		}
 		
 		//write to file
-		new MatsimLaneDefinitionsWriter().writeFileV20("output/example90/TrafficLights/lane_definitions_v2.0.xml", scenario.getScenarioElement(LaneDefinitionsV2.class));
+		String configFile = "output/example90TrafficLights/config.xml";
+		String lanesFile = "output/example90TrafficLights/lane_definitions_v2.0.xml";
+		String signalSystemsFile = "output/example90TrafficLights/signal_systems.xml";
+		String signalGroupsFile = "output/example90TrafficLights/signal_groups.xml";
+		String signalControlFile = "output/example90TrafficLights/signal_control.xml";
+
+		new MatsimLaneDefinitionsWriter().writeFileV20(lanesFile, scenario.getScenarioElement(LaneDefinitionsV2.class));
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
-		signalsWriter.setSignalSystemsOutputFilename("output/example90TrafficLights/signal_systems.xml");
-		signalsWriter.setSignalGroupsOutputFilename("output/example90TrafficLights/signal_groups.xml");
-		signalsWriter.setSignalControlOutputFilename("output/example90TrafficLights/signal_control.xml");
+		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);
+		signalsWriter.setSignalGroupsOutputFilename(signalGroupsFile);
+		signalsWriter.setSignalControlOutputFilename(signalControlFile);
 		signalsWriter.writeSignalsData(signalsData);
+
+		config.network().setLaneDefinitionsFile(lanesFile);
+		config.signalSystems().setSignalSystemFile(signalSystemsFile);
+		config.signalSystems().setSignalGroupsFile(signalGroupsFile);
+		config.signalSystems().setSignalControlFile(signalControlFile);
+		ConfigWriter configWriter = new ConfigWriter(config);
+		configWriter.write(configFile);
+		
+		//play
+		OTFVis.playConfig(configFile);
 
 	}
 

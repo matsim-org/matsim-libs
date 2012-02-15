@@ -27,7 +27,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -155,19 +158,19 @@ public class CreateSimpleTrafficSignalScenario {
 		return control;
 	}
 	
-	public Scenario createConfigAndLoadScenario(){
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
-		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
-		config.scenario().setUseSignalSystems(true);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
 
 	
 	
 	private void run() {
-		Scenario scenario = this.createConfigAndLoadScenario();
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
+		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
+		config.scenario().setUseSignalSystems(true);
+		config.otfVis().setNodeOffset(20.0);
+		config.controler().setMobsim("qsim");
+		config.addQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setSnapshotStyle("queue");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		this.createSignalSystemsAndGroups(scenario, signalsData);
 		this.createSignalControl(scenario, signalsData);
@@ -178,11 +181,26 @@ public class CreateSimpleTrafficSignalScenario {
 		}
 		
 		//write to file
+		String configFile = "output/example90TrafficLights/config.xml";
+		String signalSystemsFile = "output/example90TrafficLights/signal_systems.xml";
+		String signalGroupsFile = "output/example90TrafficLights/signal_groups.xml";
+		String signalControlFile = "output/example90TrafficLights/signal_control.xml";
+
+		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
-		signalsWriter.setSignalSystemsOutputFilename("output/example90TrafficLights/signal_systems.xml");
-		signalsWriter.setSignalGroupsOutputFilename("output/example90TrafficLights/signal_groups.xml");
-		signalsWriter.setSignalControlOutputFilename("output/example90TrafficLights/signal_control.xml");
+		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);
+		signalsWriter.setSignalGroupsOutputFilename(signalGroupsFile);
+		signalsWriter.setSignalControlOutputFilename(signalControlFile);
 		signalsWriter.writeSignalsData(signalsData);
+
+		config.signalSystems().setSignalSystemFile(signalSystemsFile);
+		config.signalSystems().setSignalGroupsFile(signalGroupsFile);
+		config.signalSystems().setSignalControlFile(signalControlFile);
+		ConfigWriter configWriter = new ConfigWriter(config);
+		configWriter.write(configFile);
+		
+		//play
+		OTFVis.playConfig(configFile);
 
 	}
 	
