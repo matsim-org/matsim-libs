@@ -59,24 +59,11 @@ public class EmissionsPerPersonColdEventHandler implements ColdEmissionEventHand
 		}
 	}
 
-	public Map<Id, Map<String, Double>> getColdEmissionsPerPerson() {
-		Map<Id, Map<String, Double>> personId2coldEmissionsAsString = new HashMap<Id, Map<String, Double>>();
-
-		for (Entry<Id, Map<ColdPollutant, Double>> entry1: this.coldEmissionsTotal.entrySet()){
-			Id personId = entry1.getKey();
-			Map<ColdPollutant, Double> pollutant2Values = entry1.getValue();
-			Map<String, Double> pollutantString2Values = new HashMap<String, Double>();
-			for (Entry<ColdPollutant, Double> entry2: pollutant2Values.entrySet()){
-				String pollutant = entry2.getKey().toString();
-				Double value = entry2.getValue();
-				pollutantString2Values.put(pollutant, value);
-			}
-			personId2coldEmissionsAsString.put(personId, pollutantString2Values);
-		}
-		return personId2coldEmissionsAsString;
+	public Map<Id, Map<ColdPollutant, Double>> getColdEmissionsPerPerson() {
+		return coldEmissionsTotal;
 	}
 
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
+		coldEmissionsTotal.clear();
 	}
 }

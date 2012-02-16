@@ -43,21 +43,28 @@ import playground.benjamin.emissions.EmissionModule;
 public class RunEmissionToolOffline {
 	private static final Logger logger = Logger.getLogger(RunEmissionToolOffline.class);
 
-	final static String runNumber = "981";
-	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
-	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
-	static final Integer lastIteration = getLastIteration(configFile);
+//	final static String runNumber = "981";
+//	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+//	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+//	final static Integer lastIteration = getLastIteration(configFile);
+//	
+//	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration;
+//	static String eventsFile = eventsPath + ".events.xml.gz";
+//	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+//	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
+//	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
 	
-	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration;
+	final static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/short/";
+	static String configFile = runDirectory + "output_config.xml.gz";
+	static String netFile =  runDirectory + "output_network.xml.gz";
+//	final static  Integer lastIteration = getLastIteration(configFile);
+	final static  Integer lastIteration = 1000;
+	
+	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + lastIteration;
 	static String eventsFile = eventsPath + ".events.xml.gz";
-	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
-	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
-	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
 	
-//	static String eventsFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.events.xml.gz";
-//	static String netFile = "../../detailedEval/emissions/testScenario/output/output_network.xml.gz";
-//	static String emissionVehicleFile = "../../detailedEval/emissions/testScenario/input/emissionVehicles_10pct.xml.gz";
-//	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
+	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_1pct.xml.gz";
+	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
 
 	// ===
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";

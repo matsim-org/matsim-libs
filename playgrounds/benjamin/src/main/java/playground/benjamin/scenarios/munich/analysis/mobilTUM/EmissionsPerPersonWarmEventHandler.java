@@ -62,24 +62,11 @@ public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHand
 		}
 	}
 
-	public Map<Id, Map<String, Double>> getWarmEmissionsPerPerson() {
-		Map<Id, Map<String, Double>> personId2warmEmissionsAsString = new HashMap<Id, Map<String, Double>>();
-
-		for (Entry<Id, Map<WarmPollutant, Double>> entry1: this.warmEmissionsTotal.entrySet()){
-			Id personId = entry1.getKey();
-			Map<WarmPollutant, Double> pollutant2Values = entry1.getValue();
-			Map<String, Double> pollutantString2Values = new HashMap<String, Double>();
-			for (Entry<WarmPollutant, Double> entry2: pollutant2Values.entrySet()){
-				String pollutant = entry2.getKey().toString();
-				Double value = entry2.getValue();
-				pollutantString2Values.put(pollutant, value);
-			}
-			personId2warmEmissionsAsString.put(personId, pollutantString2Values);
-		}
-		return personId2warmEmissionsAsString;
+	public Map<Id, Map<WarmPollutant, Double>> getWarmEmissionsPerPerson() {
+		return warmEmissionsTotal;
 	}
 
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
+		warmEmissionsTotal.clear();
 	}
 }

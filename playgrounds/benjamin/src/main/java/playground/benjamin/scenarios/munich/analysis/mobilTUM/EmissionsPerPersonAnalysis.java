@@ -19,17 +19,26 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.mobilTUM;
 
+import java.util.Map;
+import java.util.SortedMap;
 import java.util.SortedSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.benjamin.emissions.events.EmissionEventsReader;
+import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.EmissionWriter;
+import playground.benjamin.utils.EmissionSummarizer;
 
 
 /**
@@ -56,26 +65,39 @@ public class EmissionsPerPersonAnalysis {
 	public static void main(String[] args) {
 		loadScenario();
 		
+		// TODO: do this to EmissionSummarizer...
 		Population population = scenario.getPopulation();
-		EmissionsPerPersonAggregator epa = new EmissionsPerPersonAggregator(population, emissionFile);
-		epa.run();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		EmissionsPerPersonWarmEventHandler warmHandler = new EmissionsPerPersonWarmEventHandler();
+		EmissionsPerPersonColdEventHandler coldHandler = new EmissionsPerPersonColdEventHandler();
+		eventsManager.addHandler(warmHandler);
+		eventsManager.addHandler(coldHandler);
+		emissionReader.parse(emissionFile);
 		
-		SortedSet<String> listOfPollutants = epa.getListOfPollutants();
+		Map<Id, Map<WarmPollutant, Double>> warmEmissions = warmHandler.getWarmEmissionsPerPerson();
+		Map<Id, Map<ColdPollutant, Double>> coldEmissions = coldHandler.getColdEmissionsPerPerson();
+		
+		EmissionSummarizer ems = new EmissionSummarizer();
+		Map<Id, SortedMap<String, Double>> totalEmissions = ems.sumUpEmissionsPerPerson(warmEmissions, coldEmissions);
+		Map<Id, SortedMap<String, Double>> filledTotalEmissions = ems.setNonCalculatedEmissions(population, totalEmissions);
+		
+		SortedSet<String> listOfPollutants = ems.getListOfPollutants();
 		EmissionWriter emissionWriter = new EmissionWriter();
-		emissionWriter.writeHomeLocation2Emissions(
+//		emissionWriter.writeHomeLocation2TotalEmissions(
+//				population,
+//				listOfPollutants,
+//				filledWarmEmissions,
+//				runDirectory + runNumber + "." + lastIteration + ".emissionsWarmPerHomeLocation.txt");
+//		emissionWriter.writeHomeLocation2TotalEmissions(
+//				population,
+//				listOfPollutants,
+//				filledColdEmissions,
+//				runDirectory + runNumber + "." + lastIteration + ".emissionsColdPerHomeLocation.txt");
+		emissionWriter.writeHomeLocation2TotalEmissions(
 				population,
 				listOfPollutants,
-				epa.getWarmEmissions(),
-				runDirectory + runNumber + "." + lastIteration + ".emissionsWarmPerHomeLocation.txt");
-		emissionWriter.writeHomeLocation2Emissions(
-				population,
-				listOfPollutants,
-				epa.getColdEmissions(),
-				runDirectory + runNumber + "." + lastIteration + ".emissionsColdPerHomeLocation.txt");
-		emissionWriter.writeHomeLocation2Emissions(
-				population,
-				listOfPollutants,
-				epa.getTotalEmissions(),
+				filledTotalEmissions,
 				runDirectory + runNumber + "." + lastIteration + ".emissionsTotalPerHomeLocation.txt");
 	}
 	

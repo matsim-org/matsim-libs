@@ -36,24 +36,11 @@ public class PersonFilter {
 	
 	public Population getPopulation(Population population, UserGroup userGroup) {
 		Population filteredPopulation = null;
-		
 		if(userGroup.equals(UserGroup.MID)) filteredPopulation = getMiDPopulation(population);
 		else if(userGroup.equals(UserGroup.INN_COMMUTER)) filteredPopulation = getInnCommuter(population);
 		else if(userGroup.equals(UserGroup.OUT_COMMUTER)) filteredPopulation = getOutCommuter(population);
 		else if(userGroup.equals(UserGroup.FREIGHT)) filteredPopulation = getFreightPopulation(population);
-		
 		return filteredPopulation;
-	}
-	
-	public boolean isPersonFromUserGroup(Person person, UserGroup userGroup) {
-		boolean isFromUserGroup = false;
-		
-		if(isPersonFromMID(person) && userGroup.equals(UserGroup.MID)) isFromUserGroup = true;
-		else if(isPersonInnCommuter(person) && userGroup.equals(UserGroup.INN_COMMUTER)) isFromUserGroup = true;
-		else if(isPersonOutCommuter(person) && userGroup.equals(UserGroup.OUT_COMMUTER)) isFromUserGroup = true;
-		else if(isPersonFreight(person) && userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;
-		
-		return isFromUserGroup;
 	}
 	
 	public boolean isPersonIdFromUserGroup(Id personId, UserGroup userGroup) {
@@ -72,14 +59,8 @@ public class PersonFilter {
 			if(userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;
 		}
 		else{
-			logger.warn("Cannot match person " + personId + " to any user group.");
+			logger.warn("Cannot match person " + personId + " to any user group defined in " + PersonFilter.class);
 		}
-		
-//		if(isPersonFromMID(personId) && userGroup.equals(UserGroup.MID)) isFromUserGroup = true ;
-//		else if(isPersonInnCommuter(personId) && userGroup.equals(UserGroup.INN_COMMUTER)) isFromUserGroup = true;
-//		else if(isPersonOutCommuter(personId) && userGroup.equals(UserGroup.OUT_COMMUTER)) isFromUserGroup = true;
-//		else if(isPersonFreight(personId) && userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;
-		
 		return isFromUserGroup;
 	}
 
@@ -87,7 +68,7 @@ public class PersonFilter {
 		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
-			if(isPersonFromMID(person)){
+			if(isPersonFromMID(person.getId())){
 				filteredPopulation.addPerson(person);
 			}
 		}
@@ -98,7 +79,7 @@ public class PersonFilter {
 		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
-			if(isPersonFromMunich(person)){
+			if(isPersonFromMunich(person.getId())){
 				filteredPopulation.addPerson(person);
 			}
 		}
@@ -109,7 +90,7 @@ public class PersonFilter {
 		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
-			if(isPersonInnCommuter(person)){
+			if(isPersonInnCommuter(person.getId())){
 				filteredPopulation.addPerson(person);
 			}
 		}
@@ -120,7 +101,7 @@ public class PersonFilter {
 		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
-			if(isPersonOutCommuter(person)){
+			if(isPersonOutCommuter(person.getId())){
 				filteredPopulation.addPerson(person);
 			}
 		}
@@ -131,7 +112,7 @@ public class PersonFilter {
 		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
-			if(isPersonFreight(person)){
+			if(isPersonFreight(person.getId())){
 				filteredPopulation.addPerson(person);
 			}
 		}
@@ -142,35 +123,19 @@ public class PersonFilter {
 		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
-			if(!isPersonFreight(person)){
+			if(!isPersonFreight(person.getId())){
 				filteredPopulation.addPerson(person);
 			}
 		}
 		return filteredPopulation;
 	}
 	
-	public boolean isPersonFromMID(Person person) {
-		boolean isFromMID = false;
-		if(person.getId().toString().startsWith("gv_")); //do nothing
-		else if(person.getId().toString().startsWith("pv_")); //do nothing
-		else isFromMID = true;
-		return isFromMID;
-	}
-
 	public boolean isPersonFromMID(Id personId) {
 		boolean isFromMID = false;
 		if(personId.toString().startsWith("gv_")); //do nothing
 		else if(personId.toString().startsWith("pv_")); //do nothing
 		else isFromMID = true;
 		return isFromMID;
-	}
-	
-	public boolean isPersonFromMunich(Person person) {
-		boolean isFromMunich = false;
-		if(isPersonFromMID(person) || isPersonOutCommuter(person)){
-			isFromMunich = true;
-		}
-		return isFromMunich;
 	}
 	
 	public boolean isPersonFromMunich(Id personId) {
@@ -181,16 +146,6 @@ public class PersonFilter {
 		return isFromMunich;
 	}
 
-	public boolean isPersonInnCommuter(Person person) {
-		boolean isInnCommuter = false;
-		if(person.getId().toString().startsWith("pv_")){
-			if(person.getId().toString().startsWith("pv_car_9162")); //do nothing
-			else if(person.getId().toString().startsWith("pv_pt_9162")); //do nothing
-			else isInnCommuter = true;
-		}
-		return isInnCommuter;
-	}
-	
 	public boolean isPersonInnCommuter(Id personId) {
 		boolean isInnCommuter = false;
 		if(personId.toString().startsWith("pv_")){
@@ -201,28 +156,12 @@ public class PersonFilter {
 		return isInnCommuter;
 	}
 
-	public boolean isPersonOutCommuter(Person person) {
-		boolean isOutCommuter = false;
-		if(person.getId().toString().startsWith("pv_car_9162") || person.getId().toString().startsWith("pv_pt_9162")){
-			isOutCommuter = true;
-		}
-		return isOutCommuter;
-	}
-
 	public boolean isPersonOutCommuter(Id personId) {
 		boolean isOutCommuter = false;
 		if(personId.toString().startsWith("pv_car_9162") || personId.toString().startsWith("pv_pt_9162")){
 			isOutCommuter = true;
 		}
 		return isOutCommuter;
-	}
-
-	public boolean isPersonFreight(Person person) {
-		boolean isFreight = false;
-		if(person.getId().toString().startsWith("gv_")){
-			isFreight = true;
-		}
-		return isFreight;
 	}
 
 	public boolean isPersonFreight(Id personId) {

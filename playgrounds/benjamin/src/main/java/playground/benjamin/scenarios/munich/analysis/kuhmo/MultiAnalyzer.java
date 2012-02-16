@@ -34,10 +34,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.emissions.events.EmissionEventsReader;
-import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerGroupColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerGroupWarmEventHandler;
+import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonColdEventHandler;
+import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonWarmEventHandler;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
 import playground.benjamin.utils.BkNumberUtils;
 import playground.benjamin.utils.EmissionSummarizer;
@@ -73,8 +75,8 @@ public class MultiAnalyzer {
 	}
 
 	private void run() {
-		calculateUserWelfareChange(netFile, configFile, initialPlansFile, finalPlansFile);
-		calculateTollRevenueByUserGroup(finalEventsFile);
+//		calculateUserWelfareChange(netFile, configFile, initialPlansFile, finalPlansFile);
+//		calculateTollRevenueByUserGroup(finalEventsFile);
 		calculateAverageTripTravelTimePerMode(initialEventsFile, finalEventsFile);
 		calculateAverageTripLengthCar(initialEventsFile, finalEventsFile);
 		calculateEmissionChangesByUserGroup(initialEmissionEventsFile, finalEmissionEventsFile);
@@ -164,7 +166,8 @@ public class MultiAnalyzer {
 			}
 			// need to take the absolute value since money events are negative from the users' perspective.
 			double absoluteTollRevenueUserGroup = Math.abs(tollRevenueFromGroup);
-			System.out.println("Toll revenue from ``" + userGroup + "'' (" + groupSize + " users) is calculated to\t" + BkNumberUtils.roundDouble(absoluteTollRevenueUserGroup, decimalPlace));
+			System.out.println("Toll revenue from ``" + userGroup + "'' (" + groupSize + " users) is calculated to\t" + 
+							   BkNumberUtils.roundDouble(absoluteTollRevenueUserGroup, decimalPlace));
 		}
 		
 		double tollRevenue = 0.0;
@@ -173,7 +176,8 @@ public class MultiAnalyzer {
 		}
 		double absoluteTollRevenue = Math.abs(tollRevenue);
 		System.out.println("===================================================================");
-		System.out.println("Total toll revenue from " + personId2Toll.size() + " users is calculated to\t\t" + BkNumberUtils.roundDouble(absoluteTollRevenue, decimalPlace));
+		System.out.println("Total toll revenue from " + personId2Toll.size() + " users is calculated to\t\t" +
+						   BkNumberUtils.roundDouble(absoluteTollRevenue, decimalPlace));
 		System.out.println("*******************************************************************\n");
 	}
 
@@ -182,45 +186,40 @@ public class MultiAnalyzer {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		EmissionsPerGroupWarmEventHandler warmHandler = new EmissionsPerGroupWarmEventHandler();
-		EmissionsPerGroupColdEventHandler coldHandler = new EmissionsPerGroupColdEventHandler();
+		EmissionsPerPersonWarmEventHandler warmHandler = new EmissionsPerPersonWarmEventHandler();
+		EmissionsPerPersonColdEventHandler coldHandler = new EmissionsPerPersonColdEventHandler();
 		eventsManager.addHandler(warmHandler);
 		eventsManager.addHandler(coldHandler);
 		emissionReader.parse(finalEmissionEventsFile);
 		
-		SortedMap<UserGroup, Map<String, Double>> group2FinalWarmEmissions = warmHandler.getWarmEmissionsPerGroup();
-		SortedMap<UserGroup, Map<String, Double>> group2FinalColdEmissions = coldHandler.getColdEmissionsPerGroup();
-		SortedMap<UserGroup, Map<String, Double>> group2FinalTotalEmissions = summarizer.sumUpEmissionsPerGroup(group2FinalWarmEmissions, group2FinalColdEmissions);
-
-		SortedMap<String, Double> overallFinalWarmEmissions = warmHandler.getOverallWarmEmissions();
-		SortedMap<String, Double> overallFinalColdEmissions = coldHandler.getOverallColdEmissions();
-		SortedMap<String, Double> overallFinalTotalEmissions = summarizer.sumUpEmissions(overallFinalWarmEmissions, overallFinalColdEmissions);
+		Map<Id, Map<WarmPollutant, Double>> person2FinalWarmEmissions = warmHandler.getWarmEmissionsPerPerson();
+		Map<Id, Map<ColdPollutant, Double>> person2FinalColdEmissions = coldHandler.getColdEmissionsPerPerson();
+		Map<Id, SortedMap<String, Double>> person2FinalTotalEmissions = summarizer.sumUpEmissionsPerPerson(person2FinalWarmEmissions, person2FinalColdEmissions);
+		SortedMap<UserGroup, SortedMap<String, Double>> group2FinalTotalEmissions = summarizer.getEmissionsPerGroup(person2FinalTotalEmissions);
 
 		warmHandler.reset(0);
 		coldHandler.reset(0);
 		emissionReader.parse(initialEmissionEventsFile);
 		
-		SortedMap<UserGroup, Map<String, Double>> group2InitialWarmEmissions = warmHandler.getWarmEmissionsPerGroup();
-		SortedMap<UserGroup, Map<String, Double>> group2InitialColdEmissions = coldHandler.getColdEmissionsPerGroup();
-		SortedMap<UserGroup, Map<String, Double>> group2InitialTotalEmissions = summarizer.sumUpEmissionsPerGroup(group2InitialWarmEmissions, group2InitialColdEmissions);
-		
-		SortedMap<String, Double> overallInitialWarmEmissions = warmHandler.getOverallWarmEmissions();
-		SortedMap<String, Double> overallInitialColdEmissions = coldHandler.getOverallColdEmissions();
-		SortedMap<String, Double> overallInitialTotalEmissions = summarizer.sumUpEmissions(overallInitialWarmEmissions, overallInitialColdEmissions);
+		Map<Id, Map<WarmPollutant, Double>> person2InitialWarmEmissions = warmHandler.getWarmEmissionsPerPerson();
+		Map<Id, Map<ColdPollutant, Double>> person2InitialColdEmissions = coldHandler.getColdEmissionsPerPerson();
+		Map<Id, SortedMap<String, Double>> person2InitialTotalEmissions = summarizer.sumUpEmissionsPerPerson(person2InitialWarmEmissions, person2InitialColdEmissions);
+		SortedMap<UserGroup, SortedMap<String, Double>> group2InitialTotalEmissions = summarizer.getEmissionsPerGroup(person2InitialTotalEmissions);
 		
 		for(UserGroup userGroup : group2FinalTotalEmissions.keySet()){
 			System.out.println("\n*******************************************************************");
 			System.out.println("VALUES FOR " + userGroup);
 			System.out.println("*******************************************************************");
-			Map<String, Double> pollutant2Emissions = group2FinalTotalEmissions.get(userGroup);
-			for(String pollutant : pollutant2Emissions.keySet()){
-				double pollutantDiff = BkNumberUtils.roundDouble(pollutant2Emissions.get(pollutant) - group2InitialTotalEmissions.get(userGroup).get(pollutant), decimalPlace);
+			Map<String, Double> pollutant2FinalEmissions = group2FinalTotalEmissions.get(userGroup);
+			for(String pollutant : pollutant2FinalEmissions.keySet()){
+				double pollutantDiff = BkNumberUtils.roundDouble(pollutant2FinalEmissions.get(pollutant) - group2InitialTotalEmissions.get(userGroup).get(pollutant), decimalPlace);
 				double pollutantDiffPct = BkNumberUtils.roundDouble(100 * (pollutantDiff / group2InitialTotalEmissions.get(userGroup).get(pollutant)), decimalPlace);
 				System.out.println("Final emissions " + pollutant + " are calculated to\t" 
-						+ BkNumberUtils.roundDouble(pollutant2Emissions.get(pollutant), decimalPlace) + " [ Change: " + pollutantDiff + " or " + pollutantDiffPct + "% ]");
+						+ BkNumberUtils.roundDouble(pollutant2FinalEmissions.get(pollutant), decimalPlace) + " [ Change: " + pollutantDiff + " or " + pollutantDiffPct + "% ]");
 			}
 		}
-
+		SortedMap<String, Double> overallFinalTotalEmissions = summarizer.getTotalEmissions(person2FinalTotalEmissions);
+		SortedMap<String, Double> overallInitialTotalEmissions = summarizer.getTotalEmissions(person2InitialTotalEmissions);
 		System.out.println("\n*******************************************************************");
 		System.out.println("VALUES FOR WHOLE POPULATION");
 		System.out.println("*******************************************************************");

@@ -22,6 +22,7 @@ package playground.benjamin.scenarios.munich.analysis;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
@@ -41,10 +42,10 @@ import org.matsim.api.core.v01.population.Population;
 public class EmissionWriter {
 	private static final Logger logger = Logger.getLogger(EmissionWriter.class);
 
-	public void writeHomeLocation2Emissions(
+	public void writeHomeLocation2TotalEmissions(
 			Population population,
 			SortedSet<String> listOfPollutants,
-			Map<Id, Map<String, Double>> emissions,
+			Map<Id, SortedMap<String, Double>> totalEmissions,
 			String outFile) {
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
@@ -65,7 +66,7 @@ public class EmissionWriter {
 
 				out.append(personId + "\t" + xHome + "\t" + yHome + "\t");
 
-				Map<String, Double> emissionType2Value = emissions.get(personId);
+				Map<String, Double> emissionType2Value = totalEmissions.get(personId);
 				for(String pollutant : listOfPollutants){
 					if(emissionType2Value.get(pollutant) != null){
 						out.append(emissionType2Value.get(pollutant) + "\t");

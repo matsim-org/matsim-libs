@@ -22,10 +22,10 @@ package playground.benjamin.scenarios.munich.analysis.cupum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
@@ -36,12 +36,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.HomeLocationFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
@@ -209,7 +209,7 @@ public class UrbanSuburbanAnalyzer {
 		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
-			if(!personFilter.isPersonFreight(person)){
+			if(!personFilter.isPersonFreight(person.getId())){
 				if(homeLocationFilter.isPersonsHomeInShape(person, featuresInShape)){
 					filteredPopulation.addPerson(person);
 				}
