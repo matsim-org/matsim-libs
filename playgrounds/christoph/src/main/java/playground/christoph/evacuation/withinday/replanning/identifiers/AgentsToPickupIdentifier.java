@@ -235,8 +235,8 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 			}
 		} else if (this.carLegPerformingAgents.contains(event.getPersonId())) {
 			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-			double time = link.getLength() / link.getFreespeed(event.getTime());
-			this.earliestLinkLeaveTime.put(event.getPersonId(), time);
+			double minTravelTime = link.getLength() / link.getFreespeed(event.getTime());
+			this.earliestLinkLeaveTime.put(event.getPersonId(), event.getTime() + minTravelTime);
 		}
 	}
 

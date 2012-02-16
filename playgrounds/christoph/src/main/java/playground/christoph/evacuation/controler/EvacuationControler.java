@@ -117,9 +117,9 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	
 	protected boolean adaptOriginalPlans = false;
 	
-	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer2km.shp"};
+//	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer2km.shp"};
 	
-//	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
+	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
 
 //	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp",
 //																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 2.shp"};
@@ -476,7 +476,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		
-//		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
+		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
 	}
 	
 	/*
@@ -527,9 +527,9 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-//		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-//		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
-//		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
+		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 	}
 
 	private void addPickupFacilities() {
