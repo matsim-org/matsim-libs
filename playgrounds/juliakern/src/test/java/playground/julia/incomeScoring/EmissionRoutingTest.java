@@ -70,9 +70,7 @@ import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.internalization.EmissionScoringFunctionFactory;
 import playground.benjamin.internalization.EmissionTravelCostCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
-//import tutorial.programming.example06EventsHandling.MyEventHandler1;
 import playground.julia.incomeScoring.RoadUsedHandler;
-import tutorial.programming.example06EventsHandling.MyEventHandler1;
 
 /**
  * @author benjamin
