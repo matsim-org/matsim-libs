@@ -28,12 +28,14 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
 import org.matsim.api.core.v01.Coord;
@@ -137,7 +139,10 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 */
 	final private double MinAllowableCap = 10.0;
 
-
+	private Cursor pencilCursor = null;
+	private Cursor moveCursor = null;
+	private Cursor scissorCursor = null;
+	
 	/** Creates new form NetBlackboard */
 	public NetBlackboard() {
 		initComponents();
@@ -171,6 +176,23 @@ public class NetBlackboard extends javax.swing.JPanel {
 		isControlPressed = false;
 		tolerance = 0.03;
 		initCounts();
+
+		try {
+			Toolkit toolkit = Toolkit.getDefaultToolkit();
+			Image image = ImageIO.read(getClass().getResource("/org/matsim/contrib/networkEditor/images/pencil.gif"));
+			Point hotSpot = new Point(0,0);
+			this.pencilCursor = toolkit.createCustomCursor(image, hotSpot, "Pencil");
+	
+			image = ImageIO.read(getClass().getResource("/org/matsim/contrib/networkEditor/images/move.png"));
+			hotSpot = new Point(0,0);
+			this.moveCursor = toolkit.createCustomCursor(image, hotSpot, "Move");
+	
+			image = ImageIO.read(getClass().getResource("/org/matsim/contrib/networkEditor/images/scissors.png"));
+			hotSpot = new Point(20,10);
+			this.scissorCursor = toolkit.createCustomCursor(image, hotSpot, "Scissor");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -525,30 +547,17 @@ public class NetBlackboard extends javax.swing.JPanel {
 		if(this.actualMode == Mode.NONE)
 			this.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 		else if(this.actualMode == Mode.PAINTING) {
-			Toolkit toolkit = Toolkit.getDefaultToolkit();
-			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/pencil.gif").getPath());
-			Point hotSpot = new Point(0,0);
-			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Pencil");
-			this.setCursor(cursor);
+			this.setCursor(this.pencilCursor);
 		} else if(this.actualMode == Mode.SELECTION)
 			this.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 		else if(actualMode == Mode.MOVING) {
-			Toolkit toolkit = Toolkit.getDefaultToolkit();
-			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/move.png").getPath());
-			Point hotSpot = new Point(0,0);
-			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Move");
-			this.setCursor(cursor);
+			this.setCursor(this.moveCursor);
 		} else if(actualMode == Mode.CUTTING) {
-			Toolkit toolkit = Toolkit.getDefaultToolkit();
-			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/scissors.png").getPath());
-			Point hotSpot = new Point(20,10);
-			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Scissor");
-			this.setCursor(cursor);
+			this.setCursor(this.scissorCursor);
 		}
 	}//GEN-LAST:event_formMouseEntered
 
 	private void formMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseExited
-		// TODO add your handling code here:
 	}//GEN-LAST:event_formMouseExited
 
 	private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
