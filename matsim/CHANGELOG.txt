@@ -15,6 +15,7 @@ Changes:
 - Configuration Changes:
   - move the "snapshotFormat" entry which you may have in your "simulation" and/or in your "qsim" configuration group to the "controler" configuration group (mzilske, r16484)
 	- In module "controler" one can set the parameters  "writeSnapshotsInterval", "writePlansInterval", "writeEventsInterval" in order to reduce time needed for IO during the iterations.
+	- In module "controler" one should specify which mobility simulation shall be used via the "mobsim" parameter
 
 - New features:
   - OTFVis can display OSM-maps as background. Set option "mapOverlayMode" to "true". Also set the coordinate system of your scenario in the "global" section of config. 
