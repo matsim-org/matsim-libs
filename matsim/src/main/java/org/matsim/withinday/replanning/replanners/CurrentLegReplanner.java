@@ -71,10 +71,6 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-
-		// If it is not a car Leg we don't replan it.
-//		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
-
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 
@@ -83,9 +79,6 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();
-
-//		// create ReplanningEvent
-//		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
 
 		return true;
 	}

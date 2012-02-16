@@ -21,6 +21,7 @@
 package org.matsim.withinday.replanning.identifiers.tools;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,9 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -49,9 +53,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
-import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
@@ -67,9 +69,8 @@ import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
  * Traffic System is congested and the Link Travel Times are much longer
  * than the Freespeed Travel Times.
  */
-public class LinkReplanningMap implements LinkEnterEventHandler,
-		LinkLeaveEventHandler, AgentArrivalEventHandler,
-		AgentDepartureEventHandler, AgentWait2LinkEventHandler,
+public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+		AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
 		AgentStuckEventHandler, SimulationInitializedListener {
 
 	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
@@ -78,7 +79,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	private boolean repeatedReplanning = true;
 	private double replanningInterval = 300.0;
 
-	private NetsimNetwork netsimNetwork;
+	private Network network;
 
 	/*
 	 * Mapping between the PersonDriverAgents and the PersonIds.
@@ -88,22 +89,54 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 
 	private Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
 	
+	private Set<String> observedModes;
+	
+	private Map<Id, String> agentTransportModeMap;
+	
 	public LinkReplanningMap() {
 		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 		init();
 	}
-		
+	
 	private void init() {
 		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
+		this.agentTransportModeMap = new HashMap<Id, String>();
+		this.observedModes = new HashSet<String>();
+		this.addObservedMode(TransportMode.car);
 	}
 
+	public void addObservedMode(String mode) {
+		this.observedModes.add(mode);
+	}
+	
+	public void setObservedModes(Set<String> modes) {
+		this.observedModes.clear();
+		this.observedModes.addAll(modes);
+	}
+
+	public void doRepeatedReplanning(boolean value) {
+		this.repeatedReplanning = value;
+	}
+	
+	public boolean isRepeatedReplanning() {
+		return this.repeatedReplanning;
+	}
+	
+	public void setRepeatedReplanningInterval(double interval) {
+		this.replanningInterval = interval;
+	}
+	
+	public double getReplanningInterval() {
+		return this.replanningInterval;
+	}
+	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 
-		Netsim sim = (Netsim) e.getQueueSimulation();
+		Mobsim sim = (Mobsim) e.getQueueSimulation();
 
-		// Update Reference to QNetwork
-		this.netsimNetwork = sim.getNetsimNetwork();
+		// Update Reference to network
+		this.network = sim.getScenario().getNetwork();
 
 		personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 
@@ -120,11 +153,14 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	// set the earliest possible leave link time as replanning time
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		double now = event.getTime();
-		NetsimLink qLink = netsimNetwork.getNetsimLink(event.getLinkId());
-		double departureTime = (now + ((LinkImpl)qLink.getLink()).getFreespeedTravelTime(now));
-
-		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));
+		String mode = agentTransportModeMap.get(event.getPersonId());
+		if (observedModes.contains(mode)) {
+			double now = event.getTime();
+			Link link = network.getLinks().get(event.getLinkId());
+			double departureTime = (now + ((LinkImpl) link).getFreespeedTravelTime(now));
+			
+			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));			
+		}
 	}
 
 	@Override
@@ -135,15 +171,23 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		replanningMap.remove(event.getPersonId());
+		agentTransportModeMap.remove(event.getPersonId());
 	}
 
 	/*
 	 * The agent has ended an activity and returns to the network.
 	 * We do a replanning so the agent can choose his next link.
+	 * 
+	 * We don't do this anymore since the agent is limited in its
+	 * replanning capabilities on the link he is departing to.
+	 * It is e.g. not possible, to schedule a new activity there.
 	 */
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));
+		agentTransportModeMap.put(event.getPersonId(), event.getLegMode());
+//		if (observedModes.contains(event.getLegMode())) {
+//			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));		
+//		}		
 	}
 
 	/*
@@ -163,6 +207,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		replanningMap.remove(event.getPersonId());
+		agentTransportModeMap.remove(event.getPersonId());
 	}
 
 	/*
@@ -189,8 +234,6 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 				agentsToReplanLeaveLink.add(withinDayAgent);
 			}
 		}
-
-//		log.info(time + ": replanning " + vehiclesToReplanLeaveLink.size() + " vehicles");
 
 		return agentsToReplanLeaveLink;
 	}
