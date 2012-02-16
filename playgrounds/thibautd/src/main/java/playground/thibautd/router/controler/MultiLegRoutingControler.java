@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.router.controler;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -30,19 +35,26 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 
-import playground.thibautd.router.BaseTripRouterBuilder;
-import playground.thibautd.router.CompositeTripRouterBuilder;
+import playground.thibautd.router.DefaultRoutingModuleFactory;
 import playground.thibautd.router.PlanRouterWrapper;
-import playground.thibautd.router.TeleportationPtTripRouterBuilder;
-import playground.thibautd.router.TransitTripRouterBuilder;
+import playground.thibautd.router.RoutingModule;
+import playground.thibautd.router.RoutingModuleFactory;
+import playground.thibautd.router.TransitRoutingModuleFactory;
 import playground.thibautd.router.TripRouterFactory;
 
 /**
  * @author thibautd
  */
 public class MultiLegRoutingControler extends Controler {
+	private final Map<String, RoutingModuleFactory> userDefinedRoutingModuleFactories =
+		new HashMap<String, RoutingModuleFactory>();
+
 	public MultiLegRoutingControler(final Config config) {
 		super(config);
+	}
+
+	public MultiLegRoutingControler(final Scenario scenario) {
+		super(scenario);
 	}
 
 	//@Override
@@ -68,6 +80,14 @@ public class MultiLegRoutingControler extends Controler {
 		return plansCalcRoute;
 	}
 
+	/**
+	 * <b>Creates</b> a new router factory. Thus, modifying the returned instance
+	 * will not modify the next returned instances.
+	 * To customize the routing behaviour, the default {@link RoutingModule}s can be erased
+	 * using the {@link #setRoutingModuleFactory(String, RoutingModuleFactory)}.
+	 *
+	 * @return a new {@link TripRouterFactory}
+	 */
 	public TripRouterFactory getTripRouterFactory() {
 		// initialise each time, as components may vary accross iterations
 		TravelTimeCalculatorFactory travelTimeFactory = getTravelTimeCalculatorFactory();
@@ -80,34 +100,51 @@ public class MultiLegRoutingControler extends Controler {
 			persFactory = new TravelTimeFactoryWrapper( getTravelTimeCalculator() );
 		}
 
-		CompositeTripRouterBuilder builder = new CompositeTripRouterBuilder();
-
-		// Base handlers
-		builder.addBuilder(
-				new BaseTripRouterBuilder(
-					getConfig().plansCalcRoute(),
-					getConfig().planCalcScore()));
-
-		// PT handler: depends on the type of PT simulation
-		if (getConfig().scenario().isUseTransit()) {
-			builder.addBuilder(
-					new TransitTripRouterBuilder(
-						getTransitRouterFactory()));
-		}
-		else {
-			builder.addBuilder(
-					new TeleportationPtTripRouterBuilder(
-						getConfig().plansCalcRoute(),
-						getConfig().planCalcScore()));
-		}
-
-		return new TripRouterFactory(
+		TripRouterFactory factory =  new TripRouterFactory(
 				getNetwork(),
 				getTravelCostCalculatorFactory(),
 				persFactory,
 				getLeastCostPathCalculatorFactory(),
-				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory(),
-				builder);
+				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory());
+
+		// Base modules
+		RoutingModuleFactory defaultFactory =
+			new DefaultRoutingModuleFactory(
+				getConfig().plansCalcRoute(),
+				getConfig().planCalcScore());
+
+		for (String mode : DefaultRoutingModuleFactory.HANDLED_MODES) {
+			factory.setRoutingModuleFactory( mode , defaultFactory );
+		}
+
+		// PT module: if use transit, erase default
+		if (getConfig().scenario().isUseTransit()) {
+			factory.setRoutingModuleFactory(
+					TransportMode.pt,
+					new TransitRoutingModuleFactory(getTransitRouterFactory()));
+		}
+
+		// if the user defined something, erase defaults
+		for (Map.Entry<String, RoutingModuleFactory> entry : userDefinedRoutingModuleFactories.entrySet()) {
+			factory.setRoutingModuleFactory( entry.getKey() , entry.getValue() );
+		}
+
+		return factory;
+	}
+
+	/**
+	 * Sets the {@link RoutingModuleFactory} to use to create {@link RoutingModule}s
+	 * for the given main mode.
+	 *
+	 * @param mainMode the main mode for which the factory is to use
+	 * @param factory the factory
+	 * @return the previously set <b>user defined</b> factory. Nothing will be returned
+	 * if the defaults were used.
+	 */
+	public RoutingModuleFactory setRoutingModuleFactory(
+			final String mainMode,
+			final RoutingModuleFactory factory) {
+		return userDefinedRoutingModuleFactories.put( mainMode , factory );
 	}
 }
 

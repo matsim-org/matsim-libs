@@ -35,15 +35,15 @@ import org.matsim.core.population.LegImpl;
 
 /**
  * Class acting as an intermediate between clients needing to
- * compute routes and all registered {@link RoutingModeHandler}s.
+ * compute routes and all registered {@link RoutingModule}s.
  * It provides convenience methods to route an individual trip with
  * a desired mode or to identify trips.
  *
  * @author thibautd
  */
 public class TripRouter {
-	private final Map<String, RoutingModeHandler> routingModules =
-		new HashMap<String , RoutingModeHandler>();
+	private final Map<String, RoutingModule> routingModules =
+		new HashMap<String , RoutingModule>();
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -54,15 +54,15 @@ public class TripRouter {
 	// setters / getters
 	// /////////////////////////////////////////////////////////////////////////
 	/**
-	 * Sets the {@link RoutingModeHandler} to use for the given (main) mode
+	 * Sets the {@link RoutingModule} to use for the given (main) mode
 	 * @param mainMode the mode
 	 * @param module the module to use with this mode
-	 * @return the previously registered {@link RoutingModeHandler} for this mode if any, null otherwise.
+	 * @return the previously registered {@link RoutingModule} for this mode if any, null otherwise.
 	 */
-	public RoutingModeHandler setModeHandler(
+	public RoutingModule setRoutingModule(
 			final String mainMode,
-			final RoutingModeHandler module) {
-		RoutingModeHandler old = routingModules.put( mainMode , module );
+			final RoutingModule module) {
+		RoutingModule old = routingModules.put( mainMode , module );
 
 		if (old != null) {
 			checker.removeActivityTypes( old.getStageActivityTypes() );
@@ -145,7 +145,7 @@ public class TripRouter {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		RoutingModeHandler module = routingModules.get( mainMode );
+		RoutingModule module = routingModules.get( mainMode );
 
 		if (module != null) {
 			return module.calcRoute(

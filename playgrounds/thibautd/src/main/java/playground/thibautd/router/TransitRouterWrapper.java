@@ -42,7 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  *
  * @author thibautd
  */
-public class TransitRouterWrapper implements RoutingModeHandler {
+public class TransitRouterWrapper implements RoutingModule {
 	private static final StageActivityTypes CHECKER =
 		new StageActivityTypesImpl(
 				Arrays.asList( new String[]{ PtConstants.TRANSIT_ACTIVITY_TYPE } ) );

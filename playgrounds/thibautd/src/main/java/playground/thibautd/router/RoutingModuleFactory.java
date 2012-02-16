@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CompositeTripRouterBuilder.java
+ * RoutingModuleFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,35 +19,18 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * A composite {@link TripRouterBuilder}.
+ * Creates a routing module.
  * @author thibautd
  */
-public class CompositeTripRouterBuilder implements TripRouterBuilder {
-	private final List<TripRouterBuilder> builders = new ArrayList<TripRouterBuilder>();
-
-
+public interface RoutingModuleFactory {
 	/**
-	 * Adds a builder to the list.
-	 * @param builder the builder to add.
+	 * Creates a new instance.
+	 * @param mainMode the main mode of the trips to handle
+	 * @param factory the {@link TripRouterFactory} from which pertinent
+	 * elements/estimators can be obtained
+	 * @return a new instance
 	 */
-	public void addBuilder(final TripRouterBuilder builder) {
-		builders.add( builder );
-	}
-
-	/**
-	 * Executes all registered builders, in the order they were added.
-	 */
-	@Override
-	public void setModeHandlers(
-			final TripRouterFactory factory,
-			final TripRouter tripRouter) {
-		for (TripRouterBuilder builder : builders) {
-			builder.setModeHandlers( factory , tripRouter );
-		}
-	}
+	public RoutingModule createModule(String mainMode, TripRouterFactory factory);
 }
 

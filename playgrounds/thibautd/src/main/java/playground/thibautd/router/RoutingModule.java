@@ -34,7 +34,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
  * 
  * @author thibautd
  */
-public interface RoutingModeHandler {
+public interface RoutingModule {
 	/**
 	 * Computes a route, as a sequence of plan elements. The plan elements can
 	 * be only legs, or a sequence of legs and "dummy" activities. All activity

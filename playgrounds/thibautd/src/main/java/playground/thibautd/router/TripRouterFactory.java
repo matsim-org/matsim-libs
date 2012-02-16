@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -45,36 +48,9 @@ public class TripRouterFactory implements MatsimFactory {
 	private final PersonalizableTravelTimeFactory travelTimeFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
 	private final ModeRouteFactory modeRouteFactory;
-	private final TripRouterBuilder builder;
 
-	///**
-	// * Default constructor: uses a {@link TripRouterBuilderImpl} to configure
-	// * the {@link TripRouter}.
-	// *
-	// * @param routeConfigGroup
-	// * @param scoreConfigGroup
-	// * @param network
-	// * @param travelCostCalculatorFactory
-	// * @param travelTimeFactory
-	// * @param leastCostPathAlgoFactory
-	// * @param modeRouteFactory
-	// */
-	//public TripRouterFactory(
-	//		final PlansCalcRouteConfigGroup routeConfigGroup,
-	//		final PlanCalcScoreConfigGroup scoreConfigGroup,
-	//		final Network network,
-	//		final TravelCostCalculatorFactory travelCostCalculatorFactory,
-	//		final PersonalizableTravelTimeFactory travelTimeFactory,
-	//		final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
-	//		final ModeRouteFactory modeRouteFactory) {
-	//	this( network,
-	//			travelCostCalculatorFactory,
-	//			travelTimeFactory,
-	//			leastCostPathAlgoFactory,
-	//			modeRouteFactory,
-	//			new TripRouterBuilderImpl( routeConfigGroup , scoreConfigGroup ));
-	//}
-
+	private final Map<String, RoutingModuleFactory> routingModulesFactories =
+		new HashMap<String, RoutingModuleFactory>();
 
 	/**
 	 * Configurable constructor: the {@link TripRouterBuilder} can be specified.
@@ -91,14 +67,12 @@ public class TripRouterFactory implements MatsimFactory {
 			final TravelCostCalculatorFactory travelCostCalculatorFactory,
 			final PersonalizableTravelTimeFactory travelTimeFactory,
 			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
-			final ModeRouteFactory modeRouteFactory,
-			final TripRouterBuilder builder) {
+			final ModeRouteFactory modeRouteFactory) {
 		this.network = network;
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 		this.travelTimeFactory = travelTimeFactory;
 		this.leastCostPathAlgorithmFactory = leastCostPathAlgoFactory;
 		this.modeRouteFactory = modeRouteFactory;
-		this.builder = builder;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -127,6 +101,12 @@ public class TripRouterFactory implements MatsimFactory {
 	// /////////////////////////////////////////////////////////////////////////
 	// factory methods
 	// /////////////////////////////////////////////////////////////////////////
+	public RoutingModuleFactory setRoutingModuleFactory(
+			final String mainMode,
+			final RoutingModuleFactory moduleFactory) {
+		return routingModulesFactories.put( mainMode , moduleFactory );
+	}
+
 	/**
 	 * Creates a new {@link TripRouter} instance.
 	 * @return a fully initialised {@link TripRouter}.
@@ -134,7 +114,13 @@ public class TripRouterFactory implements MatsimFactory {
 	public TripRouter createTripRouter() {
 		TripRouter tripRouter = new TripRouter();
 
-		builder.setModeHandlers( this , tripRouter );
+		for (Map.Entry<String, RoutingModuleFactory> entry : routingModulesFactories.entrySet()) {
+			tripRouter.setRoutingModule(
+					entry.getKey(),
+					entry.getValue().createModule(
+						entry.getKey(),
+						this ));
+		}
 
 		return tripRouter;
 	}

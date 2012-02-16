@@ -37,11 +37,11 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import playground.thibautd.router.StageActivityTypes;
 
 /**
- * Class wrapping a {@link LegRouter} in a {@link RoutingModeHandler}.
+ * Class wrapping a {@link LegRouter} in a {@link RoutingModule}.
  *
  * @author thibautd
  */
-public class LegRouterWrapper implements RoutingModeHandler {
+public class LegRouterWrapper implements RoutingModule {
 	private static final StageActivityTypes EMPTY_CHECKER = new StageActivityTypesImpl( null );
 
 	private final String mode;

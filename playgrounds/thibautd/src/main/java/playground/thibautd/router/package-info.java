@@ -29,11 +29,11 @@
  * <br>
  * It is based on a three layers architecture:
  * <ul>
- * <li> the {@link playground.thibautd.router.RoutingModeHandler}s are responsible for computing trips
+ * <li> the {@link playground.thibautd.router.RoutingModule}s are responsible for computing trips
  * between individual O/D couples, for a given mode. They moreover provide
  * access to an object allowing to identify their stage activities, implementing
  * {@link playground.thibautd.router.StageActivityTypes}.
- * <li> the {@link playground.thibautd.router.TripRouter} registers {@link playground.thibautd.router.RoutingModeHandler}s for each
+ * <li> the {@link playground.thibautd.router.TripRouter} registers {@link playground.thibautd.router.RoutingModule}s for each
  * mode, and allows to route between O/D pairs for any mode. It does not modify the plan.
  * It moreover provides access to a {@link playground.thibautd.router.StageActivityTypes} instance allowing
  * to identify all possible stage activities, for all modes.

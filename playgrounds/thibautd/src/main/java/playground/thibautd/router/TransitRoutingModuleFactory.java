@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TripRouterBuilder.java
+ * TransitRoutingModuleFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,21 +19,31 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
+import org.matsim.pt.router.TransitRouterFactory;
+
 /**
- * Defines object meant to "build" a trip router before it is used.
- * See javadoc of individual methods for details.
+ * Sets the handler for PT so has to use detailed transit simulation.
+ * No other mode is set here!
  *
  * @author thibautd
  */
-public interface TripRouterBuilder {
+public class TransitRoutingModuleFactory implements RoutingModuleFactory {
+	private final TransitRouterFactory transitRouterFactory;
 
 	/**
-	 * Sets the mode handlers, using the method {@link TripRouter#setModeHandler(String, RoutingModeHandler)}.
-	 * The elements with which to initialize the {@link RoutingModeHandler}s should
-	 * be obtained from the factories provided by the argument {@link TripRouterFactory}.
-	 *
-	 * @param tripRouter the instance for which mode handlers are to set.
+	 * Initialises a builder.
+	 * @param transitRouterFactory the factory to use to initialise hanlders
 	 */
-	public void setModeHandlers(final TripRouterFactory factory, final TripRouter tripRouter);
+	public TransitRoutingModuleFactory(
+			final TransitRouterFactory transitRouterFactory) {
+		this.transitRouterFactory = transitRouterFactory;
+	}
+
+	@Override
+	public RoutingModule createModule(
+			final String mainMode,
+			final TripRouterFactory factory) {
+		return new TransitRouterWrapper(transitRouterFactory.createTransitRouter());
+	}
 }
 
