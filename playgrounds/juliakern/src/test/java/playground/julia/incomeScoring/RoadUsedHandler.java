@@ -16,6 +16,10 @@ public class RoadUsedHandler implements LinkLeaveEventHandler{
 	int i=20;
 	String usedRoadVariant = new String("");
 	
+public RoadUsedHandler(){
+	
+}
+	
 
 public RoadUsedHandler(int j) {
 		i= j;// TODO Auto-generated constructor stub
