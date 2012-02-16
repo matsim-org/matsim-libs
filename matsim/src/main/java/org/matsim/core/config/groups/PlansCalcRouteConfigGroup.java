@@ -219,10 +219,12 @@ public class PlansCalcRouteConfigGroup extends Module {
 	}
 
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
+		clearDefaults();
 		teleportedModeFreespeedFactors.put(mode, freespeedFactor);
 	}
 
 	public void setTeleportedModeSpeed(String mode, double speed) {
+		clearDefaults();
 		teleportedModeSpeeds.put(mode, speed);
 	}
 
