@@ -110,8 +110,9 @@ public class MultiLegRoutingControler extends Controler {
 		// Base modules
 		RoutingModuleFactory defaultFactory =
 			new DefaultRoutingModuleFactory(
-				getConfig().plansCalcRoute(),
-				getConfig().planCalcScore());
+					getPopulation().getFactory(),
+					getConfig().plansCalcRoute(),
+					getConfig().planCalcScore());
 
 		for (String mode : DefaultRoutingModuleFactory.HANDLED_MODES) {
 			factory.setRoutingModuleFactory( mode , defaultFactory );

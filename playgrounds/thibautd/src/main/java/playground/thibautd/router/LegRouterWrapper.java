@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.LegRouter;
@@ -45,6 +46,7 @@ public class LegRouterWrapper implements RoutingModule {
 	private static final StageActivityTypes EMPTY_CHECKER = new StageActivityTypesImpl( null );
 
 	private final String mode;
+	private final PopulationFactory populationFactory;
 	private final LegRouter wrapped;
 	private final PersonalizableTravelCost travelCost;
 	private final PersonalizableTravelTime travelTime;
@@ -63,10 +65,12 @@ public class LegRouterWrapper implements RoutingModule {
 	 */
 	public LegRouterWrapper(
 			final String mode,
+			final PopulationFactory populationFactory,
 			final LegRouter toWrap,
 			final PersonalizableTravelCost travelCost,
 			final PersonalizableTravelTime travelTime) {
 		this.mode = mode;
+		this.populationFactory = populationFactory;
 		this.wrapped = toWrap;
 		this.travelCost = travelCost;
 		this.travelTime = travelTime;
@@ -85,7 +89,7 @@ public class LegRouterWrapper implements RoutingModule {
 			travelTime.setPerson( person );
 		}
 
-		Leg newLeg = new LegImpl( mode );
+		Leg newLeg = populationFactory.createLeg( mode );
 		newLeg.setDepartureTime( departureTime );
 
 		double travTime = wrapped.routeLeg(

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -54,6 +55,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 				TransportMode.walk, TransportMode.bike, UNDEFINED_MODE});
 	private final PlansCalcRouteConfigGroup routeConfigGroup;
 	private final PlanCalcScoreConfigGroup scoreConfigGroup;
+	private final PopulationFactory populationFactory;
 
 	/**
 	 * Initialises an instance.
@@ -62,8 +64,10 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 	 * @param scoreConfigGroup the config group with score-related parameters
 	 */
 	public DefaultRoutingModuleFactory(
+			final PopulationFactory populationFactory,
 			final PlansCalcRouteConfigGroup routeConfigGroup,
 			final PlanCalcScoreConfigGroup scoreConfigGroup) {
+		this.populationFactory = populationFactory;
 		this.routeConfigGroup = routeConfigGroup;
 		this.scoreConfigGroup = scoreConfigGroup;
 	}
@@ -93,6 +97,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 		if (routeConfigGroup.getTeleportedModeFreespeedFactors().containsKey( mainMode )) {
 			return new LegRouterWrapper(
 					mainMode,
+					populationFactory,
 					new PseudoTransitLegRouter(
 						network,
 						routeAlgoPtFreeFlow,
@@ -106,6 +111,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 		if (routeConfigGroup.getTeleportedModeSpeeds().containsKey( mainMode )) {
 			return new LegRouterWrapper(
 					mainMode,
+					populationFactory,
 					new TeleportationLegRouter(
 						routeFactory,
 						routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
@@ -118,6 +124,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 		if ( mainMode.equals( TransportMode.car ) ) {
 			return new LegRouterWrapper(
 					TransportMode.car,
+					populationFactory,
 					new NetworkLegRouter(
 						network,
 						routeAlgo,
@@ -129,6 +136,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 		if ( mainMode.equals( TransportMode.ride ) ) {
 			return new LegRouterWrapper(
 					TransportMode.ride,
+					populationFactory,
 					new NetworkLegRouter(
 						network,
 						routeAlgo,
@@ -140,6 +148,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 		if ( mainMode.equals( TransportMode.bike ) ) {
 			return new LegRouterWrapper(
 					TransportMode.bike,
+					populationFactory,
 					new TeleportationLegRouter(
 						routeFactory,
 						routeConfigGroup.getBikeSpeed(),
@@ -151,6 +160,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 		if ( mainMode.equals( TransportMode.walk ) ) {
 			return new LegRouterWrapper(
 					TransportMode.walk,
+					populationFactory,
 					new TeleportationLegRouter(
 						routeFactory,
 						routeConfigGroup.getWalkSpeed(),
@@ -162,6 +172,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 		if ( mainMode.equals( UNDEFINED_MODE ) ) {
 			return new LegRouterWrapper(
 					UNDEFINED_MODE,
+					populationFactory,
 					new TeleportationLegRouter(
 						routeFactory,
 						routeConfigGroup.getUndefinedModeSpeed(),
