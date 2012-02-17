@@ -106,7 +106,6 @@ import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtil
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
-import playground.christoph.population.PlansLinkReferenceDumping;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -119,10 +118,10 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	
 //	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer2km.shp"};
 	
-	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
+//	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
 
-//	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp",
-//																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 2.shp"};
+	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp",
+																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 2.shp"};
 	
 //	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp",
 //																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 1.shp",
@@ -300,6 +299,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		super.createAndInitReplanningManager(numReplanningThreads);
 		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
+		super.getLinkReplanningMap().doRepeatedReplanning(false);
 		
 		this.householdsUtils = new HouseholdsUtils(this.scenarioData, this.getEvents());
 		this.getEvents().addHandler(householdsUtils);
