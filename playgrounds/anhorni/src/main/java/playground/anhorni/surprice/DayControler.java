@@ -8,10 +8,5 @@ public class DayControler extends Controler {
 	public DayControler(final ScenarioImpl scenario) {
 		super(scenario);	
 		super.setOverwriteFiles(true);
-	}
-    
-    @Override
-    protected void setUp() {
-    	super.setUp(); 
-	}  
+	} 
 }

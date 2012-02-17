@@ -52,7 +52,7 @@ public class WeekScenario {
 			}
 			this.runDay(days[i]);
 		}
-		log.info("Week simulated ##################################################");
+		log.info("######################### Week simulated ################################");
 	}
 	
 	public void init(String path) {		
@@ -118,21 +118,25 @@ public class WeekScenario {
 	
 	private void assignPlans2Agents(String day) {
 		for (Person p : this.baseScenario.getPopulation().getPersons().values()) {
-			Plan plan = this.drawPlanFromPool(day, p.getId());
+			Plan plan = this.drawPlanFromPool(day, p.getId(), this.getDecisionModel());
 			p.addPlan(plan);
 			((PersonImpl)p).setSelectedPlan(plan);
 		}
 	}
 	
-    private Plan drawPlanFromPool(String day, Id personId) {    	
+	private DecisionModel getDecisionModel() {
+		return new DecisionModel();
+	}
+	
+    private Plan drawPlanFromPool(String day, Id personId, DecisionModel decisionModel) {    	
     	if (day.equals("Sat")) {
-    		return this.saturdayPool.getPlan(this.memories.get(personId));	
+    		return this.saturdayPool.getPlan(this.memories.get(personId), decisionModel);	
 	    }
     	else if (day.equals("Sun")) {
-    		return this.sundayPool.getPlan(this.memories.get(personId));
+    		return this.sundayPool.getPlan(this.memories.get(personId), decisionModel);
     	}
 	    else {
-	    	return this.weekPool.getPlan(this.memories.get(personId));	
+	    	return this.weekPool.getPlan(this.memories.get(personId), decisionModel);	
 	    }    	
     }
     

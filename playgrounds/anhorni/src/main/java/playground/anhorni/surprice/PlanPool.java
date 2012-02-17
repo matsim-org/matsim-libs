@@ -11,8 +11,8 @@ public class PlanPool {
 	
 	private List<Plan> plans = new Vector<Plan>();
 		
-	public Plan getPlan(AgentMemory memory) {
-		return plans.get(0);
+	public Plan getPlan(AgentMemory memory, DecisionModel decisionModel) {
+		return decisionModel.getPlan(this.plans);
 	}
 	
 	public void create(Population population) {
