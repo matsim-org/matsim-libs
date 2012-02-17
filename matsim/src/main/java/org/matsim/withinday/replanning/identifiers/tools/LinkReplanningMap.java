@@ -85,26 +85,27 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * Mapping between the PersonDriverAgents and the PersonIds.
 	 * The events only contain a PersonId.
 	 */
-	private Map<Id, PlanBasedWithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
+	private final Map<Id, PlanBasedWithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 
-	private Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
+	private final Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
 	
-	private Set<String> observedModes;
+	private final Set<String> observedModes;
 	
-	private Map<Id, String> agentTransportModeMap;
+	private final Set<Id> enrouteAgents;
+	
+	private final Map<Id, String> agentTransportModeMap;
 	
 	public LinkReplanningMap() {
 		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
-		init();
-	}
-	
-	private void init() {
+
+		this.enrouteAgents = new HashSet<Id>();
 		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
+		this.personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.agentTransportModeMap = new HashMap<Id, String>();
 		this.observedModes = new HashSet<String>();
 		this.addObservedMode(TransportMode.car);
 	}
-
+	
 	public void addObservedMode(String mode) {
 		this.observedModes.add(mode);
 	}
@@ -138,7 +139,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 		// Update Reference to network
 		this.network = sim.getScenario().getNetwork();
 
-		personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
+		personAgentMapping.clear();
 
 		if (sim instanceof QSim) {
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
@@ -157,9 +158,9 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 		if (observedModes.contains(mode)) {
 			double now = event.getTime();
 			Link link = network.getLinks().get(event.getLinkId());
-			double departureTime = (now + ((LinkImpl) link).getFreespeedTravelTime(now));
+			double departureTime = Math.floor((now + ((LinkImpl) link).getFreespeedTravelTime(now)));
 			
-			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));			
+			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));
 		}
 	}
 
@@ -172,22 +173,23 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	public void handleEvent(AgentArrivalEvent event) {
 		replanningMap.remove(event.getPersonId());
 		agentTransportModeMap.remove(event.getPersonId());
+		enrouteAgents.remove(event.getPersonId());
 	}
 
 	/*
 	 * The agent has ended an activity and returns to the network.
 	 * We do a replanning so the agent can choose his next link.
 	 * 
-	 * We don't do this anymore since the agent is limited in its
-	 * replanning capabilities on the link he is departing to.
-	 * It is e.g. not possible, to schedule a new activity there.
+	 * We don't do this anymore since the agent is limited in its 
+	 * replanning capabilities on the link he is departing to. 
+ 	 * It is e.g. not possible, to schedule a new activity there. 
 	 */
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		agentTransportModeMap.put(event.getPersonId(), event.getLegMode());
-//		if (observedModes.contains(event.getLegMode())) {
-//			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));		
-//		}		
+		if (observedModes.contains(event.getLegMode())) {
+			this.enrouteAgents.add(event.getPersonId());
+		}		
 	}
 
 	/*
@@ -208,6 +210,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	public void handleEvent(AgentStuckEvent event) {
 		replanningMap.remove(event.getPersonId());
 		agentTransportModeMap.remove(event.getPersonId());
+		enrouteAgents.remove(event.getPersonId());
 	}
 
 	/*
@@ -244,10 +247,9 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	public synchronized Set<PlanBasedWithinDayAgent> getLegPerformingAgents() {
 		Set<PlanBasedWithinDayAgent> legPerformingAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 
-		for (Entry<Id, Tuple<Id, Double>> entry : replanningMap.entrySet()) {
-			Id personId = entry.getKey();
-			PlanBasedWithinDayAgent agent = this.personAgentMapping.get(personId);
-			legPerformingAgents.add(agent);
+		for (Id id : this.enrouteAgents) {
+			PlanBasedWithinDayAgent agent = this.personAgentMapping.get(id);
+			legPerformingAgents.add(agent);			
 		}
 
 		return legPerformingAgents;
@@ -255,7 +257,8 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 
 	@Override
 	public void reset(int iteration) {
-		replanningMap = new HashMap<Id, Tuple<Id, Double>>();
+		this.replanningMap.clear();
+		this.enrouteAgents.clear();
 	}
 
 }

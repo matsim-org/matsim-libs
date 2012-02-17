@@ -46,6 +46,8 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		QSimConfigGroup qSimConfig = new QSimConfigGroup();
 		qSimConfig.setNumberOfThreads(2);
+		qSimConfig.setFlowCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
+		qSimConfig.setStorageCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
 		config.addQSimConfigGroup(qSimConfig);
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(0);
@@ -90,6 +92,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		private static final int t2 = 5*3600 + 59*60;
 		private static final int t3 = 5*3600 + 59*60 + 30;
 		private static final int t4 = 6*3600;
+		private static final int linkTravelTime = 360;
 
 		public MobsimListenerForTests(final LinkReplanningMap lrp) {
 			this.lrp = lrp;
@@ -129,22 +132,31 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		public void notifySimulationAfterSimStep(final SimulationAfterSimStepEvent e) {
 			if (e.getSimulationTime() == t1) {
 				assertEquals(1, this.lrp.getLegPerformingAgents().size());	// one agent performs a Leg
-				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed and might do a replanning
+				assertEquals(0, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed but cannot do a replanning
+			}
+			if (e.getSimulationTime() == t1 + linkTravelTime) {
+				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent could leave the second link in its route and should be identified as to be replanned
 			}
 
 			if (e.getSimulationTime() == t2) {
 				assertEquals(2, this.lrp.getLegPerformingAgents().size());	// two agents perform a Leg
-				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed and might do a replanning
+				assertEquals(0, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed but cannot do a replanning
+			}
+			if (e.getSimulationTime() == t2 + linkTravelTime) {
+				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent could leave the second link in its route and should be identified as to be replanned
 			}
 
 			if (e.getSimulationTime() == t3) {
 				assertEquals(3, this.lrp.getLegPerformingAgents().size());	// three agents perform a Leg
-				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed and might do a replanning
+				assertEquals(0, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed and might do a replanning
 			}
 
 			if (e.getSimulationTime() == t4) {
 				assertEquals(100, this.lrp.getLegPerformingAgents().size());	// all agents  perform a Leg
-				assertEquals(97, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// 97 agents have just departed and might do a replanning
+				assertEquals(0, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// 97 agents have just departed but cannot do a replanning
+			}
+			if (e.getSimulationTime() == t4 + linkTravelTime) {
+				assertEquals(97, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// 97 agents could leave the second link in its route and should be identified as to be replanned
 			}
 		}
 	}
