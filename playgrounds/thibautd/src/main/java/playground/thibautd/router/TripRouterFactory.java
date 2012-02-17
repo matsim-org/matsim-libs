@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -98,9 +97,23 @@ public class TripRouterFactory implements MatsimFactory {
 		return leastCostPathAlgorithmFactory;
 	}
 
+	/**
+	 * Gives access to a map view of the registered {@link RoutingModuleFactory}s.
+	 * @return an immutable map linking main modes to {@link RoutingModuleFactory}
+	 */
+	public Map<String, RoutingModuleFactory> getRoutingModuleFactories() {
+		return Collections.unmodifiableMap( routingModulesFactories );
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// factory methods
 	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * Sets a factory for creating {@link RoutingModule}s for a given mode.
+	 * @param mainMode the main mode
+	 * @param moduleFactory the factory
+	 * @return the previously registered factory, if any
+	 */
 	public RoutingModuleFactory setRoutingModuleFactory(
 			final String mainMode,
 			final RoutingModuleFactory moduleFactory) {
