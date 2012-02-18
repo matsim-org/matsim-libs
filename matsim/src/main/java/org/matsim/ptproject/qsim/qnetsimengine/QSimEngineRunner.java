@@ -123,7 +123,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 					for (QNode node : nodesArray) {
 						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
 						if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
-							node.moveNode(time, random);
+							node.doSimStep(time, random);
 						}
 					}
 				} else {
@@ -133,7 +133,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 					while (simNodes.hasNext()) {
 						node = simNodes.next();
 						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
-						node.moveNode(time, random);
+						node.doSimStep(time, random);
 
 						if (!node.isActive()) simNodes.remove();
 					}
@@ -156,7 +156,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				while (simLinks.hasNext()) {
 					link = simLinks.next();
 
-					isActive = link.moveLink(time);
+					isActive = link.doSimStep(time);
 
 					if (!isActive && !simulateAllLinks) {
 						simLinks.remove();

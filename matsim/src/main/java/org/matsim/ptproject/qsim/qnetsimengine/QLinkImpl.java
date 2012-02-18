@@ -236,7 +236,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 
 	@Override
-	boolean moveLink(double now) {
+	boolean doSimStep(double now) {
 		updateBufferCapacity();
 
 		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered

@@ -266,7 +266,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	boolean moveLink(double now) {
+	boolean doSimStep(double now) {
 		boolean activeLane = false;
 		boolean otherLaneActive = false;
 		boolean activeWaitBuffer = false;

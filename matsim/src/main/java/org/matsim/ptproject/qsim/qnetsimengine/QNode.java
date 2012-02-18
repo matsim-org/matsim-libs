@@ -127,7 +127,7 @@ public class QNode implements NetsimNode {
 	 *          The current time in seconds from midnight.
 	 * @param random the random number generator to be used
 	 */
-	/*package*/ void moveNode(final double now, final Random random) {
+	/*package*/ void doSimStep(final double now, final Random random) {
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents

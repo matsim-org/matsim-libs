@@ -86,7 +86,7 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 		this.netElementActivator = network.simEngine;
 	}
 	
-	abstract boolean moveLink(double now);
+	abstract boolean doSimStep(double now);
 
 	abstract void activateLink();
 

@@ -250,7 +250,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 					 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
 					 * -marcel/20aug2008
 					 */
-					node.moveNode(time, random);
+					node.doSimStep(time, random);
 				}
 			}			
 		} else {
@@ -260,7 +260,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 			while (simNodes.hasNext()) {
 				node = simNodes.next();
-				node.moveNode(time, random);
+				node.doSimStep(time, random);
 
 				if (!node.isActive()) simNodes.remove();
 			}
@@ -275,7 +275,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
-			isActive = link.moveLink(time);
+			isActive = link.doSimStep(time);
 			if (!isActive && !simulateAllLinks) {
 				simLinks.remove();
 			}

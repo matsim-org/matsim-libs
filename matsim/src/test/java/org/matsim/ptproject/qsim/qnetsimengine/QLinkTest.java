@@ -123,7 +123,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		// time step 1, vehicle should be now in the buffer
-		f.qlink1.moveLink(1.0);
+		f.qlink1.doSimStep(1.0);
 		assertFalse(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
@@ -131,7 +131,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
 
 		// time step 2, vehicle leaves link
-		f.qlink1.moveLink(2.0);
+		f.qlink1.doSimStep(2.0);
 		assertEquals(veh, f.qlink1.popFirstFromBuffer());
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
@@ -214,7 +214,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
 
 		// time step 1, vehicle should be now in the buffer
-		f.qlink1.moveLink(1.0);
+		f.qlink1.doSimStep(1.0);
 		assertFalse(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
@@ -280,7 +280,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 		// time step 1, v1 is moved to buffer
-		qlink.moveLink(1.0);
+		qlink.doSimStep(1.0);
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// add v2, still time step 1
@@ -288,7 +288,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// time step 2, v1 still in buffer, v2 cannot enter buffer, so still on link
-		qlink.moveLink(2.0);
+		qlink.doSimStep(2.0);
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// v1 leaves buffer
@@ -296,7 +296,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(1, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 		// time step 3, v2 moves to buffer
-		qlink.moveLink(3.0);
+		qlink.doSimStep(3.0);
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertFalse(qlink.bufferIsEmpty());
 		// v2 leaves buffer
@@ -304,7 +304,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 		// time step 4, empty link
-		qlink.moveLink(4.0);
+		qlink.doSimStep(4.0);
 		assertEquals(0, qlink.vehOnLinkCount());
 		assertTrue(qlink.bufferIsEmpty());
 	}
@@ -329,7 +329,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertFalse(f.qlink2.hasSpace());
 
 		assertTrue(f.qlink2.bufferIsEmpty());
-		f.qlink2.moveLink(5.0); // first veh moves to buffer, used vehicle equivalents: 5
+		f.qlink2.doSimStep(5.0); // first veh moves to buffer, used vehicle equivalents: 5
 		assertTrue(f.qlink2.hasSpace());
 		assertFalse(f.qlink2.bufferIsEmpty());
 		f.qlink2.popFirstFromBuffer();  // first veh leaves buffer
@@ -342,7 +342,7 @@ public class QLinkTest extends MatsimTestCase {
 		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 10.5
 		assertFalse(f.qlink2.hasSpace());
 
-		f.qlink2.moveLink(6.0); // first veh moves to buffer, used vehicle equivalents: 5.5
+		f.qlink2.doSimStep(6.0); // first veh moves to buffer, used vehicle equivalents: 5.5
 		assertTrue(f.qlink2.hasSpace());
 		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 6.5
 		f.qlink2.addFromIntersection(veh25); // used vehicle equivalents: 9.0
