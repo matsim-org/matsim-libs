@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Node;
  */
 public class KaiHybridNode extends QNode {
 
-	public KaiHybridNode(Node n, QNetwork network) {
+	 KaiHybridNode(Node n, QNetwork network) {
 		super(n, network);
 	}
 	
