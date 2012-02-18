@@ -219,18 +219,22 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		for (QVehicle veh : this.vehQueue) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			this.network.simEngine.getMobsim().getAgentCounter().incLost();
+			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
-		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
-		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.vehQueue.size());
+//		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
+//		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 		this.linkEnterTimeMap.clear();
 		
 		for (QVehicle veh : this.buffer) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			this.network.simEngine.getMobsim().getAgentCounter().incLost();
+			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
-		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.buffer.size());
-		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.buffer.size());
+//		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.buffer.size());
+//		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.buffer.size());
 		this.buffer.clear();
 	}
 

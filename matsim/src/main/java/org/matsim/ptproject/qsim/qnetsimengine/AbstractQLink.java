@@ -131,9 +131,11 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 		for (QVehicle veh : this.waitingList) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			this.network.simEngine.getMobsim().getAgentCounter().incLost();
+			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
-		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.waitingList.size());
-		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.waitingList.size());
+//		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.waitingList.size());
+//		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.waitingList.size());
 		this.waitingList.clear();
 
 	}

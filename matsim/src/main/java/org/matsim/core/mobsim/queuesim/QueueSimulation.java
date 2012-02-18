@@ -109,7 +109,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 	private Scenario scenario = null;
 
-	private AgentCounter agentCounter = new AgentCounter() ;
+	/*package*/ AgentCounter agentCounter = new AgentCounter() ;
 	private MobsimTimer simTimer ;
 
 	public QueueSimulation(final Scenario sc, final EventsManager events) {

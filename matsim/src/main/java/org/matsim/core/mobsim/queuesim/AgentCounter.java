@@ -68,16 +68,16 @@ class AgentCounter implements AgentCounterI {
 
 	@Override
 	public final int getLiving() {return living.get();	}
-	@Override
-	public final void setLiving(final int count) {living.set(count);}
+
+	 final void setLiving(final int count) {living.set(count);}
 	@Override
 	public final boolean isLiving() {return living.get() > 0;	}
 	@Override
 	public final int getLost() {return lost.get();	}
 	@Override
 	public final void incLost() {lost.incrementAndGet(); }
-	@Override
-	public final void incLost(final int count) {lost.addAndGet(count);}
+
+	 final void incLost(final int count) {lost.addAndGet(count);}
 	private final void resetLost() { lost.set(0); }
 
 	final void incLiving() {living.incrementAndGet();}
@@ -85,8 +85,8 @@ class AgentCounter implements AgentCounterI {
 	 final void incLiving(final int count) {living.addAndGet(count);}
 	@Override
 	public final void decLiving() {living.decrementAndGet();}
-	@Override
-	public final void decLiving(final int count) {living.decrementAndGet();}
+
+	 final void decLiving(final int count) {living.decrementAndGet();}
 	// yyyyyy does this work (`count' never used)??? kai, feb'12
 
 

@@ -214,11 +214,11 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.waitingList.size());
-		this.queueNetwork.getMobsim().getAgentCounter().decLiving(
+		this.queueNetwork.getMobsim().agentCounter.decLiving(
 				this.waitingList.size());
 
 		// QueueAgentCounter.staticIncLost(this.waitingList.size());
-		this.queueNetwork.getMobsim().getAgentCounter().incLost(
+		this.queueNetwork.getMobsim().agentCounter.incLost(
 				this.waitingList.size());
 
 		this.waitingList.clear();
@@ -230,11 +230,11 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.vehQueue.size());
-		this.queueNetwork.getMobsim().getAgentCounter().decLiving(
+		this.queueNetwork.getMobsim().agentCounter.decLiving(
 				this.vehQueue.size());
 
 		// QueueAgentCounter.staticIncLost(this.vehQueue.size());
-		this.queueNetwork.getMobsim().getAgentCounter().incLost(
+		this.queueNetwork.getMobsim().agentCounter.incLost(
 				this.vehQueue.size());
 
 		this.vehQueue.clear();
@@ -245,11 +245,11 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.buffer.size());
-		this.queueNetwork.getMobsim().getAgentCounter().decLiving(
+		this.queueNetwork.getMobsim().agentCounter.decLiving(
 				this.buffer.size());
 
 		// QueueAgentCounter.staticIncLost(this.buffer.size());
-		this.queueNetwork.getMobsim().getAgentCounter().incLost(
+		this.queueNetwork.getMobsim().agentCounter.incLost(
 				this.buffer.size());
 
 		this.buffer.clear();
