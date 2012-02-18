@@ -305,4 +305,12 @@ public class Agent2D implements MobsimAgent {
 	}
 
 
+
+	@Override
+	public void abort(double now) {
+		// (additional MobsimAgent interface method.   I guess this should never happen with 2d agents. kai, feb'12)
+		throw new UnsupportedOperationException() ;
+	}
+
+
 }
