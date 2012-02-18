@@ -112,6 +112,14 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	 * @param now the current time in the simulation
 	 */
 	public void endLegAndComputeNextState(final double now);
+	
+	/**
+	 * This is another method besides endLeg... and endActivity... .  Seems to be necessary to abort agents
+	 * in states where they should not be.  kai, feb'12
+	 */
+	public void abort(final double now) ;
+
+
 
 //	public PlanElement getCurrentPlanElement() ;
 	// if this does not make sense for a class, then the class is maybe not a "Plan"Agent.  kai, may'10

@@ -418,6 +418,11 @@ public final class QSim implements VisMobsim, Netsim {
 			this.arrangeAgentDeparture(agent) ; 
 			break ;
 		case ABORT:
+			this.events.processEvent( this.events.getFactory().createAgentStuckEvent(
+					this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), null
+			)) ;
+			// (yyyy returning ``null'' for mode since not every agent in this state can answer this here. kai, feb'12)
+			
 			this.agents.remove(agent) ;
 			this.getAgentCounter().decLiving();
 			this.getAgentCounter().incLost();

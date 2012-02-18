@@ -53,6 +53,7 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -823,7 +824,7 @@ public class TransitQueueSimulationTest {
 
         int offset=1 ; // "1" if there is an additional teleportation dp event.  kai, aug'10
 
-        assertEquals(2*offset+29, allEvents.size());
+        assertEquals(2*offset+30, allEvents.size());
 
         assertTrue(allEvents.get(0) instanceof ActivityEndEventImpl);
         assertEquals("h", ((ActivityEndEventImpl) allEvents.get(0)).getActType());
@@ -860,5 +861,6 @@ public class TransitQueueSimulationTest {
         assertTrue(allEvents.get(2*offset+26) instanceof VehicleDepartsAtFacilityEvent);
         assertTrue(allEvents.get(2*offset+27) instanceof PersonLeavesVehicleEventImpl); // pt-driver
         assertTrue(allEvents.get(2*offset+28) instanceof AgentArrivalEventImpl); // pt-driver
+        assertTrue(allEvents.get(2*offset+29) instanceof AgentStuckEventImpl); // pt-driver
     }
 }
