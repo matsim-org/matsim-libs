@@ -31,6 +31,14 @@ public class KaiHybridNode extends QNode {
 		super(n, network);
 	}
 	
+	/**
+	 * Design thoughts:<ul>
+	 * <li> My current intuition is that this method just just depend on the type of the inlink, 
+	 * but it should call a method that depends both on the type of the in- and the outlink.
+	 * By this, one would be able to replace the corresponding moverOverNode methods via overloading.
+	 * kai, feb'12
+	 * </ul>
+	 */
 	@Override
 	/*package*/ void clearLinkBuffer(final AbstractQLink inLink, final double now){
 		if (inLink instanceof QLinkImpl){
