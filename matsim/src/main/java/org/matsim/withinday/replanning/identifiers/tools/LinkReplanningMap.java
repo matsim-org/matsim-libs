@@ -30,9 +30,9 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -49,11 +49,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
@@ -62,12 +62,19 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  * The time is estimated as following:
  * When a LinkEnterEvent is thrown the Replanning Time is set to
  * the current time + the FreeSpeed Travel Time. This guarantees that
- * the replanning will be done while the agent is on the Link.
-  * <p/>
- * Additionally a Replanning Interval can be set. This allows an Agent
- * to do multiple Replanning on a single Link. This may be useful if the
- * Traffic System is congested and the Link Travel Times are much longer
- * than the Freespeed Travel Times.
+ * the replanning will be done while the agent is on the Link. After that
+ * time, the agent might be already in the outgoing queue of a QLink
+ * where not all replanning operations are possible anymore (the agent
+ * can e.g. not insert an Activity on its current link anymore).
+ * <p/>
+ * <p>
+ * The replanning interval (multiple replannings on the same link when
+ * an agent is stuck on a link due to a traffic jam) has been removed
+ * since it cannot be guaranteed that all replanning operations are
+ * valid anymore.
+ * </p>
+ * 
+ * @author cdobler
  */
 public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 		AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
@@ -75,72 +82,53 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 
 	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
 
-	// Repeated replanning if a person gets stuck in a Link
-	private boolean repeatedReplanning = true;
-	private double replanningInterval = 300.0;
+	private final Network network;
+	private final MultiModalTravelTime multiModalTravelTime;
 
-	private Network network;
-
+	/*
+	 * EXACT... replanning is scheduled for the current time step (time == replanning time)
+	 * RESTRICTED ... available replanning operations are restricted (time > replanning time)
+	 * UNRESTRICTED ... replanning operations are not restricted (time <= replanning time)
+	 */
+	private enum timeFilterMode {
+		EXACT, RESTRICTED, UNRESTRICTED
+	}
+	
 	/*
 	 * Mapping between the PersonDriverAgents and the PersonIds.
 	 * The events only contain a PersonId.
 	 */
 	private final Map<Id, PlanBasedWithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 
-	private final Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
-	
-	private final Set<String> observedModes;
+	private final Map<Id, Double> replanningMap;	// PersonId, ReplanningTime
 	
 	private final Set<Id> enrouteAgents;
 	
 	private final Map<Id, String> agentTransportModeMap;
 	
-	public LinkReplanningMap() {
+	public LinkReplanningMap(Network network) {
+		this(network, null);
+		log.info("Note: no MultiModalTravelTime object given. Therefore use free speed car travel time as " +
+				"minimal link travel time for all modes.");
+	}
+	
+	public LinkReplanningMap(Network network, MultiModalTravelTime multiModalTravelTime) {
 		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 
+		this.network = network;
+		this.multiModalTravelTime = multiModalTravelTime;
+		
 		this.enrouteAgents = new HashSet<Id>();
-		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
+		this.replanningMap = new HashMap<Id, Double>();
 		this.personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.agentTransportModeMap = new HashMap<Id, String>();
-		this.observedModes = new HashSet<String>();
-		this.addObservedMode(TransportMode.car);
-	}
-	
-	public void addObservedMode(String mode) {
-		this.observedModes.add(mode);
-	}
-	
-	public void setObservedModes(Set<String> modes) {
-		this.observedModes.clear();
-		this.observedModes.addAll(modes);
-	}
-
-	public void doRepeatedReplanning(boolean value) {
-		this.repeatedReplanning = value;
-	}
-	
-	public boolean isRepeatedReplanning() {
-		return this.repeatedReplanning;
-	}
-	
-	public void setRepeatedReplanningInterval(double interval) {
-		this.replanningInterval = interval;
-	}
-	
-	public double getReplanningInterval() {
-		return this.replanningInterval;
 	}
 	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-
 		Mobsim sim = (Mobsim) e.getQueueSimulation();
-
-		// Update Reference to network
-		this.network = sim.getScenario().getNetwork();
-
+		
 		personAgentMapping.clear();
-
 		if (sim instanceof QSim) {
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
 				if (mobsimAgent instanceof PlanBasedWithinDayAgent) {
@@ -155,13 +143,19 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		String mode = agentTransportModeMap.get(event.getPersonId());
-		if (observedModes.contains(mode)) {
-			double now = event.getTime();
-			Link link = network.getLinks().get(event.getLinkId());
-			double departureTime = Math.floor((now + ((LinkImpl) link).getFreespeedTravelTime(now)));
-			
-			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));
-		}
+
+		double now = event.getTime();
+		Link link = network.getLinks().get(event.getLinkId());
+		
+		double departureTime = event.getTime();
+		if (this.multiModalTravelTime != null) {
+			Person person = this.personAgentMapping.get(event.getPersonId()).getSelectedPlan().getPerson();
+			multiModalTravelTime.setPerson(person);
+			double travelTime = multiModalTravelTime.getModalLinkTravelTime(link, now, mode);
+			departureTime = Math.floor(now + travelTime);				
+		} else departureTime = Math.floor((now + ((LinkImpl) link).getFreespeedTravelTime(now)));
+		
+		replanningMap.put(event.getPersonId(), departureTime);
 	}
 
 	@Override
@@ -182,14 +176,18 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * 
 	 * We don't do this anymore since the agent is limited in its 
 	 * replanning capabilities on the link he is departing to. 
- 	 * It is e.g. not possible, to schedule a new activity there. 
+ 	 * It is e.g. not possible, to schedule a new activity there.
+ 	 * Instead we create an entry in the replanning map that
+ 	 * says that the agents should perform a replanning in the
+ 	 * current time step. Doing so allows to identify the agent
+ 	 * as performing a leg and being allowed to perform a restricted
+ 	 * set of replanning operations.
 	 */
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		agentTransportModeMap.put(event.getPersonId(), event.getLegMode());
-		if (observedModes.contains(event.getLegMode())) {
-			this.enrouteAgents.add(event.getPersonId());
-		}		
+		this.agentTransportModeMap.put(event.getPersonId(), event.getLegMode());
+		this.replanningMap.put(event.getPersonId(), event.getTime());
+		this.enrouteAgents.add(event.getPersonId());	
 	}
 
 	/*
@@ -209,56 +207,181 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		replanningMap.remove(event.getPersonId());
-		agentTransportModeMap.remove(event.getPersonId());
 		enrouteAgents.remove(event.getPersonId());
+		agentTransportModeMap.remove(event.getPersonId());
 	}
-
-	/*
-	 * returns a List of Agents who might need a replanning
-	 */
-	public synchronized Set<PlanBasedWithinDayAgent> getReplanningAgents(double time) {
-		Set<PlanBasedWithinDayAgent> agentsToReplanLeaveLink = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		
-		Iterator<Entry<Id, Tuple<Id, Double>>> entries = replanningMap.entrySet().iterator();
-		while (entries.hasNext()) {
-			Entry<Id, Tuple<Id, Double>> entry = entries.next();
-			Id personId = entry.getKey();
-			Id linkId = entry.getValue().getFirst();
-
-			double replanningTime = entry.getValue().getSecond();
-
-			if (time >= replanningTime) {
-				PlanBasedWithinDayAgent withinDayAgent = this.personAgentMapping.get(personId);
-
-				// Repeated Replanning per Link possible?
-				if (repeatedReplanning) entry.setValue(new Tuple<Id,Double>(linkId, time + this.replanningInterval));
-				else entries.remove();
-
-				agentsToReplanLeaveLink.add(withinDayAgent);
-			}
-		}
-
-		return agentsToReplanLeaveLink;
-	}
-
-	/*
-	 * Returns a List of all Agents, that are currently performing a Leg.
-	 */
-	public synchronized Set<PlanBasedWithinDayAgent> getLegPerformingAgents() {
-		Set<PlanBasedWithinDayAgent> legPerformingAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-
-		for (Id id : this.enrouteAgents) {
-			PlanBasedWithinDayAgent agent = this.personAgentMapping.get(id);
-			legPerformingAgents.add(agent);			
-		}
-
-		return legPerformingAgents;
-	}
-
+	
 	@Override
 	public void reset(int iteration) {
 		this.replanningMap.clear();
 		this.enrouteAgents.clear();
+		this.agentTransportModeMap.clear();
+	}
+	
+	/**
+	 * @param time
+	 * @return a list of agents who might need a replanning
+	 */
+	public Set<PlanBasedWithinDayAgent> getReplanningAgents(final double time) {
+		Set<String> transportModes = null;
+		return this.getReplanningAgents(time, transportModes);
+	}
+
+	/**
+	 * @param time
+	 * @param transportMode
+	 * @return a list of agents who might need a replanning and use the given transport mode
+	 */
+	public Set<PlanBasedWithinDayAgent> getReplanningAgents(final double time, final String transportMode) {
+		Set<String> transportModes = new HashSet<String>();
+		transportModes.add(transportMode);
+		return this.getReplanningAgents(time, transportModes);
+	}
+	
+	/**
+	 * @param time
+	 * @param transportModes
+	 * @return a list of agents who might need a replanning and use one of the given transport modes
+	 */
+	public Set<PlanBasedWithinDayAgent> getReplanningAgents(final double time, final Set<String> transportModes) {
+		return this.filterAgents(time, transportModes, timeFilterMode.EXACT);
+	}
+
+	/**
+	 * @param time
+	 * @return a list of agents who might need an unrestricted replanning and use the given transport mode
+	 */
+	public Set<PlanBasedWithinDayAgent> getUnrestrictedReplanningAgents(final double time) {
+		Set<String> transportModes = null;
+		return this.getUnrestrictedReplanningAgents(time, transportModes);
+	}
+	
+	/**
+	 * @param time
+	 * @param transportMode
+	 * @return a list of agents who might need an unrestricted replanning and use the given transport mode
+	 */
+	public Set<PlanBasedWithinDayAgent> getUnrestrictedReplanningAgents(final double time, final String transportMode) {
+		Set<String> transportModes = new HashSet<String>();
+		transportModes.add(transportMode);
+		return this.getUnrestrictedReplanningAgents(time, transportModes);
+	}
+	
+	/**
+	 * @param time
+	 * @param transportModes
+	 * @return a list of agents who might need an unrestricted replanning and use one of the given transport modes
+	 */
+	public Set<PlanBasedWithinDayAgent> getUnrestrictedReplanningAgents(final double time, final Set<String> transportModes) {
+		return this.filterAgents(time, transportModes, timeFilterMode.UNRESTRICTED);
+	}
+	
+	/**
+	 * @param time
+	 * @return a list of agents who might need a restricted replanning and use the given transport mode
+	 */
+	public Set<PlanBasedWithinDayAgent> getRestrictedReplanningAgents(final double time) {
+		Set<String> transportModes = null;
+		return this.getRestrictedReplanningAgents(time, transportModes);
+	}
+	
+	/**
+	 * @param time
+	 * @param transportMode
+	 * @return a list of agents who might need a restricted replanning and use the given transport mode
+	 */
+	public Set<PlanBasedWithinDayAgent> getRestrictedReplanningAgents(final double time, final String transportMode) {
+		Set<String> transportModes = new HashSet<String>();
+		transportModes.add(transportMode);
+		return this.getRestrictedReplanningAgents(time, transportModes);
+	}
+	
+	/**
+	 * @param time
+	 * @param transportModes
+	 * @return a list of agents who might need a restricted replanning and use one of the given transport modes
+	 */
+	public Set<PlanBasedWithinDayAgent> getRestrictedReplanningAgents(final double time, final Set<String> transportModes) {
+		return this.filterAgents(time, transportModes, timeFilterMode.RESTRICTED);
+	}
+	
+	private Set<PlanBasedWithinDayAgent> filterAgents(final double time, final Set<String> transportModes, final timeFilterMode timeMode) {
+		Set<PlanBasedWithinDayAgent> set = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		
+		Iterator<Entry<Id, Double>> entries = replanningMap.entrySet().iterator();
+		while (entries.hasNext()) {
+			Entry<Id, Double> entry = entries.next();
+			Id personId = entry.getKey();
+
+			double replanningTime = entry.getValue();
+
+			// check time
+			if (timeMode == timeFilterMode.EXACT) {
+				if (time != replanningTime) continue;				
+			} else if (timeMode == timeFilterMode.RESTRICTED) {
+				if (time <= replanningTime) continue;
+			} else if (timeMode == timeFilterMode.UNRESTRICTED) {
+				if (time > replanningTime) continue;
+			}
+
+			// check transport mode
+			if (transportModes != null) {
+				String mode = this.agentTransportModeMap.get(personId);
+				if (!transportModes.contains(mode)) continue;
+			}
+			
+			// non of the checks fails therefore add agent to the replanning set
+			PlanBasedWithinDayAgent withinDayAgent = this.personAgentMapping.get(personId);
+			set.add(withinDayAgent);	
+		}
+
+		return set;
+	}
+	
+	/**
+	 * @return A list of all agents that are currently performing a leg. Note that
+	 * some of them might be limited in the available replanning operations! 
+	 */
+	public Set<PlanBasedWithinDayAgent> getLegPerformingAgents() {
+		Set<String> transportModes = null;
+		return this.getLegPerformingAgents(transportModes);
+	}
+	
+	/**
+	 * @param transportMode
+	 * @return A list of all agents that are currently performing a leg with the
+	 * given transport mode. Note that some of them might be limited in the available 
+	 * replanning operations! 
+	 */
+	public Set<PlanBasedWithinDayAgent> getLegPerformingAgents(final String transportMode) {
+		Set<String> transportModes = new HashSet<String>();
+		transportModes.add(transportMode);
+		return this.getLegPerformingAgents(transportModes);
+	}
+
+	/**
+	 * @param transportModes
+	 * @return A list of all agents that are currently performing a leg with the
+	 * given transport mode. Note that some of them might be limited in the available 
+	 * replanning operations! 
+	 */
+	public Set<PlanBasedWithinDayAgent> getLegPerformingAgents(final Set<String> transportModes) {
+		Set<PlanBasedWithinDayAgent> legPerformingAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		
+		for (Id id : this.enrouteAgents) {
+			
+			// check transport mode
+			if (transportModes != null) {
+				String mode = this.agentTransportModeMap.get(id);
+				if (!transportModes.contains(mode)) continue;
+			}
+			
+			// the check did not fail therefore add agent to the replanning set
+			PlanBasedWithinDayAgent agent = this.personAgentMapping.get(id);
+			legPerformingAgents.add(agent);
+		}
+
+		return legPerformingAgents;
 	}
 
 }

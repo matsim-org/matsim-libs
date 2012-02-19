@@ -57,13 +57,16 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.withinday.controller.WithinDayController;
@@ -131,36 +134,21 @@ public class EvacuationControler extends WithinDayController implements Simulati
 //																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 5.shp",
 //																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 6.shp"};
 	
-	protected String[] householdVehicleFiles = new String[]{
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AG.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AI.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AR.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BE.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BL.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BS.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_FR.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GE.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GL.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GR.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_JU.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_LU.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_NE.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_NW.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_OW.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SG.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SH.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SO.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SZ.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_TG.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_TI.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_UR.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_VD.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_VS.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZG.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZH.txt"};
-
-	protected String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
-	protected String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
+	protected String pathToVehiclesFiles;
+	protected String[] householdVehicleFiles = new String[] {
+			"Fahrzeugtypen_Kanton_AG.txt", "Fahrzeugtypen_Kanton_AI.txt", "Fahrzeugtypen_Kanton_AR.txt",
+			"Fahrzeugtypen_Kanton_BE.txt", "Fahrzeugtypen_Kanton_BL.txt", "Fahrzeugtypen_Kanton_BS.txt",
+			"Fahrzeugtypen_Kanton_FR.txt", "Fahrzeugtypen_Kanton_GE.txt", "Fahrzeugtypen_Kanton_GL.txt",
+			"Fahrzeugtypen_Kanton_GR.txt", "Fahrzeugtypen_Kanton_JU.txt", "Fahrzeugtypen_Kanton_LU.txt",
+			"Fahrzeugtypen_Kanton_NE.txt", "Fahrzeugtypen_Kanton_NW.txt", "Fahrzeugtypen_Kanton_OW.txt",
+			"Fahrzeugtypen_Kanton_SG.txt", "Fahrzeugtypen_Kanton_SH.txt", "Fahrzeugtypen_Kanton_SO.txt",
+			"Fahrzeugtypen_Kanton_SZ.txt", "Fahrzeugtypen_Kanton_TG.txt", "Fahrzeugtypen_Kanton_TI.txt",
+			"Fahrzeugtypen_Kanton_UR.txt", "Fahrzeugtypen_Kanton_VD.txt", "Fahrzeugtypen_Kanton_VS.txt",
+			"Fahrzeugtypen_Kanton_ZG.txt", "Fahrzeugtypen_Kanton_ZH.txt"};
+	
+	protected String pathToGISFiles;
+	protected String dhm25File = "nodes_3d_dhm25.shp";
+	protected String srtmFile = "nodes_3d_srtm.shp";
 	
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -184,7 +172,9 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected WithinDayDuringLegReplanner currentLegToMeetingPointReplanner;
 	protected WithinDayDuringLegReplanner pickupAgentsReplanner;
 	protected WithinDayDuringLegReplanner duringLegRerouteReplanner;
-
+	
+	protected double duringLegRerouteShare = 0.25;
+	
 	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected HouseholdsUtils householdsUtils;
 	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
@@ -217,6 +207,15 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	public EvacuationControler(String[] args) {
 		super(args);
 
+		pathToVehiclesFiles = args[1];
+		if (!pathToVehiclesFiles.endsWith("/")) pathToVehiclesFiles = pathToVehiclesFiles + "/";
+		for (int i = 0; i < householdVehicleFiles.length; i++) householdVehicleFiles[i] = pathToVehiclesFiles + householdVehicleFiles[i];
+
+		pathToGISFiles = args[2];
+		if (!pathToGISFiles.endsWith("/")) pathToGISFiles = pathToGISFiles + "/";
+		srtmFile = pathToGISFiles + srtmFile;
+		dhm25File = pathToGISFiles + dhm25File;
+		
 		setConstructorParameters();
 		
 		// register this as a Controller and Simulation Listener
@@ -298,8 +297,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		super.createAndInitReplanningManager(numReplanningThreads);
 		super.createAndInitActivityReplanningMap();
-		super.createAndInitLinkReplanningMap();
-		super.getLinkReplanningMap().doRepeatedReplanning(false);
+		MultiModalTravelTime linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
+		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
 		
 		this.householdsUtils = new HouseholdsUtils(this.scenarioData, this.getEvents());
 		this.getEvents().addHandler(householdsUtils);
@@ -476,7 +475,9 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		
-		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
+		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
+		duringLegRerouteTransportModes.add(TransportMode.car);
+		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes).createIdentifier();
 	}
 	
 	/*
@@ -527,7 +528,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, duringLegRerouteShare).createReplanner();
 		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 	}
@@ -544,6 +545,46 @@ public class EvacuationControler extends WithinDayController implements Simulati
 			ActivityOption activityOption = ((ActivityFacilityImpl)secureFacility).createActivityOption("pickup");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 			activityOption.setCapacity(Double.MAX_VALUE);
+		}
+	}
+	
+	/*
+	 * The LinkReplanningMap calculates the earliest link exit time for each agent.
+	 * To do so, a MultiModalTravelTime object is required which calculates these
+	 * times. We use a MultiModalTravelTimeWrapper with walk- and bike travel times
+	 * and replace the car, ride and pt travel time calculators with free speed
+	 * travel time calculators.
+	 */
+	private MultiModalTravelTime createLinkReplanningMapTravelTime() {
+		
+		// create a copy of the MultiModalTravelTimeWrapperFactory and set a FreeSpeedTravelTimeCalculator for car mode
+		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
+		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
+		}
+
+		// replace modes
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, new FreeSpeedTravelTimeFactory());
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new FreeSpeedTravelTimeFactory());
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new FreeSpeedTravelTimeFactory());
+
+		// return travel time object
+		return timeFactory.createTravelTime();
+		
+//		Map<String, PersonalizableTravelTimeFactory> map = this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories();
+//		PersonalizableTravelTimeFactory originalCarFactory = map.get(TransportMode.car);
+//		PersonalizableTravelTimeFactory newCarFactory = new FreeSpeedTravelTimeFactory();
+//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.car, newCarFactory);
+//		MultiModalTravelTime travelTime = this.getMultiModalTravelTimeWrapperFactory().createTravelTime();
+//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.car, originalCarFactory);
+//		return travelTime;
+	}
+	
+	private static class FreeSpeedTravelTimeFactory implements PersonalizableTravelTimeFactory {
+
+		@Override
+		public PersonalizableTravelTime createTravelTime() {
+			return new FreeSpeedTravelTimeCalculator();
 		}
 	}
 	
