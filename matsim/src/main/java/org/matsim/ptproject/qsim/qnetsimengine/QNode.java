@@ -210,60 +210,64 @@ public class QNode implements NetsimNode {
 	private boolean moveVehicleOverNode(final QVehicle veh, final AbstractQLane fromLaneBuffer, final double now) {
 		Id nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
+
 		if ((!fromLaneBuffer.hasGreenForToLink(nextLinkId))) {
-			if (!((now - fromLaneBuffer.getBufferLastMovedTime()) > network.simEngine.getStuckTime())){
+			if (!(vehicleIsStuck(fromLaneBuffer, now))){
 				return false;
 			}
 		}
-		// veh has to move over node
-		if (nextLinkId != null) {
-			AbstractQLink nextQueueLink = network.getNetsimLinks().get(nextLinkId);
-			Link nextLink = nextQueueLink.getLink();
-			this.checkNextLinkSemantics(currentLink, nextLink, veh);
-			if (nextQueueLink.hasSpace()) {
-				fromLaneBuffer.popFirstFromBuffer();
-				veh.getDriver().notifyMoveOverNode(nextLinkId);
-				nextQueueLink.addFromIntersection(veh);
-				return true;
-			}
 
-			// check if veh is stuck!
+		if (nextLinkId == null) {
+			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
+					+ " currentLink=" + currentLink.getId().toString()
+					+ ". The agent is removed from the simulation.");
+			moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now);
+			return true;
+		}
+		
+		AbstractQLink nextQueueLink = network.getNetsimLinks().get(nextLinkId);
+		this.checkNextLinkSemantics(currentLink, nextQueueLink.getLink(), veh);
 
-			if ((now - fromLaneBuffer.getBufferLastMovedTime()) > network.simEngine.getStuckTime()) {
-				/* We just push the vehicle further after stucktime is over, regardless
-				 * of if there is space on the next link or not.. optionally we let them
-				 * die here, we have a config setting for that!
-				 */
-				if (network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
-					fromLaneBuffer.popFirstFromBuffer();
-					veh.getDriver().abort(now) ;
-					network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
-//					
-//					network.simEngine.getMobsim().getAgentCounter().decLiving();
-//					network.simEngine.getMobsim().getAgentCounter().incLost();
-//					network.simEngine.getMobsim().getEventsManager().processEvent(
-//							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
-				} else {
-					fromLaneBuffer.popFirstFromBuffer();
-					veh.getDriver().notifyMoveOverNode(nextLinkId);
-					nextQueueLink.addFromIntersection(veh);
-					return true;
-				}
-			}
-			return false;
+		if (nextQueueLink.hasSpace()) {
+			moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextQueueLink);
+			return true;
 		}
 
-		// --> nextLink == null
+		if (vehicleIsStuck(fromLaneBuffer, now)) {
+			/* We just push the vehicle further after stucktime is over, regardless
+			 * of if there is space on the next link or not.. optionally we let them
+			 * die here, we have a config setting for that!
+			 */
+			if (network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
+				moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now);
+				return false ;
+			} else {
+				moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextQueueLink);
+				return true; 
+				// (yyyy why is this returning `true'?  Since this is a fix to avoid gridlock, this should proceed in small steps. 
+				// kai, feb'12) 
+			}
+		}
+
+		return false;
+
+	}
+
+	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final AbstractQLane fromLaneBuffer, final double now) {
 		fromLaneBuffer.popFirstFromBuffer();
-//		network.simEngine.getMobsim().getAgentCounter().decLiving();
-//		network.simEngine.getMobsim().getAgentCounter().incLost();
-		log.error(
-				"Agent has no or wrong route! agentId=" + veh.getDriver().getId()
-				+ " currentLink=" + currentLink.getId().toString()
-				+ ". The agent is removed from the simulation.");
 		veh.getDriver().abort(now) ;
 		network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
-		return true;
+	}
+
+	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, final AbstractQLane fromLaneBuffer, AbstractQLink nextQueueLink)
+	{
+		fromLaneBuffer.popFirstFromBuffer();
+		veh.getDriver().notifyMoveOverNode(nextQueueLink.getLink().getId());
+		nextQueueLink.addFromIntersection(veh);
+	}
+
+	private boolean vehicleIsStuck(final AbstractQLane fromLaneBuffer, final double now) {
+		return (now - fromLaneBuffer.getBufferLastMovedTime()) > network.simEngine.getStuckTime();
 	}
 
 
