@@ -458,10 +458,15 @@ public class JointPlan implements Plan {
 	 *
 	 */
 	public void resetFromPlan(final JointPlan plan) {
+		if (plan == this) {
+			return;
+		}
+
 		if (plan.getClique() != this.clique) {
 			throw new UnsupportedOperationException("resetting a joint plan from"+
 					" a plan of a different clique is unsupported.");
 		}
+
 		if (this.setAtIndividualLevel) {
 			PlanImpl currentPlan;
 			for (Person currentIndividual : this.clique.getMembers().values()) {
@@ -480,6 +485,7 @@ public class JointPlan implements Plan {
 				}
 			}
 		}
+
 		this.individualPlans.clear();
 		this.individualPlans.putAll(plan.individualPlans);
 		// update the aggregator, so that it considers the scores of the new plans
@@ -489,6 +495,8 @@ public class JointPlan implements Plan {
 		this.aggregator = this.aggregatorFactory.createScoresAggregator(this.individualPlans.values());
 		this.legsMap.clear();
 		this.legsMap.putAll(plan.legsMap);
+		this.actMap.clear();
+		this.actMap.putAll(plan.actMap);
 	}
 
 	/**
@@ -529,7 +537,8 @@ public class JointPlan implements Plan {
 		if (leg == null) {
 			throw new LinkedElementsResolutionException(
 					"legs links could not be resolved, when searching for leg with id "+legId+
-					" in plan with registered legs "+legsMap.keySet());
+					" in plan with registered legs "+legsMap.keySet()+" and plan elements: "+
+					getIndividualPlanElements()+", for clique "+clique);
 		}
 
 		return leg;
@@ -546,7 +555,8 @@ public class JointPlan implements Plan {
 		if (act == null) {
 			throw new LinkedElementsResolutionException(
 					"acts links could not be resolved, when searching for act with id "+actId+
-					" in plan with registered activities "+actMap.keySet());
+					" in plan with registered activities "+actMap.keySet()+" and plan elements: "+
+					getIndividualPlanElements()+", for clique "+clique);
 		}
 
 		return act;
@@ -594,6 +604,12 @@ public class JointPlan implements Plan {
 		}
 
 		return type.toString();
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+": clique="+clique+", elements="+getIndividualPlanElements()+", plans="+getIndividualPlans()+", addAtIndividualLevel="+
+			setAtIndividualLevel+", isSelected="+this.isSelected();
 	}
 
 	public ScoresAggregatorFactory getScoresAggregatorFactory() {
