@@ -30,6 +30,7 @@ import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.analysis.listeners.ModeAnalysis;
+import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * loads a config, sets the scoring function and some listeners, and runs the
@@ -43,7 +44,7 @@ public class RunIndivSimulation {
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+		Controler controler = new MultiLegRoutingControler(scenario);
 		//controler.addControlerListener(new CliqueScoreStats(
 		//			"scoresStats",
 		//			true));
