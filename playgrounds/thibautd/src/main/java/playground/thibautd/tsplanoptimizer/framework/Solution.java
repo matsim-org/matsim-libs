@@ -1,0 +1,58 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Solution.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.thibautd.tsplanoptimizer.framework;
+
+import java.util.List;
+
+import org.matsim.api.core.v01.population.Plan;
+
+/**
+ * Represents a plan, under the form of an Array of values,
+ * and a plan.
+ * The clone method must copy the representation.
+ * <br>
+ * It must implement equals and hashCode
+ * @author thibautd
+ */
+public interface Solution {
+	/**
+	 * Gives access to the representation, under the form of an ordered
+	 * list of values. The values must be internal references (modifying
+	 * them modifies the represented plan), the list may not (it should not be
+	 * modified).
+	 *
+	 * @return the internal representation.
+	 */
+	public List<? extends Value> getRepresentation();
+
+	/**
+	 * Returns the plan represented by this solution.
+	 * It must not be modified by the moves. Moves acting directly on the plan
+	 * should use representations with Value\<Plan\> values.
+	 *
+	 * @return the plan, which may be a newly created plan or a modification
+	 * of a plan used at initialisation (in both case, it should be indicated in
+	 * the documentation)
+	 */
+	public Plan getRepresentedPlan();
+
+	public Solution createClone();
+}
+
