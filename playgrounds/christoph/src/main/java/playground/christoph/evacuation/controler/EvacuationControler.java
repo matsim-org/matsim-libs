@@ -84,7 +84,10 @@ import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.config.EvacuationConfigReader;
+import playground.christoph.evacuation.mobsim.AgentsTracker;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
+import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
@@ -118,38 +121,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	public static final String FILENAME_VEHICLES = "output_vehicles.xml.gz";
 	
 	protected boolean adaptOriginalPlans = false;
-	
-//	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer2km.shp"};
-	
-//	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
 
-	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp",
-																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 2.shp"};
-	
-//	protected String[] evacuationAreaSHPFiles = new String[]{	"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp",
-//																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 1.shp",
-//																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 2.shp",
-//																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 3.shp",
-//																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 4.shp",
-//																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 5.shp",
-//																"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone 2, Sektor 6.shp"};
-	
-	protected String pathToVehiclesFiles;
-	protected String[] householdVehicleFiles = new String[] {
-			"Fahrzeugtypen_Kanton_AG.txt", "Fahrzeugtypen_Kanton_AI.txt", "Fahrzeugtypen_Kanton_AR.txt",
-			"Fahrzeugtypen_Kanton_BE.txt", "Fahrzeugtypen_Kanton_BL.txt", "Fahrzeugtypen_Kanton_BS.txt",
-			"Fahrzeugtypen_Kanton_FR.txt", "Fahrzeugtypen_Kanton_GE.txt", "Fahrzeugtypen_Kanton_GL.txt",
-			"Fahrzeugtypen_Kanton_GR.txt", "Fahrzeugtypen_Kanton_JU.txt", "Fahrzeugtypen_Kanton_LU.txt",
-			"Fahrzeugtypen_Kanton_NE.txt", "Fahrzeugtypen_Kanton_NW.txt", "Fahrzeugtypen_Kanton_OW.txt",
-			"Fahrzeugtypen_Kanton_SG.txt", "Fahrzeugtypen_Kanton_SH.txt", "Fahrzeugtypen_Kanton_SO.txt",
-			"Fahrzeugtypen_Kanton_SZ.txt", "Fahrzeugtypen_Kanton_TG.txt", "Fahrzeugtypen_Kanton_TI.txt",
-			"Fahrzeugtypen_Kanton_UR.txt", "Fahrzeugtypen_Kanton_VD.txt", "Fahrzeugtypen_Kanton_VS.txt",
-			"Fahrzeugtypen_Kanton_ZG.txt", "Fahrzeugtypen_Kanton_ZH.txt"};
-	
-	protected String pathToGISFiles;
-	protected String dhm25File = "nodes_3d_dhm25.shp";
-	protected String srtmFile = "nodes_3d_srtm.shp";
-	
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
@@ -173,7 +145,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected WithinDayDuringLegReplanner pickupAgentsReplanner;
 	protected WithinDayDuringLegReplanner duringLegRerouteReplanner;
 	
-	protected double duringLegRerouteShare = 0.25;
+	protected double duringLegRerouteShare = 0.10;
 	
 	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected HouseholdsUtils householdsUtils;
@@ -186,6 +158,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	protected PassengerDepartureHandler passengerDepartureHandler;
+	protected HouseholdsTracker househouldsTracker;
 	protected VehiclesTracker vehiclesTracker;
 	protected CoordAnalyzer coordAnalyzer;
 	protected Geometry affectedArea;
@@ -196,37 +169,22 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	/*
 	 * Analysis modules
 	 */
-//	protected boolean analyzeEvacuation = true;
-	protected boolean createEvacuationTimePicture = false;
 	protected EvacuationTimePicture evacuationTimePicture;
-	protected boolean countAgentsInEvacuationArea = true;
 	protected AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
 	
 	static final Logger log = Logger.getLogger(EvacuationControler.class);
 
 	public EvacuationControler(String[] args) {
 		super(args);
-
-		pathToVehiclesFiles = args[1];
-		if (!pathToVehiclesFiles.endsWith("/")) pathToVehiclesFiles = pathToVehiclesFiles + "/";
-		for (int i = 0; i < householdVehicleFiles.length; i++) householdVehicleFiles[i] = pathToVehiclesFiles + householdVehicleFiles[i];
-
-		pathToGISFiles = args[2];
-		if (!pathToGISFiles.endsWith("/")) pathToGISFiles = pathToGISFiles + "/";
-		srtmFile = pathToGISFiles + srtmFile;
-		dhm25File = pathToGISFiles + dhm25File;
 		
-		setConstructorParameters();
+		new EvacuationConfigReader().readFile(args[1]);
+		
+		// Use a Scoring Function, that only scores the travel times!
+		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 		
 		// register this as a Controller and Simulation Listener
 		super.getFixedOrderSimulationListener().addSimulationListener(this);
 		super.addControlerListener(this);
-	}
-
-	private void setConstructorParameters() {
-
-		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 	}
 
 	/*
@@ -279,7 +237,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		/*
 		 * Adding z-coordinates to the network
 		 */
-		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, dhm25File, srtmFile);
+		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, EvacuationConfig.dhm25File, EvacuationConfig.srtmFile);
 		zCoordinateAdder.addZCoordinatesToNetwork();
 		zCoordinateAdder.checkSteepness();
 
@@ -307,7 +265,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		Set<Feature> features = new HashSet<Feature>();
 		SHPFileUtil util = new SHPFileUtil();
-		for (String file : this.evacuationAreaSHPFiles) {
+		for (String file : EvacuationConfig.evacuationArea) {
 			features.addAll(util.readFile(file));		
 		}
 		affectedArea = util.mergeGeomgetries(features);
@@ -317,6 +275,10 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.getEvents(), householdsUtils, coordAnalyzer);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
+		
+		this.househouldsTracker = new HouseholdsTracker();
+		this.getEvents().addHandler(househouldsTracker);
+		this.getFixedOrderSimulationListener().addSimulationListener(househouldsTracker);
 		
 		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
 		this.getEvents().addHandler(vehiclesTracker);
@@ -330,7 +292,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 * Read household-vehicles-assignment files.
 		 */
 		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
-		for (String file : this.householdVehicleFiles) this.householdVehicleAssignmentReader.parseFile(file);
+		for (String file : EvacuationConfig.vehicleFleet) this.householdVehicleAssignmentReader.parseFile(file);
 		this.householdVehicleAssignmentReader.createVehiclesForCrossboarderHouseholds();
 		
 //		this.householdVehiclesTracker = new HouseholdVehiclesTracker(this.scenarioData, householdVehicleAssignmentReader.getAssignedVehicles());
@@ -380,15 +342,15 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 * intialize analyse modules
 		 */
 		// Create kmz file containing distribution of evacuation times. 
-		if (createEvacuationTimePicture) {
-			evacuationTimePicture = new EvacuationTimePicture(scenarioData, transportModes, coordAnalyzer);
+		if (EvacuationConfig.createEvacuationTimePicture) {
+			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer, househouldsTracker, vehiclesTracker);
 			this.addControlerListener(evacuationTimePicture);
 			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
 			this.events.addHandler(evacuationTimePicture);	
 		}
 		
 		 // Create and add an AgentsInEvacuationAreaCounter.
-		if (countAgentsInEvacuationArea) {
+		if (EvacuationConfig.countAgentsInEvacuationArea) {
 			double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
 			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
@@ -570,14 +532,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 
 		// return travel time object
 		return timeFactory.createTravelTime();
-		
-//		Map<String, PersonalizableTravelTimeFactory> map = this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories();
-//		PersonalizableTravelTimeFactory originalCarFactory = map.get(TransportMode.car);
-//		PersonalizableTravelTimeFactory newCarFactory = new FreeSpeedTravelTimeFactory();
-//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.car, newCarFactory);
-//		MultiModalTravelTime travelTime = this.getMultiModalTravelTimeWrapperFactory().createTravelTime();
-//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.car, originalCarFactory);
-//		return travelTime;
 	}
 	
 	private static class FreeSpeedTravelTimeFactory implements PersonalizableTravelTimeFactory {

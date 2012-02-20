@@ -57,6 +57,8 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.christoph.netherlands.zones.SpecialZones;
+import playground.christoph.router.FullNetworkDijkstra;
+import playground.christoph.router.FullNetworkDijkstraFactory;
 
 public class CalculateTravelTimes {
 

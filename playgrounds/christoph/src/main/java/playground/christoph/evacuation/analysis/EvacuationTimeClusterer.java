@@ -38,14 +38,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
+
+import playground.christoph.router.FullNetworkDijkstra;
+import playground.christoph.router.FullNetworkDijkstraFactory;
 
 public class EvacuationTimeClusterer {
 
@@ -56,11 +57,12 @@ public class EvacuationTimeClusterer {
 	private Map<BasicLocation, Map<BasicLocation, Double>> costMap;
 	private QuadTree <ClusterableLocation> quadTree;
 	
-	private int numOfThreads = 6;
+	private int numOfThreads = 1;
 	
-	public EvacuationTimeClusterer(Network network, Map<BasicLocation, List<Double>> locationMap) {
+	public EvacuationTimeClusterer(Network network, Map<BasicLocation, List<Double>> locationMap, int numOfThreads) {
 		this.network = network;
 		this.locationMap = locationMap;
+		this.numOfThreads = numOfThreads;
 		
 		initQuadTree();
 	}
@@ -156,9 +158,8 @@ public class EvacuationTimeClusterer {
 		for (int i = 0; i < numOfThreads; i++) {
 
 			TravelTimeCost travelTimeCost = new TravelTimeCost();
-//			LeastCostPathCalculator leastCostPathCalculator = new AStarLandmarksFactory(network, travelTimeCost).createPathCalculator(network, travelTimeCost, travelTimeCost);
-			LeastCostPathCalculator leastCostPathCalculator = new FastDijkstraFactory().createPathCalculator(network, travelTimeCost, travelTimeCost);
-						
+			FullNetworkDijkstra leastCostPathCalculator = new FullNetworkDijkstraFactory().createPathCalculator(network, travelTimeCost, travelTimeCost);
+			
 			Thread thread = new ParallelThread();
 			thread.setDaemon(true);
 			thread.setName("ParallelEvacuationTimeClusterThread" + i);
@@ -267,7 +268,7 @@ public class EvacuationTimeClusterer {
 		Counter counter;
 		Map<BasicLocation, List<Double>> locationMap;
 		Map<BasicLocation, Map<BasicLocation, Double>> costMap;
-		LeastCostPathCalculator leastCostPathCalculator;
+		FullNetworkDijkstra leastCostPathCalculator;
 		List<BasicLocation> fromLocations = new ArrayList<BasicLocation>();
 		
 		@Override
@@ -276,7 +277,7 @@ public class EvacuationTimeClusterer {
 			for (BasicLocation fromLocation : fromLocations) {
 				Map<BasicLocation, Double> toCosts = new HashMap<BasicLocation, Double>();
 
-//				calcLeastCostTree(fromLocation);
+				calcLeastCostTree(fromLocation);
 				
 				for (BasicLocation toLocation : locationMap.keySet()) {
 					double costs = calcCost(fromLocation, toLocation);
@@ -288,16 +289,14 @@ public class EvacuationTimeClusterer {
 			}
 		}
 		
-//		private void calcLeastCostTree(BasicLocation from) {
-//			Link fromLink;
-//			
-//			if (from instanceof Link) fromLink = (Link) from;
-//			else fromLink = network.getLinks().get(((Facility) from).getLinkId());
-//			
-//			if (leastCostPathCalculator instanceof FullNetworkDijkstra) {
-//				((FullNetworkDijkstra)leastCostPathCalculator).calcLeastCostTree(fromLink.getToNode(), Time.UNDEFINED_TIME);
-//			}
-//		}
+		private void calcLeastCostTree(BasicLocation from) {
+			Link fromLink;
+			
+			if (from instanceof Link) fromLink = (Link) from;
+			else fromLink = network.getLinks().get(((Facility) from).getLinkId());
+			
+			leastCostPathCalculator.calcLeastCostTree(fromLink.getToNode(), Time.UNDEFINED_TIME);
+		}
 		
 		private double calcCost(BasicLocation from, BasicLocation to) {
 			Link fromLink;

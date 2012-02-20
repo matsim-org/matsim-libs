@@ -26,9 +26,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
@@ -66,6 +69,7 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.NetworkFeatureFactory;
 
+import playground.christoph.evacuation.analysis.EvacuationTimePicture.AgentInfo;
 import playground.christoph.evacuation.config.EvacuationConfig;
 
 public class EvacuationTimePictureWriter {
@@ -230,7 +234,7 @@ public class EvacuationTimePictureWriter {
 	}
 	
 	// Ids are personIds!
-	public FolderType getLinkFolder(Map<Id, BasicLocation> locations, Map<String, Map<Id, Double>> evacuationTimes) throws IOException {
+	public FolderType getLinkFolder(Map<Id, BasicLocation> locations, Map<Id, BasicLocation> positionAtEvacuationStart, Map<Id, AgentInfo> agentInfos) throws IOException {
 	
 		/*
 		 * Create basic structures
@@ -242,25 +246,27 @@ public class EvacuationTimePictureWriter {
 		
 		// add the MATSim logo to the kml
 		mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(MatsimKMLLogo.writeMatsimKMLLogo(kmzWriter)));
-		
+				
 		/*
-		 * Time shift correction because typically evacuation does not start at 0:00
+		 * Identify all utilized modes
 		 */
-		for (Map<Id, Double> map : evacuationTimes.values()) {
-			for (Id id : map.keySet()) {
-				double value = map.get(id) - EvacuationConfig.evacuationTime;
-				if (value < 0.0) value = 0.0;
-				map.put(id, value);
-			}				
-		}
+		Set<String> modes = new HashSet<String>();
+		for (AgentInfo agentInfo : agentInfos.values()) modes.addAll(agentInfo.transportModes);
+		Set<String> orderedModes = new TreeSet<String>(modes);
 		
 		/*
 		 * for every transportMode
 		 */
-		for (Entry<String, Map<Id, Double>> entry : evacuationTimes.entrySet()) {
-			String transportMode = entry.getKey();
-			Map<Id, Double> times = entry.getValue();
-			
+
+		for (String transportMode : orderedModes) {
+			Map<Id, Double> times = new HashMap<Id, Double>();
+
+			/*
+			 * TODO
+			 * - Filter agents based on their transport mode
+			 * - calculate evacuation time (leave time - evacuation start time)
+			 */
+						
 			/*
 			 * If no agents uses the current transport mode we can skip it. 
 			 */
@@ -360,7 +366,7 @@ public class EvacuationTimePictureWriter {
 		log.info("Number of different start locations found: " + locationMap.size());
 
 		if (doClustering) {
-			EvacuationTimeClusterer clusterer = new EvacuationTimeClusterer(scenario.getNetwork(), locationMap);
+			EvacuationTimeClusterer clusterer = new EvacuationTimeClusterer(scenario.getNetwork(), locationMap, scenario.getConfig().global().getNumberOfThreads());
 			int numClusters = (int) Math.ceil(locationMap.size() / clusterFactor);
 //			locationMap = clusterer.buildCluster(clusterFactor, clusterIterations);
 			locationMap = clusterer.buildCluster(numClusters, clusterIterations);			

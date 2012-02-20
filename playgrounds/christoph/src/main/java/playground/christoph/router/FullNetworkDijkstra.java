@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.netherlands.analysis;
+package playground.christoph.router;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +33,6 @@ import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
-import org.matsim.core.utils.misc.Time;
 
 public class FullNetworkDijkstra extends Dijkstra {
 	
@@ -70,12 +69,6 @@ public class FullNetworkDijkstra extends Dijkstra {
 		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
 
 		return path;
-	}
-	
-	public void calcLeastCostTrees() {
-		for (Node fromNode : this.network.getNodes().values()) {
-			calcLeastCostTree(fromNode, Time.UNDEFINED_TIME);
-		}
 	}
 	
 	public void calcLeastCostTree(Node fromNode, double startTime) {

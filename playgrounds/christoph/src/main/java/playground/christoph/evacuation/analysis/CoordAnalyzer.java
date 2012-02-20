@@ -26,6 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.Facility;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -37,16 +38,28 @@ public class CoordAnalyzer {
 	private final Geometry affectedArea;
 	private final GeometryFactory factory;
 	private final Map<Id, Boolean> linkCache;
+	private final Map<Id, Boolean> facilityCache;
 	
 	public CoordAnalyzer(Geometry affectedArea) {
 		this.affectedArea = affectedArea;
 		
 		this.factory = new GeometryFactory();
 		this.linkCache = new HashMap<Id, Boolean>();
+		this.facilityCache = new HashMap<Id, Boolean>();
 	}
 	
 	public void clearCache() {
 		linkCache.clear();
+		facilityCache.clear();
+	}
+	
+	public boolean isFacilityAffected(Facility facility) {
+		Boolean isAffected = facilityCache.get(facility.getId());
+		if (isAffected == null) {
+			isAffected = isCoordAffected(facility.getCoord());
+			facilityCache.put(facility.getId(), isAffected);
+			return isAffected;
+		} else return isAffected;
 	}
 	
 	public boolean isLinkAffected(Link link) {

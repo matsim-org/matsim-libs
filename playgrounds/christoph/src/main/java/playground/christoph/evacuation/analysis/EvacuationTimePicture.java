@@ -20,11 +20,18 @@
 
 package playground.christoph.evacuation.analysis;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.zip.GZIPOutputStream;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -36,245 +43,419 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.KMZWriter;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.mobsim.AgentPosition;
+import playground.christoph.evacuation.mobsim.AgentsTracker;
+import playground.christoph.evacuation.mobsim.Tracker.Position;
+import playground.christoph.evacuation.mobsim.VehiclesTracker;
 
 /**
  * Identifies persons who are inside (or cross) the evacuation area after the
  * evacuation has started.
+ * 
+ * All utilized transport modes for each of those persons are logged.
  *  
  * @author cdobler
  */
-public class EvacuationTimePicture implements AgentDepartureEventHandler, ActivityStartEventHandler,
-	LinkEnterEventHandler, SimulationInitializedListener, IterationEndsListener {
+public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentArrivalEventHandler,
+		ActivityStartEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler, 
+		PersonLeavesVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
+		SimulationAfterSimStepListener, IterationEndsListener {
 	
 	private static final Logger log = Logger.getLogger(EvacuationTimePicture.class);
+	private static final String separator = "\t";
+	private static final String newLine = "\n";
+	private static final Charset charset = Charset.forName("UTF-8");
 	
 	private final Scenario scenario;
-	private final Set<String> transportModes;
 	private final CoordAnalyzer coordAnalyzer;
+	private final AgentsTracker agentsTracker;
+	private final VehiclesTracker vehiclesTracker;
 
-	private final Map<String, Map<Id, Double>> lastLeft;			// <TransportMode, <PersonId, last time the Evacuation Area was left>>
-	private final Map<Id, Id> positionAtEvacuationStartLinks;		// <PersonId, LinkId>
-	private final Map<Id, Id> positionAtEvacuationStartFacilities;	// <PersonId, FacilityId>
-	private final Map<Id, Id> currentPosition;						// <PersonId, FacilityId or LinkId>
-	private final Map<Id, String> currentTransportMode;				// <PersonId, TransportMode>
-	private final Set<Id> affectedFacilities;
-	private final Set<Id> affectedLinks;
+	private final Map<Id, AgentInfo> agentInfos;
+	private final Set<Id> agentsToUpdate;
 	
 	private String kmzFile = "EvacuationTime.kmz";
+	private String txtFile = "EvacuationTime.txt.gz";
 	
-	public EvacuationTimePicture(Scenario scenario, Set<String> transportModes, CoordAnalyzer coordAnalyzer) {
+	// just a cache flag
+	private boolean evacuationStarted = false;
+	
+	public EvacuationTimePicture(Scenario scenario, CoordAnalyzer coordAnalyzer, 
+			AgentsTracker agentsTracker, VehiclesTracker vehiclesTracker) {
 		this.scenario = scenario;
-		this.transportModes = transportModes;
 		this.coordAnalyzer = coordAnalyzer;
-		
-		this.affectedLinks = new HashSet<Id>();
-		this.affectedFacilities = new HashSet<Id>();
+		this.agentsTracker = agentsTracker;
+		this.vehiclesTracker = vehiclesTracker;
 
-		this.currentPosition = new HashMap<Id, Id>();
-		this.currentTransportMode = new HashMap<Id, String>();
-		this.positionAtEvacuationStartLinks = new HashMap<Id, Id>();
-		this.positionAtEvacuationStartFacilities = new HashMap<Id, Id>();
-		
-		this.lastLeft = new HashMap<String, Map<Id, Double>>();
-		for (String transportMode : transportModes) this.lastLeft.put(transportMode, new HashMap<Id, Double>());
-	}
-	
-	/*
-	 * Get those facilities and links that are located in the affected area.
-	 */
-	private void getAffectedLinksAndFacilities() {
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			if (coordAnalyzer.isLinkAffected(link)) affectedLinks.add(link.getId());
-		}
-		log.info("Found " + affectedLinks.size() + " links in affected area.");
-		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
-			if (coordAnalyzer.isCoordAffected(facility.getCoord())) affectedFacilities.add(facility.getId());
-		}
-		log.info("Found " + affectedFacilities.size() + " facilities in affected area.");
-	}
-		
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		Id personId = event.getPersonId();
-		Id linkId = event.getLinkId();
-		String transportMode = event.getLegMode();
-		double time = event.getTime();
-		
-		// set transport mode
-		currentTransportMode.put(personId, transportMode);
-		
-		if (time < EvacuationConfig.evacuationTime) {
-			positionAtEvacuationStartFacilities.remove(personId);
-			positionAtEvacuationStartLinks.put(personId, linkId);
-		} else {
-			/*
-			 * If the facility where the activity was performed is affected but the
-			 * link where the facility is connected to is not affected, the agent
-			 * has left the affected area.
-			 */
-			if (affectedFacilities.contains(currentPosition.get(personId)) &&
-				!affectedLinks.contains(linkId)) {
-				 lastLeft.get(transportMode).put(personId, time);
-			}			
-		}
-		// update current position
-		currentPosition.put(personId, linkId);
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		Id personId = event.getPersonId();
-		Id linkId = event.getLinkId();
-		Id facilityId = event.getFacilityId();
-		double time = event.getTime();
-
-		// reset current transport mode
-		String transportMode = currentTransportMode.remove(personId);
-		
-		if (time < EvacuationConfig.evacuationTime) {
-			positionAtEvacuationStartLinks.remove(personId);
-			positionAtEvacuationStartFacilities.put(personId, facilityId);
-		} else {
-			
-			/*
-			 * If the links where the facility is connected to is affected but the
-			 * facility where the activity is performed is connected to is not affected, 
-			 * the agent has left the affected area.
-			 */
-			if (affectedLinks.contains(currentPosition.get(personId)) &&
-				!affectedFacilities.contains(linkId)) {
-				 lastLeft.get(transportMode).put(personId, time);
-			}			
-		}		
-
-		// update current position
-		currentPosition.put(personId, facilityId);
+		this.agentInfos = new HashMap<Id, AgentInfo>();
+		this.agentsToUpdate = new HashSet<Id>();		
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
-		Id linkId = event.getLinkId();
-		double time = event.getTime();
-		
-		if (time < EvacuationConfig.evacuationTime) {
-			positionAtEvacuationStartLinks.put(personId, linkId);
-		} else {
-			String transportMode = currentTransportMode.get(personId);
-			/*
-			 * If the last link was affected but this one is not, the agent has left
-			 * the affected area.
-			 */
-			boolean a = affectedLinks.contains(currentPosition.get(personId));
-			boolean b = affectedLinks.contains(linkId);
-			
-			if (affectedLinks.contains(currentPosition.get(personId)) &&
-				!affectedLinks.contains(linkId)) {
-				lastLeft.get(transportMode).put(personId, time);
-			}	
-		}
-		// update current position
-		currentPosition.put(personId, linkId);
+		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
 	}
-		
+	
 	@Override
-	public void reset(int iteration) {
-		this.positionAtEvacuationStartFacilities.clear();
-		this.positionAtEvacuationStartLinks.clear();
-		this.currentPosition.clear();
-		this.currentTransportMode.clear();
-		this.affectedFacilities.clear();
-		this.affectedLinks.clear();
-		this.lastLeft.clear();
-		for (String transportMode : transportModes) this.lastLeft.put(transportMode, new HashMap<Id, Double>());
+	public void handleEvent(LinkLeaveEvent event) {
+		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
+	}
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
 	}
 
-	/*
-	 * Get the initial position of each agent and 
-	 * the links and facilities in the affected area.
-	 */
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		for (MobsimAgent agent : ((QSim)e.getQueueSimulation()).getAgents()) {
-			Activity firstActivity = (Activity) ((PlanAgent) agent).getSelectedPlan().getPlanElements().get(0);
-			positionAtEvacuationStartFacilities.put(agent.getId(), firstActivity.getFacilityId());
-			currentPosition.put(agent.getId(), firstActivity.getFacilityId());
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
+	}
+	
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
+	}
+	
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
+	}
+			
+	@Override
+	public void reset(int iteration) {
+		this.agentInfos.clear();
+		this.agentsToUpdate.clear();
+	}
+	
+	private void createFiles(String kmzFile, String txtFile) {
+		/*
+		 * Get all agents who were in the affected area after the evacuation has started.
+		 */
+		Map<Id, BasicLocation> positionAtEvacuationStart = new HashMap<Id, BasicLocation>();
+		for (AgentInfo agentInfo : this.agentInfos.values()) {
+			
+			// if the agents was inside the affected area after the evacuation started
+			if (agentInfo.leftArea != Time.UNDEFINED_TIME) {
+				
+				Position positionType = agentInfo.initialPositionType;
+				Id positionId = agentInfo.initialPositionId;
+				
+				/*
+				 * We do not expect any Position.VEHICLE entry here since we
+				 * converted all of them to Position.LINK...
+				 */
+				if (positionType.equals(Position.LINK)) {
+					positionAtEvacuationStart.put(agentInfo.id, scenario.getNetwork().getLinks().get(positionId));
+				}
+				else if (positionType.equals(Position.FACILITY)) {
+					positionAtEvacuationStart.put(agentInfo.id, ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(positionId));
+				}
+				else log.warn("Found agent with an undefined initial position type. Type: " + positionType + ", AgentId: " + agentInfo.id);
+			}
 		}
 		
-		getAffectedLinksAndFacilities();
+//		createKML(kmzFile, positionAtEvacuationStart);
+		createTXT(txtFile, positionAtEvacuationStart);
 	}
 	
 	/*
 	 * Write KML File
 	 */
-	private void createKML(String file) {
+	private void createKML(String fileName, Map<Id, BasicLocation> positionAtEvacuationStart) {
+		
 		try {
 			ObjectFactory kmlObjectFactory = new ObjectFactory();
-			KMZWriter kmzWriter = new KMZWriter(file);
+			KMZWriter kmzWriter = new KMZWriter(this.kmzFile);
 			
 			KmlType mainKml = kmlObjectFactory.createKmlType();
 			DocumentType mainDoc = kmlObjectFactory.createDocumentType();
 			mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
 			
 			CoordinateTransformation coordTransform = new CH1903LV03toWGS84();
-			EvacuationTimePictureWriter writer = new EvacuationTimePictureWriter(this.scenario, coordTransform, kmzWriter, mainDoc);
+			EvacuationTimePictureWriter writer = new EvacuationTimePictureWriter(this.scenario, coordTransform, kmzWriter, mainDoc);	
 			
-			/*
-			 * Get all agents for whose an entry in the last left map exists.
-			 */
-			Map<Id, BasicLocation> positionAtEvacuationStart = new HashMap<Id, BasicLocation>();
-			for (Map<Id, Double> map : lastLeft.values()) {
-				for (Id personId : map.keySet()) {
-					Id linkId = positionAtEvacuationStartLinks.get(personId);
-					Id facilityId = positionAtEvacuationStartFacilities.get(personId);
-					if (linkId != null) {
-						positionAtEvacuationStart.put(personId, this.scenario.getNetwork().getLinks().get(linkId));
-					} else if (facilityId != null) {
-						positionAtEvacuationStart.put(personId, ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId));
-					} else {
-						log.warn("No initial position for agent " + personId.toString() + " was found!");
-					}
-				}
-			}
-
-			// print some statistics
-			log.info("Agents crossing the affected area after the evacation has started: " + positionAtEvacuationStart.size());
-			log.info("Agents performing an activity when the evacuation starts: " + positionAtEvacuationStartFacilities.size());
-			log.info("Agents performing a leg when the evacution starts: " + positionAtEvacuationStartLinks.size());
-			
-			FolderType linkFolderType = writer.getLinkFolder(positionAtEvacuationStart, lastLeft);
+			FolderType linkFolderType = writer.getLinkFolder(positionAtEvacuationStart, positionAtEvacuationStart, this.agentInfos);
 			mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(linkFolderType));
 			
 			kmzWriter.writeMainKml(mainKml);
 			kmzWriter.close();
-		} catch(IOException e) { }
+		} catch(IOException e) { 
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	/*
+	 * Write TXT File
+	 */
+	private void createTXT(String fileName, Map<Id, BasicLocation> positionAtEvacuationStart) {
+		
+		// identify all utilized modes
+		Set<String> modes = new HashSet<String>();
+		for (AgentInfo agentInfo : this.agentInfos.values()) modes.addAll(agentInfo.transportModes);
+		Set<String> orderedModes = new TreeSet<String>(modes);
+		
+		try {
+			FileOutputStream fos = new FileOutputStream(fileName);
+			GZIPOutputStream gzos = new GZIPOutputStream(fos);
+			OutputStreamWriter osw = new OutputStreamWriter(gzos, charset);
+			BufferedWriter bw = new BufferedWriter(osw);
+			
+			// write header
+			bw.write("PersonId");
+			bw.write(separator);
+			bw.write("enteredArea");
+			bw.write(separator);
+			bw.write("leftArea");
+			bw.write(separator);
+			bw.write("initialPositionX");
+			bw.write(separator);
+			bw.write("initialPositionY");
+			bw.write(separator);
+			bw.write("initialPositionType");
+			for (String mode : orderedModes) {
+				bw.write(separator);
+				bw.write(mode);
+			}
+			bw.write(newLine);
+			
+			// write lines
+			for (Entry<Id, BasicLocation> entry : positionAtEvacuationStart.entrySet()) {
+				AgentInfo agentInfo = this.agentInfos.get(entry.getKey());
+				
+				bw.write(entry.getKey().toString());
+				bw.write(separator);
+				bw.write(String.valueOf(agentInfo.enteredArea));
+				bw.write(separator);
+				bw.write(String.valueOf(agentInfo.leftArea));
+				bw.write(separator);
+				bw.write(String.valueOf(entry.getValue().getCoord().getX()));
+				bw.write(separator);
+				bw.write(String.valueOf(entry.getValue().getCoord().getY()));
+				bw.write(separator);
+				bw.write(agentInfo.initialPositionType.toString());
+				for (String mode : orderedModes) {
+					bw.write(separator);
+					if (agentInfo.transportModes.contains(mode)) bw.write("1");	// true
+					else bw.write("0");	// false
+				}
+				bw.write(newLine);
+			}
+			
+			bw.close();
+			osw.close();
+			gzos.close();
+			fos.close();
+			
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}		
+	}
+	
+	@Override
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+		
+		/*
+		 * If the evacuation starts in the next time step, we check each agents current position.
+		 */
+		if (e.getSimulationTime() + 1 == EvacuationConfig.evacuationTime) {
+			log.info("Evacuation starts in the next time step. Collecting agents' positions.");
+			
+			for (Person person : scenario.getPopulation().getPersons().values()) {
+				AgentPosition agentPosition = agentsTracker.getAgentPosition(person.getId());
+				
+				Position positionType = agentPosition.getPositionType();
+				Id positionId = agentPosition.getPositionId();
+				
+				if (positionType.equals(Position.LINK)) {
+					Link link = scenario.getNetwork().getLinks().get(positionId);
+					boolean isAffected = coordAnalyzer.isLinkAffected(link);
+
+					AgentInfo agentInfo = new AgentInfo();
+					agentInfo.id = person.getId();
+					agentInfo.transportModes.add(agentPosition.getTransportMode());
+					agentInfo.initialPositionId = positionId;
+					agentInfo.initialPositionType = positionType;
+					if (isAffected) {
+						agentInfo.isInsideArea = true;
+						agentInfo.enteredArea = EvacuationConfig.evacuationTime;
+					}
+					this.agentInfos.put(person.getId(), agentInfo);	
+				}
+				else if (positionType.equals(Position.VEHICLE)) {
+					/*
+					 * Use the link where the vehicle is currently located.
+					 */
+					Id linkId = this.vehiclesTracker.getVehicleDestination(positionId);
+					Link link = scenario.getNetwork().getLinks().get(linkId);
+					boolean isAffected = coordAnalyzer.isLinkAffected(link);
+										
+					/*
+					 * Convert Position.VEHICLE to Position.LINK since a links position
+					 * is fixed while a vehicles moves over time. 
+					 */
+					AgentInfo agentInfo = new AgentInfo();
+					agentInfo.id = person.getId();
+					agentInfo.transportModes.add(agentPosition.getTransportMode());
+					agentInfo.initialPositionId = linkId;
+					agentInfo.initialPositionType = Position.LINK;
+					if (isAffected) {
+						agentInfo.isInsideArea = true;
+						agentInfo.enteredArea = EvacuationConfig.evacuationTime;
+					}
+					this.agentInfos.put(person.getId(), agentInfo);
+				}
+				else if (positionType.equals(Position.FACILITY)) {
+					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(positionId);
+					boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
+					
+					AgentInfo agentInfo = new AgentInfo();
+					agentInfo.id = person.getId();
+					agentInfo.transportModes.add(agentPosition.getTransportMode());
+					agentInfo.initialPositionId = positionId;
+					agentInfo.initialPositionType = positionType;
+					if (isAffected) {
+						agentInfo.isInsideArea = true;
+						agentInfo.enteredArea = EvacuationConfig.evacuationTime;
+					}
+				} else log.warn("Found agent with an undefined position type. AgentId: " + person.getId() + ", time: " + e.getSimulationTime());
+			}
+			
+			// enable agents tracking
+			evacuationStarted = true;
+		} 
+		
+		/*
+		 * If the evacuation has started, we update the positions of those agents who have moved.
+		 */
+		else if (e.getSimulationTime() > EvacuationConfig.evacuationTime) {
+			for (Id id : this.agentsToUpdate) {
+				AgentPosition agentPosition = agentsTracker.getAgentPosition(id);
+				
+				Position positionType = agentPosition.getPositionType();
+				Id positionId = agentPosition.getPositionId();
+				AgentInfo agentInfo = this.agentInfos.get(id);
+				boolean wasInsideArea = agentInfo.isInsideArea;
+				
+				if (positionType.equals(Position.LINK)) {
+					Link link = scenario.getNetwork().getLinks().get(positionId);
+					boolean isAffected = coordAnalyzer.isLinkAffected(link);
+
+					/*
+					 * Add the agents transport mode to the set of utilized modes. 
+					 */
+					agentInfo.transportModes.add(agentPosition.getTransportMode());
+					
+					/* 
+					 * If the agent entered the affected area for the first time, set the enter time.
+					 */
+					if (!wasInsideArea && isAffected && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
+						agentInfo.enteredArea = e.getSimulationTime();
+					}
+					/*
+					 * If the agent left the affected area, set the left time.
+					 */
+					else if (wasInsideArea && !isAffected) agentInfo.leftArea = e.getSimulationTime();					
+
+				} else if (positionType.equals(Position.VEHICLE)) {
+					/*
+					 * Use the link where the vehicle is currently located.
+					 */
+					Id linkId = this.vehiclesTracker.getVehicleDestination(positionId);
+					Link link = scenario.getNetwork().getLinks().get(linkId);
+					boolean isAffected = coordAnalyzer.isLinkAffected(link);
+					
+					/*
+					 * Add the agents transport mode to the set of utilized modes. 
+					 */
+					agentInfo.transportModes.add(agentPosition.getTransportMode());
+					
+					/* 
+					 * If the agent entered the affected area for the first time, set the enter time
+					 */
+					if (!wasInsideArea && isAffected && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
+						agentInfo.enteredArea = e.getSimulationTime();
+					}
+					/*
+					 * If the agent left the affected area
+					 */
+					else if (wasInsideArea && !isAffected) agentInfo.leftArea = e.getSimulationTime();					
+
+				} else if (positionType.equals(Position.FACILITY)) {
+					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(positionId);
+					boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
+					
+					/* 
+					 * If the agent entered the affected area for the first time, set the enter time
+					 */
+					if (!wasInsideArea && isAffected && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
+						agentInfo.enteredArea = e.getSimulationTime();
+					}
+					/*
+					 * If the agent left the affected area
+					 */
+					else if (wasInsideArea && !isAffected) agentInfo.leftArea = e.getSimulationTime();
+					
+				} else log.warn("Found agent with an undefined position type. AgentId: " + id + ", time: " + e.getSimulationTime());
+			}
+			
+			this.agentsToUpdate.clear();
+		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), kmzFile);
-		createKML(fileName);
+		String kmzFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), kmzFile);
+		String txtFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), txtFile);
+		this.createFiles(kmzFileName, txtFileName);
 	}
 
+	/*package*/ static class AgentInfo {
+		Id id = null;
+		boolean isInsideArea = false;
+		double enteredArea = Time.UNDEFINED_TIME;
+		double leftArea = Time.UNDEFINED_TIME;
+		Id initialPositionId = null;
+		Position initialPositionType = Position.UNDEFINED;
+		Set<String> transportModes = new HashSet<String>();
+	}
 }
