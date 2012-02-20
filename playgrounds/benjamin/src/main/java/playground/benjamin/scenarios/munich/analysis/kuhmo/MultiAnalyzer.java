@@ -75,8 +75,8 @@ public class MultiAnalyzer {
 	}
 
 	private void run() {
-//		calculateUserWelfareChange(netFile, configFile, initialPlansFile, finalPlansFile);
-//		calculateTollRevenueByUserGroup(finalEventsFile);
+		calculateUserWelfareChange(netFile, configFile, initialPlansFile, finalPlansFile);
+		calculateTollRevenueByUserGroup(finalEventsFile);
 		calculateAverageTripTravelTimePerMode(initialEventsFile, finalEventsFile);
 		calculateAverageTripLengthCar(initialEventsFile, finalEventsFile);
 		calculateEmissionChangesByUserGroup(initialEmissionEventsFile, finalEmissionEventsFile);

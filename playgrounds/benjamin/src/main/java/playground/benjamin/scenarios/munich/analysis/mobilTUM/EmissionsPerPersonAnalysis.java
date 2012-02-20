@@ -31,7 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.emissions.events.EmissionEventsReader;
@@ -60,12 +59,9 @@ public class EmissionsPerPersonAnalysis {
 //	private final static String plansFile = runDirectory + "output_plans.xml.gz";
 //	private final static String emissionFile = runDirectory + runNumber + ".emission.events.xml.gz";
 
-	private static Scenario scenario;
-	
 	public static void main(String[] args) {
-		loadScenario();
+		Scenario scenario = loadScenario(netFile, plansFile);
 		
-		// TODO: do this to EmissionSummarizer...
 		Population population = scenario.getPopulation();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
@@ -101,14 +97,12 @@ public class EmissionsPerPersonAnalysis {
 				runDirectory + runNumber + "." + lastIteration + ".emissionsTotalPerHomeLocation.txt");
 	}
 	
-	@SuppressWarnings("deprecation")
-	private static void loadScenario() {
+	private static Scenario loadScenario(String netfile, String plansfile) {
 		Config config = ConfigUtils.createConfig();
-		scenario = ScenarioUtils.createScenario(config);
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(plansFile);
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario) ;
-		scenarioLoader.loadScenario() ;
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
 	}
 
 	private static Integer getLastIteration(String configFile) {

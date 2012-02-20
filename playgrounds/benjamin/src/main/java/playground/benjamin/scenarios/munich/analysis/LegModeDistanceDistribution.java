@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.utils;
+package playground.benjamin.scenarios.munich.analysis;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -51,7 +51,6 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  *
  */
 public class LegModeDistanceDistribution {
-
 	private static final Logger logger = Logger.getLogger(LegModeDistanceDistribution.class);
 
 	// INPUT
@@ -64,35 +63,30 @@ public class LegModeDistanceDistribution {
 	//	private static String finalPlansFile = runDirectory + "ITERS/it.300/300.plans.xml.gz";
 	//	private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified---withLanes.xml";
 
-	private Scenario initialScenario;
-	private Scenario finalScenario;
 	private final List<Integer> distanceClasses;
 	private final SortedSet<String> usedModes;
-	private final PersonFilter personFilter;
 
-	private final boolean considerGroups = true;
+	private final boolean considerGroups = false;
 	private final boolean considerMidOnly = false;
 	private final int noOfDistanceClasses = 15;
 
 	public LegModeDistanceDistribution(){
-		Config config = ConfigUtils.createConfig();
-		this.initialScenario = ScenarioUtils.createScenario(config);
-		this.finalScenario = ScenarioUtils.createScenario(config);
 		this.distanceClasses = new ArrayList<Integer>();
 		this.usedModes = new TreeSet<String>();
-		this.personFilter = new PersonFilter();
 	}
 
 	private void run(String[] args) {
-		this.initialScenario = loadScenario(netFile, initialPlansFile);
-		this.finalScenario = loadScenario(netFile, finalPlansFile);
+		Scenario initialScenario = loadScenario(netFile, initialPlansFile);
+		Scenario finalScenario = loadScenario(netFile, finalPlansFile);
 		setDistanceClasses(noOfDistanceClasses);
 
-		Population initialPop = this.initialScenario.getPopulation();
-		Population finalPop = this.finalScenario.getPopulation();
+		Population initialPop = initialScenario.getPopulation();
+		Population finalPop = finalScenario.getPopulation();
 
 		getUsedModes(initialPop);
 
+		PersonFilter personFilter = new PersonFilter();
+		
 		if(considerGroups){
 			for(UserGroup userGroup : UserGroup.values()){
 				Population initialRelevantPop = personFilter.getPopulation(initialPop, userGroup);
@@ -243,7 +237,7 @@ public class LegModeDistanceDistribution {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(plansFile);
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
 	}
 
