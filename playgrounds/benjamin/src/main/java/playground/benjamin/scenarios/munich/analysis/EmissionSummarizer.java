@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.utils;
+package playground.benjamin.scenarios.munich.analysis;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -36,13 +36,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
+import playground.benjamin.scenarios.munich.analysis.EmissionSummarizer;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonWarmEventHandler;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
 import playground.benjamin.utils.BkNumberUtils;
-import playground.benjamin.utils.EmissionSummarizer;
 
 /**
  * @author benjamin
