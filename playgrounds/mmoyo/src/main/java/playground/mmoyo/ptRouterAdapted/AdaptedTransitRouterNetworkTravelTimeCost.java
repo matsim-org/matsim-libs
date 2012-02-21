@@ -22,13 +22,18 @@ package playground.mmoyo.ptRouterAdapted;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 /**
  *  This version of TransitRouterNetworkTravelTimeCost reads values from a MyTransitRouterConfig object
  */
 public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetworkTravelTimeCost {
+	private final static double MIDNIGHT = 24.0*3600;
+
+	
 	private static final Logger log = Logger.getLogger(AdaptedTransitRouterNetworkTravelTimeCost.class);
 
 	private MyTransitRouterConfig myConfig;	
@@ -47,8 +52,27 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 			cost = -getLinkTravelTime(link, time) * this.myConfig.getMarginalUtilityOfTravelTimeWalk_utl_s() - this.myConfig.getUtilityOfLineSwitch_utl();
 		} else {
 			//pt link
-			cost = -getLinkTravelTime(link, time) * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+			cost = -getLinkTravelTime(link, time) * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
+			- link.getLength() * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
 		}
 		return cost;
 	}
+	
+	private Double getPtVehicleDepartureTime(final Link link, final double time) {
+
+		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+		TransitRouteStop fromStop = wrapped.fromNode.stop;
+		TransitRouteStop toStop = wrapped.toNode.stop;
+		if (wrapped.getRoute() != null) {
+			// (agent stays on the same route, so use transit line travel time)
+			
+			// get the next departure time:
+			double bestDepartureTime = getNextDepartureTime(wrapped.getRoute(), fromStop, time);
+
+			return bestDepartureTime ;
+		}
+		// no transit route, so we must be on a transfer link.
+		return null ;
+	}
+
 }
