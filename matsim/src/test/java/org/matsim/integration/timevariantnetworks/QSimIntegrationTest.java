@@ -67,6 +67,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 	public void testFreespeed() {
 		Config config = loadConfig(null);
+		config.network().setTimeVariantNetwork(true);
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
@@ -112,6 +113,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		final double capacityFactor = 0.5;
 
 		Config config = loadConfig(null);
+		config.network().setTimeVariantNetwork(true);
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 

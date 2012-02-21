@@ -116,7 +116,6 @@ public final class QSim implements VisMobsim, Netsim {
 	private final EventsManager events;
 
 	private final QNetsimEngine netEngine;
-	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
 
 	private Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
@@ -196,6 +195,9 @@ public final class QSim implements VisMobsim, Netsim {
         } else {
             agentFactory = new DefaultAgentFactory(qSim);
         }
+        if (sc.getConfig().network().isTimeVariantNetwork()) {
+    		qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+        }
         PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
         qSim.addAgentSource(agentSource);
         return qSim;
@@ -221,8 +223,6 @@ public final class QSim implements VisMobsim, Netsim {
 		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
 		this.netEngine.setInternalInterface(this.internalInterface) ;
 		// (the netEngine is never ``added'', thus this needs to be done manually. kai, dec'11)
-
-
 
 		this.addDepartureHandler(this.netEngine.getDepartureHandler());
 	}
@@ -277,11 +277,6 @@ public final class QSim implements VisMobsim, Netsim {
 				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
 		// to print out the info at the very first
 		// timestep already
-		this.changeEventsEngine = new NetworkChangeEventsEngine(this);
-		this.changeEventsEngine.setInternalInterface(internalInterface) ;
-		if (this.changeEventsEngine != null) {
-			this.changeEventsEngine.onPrepareSim();
-		}
 	}
 
 	private void createAgents() {
@@ -357,10 +352,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 */
 	 final boolean doSimStep(final double time) { // do not overwrite
 		// in inheritance.
-		// (network) change events engine:
-		if (this.changeEventsEngine != null) {
-			this.changeEventsEngine.doSimStep(time);
-		}
+			
 		// teleportation "engine":
 		this.handleTeleportationArrivals();
 
@@ -371,12 +363,11 @@ public final class QSim implements VisMobsim, Netsim {
 		if (this.netEngine != null) {
 			this.netEngine.doSimStep(time);
 		}
-
+		
 		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.doSimStep(time);
 		}
-
 		// console printout:
 		this.printSimLog(time);
 		return (this.agentCounter.isLiving() && (this.stopTime > time));

@@ -29,8 +29,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.ptproject.qsim.InternalInterface;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**
  * @author dgrether
@@ -38,30 +38,26 @@ import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 public class NetworkChangeEventsEngine implements MobsimEngine {
 	
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
-	private QSim qsim;
+	private Netsim mobsim;
 
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
-		// internalInterface is not used in this class
+		this.mobsim = internalInterface.getMobsim();
 	}
 
-	public NetworkChangeEventsEngine(QSim sim) {
-		this.qsim = sim;
-	}
-	
 	@Override
 	public void afterSim() {
 		
 	}
 
 	@Override
-	public QSim getMobsim() {
-		return this.qsim;
+	public Netsim getMobsim() {
+		return this.mobsim;
 	}
 
 	@Override
 	public void onPrepareSim() {
-		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)this.qsim.getScenario().getNetwork()).getNetworkChangeEvents();
+		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)this.mobsim.getScenario().getNetwork()).getNetworkChangeEvents();
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);
@@ -79,9 +75,9 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)) {
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
-				this.getMobsim().getNetsimNetwork().getNetsimLink(link.getId()).recalcTimeVariantAttributes(time);
+				this.mobsim.getNetsimNetwork().getNetsimLink(link.getId()).recalcTimeVariantAttributes(time);
 
-				EventsManager eventsManager = this.qsim.getEventsManager();
+				EventsManager eventsManager = this.mobsim.getEventsManager();
 				EventsFactory eventsFactory = eventsManager.getFactory();
 
 				if (event.getFlowCapacityChange() != null) {
