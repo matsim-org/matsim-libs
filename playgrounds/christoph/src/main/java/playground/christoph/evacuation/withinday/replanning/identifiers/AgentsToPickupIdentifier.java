@@ -230,12 +230,12 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				this.walkTravelTime.setPerson(person);
 				double travelTime = walkTravelTime.getLinkTravelTime(link, event.getTime());
 				double departureTime = event.getTime() + travelTime;
-				departureTime = Math.round(departureTime);
+				departureTime = Math.floor(departureTime);
 				this.agentsLeaveLinkQueue.add(new Tuple<Double, MobsimAgent>(departureTime, agent));
 			}
 		} else if (this.carLegPerformingAgents.contains(event.getPersonId())) {
 			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-			double minTravelTime = link.getLength() / link.getFreespeed(event.getTime());
+			double minTravelTime = Math.floor(link.getLength() / link.getFreespeed(event.getTime()));
 			this.earliestLinkLeaveTime.put(event.getPersonId(), event.getTime() + minTravelTime);
 		}
 	}

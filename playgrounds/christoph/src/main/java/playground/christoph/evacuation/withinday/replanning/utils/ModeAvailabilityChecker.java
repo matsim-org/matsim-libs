@@ -100,35 +100,6 @@ public class ModeAvailabilityChecker {
 	}
 	
 	/**
-	 * @param personId Id of the person to check
-	 * @param facilityId Id of the facility where the person performs an activity
-	 * @return true if the person has a car available on the same link where the activity is performed, otherwise false
-	 */
-//	public boolean isCarAvailable(Id personId, Id facilityId) {
-//		
-//		Id vehicleId = this.driverVehicleMapping.get(personId);
-//		if (vehicleId == null) return false;
-//		
-//		Id vehicleLinkId = this.vehiclePositions.get(vehicleId);
-//		if (vehicleLinkId == null) return false;
-//				
-//		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
-//		if (facility == null) return false;
-//		else return vehicleId.equals(facility.getLinkId());
-//	}
-	
-//	/**
-//	 * @param personId Id of the person to check
-//	 * @param facility ActivityFacility where the person currently performs an Activity
-//	 * @return true if the person has a car available on the link where the ActivityFacility is attached to, otherwise false
-//	 */
-//	public boolean isCarAvailable(Id personId, ActivityFacility facility) {
-//		Id vehicleId = this.driverVehicleMapping.get(personId);
-//		Id linkId = facility.getLinkId();
-//		return vehicleId.equals(linkId);
-//	}
-	
-	/**
 	 * By default we try to use a car. We can do this, if the previous or the next 
 	 * Leg are performed with a car or the agents car is within a reachable distance.
 	 * The order is as following:
@@ -155,7 +126,6 @@ public class ModeAvailabilityChecker {
 				if (linkId.equals(currentActivity.getLinkId())) carAvailable = true;
 			}
 		}
-//		boolean carAvilable = this.isCarAvailable(plan.getPerson().getId(), currentActivity.getFacilityId());
 		if (carAvailable) return TransportMode.car;
 		
 		/*

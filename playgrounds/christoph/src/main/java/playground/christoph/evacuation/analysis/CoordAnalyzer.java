@@ -20,8 +20,8 @@
 
 package playground.christoph.evacuation.analysis;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,8 +44,23 @@ public class CoordAnalyzer {
 		this.affectedArea = affectedArea;
 		
 		this.factory = new GeometryFactory();
-		this.linkCache = new HashMap<Id, Boolean>();
-		this.facilityCache = new HashMap<Id, Boolean>();
+		this.linkCache = new ConcurrentHashMap<Id, Boolean>();
+		this.facilityCache = new ConcurrentHashMap<Id, Boolean>();
+	}
+	
+	private CoordAnalyzer(Geometry affectedArea, Map<Id, Boolean> linkCache, Map<Id, Boolean> facilityCache) {
+		this.affectedArea = affectedArea;
+		this.factory = new GeometryFactory();
+		this.linkCache = linkCache;
+		this.facilityCache = facilityCache;
+	}
+	
+	/*
+	 * Create a new instance which uses the same affected area and CacheMaps which are
+	 * ConcurrentHashMaps and therefore thread-safe.
+	 */
+	public CoordAnalyzer createInstance() {
+		return new CoordAnalyzer(this.affectedArea, this.linkCache, this.facilityCache);
 	}
 	
 	public void clearCache() {

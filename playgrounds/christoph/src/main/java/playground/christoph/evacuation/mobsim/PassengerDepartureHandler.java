@@ -62,11 +62,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 					throw new RuntimeException("Person was registered as Passenger in a vehicle and also " +
 							"no entry in the planned vehicles map was found. This should not happen...");
 				}
-//				Id vehicleId = vehiclesTracker.getPassengersVehicle(agent.getId());
-//				vehicleId might be null!!!
-//				if it is null, get get planned vehicle :?
-				
-//				vehiclesTracker.addEnrouteAgent(agent);
+
 				eventsManager.processEvent(eventsManager.getFactory().createPersonEntersVehicleEvent(now, agent.getId(), vehicleId));
 				
 				

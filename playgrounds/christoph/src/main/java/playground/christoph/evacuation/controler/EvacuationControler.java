@@ -37,7 +37,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
@@ -211,17 +210,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		legModeChecker.run(this.scenarioData.getPopulation());
 		legModeChecker.printStatistics();
 		
-		/*
-		 * If a SimStepParallelEventsManagerImpl is used, we ensure that it it
-		 * processed as very first SimulationListener. Doing so ensures that all
-		 * events of a time step have been processed before the other
-		 * SimulationAfterSimStepListeners are informed. 
-		 */
-		if (this.getEvents() instanceof SimStepParallelEventsManagerImpl) {
-			this.getQueueSimulationListener().remove(this.getEvents());
-			this.getFixedOrderSimulationListener().addSimulationListener((SimStepParallelEventsManagerImpl) this.getEvents());
-		}
-		
+		// connect facilities to links
 		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
 
 		// Add Rescue Links to Network
@@ -272,7 +261,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
 		
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.getEvents(), householdsUtils, coordAnalyzer);
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.getEvents(), householdsUtils, coordAnalyzer.createInstance());
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		
 		this.househouldsTracker = new HouseholdsTracker();
@@ -342,7 +331,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 */
 		// Create txtand kmz files containing distribution of evacuation times. 
 		if (EvacuationConfig.createEvacuationTimePicture) {
-			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer, househouldsTracker, vehiclesTracker);
+			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer.createInstance(), househouldsTracker, vehiclesTracker);
 			this.addControlerListener(evacuationTimePicture);
 			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
 			this.events.addHandler(evacuationTimePicture);	
@@ -351,7 +340,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 // Create and add an AgentsInEvacuationAreaCounter.
 		if (EvacuationConfig.countAgentsInEvacuationArea) {
 			double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
-			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer, scaleFactor);
+			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer.createInstance(), scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
 			this.events.addHandler(agentsInEvacuationAreaCounter);	

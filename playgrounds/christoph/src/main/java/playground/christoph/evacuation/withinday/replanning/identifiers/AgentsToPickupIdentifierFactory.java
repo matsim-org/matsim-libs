@@ -45,7 +45,7 @@ public class AgentsToPickupIdentifierFactory implements DuringLegIdentifierFacto
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, coordAnalyzer,
+		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, coordAnalyzer.createInstance(), 
 				vehiclesTracker, travelTimeFactory.createTravelTime());
 		identifier.setIdentifierFactory(this);
 		return identifier;

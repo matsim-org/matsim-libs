@@ -387,10 +387,11 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 				Id positionId = agentPosition.getPositionId();
 				AgentInfo agentInfo = this.agentInfos.get(id);
 				boolean wasInsideArea = agentInfo.isInsideArea;
+				boolean isInsideArea = wasInsideArea;
 				
 				if (positionType.equals(Position.LINK)) {
 					Link link = scenario.getNetwork().getLinks().get(positionId);
-					boolean isAffected = coordAnalyzer.isLinkAffected(link);
+					isInsideArea = coordAnalyzer.isLinkAffected(link);
 
 					/*
 					 * Add the agents transport mode to the set of utilized modes. 
@@ -400,21 +401,20 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					/* 
 					 * If the agent entered the affected area for the first time, set the enter time.
 					 */
-					if (!wasInsideArea && isAffected && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
+					if (!wasInsideArea && isInsideArea && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
 						agentInfo.enteredArea = e.getSimulationTime();
 					}
 					/*
 					 * If the agent left the affected area, set the left time.
 					 */
-					else if (wasInsideArea && !isAffected) agentInfo.leftArea = e.getSimulationTime();					
-
+					else if (wasInsideArea && !isInsideArea) agentInfo.leftArea = e.getSimulationTime();					
 				} else if (positionType.equals(Position.VEHICLE)) {
 					/*
 					 * Use the link where the vehicle is currently located.
 					 */
 					Id linkId = this.vehiclesTracker.getVehicleDestination(positionId);
 					Link link = scenario.getNetwork().getLinks().get(linkId);
-					boolean isAffected = coordAnalyzer.isLinkAffected(link);
+					isInsideArea = coordAnalyzer.isLinkAffected(link);
 					
 					/*
 					 * Add the agents transport mode to the set of utilized modes. 
@@ -424,30 +424,35 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					/* 
 					 * If the agent entered the affected area for the first time, set the enter time
 					 */
-					if (!wasInsideArea && isAffected && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
+					if (!wasInsideArea && isInsideArea && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
 						agentInfo.enteredArea = e.getSimulationTime();
 					}
 					/*
 					 * If the agent left the affected area
 					 */
-					else if (wasInsideArea && !isAffected) agentInfo.leftArea = e.getSimulationTime();					
+					else if (wasInsideArea && !isInsideArea) agentInfo.leftArea = e.getSimulationTime();					
 
 				} else if (positionType.equals(Position.FACILITY)) {
 					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(positionId);
-					boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
+					isInsideArea = coordAnalyzer.isFacilityAffected(facility);
 					
 					/* 
 					 * If the agent entered the affected area for the first time, set the enter time
 					 */
-					if (!wasInsideArea && isAffected && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
+					if (!wasInsideArea && isInsideArea && agentInfo.enteredArea == Time.UNDEFINED_TIME) {
 						agentInfo.enteredArea = e.getSimulationTime();
 					}
 					/*
 					 * If the agent left the affected area
 					 */
-					else if (wasInsideArea && !isAffected) agentInfo.leftArea = e.getSimulationTime();
+					else if (wasInsideArea && !isInsideArea) agentInfo.leftArea = e.getSimulationTime();
 					
 				} else log.warn("Found agent with an undefined position type. AgentId: " + id + ", time: " + e.getSimulationTime());
+				
+				/*
+				 * Update agent's is inside area information.
+				 */
+				agentInfo.isInsideArea = isInsideArea;
 			}
 			
 			this.agentsToUpdate.clear();
