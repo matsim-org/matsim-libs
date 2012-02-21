@@ -361,7 +361,7 @@ public class Controler {
 				}
 				this.config = config;
 			} else {
-				this.config = ConfigUtils.createConfig();
+				this.config = ConfigUtils.loadConfig(configFileName);
 				this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			}
 			this.scenarioData = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
@@ -710,7 +710,7 @@ public class Controler {
 					.getWritePlansInterval();
 		}
 	}
-
+	
 	/**
 	 * Design decisions:
 	 * <ul>
