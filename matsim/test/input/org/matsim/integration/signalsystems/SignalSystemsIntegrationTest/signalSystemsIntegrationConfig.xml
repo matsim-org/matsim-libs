@@ -22,7 +22,7 @@
 
   <module name="network">
     <param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
-    <param name="laneDefinitionsFile" value="&INPUTBASE;/testLaneDefinitions_v1.1.xml" />
+    <param name="laneDefinitionsFile" value="./test/output/org/matsim/integration/signalsystems/SignalSystemsIntegrationTest/testSignalSystems/testLaneDefinitions_v2.0.xml" />
   </module>
 
   <module name="plans">
@@ -92,7 +92,13 @@
     <param name="ModuleProbability_3" value="0.1" />
   </module>
 
-
+	<module name="qsim" >
+		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
+		<param name="numberOfThreads" value="1" />
+		<param name="removeStuckVehicles" value="false" />
+		<!-- snapshotStyle: `equidist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) -->
+		<param name="stuckTime" value="100.0" />
+	</module>
 
   
 </config>
