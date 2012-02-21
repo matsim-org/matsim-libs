@@ -104,6 +104,9 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 	private final Map<Id, AgentInfo> agentInfos;
 	private final Set<Id> agentsToUpdate;
 	
+	private boolean writeKMZFile = false;
+	private boolean writeTXTFile = true;
+	
 	private String kmzFile = "EvacuationTime.kmz";
 	private String txtFile = "EvacuationTime.txt.gz";
 	
@@ -194,8 +197,17 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 			}
 		}
 		
-//		createKML(kmzFile, positionAtEvacuationStart);
-		createTXT(txtFile, positionAtEvacuationStart);
+		if (this.writeKMZFile) {
+			log.info("Creating kmz output file...");
+			createKML(kmzFile, positionAtEvacuationStart);
+			log.info("Done.");			
+		}
+		
+		if (this.writeTXTFile) {
+			log.info("Creating txt ouput file...");
+			createTXT(txtFile, positionAtEvacuationStart);
+			log.info("Done.");			
+		}
 	}
 	
 	/*
@@ -350,13 +362,13 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					
 					AgentInfo agentInfo = new AgentInfo();
 					agentInfo.id = person.getId();
-					agentInfo.transportModes.add(agentPosition.getTransportMode());
 					agentInfo.initialPositionId = positionId;
 					agentInfo.initialPositionType = positionType;
 					if (isAffected) {
 						agentInfo.isInsideArea = true;
 						agentInfo.enteredArea = EvacuationConfig.evacuationTime;
 					}
+					this.agentInfos.put(person.getId(), agentInfo);
 				} else log.warn("Found agent with an undefined position type. AgentId: " + person.getId() + ", time: " + e.getSimulationTime());
 			}
 			

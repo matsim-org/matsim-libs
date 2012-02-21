@@ -85,7 +85,6 @@ import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
-import playground.christoph.evacuation.mobsim.AgentsTracker;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
@@ -341,7 +340,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		/*
 		 * intialize analyse modules
 		 */
-		// Create kmz file containing distribution of evacuation times. 
+		// Create txtand kmz files containing distribution of evacuation times. 
 		if (EvacuationConfig.createEvacuationTimePicture) {
 			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer, househouldsTracker, vehiclesTracker);
 			this.addControlerListener(evacuationTimePicture);

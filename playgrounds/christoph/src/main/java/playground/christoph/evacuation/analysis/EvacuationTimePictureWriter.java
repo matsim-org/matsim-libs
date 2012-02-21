@@ -261,12 +261,13 @@ public class EvacuationTimePictureWriter {
 		for (String transportMode : orderedModes) {
 			Map<Id, Double> times = new HashMap<Id, Double>();
 
-			/*
-			 * TODO
-			 * - Filter agents based on their transport mode
-			 * - calculate evacuation time (leave time - evacuation start time)
-			 */
-						
+			for (Entry<Id, BasicLocation> entry : positionAtEvacuationStart.entrySet()) {
+				AgentInfo agentInfo = agentInfos.get(entry.getKey());
+				if (agentInfo.transportModes.size() == 1 && agentInfo.transportModes.contains(transportMode)) {
+					times.put(entry.getKey(), agentInfo.leftArea - EvacuationConfig.evacuationTime);
+				}
+			}
+			
 			/*
 			 * If no agents uses the current transport mode we can skip it. 
 			 */
@@ -348,9 +349,6 @@ public class EvacuationTimePictureWriter {
 		for (Entry<Id, BasicLocation> entry : locations.entrySet()) {
 			Id id = entry.getKey();
 			BasicLocation location = entry.getValue();
-//			if (location == null) {
-//				log.error("null!");
-//			}
 			
 			List<Double> list = locationMap.get(location);
 			if (list == null) {
@@ -368,8 +366,7 @@ public class EvacuationTimePictureWriter {
 		if (doClustering) {
 			EvacuationTimeClusterer clusterer = new EvacuationTimeClusterer(scenario.getNetwork(), locationMap, scenario.getConfig().global().getNumberOfThreads());
 			int numClusters = (int) Math.ceil(locationMap.size() / clusterFactor);
-//			locationMap = clusterer.buildCluster(clusterFactor, clusterIterations);
-			locationMap = clusterer.buildCluster(numClusters, clusterIterations);			
+			locationMap = clusterer.buildCluster(numClusters, clusterIterations);
 		}
 		
 		for (Entry<BasicLocation, List<Double>> entry : locationMap.entrySet()) {
