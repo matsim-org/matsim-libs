@@ -223,7 +223,9 @@ public class WarmEmissionAnalysisModule {
 			}
 			
 			if (averageSpeed_kmh > freeFlowSpeed_kmh){
-				logger.warn("Average speed is higher than free flow speed; this might produce negative warm emissions...");
+				logger.warn("Average speed is higher than free flow speed; please check consistency of your scenario!");
+				logger.info("Setting speed for emission calculation to free flow speed (" + freeFlowSpeed_kmh + "); This is likely to influence the results ...");
+				averageSpeed_kmh = freeFlowSpeed_kmh;
 //				throw new RuntimeException("Average speed is higher than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
 			if(averageSpeed_kmh == freeFlowSpeed_kmh) {
