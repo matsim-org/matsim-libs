@@ -49,6 +49,14 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 /**
  * @author mrieser
  */
+/**
+ * @author nagel
+ *
+ */
+/**
+ * @author nagel
+ *
+ */
 public final class TransitRouterNetwork implements Network {
 
 	private final static Logger log = Logger.getLogger(TransitRouterNetwork.class);
@@ -119,6 +127,11 @@ public final class TransitRouterNetwork implements Network {
 		}
 	}
 
+	/**
+	 * Looks to me like an implementation of the Link interface, with get(Transit)Route and get(Transit)Line on top.
+	 * To recall: TransitLine is something like M44.  But it can have more than one route, e.g. going north, going south,
+	 * long route, short route. That is, presumably we have one such TransitRouterNetworkLink per TransitRoute. kai/manuel, feb'12
+	 */
 	public static final class TransitRouterNetworkLink implements Link {
 
 		public final TransitRouterNetworkNode fromNode;
