@@ -55,7 +55,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -89,22 +89,20 @@ public class EmissionRoutingTest extends MatsimTestCase{
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
 	
-	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
-	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
-	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
-	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
-	static boolean isUsingDetailedEmissionCalculation = false;
-
-	private final String outputDirectory = "../../detailedEval/internalization/test/";
+	//private final String outputDirectory = "../../detailedEval/internalization/test/";
+	//private final String outputDirectory = this.getOutputDirectory()+"../../detailedEval/internalization/test/";
+	
 
 	private Config config;
 	private Scenario scenario;
 	private Controler controler;
 	private Vehicles emissionVehicles;
 	private EmissionModule emissionModule;
+	private String outputDirectory;
 
 	public void testEmissionRouting() {
 		
+		this.outputDirectory = this.getOutputDirectory()+"../../detailedEval/internalization/test/";
 		this.config = new Config();
 		this.config.addCoreModules();
 		this.config.controler().setOutputDirectory(this.outputDirectory);
@@ -147,6 +145,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 
 	public void testDistanceRouting() {
 		
+		this.outputDirectory = this.getOutputDirectory()+"../../detailedEval/internalization/test/";
 		this.config = new Config();
 		this.config.addCoreModules();
 		this.config.controler().setOutputDirectory(this.outputDirectory);
@@ -185,6 +184,8 @@ public class EmissionRoutingTest extends MatsimTestCase{
 
 
 	public void testTimeRouting() {
+		
+		this.outputDirectory = this.getOutputDirectory()+"../../detailedEval/internalization/test/";
 		this.config = new Config();
 		this.config.addCoreModules();
 		this.config.controler().setOutputDirectory(this.outputDirectory);
@@ -217,7 +218,6 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		this.controler.addControlerListener(startupListener);
 		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
-		
 		assertTrue("Person was expected to be routed through link 9, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
 	}
 	
@@ -285,6 +285,12 @@ public class EmissionRoutingTest extends MatsimTestCase{
 
 	// define emission tool input files	
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
+		 String emissionInputPath = (this.getClassInputDirectory()+"detailedEval/emissions/hbefaForMatsim/");
+		 String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
+		 String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
+		 String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
+		 boolean isUsingDetailedEmissionCalculation = false;
+		 
 		vcg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
 		
 		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
