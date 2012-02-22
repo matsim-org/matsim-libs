@@ -15,6 +15,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 //import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 //import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.anhorni.surprice.preprocess.PlanPool;
+
 
 public class WeekScenario {	
 	private String [] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
@@ -22,6 +24,7 @@ public class WeekScenario {
 	private PlanPool saturdayPool;
 	private PlanPool sundayPool;
 	private TreeMap<Id, AgentMemory> memories = new TreeMap<Id, AgentMemory>();
+	private TreeMap<Id, DecisionModel> decisionModels = new TreeMap<Id, DecisionModel>();
 	
 	private Config config;
 	
@@ -48,7 +51,7 @@ public class WeekScenario {
 		
 		for ( int i = 0; i < days.length; i++) {
 			if (days[i].equals("Tue")) {
-				this.createPlansPool();
+				this.initAfterMonday();
 			}
 			this.runDay(days[i]);
 		}
@@ -59,8 +62,15 @@ public class WeekScenario {
 		this.config = ConfigUtils.loadConfig(path);		
 		this.baseOutDir = this.config.getParam("controler", "outputDirectory");		
 		this.baseScenario = (ScenarioImpl) ScenarioUtils.loadScenario(this.config);
+		
+		// TODO: replace by sat and sun configs
 		this.saturdayScenario = (ScenarioImpl) ScenarioUtils.loadScenario(this.config);
 		this.sundayScenario = (ScenarioImpl) ScenarioUtils.loadScenario(this.config);
+	}
+	
+	public void initAfterMonday() {
+		this.createPlansPool();
+		this.initDecisionModels();
 	}
 	
 	public void runDay(String day) {		
@@ -118,13 +128,13 @@ public class WeekScenario {
 	
 	private void assignPlans2Agents(String day) {
 		for (Person p : this.baseScenario.getPopulation().getPersons().values()) {
-			Plan plan = this.drawPlanFromPool(day, p.getId(), this.getDecisionModel());
+			Plan plan = this.drawPlanFromPool(day, p.getId(), this.decisionModels.get(p.getId()));
 			p.addPlan(plan);
 			((PersonImpl)p).setSelectedPlan(plan);
 		}
 	}
 	
-	private DecisionModel getDecisionModel() {
+	private DecisionModel initDecisionModels() {
 		return new DecisionModel();
 	}
 	

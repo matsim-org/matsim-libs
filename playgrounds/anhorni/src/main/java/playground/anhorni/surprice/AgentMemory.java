@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class AgentMemory {
 	
@@ -18,10 +19,30 @@ public class AgentMemory {
 	private int nEducActs = 0;
 	
 	public void addPlan(Plan plan) {
-		this.plans.add(plan);
-		
+		this.plans.add(plan);		
 		this.countActs(plan);
 	}
+		
+	public List<String> getModeOfLastTripsWithSamePurpose(String purpose) {
+		List<String> modes = new Vector<String>();
+		
+		for (Plan plan : this.plans) {
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					ActivityImpl act = (ActivityImpl)pe;
+					
+					if (act.getType().equals(purpose)) {
+						PlanImpl pl = (PlanImpl)plan;
+						String mode = pl.getPreviousLeg(act).getMode();
+						modes.add(mode);
+					}
+				}
+			}			
+		}		
+		return modes;
+	}
+	
+	// act frequency -------------------------------------------------------------
 	
 	private void countActs(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -44,7 +65,7 @@ public class AgentMemory {
 			}
 		}
 	}
-
+	
 	public int getnShoppingActs() {
 		return nShoppingActs;
 	}
