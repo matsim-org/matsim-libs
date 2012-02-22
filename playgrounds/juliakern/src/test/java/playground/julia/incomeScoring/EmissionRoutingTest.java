@@ -77,7 +77,8 @@ import playground.julia.incomeScoring.RoadUsedHandler;
  * junit testclass for different routing options
  * 
  * This class has three methods which test routings for different generalized costs on a simple network.
- * The network consists of a main route (links 1, 2, 3, 4, 5, 6, 7) with three variants (links 8+9, 10+11, 12+13) witch differ in length and free flow speed.
+ * The network consists of a main route (links 1, 2, 3, 4, 5, 6, 7) with three variants (links 8+9, 10+11, 12+13) 
+ * which differ in length and free flow speed.
  * 
  * testTimeRouting uses only the time as generalized costs and should use the 8+9 variant
  * testDistanceRouting uses only the distance as generalized costs and should use the 10+11 variant
@@ -137,7 +138,6 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
-		
 		assertTrue("Person was expected to be routed through link 11, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
 	}
 
@@ -176,7 +176,6 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
-		
 		assertTrue("Person was expected to be routed through link 13, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
 		
 	}
