@@ -90,9 +90,6 @@ public class EmissionRoutingTest extends MatsimTestCase{
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
 	
-	//private final String outputDirectory = "../../detailedEval/internalization/test/";
-	//private final String outputDirectory = this.getOutputDirectory()+"../../detailedEval/internalization/test/";
-	
 
 	private Config config;
 	private Scenario scenario;
@@ -284,7 +281,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 
 	// define emission tool input files	
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
-		 String emissionInputPath = (this.getClassInputDirectory()+"detailedEval/emissions/hbefaForMatsim/");
+		 String emissionInputPath = (this.getInputDirectory()+"detailedEval/emissions/hbefaForMatsim/");
 		 String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
 		 String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
 		 String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
