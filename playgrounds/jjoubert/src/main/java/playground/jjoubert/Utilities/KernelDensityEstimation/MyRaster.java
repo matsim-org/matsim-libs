@@ -22,6 +22,7 @@ package playground.jjoubert.Utilities.KernelDensityEstimation;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
 
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
@@ -54,10 +56,10 @@ public class MyRaster{
 	private Double radius;
 	/*==========================================================================
 	 * The following Kernel Density Estimate function types are available:		|
-	 * 	0 - Only the pixel in which the point occurs.							|
+	 * 	0 - Only the pixel at which the point occurs.							|
 	 *  1 - Uniform function. A radius must be given.							|
-	 *  2 - Triangular function.	
-	 *  3 - Triweight function.											|
+	 *  2 - Triangular function.	                                            |
+	 *  3 - Triweight function.											        |
 	 *  																		|
 	 *  For all but the `0' case a value for the radius is required. 			|
 	 *========================================================================*/
@@ -66,6 +68,13 @@ public class MyRaster{
 	private Double originX = null;
 	private Double originY = null;
 	private double maxValue = 0;
+	
+	/* JWJ: 2012/02/20
+	 * The raster seems to have problems when dealing with negative coordinates, 
+	 * for example when using Gauteng in the SA-Albers CRS.
+	 */
+	private double xOffset = 0.0;
+	private double yOffset = 0.0;
 	
 	/**
 	 * Constructs an instance of the raster-generating class.
@@ -233,6 +242,14 @@ public class MyRaster{
 			 */
 			int x = (int) Math.floor((point.getX() - originX)/resolution);
 			int y = (int) Math.floor((originY - point.getY())/resolution);
+			
+			/* There seems to be negative values found (JWJ 2012/02/20). */
+			if(x < 0){
+				log.error("Negative x-entry found for raster.");
+			}
+			if(x < 0){
+				log.error("Negative y-entry found for raster.");
+			}
 
 			double value = 0;
 			Point p = null;
@@ -286,6 +303,10 @@ public class MyRaster{
 				for(int i = minX; i <= maxX; i++){
 					for(int j = minY; j <= maxY; j++){
 						p = gf.createPoint(new Coordinate((i + 0.5)*resolution + originX, originY - (j + 0.5)*resolution));
+						
+						if(i < 0 || j < 0){
+							log.warn("Negative positions");
+						}
 						
 						double x1 = originX + i*resolution;
 						double x2 = originX + (i+1)*resolution;
@@ -391,5 +412,38 @@ public class MyRaster{
 	public double getImageMatrixValue(int x, int y){
 		return this.imageMatrix.get(x, y);
 	}
+	
+	
+	public void writeRasterForR(String filename){
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		log.info("originX: " + originX);
+		log.info("originY: " + originY);
+		log.info("resolution: " + resolution);
+		log.info("# rows: " + imageMatrix.rows());
+		log.info("# columns: " + imageMatrix.columns());
+		try{
+			bw.write("xMin,xMax,yMin,yMax,Value");
+			bw.newLine();
+			for(int row = 0; row < imageMatrix.rows(); row++){
+				double xMin = originX + (row)*resolution;
+				double xMax = xMin + resolution;
+				for(int col = 0; col < imageMatrix.columns(); col++){
+					double yMin = originY - (col)*resolution;
+					double yMax = yMin - resolution;
+					bw.write(String.format("%.2f,%.2f,%.2f,%.2f,%.4f\n", xMin, xMax, yMin, yMax, getImageMatrixValue(row, col)));
+				}
+			}
+			
+		} catch (IOException e) {
+			throw new RuntimeException("Could not write to BufferedWriter " + filename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not close BufferedWriter " + filename);
+			}
+		}
+	}
+	
 
 }

@@ -21,9 +21,11 @@
 package playground.jjoubert.Utilities.KernelDensityEstimation;
 
 import java.awt.Color;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -55,6 +57,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author jwjoubert
  */
 public class MyRasterTest extends MatsimTestCase{
+	private final static Logger log = Logger.getLogger(MyRasterTest.class); 
 	private final Polygon polygon = buildTestPolygon();
 	private final List<Point> points = buildTestPoints();
 	
@@ -243,6 +246,17 @@ public class MyRasterTest extends MatsimTestCase{
 		assertEquals("Pixel (1,0) of the raster in incorrect.", (int) Math.floor((double) 1 / (double) 6 * 255), mr3.getBufferedImage().getData().getSample(1, 0, 3));
 		
 		mr3.writeMyRasterToFile(getOutputDirectory() + "Test3.png", "png");
+	}
+	
+	public void testWriteRasterForR(){
+		/*
+		 * Create a raster with stride of 1: raster is 4x3. 
+		 */
+		MyRaster mr1 = new MyRaster(polygon, 1, null, 0, Color.blue);
+		mr1.processPoints(points);
+		mr1.convertMatrixToRaster();
+		mr1.writeRasterForR(getOutputDirectory() + "/rasterForR.csv");
+		
 	}
 	
 	

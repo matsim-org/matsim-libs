@@ -61,7 +61,7 @@ public class MyDemandMatrixTest extends MatsimTestCase{
 	
 	public void testReadLocationCoordinates(){
 		MyDemandMatrix mdm = new MyDemandMatrix();
-		mdm.readLocationCoordinates(getClassInputDirectory() + "centroids.txt");
+		mdm.readLocationCoordinates(getClassInputDirectory() + "centroids.txt", 2, 0, 1);
 		Map<Id, Coord> lm = mdm.getLocationCoordinates();
 		assertEquals("Wrong number of entries.", 4, lm.size());
 		assertEquals("Location 1 has the wrong coordinate.", true, lm.get(new IdImpl("1")).getX() == 0.0 && lm.get(new IdImpl("1")).getY() == 1.0);
@@ -72,13 +72,13 @@ public class MyDemandMatrixTest extends MatsimTestCase{
 	
 	public void testGenerateExternalDemand(){
 		MyDemandMatrix mdm = new MyDemandMatrix();
-		mdm.readLocationCoordinates(getClassInputDirectory() + "centroids.txt");
+		mdm.readLocationCoordinates(getClassInputDirectory() + "centroids.txt", 2, 0, 1);
 		mdm.parseMatrix(getClassInputDirectory() + "matrix.txt", "dummy", "dummy");
 		
 		List<Id> list = new ArrayList<Id>(2);
 		list.add(new IdImpl("4"));
 		Random r = new Random(1234);
-		Scenario sc = mdm.generateDemand(list, r, 1.0);
+		Scenario sc = mdm.generateDemand(list, r, 1.0, "car");
 		
 		assertEquals("Wrong population size.", 91, sc.getPopulation().getPersons().size());
 	}
