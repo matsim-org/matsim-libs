@@ -39,7 +39,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
@@ -146,7 +145,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public final void notifyMoveOverNode(Id newLinkId) {
-		if ( this.cachedNextLinkId != newLinkId ) {
+		if (! this.cachedNextLinkId.equals(newLinkId)) {
 			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " +
 					"anyway ...") ;
 		}
