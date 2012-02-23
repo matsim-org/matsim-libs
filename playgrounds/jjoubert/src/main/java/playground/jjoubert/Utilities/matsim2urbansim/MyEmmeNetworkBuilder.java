@@ -24,16 +24,23 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -58,8 +65,12 @@ public class MyEmmeNetworkBuilder {
 	private int linkLanesField;
 	private int linkCapacityField;
 	private int linkSpeedField;
+	
 	private String networkFile;
+	private String fromsystem;
+	private String toSystem; 
 	private Boolean overwrite;
+	private Integer linkModeField; /* Added to identify rail for Nelson Mandela from Aurecon data. */
 	private ScenarioImpl scenario;
 	
 
@@ -104,11 +115,19 @@ public class MyEmmeNetworkBuilder {
 			menb.linkLanesField = Integer.parseInt(args[9]);
 			menb.linkCapacityField = Integer.parseInt(args[10]);
 			menb.linkSpeedField = Integer.parseInt(args[11]);
+			
+			// Output network
 			menb.networkFile = args[12];
-			if(args.length >= 14){
-				menb.overwrite = Boolean.parseBoolean(args[12]);
-				if(args.length > 14){
-					throw new IllegalArgumentException("Too many arguments passed");					
+			menb.fromsystem = args[13];
+			menb.toSystem = args[14];
+			
+			if(args.length >= 16){
+				menb.overwrite = Boolean.parseBoolean(args[15]);
+				if(args.length >= 17){
+					menb.linkModeField = Integer.parseInt(args[16]);
+					if(args.length > 17){
+						throw new IllegalArgumentException("Too many arguments passed");					
+					}
 				}
 			} 
 		} else{
@@ -121,11 +140,16 @@ public class MyEmmeNetworkBuilder {
 			throw new RuntimeException("The output file " + output.getAbsolutePath() + " exists and may not be overwritten.");
 		}
 		
-		menb.buildNodes();
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(menb.fromsystem, menb.toSystem);
+		menb.buildNodes(ct);
 		menb.buildLinks();
+		
+		NetworkCleaner nc = new NetworkCleaner();
+		nc.run(menb.scenario.getNetwork());
 		
 		NetworkWriter nw = new NetworkWriter(menb.scenario.getNetwork());
 		nw.writeFileV1(menb.networkFile);
+		
 		
 		
 		log.info("----------------------------------------");
@@ -138,13 +162,14 @@ public class MyEmmeNetworkBuilder {
 		nodeFile = null;
 		linkFile = null;
 		networkFile = null;
+		linkModeField = null;
 		overwrite = false;
 	}
 	
 	/**
 	 * Reads all the nodes from the DBF-converted CSV file.
 	 */
-	public void buildNodes(){
+	public void buildNodes(CoordinateTransformation ct){
 		log.info("Building nodes.");
 		NetworkFactory f = scenario.getNetwork().getFactory();
 		try {
@@ -154,11 +179,18 @@ public class MyEmmeNetworkBuilder {
 				String header = br.readLine();
 				String line = null;
 				while((line = br.readLine()) != null){
-					String[] values = line.split("\t");
+					String[] values = line.split(",");
 					Integer nodeId = Integer.parseInt(values[nodeIdField]);
 					Double nodeX = Double.parseDouble(values[nodeXField]);
-					Double nodeY = Double.parseDouble(values[nodeYField]);					
-					scenario.getNetwork().addNode(f.createNode(new IdImpl(nodeId), new CoordImpl(nodeX, nodeY)));
+					Double nodeY = Double.parseDouble(values[nodeYField]);
+					Coord cOld = new CoordImpl(nodeX, nodeY); 
+					Coord cNew;
+					if(ct != null){
+						cNew = ct.transform(cOld);
+					} else{
+						cNew = cOld;
+					}
+					scenario.getNetwork().addNode(f.createNode(new IdImpl(nodeId), cNew));
 				}
 			} finally{
 				br.close();
@@ -182,7 +214,7 @@ public class MyEmmeNetworkBuilder {
 				String header = br.readLine();
 				String line = null;
 				while((line = br.readLine()) != null){
-					String[] values = line.split("\t");
+					String[] values = line.split(",");
 					Integer id = Integer.parseInt(values[linkIdField]);
 					Integer from = Integer.parseInt(values[linkFromNodeField]);
 					Integer to = Integer.parseInt(values[linkToNodeField]);
@@ -190,15 +222,34 @@ public class MyEmmeNetworkBuilder {
 					Double lanes = Double.parseDouble(values[linkLanesField]);
 					Double cap = Double.parseDouble(values[linkCapacityField]);
 					Double speed = Double.parseDouble(values[linkSpeedField]);
+					
+					int modeCode = 1;
+					Set<String> modes = new HashSet<String>();
+					if(!(linkModeField == null)){
+						modeCode = Integer.parseInt(values[linkModeField]);
+					}
+					if(modeCode == 99){ /* Aurecon data indicate `99' as rail. */
+						modes.add(TransportMode.pt);
+					} else{
+						modes.add(TransportMode.car);
+						modes.add(TransportMode.pt);
+					}
+					
+					
+					String suffix = "a";
+					if(scenario.getNetwork().getLinks().containsKey(new IdImpl(String.valueOf(id) + suffix))){
+						suffix = "b";
+					}
 
 					Link l = f.createLink(
-							new IdImpl(id), 
+							new IdImpl(String.valueOf(id) + suffix), 
 							scenario.getNetwork().getNodes().get(new IdImpl(from)), 
 							scenario.getNetwork().getNodes().get(new IdImpl(to)));
 					l.setLength(len*1000); 					// Nelson Mandela data is in km
 					l.setFreespeed(speed*1000.0/3600.0); 		// Nelson Mandela data in in km/h
 					l.setCapacity(cap); 
 					l.setNumberOfLanes(lanes);
+					l.setAllowedModes(modes);
 					scenario.getNetwork().addLink(l);
 				}
 			} finally{

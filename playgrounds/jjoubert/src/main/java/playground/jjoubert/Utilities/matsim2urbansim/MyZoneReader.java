@@ -85,6 +85,7 @@ public class MyZoneReader {
 	 * 		<li> eThekwini parcel - 1
 	 * 		<li> Gauteng GAP zones - 1
 	 * 		<li> KwazuluNatal GAP - 2
+	 * 		<li> Nelson Mandela Bay Metro UrbanSim parcels - 1
 	 * 		<li> Western Cape GAP - 2
 	 * 		<li> MATSim test - 1 
 	 * </ul>

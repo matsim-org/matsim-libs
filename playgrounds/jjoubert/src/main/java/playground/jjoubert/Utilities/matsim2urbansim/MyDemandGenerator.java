@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -54,6 +53,11 @@ import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 
 import com.vividsolutions.jts.geom.Point;
 
+/**
+ * Class to generate a synthetic population of agents from data extracted from UrbanSim.
+ * 
+ * @author johanwjoubert
+ */
 public class MyDemandGenerator {
 	private final static Logger log = Logger.getLogger(MyDemandGenerator.class);
 	private File inputFile;
@@ -67,6 +71,11 @@ public class MyDemandGenerator {
 	}
 	
 	public MyDemandGenerator(String input, String shapefile, String network, String output, boolean overwrite) {
+//		this.inputFile = new File(input);
+//		this.shapefile = new File(shapefile);
+//		this.networkFile = new File(network);
+//		this.outputFile = new File(output);
+
 		File fIn = new File(input);
 		if(!fIn.exists()){
 			throw new RuntimeException("The input file " + input + " does not exist");
@@ -94,7 +103,7 @@ public class MyDemandGenerator {
 			}
 		}		
 	}
-	
+
 	public void generateDemand(Map<Id, MyZone> zones){
 		// TODO Complete.
 		log.info("Generating a synthetic population:");
@@ -114,7 +123,9 @@ public class MyDemandGenerator {
 				while((line = br.readLine()) != null){
 					String[] entry = line.split(",");
 					String agentId = entry[0];
-					Person agent = new PersonImpl(new IdImpl(agentId));
+					PersonImpl agent = new PersonImpl(new IdImpl(agentId));
+					agent.setEmployed(true);
+
 					Plan plan = new PlanImpl(agent);
 					
 					/*
@@ -122,8 +133,11 @@ public class MyDemandGenerator {
 					 *    - must end between 05:55 and 06:05;
 					 * TODO Check that "interiorpoint" is a random point
 					 */
-					String homeId = entry[1];
+					String homeId = entry[1]; 
 					MyZone homeZone = zones.get(new IdImpl(homeId));
+					if(homeZone == null){
+						log.error("Agent Id: " + agentId + "; Null homezone (Id: " + homeId + ")");
+					}
 					Point pHome = homeZone.getInteriorPoint();
 					Coord cHome = new CoordImpl(pHome.getX(), pHome.getY());
 					Link lHome = ni.getNearestRightEntryLink(cHome);
@@ -132,9 +146,25 @@ public class MyDemandGenerator {
 					homeStart.setEndTime(21595 + Math.random()*10.0);
 					
 					/*
-					 * Generate travel leg from home to work.
+					 * Generate travel legs from home to work.
+					 * 
+					 * UPDATE: Since September 2011 this has been updated, for Nelson Mandela,
+					 * to also consider public transport. A full working population is 
+					 * extracted from UrbanSim: both car and non-car commuters. The fourth
+					 * field of the input file shows `1' for car owners, and `0' for public
+					 * transport commuters. 
 					 */
-					Leg fromHome = new LegImpl(TransportMode.car);
+					Leg fromHome = null;
+					Leg toHome = null;
+					int carOwner = Integer.parseInt(entry[3]);
+					if(carOwner == 1){
+						fromHome = new LegImpl(TransportMode.car);
+						toHome = new LegImpl(TransportMode.car);
+					} else{
+						fromHome = new LegImpl(TransportMode.pt);
+						toHome = new LegImpl(TransportMode.pt);
+					}
+					
 					
 					/*
 					 * Generate work activity. some criteria:
@@ -150,10 +180,6 @@ public class MyDemandGenerator {
 					work.setStartTime(25200);
 					work.setEndTime(work.getStartTime() + 32400);
 					
-					/*
-					 * Generate travel leg from work back to home.
-					 */
-					Leg toHome = new LegImpl(TransportMode.car);
 					
 					/*
 					 * Generate the end-of-day home activity.
@@ -183,7 +209,7 @@ public class MyDemandGenerator {
 		PopulationWriter pw = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		pw.writeFileV4(outputFile.getAbsolutePath());
 		
-		SelectedPlans2ESRIShape sh = new SelectedPlans2ESRIShape(scenario.getPopulation(), scenario.getNetwork(), MGC.getCRS("WGS84_UTM36S"), outputFile.getParent());
+		SelectedPlans2ESRIShape sh = new SelectedPlans2ESRIShape(scenario.getPopulation(), scenario.getNetwork(), MGC.getCRS("WGS84_SA_Albers"), outputFile.getParent());
 		String outputFolder = outputFile.getParentFile().getAbsolutePath();
 		log.info("Writing plans as shapefile to " + outputFolder);
 		sh.setWriteActs(true);

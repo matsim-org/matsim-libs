@@ -69,7 +69,7 @@ public class MyDemandMatrix {
 	 * @param filename the absolute path of the <code>csv</code>-file that 
 	 * 		contains the origin-destination matrix.
 	 * @param matrixName for the origin-destination matrix provided.
-	 * @param matrixDesc describingthe given origin-destination matrix.
+	 * @param matrixDesc describing the given origin-destination matrix.
 	 * @see {@link Matrix}
 	 */
 	public void parseMatrix(String filename, String matrixName, String matrixDesc) {
@@ -125,7 +125,54 @@ public class MyDemandMatrix {
 		demandMatrix = matrix;
 	}
 
-	public void readLocationCoordinates(String filename) {
+	/**
+	 * Parses an origin-destination file and generates a demand {@link Matrix}.
+	 * <P>
+	 * <b><i>Note:</i></b>
+	 * <ul>
+	 * 	<li> First row is a column header.
+	 * 	<li> Each row has three entries: origin zone Id; destination zone Id; and the 
+	 * 		number of trips. 
+	 * </ul>
+	 * </P>
+	 * @param filename the absolute path of the <code>csv</code>-file that 
+	 * 		contains the origin-destination data.
+	 * @param matrixName for the origin-destination matrix provided.
+	 * @param matrixDesc describing the given origin-destination matrix.
+	 * @see {@link Matrix}
+	 */
+	public void parseODPairs(String filename, String matrixName, String matrixDesc) {
+		log.info("Reading matrix from " + filename);
+		Matrix matrix = new Matrix(matrixName, matrixDesc);
+		BufferedReader br = IOUtils.getBufferedReader(filename);
+		try{
+			br.readLine(); /* Header. */
+			String ls = null;
+			while((ls = br.readLine()) != null){
+				String [] entries = ls.split(",");
+				if(entries.length != 3){
+					log.error("The line `" + ls + "' has more than three entries!");
+				}
+				Id fromId = new IdImpl(entries[0]);
+				Id toId = new IdImpl(entries[1]);
+				Double trips = Double.parseDouble(entries[2]);
+				matrix.createEntry(fromId, toId, trips);				
+			}
+			
+		} catch (IOException e) {
+			throw new RuntimeException("Could not read from " + filename);
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not close BufferedReader for " + filename);
+			}
+		}
+		demandMatrix = matrix;		
+	}
+	
+	
+	public void readLocationCoordinates(String filename, int idField, int longField, int latField) {
 		log.info("Reading location coordinates from " + filename);
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(filename);
@@ -134,7 +181,7 @@ public class MyDemandMatrix {
 				while((line = br.readLine()) != null){
 					String[] sa = line.split(",");
 					if(sa.length == 3){
-						locationCoordinates.put(new IdImpl(sa[2]), new CoordImpl(sa[0], sa[1]));						
+						locationCoordinates.put(new IdImpl(sa[idField]), new CoordImpl(sa[longField], sa[latField]));						
 					}
 				}
 			} finally{
@@ -147,6 +194,8 @@ public class MyDemandMatrix {
 		}
 		
 	}
+	
+
 
 	public Map<Id, Coord> getLocationCoordinates() {
 		return locationCoordinates;
@@ -155,13 +204,21 @@ public class MyDemandMatrix {
 	public Matrix getDemandMatrix() {
 		return demandMatrix;
 	}
-
-	public Scenario generateDemand(List<Id> list, Random r, double fraction) {
+	
+	
+	/**
+	 * 
+	 * @param list
+	 * @param r
+	 * @param fraction
+	 * @return
+	 */
+	public Scenario generateDemand(List<Id> list, Random r, double fraction, String mode) {
 		if(locationCoordinates.size() == 0){
 			throw new RuntimeException("Cannot create plans if no locations coordinates exist.");
 		}
 		if(demandMatrix == null){
-			throw new RuntimeException("Cannot create plans demand matrix is null.");
+			throw new RuntimeException("Cannot create plans... demand matrix is null.");
 		}
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = sc.getPopulation();
@@ -264,13 +321,13 @@ public class MyDemandMatrix {
 					Activity home1 = pf.createActivityFromCoord("home", locationCoordinates.get(id));
 					home1.setEndTime(21600); // 06:00
 					plan.addActivity(home1);
-					Leg toWork = pf.createLeg("car");
+					Leg toWork = pf.createLeg(mode);
 					plan.addLeg(toWork);
 					Activity work = pf.createActivityFromCoord("work", locationCoordinates.get(theDestination));
 					work.setStartTime(25200); // 07:00
 					work.setEndTime(57600);
 					plan.addActivity(work);
-					Leg fromWork = pf.createLeg("car");
+					Leg fromWork = pf.createLeg(mode);
 					plan.addLeg(fromWork);
 					Activity home2 = pf.createActivityFromCoord("home", locationCoordinates.get(id));
 					home2.setStartTime(64800);

@@ -31,6 +31,9 @@ public class DateString extends GregorianCalendar{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Returns the date of the class in the form YYYYMMDDHHMMSS.
+	 */
 	@Override
 	public String toString(){
 		String result = null;
