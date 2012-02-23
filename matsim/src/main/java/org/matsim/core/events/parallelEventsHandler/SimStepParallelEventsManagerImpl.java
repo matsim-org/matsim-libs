@@ -221,8 +221,24 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 					Event event = ((LinkedBlockingQueue<Event>) eventsQueue).take();
 					
 					if (event instanceof LastEventOfSimStep) {
-						simStepEndBarrier.await();
-						continue;
+						/*
+						 * Some EventHandlers might have created additional Events [1] which 
+						 * could be located in the list AFTER the LastEventOfSimStep, meaning 
+						 * that they would be processed while the simulation is already processing
+						 * the next time step. Therefore we check whether the eventsQueue is really
+						 * empty. If not, we again add the event to the queue and go on with
+						 * the events processing while the main thread waits until the simStepEndBarrier
+						 * is reached.
+						 * 
+						 * [1] ... Such a behavior is NOT part of MATSim's default EventHandlers but it
+						 * still might occur.
+						 */
+						if (!eventsQueue.isEmpty()) {
+							this.processEvent(event);
+						} else {
+							simStepEndBarrier.await();
+							continue;
+						}
 					}
 					else if (event instanceof LastEventOfIteration) {
 						break;
