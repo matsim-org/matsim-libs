@@ -142,41 +142,67 @@ public class CreatePopulation {
 		
 		ActivityImpl act = new ActivityImpl("home", home.getCoord());
 		act.setFacilityId(home.getId());
-		act.setEndTime(11.0 * 3600.0);
+		
+		double endTime = Math.max(0.0, this.random.nextGaussian() * 2.0 * 3600.0 + 7.0 * 3600.0);
+		act.setEndTime(endTime);
 		plan.addActivity(act);
 		plan.addLeg(new LegImpl("car"));
 		
-		this.addOtherActs(plan, person, day);
-		this.addWorkingAct(plan, person, day);
-		this.finishPlan(plan, person);	
+		endTime = this.addWorkingAct(plan, person, day, endTime);
+		endTime = this.addOtherActs(plan, person, day, endTime);
 		
-		// TODO: modify times
-		
+		this.finishPlan(plan, person);		
 		this.memories.getMemory(person.getId()).addPlan(plan, day);
 	}
 	
-	private void addOtherActs(PlanImpl plan, PersonImpl person, String day) {
+	private double addOtherActs(PlanImpl plan, PersonImpl person, String day, double endTime) {
 		DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
+		boolean checkShopping = false;
+		boolean checkLeisure = false;
 		
-		// check shopping
-		if (decisionModel.doesAct("shop", day)) {
+		if (this.random.nextBoolean()) {
+			checkShopping = true;
+		}
+		if (this.random.nextBoolean()) {
+			checkLeisure = true;
+		}
+				
+		if (decisionModel.doesAct("shop", day) && checkShopping) {
 			ActivityFacility facility = this.memories.getMemory(person.getId()).getHomeZone().getRandomLocationInZone(random);
 			ActivityImpl act = new ActivityImpl("shop", facility.getCoord());
-			act.setEndTime(17.0 * 3600);
+			endTime += Math.max(0.1 * 3600.0, this.random.nextGaussian() * 1.5 * 3600.0 + 1.0 * 3600.0);
+			act.setEndTime(endTime);
 			act.setFacilityId(facility.getId());
 			plan.addActivity(act);
 			plan.addLeg(new LegImpl("car"));
 		}
 		// check leisure
-		if (decisionModel.doesAct("leisure", day)) {
+		if (decisionModel.doesAct("leisure", day) && checkLeisure) {
 			TreeMap<Id, ActivityFacility> facilitiesLeisure = this.scenario.getActivityFacilities().getFacilitiesForActivityType("leisure");
 			ActivityFacility facility = (ActivityFacility) facilitiesLeisure.values().toArray()[random.nextInt(facilitiesLeisure.size())];
 			ActivityImpl act = new ActivityImpl("leisure", facility.getCoord());
-			act.setEndTime(17.0 * 3600);
+			endTime += Math.max(0.1 * 3600.0, this.random.nextGaussian() * 2.0 * 3600.0 + 3.0 * 3600.0);
+			act.setEndTime(endTime);
 			act.setFacilityId(facility.getId());
 			plan.addActivity(act);
 			plan.addLeg(new LegImpl("car"));
 		}
+		return endTime;
+	}
+	
+	private double addWorkingAct(PlanImpl plan, PersonImpl person, String day, double endTime) {
+		DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
+		
+		if (decisionModel.doesAct("work", day)) {
+			ActivityFacility facility = this.workLocations.get(person.getId());
+			ActivityImpl workAct = new ActivityImpl("work", facility.getCoord());
+			endTime += Math.max(0.5 * 3600.0, this.random.nextGaussian() * 1.5 * 3600.0 + 8.0 * 3600.0);
+			workAct.setEndTime(endTime);
+			workAct.setFacilityId(facility.getId());
+			plan.addActivity(workAct);
+			plan.addLeg(new LegImpl("car"));
+		}
+		return endTime;
 	}
 	
 	private void finishPlan(PlanImpl plan, PersonImpl person) {
@@ -185,20 +211,7 @@ public class CreatePopulation {
 		homeAct.setFacilityId(home.getId());
 		plan.addActivity(homeAct);
 	}
-	
-	private void addWorkingAct(PlanImpl plan, PersonImpl person, String day) {
-		DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
-		
-		if (decisionModel.doesAct("work", day)) {
-			ActivityFacility facility = this.workLocations.get(person.getId());
-			ActivityImpl workAct = new ActivityImpl("work", facility.getCoord());
-			workAct.setEndTime(17.0 * 3600);
-			workAct.setFacilityId(facility.getId());
-			plan.addActivity(workAct);
-			plan.addLeg(new LegImpl("car"));
-		}	
-	}
-						
+							
 	public void write(String path) {
 		log.info("Writing population ...");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(path + "/plans.xml");

@@ -33,8 +33,7 @@ public class CreateScenario {
 	private String configFile;
 	public static String [] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 				
-	public static void main(final String[] args) {
-		
+	public static void main(final String[] args) {		
 		if (args.length != 1) {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);

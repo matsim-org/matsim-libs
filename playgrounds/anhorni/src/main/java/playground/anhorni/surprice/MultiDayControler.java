@@ -17,31 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess;
+package playground.anhorni.surprice;
 
-import org.matsim.core.population.PersonImpl;
+import org.apache.log4j.Logger;
 
-import playground.anhorni.surprice.AgentMemory;
-import playground.anhorni.surprice.DecisionModel;
+import playground.anhorni.surprice.preprocess.CreateScenario;
 
-public class DecisionModelCreator {
+public class MultiDayControler {
 	
-	public DecisionModel createDecisionModelForAgent(PersonImpl person, AgentMemory memory) {
-		DecisionModel model = new DecisionModel();
-		model.setMemory(memory);
-		
-		model.setFrequency("work", "Mon-Fri", 1);
-		model.setFrequency("shop", "Mon-Fri", 0.2);
-		model.setFrequency("leisure", "Mon-Fri", 0.2);
-		
-		model.setFrequency("work", "Sat", 0);
-		model.setFrequency("shop", "Sat", 1);
-		model.setFrequency("leisure", "Sat", 0);
-		
-		model.setFrequency("work", "Sun", 0);
-		model.setFrequency("shop", "Sun", 0);
-		model.setFrequency("leisure", "Sun", 1);
-		
-		return model;
-	}
+	private final static Logger log = Logger.getLogger(MultiDayControler.class);
+	
+	public static void main (final String[] args) {		
+		if (args.length != 1) {
+			log.error("Provide correct number of arguments ...");
+			System.exit(-1);
+		}		
+		String configFile = args[0];		
+				
+		for (String day : CreateScenario.days) {	
+			DayControler controler = new DayControler(configFile);
+			String outPath = controler.getConfig().controler().getOutputDirectory();
+			String plansPath = controler.getConfig().plans().getInputFile();
+			controler.getConfig().setParam("controler", "outputDirectory", outPath + "/" + day);
+			controler.getConfig().setParam("plans", "inputPlansFile", plansPath + "/" + day);
+			controler.run();
+		}
+    }
 }
