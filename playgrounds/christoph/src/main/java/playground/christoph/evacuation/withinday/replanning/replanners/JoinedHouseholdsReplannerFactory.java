@@ -25,27 +25,27 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
+import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
-import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 
 public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private final Scenario scenario;
-	private final HouseholdsUtils householdsUtils; 
+	private final HouseholdsTracker householdsTracker;
 	private final JoinedHouseholdsIdentifier identifier;
 	
 	public JoinedHouseholdsReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, 
-			double replanningProbability, HouseholdsUtils householdsUtils, JoinedHouseholdsIdentifier identifier) {
+			double replanningProbability, HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier) {
 		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
-		this.householdsUtils = householdsUtils;
+		this.householdsTracker = householdsTracker;
 		this.identifier = identifier;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new JoinedHouseholdsReplanner(super.getId(), scenario, 
-				householdsUtils, identifier);
+				householdsTracker, identifier);
 		super.initNewInstance(replanner);
 		return replanner;
 	}

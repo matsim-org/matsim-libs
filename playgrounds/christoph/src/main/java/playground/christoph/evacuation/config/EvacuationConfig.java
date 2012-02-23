@@ -19,6 +19,8 @@ public class EvacuationConfig {
 	public static String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
 	public static String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
 	
+	public static String householdObjectAttributesFile = "";
+	
 	public static List<String> evacuationArea = new ArrayList<String>();
 	
 	public static List<String> vehicleFleet = new ArrayList<String>();

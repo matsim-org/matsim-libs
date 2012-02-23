@@ -23,8 +23,6 @@ package playground.christoph.evacuation.withinday.replanning.utils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -34,9 +32,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.events.HouseholdEnterMeetingPointEventImpl;
-import playground.christoph.evacuation.events.HouseholdLeaveMeetingPointEventImpl;
-import playground.christoph.evacuation.events.HouseholdSetMeetingPointEventImpl;
+import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 
 /**
  * Decides where a household will meet after the evacuation order has been given.
@@ -52,69 +48,60 @@ import playground.christoph.evacuation.events.HouseholdSetMeetingPointEventImpl;
 public class SelectHouseholdMeetingPoint implements SimulationInitializedListener, SimulationBeforeSimStepListener {
 
 	private final Scenario scenario;
-	private final EventsManager eventsManager;
-	private final HouseholdsUtils householdsUtils;
+	private final HouseholdsTracker householdsTracker;
 	private final CoordAnalyzer coordAnalyzer;
 	
 	private double time = Time.UNDEFINED_TIME;
 	
-	public SelectHouseholdMeetingPoint(Scenario scenario, EventsManager eventsManager, HouseholdsUtils householdsUtils, CoordAnalyzer coordAnalyzer) {
+	public SelectHouseholdMeetingPoint(Scenario scenario, HouseholdsTracker householdsTracker, CoordAnalyzer coordAnalyzer) {
 		this.scenario = scenario;
-		this.eventsManager = eventsManager;
-		this.householdsUtils = householdsUtils;
+		this.householdsTracker = householdsTracker;
 		this.coordAnalyzer = coordAnalyzer;
 	}
 	
-	public void setHomeFacilitySecurity(HouseholdInfo householdInfo) {
-		Id homeFacilityId = householdInfo.getMeetingPointId();
-		Coord homeFacilityCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(homeFacilityId).getCoord();
-		householdInfo.setHomeLocationIsSecure(isCoordinateSecure(homeFacilityCoord));
-	}
-	
-//	/*
-//	 * Decide where a household is going to meet. This can be either
-//	 * the home location or an arbitrary other location if the home
-//	 * location is not treated to be secure.
-//	 */
-//	public void selectMeetingPoint(HouseholdInfo householdInfo) {
-//		// TODO
+//	public void setHomeFacilitySecurity(HouseholdPosition householdPosition) {
+//		Id homeFacilityId = householdInfo.getMeetingPointId();
+//		Coord homeFacilityCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(homeFacilityId).getCoord();
+//		householdInfo.setHomeLocationIsSecure(isCoordinateSecure(homeFacilityCoord));
 //	}
-
+	
 	/*
 	 *  At the moment, there is only a single rescue facility.
 	 *  Instead, multiple *real* rescue facilities could be defined.
 	 */
-	public void selectRescueMeetingPoint(Id householdId) {
-		HouseholdInfo householdInfo = householdsUtils.getHouseholdInfoMap().get(householdId);
-		Id oldMeetingPointId = householdInfo.getMeetingPointId();
+	public Id selectRescueMeetingPoint(Id householdId) {
+//		HouseholdInfo householdInfo = householdsUtils.getHouseholdInfoMap().get(householdId);
+//		Id oldMeetingPointId = householdInfo.getMeetingPointId();
 		Id newMeetingPointId = scenario.createId("rescueFacility");
 
-		/*
-		 * If the meeting point is not changed we have nothing to do.
-		 */
-		if (oldMeetingPointId == newMeetingPointId) return;
+//		/*
+//		 * If the meeting point is not changed we have nothing to do.
+//		 */
+//		if (oldMeetingPointId == newMeetingPointId) return;
+//		
+//		/*
+//		 * If the household is currently joined at the old meeting point and
+//		 * a new meeting point is set.
+//		 */
+//		if (householdInfo.allMembersAtMeetingPoint()) {
+//			Event leaveEvent = new HouseholdLeaveMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
+//			eventsManager.processEvent(leaveEvent);	
+//		}
+//			
+//		householdsUtils.setMeetingPoint(householdId, newMeetingPointId);
+//		
+//		/*
+//		 * If the household is currently joined at the new meeting point.
+//		 */
+//		if (householdInfo.allMembersAtMeetingPoint()) {
+//			Event enterEvent = new HouseholdEnterMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
+//			eventsManager.processEvent(enterEvent);	
+//		}
+//		
+//		Event setEvent = new HouseholdSetMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
+//		eventsManager.processEvent(setEvent);
 		
-		/*
-		 * If the household is currently joined at the old meeting point and
-		 * a new meeting point is set.
-		 */
-		if (householdInfo.allMembersAtMeetingPoint()) {
-			Event leaveEvent = new HouseholdLeaveMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
-			eventsManager.processEvent(leaveEvent);	
-		}
-			
-		householdsUtils.setMeetingPoint(householdId, newMeetingPointId);
-		
-		/*
-		 * If the household is currently joined at the new meeting point.
-		 */
-		if (householdInfo.allMembersAtMeetingPoint()) {
-			Event enterEvent = new HouseholdEnterMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
-			eventsManager.processEvent(enterEvent);	
-		}
-		
-		Event setEvent = new HouseholdSetMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
-		eventsManager.processEvent(setEvent);
+		return newMeetingPointId;
 	}
 	
 	/**
@@ -144,9 +131,9 @@ public class SelectHouseholdMeetingPoint implements SimulationInitializedListene
 	 */
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		for (HouseholdInfo householdInfo : householdsUtils.getHouseholdInfoMap().values()) {
-			setHomeFacilitySecurity(householdInfo);
-		}
+//		for (HouseholdInfo householdInfo : householdsUtils.getHouseholdInfoMap().values()) {
+//			setHomeFacilitySecurity(householdInfo);
+//		}
 	}
 
 	/*

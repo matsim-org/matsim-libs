@@ -41,9 +41,9 @@ import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
+import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplanner;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
-import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 
 public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActivityReplanner {
 	
@@ -51,13 +51,13 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	
 	private static final String activityType = "meetHousehold";
 	
-	protected final HouseholdsUtils householdsUtils;
+	protected final HouseholdsTracker householdsTracker;
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
 	
-	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario, HouseholdsUtils householdsUtils, 
+	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario, HouseholdsTracker householdsTracker, 
 			ModeAvailabilityChecker modeAvailabilityChecker) {
 		super(id, scenario);
-		this.householdsUtils = householdsUtils;
+		this.householdsTracker = householdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 	}
 	
@@ -94,7 +94,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		 * Otherwise create a new activity at the meeting point, add it to the plan
 		 * and remove all other remaining activities.
 		 */
-		Id meetingPointId = householdsUtils.getMeetingPointId(withinDayAgent.getId());
+		Id meetingPointId = householdsTracker.getPersonsHouseholdPosition(withinDayAgent.getId()).getMeetingPointFacilityId();
 		if (currentActivity.getFacilityId().equals(meetingPointId)) {
 			currentActivity.setType(activityType);
 			currentActivity.setMaximumDuration(Time.UNDEFINED_TIME);

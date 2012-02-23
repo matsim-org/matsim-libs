@@ -25,28 +25,28 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
+import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
-import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 
 public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private final Scenario scenario;
-	private final HouseholdsUtils householdsUtils; 
+	private final HouseholdsTracker householdsTracker; 
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	
 	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, 
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, 
-			HouseholdsUtils householdsUtils, ModeAvailabilityChecker modeAvailabilityChecker) {
+			 HouseholdsTracker householdsTracker, ModeAvailabilityChecker modeAvailabilityChecker) {
 		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
-		this.householdsUtils = householdsUtils;
+		this.householdsTracker = householdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario, 
-				householdsUtils, modeAvailabilityChecker);
+				householdsTracker, modeAvailabilityChecker);
 		super.initNewInstance(replanner);
 		return replanner;
 	}

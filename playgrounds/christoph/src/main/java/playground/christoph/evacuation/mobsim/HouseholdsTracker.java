@@ -23,7 +23,6 @@ package playground.christoph.evacuation.mobsim;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,16 +37,20 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
-public class HouseholdsTracker extends AgentsTracker implements SimulationAfterSimStepListener {
+public class HouseholdsTracker extends AgentsTracker implements 
+		SimulationBeforeSimStepListener, SimulationAfterSimStepListener {
 
 	static final Logger log = Logger.getLogger(HouseholdsTracker.class);
 	
@@ -55,14 +58,37 @@ public class HouseholdsTracker extends AgentsTracker implements SimulationAfterS
 	private int infoTime = 0;
 	private static final int INFO_PERIOD = 3600;
 	
+	private final ObjectAttributes householdObjectAttributes;
 	private final Set<Id> householdsToUpdate;
 	private final Map<Id, Id> personHouseholdMap;
 	private final Map<Id, HouseholdPosition> householdPositions;
 	
-	public HouseholdsTracker() {		
+	public HouseholdsTracker(ObjectAttributes householdObjectAttributes) {
+		this.householdObjectAttributes = householdObjectAttributes;
+		
 		this.householdsToUpdate = new HashSet<Id>();
 		this.personHouseholdMap = new HashMap<Id, Id>();
 		this.householdPositions = new HashMap<Id, HouseholdPosition>();
+	}
+	
+	public Id getPersonsHouseholdId(Id personId) {
+		return this.personHouseholdMap.get(personId);
+	}
+	
+	public HouseholdPosition getPersonsHouseholdPosition(Id personId) {
+		return householdPositions.get(personHouseholdMap.get(personId));
+	}
+	
+	public HouseholdPosition getHouseholdPosition(Id householdId) {
+		return householdPositions.get(householdId);
+	}
+	
+	public Map<Id, HouseholdPosition> getHouseholdPositions() {
+		return this.householdPositions;
+	}
+	
+	public Set<Id> getHouseholdsToUpdate() {
+		return this.householdsToUpdate;
 	}
 	
 	@Override
@@ -128,7 +154,11 @@ public class HouseholdsTracker extends AgentsTracker implements SimulationAfterS
 		Households households = ((ScenarioImpl) sim.getScenario()).getHouseholds();
 		for (Household household : households.getHouseholds().values()) {
 			
-			HouseholdPosition householdPosition = new HouseholdPosition();
+			Id homeFacilityId = sim.getScenario().createId(this.householdObjectAttributes.getAttribute(household.getId().toString(), "homeFacilityId").toString());
+			
+			HouseholdPosition householdPosition = new HouseholdPosition();			
+			householdPosition.setHomeFacilityId(homeFacilityId);
+			householdPosition.setMeetingPointFacilityId(homeFacilityId);
 			for (Id personId : household.getMemberIds()) {
 				personHouseholdMap.put(personId, household.getId());
 				
@@ -143,12 +173,15 @@ public class HouseholdsTracker extends AgentsTracker implements SimulationAfterS
 	}
 	
 	@Override
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		// clear list for the upcoming time-step
+		householdsToUpdate.clear();
+	}
+	
+	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
-		Iterator<Id> iter = householdsToUpdate.iterator();
-		while (iter.hasNext()) {
-			Id id = iter.next();
+		for (Id id : this.householdsToUpdate) {
 			householdPositions.get(id).update();
-			iter.remove();
 		}
 		
 		if (e.getSimulationTime() >= this.infoTime) {
@@ -188,4 +221,5 @@ public class HouseholdsTracker extends AgentsTracker implements SimulationAfterS
 			+ ", # undefined joined Households=" + joinedUndefined + "(" + df.format((100.0*joinedUndefined)/numHouseholds) + "%)"
 			+ ", # split Households=" + split + "(" + df.format((100.0*split)/numHouseholds) + "%)");
 	}
+
 }

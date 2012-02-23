@@ -38,6 +38,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String HEIGHTINFORMATION = "heightinformation";
 	public static String VEHICLEFLEET = "vehiclefleet";
 	public static String EVACUATIONAREA = "evacuationarea";
+	public static String HOUSEHOLDOBJECTATTRIBUTES = "householdobjectattributes";
 	public static String ANALYSIS = "analysis";
 	public static String FILE = "file";
 	
@@ -87,7 +88,10 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			if (!path.endsWith("/")) path = "/" + path;
 			this.readEvacuationArea = true;
 			EvacuationConfig.evacuationArea.clear();
-		} else if (FILE.equalsIgnoreCase(name)) {
+		} else if (HOUSEHOLDOBJECTATTRIBUTES.equalsIgnoreCase(name)) {
+			EvacuationConfig.householdObjectAttributesFile = atts.getValue(FILENAME);
+		}
+		else if (FILE.equalsIgnoreCase(name)) {
 			if (readEvacuationArea && !readVehicleFleet) {
 				EvacuationConfig.evacuationArea.add(path + atts.getValue(FILENAME));
 			} else if (readVehicleFleet && !readEvacuationArea) {
@@ -107,13 +111,14 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		if (EVACUATIONCONFIG.equalsIgnoreCase(name)) {
 		} else if (EVACUATIONTIME.equalsIgnoreCase(name)) {
 		} else if (CENTERCOORD.equalsIgnoreCase(name)) {
-		} else if (HEIGHTINFORMATION.equalsIgnoreCase(name)) {			
+		} else if (HEIGHTINFORMATION.equalsIgnoreCase(name)) {
 		} else if (VEHICLEFLEET.equalsIgnoreCase(name)) {
 			this.readVehicleFleet = false;
 			this.path = "";
 		} else if (EVACUATIONAREA.equalsIgnoreCase(name)) {
 			this.readEvacuationArea = false;
 			this.path = "";
+		} else if (HOUSEHOLDOBJECTATTRIBUTES.equalsIgnoreCase(name)) {
 		} else if (FILE.equalsIgnoreCase(name)) {
 		} else if(ANALYSIS.equalsIgnoreCase(name)) {
 		} else log.warn("Ignoring endTag: " + name);

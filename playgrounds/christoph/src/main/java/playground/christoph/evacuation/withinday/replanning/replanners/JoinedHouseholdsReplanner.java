@@ -38,9 +38,9 @@ import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
+import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
-import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 
 /**
  * Replanner for agents that are currently together with the other
@@ -55,12 +55,12 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 	
 	public static final String activityType = "rescue";
 	
-	private final HouseholdsUtils householdsUtils;
+	private final HouseholdsTracker householdsTracker;
 	private final JoinedHouseholdsIdentifier identifier;
 	
-	public JoinedHouseholdsReplanner(Id id, Scenario scenario, HouseholdsUtils householdsUtils, JoinedHouseholdsIdentifier identifier) {
+	public JoinedHouseholdsReplanner(Id id, Scenario scenario, HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier) {
 		super(id, scenario);
-		this.householdsUtils = householdsUtils;
+		this.householdsTracker = householdsTracker;
 		this.identifier = identifier;
 	}
 
@@ -93,7 +93,8 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 * Otherwise create a new activity at the meeting point, add it to the plan
 		 * and remove all other remaining activities.
 		 */
-		Id meetingPointId = householdsUtils.getMeetingPointId(withinDayAgent.getId());
+		Id householdId = householdsTracker.getPersonsHouseholdId(withinDayAgent.getId());
+		Id meetingPointId = identifier.getHouseholdMeetingPointMapping().get(householdId);
 		
 		/*
 		 * The agent is currently not at the Meeting Point. Therefore, we create a new Activity

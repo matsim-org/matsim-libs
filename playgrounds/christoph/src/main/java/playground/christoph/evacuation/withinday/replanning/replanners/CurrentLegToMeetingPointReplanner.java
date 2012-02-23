@@ -32,7 +32,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.ReplacePlanElements;
 
-import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
+import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 
 /**
  * Move the destination of the next activity to the agent's household,
@@ -45,11 +45,11 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 
 	private static final String activityType = "meetHousehold";
 	
-	protected final HouseholdsUtils householdsUtils;
+	protected final HouseholdsTracker householdsTracker;
 	
-	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario, HouseholdsUtils householdsUtils) {
+	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario, HouseholdsTracker householdsTracker) {
 		super(id, scenario);
-		this.householdsUtils = householdsUtils;
+		this.householdsTracker = householdsTracker;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		/*
 		 * Create new Activity at the meeting point.
 		 */
-		Id meetingPointId = householdsUtils.getMeetingPointId(withinDayAgent.getId());
+		Id meetingPointId = householdsTracker.getPersonsHouseholdPosition(withinDayAgent.getId()).getMeetingPointFacilityId();
 		ActivityFacility meetingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(meetingPointId);
 		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
 		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);

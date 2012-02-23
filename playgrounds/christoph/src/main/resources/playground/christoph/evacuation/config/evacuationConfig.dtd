@@ -4,7 +4,7 @@
 
 <!-- Author: Christoph Dobler -->
 
-<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, analysis)>
+<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis)>
 
 <!ELEMENT evacuationTime	EMPTY>
 <!ATTLIST evacuationTime
@@ -35,6 +35,10 @@
 <!ATTLIST file
 			fileName	CDATA				#REQUIRED>
 
+<!ELEMENT householdObjectAttributes	EMPTY>
+<!ATTLIST householdObjectAttributes
+			fileName	CDATA				#REQUIRED>
+			
 <!ELEMENT analysis 		EMPTY>
 <!ATTLIST analysis
 			createEvacuationTimePicture	CDATA	#REQUIRED

@@ -67,6 +67,8 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
@@ -106,7 +108,6 @@ import playground.christoph.evacuation.withinday.replanning.replanners.CurrentAc
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
@@ -146,7 +147,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected double duringLegRerouteShare = 0.10;
 	
 	protected AddZCoordinatesToNetwork zCoordinateAdder;
-	protected HouseholdsUtils householdsUtils;
+	protected ObjectAttributes householdObjectAttributes;
+//	protected HouseholdsUtils householdsUtils;
 	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
 //	protected HouseholdVehiclesTracker householdVehiclesTracker;
 	
@@ -156,7 +158,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	protected PassengerDepartureHandler passengerDepartureHandler;
-	protected HouseholdsTracker househouldsTracker;
+	protected HouseholdsTracker householdsTracker;
 	protected VehiclesTracker vehiclesTracker;
 	protected CoordAnalyzer coordAnalyzer;
 	protected Geometry affectedArea;
@@ -222,6 +224,10 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		// Add pickup facilities to Links.
 		addPickupFacilities();
 		
+		// load household object attributes
+		this.householdObjectAttributes = new ObjectAttributes();
+		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
+		
 		/*
 		 * Adding z-coordinates to the network
 		 */
@@ -246,10 +252,10 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		MultiModalTravelTime linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
 		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
 		
-		this.householdsUtils = new HouseholdsUtils(this.scenarioData, this.getEvents());
-		this.getEvents().addHandler(householdsUtils);
-		this.getFixedOrderSimulationListener().addSimulationListener(householdsUtils);
-		this.householdsUtils.printStatistics();
+//		this.householdsUtils = new HouseholdsUtils(this.scenarioData, this.getEvents());
+//		this.getEvents().addHandler(householdsUtils);
+//		this.getFixedOrderSimulationListener().addSimulationListener(householdsUtils);
+//		this.householdsUtils.printStatistics();
 		
 		Set<Feature> features = new HashSet<Feature>();
 		SHPFileUtil util = new SHPFileUtil();
@@ -261,16 +267,16 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
 		
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.getEvents(), householdsUtils, coordAnalyzer.createInstance());
-		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
-		
-		this.househouldsTracker = new HouseholdsTracker();
-		this.getEvents().addHandler(househouldsTracker);
-		this.getFixedOrderSimulationListener().addSimulationListener(househouldsTracker);
+		this.householdsTracker = new HouseholdsTracker(this.householdObjectAttributes);
+		this.getEvents().addHandler(householdsTracker);
+		this.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
 		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
+		
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.householdsTracker, coordAnalyzer.createInstance());
+		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
 		
@@ -331,10 +337,10 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 */
 		// Create txtand kmz files containing distribution of evacuation times. 
 		if (EvacuationConfig.createEvacuationTimePicture) {
-			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer.createInstance(), househouldsTracker, vehiclesTracker);
-			this.addControlerListener(evacuationTimePicture);
-			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
-			this.events.addHandler(evacuationTimePicture);	
+//			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer.createInstance(), householdsTracker, vehiclesTracker);
+//			this.addControlerListener(evacuationTimePicture);
+//			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
+//			this.events.addHandler(evacuationTimePicture);	
 		}
 		
 		 // Create and add an AgentsInEvacuationAreaCounter.
@@ -398,8 +404,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		householdsUtils.printStatistics();
-		householdsUtils.printClosingStatistics();
+//		householdsUtils.printStatistics();
+//		householdsUtils.printClosingStatistics();
 		
 //		householdVehiclesTracker.printClosingStatistics();
 	}
@@ -411,9 +417,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 */
 		this.activityPerformingIdentifier = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap()).createIdentifier();
 		
-		this.joinedHouseholdsIdentifier = new JoinedHouseholdsIdentifierFactory(this.scenarioData.getVehicles(), this.householdsUtils, 
-				this.selectHouseholdMeetingPoint, this.modeAvailabilityChecker, this.vehiclesTracker).createIdentifier();
-		this.getEvents().addHandler((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
+		this.joinedHouseholdsIdentifier = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
+				this.modeAvailabilityChecker, this.vehiclesTracker, this.householdsTracker).createIdentifier();
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		
 		/*
@@ -421,13 +426,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 */
 		this.legPerformingIdentifier = new LegPerformingIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
 		
-		this.agentsToPickupIdentifier = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, walkTravelTimeFactory).createIdentifier();
-		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
-		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
+//		this.agentsToPickupIdentifier = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, walkTravelTimeFactory).createIdentifier();
+//		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
+//		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		
-		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
-		duringLegRerouteTransportModes.add(TransportMode.car);
-		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes).createIdentifier();
+//		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
+//		duringLegRerouteTransportModes.add(TransportMode.car);
+//		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes).createIdentifier();
 	}
 	
 	/*
@@ -459,28 +464,28 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		/*
 		 * During Activity Replanners
 		 */
-		this.currentActivityToMeetingPointReplanner = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsUtils, modeAvailabilityChecker).createReplanner();
+		this.currentActivityToMeetingPointReplanner = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsTracker, modeAvailabilityChecker).createReplanner();
 		this.currentActivityToMeetingPointReplanner.addAgentsToReplanIdentifier(this.activityPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplanner(this.currentActivityToMeetingPointReplanner, EvacuationConfig.evacuationTime, EvacuationConfig.evacuationTime + 1);
 		
-		this.joinedHouseholdsReplanner = new JoinedHouseholdsReplannerFactory(this.scenarioData, router, 1.0, householdsUtils, (JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier).createReplanner();
+		this.joinedHouseholdsReplanner = new JoinedHouseholdsReplannerFactory(this.scenarioData, router, 1.0, householdsTracker, (JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier).createReplanner();
 		this.joinedHouseholdsReplanner.addAgentsToReplanIdentifier(joinedHouseholdsIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplanner(this.joinedHouseholdsReplanner, EvacuationConfig.evacuationTime + 1, Double.MAX_VALUE);
 
 		/*
 		 * During Leg Replanners
 		 */
-		this.currentLegToMeetingPointReplanner = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsUtils).createReplanner();
+		this.currentLegToMeetingPointReplanner = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsTracker).createReplanner();
 		this.currentLegToMeetingPointReplanner.addAgentsToReplanIdentifier(this.legPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.currentLegToMeetingPointReplanner, EvacuationConfig.evacuationTime, EvacuationConfig.evacuationTime + 1);
 				
-		this.pickupAgentsReplanner = new PickupAgentReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
-		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+//		this.pickupAgentsReplanner = new PickupAgentReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+//		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
+//		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, duringLegRerouteShare).createReplanner();
-		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
-		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+//		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, duringLegRerouteShare).createReplanner();
+//		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
+//		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 	}
 
 	private void addPickupFacilities() {
