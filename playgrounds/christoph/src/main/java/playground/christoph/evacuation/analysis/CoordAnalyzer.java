@@ -60,7 +60,7 @@ public class CoordAnalyzer {
 	 * ConcurrentHashMaps and therefore thread-safe.
 	 */
 	public CoordAnalyzer createInstance() {
-		return new CoordAnalyzer(this.affectedArea, this.linkCache, this.facilityCache);
+		return new CoordAnalyzer((Geometry) this.affectedArea.clone(), this.linkCache, this.facilityCache);
 	}
 	
 	public void clearCache() {

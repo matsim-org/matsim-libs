@@ -96,10 +96,13 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		Id householdId = householdsTracker.getPersonsHouseholdId(withinDayAgent.getId());
 		Id meetingPointId = identifier.getHouseholdMeetingPointMapping().get(householdId);
 		
+		// set new meeting point
+		this.householdsTracker.getHouseholdPosition(householdId).setMeetingPointFacilityId(meetingPointId);
+		
 		/*
 		 * The agent is currently not at the Meeting Point. Therefore, we create a new Activity
 		 * which is located there. Additionally, we set a new end time for the current Activity.
-		 */		
+		 */
 		ActivityFacility meetingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(meetingPointId);
 		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
 		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);

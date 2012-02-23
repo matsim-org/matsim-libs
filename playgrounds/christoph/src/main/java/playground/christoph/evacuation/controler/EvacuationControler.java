@@ -418,7 +418,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.activityPerformingIdentifier = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap()).createIdentifier();
 		
 		this.joinedHouseholdsIdentifier = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
-				this.modeAvailabilityChecker, this.vehiclesTracker, this.householdsTracker).createIdentifier();
+				this.modeAvailabilityChecker, this.coordAnalyzer.createInstance(), this.vehiclesTracker, this.householdsTracker).createIdentifier();
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		
 		/*

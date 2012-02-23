@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
@@ -34,15 +35,17 @@ public class JoinedHouseholdsIdentifierFactory implements DuringActivityIdentifi
 	private final Scenario scenario;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
+	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
 	private final HouseholdsTracker householdsTracker;
 	
 	public JoinedHouseholdsIdentifierFactory(Scenario scenario,
 			SelectHouseholdMeetingPoint selectHouseholdMeetingPoint, ModeAvailabilityChecker modeAvailabilityChecker, 
-			VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker) {
+			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker) {
 		this.scenario = scenario;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.householdsTracker = householdsTracker;
 	}
@@ -50,7 +53,7 @@ public class JoinedHouseholdsIdentifierFactory implements DuringActivityIdentifi
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(scenario, selectHouseholdMeetingPoint, 
-				modeAvailabilityChecker, vehiclesTracker, householdsTracker);
+				modeAvailabilityChecker, coordAnalyzer.createInstance(), vehiclesTracker, householdsTracker);
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}
