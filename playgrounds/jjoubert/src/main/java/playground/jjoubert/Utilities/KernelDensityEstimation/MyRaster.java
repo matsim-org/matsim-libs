@@ -31,6 +31,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
@@ -199,18 +200,13 @@ public class MyRaster{
 	 * 		points to be processed.
 	 */
 	public void processPoints(List<com.vividsolutions.jts.geom.Point> list){
-		int counter = 0;
-		int multiplier = 1;
 		log.info("Processing list of points (total " + list.size() + "):");
+		Counter counter = new Counter(" # points: ");
 		for (com.vividsolutions.jts.geom.Point point : list) {
 			processPoint(point);
-			if(++counter == multiplier){
-				// Report progress.
-				log.info("   ...points processed: " + counter);
-				multiplier *= 2;
-			}
+			counter.incCounter();
 		}
-		log.info("   ...points processed: " + counter + " (Done)");
+		counter.printCounter();
 	}
 
 	/**

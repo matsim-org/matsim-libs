@@ -112,9 +112,9 @@ public class createDemandFromSaturnMatrix {
 		}
 		
 		MyDemandMatrix mdm = new MyDemandMatrix();
-		mdm.readLocationCoordinates(coordinateFilename);
+		mdm.readLocationCoordinates(coordinateFilename, 2, 0, 1);
 		mdm.parseMatrix(matrixFilename, "Saturn", "Saturn model received for Sanral project");
-		Scenario sc = mdm.generateDemand(list, new Random(5463), populationFraction);
+		Scenario sc = mdm.generateDemand(list, new Random(5463), populationFraction, "car");
 		
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
 		nr.parse(networkFilename);
