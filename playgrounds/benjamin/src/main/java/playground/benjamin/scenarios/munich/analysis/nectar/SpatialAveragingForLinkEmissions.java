@@ -79,7 +79,7 @@ public class SpatialAveragingForLinkEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkEmissions.class);
 
 	private final static String runNumber1 = "981";
-	private final static String runNumber2 = "982";
+	private final static String runNumber2 = "983";
 	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
 	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
 	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
@@ -89,11 +89,14 @@ public class SpatialAveragingForLinkEmissions {
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
 	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String emissionFile1 = runDirectory1 + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
+	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 
 	//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	//	private final String configFile1 = runDirectory1 + "output_config.xml.gz";
+	
+	Map<Double, Map<Id, Double>> time2CountsPerLink1;
+	Map<Double, Map<Id, Double>> time2CountsPerLink2;
 
 	Network network;
 	FeatureType featureType;
@@ -118,7 +121,7 @@ public class SpatialAveragingForLinkEmissions {
 	private final double smoothingRadius_m = 500.; 
 	static String pollutant = WarmPollutant.NO2.toString();
 	static boolean baseCaseOnly = false;
-	static boolean calculateRelativeChange = true;
+	static boolean calculateRelativeChange = false;
 
 	// OUTPUT
 	private String outPathStub;
@@ -134,9 +137,11 @@ public class SpatialAveragingForLinkEmissions {
 		processEmissions(emissionFile1);
 		Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 		Map<Double, Map<Id, Map<String, Double>>> time2coldEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
+		time2CountsPerLink1 = this.warmHandler.getTime2linkIdLeaveCount();
 
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal1 = sumUpEmissions(time2warmEmissionsTotal1, time2coldEmissionsTotal1);
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered1 = setNonCalculatedEmissionsAndFilter(time2EmissionsTotal1);
+		time2CountsPerLink1 = setNonCalculatedCountsAndFilter(time2CountsPerLink1);
 
 		this.warmHandler.reset(0);
 		this.coldHandler.reset(0);
@@ -144,9 +149,11 @@ public class SpatialAveragingForLinkEmissions {
 		processEmissions(emissionFile2);
 		Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal2 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 		Map<Double, Map<Id, Map<String, Double>>> time2coldEmissionsTotal2 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
-
+		time2CountsPerLink2 = this.warmHandler.getTime2linkIdLeaveCount();
+		
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal2 = sumUpEmissions(time2warmEmissionsTotal2, time2coldEmissionsTotal2);
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered2 = setNonCalculatedEmissionsAndFilter(time2EmissionsTotal2);
+		time2CountsPerLink2 = setNonCalculatedCountsAndFilter(time2CountsPerLink2);
 
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze;
 
@@ -207,7 +214,11 @@ public class SpatialAveragingForLinkEmissions {
 					if(noOfLinksInCell[xIndex][yIndex] >= minimumNoOfLinksInCell){
 						if(isInMunichShape(cellCentroid)){
 // 							if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
-							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
+
+//							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
+							
+							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m);
+							
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 							String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";
 							writer.append(outString);
@@ -306,8 +317,33 @@ public class SpatialAveragingForLinkEmissions {
 				for(String pollutant : entry1.getValue().keySet()){
 					Double emissionsBefore = entry1.getValue().get(pollutant);
 					Double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval).get(linkId).get(pollutant);
-					Double emissionDifference = emissionsAfter - emissionsBefore;
-					emissionDifferenceMap.put(pollutant, emissionDifference);
+					
+					
+					double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
+					
+					double emissionsPerVehicleKmBefore; 
+					double countBefore = this.time2CountsPerLink1.get(endOfTimeInterval).get(linkId);
+					if(countBefore != 0.0){
+						emissionsPerVehicleKmBefore = emissionsBefore / (countBefore * linkLength_km);
+					} else {
+						emissionsPerVehicleKmBefore = 0.0;
+					}
+					
+					double emissionsPerVehicleKmAfter;
+					double countAfter = this.time2CountsPerLink2.get(endOfTimeInterval).get(linkId);
+					if(countAfter != 0.0){
+						emissionsPerVehicleKmAfter = emissionsAfter / (countAfter * linkLength_km);
+					} else {
+						emissionsPerVehicleKmAfter = 0.0;
+					}
+
+					double emissionsPerVehicleKmDifference = emissionsPerVehicleKmAfter - emissionsPerVehicleKmBefore;
+//					double emissionsPerVehicleKmDifference = (emissionsPerVehicleKmAfter - emissionsPerVehicleKmBefore) / emissionsPerVehicleKmBefore;
+					emissionDifferenceMap.put(pollutant, emissionsPerVehicleKmDifference);
+					
+					
+//					Double emissionDifference = emissionsAfter - emissionsBefore;
+//					emissionDifferenceMap.put(pollutant, emissionDifference);
 				}
 				absoluteDelta.put(linkId, emissionDifferenceMap);
 			}
@@ -387,6 +423,34 @@ public class SpatialAveragingForLinkEmissions {
 			time2EmissionsTotalFiltered.put(endOfTimeInterval, emissionsTotalFiltered);
 		}
 		return time2EmissionsTotalFiltered;
+	}
+
+	private Map<Double, Map<Id, Double>> setNonCalculatedCountsAndFilter(Map<Double, Map<Id, Double>> time2CountsPerLink) {
+		Map<Double, Map<Id, Double>> time2CountsTotalFiltered = new HashMap<Double, Map<Id,Double>>();
+
+		for(Double endOfTimeInterval : time2CountsPerLink.keySet()){
+			Map<Id, Double> linkId2Count = time2CountsPerLink.get(endOfTimeInterval);
+			Map<Id, Double> linkId2CountFiltered = new HashMap<Id, Double>();
+			for(Link link : network.getLinks().values()){
+				Coord linkCoord = link.getCoord();
+				Double xLink = linkCoord.getX();
+				Double yLink = linkCoord.getY();
+
+				if(xLink > xMin && xLink < xMax){
+					if(yLink > yMin && yLink < yMax){
+						Id linkId = link.getId();
+						if(linkId2Count.get(linkId) == null){
+							linkId2CountFiltered.put(linkId, 0.);
+						} else {
+							linkId2CountFiltered = linkId2Count;
+						}
+					}
+				}
+			}
+			time2CountsTotalFiltered.put(endOfTimeInterval, linkId2CountFiltered);
+		}
+
+		return time2CountsTotalFiltered;
 	}
 
 	private Map<Double, Map<Id, Map<String, Double>>> sumUpEmissions(

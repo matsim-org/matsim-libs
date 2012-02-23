@@ -69,6 +69,7 @@ public class SpatialAveragingForLinkDemand {
 	FeatureType featureType;
 	Set<Feature> featuresInMunich;
 	
+	WeightedDemandPerLinkHandler weightedDemandPerLinkHandler;
 	DemandPerLinkHandler demandHandler; 
 	SortedSet<String> listOfPollutants;
 
@@ -100,24 +101,32 @@ public class SpatialAveragingForLinkDemand {
 		processEvents(eventsFile1);
 		Map<Double, Map<Id, Integer>> time2Demand1 = this.demandHandler.getDemandPerLinkAndTimeInterval();
 		Map<Double, Map<Id, Integer>> time2DemandFiltered1 = setNonCalculatedDemandAndFilter(time2Demand1);
+//		Map<Double, Map<Id, Double>> time2Demand1 = this.weightedDemandPerLinkHandler.getDemandPerLinkAndTimeInterval();
+//		Map<Double, Map<Id, Double>> time2DemandFiltered1 = setNonCalculatedDemandAndFilterDouble(time2Demand1);
 
 		this.demandHandler.reset(0);
+//		this.weightedDemandPerLinkHandler.reset(0);
 		
 		processEvents(eventsFile2);
 		Map<Double, Map<Id, Integer>> time2Demand2 = this.demandHandler.getDemandPerLinkAndTimeInterval();
 		Map<Double, Map<Id, Integer>> time2DemandFiltered2 = setNonCalculatedDemandAndFilter(time2Demand2);
+//		Map<Double, Map<Id, Double>> time2Demand2 = this.weightedDemandPerLinkHandler.getDemandPerLinkAndTimeInterval();
+//		Map<Double, Map<Id, Double>> time2DemandFiltered2 = setNonCalculatedDemandAndFilterDouble(time2Demand2);
 		
 		Map<Double, Map<Id, Double>> time2DemandMapToAnalyze;
 		
 		if(baseCaseOnly){
 			time2DemandMapToAnalyze = convertMapToDoubleValues(time2DemandFiltered1);
+//			time2DemandMapToAnalyze = time2DemandFiltered1;
 			outPathStub = runDirectory1 + runNumber1 + "." + lastIteration1;
 		} else {
 			if(calculateRelativeChange){
 				time2DemandMapToAnalyze = calculateRelativeDemandDifferences(time2DemandFiltered1, time2DemandFiltered2);
+//				time2DemandMapToAnalyze = calculateRelativeDemandDifferencesDouble(time2DemandFiltered1, time2DemandFiltered2);
 				outPathStub = runDirectory1 + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".relativeDelta";
 			} else {
-				time2DemandMapToAnalyze = calcualateAbsoluteEmissionDifferences(time2DemandFiltered1, time2DemandFiltered2);;
+				time2DemandMapToAnalyze = calcualateAbsoluteEmissionDifferences(time2DemandFiltered1, time2DemandFiltered2);
+//				time2DemandMapToAnalyze = calcualateAbsoluteEmissionDifferencesDouble(time2DemandFiltered1, time2DemandFiltered2);
 				outPathStub = runDirectory1 + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
 			}
 		}
@@ -166,7 +175,11 @@ public class SpatialAveragingForLinkDemand {
 					if(noOfLinksInCell[xIndex][yIndex] >= minimumNoOfLinksInCell){
 						if(isInMunichShape(cellCentroid)){
 					//	if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
-							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
+							
+//							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
+							
+							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m);
+							
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 						
 							Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
@@ -266,7 +279,15 @@ public class SpatialAveragingForLinkDemand {
 				} else {
 					// do nothing
 				}
+				
 				demandDifferenceRatio = (demandAfter - demandBefore) / demandBefore;
+				
+//				double linkLength = this.network.getLinks().get(linkId).getLength();
+//				demandDifferenceRatio = ((demandAfter / linkLength) - (demandBefore / linkLength)) / (demandBefore / linkLength);
+				
+//				double linkFlowCap = this.network.getLinks().get(linkId).getCapacity();
+//				demandDifferenceRatio = ((demandAfter / linkFlowCap) - (demandBefore / linkFlowCap)) / (demandBefore / linkFlowCap);
+				
 				delta.put(linkId, demandDifferenceRatio);
 			}
 			time2RelativeDelta.put(endOfTimeInterval, delta);
@@ -288,6 +309,62 @@ public class SpatialAveragingForLinkDemand {
 				Id linkId = entry1.getKey();
 				int demandBefore = entry1.getValue();
 				int demandAfter = time2Demand2.get(endOfTimeInterval).get(linkId);
+
+//				double demandDifference = demandAfter - demandBefore;
+
+				double linkLength = this.network.getLinks().get(linkId).getLength();
+				double demandDifference= ((demandAfter * linkLength) - (demandBefore * linkLength));
+				
+				delta.put(linkId, demandDifference);
+			}
+			time2AbsoluteDelta.put(endOfTimeInterval, delta);
+		}
+		return time2AbsoluteDelta;
+	}
+
+	private Map<Double, Map<Id, Double>> calculateRelativeDemandDifferencesDouble(
+			Map<Double, Map<Id, Double>> time2Demand1,
+			Map<Double, Map<Id, Double>> time2Demand2) {
+
+		Map<Double, Map<Id, Double>> time2RelativeDelta = new HashMap<Double, Map<Id, Double>>();
+		for(Entry<Double, Map<Id, Double>> entry0 : time2Demand1.entrySet()){
+			double endOfTimeInterval = entry0.getKey();
+			Map<Id, Double> linkId2Demand = entry0.getValue();
+			Map<Id, Double> delta = new HashMap<Id, Double>();
+
+			for(Entry<Id, Double> entry1 : linkId2Demand.entrySet()){
+				Id linkId = entry1.getKey();
+				double demandDifferenceRatio;
+				double demandBefore = entry1.getValue();
+				double demandAfter = time2Demand2.get(endOfTimeInterval).get(linkId);
+				if (demandBefore == 0.0){// cannot calculate relative change if "before" value is 0 ...
+					logger.warn("setting demand in baseCase for link " + linkId + " from " + demandBefore + " to 1.0 ...");
+					demandBefore = 1;
+				} else {
+					// do nothing
+				}
+				demandDifferenceRatio = (demandAfter - demandBefore) / demandBefore;
+				delta.put(linkId, demandDifferenceRatio);
+			}
+			time2RelativeDelta.put(endOfTimeInterval, delta);
+		}
+		return time2RelativeDelta;
+	}
+
+	private Map<Double, Map<Id, Double>> calcualateAbsoluteEmissionDifferencesDouble(
+			Map<Double, Map<Id, Double>> time2Demand1,
+			Map<Double, Map<Id, Double>> time2Demand2) {
+		
+		Map<Double, Map<Id, Double>> time2AbsoluteDelta = new HashMap<Double, Map<Id, Double>>();
+		for(Entry<Double, Map<Id, Double>> entry0 : time2Demand1.entrySet()){
+			double endOfTimeInterval = entry0.getKey();
+			Map<Id, Double> linkId2Demand = entry0.getValue();
+			Map<Id, Double> delta = new HashMap<Id, Double>();
+			
+			for(Entry<Id, Double> entry1 : linkId2Demand.entrySet()){
+				Id linkId = entry1.getKey();
+				double demandBefore = entry1.getValue();
+				double demandAfter = time2Demand2.get(endOfTimeInterval).get(linkId);
 				double demandDifference = demandAfter - demandBefore;
 				delta.put(linkId, demandDifference);
 			}
@@ -305,7 +382,15 @@ public class SpatialAveragingForLinkDemand {
 			for(Id linkId : linkId2Value.keySet()){
 				int intValue = linkId2Value.get(linkId);
 				double doubleValue = intValue;
-				linkId2DoubleValue.put(linkId, doubleValue);
+				
+				
+				
+				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
+				double vehicleKm = doubleValue * linkLength_km;
+				linkId2DoubleValue.put(linkId, vehicleKm);
+				
+				
+//				linkId2DoubleValue.put(linkId, doubleValue);
 			}
 			mapOfDoubleValues.put(endOfTimeInterval, linkId2DoubleValue);
 		}
@@ -341,9 +426,40 @@ public class SpatialAveragingForLinkDemand {
 	return time2DemandFiltered;
 }
 
+	private Map<Double, Map<Id, Double>> setNonCalculatedDemandAndFilterDouble(Map<Double, Map<Id, Double>> time2Demand) {
+		Map<Double, Map<Id, Double>> time2DemandFiltered = new HashMap<Double, Map<Id, Double>>();
+
+		for(Double endOfTimeInterval : time2Demand.keySet()){
+			Map<Id, Double> linkId2Demand = time2Demand.get(endOfTimeInterval);
+			Map<Id, Double> linkId2DemandFiltered = new HashMap<Id, Double>();
+
+			for(Link link : network.getLinks().values()){
+				Coord linkCoord = link.getCoord();
+				Double xLink = linkCoord.getX();
+				Double yLink = linkCoord.getY();
+
+				if(xLink > xMin && xLink < xMax){
+					if(yLink > yMin && yLink < yMax){
+						Id linkId = link.getId();
+							if(linkId2Demand.get(linkId) != null){
+								double demand = linkId2Demand.get(linkId);
+								linkId2DemandFiltered.put(linkId, demand);
+							} else { // setting demand for all links that were not in map to 0
+								linkId2DemandFiltered.put(linkId, 0.0);
+							}
+					}
+				}
+			}					
+		time2DemandFiltered.put(endOfTimeInterval, linkId2DemandFiltered);
+	}
+	return time2DemandFiltered;
+	}
+
 	private void processEvents(String eventsFile) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+//		this.weightedDemandPerLinkHandler = new WeightedDemandPerLinkHandler(this.network, this.simulationEndTime, noOfTimeBins);
+//		eventsManager.addHandler(this.weightedDemandPerLinkHandler);
 		this.demandHandler = new DemandPerLinkHandler(this.simulationEndTime, noOfTimeBins);
 		eventsManager.addHandler(this.demandHandler);
 		reader.readFile(eventsFile);

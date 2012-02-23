@@ -38,13 +38,22 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 	private static final Logger logger = Logger.getLogger(EmissionsPerLinkWarmEventHandler.class);
 
 	Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = new HashMap<Double, Map<Id, Map<WarmPollutant, Double>>>();
-
+	Map<Double, Map<Id, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id,Double>>();
+	
 	private final int noOfTimeBins;
 	private final double timeBinSize;
 
 	public EmissionsPerLinkWarmEventHandler(double simulationEndTime, int noOfTimeBins){
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
+	}
+
+	@Override
+	public void reset(int iteration) {
+		this.time2warmEmissionsTotal.clear();
+		logger.info("Resetting warm emission aggregation to " + this.time2warmEmissionsTotal);
+		this.time2linkIdLeaveCount.clear();
+		logger.info("Resetting linkLeve counter to " + this.time2linkIdLeaveCount);
 	}
 
 	@Override
@@ -58,9 +67,11 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 			if(time > i * timeBinSize && time <= (i + 1) * timeBinSize){
 				endOfTimeInterval = (i + 1) * timeBinSize;
 				Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();;
+				Map<Id, Double> countTotal = new HashMap<Id, Double>();
 				
 				if(time2warmEmissionsTotal.get(endOfTimeInterval) != null){
 					warmEmissionsTotal = time2warmEmissionsTotal.get(endOfTimeInterval);
+					countTotal = time2linkIdLeaveCount.get(endOfTimeInterval);
 
 					if(warmEmissionsTotal.get(linkId) != null){
 						Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
@@ -73,15 +84,25 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 							warmEmissionsSoFar.put(pollutant, newValue);
 						}
 						warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
+						double countsSoFar = countTotal.get(linkId);
+						double newValue = countsSoFar + 1.;
+						countTotal.put(linkId, newValue);
 					} else {
 						warmEmissionsTotal.put(linkId, warmEmissionsOfEvent);
+						countTotal.put(linkId, 1.);
 					}
 				} else {
 					warmEmissionsTotal.put(linkId, warmEmissionsOfEvent);
+					countTotal.put(linkId, 1.);
 				}
 				time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
+				time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
 			}
 		}
+	}
+
+	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {
+		return time2linkIdLeaveCount;
 	}
 
 	public Map<Double, Map<Id, Map<String, Double>>> getWarmEmissionsPerLinkAndTimeInterval() {
@@ -107,11 +128,5 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 			time2warmEmissionsTotal.put(endOfTimeInterval, linkId2warmEmissionsAsString);
 		}
 		return time2warmEmissionsTotal;
-	}
-
-	@Override
-	public void reset(int iteration) {
-		this.time2warmEmissionsTotal.clear();
-		logger.info("Resetting warm emission aggregation to " + this.time2warmEmissionsTotal);
 	}
 }
