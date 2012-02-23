@@ -235,6 +235,7 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 						 */
 						if (!eventsQueue.isEmpty()) {
 							this.processEvent(event);
+							continue;
 						} else {
 							simStepEndBarrier.await();
 							continue;
