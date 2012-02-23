@@ -19,6 +19,8 @@
 
 package playground.anhorni.surprice.preprocess;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,11 +49,12 @@ public class CreateNetwork {
 		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(this.scenario.getNetwork());
 		
 		this.addNodes(networkFactory);
-		this.addLinks(networkFactory);	
+		this.addLinks(networkFactory);
+		
+		this.write(config.findParam(CreateScenario.LCEXP, "outPath"));
 	}
 			
-	private void addLinks(NetworkFactoryImpl networkFactory) {
-		
+	private void addLinks(NetworkFactoryImpl networkFactory) {		
 		int linkCnt = 0;
 		int facilityCnt = 0;
 		double freeSpeed = 35.0 / 3.6;
@@ -119,29 +122,30 @@ public class CreateNetwork {
 		log.info("Created " + facilityCnt + " facilities");
 	}
 	
-	private void addFacility(Link l, int facilityId) {
-		int personsPerLocation = Integer.parseInt(config.findParam(CreateScenario.LCEXP, "personsPerLoc"));
-				
+	private void addFacility(Link l, int facilityId) {				
 		IdImpl id = new IdImpl(Integer.toString(facilityId));
 		this.scenario.getActivityFacilities().createFacility(id, l.getCoord());
 		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));
-		facility.createActivityOption("shop");
 		facility.createActivityOption("home");
 		facility.createActivityOption("work");
-		
-		facility.getActivityOptions().get("shop").setCapacity((double) personsPerLocation * 0.5);
-				
-		ActivityOptionImpl actOptionShop = (ActivityOptionImpl)facility.getActivityOptions().get("shop");
-		OpeningTimeImpl opentimeShop = new OpeningTimeImpl(DayType.wk, 9.5 * 3600.0, 14.5 * 3600);
-		actOptionShop.addOpeningTime(opentimeShop);
-		
+		facility.createActivityOption("shop");
+		facility.createActivityOption("leisure");
+								
 		ActivityOptionImpl actOptionHome = (ActivityOptionImpl)facility.getActivityOptions().get("home");
-		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(DayType.wk, 0 * 3600.0, 24.0 * 3600);
+		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
 		actOptionHome.addOpeningTime(opentimeHome);
 		
 		ActivityOptionImpl actOptionWork = (ActivityOptionImpl)facility.getActivityOptions().get("work");
-		OpeningTimeImpl opentimeWork = new OpeningTimeImpl(DayType.wk, 6 * 3600.0, 20.0 * 3600);
+		OpeningTimeImpl opentimeWork = new OpeningTimeImpl(DayType.wk, 6.0 * 3600.0, 20.0 * 3600);
 		actOptionWork.addOpeningTime(opentimeWork);
+		
+		ActivityOptionImpl actOptionShop = (ActivityOptionImpl)facility.getActivityOptions().get("shop");
+		OpeningTimeImpl opentimeShop = new OpeningTimeImpl(DayType.wk, 7.5 * 3600.0, 18.5 * 3600);
+		actOptionShop.addOpeningTime(opentimeShop);
+		
+		ActivityOptionImpl actOptionLeisure = (ActivityOptionImpl)facility.getActivityOptions().get("leisure");
+		OpeningTimeImpl opentimeLeisure = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
+		actOptionLeisure.addOpeningTime(opentimeLeisure);
 	}
 			
 	private void addNodes(NetworkFactoryImpl networkFactory) {		
@@ -161,6 +165,7 @@ public class CreateNetwork {
 	}
 	
 	public void write(String path) {
+		new File(path).mkdirs();
 		this.writeNetwork(path);
 		this.writeFacilities(path);
 	}

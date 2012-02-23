@@ -9,13 +9,15 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class Zone {	
+	String name;
 	private Coord topleft;
 	private double height;
 	private double length;
 	private List<ActivityFacility> facilitiesInZone = new Vector<ActivityFacility>();
 	private final static Logger log = Logger.getLogger(Zone.class);	
 	
-	public Zone(Coord topleft, double height, double length) {
+	public Zone(String name, Coord topleft, double height, double length) {
+		this.name = name;
 		this.topleft = topleft;
 		this.height = height;
 		this.length = length;
@@ -44,12 +46,11 @@ public class Zone {
 		this.facilitiesInZone.add(facility);
 	}
 	
-	public ActivityFacility getRandomLocationInZone() {
+	public ActivityFacility getRandomLocationInZone(Random random) {
 		if (facilitiesInZone.size() == 0) {
-			log.error("No facilities in zone!");
+			log.error("No facilities in zone " + this.name);
 			System.exit(-1);
 		}
-		Random random = new Random(37835409);
 		int index = random.nextInt(facilitiesInZone.size());
 		return this.facilitiesInZone.get(index);
 	}

@@ -15,9 +15,4 @@ public class DecisionModels {
 	public void addDecsionModelForAgent(DecisionModel decisionModel, Id agentId) {
 		this.decisionModels.put(agentId, decisionModel);
 	}
-	
-	public void init() {
-		
-	}
-
 }

@@ -15,14 +15,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 //import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 //import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.anhorni.surprice.preprocess.PlanPool;
-
 
 public class WeekScenario {	
 	private String [] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-	private PlanPool weekPool;
-	private PlanPool saturdayPool;
-	private PlanPool sundayPool;
 	private TreeMap<Id, AgentMemory> memories = new TreeMap<Id, AgentMemory>();
 	private TreeMap<Id, DecisionModel> decisionModels = new TreeMap<Id, DecisionModel>();
 	
@@ -99,16 +94,16 @@ public class WeekScenario {
 	}
 	
 	private void createPlansPool() {
-    	// create week pool
-    	this.weekPool = new PlanPool();
-    	this.weekPool.create(this.baseScenario.getPopulation());
-    	
-    	// create weekend pools
-    	this.saturdayPool = new PlanPool();  
-    	this.saturdayPool.create(this.saturdayScenario.getPopulation());
-    	
-    	this.sundayPool = new PlanPool();  
-    	this.sundayPool.create(this.sundayScenario.getPopulation());    	
+//    	// create week pool
+//    	this.weekPool = new PlanPool();
+//    	this.weekPool.create(this.baseScenario.getPopulation());
+//    	
+//    	// create weekend pools
+//    	this.saturdayPool = new PlanPool();  
+//    	this.saturdayPool.create(this.saturdayScenario.getPopulation());
+//    	
+//    	this.sundayPool = new PlanPool();  
+//    	this.sundayPool.create(this.sundayScenario.getPopulation());    	
     }
 	
 	private void addPlans2Memory() {
@@ -116,7 +111,7 @@ public class WeekScenario {
 			if (this.memories.get(p.getId()) == null) {
 				this.memories.put(p.getId(), new AgentMemory());
 			}
-			this.memories.get(p.getId()).addPlan(p.getSelectedPlan());
+			//this.memories.get(p.getId()).addPlan(p.getSelectedPlan());
 		}
 	}
 	
@@ -139,15 +134,16 @@ public class WeekScenario {
 	}
 	
     private Plan drawPlanFromPool(String day, Id personId, DecisionModel decisionModel) {    	
-    	if (day.equals("Sat")) {
-    		return this.saturdayPool.getPlan(this.memories.get(personId), decisionModel);	
-	    }
-    	else if (day.equals("Sun")) {
-    		return this.sundayPool.getPlan(this.memories.get(personId), decisionModel);
-    	}
-	    else {
-	    	return this.weekPool.getPlan(this.memories.get(personId), decisionModel);	
-	    }    	
+//    	if (day.equals("Sat")) {
+//    		return this.saturdayPool.getPlan(this.memories.get(personId), decisionModel);	
+//	    }
+//    	else if (day.equals("Sun")) {
+//    		return this.sundayPool.getPlan(this.memories.get(personId), decisionModel);
+//    	}
+//	    else {
+//	    	return this.weekPool.getPlan(this.memories.get(personId), decisionModel);	
+//	    }   
+    	return null;
     }
     
 //    private void writeAgentsMemories() {

@@ -30,11 +30,16 @@ public class CreateScenario {
 	private final static Logger log = Logger.getLogger(CreateScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	public static final String LCEXP = "dc_preprocess";
-	private String outPath;
 	private String configFile;
 	public static String [] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 				
 	public static void main(final String[] args) {
+		
+		if (args.length != 1) {
+			log.error("Provide correct number of arguments ...");
+			System.exit(-1);
+		}
+		
 		CreateScenario scenarioCreator = new CreateScenario();	
 		scenarioCreator.init(args[0]);
 		scenarioCreator.run();			
@@ -52,19 +57,11 @@ public class CreateScenario {
 	private void create() {				
 		Config config = ConfigUtils.loadConfig(this.configFile);			
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
-		
-		this.outPath = config.findParam(CreateScenario.LCEXP, "outPath");
-						
+								
 		CreateNetwork networkCreator = new CreateNetwork();
 		networkCreator.createNetwork(this.scenario, config);
 				
 		CreatePopulation populationCreator = new CreatePopulation();
 		populationCreator.createPopulation(this.scenario, config);	
-		
-		networkCreator.write(this.outPath);
-	}
-
-	public void setOutPath(String outPath) {
-		this.outPath = outPath;
 	}
 }
