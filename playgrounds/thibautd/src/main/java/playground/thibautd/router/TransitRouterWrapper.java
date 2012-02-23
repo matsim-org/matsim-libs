@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -37,12 +39,15 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+import playground.thibautd.router.population.LegWithMainMode;
+
 /**
  * Wraps a {@link TransitRouter}.
  *
  * @author thibautd
  */
 public class TransitRouterWrapper implements RoutingModule {
+	private static final String MAIN_MODE = TransportMode.pt;
 	private static final StageActivityTypes CHECKER =
 		new StageActivityTypesImpl(
 				Arrays.asList( new String[]{ PtConstants.TRANSIT_ACTIVITY_TYPE } ) );
@@ -87,7 +92,9 @@ public class TransitRouterWrapper implements RoutingModule {
 		}
 
 		//XXX: use ModeRouteFactory instead?
-		firstLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
+		Route route = new GenericRouteImpl(fromLinkId, toLinkId);
+		route.setTravelTime( firstLeg.getTravelTime() );
+		firstLeg.setRoute( route );
 
 		Leg lastLeg = baseTrip.get(baseTrip.size() - 1);
 		toLinkId = toFacility.getLinkId();
@@ -96,13 +103,17 @@ public class TransitRouterWrapper implements RoutingModule {
 		}
 
 		//XXX: use ModeRouteFactory instead?
-		lastLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
+		route = new GenericRouteImpl(fromLinkId, toLinkId);
+		route.setTravelTime( lastLeg.getTravelTime() );
+		lastLeg.setRoute( route );
 
 		boolean isFirstLeg = true;
 		Coord nextCoord = null;
 		for (Leg leg2 : baseTrip) {
 			if (isFirstLeg) {
-				trip.add( leg2 );
+				LegWithMainMode legWithMainMode = new LegWithMainMode( leg2 );
+				legWithMainMode.setMainMode( MAIN_MODE );
+				trip.add( legWithMainMode );
 				isFirstLeg = false;
 			}
 			else {
@@ -126,7 +137,10 @@ public class TransitRouterWrapper implements RoutingModule {
 					act.setMaximumDuration(0.0);
 					trip.add(act);
 				}
-				trip.add(leg2);
+
+				LegWithMainMode legWithMainMode = new LegWithMainMode( leg2 );
+				legWithMainMode.setMainMode( MAIN_MODE );
+				trip.add( legWithMainMode );
 			}
 		}
 

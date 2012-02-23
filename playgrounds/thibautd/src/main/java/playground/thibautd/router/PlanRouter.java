@@ -81,11 +81,34 @@ public class PlanRouter implements PlanAlgorithm {
 		return routingHandler;
 	}
 
+	/**
+	 * Extracts the plan structure using {@link TripRouter#tripsToLegs(Plan)},
+	 * routes it using {@link #run(Person, List)}, and updates the plan so that
+	 * it references the routed sequence.
+	 */
 	@Override
 	public void run(final Plan plan) {
-		List<PlanElement> planStructure = routingHandler.tripsToLegs( plan );
+		List<PlanElement> newSequence = routingHandler.tripsToLegs( plan );
+		newSequence = run( plan.getPerson() , newSequence );
+		updatePlanElements( plan , newSequence );
+	}
+
+	/**
+	 * The actual processing method of the {@link #run(Plan)} method.
+	 *
+	 * It routes the trips defined by the legs in the planStructure sequence,
+	 * and returns the full routed structure.
+	 * @param person the {@link Person} to route
+	 * @param planStructure the sequence of plan elements, where the trips are replaced
+	 * by legs. This can be obtained by the {@link TripRouter#tripsToLegs(Plan)}
+	 * and {@link TripRouter#tripsToLegs(List)} methods.
+	 *
+	 * @return the routed sequence of plan elements
+	 */
+	public List<PlanElement> run(
+			final Person person,
+			final List<PlanElement> planStructure) {
 		List<PlanElement> newPlanElements = new ArrayList<PlanElement>();
-		Person person = plan.getPerson();
 
 		Facility destination = null;
 		Iterator<PlanElement> pes = planStructure.iterator();
@@ -139,7 +162,7 @@ public class PlanRouter implements PlanAlgorithm {
 			origin = destination;
 		}
 
-		updatePlanElements( plan , newPlanElements );
+		return newPlanElements;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

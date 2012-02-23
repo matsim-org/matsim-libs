@@ -22,6 +22,7 @@ package playground.thibautd.router;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.population.Activity;
@@ -29,9 +30,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.utils.misc.Time;
+
+import playground.thibautd.router.population.LegWithMainMode;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -95,11 +101,24 @@ public class TripRouter {
 	 * @return the simplified sequence of plan elements
 	 */
 	public List<PlanElement> tripsToLegs(final Plan plan) {
+		return tripsToLegs( plan.getPlanElements() );
+	}
+
+	/**
+	 * Actual processing method used by {@link #tripsToLegs(Plan)}. Allows
+	 * to analyse any sequence of plan elements, even outside of a plan container.
+	 * @param plan the sequence of {@link PlanElement} to analyse.
+	 * @return the simplified sequence of plan elements
+	 */
+	public List<PlanElement> tripsToLegs(final List<PlanElement> plan) {
 		List<PlanElement> simplifiedPlan = new ArrayList<PlanElement>();
 		List<PlanElement> currentTrip = new ArrayList<PlanElement>();
 
-		for (PlanElement currentElement : plan.getPlanElements()) {
+		double now = 0;
+		double startOfTrip = Time.UNDEFINED_TIME;
+		for (PlanElement currentElement : plan) {
 			if (currentElement instanceof Activity) {
+				now = updateNow( now , currentElement );
 				Activity act = (Activity) currentElement;
 
 				if (checker.isStageActivity( act.getType() )) {
@@ -108,14 +127,22 @@ public class TripRouter {
 				else {
 					if (currentTrip.size() > 0) {
 						Leg newLeg = new LegImpl( identifyMainMode( currentTrip ) );
-						// set the time attributes?
+
+						// set the time
+						newLeg.setDepartureTime( startOfTrip);
+						newLeg.setTravelTime( now - startOfTrip );
+
 						simplifiedPlan.add( newLeg );
 						currentTrip.clear();
+					}
+					else {
+						startOfTrip = now;
 					}
 					simplifiedPlan.add( act );
 				}
 			}
 			else if (currentElement instanceof Leg) {
+				now = updateNow( now , currentElement );
 				currentTrip.add( currentElement );
 			}
 			else {
@@ -158,11 +185,13 @@ public class TripRouter {
 		throw new UnknownModeException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
 	}
 
-	// TODO: include a "main mode" attribute in leg, and use it
 	private static String identifyMainMode(final List<PlanElement> trip) {
-		String mode = ((Leg) trip.get( 0 )).getMode();
+		// check better (ie, main mode should be the same for all legs in trip)?
+		Leg firstLeg = (Leg) trip.get( 0 );
 
-		return mode.equals( TransportMode.transit_walk ) ? TransportMode.pt : mode;
+		return firstLeg instanceof LegWithMainMode ?
+			((LegWithMainMode) firstLeg).getMainMode() :
+			firstLeg.getMode();
 	}
 
 	public static class UnknownModeException extends RuntimeException {
@@ -171,5 +200,44 @@ public class TripRouter {
 			super( msg );
 		}
 	}
+
+	private static double updateNow(
+			final double now,
+			final PlanElement pe) {
+		if (now == Time.UNDEFINED_TIME) {
+			throw new RuntimeException("got wrong now to update with plan element" + pe);
+		}
+
+		if (pe instanceof Activity) {
+			Activity act = (Activity) pe;
+			double endTime = act.getEndTime();
+			double startTime = act.getStartTime();
+			double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
+			if (endTime != Time.UNDEFINED_TIME) {
+				// use fromAct.endTime as time for routing
+				return endTime;
+			}
+			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+				// use fromAct.startTime + fromAct.duration as time for routing
+				return startTime + dur;
+			}
+			else if (dur != Time.UNDEFINED_TIME) {
+				// use last used time + fromAct.duration as time for routing
+				return now + dur;
+			}
+			else {
+				return Time.UNDEFINED_TIME;
+			}
+		}
+		else {
+			Route route = ((Leg) pe).getRoute();
+
+			double travelTime = route != null ? route.getTravelTime() : ((Leg) pe).getTravelTime();
+
+			return now + (travelTime != Time.UNDEFINED_TIME ? travelTime : 0);
+		}
+	}	
+
+
 }
 
