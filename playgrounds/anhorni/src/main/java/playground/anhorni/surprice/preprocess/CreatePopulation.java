@@ -101,6 +101,8 @@ public class CreatePopulation {
 		double sideLength = Double.parseDouble(config.findParam(CreateScenario.LCEXP, "sideLength"));
 		Zone centerZone = new Zone("centerZone", (Coord) new CoordImpl(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 1000.0, 1000.0);	
 		this.initZone(centerZone);
+		Zone topLeftZone =  new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, sideLength), 1000.0, 1000.0); 
+		this.initZone(topLeftZone);
 		Zone bottomLeftZone =  new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, 1000.0), 1000.0, 1000.0); 
 		this.initZone(bottomLeftZone);
 		Zone bottomRightZone =  new Zone("bottomRightZone", (Coord) new CoordImpl(sideLength - 1000.0, 0.0), 1000.0, 1000.0);
@@ -111,6 +113,8 @@ public class CreatePopulation {
 		this.initZone(bottomRightLargeZone);
 		
 		int personCnt = this.addPersons(centerZone, centerZone, 0);
+		personCnt += this.addPersons(topLeftZone, centerZone, personCnt);
+		personCnt += this.addPersons(bottomLeftZone, topRightLargeZone, personCnt);
 		personCnt += this.addPersons(bottomLeftZone, topRightLargeZone, personCnt);
 		personCnt += this.addPersons(bottomRightZone, bottomRightLargeZone, personCnt);
 		
