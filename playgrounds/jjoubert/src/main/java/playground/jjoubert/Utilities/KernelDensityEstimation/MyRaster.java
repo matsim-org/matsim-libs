@@ -30,6 +30,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -70,12 +71,6 @@ public class MyRaster{
 	private Double originY = null;
 	private double maxValue = 0;
 	
-	/* JWJ: 2012/02/20
-	 * The raster seems to have problems when dealing with negative coordinates, 
-	 * for example when using Gauteng in the SA-Albers CRS.
-	 */
-	private double xOffset = 0.0;
-	private double yOffset = 0.0;
 	
 	/**
 	 * Constructs an instance of the raster-generating class.
@@ -199,11 +194,11 @@ public class MyRaster{
 	 * @param list of type <code>com.vividsolutions.jts.geom.Point</code> 
 	 * 		points to be processed.
 	 */
-	public void processPoints(List<com.vividsolutions.jts.geom.Point> list){
+	public void processPoints(List<Coord> list){
 		log.info("Processing list of points (total " + list.size() + "):");
 		Counter counter = new Counter(" # points: ");
-		for (com.vividsolutions.jts.geom.Point point : list) {
-			processPoint(point);
+		for (Coord coord : list) {
+			processPoint(coord);
 			counter.incCounter();
 		}
 		counter.printCounter();
@@ -230,7 +225,9 @@ public class MyRaster{
 	 * @param point that is to be processed.
 	 * @return
 	 */
-	public boolean processPoint(com.vividsolutions.jts.geom.Point point) {
+	public boolean processPoint(Coord coord) {
+		GeometryFactory gf = new GeometryFactory();
+		Point point = gf.createPoint(new Coordinate(coord.getX(), coord.getY()));
 		boolean result = false;
 		if(envelope.contains(point)){
 			/*
@@ -250,7 +247,6 @@ public class MyRaster{
 			double value = 0;
 			Point p = null;
 			Polygon pixel = null;
-			GeometryFactory gf = new GeometryFactory();
 			
 			switch (this.KdeType) {
 			case 0:
