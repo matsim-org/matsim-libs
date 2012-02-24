@@ -31,6 +31,7 @@ import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 
 
@@ -47,9 +48,12 @@ public class DgSylviaSignalModelFactory implements SignalModelFactory {
 
 	private DgSensorManager sensorManager;
 
-	public DgSylviaSignalModelFactory(DefaultSignalModelFactory delegate, DgSensorManager sensorManager) {
+	private DgSylviaConfig sylviaConfig;
+	
+	public DgSylviaSignalModelFactory(DefaultSignalModelFactory delegate, DgSensorManager sensorManager, DgSylviaConfig sylviaConfig) {
 		this.delegate = delegate;
 		this.sensorManager = sensorManager;
+		this.sylviaConfig = sylviaConfig;
 	}
 
 	@Override
@@ -66,7 +70,7 @@ public class DgSylviaSignalModelFactory implements SignalModelFactory {
 	public SignalController createSignalSystemController(String controllerIdentifier) {
 		if (DgSylviaController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Creating " + DgSylviaController.CONTROLLER_IDENTIFIER);
-			return new DgSylviaController(this.sensorManager);
+			return new DgSylviaController(this.sylviaConfig, this.sensorManager);
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier);
 	}

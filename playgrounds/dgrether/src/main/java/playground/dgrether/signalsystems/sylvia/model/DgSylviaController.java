@@ -38,6 +38,7 @@ import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
@@ -52,10 +53,6 @@ public class DgSylviaController implements SignalController {
 	
 	public final static String CONTROLLER_IDENTIFIER = "SylviaSignalControl";
 
-	private final static double SENSOR_DISTANCE = 10.0;
-	
-	private final static double GAP_SECONDS = 5.0;
-	
 	private static int extensionPointsDumpCount = 0;
 	
 	private SignalSystem system = null;
@@ -71,6 +68,8 @@ public class DgSylviaController implements SignalController {
 	private int extensionTime = 0;
 	private int secondInCycle = 0;
 
+	private DgSylviaConfig sylviaConfig;
+	
 	private DgExtensionPoint currentExtensionPoint = null;
 
 	private DgSensorManager sensorManager = null;
@@ -88,7 +87,7 @@ public class DgSylviaController implements SignalController {
 
 	private Map<Double, SensorRecord> lastTimeStepSensorRecordsMap = null;
 	
-	public DgSylviaController(DgSensorManager sensorManager) {
+	public DgSylviaController(DgSylviaConfig sylviaConfig, DgSensorManager sensorManager) {
 		this.sensorManager = sensorManager;
 		this.init();
 	}
@@ -238,12 +237,12 @@ public class DgSylviaController implements SignalController {
 			this.lastTimeStepSensorRecordsMap = new HashMap<Double, SensorRecord>();
 		}
 		else {
-			this.lastTimeStepSensorRecordsMap.remove(timeSeconds - GAP_SECONDS);
+			this.lastTimeStepSensorRecordsMap.remove(timeSeconds - this.sylviaConfig.getGapSeconds());
 		}
 		SensorRecord sensorRecord = new SensorRecord();
 		this.lastTimeStepSensorRecordsMap.put(timeSeconds, sensorRecord);
 		for (Id linkId : this.links4extensionPointMap.get(extensionPoint)){
-			Integer noCars = this.sensorManager.getNumberOfCarsAtDistancePerSecond(linkId, SENSOR_DISTANCE, timeSeconds);
+			Integer noCars = this.sensorManager.getNumberOfCarsAtDistancePerSecond(linkId, this.sylviaConfig.getSensorDistanceMeter(), timeSeconds);
 			log.error("Link " + linkId + " noCarsAtSecond " + noCars + " noCarsOnLink: " + this.sensorManager.getNumberOfCarsOnLink(linkId));
 			sensorRecord.linkIdNoCarsMap.put(linkId, noCars);
 		}
@@ -256,7 +255,7 @@ public class DgSylviaController implements SignalController {
 		for (SignalData signal : extensionPoint.getSignals()){
 //			log.error("system id : " + this.system.getId() + " signal: " + signal.getId());
 			if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
-				noCars = this.sensorManager.getNumberOfCarsInDistance(signal.getLinkId(), SENSOR_DISTANCE, timeSeconds);
+				noCars = this.sensorManager.getNumberOfCarsInDistance(signal.getLinkId(), this.sylviaConfig.getSensorDistanceMeter(), timeSeconds);
 				if (noCars > 0){
 //					log.debug(" Dehnung Aktiv!!");
 					return true;
@@ -277,12 +276,12 @@ public class DgSylviaController implements SignalController {
 	
 	private boolean checkTrafficConditionsOld(double timeSeconds, DgExtensionPoint extensionPoint){
 		//we have not enough measures to check for the specified gap
-		if (this.lastTimeStepSensorRecordsMap.size() < GAP_SECONDS) {
+		if (this.lastTimeStepSensorRecordsMap.size() < this.sylviaConfig.getGapSeconds()) {
 			return true;
 		}
 //		log.error("extension check for traffic conditions...");
 		//there are GAP_SECONDS many measures
-		for (double t = timeSeconds - GAP_SECONDS + 1; t <= timeSeconds; t++){
+		for (double t = timeSeconds - this.sylviaConfig.getGapSeconds() + 1; t <= timeSeconds; t++){
 			SensorRecord gapSensorRecord = this.lastTimeStepSensorRecordsMap.get(t);
 			for (Id linkId : this.links4extensionPointMap.get(extensionPoint)){
 				int noCars = gapSensorRecord.linkIdNoCarsMap.get(linkId);
@@ -316,7 +315,7 @@ public class DgSylviaController implements SignalController {
 	public void simulationInitialized(double simStartTimeSeconds) {
 		Tuple<SignalPlan, DgSylviaSignalPlan> plans = this.searchActivePlans();
 		this.activeSylviaPlan = plans.getSecond();
-		this.setFixedTimeCycleInSylviaPlan(plans);
+		this.activeSylviaPlan.setFixedTimeCycle(plans.getFirst().getCycleTime());
 		this.setMaxExtensionTimeInSylviaPlan(plans);
 		this.calculateExtensionPoints(plans);
 		if (extensionPointsDumpCount < 1){
@@ -332,9 +331,6 @@ public class DgSylviaController implements SignalController {
 		plans.getSecond().setMaxExtensionTime(ext);
 	}
 
-	private void setFixedTimeCycleInSylviaPlan(Tuple<SignalPlan, DgSylviaSignalPlan> plans) {
-		plans.getSecond().setFixedTimeCycle(plans.getFirst().getCycleTime());
-	}
 
 	private Tuple<SignalPlan,DgSylviaSignalPlan> searchActivePlans() {
 		DgSylviaSignalPlan sylviaPlan = null;
@@ -376,7 +372,7 @@ public class DgSylviaController implements SignalController {
 			//calculate max green time
 			SignalGroupSettingsData fixedTimeSettings = ((DatabasedSignalPlan)fixedTime).getPlanData().getSignalGroupSettingsDataByGroupId().get(settings.getSignalGroupId());
 			int fixedTimeGreen = DgSignalsUtils.calculateGreenTimeSeconds(fixedTimeSettings, fixedTime.getCycleTime());
-			int maxGreen = (int) (fixedTimeGreen * 1.5);
+			int maxGreen = (int) (fixedTimeGreen * this.sylviaConfig.getMaxGreenScale());
 			if (maxGreen >= fixedTime.getCycleTime()){
 				maxGreen = fixedTimeGreen;
 			}
@@ -409,7 +405,7 @@ public class DgSylviaController implements SignalController {
 			for (SignalData signal : extPointSignals){
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 //					log.error("system: " + this.system.getId() + " signal: " + signal.getId() + " has no lanes...");
-					this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), SENSOR_DISTANCE);
+					this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), this.sylviaConfig.getSensorDistanceMeter());
 				}
 				else {
 					for (Id laneId : signal.getLaneIds()){
@@ -418,8 +414,6 @@ public class DgSylviaController implements SignalController {
 					}
 				}
 			}
-			//TODO change this
-//			this.links4extensionPointMap.put(extPoint, linkIdList);
 		}
 	}
 	

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -38,7 +39,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.utils.DgNet2Tex;
 
 /**
  * @author dgrether
@@ -49,32 +49,22 @@ public class Daganzo2012ScenarioGenerator {
 	private static final Logger log = Logger
 			.getLogger(Daganzo2012ScenarioGenerator.class);
 
-	public static String DAGANZO_SVN_DIR = "shared-svn/studies/dgrether/daganzo2012/scenario_1/";
+	public static String DAGANZO_SVN_DIR = "shared-svn/studies/dgrether/daganzo2012/scenario_2/";
 
 	public static String DAGANZOBASEDIR = DgPaths.REPOS + DAGANZO_SVN_DIR;
 
 	public static final String NETWORK_INPUTFILE = DAGANZOBASEDIR
-			+"network.xml";
+			+"network22.xml";
 
 	private static final String PLANS_OUTPUTFILE = DAGANZOBASEDIR
-			+ "plans.xml";
-
-	private static final String CONFIG_INPUTFILE = DAGANZOBASEDIR
-			+ "config.xml";
-
-
-	public static int iterations = 4000;
-
+			+ "plans_long_route_selected.xml";
+//			+ "plans_short_route_selected.xml";
 	private static final int agents = 5000;
 
-	public static final String runId = "1150";
-
-	public static final String OUTPUTDIR = "/media/data/work/repos/runs-svn/run" + runId + "/";
-	
 	private ScenarioImpl scenario = null;
 
 	private Config config;
-
+	
 	private boolean isUseReplanning = false;
 
 	private Id getId(int i){
@@ -82,16 +72,16 @@ public class Daganzo2012ScenarioGenerator {
 	}
 	
 	public void createScenario() {
-		this.config = ConfigUtils.loadConfig(CONFIG_INPUTFILE);
+		this.config = ConfigUtils.createConfig();
 		config.network().setInputFile(NETWORK_INPUTFILE);
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 
-//		this.createPlans(this.scenario);
-//		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
-//		popWriter.writeV5(PLANS_OUTPUTFILE);
+		this.createPlans(this.scenario);
+		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
+		popWriter.writeV5(PLANS_OUTPUTFILE);
 		
-		DgNet2Tex net2tex = new DgNet2Tex();
-		net2tex.convert(this.scenario.getNetwork(), NETWORK_INPUTFILE + ".tex");
+//		DgNet2Tex net2tex = new DgNet2Tex();
+//		net2tex.convert(this.scenario.getNetwork(), "/media/data/work/repos/shared-svn/studies/dgrether/daganzo2012/workplan/network22.xml.tex");
 		
 		log.info("scenario written!");
 	}
@@ -106,16 +96,18 @@ public class Daganzo2012ScenarioGenerator {
 //		Link l7 = network.getLinks().get(scenario.createId("7"));
 		PopulationFactory factory = population.getFactory();
 
-		for (int i = 1; i <= this.agents; i++) {
+		for (int i = 1; i <=  agents; i++) {
 			PersonImpl p = (PersonImpl) factory.createPerson(scenario.createId(Integer
 					.toString(i)));
-			homeEndTime+= 1;
+			if ((i +1) % 2 == 0){
+				homeEndTime += 1;
+			}
 			Plan plan = null;
 			Plan plan2 = null;
-			if (! isUseReplanning){
-			  plan = this.createPlan(false, factory, homeEndTime, network);
+			if (! this.isUseReplanning){
+			  plan = this.createPlan(true, factory, homeEndTime, network);
 			  p.addPlan(plan);
-        plan2 = this.createPlan(true, factory, homeEndTime, network);
+        plan2 = this.createPlan(false, factory, homeEndTime, network);
         p.addPlan(plan2);
 			}
 			else {

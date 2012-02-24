@@ -43,6 +43,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFanCreator;
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
 import playground.dgrether.signalsystems.cottbus.footballdemand.SimpleCottbusFanCreator;
+import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
 
@@ -100,7 +101,7 @@ public class CottbusFootballBatch {
 			controler.addControlerListener(cbfbControllerListener);
 			// enable sylvia
 			if (baseConfig.scenario().isUseSignalSystems()){
-				controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
+				controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(new DgSylviaConfig()));
 			}
 			controler.run();
 			if (cbfbControllerListener.getAverageTraveltime() != null){

@@ -35,6 +35,7 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
 
 
@@ -47,8 +48,13 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 
 	private SignalSystemsManager signalManager;
 	private DgSensorManager sensorManager;
-
+	private DgSylviaConfig sylviaConfig;
 	
+	public DgSylviaSignalControlerListener(DgSylviaConfig sylviaConfig) {
+		this.sylviaConfig = sylviaConfig;
+	}
+
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		ScenarioImpl scenario = event.getControler().getScenario();
@@ -60,7 +66,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		event.getControler().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getControler().getEvents());
+				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager, this.sylviaConfig) , event.getControler().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		
 		SignalEngine engine = new QSimSignalEngine(this.signalManager);

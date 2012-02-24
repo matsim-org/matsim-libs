@@ -52,7 +52,8 @@ public class SylviaMain {
 //		DgCottbusSylviaAnalysisControlerListener analysis = new DgCottbusSylviaAnalysisControlerListener();
 		
 		Controler controler = new Controler(args2);
-		controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
+		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+		controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(sylviaConfig));
 //		controler.addControlerListener(analysis);
 		controler.setOverwriteFiles(true);
 		controler.run();

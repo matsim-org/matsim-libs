@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Daganzo2012Vis
+ * DgSylviaConfig
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,61 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.daganzo2012;
-
-import org.matsim.run.OTFVis;
+package playground.dgrether.signalsystems.sylvia;
 
 
 /**
  * @author dgrether
  *
  */
-public class Daganzo2012Vis {
+public class DgSylviaConfig {
+	
+	private boolean useMaximalExtension = true;
+	
+	private double sensorDistanceMeter= 10.0;
+	
+	private double gapSeconds = 5.0;
+	
+	private double signalGroupMaxGreenScale = 1.5;
 
-	public static void main(String[] args) {
-		
-		String runid = "1550";
-		String iteration = "200";
-		
-		String file = "/media/data/work/repos/runs-svn/run"+runid+"/ITERS/it."+iteration+"/"+runid+"."+iteration+".otfvis.mvi";
-		OTFVis.playMVI(file);
+	
+//	public boolean isUseMaximalExtension() {
+//		return useMaximalExtension;
+//	}
+//
+//	public void setUseMaximalExtension(boolean useMaximalExtension) {
+//		this.useMaximalExtension = useMaximalExtension;
+//	}
+
+	
+	public double getSensorDistanceMeter() {
+		return sensorDistanceMeter;
 	}
 
+	
+	public void setSensorDistanceMeter(double sensorDistanceMeter) {
+		this.sensorDistanceMeter = sensorDistanceMeter;
+	}
+
+	
+	public double getGapSeconds() {
+		return gapSeconds;
+	}
+
+	
+	public void setGapSeconds(double gapSeconds) {
+		this.gapSeconds = gapSeconds;
+	}
+
+	
+	public double getMaxGreenScale() {
+		return signalGroupMaxGreenScale;
+	}
+
+	
+	public void setMaxGreenScale(double maxGreenScale) {
+		this.signalGroupMaxGreenScale = maxGreenScale;
+	}
+	
+	
 }

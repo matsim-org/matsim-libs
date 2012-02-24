@@ -22,6 +22,8 @@ package playground.dgrether.signalsystems.sylvia.controler;
 import org.matsim.signalsystems.controler.SignalsControllerListener;
 import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 
+import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
+
 
 /**
  * @author dgrether
@@ -29,9 +31,15 @@ import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
  */
 public class DgSylviaControlerListenerFactory implements SignalsControllerListenerFactory {
 
+	private DgSylviaConfig sylviaConfig;
+	
+	public DgSylviaControlerListenerFactory(DgSylviaConfig sylviaConfig) {
+		this.sylviaConfig = sylviaConfig;
+	}
+
 	@Override
 	public SignalsControllerListener createSignalsControllerListener() {
-		return new DgSylviaSignalControlerListener();
+		return new DgSylviaSignalControlerListener(this.sylviaConfig);
 	}
 
 }

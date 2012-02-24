@@ -78,7 +78,7 @@ public class DgNet2Tex {
 		writer.newLine();
 		writer.write("	\\begin{tikzpicture}");
 		writer.newLine();
-		writer.write("	[scale=0.7,");
+		writer.write("	[scale=1.0,");
 		writer.newLine();
 		writer.write("vertex/.style={circle,draw,thick,inner sep=0pt,minimum size=4mm}");
 		writer.newLine();

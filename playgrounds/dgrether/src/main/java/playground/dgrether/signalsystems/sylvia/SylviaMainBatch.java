@@ -95,7 +95,7 @@ public class SylviaMainBatch {
 			baseConfig.controler().setRunId("sylvia_scale" + scale);
 			
 			controler = new Controler(baseConfig);
-			controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
+			controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(new DgSylviaConfig()));
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
 			controler.run();
