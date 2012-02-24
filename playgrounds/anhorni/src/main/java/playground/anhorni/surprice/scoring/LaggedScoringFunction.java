@@ -17,37 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice;
+package playground.anhorni.surprice.scoring;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
-import playground.anhorni.surprice.scoring.LaggedScoringFunctionFactory;
+import playground.anhorni.surprice.AgentMemory;
 
-public class DayControler extends Controler {
+public class LaggedScoringFunction extends CharyparNagelOpenTimesScoringFunction {
 	
-	private AgentMemories memories = new AgentMemories();
-	
-	public DayControler(final ScenarioImpl scenario) {
-		super(scenario);	
-		super.setOverwriteFiles(true);
-	} 
-	
-	public DayControler(final Config config, AgentMemories memories) {
-		super(config);	
-		super.setOverwriteFiles(true);
-		this.memories = memories;
-	} 
-	
-	public DayControler(final String configFile) {
-		super(configFile);	
-		super.setOverwriteFiles(true);
+	private AgentMemory memory;
+
+	public LaggedScoringFunction(Plan plan, CharyparNagelScoringParameters params, ActivityFacilities facilities,
+			AgentMemory memory) {
+		super(plan, params, facilities);
+		this.memory = memory;
 	}
 	
-	protected void setUp() {
-	    super.setUp();	           
-	  	LaggedScoringFunctionFactory scoringFunctionFactory = new LaggedScoringFunctionFactory(this, this.config.planCalcScore(), this.network, this.memories);	  		
-	  	this.setScoringFunctionFactory(scoringFunctionFactory);
+	
+public void finish() {		
+		super.finish();	
+		for (PlanElement pe : super.plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				this.score += 0.0; // TODO: include lag effects from memory
+			}
+		}
 	}
+	
 }

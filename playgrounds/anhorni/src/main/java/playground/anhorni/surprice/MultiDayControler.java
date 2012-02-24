@@ -28,13 +28,15 @@ import playground.anhorni.surprice.preprocess.CreateScenario;
 public class MultiDayControler {
 	
 	private final static Logger log = Logger.getLogger(MultiDayControler.class);
-	
+		
 	public static void main (final String[] args) {		
 		if (args.length != 1) {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
 		}		
-		String configFile = args[0];		
+		String configFile = args[0];
+		
+		AgentMemories memories = new AgentMemories();
 				
 		for (String day : CreateScenario.days) {
 			Config config = ConfigUtils.loadConfig(configFile);
@@ -46,7 +48,7 @@ public class MultiDayControler {
 			config.setParam("plans", "inputPlansFile", plansPath + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
 			
-			DayControler controler = new DayControler(config);
+			DayControler controler = new DayControler(config, memories);
 			controler.run();
 		}
 		log.info("Week simulated, yep, ..........");
