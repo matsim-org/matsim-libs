@@ -20,6 +20,8 @@
 package playground.anhorni.surprice;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.anhorni.surprice.preprocess.CreateScenario;
 
@@ -34,13 +36,19 @@ public class MultiDayControler {
 		}		
 		String configFile = args[0];		
 				
-		for (String day : CreateScenario.days) {	
-			DayControler controler = new DayControler(configFile);
-			String outPath = controler.getConfig().controler().getOutputDirectory();
-			String plansPath = controler.getConfig().plans().getInputFile();
-			controler.getConfig().setParam("controler", "outputDirectory", outPath + "/" + day);
-			controler.getConfig().setParam("plans", "inputPlansFile", plansPath + "/" + day);
+		for (String day : CreateScenario.days) {
+			Config config = ConfigUtils.loadConfig(configFile);
+			
+			String outPath = config.controler().getOutputDirectory();
+			String plansPath = config.plans().getInputFile();
+			
+			config.setParam("controler", "outputDirectory", outPath + "/" + day);
+			config.setParam("plans", "inputPlansFile", plansPath + "/" + day + "/plans.xml");
+			config.setParam("controler", "runId", day);
+			
+			DayControler controler = new DayControler(config);
 			controler.run();
 		}
+		log.info("Week simulated, yep, ..........");
     }
 }
