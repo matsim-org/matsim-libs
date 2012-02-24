@@ -93,7 +93,6 @@ import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
-import playground.christoph.evacuation.router.util.FuzzyTravelTimeDataCollector;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
@@ -426,13 +425,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 */
 		this.legPerformingIdentifier = new LegPerformingIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
 		
-//		this.agentsToPickupIdentifier = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, walkTravelTimeFactory).createIdentifier();
-//		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
-//		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
+		this.agentsToPickupIdentifier = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, walkTravelTimeFactory).createIdentifier();
+		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
+		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		
-//		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
-//		duringLegRerouteTransportModes.add(TransportMode.car);
-//		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes).createIdentifier();
+		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
+		duringLegRerouteTransportModes.add(TransportMode.car);
+		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes).createIdentifier();
 	}
 	
 	/*
@@ -444,10 +443,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 			
 		// use fuzzyTravelTimes
-		FuzzyTravelTimeDataCollector fuzzyTravelTimeDataCollector = new FuzzyTravelTimeDataCollector(this.scenarioData);
-		this.getEvents().addHandler(fuzzyTravelTimeDataCollector);
-		
-		FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.getTravelTimeCollectorFactory(), fuzzyTravelTimeDataCollector);
+		FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.getTravelTimeCollectorFactory(), this.householdsTracker, this.vehiclesTracker);
 		
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
@@ -479,13 +475,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.currentLegToMeetingPointReplanner.addAgentsToReplanIdentifier(this.legPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.currentLegToMeetingPointReplanner, EvacuationConfig.evacuationTime, EvacuationConfig.evacuationTime + 1);
 				
-//		this.pickupAgentsReplanner = new PickupAgentReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-//		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
-//		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.pickupAgentsReplanner = new PickupAgentReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
+		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-//		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, duringLegRerouteShare).createReplanner();
-//		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
-//		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, duringLegRerouteShare).createReplanner();
+		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
+		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 	}
 
 	private void addPickupFacilities() {

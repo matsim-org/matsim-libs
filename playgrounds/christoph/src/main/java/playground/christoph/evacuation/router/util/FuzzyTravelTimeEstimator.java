@@ -20,12 +20,21 @@
 
 package playground.christoph.evacuation.router.util;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import playground.christoph.evacuation.mobsim.AgentPosition;
+import playground.christoph.evacuation.mobsim.AgentsTracker;
+import playground.christoph.evacuation.mobsim.Tracker.Position;
+import playground.christoph.evacuation.mobsim.VehiclesTracker;
 
 /**
  * Get travel times from a given travel time calculator and adds a random fuzzy value.
@@ -37,18 +46,25 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 
+	private static final Logger log = Logger.getLogger(FuzzyTravelTimeEstimator.class);
+	
 	private static final long hashCodeModFactor = 123456;
 
+	private final Scenario scenario;
 	private final PersonalizableTravelTime travelTime;
-	private final FuzzyTravelTimeDataCollector fuzzyTravelTimeDataCollector;
-
+	private final AgentsTracker agentsTracker;
+	private final VehiclesTracker vehiclesTracker;
+	
 	private Id pId;
 	private int pIdHashCode;
 	private double personFuzzyFactor;
 	
-	/*package*/ FuzzyTravelTimeEstimator(PersonalizableTravelTime travelTime, FuzzyTravelTimeDataCollector fuzzyTravelTimeDataCollector) {
+	/*package*/ FuzzyTravelTimeEstimator(Scenario scenario, PersonalizableTravelTime travelTime, AgentsTracker agentsTracker,
+			VehiclesTracker vehiclesTracker) {
+		this.scenario = scenario;
 		this.travelTime = travelTime;
-		this.fuzzyTravelTimeDataCollector = fuzzyTravelTimeDataCollector;
+		this.agentsTracker = agentsTracker;
+		this.vehiclesTracker = vehiclesTracker;
 	}
 	
 	@Override
@@ -84,7 +100,22 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	 * and 1.0 (distance ~ 15000.0).
 	 */
 	private double calcDistanceFuzzyFactor(Link link) {
-		double distance = CoordUtils.calcDistance(fuzzyTravelTimeDataCollector.getAgentLocations().get(pId), link.getCoord());
+		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(pId);
+		Position positionType = agentPosition.getPositionType();
+		Coord coord = null;
+		if (positionType == Position.LINK) {
+			coord = scenario.getNetwork().getLinks().get(agentPosition.getPositionId()).getCoord();
+		} else if (positionType == Position.FACILITY) {
+			coord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getCoord();
+		} else if (positionType == Position.VEHICLE) {
+			Id linkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());
+			coord = scenario.getNetwork().getLinks().get(linkId).getCoord();
+		} else {
+			log.warn("Agent's position is undefined! Id: " + this.pId);
+			return 1.0;
+		}
+		
+		double distance = CoordUtils.calcDistance(coord, link.getCoord());
 		
 		return (1 / (Math.exp(-distance/1500.0) + 4.0));
 	}
@@ -99,7 +130,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	}
 	
 	public static void main(String[] args) {
-		FuzzyTravelTimeEstimator ftte = new FuzzyTravelTimeEstimator(null, null);
+		FuzzyTravelTimeEstimator ftte = new FuzzyTravelTimeEstimator(null, null, null, null);
 
 		Gbl.startMeasurement();
 		double sum = 0.0;

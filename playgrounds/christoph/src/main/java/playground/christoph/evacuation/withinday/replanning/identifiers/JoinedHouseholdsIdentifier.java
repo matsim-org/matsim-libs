@@ -413,7 +413,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 					 */
 					else {
 						this.householdDepartures.remove(id);
-						if (time > EvacuationConfig.evacuationTime) {
+						if (time > EvacuationConfig.evacuationTime && !facilityId.toString().contains("pickup")) {
 							log.warn("Household is joined at a facility which is not its meeting facility. Id: " + id);							
 						}
 					}
