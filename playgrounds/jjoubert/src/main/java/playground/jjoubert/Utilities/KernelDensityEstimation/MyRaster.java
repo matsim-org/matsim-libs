@@ -405,6 +405,10 @@ public class MyRaster{
 		return this.imageMatrix.get(x, y);
 	}
 	
+	public void increaseImageMatrixValue(int x, int y, double value){
+		this.imageMatrix.setQuick(x, y, this.imageMatrix.get(x, y) + value);
+	}
+	
 	
 	public void writeRasterForR(String filename){
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
@@ -435,6 +439,14 @@ public class MyRaster{
 				throw new RuntimeException("Could not close BufferedWriter " + filename);
 			}
 		}
+	}
+	
+	public int rows(){
+		return this.imageMatrix.rows();
+	}
+	
+	public int columns(){
+		return this.imageMatrix.columns();
 	}
 	
 
