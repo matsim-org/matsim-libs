@@ -88,6 +88,7 @@ public class DgSylviaController implements SignalController {
 	private Map<Double, SensorRecord> lastTimeStepSensorRecordsMap = null;
 	
 	public DgSylviaController(DgSylviaConfig sylviaConfig, DgSensorManager sensorManager) {
+		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
 		this.init();
 	}
