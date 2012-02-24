@@ -92,6 +92,48 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 		totalMean = totalMean / totalTrips;
 		
 		double tripsPerPerson = (double)totalTrips / (double)numPersons;
+				
+		double meanReplannedAbsoluteTripDeviation = 0.0;
+		for (double d : this.replannedTrips) {
+			meanReplannedAbsoluteTripDeviation += Math.abs(meanReplannedTrip - d);
+		}
+		meanReplannedAbsoluteTripDeviation = meanReplannedAbsoluteTripDeviation / this.replannedTrips.size();
+		
+		double s2 = 0.0;
+		for (double d : this.replannedTrips) {
+			s2 = s2 + Math.pow(d - meanReplannedTrip, 2);
+		}
+		s2 = s2 / (this.replannedTrips.size() - 1);
+		double replannedStandardDeviation = Math.pow(s2, 0.5);
+		
+		double meanNotReplannedAbsoluteTripDeviation = 0.0;
+		for (double d : this.notReplannedTrips) {
+			meanNotReplannedAbsoluteTripDeviation += Math.abs(meanNotReplannedTrip - d);
+		}
+		meanNotReplannedAbsoluteTripDeviation = meanNotReplannedAbsoluteTripDeviation / this.notReplannedTrips.size();
+		
+		s2 = 0.0;
+		for (double d : this.notReplannedTrips) {
+			s2 = s2 + Math.pow(d - meanNotReplannedTrip, 2);
+		}
+		s2 = s2 / (this.notReplannedTrips.size() - 1);
+		double notReplannedStandardDeviation = Math.pow(s2, 0.5);
+		
+		List<Double> totalTripsList = new ArrayList<Double>();
+		totalTripsList.addAll(replannedTrips);
+		totalTripsList.addAll(notReplannedTrips);
+		double meanTotalAbsoluteTripDeviation = 0.0;
+		for (double d : totalTripsList) {
+			meanTotalAbsoluteTripDeviation += Math.abs(totalMean - d);
+		}
+		meanTotalAbsoluteTripDeviation = meanTotalAbsoluteTripDeviation / totalTrips;
+		
+		s2 = 0.0;
+		for (double d : totalTripsList) {
+			s2 = s2 + Math.pow(d - totalMean, 2);
+		}
+		s2 = s2 / (totalTrips - 1);
+		double totalStandardDeviation = Math.pow(s2, 0.5);
 		
 		log.info("");
 		log.info("number of Persons: \t" + numPersons);
@@ -106,6 +148,15 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 		log.info("mean replanned daily Trip length: \t" + meanReplannedTrip * tripsPerPerson);
 		log.info("mean not replanned daily Trips length: \t" + meanNotReplannedTrip * tripsPerPerson);
 		log.info("mean total daily Trips length: \t" + totalMean * tripsPerPerson);
+		log.info("");
+		log.info("mean absolute replanned trip deviation: \t" + meanReplannedAbsoluteTripDeviation);
+		log.info("replanned trips standard deviation: \t" + replannedStandardDeviation);
+		log.info("");
+		log.info("mean absolute not replanned trip deviation: \t" + meanNotReplannedAbsoluteTripDeviation);
+		log.info("not replanned trips standard deviation: \t" + notReplannedStandardDeviation);
+		log.info("");
+		log.info("mean total absolute trip deviation: \t" + meanTotalAbsoluteTripDeviation);
+		log.info("total trips standard deviation: \t" + totalStandardDeviation);
 		log.info("");
 	}
 

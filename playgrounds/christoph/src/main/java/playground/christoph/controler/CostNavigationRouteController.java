@@ -29,7 +29,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -41,7 +46,10 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -83,7 +91,8 @@ public class CostNavigationRouteController extends WithinDayController implement
 	/*package*/ int followedAndNotAccepted = 1;
 	/*package*/ int notFollowedAndAccepted = 1;
 	/*package*/ int notFollowedAndNotAccepted = 1;
-		
+	/*package*/ String eventsFile = null;
+	
 	protected DuringLegIdentifier duringLegIdentifier;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
@@ -191,9 +200,37 @@ public class CostNavigationRouteController extends WithinDayController implement
 	protected void runMobSim() {
 		
 		selector = new SelectHandledAgentsByProbability();
-//		super.getFixedOrderSimulationListener().addSimulationListener(selector);
 		
-		super.runMobSim();
+		/*
+		 * If no events file is given, the simulation is run...
+		 */
+		if (eventsFile == null) {
+			super.runMobSim();
+		}
+		
+		/*
+		 * ... otherwise the events file is parsed and analyzed.
+		 */
+		else {
+			QSim qSim = new QSim(scenarioData, events, new DefaultQSimEngineFactory());
+			ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+			PopulationAgentSource agentSource = new PopulationAgentSource(scenarioData.getPopulation(), agentFactory, qSim);
+			qSim.addAgentSource(agentSource);
+			agentSource.insertAgentsIntoMobsim();
+			
+			/*
+			 * To create consistent results, the same random numbers have to be used. When running
+			 * a real simulation, for each node in the network, an additional random object is created.
+			 * Since those objects are not created when the QSim does not run, we create them by our own.
+			 */
+			for (int i = 0; i < this.scenarioData.getNetwork().getNodes().size(); i++) MatsimRandom.getLocalInstance();
+			
+			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
+						
+			this.notifySimulationInitialized(new SimulationInitializedEventImpl(qSim));
+			log.info("Agents to be handled: " + this.duringLegIdentifier.getHandledAgents().size());
+			new EventsReaderXMLv1(getEvents()).parse(eventsFile);
+		}		
 		
 		printStatistics();
 		this.analyzeTravelTimes.printStatistics();
@@ -243,6 +280,8 @@ public class CostNavigationRouteController extends WithinDayController implement
 	private final static String FOLLOWEDANDNOTACCEPTED = "-followedandnotaccepted";
 	private final static String NOTFOLLOWEDANDACCEPTED = "-notfollowedandaccepted";
 	private final static String NOTFOLLOWEDANDNOTACCEPTED = "-notfollowedandnotaccepted";
+	
+	private final static String EVENTSFILE = "-eventsfile";
 	
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -331,6 +370,11 @@ public class CostNavigationRouteController extends WithinDayController implement
 					if (value < 0) value = 0;
 					controller.notFollowedAndNotAccepted = value;
 					log.info("notFollowedAndNotAccepted: " + value);
+				}  else if (args[i].equalsIgnoreCase(EVENTSFILE)) {
+					i++;
+					String value = args[i];
+					controller.eventsFile = value;
+					log.info("events file to analyze: " + value);
 				} else log.warn("Unknown Parameter: " + args[i]);
 			}
 
