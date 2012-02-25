@@ -29,25 +29,32 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.qnetsimengine.KaiHybridEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.KaiHybridNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 
-public class KaiController {
+public class Main {
 
 	public static void main(String[] args) {
 		
+		final KaiHybridEngine hybridEngine = new KaiHybridEngine() ;
+		
+		// reconfigure the netsimEngineFactory such that it uses the KaiHybridNetworkFactory:
 		final QNetsimEngineFactory netsimEngineFactory = new QNetsimEngineFactory() {
 			@Override
 			public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
-//				return new QNetsimEngine( (QSim) sim, random ) ;
-				return new QNetsimEngine( (QSim)sim, random, new KaiHybridNetworkFactory() ) ;
+				return new QNetsimEngine( (QSim)sim, random, new KaiHybridNetworkFactory(hybridEngine) ) ;
 			}
 		} ;
-		MobsimFactory mobsimFactory = new MobsimFactory() {
+		
+		// make sure that the mobsim indeed uses that reconfigured netsimEngineFactory:
+		final MobsimFactory mobsimFactory = new MobsimFactory() {
 			@Override
 			public Simulation createMobsim(Scenario sc, EventsManager events) {
-				return QSim.createQSimAndAddAgentSource(sc, events, netsimEngineFactory) ;
+				QSim qsim = QSim.createQSimAndAddAgentSource(sc, events, netsimEngineFactory) ;
+				qsim.addMobsimEngine(hybridEngine) ;
+				return qsim ;
 			}
 			
 		} ;
