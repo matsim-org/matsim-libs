@@ -47,7 +47,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 
 	private QNode[] nodesArray = null;
 	private List<QNode> nodesList = null;
-	private List<AbstractQLink> linksList = new ArrayList<AbstractQLink>();
+	private List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
 
 	/** 
 	 * This is the collection of nodes that have to be activated in the current time step.
@@ -62,7 +62,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	private final Map<Id, QNode> nodesToActivate = new ConcurrentHashMap<Id, QNode>();
 	
 	/** This is the collection of links that have to be activated in the current time step */
-	private final ArrayList<AbstractQLink> linksToActivate = new ArrayList<AbstractQLink>();
+	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
 	
 	/*package*/ QSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier) {
 		this.simulateAllNodes = simulateAllNodes;
@@ -80,7 +80,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 		this.nodesList = nodes;
 	}
 
-	/*package*/ void setLinks(List<AbstractQLink> links) {
+	/*package*/ void setLinks(List<QLinkInternalI> links) {
 		this.linksList = links;
 	}
 
@@ -149,8 +149,8 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				/*
 				 * Move Links
 				 */
-				ListIterator<AbstractQLink> simLinks = this.linksList.listIterator();
-				AbstractQLink link;
+				ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
+				QLinkInternalI link;
 				boolean isActive;
 
 				while (simLinks.hasNext()) {
@@ -178,7 +178,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	}	// run()
 
 	@Override
-	protected void activateLink(AbstractQLink link) {
+	protected void activateLink(QLinkInternalI link) {
 		if (!simulateAllLinks) {
 			linksToActivate.add(link);
 		}
@@ -214,7 +214,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 		else return nodesList.size();
 	}
 
-	public NetsimNetworkFactory<QNode,AbstractQLink> getNetsimNetworkFactory() {
+	public NetsimNetworkFactory<QNode,QLinkInternalI> getNetsimNetworkFactory() {
 		return new DefaultQNetworkFactory() ;
 	}
 

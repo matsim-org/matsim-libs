@@ -66,7 +66,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id linkId) {
 		Id vehicleId = agent.getPlannedVehicleId() ;
-		AbstractQLink qlink = (AbstractQLink) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
+		QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			if (vehicleBehavior == VehicleBehavior.TELEPORT && agent instanceof PersonDriverAgentImpl) {
@@ -103,7 +103,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 					log.info("No more occurrences of teleported vehicles will be reported.");
 				}
 			}
-			AbstractQLink qlinkOld = (AbstractQLink) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
+			QLinkInternalI qlinkOld = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
 			qlinkOld.removeParkedVehicle(vehicle.getId());
 		}
 	}

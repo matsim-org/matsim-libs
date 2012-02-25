@@ -48,7 +48,7 @@ import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
  * @author nagel
  *
  */
-abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
+abstract class AbstractQLink extends QLinkInternalI {
 	
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
@@ -119,7 +119,7 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 		return this.additionalAgentsOnLink.remove(mobsimAgentId);
 	}
 
-	/*package*/ Collection<MobsimAgent> getUnmodifiableAdditionalAgentsOnLink(){
+	/*package*/ Collection<MobsimAgent> getAdditionalAgentsOnLink(){
 		return Collections.unmodifiableCollection( this.additionalAgentsOnLink.values());
 	}
 	

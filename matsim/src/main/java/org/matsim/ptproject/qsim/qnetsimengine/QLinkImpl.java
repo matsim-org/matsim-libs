@@ -457,7 +457,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	@Override
-	boolean bufferIsEmpty() {
+	boolean isNotOfferingVehicle() {
 		return this.buffer.isEmpty();
 	}
 
@@ -465,7 +465,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	boolean hasSpace() {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
-		boolean storageOk = this.usedStorageCapacity < getStorageCapacity();
+		boolean storageOk = this.usedStorageCapacity < this.storageCapacity ;
 		if ( !HOLES ) {
 			return storageOk ;
 		}
@@ -626,15 +626,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	/**
-	 * @return Returns the maximum number of vehicles that can be placed on the
-	 *         link at a time.
-	 */
-	@Override
-	/*package*/ double getStorageCapacity() {
-		return this.storageCapacity;
-	}
-
-	/**
 	 * @return the total space capacity available on that link (includes the space on lanes if available)
 	 */
 	double getSpaceCap() {
@@ -715,7 +706,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	@Override
-	QVehicle popFirstFromBuffer() {
+	QVehicle popFirstVehicle() {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -725,12 +716,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	@Override
-	QVehicle getFirstFromBuffer() {
+	QVehicle getFirstVehicle() {
 		return this.buffer.peek();
 	}
 
 	@Override
-	double getBufferLastMovedTime() {
+	double getLastMovementTimeOfFirstVehicle() {
 		return this.bufferLastMovedTime;
 	}
 
@@ -819,7 +810,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					QLinkImpl.this.waitingList);
 
 			snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
-					QLinkImpl.this.getUnmodifiableAdditionalAgentsOnLink(), cnt2);
+					QLinkImpl.this.getAdditionalAgentsOnLink(), cnt2);
 
 			// return:
 			return positions;
@@ -867,27 +858,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 	}
 
-	/**
-	 * this method is here so that aspects of QLane and QLink can be addressed via the same syntax.
-	 */
-	@Override
-	AbstractQLink getQLink() {
-		return this;
-	}
-
-	@Override
 	double getInverseSimulatedFlowCapacity() {
 		return this.inverseSimulatedFlowCapacityCache ;
-	}
-
-	@Override
-	int getBufferStorage() {
-		return this.bufferStorageCapacity ;
-	}
-
-	@Override
-	double getLength() {
-		return this.length ;
 	}
 
 }

@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.network.Node;
 /**
  * @author dgrether
  */
-public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
+public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 
 	@Override
-	public AbstractQLink createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 		return new QLinkImpl(link, network, toQueueNode);
 	}
 

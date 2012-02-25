@@ -40,22 +40,22 @@ import org.matsim.api.core.v01.Id;
  * 
  * @author dgrether
  */
-abstract class AbstractQLane extends VisLane {
+abstract class AbstractQLane {
 	/**
 	 * equivalent to a Buffer.isEmpty() operation
 	 */
-	abstract boolean bufferIsEmpty();
+	abstract boolean isNotOfferingVehicle();
 
 	/**
 	 * equivalent to a Buffer.pop() operation
 	 */
-	abstract QVehicle popFirstFromBuffer();
+	abstract QVehicle popFirstVehicle();
 	/**
 	 * equivalent to a Buffer.peek() operation
 	 */
-	abstract QVehicle getFirstFromBuffer();
+	abstract QVehicle getFirstVehicle();
 
-	abstract double getBufferLastMovedTime();
+	abstract double getLastMovementTimeOfFirstVehicle();
 
 	abstract boolean hasGreenForToLink(Id toLinkId);
 	

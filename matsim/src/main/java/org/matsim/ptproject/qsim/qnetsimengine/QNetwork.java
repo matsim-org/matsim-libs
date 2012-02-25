@@ -40,25 +40,25 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dgrether
  */
 
-class QNetwork implements VisNetwork, NetsimNetwork {
+class QNetwork implements NetsimNetwork {
 
-	private final Map<Id, AbstractQLink> links;
+	private final Map<Id, QLinkInternalI> links;
 
 	private final Map<Id, QNode> nodes;
 
 	private final Network network;
 
-	private final NetsimNetworkFactory<QNode, AbstractQLink> queueNetworkFactory;
+	private final NetsimNetworkFactory<QNode, QLinkInternalI> queueNetworkFactory;
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 	
 	QNetsimEngine simEngine;
 
-	QNetwork(final Network network, final NetsimNetworkFactory<QNode, AbstractQLink> factory ) {
+	QNetwork(final Network network, final NetsimNetworkFactory<QNode, QLinkInternalI> factory ) {
 		this.network = network;
 		this.queueNetworkFactory = factory;
-		this.links = new LinkedHashMap<Id, AbstractQLink>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.links = new LinkedHashMap<Id, QLinkInternalI>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<Id, QNode>((int)(network.getLinks().size()*1.1), 0.95f);
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
@@ -90,7 +90,7 @@ class QNetwork implements VisNetwork, NetsimNetwork {
 	}
 
 	@Override
-	public Map<Id, AbstractQLink> getNetsimLinks() {
+	public Map<Id, QLinkInternalI> getNetsimLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
@@ -105,7 +105,7 @@ class QNetwork implements VisNetwork, NetsimNetwork {
 	}
 
 	@Override
-	public AbstractQLink getNetsimLink(final Id id) {
+	public QLinkInternalI getNetsimLink(final Id id) {
 		return this.links.get(id);
 	}
 

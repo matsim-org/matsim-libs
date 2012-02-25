@@ -309,14 +309,14 @@ public class QLinkLanesImpl extends AbstractQLink {
 	}
 	
 	@Override
-	boolean bufferIsEmpty() {
+	boolean isNotOfferingVehicle() {
 		//if there is only one lane...
 		if (this.toNodeQueueLanes == null){
-			return this.firstLane.bufferIsEmpty();
+			return this.firstLane.isNotOfferingVehicle();
 		}
 		//otherwise we have to do a bit more work
 		for (QLane lane : this.toNodeQueueLanes){
-			if (!lane.bufferIsEmpty()){
+			if (!lane.isNotOfferingVehicle()){
 				return false;
 			}
 		}
@@ -425,17 +425,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 		return this.firstLane;
 	}
 
-	@Override
-	AbstractQLink getQLink() {
-		return this;
-	}
-
-	@Override
-	double getLength() {
-		return this.getLink().getLength();
-	}
-
-	
 	/**
 	 * Inner class to capsulate visualization methods
 	 * @author dgrether
@@ -473,7 +462,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 					QLinkLanesImpl.this.waitingList);
 			cnt2 = QLinkLanesImpl.this.waitingList.size();
 			agentSnapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.link,
-					QLinkLanesImpl.this.getUnmodifiableAdditionalAgentsOnLink(), cnt2);
+					QLinkLanesImpl.this.getAdditionalAgentsOnLink(), cnt2);
 
 			return positions;
 		}
@@ -486,13 +475,13 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 
 	@Override
-	double getBufferLastMovedTime() {
+	double getLastMovementTimeOfFirstVehicle() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
 
 	@Override
-	QVehicle getFirstFromBuffer() {
+	QVehicle getFirstVehicle() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
@@ -504,26 +493,8 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 
 	@Override
-	QVehicle popFirstFromBuffer() {
+	QVehicle popFirstVehicle() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
-
-	@Override
-	double getInverseSimulatedFlowCapacity() {
-		throw new UnsupportedOperationException("Method should not be called on this instance");
-	}
-
-
-	@Override
-	double getStorageCapacity() {
-		throw new UnsupportedOperationException("Method should not be called on this instance");
-	}
-
-
-	@Override
-	int getBufferStorage() {
-		throw new UnsupportedOperationException("Method should not be called on this instance");
-	}
-
 
 }

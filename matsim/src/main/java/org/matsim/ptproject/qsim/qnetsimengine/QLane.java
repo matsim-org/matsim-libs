@@ -291,7 +291,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 	@Override
-	boolean bufferIsEmpty() {
+	boolean isNotOfferingVehicle() {
 		return this.buffer.isEmpty();
 	}
 
@@ -435,7 +435,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 	boolean isActive() {
 		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
-		|| (!this.bufferIsEmpty()) || (!this.transitVehicleStopQueue.isEmpty());
+		|| (!this.isNotOfferingVehicle()) || (!this.transitVehicleStopQueue.isEmpty());
 		return active;
 	}
 
@@ -589,7 +589,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 	@Override
-	QVehicle popFirstFromBuffer() {
+	QVehicle popFirstVehicle() {
 		double now = this.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -618,7 +618,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 	@Override
-	QVehicle getFirstFromBuffer() {
+	QVehicle getFirstVehicle() {
 		return this.buffer.peek();
 	}
 
@@ -643,12 +643,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return this.vehQueue.size();
 	}
 
-	/**
-	 * @return Returns the maximum number of vehicles that can be placed on the
-	 *         link at a time.
-	 */
-	@Override
-	double getStorageCapacity() {
+	/*package*/ double getStorageCapacity() {
+		// only for tests
 		return this.storageCapacity;
 	}
 
@@ -736,18 +732,17 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return this.vehQueue;
 	}
 
-	@Override
-	public AbstractQLink getQLink() {
+	AbstractQLink getQLink() {
 		return this.qLink;
 	}
 
-	@Override
 	public double getLength(){
+		// needed once, by OTFVis
 		return this.length;
 	}
 
 	@Override
-	double getBufferLastMovedTime() {
+	double getLastMovementTimeOfFirstVehicle() {
 		return this.bufferLastMovedTime;
 	}
 
@@ -858,15 +853,14 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		}
 	}
 
-	@Override
 	double getInverseSimulatedFlowCapacity() {
 		return this.inverseSimulatedFlowCapacity ;
 	}
 
-	@Override
-	int getBufferStorage() {
-		return this.bufferStorageCapacity ;
-	}
+//	@Override
+//	int getBufferStorage() {
+//		return this.bufferStorageCapacity ;
+//	}
 
 	void setOTFLane(OTFLane otfLane) {
 		this.visdata.visLane = otfLane;

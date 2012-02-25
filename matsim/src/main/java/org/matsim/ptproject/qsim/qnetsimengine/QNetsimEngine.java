@@ -89,15 +89,15 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	/*package*/ static boolean useNodeArray = false;
 	/*package*/   QNetwork network;
 
-	/*package*/  List<AbstractQLink> allLinks = null;
+	/*package*/  List<QLinkInternalI> allLinks = null;
 	/*package*/  List<QNode> allNodes = null;
 	/** This is the collection of links that have to be moved in the simulation */
-	/*package*/  List<AbstractQLink> simLinksList = new ArrayList<AbstractQLink>();
+	/*package*/  List<QLinkInternalI> simLinksList = new ArrayList<QLinkInternalI>();
 	/** This is the collection of nodes that have to be moved in the simulation */
 	/*package*/  QNode[] simNodesArray = null;
 	/*package*/  List<QNode> simNodesList = null;
 	/** This is the collection of links that have to be activated in the current time step */
-	/*package*/  ArrayList<AbstractQLink> simActivateLinks = new ArrayList<AbstractQLink>();
+	/*package*/  ArrayList<QLinkInternalI> simActivateLinks = new ArrayList<QLinkInternalI>();
 
 	/** This is the collection of nodes that have to be activated in the current time step */
 	/*package*/  ArrayList<QNode> simActivateNodes = new ArrayList<QNode>();
@@ -122,7 +122,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		this( sim, random, null ) ;
 	}
 
-	public QNetsimEngine(final QSim sim, final Random random, NetsimNetworkFactory<QNode, AbstractQLink> netsimNetworkFactory ) {
+	public QNetsimEngine(final QSim sim, final Random random, NetsimNetworkFactory<QNode, QLinkInternalI> netsimNetworkFactory ) {
 		this.random = random;
 		this.qsim = sim;
 
@@ -178,7 +178,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
 		vehicles.put(veh.getId(), (QVehicle) veh);
-		AbstractQLink qlink = network.getNetsimLinks().get(startLinkId);
+		QLinkInternalI qlink = network.getNetsimLinks().get(startLinkId);
 		qlink.addParkedVehicle(veh);
 	}
 
@@ -202,7 +202,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		this.allLinks = new ArrayList<AbstractQLink>(network.getNetsimLinks().values());
+		this.allLinks = new ArrayList<QLinkInternalI>(network.getNetsimLinks().values());
 		this.allNodes = new ArrayList<QNode>(network.getNetsimNodes().values());
 		if (useNodeArray) {
 			this.simNodesArray = network.getNetsimNodes().values().toArray(new QNode[network.getNetsimNodes().values().size()]);
@@ -225,7 +225,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (AbstractQLink link : this.allLinks) {
+		for (QLinkInternalI link : this.allLinks) {
 			link.clearVehicles();
 		}
 	}
@@ -269,8 +269,8 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	private void moveLinks(final double time) {
 		reactivateLinks();
-		ListIterator<AbstractQLink> simLinks = this.simLinksList.listIterator();
-		AbstractQLink link;
+		ListIterator<QLinkInternalI> simLinks = this.simLinksList.listIterator();
+		QLinkInternalI link;
 		boolean isActive;
 
 		while (simLinks.hasNext()) {
@@ -283,7 +283,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	}
 
 	@Override
-	protected void activateLink(final AbstractQLink link) {
+	protected void activateLink(final QLinkInternalI link) {
 		if (!simulateAllLinks) {
 			this.simActivateLinks.add(link);
 		}
@@ -351,12 +351,12 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 		Id linkId = planAgent.getCurrentLinkId(); 
-		AbstractQLink qLink = network.getNetsimLink(linkId);
+		QLinkInternalI qLink = network.getNetsimLink(linkId);
 		qLink.registerAdditionalAgentOnLink(planAgent);
 	}
 
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-		AbstractQLink qLink = network.getNetsimLink(linkId);
+		QLinkInternalI qLink = network.getNetsimLink(linkId);
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
 

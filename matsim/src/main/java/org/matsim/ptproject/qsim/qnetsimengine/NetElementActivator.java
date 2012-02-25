@@ -26,7 +26,7 @@ public abstract class NetElementActivator {
 	
 	abstract int getNumberOfSimulatedNodes();
 	
-	protected abstract void activateLink(final AbstractQLink link);
+	protected abstract void activateLink(final QLinkInternalI link);
 
 	abstract int getNumberOfSimulatedLinks();
 } 

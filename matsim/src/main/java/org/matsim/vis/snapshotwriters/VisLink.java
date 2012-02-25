@@ -9,9 +9,11 @@ import org.matsim.api.core.v01.network.Link;
  * @author nagel
  *
  */
-public interface VisLink extends VisObject {
+public interface VisLink {
 
 	Link getLink() ;
 	
 	Collection<? extends VisVehicle> getAllVehicles() ;
+	
+	VisData getVisData() ;
 }

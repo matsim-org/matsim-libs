@@ -25,19 +25,19 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 
 
-public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
+public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 
-	private NetsimNetworkFactory<QNode, AbstractQLink> delegate;
+	private NetsimNetworkFactory<QNode, QLinkInternalI> delegate;
 	private LaneDefinitions20 laneDefinitions;
 
-	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, AbstractQLink> delegate, LaneDefinitions20 laneDefintions){
+	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, QLinkInternalI> delegate, LaneDefinitions20 laneDefintions){
 		this.delegate = delegate;
 		this.laneDefinitions = laneDefintions;
 	}
 
 	@Override
-	public AbstractQLink createNetsimLink(Link link, QNetwork network, QNode queueNode) {
-		AbstractQLink ql = null;
+	public QLinkInternalI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
+		QLinkInternalI ql = null;
 		if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
 			ql = new QLinkLanesImpl(link, network, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()));
 		}
