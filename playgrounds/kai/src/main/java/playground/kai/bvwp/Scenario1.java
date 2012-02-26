@@ -20,7 +20,7 @@ class Scenario1 {
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV) ;
+				ValuesForAUserType pvValues = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.XX, 1000. ) ; // number of persons
 				pvValues.setByEntry( Entry.km, 10. ) ;
 				pvValues.setByEntry( Entry.hrs, 1. ) ;
@@ -53,7 +53,7 @@ class Scenario1 {
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.PV).incByEntry( Entry.hrs, -0.1 ) ;
+			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -0.1 ) ;
 			railValues.getByType(Type.GV).incByEntry( Entry.hrs, -0.1 ) ;
 			
 			// modify some demand (presumably as a result):

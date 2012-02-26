@@ -11,7 +11,7 @@ class EconomicValues0 {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV) ;
+				ValuesForAUserType pvValues = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.23 ) ;
 				pvValues.setByEntry( Entry.hrs, -5.00 ) ;
 			}
@@ -24,7 +24,7 @@ class EconomicValues0 {
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
-				ValuesForAUserType pvValues = railValues.getByType(Type.PV) ;
+				ValuesForAUserType pvValues = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -5.00 ) ;
 			}

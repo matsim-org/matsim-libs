@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * Values.java
+ * project: kai
+ * KaiHybridEngine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.bvwp;
+
+package org.matsim.ptproject.qsim.qnetsimengine;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-class Values {
-	enum Entry { XX, km, hrs, mon }
+import org.matsim.api.core.v01.Id;
+import org.matsim.ptproject.qsim.InternalInterface;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
-	enum Type { GV, PV_NON_COMMERCIAL, PV_COMMERCIAL }
+public class KaiHybridEngine implements MobsimEngine {
 
-	enum Mode { road, rail }
+	private InternalInterface internalInterface;
+	private Map<Id,KaiHiResLink> hiResLinks = new TreeMap<Id,KaiHiResLink>() ;
+
+	@Override
+	public void afterSim() {
+	}
+
+	@Override
+	public Netsim getMobsim() {
+		return this.internalInterface.getMobsim() ;
+	}
+
+	@Override
+	public void onPrepareSim() {
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface ;
+	}
+
+	@Override
+	public void doSimStep(double time) {
+	}
+
+	public void registerHiResLink(KaiHiResLink hiResLink) {
+		this.hiResLinks.put( hiResLink.getLink().getId(), hiResLink ) ;
+	}
 	
-	Map<Mode,ValuesForAMode> valuesByMode = new TreeMap<Mode,ValuesForAMode>() ;
-	Values() {
-		for ( Mode mode : Mode.values() ) {
-			ValuesForAMode vals = new ValuesForAMode() ;
-			valuesByMode.put( mode, vals ) ;
-		}
-	}
-	Values createDeepCopy( ) {
-		Values planfall = new Values() ;
-		for ( Mode mode : Mode.values() ) {
-			ValuesForAMode oldValues = this.getByMode(mode) ;
-			ValuesForAMode newValues = oldValues.createDeepCopy() ;
-			planfall.valuesByMode.put( mode, newValues ) ;
-		}
-		return planfall ; 
-	}
-	ValuesForAMode getByMode( Mode mode ) {
-			return valuesByMode.get(mode) ;
-	}
-	void setValuesForMode( Mode mode, ValuesForAMode values ) {
-		valuesByMode.put( mode, values ) ;
-	}
 }
-

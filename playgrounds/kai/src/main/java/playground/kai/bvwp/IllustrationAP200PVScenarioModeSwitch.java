@@ -25,7 +25,7 @@ class IllustrationAP200PVScenarioModeSwitch { // Relationsbezogen_mit_generalisi
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRoad = roadValues.getByType(Type.PV) ;
+				ValuesForAUserType pvValuesRoad = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
 				pvValuesRoad.setByEntry( Entry.XX, 1000. ) ; // number of persons
 				pvValuesRoad.setByEntry( Entry.km, 100. ) ;
 				pvValuesRoad.setByEntry( Entry.hrs, 1. ) ;
@@ -35,7 +35,7 @@ class IllustrationAP200PVScenarioModeSwitch { // Relationsbezogen_mit_generalisi
 			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV) ;
+				ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
 				pvValuesRail.setByEntry( Entry.XX, 10. ) ; // number of persons
 				pvValuesRail.setByEntry( Entry.km, 100. ) ;
 				pvValuesRail.setByEntry( Entry.hrs, 6. ) ;
@@ -62,12 +62,12 @@ class IllustrationAP200PVScenarioModeSwitch { // Relationsbezogen_mit_generalisi
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.PV).incByEntry( Entry.hrs, -4. ) ;
+			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -4. ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 90. ;
-			railValues.getByType(Type.PV).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByType(Type.PV).incByEntry(Entry.XX, -delta ) ;
+			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByType(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -delta ) ;
 		}
 		return planfall;
 	}

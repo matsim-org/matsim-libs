@@ -53,7 +53,7 @@ class Scenario0 {
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.PV).incByEntry( Entry.hrs, -0.1 ) ;
+			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -0.1 ) ;
 			railValues.getByType(Type.GV).incByEntry( Entry.hrs, -0.1 ) ;
 			
 			// modify some demand (presumably as a result):

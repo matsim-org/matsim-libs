@@ -26,7 +26,7 @@ public class IllustrationFictiveExamplePVwithoutOldUsers {
 		ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 		{
 			// passenger traffic:
-			ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV) ;
+			ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
 			pvValuesRail.setByEntry( Entry.XX, 0. ) ; // number of persons
 		}			
 
