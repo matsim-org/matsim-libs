@@ -209,7 +209,7 @@ public class MyRaster{
 	 * 		<b>0</b> - Only increase the value of the pixel within which the 
 	 * 				   point falls. <br>
 	 * 		<b>1</b> - Uniform. Increases all pixels within the radius by the
-	 * 				   same amount, 0.5.<br>
+	 * 				   same amount, 1 / radius.<br>
 	 * 		<b>2</b> - Triangular. Increases the pixel within which the activity
 	 * 				   takes place, by 1, and all other pixels within the radius
 	 * 				   by an inverse linear function between 0 (at a distance 
@@ -256,7 +256,7 @@ public class MyRaster{
 				int maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
 				int minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
 				int maxY = (int) Math.min(imageMatrix.columns()-1, Math.floor((originY - (point.getY() - radius))/resolution));
-				value = 0.5;
+				value = 1 / radius;
 				for(int i = minX; i <= maxX; i++){
 					for(int j = minY; j <= maxY; j++){
 						p = gf.createPoint(new Coordinate((i + 0.5)*resolution + originX, originY - (j + 0.5)*resolution));
@@ -283,6 +283,7 @@ public class MyRaster{
 				break;
 				
 			case 2: // Triangular
+				double height = 1 / radius;
 				minX = (int) Math.max(0, Math.floor((point.getX() - radius - originX)/resolution));
 				maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
 				minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
@@ -309,9 +310,9 @@ public class MyRaster{
 						double d = point.distance(p);
 						double u = d / radius;
 						if(pixel.contains(point)){
-							value = 1.0;
+							value = height;
 						} else if( d <= radius){
-							value = 1 - u;
+							value = height*(1 - u);
 						}
 						imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + value);
 						maxValue = Math.max(maxValue,imageMatrix.getQuick(i, j));
@@ -321,7 +322,7 @@ public class MyRaster{
 				result = true;
 				break;
 
-			case 3: // Triweight
+			case 3: // Triweight. The formula used here comes from R documentation.
 				minX = (int) Math.max(0, Math.floor((point.getX() - radius - originX)/resolution));
 				maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
 				minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
