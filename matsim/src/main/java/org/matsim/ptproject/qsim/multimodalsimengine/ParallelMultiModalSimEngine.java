@@ -23,9 +23,11 @@ package org.matsim.ptproject.qsim.multimodalsimengine;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNode;
@@ -108,6 +110,11 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		}
 	}
 
+	@Override
+	/*package*/ MultiModalTravelTime getMultiModalTravelTime() {
+		throw new RuntimeException("This method should never be called - calls should go to the MultiModalSimEngineRunner Threads.");
+	}
+	
 	@Override
 	/*package*/ void moveNodes(final double time) {
 		throw new RuntimeException("This method should never be called - calls should go to the MultiModalSimEngineRunner Threads.");
@@ -219,12 +226,18 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		int roundRobin = 0;
 
 		for (NetsimNode node : this.getMobsim().getNetsimNetwork().getNetsimNodes().values()) {
-			super.getMultiModalQNodeExtension(node).setMultiModalSimEngine(engines[roundRobin % this.numOfThreads]);
-			roundRobin++;
-		}
+			MultiModalSimEngine simEngine = engines[roundRobin % this.numOfThreads];
+			super.getMultiModalQNodeExtension(node).setMultiModalSimEngine(simEngine);
 		
-		for (NetsimLink link : this.getMobsim().getNetsimNetwork().getNetsimLinks().values()) {
-			super.getMultiModalQLinkExtension(link).setMultiModalSimEngine(engines[roundRobin % this.numOfThreads]);
+			/*
+			 * Assign each link to its in-node to ensure that they are processed by the same
+			 * thread which should avoid running into some race conditions.
+			 */
+			for (Link l : node.getNode().getOutLinks().values()) {
+				NetsimLink link = this.getMobsim().getNetsimNetwork().getNetsimLinks().get(l.getId());
+				super.getMultiModalQLinkExtension(link).setMultiModalSimEngine(simEngine);
+			}
+			
 			roundRobin++;
 		}
 	}
