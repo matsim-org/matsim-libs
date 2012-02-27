@@ -45,6 +45,7 @@ public class ScenarioGenerator {
 
 	private static final Logger log = Logger.getLogger(ScenarioGenerator.class);
 	private final String configFile;
+	private String matsimConfigFile;
 	private Id safeLinkId;
 	private final EventsManager em;
 
@@ -95,7 +96,9 @@ public class ScenarioGenerator {
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", "0.9");
 
-		new ConfigWriter(c).write(getGripsConfig(c).getOutputDir() + "/config.xml");
+		this.matsimConfigFile = getGripsConfig(c).getOutputDir() + "/config.xml";
+		
+		new ConfigWriter(c).write(this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(), "scenario generation finished.");
 		this.em.processEvent(e);
 
@@ -214,6 +217,10 @@ public class ScenarioGenerator {
 		GripsConfigModule gcm = new GripsConfigModule(m);
 		c.getModules().put("grips", gcm);
 		return gcm;
+	}
+	
+	public String getPathToMatsimConfigXML() {
+		return this.matsimConfigFile;
 	}
 
 	public static void main(String [] args) {
