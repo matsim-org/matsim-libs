@@ -239,13 +239,13 @@ public class MyRaster{
 				log.error("Negative y-entry found for raster.");
 			}
 
-			double value = 0;
+			double height = 0;
 			Point p = null;
 			Polygon pixel = null;
 			
 			switch (this.KdeType) {
 			case 0:
-				value = 1.0;
+				height = 1.0;
 				imageMatrix.setQuick(x, y, imageMatrix.getQuick(x, y) + 1);	
 				maxValue = Math.max(maxValue,imageMatrix.getQuick(x, y));
 				result = true;
@@ -256,7 +256,7 @@ public class MyRaster{
 				int maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
 				int minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
 				int maxY = (int) Math.min(imageMatrix.columns()-1, Math.floor((originY - (point.getY() - radius))/resolution));
-				value = 1 / radius;
+				height = 1 / (2.0*radius);
 				for(int i = minX; i <= maxX; i++){
 					for(int j = minY; j <= maxY; j++){
 						p = gf.createPoint(new Coordinate((i + 0.5)*resolution + originX, originY - (j + 0.5)*resolution));
@@ -274,7 +274,7 @@ public class MyRaster{
 						
 						double d = point.distance(p);
 						if(d <= radius || pixel.contains(point)){
-							imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + value);
+							imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + height);
 							maxValue = Math.max(maxValue,imageMatrix.getQuick(i, j));
 						}
 					}
@@ -283,7 +283,7 @@ public class MyRaster{
 				break;
 				
 			case 2: // Triangular
-				double height = 1 / radius;
+				height = 1 / radius;
 				minX = (int) Math.max(0, Math.floor((point.getX() - radius - originX)/resolution));
 				maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
 				minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
@@ -310,11 +310,11 @@ public class MyRaster{
 						double d = point.distance(p);
 						double u = d / radius;
 						if(pixel.contains(point)){
-							value = height;
+							height = height;
 						} else if( d <= radius){
-							value = height*(1 - u);
+							height = height*(1 - u);
 						}
-						imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + value);
+						imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + height);
 						maxValue = Math.max(maxValue,imageMatrix.getQuick(i, j));
 					}
 				}
@@ -345,11 +345,11 @@ public class MyRaster{
 						double d = point.distance(p);
 						double u = d / radius;
 						if(pixel.contains(point)){
-							value = 35.0 / 32.0;
+							height = 35.0 / 32.0;
 						} else if( d <= radius){
-							value = (35.0 / 32.0)*Math.pow(1 - Math.pow(u, 2), 3);
+							height = (35.0 / 32.0)*Math.pow(1 - Math.pow(u, 2), 3);
 						}
-						imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + value);
+						imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + height);
 						maxValue = Math.max(maxValue,imageMatrix.getQuick(i, j));
 					}
 				}
