@@ -67,6 +67,9 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -164,6 +167,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 
 	protected PersonalizableTravelTimeFactory walkTravelTimeFactory;
 	protected PersonalizableTravelTimeFactory bikeTravelTimeFactory;
+	protected PersonalizableTravelTimeFactory travelTimeCollectorWrapperFactory;
 	
 	/*
 	 * Analysis modules
@@ -235,6 +239,16 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		zCoordinateAdder.checkSteepness();
 
 		/*
+		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
+		 * factory but returns always the same travel time object, which is possible since
+		 * the TravelTimeCollector is not personalized.
+		 */
+		Set<String> analyzedModes = new HashSet<String>();
+		analyzedModes.add(TransportMode.car);
+		super.createAndInitTravelTimeCollector(analyzedModes);
+		travelTimeCollectorWrapperFactory = new TravelTimeFactoryWrapper(this.getTravelTimeCollector());
+		
+		/*
 		 * Use advanced walk- and bike travel time calculators
 		 */
 		this.walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
@@ -242,9 +256,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
 		
-		Set<String> analyzedModes = new HashSet<String>();
-		analyzedModes.add(TransportMode.car);
-		super.createAndInitTravelTimeCollector(analyzedModes);
+		/*
+		 * Use the TravelTimeCollector as ride and pt travel time estimator
+		 */
+		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.pt, 
+				new PTTravelTimeFactory(this.config.plansCalcRoute(), travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
+		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.ride, 
+				new RideTravelTimeFactory(travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
 		
 		super.createAndInitReplanningManager(numReplanningThreads);
 		super.createAndInitActivityReplanningMap();
@@ -334,12 +352,12 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		/*
 		 * intialize analyse modules
 		 */
-		// Create txtand kmz files containing distribution of evacuation times. 
+		// Create txt and kmz files containing distribution of evacuation times. 
 		if (EvacuationConfig.createEvacuationTimePicture) {
-//			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer.createInstance(), householdsTracker, vehiclesTracker);
-//			this.addControlerListener(evacuationTimePicture);
-//			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
-//			this.events.addHandler(evacuationTimePicture);	
+			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer.createInstance(), householdsTracker, vehiclesTracker);
+			this.addControlerListener(evacuationTimePicture);
+			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
+			this.events.addHandler(evacuationTimePicture);	
 		}
 		
 		 // Create and add an AgentsInEvacuationAreaCounter.
@@ -443,7 +461,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 			
 		// use fuzzyTravelTimes
-		FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.getTravelTimeCollectorFactory(), this.householdsTracker, this.vehiclesTracker);
+		FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.travelTimeCollectorWrapperFactory, this.householdsTracker, this.vehiclesTracker);
 		
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();

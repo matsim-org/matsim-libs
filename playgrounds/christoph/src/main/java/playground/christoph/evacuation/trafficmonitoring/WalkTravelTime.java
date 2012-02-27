@@ -161,11 +161,11 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		}
 	}
 
-	private void incGendereWarnCount(String text) {
+	private void incGenderWarnCount(String text) {
 		genderWarnCount++;
 		if (warnGender) {
 			printWarning(text, genderWarnCount);
-			if (genderWarnCount >= 10) warnLinkLength = false;
+			if (genderWarnCount >= 10) warnGender = false;
 		}
 	}
 	
@@ -173,15 +173,15 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		slopeWarnCount++;
 		if (warnSlope) {
 			printWarning(text, slopeWarnCount);
-			if (slopeWarnCount >= 10) warnLinkLength = false;
+			if (slopeWarnCount >= 10) warnSlope = false;
 		}
 	}
 	
 	private void incAgeWarnCount(String text) {
 		ageWarnCount++;
-		if (warnLinkLength) {
+		if (warnAge) {
 			printWarning(text, ageWarnCount);
-			if (ageWarnCount >= 10) warnLinkLength = false;
+			if (ageWarnCount >= 10) warnAge = false;
 		}
 	}
 	
@@ -218,7 +218,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 			else if (p.getSex().equals("f")) genderFactor = femaleScaleFactor;
 			else {
 				if (genderWarnCount < 10) {
-					incGendereWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
+					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
 				}
 			}
 			
