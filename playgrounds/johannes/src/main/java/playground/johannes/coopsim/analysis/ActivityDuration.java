@@ -44,14 +44,20 @@ public class ActivityDuration extends AbstractTrajectoryProperty {
 		TObjectDoubleHashMap<Trajectory> values = new TObjectDoubleHashMap<Trajectory>(trajectories.size());
 		
 		for(Trajectory trajectory : trajectories) {
+			double dur_sum = 0;
+			double cnt = 0;
 			for(int i = 0; i < trajectory.getElements().size(); i += 2) {
 				Activity act = (Activity)trajectory.getElements().get(i);
 				
 				if(purpose == null || act.getType().equals(purpose)) {
 					double dur = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
-					
-					values.put(trajectory, dur);
+					dur_sum += dur;
+					cnt++;
 				}
+			}
+			if (cnt > 0) {
+				double dur_mean = dur_sum / (double) cnt;
+				values.put(trajectory, dur_mean);
 			}
 		}
 		

@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 
+import playground.johannes.sna.snowball.analysis.BridgeEdgeTask;
 import playground.johannes.sna.snowball.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.ComponentsSeedTask;
@@ -43,6 +44,6 @@ public class SnowballAnalyzerTask extends AnalyzerTaskComposite {
 		
 		addTask(new SeedConnectionTask());
 		addTask(new ComponentsSeedTask());
-		
+		addTask(new BridgeEdgeTask());
 	}
 }

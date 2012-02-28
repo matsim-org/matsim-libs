@@ -23,7 +23,6 @@ import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -31,6 +30,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.Transitivity;
+import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
 
 /**
@@ -79,7 +79,7 @@ public class ObservedTransitivity extends Transitivity {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public DescriptiveStatistics localClusteringDistribution(Set<? extends Vertex> vertices) {
+	public DescriptiveStatistics statistics(Set<? extends Vertex> vertices) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		int iteration = SnowballStatistics.getInstance().lastIteration((Set<? extends SampledVertex>) vertices);
 		
@@ -105,33 +105,25 @@ public class ObservedTransitivity extends Transitivity {
 	 * @return the global clustering coefficient.
 	 */
 	public double globalClusteringCoefficient(Graph graph) {
-		int n_tripples = 0;
-		int n_triangles = 0;
-		for (Vertex v : graph.getVertices()) {
-			
-			if (((SampledVertex) v).isSampled()) {
-				List<? extends Vertex> n1s = v.getNeighbours();
+		double n_tripples = 0;
+		double n_triangles = 0;
 
-				for (int i = 0; i < n1s.size(); i++) {
-					SampledVertex n1 = (SampledVertex) n1s.get(i);
-
-					if (n1.isSampled()) {
-						List<? extends Vertex> n2s = n1.getNeighbours();
-
-						for (int k = 0; k < n2s.size(); k++) {
-							SampledVertex n2 = (SampledVertex) n2s.get(k);
-
-							if (n2.isSampled() && !n2.equals(v)) {
-								n_tripples++;
-								if (n2.getNeighbours().contains(v))
-									n_triangles++;
-							}
-						}
-					}
+		SampledGraph sampledGraph = (SampledGraph) graph;
+		int iteration = SnowballStatistics.getInstance().lastIteration(sampledGraph.getVertices());
+		
+		for(SampledVertex v : sampledGraph.getVertices()) {
+			if(v.isSampled() && v.getIterationSampled() < iteration) {
+				int k = v.getNeighbours().size();
+				if(k > 1) {
+					int n_2 = k*(k-1)/2;
+					double n_3 = countAdjacentEdges(v);
+					
+					n_tripples += n_2;
+					n_triangles += n_3; 
 				}
 			}
 		}
-
-		return n_triangles / (double) n_tripples;
+		 
+		return n_triangles/n_tripples;
 	}
 }

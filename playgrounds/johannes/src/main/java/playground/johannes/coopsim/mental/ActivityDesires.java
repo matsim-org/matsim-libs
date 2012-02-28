@@ -32,6 +32,8 @@ public class ActivityDesires extends Desires {
 
 	private final Map<String, Double> startTimes;
 	
+	private String activityType;
+	
 	public ActivityDesires() {
 		super(null);
 		startTimes = new HashMap<String, Double>();
@@ -45,4 +47,11 @@ public class ActivityDesires extends Desires {
 		return startTimes.get(type);
 	}
 
+	public void setActivityType(String type) {
+		this.activityType = type;
+	}
+	
+	public String getActivityType() {
+		return activityType;
+	}
 }

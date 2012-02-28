@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +50,9 @@ import playground.johannes.coopsim.LoggerUtils;
 import playground.johannes.coopsim.SimEngine;
 import playground.johannes.coopsim.analysis.ActTypeShareTask;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
+import playground.johannes.coopsim.analysis.ActivityLoadTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
+import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
 import playground.johannes.coopsim.analysis.InfiniteScoresTask;
 import playground.johannes.coopsim.analysis.JointActivityTask;
 import playground.johannes.coopsim.analysis.PlansWriterTask;
@@ -58,8 +61,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TransitionProbaAnalyzer;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
-import playground.johannes.coopsim.eval.ActivityDurationEvaluator;
-import playground.johannes.coopsim.eval.ActivityEvaluator;
+import playground.johannes.coopsim.eval.ActivityEvaluator2;
 import playground.johannes.coopsim.eval.EvalEngine;
 import playground.johannes.coopsim.eval.EvaluatorComposite;
 import playground.johannes.coopsim.eval.JointActivityEvaluator;
@@ -71,6 +73,7 @@ import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;
 import playground.johannes.coopsim.mental.choice.ActivityGroupGenerator;
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
 import playground.johannes.coopsim.mental.choice.ActivityTypeSelector;
+import playground.johannes.coopsim.mental.choice.AltersHome;
 import playground.johannes.coopsim.mental.choice.ArrivalTimeSelector;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
 import playground.johannes.coopsim.mental.choice.ChoiceSelectorComposite;
@@ -79,9 +82,11 @@ import playground.johannes.coopsim.mental.choice.DurationSelector;
 import playground.johannes.coopsim.mental.choice.EgoSelector;
 import playground.johannes.coopsim.mental.choice.EgosFacilities;
 import playground.johannes.coopsim.mental.choice.EgosHome;
+import playground.johannes.coopsim.mental.choice.FixedActivityTypeSelector;
+import playground.johannes.coopsim.mental.choice.OnlyEgo;
 import playground.johannes.coopsim.mental.choice.PlanIndexSelector;
 import playground.johannes.coopsim.mental.choice.RandomAlter;
-import playground.johannes.coopsim.mental.choice.RandomAlters;
+import playground.johannes.coopsim.mental.choice.RandomAltersFast;
 import playground.johannes.coopsim.mental.planmod.ActivityDurationModAdaptor;
 import playground.johannes.coopsim.mental.planmod.ActivityFacilityModAdaptor;
 import playground.johannes.coopsim.mental.planmod.ActivityTypeModAdaptor;
@@ -91,11 +96,15 @@ import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorComposite;
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
+import playground.johannes.mz2005.io.ActivityType;
 import playground.johannes.sna.util.MultiThreading;
+import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.GaussDistribution;
+import playground.johannes.socialnetworks.statistics.LinearDistribution;
 import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
+import playground.johannes.socialnetworks.statistics.PowerLawDistribution;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
@@ -116,6 +125,10 @@ public class Simulator {
 	private static Config config;
 	
 	private static Map<Person, ActivityDesires> personDesires;
+	
+	private static ScoreTask scoreTask;
+	
+	private static boolean nonCooperativeMode = false;
 	
 	public static void main(String[] args) throws IOException {
 		LoggerUtils.setDisallowVerbose(false);
@@ -151,6 +164,11 @@ public class Simulator {
 		 * initialize choice selectors
 		 */
 		logger.info("Initializing choice selectors...");
+		if(config.getParam("socialnets", "noncooperative") != null) {
+			nonCooperativeMode = Boolean.parseBoolean(config.getParam("socialnets", "noncooperative"));
+			if(nonCooperativeMode)
+				logger.warn("*\n*** Simulation runs in non-cooperative mode! ***\n*");
+		}
 		ChoiceSelector choiceSelector = initSelectors(random);
 		
 //		DurationChoiceLogger durLogger = new DurationChoiceLogger();
@@ -164,13 +182,15 @@ public class Simulator {
 		 * initialize mental engine
 		 */
 		logger.info("Initializing mental engine...");
+		
+		boolean includeAlters = Boolean.parseBoolean(config.getParam("socialnets", "includeAlters"));
 		int threads = config.global().getNumberOfThreads();
 		MultiThreading.setNumAllowedThreads(threads);
 		MentalEngine mental;
 		if(threads > 1)
-			mental = new MentalEngine(graph, choiceSelector, new ConcurrentPlanModEngine(adaptorFactory), random);
+			mental = new MentalEngine(graph, choiceSelector, new ConcurrentPlanModEngine(adaptorFactory), random, includeAlters);
 		else
-			mental = new MentalEngine(graph, choiceSelector, adaptorFactory.create(), random);
+			mental = new MentalEngine(graph, choiceSelector, adaptorFactory.create(), random, includeAlters);
 		/*
 		 * initialize scoring
 		 */
@@ -182,15 +202,18 @@ public class Simulator {
 		priorities.put(ActivityType.gastro.name(), Double.parseDouble(config.getParam("socialnets", "priority_gastro")));
 		
 		double beta_join = Double.parseDouble(config.getParam("socialnets", "beta_join"));
-		double beta_duration = Double.parseDouble(config.getParam("socialnets", "beta_duration"));
+//		double beta_duration = Double.parseDouble(config.getParam("socialnets", "beta_duration"));
 		double beta_act = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getPerforming_utils_hr() / 3600.0;
 		double beta_leg = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getTraveling_utils_hr() / 3600.0;
 	
+		if(nonCooperativeMode && beta_join != 0) {
+			logger.warn("Simulation runs in non-cooperative mode with beta_join set!");
+		}
 		EvaluatorComposite evaluator = new EvaluatorComposite();
 		evaluator.addComponent(new LegEvaluator(beta_leg));
-		evaluator.addComponent(new ActivityEvaluator(beta_act, personDesires, priorities));
+		evaluator.addComponent(new ActivityEvaluator2(beta_act, personDesires, priorities));
 		evaluator.addComponent(new JointActivityEvaluator(beta_join, physical.getVisitorTracker(), graph));
-		evaluator.addComponent(new ActivityDurationEvaluator(beta_duration, personDesires));
+//		evaluator.addComponent(new ActivityDurationEvaluator(beta_duration, personDesires));
 		EvalEngine eval = new EvalEngine(evaluator);
 		/*
 		 * initialize simulation engine
@@ -207,7 +230,9 @@ public class Simulator {
 //		((TrajectoryAnalyzerTaskComposite)task).addTask(durLogger);
 		simEngine.setAnalyzerTask(task, output);
 		
-		simEngine.run(iterations);
+		ActivityFacilitySelector.facilities = facilities;
+		
+		simEngine.run(scoreTask, iterations);
 	}
 
 	private static void loadData(Config config) {
@@ -219,6 +244,7 @@ public class Simulator {
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		network = (NetworkImpl) scenario.getNetwork();
 		LoggerUtils.setVerbose(true);
+		logger.info(String.format("%1$s nodes, %2$s links.", network.getNodes().size(), network.getLinks().size()));
 		
 		logger.info("Loading facilities data...");
 		LoggerUtils.setVerbose(false);
@@ -277,43 +303,59 @@ public class Simulator {
 		 * initialize activity type selector
 		 */
 		ChoiceSet<String> actTypeChoiceSet = new ChoiceSet<String>(random);
-		actTypeChoiceSet.addChoice(ActivityType.visit.name());
-		actTypeChoiceSet.addChoice(ActivityType.gastro.name());
-		actTypeChoiceSet.addChoice(ActivityType.culture.name());
+		actTypeChoiceSet.addChoice(ActivityType.visit.name(), 38);
+		actTypeChoiceSet.addChoice(ActivityType.gastro.name(), 22);
+		actTypeChoiceSet.addChoice(ActivityType.culture.name(), 40);
 
-		ActivityTypeSelector actTypeSelector = new ActivityTypeSelector(actTypeChoiceSet);
+//		ActivityTypeSelector actTypeSelector = new ActivityTypeSelector(actTypeChoiceSet);
+		Map<SocialVertex, String> types = new HashMap<SocialVertex, String>();
+		for(SocialVertex v : graph.getVertices()) {
+			types.put(v, actTypeChoiceSet.randomWeightedChoice());
+		}
+		FixedActivityTypeSelector actTypeSelector = new FixedActivityTypeSelector(types, random);
 		choiceSelector.addComponent(actTypeSelector);
 		/*
 		 * initialize group selector
 		 */
 		ActivityGroupSelector groupSelector = new ActivityGroupSelector();
 		ActivityGroupGenerator generator = null;
-		String type = config.getParam("socialnets", "groupGenerator");
-		if(type.equals("randomAlter")) {
-			generator = new RandomAlter(random);
+		if (nonCooperativeMode) {
+			generator = new OnlyEgo();
 			groupSelector.addGenerator(ActivityType.visit.name(), generator);
 			groupSelector.addGenerator(ActivityType.gastro.name(), generator);
 			groupSelector.addGenerator(ActivityType.culture.name(), generator);
-		} else if(type.equals("randomAlters")) {
-			double p = Double.parseDouble(config.getParam("socialnets", "alterProba_visit"));
-			groupSelector.addGenerator(ActivityType.visit.name(), new RandomAlters(p, 1, random));
-			
-			p = Double.parseDouble(config.getParam("socialnets", "alterProba_culture"));
-			groupSelector.addGenerator(ActivityType.gastro.name(), new RandomAlters(p, random));
-			
-			p = Double.parseDouble(config.getParam("socialnets", "alterProba_gastro"));
-			groupSelector.addGenerator(ActivityType.culture.name(), new RandomAlters(p, random));
 		} else {
-			throw new IllegalArgumentException(String.format("Activity group generator \"%1$s\" unknown.", type));
+			String type = config.getParam("socialnets", "groupGenerator");
+			if (type.equals("randomAlter")) {
+				generator = new RandomAlter(random);
+				groupSelector.addGenerator(ActivityType.visit.name(), generator);
+				groupSelector.addGenerator(ActivityType.gastro.name(), generator);
+				groupSelector.addGenerator(ActivityType.culture.name(), generator);
+			} else if (type.equals("randomAlters")) {
+				double p = Double.parseDouble(config.getParam("socialnets", "alterProba_visit"));
+				groupSelector.addGenerator(ActivityType.visit.name(), new RandomAltersFast(p, 1, random));
+
+				p = Double.parseDouble(config.getParam("socialnets", "alterProba_culture"));
+				groupSelector.addGenerator(ActivityType.gastro.name(), new RandomAltersFast(p, random));
+
+				p = Double.parseDouble(config.getParam("socialnets", "alterProba_gastro"));
+				groupSelector.addGenerator(ActivityType.culture.name(), new RandomAltersFast(p, random));
+			} else {
+				throw new IllegalArgumentException(String.format("Activity group generator \"%1$s\" unknown.", type));
+			}
 		}
-		
 		choiceSelector.addComponent(groupSelector);
 		/*
 		 * initialize facility selector
 		 */
 		ActivityFacilitySelector facilitySelector = new ActivityFacilitySelector();
 
-		facilitySelector.addGenerator(ActivityType.visit.name(), new EgosHome(random));
+		if(nonCooperativeMode) {
+			facilitySelector.addGenerator(ActivityType.visit.name(), new AltersHome(random));
+		} else {
+			facilitySelector.addGenerator(ActivityType.visit.name(), new EgosHome(random));
+		}
+
 //		FacilityChoiceSetGenerator generator2 = new FacilityChoiceSetGenerator(-1.4, 5, random, CartesianDistanceCalculator.getInstance());
 //		try {
 ////			generator2.write(generator2.generate(graph, facilities, "gastro"), "/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.gastro.145412.txt");
@@ -340,38 +382,44 @@ public class Simulator {
 		
 		personDesires = new HashMap<Person, ActivityDesires>();
 		//visit
+		logger.info("Drawing arrival times and durations for visit...");
 		AdditiveDistribution arrTimePDF = new AdditiveDistribution();
-		arrTimePDF.addComponent(new GaussDistribution(3169.5, 41787.8, 274.3));
-		arrTimePDF.addComponent(new GaussDistribution(7619.2, 56968.2, 729.4));
-		Map<SocialVertex, Double> arrivals = initTimes(arrTimePDF, 86400, random);
+		arrTimePDF.addComponent(new GaussDistribution(2645, 41879, 228));
+		arrTimePDF.addComponent(new GaussDistribution(9629, 56152, 1148));
+		Map<SocialVertex, Double> arrivals = initArrivalTimes(arrTimePDF, 86400, random);
 		arrTimeSelector.addSelector(ActivityType.visit.name(), new ArrivalTimeSelector(arrivals, random));
 		
-		LogNormalDistribution durPDF = new LogNormalDistribution(1.027, 9.743, 1455.990);
-		Map<SocialVertex, Double> durations = initTimes(durPDF, 13*3600, random);
+		LinearDistribution visitArrDur = new LinearDistribution(-0.2, 22091);
+		Map<SocialVertex, Double> durations = initDurations(arrivals, visitArrDur, 0.8864, 1061, random);
 		durTimeSelector.addSelector(ActivityType.visit.name(), new DurationSelector(durations, random));
 		
 		addDesire(durations, arrivals, ActivityType.visit.name());
 		//culture
+		logger.info("Drawing arrival times and durations for culture...");
 		arrTimePDF = new AdditiveDistribution();
-		arrTimePDF.addComponent(new GaussDistribution(3040, 36046, 404));
-		arrTimePDF.addComponent(new GaussDistribution(7687, 53845, 1144));
-		arrivals = initTimes(arrTimePDF, 86400, random);
+		arrTimePDF.addComponent(new GaussDistribution(3246, 36293, 429));
+		arrTimePDF.addComponent(new GaussDistribution(7281, 54261, 1046));
+		arrivals = initArrivalTimes(arrTimePDF, 86400, random);
 		arrTimeSelector.addSelector(ActivityType.culture.name(), new ArrivalTimeSelector(arrivals, random));
 		
-		durPDF = new LogNormalDistribution(0.5689, 9.0656, 764.2739);
-		durations = initTimes(durPDF, 14*3600, random);
+		PowerLawDistribution cultureArrDur = new PowerLawDistribution(-1.28, 9.528E09);
+		durations = initDurations(arrivals, cultureArrDur, 0.9609, 1093, random);
 		durTimeSelector.addSelector(ActivityType.culture.name(), new DurationSelector(durations, random));
 		
 		addDesire(durations, arrivals, ActivityType.culture.name());
 		//gastro
+		logger.info("Drawing arrival times and durations for gastro...");
 		arrTimePDF = new AdditiveDistribution();
-		arrTimePDF.addComponent(new GaussDistribution(2023.9, 43138.4, 289.9));
-		arrTimePDF.addComponent(new GaussDistribution(13158.8, 59829.9, 811.3));
-		arrivals = initTimes(arrTimePDF, 86400, random);
+		arrTimePDF.addComponent(new GaussDistribution(3071, 43340, 630));
+		arrTimePDF.addComponent(new GaussDistribution(6236, 68048, 656));
+		arrTimePDF.addComponent(new GaussDistribution(3938, 54224, 499));
+		arrivals = initArrivalTimes(arrTimePDF, 86400, random);
 		arrTimeSelector.addSelector(ActivityType.gastro.name(), new ArrivalTimeSelector(arrivals, random));
 		
-		durPDF = new LogNormalDistribution(0.6344, 8.7971, 885.4643);
-		durations = initTimes(durPDF, 8*3600, random);
+		AdditiveDistribution arrDurPDF = new AdditiveDistribution();
+		arrDurPDF.addComponent(new GaussDistribution(8185, 42524, 168916676));
+		arrDurPDF.addComponent(new GaussDistribution(9321, 69593, 169103450));
+		durations = initDurations(arrivals, arrDurPDF, 0.6883, 522, random);
 		durTimeSelector.addSelector(ActivityType.gastro.name(), new DurationSelector(durations, random));
 		addDesire(durations, arrivals, ActivityType.gastro.name());
 		
@@ -390,7 +438,7 @@ public class Simulator {
 		}
 	}
 	
-	private static Map<SocialVertex, Double> initTimes(UnivariateRealFunction pdf, int max, Random random) {
+	private static Map<SocialVertex, Double> initArrivalTimes(UnivariateRealFunction pdf, int max, Random random) {
 		TimeSampler sampler = new TimeSampler(pdf, max, random);
 		Map<SocialVertex, Double> map = new HashMap<SocialVertex, Double>(graph.getVertices().size());
 
@@ -402,6 +450,28 @@ public class Simulator {
 		return map;
 	}
 	
+	private static Map<SocialVertex, Double> initDurations(Map<SocialVertex, Double> arrivals, UnivariateRealFunction arrDur, double sigma, double lin, Random random) {
+		Map<SocialVertex, Double> durations = new HashMap<SocialVertex, Double>();
+		for(SocialVertex v : graph.getVertices()) {
+			double t_arr = arrivals.get(v);
+			double dur_mean;
+			try {
+				dur_mean = arrDur.value(t_arr);
+				if(dur_mean > 0) {
+					double mu = Math.log(dur_mean) - Math.pow(sigma, 2)/2.0;
+				
+					TimeSampler sampler = new TimeSampler(new LogNormalDistribution(sigma, mu, lin), 86400, random);
+					double dur = sampler.nextSample();
+					durations.put(v, dur);
+				}
+			} catch (FunctionEvaluationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return durations;
+	}
+	
 	private static TrajectoryAnalyzerTask initAnalyzerTask(PhysicalEngine physical, EvalEngine eval, MentalEngine mentalEngine, int logInterval) {
 		TrajectoryAnalyzerTaskComposite composite = new TrajectoryAnalyzerTaskComposite();
 		composite.addTask(new PlansWriterTask(network));
@@ -410,12 +480,14 @@ public class Simulator {
 		composite.addTask(new TripDistanceTask(facilities));
 //		composite.addTask(new TripDistanceAccessibilityTask(graph, facilities));
 		composite.addTask(new JointActivityTask(graph, physical.getVisitorTracker()));
-		composite.addTask(new ScoreTask());
+		scoreTask = new ScoreTask();
+		composite.addTask(scoreTask);
 		composite.addTask(new ActTypeShareTask());
 		composite.addTask(new InfiniteScoresTask());
 //		composite.addTask(new ActivityDurationPlanTask());
 		composite.addTask(new TransitionProbaAnalyzer(mentalEngine, logInterval));
-		
+		composite.addTask(new ActivityLoadTask());
+		composite.addTask(new DurationArrivalTimeTask());
 		return composite;
 	}
 	

@@ -29,6 +29,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
@@ -56,17 +57,28 @@ public class MentalEngine {
 	
 	private double totalPiSum;
 	
-	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, Choice2ModAdaptor adaptor, Random random) {
+	private final boolean includeAlters;
+	
+	private final double beta_start = 100;
+	
+	private final double beta_target = 1;
+	
+	private final double beta_burnin = 0;
+	
+	private long iterCounter = 0;
+	
+	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, Choice2ModAdaptor adaptor, Random random, boolean includeAlters) {
 		this.choiceSelector = choiceSelector;
 		this.random = random;
-		
+		this.includeAlters = includeAlters;
 		modEngine = new SingleThreadedModEngine(adaptor);
 	}
 	
-	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, PlanModEngine modEngine, Random random) {
+	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, PlanModEngine modEngine, Random random, boolean includeAlters) {
 		this.choiceSelector = choiceSelector;
 		this.random = random;		
 		this.modEngine = modEngine;
+		this.includeAlters = includeAlters;
 	}
 	
 	public List<SocialVertex> nextState() {
@@ -95,7 +107,7 @@ public class MentalEngine {
 		return egos;
 	}
 	
-	public boolean acceptRejectState(Collection<SocialVertex> egos) {
+	public boolean acceptRejectState(Collection<SocialVertex> egos, List<Tuple<Plan, Double>> alter1Scores) {
 		boolean accept;
 		/*
 		 * get new and old plans
@@ -120,14 +132,30 @@ public class MentalEngine {
 		for(int i = 0; i < newState.size(); i++)
 			newScore +=  newState.get(i).getScore();
 		
+		if(includeAlters) {
+			for(Tuple<Plan, Double> tuple : alter1Scores) {
+				newScore += tuple.getFirst().getScore();
+			}
+		}
+		
 		double oldScore = 0;
 		for(int i = 0; i < oldState.size(); i++)
 			oldScore += oldState.get(i).getScore();
+		
+		if(includeAlters) {
+			for(Tuple<Plan, Double> tuple : alter1Scores) {
+				oldScore += tuple.getSecond();
+			}
+		}
 		/*
 		 * calculate transition probability
 		 */
+		double beta = 1.0;
+		if(iterCounter < beta_burnin) {
+			beta = (beta_target - beta_start)/beta_burnin * iterCounter + beta_start;
+		}
 		double delta = oldScore - newScore;
-		double pi = 1 / (1 + Math.exp(delta));
+		double pi = 1 / (1 + Math.exp(beta * delta));
 
 		piSum += pi;
 		totalPiSum += pi;
@@ -159,6 +187,8 @@ public class MentalEngine {
 			person.setSelectedPlan(person.getPlans().get(0));
 		}
 		
+		iterCounter++;
+		
 		return accept;
 	}
 	
@@ -181,5 +211,14 @@ public class MentalEngine {
 	
 	public void cleatTotalPiSum() {
 		totalPiSum = 0;
+	}
+	
+	public void finalize() {
+		try {
+			super.finalize();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		modEngine.finalize();
 	}
 }

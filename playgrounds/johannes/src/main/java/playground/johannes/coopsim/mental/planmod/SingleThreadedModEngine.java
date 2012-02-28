@@ -49,4 +49,11 @@ public class SingleThreadedModEngine implements PlanModEngine {
 			mod.apply(plan);
 	}
 
+	public void finalize() {
+		try {
+			super.finalize();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -60,7 +60,7 @@ public class EdgeLengthAccessibilityTask extends ModuleAnalyzerTask<Accessibilit
 
 //		TObjectDoubleHashMap<Vertex> edgeLengthMean = EdgeLengthMean.getInstance().values(graph.getVertices());
 
-		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 50, 200);
+		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 1, 50);
 //		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(edgeLengthMean, accessValues,
 //				discretizer);
 		

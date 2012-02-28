@@ -62,6 +62,7 @@ public class ConfidenceInterval {
 		
 		final double mean = Double.parseDouble(args[9]);
 		double confProba = Double.parseDouble(args[10]);
+		String mode = args[11];
 		
 		TIntObjectHashMap<TIntDoubleHashMap> table = new TIntObjectHashMap<TIntDoubleHashMap>();
 		SortedSet<Integer> dumpKeys = new TreeSet<Integer>();
@@ -121,7 +122,12 @@ public class ConfidenceInterval {
 				double vals[] = entry.getValue().toNativeArray();
 				for(double val : vals) {	
 					if(!Double.isNaN(val)) {
-						double relerr = Math.abs((val - mean)/mean);
+						double relerr;
+						if(mode.equals("abs")) {
+							relerr = Math.abs((val - mean)/mean);
+						} else {
+							relerr = (val - mean)/mean;
+						}
 						stats.addValue(relerr);
 				
 					}
@@ -129,11 +135,27 @@ public class ConfidenceInterval {
 				if(stats.getN() < 50) {
 					System.err.println("Less than 50 samples. Ignoring dump.");
 				} else {
-					double conf = stats.getPercentile(confProba);
+					double conf;
+					if(mode.equals("abs"))
+						conf = stats.getPercentile(confProba);
+					else if(mode.equals("pos")) {
+						confProba = (100 - confProba)/2.0;
+						conf = stats.getPercentile(100 - confProba);
+					} else if(mode.equals("neg")) {
+						confProba = (100 - confProba)/2.0;
+						conf = stats.getPercentile(confProba);
+					} else {
+						throw new IllegalArgumentException(String.format("Mode %1$s unknown.", mode));
+					}
 					// int key = Integer.parseInt(keys[i]);
-					int key = (int) Double.parseDouble(dumpMapping.get(entry.getKey()));
-					row.put(key, conf);
-					dumpKeys.add(key);
+					String keyStr = entry.getKey();
+					if(!dumpMapping.get(keyStr).equals("null")) {
+						int key = (int) Double.parseDouble(dumpMapping.get(keyStr));
+						row.put(key, conf);
+						dumpKeys.add(key);
+					} else {
+						System.err.println("Null key");
+					}
 				}
 			}
 			table.put(dumpKey, row);

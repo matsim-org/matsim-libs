@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.graph.analysis.VertexProperty;
@@ -32,7 +31,6 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.ZoneUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
@@ -45,6 +43,10 @@ import com.vividsolutions.jts.geom.Polygon;
 public class VertexPropertyGrid {
 
 	public static ZoneLayer<Double> createMeanGrid(Set<? extends SpatialVertex> vertices, VertexProperty property) {
+		return createMeanGrid(vertices, property, 1000.0);
+	}
+	
+	public static ZoneLayer<Double> createMeanGrid(Set<? extends SpatialVertex> vertices, VertexProperty property, double resolution) {
 		Set<Point> points = new HashSet<Point>(vertices.size());
 		for(SpatialVertex vertex : vertices)
 			if(vertex.getPoint() != null)
@@ -65,11 +67,11 @@ public class VertexPropertyGrid {
 		Polygon polygon = factory.createPolygon(linearRing, null);
 		polygon.setSRID(points.iterator().next().getSRID());
 		
-		ZoneLayer<Set<SpatialVertex>> vertexLayer = ZoneUtils.createGridLayer(1000.0, polygon);
+		ZoneLayer<Set<SpatialVertex>> vertexLayer = ZoneUtils.createGridLayer(resolution, polygon);
 		
 		ZoneUtils.fillZoneLayer(vertexLayer, (Set<SpatialVertex>)vertices);
 		
-		ZoneLayer<Double> valueLayer = ZoneUtils.createGridLayer(1000.0, polygon);
+		ZoneLayer<Double> valueLayer = ZoneUtils.createGridLayer(resolution, polygon);
 		
 		for(Zone<Set<SpatialVertex>> zone : vertexLayer.getZones()) {
 			if(zone.getAttribute() != null) {

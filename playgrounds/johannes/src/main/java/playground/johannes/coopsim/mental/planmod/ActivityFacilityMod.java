@@ -25,9 +25,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author illenberger
@@ -52,7 +54,7 @@ public class ActivityFacilityMod implements PlanModifier {
 	public ActivityFacilityMod(ActivityFacilities facilities, NetworkLegRouter router) {
 		this.facilities = facilities;
 		this.router = router;
-		this.factory = new PopulationFactoryImpl(null);
+		this.factory = new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 	}
 	
 	public void setPlanIndex(int planIndex) {

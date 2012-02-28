@@ -45,7 +45,7 @@ public class PropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 		if (outputDirectoryNotNull()) {
 			try {
 				TDoubleDoubleHashMap map = VertexPropertyCorrelation.mean(Transitivity.getInstance(), module, graph.getVertices());
-				TXTWriter.writeMap(map, getOutputDirectory() + "/c_k.mean.txt", "k", "c_local");
+				TXTWriter.writeMap(map, "k", "c_local", getOutputDirectory() + "/c_k.mean.txt");
 				
 				TDoubleObjectHashMap<DescriptiveStatistics> stat = VertexPropertyCorrelation.statistics(Transitivity.getInstance(), module, graph.getVertices());
 				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "/c_k.table.txt");

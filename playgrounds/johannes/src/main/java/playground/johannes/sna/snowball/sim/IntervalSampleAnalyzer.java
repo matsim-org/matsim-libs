@@ -80,7 +80,7 @@ public class IntervalSampleAnalyzer extends SampleAnalyzer {
 		return true;
 	}
 
-	private void dump(Sampler<?, ?, ?> sampler) {
+	protected void dump(Sampler<?, ?, ?> sampler) {
 		File file = makeDirectories(String.format("%1$s/vertex.%2$s", getRootDirectory(), sampler
 				.getNumSampledVertices()));
 		analyze(sampler.getSampledGraph(), file.getAbsolutePath());
@@ -97,10 +97,11 @@ public class IntervalSampleAnalyzer extends SampleAnalyzer {
 	}
 
 	/**
-	 * Does nothing.
+	 * Makes a dump with the maximum network sampled.
 	 */
 	@Override
 	public void endSampling(Sampler<?, ?, ?> sampler) {
+		dump(sampler);
 	}
 
 }

@@ -24,6 +24,7 @@ import java.io.IOException;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.analysis.ComponentsTask;
+import playground.johannes.sna.graph.analysis.Degree;
 import playground.johannes.sna.graph.analysis.DegreeTask;
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.sna.graph.analysis.GraphSizeTask;
@@ -42,6 +43,10 @@ public class TopologyAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(new DegreeTask());
 		addTask(new TransitivityTask());
 		addTask(new ComponentsTask());
+		
+		PropertyDegreeTask task = new PropertyDegreeTask();
+		task.setModule(Degree.getInstance());
+		addTask(task);
 	}
 
 	public static void main(String args[]) throws IOException {

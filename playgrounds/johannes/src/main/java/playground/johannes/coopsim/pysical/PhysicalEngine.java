@@ -49,6 +49,7 @@ public class PhysicalEngine {
 //		this.pseudoSim = new PseudoSim();
 		this.pseudoSim = new ParallelPseudoSim(MultiThreading.getNumAllowedThreads());
 		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
+//		this.travelTime = new TravelTimeDecorator(new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup()));
 		this.tracker = new VisitorTracker();
 	}
 	

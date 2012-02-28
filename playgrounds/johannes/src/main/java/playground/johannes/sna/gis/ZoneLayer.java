@@ -72,6 +72,10 @@ public class ZoneLayer<T> {
 		}
 	}
 
+	public CoordinateReferenceSystem getCRS() {
+		return crs;
+	}
+	
 	/**
 	 * Allows to manually overwrite the coordinate reference system (e.g. if the
 	 * ZoneLayer is read from a shape file without crs information).

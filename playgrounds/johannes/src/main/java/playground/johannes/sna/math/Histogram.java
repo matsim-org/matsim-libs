@@ -25,6 +25,7 @@ import gnu.trove.TDoubleFunction;
 
 import java.util.Arrays;
 
+import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
@@ -48,10 +49,14 @@ public class Histogram {
 	 *         the bin height.
 	 */
 	public static TDoubleDoubleHashMap createHistogram(DescriptiveStatistics stats, Discretizer discretizer, boolean reweight) {
+		return createHistogram(stats, discretizer, reweight, false);
+	}
+	
+	public static TDoubleDoubleHashMap createHistogram(DescriptiveStatistics stats, Discretizer discretizer, boolean reweight, boolean reverse) {
 		if (stats instanceof DescriptivePiStatistics)
-			return createHistogram((DescriptivePiStatistics) stats, discretizer, reweight);
+			return createHistogram((DescriptivePiStatistics) stats, discretizer, reweight, reverse);
 		else
-			return createHistogram(stats.getValues(), discretizer, reweight);
+			return createHistogram(stats.getValues(), discretizer, reweight, reverse);
 	}
 
 	/**
@@ -67,13 +72,17 @@ public class Histogram {
 	 *         the bin height.
 	 */
 	public static TDoubleDoubleHashMap createHistogram(DescriptivePiStatistics stats, Discretizer discretizer, boolean reweight) {
+		return createHistogram(stats, discretizer, reweight, false);
+	}
+	
+	public static TDoubleDoubleHashMap createHistogram(DescriptivePiStatistics stats, Discretizer discretizer, boolean reweight, boolean reverse) {
 		double[] piValues = stats.getPiValues();
 		double[] weights = new double[piValues.length];
 		for (int i = 0; i < piValues.length; i++) {
 			weights[i] = 1 / piValues[i];
 		}
 
-		return createHistogram(stats.getValues(), weights, discretizer, reweight);
+		return createHistogram(stats.getValues(), weights, discretizer, reweight, reverse);
 	}
 
 	/**
@@ -88,9 +97,13 @@ public class Histogram {
 	 *         the bin height.
 	 */
 	public static TDoubleDoubleHashMap createHistogram(double[] values, Discretizer discretizer, boolean reweight) {
+		return createHistogram(values, discretizer, reweight, false);
+	}
+	
+	public static TDoubleDoubleHashMap createHistogram(double[] values, Discretizer discretizer, boolean reweight, boolean reverse) {
 		double[] weights = new double[values.length];
 		Arrays.fill(weights, 1.0);
-		return createHistogram(values, weights, discretizer, reweight);
+		return createHistogram(values, weights, discretizer, reweight, reverse);
 	}
 
 	/**
@@ -108,12 +121,20 @@ public class Histogram {
 	 *         the bin height.
 	 */
 	public static TDoubleDoubleHashMap createHistogram(double[] values, double[] weights, Discretizer discretizer, boolean reweight) {
+		return createHistogram(values, weights, discretizer, reweight, false);
+	}
+	
+	public static TDoubleDoubleHashMap createHistogram(double[] values, double[] weights, Discretizer discretizer, boolean reweight, boolean reverse) {
 		TDoubleDoubleHashMap histogram = new TDoubleDoubleHashMap();
 		for (int i = 0; i < values.length; i++) {
 			double bin = discretizer.discretize(values[i]);
 			double weight = weights[i];
-			if(reweight)
-				weight = weights[i] / discretizer.binWidth(values[i]);
+			if(reweight) {
+				if(reverse)
+					weight = weights[i] * discretizer.binWidth(values[i]);
+				else
+					weight = weights[i] / discretizer.binWidth(values[i]);
+			}
 			
 			histogram.adjustOrPutValue(bin, weight, weight);
 		}
@@ -163,5 +184,53 @@ public class Histogram {
 			sum += it.value();
 		}
 		return sum;
+	}
+	
+	public static TDoubleDoubleHashMap createCumulativeHistogram(TDoubleDoubleHashMap histogram) {
+		double[] keys = histogram.keys();
+		Arrays.sort(keys);
+		double sum = 0;
+		for(double key : keys) {
+			double val = histogram.get(key);
+			sum += val;
+			histogram.put(key, sum);
+		}
+		
+		return histogram;
+	}
+	
+	public static TDoubleDoubleHashMap normalizeCumulative(TDoubleDoubleHashMap histogram) {
+		return normalizeCumulative(histogram, 1.0);
+	}
+	
+	public static TDoubleDoubleHashMap normalizeCumulative(TDoubleDoubleHashMap histogram, double sum) {
+		double[] keys = histogram.keys();
+		double max = StatUtils.max(keys);
+		
+		final double norm = sum/histogram.get(max);
+		
+		TDoubleFunction fct = new TDoubleFunction() {
+			public double execute(double value) {
+				return value * norm;
+			}
+
+		};
+
+		histogram.transformValues(fct);
+
+		return histogram;
+	}
+	
+	public static TDoubleDoubleHashMap complementary(TDoubleDoubleHashMap histogram) {
+		TDoubleFunction fct = new TDoubleFunction() {
+			public double execute(double value) {
+				return 1 - value;
+			}
+
+		};
+
+		histogram.transformValues(fct);
+
+		return histogram;
 	}
 }

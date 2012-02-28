@@ -49,7 +49,9 @@ import org.opengis.referencing.operation.TransformException;
 
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
 import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.LinLogDiscretizer;
 import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.math.LogDiscretizer;
 import playground.johannes.socialnetworks.statistics.Normalizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -68,7 +70,8 @@ public class SpatialGridKMLWriter {
 	
 	private GeometryFactory geoFactory = new GeometryFactory();
 	
-	private Discretizer discretizer = new LinearDiscretizer(0.1);
+	private Discretizer discretizer = new LinearDiscretizer(10000);
+//	private Discretizer discretizer = new LinLogDiscretizer(0.001, 2.0);
 	
 //	private Normalizer normalizer;
 //	public CoordinateTransformation getCoordTransform() {
@@ -112,6 +115,7 @@ public class SpatialGridKMLWriter {
 		}
 		
 		System.out.println("Min score = " + minVal + ", max socre = "+maxVal);
+		maxVal =200000;
 		double numBins = discretizer.index(maxVal) - discretizer.index(minVal) + 1;
 //		double numBins = 0;
 		double minBin = discretizer.index(minVal);
@@ -175,7 +179,7 @@ public class SpatialGridKMLWriter {
 //					int bin = (int)Math.floor((val - minVal)/binSize);
 //					bin = (int) Math.min(bin, maxVal-minVal) - 1;
 //					bin = (int) Math.max(bin, 0);
-					
+					bin = Math.min(bin, polySytleTypes.length - 1);
 					polyPlacemarkType.setStyleUrl(polySytleTypes[bin].getId());
 					polyPlacemarkType.setName(String.valueOf(val));
 				} else {
@@ -196,7 +200,7 @@ public class SpatialGridKMLWriter {
 				lablePlacemarkType.setAbstractGeometryGroup(objectFactory.createPoint(pointType));
 				lablePlacemarkType.setName(String.valueOf(grid.getValue(row, col)));
 				lablePlacemarkType.setStyleUrl(lableStyleType.getId());
-				labelFolderType.getAbstractFeatureGroup().add(objectFactory.createPlacemark(lablePlacemarkType));
+//				labelFolderType.getAbstractFeatureGroup().add(objectFactory.createPlacemark(lablePlacemarkType));
 				
 			}
 		}
@@ -213,7 +217,9 @@ public class SpatialGridKMLWriter {
 	
 	private Point makeCoordinate(SpatialGrid<?> grid, int row, int col) {
 		double x = grid.getXmin() + (col * grid.getResolution());
-		double y = grid.getYmin() + (row * grid.getResolution());
+//		double x = grid.getXmax() - (col * grid.getResolution());
+//		double y = grid.getYmin() + (row * grid.getResolution());
+		double y = grid.getYmax() - (row * grid.getResolution());
 		Point point;
 		if(transform != null) {
 			double[] points = new double[] { x, y };

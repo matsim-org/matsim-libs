@@ -56,6 +56,12 @@ public class Profiler {
 		return time;
 	}
 	
+	public static void stopAll() {
+		for(Object obj : starts.keys()) {
+			stop(obj, true);
+		}
+	}
+	
 	public static void pause(Object obj) {
 		long time = System.currentTimeMillis() - starts.get(obj);
 		measures.adjustOrPutValue(obj, time, time);

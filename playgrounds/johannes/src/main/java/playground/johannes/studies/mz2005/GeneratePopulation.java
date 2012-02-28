@@ -43,17 +43,17 @@ public class GeneratePopulation {
 		String basedir = "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/";
 		RawDataToPopulation generator = new RawDataToPopulation();
 		List<Integer> days = new ArrayList<Integer>();
-		for(int i = 1; i < 6; i++)
-			days.add(i);
-//		days.add(6);
+//		for(int i = 1; i < 8; i++)
+//			days.add(i);
+		days.add(6);
 //		days.add(7);
 		Population pop = generator.create(basedir, days);
 		
 		PopulationWriter writer = new PopulationWriter(pop, null);
-		writer.write(basedir + "/07-09-2011/plans.wkday.xml");
+		writer.write(basedir + "/26-01-2012/plans.sun.xml");
 		
 		EscortData escortData = generator.getEscortData();
-		escortData.write(basedir + "/07-09-2011/escort.wkday.txt");
+		escortData.write(basedir + "/26-01-2012/escort.sun.txt");
 	}
 
 }

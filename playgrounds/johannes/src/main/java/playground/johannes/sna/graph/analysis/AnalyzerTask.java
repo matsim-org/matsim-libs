@@ -21,7 +21,9 @@ package playground.johannes.sna.graph.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
@@ -133,24 +135,60 @@ public abstract class AnalyzerTask {
 		}
 	}
 	
-	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
+	protected TDoubleDoubleHashMap writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
 		double[] values = stats.getValues();
 		if (values.length > 0) {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats,
 					FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
+			TXTWriter.writeMap(hist, name, "p",
+					String.format("%1$s/%2$s.n%3$s.nonorm.txt", getOutputDirectory(), name, values.length / bins));
 			Histogram.normalize(hist);
 			TXTWriter.writeMap(hist, name, "p",
 					String.format("%1$s/%2$s.n%3$s.txt", getOutputDirectory(), name, values.length / bins));
+			
+			return hist;
 		} else {
 			logger.warn("Cannot create histogram. No samples.");
+			return null;
 		}
 	}
 	
-	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
+	protected TDoubleDoubleHashMap writeCumulativeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
+		double[] values = stats.getValues();
+		if (values.length > 0) {
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), false, false);
+			hist = Histogram.createCumulativeHistogram(hist);
+			Histogram.normalizeCumulative(hist);
+			Histogram.complementary(hist);
+			TXTWriter.writeMap(hist, name, "P",	String.format("%1$s/%2$s.n%3$s.cum.txt", getOutputDirectory(), name, values.length / bins));
+			
+			return hist;
+		} else {
+			logger.warn("Cannot create histogram. No samples.");
+			return null;
+		}
+	}
+	
+	protected TDoubleDoubleHashMap writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, reweight);
 		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name)); 
 		Histogram.normalize(hist);
 		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
+		
+		return hist;
+	}
+	
+	protected void writeRawData(DescriptiveStatistics stats, String name) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%1$s/%2$s.raw.txt", getOutputDirectory(), name)));
+			for(double val : stats.getSortedValues()) {
+				writer.write(String.valueOf(val));
+				writer.newLine();
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	protected boolean outputDirectoryNotNull() {

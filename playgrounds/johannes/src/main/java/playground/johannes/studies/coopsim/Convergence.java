@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
+import gnu.trove.TDoubleArrayList;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import org.apache.commons.math.stat.regression.SimpleRegression;
 
 /**
  * @author illenberger
@@ -37,17 +41,20 @@ public class Convergence {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String root = "/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run89/";
+		String root = "/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run182/";
 		File outputDir = new File(root + "/output");
-		String property = "d_trip_visit";
+		String property = "score";
 		
-		File analysisDir = new File(root + "/analyis");
+		File analysisDir = new File(root + "/analysis");
 		analysisDir.mkdirs();
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(analysisDir.getAbsolutePath() + "/" + property + ".txt"));
 		writer.write("it\t");
 		writer.write(property);
 		writer.newLine();
+		
+		TDoubleArrayList yVals = new TDoubleArrayList();
+		TDoubleArrayList xVals = new TDoubleArrayList();
 		
 		for(File file : outputDir.listFiles()) {
 			if(file.isDirectory()) {
@@ -69,6 +76,9 @@ public class Convergence {
 							writer.write("\t");
 							writer.write(val);
 							writer.newLine();
+							
+							xVals.add(Double.parseDouble(iter));
+							yVals.add(Double.parseDouble(val));
 						}
 					}
 				}
@@ -76,6 +86,16 @@ public class Convergence {
 		}
 
 		writer.close();
+		
+		for(int i = 40; i < yVals.size(); i++) {
+			SimpleRegression reg = new SimpleRegression();
+			for(int k = i - 40; k < i;  k++) {
+				reg.addData(k, yVals.get(k));
+			}
+			
+			
+			System.out.println(String.format("Slope after iteration %1$s: %2$s.", i, reg.getSlope() ));
+		}
 	}
 
 }

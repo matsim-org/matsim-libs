@@ -21,11 +21,11 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import java.io.IOException;
 
-
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
@@ -43,7 +43,8 @@ public class PajekWriter extends playground.johannes.socialnetworks.graph.io.Paj
 	@Override
 	protected String getVertexLabel(Vertex v) {
 		SampledVertexDecorator<SocialVertex> vertex = (SampledVertexDecorator<SocialVertex>) v;
-		return vertex.getDelegate().getPerson().getId().toString();
+//		return vertex.getDelegate().getPerson().getId().toString();
+		return String.valueOf(((SampledVertex)v).getIterationSampled());
 	}
 
 	public static void main(String args[]) throws IOException {

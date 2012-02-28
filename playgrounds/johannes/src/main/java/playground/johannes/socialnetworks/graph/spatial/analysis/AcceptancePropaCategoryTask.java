@@ -24,6 +24,7 @@ import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,9 +38,11 @@ import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinLogDiscretizer;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.ObservedAcceptanceProbability;
@@ -100,6 +103,7 @@ public class AcceptancePropaCategoryTask extends ModuleAnalyzerTask<Accessibilit
 //		AcceptanceProbability propa = new AcceptanceProbability();
 
 		Map<String, TDoubleDoubleHashMap> histograms = new HashMap<String, TDoubleDoubleHashMap>();
+		Map<String, DescriptiveStatistics> distributions = new HashMap<String, DescriptiveStatistics>();
 		double sum = 0;
 		
 		for (int i = 0; i < partitions.size(); i++) {
@@ -108,21 +112,16 @@ public class AcceptancePropaCategoryTask extends ModuleAnalyzerTask<Accessibilit
 			Set<SpatialVertex> partition = (Set<SpatialVertex>) it.value();
 			System.out.println("Partition size = " + partition.size() + "; key = " + key);
 			DescriptiveStatistics distr = propa.distribution(partition, destinations);
-
 			try {
 				double[] values = distr.getValues();
 				System.out.println("Num samples = " + values.length);
 				if(values.length > 0) {
-					TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, FixedSampleSizeDiscretizer.create(values, 100, 50), true);
-//					Histogram.normalize(hist);
-//					TXTWriter.writeMap(hist, name, "p",
-//							String.format("%1$s/%2$s.n%3$s.txt", getOutputDirectory(), name, values.length / bins));
-				sum += Histogram.sum(hist);
-				histograms.put(String.format("p_accept-cat%1$.1f", key), hist);
+					TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, FixedSampleSizeDiscretizer.create(values, 1, 50), true);
+					sum += Histogram.sum(hist);
+					histograms.put(String.format("p_accept-cat%1$.0f", key), hist);
+					distributions.put(String.format("p_accept-cat%1$.0f", key), distr);
 				}
-//				writeHistograms(distr, String.format("p_accept-cat%1$.1f", key), 500, 200);
-				writeHistograms(distr, new LinLogDiscretizer(1000.0, 2), String.format("p_accept-cat%1$.1f.log", key),
-						true);
+				writeHistograms(distr, new LinLogDiscretizer(1000.0, 2), String.format("p_accept-cat%1$.0f.log", key), true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -135,9 +134,20 @@ public class AcceptancePropaCategoryTask extends ModuleAnalyzerTask<Accessibilit
 			try {
 				TXTWriter.writeMap(histogram, "d", "p", String.format("%1$s/%2$s.txt", getOutputDirectory(), key));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			
+			histogram = Histogram.createCumulativeHistogram(histogram);
+			Histogram.complementary(histogram);
+			try {
+				TXTWriter.writeMap(histogram, "d", "p", String.format("%1$s/%2$s.cum.txt", getOutputDirectory(), key));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			DescriptiveStatistics stats = distributions.get(key);
+			writeRawData(stats, key);
 		}
 	}
 

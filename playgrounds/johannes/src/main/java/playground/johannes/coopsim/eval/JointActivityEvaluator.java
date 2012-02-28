@@ -69,13 +69,27 @@ public class JointActivityEvaluator implements Evaluator {
 	@Override
 	public double evaluate(Trajectory trajectory) {
 		double score = 0;
-		double time = 0;
+//		double time = 0;
 
-		time = tracker.timeOverlap(trajectory.getPerson(), alters.get(trajectory.getPerson()));
-		if(time >= 1)
-			score = Math.log(time) * beta;
+		int n = tracker.metAlters(trajectory.getPerson(), alters.get(trajectory.getPerson()));
+		if(n > 1 && beta > 0)
+			score = Math.log(n * Math.exp(beta));
 		else
 			score = 0;
+//		for(Person p : alters.get(trajectory.getPerson())) {
+//			time = tracker.timeOverlap(trajectory.getPerson(), p);
+//			if(time > 0) {
+//				score += beta;
+//			}
+//		}
+//		time = tracker.timeOverlap(trajectory.getPerson(), alters.get(trajectory.getPerson()));
+//		if(time > 0) {
+//			score = beta;
+//		}
+//		if(time >= 1)
+//			score = Math.log(time) * beta;
+//		else
+//			score = 0;
 		
 		if(isLogging)
 			stats.addValue(score);

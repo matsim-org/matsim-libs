@@ -23,11 +23,15 @@ import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.DummyDiscretizer;
 
 
 /**
@@ -37,6 +41,10 @@ import playground.johannes.sna.math.Discretizer;
 public class AttributePartition {
 
 	private Discretizer discritizer;
+	
+	public AttributePartition() {
+		this.discritizer = new DummyDiscretizer();
+	}
 	
 	public AttributePartition(Discretizer discretizer) {
 		this.discritizer = discretizer;
@@ -60,4 +68,19 @@ public class AttributePartition {
 		return partitions;
 	}
 
+	public <V extends Vertex> Map<String, Set<V>> partition(Map<V, String> vertices) {
+		Map<String, Set<V>> partitions = new HashMap<String, Set<V>>();
+		
+		for(Entry<V, String> entry : vertices.entrySet()) {
+			Set<V> partition = partitions.get(entry.getValue());
+			if(partition == null) {
+				partition = new HashSet<V>();
+				partitions.put(entry.getValue(), partition);
+			}
+			
+			partition.add(entry.getKey());
+		}
+		
+		return partitions;
+	}
 }

@@ -62,7 +62,7 @@ public class FeatureKMLWriter {
 
 	private Colorizable colorizable = new DefaultColorizer();
 
-	private boolean drawContours;
+	private boolean drawContours = true;
 
 	private final ObjectFactory objectFactory = new ObjectFactory();
 	
@@ -126,12 +126,12 @@ public class FeatureKMLWriter {
 //		/*
 //		 * Create style type for the lable. 
 //		 */
-////		IconStyleType iconStyleType = objectFactory.createIconStyleType();
-////		iconStyleType.setScale(0.0);
-//		StyleType lableStyleType = objectFactory.createStyleType();
-////		lableStyleType.setIconStyle(iconStyleType);
-//		lableStyleType.setId("label");
-//		documentType.getAbstractStyleSelectorGroup().add(objectFactory.createStyle(lableStyleType));
+//		IconStyleType iconStyleType = objectFactory.createIconStyleType();
+//		iconStyleType.setScale(0.0);
+		StyleType lableStyleType = objectFactory.createStyleType();
+//		lableStyleType.setIconStyle(iconStyleType);
+		lableStyleType.setId("label");
+		documentType.getAbstractStyleSelectorGroup().add(objectFactory.createStyle(lableStyleType));
 		/*
 		 * Draw polygons.
 		 */

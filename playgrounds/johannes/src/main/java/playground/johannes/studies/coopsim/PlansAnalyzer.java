@@ -41,7 +41,9 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
 import playground.johannes.coopsim.analysis.ActTypeShareTask;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
+import playground.johannes.coopsim.analysis.ActivityLoadTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
+import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
 import playground.johannes.coopsim.analysis.JointActivityTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
@@ -68,10 +70,10 @@ public class PlansAnalyzer {
 		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run68/output/20800000/plans.xml.gz");
+		reader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run179/output/4300000/plans.xml.gz");
 		
 		SocialSparseGraphMLReader reader2 = new SocialSparseGraphMLReader();
-		SocialGraph graph = reader2.readGraph("/Users/jillenberger/Work/socialnets/locationChoice/mcmc.backup/run333/output/60000000000/graph.graphml", scenario.getPopulation());
+		SocialGraph graph = reader2.readGraph("/Users/jillenberger/Work/socialnets/locationChoice/mcmc.backup/run336/output/20000000000/graph.graphml", scenario.getPopulation());
 		
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.cg.xml");
@@ -109,9 +111,11 @@ public class PlansAnalyzer {
 		composite.addTask(new TripDistanceTask(scenario.getActivityFacilities()));
 		composite.addTask(new ActTypeShareTask());
 		composite.addTask(new JointActivityTask(graph, tracker));
+		composite.addTask(new ActivityLoadTask());
+		composite.addTask(new DurationArrivalTimeTask());
 		
 		TrajectoryAnalyzerTask.overwriteStratification(50, 1);
 		
-		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/analysis/run68/");
+		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/analysis/run179/");
 	}
 }

@@ -70,7 +70,7 @@ public abstract class DijkstraEngine {
 			public int compare(Integer o1, Integer o2) {
 				int r = Double.compare(costs[o1], costs[o2]);
 				if (r == 0) {
-					return o1;
+					return o1-o2;
 				} else
 					return r;
 			}

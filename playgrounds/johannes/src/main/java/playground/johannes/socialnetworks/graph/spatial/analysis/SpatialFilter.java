@@ -47,12 +47,21 @@ public class SpatialFilter implements GraphFilter<SpatialGraph> {
 
 	private Geometry geometry;
 
+	private boolean edgeMode;
+
 	@SuppressWarnings("unchecked")
-	public SpatialFilter(GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge> builder, Geometry geometry) {
+	public SpatialFilter(GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge> builder,
+			Geometry geometry) {
 		this.builder = (GraphBuilder<SpatialGraph, SpatialVertex, SpatialEdge>) builder;
 		this.geometry = geometry;
 	}
 
+	public SpatialFilter(GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge> builder,
+			Geometry geometry, boolean edgeMode) {
+		this(builder, geometry);
+		this.edgeMode = edgeMode;
+	}
+	
 	@Override
 	public SpatialGraph apply(SpatialGraph graph) {
 		/*
@@ -65,7 +74,7 @@ public class SpatialFilter implements GraphFilter<SpatialGraph> {
 		Set<SpatialEdge> edges = new HashSet<SpatialEdge>();
 		Set<SpatialVertex> vertices = new HashSet<SpatialVertex>();
 		findElements(copy, vertices, edges);
-		
+
 		for (SpatialEdge edge : edges)
 			builder.removeEdge(copy, edge);
 
@@ -76,6 +85,10 @@ public class SpatialFilter implements GraphFilter<SpatialGraph> {
 
 	}
 
+	public void setEdgeMode(boolean flag) {
+		this.edgeMode = flag;
+	}
+	
 	protected void findElements(SpatialGraph graph, Set<SpatialVertex> vertices, Set<SpatialEdge> edges) {
 		try {
 			CoordinateReferenceSystem sourceCRS = graph.getCoordinateReferenceSysten();
@@ -83,23 +96,50 @@ public class SpatialFilter implements GraphFilter<SpatialGraph> {
 
 			MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
 
-			for (SpatialVertex vertex : graph.getVertices()) {
-				boolean remove = false;
-				
-				if(vertex.getPoint() == null)
-					remove = true;
-				else {
-					Point p = CRSUtils.transformPoint(vertex.getPoint(), transform);
-					if (!geometry.contains(p)) {
-						remove = true;
+			if (edgeMode) {
+				for(SpatialEdge edge : graph.getEdges()) {
+					Point p1 = edge.getVertices().getFirst().getPoint();
+					Point p2 = edge.getVertices().getSecond().getPoint();
+					
+					if(p1 == null) {
+						edges.add(edge);
+						vertices.add(edge.getVertices().getFirst());
+					}
+					if(p2 == null) {
+						edges.add(edge);
+						vertices.add(edge.getVertices().getSecond());
+					}
+					
+					if(p1 != null && p2 != null) {
+						p1 = CRSUtils.transformPoint(p1, transform);
+						p2 = CRSUtils.transformPoint(p2, transform);
+						
+						if (!geometry.contains(p1) && !geometry.contains(p2)) {
+							edges.add(edge);
+							vertices.add(edge.getVertices().getFirst());
+							vertices.add(edge.getVertices().getSecond());
+						}
 					}
 				}
-				
-				if(remove) {
-					vertices.add(vertex);
-					edges.addAll(vertex.getEdges());
-				}
+			} else {
+				for (SpatialVertex vertex : graph.getVertices()) {
+					boolean remove = false;
 
+					if (vertex.getPoint() == null)
+						remove = true;
+					else {
+						Point p = CRSUtils.transformPoint(vertex.getPoint(), transform);
+						if (!geometry.contains(p)) {
+							remove = true;
+						}
+					}
+
+					if (remove) {
+						vertices.add(vertex);
+						edges.addAll(vertex.getEdges());
+					}
+
+				}
 			}
 		} catch (FactoryException e) {
 			e.printStackTrace();

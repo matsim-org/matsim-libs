@@ -74,7 +74,7 @@ public class SpatialPropertyAccessibilityTask extends ModuleAnalyzerTask<LogAcce
 				/*
 				 * degree-accessibility correlation
 				 */
-				TObjectDoubleHashMap<Vertex> yVals = Degree.getInstance().values(graph.getVertices());
+				TObjectDoubleHashMap yVals = Degree.getInstance().values(graph.getVertices());
 				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, discretizer);
 				TXTWriter.writeMap(correl, "A", "k", getOutputDirectory() + "k_A.mean.txt");
 				

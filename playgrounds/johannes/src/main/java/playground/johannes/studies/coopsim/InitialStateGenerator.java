@@ -27,10 +27,12 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
@@ -42,7 +44,7 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
 public class InitialStateGenerator {
 
 	public static void generate(SocialGraph graph, ActivityFacilities facilities, NetworkLegRouter router) {
-		PopulationFactory factory = new PopulationFactoryImpl(null);
+		PopulationFactory factory = new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		/*
 		 * delete all plans
 		 */

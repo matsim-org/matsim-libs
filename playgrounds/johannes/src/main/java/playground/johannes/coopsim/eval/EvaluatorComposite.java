@@ -21,6 +21,7 @@ package playground.johannes.coopsim.eval;
 
 import org.apache.log4j.Logger;
 
+import playground.johannes.coopsim.Profiler;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.sna.util.Composite;
 
@@ -36,17 +37,19 @@ public class EvaluatorComposite extends Composite<Evaluator> implements Evaluato
 	public double evaluate(Trajectory trajectory) {
 		double score = 0;
 		
-		for(Evaluator e : components)
+		for(Evaluator e : components) {
+//			Profiler.resume(e.getClass().getName());
 			score += e.evaluate(trajectory);
+//			Profiler.pause(e.getClass().getName());
+		}
 		
 		if(Double.isInfinite(score))
-			logger.debug("Infinite score.");
+			logger.warn("Infinite score.");
 		else if (Double.isNaN(score)) {
 			logger.warn("*** Score is NaN! Treating like negative infinity. ***");
 			return Double.NEGATIVE_INFINITY;
 		}
-//			throw new IllegalArgumentException("NaN is not a valid score.");
-		
+
 		return score;
 	}
 

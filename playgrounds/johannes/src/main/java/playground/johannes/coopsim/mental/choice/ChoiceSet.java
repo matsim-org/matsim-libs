@@ -61,6 +61,10 @@ public class ChoiceSet<T> {
 		weightSum += weight;
 	}
 	
+	public List<T> getChoices() {
+		return options;
+	}
+	
 	public T randomChoice() {
 		return options.get(random.nextInt(options.size()));
 	}

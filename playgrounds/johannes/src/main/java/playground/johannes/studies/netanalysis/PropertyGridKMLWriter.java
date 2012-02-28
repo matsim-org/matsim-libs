@@ -20,12 +20,22 @@
 package playground.johannes.studies.netanalysis;
 
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.geotools.feature.Feature;
+
+import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerKMLWriter;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.analysis.GenderNumeric;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.VertexPropertyGrid;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
@@ -35,15 +45,37 @@ public class PropertyGridKMLWriter {
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
-		SocialSparseGraphMLReader reader = new SocialSparseGraphMLReader();
-		SocialGraph graph = reader.readGraph(args[0]);
+	public static void main(String[] args) throws IOException {
+//		SocialSparseGraphMLReader reader = new SocialSparseGraphMLReader();
+//		SocialGraph graph = reader.readGraph(args[0]);
+//		
+//		ZoneLayer<Double> layer = VertexPropertyGrid.createMeanGrid(graph.getVertices(), GenderNumeric.getInstance());
+//		
+//		ZoneLayerKMLWriter writer = new ZoneLayerKMLWriter();
+//		writer.writeWithColor(layer, args[1]);
 		
-		ZoneLayer<Double> layer = VertexPropertyGrid.createMeanGrid(graph.getVertices(), GenderNumeric.getInstance());
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/output/plain/graph.graphml");
 		
-		ZoneLayerKMLWriter writer = new ZoneLayerKMLWriter();
-		writer.writeWithColor(layer, args[1]);
+		ZoneLayer<Double> layer = VertexPropertyGrid.createMeanGrid(graph.getVertices(), Degree.getInstance(), 1000.0);
+		
+		Set<Feature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp");
+		Geometry ch = features.iterator().next().getDefaultGeometry();
+		
+		Set<Zone> remove = new HashSet<Zone>();
+		for(Zone z : layer.getZones()) {
+			if(!ch.contains(z.getGeometry())) {
+				remove.add(z);
+			}
+		}
+		
+		Set<Zone<Double>> zones = new HashSet<Zone<Double>>(layer.getZones());
+		zones.removeAll(remove);
+		
+		layer = new ZoneLayer<Double>(zones);
+		ZoneLayerSHP.write(layer, "/Users/jillenberger/Work/socialnets/mcmc/output/plain/degreegrid.shp");
 	}
 
 }

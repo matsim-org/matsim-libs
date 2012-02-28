@@ -90,7 +90,7 @@ public class RawDataToPopulation {
 				Collections.sort(pContainer.trips, comparator);
 				
 				if (days == null || days.contains(pContainer.referenceDay)) {
-					Person p = createPerson(pContainer.trips);
+					Person p = createPerson(pContainer);
 					pop.addPerson(p);
 				}
 			}
@@ -120,11 +120,13 @@ public class RawDataToPopulation {
 	
 	}
 
-	private Person createPerson(List<TripDataContaienr> trips) {
+	private Person createPerson(PersonDataContainer container) {
+		List<TripDataContaienr> trips = container.trips;
 		/*
 		 * create a person and a plan
 		 */
-		Person person = new PersonImpl(scenario.createId(trips.get(0).personId));
+		PersonImpl person = new PersonImpl(scenario.createId(trips.get(0).personId));
+		person.setAge(container.age);
 		Plan plan = new PlanImpl(person);
 		/*
 		 * create the first home activity

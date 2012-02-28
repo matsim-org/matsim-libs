@@ -42,17 +42,19 @@ import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
 import playground.johannes.sna.snowball.analysis.EstimatedDegree;
 import playground.johannes.sna.snowball.analysis.EstimatedTransitivity;
 import playground.johannes.sna.snowball.analysis.ObservedDegree;
-import playground.johannes.sna.snowball.analysis.ObservedTransitivity;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
+import playground.johannes.sna.snowball.sim.FinalSampleAnalyzer;
 import playground.johannes.sna.snowball.sim.IntervalSampleAnalyzer;
+import playground.johannes.sna.snowball.sim.IterationSampleAnalyzer;
+import playground.johannes.sna.snowball.sim.LogIntervalSampleAnalyzer;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
-import playground.johannes.socialnetworks.snowball2.analysis.ResponseRateTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
+import playground.johannes.socialnetworks.snowball2.sim.RDSEstimator;
 
 /**
  * @author illenberger
@@ -98,9 +100,11 @@ public class SnowballSim {
 		 * Init estimators.
 		 */
 		PiEstimator estimator = new SimplePiEstimator(graph.getVertices().size());
-		Map<String, AnalyzerTask> analyzers = loadAnalyzers(graph, estimator);
-		List<PiEstimator> estimators = new ArrayList<PiEstimator>(1);
+		RDSEstimator rdsEstimator = new RDSEstimator(graph.getVertices().size());
+		Map<String, AnalyzerTask> analyzers = loadAnalyzers(graph, estimator, rdsEstimator);
+		List<PiEstimator> estimators = new ArrayList<PiEstimator>(2);
 		estimators.add(estimator);
+		estimators.add(rdsEstimator);
 		/*
 		 * Get output directory.
 		 */
@@ -109,7 +113,8 @@ public class SnowballSim {
 		 * Init sample analyzers.
 		 */
 //		final int interval = Integer.parseInt(config.getParam(MODULENAME, "interval"));
-		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimators, output);
+//		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimators, output);
+		IntervalSampleAnalyzer intervalAnalyzer = new LogIntervalSampleAnalyzer(analyzers, estimators, output, 1.5, 100);
 //		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimators, output);
 //		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimators, output);
 //		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
@@ -158,7 +163,7 @@ public class SnowballSim {
 		return reader.readGraph(file);
 	}
 	
-	private static Map<String, AnalyzerTask> loadAnalyzers(Graph graph, PiEstimator estimator) {
+	private static Map<String, AnalyzerTask> loadAnalyzers(Graph graph, PiEstimator estimator, RDSEstimator rdsEstimator) {
 		Map<String, AnalyzerTask> analyzers = new HashMap<String, AnalyzerTask>();
 		/*
 		 * observed 1
@@ -171,14 +176,14 @@ public class SnowballSim {
 		DegreeTask obsDegree = new DegreeTask();
 		obsDegree.setModule(ObservedDegree.getInstance());
 		tasks.addTask(obsDegree);
+//		
+//		TransitivityTask obsTransitivity = new TransitivityTask();
+//		obsTransitivity.setModule(ObservedTransitivity.getInstance());
+//		tasks.addTask(obsTransitivity);
+//		
+//		tasks.addTask(new ResponseRateTask());
 		
-		TransitivityTask obsTransitivity = new TransitivityTask();
-		obsTransitivity.setModule(ObservedTransitivity.getInstance());
-		tasks.addTask(obsTransitivity);
-		
-		tasks.addTask(new ResponseRateTask());
-		
-		analyzers.put("obs", tasks);
+//		analyzers.put("obs", tasks);
 		/*
 		 * observed 2
 		 */
@@ -189,7 +194,9 @@ public class SnowballSim {
 		 * estimated
 		 */
 		DescriptivePiStatisticsFactory wsmFactory = new WSMStatsFactory();
-		analyzers.put("wsm", createDefaultEstimAnalyzer(estimator, wsmFactory));
+//		analyzers.put("wsm", createDefaultEstimAnalyzer(estimator, wsmFactory));
+		
+		analyzers.put("rds", createDefaultEstimAnalyzer(rdsEstimator, wsmFactory));
 		
 //		DescriptivePiStatisticsFactory htFactory = new HTStatsFactory(graph.getVertices().size());
 //		analyzers.put("ht", createDefaultEstimAnalyzer(estimator, htFactory));
@@ -224,11 +231,11 @@ public class SnowballSim {
 		estimDegree.setModule(new EstimatedDegree(estimator, factory));
 		tasks.addTask(estimDegree);
 		
-		TransitivityTask estimTransitivity = new TransitivityTask();
-		EstimatedTransitivity trans = new EstimatedTransitivity(estimator, factory, true);
-		trans.enableCaching(false);
-		estimTransitivity.setModule(trans);
-		tasks.addTask(estimTransitivity);
+//		TransitivityTask estimTransitivity = new TransitivityTask();
+//		EstimatedTransitivity trans = new EstimatedTransitivity(estimator, factory, true);
+//		trans.enableCaching(false);
+//		estimTransitivity.setModule(trans);
+//		tasks.addTask(estimTransitivity);
 		
 //		tasks.addTask(new EstimatorTask(estimator));
 		

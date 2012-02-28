@@ -23,9 +23,12 @@ import java.util.Set;
 
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
+import playground.johannes.socialnetworks.graph.social.analysis.F2FFreqEdgeLengthTask;
+import playground.johannes.socialnetworks.graph.social.analysis.F2FFrequencyTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,10 +41,7 @@ import com.vividsolutions.jts.geom.Point;
 public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 	
 	public ObsSpatialAnalyzerTask(Set<Point> points, Geometry boundary) {
-		
-		
-//		addTask(new EpsilonTask(points));
-		
+//		addTask(new CoordAvailTask());
 //		EdgeLengthTask distanceTask = new EdgeLengthTask();
 //		distanceTask.setModule(EdgeLength.getInstance());
 //		addTask(new EdgeLengthTask());
@@ -52,12 +52,9 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 		
 		Accessibility access = new ObservedAccessibility(new GravityCostFunction(1.4, 0));
 		access.setTargets(points);
-		addTask(new DegreeAccessibilityTask(access));
 		
-		
-//		addTask(new EdgeLengthAccessibilityTask(access));
-//		
-//		addTask(new TripTask());
+//		addTask(new DegreeAccessibilityTask(access));
+		addTask(new EdgeLengthAccessibilityTask(access));
 		
 //		AcceptancePropaCategoryTask t = new AcceptancePropaCategoryTask(access);
 //		t.setBoundary(boundary);
@@ -66,29 +63,9 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 //		
 //		TransitivityAccessibilityTask tatask = new TransitivityAccessibilityTask(access);
 //		addTask(tatask);
-//		PropConstAccessibilityTask t = new PropConstAccessibilityTask();
-//		t.setTargets(points);
-//		addTask(t);
-		
-//		DegreeNormConstantTask kcTask = new DegreeNormConstantTask();
-//		ObservedNormConstant norm = new ObservedNormConstant();
-//		norm.setDestinations(points);
-//		kcTask.setModule(norm);
-//		addTask(kcTask);
-		
-//		GravityCostFunction func = new GravityCostFunction(1.4, 0, new CartesianDistanceCalculator());
-////////		
-//		SpatialPropertyDegreeTask xkTask = new SpatialPropertyDegreeTask(func, points);
-//		xkTask.setModule(new ObservedDegree());
-//		xkTask.setDiscretizer(new LinearDiscretizer(5.0));
-//		addTask(xkTask);
-//		NormConstAcceptPropConstTask t = new NormConstAcceptPropConstTask();
-//		t.setDestinations(points);
-//		addTask(t);
-		
-//		addTask(new AcceptFactorTask(choiceSet));
-//		DegreeDensityTask kRhoTask = new DegreeDensityTask(zones);
-//		kRhoTask.setModule(new ObservedDegree());
-//		addTask(kRhoTask);
+//		
+		addTask(new F2FFreqEdgeLengthTask());
+		addTask(new TripTask());
+		addTask(new F2FFrequencyTask());
 	}
 }

@@ -22,6 +22,7 @@ package playground.johannes.coopsim.pysical;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -138,15 +139,66 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 		double sum = 0;
 		for (Visit visit : data.visits) {
 			List<Visitor> visitors = facilityData.get(visit.facilityId);
+			List<Person> linkedAlters = new LinkedList<Person>(alters);
+
 			for (Visitor visitor : visitors) {
-				for (Person alter : alters) {
+			
+				if(linkedAlters.isEmpty())
+					break;
+				
+				Person match = null;
+				for (Person alter : linkedAlters) {
 					if (alter.getId().equals(visitor.personId)) {
 						double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
 						double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
 						double delta = Math.max(0.0, end - start);
 						sum += delta;
+						match = alter;
 						break;
 					}
+				}
+				
+				if(match != null) {
+					linkedAlters.remove(match);
+				}
+
+			}
+		}
+
+		return sum;
+	}
+	
+	public int metAlters(Person person, Collection<Person> alters) {
+		PersonData data = personData.get(person.getId());
+		if(data == null)
+			return 0;
+
+		int sum = 0;
+		for (Visit visit : data.visits) {
+			List<Visitor> visitors = facilityData.get(visit.facilityId);
+			List<Person> linkedAlters = new LinkedList<Person>(alters);
+
+			for (Visitor visitor : visitors) {
+			
+				if(linkedAlters.isEmpty())
+					break;
+				
+				Person match = null;
+				for (Person alter : linkedAlters) {
+					if (alter.getId().equals(visitor.personId)) {
+						double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
+						double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
+						double delta = Math.max(0.0, end - start);
+						if(delta > 0)
+							sum++;
+						
+						match = alter;
+						break;
+					}
+				}
+				
+				if(match != null) {
+					linkedAlters.remove(match);
 				}
 
 			}

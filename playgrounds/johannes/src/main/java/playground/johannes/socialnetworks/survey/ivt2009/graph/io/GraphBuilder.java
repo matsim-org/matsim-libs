@@ -20,31 +20,39 @@
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TObjectIntHashMap;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.math.Distribution;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.snowball.SampledGraphProjection;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
@@ -203,7 +211,7 @@ public class GraphBuilder {
 		/*
 		 * Sociogram
 		 */
-//		loadSociogramData(alterReader.getVertices().values(), sqlReader);
+		loadSociogramData(alterReader.getVertices().values(), sqlReader);
 		
 		logger.info(errLogger.toString());
 		return proj;
@@ -250,8 +258,10 @@ public class GraphBuilder {
 			return 1;
 		else if(id > 10000 && id <= 100000)
 			return 2;
-		else if(id > 100000)
+		else if(id > 100000 && id <= 400000)
 			return 3;
+		else if(id > 400000)
+			return 4;
 		else {
 			logger.warn(String.format("Cannot infere sampling iteration (%1$s)", id));
 			return null;
@@ -262,12 +272,23 @@ public class GraphBuilder {
 		logger.info("Loading sociogram data...");
 		Map<String, VertexRecord> map = sqlData.getFullAlterKeyMappping(records);
 		
+		TObjectIntHashMap<Vertex> rawDegrees = new TObjectIntHashMap<Vertex>();
+		for(Vertex v : proj.getVertices()) {
+			rawDegrees.put(v, v.getNeighbours().size());
+		}
+		
 		int edgecnt = 0;
 		int doublecnt = 0;
+		int egoEdge = 0;
 		
-		Distribution numDistr = new Distribution();
-		Distribution numDistrNoZero = new Distribution();
-		Distribution sizeDistr = new Distribution();
+		Set<Vertex> notOkVertices = new HashSet<Vertex>();
+		Set<Vertex> okVertices = new HashSet<Vertex>();
+		DescriptiveStatistics notOkStats = new DescriptiveStatistics();
+		DescriptiveStatistics okStats = new DescriptiveStatistics();
+		
+		DescriptiveStatistics numDistr = new DescriptiveStatistics();
+		DescriptiveStatistics numDistrNoZero = new DescriptiveStatistics();
+		DescriptiveStatistics sizeDistr = new DescriptiveStatistics();
 		
 		TDoubleArrayList sizeValues = new TDoubleArrayList();
 		TDoubleArrayList kSizeValues = new TDoubleArrayList();
@@ -278,19 +299,19 @@ public class GraphBuilder {
 		for(VertexRecord record : records) {
 			if(record.isEgo) {
 			List<Set<String>> cliques = sqlData.getCliques(record);
-			numDistr.add(cliques.size());
+			numDistr.addValue(cliques.size());
 			
 			Vertex v = idMap.get(record.id);
 			numValues.add(cliques.size());
 			kNumValues.add(v.getNeighbours().size());
 			
 			if(!cliques.isEmpty())
-				numDistrNoZero.add(cliques.size());
+				numDistrNoZero.addValue(cliques.size());
 			
 			for(Set<String> clique : cliques) {
-					sizeDistr.add(clique.size());
+					sizeDistr.addValue(clique.size());
 					sizeValues.add(clique.size());
-					kSizeValues.add(v.getNeighbours().size());
+					kSizeValues.add(rawDegrees.get(projMap.get(v)));
 					numValues2.add(cliques.size());
 					List<SocialSparseVertex> vertices = new ArrayList<SocialSparseVertex>(clique.size());
 					for (String alter : clique) {
@@ -309,15 +330,32 @@ public class GraphBuilder {
 
 				for(int i = 0; i < vertices.size(); i++) {
 					for(int j = i+1; j < vertices.size(); j++) {
-						SocialSparseEdge socialEdge = builder.addEdge(graph, vertices.get(i), vertices.get(j));
-						if(socialEdge != null) {
-							SampledVertexDecorator<SocialSparseVertex> vProj1 = projMap.get(vertices.get(i));
-							SampledVertexDecorator<SocialSparseVertex> vProj2 = projMap.get(vertices.get(j));
-						
-							projBuilder.addEdge(proj, vProj1, vProj2, socialEdge);
-							edgecnt++;
-						} else {
-							doublecnt++;
+						SampledVertexDecorator<SocialSparseVertex> vProj1 = projMap.get(vertices.get(i));
+						SampledVertexDecorator<SocialSparseVertex> vProj2 = projMap.get(vertices.get(j));
+						if (!vProj1.isSampled() && !vProj2.isSampled()) {
+													
+							if (Math.random() < 0.62) {
+								SocialSparseEdge socialEdge = builder.addEdge(graph, vertices.get(i), vertices.get(j));
+								if (socialEdge != null) {
+									projBuilder.addEdge(proj, vProj1, vProj2, socialEdge);
+									edgecnt++;
+									
+									if (vProj1.isSampled() || vProj2.isSampled()) {
+										egoEdge++;
+										if (vProj1.isSampled())
+											notOkVertices.add(vProj1);
+										else
+											notOkVertices.add(vProj2);
+									}
+									
+								} else {
+									doublecnt++;
+									if (vProj1.isSampled())
+										okVertices.add(vProj1);
+									else if (vProj2.isSampled())
+										okVertices.add(vProj2);
+								}
+							}
 						}
 					}
 				}
@@ -325,21 +363,62 @@ public class GraphBuilder {
 		}
 		}
 		
+		for(Vertex v : okVertices)
+			okStats.addValue(rawDegrees.get(v));
+		
+		for(Vertex v: notOkVertices)
+			notOkStats.addValue(rawDegrees.get(v));
 		try {
-			logger.info("Mean num of cliques: " + numDistrNoZero.mean());
-			logger.info("Mean size: " + sizeDistr.mean());
+			
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(okStats, new LinearDiscretizer(1), false);
+		TXTWriter.writeMap(hist, "k", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_ok.txt");
+		
+		TDoubleDoubleHashMap hist2 = Histogram.createHistogram(notOkStats, new LinearDiscretizer(1), false);
+		TXTWriter.writeMap(hist2, "k", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_notok.txt");
+		
+		TDoubleDoubleHashMap ratio = new TDoubleDoubleHashMap();
+		double[] keys = hist.keys();
+		for(double k : keys) {
+			double val1 = hist2.get(k);
+			double val2 = hist.get(k);
+			
+			ratio.put(k, val1/(val2+val1));
+		}
+		TXTWriter.writeMap(ratio, "k", "p", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_ratio.txt");
+		
+			logger.info("Mean num of cliques: " + numDistrNoZero.getMean());
+			logger.info("Mean size: " + sizeDistr.getMean());
 			logger.info("Median num of cliques: " + StatUtils.percentile(numDistrNoZero.getValues(), 50));
 			logger.info("Median size: " + StatUtils.percentile(sizeDistr.getValues(), 50));
-			Distribution.writeHistogram(numDistr.absoluteDistribution(), "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/numCliques.txt");
-			Distribution.writeHistogram(sizeDistr.absoluteDistribution(), "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/numPersons.txt");
 			
-			Correlations.writeToFile(Correlations.mean(kSizeValues.toNativeArray(), sizeValues.toNativeArray()),
-					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/size_k.txt", "k", "size");
-			Correlations.writeToFile(Correlations.mean(kNumValues.toNativeArray(), numValues.toNativeArray()), 
-					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/num_k.txt", "k", "n");
+			TDoubleDoubleHashMap histNum = Histogram.createHistogram(numDistrNoZero, FixedSampleSizeDiscretizer.create(numDistrNoZero.getValues(), 2, 20), true);
+			Histogram.normalize(histNum);
+			TXTWriter.writeMap(histNum, "num", "freq", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/numCliques.txt");
+			
+			TDoubleDoubleHashMap histSize = Histogram.createHistogram(sizeDistr, FixedSampleSizeDiscretizer.create(sizeDistr.getValues(), 2, 20), true);
+			Histogram.normalize(histSize);
+			TXTWriter.writeMap(histSize, "size", "freq", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/numPersons.txt");
+			
+			Discretizer discretizer = FixedSampleSizeDiscretizer.create(kSizeValues.toNativeArray(), 20, 20);
+			TDoubleArrayList valuesX = new TDoubleArrayList();
+			for(int i = 0; i < kSizeValues.size(); i++) {
+				valuesX.add(discretizer.discretize(kSizeValues.get(i)));
+			}
+			
+			Correlations.writeToFile(Correlations.mean(valuesX.toNativeArray(), sizeValues.toNativeArray()),
+					"/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/size_k.txt", "k", "size");
+			
+			discretizer = FixedSampleSizeDiscretizer.create(kNumValues.toNativeArray(), 20, 20);
+			valuesX = new TDoubleArrayList();
+			for(int i = 0; i < kNumValues.size(); i++) {
+				valuesX.add(discretizer.discretize(kNumValues.get(i)));
+			}
+			
+			Correlations.writeToFile(Correlations.mean(valuesX.toNativeArray(), numValues.toNativeArray()), 
+					"/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/num_k.txt", "k", "n");
 			
 			Correlations.writeToFile(Correlations.mean(numValues2.toNativeArray(), sizeValues.toNativeArray()), 
-					"/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/size_num.txt", "num", "size");
+					"/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/size_num.txt", "num", "size");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -348,6 +427,7 @@ public class GraphBuilder {
 			e.printStackTrace();
 		}
 		logger.info(String.format("Inserted %1$s edges, %2$s edges already present.", edgecnt, doublecnt));
+		logger.info(String.format("Inserted %1$s edges between at least one ego.", egoEdge));
 	}
 	
 	private class ErrorLogger {
@@ -416,8 +496,8 @@ public class GraphBuilder {
 		GraphBuilder builder = new GraphBuilder();
 		
 		ArrayList<String> alterTables = new ArrayList<String>();
-		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/05-2011/raw/alters1.txt");
-		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/05-2011/raw/alters2.txt");
+		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/raw/alters1.txt");
+		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/raw/alters2.txt");
 		
 		
 		ArrayList<String> egoTables = new ArrayList<String>();
@@ -425,11 +505,11 @@ public class GraphBuilder {
 //		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/egos2.txt");
 		
 		ArrayList<String> sqlDumps = new ArrayList<String>();
-		sqlDumps.add("/Users/jillenberger/Work/socialnets/data/ivt2009/05-2011/raw/snowball.csv");
+		sqlDumps.add("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/raw/snowball.csv");
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
 		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialSparseGraphMLWriter());
-		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/05-2011/graph/graph.graphml");
+//		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/graph/graph.graphml");
 //		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/graph.graphml");
 	}
 }

@@ -90,7 +90,7 @@ public class TripDistEscortTask extends TrajectoryAnalyzerTask {
 		}
 
 		try {
-			TXTWriter.writeStatistics(statsMap, "escorts", getOutputDirectory() + "d_trip_escorts.txt");
+			TXTWriter.writeStatistics(statsMap, "escorts", getOutputDirectory() + "/d_trip_escorts.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

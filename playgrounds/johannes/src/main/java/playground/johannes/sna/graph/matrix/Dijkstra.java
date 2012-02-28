@@ -93,6 +93,8 @@ public class Dijkstra extends DijkstraEngine {
 	 *            the target vertex index.
 	 * @return a shortest path from vertex <tt>i</tt> to <tt>j</tt>, or
 	 *         <tt>null</tt> if there is no path from <tt>i</tt> to <tt>j</tt>.
+	 *         The path contains the indices of the vertices excluding the
+	 *         source vertex.
 	 */
 	public TIntArrayList getPath(int i, int j) {
 		TIntArrayList path = new TIntArrayList();

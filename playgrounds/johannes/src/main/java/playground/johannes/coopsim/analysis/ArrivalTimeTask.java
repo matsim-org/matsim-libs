@@ -28,6 +28,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * @author illenberger
@@ -52,7 +53,8 @@ public class ArrivalTimeTask extends TrajectoryAnalyzerTask {
 			results.put(key, stats);
 			
 			try {
-				writeHistograms(stats, key, 50, 50);
+				writeHistograms(stats, key, 24, 1);
+				writeHistograms(stats, new LinearDiscretizer(3600), key, false);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -37,6 +37,7 @@ public class FacilityFromActivity {
 
 	public static void createActivities(Population population, ActivityFacilitiesImpl facilities) {
 		for(Person person : population.getPersons().values()) {
+			int k = 0;
 			for(Plan plan : person.getPlans()) {
 				for(int i = 0; i < plan.getPlanElements().size(); i += 2) {
 					Activity act = (Activity) plan.getPlanElements().get(i);
@@ -44,10 +45,11 @@ public class FacilityFromActivity {
 					if(act.getCoord() == null) 
 						throw new NullPointerException("Activity has no coordinate.");
 					
-					Id id = new IdImpl(String.format("tmp.%1$s.%2$s", person.getId().toString(), i));
+					Id id = new IdImpl(String.format("tmp.%1$s.%2$s.%3$s", person.getId().toString(), k, i));
 					ActivityFacilityImpl facility = facilities.createFacility(id, act.getCoord());
 					((ActivityImpl)act).setFacilityId(facility.getId());
 				}
+				k++;
 			}
 		}
 	}

@@ -35,6 +35,7 @@ import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.graph.social.analysis.F2FFrequency;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
 
 /**
@@ -52,16 +53,22 @@ public class TripTask extends AnalyzerTask {
 		
 		DescriptivePiStatistics stats = new DescriptivePiStatistics();
 		
+		int count = 0;
+		
 		TObjectDoubleIterator<Edge> it = edgeLengths.iterator();
 		for(int i = 0; i < edgeLengths.size(); i++) {
 			it.advance();
 			double d = it.value();
 			double f = f2fFreq.get(it.key());
-			if(f > 0 && d > 0)
+			if(f > 0 && d > 0) {
 				stats.addValue(d, 1/f);
+				count++;
+			}
 		}
 		
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 100, 50), true);
+		System.out.println("Number of edges with dist and freq: " + count);
+		
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 50), true);
 		Histogram.normalize(hist);
 		try {
 			TXTWriter.writeMap(hist, "d", "p_trip", getOutputDirectory() + "p_trip.txt");

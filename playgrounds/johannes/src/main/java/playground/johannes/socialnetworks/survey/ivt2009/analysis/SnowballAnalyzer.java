@@ -27,10 +27,10 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -48,6 +48,7 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.FilteredAnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilter;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilterComposite;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
@@ -77,6 +78,8 @@ public class SnowballAnalyzer {
 	
 	private Geometry chBorder;
 	
+	private Geometry zrhBorder;
+	
 	public static void main(String args[]) {
 		Config config = new Config();
 		ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(config);
@@ -102,6 +105,10 @@ public class SnowballAnalyzer {
 		Feature feature = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "chzone")).iterator().next();
 		chBorder = feature.getDefaultGeometry();
 		chBorder.setSRID(21781);
+		
+		feature = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "zrhzone")).iterator().next();
+		zrhBorder = feature.getDefaultGeometry();
+		zrhBorder.setSRID(21781);
 		
 		String output = config.getParam(MODULE_NAME, "output");
 //		graph2.transformToCRS(CRSUtils.getCRS(4326));
@@ -138,6 +145,10 @@ public class SnowballAnalyzer {
 		FilteredAnalyzerTask task = new FilteredAnalyzerTask(obsEstim);
 //		task.addFilter(new DefaultFilter(), "full");
 		task.addFilter(new SpatialFilter((GraphBuilder) builder, chBorder), "ch");
+//		SpatialFilterComposite composite = new SpatialFilterComposite();
+//		composite.addComponent(new SpatialFilter((GraphBuilder) builder, chBorder));
+//		composite.addComponent(new SpatialFilter((GraphBuilder) builder, zrhBorder, true));
+//		task.addFilter(composite, "zrh");
 		
 		
 		return task;
@@ -145,7 +156,8 @@ public class SnowballAnalyzer {
 	
 	private void analyze(SampledGraph graph, String output) {
 		try {
-			
+			ApplySeedsFilter sFilter = new ApplySeedsFilter();
+			sFilter.apply(graph);
 			
 			int it = 0;
 			for(SampledVertex vertex : graph.getVertices()) {
@@ -157,10 +169,10 @@ public class SnowballAnalyzer {
 			AnalyzerTask itTask = createIterationTask();
 			FilteredAnalyzerTask task = new FilteredAnalyzerTask(itTask);
 			task.addFilter(new DefaultFilter(), "plain");
-			for(int i = 0; i <= it; i++) {
-				SampledGraphFilter filter = new SampledGraphFilter(builder, i);
-				task.addFilter(filter, String.format("it.%1$s", i));
-			}
+//			for(int i = 0; i <= it; i++) {
+//				SampledGraphFilter filter = new SampledGraphFilter(builder, i);
+//				task.addFilter(filter, String.format("it.%1$s", i));
+//			}
 			task.setOutputDirectoy(output);
 			
 			GraphAnalyzer.analyze(graph, task, output);

@@ -48,7 +48,13 @@ public class ArrivalTime extends AbstractTrajectoryProperty {
 				Activity act = (Activity)trajectory.getElements().get(i);
 				
 				if(purpose == null || act.getType().equals(purpose)) {
-					values.put(trajectory, trajectory.getTransitions().get(i));
+					if(values.containsKey(trajectory)) {
+						if(Math.random() > 0.5) // this is a hack to deal with multiple activities of the same type
+							values.put(trajectory, trajectory.getTransitions().get(i));
+					} else {
+						values.put(trajectory, trajectory.getTransitions().get(i));
+					}
+						
 				}
 			}
 		}

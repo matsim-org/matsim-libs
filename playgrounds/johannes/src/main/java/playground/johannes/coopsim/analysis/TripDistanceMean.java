@@ -38,7 +38,7 @@ import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
  * @author illenberger
  *
  */
-public class TripDistanceSum extends AbstractTrajectoryProperty {
+public class TripDistanceMean extends AbstractTrajectoryProperty {
 
 	private final String purpose;
 	
@@ -46,11 +46,11 @@ public class TripDistanceSum extends AbstractTrajectoryProperty {
 	
 	private final ActivityFacilities facilities;
 	
-	public TripDistanceSum(String purpose, ActivityFacilities facilities) {
+	public TripDistanceMean(String purpose, ActivityFacilities facilities) {
 		this(purpose, facilities, OrthodromicDistanceCalculator.getInstance());
 	}
 	
-	public TripDistanceSum(String purpose, ActivityFacilities facilities, DistanceCalculator calculator) {
+	public TripDistanceMean(String purpose, ActivityFacilities facilities, DistanceCalculator calculator) {
 		this.purpose = purpose;
 		this.facilities = facilities;
 		this.calculator = calculator;
@@ -61,6 +61,8 @@ public class TripDistanceSum extends AbstractTrajectoryProperty {
 		TObjectDoubleHashMap<Trajectory> values = new TObjectDoubleHashMap<Trajectory>(trajectories.size());
 		
 		for(Trajectory trajectory : trajectories) {
+			double d_sum = 0;
+			int cnt = 0;
 			for(int i = 2; i < trajectory.getElements().size(); i += 2) {
 				Activity destination = (Activity) trajectory.getElements().get(i);
 				
@@ -73,10 +75,18 @@ public class TripDistanceSum extends AbstractTrajectoryProperty {
 					ActivityFacility fac = facilities.getFacilities().get(id);
 					Coord source = fac.getCoord();
 					
-					double d = calculator.distance(MatsimCoordUtils.coordToPoint(source), MatsimCoordUtils.coordToPoint(dest));
-					values.adjustOrPutValue(trajectory, d, d);
+					try {
+						double d = calculator.distance(MatsimCoordUtils.coordToPoint(source), MatsimCoordUtils.coordToPoint(dest));
+						d_sum += d;
+						cnt++;
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					}
 				}
-				
+			}
+			if (cnt > 0) {
+				double d_mean = d_sum / (double) cnt;
+				values.adjustOrPutValue(trajectory, d_mean, d_mean);
 			}
 		}
 		

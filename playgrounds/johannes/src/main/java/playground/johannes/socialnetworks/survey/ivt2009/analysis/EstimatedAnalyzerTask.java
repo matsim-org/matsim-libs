@@ -20,16 +20,21 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 
+import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
+import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.DegreeTask;
 import playground.johannes.sna.graph.analysis.TransitivityTask;
 import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.analysis.EstimatedDegree;
 import playground.johannes.sna.snowball.analysis.EstimatedTransitivity;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.sim.EstimatorTask;
-import playground.johannes.socialnetworks.snowball2.sim.deprecated.EstimatedDegree2;
 
 /**
  * @author illenberger
@@ -39,14 +44,13 @@ public class EstimatedAnalyzerTask extends AnalyzerTaskComposite {
 
 	private final static int N = 5200000;
 	
+	private final PiEstimator estim;
+	
 	public EstimatedAnalyzerTask(SampledGraph graph) {
-		PiEstimator estim = new SimplePiEstimator(N);
-//		ProbabilityEstimator estim = new NormalizedEstimator(new Estimator1(N), N);
-		estim.update(graph);
+		estim = new SimplePiEstimator(N);
 		
 		DegreeTask kTask = new DegreeTask();
-//		kTask.setModule(new EstimatedDegree2(estim, new HTEstimator(N), new HTEstimator(N)));
-		kTask.setModule(new EstimatedDegree2(estim, new WSMStatsFactory()));
+		kTask.setModule(new EstimatedDegree(estim, new WSMStatsFactory()));
 		addTask(kTask);
 		
 		TransitivityTask tTask = new TransitivityTask();
@@ -54,5 +58,11 @@ public class EstimatedAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(tTask);
 		
 		addTask(new EstimatorTask(estim));
+	}
+
+	@Override
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		estim.update((SampledGraph) graph);
+		super.analyze(graph, statsMap);
 	}
 }

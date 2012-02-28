@@ -44,6 +44,14 @@ import playground.johannes.sna.graph.matrix.Dijkstra;
  */
 public class Components {
 
+	private static Components instance;
+	
+	public static Components getInstance() {
+		if(instance == null)
+			instance = new Components();
+		return instance;
+	}
+	
 	/**
 	 * Counts the number of disconnected components in the graph.
 	 * 

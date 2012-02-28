@@ -64,7 +64,7 @@ public class TripDistanceTask extends TrajectoryAnalyzerTask {
 		}
 		
 		for(String purpose : purposes) {
-			TripDistanceSum tripDistance = new TripDistanceSum(purpose, facilities, calculator);
+			TripDistanceMean tripDistance = new TripDistanceMean(purpose, facilities, calculator);
 			DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
 			
 			String key = "d_trip_" + purpose;
@@ -73,7 +73,7 @@ public class TripDistanceTask extends TrajectoryAnalyzerTask {
 				writeHistograms(stats, key, 50, 50);
 				
 				double[] values = stats.getValues();
-				LinearDiscretizer lin = new LinearDiscretizer(500.0);
+				LinearDiscretizer lin = new LinearDiscretizer(250.0);
 				DescriptiveStatistics linStats = new DescriptiveStatistics();
 				for(double d : values)
 					linStats.addValue(lin.discretize(d));

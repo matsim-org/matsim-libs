@@ -52,8 +52,9 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropa
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.CachedAccessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
@@ -75,7 +76,7 @@ public class SnowballSample {
 	 */
 	public static void main(String[] args) throws IOException {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialSparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/snowball/graph.363332.graphml");
+		SpatialSparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/output/plain/graph.graphml");
 		
 		Set<Feature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
 		Geometry geometry = features.iterator().next().getDefaultGeometry();
@@ -84,7 +85,7 @@ public class SnowballSample {
 		
 		sampler.setBuilder(new SpatialSampledGraphProjectionBuilder<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>());
 		sampler.setSeedGenerator(new SeedGenerator(geometry));
-		sampler.setResponseGenerator(new RandomPartition<SpatialSparseVertex>(0.2));
+		sampler.setResponseGenerator(new RandomPartition<SpatialSparseVertex>(0.1));
 		sampler.setListener(new SampleSizeListener());
 		
 		sampler.run(graph);
@@ -92,7 +93,8 @@ public class SnowballSample {
 		AnalyzerTaskArray array = new AnalyzerTaskArray();
 		array.addAnalyzerTask(new TopologyAnalyzerTask(), "topo");
 		AnalyzerTaskComposite spatialTask = new AnalyzerTaskComposite();
-		spatialTask.addTask(new SpatialAnalyzerTask());
+		spatialTask.addTask(new EdgeLengthTask());
+		EdgeLength.getInstance().setIgnoreZero(true);
 		
 		Set<Point> choiceSet = new HashSet<Point>();
 //		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("");
@@ -123,11 +125,11 @@ public class SnowballSample {
 		composite.addTask(new WaveSizeTask());
 		array.addAnalyzerTask(composite, "snowball");
 		estim.update(sampler.getSampledGraph());
-		GraphAnalyzer.analyze(sampler.getSampledGraph(), array, "/Users/jillenberger/Work/socialnets/mcmc/snowball/");
+		GraphAnalyzer.analyze(sampler.getSampledGraph(), array, "/Users/jillenberger/Work/socialnets/mcmc/output/snowball/");
 		
 		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
 		writer.setDrawEdges(false);
-		writer.write((SpatialGraph) sampler.getSampledGraph(), "/Users/jillenberger/Work/socialnets/mcmc/snowball/graph.kmz");
+		writer.write((SpatialGraph) sampler.getSampledGraph(), "/Users/jillenberger/Work/socialnets/mcmc/output/snowball/graph.kmz");
 	}
 
 	private static class SeedGenerator implements VertexFilter<SpatialSparseVertex> {
@@ -159,8 +161,8 @@ public class SnowballSample {
 
 		@Override
 		public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-			if(sampler.getSampledGraph().getVertices().size() > 7000)
-//			if(sampler.getNumSampledVertices() > 200)
+//			if(sampler.getSampledGraph().getVertices().size() > 12363)
+			if(sampler.getNumSampledVertices() > 700)
 				return false;
 			else
 				return true;

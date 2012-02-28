@@ -37,6 +37,8 @@ public interface PajekAttributes<V extends Vertex, E extends Edge> {
 
 	public final static String VERTEX_FILL_COLOR = "ic";
 	
+	public final static String EDGE_WIDTH = "w";
+	
 	public List<String> getVertexAttributes();
 	
 	public List<String> getEdgeAttributes();

@@ -76,7 +76,7 @@ public class FacilityChoiceSetGenerator {
 		logger.info("Generating facility choice set...");
 		
 		List<ActivityFacility> facList = filterFacilities(facilities, type);
-		
+		logger.info(String.format("%1$s facilities of type %2$s.", facList.size(), type));
 		Map<SocialVertex, List<Id>> choiceSets = new HashMap<SocialVertex, List<Id>>(graph.getVertices().size());
 		
 		ProgressLogger.init(graph.getVertices().size(), 1, 5);

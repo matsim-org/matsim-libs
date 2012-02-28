@@ -50,7 +50,7 @@ public class TopoAnalyzer {
 
 		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
 		composite.addTask(new TopologyAnalyzerTask());
-		composite.addTask(new ExtendedTopologyAnalyzerTask());
+//		composite.addTask(new ExtendedTopologyAnalyzerTask());
 		
 		if(output != null)
 			composite.setOutputDirectoy(output);

@@ -40,6 +40,8 @@ public class EdgeLength extends AbstractEdgeProperty {
 
 	private static EdgeLength instance;
 	
+	private boolean ignoreZero;
+	
 	public static EdgeLength getInstance() {
 		if(instance == null)
 			instance = new EdgeLength();
@@ -50,6 +52,10 @@ public class EdgeLength extends AbstractEdgeProperty {
 	
 	public void setDistanceCalculator(DistanceCalculator calculator) {
 		this.distanceCalculator = calculator;
+	}
+	
+	public void setIgnoreZero(boolean flag) {
+		this.ignoreZero = flag;
 	}
 	
 	@Override
@@ -69,8 +75,13 @@ public class EdgeLength extends AbstractEdgeProperty {
 					}
 					
 					double d = distanceCalculator.distance(v_i.getPoint(), v_j.getPoint());
-					d = Math.max(d, 300);
-					values.put(edge, d);
+					if(ignoreZero) {
+						if(d > 300)
+							values.put(edge, d);
+					} else {
+						values.put(edge, d);
+					}
+					
 				} else {
 					throw new RuntimeException("Points do not share the same coordinate reference system.");
 				}

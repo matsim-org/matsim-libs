@@ -34,6 +34,7 @@ import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.sna.graph.matrix.Dijkstra;
 import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
 
 /**
@@ -44,21 +45,22 @@ public class SeedAPLTask extends AnalyzerTask {
 
 	public static String KEY = "seed_apl";
 	
-	private List<Vertex> seeds;
+	private List<SampledVertex> seeds;
 	
 	@Override
-	public void analyze(Graph graph, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> results) {
+		SampledGraph graph = (SampledGraph) g;
 		if(seeds == null) {
-			seeds = new ArrayList<Vertex>(graph.getVertices().size());
-			for(Vertex vertex : graph.getVertices()) {
-				Integer it = ((SampledVertex)vertex).getIterationDetected();
+			seeds = new ArrayList<SampledVertex>(graph.getVertices().size());
+			for(SampledVertex vertex : graph.getVertices()) {
+				Integer it = vertex.getIterationDetected();
 				if(it != null && it == -1) {
 					seeds.add(vertex);
 				}
 			}
 		}
 		
-		AdjacencyMatrix<Vertex> y = new AdjacencyMatrix<Vertex>(graph);
+		AdjacencyMatrix<SampledVertex> y = new AdjacencyMatrix<SampledVertex>(graph);
 		
 		int[] seedIndices = new int[seeds.size()];
 		for(int i = 0; i < seeds.size(); i++) {
@@ -82,15 +84,12 @@ public class SeedAPLTask extends AnalyzerTask {
 					 * filter indirect paths
 					 */
 					boolean indirect = false;
-					for(int k = 0; k < path.size() - 1; k++) {
-						for(int l = 0; l < seedIndices.length; l++) {
-							if(path.get(k) == seedIndices[l]) {
-								indirect = true;
-								break;
-							}
-						}
-						if(indirect)
+					for(int k = 1; k < path.size() - 1; k++) {
+						SampledVertex v = y.getVertex(path.get(k));
+						if(v.getSeed() != seeds.get(i) && v.getSeed() != seeds.get(j)) {
+							indirect = true;
 							break;
+						}
 					}
 					
 					if(!indirect)

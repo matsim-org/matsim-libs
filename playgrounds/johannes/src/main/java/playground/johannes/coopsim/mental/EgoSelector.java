@@ -35,7 +35,7 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGr
 
 /**
  * @author illenberger
- *
+ * @deprecated
  */
 public class EgoSelector {
 

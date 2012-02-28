@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
+import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.VertexProperty;
 import playground.johannes.sna.math.Discretizer;
@@ -46,6 +47,10 @@ public class VertexPropertyCorrelation {
 		return mean(propY, porpX, vertices, new DummyDiscretizer());
 	}
 	
+	public static TDoubleDoubleHashMap mean(EdgeProperty propY, EdgeProperty porpX, Set<? extends Edge> edges) {
+		return mean(propY, porpX, edges, new DummyDiscretizer());
+	}
+	
 	public static TDoubleDoubleHashMap mean(VertexProperty propY, VertexProperty propX, Set<? extends Vertex> vertices, Discretizer discretizer) {
 		TObjectDoubleHashMap<Vertex> propValuesX = propX.values(vertices);
 		Set<Vertex> filtered = filter(propValuesX);
@@ -54,9 +59,17 @@ public class VertexPropertyCorrelation {
 		return mean(propValuesY, propValuesX, discretizer);
 	}
 	
-	private static <V extends Vertex> Set<V> filter(TObjectDoubleHashMap<V> propValuesX) {
-		Set<V> filtered = new HashSet<V>();
-		TObjectDoubleIterator<V> it = propValuesX.iterator();
+	public static TDoubleDoubleHashMap mean(EdgeProperty propY, EdgeProperty propX, Set<? extends Edge> edges, Discretizer discretizer) {
+		TObjectDoubleHashMap<Edge> propValuesX = propX.values(edges);
+		Set<Edge> filtered = filter(propValuesX);
+		TObjectDoubleHashMap<Edge> propValuesY = propY.values(filtered);
+		
+		return mean(propValuesY, propValuesX, discretizer);
+	}
+	
+	private static <T> Set<T> filter(TObjectDoubleHashMap<T> propValuesX) {
+		Set<T> filtered = new HashSet<T>();
+		TObjectDoubleIterator<T> it = propValuesX.iterator();
 		for(int i = 0; i < propValuesX.size(); i++) {
 			it.advance();
 			filtered.add(it.key());
@@ -64,11 +77,11 @@ public class VertexPropertyCorrelation {
 		return filtered;
 	}
 	
-	public static TDoubleDoubleHashMap mean(TObjectDoubleHashMap<? extends Vertex> propValuesY, TObjectDoubleHashMap<? extends Vertex> propValuesX, Discretizer discretizer) {
+	public static <T> TDoubleDoubleHashMap mean(TObjectDoubleHashMap<T> propValuesY, TObjectDoubleHashMap<T> propValuesX, Discretizer discretizer) {
 		TDoubleArrayList valuesY = new TDoubleArrayList(propValuesX.size());
 		TDoubleArrayList valuesX = new TDoubleArrayList(propValuesX.size());
 
-		discretizeValues((TObjectDoubleHashMap<Vertex>) propValuesY, (TObjectDoubleHashMap<Vertex>) propValuesX, valuesX, valuesY, discretizer);
+		discretizeValues(propValuesY, propValuesX, valuesX, valuesY, discretizer);
 		
 		return Correlations.mean(valuesX.toNativeArray(), valuesY.toNativeArray());
 	}
@@ -85,17 +98,17 @@ public class VertexPropertyCorrelation {
 		return statistics(propValuesY, propValuesX, discretizer);
 	}
 	
-	public static TDoubleObjectHashMap<DescriptiveStatistics> statistics(TObjectDoubleHashMap<? extends Vertex> propValuesY, TObjectDoubleHashMap<? extends Vertex> propValuesX, Discretizer discretizer) {
+	public static <T> TDoubleObjectHashMap<DescriptiveStatistics> statistics(TObjectDoubleHashMap<T> propValuesY, TObjectDoubleHashMap<T> propValuesX, Discretizer discretizer) {
 		TDoubleArrayList valuesY = new TDoubleArrayList(propValuesX.size());
 		TDoubleArrayList valuesX = new TDoubleArrayList(propValuesX.size());
 		
-		discretizeValues((TObjectDoubleHashMap<Vertex>)propValuesY, (TObjectDoubleHashMap<Vertex>)propValuesX, valuesX, valuesY, discretizer);
+		discretizeValues(propValuesY, propValuesX, valuesX, valuesY, discretizer);
 		
 		return Correlations.statistics(valuesX.toNativeArray(), valuesY.toNativeArray(), discretizer);
 	}
 	
-	private static void discretizeValues(TObjectDoubleHashMap<Vertex> propValuesY, TObjectDoubleHashMap<Vertex> propValuesX, TDoubleArrayList valuesX, TDoubleArrayList valuesY, Discretizer discretizer) {
-		TObjectDoubleIterator<Vertex> it = propValuesX.iterator();
+	private static <T> void discretizeValues(TObjectDoubleHashMap<T> propValuesY, TObjectDoubleHashMap<T> propValuesX, TDoubleArrayList valuesX, TDoubleArrayList valuesY, Discretizer discretizer) {
+		TObjectDoubleIterator<T> it = propValuesX.iterator();
 		
 		for(int i = 0; i < propValuesX.size(); i++) {
 			it.advance();

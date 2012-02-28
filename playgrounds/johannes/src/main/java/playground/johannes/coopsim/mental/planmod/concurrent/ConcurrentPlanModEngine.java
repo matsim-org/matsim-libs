@@ -71,9 +71,13 @@ public class ConcurrentPlanModEngine implements PlanModEngine {
 		}
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
+	
+	public void finalize() {
+		try {
+			super.finalize();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 		executor.shutdown();
 	}
 

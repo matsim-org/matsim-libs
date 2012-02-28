@@ -76,7 +76,7 @@ public class TripDistanceAccessibilityTask extends TrajectoryAnalyzerTask {
 		}
 		
 		for (String purpose : purposes) {
-			TripDistanceSum tripDist = new TripDistanceSum(purpose, facilities);
+			TripDistanceMean tripDist = new TripDistanceMean(purpose, facilities);
 			PersonTrajectoryPropertyAdaptor pAdaptor = new PersonTrajectoryPropertyAdaptor(bidiMap, tripDist);
 			VertexPersonPropertyAdaptor vAdaptor = new VertexPersonPropertyAdaptor(graph, pAdaptor);
 

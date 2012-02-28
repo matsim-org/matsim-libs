@@ -163,7 +163,7 @@ public class EstimatedTransitivity extends Transitivity {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public DescriptivePiStatistics localClusteringDistribution(Set<? extends Vertex> vertices) {
+	public DescriptivePiStatistics statistics(Set<? extends Vertex> vertices) {
 		DescriptivePiStatistics stats = facory.newInstance();
 		int iteration = SnowballStatistics.getInstance().lastIteration((Set<? extends SampledVertex>) vertices);
 		
@@ -187,9 +187,10 @@ public class EstimatedTransitivity extends Transitivity {
 		double n_triangles = 0;
 
 		SampledGraph sampledGraph = (SampledGraph) graph;
+		int iteration = SnowballStatistics.getInstance().lastIteration(sampledGraph.getVertices());
 		
 		for(SampledVertex v : sampledGraph.getVertices()) {
-			if(v.isSampled()) {
+			if(v.isSampled() && v.getIterationSampled() < iteration) {
 				int k = v.getNeighbours().size();
 				if(k > 1) {
 					int n_2 = k*(k-1)/2;
@@ -197,7 +198,7 @@ public class EstimatedTransitivity extends Transitivity {
 					if(estimEdges)
 						n_3 = estimateAdjacentEdges(v, (int)n_3);
 					
-					double p = piEstimator.probability(v);
+					double p = piEstimator.probability(v, iteration - 1);
 					
 					n_tripples += n_2 * 1/p;
 					n_triangles += n_3 * 1/p; 

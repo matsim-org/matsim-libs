@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim.postprocess;
+package playground.johannes.studies.snowball;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -57,10 +57,11 @@ public class StatsMerge {
 		String propertyKey = args[3];
 		String outputTable = args[4];
 		String outputAvr = args[5];
+		int ensembleSize = Integer.parseInt(args[6]);
 		
 		int valueColIdx = 1;
-		if(args.length >= 7) {
-			valueColIdx = Integer.parseInt(args[6]);
+		if(args.length >= 8) {
+			valueColIdx = Integer.parseInt(args[7]);
 		}
 		
 		logger.info(String.format("Root dir = %1$s", rootDir));
@@ -128,8 +129,8 @@ public class StatsMerge {
 				/*
 				 * Open the stats.txt file.
 				 */
-//				String path = String.format("%1$s/%2$s/statistics.txt", dumpDir.getAbsolutePath(), analyzerKey);
-				String path = String.format("%1$s/%2$s/stats.txt", dumpDir.getAbsolutePath(), analyzerKey);
+				String path = String.format("%1$s/%2$s/statistics.txt", dumpDir.getAbsolutePath(), analyzerKey);
+//				String path = String.format("%1$s/%2$s/stats.txt", dumpDir.getAbsolutePath(), analyzerKey);
 				File file = new File(path);
 				if (file.exists()) {
 					BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -170,8 +171,12 @@ public class StatsMerge {
 					count++;
 				}
 			}
-			double mean = sum/(double)count; 
-			averages.put(entry.getKey(), mean);
+			if(count >= ensembleSize) {
+				double mean = sum/(double)count; 
+				averages.put(entry.getKey(), mean);
+			} else {
+				logger.warn(String.format("Not enough simulation ensembles (%1$s, min %2$s)", count, ensembleSize));
+			}
 		}
 		/*
 		 * Sort the dump names.

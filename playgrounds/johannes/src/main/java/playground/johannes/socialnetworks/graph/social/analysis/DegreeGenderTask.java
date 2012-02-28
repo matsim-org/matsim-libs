@@ -40,31 +40,33 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
 public class DegreeGenderTask extends ModuleAnalyzerTask<Degree> {
 
 	private static final Logger logger = Logger.getLogger(ModuleAnalyzerTask.class);
+
+	public DegreeGenderTask(Degree module) {
+		setModule(module);
+	}
 	
 	@Override
 	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
-//		SocialGraph graph = (SocialGraph) g;
-		
 		int sumMale = 0;
 		int cntMale = 0;
 		int sumFemale = 0;
 		int cntFemale = 0;
-		
+
 		TObjectDoubleHashMap<Vertex> values = module.values(g.getVertices());
 		TObjectDoubleIterator<Vertex> it = values.iterator();
-		for(int i = 0; i < values.size(); i++) {
+		for (int i = 0; i < values.size(); i++) {
 			it.advance();
 			SocialVertex v = (SocialVertex) it.key();
 			double k = it.value();
-			
-			if(v.getPerson().getPerson().getSex() != null) {
-			if(v.getPerson().getPerson().getSex().equalsIgnoreCase("m")) {
-				sumMale += k;
-				cntMale++;
-			} else if (v.getPerson().getPerson().getSex().equalsIgnoreCase("f")){
-				sumFemale += k;
-				cntFemale++;
-			}
+
+			if (v.getPerson().getPerson().getSex() != null) {
+				if (v.getPerson().getPerson().getSex().equalsIgnoreCase("m")) {
+					sumMale += k;
+					cntMale++;
+				} else if (v.getPerson().getPerson().getSex().equalsIgnoreCase("f")) {
+					sumFemale += k;
+					cntFemale++;
+				}
 			}
 		}
 		

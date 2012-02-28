@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.eval;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 
@@ -38,10 +41,14 @@ public class EvalEngine {
 	
 
 	public void evaluate(Set<Trajectory> trajectories) {
+		Set<Id> persons = new HashSet<Id>();
 		for(Trajectory t : trajectories) {
 			double score = evaluator.evaluate(t);
 			
 			t.getPerson().getSelectedPlan().setScore(score);
+			persons.add(t.getPerson().getId());
 		}
+		
+//		System.out.println("Trajectories: " + trajectories.size() + ", persons: " + persons.size());
 	}
 }

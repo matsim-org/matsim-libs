@@ -33,4 +33,5 @@ public interface PlanModEngine {
 
 	public void run(List<Plan> plans, Map<String, Object> choices);
 	
+	public void finalize(); // subject to change
 }

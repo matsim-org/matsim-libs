@@ -82,7 +82,7 @@ public class SpatialPropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 				 * distance-degree correlation
 				 */
 				TObjectDoubleHashMap<SpatialVertex> yVals = Distance.getInstance().vertexMean(graph.getVertices());
-				TObjectDoubleHashMap<Vertex> kVals =  module.values(graph.getVertices());
+				TObjectDoubleHashMap kVals =  module.values(graph.getVertices());
 				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, kVals, discretizer);
 				TXTWriter.writeMap(correl, "k", "d_mean", getOutputDirectory() + "d_mean_k.mean.txt");
 				

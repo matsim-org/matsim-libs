@@ -22,9 +22,9 @@ package playground.johannes.coopsim.eval;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.population.Desires;
 
 import playground.johannes.coopsim.mental.ActivityDesires;
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -35,6 +35,10 @@ import playground.johannes.coopsim.pysical.Trajectory;
  */
 public class ActivityEvaluator implements Evaluator {
 
+	private final static Logger logger = Logger.getLogger(ActivityEvaluator.class);
+	
+	private static int tZeroCount;
+	
 	private final static String HOME = "home";
 	
 	private final static String IDLE = "idle";
@@ -89,16 +93,22 @@ public class ActivityEvaluator implements Evaluator {
 							throw new RuntimeException("Not a starting or ending home activity!");
 						}
 						
-						t_star = Math.max(t_star, 1);
+						t_star = Math.max(t_star, 3600);
 					}
 				}
 				
 				double priority = getPriority(act.getType());
 
-				double t_zero = t_star * Math.exp(SCALE / (t_star * priority * beta));
-				if (t_zero == 0)
-					throw new IllegalArgumentException("t_zero must not be 0!");
+//				double t_zero = t_star * Math.exp(SCALE / (t_star * priority * beta));
+				double t_zero = t_star * Math.exp(SCALE / (t_star * priority));
+				if (t_zero < 0.0001) {
+					t_zero = 0.0001;
+					tZeroCount++;
+					if(tZeroCount % 10000 == 0)
+						logger.warn("10000 repeated warnings: t_zero<0.0001, setting t_zero=0.0001. index = " + i);
+				}
 
+				t = Math.max(t, 2.0);
 				score += beta * t_star * Math.log(t / t_zero);
 			}
 		}
@@ -116,12 +126,14 @@ public class ActivityEvaluator implements Evaluator {
 	}
 
 	public static void startLogging() {
-		stats = new DescriptiveStatistics();
-		isLogging = true;
+		ActivityEvaluator2.startLogging();
+//		stats = new DescriptiveStatistics();
+//		isLogging = true;
 	}
 	
 	public static DescriptiveStatistics stopLogging() {
-		isLogging = false;
-		return stats;
+		return ActivityEvaluator2.stopLogging();
+//		isLogging = false;
+//		return stats;
 	}
 }

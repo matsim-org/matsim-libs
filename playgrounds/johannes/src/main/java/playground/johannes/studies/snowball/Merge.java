@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim.postprocess;
+package playground.johannes.studies.snowball;
 
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
@@ -35,7 +35,7 @@ import java.util.TreeSet;
  * @author illenberger
  *
  */
-public class Merge2 {
+public class Merge {
 
 	/**
 	 * @param args
@@ -84,13 +84,21 @@ public class Merge2 {
 				
 				String tokens[] = valueLine.split("\t");
 //				int key = (int) Double.parseDouble(tokens[0]);
-				double val = Double.parseDouble(tokens[1]);
-				
-				tokens = dumpLine.split("\t");
-				int key = (int) Double.parseDouble(tokens[1]);
-				
-				row.put(key, val);
-				dumpKeys.add(key);
+				if (!tokens[1].equals("null")) {
+					double val = Double.parseDouble(tokens[1]);
+
+					tokens = dumpLine.split("\t");
+					if (!tokens[1].equals("null")) {
+						int key = (int) Double.parseDouble(tokens[1]);
+
+						row.put(key, val);
+						dumpKeys.add(key);
+					} else {
+						System.err.println("Null key");
+					}
+				} else {
+					System.err.println("Null value");
+				}
 			}
 			valueReader.close();
 			dumpReader.close();

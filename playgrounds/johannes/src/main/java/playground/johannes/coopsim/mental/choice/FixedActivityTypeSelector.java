@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * F2FFrequency.java
+ * ActivityTypeSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,42 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.coopsim.mental.choice;
 
-import gnu.trove.TObjectDoubleHashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-import java.util.Set;
-
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.socialnetworks.graph.analysis.AbstractEdgeProperty;
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class F2FFrequency extends AbstractEdgeProperty {
+public class FixedActivityTypeSelector implements ChoiceSelector {
 
-	private static F2FFrequency instance;
+	public static final String KEY = "acttype";
 	
-	public static F2FFrequency getInstance() {
-		if(instance == null)
-			instance = new F2FFrequency();
-		
-		return instance;
+	private final Map<SocialVertex, String> types;
+	
+	private final Random random;
+	
+	public FixedActivityTypeSelector(Map<SocialVertex, String> types, Random random) {
+		this.types = types;
+		this.random = random;
 	}
 	
 	@Override
-	public TObjectDoubleHashMap<Edge> values(Set<? extends Edge> edges) {
-		Set<SocialEdge> socialEdges = (Set<SocialEdge>) edges;
+	public Map<String, Object> select(Map<String, Object> choices) {
+//		@SuppressWarnings("unchecked")
+//		List<SocialVertex> egos = (List<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
+//		
+//		List<String> choiceSet = new ArrayList<String>(egos.size());
+//		for(SocialVertex ego : egos)
+//			choiceSet.add(types.get(ego));
+//		
+//		String time = choiceSet.get(random.nextInt(choiceSet.size()));
 		
-		TObjectDoubleHashMap<Edge> values = new TObjectDoubleHashMap<Edge>();
-		for(SocialEdge edge : socialEdges) {
-			values.put(edge, edge.getFrequency());
-		}
-		
-		return values;
+		choices.put(KEY, types.get(choices.get(EgoSelector.KEY)));
+	
+		return choices;
 	}
 
 }

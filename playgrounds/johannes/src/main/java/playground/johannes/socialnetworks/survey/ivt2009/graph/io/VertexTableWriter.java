@@ -61,7 +61,7 @@ public class VertexTableWriter {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SocialSampledGraphProjection<SocialSparseGraph,SocialSparseVertex,SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/graph.graphml");
+		SocialSampledGraphProjection<SocialSparseGraph,SocialSparseVertex,SocialSparseEdge> graph = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/graph/graph.graphml");
 
 		ApplySeedsFilter filter = new ApplySeedsFilter();
 		filter.apply(graph);
@@ -107,7 +107,7 @@ public class VertexTableWriter {
 //		
 //		List<Id> list = new ArrayList<Id>(seedIds);
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/vertexlist.txt"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/graph/vertexlist.txt"));
 		writer.write("id\tcolor\tshape");
 		writer.newLine();
 		for(SocialSampledVertexDecorator<SocialSparseVertex> vertex : graph.getVertices()) {
@@ -133,13 +133,13 @@ public class VertexTableWriter {
 	}
 	
 	public void writeEdgeList(SocialSampledGraphProjection<SocialSparseGraph,SocialSparseVertex,SocialSparseEdge> graph) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/edgelist.txt"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/graph/edgelist.txt"));
 		
 		SeedConnectionTask task = new SeedConnectionTask();
 		Map<String, DescriptiveStatistics> map = new HashMap<String, DescriptiveStatistics>();
 		Set<Edge> edges = new HashSet<Edge>();
 		Set<Edge> yellowEdges = new HashSet<Edge>();
-		task.setOutputDirectoy("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/");
+		task.setOutputDirectoy("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/graph/");
 		task.analyze(graph, map);
 		for(List<SampledVertexDecorator<SocialVertex>> list : task.pathSet) {
 //			boolean yellow = false;

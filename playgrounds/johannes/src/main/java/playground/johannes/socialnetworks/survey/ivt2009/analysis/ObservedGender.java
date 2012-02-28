@@ -22,8 +22,6 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.Map;
 import java.util.Set;
 
-
-import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Gender;
@@ -42,5 +40,10 @@ public class ObservedGender extends Gender {
 		Map<SocialVertex, String> egos = super.values(SnowballPartitions.<SocialSampledVertexDecorator<?>>createSampledPartition((Set<SocialSampledVertexDecorator<?>>)vertices));
 		Map<SocialVertex, String> alters = super.values(vertices);
 		return SocioMatrixBuilder.probaMatrix(egos, alters);
+	}
+
+	@Override
+	public Map<SocialVertex, String> values(Set<? extends SocialVertex> vertices) {
+		return super.values(SnowballPartitions.<SocialSampledVertexDecorator<?>>createSampledPartition((Set<SocialSampledVertexDecorator<?>>)vertices, 0));
 	}
 }

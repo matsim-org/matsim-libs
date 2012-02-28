@@ -107,8 +107,7 @@ public class PajekWriter<G extends Graph, V extends Vertex, E extends Edge> {
 			writer.write(NEW_LINE);
 		}
 		
-		writer.write("*Edges ");
-		writer.write(String.valueOf(g.getEdges().size()));
+		writer.write("*Edges");
 		writer.write(NEW_LINE);
 		
 		for(Edge e : g.getEdges()) {
@@ -120,13 +119,14 @@ public class PajekWriter<G extends Graph, V extends Vertex, E extends Edge> {
 			/*
 			 * Edge attributes
 			 */
-			for(String att : attrs.getEdgeAttributes()) {
-				writer.write(WHITESPACE);
-				writer.write(att);
-				writer.write(WHITESPACE);
-				writer.write(attrs.getEdgeValue((E) e, att));
+			if (attrs.getEdgeAttributes() != null) {
+				for (String att : attrs.getEdgeAttributes()) {
+					writer.write(WHITESPACE);
+					writer.write(att);
+					writer.write(WHITESPACE);
+					writer.write(attrs.getEdgeValue((E) e, att));
+				}
 			}
-			
 			writer.write(NEW_LINE);
 		}
 		

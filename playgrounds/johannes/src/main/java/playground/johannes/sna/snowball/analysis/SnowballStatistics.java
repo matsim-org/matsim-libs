@@ -206,6 +206,19 @@ public class SnowballStatistics {
 		return rates;		
 	}
 	
+	public double[] responseRatePerIteration(Set<? extends SampledVertex> vertices) {
+		int[] sampled = numVerticesSampled(vertices);
+		int[] detected = numVerticesDetected(vertices);
+		
+		double[] rates = new double[sampled.length];
+		
+		rates[0] = 1.0;
+		for(int i = 1; i < sampled.length; i++) {
+			rates[i] = sampled[i]/(double)detected[i - 1];
+		}
+		
+		return rates;
+	}
 	/**
 	 * Returns the highest (last) iteration value of <tt>vertices</tt>.
 	 * 

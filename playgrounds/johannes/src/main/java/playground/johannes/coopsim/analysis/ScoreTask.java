@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import gnu.trove.TDoubleArrayList;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math.stat.regression.SimpleRegression;
 
+import playground.johannes.coopsim.ConvergenceCriterion;
 import playground.johannes.coopsim.eval.ActivityDurationEvaluator;
 import playground.johannes.coopsim.eval.ActivityEvaluator;
 import playground.johannes.coopsim.eval.JointActivityEvaluator;
@@ -35,8 +39,16 @@ import playground.johannes.coopsim.pysical.Trajectory;
  * @author illenberger
  * 
  */
-public class ScoreTask extends TrajectoryAnalyzerTask {
+public class ScoreTask extends TrajectoryAnalyzerTask implements ConvergenceCriterion {
 
+	private final static int MIN_SAMPLES = 40;
+	
+	private final static double THRESHOLD = 0.001;
+	
+	private TDoubleArrayList scores = new TDoubleArrayList(1000);
+	
+	private boolean converged = false;
+	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		DescriptiveStatistics allScores = new DescriptiveStatistics();
@@ -65,6 +77,25 @@ public class ScoreTask extends TrajectoryAnalyzerTask {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		scores.add(allScores.getMean());
+		
+		if (scores.size() >= MIN_SAMPLES) {
+			SimpleRegression reg = new SimpleRegression();
+
+			for (int i = scores.size() - MIN_SAMPLES; i < scores.size(); i++) {
+				reg.addData(i, scores.get(i));
+			}
+			
+			if(reg.getSlope() < THRESHOLD)
+				converged = true;
+		}
+		
+	}
+
+	@Override
+	public boolean achivedConvergence() {
+		return converged;
 	}
 
 }

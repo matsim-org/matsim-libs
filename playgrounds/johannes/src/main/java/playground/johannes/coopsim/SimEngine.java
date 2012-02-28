@@ -106,13 +106,13 @@ public class SimEngine {
 		this.outpurDirectory = output;
 	}
 
-	public void run(int iterations) {
+	public void run(ConvergenceCriterion criterion, int maxIterations) {
 		logger.info("Drawing initial full sample...");
 		drawSample(0);
 
-		logger.info(String.format("Running markov chain for %1$s iterations.", iterations));
+		logger.info(String.format("Running markov chain for %1$s iterations.", maxIterations));
 		mentalEngine.clearStatistics();
-		for (int i = 1; i <= iterations; i++) {
+		for (int i = 1; i <= maxIterations; i++) {
 			LoggerUtils.setVerbose(false);
 			step();
 			LoggerUtils.setVerbose(true);
@@ -128,12 +128,17 @@ public class SimEngine {
 				logger.info("Drawing full sample...");
 				drawSample(i);
 			}
+			
+			if(criterion.achivedConvergence()) {
+				logger.info("Convergence achived. Terminating simulation.");
+				break;
+			}
 		}
 		
 		try {
 			physicalEngine.finalize();
+			mentalEngine.finalize();
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -142,13 +147,13 @@ public class SimEngine {
 		/*
 		 * run mental layer
 		 */
-		Profiler.resume("mental engine");
+//		Profiler.resume("mental engine");
 		List<SocialVertex> egos = mentalEngine.nextState();
-		Profiler.pause("mental engine");
+//		Profiler.pause("mental engine");
 		/*
 		 * get alters
 		 */
-		Profiler.resume("step preprocessing");
+//		Profiler.resume("step preprocessing");
 		Set<SocialVertex> altersLevel1 = new HashSet<SocialVertex>();
 		for (SocialVertex ego : egos) {
 			for (SocialVertex alter : ego.getNeighbours()) {
@@ -186,23 +191,23 @@ public class SimEngine {
 			plans.add(plan);
 			alter2Scores.add(new Tuple<Plan, Double>(plan, plan.getScore()));
 		}
-		Profiler.pause("step preprocessing");
+//		Profiler.pause("step preprocessing");
 		/*
 		 * run physical layer
 		 */
-		Profiler.resume("physical engine");
+//		Profiler.resume("physical engine");
 		trajectoryBuilder.reset(0);
 		physicalEngine.run(plans, eventsManager);
-		Profiler.pause("physical engine");
+//		Profiler.pause("physical engine");
 		/*
 		 * evaluate plans
 		 */
-		Profiler.resume("evaluation & postprocessing");
+//		Profiler.resume("evaluation & postprocessing");
 		evalEngine.evaluate(trajectoryBuilder.trajectories());
 		/*
 		 * accept/reject state
 		 */
-		boolean accept = mentalEngine.acceptRejectState(egos);
+		boolean accept = mentalEngine.acceptRejectState(egos, alter1Scores);
 		/*
 		 * reset scores of level 2 alters
 		 */
@@ -219,15 +224,15 @@ public class SimEngine {
 				tuple.getFirst().setScore(tuple.getSecond());
 			}
 		}
-		
-		Profiler.pause("evaluation & postprocessing");
+//		Profiler.pause("evaluation & postprocessing");
 	}
 
 	public void drawSample(int iter) {
-		Profiler.stop("mental engine", true);
-		Profiler.stop("step preprocessing", true);
-		Profiler.stop("physical engine", true);
-		Profiler.stop("evaluation & postprocessing", true);
+//		Profiler.stop("mental engine", true);
+//		Profiler.stop("step preprocessing", true);
+//		Profiler.stop("physical engine", true);
+//		Profiler.stop("evaluation & postprocessing", true);
+//		Profiler.stopAll();
 		
 		LoggerUtils.setVerbose(false);
 

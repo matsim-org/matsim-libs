@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import org.apache.commons.math.FunctionEvaluationException;
@@ -32,29 +33,49 @@ public class TimeSampler {
 
 	private final Random random;
 
-	private final int max;
-
-	private final UnivariateRealFunction pdf;
+	private final int resolution = 60;
+	
+	private double[] y;
 
 	public TimeSampler(UnivariateRealFunction pdf, int max, Random random) {
-		this.pdf = pdf;
 		this.random = random;
-		this.max = max;
-	}
-	
-	public int nextSample() {
-		while (true) { // for ever
-			int t = random.nextInt(max);
-
-			try {
-				double p = pdf.value(t);
-
-				if (random.nextDouble() < p)
-					return t;
-				
-			} catch (FunctionEvaluationException e) {
-				e.printStackTrace();
+		max = max/resolution;
+		try {
+			y = new double[max];
+			y[0] = 0;//pdf.value(0); FIXME
+			int i = 1;
+			for (int t = resolution; t < max*resolution; t += resolution) {
+				y[i] = pdf.value(t) + y[i - 1];
+				i++;
 			}
+
+			for (i = 0; i < max; i++) {
+				y[i] = y[i] / y[max - 1];
+			}
+//			System.out.println("last index = " + y[max-1]);
+		} catch (FunctionEvaluationException e) {
+			e.printStackTrace();
 		}
+	}
+
+	public int nextSample() {
+		double p = random.nextDouble();
+		int idx = Arrays.binarySearch(y, p);
+		if (idx < 0)
+			idx = -idx - 1;
+		return Math.max(resolution, idx*resolution);
+		// while (true) { // for ever
+		// int t = random.nextInt(max);
+		//
+		// try {
+		// double p = pdf.value(t)/norm;
+		//
+		// if (random.nextDouble() < p)
+		// return t;
+		//
+		// } catch (FunctionEvaluationException e) {
+		// e.printStackTrace();
+		// }
+
 	}
 }

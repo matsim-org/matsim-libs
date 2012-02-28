@@ -19,15 +19,18 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-import playground.johannes.socialnetworks.graph.social.analysis.AgeAccessibilityTask;
+import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import playground.johannes.socialnetworks.graph.social.analysis.AgeCorrelationTask;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
+import playground.johannes.socialnetworks.graph.social.analysis.CentralityLingAttTask;
+import playground.johannes.socialnetworks.graph.social.analysis.DegreeAgeTask;
+import playground.johannes.socialnetworks.graph.social.analysis.DegreeEducationTask;
+import playground.johannes.socialnetworks.graph.social.analysis.DegreeGenderTask;
+import playground.johannes.socialnetworks.graph.social.analysis.EducationCategorized;
 import playground.johannes.socialnetworks.graph.social.analysis.EducationTask;
-import playground.johannes.socialnetworks.graph.social.analysis.GenderAccessibilityTask;
+import playground.johannes.socialnetworks.graph.social.analysis.Gender;
 import playground.johannes.socialnetworks.graph.social.analysis.GenderTask;
 import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 
 /**
@@ -39,9 +42,20 @@ public class ObservedSocialAnalyzerTask extends SocialAnalyzerTask {
 	public ObservedSocialAnalyzerTask() {
 		addTask(new AgeTask(new ObservedAge()));
 		addTask(new GenderTask(new ObservedGender()));
-		addTask(new EducationTask());
+		addTask(new EducationTask(new ObservedEducationCategorized()));
+		addTask(new DegreeEducationTask(ObservedDegree.getInstance(), EducationCategorized.getInstance()));
 		
-//		SpatialCostFunction function = new GravityCostFunction(1.6, 0);
+		addTask(new DegreeAgeTask(ObservedDegree.getInstance()));
+		addTask(new DegreeGenderTask(ObservedDegree.getInstance()));
+		addTask(new AgeCorrelationTask(new ObservedAge()));
+		addTask(new GenderResponseRateTask());
+		addTask(new EducationResponseRateTask());
+		
+//		addTask(new CentralityLingAttTask<ObservedGender>(new ObservedGender()));
+		addTask(new CentralityLingAttTask<ObservedEducationCategorized>(new ObservedEducationCategorized()));
+		addTask(new GenderEductionTask());
+		addTask(new TrianglesEduTask());
+//		SpatialCostFunction function = new GravityCostFunction(1.2, 0);
 //		Accessibility access = new Accessibility(function);
 //		
 //		addTask(new AgeAccessibilityTask(access));

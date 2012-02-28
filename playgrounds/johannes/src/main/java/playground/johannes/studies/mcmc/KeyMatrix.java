@@ -83,9 +83,15 @@ public class KeyMatrix<T> {
 			TObjectDoubleHashMap<T> row = rows.get(rowKey);
 			for(T colKey : colKeys) {
 				writer.write("\t");
+				if(!row.containsKey(colKey))
+					writer.write("NA");
+				else {
 				double val = row.get(colKey);
 				if(!Double.isNaN(val))
 					writer.write(String.valueOf(val));
+				else
+					writer.write("NA");
+				}
 			}
 			writer.newLine();
 		}
