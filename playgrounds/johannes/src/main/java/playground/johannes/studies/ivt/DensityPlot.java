@@ -110,7 +110,7 @@ public class DensityPlot {
 			sampleLayer = ZoneLayerSHP.read(zoneFile);
 		}
 		sampleLayer.overwriteCRS(CRSUtils.getCRS(21781));
-		ZoneUtils.fillZoneLayer(sampleLayer, (Set<SpatialVertex>)graph.getVertices());
+		ZoneUtils.fillZoneLayer(sampleLayer, (Set)graph.getVertices());
 		
 		ZoneLayer<Set<SpatialVertex>> popLayer = null;
 		if(MODE.equals("density") || MODE.equals("weighted")) {
@@ -119,7 +119,7 @@ public class DensityPlot {
 			else
 				popLayer = ZoneLayerSHP.read(zoneFile);
 			popLayer.overwriteCRS(CRSUtils.getCRS(21781));
-			ZoneUtils.fillZoneLayer(popLayer, (Set<SpatialVertex>)popGraph.getVertices());
+			ZoneUtils.fillZoneLayer(popLayer, (Set)popGraph.getVertices());
 			
 		}
 		
