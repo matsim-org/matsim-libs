@@ -10,19 +10,19 @@ import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.DistributionTourAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.DistributionTourAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Locations;
-import org.matsim.contrib.freight.vrp.basics.PickORDeliveryCapacityAndTWConstraint;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+import org.matsim.contrib.freight.vrp.constraints.PickORDeliveryCapacityAndTWConstraint;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -73,7 +73,7 @@ public class Christophides {
 	
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(Level.INFO);
-		Christophides christophides = new Christophides("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/vrp_christofides_mingozzi_toth/vrpnc1.txt", "vrpnc1");
+		Christophides christophides = new Christophides("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/vrp_christofides_mingozzi_toth/vrpnc1.txt", "vrpnc1_greedy");
 		christophides.run();
 		
 	}
@@ -99,8 +99,8 @@ public class Christophides {
 	
 	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
 		RuinAndRecreateFactory factory = new DistributionTourAlgoFactory();
-		factory.setIterations(500);
-		factory.setWarmUp(100);
+		factory.setIterations(1000);
+		factory.setWarmUp(0);
 		ChartListener chartListener = new ChartListener();
 		chartListener.setFilename("output/"+instanceName+".png");
 		RuinAndRecreateReport report = new RuinAndRecreateReport();

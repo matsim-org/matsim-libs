@@ -3,18 +3,29 @@
  */
 package city2000w;
 
-import freight.TSPPlanReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanReader;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.Offer;
 import org.matsim.contrib.freight.events.CarrierOfferRejectEvent;
 import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
 import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEvent;
 import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEvent;
-import org.matsim.contrib.freight.mobsim.CarrierAgentFactory;
-import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
-import org.matsim.contrib.freight.mobsim.CarrierDriverAgentFactoryImpl;
 import org.matsim.contrib.freight.trade.Service;
 import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
@@ -23,19 +34,37 @@ import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.mzilske.city2000w.City2000WMobsimFactory;
-import playground.mzilske.freight.*;
-import playground.mzilske.freight.TransportChain.ChainLeg;
-import playground.mzilske.freight.api.TSPAgentFactory;
-import playground.mzilske.freight.events.*;
 
-import java.util.*;
+import playground.mzilske.city2000w.City2000WMobsimFactory;
+import playground.mzilske.freight.TSPAgentTracker;
+import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TSPPlan;
+import playground.mzilske.freight.TSPShipment;
+import playground.mzilske.freight.TransportChain;
+import playground.mzilske.freight.TransportChain.ChainLeg;
+import playground.mzilske.freight.TransportChainAgentFactoryImpl;
+import playground.mzilske.freight.TransportChainBuilder;
+import playground.mzilske.freight.TransportServiceProvider;
+import playground.mzilske.freight.TransportServiceProviders;
+import playground.mzilske.freight.api.TSPAgentFactory;
+import playground.mzilske.freight.events.OfferUtils;
+import playground.mzilske.freight.events.TransportChainAddedEvent;
+import playground.mzilske.freight.events.TransportChainRemovedEvent;
+import freight.TSPPlanReader;
 
 /**
  * @author schroeder
@@ -85,8 +114,8 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		
 		
 //		CarrierAgentFactory carrierAgentFactory = new TRBCarrierAgentFactoryImpl(scenario.getNetwork(), controler.createRoutingAlgorithm(), new CarrierDriverAgentFactoryImpl());
-		CarrierAgentFactory carrierAgentFactory = new KarlsruheCarrierAgentFactory(controler.createRoutingAlgorithm(), new CarrierDriverAgentFactoryImpl());
-		carrierAgentTracker = new CarrierAgentTracker(carriers, controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
+		
+		carrierAgentTracker = new CarrierAgentTracker(carriers, scenario.getNetwork());
 		
 		TSPAgentFactory tspAgentFactory = new KarlsruheTSPAgentFactory(new TransportChainAgentFactoryImpl());
 		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders(),tspAgentFactory);

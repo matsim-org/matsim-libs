@@ -10,21 +10,21 @@ import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.DistributionTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.PickupAndDeliveryTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.DistributionTourWithTimeWindowsAlgoFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.PickupAndDeliveryTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Locations;
-import org.matsim.contrib.freight.vrp.basics.PickORDeliveryCapacityAndTWConstraint;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+import org.matsim.contrib.freight.vrp.constraints.PickORDeliveryCapacityAndTWConstraint;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -79,7 +79,7 @@ public class Solomon {
 	
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(Level.INFO);
-		Solomon solomon = new Solomon("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/cvrptw_solomon/nOfCust100/C101.txt", "100_C101");
+		Solomon solomon = new Solomon("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/cvrptw_solomon/nOfCust100/R108.txt", "100_R108");
 		solomon.run();
 	}
 
@@ -101,7 +101,7 @@ public class Solomon {
 
 	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
 		RuinAndRecreateFactory factory = new DistributionTourWithTimeWindowsAlgoFactory();
-		factory.setIterations(200);
+		factory.setIterations(500);
 		factory.setWarmUp(50);
 		ChartListener chartListener = new ChartListener();
 		chartListener.setFilename("output/"+instanceName+".png");

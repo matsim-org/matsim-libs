@@ -53,8 +53,8 @@ public class RunMobSim implements StartupListener, BeforeMobsimListener{
 
 	private void init() {
 		logger.info("initialise model");
-		NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruhe.xml";
-		PLAN_FILENAME = "../playgrounds/sschroeder/output/karlsruhePlans.xml";
+		NETWORK_FILENAME = "../playgrounds/sschroeder/in/karlsruhe.xml";
+		PLAN_FILENAME = "../playgrounds/sschroeder/in/karlsruhePlans.xml";
 	}
 
 	private void readNetwork(String networkFilename) {

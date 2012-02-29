@@ -12,16 +12,15 @@ import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.DistributionTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.DistributionTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Locations;
-import org.matsim.contrib.freight.vrp.basics.PickORDeliveryCapacityAndTWConstraint;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
@@ -30,6 +29,7 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+import org.matsim.contrib.freight.vrp.constraints.PickORDeliveryCapacityAndTWConstraint;
 import org.matsim.core.utils.io.IOUtils;
 
 /**

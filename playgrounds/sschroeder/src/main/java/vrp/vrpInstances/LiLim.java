@@ -11,18 +11,18 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.PickupAndDeliveryTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.PickupAndDeliveryTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Locations;
-import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+import org.matsim.contrib.freight.vrp.constraints.PickAndDeliveryCapacityAndTWConstraint;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
