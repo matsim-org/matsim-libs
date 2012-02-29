@@ -1,15 +1,11 @@
 package playground.mzilske.city2000w;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.mobsim.SimpleCarrierAgentFactory;
-import org.matsim.contrib.freight.mobsim.*;
+import org.matsim.contrib.freight.carrier.CarrierPlanReader;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -71,9 +67,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
         Carriers carriers = new Carriers();
         new CarrierPlanReader(carriers).read("../playgrounds/sschroeder/input/carrierPlans.xml");
 		PlanAlgorithm router = event.getControler().createRoutingAlgorithm();
-		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
-		agentFactory.setRouter(router);
-		carrierAgentTracker = new CarrierAgentTracker(carriers, router, scenario.getNetwork(), agentFactory);
+		carrierAgentTracker = new CarrierAgentTracker(carriers, scenario.getNetwork());
 		// City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker.createPlans());
 		// mobsimFactory.setUseOTFVis(true);
 
