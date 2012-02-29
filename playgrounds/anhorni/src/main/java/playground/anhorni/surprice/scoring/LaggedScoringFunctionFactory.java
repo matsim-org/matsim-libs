@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
@@ -35,23 +36,31 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 	
 	private final Controler controler;
 	private AgentMemories memories = new AgentMemories();
+	private CharyparNagelScoringParameters params;
 
 	public LaggedScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, AgentMemories memories) {
 		super(configGroup, network);
 		this.controler = controler;
 		this.memories = memories;
+		this.params =  super.getParams();
 	}
 	
-	public ScoringFunction createNewScoringFunction(Plan plan) {		
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+	public ScoringFunction createNewScoringFunction(Plan plan) {	
 		
-		Person person = plan.getPerson();
-		LaggedScoringFunction scoringFunction = new LaggedScoringFunction(plan, super.getParams(), this.controler.getFacilities(), 
-				this.memories.getMemory(person.getId()));
+		// take into account lag effects
+		this.adaptCoefficients(plan.getPerson());
+		
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+			
+		LaggedScoringFunction scoringFunction = new LaggedScoringFunction(plan, this.params, this.controler.getFacilities());
 		
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(super.getParams(), controler.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
 		return scoringFunctionAccumulator;
+	}
+	
+	private void adaptCoefficients(Person person) {
+		
 	}
 }

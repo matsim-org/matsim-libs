@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * FacilitiesLoadCalculator.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice;
+package playground.anhorni.surprice.scoring;
 
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 
-import playground.anhorni.surprice.scoring.LaggedScoringFunctionFactory;
-import playground.anhorni.surprice.scoring.ScoringFunctionResetter;
 
-public class DayControler extends Controler {
-	
-	private AgentMemories memories = new AgentMemories();
-	
-	public DayControler(final ScenarioImpl scenario) {
-		super(scenario);	
-		super.setOverwriteFiles(true);
-	} 
-	
-	public DayControler(final Config config, AgentMemories memories) {
-		super(config);	
-		super.setOverwriteFiles(true);
-		this.memories = memories;		
-	} 
-	
-	public DayControler(final String configFile) {
-		super(configFile);	
-		super.setOverwriteFiles(true);
-	}
-	
-	protected void setUp() {
-	    super.setUp();	           
-	  	LaggedScoringFunctionFactory scoringFunctionFactory = new LaggedScoringFunctionFactory(this, this.config.planCalcScore(), this.network, this.memories);	  		
-	  	this.setScoringFunctionFactory(scoringFunctionFactory);
-	  	
-	  	this.addControlerListener(new ScoringFunctionResetter());
+/**
+ * 
+ * @author anhorni
+ */
+public class ScoringFunctionResetter implements IterationEndsListener {
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		Controler controler = event.getControler();
+		controler.getPlansScoring().getPlanScorer().reset(event.getIteration() + 1);
 	}
 }
