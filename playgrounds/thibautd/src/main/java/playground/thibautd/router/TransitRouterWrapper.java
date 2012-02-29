@@ -39,8 +39,6 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.thibautd.router.population.LegWithMainMode;
-
 /**
  * Wraps a {@link TransitRouter}.
  *
@@ -111,9 +109,7 @@ public class TransitRouterWrapper implements RoutingModule {
 		Coord nextCoord = null;
 		for (Leg leg2 : baseTrip) {
 			if (isFirstLeg) {
-				LegWithMainMode legWithMainMode = new LegWithMainMode( leg2 );
-				legWithMainMode.setMainMode( MAIN_MODE );
-				trip.add( legWithMainMode );
+				trip.add( leg2 );
 				isFirstLeg = false;
 			}
 			else {
@@ -138,9 +134,7 @@ public class TransitRouterWrapper implements RoutingModule {
 					trip.add(act);
 				}
 
-				LegWithMainMode legWithMainMode = new LegWithMainMode( leg2 );
-				legWithMainMode.setMainMode( MAIN_MODE );
-				trip.add( legWithMainMode );
+				trip.add( leg2 );
 			}
 		}
 

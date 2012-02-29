@@ -37,8 +37,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
-import playground.thibautd.router.population.LegWithMainMode;
-
 /**
  * Class acting as an intermediate between clients needing to
  * compute routes and all registered {@link RoutingModule}s.
@@ -186,12 +184,8 @@ public class TripRouter {
 	}
 
 	private static String identifyMainMode(final List<PlanElement> trip) {
-		// check better (ie, main mode should be the same for all legs in trip)?
-		Leg firstLeg = (Leg) trip.get( 0 );
-
-		return firstLeg instanceof LegWithMainMode ?
-			((LegWithMainMode) firstLeg).getMainMode() :
-			firstLeg.getMode();
+		String mode = ((Leg) trip.get( 0 )).getMode();
+		return mode.equals( TransportMode.transit_walk ) ? TransportMode.pt : mode;
 	}
 
 	public static class UnknownModeException extends RuntimeException {
@@ -238,6 +232,75 @@ public class TripRouter {
 		}
 	}	
 
+	// /////////////////////////////////////////////////////////////////////////
+	// public static convenience methods.
+	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * Inserts a trip between two activities in the sequence of plan elements
+	 * returned by the {@link Plan#getPlanElements()} method of a plan. Note
+	 * that the plan will be modified only if the returned list is the internal
+	 * reference!
+	 *
+	 * @param plan the plan to modify
+	 * @param origin the activity to use as origin. It must be a member of the list of plan elements.
+	 * @param trip the trip to insert
+	 * @param destination the destination activity. It must be a member of the list.
+	 * @return the "old trip": the sequence of plan elements originally existing between the origin and the destination
+	 */
+	public static List<PlanElement> insertTrip(
+			final Plan plan,
+			final Activity origin,
+			final List<? extends PlanElement> trip,
+			final Activity destination) {
+		return insertTrip(
+				plan.getPlanElements(),
+				origin,
+				trip,
+				destination);
+	}
 
+	/**
+	 * Inserts a trip between two activities in a sequence of plan elements.
+	 * @param plan the sequence of plan elements to modify
+	 * @param origin the activity to use as origin. It must be a member of the list of plan elements.
+	 * @param trip the trip to insert
+	 * @param destination the destination activity. It must be a member of the list.
+	 * @return the "old trip": the sequence of plan elements originally existing between the origin and the destination
+	 */
+	public static List<PlanElement> insertTrip(
+			final List<PlanElement> plan,
+			final Activity origin,
+			final List<? extends PlanElement> trip,
+			final Activity destination) {
+		List<PlanElement> oldTrip = new ArrayList<PlanElement>();
+
+		int index = plan.indexOf( origin );
+		if (index == -1) {
+			throw new IllegalArgumentException( origin+" does not belongs to "+plan );
+		}
+
+		int indexOfDestination = plan.indexOf( destination );
+		if (indexOfDestination == -1) {
+			throw new IllegalArgumentException( destination+" does not belongs to "+plan );
+		}
+
+		// go to the trip
+		index++;
+
+		// remove it
+		int toRemove = indexOfDestination - index;
+		while (toRemove > 0) {
+			oldTrip.add( plan.remove( index ) );
+			toRemove--;
+		}
+
+		// insert new trip
+		for (PlanElement pe : trip) {
+			plan.add( index , pe );
+			index++;
+		}
+
+		return oldTrip;
+	}
 }
 

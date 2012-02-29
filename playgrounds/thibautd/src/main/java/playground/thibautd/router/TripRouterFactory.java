@@ -52,7 +52,6 @@ public class TripRouterFactory implements MatsimFactory {
 		new HashMap<String, RoutingModuleFactory>();
 
 	/**
-	 * Configurable constructor: the {@link TripRouterBuilder} can be specified.
 	 *
 	 * @param network
 	 * @param travelCostCalculatorFactory
