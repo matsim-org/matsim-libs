@@ -28,9 +28,10 @@ import java.util.LinkedList;
 public class Tour {
 	
 	public static class Costs {
-		public double time;
-		public double distance;
+		public double transportTime;
 		public double generalizedCosts;
+		public double serviceTime;
+		
 	}
 	
 	private LinkedList<TourActivity> tourActivities = new LinkedList<TourActivity>();
@@ -47,7 +48,8 @@ public class Tour {
 		for(TourActivity c : tourActivities){
 			tour += "[" + c.getType() + "@" + c.getLocationId() + "@" + c.getEarliestArrTime() + "-" + c.getLatestArrTime() + "]";
 		}
-		tour += "[time=" + costs.time + "][distance=" + costs.distance + "][generalizedCosts=" + costs.generalizedCosts + "]"; 
+		tour += "[transportTime=" + costs.transportTime + "][serviceTime=" + costs.serviceTime + 
+			"][generalizedCosts=" + costs.generalizedCosts + "]"; 
 		return tour;
 	}
 

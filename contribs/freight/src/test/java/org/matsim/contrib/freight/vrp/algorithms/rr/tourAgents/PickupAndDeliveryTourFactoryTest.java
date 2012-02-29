@@ -106,15 +106,13 @@ public class PickupAndDeliveryTourFactoryTest extends VRPTestCase{
 	public void testAddShipmentAndResultingCosts(){
 		Tour newTour = new PickupAndDeliveryTourFactory(costs, constraints, tourActivityStatusUpdater).createTour(vehicle, tour, shipment, Double.MAX_VALUE);
 		assertEquals(50.0,newTour.costs.generalizedCosts);
-		assertEquals(50.0,newTour.costs.distance);
-		assertEquals(50.0,newTour.costs.time);
+		assertEquals(50.0,newTour.costs.transportTime);
 	}
 	
 	public void testAddShipmentAndResultingCostsWithTDCosts(){
 		Tour newTour = new PickupAndDeliveryTourFactory(tdCosts, constraints, tdTourStatusProcessor).createTour(vehicle, tour, shipment, Double.MAX_VALUE);
 		assertEquals(85.0,newTour.costs.generalizedCosts);
-		assertEquals(50.0,newTour.costs.distance);
-		assertEquals(35.0,newTour.costs.time);
+		assertEquals(35.0,newTour.costs.transportTime);
 	}
 	
 	public void testAddShipmentInDesiredOrder(){
@@ -151,8 +149,7 @@ public class PickupAndDeliveryTourFactoryTest extends VRPTestCase{
 		Tour tour = tourBuilder.build();
 		
 		Tour newTour =  new PickupAndDeliveryTourFactory(tdCosts, constraints, tdTourStatusProcessor).createTour(vehicle, tour, s4, Double.MAX_VALUE);
-		assertEquals(40.0,newTour.costs.distance);
-		assertEquals(30.0,newTour.costs.time);
+		assertEquals(30.0,newTour.costs.transportTime);
 		assertEquals( makeId(10,10),newTour.getActivities().get(3).getLocationId());
 		assertEquals(makeId(0,0), newTour.getActivities().get(6).getLocationId());
 	}
@@ -194,8 +191,7 @@ public class PickupAndDeliveryTourFactoryTest extends VRPTestCase{
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
 		Tour tour = tourBuilder.build();
 		Tour newTour =  new PickupAndDeliveryTourFactory(tdCosts, constraints, tdTourStatusProcessor).createTour(vehicle, tour, s4, Double.MAX_VALUE);
-		assertEquals(40.0,newTour.costs.time);
-		assertEquals(60.0,newTour.costs.distance);
+		assertEquals(40.0,newTour.costs.transportTime);
 		assertEquals(makeId(10,10),newTour.getActivities().get(1).getLocationId());
 		assertEquals(makeId(0,0), newTour.getActivities().get(8).getLocationId());
 	}

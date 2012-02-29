@@ -43,6 +43,9 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
  * Created by IntelliJ IDEA.

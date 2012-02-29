@@ -75,4 +75,8 @@ public class Shipment implements Job{
 		return id;
 	}
 	
+	public String toString(){
+		return "[id="+id+"][from="+fromId+"][to="+toId+"[size="+size+"]";
+	}
+	
 }

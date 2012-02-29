@@ -21,25 +21,21 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler
 {
 
     private Carriers carriers;
 
-    private Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
+    private Collection<CarrierAgentImpl> carrierAgents = new ArrayList<CarrierAgentImpl>();
 
     private Network network;
 
-    private CarrierAgentFactory carrierAgentFactory;
-
     private EventsManager eventsManager;
 
-    public CarrierAgentTracker(Carriers carriers, PlanAlgorithm router, Network network, CarrierAgentFactory carrierAgentFactory) {
+    public CarrierAgentTracker(Carriers carriers, Network network) {
         this.carriers = carriers;
         this.network = network;
-        this.carrierAgentFactory = carrierAgentFactory;
         createCarrierAgents();
         eventsManager = EventsUtils.createEventsManager();
     }
@@ -56,7 +52,7 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
     public void handleEvent(ActivityEndEvent event) {
         Id personId = event.getPersonId();
         String activityType = event.getActType();
-        for (CarrierAgent carrierAgent : carrierAgents) {
+        for (CarrierAgentImpl carrierAgent : carrierAgents) {
             if (carrierAgent.getDriverIds().contains(personId)) {
                 carrierAgent.activityEndOccurs(personId, activityType, event.getTime());
             }
@@ -68,7 +64,7 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
         Id personId = event.getPersonId();
         Id linkId = event.getLinkId();
         double distance = network.getLinks().get(linkId).getLength();
-        for (CarrierAgent carrierAgent : carrierAgents) {
+        for (CarrierAgentImpl carrierAgent : carrierAgents) {
             if (carrierAgent.getDriverIds().contains(personId)) {
                 carrierAgent.tellDistance(personId, distance);
                 carrierAgent.tellLink(personId, linkId);
@@ -80,7 +76,7 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
     public void handleEvent(ActivityStartEvent event) {
         Id personId = event.getPersonId();
         String activityType = event.getActType();
-        for (CarrierAgent carrierAgent : carrierAgents) {
+        for (CarrierAgentImpl carrierAgent : carrierAgents) {
             if (carrierAgent.getDriverIds().contains(personId)) {
                 carrierAgent.activityStartOccurs(personId, activityType, event.getTime());
             }
@@ -89,7 +85,8 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
 
     private void createCarrierAgents() {
         for (Carrier carrier : carriers.getCarriers().values()) {
-            CarrierAgent carrierAgent = carrierAgentFactory.createAgent(this,carrier);
+            CarrierAgentImpl carrierAgent = new CarrierAgentImpl(this,carrier); 
+//            	carrierAgentFactory.createAgent(this,carrier);
             carrierAgents.add(carrierAgent);
         }
     }
@@ -102,8 +99,8 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
         processEvent(new ShipmentDeliveredEvent(carrierId, driverId, shipment, time));
     }
 
-    private CarrierAgent findCarrierAgent(Id id) {
-        for(CarrierAgent agent : carrierAgents){
+    private CarrierAgentImpl findCarrierAgent(Id id) {
+        for(CarrierAgentImpl agent : carrierAgents){
             if(agent.getId().equals(id)){
                 return agent;
             }
@@ -113,7 +110,7 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
 
     public void calculateCosts() {
         for(Carrier carrier : carriers.getCarriers().values()){
-            CarrierAgent agent = findCarrierAgent(carrier.getId());
+            CarrierAgentImpl agent = findCarrierAgent(carrier.getId());
             agent.calculateCosts();
         }
 
@@ -121,7 +118,7 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
 
     public Collection<Plan> createPlans() {
         List<Plan> plans = new ArrayList<Plan>();
-        for (CarrierAgent carrierAgent : carrierAgents) {
+        for (CarrierAgentImpl carrierAgent : carrierAgents) {
             List<Plan> plansForCarrier = carrierAgent.createFreightDriverPlans();
             plans.addAll(plansForCarrier);
         }

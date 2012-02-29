@@ -15,20 +15,42 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
+/**
+ * 
+ */
+package org.matsim.contrib.freight.vrp.constraints;
 
+import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 /**
- * 
  * @author stefan schroeder
  *
  */
+public class PickAndDeliveryCapacityAndTWConstraint implements Constraints {
 
-public interface TourAgentFactory {
-
-
-	public TourAgent createTourAgent(Tour tour, Vehicle vehicle);
-
+	private Logger logger = Logger.getLogger(PickAndDeliveryCapacityAndTWConstraint.class);
+	
+	@Override
+	public boolean judge(Tour tour, Vehicle vehicle) {
+		int currentLoad = 0;
+		int maxCap = vehicle.getCapacity();
+		for(TourActivity tourAct : tour.getActivities()){
+			if(tourAct instanceof JobActivity){
+				currentLoad += ((JobActivity) tourAct).getCapacityDemand();
+			}
+			if(currentLoad > vehicle.getCapacity()){
+				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentLoad=" + currentLoad + " on tour " + tour);
+				return false;
+			}
+			if(tourAct.getLatestArrTime() < tourAct.getEarliestArrTime()){
+				logger.debug("timeWindow-conflic on tour " + tour);
+				return false;
+			}
+		}
+		return true;
+	}
 }

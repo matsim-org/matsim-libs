@@ -25,15 +25,12 @@ package org.matsim.contrib.freight.vrp.basics;
 
 public interface Costs {
 
-	public Double getGeneralizedCost(String fromId, String toId, double departureTime);
-	
-	public Double getDistance(String fromId, String toId, double departureTime);
+	public Double getTransportCost(String fromId, String toId, double departureTime);
 	
 	public Double getTransportTime(String fromId, String toId, double departureTime);
 	
-	public Double getBackwardGeneralizedCost(String fromId, String toId, double arrivalTime);
+	public Double getBackwardTransportCost(String fromId, String toId, double arrivalTime);
 
 	public Double getBackwardTransportTime(String fromId, String toId, double arrivalTime);
 	
-	public Double getBackwardDistance(String fromId, String toId, double arrivalTime);
 }

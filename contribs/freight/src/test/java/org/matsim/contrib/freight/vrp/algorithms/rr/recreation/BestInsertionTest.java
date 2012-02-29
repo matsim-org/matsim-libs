@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -36,9 +36,9 @@ public class BestInsertionTest extends VRPTestCase{
 	
 	VehicleRoutingProblem vrp;
 	
-	TourAgent tourAgent1;
+	RRTourAgent tourAgent1;
 	
-	TourAgent tourAgent2;
+	RRTourAgent tourAgent2;
 	
 	RRSolution solution;
 	
@@ -69,7 +69,7 @@ public class BestInsertionTest extends VRPTestCase{
 		anotherTourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
 		tourAgent2 = new RRTourAgentFactory(tourStatusProcessor, tourFactory).createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
 		
-		Collection<TourAgent> agents = new ArrayList<TourAgent>();
+		Collection<RRTourAgent> agents = new ArrayList<RRTourAgent>();
 		agents.add(tourAgent1);
 		agents.add(tourAgent2);
 		solution = new RRSolution(agents);
@@ -106,10 +106,10 @@ public class BestInsertionTest extends VRPTestCase{
 	
 	public void testTotalCost(){
 		double oldCost = solution.getResult();
-		assertEquals(40.0,oldCost);
+		assertEquals(240.0,oldCost);
 		bestInsertion.run(solution, unassignedJobs);
 		double newCost = solution.getResult();
-		assertEquals(44.0,newCost);
+		assertEquals(244.0,newCost);
 	}
 	
 	

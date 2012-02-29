@@ -1,91 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
-	<!--
-  ~ /* *********************************************************************** *
-  ~  * project: org.matsim.*
-  ~  * ${file_name}
-  ~  *                                                                         *
-  ~  * *********************************************************************** *
-  ~  *                                                                         *
-  ~  * copyright       : (C) ${year} by the members listed in the COPYING,        *
-  ~  *                   LICENSE and WARRANTY file.                            *
-  ~  * email           : info at matsim dot org                                *
-  ~  *                                                                         *
-  ~  * *********************************************************************** *
-  ~  *                                                                         *
-  ~  *   This program is free software; you can redistribute it and/or modify  *
-  ~  *   it under the terms of the GNU General Public License as published by  *
-  ~  *   the Free Software Foundation; either version 2 of the License, or     *
-  ~  *   (at your option) any later version.                                   *
-  ~  *   See also COPYING, LICENSE and WARRANTY file                           *
-  ~  *                                                                         *
-  ~  * *********************************************************************** */
-  ~
-  ~ ${filecomment}
-  ~ ${package_declaration}
-  ~
-  ~ ${typecomment}
-  ~ ${type_declaration}
-  -->
-
-<carriers>
+	<carriers>
 		<carrier id="carrier1" linkId="i(4,0)">
 			<vehicles>
-				<vehicle id="vehicle_c1" linkId="i(4,0)" cap="30"/>
+				<vehicle id="vehicle_c1_1" linkId="i(4,0)" cap="80" earliestStart="0.0" latestEnd="1.7976931348623157E308"/>
+				<vehicle id="vehicle_c1_2" linkId="i(4,0)" cap="80" earliestStart="0.0" latestEnd="1.7976931348623157E308"/>
 			</vehicles>
 			<shipments>
-				<shipment id="7" from="j(8,1)" to="j(0,4)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="10" from="j(8,5)" to="j(0,2)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="9" from="j(8,5)" to="j(0,4)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="6" from="j(8,1)" to="j(0,3)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="11" from="j(8,5)" to="j(0,1)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="12" from="j(8,1)" to="j(0,2)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="8" from="j(8,1)" to="j(0,5)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
+				<shipment id="1" from="j(8,1)" to="j(0,4)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="2" from="j(8,5)" to="j(0,2)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="3" from="j(8,5)" to="j(0,4)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="4" from="j(8,1)" to="j(0,3)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="5" from="j(8,5)" to="j(0,1)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="6" from="j(8,1)" to="j(0,2)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="7" from="j(8,1)" to="j(0,5)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
 			</shipments>
 			<tours>
-				<tour vehicleId="vehicle_c1" linkId="i(4,0)" start="0.0">
+				<tour vehicleId="vehicle_c1_1" start="0.0">
 					<act type="start" />
+					<leg>
+						<route>i(5,0) i(6,0) i(7,0) i(8,0)</route>
+					</leg>
+					<act type="pickup" shipmentId="1"/>
+					<leg>
+						<route></route>
+					</leg>
 					<act type="pickup" shipmentId="6"/>
+					<leg>
+						<route></route>
+					</leg>
 					<act type="pickup" shipmentId="7"/>
-					<act type="pickup" shipmentId="8"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="4"/>
+					<leg>
+						<route>j(8,2) j(8,3) j(8,4)</route>
+					</leg>
+					<act type="pickup" shipmentId="3"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="2"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="5"/>
+					<leg>
+						<route>i(8,5)R i(7,5)R i(6,5)R i(5,5)R i(4,5)R i(3,5)R j(2,5)R i(2,4)R j(1,4)R j(1,3)R j(1,2)R i(1,1)R j(0,1)R</route>
+					</leg>
+					<act type="delivery" shipmentId="5"/>
+					<leg>
+						<route></route>
+					</leg>
 					<act type="delivery" shipmentId="6"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="delivery" shipmentId="2"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="delivery" shipmentId="4"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="delivery" shipmentId="1"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="delivery" shipmentId="3"/>
+					<leg>
+						<route></route>
+					</leg>
 					<act type="delivery" shipmentId="7"/>
-					<act type="delivery" shipmentId="8"/>
-					<act type="pickup" shipmentId="9"/>
-					<act type="pickup" shipmentId="10"/>
-					<act type="pickup" shipmentId="11"/>
-					<act type="delivery" shipmentId="9"/>
-					<act type="pickup" shipmentId="12"/>
-					<act type="delivery" shipmentId="12"/>
-					<act type="delivery" shipmentId="10"/>
-					<act type="delivery" shipmentId="11"/>
+					<leg>
+						<route>j(0,5)R j(0,4)R j(0,3)R i(1,2) j(1,2)R i(2,1) j(2,1)R i(3,0)</route>
+					</leg>
 					<act type="end"/>
 				</tour>
 			</tours>
 		</carrier>
 		<carrier id="carrier2" linkId="i(4,8)">
 			<vehicles>
-				<vehicle id="vehicle_c2" linkId="i(4,8)" cap="30"/>
+				<vehicle id="vehicle_c2_1" linkId="i(4,8)" cap="80" earliestStart="0.0" latestEnd="1.7976931348623157E308"/>
+				<vehicle id="vehicle_c2_2" linkId="i(4,8)" cap="80" earliestStart="0.0" latestEnd="1.7976931348623157E308"/>
 			</vehicles>
 			<shipments>
-				<shipment id="3" from="j(8,5)" to="j(0,8)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="5" from="j(8,1)" to="j(0,8)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="1" from="j(8,5)" to="j(0,3)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="4" from="j(8,1)" to="j(0,1)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
-				<shipment id="2" from="j(8,5)" to="j(0,5)" size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200.0"/>
+				<shipment id="8" from="j(8,5)" to="j(0,8)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="9" from="j(8,1)" to="j(0,8)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="10" from="j(8,5)" to="j(0,3)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="11" from="j(8,1)" to="j(0,1)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="12" from="j(8,5)" to="j(0,5)" size="10" startPickup="0.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
 			</shipments>
 			<tours>
-				<tour vehicleId="vehicle_c2" linkId="i(4,8)" start="0.0">
+				<tour vehicleId="vehicle_c2_1" start="0.0">
 					<act type="start" />
-					<act type="pickup" shipmentId="1"/>
-					<act type="pickup" shipmentId="2"/>
-					<act type="pickup" shipmentId="3"/>
-					<act type="delivery" shipmentId="2"/>
-					<act type="delivery" shipmentId="1"/>
-					<act type="pickup" shipmentId="4"/>
-					<act type="pickup" shipmentId="5"/>
-					<act type="delivery" shipmentId="4"/>
-					<act type="delivery" shipmentId="5"/>
-					<act type="delivery" shipmentId="3"/>
+					<leg>
+						<route>j(4,8)R j(4,7)R j(4,6)R i(5,5) i(6,5) j(6,5)R i(7,4) i(8,4)</route>
+					</leg>
+					<act type="pickup" shipmentId="8"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="12"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="10"/>
+					<leg>
+						<route>j(8,5)R j(8,4)R j(8,3)R j(8,2)R j(8,1)R</route>
+					</leg>
+					<act type="pickup" shipmentId="11"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="9"/>
+					<leg>
+						<route>i(8,1)R i(7,1)R i(6,1)R i(5,1)R i(4,1)R i(3,1)R i(2,1)R i(1,1)R j(0,1)R</route>
+					</leg>
+					<act type="delivery" shipmentId="11"/>
+					<leg>
+						<route>j(0,2)</route>
+					</leg>
+					<act type="delivery" shipmentId="10"/>
+					<leg>
+						<route>j(0,4)</route>
+					</leg>
+					<act type="delivery" shipmentId="12"/>
+					<leg>
+						<route>j(0,6) j(0,7)</route>
+					</leg>
+					<act type="delivery" shipmentId="8"/>
+					<leg>
+						<route></route>
+					</leg>
+					<act type="delivery" shipmentId="9"/>
+					<leg>
+						<route>i(1,8) i(2,8) i(3,8)</route>
+					</leg>
 					<act type="end"/>
 				</tour>
 			</tours>

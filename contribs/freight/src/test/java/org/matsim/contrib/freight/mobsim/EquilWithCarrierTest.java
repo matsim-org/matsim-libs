@@ -32,7 +32,9 @@ public class EquilWithCarrierTest extends MatsimTestCase {
 	
     public void testMobsimWithCarrier()  {
     	String NETWORK_FILENAME = getInputDirectory() + "network.xml";
+//    	String NETWORK_FILENAME = "../contrib/freight/" + getInputDirectory() + "network.xml";
     	String PLANS_FILENAME = getInputDirectory() + "plans100.xml";
+//    	String PLANS_FILENAME = "../contrib/freight/" + getInputDirectory() + "plans100.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		ActivityParams workParams = new ActivityParams("w");
@@ -43,13 +45,16 @@ public class EquilWithCarrierTest extends MatsimTestCase {
 		config.planCalcScore().addActivityParams(homeParams);
 		config.global().setCoordinateSystem("EPSG:32632");
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
+		config.controler().setLastIteration(2);
         config.network().setInputFile(NETWORK_FILENAME);
-      //  config.plans().setInputFile(PLANS_FILENAME);
+        config.plans().setInputFile(PLANS_FILENAME);
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		Controler controler = new Controler(config);
+		controler.setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);
-		controler.addControlerListener(new RunMobSimWithCarrier( getInputDirectory() + "carrierPlans.xml"));
+		String CARRIER_PLANS = getInputDirectory() + "carrierPlans.xml";
+//		String CARRIER_PLANS = "../contrib/freight/" + getInputDirectory() + "carrierPlans.xml";
+		controler.addControlerListener(new RunMobSimWithCarrier(CARRIER_PLANS));
 		controler.setOverwriteFiles(true);
 		controler.run();
     }

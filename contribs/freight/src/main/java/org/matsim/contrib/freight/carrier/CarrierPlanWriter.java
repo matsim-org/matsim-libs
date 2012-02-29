@@ -8,11 +8,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.Tour.Delivery;
-import org.matsim.contrib.freight.carrier.Tour.GeneralActivity;
-import org.matsim.contrib.freight.carrier.Tour.Pickup;
+import org.matsim.contrib.freight.carrier.Tour.Leg;
+import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 
@@ -67,7 +67,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		writer.write("\t\t\t<vehicles>\n");
 		for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
 			writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId() + "\" linkId=\"" + v.getLocation() + "\"" +
-			" cap=\"" + v.getCapacity() + "\"/>\n");
+			" cap=\"" + v.getCapacity() + "\" earliestStart=\"" + v.getEarliestStartTime() + "\" latestEnd=\"" + v.getLatestEndTime() + "\"/>\n");
 		}
 		writer.write("\t\t\t</vehicles>\n");
 	}
@@ -86,7 +86,9 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 			writer.write("startPickup=\"" + s.getPickupTimeWindow().getStart() + "\" ");
 			writer.write("endPickup=\""  + s.getPickupTimeWindow().getEnd() + "\" ");
 			writer.write("startDelivery=\"" + s.getDeliveryTimeWindow().getStart() + "\" ");
-			writer.write("endDelivery=\"" + s.getDeliveryTimeWindow().getEnd() + "\"/>\n");
+			writer.write("endDelivery=\"" + s.getDeliveryTimeWindow().getEnd()  + "\" ");
+			writer.write("pickupServiceTime=\"" + s.getPickupServiceTime()  + "\" ");
+			writer.write("deliveryServiceTime=\"" + s.getDeliveryServiceTime()  + "\"/>\n");		
 		}
 		writer.write("\t\t\t</shipments>\n");
 	}
@@ -99,21 +101,40 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		for(ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()){
 			writer.write("\t\t\t\t<tour ");
 			writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId() + "\" ");
-			writer.write("linkId=\"" + tour.getVehicle().getLocation() + "\" ");
 			writer.write("start=\"" + tour.getDeparture() + "\">\n");
 			writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START + "\" />\n");
 			for(TourElement tourElement : tour.getTour().getTourElements()){
-				writer.write("\t\t\t\t\t<act ");
-				writer.write("type=\"" + tourElement.getActivityType() + "\" ");
-				if((tourElement instanceof Pickup) || (tourElement instanceof Delivery)){
-					writer.write("shipmentId=\"" + registeredShipments.get(tourElement.getShipment()) + "\"");
+				if(tourElement instanceof Leg){
+					Leg leg = (Leg) tourElement;
+					writer.write("\t\t\t\t\t<leg>");
+					if(leg.getRoute() != null){
+						writer.write("\n");
+						writer.write("\t\t\t\t\t\t<route>");
+						boolean firstLink = true;
+						for(Id id : ((NetworkRoute)leg.getRoute()).getLinkIds()){
+							if(firstLink){
+								writer.write(id.toString());
+								firstLink = false;
+							}
+							else{
+								writer.write(" " + id.toString());
+							}
+						}
+						writer.write("</route>\n");
+						writer.write("\t\t\t\t\t</leg>\n");
+					}
+					else{
+						writer.write("</leg>\n");
+					}
 				}
-				else if(tourElement instanceof GeneralActivity){
-					GeneralActivity genAct = (GeneralActivity)tourElement;
-					writer.write("linkId=\"" + genAct.getLocation() + "\" ");
-					writer.write("duration=\"" + genAct.getDuration() + "\"");
+				if(tourElement instanceof ShipmentBasedActivity){
+					ShipmentBasedActivity act = (ShipmentBasedActivity) tourElement;
+					writer.write("\t\t\t\t\t<act ");
+					writer.write("type=\"" + act.getActivityType() + "\" ");
+					writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\"");
+					writer.write("/>\n");
 				}
-				writer.write("/>\n");
+				
 			}
 			writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.END + "\"/>\n");
 			writer.write("\t\t\t\t</tour>\n");

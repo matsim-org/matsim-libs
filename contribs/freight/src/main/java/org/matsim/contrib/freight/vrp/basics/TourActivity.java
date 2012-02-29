@@ -18,5 +18,9 @@ public interface TourActivity {
 	public double getServiceTime();
 
 	public abstract String getType();
+	
+	public abstract int getCurrentLoad();
+	
+	public abstract void setCurrentLoad(int load);
 
 }

@@ -19,8 +19,10 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.core.utils.misc.Counter;
 
 
 /**
@@ -39,29 +41,42 @@ public class TourCostProcessor implements TourStatusProcessor{
 	
 	private Costs costs;
 	
+	public Counter counter;
+	
 	public TourCostProcessor(Costs costs) {
 		super();
 		this.costs = costs;
+		counter = new Counter("#tour processors (tourCostProcessor)");
 	}
 	
 	@Override
 	public void process(Tour tour){
-		reset(tour);
-		for(int i=1;i<tour.getActivities().size();i++){
-			TourActivity fromAct = tour.getActivities().get(i-1);
-			TourActivity toAct = tour.getActivities().get(i);
-			tour.costs.generalizedCosts += costs.getGeneralizedCost(fromAct.getLocationId(),toAct.getLocationId(), 0.0);
-			tour.costs.distance += costs.getDistance(fromAct.getLocationId(),toAct.getLocationId(), 0.0);
-			tour.costs.time  += costs.getTransportTime(fromAct.getLocationId(),toAct.getLocationId(), 0.0);
-			logger.debug("from=" + fromAct.getLocationId() + " to=" + toAct.getLocationId() + " dist: " + costs.getDistance(fromAct.getLocationId(),toAct.getLocationId(), 0.0));
+		if(tour.getActivities().size() <= 2){
+			tour.getCosts().generalizedCosts = 0.0;
+			tour.getCosts().transportTime = 0.0;
+			return;
 		}
-		logger.debug("totDist: " + tour.costs.distance);
+		reset(tour);
+		counter.incCounter();
+		counter.printCounter();
+		TourActivity prevAct = tour.getActivities().getFirst();
+		for(int i=1;i<tour.getActivities().size();i++){
+			TourActivity toAct = tour.getActivities().get(i);
+			if(toAct instanceof JobActivity){
+				toAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)toAct).getCapacityDemand());
+			}
+			else{
+				toAct.setCurrentLoad(prevAct.getCurrentLoad());
+			}
+			tour.costs.generalizedCosts += costs.getTransportCost(prevAct.getLocationId(),toAct.getLocationId(), 0.0);
+			tour.costs.transportTime  += costs.getTransportTime(prevAct.getLocationId(),toAct.getLocationId(), 0.0);
+			prevAct = toAct;
+		}
 	}
 	
 	private void reset(Tour tour) {
 		tour.costs.generalizedCosts = 0.0;
-		tour.costs.time = 0.0;
-		tour.costs.distance = 0.0;
+		tour.costs.transportTime = 0.0;
 	}
 
 }

@@ -3,6 +3,8 @@ package org.matsim.contrib.freight.vrp.basics;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.contrib.freight.vrp.constraints.Constraints;
+
 
 public class VrpBuilder {
 	

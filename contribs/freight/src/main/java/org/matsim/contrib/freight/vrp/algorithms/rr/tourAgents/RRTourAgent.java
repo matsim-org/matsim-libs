@@ -29,24 +29,49 @@ import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
-
-
 /**
  * 
  * @author stefan schroeder
  *
  */
 
-class RRTourAgent implements TourAgent {
+public class RRTourAgent {
+	
+	public static class Offer {
+		
+		private RRTourAgent agent;
+		
+		private double cost;
+
+		public Offer(RRTourAgent agent, double cost) {
+			super();
+			this.agent = agent;
+			this.cost = cost;
+		}
+
+		public RRTourAgent getTourAgent() {
+			return agent;
+		}
+
+		public double getPrice() {
+			return cost;
+		}
+		
+		@Override
+		public String toString() {
+			return "currentTour=" + agent + "; marginalInsertionCosts=" + cost;
+		}
+		
+	}
 	
 	private static Logger logger = Logger.getLogger(RRTourAgent.class);
 	
 	private Tour tour;
 	
+	private String id;
+	
 	private Vehicle vehicle;
 
-	private Offer openOffer = null;
-	
 	private Tour tourOfLastOffer = null;
 	
 	private TourStatusProcessor activityStatusUpdater;
@@ -57,18 +82,27 @@ class RRTourAgent implements TourAgent {
 	
 	private TourFactory tourFactory;
 	
-	RRTourAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder) {
+	private boolean active = false;
+	
+	private boolean keepScaling = false;
+	
+	public double marginalCostScalingFactorForNewService = 1.0;
+	
+	public double fixCostsForService = 0.0;
+	
+	public RRTourAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder) {
 		super();
 		this.tour = tour;
 		this.tourFactory=tourBuilder;
 		this.activityStatusUpdater=tourStatusProcessor;
 		this.vehicle = vehicle;
+		id = vehicle.getId();
 		iniJobs();
 		syncTour();
 	}
 
-	public void setTourBuilder(TourFactory tourBuilder) {
-		this.tourFactory = tourBuilder;
+	public String getId() {
+		return id;
 	}
 
 	private void iniJobs() {
@@ -83,22 +117,25 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#offerRejected(core.algorithms.ruinAndRecreate.RuinAndRecreate.Offer)
 	 */
-	@Override
+
 	public void offerRejected(Offer offer){
-		openOffer = null;
 		tourOfLastOffer = null;
 	}
 
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#getTotalCost()
 	 */
-	@Override
+
 	public double getTourCost(){
 		syncTour();
-		return tour.getCosts().generalizedCosts;
+		double fix =0.0;
+		if(isActive()){
+			fix = fixCostsForService;
+		}
+		return tour.getCosts().generalizedCosts + fix;
 	}
 	
-	@Override
+
 	public Tour getTour() {
 		syncTour();
 		return tour;
@@ -110,14 +147,17 @@ class RRTourAgent implements TourAgent {
 		return tour.toString();
 	}
 
-	@Override
+
 	public Offer requestService(Job job, double bestKnownPrice) {
 		syncTour();
 		Tour newTour = tourFactory.createTour(vehicle, tour, job, bestKnownPrice);
 		if(newTour != null){
 			double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
+			if(!active || keepScaling){
+				marginalCosts = scale(marginalCosts);
+				keepScaling = true;
+			}
 			Offer offer = new Offer(this, marginalCosts);
-			openOffer = offer;
 			tourOfLastOffer = newTour;
 			return offer;
 		}
@@ -126,22 +166,28 @@ class RRTourAgent implements TourAgent {
 		}
 	}
 
+	private double scale(double marginalCosts) {
+		return marginalCosts*marginalCostScalingFactorForNewService;
+	}
+
 	private void syncTour() {
 		if(tourStatusOutOfSync){
 			tourStatusOutOfSync = false;
 			activityStatusUpdater.process(tour);
+			if(tour.getActivities().size()<=2){
+				active=false;
+			}
+			else{
+				active=true;
+			}
 		}
 	}
 
 
-	@Override
 	public void offerGranted(Job job) {
 		jobs.put(job.getId(), job);
 		if(tourOfLastOffer != null){
 			tour = tourOfLastOffer;
-			logger.debug("granted offer: " + openOffer);
-			logger.debug("");
-			openOffer = null;
 			tourOfLastOffer = null;
 		}
 		else {
@@ -149,7 +195,6 @@ class RRTourAgent implements TourAgent {
 		}
 	}
 
-	@Override
 	public boolean hasJob(Job job) {
 		if(jobs.containsKey(job.getId())){
 			return true;
@@ -157,7 +202,6 @@ class RRTourAgent implements TourAgent {
 		return false;
 	}
 
-	@Override
 	public void removeJob(Job job) {
 		if(jobs.containsKey(job.getId())){
 			List<TourActivity> acts = new ArrayList<TourActivity>(tour.getActivities());
@@ -171,5 +215,14 @@ class RRTourAgent implements TourAgent {
 			tourStatusOutOfSync = true;
 			jobs.remove(job.getId());
 		}
+	}
+
+	public Vehicle getVehicle() {
+		return vehicle;
+	}
+	
+	public boolean isActive(){
+//		syncTour();
+		return tour.getActivities().size()>2;
 	}
 }

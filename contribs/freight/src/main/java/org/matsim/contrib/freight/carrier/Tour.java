@@ -5,33 +5,89 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
 
 
 public class Tour {
 
 	public static abstract class TourElement {
 		
+//		public abstract String getActivityType();
+//
+//		public abstract Id getLocation();
+//
+//		public abstract double getDuration();
+//		
+//		@Deprecated
+//		public abstract CarrierShipment getShipment();
+//		
+//		public abstract TimeWindow getTimeWindow();
+		
+	};
+	
+	public static abstract class TourActivity extends TourElement{
+		
 		public abstract String getActivityType();
 
 		public abstract Id getLocation();
 
 		public abstract double getDuration();
-		
-		@Deprecated
-		public abstract CarrierShipment getShipment();
-		
+
 		public abstract TimeWindow getTimeWindow();
 		
-	};
+		public abstract void setExpectedActStart(double startTime);
+		
+		public abstract double getExpectedActStart();
+		
+		public abstract void setExpectedArrival(double arrivalTime);
+		
+		public abstract double getExpectedArrival();
+	}
 	
-	public static abstract class ShipmentBasedActivity extends TourElement {
+	public static abstract class ShipmentBasedActivity extends TourActivity {
 		public abstract CarrierShipment getShipment();
+	}
+	
+	public static class Leg extends TourElement {
+		
+		private Route route;
+		
+		private double expTransportTime;
+
+		private double departureTime;
+		
+		public Route getRoute(){
+			return route;
+		}
+		
+		public void setRoute(Route route){
+			this.route = route;
+		}
+
+		public double getExpectedTransportTime() {
+			return expTransportTime;
+		}
+		
+		public void setExpectedTransportTime(double transportTime){
+			this.expTransportTime = transportTime;
+		}
+
+		public void setDepartureTime(double currTime) {
+			this.departureTime = currTime;
+		}
+		
+		public double getDepartureTime(){
+			return departureTime;
+		}
 	}
 	
 	public static class Pickup extends ShipmentBasedActivity {
 
-		
 		private CarrierShipment shipment;
+		
+		private double expActStartTime;
+		
+		private double expActArrTime;
 
 		public Pickup(CarrierShipment shipment) {
 			this.shipment = shipment;
@@ -62,11 +118,36 @@ public class Tour {
 			return shipment;
 		}
 
+		@Override
+		public void setExpectedActStart(double startTime) {
+			expActStartTime = startTime;
+		}
+
+		@Override
+		public double getExpectedActStart() {
+			return expActStartTime;
+		}
+
+		@Override
+		public void setExpectedArrival(double arrivalTime) {
+			expActArrTime = arrivalTime;
+			
+		}
+
+		@Override
+		public double getExpectedArrival() {
+			return expActArrTime;
+		}
+
 	};
 	
 	public static class Delivery extends ShipmentBasedActivity {
 
 		private CarrierShipment shipment;
+		
+		private double expActStartTime;
+		
+		private double expArrTime;
 
 		public Delivery(CarrierShipment shipment) {
 			this.shipment = shipment;
@@ -96,10 +177,30 @@ public class Tour {
 		public CarrierShipment getShipment() {
 			return shipment;
 		}
+
+		@Override
+		public void setExpectedActStart(double startTime) {
+			expActStartTime = startTime;
+		}
+
+		@Override
+		public double getExpectedActStart() {
+			return expActStartTime;
+		}
+
+		@Override
+		public void setExpectedArrival(double arrivalTime) {
+			expArrTime = arrivalTime;
+		}
+
+		@Override
+		public double getExpectedArrival() {
+			return expArrTime;
+		}
 		
 	};
 	
-	public static class GeneralActivity extends TourElement {
+	public static class GeneralActivity extends TourActivity {
 
 		private String type;
 		
@@ -110,6 +211,10 @@ public class Tour {
 		private Double earliestStart;
 		
 		private Double latestStart;
+		
+		private double expActStartTime;
+		
+		private double expArrTime;
 		
 		public GeneralActivity(String type, Id location, Double earliestStart, Double latestStart, Double duration) {
 			super();
@@ -136,13 +241,28 @@ public class Tour {
 		}
 
 		@Override
-		public CarrierShipment getShipment() {
-			return null;
+		public TimeWindow getTimeWindow() {
+			return new TimeWindow(earliestStart, latestStart);
 		}
 
 		@Override
-		public TimeWindow getTimeWindow() {
-			return new TimeWindow(earliestStart, latestStart);
+		public void setExpectedActStart(double startTime) {
+			expActStartTime = startTime;
+		}
+
+		@Override
+		public double getExpectedActStart() {
+			return expActStartTime;
+		}
+
+		@Override
+		public void setExpectedArrival(double arrivalTime) {
+			expArrTime = arrivalTime;
+		}
+
+		@Override
+		public double getExpectedArrival() {
+			return expArrTime;
 		}
 		
 	}

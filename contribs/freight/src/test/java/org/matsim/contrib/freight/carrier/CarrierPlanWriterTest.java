@@ -26,30 +26,28 @@
  * ${type_declaration}
  */
 
-package org.matsim.contrib.freight.mobsim;
+package org.matsim.contrib.freight.carrier;
 
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestCase;
 
 /**
-* Created by IntelliJ IDEA.
-* User: zilske
-* Date: 10/31/11
-* Time: 12:41 PM
-* To change this template use File | Settings | File Templates.
-*/
-public class SimpleCarrierAgentFactory implements CarrierAgentFactory {
+ */
+public class CarrierPlanWriterTest extends MatsimTestCase {
 
-    private PlanAlgorithm router;
-
-    public void setRouter(PlanAlgorithm router){
-        this.router = router;
+    @Test
+    public void testCarrierPlanWriterWrites() {
+        Carriers carriers = new Carriers();
+        CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
+        carrierPlanReader.read(getInputDirectory() + "carrierPlansEquils.xml");
+        CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
+        try{
+        	planWriter.write(getInputDirectory() + "carrierPlansEquilsWritten.xml");
+        	assertTrue(true);
+        }
+        catch(Exception e){
+        	assertFalse(true);
+        }
+        
     }
-
-    @Override
-    public CarrierAgent createAgent(CarrierAgentTracker tracker,Carrier carrier) {
-        CarrierAgentImpl agent = new CarrierAgentImpl(tracker, carrier, router,  new CarrierDriverAgentFactoryImpl());
-        return agent;
-    }
-
 }

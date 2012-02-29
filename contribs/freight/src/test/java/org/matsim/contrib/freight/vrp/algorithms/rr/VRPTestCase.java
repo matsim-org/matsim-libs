@@ -24,23 +24,23 @@ import junit.framework.TestCase;
 
 import org.junit.Ignore;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryTourFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
-import org.matsim.contrib.freight.vrp.basics.Constraints;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
-import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+import org.matsim.contrib.freight.vrp.constraints.Constraints;
+import org.matsim.contrib.freight.vrp.constraints.PickAndDeliveryCapacityAndTWConstraint;
 
 @Ignore
 public class VRPTestCase extends TestCase{
@@ -134,7 +134,7 @@ public class VRPTestCase extends TestCase{
 		return new InitialSolution().createInitialSolution(vrp);
 	}
 	
-	protected TourAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
+	protected RRTourAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
 		
 		return new RRTourAgentFactory(tourStatusProcessor, tourFactory).createTourAgent(tour1, vehicle);
 	}

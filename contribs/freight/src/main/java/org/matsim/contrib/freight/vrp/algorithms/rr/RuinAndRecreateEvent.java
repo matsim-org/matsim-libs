@@ -17,9 +17,7 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-import java.util.Collection;
 
-import org.matsim.contrib.freight.vrp.basics.Tour;
 
 
 
@@ -42,7 +40,7 @@ public class RuinAndRecreateEvent {
 	
 	private boolean solutionAccepted;
 	
-	private Collection<org.matsim.contrib.freight.vrp.basics.Tour> currentSolution;
+	private RRSolution currentSolution;
 
 	public RuinAndRecreateEvent(int currentMutation, double tentativeSolution,
 			double currentResult, double currentThreshold, boolean solutionAccepted) {
@@ -54,12 +52,12 @@ public class RuinAndRecreateEvent {
 		this.currentResult = currentResult;
 	}
 
-	public Collection<org.matsim.contrib.freight.vrp.basics.Tour> getCurrentSolution() {
+	public RRSolution getCurrentSolution() {
 		return currentSolution;
 	}
 
-	public void setCurrentSolution(Collection<Tour> currentSolution) {
-		this.currentSolution = currentSolution;
+	public void setCurrentSolution(RRSolution rrSolution) {
+		this.currentSolution = rrSolution;
 	}
 
 	public double getCurrentResult() {

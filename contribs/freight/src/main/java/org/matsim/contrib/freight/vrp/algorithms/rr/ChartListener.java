@@ -41,6 +41,7 @@ public class ChartListener implements RuinAndRecreateListener {
 
 	@Override
 	public void finish() {
+		log.info("create chart " + filename);
 		bestResults = new double[bestResultList.size()];
 		tentativeResults = new double[tentativeResultList.size()];
 		double[] mutation = new double[bestResultList.size()];

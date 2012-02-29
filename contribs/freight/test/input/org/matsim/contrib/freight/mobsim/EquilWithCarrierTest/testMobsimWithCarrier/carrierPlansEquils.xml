@@ -30,11 +30,11 @@
 <carriers>
 		<carrier id="carrier1" linkId="1">
 			<vehicles>
-				<vehicle id="vehicle_c1" linkId="23" cap="30" earliestStart="23000"/>
+				<vehicle id="vehicle_c1" linkId="23" cap="30" earliestStart="21900"/>
 			</vehicles>
 			<shipments>
 				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/>
-				<shipment id="s2" from="21" to="22" size="10" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/>
+				<shipment id="s2" from="20" to="22" size="10" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/>
 			</shipments>
 <!-- 			<tours> -->
 <!-- 				<tour vehicleId="vehicle_c1" linkId="1" start="21660.0"> -->

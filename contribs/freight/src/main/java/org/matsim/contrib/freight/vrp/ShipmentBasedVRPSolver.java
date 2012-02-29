@@ -13,27 +13,34 @@ package org.matsim.contrib.freight.vrp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
-import org.matsim.contrib.freight.vrp.basics.Constraints;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.End;
+import org.matsim.contrib.freight.vrp.basics.InitialSolutionFactory;
+import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Start;
+import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.constraints.Constraints;
 import org.matsim.core.basic.v01.IdImpl;
 
 
@@ -47,7 +54,7 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 	
 	private Collection<CarrierShipment> shipments;
 	
-	private SingleDepotInitialSolutionFactory iniSolutionFactory = new InitialSolution();
+	private InitialSolutionFactory iniSolutionFactory = new InitialSolution();
 	
 	private Constraints constraints;
 	
@@ -73,7 +80,7 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 		this.rrFactory = ruinAndRecreateFactory;
 	}
 
-	public void setConstraints(Constraints constraints) {
+	public void setGlobalConstraints(Constraints constraints) {
 		this.constraints = constraints;
 	}
 
@@ -89,7 +96,7 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 		this.nOfWarmupIterations = nOfWarmupIterations;
 	}
 
-	public void setIniSolutionFactory(SingleDepotInitialSolutionFactory iniSolutionFactory) {
+	public void setIniSolutionFactory(InitialSolutionFactory iniSolutionFactory) {
 		this.iniSolutionFactory = iniSolutionFactory;
 	}
 
@@ -98,16 +105,47 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 	 * And returns a collections of tours.
 	 */
 	@Override
-	public Collection<org.matsim.contrib.freight.carrier.Tour> solve() {
+	public Collection<ScheduledTour> solve() {
 		verify();
 		if(shipments.isEmpty()){
 			return Collections.emptyList();
 		}
 		VehicleRoutingProblem vrp = setupProblem();
+		logger.debug("problem: ");
+		logger.debug("#jobs: " + vrp.getJobs().size());
+		logger.debug("#print jobs");
+		logger.debug(printJobs(vrp));
 		RuinAndRecreate ruinAndRecreate = makeAlgorithm(vrp);
 		ruinAndRecreate.run();
-		Collection<org.matsim.contrib.freight.carrier.Tour> tours = makeVehicleTours(ruinAndRecreate.getSolution());
+		logger.debug("");
+		logger.debug(printTours(getTours(ruinAndRecreate.getSolution())));
+		Collection<ScheduledTour> tours = makeScheduledVehicleTours(ruinAndRecreate.getSolution());
 		return tours;
+	}
+
+	private Collection<Tour> getTours(RRSolution solution) {
+		List<Tour> tours = new ArrayList<Tour>();
+		for(RRTourAgent a : solution.getTourAgents()){
+			tours.add(a.getTour());
+		}
+		return tours;
+	}
+
+	private String printTours(Collection<Tour> solution) {
+		String tourString = "";
+		for(Tour t : solution){
+			tourString += t + "\n";
+		}
+		return tourString;
+	}
+
+	private String printJobs(VehicleRoutingProblem vrp) {
+		String jobs = "";
+		for(Job j : vrp.getJobs().values()){
+			Shipment s = (Shipment)j;
+			jobs+= s + "\n";
+		}
+		return jobs;
 	}
 
 	private VehicleRoutingProblem setupProblem() {
@@ -136,26 +174,32 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 	/*
 	 * translates vrp-solution (being vrp-tours) to matsim-carrier-tours
 	 */
-	private Collection<org.matsim.contrib.freight.carrier.Tour> makeVehicleTours(Collection<org.matsim.contrib.freight.vrp.basics.Tour> vrpSolution) {
-		Collection<org.matsim.contrib.freight.carrier.Tour> tours = new ArrayList<org.matsim.contrib.freight.carrier.Tour>();
-		for(org.matsim.contrib.freight.vrp.basics.Tour tour : vrpSolution){
+	private Collection<ScheduledTour> makeScheduledVehicleTours(RRSolution rrSolution) {
+		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
+		for(RRTourAgent a : rrSolution.getTourAgents()){
+			if(!a.isActive()){
+				continue;
+			}
+			Tour tour = a.getTour();
 			TourBuilder tourBuilder = new TourBuilder();
 			for(TourActivity act : tour.getActivities()){
 				if(act instanceof Pickup){
 					Shipment shipment = (Shipment)((Pickup)act).getJob();
 					CarrierShipment carrierShipment = matsim2vrp.getCarrierShipment(shipment);
+					tourBuilder.addLeg(new Leg());
 					tourBuilder.schedulePickup(carrierShipment);
 				}
 				else if(act instanceof Delivery){
 					Shipment shipment = (Shipment)((Delivery)act).getJob();
 					CarrierShipment carrierShipment = matsim2vrp.getCarrierShipment(shipment);
+					tourBuilder.addLeg(new Leg());
 					tourBuilder.scheduleDelivery(carrierShipment);
 				}
 				else if(act instanceof Start){
-					tourBuilder.scheduleStart(makeId(act.getLocationId()));
-					tourBuilder.setTourStartTimeWindow(act.getEarliestArrTime(), act.getLatestArrTime());
+					tourBuilder.scheduleStart(makeId(act.getLocationId()), act.getEarliestArrTime(), act.getLatestArrTime());
 				}
 				else if(act instanceof End){
+					tourBuilder.addLeg(new Leg());
 					tourBuilder.scheduleEnd(makeId(act.getLocationId()));
 				}
 				else {
@@ -163,9 +207,19 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 				}
 			}
 			org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
-			tours.add(vehicleTour);
+			ScheduledTour scheduledTour = new ScheduledTour(vehicleTour, getCarrierVehicle(a.getVehicle()), vehicleTour.getEarliestDeparture());
+			scheduledTours.add(scheduledTour);
 		}
-		return tours;
+		return scheduledTours;
+	}
+
+	private CarrierVehicle getCarrierVehicle(Vehicle vehicle) {
+		for(CarrierVehicle v : vehicles){
+			if(v.getVehicleId().toString().equals(vehicle.getId())){
+				return v;
+			}
+		}
+		throw new IllegalStateException("cannot assign vehcile. vehicle " + vehicle.getId() + " not found in the set of carriers' vehicles.");
 	}
 
 	private Id makeId(String id) {

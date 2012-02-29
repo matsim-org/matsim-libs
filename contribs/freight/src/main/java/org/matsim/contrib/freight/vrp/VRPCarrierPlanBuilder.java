@@ -3,7 +3,7 @@ package org.matsim.contrib.freight.vrp;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Id;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierContract;
@@ -12,16 +12,18 @@ import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 public class VRPCarrierPlanBuilder {
 	
+	private static Logger logger = Logger.getLogger(VRPCarrierPlanBuilder.class);
 	private CarrierCapabilities caps;
 	private Collection<CarrierContract> contracts;
 	private Network network;
 	private VRPSolverFactory vrpSolverFactory;
 	private Costs costs;
+	private LeastCostPathCalculator router;
 
 	public VRPCarrierPlanBuilder(CarrierCapabilities caps, Collection<CarrierContract> contracts, Network network, Costs costs) {
 		super();
@@ -31,6 +33,10 @@ public class VRPCarrierPlanBuilder {
 		this.network=network;
 	}
 	
+	public void setRouter(LeastCostPathCalculator router) {
+		this.router = router;
+	}
+
 	public void setVrpSolverFactory(VRPSolverFactory vrpSolverFactory) {
 		this.vrpSolverFactory = vrpSolverFactory;
 	}
@@ -43,30 +49,11 @@ public class VRPCarrierPlanBuilder {
 			return null;
 		}
 		VRPSolver vrpSolver = vrpSolverFactory.createSolver(getShipments(contracts), getVehicles(caps), network, costs);
-		Collection<Tour> tours = vrpSolver.solve();
-		Collection<ScheduledTour> scheduledTours = makeScheduledTours(tours);
+		Collection<ScheduledTour> scheduledTours = vrpSolver.solve();
+//		route(scheduledTours);
 		return new CarrierPlan(scheduledTours);
 	}
-	
-	private Collection<ScheduledTour> makeScheduledTours(Collection<Tour> tours) {
-		Collection<ScheduledTour> sTours = new ArrayList<ScheduledTour>();
-		for(Tour t : tours){
-			sTours.add(new ScheduledTour(t, getVehicle(t,caps), t.getEarliestDeparture()));
-		}
-		return sTours;
-	}
-	
-	private CarrierVehicle getVehicle(Tour t, CarrierCapabilities caps) {
-		Id locationId = t.getStartLinkId();
-		CarrierVehicle cV = null;
-		for(CarrierVehicle vehicle : caps.getCarrierVehicles()){
-			if(vehicle.getLocation().equals(locationId)){
-				cV = vehicle;
-			}
-		}
-		return cV;
-	}
-	
+
 	private Collection<CarrierVehicle> getVehicles(CarrierCapabilities caps) {
 		return new ArrayList<CarrierVehicle>(caps.getCarrierVehicles());
 	}

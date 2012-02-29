@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 
 
 /**
@@ -38,19 +38,19 @@ public class VrpUtils {
 		return new Vehicle(id, locationId, vehicleCapacity);
 	}
 	
-	public static RRSolution copySolution(RRSolution solution, VehicleRoutingProblem vrp, TourAgentFactory tourAgentFactory){
-		List<TourAgent> agents = new ArrayList<TourAgent>();
+	public static RRSolution copySolution(RRSolution solution, VehicleRoutingProblem vrp, RRTourAgentFactory tourAgentFactory){
+		List<RRTourAgent> agents = new ArrayList<RRTourAgent>();
 		List<Vehicle> vehicles = new ArrayList<Vehicle>(vrp.getVehicles());
-		List<TourAgent> tourAgentsInSolution = new ArrayList<TourAgent>(solution.getTourAgents());
+		List<RRTourAgent> tourAgentsInSolution = new ArrayList<RRTourAgent>(solution.getTourAgents());
 		for(int i=0;i<tourAgentsInSolution.size();i++){
 			VrpTourBuilder tourBuilder = new VrpTourBuilder();
 			Vehicle vehicle = vehicles.get(i);
-			TourAgent agent = tourAgentsInSolution.get(i);
+			RRTourAgent agent = tourAgentsInSolution.get(i);
 			for(TourActivity tourAct : agent.getTour().getActivities()){
 				tourBuilder.scheduleActivity(tourAct);
 			}
 			Tour tour = tourBuilder.build();
-			TourAgent newTourAgent = tourAgentFactory.createTourAgent(tour, vehicle);
+			RRTourAgent newTourAgent = tourAgentFactory.createTourAgent(tour, vehicle);
 			agents.add(newTourAgent);
 		}
 		return new RRSolution(agents);  

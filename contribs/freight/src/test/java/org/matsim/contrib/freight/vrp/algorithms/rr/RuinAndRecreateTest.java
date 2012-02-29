@@ -17,6 +17,7 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -25,14 +26,16 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.PickupAndDeliveryTourAlgoFactory;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.TimeAndCapacityAndTWConstraints;
 import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+import org.matsim.contrib.freight.vrp.constraints.PickORDeliveryCapacityAndTWConstraint;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * test case: example is take from: http://web.mit.edu/urban_or_book/www/book/chapter6/6.4.12.html
@@ -87,20 +90,15 @@ public class RuinAndRecreateTest extends TestCase{
 					return distanceMatrix.get(toInt).get(fromInt).doubleValue();
 				}
 			}
-			
+				
 			@Override
-			public Double getDistance(String fromId, String toId, double time) {
-				return getTransportTime(fromId,toId, 0.0);
-			}
-			
-			@Override
-			public Double getGeneralizedCost(String fromId, String toId, double time) {
+			public Double getTransportCost(String fromId, String toId, double time) {
 				return getTransportTime(fromId,toId, 0.0);
 			}
 
 			@Override
-			public Double getBackwardGeneralizedCost(String fromId,String toId, double arrivalTime) {
-				return getGeneralizedCost(fromId, toId, arrivalTime);
+			public Double getBackwardTransportCost(String fromId,String toId, double arrivalTime) {
+				return getTransportCost(fromId, toId, arrivalTime);
 			}
 
 			@Override
@@ -108,12 +106,8 @@ public class RuinAndRecreateTest extends TestCase{
 				return getTransportTime(fromId, toId, arrivalTime);
 			}
 
-			@Override
-			public Double getBackwardDistance(String fromId, String toId,double arrivalTime) {
-				return getDistance(fromId, toId, arrivalTime);
-			}
 		};
-		vrpBuilder = new VrpBuilder(costs, new TimeAndCapacityAndTWConstraints(250));
+		vrpBuilder = new VrpBuilder(costs, new PickORDeliveryCapacityAndTWConstraint());
 //		vrpBuilder.setDepot("0", 0.0, 0.0);
 		for(Integer i=1;i<demand.size();i++){
 			vrpBuilder.addJob(VrpUtils.createShipment(i.toString(), "0", i.toString(), demand.get(i), 
@@ -124,28 +118,40 @@ public class RuinAndRecreateTest extends TestCase{
 	}
 	
 	public void testSizeOfSolution(){
-		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 23));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 23));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new PickupAndDeliveryTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
-		int active = getActiveVehicles(algo.getSolution());
+		int active = getActiveVehicles(getTours(algo.getSolution()));
 		assertEquals(2,active);
  	}
 	
+	private Id makeId(String string) {
+		return new IdImpl(string);
+	}
+
+	private Collection<Tour> getTours(RRSolution solution) {
+		List<Tour> tours = new ArrayList<Tour>();
+		for(RRTourAgent a : solution.getTourAgents()){
+			tours.add(a.getTour());
+		}
+ 		return tours;
+	}
+
 	public void testSolutionValue(){
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 23));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new PickupAndDeliveryTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		
-		Collection<Tour> solution = algo.getSolution();
+		Collection<Tour> solution = getTours(algo.getSolution());
 		int solVal = 0;
 		for(Tour t : solution){
-			solVal += t.costs.distance;
+			solVal += t.costs.generalizedCosts;
 		}
 		assertEquals(397,solVal);
  	}
@@ -155,9 +161,9 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2","0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3","0", 16));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new PickupAndDeliveryTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
-		int active = getActiveVehicles(algo.getSolution());
+		int active = getActiveVehicles(getTours(algo.getSolution()));
 		assertEquals(3,active);
 	}
 	
@@ -166,13 +172,13 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 16));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new PickupAndDeliveryTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		
-		Collection<Tour> solution = algo.getSolution();
+		Collection<Tour> solution = getTours(algo.getSolution());
 		int solVal = 0;
 		for(Tour t : solution){
-			solVal += t.costs.distance;
+			solVal += t.costs.generalizedCosts;
 		}
 		assertEquals(solVal,445);
 	}

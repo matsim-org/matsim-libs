@@ -28,7 +28,7 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
  *
  */
 
-public class RRTourAgentFactory implements TourAgentFactory{
+public class RRTourAgentFactory {
 
 	private TourStatusProcessor tourStatusProcessor;
 	
@@ -40,9 +40,10 @@ public class RRTourAgentFactory implements TourAgentFactory{
 		this.tourBuilder = tourBuilder;
 	}
 
-	@Override
-	public TourAgent createTourAgent(Tour tour, Vehicle vehicle) {
+	public RRTourAgent createTourAgent(Tour tour, Vehicle vehicle) {
 		RRTourAgent tourAgent = new RRTourAgent(vehicle, tour, tourStatusProcessor, tourBuilder);
+		tourAgent.marginalCostScalingFactorForNewService = 10.0;
+		tourAgent.fixCostsForService = 100.0;
 		return tourAgent;
 	}
 }

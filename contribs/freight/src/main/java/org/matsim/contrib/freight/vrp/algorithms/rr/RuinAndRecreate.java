@@ -25,10 +25,8 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.RecreationStrategy;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinStrategy;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.ThresholdFunction;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 
@@ -66,7 +64,7 @@ public class RuinAndRecreate {
 	
 	private Double initialThreshold = 0.0;
 	
-	private TourAgentFactory tourAgentFactory;
+	private RRTourAgentFactory tourAgentFactory;
 
 	private Collection<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
 	
@@ -82,7 +80,7 @@ public class RuinAndRecreate {
 		this.recreationStrategy = recreationStrategy;
 	}
 
-	public void setTourAgentFactory(TourAgentFactory tourAgentFactory) {
+	public void setTourAgentFactory(RRTourAgentFactory tourAgentFactory) {
 		this.tourAgentFactory = tourAgentFactory;
 	}
 
@@ -142,7 +140,6 @@ public class RuinAndRecreate {
 
 	private void ruinAndRecreate(RRSolution solution) {
 		RuinStrategy ruinStrategy = ruinStrategyManager.getRandomStrategy();
-		logger.debug("stratClass=" + ruinStrategy.getClass());
 		ruinStrategy.run(solution);
 		recreationStrategy.run(solution,ruinStrategy.getUnassignedJobs());
 	}
@@ -200,11 +197,7 @@ public class RuinAndRecreate {
 		return listeners;
 	}
 	
-	public Collection<Tour> getSolution(){
-		Collection<Tour> tours = new ArrayList<Tour>();
-		for(TourAgent tA : currentSolution.getTourAgents()){
-			tours.add(tA.getTour());
-		}
-		return tours;
+	public RRSolution getSolution(){
+		return currentSolution;
 	}
 }

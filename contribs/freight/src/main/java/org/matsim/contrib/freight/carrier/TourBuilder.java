@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
-import org.matsim.contrib.freight.carrier.Tour.GeneralActivity;
+import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
@@ -26,38 +26,68 @@ public class TourBuilder {
 	
 	private double latestDeparture;
 	
-	private boolean departureSet = false;
+	private boolean previousElementIsActivity;
 	
-	public void scheduleStart(Id startLinkId) {
+	public void scheduleStart(Id startLinkId, double earliestDeparture, double latestDeparture) {
 		this.startLinkId = startLinkId;
+		this.earliestDeparture = earliestDeparture;
+		this.latestDeparture = latestDeparture;
+		previousElementIsActivity = true;
 	}
 	
 	public void scheduleEnd(Id endLinkId) {
+		assertLastElementIsLeg();
 		this.endLinkId = endLinkId;
+	}
+	
+	public void addLeg(Leg leg){
+		assertIsNotNull(leg);
+		if(!previousElementIsActivity){
+			throw new RuntimeException("cannot add leg, since last tour element is not an activity.");
+		}
+		tourElements.add(leg);
+		previousElementIsActivity = false;
+	}
+
+	private void assertIsNotNull(Object o) {
+		if(o == null){
+			throw new RuntimeException("leg cannot be null");
+		}
+		
 	}
 
 	public void schedulePickup(CarrierShipment shipment) {
+		assertIsNotNull(shipment);
 		boolean wasNew = openPickups.add(shipment);
 		if (!wasNew) {
 			throw new RuntimeException("Trying to deliver something which was already picked up.");
 		}
+		assertLastElementIsLeg();
 		tourElements.add(createPickup(shipment));
+		previousElementIsActivity = true;
+	}
+
+	private void assertLastElementIsLeg() {
+		if(previousElementIsActivity){
+			throw new RuntimeException("cannot add activity, since last tour element is not a leg.");
+		}
 	}
 
 	public void scheduleDelivery(CarrierShipment shipment) {
+		assertIsNotNull(shipment);
 		boolean wasOpen = openPickups.remove(shipment);
 		if (!wasOpen) {
 			throw new RuntimeException("Trying to deliver something which was not picked up.");
 		}
+		assertLastElementIsLeg();
 		tourElements.add(createDelivery(shipment));
+		previousElementIsActivity = true;
 	}
 
 	public Tour build() {
 		Tour tour = new Tour(startLinkId, tourElements, endLinkId);
-		if(departureSet){
-			tour.setEarliestDeparture(earliestDeparture);
-			tour.setLatestDeparture(latestDeparture);
-		}
+		tour.setEarliestDeparture(earliestDeparture);
+		tour.setLatestDeparture(latestDeparture);
 		return tour;
 	}
 
@@ -69,29 +99,5 @@ public class TourBuilder {
 		return new Delivery(shipment);
 	}
 
-	public void schedule(TourElement tourElement) {
-		if (tourElement instanceof Pickup) {
-			schedulePickup(tourElement.getShipment());
-		} else if (tourElement instanceof Delivery) {
-			scheduleDelivery(tourElement.getShipment());
-		} else {
-			throw new RuntimeException("Cannot happen.");
-		}
-	}
-	
-	public void scheduleGeneralActivity(String type, Id locationLink, Double earliestStart, Double latestStart, Double duration){
-		tourElements.add(createGeneralActivity(type,locationLink,earliestStart,latestStart,duration));
-	}
-
-	private TourElement createGeneralActivity(String type, Id locationLink,Double earliestStart, Double latestStart, Double duration) {
-		GeneralActivity act = new GeneralActivity(type, locationLink, earliestStart, latestStart, duration);
-		return act;
-	}
-
-	public void setTourStartTimeWindow(double earliestDeparture, double latestDeparture) {
-		this.earliestDeparture = earliestDeparture;
-		this.latestDeparture = latestDeparture;
-		departureSet = true;
-	}
 
 }

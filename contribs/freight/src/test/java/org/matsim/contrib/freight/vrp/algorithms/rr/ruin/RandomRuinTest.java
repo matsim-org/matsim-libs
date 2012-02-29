@@ -22,12 +22,12 @@ import java.util.Collections;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 public class RandomRuinTest extends VRPTestCase{
 
@@ -54,13 +54,13 @@ public class RandomRuinTest extends VRPTestCase{
 	
 	public void testRemainingSolution(){
 		int nOfRemainingActivities = 0;
-		for(TourAgent a : solution.getTourAgents()){
+		for(RRTourAgent a : solution.getTourAgents()){
 			nOfRemainingActivities += a.getTour().getActivities().size();
 		}
 		assertEquals(10,nOfRemainingActivities);
 		randomRuin.run(solution);
 		nOfRemainingActivities = 0;
-		for(TourAgent a : solution.getTourAgents()){
+		for(RRTourAgent a : solution.getTourAgents()){
 			nOfRemainingActivities += a.getTour().getActivities().size();
 		}
 		assertEquals(8,nOfRemainingActivities);
@@ -70,7 +70,7 @@ public class RandomRuinTest extends VRPTestCase{
 		randomRuin.run(solution);
 		Job unassignedJob = randomRuin.getUnassignedJobs().iterator().next();
 		boolean jobFoundInAgentsTour = false;
-		for(TourAgent a : solution.getTourAgents()){
+		for(RRTourAgent a : solution.getTourAgents()){
 			for(TourActivity act : a.getTour().getActivities()){
 				if(act instanceof JobActivity){
 					if(((JobActivity) act).getJob().equals(unassignedJob)){

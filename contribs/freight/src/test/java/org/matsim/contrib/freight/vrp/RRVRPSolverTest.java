@@ -14,16 +14,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.carrier.Tour.Delivery;
-import org.matsim.contrib.freight.carrier.Tour.Pickup;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.PickupAndDeliveryTourAlgoFactory;
-import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
+import org.matsim.contrib.freight.vrp.algorithms.rr.PickupAndDeliveryTourAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
+import org.matsim.contrib.freight.vrp.constraints.PickAndDeliveryCapacityAndTWConstraint;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -40,7 +38,7 @@ public class RRVRPSolverTest extends TestCase{
 			PickupAndDeliveryTourAlgoFactory ruinAndRecreateFactory = new PickupAndDeliveryTourAlgoFactory();
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 			solver.setCosts(costs);
-			solver.setConstraints(new PickAndDeliveryCapacityAndTWConstraint());
+			solver.setGlobalConstraints(new PickAndDeliveryCapacityAndTWConstraint());
 			solver.setIniSolutionFactory(new InitialSolution());
 			solver.setnOfWarmupIterations(20);
 			solver.setnOfIterations(50);
@@ -114,7 +112,7 @@ public class RRVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("vehicleLocation"));
 		vehicle.setCapacity(10);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
+		Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		assertTrue(tours.isEmpty());
 	}
 	
@@ -122,7 +120,7 @@ public class RRVRPSolverTest extends TestCase{
 		vehicles.clear();
 		shipments.add(makeShipment("depotLocation","customerLocation",20));
 		try{
-			Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
+			Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 			assertTrue(false);
 		}
 		catch(IllegalStateException e){

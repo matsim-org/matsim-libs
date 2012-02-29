@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.constraints.Constraints;
 
 public class VRPImpl implements VehicleRoutingProblem{
 
@@ -29,18 +30,20 @@ public class VRPImpl implements VehicleRoutingProblem{
 	
 	private Costs costs;
 	
-	private Constraints constraints;
+	private Constraints globalConstraints;
 	
 	private Map<String,Job> jobs;
 	
 	private Collection<Vehicle> vehicles;
 
-	public VRPImpl(Collection<? extends Job> jobs, Collection<Vehicle> vehicles, Costs costs, Constraints constraints) {
+	private Locations locations;
+
+	public VRPImpl(Collection<? extends Job> jobs, Collection<Vehicle> vehicles, Costs costs, Constraints globalConstraints) {
 		this.jobs = new HashMap<String, Job>();
 		mapJobs(jobs);
 		this.vehicles = vehicles;
 		this.costs = costs;
-		this.constraints = constraints;
+		this.globalConstraints = globalConstraints;
 		
 	}
 
@@ -59,13 +62,22 @@ public class VRPImpl implements VehicleRoutingProblem{
 	}
 
 	@Override
-	public Constraints getConstraints() {
-		return constraints;
+	public Constraints getGlobalConstraints() {
+		return globalConstraints;
 	}
 
 	@Override
 	public Costs getCosts() {
 		return costs;
+	}
+
+	@Override
+	public Locations getLocations() {
+		return this.locations;
+	}
+
+	public void setLocations(Locations locations) {
+		this.locations = locations;
 	}
 
 }

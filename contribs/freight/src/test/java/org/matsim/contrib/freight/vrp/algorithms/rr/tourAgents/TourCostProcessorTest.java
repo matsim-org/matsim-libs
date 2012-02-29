@@ -62,11 +62,6 @@ public class TourCostProcessorTest extends VRPTestCase{
 		
 	}
 	
-	public void testCalculatedDistance(){
-		statusUpdater.process(tour);
-		assertEquals(40.0, tour.costs.distance);
-	}
-	
 	public void testCalculatedCosts(){
 		statusUpdater.process(tour);
 		assertEquals(40.0, tour.costs.generalizedCosts);
@@ -74,12 +69,7 @@ public class TourCostProcessorTest extends VRPTestCase{
 	
 	public void testCalculatedTime(){
 		statusUpdater.process(tour);
-		assertEquals(40.0, tour.costs.time);
-	}
-	
-	public void testCalculatedDistanceForAnotherTour(){
-		statusUpdater.process(anotherTour);
-		assertEquals(38.0, anotherTour.costs.distance);
+		assertEquals(40.0, tour.costs.transportTime);
 	}
 	
 	public void testCalculatedCostsForAnotherTour(){
@@ -89,7 +79,7 @@ public class TourCostProcessorTest extends VRPTestCase{
 	
 	public void testCalculatedTimeForAnotherTour(){
 		statusUpdater.process(anotherTour);
-		assertEquals(38.0, anotherTour.costs.time);
+		assertEquals(38.0, anotherTour.costs.transportTime);
 	}
 
 }

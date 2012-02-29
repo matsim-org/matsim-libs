@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<carriers>
+		<carrier id="carrier1" linkId="1">
+			<vehicles>
+				<vehicle id="vehicle_c1" linkId="23" cap="30" earliestStart="21900.0" latestEnd="1.7976931348623157E308"/>
+			</vehicles>
+			<shipments>
+				<shipment id="1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+				<shipment id="2" from="20" to="22" size="10" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="0.0" deliveryServiceTime="0.0"/>
+			</shipments>
+			<tours>
+				<tour vehicleId="vehicle_c1" start="21660.0">
+					<act type="start" />
+					<leg>
+						<route>2 3 4</route>
+					</leg>
+					<act type="pickup" shipmentId="1"/>
+					<leg></leg>
+					<act type="delivery" shipmentId="1"/>
+					<leg></leg>
+					<act type="pickup" shipmentId="2"/>
+					<leg></leg>
+					<act type="delivery" shipmentId="2"/>
+					<leg></leg>
+					<act type="end"/>
+				</tour>
+			</tours>
+		</carrier>
+	</carriers>

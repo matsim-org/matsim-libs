@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.matsim.contrib.freight.vrp.basics.Costs;
-import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
 
@@ -102,22 +101,19 @@ public class TDCosts implements Costs {
 		}
 			
 		@Override
-		public Double getGeneralizedCost(String fromId, String toId, double departureTime) {
-			return getDistance(fromId,toId,departureTime) + getTransportTime(fromId,toId,departureTime);
+		public Double getTransportCost(String fromId, String toId, double departureTime) {
+			double totDistance = crowFly.getTransportCost(fromId, toId, departureTime);
+			return totDistance + getTransportTime(fromId,toId,departureTime);
 //			return getTransportTime(fromId,toId,departureTime);
 		}
 		
 		@Override
-		public Double getBackwardGeneralizedCost(String fromId, String toId,double arrivalTime) {
-			return getBackwardDistance(fromId, toId, arrivalTime) + getBackwardTransportTime(fromId, toId, arrivalTime);
+		public Double getBackwardTransportCost(String fromId, String toId,double arrivalTime) {
+			return crowFly.getTransportCost(fromId, toId, arrivalTime) + getBackwardTransportTime(fromId, toId, arrivalTime);
 //			return getBackwardTransportTime(fromId, toId, arrivalTime);
 		}
 
-		@Override
-		public Double getDistance(String fromId, String toId, double departureTime) {
-			double totDistance = crowFly.getDistance(fromId, toId, departureTime);
-			return totDistance;
-		}
+		
 
 		@Override
 		public Double getTransportTime(String fromId, String toId, double departureTime) {
@@ -129,7 +125,7 @@ public class TDCosts implements Costs {
 				return travelTimes.get(key);
 			}
 			double totalTravelTime = 0.0;
-			double distanceToTravel = getDistance(fromId, toId, departureTime);
+			double distanceToTravel = crowFly.getTransportCost(fromId, toId, departureTime);
 			double currentTime = departureTime;
 			for(int i=0;i<timeBins.size();i++){
 				double timeThreshold = timeBins.get(i);
@@ -162,7 +158,7 @@ public class TDCosts implements Costs {
 				return travelTimes.get(key);
 			}
 			double totalTravelTime = 0.0;
-			double distanceToTravel = getDistance(fromId, toId, arrivalTime);
+			double distanceToTravel = crowFly.getTransportCost(fromId, toId, arrivalTime);
 			log.debug("distance2Travel="+distanceToTravel);
 			double currentTime = arrivalTime;
 			for(int i=timeBins.size()-1;i>=0;i--){
@@ -196,9 +192,5 @@ public class TDCosts implements Costs {
 			return totalTravelTime;
 		}
 
-		@Override
-		public Double getBackwardDistance(String fromId, String toId,double arrivalTime) {
-			return getDistance(fromId, toId, arrivalTime);
-		}
 		
 	}

@@ -20,7 +20,7 @@ package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.Collection;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 
 /**
  * 
@@ -30,22 +30,34 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
 
 public class RRSolution {
 	
-	private Collection<TourAgent> tourAgents;
+	private Collection<RRTourAgent> tourAgents;
 
-	public RRSolution(Collection<TourAgent> tourAgents) {
+	public RRSolution(Collection<RRTourAgent> tourAgents) {
 		super();
 		this.tourAgents = tourAgents;
 	}
 
 	public double getResult() {
 		double total = 0.0;
-		for(TourAgent a : tourAgents){
-			total += a.getTourCost();
+		for(RRTourAgent a : tourAgents){
+			if(a.isActive()){
+				total += a.getTourCost();
+			}
 		}
 		return total;
 	}
 	
-	public Collection<TourAgent> getTourAgents(){
+	public int getNuOfActiveTourAgents(){
+		int nOfActiveAgents = 0;
+		for(RRTourAgent a : tourAgents){
+			if(a.isActive()){
+				nOfActiveAgents++;
+			}
+		}
+		return nOfActiveAgents;
+	}
+	
+	public Collection<RRTourAgent> getTourAgents(){
 		return tourAgents;
 	}
 

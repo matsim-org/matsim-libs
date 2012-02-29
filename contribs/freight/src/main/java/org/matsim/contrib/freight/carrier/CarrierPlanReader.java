@@ -3,13 +3,17 @@ package org.matsim.contrib.freight.carrier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.xml.sax.Attributes;
 
 
@@ -49,14 +53,24 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	public static String VEHICLES = "vehicles";
 	
 	private static final String CAPACITY = "cap";
+
+	private static final String VEHICLESTART = "earliestStart";
+
+	private static final String VEHICLEEND = "latestEnd";
 	
-	public Carrier currentCarrier = null;
+	private Carrier currentCarrier = null;
 	
-	public CarrierVehicle currentVehicle = null;
+	private CarrierVehicle currentVehicle = null;
 	
-	public TourBuilder currentTourBuilder = null;
+	private TourBuilder currentTourBuilder = null;
 	
-	public Double currentStartTime = null; 
+	private Double currentStartTime = null; 
+	
+	private Leg currentLeg = null;
+	
+	private Id previousActLoc = null;
+
+	private String previousRouteContent;
 	
 	public Map<String,CarrierShipment> currentShipments = null;
 	
@@ -82,8 +96,6 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	
 	}
 
-	
-	
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if(name.equals(CARRIER)){
@@ -100,12 +112,26 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			String endPickup = atts.getValue("endPickup");
 			String startDelivery = atts.getValue("startDelivery");
 			String endDelivery = atts.getValue("endDelivery");
+			String pickupServiceTime = atts.getValue("pickupServiceTime");
+			String deliveryServiceTime = atts.getValue("deliveryServiceTime"); 
 			CarrierShipment shipment = null;
 			if(startPickup == null ){
 				shipment = CarrierUtils.createShipment(from, to, size, 0, 24*3600, 0, 24*3600);
 			}
 			else{
 				shipment = CarrierUtils.createShipment(from, to, size, getDouble(startPickup), getDouble(endPickup), getDouble(startDelivery), getDouble(endDelivery));
+			}
+			if(pickupServiceTime == null){
+				shipment.setPickupServiceTime(0.0);
+			}
+			else{
+				shipment.setPickupServiceTime(getDouble(pickupServiceTime));
+			}
+			if(deliveryServiceTime == null){
+				shipment.setDeliveryServiceTime(0.0);
+			}
+			else{
+				shipment.setDeliveryServiceTime(getDouble(deliveryServiceTime));
 			}
 			currentShipments.put(atts.getValue(ID), shipment);
 			CarrierUtils.createAndAddContract(currentCarrier, shipment, new CarrierOffer());
@@ -118,6 +144,8 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			String vId = atts.getValue(ID);
 			String linkId = atts.getValue(LINKID);
 			String capacity = atts.getValue(CAPACITY);
+			String startTime = atts.getValue(VEHICLESTART);
+			String endTime = atts.getValue(VEHICLEEND);
 			Integer cap = null;
 			if(capacity != null){
 				cap = getInt(capacity);
@@ -129,6 +157,18 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				throw new IllegalStateException("no capacity available");
 			}
 			CarrierVehicle vehicle = CarrierUtils.createAndAddVehicle(currentCarrier, vId, linkId, cap);
+			if(startTime == null){
+				vehicle.setEarliestStartTime(0.0);
+			}
+			else{
+				vehicle.setEarliestStartTime(getDouble(startTime));
+			}
+			if(endTime == null){
+				vehicle.setLatestEndTime(Double.MAX_VALUE);
+			}
+			else{
+				vehicle.setLatestEndTime(getDouble(endTime));
+			}
 			vehicles.put(vId,vehicle);
 		}
 		if(name.equals("tours")){ 
@@ -140,32 +180,47 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			currentVehicle = vehicles.get(vehicleId);
 			currentStartTime = Double.parseDouble(atts.getValue(START));
 		}
+		if(name.equals("leg")){
+			currentLeg = new Leg();
+		}
 		if(name.equals(ACTIVITY)){
 			if(atts.getValue(TYPE).equals("start")){
-				currentTourBuilder.scheduleStart(currentVehicle.getLocation());
+				currentTourBuilder.scheduleStart(currentVehicle.getLocation(), currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime());
+				previousActLoc = currentVehicle.getLocation();
 			}
 			else if(atts.getValue(TYPE).equals("pickup")){
 				String id = atts.getValue(SHIPMENTID);
 				CarrierShipment s = currentShipments.get(id);
+				finishLeg(s.getFrom());
 				currentTourBuilder.schedulePickup(s);
+				previousActLoc = s.getFrom();
 			}
 			else if(atts.getValue(TYPE).equals("delivery")){
 				String id = atts.getValue(SHIPMENTID);
 				CarrierShipment s = currentShipments.get(id);
+				finishLeg(s.getTo());
 				currentTourBuilder.scheduleDelivery(s);
+				previousActLoc = s.getTo();
 			}
 			else if(atts.getValue(TYPE).equals("end")){
+				finishLeg(currentVehicle.getLocation());
 				currentTourBuilder.scheduleEnd(currentVehicle.getLocation());
 			}
-			else {
-				String durationString = atts.getValue("duration");
-				Double duration = null;
-				if(durationString != null){
-					duration = Double.parseDouble(durationString);
-				}
-				currentTourBuilder.scheduleGeneralActivity(atts.getValue(TYPE), makeId(atts.getValue(LINKID)), null, null, duration);
-			}
 		}
+	}
+
+	private void finishLeg(Id toLocation) {
+		if(previousRouteContent != null){
+			List<Id> linkIds = NetworkUtils.getLinkIds(previousRouteContent);
+			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(previousActLoc, toLocation);
+			if(!linkIds.isEmpty()){
+				route.setLinkIds(previousActLoc, linkIds, toLocation);
+			}
+			currentLeg.setRoute(route);
+		}
+		currentTourBuilder.addLeg(currentLeg);
+		currentLeg = null;
+		previousRouteContent = null;
 	}
 
 	private double getDouble(String value) {
@@ -174,11 +229,8 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		if(name.equals(VEHICLE)){
-			
-		}
-		if(name.equals(VEHICLES)){
-			
+		if(name.equals("route")){
+			this.previousRouteContent = content;  
 		}
 		if(name.equals("carrier")){
 			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
@@ -192,10 +244,6 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			ScheduledTour sTour = new ScheduledTour(tour, currentVehicle, currentStartTime);
 			scheduledTours.add(sTour);
 		}
-		if(name.equals("carrier")){
-			
-		}
-		
 	}
 
 	private int getInt(String value) {

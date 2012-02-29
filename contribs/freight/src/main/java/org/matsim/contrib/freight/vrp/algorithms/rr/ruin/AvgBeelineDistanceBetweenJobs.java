@@ -1,16 +1,17 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
-import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 
-public class AvgDistanceBetweenJobs implements JobDistance{
+public class AvgBeelineDistanceBetweenJobs implements JobDistance{
 
-	private Costs costs;
+	private Locations locations;
 	
-	public AvgDistanceBetweenJobs(Costs costs) {
+	public AvgBeelineDistanceBetweenJobs(Locations locations) {
 		super();
-		this.costs = costs;
+		this.locations = locations;
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class AvgDistanceBetweenJobs implements JobDistance{
 	}
 
 	private double calcDist(String from, String to) {
-		return costs.getTransportCost(from, to, 0.0);
+		return new CrowFlyCosts(locations).getTransportCost(from, to, 0.0);
 	}
 
 }

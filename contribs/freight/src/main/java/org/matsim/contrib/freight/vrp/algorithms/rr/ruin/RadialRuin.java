@@ -11,7 +11,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -85,7 +85,6 @@ public class RadialRuin implements RuinStrategy{
 			distanceNodeTree.put(i.getId(), treeSet);
 			for(Job j : vrp.getJobs().values()){
 				double distance = jobDistance.calculateDistance(i,j);
-				logger.debug("distMatrix: " + i.getId() + " " + j.getId() + " " + distance);
 				ReferencedJob refNode = new ReferencedJob(j, distance);
 				treeSet.add(refNode);
 			}
@@ -101,15 +100,13 @@ public class RadialRuin implements RuinStrategy{
 			return;
 		}
 		Job randomJob = pickRandomJob();
-		logger.debug("randomJob: " + randomJob.getId());
 		TreeSet<ReferencedJob> tree = distanceNodeTree.get(randomJob.getId());
 		Iterator<ReferencedJob> descendingIterator = tree.descendingIterator();
 		int counter = 0;
 		while(descendingIterator.hasNext() && counter<nOfJobs2BeRemoved){
 			ReferencedJob refJob = descendingIterator.next();
 			Job job = refJob.getJob();
-			logger.debug("removedJob: " + job.getId());
-			for(TourAgent agent : initialSolution.getTourAgents()){
+			for(RRTourAgent agent : initialSolution.getTourAgents()){
 				if(agent.hasJob(job)){
 					agent.removeJob(job);
 					unassignedJobs.add(job);
@@ -131,7 +128,7 @@ public class RadialRuin implements RuinStrategy{
 	}
 
 	private int getNuOfJobs2BeRemoved(){
-		return (int)Math.round(vrp.getJobs().values().size()*fractionOfAllNodes2beRuined);
+		return (int)Math.ceil(vrp.getJobs().values().size()*fractionOfAllNodes2beRuined);
 	}
 	
 	@Override

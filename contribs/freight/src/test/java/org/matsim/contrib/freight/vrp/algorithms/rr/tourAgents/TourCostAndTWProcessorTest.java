@@ -100,20 +100,11 @@ public class TourCostAndTWProcessorTest extends VRPTestCase{
 		TDCosts tdCosts = new TDCosts(loc, timeBins, speedValues);
 		tdTourStatusProcessor = new TourCostAndTWProcessor(tdCosts);
 	}
-	
-	public void testCalculatedDistance(){
-		statusUpdater.process(tour);
-		assertEquals(40.0, tour.costs.distance);
-	}
+
 	
 	public void testCalculatedTimeWithTDCost(){
 		tdTourStatusProcessor.process(tour);
-		assertEquals((10.0+10.0+5.0+5.0), tour.costs.time);
-	}
-	
-	public void testCalculatedDistanceWithTDCost(){
-		tdTourStatusProcessor.process(tour);
-		assertEquals(40.0, tour.costs.distance);
+		assertEquals((10.0+10.0+5.0+5.0), tour.costs.transportTime);
 	}
 
 	public void testEarliestArrStart(){

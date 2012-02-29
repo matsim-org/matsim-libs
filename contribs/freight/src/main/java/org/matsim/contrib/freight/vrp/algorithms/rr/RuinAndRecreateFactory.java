@@ -18,4 +18,5 @@ public interface RuinAndRecreateFactory {
 	public abstract void setIterations(int iterations);
 	
 	public abstract void setWarmUp(int nOfWarmUpIterations);
+	
 }

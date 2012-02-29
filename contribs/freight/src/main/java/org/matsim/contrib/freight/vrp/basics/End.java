@@ -8,6 +8,8 @@ public class End implements TourActivity{
 	private double practical_earliestArrivalTime;
 
 	private double practical_latestArrivalTime;
+
+	private int currentLoad;
 	
 	public End(String locationId) {
 		super();
@@ -46,6 +48,17 @@ public class End implements TourActivity{
 
 	@Override
 	public double getServiceTime() {
-		return 0;
+		return 0.0;
+	}
+
+	@Override
+	public int getCurrentLoad() {
+		return this.currentLoad;
+	}
+
+	@Override
+	public void setCurrentLoad(int load) {
+		this.currentLoad = load;
+		
 	}
 }

@@ -18,16 +18,17 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.basics.Constraints;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
+import org.matsim.contrib.freight.vrp.constraints.Constraints;
 
 
 /**
@@ -74,18 +75,32 @@ public class PickupAndDeliveryTourFactory implements TourFactory {
 			Delivery delivery = createDelivery(shipment);
 			Double bestMarginalCost = bestKnownPrice;
 			Tour bestTour = null;
+			int currentLoad = 0;
 			for(int i=1;i<tour.getActivities().size();i++){
-				double mc1 = getMarginalInsertionCosts(getActivity(tour,i-1), getActivity(tour,i), pickup);
+//				TourActivity tourAct = getActivity(tour,i);
+//				if(tourAct instanceof JobActivity){
+//					/*
+//					 * this is a capacity check; when vehicle-capacity does not allow this shipment to be picked up at this point,
+//					 * marginal costs do not need to be calculated
+//					 */
+//					if(vehicleCapacityIsExceeded(vehicle,currentLoad,tourAct)){
+//						continue;
+//					}
+//					else{
+//						currentLoad += ((JobActivity) tourAct).getCapacityDemand();
+//					}
+//				}
+				double mc4pickup = getMarginalInsertionCosts(getActivity(tour,i-1), getActivity(tour,i), pickup);
 				for(int j=i;j<tour.getActivities().size();j++){
 					double marginalCost;
-					double mc2;
+					double mc4delivery;
 					if(i == j){
-						mc2 = getMarginalInsertionCosts(pickup, getActivity(tour,i), delivery);
+						mc4delivery = getMarginalInsertionCosts(pickup, getActivity(tour,i), delivery);
 					}
 					else{
-						mc2 = getMarginalInsertionCosts(getActivity(tour,j-1), getActivity(tour,j), delivery);
+						mc4delivery = getMarginalInsertionCosts(getActivity(tour,j-1), getActivity(tour,j), delivery);
 					}
-					marginalCost = mc1 + mc2;
+					marginalCost = mc4pickup + mc4delivery;
 					if(marginalCost < bestMarginalCost){
 						Tour newTour = buildTour(tour,shipment,i,j);
 						if(this.constraints.judge(newTour,vehicle)){
@@ -100,6 +115,14 @@ public class PickupAndDeliveryTourFactory implements TourFactory {
 			}
 			return null;
 		}
+
+	private boolean vehicleCapacityIsExceeded(Vehicle vehicle, int currentLoad, TourActivity tourActivity) {
+		int thisDemand = ((JobActivity) tourActivity).getCapacityDemand();
+		if(currentLoad + thisDemand > vehicle.getCapacity()){
+			return true;
+		}
+		return false;
+	}
 
 	private double getMarginalInsertionCosts(TourActivity act_i, TourActivity act_j, TourActivity newAct) {
 		double tt_acti2newAct = getTravelTime(act_i.getLocationId(), newAct.getLocationId(), 
@@ -143,7 +166,7 @@ public class PickupAndDeliveryTourFactory implements TourFactory {
 	}
 
 	private double getGeneralizedCosts(String fromId, String toId, double time) {
-		return costs.getGeneralizedCost(fromId, toId, time);
+		return costs.getTransportCost(fromId, toId, time);
 	}
 
 	private TourActivity getActivity(Tour tour, int i) {

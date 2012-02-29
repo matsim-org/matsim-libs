@@ -18,9 +18,15 @@
 /**
  * 
  */
-package org.matsim.contrib.freight.vrp.basics;
+package org.matsim.contrib.freight.vrp.constraints;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.basics.Delivery;
+import org.matsim.contrib.freight.vrp.basics.JobActivity;
+import org.matsim.contrib.freight.vrp.basics.Pickup;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 /**
  * @author stefan schroeder
@@ -30,10 +36,11 @@ public class PickORDeliveryCapacityAndTWConstraint implements Constraints {
 
 	private Logger logger = Logger.getLogger(PickORDeliveryCapacityAndTWConstraint.class);
 	
+	public double maxTimeInOperation = Double.MAX_VALUE;
+	
 	@Override
 	public boolean judge(Tour tour, Vehicle vehicle) {
 		int currentLoad = 0;
-		int maxCap = vehicle.getCapacity();
 		boolean deliveryOccured = false;
 		for(TourActivity tourAct : tour.getActivities()){
 			if(tourAct instanceof JobActivity){
@@ -48,11 +55,11 @@ public class PickORDeliveryCapacityAndTWConstraint implements Constraints {
 				}
 			}
 			if(currentLoad > vehicle.getCapacity()){
-				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentLoad=" + currentLoad + " on tour " + tour);
+//				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentLoad=" + currentLoad + " on tour " + tour);
 				return false;
 			}
 			if(tourAct.getLatestArrTime() < tourAct.getEarliestArrTime()){
-				logger.debug("timeWindow-conflic on tour " + tour);
+//				logger.debug("timeWindow-conflic on tour " + tour);
 				return false;
 			}
 		}

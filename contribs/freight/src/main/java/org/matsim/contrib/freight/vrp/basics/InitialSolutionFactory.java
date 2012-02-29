@@ -18,14 +18,11 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 
-/**
- * 
- * @author stefan schroeder
- *
- */
+import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 
-public interface Constraints {
+
+public interface InitialSolutionFactory {
 	
-	public boolean judge(Tour tour, Vehicle vehicle);
+	public RRSolution createInitialSolution(VehicleRoutingProblem vrp);
 
 }

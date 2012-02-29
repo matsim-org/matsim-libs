@@ -8,6 +8,8 @@ public class Delivery implements TourActivity, JobActivity{
 	private double practical_earliestArrivalTime;
 	
 	private double practical_latestArrivalTime;
+
+	private int currentLoad;
 	
 	public Delivery(Shipment shipment) {
 		super();
@@ -58,6 +60,19 @@ public class Delivery implements TourActivity, JobActivity{
 	public Job getJob() {
 		return shipment;
 	}
+
+	@Override
+	public int getCurrentLoad() {
+		return this.currentLoad;
+	}
+
+	@Override
+	public void setCurrentLoad(int load) {
+		this.currentLoad = load;
+		
+	}
+
+	
 
 
 }

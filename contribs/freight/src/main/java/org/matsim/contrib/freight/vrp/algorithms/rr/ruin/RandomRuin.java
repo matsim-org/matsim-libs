@@ -24,7 +24,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -66,8 +66,7 @@ public class RandomRuin implements RuinStrategy {
 		LinkedList<Job> availableJobs = new LinkedList<Job>(vrp.getJobs().values());
 		for(int i=0;i<nOfJobs2BeRemoved;i++){
 			Job job = pickRandomJob(availableJobs);
-			logger.debug("randomJob: " + job);
-			for(TourAgent agent : initialSolution.getTourAgents()){
+			for(RRTourAgent agent : initialSolution.getTourAgents()){
 				if(agent.hasJob(job)){
 					agent.removeJob(job);
 					unassignedJobs.add(job);
@@ -87,7 +86,7 @@ public class RandomRuin implements RuinStrategy {
 	}
 	
 	private int selectNuOfJobs2BeRemoved(){
-		return (int)Math.round(vrp.getJobs().values().size()*fractionOfAllNodes2beRuined);
+		return (int)Math.ceil(vrp.getJobs().values().size()*fractionOfAllNodes2beRuined);
 	}
 	
 	private void clear() {

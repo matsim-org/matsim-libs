@@ -1,14 +1,9 @@
-package org.matsim.contrib.freight.vrp.algorithms.rr.factories;
+package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinStrategyManager;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.BestInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.AvgDistanceBetweenJobs;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RadialRuin;
@@ -16,11 +11,11 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RandomRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.SchrimpfsRRThresholdFunction;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionTourFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
-public class DistributionTourWithTimeWindowsAlgoFactory implements RuinAndRecreateFactory {
+public class DistributionTourAlgoFactory implements RuinAndRecreateFactory {
 
 
 	private static Logger logger = Logger.getLogger(PickupAndDeliveryTourWithTimeWindowsAlgoFactory.class);
@@ -32,7 +27,7 @@ public class DistributionTourWithTimeWindowsAlgoFactory implements RuinAndRecrea
 	private int iterations = 50;
 
 
-	public DistributionTourWithTimeWindowsAlgoFactory() {
+	public DistributionTourAlgoFactory() {
 		super();
 	}
 
@@ -47,8 +42,8 @@ public class DistributionTourWithTimeWindowsAlgoFactory implements RuinAndRecrea
 	
 	@Override
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution) {
-		TourCostAndTWProcessor tourCostProcessor = new TourCostAndTWProcessor(vrp.getCosts());
-		TourFactory tourFactory = new DistributionTourFactory(vrp.getCosts(), vrp.getConstraints(), tourCostProcessor);
+		TourCostProcessor tourCostProcessor = new TourCostProcessor(vrp.getCosts());
+		TourFactory tourFactory = new DistributionTourFactory(vrp.getCosts(), vrp.getGlobalConstraints(), tourCostProcessor);
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,tourFactory);
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);

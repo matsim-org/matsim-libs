@@ -24,24 +24,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.BestInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryTourFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
+import org.matsim.contrib.freight.vrp.basics.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
 
-public class InitialSolution implements SingleDepotInitialSolutionFactory {
+public class InitialSolution implements InitialSolutionFactory {
 
+	private static Logger logger = Logger.getLogger(InitialSolution.class);
+	
 	@Override
 	public RRSolution createInitialSolution(VehicleRoutingProblem vrp) {
+		logger.info("create initial solution.");
 		RRSolution solution = createEmptySolution(vrp);
 		BestInsertion bestInsertion = new BestInsertion();
 		bestInsertion.run(solution, getUnassignedJobs(vrp));
@@ -54,19 +57,19 @@ public class InitialSolution implements SingleDepotInitialSolutionFactory {
 	}
 
 	private RRSolution createEmptySolution(VehicleRoutingProblem vrp) {
-		Collection<TourAgent> emptyTours = new ArrayList<TourAgent>();
+		Collection<RRTourAgent> emptyTours = new ArrayList<RRTourAgent>();
 		TourStatusProcessor statusProcessor = new TourCostAndTWProcessor(vrp.getCosts());
-		TourAgentFactory tourAgentFactory = new RRTourAgentFactory(statusProcessor, new PickupAndDeliveryTourFactory(vrp.getCosts(), 
-				vrp.getConstraints(), statusProcessor));
+		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(statusProcessor, new PickupAndDeliveryTourFactory(vrp.getCosts(), 
+				vrp.getGlobalConstraints(), statusProcessor));
 		for (Vehicle vehicle : vrp.getVehicles()) { 
-			TourAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory);
+			RRTourAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory);
 			emptyTours.add(tourAgent);
 		}
 		return new RRSolution(emptyTours);
 	}
 
 
-	private TourAgent createTourAgent(Vehicle vehicle, String vehicleLocationId, TourAgentFactory tourAgentFactory) {
+	private RRTourAgent createTourAgent(Vehicle vehicle, String vehicleLocationId, RRTourAgentFactory tourAgentFactory) {
 		VrpTourBuilder tourBuilder = new VrpTourBuilder();
 		tourBuilder.scheduleStart(vehicleLocationId, vehicle.getEarliestDeparture(), Double.MAX_VALUE);
 		tourBuilder.scheduleEnd(vehicleLocationId, 0.0, vehicle.getLatestArrival());

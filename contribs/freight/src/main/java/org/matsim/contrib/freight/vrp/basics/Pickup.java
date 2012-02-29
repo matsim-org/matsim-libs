@@ -8,6 +8,8 @@ public class Pickup implements TourActivity, JobActivity{
 	private double practical_earliestArrivalTime;
 	
 	private double practical_latestArrivalTime;
+
+	private int currentLoad;
 	
 	public Pickup(Shipment shipment) {
 		super();
@@ -57,6 +59,16 @@ public class Pickup implements TourActivity, JobActivity{
 	@Override
 	public Job getJob() {
 		return shipment;
+	}
+
+	@Override
+	public int getCurrentLoad() {
+		return this.currentLoad;
+	}
+
+	@Override
+	public void setCurrentLoad(int load) {
+		this.currentLoad = load;
 	}
 
 }
