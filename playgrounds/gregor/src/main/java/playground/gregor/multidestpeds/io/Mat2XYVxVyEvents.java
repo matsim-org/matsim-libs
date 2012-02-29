@@ -71,9 +71,11 @@ public class Mat2XYVxVyEvents {
 	private final Scenario sc;
 	private final String inputDir;
 	private final String inputMat;
+	private final String mode;
 
-	public  Mat2XYVxVyEvents(Scenario sc, String inputDir, String inputMat){
+	public  Mat2XYVxVyEvents(Scenario sc, String inputDir, String inputMat,String mode){
 		this.sc = sc;
+		this.mode = mode;
 		this.inputDir = inputDir;
 		this.inputMat = inputMat;
 	}
@@ -91,8 +93,12 @@ public class Mat2XYVxVyEvents {
 
 		EventWriterXML writer = new EventWriterXML(this.inputDir + "/events.xml");
 		EventsManager manager = EventsUtils.createEventsManager();
-		
-		XYZEvents2Plan planGen = new XYZEvents2Plan(this.sc);
+		XYZEvents2Plan planGen;
+		if (this.mode.equals("car")) {
+			planGen = new XYZEvents2Plan(this.sc,this.mode,"/Users/laemmel/devel/gr90/input/events_walk2d.xml.gz");
+		} else {
+			planGen = new XYZEvents2Plan(this.sc,this.mode);
+		}
 		
 		manager.addHandler(writer);
 		manager.addHandler(planGen);
@@ -138,7 +144,6 @@ public class Mat2XYVxVyEvents {
 				XYVxVyEvent ev = new XYVxVyEventImpl(id, c, v.x, v.y, time);
 				manager.processEvent(ev);
 
-				ped.lastPos = c;
 				if (time == ped.arrived) {
 					Id linkId = ped.path.links.get(ped.path.links.size()-1).getId(); 
 							
@@ -146,9 +151,13 @@ public class Mat2XYVxVyEvents {
 					manager.processEvent(fac.createAgentArrivalEvent(time, ped.id, linkId, "walk2d"));
 				} else if (checkForNextLink(ped,c)) {
 					manager.processEvent(fac.createLinkLeaveEvent(time, id, ped.path.links.get(ped.currLink).getId(), null));
-					ped.currLink++;
-					manager.processEvent(fac.createLinkEnterEvent(time, id, ped.path.links.get(ped.currLink).getId(), null));
+					
+					if (ped.currLink < ped.path.links.size()-2) {
+						ped.currLink++;
+						manager.processEvent(fac.createLinkEnterEvent(time, id, ped.path.links.get(ped.currLink).getId(), null));
+					}
 				}
+				ped.lastPos = c;
 
 			}
 
@@ -176,11 +185,11 @@ public class Mat2XYVxVyEvents {
 		Node to = null;
 		Id endLink = null;
 		if (ped.id.toString().contains("g")) {
-			Coordinate toC = new Coordinate(2,-5);
+			Coordinate toC = new Coordinate(2,-10);
 			endLink = getLinkId(toC,ped.velocities.get(ped.arrived),sc);
 			to = sc.getNetwork().getLinks().get(endLink).getToNode();
 		} else {
-			Coordinate toC = new Coordinate(14,-2);
+			Coordinate toC = new Coordinate(10,-2);
 			endLink = getLinkId(toC,ped.velocities.get(ped.arrived),sc);
 			to = sc.getNetwork().getLinks().get(endLink).getToNode();
 		}
@@ -227,7 +236,7 @@ public class Mat2XYVxVyEvents {
 			Scenario sc) {
 
 		Link l1 = ((NetworkImpl)sc.getNetwork()).getNearestNode(MGC.coordinate2Coord(loc)).getOutLinks().values().iterator().next();
-		Id id = l1.getToNode().getOutLinks().values().iterator().next().getId();
+		Id id = l1.getId();//l1.getToNode().getOutLinks().values().iterator().next().getId();
 				
 		return id;
 //		LinkImpl l2 = null;

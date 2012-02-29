@@ -55,6 +55,13 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(e);
 		Sim2DDepartureHandler d = new Sim2DDepartureHandler(e);
 		qSim.addDepartureHandler(d);
+		
+		
+//		//DEBUG
+//		QLinkControl contr = new QLinkControl(qSim);
+//		qSim.addMobsimEngine(contr);
+//		//END DEBUG
+		
 		return qSim;
 	}
 

@@ -22,7 +22,6 @@ package playground.gregor.sim2d_v2.controller;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -44,8 +43,8 @@ public class Controller2D extends Controler {
 	public Controller2D(String[] args) {
 		super(args[0]);
 		setOverwriteFiles(true);
-		this.config.addQSimConfigGroup(new QSimConfigGroup());
-		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 5* 60);
+//		this.config.addQSimConfigGroup(new QSimConfigGroup());
+//		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 5* 60);
 		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		this.addMobsimFactory("hybridQ2D",new HybridQ2DMobsimFactory());
 	}
@@ -83,8 +82,8 @@ public class Controller2D extends Controler {
 
 		String configFile = args[0];
 		Config c = ConfigUtils.loadConfig(configFile);
-		c.addQSimConfigGroup(new QSimConfigGroup());
-		c.getQSimConfigGroup().setEndTime(  24*3600);
+//		c.addQSimConfigGroup(new QSimConfigGroup());
+//		c.getQSimConfigGroup().setEndTime(  24*3600);
 
 		Scenario sc = ScenarioUtils.createScenario(c);
 		((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());

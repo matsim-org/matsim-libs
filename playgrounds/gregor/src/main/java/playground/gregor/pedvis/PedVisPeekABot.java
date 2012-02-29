@@ -286,6 +286,15 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		//		System.out.println(e.getPersonId().toString().hashCode());
 		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (0* this.scale), (float) (GEO.getAzimuth(e.getVX(),e.getVY())),(float)this.scale);
 
+//		if (e.getPersonId().toString().equals("r0")){
+//			Coordinate old = this.locations.get(e.getPersonId());
+//			if (old != null) {
+//			double diff = old.distance(e.getCoordinate());
+//			if (diff*25 > 3) {
+//				System.err.println(diff);
+//			}}
+//		}
+		
 		this.locations.put(e.getPersonId(), e.getCoordinate());
 		
 //		createArrow(e);
@@ -410,9 +419,8 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		//				PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/counter/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/output/ITERS/it.0/0.events.xml.gz", true, 1.);
-//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/input/events.xml", true, 1.);
+//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/input/events.xml", true, 1);
 		vis.play(true);
-
 	}
 
 	/*
@@ -456,7 +464,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 
 		}
 		if (e.getLegMode().equals("walk2d")) {
-			this.carAgents.add(e.getPersonId());
+//			this.carAgents.add(e.getPersonId());
 		}
 		//			this.pc.setBotShapeII(Integer.parseInt(e.getPersonId().toString()), PeekABotClient.CAR);
 		//		} else {

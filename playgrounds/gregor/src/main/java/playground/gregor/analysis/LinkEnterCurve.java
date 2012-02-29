@@ -5,24 +5,26 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
-public class ArrivalCurve implements AgentArrivalEventHandler{
-
+public class LinkEnterCurve implements LinkEnterEventHandler {
 	int time = -1;
 	int arrived = 0;
 	private final BufferedWriter w;
 	
-	public ArrivalCurve(BufferedWriter w) {
+	public LinkEnterCurve(BufferedWriter w) {
 		this.w = w;
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
+		if (!event.getLinkId().toString().equals("2") && !event.getLinkId().toString().equals("7")) {
+			return;
+		}
 		int intTime = (int) (event.getTime() + 0.5);
 		
 		if (intTime > this.time) {
@@ -54,13 +56,13 @@ public class ArrivalCurve implements AgentArrivalEventHandler{
 		
 		BufferedWriter w = null;
 		try {
-			w = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/gr90/dbg/SVM")));
+			w = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/gr90/dbg/padang")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		ArrivalCurve arrv = new ArrivalCurve(w);
+		LinkEnterCurve arrv = new LinkEnterCurve(w);
 		mgr.addHandler(arrv);
 		new EventsReaderXMLv1(mgr).parse(events);
 		try {
@@ -70,9 +72,4 @@ public class ArrivalCurve implements AgentArrivalEventHandler{
 			e.printStackTrace();
 		}
 	}
-
-
-
-
-
 }

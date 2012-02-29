@@ -43,6 +43,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.ptproject.qsim.InternalInterface;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.PedestrianSignal;
@@ -60,6 +61,7 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityO
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalAgentInteractionForce;
+import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalEnvironmentForce;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -93,12 +95,13 @@ public class PhysicalFloor implements Floor {
 	private final Collection<? extends Link> links;
 	private FinishLineCrossedChecker finishLineCrossChecker;
 	private final Map<Id, PedestrianSignal> signals;
+	private final InternalInterface internalInterface;
 
 
 	private static final boolean MS_FORCE_UPDATE = false;
 	private static final int MAX_NUM_OF_THREADS = 4;
 
-	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents, Map<Id, PedestrianSignal> signals) {
+	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents, Map<Id, PedestrianSignal> signals, InternalInterface internalInterface) {
 		this.signals = signals;
 		this.scenario = scenario;
 		this.sim2DConfig = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d"));
@@ -106,6 +109,7 @@ public class PhysicalFloor implements Floor {
 		this.links = scenario.getNetwork().getLinks().values();
 		this.em = em;
 		this.emitXYZAzimuthEvents = emitEvents;
+		this.internalInterface = internalInterface;
 
 
 	}
@@ -122,6 +126,7 @@ public class PhysicalFloor implements Floor {
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
 			this.dynamicForceModules.add(new VelocityObstacleForceII(this, this.scenario));
 			this.dynamicForceModules.add(new PhysicalAgentInteractionForce(this, this.scenario));
+			this.forceModules.add(new PhysicalEnvironmentForce(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){
@@ -289,7 +294,7 @@ public class PhysicalFloor implements Floor {
 			// end of route
 			if (id == null) {
 				agent.endLegAndComputeNextState(time);
-
+				this.internalInterface.arrangeNextAgentState(agent);
 				return true;
 				// (returning "true" removes (or should remove) the Agent2D "wrapper" since endLegAndAssumeControl only moves
 				// the wrapped agent, not the wrapper)

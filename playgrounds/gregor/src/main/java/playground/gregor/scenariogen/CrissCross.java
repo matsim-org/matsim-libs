@@ -31,9 +31,19 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-public class ScenarioGeneratorII {
+public class CrissCross {
+//	private static final String MODE = "walk2d";
+	private static final String MODE = "car";
+	private static int nid = 0;
+	private static int lid = 0;
+
+	private static Id id0_s;
+	private static Id id0_t;
+	private static Id id1_s;
+	private static Id id1_t;
+
 	public static void main(String [] args) {
-		String scDir = "/Users/laemmel/devel/crossing/";
+		String scDir = "/Users/laemmel/devel/crisscross/";
 		String inputDir = scDir + "/input/";
 
 		Config c = ConfigUtils.createConfig();
@@ -46,6 +56,8 @@ public class ScenarioGeneratorII {
 
 		createPop(sc,inputDir);
 
+		c.network().setTimeVariantNetwork(true);
+		
 		c.controler().setLastIteration(0);
 		c.controler().setOutputDirectory(scDir + "output/");
 		c.controler().setMobsim("hybridQ2D");
@@ -86,10 +98,10 @@ public class ScenarioGeneratorII {
 		double incr1 = 1;
 		double incr2 = 1;
 		for (int i = 0; i < 500; i++) {
-			
-			if (i > 20 && i < 40) {
+
+			if (i > 20 && i < 30) {
 				incr1 = 1;
-			}else if (i >= 40 && i < 80){
+			}else if (i >= 30 && i < 50){
 				incr1 = 100;
 				i+=10;
 			}else if (i %7 == 0) {
@@ -101,33 +113,33 @@ public class ScenarioGeneratorII {
 				} else if (r < 0.25) {
 					incr1 = 1.9;
 				} else if (r < 0.75) {
-						incr1 = 2.5;
- 				} else {
- 					incr1 = 5;
- 				}
+					incr1 = 2.5;
+				} else {
+					incr1 = 5;
+				}
 			}
 			for (double y = -2; y <= 2; y+= incr1) {
 				Person pers = pb.createPerson(sc.createId("r"+Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
 				NetworkImpl net = (NetworkImpl) sc.getNetwork();
-				Link l = net.getLinks().get(new IdImpl(0));
+				Link l = net.getLinks().get(id0_s);
 				ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", l.getId());
 				act.setCoord(new CoordImpl(-12,y));
 				act.setEndTime(i);
 				plan.addActivity(act);
-				Leg leg = pb.createLeg("walk2d");
+				Leg leg = pb.createLeg(MODE);
 				plan.addLeg(leg);
-				Link l1 = net.getLinks().get(new IdImpl(4));
+				Link l1 = net.getLinks().get(id0_t);
 				Activity act2 = pb.createActivityFromLinkId("h", l1.getId());
-				act2.setEndTime(0);
+//				act2.setEndTime(Double.POSITIVE_INFINITY);
 				plan.addActivity(act2);
 				plan.setScore(0.);
 				pers.addPlan(plan);
 			}
-			if (i > 20 && i < 40) {
+			if (i > 20 && i < 30) {
 				incr2 = 1;
-			}else if (i >= 40 && i < 80){
+			}else if (i >= 30 && i < 50){
 				incr2 = 100;
 			}else if (i %7 == 0) {
 				double r = MatsimRandom.getRandom().nextDouble();
@@ -138,29 +150,29 @@ public class ScenarioGeneratorII {
 				} else if (r < 0.25) {
 					incr2 = 1.9;
 				} else if (r < 0.75) {
-						incr2 = 2.5;
- 				} else {
- 					incr2 = 5;
- 				}
+					incr2 = 2.5;
+				} else {
+					incr2 = 5;
+				}
 			}
-//			if (MatsimRandom.getRandom().nextDouble() > 0.8){
-//				incr = (MatsimRandom.getRandom().nextDouble()+0.05)*8;
-//			}
+			//			if (MatsimRandom.getRandom().nextDouble() > 0.8){
+			//				incr = (MatsimRandom.getRandom().nextDouble()+0.05)*8;
+			//			}
 			for (double x = -2; x <= 2; x+=incr2 ) {
 				Person pers = pb.createPerson(sc.createId("g"+Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
 				NetworkImpl net = (NetworkImpl) sc.getNetwork();
-				Link l = net.getLinks().get(new IdImpl(6));
+				Link l = net.getLinks().get(id1_s);
 				ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", l.getId());
 				act.setCoord(new CoordImpl(x,12));
 				act.setEndTime(i);
 				plan.addActivity(act);
-				Leg leg = pb.createLeg("walk2d");
+				Leg leg = pb.createLeg(MODE);
 				plan.addLeg(leg);
-				Link l1 = net.getLinks().get(new IdImpl(10));
+				Link l1 = net.getLinks().get(id1_t);
 				Activity act2 = pb.createActivityFromLinkId("h", l1.getId());
-				act2.setEndTime(0);
+//				act2.setEndTime(Double.POSITIVE_INFINITY);
 				plan.addActivity(act2);
 				plan.setScore(0.);
 				pers.addPlan(plan);
@@ -185,131 +197,74 @@ public class ScenarioGeneratorII {
 	}
 
 
+	private static Id createLink(double x0, double y0, double x1, double y1,
+			NetworkFactoryImpl nf,NetworkImpl net, Scenario sc, double lanes, double flowCap) {
+
+		CoordImpl c0 = new CoordImpl(x0, y0);
+		NodeImpl n0 = (NodeImpl) net.getNearestNode(c0);
+		if (n0 == null || c0.calcDistance(n0.getCoord()) > 0) {
+			n0 = nf.createNode(new IdImpl(nid++), c0);
+			sc.getNetwork().addNode(n0);
+		}
+
+		CoordImpl c1 = new CoordImpl(x1, y1);
+		NodeImpl n1 = (NodeImpl) net.getNearestNode(c1);
+		if (n1 == null || c1.calcDistance(n1.getCoord()) > 0) {
+			n1 = nf.createNode(new IdImpl(nid++), c1);
+			sc.getNetwork().addNode(n1);
+		}
+		Link l0 = nf.createLink(new IdImpl(lid++), n0, n1, (NetworkImpl) sc.getNetwork(), c1.calcDistance(c0), 1.34, flowCap, lanes);
+		sc.getNetwork().addLink(l0);
+
+		Link l1 = nf.createLink(new IdImpl(lid++), n1, n0, (NetworkImpl) sc.getNetwork(), c1.calcDistance(c0), 1.34, flowCap, lanes);
+		sc.getNetwork().addLink(l1);
+		return l0.getId();
+	}
+
+	
+	private static Id createLink(double d, double e, double f, double g,
+			NetworkFactoryImpl nf, NetworkImpl network, Scenario sc) {
+		
+		return createLink(d,e,f,g,nf,network,sc,5.4*0.26*5,5*1.33);
+	}
+	
 	private static void createNetwork(Scenario sc, String dir) {
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
+		id0_s = createLink(-12.5,0.,-7.5,0.,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(-7.5,0.,-2.5,0,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(-2.5,0.,2.5,0,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(2.5,0.,12.5,0,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(12.5,0.,17.5,0,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(17.5,0.,22.5,0,nf,(NetworkImpl)sc.getNetwork(),sc);
+		id0_t = createLink(22.5,0.,27.5,0,nf,(NetworkImpl)sc.getNetwork(),sc);
 
-
-		Id nid0 = new IdImpl(0);
-		CoordImpl c0 = new CoordImpl(-12.5,0);
-		NodeImpl n0 = nf.createNode(nid0, c0);
-
-		Id nid0b = new IdImpl(-1);
-		CoordImpl c0b = new CoordImpl(-7.5,0);
-		NodeImpl n0b = nf.createNode(nid0b, c0b);
-		
-		Id nid1 = new IdImpl(1);
-		CoordImpl c1 = new CoordImpl(-2.5,0);
-		NodeImpl n1 = nf.createNode(nid1, c1);
-
-		Id nid2 = new IdImpl(2);
-		CoordImpl c2 = new CoordImpl(2.5,0);
-		NodeImpl n2 = nf.createNode(nid2, c2);
-
-		Id nid3 = new IdImpl(3);
-		CoordImpl c3 = new CoordImpl(12.5,0);
-		NodeImpl n3 = nf.createNode(nid3, c3);
-
-		sc.getNetwork().addNode(n0);
-		sc.getNetwork().addNode(n0b);
-		sc.getNetwork().addNode(n1);
-		sc.getNetwork().addNode(n2);
-		sc.getNetwork().addNode(n3);
-
-		Id lid0 = new IdImpl(0);
-		Link l0 = nf.createLink(lid0, n0, n0b, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-		
-		Id lid0b = new IdImpl(-1);
-		Link l0b = nf.createLink(lid0b, n0b, n1, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid1 = new IdImpl(1);
-		Link l1 = nf.createLink(lid1, n1, n0, (NetworkImpl) sc.getNetwork(), 10, 1.34, 1, 1);
-
-		Id lid2 = new IdImpl(2);
-		Link l2 = nf.createLink(lid2, n1, n2, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid3 = new IdImpl(3);
-		Link l3 = nf.createLink(lid3, n2, n1, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid4 = new IdImpl(4);
-		Link l4 = nf.createLink(lid4, n2, n3, (NetworkImpl) sc.getNetwork(), 10, 1.34, 1, 1);
-
-		Id lid5 = new IdImpl(5);
-		Link l5 = nf.createLink(lid5, n3, n2, (NetworkImpl) sc.getNetwork(), 10, 1.34, 1, 1);
-
-		sc.getNetwork().addLink(l0);
-		sc.getNetwork().addLink(l0b);
-		sc.getNetwork().addLink(l1);
-		sc.getNetwork().addLink(l2);
-		sc.getNetwork().addLink(l3);
-		sc.getNetwork().addLink(l4);
-		sc.getNetwork().addLink(l5);
-
-
-		Id nid5 = new IdImpl(5);
-		CoordImpl c5 = new CoordImpl(0,12.5);
-		NodeImpl n5 = nf.createNode(nid5, c5);
-		
-		Id nid5b = new IdImpl(-2);
-		CoordImpl c5b = new CoordImpl(0,7.5);
-		NodeImpl n5b = nf.createNode(nid5b, c5b);
-
-		Id nid6 = new IdImpl(6);
-		CoordImpl c6 = new CoordImpl(0,2.5);
-		NodeImpl n6 = nf.createNode(nid6, c6);
-
-		Id nid7 = new IdImpl(7);
-		CoordImpl c7 = new CoordImpl(0,-2.5);
-		NodeImpl n7 = nf.createNode(nid7, c7);
-
-		Id nid8 = new IdImpl(8);
-		CoordImpl c8 = new CoordImpl(0,-12.5);
-		NodeImpl n8 = nf.createNode(nid8, c8);
-
-		sc.getNetwork().addNode(n5);
-		sc.getNetwork().addNode(n5b);
-		sc.getNetwork().addNode(n6);
-		sc.getNetwork().addNode(n7);
-		sc.getNetwork().addNode(n8);
-
-		Id lid6 = new IdImpl(6);
-		Link l6 = nf.createLink(lid6, n5, n5b, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-		
-		Id lid6b = new IdImpl(-2);
-		Link l6b = nf.createLink(lid6b, n5b, n6, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid7 = new IdImpl(7);
-		Link l7 = nf.createLink(lid7, n6, n5, (NetworkImpl) sc.getNetwork(), 10, 1.34, 1, 1);
-
-		Id lid8 = new IdImpl(8);
-		Link l8 = nf.createLink(lid8, n6, n7, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid9 = new IdImpl(9);
-		Link l9 = nf.createLink(lid9, n7, n6, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid10 = new IdImpl(10);
-		Link l10 = nf.createLink(lid10, n7, n8, (NetworkImpl) sc.getNetwork(), 10, 1.34, 1, 1);
-
-		Id lid11 = new IdImpl(11);
-		Link l11 = nf.createLink(lid11, n8, n7, (NetworkImpl) sc.getNetwork(), 10, 1.34, 1, 1);
-
-		sc.getNetwork().addLink(l6);
-		sc.getNetwork().addLink(l6b);
-		sc.getNetwork().addLink(l7);
-		sc.getNetwork().addLink(l8);
-		sc.getNetwork().addLink(l9);
-		sc.getNetwork().addLink(l10);
-		sc.getNetwork().addLink(l11);
-
+		id1_s = createLink(0,12.5,0,7.5,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(0,7.5,0,2.5,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(0,2.5,0,-2.5,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(0,-2.5,0,-15,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(0,-15,5,-15,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(5,-15,7.5,-15,nf,(NetworkImpl)sc.getNetwork(),sc,5.4*0.26*1.5,1.5*1.33);
+		createLink(7.5,-15,15,-15,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(15,-15,15,-2.5,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(15,-2.5,15,2.5,nf,(NetworkImpl)sc.getNetwork(),sc);
+		createLink(15,2.5,15,7.5,nf,(NetworkImpl)sc.getNetwork(),sc);
+		id1_t = createLink(15,7.5,15,12.5,nf,(NetworkImpl)sc.getNetwork(),sc);
 
 		String networkOutputFile = dir+"/network.xml";
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
+		((NetworkImpl)sc.getNetwork()).setCapacityPeriod(1);
 		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
 		sc.getConfig().network().setInputFile(networkOutputFile);
 
 
 	}
+
+
+
+
+
 
 	private static void createAndSaveEnvironment(String dir) {
 		GeometryFactory geofac = new GeometryFactory();
@@ -338,6 +293,53 @@ public class ScenarioGeneratorII {
 		LineString ls3 = geofac.createLineString(new Coordinate[]{c9,c10,c11});
 		GisDebugger.addGeometry(ls3);
 
+		Coordinate c12 = new Coordinate(17.5,-2.5);
+		Coordinate c13 = new Coordinate(27.5,-2.5);
+		LineString ls4 = geofac.createLineString(new Coordinate[]{c12,c13});
+		GisDebugger.addGeometry(ls4);
+
+		Coordinate c14 = new Coordinate(17.5,2.5);
+		Coordinate c15 = new Coordinate(27.5,2.5);
+		LineString ls5 = geofac.createLineString(new Coordinate[]{c14,c15});
+		GisDebugger.addGeometry(ls5);
+
+		Coordinate c16 = new Coordinate(12.5,-2.5);
+		Coordinate c17 = new Coordinate(12.5,-12.5);
+		Coordinate c18 = new Coordinate(2.5,-12.5);
+		LineString ls6 = geofac.createLineString(new Coordinate[]{c16,c17,c18});
+		GisDebugger.addGeometry(ls6);
+
+		Coordinate c19 = new Coordinate(-2.5,-12.5);
+		Coordinate c20 = new Coordinate(-2.5,-17.5);
+		Coordinate c21 = new Coordinate(17.5,-17.5);
+		Coordinate c22 = new Coordinate(17.5,-2.5);
+		LineString ls7 = geofac.createLineString(new Coordinate[]{c19,c20,c21,c22});
+		GisDebugger.addGeometry(ls7);
+
+		Coordinate c23 = new Coordinate(12.5,2.5);
+		Coordinate c24 = new Coordinate(12.5,12.5);
+		LineString ls8 = geofac.createLineString(new Coordinate[]{c23,c24});
+		GisDebugger.addGeometry(ls8);
+
+		Coordinate c25 = new Coordinate(17.5,2.5);
+		Coordinate c26 = new Coordinate(17.5,12.5);
+		LineString ls9 = geofac.createLineString(new Coordinate[]{c25,c26});
+		GisDebugger.addGeometry(ls9);
+
+		Coordinate c27 = new Coordinate(5,-12.5);
+		Coordinate c28 = new Coordinate(5,-14.5);
+		Coordinate c29 = new Coordinate(7.5,-14.5);
+		Coordinate c30 = new Coordinate(7.5,-12.5);
+		LineString ls10 = geofac.createLineString(new Coordinate[]{c27,c28,c29,c30});
+		GisDebugger.addGeometry(ls10);
+		
+		Coordinate c31 = new Coordinate(5,-17.5);
+		Coordinate c32 = new Coordinate(5,-16);
+		Coordinate c33 = new Coordinate(7.5,-16);
+		Coordinate c34 = new Coordinate(7.5,-17.5);
+		LineString ls11 = geofac.createLineString(new Coordinate[]{c31,c32,c33,c34});
+		GisDebugger.addGeometry(ls11);
+		
 		GisDebugger.dump(dir + "/floorplan.shp");
 
 	}

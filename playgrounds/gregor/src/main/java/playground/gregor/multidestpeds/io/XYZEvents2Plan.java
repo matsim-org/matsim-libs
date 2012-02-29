@@ -40,12 +40,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.xml.sax.SAXException;
 
+import playground.gregor.multidestpeds.helper.QueueSimDepartCalculator;
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
@@ -64,14 +64,27 @@ public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHan
 
 	private final PopulationFactory fac;
 
+	private final String mode;
+
+	private QueueSimDepartCalculator qSimDepart = null;
+
 	protected XYZEvents2Plan() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.fac = this.sc.getPopulation().getFactory();
+		this.mode = "walk2d";
 	}
 	
-	public XYZEvents2Plan(Scenario sc) {
+	public XYZEvents2Plan(Scenario sc,String mode) {
 		this.sc = sc;
 		this.fac = sc.getPopulation().getFactory();
+		this.mode = mode;
+	}
+	
+	public XYZEvents2Plan(Scenario sc,String mode, String eventsFile) {
+		this.sc = sc;
+		this.fac = sc.getPopulation().getFactory();
+		this.mode = mode;
+		this.qSimDepart = new QueueSimDepartCalculator(sc, eventsFile);
 	}
 
 	/*
@@ -122,17 +135,26 @@ public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHan
 		Person pers = this.fac.createPerson(p.id);
 		Plan plan = this.fac.createPlan();
 		Activity actS = this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.orig));
-		actS.setEndTime(p.dep);
-		Leg leg = this.fac.createLeg("walk2d");
+		double time = getEndTime(p);
+		actS.setEndTime(time);
+		Leg leg = this.fac.createLeg(this.mode);
 		ActivityImpl actE = (ActivityImpl) this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.dest));
 		actE.setLinkId(event.getLinkId());
 		plan.addActivity(actS);
 		plan.addLeg(leg);
 		plan.addActivity(actE);
 		pers.addPlan(plan);
-		((PersonImpl)pers).setLicence(Double.toString(p.vx));
-		((PersonImpl)pers).setSex(Double.toString(p.vy));
+//		((PersonImpl)pers).setLicence(Double.toString(p.vx));
+//		((PersonImpl)pers).setSex(Double.toString(p.vy));
 		this.sc.getPopulation().addPerson(pers);
+	}
+
+	private double getEndTime(P p) {
+		if (this.qSimDepart == null) {
+			return p.dep;
+		} else {
+			return this.qSimDepart.getQSimDepartures().get(p.id);
+		}
 	}
 
 	private static class P {

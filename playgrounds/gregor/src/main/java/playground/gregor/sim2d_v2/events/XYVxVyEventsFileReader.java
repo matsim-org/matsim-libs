@@ -117,6 +117,9 @@ public class XYVxVyEventsFileReader extends MatsimXmlParser {
 			int type = Integer.parseInt(lineSegType);
 			ArrowEvent e = new ArrowEvent(idImpl, c1, c2, 0.f, 0.f, 0.f, type, time);
 			this.events.processEvent(e);
+		} else if (TickEvent.type.equals(eventType)) {
+			TickEvent tick = new TickEvent(time);
+			this.events.processEvent(tick);
 		}
 
 	}

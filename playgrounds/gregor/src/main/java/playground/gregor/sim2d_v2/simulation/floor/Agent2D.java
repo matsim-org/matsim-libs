@@ -22,8 +22,8 @@ package playground.gregor.sim2d_v2.simulation.floor;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
-public class Agent2D implements MobsimAgent {
+public class Agent2D implements MobsimDriverAgent {
 
 	private Coordinate currentPosition;
 	private final Force force = new Force();
@@ -203,6 +203,7 @@ public class Agent2D implements MobsimAgent {
 		this.pda.endLegAndComputeNextState(time);
 	}
 
+	@Override
 	public Id chooseNextLinkId() {
 		return this.pda.chooseNextLinkId();
 	}
@@ -307,10 +308,38 @@ public class Agent2D implements MobsimAgent {
 
 
 	@Override
-	public void abort(double now) {
-		// (additional MobsimAgent interface method.   I guess this should never happen with 2d agents. kai, feb'12)
-		throw new UnsupportedOperationException() ;
+	public void notifyMoveOverNode(Id newLinkId) {
+		this.pda.notifyMoveOverNode(newLinkId);
+		
 	}
 
+
+
+	@Override
+	public void setVehicle(MobsimVehicle veh) {
+		this.pda.setVehicle(veh);
+	}
+
+
+
+	@Override
+	public MobsimVehicle getVehicle() {
+		return this.pda.getVehicle();
+	}
+
+
+
+	@Override
+	public Id getPlannedVehicleId() {
+		return this.pda.getPlannedVehicleId();
+	}
+
+
+
+	@Override
+	public void abort(double now) {
+		// (additional MobsimAgent interface method.   I guess this should never happen with 2d agents. kai, feb'12)
+				throw new UnsupportedOperationException() ;
+	}
 
 }

@@ -5,24 +5,26 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
-public class ArrivalCurve implements AgentArrivalEventHandler{
-
+public class LinkLeaveCurve implements LinkLeaveEventHandler {
 	int time = -1;
 	int arrived = 0;
 	private final BufferedWriter w;
 	
-	public ArrivalCurve(BufferedWriter w) {
+	public LinkLeaveCurve(BufferedWriter w) {
 		this.w = w;
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
+		if (!event.getLinkId().toString().equals("5") && !event.getLinkId().toString().equals("17")) {
+			return;
+		}
 		int intTime = (int) (event.getTime() + 0.5);
 		
 		if (intTime > this.time) {
@@ -50,6 +52,7 @@ public class ArrivalCurve implements AgentArrivalEventHandler{
 	
 	public static void main(String [] args) {
 		String events = "/Users/laemmel/devel/gr90/output/ITERS/it.0/0.events.xml.gz";
+//		String events = "/Users/laemmel/devel/gr90/input/events_walk2d.xml.gz";
 		EventsManager mgr = EventsUtils.createEventsManager();
 		
 		BufferedWriter w = null;
@@ -60,7 +63,7 @@ public class ArrivalCurve implements AgentArrivalEventHandler{
 			e.printStackTrace();
 		}
 		
-		ArrivalCurve arrv = new ArrivalCurve(w);
+		LinkLeaveCurve arrv = new LinkLeaveCurve(w);
 		mgr.addHandler(arrv);
 		new EventsReaderXMLv1(mgr).parse(events);
 		try {
@@ -70,9 +73,4 @@ public class ArrivalCurve implements AgentArrivalEventHandler{
 			e.printStackTrace();
 		}
 	}
-
-
-
-
-
 }
