@@ -34,6 +34,6 @@ public class ScoringFunctionResetter implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
-		controler.getPlansScoring().getPlanScorer().reset(event.getIteration() + 1);
+		controler.getPlansScoring().getPlanScorer().reset(event.getIteration()); // TODO: check if iteration + 1 required
 	}
 }
