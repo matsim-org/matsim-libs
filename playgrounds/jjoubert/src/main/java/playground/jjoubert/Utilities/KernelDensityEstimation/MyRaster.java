@@ -38,6 +38,7 @@ import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -407,6 +408,12 @@ public class MyRaster{
 	
 	
 	public void writeRasterForR(String filename){
+		this.writeRasterForR(filename, (MultiPolygon)this.envelope);
+	}
+	
+	
+	public void writeRasterForR(String filename, MultiPolygon polygon){
+		GeometryFactory gf = new GeometryFactory();
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		log.info("originX: " + originX);
 		log.info("originY: " + originY);
@@ -422,7 +429,15 @@ public class MyRaster{
 				for(int col = 0; col < imageMatrix.columns(); col++){
 					double yMin = originY - (col)*resolution;
 					double yMax = yMin - resolution;
-					bw.write(String.format("%.2f,%.2f,%.2f,%.2f,%.4f\n", xMin, xMax, yMin, yMax, getImageMatrixValue(row, col)));
+					
+					/* Check if the centroid of the pixel is INSIDE the given study area. */
+					Point p = gf.createPoint(new Coordinate( (xMin + xMax)/2, (yMin+yMax)/2 ));
+					if(polygon.contains(p)){
+						bw.write(String.format("%.2f,%.2f,%.2f,%.2f,%.4f\n", xMin, xMax, yMin, yMax, getImageMatrixValue(row, col)));						
+					} else{
+						/* Don't write it out, otherwise R will duplicate all pixels from different envelopes' entries. */ 
+					}
+					
 				}
 			}
 			
