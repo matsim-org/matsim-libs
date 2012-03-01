@@ -177,7 +177,17 @@ public class WithinDayController extends Controler {
 		 */
 		if (this.events instanceof ParallelEventsManagerImpl) {
 			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
-			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl();
+			
+			final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
+			final String NUMBER_OF_THREADS = "numberOfThreads";
+			String numberOfThreads = this.config.findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
+			
+			int numOfThreads = 1;
+			if (numberOfThreads != null) {
+				numOfThreads = Integer.parseInt(numberOfThreads);
+			}
+			
+			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl(numOfThreads);
 			this.fosl.addSimulationAfterSimStepListener(manager);
 			this.events = manager;
 		}
