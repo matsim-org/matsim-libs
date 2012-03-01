@@ -70,6 +70,16 @@ public class ParkAndRideFacility implements Facility {
 		return linkId;
 	}
 
+	/**
+	 * Gives access to the associated stops. The cost of walking from the parking to
+	 * the stop is considered as being the same for all stops. Thus, they should correspond
+	 * to the same "physical" station. It should even be wise to have only one stop
+	 * associated.
+	 * Possibility to walk to another stop is handled by the router itself, using the
+	 * "transfer" links of the routing network.
+	 *
+	 * @return the list of associated stops Ids, as they are referenced in the schedule
+	 */
 	public List<Id> getStopsFacilitiesIds() {
 		return stopsIds;
 	}

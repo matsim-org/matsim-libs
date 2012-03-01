@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
@@ -66,7 +67,8 @@ public class ParkAndRideRouterNetwork implements Network {
 	private final IdFactory pnrLinkIdFactory = new IdFactory( "pnr-link-" );
 
 	// TODO: final!
-	private QuadTree<TransitRouterNetworkNode> transitNodesQuadTree = null;
+	private final QuadTree<TransitRouterNetworkNode> transitNodesQuadTree;
+	private final QuadTree<Node> carQuadTree;
 	//private QuadTree<Node> carNodesQuadTree = null;
 
 	/**
@@ -83,6 +85,8 @@ public class ParkAndRideRouterNetwork implements Network {
 		// TODO: decrease a little the uglyness by separating in mono-purpose methods
 		log.info("registering car network");
 		copyCarNetwork( carNetwork );
+
+		carQuadTree = createCarQuadTree();
 
 		log.info("start creating transit sub-network");
 		final Counter linkCounter = new Counter(" new link #");
@@ -103,7 +107,7 @@ public class ParkAndRideRouterNetwork implements Network {
 			}
 		}
 
-		createTransitQuadTree();
+		transitNodesQuadTree = createTransitQuadTree();
 
 		// /////////////////////////////////////////////////////////////////////
 		// transfer
@@ -150,7 +154,7 @@ public class ParkAndRideRouterNetwork implements Network {
 		int pnrLinksCount = 0;
 		for (ParkAndRideFacility facility : pnrFacilities.values()) {
 			List<Id> stops = facility.getStopsFacilitiesIds();
-			Node carNode = links.get( facility.getLinkId() ).getToNode();
+			Node carNode = carQuadTree.get( facility.getCoord().getX() , facility.getCoord().getY() );
 
 			for (Id stopId : stops) {
 				createPnrLink(
@@ -169,43 +173,66 @@ public class ParkAndRideRouterNetwork implements Network {
 		log.info(" # pnr links:  " + pnrLinksCount);
 	}
 
-//	private void buildCarQuadTreeFromCurrentlyRegisteredNodes() {
-//		double startTime = System.currentTimeMillis();
-//		double minx = Double.POSITIVE_INFINITY;
-//		double miny = Double.POSITIVE_INFINITY;
-//		double maxx = Double.NEGATIVE_INFINITY;
-//		double maxy = Double.NEGATIVE_INFINITY;
-//
-//		for (Node n : this.nodes.values()) {
-//			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
-//			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
-//			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
-//			if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
-//		}
-//		minx -= 1.0;
-//		miny -= 1.0;
-//		maxx += 1.0;
-//		maxy += 1.0;
-//		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-//		QuadTree<Node> quadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
-//		for (Node n : this.nodes.values()) {
-//			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
-//		}
-//
-//		this.carNodesQuadTree = quadTree;
-//		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
-//	}
-
 	private void copyCarNetwork(final Network carNetwork) {
+		nodeLoop:
 		for (Node node : carNetwork.getNodes().values()) {
-			nodes.put( node.getId() , new WrappingNode( node ) );
+			for (Link link : node.getInLinks().values()) {
+				if (link.getAllowedModes().contains( TransportMode.car )) {
+					nodes.put( node.getId() , new WrappingNode( node ) );
+					continue nodeLoop;
+				}
+			}
+			for (Link link : node.getOutLinks().values()) {
+				if (link.getAllowedModes().contains( TransportMode.car )) {
+					nodes.put( node.getId() , new WrappingNode( node ) );
+					continue nodeLoop;
+				}
+			}
 		}
 		for (Link link : carNetwork.getLinks().values()) {
-			links.put( link.getId() , new WrappingLink( link ) );
+			if (link.getAllowedModes().contains( TransportMode.car )) {
+				links.put( link.getId() , new WrappingLink( link ) );
+			}
 		}
 	}
 
-	private void createTransitQuadTree() {
+	private QuadTree<Node> createCarQuadTree() {
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+
+		for (Node node : this.nodes.values()) {
+			if (node instanceof WrappingNode) {
+				Coord c = node.getCoord();
+				if (c.getX() < minX) {
+					minX = c.getX();
+				}
+				if (c.getY() < minY) {
+					minY = c.getY();
+				}
+				if (c.getX() > maxX) {
+					maxX = c.getX();
+				}
+				if (c.getY() > maxY) {
+					maxY = c.getY();
+				}
+			}
+		}
+
+		QuadTree<Node> quadTree = new QuadTree<Node>(minX, minY, maxX, maxY);
+		for (Node node : this.nodes.values()) {
+			if (node instanceof WrappingNode) {
+				Coord c = node.getCoord();
+				quadTree.put(c.getX(), c.getY(), node);
+			}
+		}
+
+		return quadTree;
+	}
+
+
+	private QuadTree<TransitRouterNetworkNode> createTransitQuadTree() {
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
@@ -238,7 +265,7 @@ public class ParkAndRideRouterNetwork implements Network {
 			}
 		}
 
-		this.transitNodesQuadTree = quadTree;
+		return quadTree;
 	}
 
 	@Override
