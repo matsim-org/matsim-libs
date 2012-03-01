@@ -310,12 +310,13 @@ public class MyRaster{
 						
 						double d = point.distance(p);
 						double u = d / radius;
+						double value = 0.0;
 						if(pixel.contains(point)){
-							height = height;
+							value = height;
 						} else if( d <= radius){
-							height = height*(1 - u);
+							value = height*(1 - u);
 						}
-						imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + height);
+						imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + value);
 						maxValue = Math.max(maxValue,imageMatrix.getQuick(i, j));
 					}
 				}
