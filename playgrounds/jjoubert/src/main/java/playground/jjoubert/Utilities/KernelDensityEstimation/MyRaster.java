@@ -408,7 +408,10 @@ public class MyRaster{
 	
 	
 	public void writeRasterForR(String filename){
-		this.writeRasterForR(filename, (MultiPolygon)this.envelope);
+		GeometryFactory gf = new GeometryFactory();
+		Polygon[] pa = {(Polygon)this.envelope};
+		MultiPolygon mp = gf.createMultiPolygon(pa);
+		this.writeRasterForR(filename, mp);
 	}
 	
 	
