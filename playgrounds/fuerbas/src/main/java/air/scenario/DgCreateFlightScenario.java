@@ -31,11 +31,16 @@ import air.analysis.DgNet2Shape;
 public class DgCreateFlightScenario {
 	
 	public static void createWorldFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception {
-		String baseDirectory = "/media/data/work/repos/"
-				+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/";
-
+//		String baseDirectory = "/media/data/work/repos/"
+//				+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/";
+//		String utcOffsetfile = "/media/data/work/repos/"
+//		+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
+		
+		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\";
+		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
+		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory);
+		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, utcOffsetfile);
 
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
 		String outputOsmAirportsFilename = baseDirectory + SfAirScheduleBuilder.AIRPORTS_FROM_OSM_OUTPUT_FILE;
@@ -93,7 +98,10 @@ public class DgCreateFlightScenario {
 	}
 
 	public static void writeShape(String baseDirectory, String networkFilename){
-		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395/";
+		
+		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395\\"; //for windows file systems
+//		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395/";
+
 		File shapeFileDirectory = new File(shapeFileDirectoryname);
 		if (shapeFileDirectory.exists()){
 			shapeFileDirectory.delete();
@@ -108,18 +116,21 @@ public class DgCreateFlightScenario {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		String inputOsmFilename = "/home/dgrether/shared-svn/projects/throughFlightData/osm_daten/2010-12-28_aeroway_nodes.osm";
-		String inputOagFilename = "/media/data/work/repos/"
-				+ "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
+//		String inputOsmFilename = "/home/dgrether/shared-svn/projects/throughFlightData/osm_daten/2010-12-28_aeroway_nodes.osm";
+//		String inputOagFilename = "/media/data/work/repos/"
+//				+ "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
+		
+		String inputOsmFilename = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\osm_daten\\2010-12-28_aeroway_nodes.osm";
+		String inputOagFilename = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\oag_rohdaten\\OAGSEP09.CSV";
 
 		//WORLD WIDE AIR TRAFFIC
-//		createWorldFlightScenario(inputOsmFilename, inputOagFilename);
+		createWorldFlightScenario(inputOsmFilename, inputOagFilename);
 		
 		//EUROPEAN AIR TRAFFIC
-		createEuropeanFlightScenario(inputOsmFilename, inputOagFilename);
+//		createEuropeanFlightScenario(inputOsmFilename, inputOagFilename);
 		
 		// GERMAN AIR TRAFFIC
-		createGermanFlightScenario(inputOsmFilename, inputOagFilename);
+//		createGermanFlightScenario(inputOsmFilename, inputOagFilename);
 		
 	}
 

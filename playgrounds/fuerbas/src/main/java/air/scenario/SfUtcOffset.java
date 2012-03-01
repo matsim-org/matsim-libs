@@ -64,9 +64,12 @@ public class SfUtcOffset {
 	
 	private static final Logger log = Logger.getLogger(SfUtcOffset.class);
 	
-	private static final String INPUTFILE_OSM = "/home/dgrether/shared-svn/projects/throughFlightData/osm_daten/2010-12-28_aeroway_nodes.osm";
-	private static final String OUTPUTFILE_UTC= "/media/data/work/repos/"
-				+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
+//	private static final String INPUTFILE_OSM = "/home/dgrether/shared-svn/projects/throughFlightData/osm_daten/2010-12-28_aeroway_nodes.osm";
+//	private static final String OUTPUTFILE_UTC= "/media/data/work/repos/"
+//				+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
+	
+	private static final String INPUTFILE_OSM = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\osm_daten\\2010-12-28_aeroway_nodes.osm";
+	private static final String OUTPUTFILE_UTC= "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\utc_offsets.txt";
 	
 	private Map<String, Coord> airportsInOsm;
 	
@@ -106,7 +109,11 @@ public class SfUtcOffset {
 	public static Double getUtcOffset(Coord coord) throws IOException, InterruptedException {
 		
 		Thread.sleep(2*1000); //requirement by the web service provider
-		String inputURL = "http://www.earthtools.org/timezone/"+coord.getX()+"/"+coord.getY();	
+		double xCoord = Math.round(coord.getX()*1000.)/1000.;
+		double yCoord = Math.round(coord.getY()*1000.)/1000.;
+		String inputURL = "http://www.earthtools.org/timezone/"+yCoord+"/"+xCoord;	// MATSim y-axis used for latitude (north-south), x-axis for longitude (east-west)
+		
+		System.out.println(inputURL);
 		
 		URL oracle = new URL(inputURL);
 		BufferedReader in = new BufferedReader(

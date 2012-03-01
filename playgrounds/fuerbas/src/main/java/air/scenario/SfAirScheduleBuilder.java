@@ -60,14 +60,14 @@ public class SfAirScheduleBuilder {
 
 	public static final String CITY_PAIRS_OUTPUT_FILENAME = "city_pairs.txt";
 	
-	public static final String UTC_OFFSET_FILE = "utc_offset.txt";
+	public static final String UTC_OFFSET_FILE = "utc_offsets.txt";
 
 	protected Map<String, Coord> airportsInOsm = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
 	protected Map<String, Double> routes = new HashMap<String, Double>();
 	protected Map<String, Integer> missingAirports = new HashMap<String, Integer>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
-	private Map<String, Integer> utcOffset = new HashMap<String, Integer>();
+	private Map<String, Double> utcOffset = new HashMap<String, Double>();
 	private boolean utcFileInUse = false;
 
 	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
@@ -162,14 +162,14 @@ public class SfAirScheduleBuilder {
 //						double utcOffset = utcOffsetNew.getUtcOffset(this.airportsInOsm.get(originAirport));
 						
 //						Getting UTC Offset from separate file which need to be created with SfUtcOffset
-						if (this.utcFileInUse) {
+						if (this.utcFileInUse && this.airportsInOsm.containsKey(originAirport)) {
 							double utcOffset = this.utcOffset.get(originAirport);
 							departureInSec = departureInSec - utcOffset;
-							System.out.println("UTC offset was calculated as: "+utcOffset);
+							System.out.println("Airport: "+originAirport+" UTC offset was calculated as: "+utcOffset);
 						}
 
 //						version for Europe ONLY (based on manually entered offsets, see below)
-						if (this.utcFileInUse==false) {
+						if (this.utcFileInUse==false && this.airportsInOsm.containsKey(originAirport)) {
 							double utcOffset = getOffsetUTC(originCountry) * 3600;
 							departureInSec = departureInSec - utcOffset;
 						}
@@ -292,7 +292,7 @@ public class SfAirScheduleBuilder {
 			String oneLine = br.readLine();
 			String[] lineEntries = new String[2];
 			lineEntries = oneLine.split("\t");
-			this.utcOffset.put(lineEntries[0], Integer.parseInt(lineEntries[1]));
+			this.utcOffset.put(lineEntries[0], Double.parseDouble(lineEntries[1]));
 		}
 		br.close();
 	}
