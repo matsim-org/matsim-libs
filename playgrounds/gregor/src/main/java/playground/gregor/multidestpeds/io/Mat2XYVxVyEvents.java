@@ -94,7 +94,7 @@ public class Mat2XYVxVyEvents {
 		EventWriterXML writer = new EventWriterXML(this.inputDir + "/events.xml");
 		EventsManager manager = EventsUtils.createEventsManager();
 		XYZEvents2Plan planGen;
-		if (this.mode.equals("car")) {
+		if (this.mode.equals("car") ||this.mode.equals("walkPrioQ") ) {
 			planGen = new XYZEvents2Plan(this.sc,this.mode,"/Users/laemmel/devel/gr90/input/events_walk2d.xml.gz");
 		} else {
 			planGen = new XYZEvents2Plan(this.sc,this.mode);

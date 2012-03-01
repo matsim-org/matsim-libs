@@ -109,7 +109,7 @@ public class StatisticsPlotter {
 			writer.append(cl+"\n");
 		}
 		writer.close();
-		clz.build();
+		clz.validateAndBuild();
 	}
 
 	private void addLinkStats(Id id, double t, int steps, BufferedWriter writer) throws IOException {

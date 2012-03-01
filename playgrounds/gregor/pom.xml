@@ -55,5 +55,17 @@
 			<version>0.4.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>tw.edu.ntu.csie</groupId>
+			<artifactId>libsvm</artifactId>
+			<version>3.1</version>
+		</dependency>
+			<dependency>
+			<groupId>net.sf.javaml</groupId>
+			<artifactId>javaml</artifactId>
+			<version>0.1.6</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/javaml-0.1.6/javaml-0.1.6.jar</systemPath>
+		</dependency>
 	</dependencies>
 </project>

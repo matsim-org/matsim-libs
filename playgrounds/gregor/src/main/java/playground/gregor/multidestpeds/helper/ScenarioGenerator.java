@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class ScenarioGenerator {
 
-	private static final String MODE = "car";
+	private static final String MODE = "walkPrioQ";
 
 	private static int nodeId = 0;
 	private static int linkId = 0;
@@ -54,7 +54,7 @@ public class ScenarioGenerator {
 
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(300);
-		//		qsim.setTimeStepSize(1./25.);
+//				qsim.setTimeStepSize(1./25.);
 		c.addModule("qsim", qsim);
 
 		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
@@ -82,7 +82,11 @@ public class ScenarioGenerator {
 
 		c.controler().setLastIteration(0);
 		c.controler().setOutputDirectory(scDir + "output/");
-		c.controler().setMobsim("hybridQ2D");
+		if (MODE.equals("walkPrioQ")) {
+			c.controler().setMobsim("prioQ");
+		} else {
+			c.controler().setMobsim("hybridQ2D");
+		}
 
 
 
@@ -186,7 +190,7 @@ public class ScenarioGenerator {
 			double cap  = w * 1.33;
 			double lanes = 5.4*0.26 * w;
 			double freespeed = 1.34;
-			double length = c0.distance(c1)-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
+			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
 			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
 			sc.getNetwork().addLink(l);
 			links.add(l);
@@ -259,7 +263,7 @@ public class ScenarioGenerator {
 			double cap  = w * 1.33;
 			double lanes = 5.4*0.26 * w;
 			double freespeed = 1.34;
-			double length = c0.distance(c1)-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
+			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
 			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
 			sc.getNetwork().addLink(l);
 			links.add(l);

@@ -114,7 +114,7 @@ public class QLinkControl implements MobsimEngine{
 		}
 		
 		classifier.setIds(predIds);
-		classifier.build();
+		classifier.validateAndBuild();
 	}
 
 	private void handleLink(double time, Id id) {

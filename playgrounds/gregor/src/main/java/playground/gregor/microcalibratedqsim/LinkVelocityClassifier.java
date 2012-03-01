@@ -10,6 +10,8 @@ public interface LinkVelocityClassifier {
 	
 	public boolean isCalibrationMode();
 	
+	public void validateAndBuild();
+	
 	public void build();
 
 	public void setIds(Id[] ids);
