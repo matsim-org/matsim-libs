@@ -1,0 +1,145 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * IdentifyParkAndRideFacilities.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.thibautd.parknride.herbiespecific;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.IdFactory;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+
+import playground.thibautd.parknride.ParkAndRideFacilities;
+import playground.thibautd.parknride.ParkAndRideFacilitiesXmlWriter;
+import playground.thibautd.parknride.ParkAndRideFacility;
+
+/**
+ * @author thibautd
+ */
+public class IdentifyParkAndRideFacilities {
+	private static final String TRAIN = "train";
+	private static final Coord CENTER = RelevantCoordinates.HAUPTBAHNHOF;
+	private static final Coord BOUNDARY_POINT = RelevantCoordinates.HARDBRUECKE;
+	// expand a little, so that the boundary point is excluded as well
+	private static final double factor = 1.20;
+
+
+	public static void main(final String[] args) {
+		final String scheduleFile = args[ 0 ];
+		final String outputFile = args[ 1 ];
+
+		final double minDist = CoordUtils.calcDistance( CENTER , BOUNDARY_POINT ) * factor;
+		final PnrIds ids = new PnrIds();
+
+		TransitSchedule schedule = readSchedule( scheduleFile );
+		ParkAndRideFacilities facilities = new ParkAndRideFacilities( "train stations, except "+minDist+" around Hbf" );
+		RelevantStops stops = new RelevantStops();
+
+		Counter count = new Counter( "analysing stop # " );
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				if (route.getTransportMode().equals( TRAIN )) {
+					for (TransitRouteStop stop : route.getStops()) {
+						count.incCounter();
+						TransitStopFacility facility = stop.getStopFacility();
+
+						if (acceptStop( facility.getCoord() , minDist )) {
+							stops.addStop( facility );
+						}
+					}
+				}
+			}
+		}
+		count.printCounter();
+
+		count = new Counter( "creating pnr facility # " );
+		for (TransitStopFacility stop : stops.facilities.values()) {
+			count.incCounter();
+			facilities.addFacility(
+					new ParkAndRideFacility(
+						ids.next(),
+						stop.getCoord(),
+						stop.getLinkId(),
+						Arrays.asList( stop.getId() ) ));
+		}
+		count.printCounter();
+
+		(new ParkAndRideFacilitiesXmlWriter( facilities )).write( outputFile );
+	}
+
+	private static boolean acceptStop(final Coord coord , final double dist) {
+		return CoordUtils.calcDistance( coord , CENTER ) > dist;
+	}
+
+	private static TransitSchedule readSchedule( final String fileName ) {
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule(); 
+
+		TransitScheduleReaderV1 reader =
+			new TransitScheduleReaderV1(
+					schedule,
+					new ModeRouteFactory(),
+					new IdFactory() {
+						@Override
+						public Id createId(final String id) {
+							return new IdImpl( id );
+						}
+					} );
+
+		reader.readFile( fileName );
+
+		return schedule;
+	}
+
+	private static class RelevantStops {
+		final Map<Coord, TransitStopFacility> facilities =
+			new HashMap<Coord, TransitStopFacility>();
+
+		public void addStop(final TransitStopFacility facil) {
+			// avoids multiplying uselessly PnR facilities
+			facilities.put( facil.getCoord() , facil );
+		}
+	}
+
+	private static class PnrIds {
+		private long count = Long.MIN_VALUE;
+
+		public Id next() {
+			count++;
+
+			if (count == Long.MAX_VALUE) {
+				throw new RuntimeException( "overflow" );
+			}
+
+			return new IdImpl( "pnr-"+count );
+		}
+	}
+}

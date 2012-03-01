@@ -1,0 +1,67 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Run.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.thibautd.parknride.herbiespecific;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+
+import playground.thibautd.parknride.ParkAndRideFacilitiesXmlWriter;
+import playground.thibautd.parknride.ParkAndRideUtils;
+import playground.thibautd.parknride.scoring.CenteredTimeProportionalPenaltyFactory;
+import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
+import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
+import playground.thibautd.router.controler.MultiLegRoutingControler;
+
+/**
+ * @author thibautd
+ */
+public class Run {
+	private static final Coord center = RelevantCoordinates.HAUPTBAHNHOF;
+	private static final Coord boundaryPoint = RelevantCoordinates.SEEBACH;
+	private static final double costPerSecondAtCenter = 0.1;
+
+	public static void main(final String[] args) {
+		String configFile = args[0];
+
+		Config config = ConfigUtils.createConfig();
+		ParkAndRideUtils.setConfigGroup( config );
+		ConfigUtils.loadConfig( config , configFile );
+
+		Scenario scenario = ParkAndRideUtils.loadScenario( config );
+
+		ParkingPenaltyFactory penalty =
+			new CenteredTimeProportionalPenaltyFactory(
+					center,
+					CoordUtils.calcDistance( center , boundaryPoint ),
+					costPerSecondAtCenter);
+
+		MultiLegRoutingControler controler = new UglyHerbieMultilegControler( scenario );
+		controler.addControlerListener( ParkAndRideScoringFunctionFactory.createFactoryListener( penalty ) );
+		controler.run();
+
+		String outputFacilities =
+			controler.getControlerIO().getOutputFilename( "output_pnrFacilities.xml.gz" );
+		(new ParkAndRideFacilitiesXmlWriter( ParkAndRideUtils.getParkAndRideFacilities( scenario ) )).write( outputFacilities );
+	}
+}
+
