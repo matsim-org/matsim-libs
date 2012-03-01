@@ -96,7 +96,9 @@ import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
+import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
+import playground.christoph.evacuation.router.util.PenaltyTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
@@ -160,6 +162,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	protected PassengerDepartureHandler passengerDepartureHandler;
+	protected AffectedAreaPenaltyCalculator penaltyCalculator;
 	protected HouseholdsTracker householdsTracker;
 	protected VehiclesTracker vehiclesTracker;
 	protected CoordAnalyzer coordAnalyzer;
@@ -281,6 +284,9 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		}
 		affectedArea = util.mergeGeomgetries(features);
 		log.info("Size of affected area: " + affectedArea.getArea());
+		
+		this.penaltyCalculator = new AffectedAreaPenaltyCalculator(this.getNetwork(), affectedArea, 
+				EvacuationConfig.affectedAreaDistanceBuffer, EvacuationConfig.affectedAreaTimePenaltyFactor);
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
 		
@@ -459,16 +465,20 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected void initReplanners(QSim sim) {
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-			
+		
 		// use fuzzyTravelTimes
 		FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.travelTimeCollectorWrapperFactory, this.householdsTracker, this.vehiclesTracker);
-		
+			
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
 		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
-			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
+			
+			// add penalties to travel times within the affected area
+			PenaltyTravelTimeFactory penaltyTravelTimeFactory = new PenaltyTravelTimeFactory(entry.getValue(), penaltyCalculator);
+			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), penaltyTravelTimeFactory);
 		}
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, fuzzyTravelTimeEstimatorFactory);
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car,  new PenaltyTravelTimeFactory(fuzzyTravelTimeEstimatorFactory, penaltyCalculator));
+//		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, fuzzyTravelTimeEstimatorFactory);
 		
 		TravelCostCalculatorFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		

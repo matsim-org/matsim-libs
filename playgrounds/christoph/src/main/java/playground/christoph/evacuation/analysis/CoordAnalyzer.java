@@ -86,7 +86,7 @@ public class CoordAnalyzer {
 		} else return isAffected;
 	}
 	
-	public boolean isCoordAffected(Coord coord) {
+	private boolean isCoordAffected(Coord coord) {
 		Point point = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
 		return affectedArea.contains(point);
 	}

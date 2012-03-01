@@ -44,7 +44,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -126,15 +125,9 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
 			if (household.getMemberIds().size() == 0) continue;
 			
-			Coord householdCoord = getHouseholdCoord(household);
+			boolean isAffected = this.isHouseholdAffected(household);
 			
-			if (householdCoord == null) {
-				throw new RuntimeException("No Coordinate found for household " + household.getId());
-			}
-			
-			boolean isInside = coordAnalyzer.isCoordAffected(householdCoord);
-			
-			if (isInside) {
+			if (isAffected) {
 				// mark household as resident household and add it to the HHTP map
 				residentHouseholds.add(household.getId());
 				int HHTP = Integer.valueOf(String.valueOf(householdObjectAttributes.getAttribute(household.getId().toString(), "HHTP")));
@@ -153,8 +146,9 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 			}
 		}
 	}
-	
-	private Coord getHouseholdCoord(Household household) {
+
+	private boolean isHouseholdAffected(Household household) {
+
 		for (Id id : household.getMemberIds()) {
 			Person person = scenario.getPopulation().getPersons().get(id);
 
@@ -164,15 +158,15 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 
 				if (activity.getFacilityId() != null) {
 					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(activity.getFacilityId());
-					return facility.getCoord();
+					return this.coordAnalyzer.isFacilityAffected(facility);
 				} else {
 					Link link = scenario.getNetwork().getLinks().get(activity.getLinkId());
 					log.warn("No facility defined in activity - taking coordinate from activity...");
-					return link.getCoord();
+					return this.coordAnalyzer.isLinkAffected(link);
 				}
 			}
 		}
-		return null;
+		throw new RuntimeException("No Coordinate found for household " + household.getId());
 	}
 	
 	
@@ -309,7 +303,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		Id facilityId = event.getFacilityId();
 		Facility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
 		
-		boolean isInside = coordAnalyzer.isCoordAffected(facility.getCoord());
+		boolean isInside = coordAnalyzer.isFacilityAffected(facility);
 		
 		if (isInside) insideAgents.add(event.getPersonId());
 		else insideAgents.remove(event.getPersonId());

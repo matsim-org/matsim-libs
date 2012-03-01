@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.ptproject.qsim.QSim;
@@ -67,7 +68,9 @@ public class EvacuationQSimFactory implements MobsimFactory {
         int numOfThreads = conf.getNumberOfThreads();
         QNetsimEngineFactory netsimEngFactory;
         if (numOfThreads > 1) {
-            eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
+        	if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
+        		eventsManager = new SynchronizedEventsManagerImpl(eventsManager);        		
+        	}
             netsimEngFactory = new ParallelQNetsimEngineFactory();
             log.info("Using parallel QSim with " + numOfThreads + " threads.");
         } else {

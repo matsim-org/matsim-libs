@@ -20,15 +20,12 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -58,12 +55,6 @@ public class SelectHouseholdMeetingPoint implements SimulationInitializedListene
 		this.householdsTracker = householdsTracker;
 		this.coordAnalyzer = coordAnalyzer;
 	}
-	
-//	public void setHomeFacilitySecurity(HouseholdPosition householdPosition) {
-//		Id homeFacilityId = householdInfo.getMeetingPointId();
-//		Coord homeFacilityCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(homeFacilityId).getCoord();
-//		householdInfo.setHomeLocationIsSecure(isCoordinateSecure(homeFacilityCoord));
-//	}
 	
 	/*
 	 *  At the moment, there is only a single rescue facility.
@@ -102,28 +93,6 @@ public class SelectHouseholdMeetingPoint implements SimulationInitializedListene
 //		eventsManager.processEvent(setEvent);
 		
 		return newMeetingPointId;
-	}
-	
-	/**
-	 * Decides whether the given facility is located in the affected area.
-	 * @param id Id of a facility to be checked
-	 */
-	public boolean isFacilitySecure(Id facilityId) {
-		
-		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
-		if (facility == null) return false;
-		else {
-			return !coordAnalyzer.isCoordAffected(facility.getCoord());
-		}
-	}
-	
-	/**
-	 * Decides whether the given coordinate is located in the affected area.
-	 * @param coord Coordinate to be checked
-	 */
-	public boolean isCoordinateSecure(Coord coord) {
-		
-		return !coordAnalyzer.isCoordAffected(coord);
 	}
 
 	/*

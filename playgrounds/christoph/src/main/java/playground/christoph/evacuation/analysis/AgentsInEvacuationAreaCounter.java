@@ -129,18 +129,17 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			else {
 				Activity activity = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 
-				Coord coord = null;
+				boolean isAffected = false;
 				if (activity.getFacilityId() != null) {
 					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(activity.getFacilityId());
-					coord = facility.getCoord();
+					isAffected = this.coordAnalyzer.isFacilityAffected(facility);
 				} else {
 					Link link = scenario.getNetwork().getLinks().get(activity.getLinkId());
-					coord = link.getCoord();
+					isAffected = this.coordAnalyzer.isLinkAffected(link);
 					log.warn("No facility defined in activity - taking coordinate from activity...");
 				}
 
-				if (this.coordAnalyzer.isCoordAffected(coord))
-					activityAgentsInEvacuationArea.add(person.getId());
+				if (isAffected) activityAgentsInEvacuationArea.add(person.getId());
 			}
 		}
 	}
@@ -189,18 +188,18 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		updateBinData(event.getTime());
-		Coord coord = null;
 
+		boolean isAffected = false;
 		if (event.getFacilityId() != null) {
 			ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId());
-			coord = facility.getCoord();
+			isAffected = this.coordAnalyzer.isFacilityAffected(facility);
 		} else {
 			Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
-			coord = link.getCoord();
+			isAffected = this.coordAnalyzer.isLinkAffected(link);
 			log.warn("No facilityId given - using link coordinates!");
 		}
 
-		if (this.coordAnalyzer.isCoordAffected(coord)) {
+		if (isAffected) {
 			activityAgentsInEvacuationArea.add(event.getPersonId());
 		} else {
 			activityAgentsInEvacuationArea.remove(event.getPersonId());
