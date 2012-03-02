@@ -36,14 +36,14 @@ import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
+import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * Quick and dirty way to obtain a {@link MultiLegRoutingControler} with 
- * herbie settings: the code is taken from the Herbie controler, replacing
+ * herbie settings: the code is mainly taken from the Herbie controler, replacing
  * <tt>extends Controler</tt> by <tt>extends MultiLegRoutingControler</tt>.
  *
  * @author thibautd
@@ -74,12 +74,14 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 
 	@Override
 	protected void setUp() {
-		HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
+		HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
+			new HerbiePlanBasedScoringFunctionFactory(
 				super.config,
 				this.herbieConfigGroup,
 				this.getFacilityPenalties(),
 				this.getFacilities(),
 				this.getNetwork());
+
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 				
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
