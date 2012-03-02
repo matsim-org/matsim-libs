@@ -154,7 +154,10 @@ public class ParkAndRideRouterNetwork implements Network {
 		int pnrLinksCount = 0;
 		for (ParkAndRideFacility facility : pnrFacilities.values()) {
 			List<Id> stops = facility.getStopsFacilitiesIds();
-			Node carNode = carQuadTree.get( facility.getCoord().getX() , facility.getCoord().getY() );
+			//Node carNode = carQuadTree.get( facility.getCoord().getX() , facility.getCoord().getY() );
+			// facility should reference a car link, as re-routing would not work
+			// otherwise.
+			Node carNode = links.get( facility.getLinkId() ).getToNode();
 
 			for (Id stopId : stops) {
 				createPnrLink(
@@ -230,7 +233,6 @@ public class ParkAndRideRouterNetwork implements Network {
 
 		return quadTree;
 	}
-
 
 	private QuadTree<TransitRouterNetworkNode> createTransitQuadTree() {
 		double minX = Double.POSITIVE_INFINITY;

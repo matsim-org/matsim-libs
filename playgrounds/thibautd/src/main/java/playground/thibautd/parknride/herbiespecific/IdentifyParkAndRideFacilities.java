@@ -19,15 +19,25 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -55,11 +65,13 @@ public class IdentifyParkAndRideFacilities {
 
 	public static void main(final String[] args) {
 		final String scheduleFile = args[ 0 ];
-		final String outputFile = args[ 1 ];
+		final String networkFile = args[ 1 ];
+		final String outputFile = args[ 2 ];
 
 		final double minDist = CoordUtils.calcDistance( CENTER , BOUNDARY_POINT ) * factor;
 		final PnrIds ids = new PnrIds();
 
+		NetworkImpl network = readNetwork( networkFile );
 		TransitSchedule schedule = readSchedule( scheduleFile );
 		ParkAndRideFacilities facilities = new ParkAndRideFacilities( "train stations, except "+minDist+" around Hbf" );
 		RelevantStops stops = new RelevantStops();
@@ -88,12 +100,38 @@ public class IdentifyParkAndRideFacilities {
 					new ParkAndRideFacility(
 						ids.next(),
 						stop.getCoord(),
-						stop.getLinkId(),
+						network.getNearestLink( stop.getCoord() ).getId(),
 						Arrays.asList( stop.getId() ) ));
 		}
 		count.printCounter();
 
 		(new ParkAndRideFacilitiesXmlWriter( facilities )).write( outputFile );
+	}
+
+	private static NetworkImpl readNetwork(final String networkFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		config.network().setInputFile( networkFile );
+		Scenario scenario = ScenarioUtils.loadScenario( config );
+		//MatsimNetworkReader reader = new MatsimNetworkReader( scenario );
+		//reader.readFile( networkFile );
+
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+
+		Collection<Link> links = new ArrayList<Link>( network.getLinks().values() );
+
+		Counter counter = new Counter( "checking for car avail for link # " );
+		for (Link link : links) {
+			counter.incCounter();
+			if ( !link.getAllowedModes().contains( TransportMode.car ) ) {
+				network.removeLink( link.getId() );
+			}
+		}
+		counter.printCounter();
+
+		(new NetworkCleaner()).run( network );
+
+		return network;
 	}
 
 	private static boolean acceptStop(final Coord coord , final double dist) {
