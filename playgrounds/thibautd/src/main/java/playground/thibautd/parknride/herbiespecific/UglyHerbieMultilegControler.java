@@ -54,13 +54,13 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
-	private final HerbieConfigGroup herbieConfigGroup = new HerbieConfigGroup();
+	private final HerbieConfigGroup herbieConfigGroup;
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 	
 	public UglyHerbieMultilegControler( final Scenario scenario ) {
 		super( scenario );
-		super.config.addModule(HerbieConfigGroup.GROUP_NAME, this.herbieConfigGroup);
+		herbieConfigGroup = (HerbieConfigGroup) super.config.getModule(HerbieConfigGroup.GROUP_NAME);
 		super.setOverwriteFiles(true);
 	}
 

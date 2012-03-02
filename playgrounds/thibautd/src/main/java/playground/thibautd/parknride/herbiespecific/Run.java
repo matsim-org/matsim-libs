@@ -25,6 +25,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import herbie.running.config.HerbieConfigGroup;
+
 import playground.thibautd.parknride.ParkAndRideFacilitiesXmlWriter;
 import playground.thibautd.parknride.ParkAndRideUtils;
 import playground.thibautd.parknride.scoring.CenteredTimeProportionalPenaltyFactory;
@@ -45,6 +47,7 @@ public class Run {
 
 		Config config = ConfigUtils.createConfig();
 		ParkAndRideUtils.setConfigGroup( config );
+		config.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
 		ConfigUtils.loadConfig( config , configFile );
 
 		Scenario scenario = ParkAndRideUtils.loadScenario( config );
