@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author thomas
  *
  */
-class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
+class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 	
 	// Logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZurichAccessibility.class);

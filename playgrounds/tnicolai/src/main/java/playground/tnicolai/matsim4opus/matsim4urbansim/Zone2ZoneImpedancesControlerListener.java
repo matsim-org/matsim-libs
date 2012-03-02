@@ -208,7 +208,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	}
 	
 	/**
-	 * goes through all person ant their plans and stores their trips into a matrix
+	 * goes through all person and their plans and stores their trips into a matrix
 	 * 
 	 * @param sc
 	 * @param originDestinationMatrix
@@ -217,6 +217,12 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		log.info("Computing zone2zone trip numbers ...") ;
 		// yyyy might make even more sense to do this via events.  kai, feb'11
 		Entry matrixEntry = null;
+		
+		Map<Id, ActivityFacility> allFacilities; 
+		if(parcels == null)
+			allFacilities = zones.getFacilities();	// used for UrbanSim Zone Models
+		else
+			allFacilities = parcels.getFacilities();// used for UrbanSim Parcel Models
 			
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
 			
@@ -235,7 +241,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					if( id == null) // that person plan doesn't contain any activity, continue with next person
 						continue;
 					
-					Map<Id, ActivityFacility> allFacilities = parcels.getFacilities();
 					ActivityFacility fac = allFacilities.get(id);
 					if(fac == null)
 						continue;

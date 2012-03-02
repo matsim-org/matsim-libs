@@ -53,10 +53,10 @@ import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
  * @author nagel
  *
  */
-public class ReadFromUrbansimParcelModel {
+public class ReadFromUrbansimZoneModel {
 
 	// Logger
-	private static final Logger log = Logger.getLogger(ReadFromUrbansimParcelModel.class);
+	private static final Logger log = Logger.getLogger(ReadFromUrbansimZoneModel.class);
 	// year of current urbansim run
 	private final int year;
 	
@@ -66,7 +66,7 @@ public class ReadFromUrbansimParcelModel {
 	 * constructor
 	 * @param year of current run
 	 */
-	public ReadFromUrbansimParcelModel ( final int year ) {
+	public ReadFromUrbansimZoneModel ( final int year ) {
 		this.year = year;
 		this.cnt = new PopulationCounter();
 	}
@@ -77,15 +77,11 @@ public class ReadFromUrbansimParcelModel {
 	 * @param parcels ActivityFacilitiesImpl
 	 * @param zones ActivityFacilitiesImpl
 	 */
-	public void readFacilities(final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones) {
-		// (these are simply defined as those entities that have x/y coordinates in urbansim)
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PARCEL_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+	public void readFacilities(final ActivityFacilitiesImpl zones) {
+		// (these are simply defined as those entities that have x/y coordinates in UrbanSim)
+		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_ZONE_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		
-		log.info( "Starting to read urbansim parcels table from " + filename );
-
-		// temporary data structure in order to get coordinates for zones:
-		// Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>();
-		Map<Id,PseudoZone> pseudoZones = new HashMap<Id,PseudoZone>();
+		log.info( "Starting to read urbansim zones table from " + filename );
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -95,56 +91,32 @@ public class ReadFromUrbansimParcelModel {
 
 			// get and initialize the column number of each header element
 			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexParcelID 	= idxFromKey.get( Constants.PARCEL_ID );
-			final int indexXCoodinate 	= idxFromKey.get( Constants.X_COORDINATE_SP );
-			final int indexYCoodinate 	= idxFromKey.get( Constants.Y_COORDINATE_SP );
+			final int indexXCoodinate 	= idxFromKey.get( Constants.X_COORDINATE );
+			final int indexYCoodinate 	= idxFromKey.get( Constants.Y_COORDINATE );
 			final int indexZoneID 		= idxFromKey.get( Constants.ZONE_ID );
 
 			// temporary variables, needed to construct parcels and zones
-			Id parcel_ID;
-			Coord coord;
 			ZoneId zone_ID;
-			PseudoZone pseudoZone;
+			Coord coord;
 			String[] parts;
 
-			//
 			while ( (line = reader.readLine()) != null ) {
 				parts = line.split(Constants.TAB_SEPERATOR);
 
-				// urbansim sometimes writes IDs as floats!
-				long parcelIdAsLong = (long) Double.parseDouble( parts[ indexParcelID ] );
-				parcel_ID = new IdImpl( parcelIdAsLong ) ;
+				// get zone ID, UrbanSim sometimes writes IDs as floats!
+				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
+				zone_ID = new ZoneId( zoneIdAsLong ) ;
 
 				// get the coordinates of that parcel
 				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
-				ActivityFacilityImpl facility = parcels.createFacility(parcel_ID,coord);
+				ActivityFacilityImpl facility = zones.createFacility(zone_ID,coord);
 				facility.setDesc( Constants.FACILITY_DESCRIPTION ) ;
-				
-				// get zone ID
-				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
-				zone_ID = new ZoneId( zoneIdAsLong );
 
 				// set custom attributes, these are needed to compute zone2zone trips
 				Map<String, Object> customFacilityAttributes = facility.getCustomAttributes();
 				customFacilityAttributes.put(Constants.ZONE_ID, zone_ID);
-				customFacilityAttributes.put(Constants.PARCEL_ID, parcel_ID);
-
-				// the pseudoZones (HashMap) is a temporary data structure to create zones.
-				// this intermediate step is needed to make sure that every zone id just exists once.
-				// in the case that there are more than one data sets (parcels) with the same zone ID they are merged.
-				// that means the coordinates are added and the count increases.
-				// later (in "construct zones") this temporary data structure is needed to get the the average value of the
-				// coordinates for each zone ID.
-				pseudoZone = pseudoZones.get(zone_ID);
-				if ( pseudoZone==null ) {
-					pseudoZone = new PseudoZone() ;
-					pseudoZones.put(zone_ID, pseudoZone);
-				}
-				pseudoZone.sumXCoordinate += coord.getX();
-				pseudoZone.sumYCoordinate += coord.getY() ;
-				pseudoZone.count ++ ;
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -154,127 +126,83 @@ public class ReadFromUrbansimParcelModel {
 			System.exit( Constants.EXCEPTION_OCCURED );
 		}
 		
-		log.info("Done reading urbansim parcels. Found " + parcels.getFacilities().size() + " parcels.");
-		// create urbansim zones from the intermediate pseudo zones
-		constructZones ( zones, pseudoZones);
+		log.info("Done reading urbansim parcels. Found " + zones.getFacilities().size() + " zones.");
 	}
-
-	/**
-	 * this method creates the final zones from the merged parcels (with the same zone ID)
-	 * by computing the average value of the coordinates for each zone ID.
-	 *
-	 * @param zones ActivityFacilitiesImpl
-	 * @param pseudoZones Map<Id,PseudoZone>
-	 */
-	void constructZones (final ActivityFacilitiesImpl zones, final Map<Id,PseudoZone> pseudoZones  ) {
-
-		log.info( "Starting to construct urbansim zones (for the impedance matrix)" ) ;
-
-		Id zone_ID;
-		PseudoZone pz;
-		Coord coord;
-
-		// constructing the zones from the pseudoZones:
-		for ( Entry<Id,PseudoZone> entry : pseudoZones.entrySet() ) {
-			zone_ID = entry.getKey();
-			pz = entry.getValue();
-			// compute the average center of a zone
-			coord = new CoordImpl( pz.sumXCoordinate/pz.count , pz.sumYCoordinate/pz.count );
-			zones.createFacility(zone_ID, coord);
-		}
-		log.info( "Done with constructing urbansim zones. Constucted " + zones.getFacilities().size() + " zones.");
-	}
-	
-	/**
-	 * pseudo zone is a temporary data structure. it can contain the summation of x and y coordinates
-	 * of different parcels with the same zone ID. the attribute "count" counts the number of parcels
-	 * with the the same zone ID. its used as a denominator to get the average x and y coordinate of
-	 * a zone.
-	 *
-	 * @author nagel
-	 *
-	 */
-	class PseudoZone {
-
-			protected double sumXCoordinate = 0.0;
-			protected double sumYCoordinate = 0.0;
-			protected long count = 0;	// denominator of x and y coordinate
-	}
-	
-	/**
-	 * dumps out raw and aggregated population data as csv
-	 * @param parcels
-	 * @param network
-	 */
-	public void readAndDumpPersons2CSV(final ActivityFacilitiesImpl parcels, final Network network){
-		
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
-		log.info( "Starting to read persons table from " + filename );
-		
-		Map<Id, PersonAndJobsObject> personLocations = new HashMap<Id, PersonAndJobsObject>();
-		Map<Id, ClusterObject> personClusterMap = new HashMap<Id, ClusterObject>();
-		
-		try {
-			BufferedReader reader = IOUtils.getBufferedReader( filename );
-
-			String line = reader.readLine();
-			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
-			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
-			
-			while ( (line=reader.readLine()) != null ) {
-				
-				String[] parts = line.split( Constants.TAB_SEPERATOR );
-				
-				// check if home location is available
-				if( Integer.parseInt(parts[ indexParcelID_HOME ]) >=  0){
-					// create new person
-					Id personId = new IdImpl( parts[ indexPersonID ] );
-					// get home location id
-					Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] );
-					ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId );
-					
-					
-					if(homeLocation != null){
-						personLocations.put(personId, new PersonAndJobsObject(personId, homeParcelId, null, homeLocation.getCoord()));
-						
-						{ // aggregating persons to nearest network nodes
-							assert( homeLocation.getCoord() != null );
-							Node nearestNode = ((NetworkImpl)network).getNearestNode( homeLocation.getCoord() );
-							assert( nearestNode != null );
-	
-							if( personClusterMap.containsKey( nearestNode.getId() ) ){
-								ClusterObject co = personClusterMap.get( nearestNode.getId() );
-								co.addObject( personId );
-							}
-							else
-								personClusterMap.put( nearestNode.getId(), new ClusterObject(personId,
-																							 homeParcelId,
-																						  	 null,
-																						  	 nearestNode.getCoord(),
-																						  	 nearestNode) );
-						}
-					}
-				}
-			}
-			// dump population data
-			PopulationCSVWriter.writePopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "population.csv", personLocations);
-			// dump aggregated population data
-			PopulationCSVWriter.writeAggregatedPopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
-			
-			
-		} catch (Exception e) {e.printStackTrace();}
-	}
+//	
+//	/**
+//	 * dumps out raw and aggregated population data as csv
+//	 * @param parcels
+//	 * @param network
+//	 */
+//	public void readAndDumpPersons2CSV(final ActivityFacilitiesImpl parcels, final Network network){
+//		
+//		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+//		log.info( "Starting to read persons table from " + filename );
+//		
+//		Map<Id, PersonAndJobsObject> personLocations = new HashMap<Id, PersonAndJobsObject>();
+//		Map<Id, ClusterObject> personClusterMap = new HashMap<Id, ClusterObject>();
+//		
+//		try {
+//			BufferedReader reader = IOUtils.getBufferedReader( filename );
+//
+//			String line = reader.readLine();
+//			// get columns for home, work and person id
+//			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+//			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
+//			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
+//			
+//			while ( (line=reader.readLine()) != null ) {
+//				
+//				String[] parts = line.split( Constants.TAB_SEPERATOR );
+//				
+//				// check if home location is available
+//				if( Integer.parseInt(parts[ indexParcelID_HOME ]) >=  0){
+//					// create new person
+//					Id personId = new IdImpl( parts[ indexPersonID ] );
+//					// get home location id
+//					Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] );
+//					ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId );
+//					
+//					
+//					if(homeLocation != null){
+//						personLocations.put(personId, new PersonAndJobsObject(personId, homeParcelId, null, homeLocation.getCoord()));
+//						
+//						{ // aggregating persons to nearest network nodes
+//							assert( homeLocation.getCoord() != null );
+//							Node nearestNode = ((NetworkImpl)network).getNearestNode( homeLocation.getCoord() );
+//							assert( nearestNode != null );
+//	
+//							if( personClusterMap.containsKey( nearestNode.getId() ) ){
+//								ClusterObject co = personClusterMap.get( nearestNode.getId() );
+//								co.addObject( personId );
+//							}
+//							else
+//								personClusterMap.put( nearestNode.getId(), new ClusterObject(personId,
+//																							 homeParcelId,
+//																						  	 null,
+//																						  	 nearestNode.getCoord(),
+//																						  	 nearestNode) );
+//						}
+//					}
+//				}
+//			}
+//			// dump population data
+//			PopulationCSVWriter.writePopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "population.csv", personLocations);
+//			// dump aggregated population data
+//			PopulationCSVWriter.writeAggregatedPopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
+//			
+//			
+//		} catch (Exception e) {e.printStackTrace();}
+//	}
 
 	/**
 	 *
 	 * @param oldPop
-	 * @param parcels
+	 * @param zones
 	 * @param network
 	 * @param samplingRate
 	 */
-	public Population readPersons(Population oldPop, final ActivityFacilitiesImpl parcels, final Network network, final double samplingRate) {
+	public Population readPersons(Population oldPop, final ActivityFacilitiesImpl zones, final Network network, final double samplingRate) {
 		
 		Population mergePop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain all persons from UrbanSim Persons table
 		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain only new persons (id) that don't exist in warm start pop file
@@ -292,9 +220,9 @@ public class ReadFromUrbansimParcelModel {
 			String line = reader.readLine();
 			// get columns for home, work and person id
 			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
-			final int indexParcelID_WORK 	= idxFromKey.get( Constants.PARCEL_ID_WORK );
-			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
+			final int indexZoneID_HOME 	   = idxFromKey.get( Constants.ZONE_ID_HOME );
+			final int indexZoneID_WORK 	   = idxFromKey.get( Constants.ZONE_ID_WORK );
+			final int indexPersonID		   = idxFromKey.get( Constants.PERSON_ID );
 
 			// We consider two cases:
 			// (1) We have an old population.  Then we look for those people who have the same id.
@@ -317,15 +245,15 @@ public class ReadFromUrbansimParcelModel {
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				// get home location id
-				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] ) ;
-				ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId ) ;
+				Id homeZoneId = new IdImpl( parts[ indexZoneID_HOME ] ) ;
+				ActivityFacility homeLocation = zones.getFacilities().get( homeZoneId ) ;
 				if ( homeLocation==null ) {
-					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
+					log.warn( "homeLocation==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this ) ;
 					continue ;
 				}
 				Coord homeCoord = homeLocation.getCoord() ;
 				if ( homeCoord==null ) {
-					log.warn( "homeCoord==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
+					log.warn( "homeCoord==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this ) ;
 					continue ;
 				}
 
@@ -334,18 +262,18 @@ public class ReadFromUrbansimParcelModel {
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
-				if ( parts[ indexParcelID_WORK ].equals("-1") )
+				if ( parts[ indexZoneID_WORK ].equals("-1") )
 					newPerson.setEmployed(Boolean.FALSE);
 				else {
 					newPerson.setEmployed(Boolean.TRUE);
-					Id workParcelId = new IdImpl( parts[ indexParcelID_WORK ] ) ;
-					ActivityFacility jobLocation = parcels.getFacilities().get( workParcelId ) ;
+					Id workZoneId = new IdImpl( parts[ indexZoneID_WORK ] ) ;
+					ActivityFacility jobLocation = zones.getFacilities().get( workZoneId ) ;
 					if ( jobLocation == null ) {
 						// show warning message only once
 						if ( cnt.jobLocationIdNullCnt < 1 ) {
 							cnt.jobLocationIdNullCnt++ ;
 							log.warn( "jobLocationId==null, probably out of area. person_id: " + personId
-									+ " workp_prcl_id: " + workParcelId + Gbl.ONLYONCE ) ;
+									+ " work_zone_id: " + workZoneId + Gbl.ONLYONCE ) ;
 						}
 						compensationFlag = true ; // WHY?
 						// can't remember.  The way this reads to me is that this is set to true if a working person is encountered
