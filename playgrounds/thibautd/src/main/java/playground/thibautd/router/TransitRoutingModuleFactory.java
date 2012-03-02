@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.pt.router.TransitRouterFactory;
 
 /**
@@ -43,7 +44,13 @@ public class TransitRoutingModuleFactory implements RoutingModuleFactory {
 	public RoutingModule createModule(
 			final String mainMode,
 			final TripRouterFactory factory) {
-		return new TransitRouterWrapper(transitRouterFactory.createTransitRouter());
+		return new TransitRouterWrapper(
+				transitRouterFactory.createTransitRouter(),
+				// use a walk router in case no PT path is found
+				factory.getRoutingModuleFactories().get(
+					TransportMode.transit_walk ).createModule(
+						TransportMode.transit_walk,
+						factory ));
 	}
 }
 

@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -50,14 +49,17 @@ public class TransitRouterWrapper implements RoutingModule {
 		new StageActivityTypesImpl(
 				Arrays.asList( new String[]{ PtConstants.TRANSIT_ACTIVITY_TYPE } ) );
 	private final TransitRouter router;
+	private final RoutingModule walkRouter;
 
 	/**
 	 * Initialises an instance
 	 * @param toWrap the router to add
 	 */
 	public TransitRouterWrapper(
-			final TransitRouter toWrap) {
+			final TransitRouter toWrap,
+			final RoutingModule walkRouter) {
 		this.router = toWrap;
+		this.walkRouter = walkRouter;
 	}
 
 	/**
@@ -76,6 +78,19 @@ public class TransitRouterWrapper implements RoutingModule {
 				departureTime,
 				person);
 
+		return baseTrip != null ?
+			fillWithActivities( baseTrip , fromFacility , toFacility ) :
+			// the previous approach was to return null and not to replace the trip if so.
+			// However, this makes the output of touing modules more tricky to handle.
+			// Thus, every module should return a valid trip. When available, the "main
+			// mode" flag should be put to the mode of the routing module.
+			walkRouter.calcRoute( fromFacility , toFacility , departureTime , person );
+	}
+
+	private final List<PlanElement> fillWithActivities(
+			final List<Leg> baseTrip,
+			final Facility fromFacility,
+			final Facility toFacility) {
 		TransitSchedule schedule = router.getSchedule();
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
@@ -145,5 +160,4 @@ public class TransitRouterWrapper implements RoutingModule {
 	public StageActivityTypes getStageActivityTypes() {
 		return CHECKER;
 	}
-}
-
+} 

@@ -52,7 +52,7 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 	private static final String UNDEFINED_MODE = "undefined";
 	public static final List<String> HANDLED_MODES = Arrays.asList( new String[]
 			{TransportMode.car, TransportMode.pt, TransportMode.ride,
-				TransportMode.walk, TransportMode.bike, UNDEFINED_MODE});
+				TransportMode.walk, TransportMode.transit_walk, TransportMode.bike, UNDEFINED_MODE});
 	private final PlansCalcRouteConfigGroup routeConfigGroup;
 	private final PlanCalcScoreConfigGroup scoreConfigGroup;
 	private final PopulationFactory populationFactory;
@@ -157,9 +157,9 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 					travelTime);
 		}
 
-		if ( mainMode.equals( TransportMode.walk ) ) {
+		if ( mainMode.equals( TransportMode.walk ) || mainMode.equals( TransportMode.transit_walk ) ) {
 			return new LegRouterWrapper(
-					TransportMode.walk,
+					mainMode,
 					populationFactory,
 					new TeleportationLegRouter(
 						routeFactory,
