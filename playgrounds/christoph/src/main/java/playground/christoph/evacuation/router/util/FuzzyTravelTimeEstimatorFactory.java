@@ -20,7 +20,12 @@
 
 package playground.christoph.evacuation.router.util;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 
 import playground.christoph.evacuation.mobsim.AgentsTracker;
@@ -30,6 +35,7 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 
 	private final Scenario scenario;
 	private final PersonalizableTravelTimeFactory timeFactory;
+	private final Map<Id, Map<Id, Double>> distanceFuzzyFactors;
 	private final AgentsTracker agentsTracker;
 	private final VehiclesTracker vehiclesTracker;
 	
@@ -39,11 +45,19 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 		this.timeFactory = timeFactory;
 		this.agentsTracker = agentsTracker;
 		this.vehiclesTracker = vehiclesTracker;
+		
+		/*
+		 * Create and initialize distanceFuzzyFactor lookup maps
+		 */
+		this.distanceFuzzyFactors = new ConcurrentHashMap<Id, Map<Id, Double>>();
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			this.distanceFuzzyFactors.put(link.getId(), new ConcurrentHashMap<Id, Double>());
+		}
 	}
 	
 	@Override
 	public FuzzyTravelTimeEstimator createTravelTime() {
-		return new FuzzyTravelTimeEstimator(scenario, timeFactory.createTravelTime(), agentsTracker, vehiclesTracker);
+		return new FuzzyTravelTimeEstimator(scenario, timeFactory.createTravelTime(), agentsTracker, vehiclesTracker, distanceFuzzyFactors);
 	}
 	
 }

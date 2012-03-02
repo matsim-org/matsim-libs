@@ -24,6 +24,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -83,6 +84,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 
 	private final Random random;
 	
+	/*package*/ Id personId;
 	/*package*/ double personFactor = 1.0;	// includes scatter, age and gender
 	private double personWalkSpeed;
 	
@@ -96,6 +98,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	private int slopeWarnCount = 0;
 	private int ageWarnCount = 0;
 
+	
 	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
 		this.referenceWalkSpeed = plansCalcGroup.getWalkSpeed();
 		this.random = MatsimRandom.getLocalInstance();
@@ -192,7 +195,12 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	
 	@Override
 	public void setPerson(Person person) {
-		
+		/* 
+		 * Only recalculate the person's walk speed factor if
+		 * the person has changed.
+		 */
+		if (person.getId().equals(personId)) return;
+				
 		double scatterFactor = 1.0;
 		double ageFactor = 1.0;
 		double genderFactor = 1.0;

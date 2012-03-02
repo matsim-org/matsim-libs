@@ -21,11 +21,11 @@
 package playground.christoph.evacuation.router.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
@@ -97,23 +97,13 @@ public class AffectedAreaPenaltyCalculator {
 			}
 		}
 		
-		this.distanceFactors = new HashMap<Id, Double>();
+		this.distanceFactors = new ConcurrentHashMap<Id, Double>();
 		
 		calculatePenaltyFactors();
 	}
 	
-	public double getPenaltyFactor(Id linkId, double time) {
-		if (time <= EvacuationConfig.evacuationTime) return 1.0;
-		else {
-			Double distanceFactor = distanceFactors.get(linkId);
-			if (distanceFactor == null) return 1.0;
-					
-			// calculate the factor like timePenaltyFactor^(time since evacuation started in hours)
-			double timeFactor = Math.pow(timePenaltyFactor, (time - EvacuationConfig.evacuationTime) / 3600);
-			
-			// scale the time factor linear with the distance
-			return 1 + ((timeFactor - 1) * distanceFactor);
-		}
+	public PenaltyCalculator getPenaltyCalculatorInstance() {
+		return new PenaltyCalculator(distanceFactors, timePenaltyFactor);
 	}
 	
 	/*

@@ -91,6 +91,12 @@ public class BikeTravelTime extends WalkTravelTime {
 	public void setPerson(Person person) {
 		super.setPerson(person);
 		
+		/* 
+		 * Only recalculate the person's walk speed factor if
+		 * the person has changed.
+		 */
+		if (person.getId().equals(personId)) return;
+		
 		this.personBikeSpeed = this.referenceBikeSpeed * this.personFactor;
 		
 		this.maxPersonBikeSpeed = maxBikeSpeed * personFactor;

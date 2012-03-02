@@ -20,6 +20,8 @@
 
 package playground.christoph.evacuation.router.util;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -54,17 +56,19 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	private final PersonalizableTravelTime travelTime;
 	private final AgentsTracker agentsTracker;
 	private final VehiclesTracker vehiclesTracker;
+	private final Map<Id, Map<Id, Double>> distanceFuzzyFactors;
 	
 	private Id pId;
 	private int pIdHashCode;
 	private double personFuzzyFactor;
 	
 	/*package*/ FuzzyTravelTimeEstimator(Scenario scenario, PersonalizableTravelTime travelTime, AgentsTracker agentsTracker,
-			VehiclesTracker vehiclesTracker) {
+			VehiclesTracker vehiclesTracker, Map<Id, Map<Id, Double>> distanceFuzzyFactors) {
 		this.scenario = scenario;
 		this.travelTime = travelTime;
 		this.agentsTracker = agentsTracker;
 		this.vehiclesTracker = vehiclesTracker;
+		this.distanceFuzzyFactors = distanceFuzzyFactors;
 	}
 	
 	@Override
@@ -89,7 +93,14 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	@Override
 	public void setPerson(Person person) {
 		this.travelTime.setPerson(person);
+
+		/* 
+		 * Only recalculate the person's HashCode and FuzzyFactor
+		 * if the person really has changed.
+		 */
+		if (person.getId().equals(this.pId)) return;
 		
+		// person has changed
 		this.pId = person.getId();
 		this.pIdHashCode = person.getId().toString().hashCode();
 		this.personFuzzyFactor = hashCodeToRandomDouble(pIdHashCode);
@@ -99,16 +110,28 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	 * So far use hard-coded values between 0.017 (distance 0.0) 
 	 * and 1.0 (distance ~ 15000.0).
 	 */
-	private double calcDistanceFuzzyFactor(Link link) {
+	private double calcDistanceFuzzyFactor(Link link) {		
 		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(pId);
 		Position positionType = agentPosition.getPositionType();
 		Coord coord = null;
+		Map<Id, Double> fuzzyFactors = null;
 		if (positionType == Position.LINK) {
+			// check whether there is already a value in the lookup map
+			fuzzyFactors = distanceFuzzyFactors.get(agentPosition.getPositionId());
+			Double fuzzyFactor = fuzzyFactors.get(link.getId());
+			if (fuzzyFactor != null) return fuzzyFactor;
+			
 			coord = scenario.getNetwork().getLinks().get(agentPosition.getPositionId()).getCoord();
 		} else if (positionType == Position.FACILITY) {
 			coord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getCoord();
 		} else if (positionType == Position.VEHICLE) {
 			Id linkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());
+			
+			// check whether there is already a value in the lookup map
+			fuzzyFactors = distanceFuzzyFactors.get(linkId);
+			Double fuzzyFactor = fuzzyFactors.get(link.getId());
+			if (fuzzyFactor != null) return fuzzyFactor;
+
 			coord = scenario.getNetwork().getLinks().get(linkId).getCoord();
 		} else {
 			log.warn("Agent's position is undefined! Id: " + this.pId);
@@ -117,20 +140,25 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 		
 		double distance = CoordUtils.calcDistance(coord, link.getCoord());
 		
-		return (1 / (Math.exp(-distance/1500.0) + 4.0));
+		double factor = 1 / (1 + Math.exp((-distance/1500.0) + 4.0));
+		
+		// if the person is located at a link, add the link factor to the lookup map
+		if (fuzzyFactors != null) fuzzyFactors.put(link.getId(), factor);
+		
+		return factor;
 	}
 	
 	/*
 	 * Returns a fuzzy value between 0.0 and 1.0 which
 	 * depends on the current person and the given link. 
 	 */
-	private double calcLinkFuzzyFactor(Link link) {		
+	private double calcLinkFuzzyFactor(Link link) {	
 		int lIdHashCode = link.getId().toString().hashCode();
 		return hashCodeToRandomDouble(lIdHashCode + pIdHashCode);
 	}
 	
 	public static void main(String[] args) {
-		FuzzyTravelTimeEstimator ftte = new FuzzyTravelTimeEstimator(null, null, null, null);
+		FuzzyTravelTimeEstimator ftte = new FuzzyTravelTimeEstimator(null, null, null, null, null);
 
 		Gbl.startMeasurement();
 		double sum = 0.0;

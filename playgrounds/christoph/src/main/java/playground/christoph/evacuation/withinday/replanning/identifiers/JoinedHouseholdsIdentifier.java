@@ -159,7 +159,8 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 			Id householdId = entry.getKey();
 			HouseholdDeparture householdDeparture = entry.getValue();
 			
-			if (householdDeparture.getDepartureTime() == time) {				
+			if (householdDeparture.getDepartureTime() == time) {
+				
 				Id facilityId = householdDeparture.getFacilityId();
 				Id meetingPointId = selectHouseholdMeetingPoint.selectRescueMeetingPoint(householdId);
 				householdMeetingPointMapping.put(householdId, meetingPointId);
@@ -312,7 +313,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				Id householdId = entry.getKey();
 				HouseholdDeparture householdDeparture = entry.getValue();
 				if (householdDeparture.departureTime < e.getSimulationTime()) {
-					log.warn("Household missed its departure time! Id " + householdId);
+					log.warn("Household missed its departure time! Id " + householdId + ". Time: " + e.getSimulationTime());
 					iter.remove();
 				}
 			}

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PenaltyTravelTime.java
+ * PenaltyCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,30 +20,33 @@
 
 package playground.christoph.evacuation.router.util;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import java.util.Map;
 
-public class PenaltyTravelTime implements PersonalizableTravelTime {
+import org.matsim.api.core.v01.Id;
 
-	private final PersonalizableTravelTime travelTime;
-	private final PenaltyCalculator penaltyCalculator;
+import playground.christoph.evacuation.config.EvacuationConfig;
+
+public class PenaltyCalculator {
+
+	private final Map<Id, Double> distanceFactors;	// 0..1 (0 .. link at outer boundary, 1 .. link at center point)
+	private final double timePenaltyFactor;
 	
-	public PenaltyTravelTime(PersonalizableTravelTime travelTime, PenaltyCalculator penaltyCalculator) {
-		this.travelTime = travelTime;
-		this.penaltyCalculator = penaltyCalculator;
+	/*package*/ PenaltyCalculator(Map<Id, Double> distanceFactors, double timePenaltyFactor) {
+		this.distanceFactors = distanceFactors;
+		this.timePenaltyFactor = timePenaltyFactor;
 	}
 	
-	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		double tt = travelTime.getLinkTravelTime(link, time);
-		double penaltyFactor = penaltyCalculator.getPenaltyFactor(link.getId(), time);
-		return tt*penaltyFactor;
+	public double getPenaltyFactor(Id linkId, double time) {
+		if (time <= EvacuationConfig.evacuationTime) return 1.0;
+		else {
+			Double distanceFactor = distanceFactors.get(linkId);
+			if (distanceFactor == null) return 1.0;
+					
+			// calculate the factor like timePenaltyFactor^(time since evacuation started in hours)
+			double timeFactor = Math.pow(timePenaltyFactor, (time - EvacuationConfig.evacuationTime) / 3600);
+			
+			// scale the time factor linear with the distance
+			return 1 + ((timeFactor - 1) * distanceFactor);
+		}
 	}
-
-	@Override
-	public void setPerson(Person person) {
-		travelTime.setPerson(person);
-	}
-
 }

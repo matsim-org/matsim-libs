@@ -453,9 +453,11 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		
-		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
-		duringLegRerouteTransportModes.add(TransportMode.car);
-		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes).createIdentifier();
+//		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
+//		duringLegRerouteTransportModes.add(TransportMode.car);
+//		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes).createIdentifier();
+		// replan all transport modes
+		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), null).createIdentifier();
 	}
 	
 	/*
@@ -472,12 +474,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
 		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+//			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
 			
 			// add penalties to travel times within the affected area
-			PenaltyTravelTimeFactory penaltyTravelTimeFactory = new PenaltyTravelTimeFactory(entry.getValue(), penaltyCalculator);
+			PenaltyTravelTimeFactory penaltyTravelTimeFactory = new PenaltyTravelTimeFactory(entry.getValue(), penaltyCalculator.getPenaltyCalculatorInstance());
 			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), penaltyTravelTimeFactory);
 		}
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car,  new PenaltyTravelTimeFactory(fuzzyTravelTimeEstimatorFactory, penaltyCalculator));
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car,  new PenaltyTravelTimeFactory(fuzzyTravelTimeEstimatorFactory, penaltyCalculator.getPenaltyCalculatorInstance()));
 //		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, fuzzyTravelTimeEstimatorFactory);
 		
 		TravelCostCalculatorFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();

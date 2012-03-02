@@ -25,9 +25,9 @@ import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 public class PenaltyTravelTimeFactory implements PersonalizableTravelTimeFactory {
 
 	private final PersonalizableTravelTimeFactory timeFactory;
-	private final AffectedAreaPenaltyCalculator penaltyCalculator;
+	private final PenaltyCalculator penaltyCalculator;
 	
-	public PenaltyTravelTimeFactory(PersonalizableTravelTimeFactory timeFactory, AffectedAreaPenaltyCalculator penaltyCalculator) {
+	public PenaltyTravelTimeFactory(PersonalizableTravelTimeFactory timeFactory, PenaltyCalculator penaltyCalculator) {
 		this.timeFactory = timeFactory;
 		this.penaltyCalculator = penaltyCalculator;
 	}
