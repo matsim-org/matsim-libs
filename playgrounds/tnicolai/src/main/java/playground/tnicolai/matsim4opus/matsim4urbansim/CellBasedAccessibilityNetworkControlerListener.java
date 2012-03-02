@@ -32,10 +32,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -92,6 +94,10 @@ import com.vividsolutions.jts.geom.Point;
  *  to each measured travel times
  *  - using walk travel times instead of travel distances. This is because of the betas that are utils/time unit. The walk time
  *  corresponds to distances since this is also linear.
+ *  
+ *  improvements march'12
+ *  - revised distance measure from centroid to network:
+ *  	* using orthogonal distance from centroid to nearest network link!
  * 
  * TODO: implement configurable betas for different accessibility measures based on different costs
  * beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts,
@@ -111,11 +117,11 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 	private SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
 	private SpatialGrid<Double> walkTravelTimeAccessibilityGrid;
 	
+	private double walkSpeedMeterPerMin = -1;
+	
 	private Benchmark benchmark;
 	
 	private String fileExtension = "networkBoundary";
-	
-//	private int csvID = -1;
 	
 	/**
 	 * constructor
@@ -170,6 +176,8 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
 		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() );
 		
+		this.walkSpeedMeterPerMin = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		
@@ -219,7 +227,10 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				// captures the eulidean distance between a square centroid and its nearest node
+				// captures the euclidean distance between a square centroid and its nearest node
+//				LinkImpl nearestLink = network.getNearestLink( coordFromZone );
+//				double distCentroid2Link = nearestLink.calcDistance(coordFromZone);
+//				double walkTimeOffset_min = (distCentroid2Link * this.walkSpeedMeterPerMin); 
 				double walkTimeOffset_min = EuclideanDistance.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;
@@ -278,7 +289,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 				log.info("Accessibility computation with " + startZones.getZones().size() + " starting points (origins) and " + this.aggregatedWorkplaces.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
 			}
 			accCsvWriter.close();
-			dumpResults(null);
+			dumpResults();
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -291,7 +302,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		return (logsum < 0.0) ? 0.0 : logsum;
 	}
 	
-	private void dumpResults(BufferedWriter accessibilityIndicatorWriter) throws IOException{
+	private void dumpResults() throws IOException{
 		log.info("Writing files ...");
 		// finish and close writing
 		GridUtils.writeSpatialGridTables(this, "UsingNetworkBoundary");

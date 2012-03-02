@@ -79,7 +79,6 @@ public class FeatureKMLWriter {
 		try {
 			transform = CRS.findMathTransform(sourceCRS, DefaultGeographicCRS.WGS84);
 		} catch (FactoryException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

@@ -33,10 +33,9 @@ import org.xml.sax.Attributes;
 
 import com.vividsolutions.jts.geom.Point;
 
-
 /**
  * @author illenberger
- *
+ * @author thomas
  */
 public class SpatialGrid<T> {
 	
@@ -59,6 +58,18 @@ public class SpatialGrid<T> {
 		minY = ymin;
 		maxX = xmax;
 		maxY = ymax;
+		this.resolution = resolution;
+		int numXBins = (int)Math.ceil((maxX - minX) / resolution) + 1;
+		int numYBins = (int)Math.ceil((maxY - minY) / resolution) + 1;
+		matrix = new Object[numYBins][numXBins];
+	}
+	
+	public SpatialGrid(double [] boundingBox, double resolution) {
+		assert(boundingBox != null);
+		minX = boundingBox[0];
+		minY = boundingBox[1];
+		maxX = boundingBox[2];
+		maxY = boundingBox[3];
 		this.resolution = resolution;
 		int numXBins = (int)Math.ceil((maxX - minX) / resolution) + 1;
 		int numYBins = (int)Math.ceil((maxY - minY) / resolution) + 1;

@@ -36,6 +36,7 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesIVTCHNetwork;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
+import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -45,6 +46,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * 2) Grid-based accessibility using network only, dumping out different girdsize resolutions (easier to use)
  * tnicolai feb'12
  * 
+ * Added custom boundig box for Grid-based accessibility using the network only
+ * 	- reason: avoiding "out of memory" issues 
+ * tnicolai march'12
  * 
  * @author thomas
  *
@@ -68,6 +72,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		checkAndSetShapeFile(args);
 		checkAndSetGridSize(args);
 		checkAndSetJobSample(args);
+		checkAndSetBoundingBox(args);
 	}
 
 	/**
@@ -122,6 +127,17 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 	}
 	
 	/**
+	 * Set custom bounding box to determine the area to process
+	 * 
+	 * @param args
+	 */
+	private void checkAndSetBoundingBox(String args[]){
+		// tnicolai: get bounding box via config
+		// minX, minY, maxX, maxY
+		NetworkBoundaryBox.setCustomBoundaryBox(676223.42, 241583.83, 689664.05, 254305.72); // this is for the Zurich application
+	}
+	
+	/**
 	 * This modifies the MATSim network according to the given
 	 * test parameter in the MATSim config file (from UrbanSim)
 	 */
@@ -161,25 +177,28 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 	@Override
 	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
 		
+		// set spatial reference id (not necessary but needed to match the outcomes with google maps)
+		int srid = Constants.SRID_SWITZERLAND; // Constants.SRID_WASHINGTON_NORTH
 		// tnicolai: make this configurable 
 		boolean computeGridBasedAccessibilitiesShapeFile = true;
-		boolean computeGridBasedAccessibilitiesNetwork 	 = false; // tnicolai: this leads to an "out of memory" issue even with moderate resolutions with 1000meter and -Xmx5000m
+		boolean computeGridBasedAccessibilitiesNetwork 	 = true; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
 		
-		// The following lines register what should be done _after_ the iterations are done:
+		// The following lines register what should be executed _after_ the iterations are done:
 		
 		if(computeGridBasedAccessibilitiesShapeFile){
 			
 			// init aggregatedWorkplaces
 			if(aggregatedWorkplaces == null)
 				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
+
 			
-			Geometry boundary = GridUtils.getBoundary(shapeFile);
+			Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
 			
 			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(gridSizeInMeter, boundary);
 			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(gridSizeInMeter, boundary);
 			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = GridUtils.createSpatialGridByShapeBoundary(gridSizeInMeter, boundary);
 			
-			controler.addControlerListener( new CellBasedAccessibilityShapeControlerListener(GridUtils.createGridLayerByGridSizeByShapeFile(gridSizeInMeter, boundary), 
+			controler.addControlerListener( new CellBasedAccessibilityShapeControlerListener(GridUtils.createGridLayerByGridSizeByShapeFile(gridSizeInMeter, boundary, srid), 
 																	  						 aggregatedWorkplaces,
 																	  						 congestedTravelTimeAccessibilityGrid, 
 																	  						 freespeedTravelTimeAccessibilityGrid, 
@@ -193,11 +212,15 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 			if(aggregatedWorkplaces == null)
 				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
 			
-			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByNetworkBoundary(gridSizeInMeter, controler.getNetwork());
-			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByNetworkBoundary(gridSizeInMeter, controler.getNetwork());
-			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = GridUtils.createSpatialGridByNetworkBoundary(gridSizeInMeter, controler.getNetwork());
+			// set default boundary box for accessibility computation
+			// if a bounding box is already set it won't be overwritten!
+			NetworkBoundaryBox.setDefaultBoundaryBox(controler.getNetwork());
 			
-			controler.addControlerListener( new CellBasedAccessibilityNetworkControlerListener(GridUtils.createGridLayerByGridSizeByNetwork(gridSizeInMeter, controler.getNetwork()), 
+			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), gridSizeInMeter);
+			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), gridSizeInMeter);
+			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), gridSizeInMeter);
+			
+			controler.addControlerListener( new CellBasedAccessibilityNetworkControlerListener(GridUtils.createGridLayerByGridSizeByNetwork(gridSizeInMeter, NetworkBoundaryBox.getBoundingBox(), srid), 
 																							   aggregatedWorkplaces, 
 																							   congestedTravelTimeAccessibilityGrid, 
 																							   freespeedTravelTimeAccessibilityGrid, 

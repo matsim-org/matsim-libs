@@ -34,18 +34,18 @@ public class GridUtils {
 	
 	/**
 	 * @param shpFile
+	 * @param srid gives the spatial reference id for the shapefile
 	 * @return
 	 */
-	public static Geometry getBoundary(String shpFile){
+	public static Geometry getBoundary(String shpFile, int srid){
 		
 		try{
 			// get boundaries of study area
 			Set<Feature> featureSet = FeatureSHP.readFeatures(shpFile);
 			log.info("Extracting boundary of the shape file ...");
 			Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
-			// boundary.setSRID( Constants.SRID_WASHINGTON_NORTH );
-			boundary.setSRID( Constants.SRID_SWITZERLAND );
-			log.warn("Using SRID of Switzerland: " + Constants.SRID_SWITZERLAND);
+			boundary.setSRID( srid );
+			log.warn("Using SRID: " + srid);
 			log.info("Done extracting boundary ...");
 			
 			return boundary;
@@ -64,7 +64,7 @@ public class GridUtils {
 	 * @param boundary
 	 * @return
 	 */
-	public static ZoneLayer<ZoneAccessibilityObject> createGridLayerByGridSizeByShapeFile(double gridSize, Geometry boundary) {
+	public static ZoneLayer<ZoneAccessibilityObject> createGridLayerByGridSizeByShapeFile(double gridSize, Geometry boundary, int srid) {
 		
 		log.info("Setting statring points for accessibility measure ...");
 
@@ -96,7 +96,7 @@ public class GridUtils {
 					// Linear Ring defines an artificial zone
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
-					polygon.setSRID( Constants.SRID_SWITZERLAND ); 
+					polygon.setSRID( srid ); 
 					
 					Zone<ZoneAccessibilityObject> zone = new Zone<ZoneAccessibilityObject>(polygon);
 					zone.setAttribute( new ZoneAccessibilityObject( setPoints ) );
@@ -119,10 +119,11 @@ public class GridUtils {
 	 * 
 	 * @param <T>
 	 * @param gridSize
+	 * @param boundingBox defines an area within the network file, this area will later be processed when calculating accessibilities.
 	 * @param boundary
 	 * @return
 	 */
-	public static ZoneLayer<ZoneAccessibilityObject> createGridLayerByGridSizeByNetwork(double gridSize, Network network) {
+	public static ZoneLayer<ZoneAccessibilityObject> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox, int srid) {
 		
 		log.info("Setting statring points for accessibility measure ...");
 
@@ -132,12 +133,12 @@ public class GridUtils {
 		GeometryFactory factory = new GeometryFactory();
 		
 		Set<Zone<ZoneAccessibilityObject>> zones = new HashSet<Zone<ZoneAccessibilityObject>>();
-		// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
-		double networkBoundingBox[] = NetworkUtils.getBoundingBox(network.getNodes().values());
-		double xmin = networkBoundingBox[0];
-		double ymin = networkBoundingBox[1];
-		double xmax = networkBoundingBox[2];
-		double ymax = networkBoundingBox[3];
+
+		double xmin = boundingBox[0];
+		double ymin = boundingBox[1];
+		double xmax = boundingBox[2];
+		double ymax = boundingBox[3];
+		
 		
 		ProgressBar bar = new ProgressBar( (xmax-xmin)/gridSize );
 		
@@ -162,7 +163,7 @@ public class GridUtils {
 					// Linear Ring defines an artificial zone
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
-					polygon.setSRID( Constants.SRID_SWITZERLAND ); 
+					polygon.setSRID( srid ); 
 					
 					Zone<ZoneAccessibilityObject> zone = new Zone<ZoneAccessibilityObject>(polygon);
 					zone.setAttribute( new ZoneAccessibilityObject( setPoints ) );
@@ -192,22 +193,6 @@ public class GridUtils {
 		double yMax = env.getMaxY();
 		
 		return new SpatialGrid<Double>(xMin, yMin, xMax, yMax, gridSize);
-	}
-	
-	/**
-	 * @param boundary
-	 */
-	public static SpatialGrid<Double> createSpatialGridByNetworkBoundary(double gridSize, Network network) {
-
-		// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
-		double networkBoundingBox[] = NetworkUtils.getBoundingBox(network.getNodes().values());
-		
-		// Saptial Grid takes : xmin, ymin, xmax, ymax, grid size
-		return new SpatialGrid<Double>(networkBoundingBox[0], // x min
-									   networkBoundingBox[1], // y min
-									   networkBoundingBox[2], // x max
-									   networkBoundingBox[3], // y max
-									   gridSize);
 	}
 	
 	/**

@@ -395,8 +395,8 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		
 		// create header line
 		testFileContent.append( Constants.PARCEL_ID + Constants.TAB + 
-								Constants.X_COORDINATE + Constants.TAB + 
-								Constants.Y_COORDINATE + Constants.TAB + 
+								Constants.X_COORDINATE_SP + Constants.TAB + 
+								Constants.Y_COORDINATE_SP + Constants.TAB + 
 								Constants.ZONE_ID + Constants.NEW_LINE);
 		
 		// put in zone 1 >> pracel_id	x_coordinate	y_coordinate	zone_id

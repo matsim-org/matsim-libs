@@ -115,8 +115,6 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 	
 	private String fileExtension = "shapeFileBoundary";
 	
-//	private int csvID = -1;
-	
 	/**
 	 * constructor
 	 * 
@@ -278,7 +276,7 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 				log.info("Accessibility computation with " + startZones.getZones().size() + " starting points (origins) and " + this.aggregatedWorkplaces.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
 			}
 			accCsvWriter.close();
-			dumpResults(null);
+			dumpResults();
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -291,7 +289,7 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 		return (logsum < 0.0) ? 0.0 : logsum;
 	}
 	
-	private void dumpResults(BufferedWriter accessibilityIndicatorWriter) throws IOException{
+	private void dumpResults() throws IOException{
 		log.info("Writing files ...");
 		// finish and close writing
 		GridUtils.writeSpatialGridTables(this, "UsingShapeFileBoundary");
