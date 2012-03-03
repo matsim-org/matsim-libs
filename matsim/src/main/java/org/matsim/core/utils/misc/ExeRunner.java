@@ -22,6 +22,7 @@ package org.matsim.core.utils.misc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,7 +52,22 @@ public abstract class ExeRunner {
 	 * @return exit-code of the executable.
 	 */
 	public static int run(final String cmd, final String stdoutFileName, final int timeout) {
-		ExternalExecutor myExecutor = new ExternalExecutor(cmd, stdoutFileName);
+		return run(cmd, stdoutFileName, timeout, null);
+	}
+
+	/**
+	 * Runs an executable and waits until the executable finishes or until
+	 * a certain amount of time has passed (timeout).
+	 *
+	 * @param cmd The system command to execute. E.g. "/bin/sh some-script.sh arg1 arg2"
+	 * @param stdoutFileName specifies the file where stdout of the executable is redirected to.
+	 * @param timeout A timeout in seconds. If the executable is still running after
+	 * 					<code>timeout</code> seconds, the executable is stopped and this method returns.
+	 * @param workingDirectory the working directory to be used when calling the command
+	 * @return exit-code of the executable.
+	 */
+	public static int run(final String cmd, final String stdoutFileName, final int timeout, final String workingDirectory) {
+		ExternalExecutor myExecutor = new ExternalExecutor(cmd, stdoutFileName, workingDirectory);
 
 		synchronized (myExecutor) {
 			try {
@@ -84,14 +100,16 @@ public abstract class ExeRunner {
 		final String cmd;
 		final String stdoutFileName;
 		final String stderrFileName;
+		final String workingDirectory;
 		private Process p = null;
 		public volatile boolean timeout = false;
 
 		public int erg = -1;
 
-		public ExternalExecutor (final String cmd, final String stdoutFileName) {
+		public ExternalExecutor (final String cmd, final String stdoutFileName, final String workingDirectory) {
 			this.cmd = cmd;
 			this.stdoutFileName = stdoutFileName;
+			this.workingDirectory = workingDirectory;
 			if (stdoutFileName.endsWith(".log")) {
 				this.stderrFileName = stdoutFileName.substring(0, stdoutFileName.length() - 4) + ".err";
 			} else {
@@ -107,7 +125,11 @@ public abstract class ExeRunner {
 		@Override
 		public void run()  {
 			try {
-				this.p = Runtime.getRuntime().exec(this.cmd);
+				if (this.workingDirectory == null) {
+					this.p = Runtime.getRuntime().exec(this.cmd);
+				} else {
+					this.p = Runtime.getRuntime().exec(this.cmd, null, new File(this.workingDirectory));
+				}
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.p.getInputStream()));
 				BufferedReader err = new BufferedReader(new InputStreamReader(this.p.getErrorStream()));
 				BufferedWriter writerIn = new BufferedWriter(new FileWriter(this.stdoutFileName));
