@@ -68,6 +68,9 @@ public final class TransportModeNetworkFilter {
 				if (fromNode2 == null) {
 					fromNode2 = factory.createNode(fromId, link.getFromNode().getCoord());
 					subNetwork.addNode(fromNode2);
+					if (fromId == toId) {
+						toNode2 = fromNode2;
+					}
 				}
 				if (toNode2 == null) {
 					toNode2 = factory.createNode(toId, link.getToNode().getCoord());

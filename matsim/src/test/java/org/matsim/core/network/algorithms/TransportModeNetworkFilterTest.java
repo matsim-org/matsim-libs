@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -262,6 +263,39 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertEquals("wrong number of nodes.", 0, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 0, subNetwork.getLinks().size());
 	}
+	
+	/**
+	 * Tests the algorithm for the case the network contains direct loops, i.e.
+	 * links with the same from and to node.
+	 * 
+	 * <code>Issue #178</code> - http://sourceforge.net/apps/trac/matsim/ticket/178
+	 * 
+	 * The problem seems only to happen when the loop link is (acidentially / randomly) 
+	 * chosen as start link for the algorithm, as otherwise the node already exists.
+	 * Thus cannot extend existing Fixture to test this, but have to create test 
+	 * scenario from scratch.
+	 */
+	@Test
+	public void testFilter_SingleMode_loop() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final Network network = scenario.getNetwork();
+		final NetworkFactory factory = network.getFactory();
+
+		Id id1 = scenario.createId("1");
+		Node node1 = factory.createNode(id1, scenario.createCoord(0, 0));
+		network.addNode(node1);
+		Link link1 = factory.createLink(id1, node1, node1);
+		link1.setAllowedModes(createHashSet(TransportMode.car));
+		network.addLink(link1);
+		
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+		
+		Network subNetwork = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
+		filter.filter(subNetwork, createHashSet(TransportMode.car));
+		Assert.assertEquals("wrong number of nodes.", 1, subNetwork.getNodes().size());
+		Assert.assertEquals("wrong number of links", 1, subNetwork.getLinks().size());
+		Assert.assertTrue(subNetwork.getLinks().containsKey(id1));
+	}
 
 	/**
 	 * Creates a simple, multi-modal network for tests.
@@ -290,7 +324,7 @@ public class TransportModeNetworkFilterTest {
 	 * @author mrieser
 	 */
 	private static class Fixture {
-		/*package*/ final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		/*package*/ final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		/*package*/ final Id[] ids = new Id[17];
 		/*package*/ final Set<String> modesC = createHashSet(TransportMode.car);
 		/*package*/ final Set<String> modesCB = createHashSet(TransportMode.car, TransportMode.bike);
@@ -322,34 +356,34 @@ public class TransportModeNetworkFilterTest {
 			network.addNode(factory.createNode(this.ids[12], this.scenario.createCoord(400, 200)));
 			network.addNode(factory.createNode(this.ids[13], this.scenario.createCoord(400, 100)));
 
-			network.addLink(createLink(factory, this.ids[ 1], this.ids[ 1], this.ids[ 2], this.modesC));
-			network.addLink(createLink(factory, this.ids[ 2], this.ids[ 2], this.ids[ 3], this.modesC));
-			network.addLink(createLink(factory, this.ids[ 3], this.ids[ 3], this.ids[ 4], this.modesC));
-			network.addLink(createLink(factory, this.ids[ 4], this.ids[ 4], this.ids[ 5], this.modesCB));
-			network.addLink(createLink(factory, this.ids[ 5], this.ids[ 5], this.ids[ 6], this.modesCB));
-			network.addLink(createLink(factory, this.ids[ 6], this.ids[ 6], this.ids[ 7], this.modesCB));
-			network.addLink(createLink(factory, this.ids[ 7], this.ids[ 7], this.ids[ 8], this.modesCB));
-			network.addLink(createLink(factory, this.ids[ 8], this.ids[ 8], this.ids[ 9], this.modesCB));
-			network.addLink(createLink(factory, this.ids[ 9], this.ids[ 9], this.ids[10], this.modesCB));
-			network.addLink(createLink(factory, this.ids[10], this.ids[10], this.ids[11], this.modesC));
-			network.addLink(createLink(factory, this.ids[11], this.ids[11], this.ids[12], this.modesC));
-			network.addLink(createLink(factory, this.ids[12], this.ids[12], this.ids[13], this.modesC));
-			network.addLink(createLink(factory, this.ids[13], this.ids[ 1], this.ids[ 4], this.modesWB));
-			network.addLink(createLink(factory, this.ids[14], this.ids[ 4], this.ids[ 7], this.modesCW));
-			network.addLink(createLink(factory, this.ids[15], this.ids[ 7], this.ids[10], this.modesW));
-			network.addLink(createLink(factory, this.ids[16], this.ids[10], this.ids[13], this.modesCBW));
+			network.addLink(createLink(network, this.ids[ 1], this.ids[ 1], this.ids[ 2], this.modesC));
+			network.addLink(createLink(network, this.ids[ 2], this.ids[ 2], this.ids[ 3], this.modesC));
+			network.addLink(createLink(network, this.ids[ 3], this.ids[ 3], this.ids[ 4], this.modesC));
+			network.addLink(createLink(network, this.ids[ 4], this.ids[ 4], this.ids[ 5], this.modesCB));
+			network.addLink(createLink(network, this.ids[ 5], this.ids[ 5], this.ids[ 6], this.modesCB));
+			network.addLink(createLink(network, this.ids[ 6], this.ids[ 6], this.ids[ 7], this.modesCB));
+			network.addLink(createLink(network, this.ids[ 7], this.ids[ 7], this.ids[ 8], this.modesCB));
+			network.addLink(createLink(network, this.ids[ 8], this.ids[ 8], this.ids[ 9], this.modesCB));
+			network.addLink(createLink(network, this.ids[ 9], this.ids[ 9], this.ids[10], this.modesCB));
+			network.addLink(createLink(network, this.ids[10], this.ids[10], this.ids[11], this.modesC));
+			network.addLink(createLink(network, this.ids[11], this.ids[11], this.ids[12], this.modesC));
+			network.addLink(createLink(network, this.ids[12], this.ids[12], this.ids[13], this.modesC));
+			network.addLink(createLink(network, this.ids[13], this.ids[ 1], this.ids[ 4], this.modesWB));
+			network.addLink(createLink(network, this.ids[14], this.ids[ 4], this.ids[ 7], this.modesCW));
+			network.addLink(createLink(network, this.ids[15], this.ids[ 7], this.ids[10], this.modesW));
+			network.addLink(createLink(network, this.ids[16], this.ids[10], this.ids[13], this.modesCBW));
 		}
 
-		private Link createLink(final NetworkFactory factory, final Id id, final Id fromNodeId, final Id toNodeId, final Set<String> modes) {
-			Link link = factory.createLink(id, fromNodeId, toNodeId);
-			link.setAllowedModes(modes);
-			link.setCapacity(2000.0);
-			link.setFreespeed(10.0);
-			link.setLength(100.0);
-			link.setNumberOfLanes(1);
-			return link;
-		}
+	}
 
+	private static Link createLink(final Network network, final Id id, final Id fromNodeId, final Id toNodeId, final Set<String> modes) {
+		Link link = network.getFactory().createLink(id, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId));
+		link.setAllowedModes(modes);
+		link.setCapacity(2000.0);
+		link.setFreespeed(10.0);
+		link.setLength(100.0);
+		link.setNumberOfLanes(1);
+		return link;
 	}
 
 	public static Set<String> createHashSet(String... modes) {
