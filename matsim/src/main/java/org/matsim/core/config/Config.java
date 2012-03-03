@@ -309,8 +309,9 @@ public class Config {
 		}
 		String str = m.getValue(paramName);
 		if (str == null) {
-			log.error("Parameter \"" + paramName + "\" of module \"" + moduleName + "\" is not known");
-			throw new IllegalArgumentException("Module \"" + moduleName + "\" is not known.");
+			String message = "Parameter \"" + paramName + "\" of module \"" + moduleName + "\" is not known";
+			log.error(message);
+			throw new IllegalArgumentException(message);
 		}
 		return str;
 	}
