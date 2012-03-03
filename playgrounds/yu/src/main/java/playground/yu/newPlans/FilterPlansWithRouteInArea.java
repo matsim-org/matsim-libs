@@ -20,14 +20,48 @@
 
 package playground.yu.newPlans;
 
-import playground.mrieser.MyRuns;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class FilterPlansWithRouteInArea {
-	/**
-	 * @param args
-	 */
+
+	public static void filterPlansWithRouteInArea(final String[] args, final double x, final double y, final double radius) {
+		System.out.println("RUN: filterPlansWithRouteInArea");
+
+		final CoordImpl center = new CoordImpl(x, y);
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
+		sl.loadNetwork();
+		Network network = sl.getScenario().getNetwork();
+
+		System.out.println("  extracting aoi... at " + (new Date()));
+		for (Link link : network.getLinks().values()) {
+			final Node from = link.getFromNode();
+			final Node to = link.getToNode();
+			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
+				System.out.println("    link " + link.getId().toString());
+				areaOfInterest.put(link.getId(),link);
+			}
+		}
+		System.out.println("  done. ");
+		System.out.println("  aoi contains: " + areaOfInterest.size() + " links.");
+
+		System.out.println("RUN: filterPlansWithRouteInArea finished");
+	}
+
+	
 	public static void main(final String[] args) {
-		MyRuns.filterPlansWithRouteInArea(
+		filterPlansWithRouteInArea(
 				new String[] { "../data/ivtch/make100pctZrh30kmPlans.xml" },
 				683518.0, 246836.0, 30000.0);
 	}
