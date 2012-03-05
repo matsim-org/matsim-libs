@@ -11,7 +11,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -59,11 +58,9 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 		Controler controler = event.getControler();
 
-		EventsToScore eventsToScore = controler.getPlansScoring().getPlanScorer();
-
 		for (Id personId : parkingScoreCollector.getPersonIdsWhoUsedCar()) {
 
-			ScoringFunction scoringFunction = eventsToScore.getScoringFunctionForAgent(personId);
+			ScoringFunction scoringFunction = controler.getPlansScoring().getScoringFunctionForAgent(personId);
 
 			if (scoringFunction instanceof ScoringFunctionAccumulator) {
 

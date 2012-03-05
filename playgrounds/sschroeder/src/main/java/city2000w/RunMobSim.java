@@ -74,7 +74,7 @@ public class RunMobSim implements StartupListener, BeforeMobsimListener{
 	}
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		event.getControler().getEvents().removeHandler(event.getControler().getPlansScoring().getPlanScorer());	
+//		event.getControler().getEvents().removeHandler(event.getControler().getPlansScoring().getPlanScorer());	
 	}
 
 }

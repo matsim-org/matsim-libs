@@ -35,7 +35,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.io.IOUtils;
@@ -80,11 +79,10 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 		double d;
 
 		Controler c = event.getControler();
-		EventsToScore eventsToScore = c.getPlansScoring().getPlanScorer();
 		
 		for (Person p : c.getPopulation().getPersons().values()) {
 			
-			ScoringFunction sf = eventsToScore.getScoringFunctionForAgent(p.getId());
+			ScoringFunction sf = c.getPlansScoring().getScoringFunctionForAgent(p.getId());
 			if (sf instanceof ScoringFunctionAccumulator) {
 				if (((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0) instanceof ActivityScoringFunction) {
 					asf = (ActivityScoringFunction) ((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0);
