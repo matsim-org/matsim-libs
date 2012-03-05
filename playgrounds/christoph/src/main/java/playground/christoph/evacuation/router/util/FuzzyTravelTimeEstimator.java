@@ -20,8 +20,6 @@
 
 package playground.christoph.evacuation.router.util;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,19 +52,19 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	private final PersonalizableTravelTime travelTime;
 	private final AgentsTracker agentsTracker;
 	private final VehiclesTracker vehiclesTracker;
-	private final Map<Id, Map<Id, Double>> distanceFuzzyFactors;
+	private final DistanceFuzzyFactorProvider distanceFuzzyFactorProvider;
 	
 	private Id pId;
 	private int pIdHashCode;
 	private double personFuzzyFactor;
 	
 	/*package*/ FuzzyTravelTimeEstimator(Scenario scenario, PersonalizableTravelTime travelTime, AgentsTracker agentsTracker,
-			VehiclesTracker vehiclesTracker, Map<Id, Map<Id, Double>> distanceFuzzyFactors) {
+			VehiclesTracker vehiclesTracker, DistanceFuzzyFactorProvider distanceFuzzyFactorProvider) {
 		this.scenario = scenario;
 		this.travelTime = travelTime;
 		this.agentsTracker = agentsTracker;
 		this.vehiclesTracker = vehiclesTracker;
-		this.distanceFuzzyFactors = distanceFuzzyFactors;
+		this.distanceFuzzyFactorProvider = distanceFuzzyFactorProvider;
 	}
 	
 	@Override
@@ -123,15 +121,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 			log.warn("Agent's position is undefined! Id: " + this.pId);
 			return 1.0;
 		}
-		
-		// Check whether there is a value in the lookup map.
-		Map<Id, Double> fuzzyFactors = distanceFuzzyFactors.get(linkId);
-		Double fuzzyFactor = fuzzyFactors.get(link.getId());
-		
-		// Use a value of 1.0 if there is no entry in the lookup map.
-		if (fuzzyFactor == null) fuzzyFactor = 1.0;
-		
-		return fuzzyFactor;
+		return distanceFuzzyFactorProvider.getFuzzyFactor(linkId, link.getId());
 	}
 	
 	/*
