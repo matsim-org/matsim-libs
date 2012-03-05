@@ -616,21 +616,18 @@ public class P3DRenderer extends PApplet
 		//SECOND ----------------------------------------
 		//draw agents
 		if (this.liveMode)
-		{
-
 			drawAgents();
-
-		}
 		else
-		{
 			drawOfflineAgents();
-		}
 		
 		double timeMeasDiff= System.currentTimeMillis()-timeMeas;
 		avgRenderingTime += timeMeasDiff;
 		
+		color(255,255,255);
+		text("time: " + currentTime, 1,30);
 		
-		save("C:/temp/f" + String.format("%04d", fr) +".png");
+		
+		//save("C:/temp/f" + String.format("%04d", fr) +".png");
 		
 
 
@@ -744,10 +741,10 @@ public class P3DRenderer extends PApplet
 						XYVxVyAgent currentAgent = (XYVxVyAgent)pairs.getValue();
 						String currentAgentID = (String)pairs.getKey();
 	
-						HashMap<Double,DataPoint> dataPoints = currentAgent.getDataPoints();
+						//HashMap<Double,DataPoint> dataPoints = currentAgent.getDataPoints();
 	
 						//check if there are any data points for the current agent
-						if ((dataPoints != null) && (dataPoints.size() > 0))
+						//if ((dataPoints != null) && (dataPoints.size() > 0))
 						{
 							//pick preattentive agent color
 							int[] agentColor = new int[3];
@@ -759,22 +756,24 @@ public class P3DRenderer extends PApplet
 							strokeWeight(4);   // Thicker
 	
 							//draw node trajectories if there is more then one datapoint for the current agent
-							if (dataPoints.size() > 1)
+							//if (dataPoints.size() > 1)
 							{
 								//number of lines (trajectories) to draw (between 2 and traceTimeRange)
-								int traceDisplayCount = Math.min(this.traceTimeRange, dataPoints.size());
+								//int traceDisplayCount = Math.min(this.traceTimeRange, dataPoints.size());
 	
 								//loop through the datapoints with the corresponding timesteps
-								for (int timeStep = 0; timeStep < traceDisplayCount-2; timeStep++)
+								//for (int timeStep = 0; timeStep < traceDisplayCount-2; timeStep++)
 								{
 	
-									this.console.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + this.timeSteps.size());
+									//this.console.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + this.timeSteps.size());
 	
 									//extract current and next datapoint (to draw a trajectory line)
-									DataPoint currentDataPoint = dataPoints.get(this.timeSteps.get(timeStep));
-									DataPoint nextDataPoint = dataPoints.get(this.timeSteps.get(timeStep+1));
+									//DataPoint currentDataPoint = currentAgent.getCurrentDataPoint();
+//									DataPoint currentDataPoint = dataPoints.get(this.timeSteps.get(timeStep));
+									//DataPoint nextDataPoint = dataPoints.get(this.timeSteps.get(timeStep+1));
+									/*
 	
-									if ((currentDataPoint != null )&&(nextDataPoint != null))
+									if ((currentDataPoint != null )) //&&(nextDataPoint != null))
 									{
 										//pick line color and make far away trajectories more transparent
 										float jFloat = timeStep;
@@ -793,6 +792,7 @@ public class P3DRenderer extends PApplet
 												(float)((height-(nextDataPoint.getPosY()    - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y));
 									}
 	
+									 */
 								}
 	
 	
@@ -801,12 +801,19 @@ public class P3DRenderer extends PApplet
 							}
 							noStroke();
 	
-							XYVxVyDataPoint lastDataPoint = (XYVxVyDataPoint)dataPoints.get(this.currentTime);
+							//XYVxVyDataPoint lastDataPoint = (XYVxVyDataPoint)dataPoints.get(this.currentTime);
+							XYVxVyDataPoint lastDataPoint = currentAgent.getCurrentDataPoint();
 							//console.println("current agent: " + currentAgent.get);
 							//							console.println("@________@________@: " + timeSteps.toString());
 							//							console.println("TS GET LAST " + timeSteps.getLast());
 							//							console.println("AVAILABLE DP: " + dataPoints.toString());
 							//							console.println("| " + lastDataPoint.toString());
+							
+//							if (lastDataPoint == null)
+//							{
+//								lastDataPoint = (XYVxVyDataPoint)dataPoints.get(this.timeSteps.get(0));
+//								
+//							}
 	
 	
 							if (lastDataPoint != null)
@@ -858,6 +865,9 @@ public class P3DRenderer extends PApplet
 							}
 							else
 							{
+//								System.out.println(currentAgent.dataPoints.size());
+//								controller.pause();
+								//background(80,80,80,80);
 								//this.console.println("agent " + currentAgentID + " missing at " + this.currentTime + " (" + this.timeSteps.getLast() + ") :" + dataPoints.toString());
 							}
 	
@@ -1060,6 +1070,8 @@ public class P3DRenderer extends PApplet
 						(float)(height-((ToDataPoint.getPosY()-this.minPosY))/this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y);
 
 
+				ellipse((float)((fromDataPoint.getPosX()-this.minPosX)/this.factorX*(this.zoomFactor/10f))+panOffset.x+offset.x, (float)(height-((fromDataPoint.getPosY()-this.minPosY))/this.factorY*(this.zoomFactor/10f))+panOffset.y+offset.y, 5, 5);
+				
 			}
 			noStroke();
 		}
@@ -1134,12 +1146,12 @@ public class P3DRenderer extends PApplet
 
 	}
 
-	public void updateView(LinkedList<Double> timeSteps, HashMap<String, Agent> agents)
+	public void updateView(Double time, HashMap<String, Agent> agents)
 	{
 		//setAgentColors(agents.size());
 		this.agents = agents;
-		this.timeSteps = timeSteps;
-		this.currentTime = timeSteps.getLast();
+		//this.timeSteps = time;
+		this.currentTime = time;
 		this.console.println("update view at " + this.currentTime + "!");
 	}
 

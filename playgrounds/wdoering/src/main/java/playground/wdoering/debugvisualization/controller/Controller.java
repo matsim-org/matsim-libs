@@ -339,7 +339,9 @@ public class Controller {
 
 		XYVxVyDataPoint dataPoint = new XYVxVyDataPoint(time, posX, posY, vX, vY);
 		this.console.println("adding dp to agent " + ID + ":" + dataPoint.toString() + "|");
-		currentAgent.addDataPoint(dataPoint);
+		//currentAgent.addDataPoint(dataPoint);
+		currentAgent.setCurrentDataPoint(dataPoint);
+		
 		
 		//XYVxVyDataPoint returnedDataPoint = (XYVxVyDataPoint)currentAgent.getDataPoint(time);
 		
@@ -412,7 +414,7 @@ public class Controller {
 				}
 
 
-
+				/*
 				//if there are already more timesteps than the range of traces
 				//(timesteps) to show: truncate in timestep list and agent data
 				while (this.timeSteps.size() > this.traceTimeRange)
@@ -443,10 +445,12 @@ public class Controller {
 						}
 					}
 
-				}
+				}*/
 
 				this.gui.updateExtremeValues(this.maxPosX, this.minPosX, this.maxPosY, this.minPosY);
-				this.gui.updateView(this.timeSteps, this.agents);
+				//this.gui.updateView(this.timeSteps, this.agents);
+				this.gui.updateView(time, this.agents);
+				
 
 				this.currentTime = time;
 				this.timeSteps.addLast(this.currentTime);
@@ -496,7 +500,7 @@ public class Controller {
 		
 		
 		//update view
-		this.gui.updateView(this.timeSteps, this.agents);
+		this.gui.updateView(currentTime, this.agents);
 		
 		isReadingData = false;
 //		gui.resumeRenderThread();

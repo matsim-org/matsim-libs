@@ -153,8 +153,9 @@ public class GUI extends JFrame {
 
 	public void updateView(LinkedList<Double> timeSteps, HashMap<String, Agent> agents)
 	{
-		renderer.updateView(timeSteps, agents);
-		guiInfo.updateView(timeSteps);
+		Double time = timeSteps.getLast();
+		renderer.updateView(time, agents);
+		guiInfo.updateView(time);
 		
 	}
 
@@ -189,6 +190,13 @@ public class GUI extends JFrame {
 	public void setOffset(int x, int y)
 	{
 		renderer.setOffset(x,y);
+		
+	}
+
+	public void updateView(Double time, HashMap<String, Agent> agents)
+	{
+		renderer.updateView(time, agents);
+		guiInfo.updateView(time);
 		
 	}
 	

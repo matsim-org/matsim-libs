@@ -1,6 +1,7 @@
 package playground.wdoering.multidestpeds.helper;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +43,7 @@ public class Bottleneck
 
 
 	private static int persId = 0;
+	
 
 	public static void main(String [] args)
 	{
@@ -57,16 +59,27 @@ public class Bottleneck
 			String scDir = "C:/temp/bottleneck/";
 //			String scDir = "/Users/laemmel/devel/bottleneck/";
 
-			//set input directory
-			String inputDir = scDir + "/input/";
 
 			//Bottleneck length, width and distance between waiting area and bottleneck
 			double length = 4.0;
-			double width = 1;
+			double width = 2.5;
 			double distance = 3;
 			double waitingAreaWidth = 7;
-			int persons = 49;
+			int persons = 175;
+			
+			int model = 2; //0=social force model, 1=collision prediction, 2=velocity obstacle
+			
+			String[] modelName = {"sf","cp","vo"};
+			
+			String subdir = modelName[model] +  "/p"+ persons +"-w" + width;
+			
+			
 
+			//set input directory
+			String inputDir = scDir + "/" + subdir + "/input/";
+			
+			new File(inputDir).mkdirs();
+			
 			//create config
 			Config c = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(c);
@@ -81,7 +94,7 @@ public class Bottleneck
 			createPop(scenario, inputDir, links, length, width, waitingAreaWidth, persons);
 			//
 			c.controler().setLastIteration(0);
-			c.controler().setOutputDirectory(scDir + "output/");
+			c.controler().setOutputDirectory(scDir + subdir +  "/output/");
 			c.controler().setMobsim("hybridQ2D");
 
 			c.strategy().setMaxAgentPlanMemorySize(3);
@@ -93,10 +106,43 @@ public class Bottleneck
 			c.strategy().addParam("ModuleProbability_2", "0.9");
 			//
 			Sim2DConfigGroup s2d = new Sim2DConfigGroup();
+			
+			
+			if (model==1)
+			{
+			
+				s2d.setEnableCircularAgentInterActionModule("false");
+				s2d.setEnableCollisionPredictionAgentInteractionModule("true");
+				s2d.setEnableCollisionPredictionEnvironmentForceModule("true");
+				s2d.setEnableDrivingForceModule("true");
+				s2d.setEnableEnvironmentForceModule("true");
+				s2d.setEnablePathForceModule("true");
+				s2d.setEnablePhysicalEnvironmentForceModule("false");
+				s2d.setEnableVelocityObstacleModule("false");
+				
+			}
+			else if (model==2)
+			{
+				s2d.setEnableCircularAgentInterActionModule("false");
+				s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+				s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+				s2d.setEnableDrivingForceModule("false");
+				s2d.setEnableEnvironmentForceModule("false");
+				s2d.setEnablePathForceModule("false");
+				s2d.setEnablePhysicalEnvironmentForceModule("false");
+				s2d.setEnableVelocityObstacleModule("true");
+			}
+				
+			
 //			s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
 			s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 			c.addModule("sim2d", s2d);
 			new ConfigWriter(c).write(inputDir + "/config.xml");
+			
+			System.out.println("");
+			System.err.println("DONE");
+			System.out.println("");
+			
 		}
 
 
@@ -242,8 +288,12 @@ public class Bottleneck
 		//create nodes
 		NodeImpl n01 = createNode(network, 0, 0d, waitingAreaWidth);
 		NodeImpl n02 = createNode(network, 1, 0d, 0d);
-		NodeImpl n03 = createNode(network, 2, 0d, -distance - width);
+		NodeImpl n03 = createNode(network, 2, 0d, -distance);
 		NodeImpl n04 = createNode(network, 3, 0d, -distance - 10d);
+		
+//		NodeImpl n02 = createNode(network, 1, 0d, -0.25d);
+//		NodeImpl n03 = createNode(network, 2, 0d, -distance - width + 0.25d);
+//		NodeImpl n04 = createNode(network, 3, 0d, -distance - width);
 
 		//add nodes to nodes list
 		nodes.add(n01); nodes.add(n02); nodes.add(n03); nodes.add(n04);
@@ -315,13 +365,13 @@ public class Bottleneck
 		Coordinate[] rightSide = new Coordinate[4];
 
 		//left side coordinates
-		leftSide[0] = new Coordinate(-waitingAreaWidth/2,waitingAreaWidth);
+		leftSide[0] = new Coordinate(-waitingAreaWidth/2,waitingAreaWidth+9d);
 		leftSide[1] = new Coordinate(-waitingAreaWidth/2,-distance);
 		leftSide[2] = new Coordinate(-width/2,-distance);
 		leftSide[3] = new Coordinate(-width/2,-distance - length);
 
 		//right side coordinates
-		rightSide[0] = new Coordinate(waitingAreaWidth/2,waitingAreaWidth);
+		rightSide[0] = new Coordinate(waitingAreaWidth/2,waitingAreaWidth+9d);
 		rightSide[1] = new Coordinate(waitingAreaWidth/2,-distance);
 		rightSide[2] = new Coordinate(width/2,-distance);
 		rightSide[3] = new Coordinate(width/2,-distance - length);

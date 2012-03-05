@@ -5,8 +5,6 @@ public class XYVxVyDataPoint extends DataPoint {
 	private Double vX;
 	private Double vY;
 
-	
-	
 	public Double getvX() {
 		return vX;
 	}
@@ -27,6 +25,7 @@ public class XYVxVyDataPoint extends DataPoint {
 		super(posX, posY);
 		// TODO Auto-generated constructor stub
 	}
+	
 
 	public XYVxVyDataPoint(Double time, Double posX, Double posY, double vX,
 			double vY) {

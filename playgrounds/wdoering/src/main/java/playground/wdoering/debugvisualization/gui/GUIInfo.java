@@ -94,7 +94,7 @@ public class GUIInfo extends JPanel {
 
 	}
 
-	public void updateView(LinkedList<Double> timeSteps)
+	public void updateView(Double time)
 	{
 
 		
@@ -122,7 +122,7 @@ public class GUIInfo extends JPanel {
 				{
 			
 					// update values
-					this.timeSteps = timeSteps;
+					//this.timeSteps = timeSteps;
 					this.agents = agents;
 					// While there are still agents in the agents array
 			
@@ -153,8 +153,7 @@ public class GUIInfo extends JPanel {
 								String currentAgentID = (String) pairs.getKey();
 								agentIDs = agentIDs + " | " + currentAgentID;
 				
-								XYVxVyDataPoint dataPoint = (XYVxVyDataPoint) currentAgent
-										.getDataPoint(timeSteps.getLast());
+								XYVxVyDataPoint dataPoint = currentAgent.getCurrentDataPoint();
 				
 								if (dataPoint != null)
 								{
@@ -312,6 +311,7 @@ public class GUIInfo extends JPanel {
 		this.updateData = !b;
 
 	}
+
 }
 
 
