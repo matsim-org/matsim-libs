@@ -314,16 +314,20 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 			throw new RuntimeException( "subtour "+subtour+" in plan "+plan.getPlanElements()+" is too short for park and ride" );
 		}
 
-		includer.routeAndIncludePnrTrips(
+		boolean included = includer.routeAndIncludePnrTrips(
 				(Activity) subtour.get( 0 ),
 				(Activity) subtour.get( 2 ),
 				(Activity) subtour.get( size - 3 ),
 				(Activity) subtour.get( size - 1 ),
 				plan);
 
+		List<PlanElement> toRouteWithPt = included ?
+				subtour.subList( 2 , size - 2 ) :
+				subtour;
+
 		changeLegModeToNonPnr(
 				plan,
-				subtour.subList( 2 , size - 2 ),
+				toRouteWithPt,
 				TransportMode.pt );
 	}
 

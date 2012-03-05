@@ -56,7 +56,7 @@ public class ParkAndRideIncluder {
 		this.tripRouter = tripRouter;
 	}
 
-	public void routeAndIncludePnrTrips(
+	public boolean routeAndIncludePnrTrips(
 			final Activity accessOriginActivity,
 			final Activity accessDestinationActivity,
 			final Activity egressOriginActivity,
@@ -70,6 +70,10 @@ public class ParkAndRideIncluder {
 					new ActivityWrapperFacility( accessDestinationActivity ),
 					getEndTime( accessOriginActivity , planElements ),
 					plan.getPerson());
+
+		if (pnrAccess == null) {
+			return false;
+		}
 
 		ParkAndRideFacility choosenFacility = identifyPnrFacility( pnrAccess );
 
@@ -92,54 +96,73 @@ public class ParkAndRideIncluder {
 				egressOriginActivity,
 				returnTrip,
 				egressDestinationActivity);
+
+		return true;
 	}
 
-	private List<PlanElement> routeReturnTrip(
+	private List<? extends PlanElement> routeReturnTrip(
 			final Person person,
 			final List<PlanElement> plan,
 			final Activity egressOriginActivity,
 			final Activity egressDestinationActivity,
 			final ParkAndRideFacility facility) {
-		List<PlanElement> trip = new ArrayList<PlanElement>();
-
 		double carDeparture = getEndTime( egressOriginActivity , plan );
-		trip.addAll(
-				tripRouter.calcRoute(
-					TransportMode.pt,
-					new ActivityWrapperFacility( egressOriginActivity ),
-					facility,
-					carDeparture,
-					person) );
 
-		ActivityImpl act = new ActivityImpl(
-					ParkAndRideConstants.PARKING_ACT,
-					facility.getCoord(),
-					facility.getLinkId());
-		act.setMaximumDuration( 0d );
+		if (facility != null) {
+			List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		// XXX: dangerous! Not a facility from ActivityFacilities!
-		act.setFacilityId( facility.getId() );
+			trip.addAll(
+					tripRouter.calcRoute(
+						TransportMode.pt,
+						new ActivityWrapperFacility( egressOriginActivity ),
+						facility,
+						carDeparture,
+						person) );
 
-		trip.add( act );
+			ActivityImpl act = new ActivityImpl(
+						ParkAndRideConstants.PARKING_ACT,
+						facility.getCoord(),
+						facility.getLinkId());
+			act.setMaximumDuration( 0d );
 
-		double ptDeparture = carDeparture + ((Leg) trip.get( 0 )).getTravelTime();
-		trip.addAll(
-				tripRouter.calcRoute(
-					TransportMode.car,
-					facility,
-					new ActivityWrapperFacility( egressDestinationActivity ),
-					ptDeparture,
-					person) );
+			// XXX: dangerous! Not a facility from ActivityFacilities!
+			act.setFacilityId( facility.getId() );
 
-		return trip;
+			trip.add( act );
+
+			double ptDeparture = carDeparture + ((Leg) trip.get( 0 )).getTravelTime();
+			trip.addAll(
+					tripRouter.calcRoute(
+						TransportMode.car,
+						facility,
+						new ActivityWrapperFacility( egressDestinationActivity ),
+						ptDeparture,
+						person) );
+
+			return trip;
+		}
+		else {
+			return tripRouter.calcRoute(
+						TransportMode.pt,
+						new ActivityWrapperFacility( egressOriginActivity ),
+						new ActivityWrapperFacility( egressDestinationActivity ),
+						carDeparture,
+						person);
+		}
 	}
 
 	private ParkAndRideFacility identifyPnrFacility(
 			final List<? extends PlanElement> pnrAccess) {
+		if (pnrAccess.size() < 2) {
+			return null;
+		}
+
 		Activity pnrAct =  (Activity) pnrAccess.get( 1 );
 
 		if (!pnrAct.getType().equals( ParkAndRideConstants.PARKING_ACT )) {
-			throw new RuntimeException( "unexpected activity type "+pnrAct.getType()+" in "+pnrAccess );
+			// throw new RuntimeException( "unexpected activity type "+pnrAct.getType()+" in "+pnrAccess );
+			// this must be a "pure" PT trip
+			return null;
 		}
 
 		Id facility = pnrAct.getFacilityId();

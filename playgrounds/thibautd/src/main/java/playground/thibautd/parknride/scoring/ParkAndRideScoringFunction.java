@@ -50,7 +50,9 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 
 	@Override
 	public void handleActivity(final Activity activity) {
-		delegate.handleActivity(activity);
+		if (!ParkAndRideConstants.PARKING_ACT.equals( activity.getType() )) {
+			delegate.handleActivity(activity);
+		}
 
 		if (lastLegWasCar && !activity.getType().equals( ParkAndRideConstants.PARKING_ACT )) {
 			isParked = true;
