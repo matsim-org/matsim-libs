@@ -43,7 +43,7 @@ public class TransitControler {
 		new MatsimConfigReader(config).readFile(args[0]);
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
+		config.otfVis().setColoringScheme( OTFVisConfigGroup.ColoringScheme.bvg ) ;
 		
 		Controler tc = new Controler(config) ;
 		
