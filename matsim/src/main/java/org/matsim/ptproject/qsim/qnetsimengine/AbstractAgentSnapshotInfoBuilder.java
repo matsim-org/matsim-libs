@@ -132,7 +132,8 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		}
 	}
 
-	public void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, double lengthOfCurve, double euclideanLength, QVehicle veh, 
+	public void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
+			double lengthOfCurve, double euclideanLength, QVehicle veh, 
 			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
 		MobsimDriverAgent driverAgent = veh.getDriver();
 		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), startCoord, endCoord, 
