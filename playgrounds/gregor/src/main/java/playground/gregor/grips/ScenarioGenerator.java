@@ -5,6 +5,9 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -24,10 +27,16 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import playground.gregor.grips.config.GripsConfigModule;
 import playground.gregor.grips.events.InfoEvent;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -48,6 +57,7 @@ public class ScenarioGenerator {
 	private String matsimConfigFile;
 	private Id safeLinkId;
 	private final EventsManager em;
+	private Config c;
 
 	public ScenarioGenerator(String config) {
 		this.em = EventsUtils.createEventsManager();
@@ -64,9 +74,11 @@ public class ScenarioGenerator {
 		log.info("loading config file");
 		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "loading config file");
 		this.em.processEvent(e);
-		Config c = ConfigUtils.loadConfig(this.configFile);
-		c.addSimulationConfigGroup(new SimulationConfigGroup());
-		Scenario sc = ScenarioUtils.createScenario(c);
+		this.c = ConfigUtils.loadConfig(this.configFile);
+		this.c.addSimulationConfigGroup(new SimulationConfigGroup());
+		this.c.global().setCoordinateSystem("EPSG:3395");
+		
+		Scenario sc = ScenarioUtils.createScenario(this.c);
 		this.safeLinkId = sc.createId("el1");
 
 		log.info("generating network file");
@@ -83,22 +95,22 @@ public class ScenarioGenerator {
 		e = new InfoEvent(System.currentTimeMillis(), "simulation config file");
 		this.em.processEvent(e);
 
-		c.global().setCoordinateSystem("EPSG:32632");
-
-		c.controler().setLastIteration(10);
-		c.controler().setOutputDirectory(getGripsConfig(c).getOutputDir()+"/output");
-
-		c.strategy().setMaxAgentPlanMemorySize(3);
-
-		c.strategy().addParam("maxAgentPlanMemorySize", "3");
-		c.strategy().addParam("Module_1", "ReRoute");
-		c.strategy().addParam("ModuleProbability_1", "0.1");
-		c.strategy().addParam("Module_2", "ChangeExpBeta");
-		c.strategy().addParam("ModuleProbability_2", "0.9");
-
-		this.matsimConfigFile = getGripsConfig(c).getOutputDir() + "/config.xml";
 		
-		new ConfigWriter(c).write(this.matsimConfigFile);
+
+		this.c.controler().setLastIteration(10);
+		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+
+		this.c.strategy().setMaxAgentPlanMemorySize(3);
+
+		this.c.strategy().addParam("maxAgentPlanMemorySize", "3");
+		this.c.strategy().addParam("Module_1", "ReRoute");
+		this.c.strategy().addParam("ModuleProbability_1", "0.1");
+		this.c.strategy().addParam("Module_2", "ChangeExpBeta");
+		this.c.strategy().addParam("ModuleProbability_2", "0.9");
+
+		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir() + "/config.xml";
+		
+		new ConfigWriter(this.c).write(this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(), "scenario generation finished.");
 		this.em.processEvent(e);
 
@@ -161,7 +173,7 @@ public class ScenarioGenerator {
 		// Step 1 raw network input
 		// for now grips network meta format is osm
 		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
-		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", "EPSG: 32632");
+		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", this.c.global().getCoordinateSystem());
 		OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, false);
 		//		reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
 		//		reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
@@ -192,9 +204,27 @@ public class ScenarioGenerator {
 		Feature ft = null;
 		try {
 			ft = (Feature) fs.getFeatures().iterator().next();
+			transform(ft,fs.getSchema().getDefaultGeometry().getCoordinateSystem());
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-2);
+		} catch (FactoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(-2);
+		} catch (MismatchedDimensionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(-2);
+		} catch (TransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(-2);
+		} catch (IllegalAttributeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(-2);
+
 		}
 		MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
 		Polygon p = (Polygon) mp.getGeometryN(0);
@@ -206,6 +236,17 @@ public class ScenarioGenerator {
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
 		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
 		sc.getConfig().network().setInputFile(networkOutputFile);
+	}
+
+	private void transform(Feature ft,
+			CoordinateReferenceSystem coordinateSystem) throws FactoryException, MismatchedDimensionException, TransformException, IllegalAttributeException {
+		CoordinateReferenceSystem target = CRS.decode(this.c.global().getCoordinateSystem(),true);
+		
+		MathTransform transform = CRS.findMathTransform(coordinateSystem, target,true);
+		Geometry geo = ft.getDefaultGeometry();
+		
+		ft.setDefaultGeometry(JTS.transform(geo, transform));
+		
 	}
 
 	public GripsConfigModule getGripsConfig(Config c) {
