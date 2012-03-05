@@ -118,7 +118,7 @@ public final class StrategyManagerConfigLoader {
 			PlanSelector planSelector = null ;
 			if ( name.equals("WorstPlanSelector") ) { 
 				planSelector = new WorstPlanForRemovalSelector() ; 
-			} else if ( name.equals("RandomPlanSelector") ) {
+			} else if ( name.equals("SelectRandom") ) {
 				planSelector = new RandomPlanSelector() ;
 			} else if ( name.equals("SelectExpBeta") ) {
 				planSelector = new ExpBetaPlanSelector(config.planCalcScore() ) ;
