@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
-public class KaiHiResLink extends QLinkInternalI {
+class KaiHiResLink extends QLinkInternalI {
 
 	private final KaiHybridEngine hybridEngine;
 	private final QNode toQueueNode;
