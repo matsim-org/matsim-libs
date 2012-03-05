@@ -97,7 +97,7 @@ import com.vividsolutions.jts.geom.Point;
  *  
  *  improvements march'12
  *  - revised distance measure from centroid to network:
- *  	* using orthogonal distance from centroid to nearest network link!
+ *  	using orthogonal distance from centroid to nearest network link!
  * 
  * TODO: implement configurable betas for different accessibility measures based on different costs
  * beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts,
@@ -176,7 +176,8 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
 		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() );
 		
-		this.walkSpeedMeterPerMin = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		// 1.38888889m/s corresponds to 5km/h
+		this.walkSpeedMeterPerMin = 1.38888889 * 60.; // sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
@@ -200,6 +201,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 			log.info("Beta car traveling per min: " + betaCarMin);
 			log.info("Beta walk traveling per h: " + betaWalkHour);
 			log.info("Beta walk traveling per min: " + betaWalkMin);
+			log.info("Walk speed (meter/min): " + this.walkSpeedMeterPerMin);
 			
 			Iterator<Zone<ZoneAccessibilityObject>> startZoneIterator = startZones.getZones().iterator();
 			log.info(startZones.getZones().size() + " measurement points are now processing ...");
@@ -228,10 +230,10 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 				// from here: accessibility computation for current starting point ("fromNode")
 				
 				// captures the euclidean distance between a square centroid and its nearest node
-//				LinkImpl nearestLink = network.getNearestLink( coordFromZone );
-//				double distCentroid2Link = nearestLink.calcDistance(coordFromZone);
-//				double walkTimeOffset_min = (distCentroid2Link * this.walkSpeedMeterPerMin); 
-				double walkTimeOffset_min = EuclideanDistance.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
+				LinkImpl nearestLink = network.getNearestLink( coordFromZone );
+				double distCentroid2Link = nearestLink.calcDistance(coordFromZone);
+				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
+//				double walkTimeOffset_min = EuclideanDistance.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;
 				double travelTimesWalkSum  	   	  = 0.; // substitute for travel distance

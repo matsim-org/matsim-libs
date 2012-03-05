@@ -153,6 +153,10 @@ public class SpatialGrid<T> {
 		return (int)Math.floor((xCoord - minX) / resolution);
 	}
 	
+	public Object[][] getMatrix(){
+		return matrix;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void toFile(String filename) {
 		toFile(filename, (ObjectSerializer<T>) new DoubleSerializer());

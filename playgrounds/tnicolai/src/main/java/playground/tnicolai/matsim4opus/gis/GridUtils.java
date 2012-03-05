@@ -8,8 +8,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.io.FeatureKMLWriter;

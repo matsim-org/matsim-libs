@@ -5,3 +5,5 @@ Todos:
 - Brussel scenario: matching coordinates of zone centroids and network
 - test different beta values
 - test accessibility measure paired with workers or 1-person hh or income in UrbanSim
+
+- Schnittstelle SpatialGrid für Interpolation

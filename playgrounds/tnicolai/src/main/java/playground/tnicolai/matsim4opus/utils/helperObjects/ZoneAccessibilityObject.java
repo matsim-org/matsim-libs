@@ -39,10 +39,10 @@ public class ZoneAccessibilityObject {
 	 * @param zoneID
 	 */
 	public ZoneAccessibilityObject(int zoneID){
-		this.zoneId 					= zoneID;
+		this.zoneId 							= zoneID;
 		this.congestedTravelTimeAccessibility 	= 0.;
 		this.freespeedTravelCostAccessibility 	= 0.;
-		this.walkTravelTimeAccessibility= 0.;
+		this.walkTravelTimeAccessibility		= 0.;
 	}
 	
 	// setter methods
