@@ -83,6 +83,7 @@ public class SpatialGrid4Interpolation {
 		logger.info("At coordinate x="+ center.getX() + " y="+ center.getY() + " the stored value is ="+ sg.getValue(center));
 		logger.info("At coordinate x="+ corner.getX() + " y="+ corner.getY() + " the stored value is ="+ sg.getValue(corner));
 
+		Object[][] test = sg.getMatrix();
 		logger.info("...done");
 	}
 }
