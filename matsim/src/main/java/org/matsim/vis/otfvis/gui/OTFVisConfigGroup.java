@@ -86,11 +86,9 @@ public class OTFVisConfigGroup extends Module {
 
 	private static final String COLORING="coloringScheme" ;
 
-	public static final String COLORING_STANDARD = "standard" ;
-	public static final String COLORING_BVG = "bvg" ;
-	public static final String COLORING_BVG_2 = "bvg2" ;
-
-	private String coloring = COLORING_STANDARD ;
+	public static enum ColoringScheme { standard, bvg, bvg2, byId } ;
+	
+	private ColoringScheme coloring = ColoringScheme.standard ;
 
 	// ---
 	
@@ -207,7 +205,7 @@ public class OTFVisConfigGroup extends Module {
 			this.leftMouseFunc = value;
 		} 
 		else if ( COLORING.equalsIgnoreCase(key) ) {
-			this.setColoringScheme( value ) ;
+			this.setColoringScheme( ColoringScheme.valueOf(value) ) ;
 		}  
 		else if ( LINK_WIDTH_IS_PROPORTIONAL_TO.equalsIgnoreCase(key) ) {
 			this.setLinkWidthIsProportionalTo( value ) ;
@@ -248,7 +246,7 @@ public class OTFVisConfigGroup extends Module {
 		map.put(SHOW_TELEPORTATION, Boolean.toString( this.isShowTeleportedAgents()));
 		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, this.getLinkWidthIsProportionalTo());
 		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()));
-		map.put(COLORING, this.getColoringScheme());
+		map.put(COLORING, this.getColoringScheme().toString() );
 		map.put(MAP_OVERLAY_MODE, Boolean.toString(this.isMapOverlayMode()));
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
 //		map.put(SHOW_PARKING, Boolean.toString( this.isShowParking() ) ) ;
@@ -264,7 +262,13 @@ public class OTFVisConfigGroup extends Module {
 				+ " rather ungracefully, or displays no agents at all." ) ;
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
 		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'." );
-		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''");
+		
+		String allowedColorings = null ;
+		for ( ColoringScheme scheme : ColoringScheme.values() ) {
+			allowedColorings += " " + scheme.toString() ; 
+		}
+		map.put(COLORING, "coloring scheme for otfvis.  Currently (2012) allowed values:" + allowedColorings );
+		
 		map.put(MAP_OVERLAY_MODE, "Render everything on top of OpenStreetMap tiles.");
 		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization. ");
 		//		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
@@ -474,10 +478,10 @@ public class OTFVisConfigGroup extends Module {
 		this.scaleQuadTreeRect = doScale;
 	}
 
-	public String getColoringScheme() {
+	public ColoringScheme getColoringScheme() {
 		return this.coloring ;
 	}
-	public void setColoringScheme( String value ) {
+	public void setColoringScheme( ColoringScheme value ) {
 		this.setModified() ;
 		this.coloring = value ;
 	}

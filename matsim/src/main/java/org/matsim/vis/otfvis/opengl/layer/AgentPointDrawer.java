@@ -53,7 +53,7 @@ public class AgentPointDrawer {
 	public void setAgent( AgentSnapshotInfo agInfo ) {
 		char[] id = agInfo.getId().toString().toCharArray();
 		
-		if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equalsIgnoreCase( OTFVisConfigGroup.COLORING_BVG ) ) {
+		if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.bvg ) ) {
 
 			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
 				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.DARK_GRAY, true);
@@ -75,7 +75,7 @@ public class AgentPointDrawer {
 			} else {
 				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
 			}
-		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equalsIgnoreCase( OTFVisConfigGroup.COLORING_BVG_2 ) ) {
+		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.bvg2 ) ) {
 			if ( bvg2cnt < 1 ) {
 				bvg2cnt++ ;
 				Logger.getLogger(this.getClass()).info( "using bvg2 coloring scheme ...") ;
@@ -101,6 +101,29 @@ public class AgentPointDrawer {
 			} else {
 				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
 			}
+		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.byId ) ) {
+			String idstr = agInfo.getId().toString() ;
+			int val = 8 ;
+			Color color = null ;
+			if ( idstr.hashCode()%val==0 ) {
+				color = Color.red ;
+			} else if (idstr.hashCode()%val==1 ) {
+				color = Color.orange ;
+			} else if (idstr.hashCode()%val==2 ) {
+				color = Color.yellow ;
+			} else if (idstr.hashCode()%val==3 ) {
+				color = Color.green ;
+			} else if (idstr.hashCode()%val==4 ) {
+				color = Color.blue ;
+			} else if (idstr.hashCode()%val==5 ) {
+				color = Color.cyan ;
+			} else if (idstr.hashCode()%val==6 ) {
+				color = Color.magenta ;
+			} else if (idstr.hashCode()%val==7 ) {
+				color = Color.pink ;
+			} 
+			this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), color, true);
+
 		} else {
 		
 			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
