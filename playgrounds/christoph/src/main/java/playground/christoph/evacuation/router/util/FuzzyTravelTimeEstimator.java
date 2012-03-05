@@ -23,7 +23,6 @@ package playground.christoph.evacuation.router.util;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
@@ -102,7 +100,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 		
 		// person has changed
 		this.pId = person.getId();
-		this.pIdHashCode = person.getId().toString().hashCode();
+		this.pIdHashCode = person.getId().hashCode();
 		this.personFuzzyFactor = hashCodeToRandomDouble(pIdHashCode);
 	}
 
@@ -113,39 +111,27 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	private double calcDistanceFuzzyFactor(Link link) {		
 		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(pId);
 		Position positionType = agentPosition.getPositionType();
-		Coord coord = null;
-		Map<Id, Double> fuzzyFactors = null;
-		if (positionType == Position.LINK) {
-			// check whether there is already a value in the lookup map
-			fuzzyFactors = distanceFuzzyFactors.get(agentPosition.getPositionId());
-			Double fuzzyFactor = fuzzyFactors.get(link.getId());
-			if (fuzzyFactor != null) return fuzzyFactor;
-			
-			coord = scenario.getNetwork().getLinks().get(agentPosition.getPositionId()).getCoord();
-		} else if (positionType == Position.FACILITY) {
-			coord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getCoord();
-		} else if (positionType == Position.VEHICLE) {
-			Id linkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());
-			
-			// check whether there is already a value in the lookup map
-			fuzzyFactors = distanceFuzzyFactors.get(linkId);
-			Double fuzzyFactor = fuzzyFactors.get(link.getId());
-			if (fuzzyFactor != null) return fuzzyFactor;
 
-			coord = scenario.getNetwork().getLinks().get(linkId).getCoord();
+		Id linkId = null;
+		if (positionType == Position.LINK) {
+			linkId = agentPosition.getPositionId();
+		} else if (positionType == Position.FACILITY) {
+			linkId = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
+		} else if (positionType == Position.VEHICLE) {
+			linkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());			
 		} else {
 			log.warn("Agent's position is undefined! Id: " + this.pId);
 			return 1.0;
 		}
 		
-		double distance = CoordUtils.calcDistance(coord, link.getCoord());
+		// Check whether there is a value in the lookup map.
+		Map<Id, Double> fuzzyFactors = distanceFuzzyFactors.get(linkId);
+		Double fuzzyFactor = fuzzyFactors.get(link.getId());
 		
-		double factor = 1 / (1 + Math.exp((-distance/1500.0) + 4.0));
+		// Use a value of 1.0 if there is no entry in the lookup map.
+		if (fuzzyFactor == null) fuzzyFactor = 1.0;
 		
-		// if the person is located at a link, add the link factor to the lookup map
-		if (fuzzyFactors != null) fuzzyFactors.put(link.getId(), factor);
-		
-		return factor;
+		return fuzzyFactor;
 	}
 	
 	/*
@@ -153,7 +139,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	 * depends on the current person and the given link. 
 	 */
 	private double calcLinkFuzzyFactor(Link link) {	
-		int lIdHashCode = link.getId().toString().hashCode();
+		int lIdHashCode = link.getId().hashCode();
 		return hashCodeToRandomDouble(lIdHashCode + pIdHashCode);
 	}
 	
