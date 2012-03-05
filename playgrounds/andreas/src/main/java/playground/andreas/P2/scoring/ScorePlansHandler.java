@@ -82,12 +82,16 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.vehicleId2ScoreMap.get(event.getVehicleId()).addPassenger();		
+		if(!event.getPersonId().toString().contains("p_")){
+			this.vehicleId2ScoreMap.get(event.getVehicleId()).addPassenger();
+		}
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		this.vehicleId2ScoreMap.get(event.getVehicleId()).removePassenger();
+		if(!event.getPersonId().toString().contains("p_")){
+			this.vehicleId2ScoreMap.get(event.getVehicleId()).removePassenger();
+		}
 	}
 
 	@Override
