@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * FacilitiesLoadCalculator.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,32 +20,47 @@
 
 package playground.anhorni.surprice;
 
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 
-import playground.anhorni.surprice.scoring.LaggedScoringFunctionFactory;
-import playground.anhorni.surprice.scoring.ScoringFunctionResetter;
-
-public class DayControler extends Controler {
-	
-	private AgentMemories memories = new AgentMemories();
+/**
+ * @author anhorni
+ */
+public class Memorizer implements IterationEndsListener {	
+	private AgentMemories memories;
 	private String day;
 	
-	
-	public DayControler(final Config config, AgentMemories memories, String day) {
-		super(config);	
-		super.setOverwriteFiles(true);
-		this.memories = memories;	
+	public Memorizer(AgentMemories memories, String day) {
+		this.memories = memories;
 		this.day = day;
-	} 
-		
-	protected void setUp() {
-	    super.setUp();	           
-	  	LaggedScoringFunctionFactory scoringFunctionFactory = new LaggedScoringFunctionFactory(
-	  			this, this.config.planCalcScore(), this.network, this.memories, this.day);	  		
-	  	this.setScoringFunctionFactory(scoringFunctionFactory);
-	  	
-	  	this.addControlerListener(new ScoringFunctionResetter());
-	  	this.addControlerListener(new Memorizer(this.memories, this.day));
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		Controler controler = event.getControler();		
+		Population population = controler.getPopulation();
+		for (Person person : population.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			if (this.memories.getMemory(person.getId()) == null) {
+				this.memories.addMemory(person.getId(), new AgentMemory());
+			}			
+			this.memories.getMemory(person.getId()).addPlan(plan, this.day);
+		}		
+	}
+
+	public AgentMemories getMemories() {
+		return memories;
+	}
+
+	public void setMemories(AgentMemories memories) {
+		this.memories = memories;
+	}
+	
+	public void setDay(String day) {
+		this.day = day;
 	}
 }

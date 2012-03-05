@@ -97,16 +97,16 @@ public class WeekScenario {
 				
 		DayControler controler = null;
 		
-		if (day.equals("Sat")) {
-			controler = new DayControler(this.saturdayScenario);
-		}
-		else if (day.equals("Sun")) {
-			controler = new DayControler(this.sundayScenario);
-		}
-		else {
-			controler = new DayControler(this.baseScenario); 
-		}
-		controler.run();		
+//		if (day.equals("Sat")) {
+//			controler = new DayControler(this.saturdayScenario);
+//		}
+//		else if (day.equals("Sun")) {
+//			controler = new DayControler(this.sundayScenario);
+//		}
+//		else {
+//			controler = new DayControler(this.baseScenario); 
+//		}
+//		controler.run();		
 		
 		this.addPlans2Memory();
 		this.clearPlans();

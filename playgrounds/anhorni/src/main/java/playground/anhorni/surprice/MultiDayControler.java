@@ -19,6 +19,9 @@
 
 package playground.anhorni.surprice;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -28,6 +31,9 @@ import playground.anhorni.surprice.preprocess.CreateScenario;
 public class MultiDayControler {
 	
 	private final static Logger log = Logger.getLogger(MultiDayControler.class);
+	
+	public static ArrayList<String> days = new ArrayList<String>(Arrays.asList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
+	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "bike", "walk"));
 		
 	public static void main (final String[] args) {		
 		if (args.length != 1) {
@@ -48,9 +54,9 @@ public class MultiDayControler {
 			config.setParam("plans", "inputPlansFile", plansPath + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
 			
-			DayControler controler = new DayControler(config, memories);
+			DayControler controler = new DayControler(config, memories, day);
 			controler.run();
 		}
-		log.info("Week simulated, yep, ..........");
+		log.info("Week simulated, yep, .................................................................");
     }
 }

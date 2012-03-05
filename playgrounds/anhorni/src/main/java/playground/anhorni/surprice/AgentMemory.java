@@ -24,9 +24,11 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.anhorni.surprice.preprocess.Zone;
@@ -37,11 +39,13 @@ public class AgentMemory {
 	private List<Plan> plansSat = new Vector<Plan>();
 	private List<Plan> plansSun = new Vector<Plan>();
 	
+	private TreeMap<String, Plan> plans = new TreeMap<String, Plan>();
+	
 	private TreeMap<String, Integer> activitiesWeek = new TreeMap<String, Integer>();
 	private TreeMap<String, Integer> activitiesSat = new TreeMap<String, Integer>();
 	private TreeMap<String, Integer> activitiesSun = new TreeMap<String, Integer>();	
 	private Zone homeZone;
-		
+			
 	public void setHomeZone(Zone homeZone) {
 		this.homeZone = homeZone;
 	}
@@ -63,6 +67,8 @@ public class AgentMemory {
 			this.plansWeek.add(plan);		
 			this.countActs(plan, this.activitiesWeek);
 		}
+		
+		this.plans.put(day, plan);
 	}
 	
 	public Plan getRandomPlanAndRemove(String day, Random random) {
@@ -116,6 +122,39 @@ public class AgentMemory {
 			}			
 		}		
 		return modes;
+	}
+	
+	public String getMainModePreviousDay(String day) {
+		String mode = "";
+		int [] modeCounts = {0, 0, 0, 0};
+		
+		int dayIndex = MultiDayControler.days.indexOf(day);
+		if (dayIndex > 0) { 
+			dayIndex--;
+		}
+		else {
+			return mode;
+		}
+		
+		Plan plan = this.plans.get(MultiDayControler.days.get(dayIndex));
+		
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				LegImpl leg = (LegImpl)pe;
+				String m = leg.getMode();
+				modeCounts[MultiDayControler.modes.indexOf(m)] += 1;
+			}
+		}
+		int maxVal = 0;
+		int maxIndex = 0;
+		for (int i = 0; i < 4; i++) {
+			if (modeCounts[i] > maxVal) {
+				maxVal = modeCounts[i];
+				maxIndex = i;
+			}
+		}
+		mode = MultiDayControler.modes.get(maxIndex);	// TODO: handle equal numbers
+		return mode;
 	}
 	
 	// act frequency -------------------------------------------------------------	

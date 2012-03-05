@@ -31,18 +31,25 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
 import playground.anhorni.surprice.AgentMemories;
+import playground.anhorni.surprice.AgentMemory;
 
 public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory{
 	
 	private final Controler controler;
 	private AgentMemories memories = new AgentMemories();
-	private CharyparNagelScoringParameters params;
+	private CharyparNagelScoringParameters newParams;
+	
+	private double f = 2.0;
+	private PlanCalcScoreConfigGroup configGroup;
+	
+	private String day;
 
-	public LaggedScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, AgentMemories memories) {
+	public LaggedScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, AgentMemories memories, String day) {
 		super(configGroup, network);
 		this.controler = controler;
 		this.memories = memories;
-		this.params =  super.getParams();
+		this.configGroup = configGroup;
+		this.day = day;
 	}
 	
 	public ScoringFunction createNewScoringFunction(Plan plan) {	
@@ -52,15 +59,33 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 			
-		LaggedScoringFunction scoringFunction = new LaggedScoringFunction(plan, this.params, this.controler.getFacilities());
+		LaggedScoringFunction scoringFunction = new LaggedScoringFunction(plan, this.newParams, this.controler.getFacilities());
 		
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(super.getParams(), controler.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(this.newParams, controler.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(this.newParams));
 		return scoringFunctionAccumulator;
 	}
 	
 	private void adaptCoefficients(Person person) {
-		
+		// adapt config group for Tue - Sun: 
+		if (!this.day.equals("Mon")) {
+			AgentMemory agentMemory = this.memories.getMemory(person.getId());
+			String mode = agentMemory.getMainModePreviousDay(this.day);
+			
+			if (mode.equals("car")) {
+				this.configGroup.setConstantCar(this.configGroup.getConstantCar() * f);
+			} else if (mode.equals("pt")) {
+				this.configGroup.setConstantPt(this.configGroup.getConstantPt() * f);
+			} else if (mode.equals("bike")) {
+				this.configGroup.setConstantBike(this.configGroup.getConstantBike() * f);			
+			} else if (mode.equals("walk")) {
+				this.configGroup.setConstantWalk(this.configGroup.getConstantWalk() * f);
+			}
+			else {
+				// do nothing
+			}
+		}
+		this.newParams = new CharyparNagelScoringParameters(this.configGroup);
 	}
 }
