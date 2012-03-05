@@ -20,63 +20,53 @@
 
 package org.matsim.core.scoring;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.api.experimental.events.handler.*;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.TravelEvent;
 import org.matsim.core.events.TravelEventHandler;
-import org.matsim.core.utils.collections.Tuple;
 
 /**
- * Calculates continuously the score of the selected plans of a given scenario
+ * Calculates the score of the selected plans of a given scenario
  * based on events.<br>
  * Departure- and Arrival-Events *must* be provided to calculate the score,
  * AgentStuck-Events are used if available to add a penalty to the score. The
  * final score are written to the selected plans of each person in the
  * scenario.
+ * 
+ * Note: As of now, this is only a convenience class which is used from many playgrounds.
+ * The MATSim Controler (more specifically, PlansScoring) plugs together the same
+ * elements which are used in this class by itself.
  *
- * @author mrieser
+ * @author mrieser, michaz
  */
 public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
 		AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkLeaveEventHandler,
         LinkEnterEventHandler, TravelEventHandler {
 
-	private Scenario scenario = null;
-	private ScoringFunctionFactory sfFactory = null;
-	private final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
-	private double scoreSum = 0.0;
-	private long scoreCount = 0;
-	private final double learningRate;
+
+
     private EventsToActivities eventsToActivities;
     private EventsToLegs eventsToLegs;
-    private DistributeToScoringFunctions handler;
-
-    private class DistributeToScoringFunctions implements ActivityHandler, LegHandler {
-
-        @Override
-        public void handleActivity(Id agentId, Activity activity) {
-            ScoringFunction scoringFunctionForAgent = getScoringFunctionForAgent(agentId);
-            if (scoringFunctionForAgent != null) {
-                scoringFunctionForAgent.handleActivity(activity);
-            }
-        }
-
-        @Override
-        public void handleLeg(Id agentId, Leg leg) {
-            ScoringFunction scoringFunctionForAgent = getScoringFunctionForAgent(agentId);
-            if (scoringFunctionForAgent != null) {
-                scoringFunctionForAgent.handleLeg(leg);
-            }
-        }
-    }
+    private PlanElementsToScore handler;
+	private Scenario scenario;
+	private ScoringFunctionFactory scoringFunctionFactory;
+	private double learningRate;
 
     /**
 	 * Initializes EventsToScore with a learningRate of 1.0.
@@ -88,13 +78,17 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		this(scenario, factory, 1.0);
 	}
 
-	public EventsToScore(final Scenario scenario, final ScoringFunctionFactory factory, final double learningRate) {
-		super();
+	public EventsToScore(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final double learningRate) {
 		this.scenario = scenario;
-		this.sfFactory = factory;
+		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
-        this.eventsToActivities = new EventsToActivities();
-        this.handler = new DistributeToScoringFunctions();
+        initHandlers(scenario, scoringFunctionFactory, learningRate);
+	}
+
+	private void initHandlers(final Scenario scenario,
+			final ScoringFunctionFactory factory, final double learningRate) {
+		this.eventsToActivities = new EventsToActivities();
+        this.handler = new PlanElementsToScore(scenario, factory, learningRate);
         this.eventsToActivities.setActivityHandler(this.handler);
         this.eventsToLegs = new EventsToLegs();
         this.eventsToLegs.setLegHandler(this.handler);
@@ -120,6 +114,8 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		eventsToLegs.handleEvent(event);
 	}
 
+    
+    
 	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
@@ -158,21 +154,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 */
 	public void finish() {
         eventsToActivities.finish();
-		for (Map.Entry<Id, Tuple<Plan, ScoringFunction>> entry : this.agentScorers.entrySet()) {
-			Plan plan = entry.getValue().getFirst();
-			ScoringFunction sf = entry.getValue().getSecond();
-			sf.finish();
-			double score = sf.getScore();
-			Double oldScore = plan.getScore();
-			if (oldScore == null) {
-				plan.setScore(score);
-			} else {
-				plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
-			}
-
-			this.scoreSum += score;
-			this.scoreCount++;
-		}
+        handler.finish();
 	}
 
 	/**
@@ -183,9 +165,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 *         (learningrate)
 	 */
 	public double getAveragePlanPerformance() {
-		if (this.scoreSum == 0)
-			return Double.NaN;
-		return (this.scoreSum / this.scoreCount);
+		return handler.getAveragePlanPerformance();
 	}
 
 	/**
@@ -197,50 +177,21 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 * @return The score of the specified agent.
 	 */
 	public Double getAgentScore(final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = this.agentScorers.get(agentId);
-		if (data == null)
+		ScoringFunction scoringFunction = getScoringFunctionForAgent(agentId);
+		if (scoringFunction == null)
 			return null;
-		return data.getSecond().getScore();
+		return scoringFunction.getScore();
 	}
 
 	@Override
 	public void reset(final int iteration) {
         this.eventsToActivities.reset(iteration);
         this.eventsToLegs.reset(iteration);
-		this.agentScorers.clear();
-		this.scoreCount = 0;
-		this.scoreSum = 0.0;
+        initHandlers(scenario, scoringFunctionFactory, learningRate);
 	}
 
-	private Tuple<Plan, ScoringFunction> getPlanAndScoringFunctionForAgent(final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = this.agentScorers.get(agentId);
-		if (data == null) {
-			Person person = this.scenario.getPopulation().getPersons().get(agentId);
-			if (person == null) {
-				return null;
-			}
-			data = new Tuple<Plan, ScoringFunction>(person.getSelectedPlan(), this.sfFactory.createNewScoringFunction(person.getSelectedPlan()));
-			this.agentScorers.put(agentId, data);
-		}
-		return data;
-	}
-
-	/**
-	 * Returns the scoring function for the specified agent. If the agent
-	 * already has a scoring function, that one is returned. If the agent does
-	 * not yet have a scoring function, a new one is created and assigned to the
-	 * agent and returned.
-	 *
-	 * @param agentId
-	 *            The id of the agent the scoring function is requested for.
-	 * @return The scoring function for the specified agent.
-	 */
-	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = this.getPlanAndScoringFunctionForAgent(agentId);
-		if (data == null) {
-			return null;
-		}
-		return data.getSecond();
+	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
+		return handler.getScoringFunctionForAgent(agentId);
 	}
 
 }
