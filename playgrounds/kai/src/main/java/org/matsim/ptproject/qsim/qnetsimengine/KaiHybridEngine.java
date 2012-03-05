@@ -53,6 +53,9 @@ public class KaiHybridEngine implements MobsimEngine {
 
 	@Override
 	public void doSimStep(double time) {
+		for ( KaiHiResLink hiResLink : hiResLinks.values() ) {
+			hiResLink.doSimStep(time) ;
+		}
 	}
 
 	public void registerHiResLink(KaiHiResLink hiResLink) {
