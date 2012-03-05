@@ -43,7 +43,7 @@ import processing.core.PShapeSVG.Font;
 public class P3DRenderer extends PApplet
 {
 
-	private final float agentSize = 20; //(meter / si units)
+	private final float agentSize = 12; //(meter / si units)
 	private HashMap<String, Agent> agents;
 	private HashMap<String, Agent> agentsCopy = null;
 	private HashMap<Integer, DataPoint> nodes;
@@ -623,8 +623,15 @@ public class P3DRenderer extends PApplet
 		double timeMeasDiff= System.currentTimeMillis()-timeMeas;
 		avgRenderingTime += timeMeasDiff;
 		
-		color(255,255,255);
+		fill(255,255,255);
 		text("time: " + currentTime, 1,30);
+		if(keyPressed)
+		{
+		    if (key == 'b' || key == 'B') 
+		    	text("offset: (" + offset.x + "," + offset.y + ")", 1,60);;
+		    
+		  }
+
 		
 		
 		//save("C:/temp/f" + String.format("%04d", fr) +".png");
@@ -681,6 +688,7 @@ public class P3DRenderer extends PApplet
 			this.c=this.c+2.1f;
 			//scale(1/c, 1/c, c);
 			//background(33,255,127+(c%127));
+			
 
 		}
 		//background(200);
@@ -859,7 +867,7 @@ public class P3DRenderer extends PApplet
 								else
 									fill(color(agentColor[0], agentColor[1],agentColor[2],255));
 	
-								ellipse (posX, posY, this.agentSize, this.agentSize);
+								ellipse (posX, posY, this.agentSize * (zoomFactor/10.01f), this.agentSize * (zoomFactor/10.01f));
 	
 	
 							}
@@ -897,6 +905,7 @@ public class P3DRenderer extends PApplet
 			displayingData = false;
 		}
 
+		
 		
 	}
 
@@ -1176,6 +1185,8 @@ public class P3DRenderer extends PApplet
 		offset.x = x;
 		offset.y = y;
 	}
+	
+	
 	
 
 }

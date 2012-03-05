@@ -24,10 +24,13 @@ public class GUIToolbar extends JPanel {
 	JButton buttonRewind;
 	JButton buttonPlay;
 	JButton buttonPause;
+	JButton buttonTool;
 	
 	JSlider sliderSpeed;
 	
 	Controller controller;
+	
+	int x = 0;
 	
 	boolean isPaused = false;
 	
@@ -42,23 +45,26 @@ public class GUIToolbar extends JPanel {
         buttonRewind  = new JButton("rewind");
         buttonPause = new JButton("pause");
         buttonPlay = new JButton("play");
+        buttonTool = new JButton("test");
+        
         
         buttonPlay.addActionListener(new ActionPlay());
         buttonPause.addActionListener(new ActionPause());
         buttonRewind.addActionListener(new ActionRewind());
+        buttonTool.addActionListener(new ActionTool());
         
         JPanel panelButtons;
         
+    	panelButtons = new JPanel(new GridLayout(0,5));
+    	
         if (!controller.isLiveMode())
         {
-        	panelButtons = new JPanel(new GridLayout(0,3));
 	        panelButtons.add(buttonPlay);
 	        panelButtons.add(buttonRewind);
         }
-        else
-        	panelButtons = new JPanel(new BorderLayout());
         
         panelButtons.add(buttonPause);
+        //panelButtons.add(buttonTool);
         	
         
         add(panelButtons, BorderLayout.NORTH);
@@ -75,6 +81,17 @@ public class GUIToolbar extends JPanel {
 			labelTitle.setText("test");
 			//controller.setAnimationSpeed(22f);
 			controller.play();
+		}
+		
+	}
+	
+	class ActionTool implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			x += 10;
+			controller.setOffset(x, 0);
+			
 		}
 		
 	}

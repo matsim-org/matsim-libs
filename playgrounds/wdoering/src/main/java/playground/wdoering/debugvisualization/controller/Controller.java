@@ -235,7 +235,7 @@ public class Controller {
 
 		this.readerThread.start();
 		
-		this.gui.setOffset(275,50);
+		this.gui.setOffset(86,76);
 		
 		this.pause();
 
@@ -381,7 +381,7 @@ public class Controller {
 				this.oldTime = System.currentTimeMillis();
 				this.console.println("time change occured!");
 
-				//recalculate extreme values
+				//recalculate extreme values and remove agents without current data
 				if (this.agents != null)
 				{
 					Iterator agentsIterator = this.agents.entrySet().iterator();
@@ -390,23 +390,20 @@ public class Controller {
 						//Get current agent
 						Map.Entry pairs = (Map.Entry) agentsIterator.next();
 						XYVxVyAgent agent = (XYVxVyAgent)pairs.getValue();
-
-						HashMap<Double,DataPoint> dataPoints = agent.getDataPoints();
-						Iterator dataPointIterator = dataPoints.entrySet().iterator();
-
-						while (dataPointIterator.hasNext())
+						
+						XYVxVyDataPoint currentDataPoint = agent.getCurrentDataPoint();
+						
+						if (currentDataPoint.getTime() < currentTime-1)
 						{
-							//Get current datapoint
-							Map.Entry dataPointPairs = (Map.Entry) dataPointIterator.next();
-							DataPoint itDataPoint = (DataPoint)dataPointPairs.getValue();
+							agentsIterator.remove();
+						}
+						else
+						{
 
-							if (itDataPoint != null)
-							{
-								this.maxPosX = Math.max(itDataPoint.getPosX(), this.maxPosX);
-								this.minPosX = Math.min(itDataPoint.getPosX(), this.minPosX);
-								this.maxPosY = Math.max(itDataPoint.getPosY(), this.maxPosY);
-								this.minPosY = Math.min(itDataPoint.getPosY(), this.minPosY);
-							}
+							this.maxPosX = Math.max(currentDataPoint.getPosX(), this.maxPosX);
+							this.minPosX = Math.min(currentDataPoint.getPosX(), this.minPosX);
+							this.maxPosY = Math.max(currentDataPoint.getPosY(), this.maxPosY);
+							this.minPosY = Math.min(currentDataPoint.getPosY(), this.minPosY);
 						}
 
 					}
@@ -524,6 +521,11 @@ public class Controller {
 	{
 		// TODO Auto-generated method stub
 		return geometries;
+	}
+
+	public void setOffset(int x, int y) {
+		gui.setOffset(x, y);
+		
 	}
 
 }
