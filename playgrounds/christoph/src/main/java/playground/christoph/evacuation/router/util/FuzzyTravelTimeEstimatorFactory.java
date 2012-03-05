@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -82,10 +83,12 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 		int numThreads = scenario.getConfig().global().getNumberOfThreads();
 		Thread[] threads = new Thread[numThreads];
 		FuzzyTravelTimeEstimatorRunnable[] runnables = new FuzzyTravelTimeEstimatorRunnable[numThreads];
-		Counter counter = new Counter("Entries in link fuzzy factor lookup map ");
+		Counter counter = new Counter("Handled links for fuzzy factor lookup map ");
+		AtomicLong entryCount = new AtomicLong();
 		
 		for (int i = 0; i < numThreads; i++) {
-			FuzzyTravelTimeEstimatorRunnable runnable = new FuzzyTravelTimeEstimatorRunnable(scenario.getNetwork(), this.distanceFuzzyFactors, counter);
+			FuzzyTravelTimeEstimatorRunnable runnable = new FuzzyTravelTimeEstimatorRunnable(scenario.getNetwork(), 
+					this.distanceFuzzyFactors, counter, entryCount);
 			runnables[i] = runnable;
 			Thread thread = new Thread(runnable);
 			thread.setDaemon(true);
@@ -112,7 +115,8 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 		}
 		
 		counter.printCounter();
-		log.info("done.");
+		log.info("Average number of fuzzy factor lookup entries per link " + entryCount.doubleValue() / counter.getCounter());
+		log.info("Done.");
 	}
 	
 	private static class FuzzyTravelTimeEstimatorRunnable implements Runnable {
@@ -121,11 +125,13 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 		private final Collection<Link> links;
 		private final Map<Id, Map<Id, Double>> distanceFuzzyFactors;
 		private final Counter counter;
+		private final AtomicLong entryCount;
 		
-		public FuzzyTravelTimeEstimatorRunnable(Network network, Map<Id, Map<Id, Double>> distanceFuzzyFactors, Counter counter) {
+		public FuzzyTravelTimeEstimatorRunnable(Network network, Map<Id, Map<Id, Double>> distanceFuzzyFactors, Counter counter, AtomicLong entryCount) {
 			this.network = network;
 			this.distanceFuzzyFactors = distanceFuzzyFactors;
 			this.counter = counter;
+			this.entryCount = entryCount;
 			
 			this.links = new ArrayList<Link>();
 		}
@@ -146,9 +152,10 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 					
 					if (factor < 0.98) {
 						fuzzyFactors.put(toLink.getId(), factor);
-						counter.incCounter();
+						entryCount.incrementAndGet();
 					}
 				}
+				counter.incCounter();
 			}			
 		}
 		
