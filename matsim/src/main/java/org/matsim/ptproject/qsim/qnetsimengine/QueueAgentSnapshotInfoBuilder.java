@@ -45,37 +45,44 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 
 		double vehLen = Math.min( 
 		linkLength / (storageCapacity + bufferStorageCapacity), // number of ``cells''
-		linkLength / numberOfVehiclesOnLink ); // the link may be more than ``full'' because of forward squeezing of stuck vehicles
-//		double vehLen = Math.min( 
-//		linkLength / (storageCapacity + bufferStorageCapacity), // all vehicles must have place on the link
-//		this.cellSize / this.storageCapacityFactor); // a vehicle should not be larger than it's actual size. yyyy why is that an issue? kai, apr'10
-
+		linkLength / (numberOfVehiclesOnLink) ); // the link may be more than ``full'' because of forward squeezing of stuck vehicles
+		
 		return vehLen;
 	}
 	
+
 	@Override
 	public double calculateDistanceOnVectorFromFromNode(double length, double spacing,
-			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double travelTime) {
-		if (Double.isNaN(lastDistanceFromFromNode)) {
-			lastDistanceFromFromNode = length;
-		}
-		double distanceFromFromNode = 0.0;
+			 double lastDistanceFromFNode, double now, double freespeedTraveltime, double travelTime) {
+		double distanceFromFNode ;
 		
 		if (freespeedTraveltime == 0.0){
-			distanceFromFromNode = 0.0;
+			distanceFromFNode = 0. ;
+			// (insure against division by zero on non-physical links)
 		}
 		else {
-			distanceFromFromNode = (travelTime / freespeedTraveltime) * length;
+			// we calculate where the vehicle would be with free speed.
+			distanceFromFNode = (travelTime / freespeedTraveltime) * length ;
+			if ( distanceFromFNode < 0. ) {
+				distanceFromFNode = 0. ;
+			}
 		}
 		
-		if (distanceFromFromNode >= lastDistanceFromFromNode - spacing ) { 
+		if (Double.isNaN(lastDistanceFromFNode)) {
+			// (non-object-oriented way of "null" (?))
+			
+			lastDistanceFromFNode = length ;
+		}
+
+		if (distanceFromFNode >= lastDistanceFromFNode - spacing ) { 
 			/* vehicle is already in queue or has to stay behind another vehicle
 			 * -> position it directly after the last position
 			 */
-			distanceFromFromNode = lastDistanceFromFromNode - spacing;
-		} 
+			distanceFromFNode = lastDistanceFromFNode - spacing;
+		}
+		
 		//else just do nothing anymore
-		return distanceFromFromNode;
+		return distanceFromFNode;
 	}
 
 	
