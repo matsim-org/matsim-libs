@@ -30,6 +30,7 @@ public class CreateToll {
     	RoadPricingScheme scheme = new RoadPricingScheme();
     	scheme.setType("area");
     	scheme.setName("surprice");
+    	scheme.setDescription("chessboard example");
     	
     	double startTime = 8.0 * 3600.0;
     	double endTime = 12.0 * 3600.0;
