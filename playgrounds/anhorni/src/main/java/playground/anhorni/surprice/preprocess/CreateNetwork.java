@@ -51,7 +51,7 @@ public class CreateNetwork {
 		this.addNodes(networkFactory);
 		this.addLinks(networkFactory);
 		
-		this.write(config.findParam(CreateScenario.LCEXP, "outPath"));
+		this.write(config.findParam(CreateScenario.SURPRICE, "outPath"));
 	}
 			
 	private void addLinks(NetworkFactoryImpl networkFactory) {		
@@ -59,9 +59,9 @@ public class CreateNetwork {
 		int facilityCnt = 0;
 		double freeSpeed = 35.0 / 3.6;
 		
-		double sideLength = Double.parseDouble(config.findParam(CreateScenario.LCEXP, "sideLength"));
-		double spacing = Double.parseDouble(config.findParam(CreateScenario.LCEXP, "spacing"));
-		double linkCapacity = Double.parseDouble(config.findParam(CreateScenario.LCEXP, "linkCapacity"));
+		double sideLength = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "sideLength"));
+		double spacing = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "spacing"));
+		double linkCapacity = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "linkCapacity"));
 		
 		int stepsPerSide = (int)(sideLength / spacing);
 		
@@ -146,11 +146,13 @@ public class CreateNetwork {
 		ActivityOptionImpl actOptionLeisure = (ActivityOptionImpl)facility.getActivityOptions().get("leisure");
 		OpeningTimeImpl opentimeLeisure = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
 		actOptionLeisure.addOpeningTime(opentimeLeisure);
+		
+		facility.setLinkId(l.getId());
 	}
 			
 	private void addNodes(NetworkFactoryImpl networkFactory) {		
-		double sideLength = Double.parseDouble(config.findParam(CreateScenario.LCEXP, "sideLength"));
-		double spacing = Double.parseDouble(config.findParam(CreateScenario.LCEXP, "spacing"));
+		double sideLength = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "sideLength"));
+		double spacing = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "spacing"));
 		
 		int nodeCnt = 0;
 		int stepsPerSide = (int)(sideLength/ spacing);

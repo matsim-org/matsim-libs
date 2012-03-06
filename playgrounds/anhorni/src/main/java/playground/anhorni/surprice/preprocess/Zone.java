@@ -19,12 +19,14 @@
 
 package playground.anhorni.surprice.preprocess;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class Zone {	
@@ -72,6 +74,14 @@ public class Zone {
 		}
 		int index = random.nextInt(facilitiesInZone.size());
 		return this.facilitiesInZone.get(index);
+	}
+	
+	public List<Id> getlinksInZone() {
+		List<Id> links = new ArrayList<Id>();
+		for (ActivityFacility facility : this.facilitiesInZone) {
+			links.add(facility.getLinkId());
+		}
+		return links;
 	}
  	
 	public boolean inZone(Coord point) {

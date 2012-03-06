@@ -29,7 +29,7 @@ public class CreateScenario {
 
 	private final static Logger log = Logger.getLogger(CreateScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	public static final String LCEXP = "dc_preprocess";
+	public static final String SURPRICE = "preprocess";
 	private String configFile;
 	public static String [] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 				
@@ -62,5 +62,8 @@ public class CreateScenario {
 				
 		CreatePopulation populationCreator = new CreatePopulation();
 		populationCreator.createPopulation(this.scenario, config);	
+		
+		CreateToll tollCreator = new CreateToll();
+		tollCreator.create(config.findParam(CreateScenario.SURPRICE, "outPath"), populationCreator.getTollZone()); // TODO: different schemes for different days
 	}
 }

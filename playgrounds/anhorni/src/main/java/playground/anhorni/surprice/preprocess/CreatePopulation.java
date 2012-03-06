@@ -56,6 +56,8 @@ public class CreatePopulation {
 	
 	private DecisionModelCreator decisionModelCreator = new DecisionModelCreator();
 	private Random random = new Random(37835409);
+	
+	private Zone tollZone;
 			
 	public void createPopulation(ScenarioImpl scenario, Config config) {		
 		this.scenario = scenario;
@@ -77,7 +79,7 @@ public class CreatePopulation {
 				((PersonImpl)person).addPlan(plan);
 				((PersonImpl)person).setSelectedPlan(plan);
 			}
-			String outPath = config.findParam(CreateScenario.LCEXP, "outPath") + day;
+			String outPath = config.findParam(CreateScenario.SURPRICE, "outPath") + day;
 			new File(outPath).mkdirs();
 			this.write(outPath);
 			
@@ -98,9 +100,12 @@ public class CreatePopulation {
 	}
 	
 	private void createPersons() {
-		double sideLength = Double.parseDouble(config.findParam(CreateScenario.LCEXP, "sideLength"));
+		double sideLength = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "sideLength"));
 		Zone centerZone = new Zone("centerZone", (Coord) new CoordImpl(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 1000.0, 1000.0);	
 		this.initZone(centerZone);
+		
+		this.tollZone = centerZone;
+		
 		Zone topLeftZone =  new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, sideLength), 1000.0, 1000.0); 
 		this.initZone(topLeftZone);
 		Zone bottomLeftZone =  new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, 1000.0), 1000.0, 1000.0); 
@@ -122,7 +127,7 @@ public class CreatePopulation {
 	}
 			
 	private int addPersons(Zone origin, Zone destination, int offset) {				
-		int personsPerLocation = Integer.parseInt(config.findParam(CreateScenario.LCEXP, "personsPerZone"));
+		int personsPerLocation = Integer.parseInt(config.findParam(CreateScenario.SURPRICE, "personsPerZone"));
 		int personCnt = 0;
 		for (int j = 0; j < personsPerLocation; j++) {
 			PersonImpl p = new PersonImpl(new IdImpl(personCnt + offset));			
@@ -219,5 +224,13 @@ public class CreatePopulation {
 	public void write(String path) {
 		log.info("Writing population ...");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(path + "/plans.xml");
+	}
+
+	public Zone getTollZone() {
+		return tollZone;
+	}
+
+	public void setTollZone(Zone tollZone) {
+		this.tollZone = tollZone;
 	}
 }
