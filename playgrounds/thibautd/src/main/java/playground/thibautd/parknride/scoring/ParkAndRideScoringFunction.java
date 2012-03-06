@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
@@ -44,6 +45,8 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 	private final ParkingPenalty penalty;
 	private final ActivityFacilities facilities;
 	private final Network network;
+	// for informative log msgs only.
+	private final Plan plan;
 
 	private double lastArrivalTime = Time.UNDEFINED_TIME;
 	private boolean isParked = false;
@@ -53,11 +56,13 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 			final ScoringFunction scoringFunction,
 			final ParkingPenalty penalty,
 			final ActivityFacilities facilities,
-			final Network network) {
+			final Network network,
+			final Plan plan) {
 		this.delegate = scoringFunction;
 		this.penalty = penalty;
 		this.facilities = facilities;
 		this.network = network;
+		this.plan = plan;
 	}
 
 	@Override
@@ -68,32 +73,12 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 			}
 
 			if (lastLegWasCar && !activity.getType().equals( ParkAndRideConstants.PARKING_ACT )) {
+				penalty.park( lastArrivalTime , extractCoord( activity ) );
 				isParked = true;
-				// use in priority the coord from act
-				Coord coord = activity.getCoord();
-
-				// if no coord, search for a facility, if possible
-				if (coord == null && facilities != null) {
-					Facility facility = facilities.getFacilities().get( activity.getFacilityId() );
-					coord = facility == null ? null : facility.getCoord();
-				}
-
-				// if still nothing, use link coord
-				if (coord == null && network != null) {
-					Id linkId = activity.getLinkId();
-					Link link = linkId == null ? null : network.getLinks().get( activity.getLinkId() );
-					coord = link == null ? null : link.getCoord();
-				}
-
-				if (coord == null) {
-					throw new RuntimeException( "could not resolve coord of activity "+activity );
-				}
-
-				penalty.park( lastArrivalTime , coord );
 			}
 		}
 		catch (Exception e) {
-			throw new RuntimeException( "problem occured while scoring activity "+activity , e );
+			throw new RuntimeException( "problem occured while scoring activity "+activity+" in plan "+plan.getPlanElements()+" for person "+plan.getPerson().getId() , e );
 		}
 	}
 
@@ -117,7 +102,7 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 			}
 		}
 		catch(Exception e) {
-			throw new RuntimeException( "a problem occured while scoring "+leg , e );
+			throw new RuntimeException( "a problem occured while scoring "+leg+" in plan "+plan.getPlanElements()+" for person "+plan.getPerson().getId() , e );
 		}
 	}
 
@@ -146,6 +131,30 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 	public void reset() {
 		delegate.reset();
 		penalty.reset();
+	}
+
+	private Coord extractCoord(final Activity activity) {
+		// use in priority the coord from act
+		Coord coord = activity.getCoord();
+
+		// if no coord, search for a facility, if possible
+		if (coord == null && facilities != null) {
+			Facility facility = facilities.getFacilities().get( activity.getFacilityId() );
+			coord = facility == null ? null : facility.getCoord();
+		}
+
+		// if still nothing, use link coord
+		if (coord == null && network != null) {
+			Id linkId = activity.getLinkId();
+			Link link = linkId == null ? null : network.getLinks().get( activity.getLinkId() );
+			coord = link == null ? null : link.getCoord();
+		}
+
+		if (coord == null) {
+			throw new RuntimeException( "could not resolve coord of activity "+activity );
+		}
+
+		return coord;
 	}
 }
 

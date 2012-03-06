@@ -55,7 +55,8 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 				scoringFunctionFactory.createNewScoringFunction( plan ),
 				parkingPenaltyFactory.createPenalty( plan ),
 				facilities,
-				network);
+				network,
+				plan);
 	}
 
 	/**
