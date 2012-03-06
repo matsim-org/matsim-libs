@@ -62,57 +62,62 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 
 	@Override
 	public void handleActivity(final Activity activity) {
-		if (!ParkAndRideConstants.PARKING_ACT.equals( activity.getType() )) {
-			try {
-				delegate.handleActivity(activity);
+		try {
+			if (!ParkAndRideConstants.PARKING_ACT.equals( activity.getType() )) {
+					delegate.handleActivity(activity);
 			}
-			catch (Exception e) {
-				throw new RuntimeException( activity.toString() , e );
+
+			if (lastLegWasCar && !activity.getType().equals( ParkAndRideConstants.PARKING_ACT )) {
+				isParked = true;
+				// use in priority the coord from act
+				Coord coord = activity.getCoord();
+
+				// if no coord, search for a facility, if possible
+				if (coord == null && facilities != null) {
+					Facility facility = facilities.getFacilities().get( activity.getFacilityId() );
+					coord = facility == null ? null : facility.getCoord();
+				}
+
+				// if still nothing, use link coord
+				if (coord == null && network != null) {
+					Id linkId = activity.getLinkId();
+					Link link = linkId == null ? null : network.getLinks().get( activity.getLinkId() );
+					coord = link == null ? null : link.getCoord();
+				}
+
+				if (coord == null) {
+					throw new RuntimeException( "could not resolve coord of activity "+activity );
+				}
+
+				penalty.park( lastArrivalTime , coord );
 			}
 		}
-
-		if (lastLegWasCar && !activity.getType().equals( ParkAndRideConstants.PARKING_ACT )) {
-			isParked = true;
-			// use in priority the coord from act
-			Coord coord = activity.getCoord();
-
-			// if no coord, search for a facility, if possible
-			if (coord == null && facilities != null) {
-				Facility facility = facilities.getFacilities().get( activity.getFacilityId() );
-				coord = facility == null ? null : facility.getCoord();
-			}
-
-			// if still nothing, use link coord
-			if (coord == null && network != null) {
-				Id linkId = activity.getLinkId();
-				Link link = linkId == null ? null : network.getLinks().get( activity.getLinkId() );
-				coord = link == null ? null : link.getCoord();
-			}
-
-			if (coord == null) {
-				throw new RuntimeException( "could not resolve coord of activity "+activity );
-			}
-
-			penalty.park( lastArrivalTime , coord );
+		catch (Exception e) {
+			throw new RuntimeException( "problem occured while scoring activity "+activity , e );
 		}
 	}
 
 	@Override
 	public void handleLeg(final Leg leg) {
-		delegate.handleLeg(leg);
+		try {
+			delegate.handleLeg(leg);
 
-		if (leg.getMode().equals( TransportMode.car )) {
-			lastArrivalTime = leg.getDepartureTime() + leg.getTravelTime();
+			if (leg.getMode().equals( TransportMode.car )) {
+				lastArrivalTime = leg.getDepartureTime() + leg.getTravelTime();
 
-			if (isParked) {
-				penalty.unPark( leg.getDepartureTime() );
-				isParked = false;
+				if (isParked) {
+					penalty.unPark( leg.getDepartureTime() );
+					isParked = false;
+				}
+
+				lastLegWasCar = true;
 			}
-
-			lastLegWasCar = true;
+			else {
+				lastLegWasCar = false;
+			}
 		}
-		else {
-			lastLegWasCar = false;
+		catch(Exception e) {
+			throw new RuntimeException( "a problem occured while scoring "+leg , e );
 		}
 	}
 
