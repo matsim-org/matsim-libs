@@ -86,17 +86,19 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Person
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(event.getVehicleId().toString().startsWith("p_")){
-			String lineId = event.getVehicleId().toString().split("-")[0];
+			if(!event.getPersonId().toString().contains("p_")){
+				String lineId = event.getVehicleId().toString().split("-")[0];
 
-			if(this.lineId2DemandTimeBins.get(lineId) == null){
-				this.lineId2DemandTimeBins.put(lineId, new int[24*4+1]);
-			}
-			
-			int slot = ((int) event.getTime() / this.timeBinSize);
-			if(slot < this.lineId2DemandTimeBins.get(lineId).length - 1){
-				this.lineId2DemandTimeBins.get(lineId)[slot]++;
-			} else {
-				this.lineId2DemandTimeBins.get(lineId)[this.lineId2DemandTimeBins.get(lineId).length - 1]++;
+				if(this.lineId2DemandTimeBins.get(lineId) == null){
+					this.lineId2DemandTimeBins.put(lineId, new int[24*4+1]);
+				}
+
+				int slot = ((int) event.getTime() / this.timeBinSize);
+				if(slot < this.lineId2DemandTimeBins.get(lineId).length - 1){
+					this.lineId2DemandTimeBins.get(lineId)[slot]++;
+				} else {
+					this.lineId2DemandTimeBins.get(lineId)[this.lineId2DemandTimeBins.get(lineId).length - 1]++;
+				}
 			}
 		}
 	}
