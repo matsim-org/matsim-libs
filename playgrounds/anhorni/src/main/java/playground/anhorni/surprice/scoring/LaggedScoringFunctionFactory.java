@@ -39,7 +39,8 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 	private AgentMemories memories = new AgentMemories();
 	private CharyparNagelScoringParameters newParams;
 	
-	private double f = 2.0;
+	private double f = 1.0;
+	private final String SURPRICE = "surprice";
 	private PlanCalcScoreConfigGroup configGroup;
 	
 	private String day;
@@ -50,6 +51,8 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 		this.memories = memories;
 		this.configGroup = configGroup;
 		this.day = day;
+		
+		f = Double.parseDouble(controler.getConfig().findParam(SURPRICE, "f"));
 	}
 	
 	public ScoringFunction createNewScoringFunction(Plan plan) {	
