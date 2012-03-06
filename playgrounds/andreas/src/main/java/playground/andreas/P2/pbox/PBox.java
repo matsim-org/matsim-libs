@@ -122,7 +122,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}
 		
 		// Reset the franchise system - TODO necessary?
-		this.franchise.reset(this.pTransitSchedule);
+		this.franchise.reset(this.cooperatives);
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}
 		
 		// Reset the franchise system
-		this.franchise.reset(this.pTransitSchedule);
+		this.franchise.reset(this.cooperatives);
 	}
 
 	@Override

@@ -1,15 +1,13 @@
 package playground.andreas.P2.pbox;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.andreas.P2.plan.PPlan;
 
@@ -65,15 +63,15 @@ public class PFranchise {
 	/**
 	 * Reset all start and end stops to the stops currently in use
 	 * 
-	 * @param pTransitSchedule
+	 * @param cooperatives
 	 */
-	public void reset(TransitSchedule pTransitSchedule) {
+	public void reset(LinkedList<Cooperative> cooperatives) {
 		this.startToEndStopIdMap = new HashMap<Id, Set<Id>>();
 		
-		for (TransitLine line : pTransitSchedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				Id startStopId = route.getStops().get(0).getStopFacility().getId();
-				Id endStopId = route.getStops().get(route.getStops().size() - 1).getStopFacility().getId();
+		for (Cooperative cooperative : cooperatives) {
+			for (PPlan plan : cooperative.getAllPlans()) {
+				Id startStopId = plan.getStartStop().getId();
+				Id endStopId = plan.getEndStop().getId();
 				if(this.startToEndStopIdMap.get(startStopId) == null){
 					this.startToEndStopIdMap.put(startStopId, new TreeSet<Id>());
 				}
