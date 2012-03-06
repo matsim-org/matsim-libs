@@ -583,6 +583,7 @@ public class PoznanNetwork
         config.scenario().setUseSignalSystems(true);
         config.otfVis().setAgentSize(70.0f);
         config.otfVis().setNodeOffset(30);
+        config.signalSystems().setUseAmbertimes(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
 
         // create network lanes and signals
