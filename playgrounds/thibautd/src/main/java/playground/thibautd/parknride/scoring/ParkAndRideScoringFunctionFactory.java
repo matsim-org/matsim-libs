@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.scoring;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -33,19 +35,27 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory {
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final ParkingPenaltyFactory parkingPenaltyFactory;
+	private final ActivityFacilities facilities;
+	private final Network network;
 
 	public ParkAndRideScoringFunctionFactory(
 			final ScoringFunctionFactory scoringFunctionFactory,
-			final ParkingPenaltyFactory parkingPenaltyFactory) {
+			final ParkingPenaltyFactory parkingPenaltyFactory,
+			final ActivityFacilities facilities,
+			final Network network) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.parkingPenaltyFactory = parkingPenaltyFactory;
+		this.facilities = facilities;
+		this.network = network;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(final Plan plan) {
 		return new ParkAndRideScoringFunction(
 				scoringFunctionFactory.createNewScoringFunction( plan ),
-				parkingPenaltyFactory.createPenalty( plan ) );
+				parkingPenaltyFactory.createPenalty( plan ),
+				facilities,
+				network);
 	}
 
 	/**
@@ -73,7 +83,9 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 			controler.setScoringFunctionFactory(
 					new ParkAndRideScoringFunctionFactory(
 						controler.getScoringFunctionFactory(),
-						parkingPenaltyFactory) );
+						parkingPenaltyFactory,
+						controler.getScenario().getActivityFacilities(),
+						controler.getNetwork()) );
 		}
 	}
 }

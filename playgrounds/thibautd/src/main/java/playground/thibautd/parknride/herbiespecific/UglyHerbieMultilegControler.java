@@ -61,7 +61,6 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 	public UglyHerbieMultilegControler( final Scenario scenario ) {
 		super( scenario );
 		herbieConfigGroup = (HerbieConfigGroup) super.config.getModule(HerbieConfigGroup.GROUP_NAME);
-		super.setOverwriteFiles(true);
 	}
 
 	@Override

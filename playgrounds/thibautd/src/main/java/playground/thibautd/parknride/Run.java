@@ -19,10 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.parknride;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.thibautd.parknride.scoring.CenteredTimeProportionalPenaltyFactory;
+import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
+import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
@@ -30,6 +35,10 @@ import playground.thibautd.router.controler.MultiLegRoutingControler;
  * @author thibautd
  */
 public class Run {
+	private static final Coord center = new CoordImpl( 0 , 0 );
+	private static final double radius = 100;
+	private static final double costPerSecondAtCenter = 100;
+
 	public static void main(final String[] args) {
 		String configFile = args[0];
 
@@ -39,7 +48,14 @@ public class Run {
 
 		Scenario scenario = ParkAndRideUtils.loadScenario( config );
 
+		ParkingPenaltyFactory penalty =
+			new CenteredTimeProportionalPenaltyFactory(
+					center,
+					radius,
+					costPerSecondAtCenter);
+
 		MultiLegRoutingControler controler = new MultiLegRoutingControler( scenario );
+		controler.addControlerListener( ParkAndRideScoringFunctionFactory.createFactoryListener( penalty ) );
 		controler.run();
 
 		String outputFacilities =
