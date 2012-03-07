@@ -10,8 +10,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class Generic2ExpRouteConverter {
 	private final static String SEP = "===";
+	final TransitSchedule schedule;
 	
-	public ExperimentalTransitRoute convert(final GenericRouteImpl genericRoute, final TransitSchedule schedule){
+	public Generic2ExpRouteConverter(final TransitSchedule schedule){
+		this.schedule = schedule;
+	}
+	
+	public ExperimentalTransitRoute convert(final GenericRouteImpl genericRoute){
 		String[] strRouteEleme = genericRoute.getRouteDescription().split(SEP);
 		
 		//-> validate that it is a transit route

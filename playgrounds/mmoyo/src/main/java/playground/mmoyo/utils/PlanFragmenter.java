@@ -1,5 +1,8 @@
 package playground.mmoyo.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,49 +35,56 @@ public class PlanFragmenter {
 		log.info("persons before fragmentation: " + population.getPersons().size());
 		
 		for (Person person : population.getPersons().values()) {
-			char suffix = 'a';
-
-			for (Plan plan: person.getPlans()){
-				Person clonPerson=null;
-				Plan newPlan=null;
-				Leg leg = null;
-				
-				int numOfLegs=0;
-				
-				for (PlanElement pe : plan.getPlanElements()){
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-
-						if (!PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {  // this is a normal act
-							if (newPlan!=null){
-								newPlan.addActivity(act);
-								
-								//add the clonPerson if he/she has a pt-connection
-								if (leg.getMode().equals(TransportMode.transit_walk)){	
-									clonPerson.setId(new IdImpl(clonPerson.getId().toString() + (suffix++)));
-									newPopulation.addPerson(clonPerson);
-								}
-
-							}
-							//start new plan
-							numOfLegs=0;
-							clonPerson = new PersonImpl(new IdImpl(person.getId().toString() + SEP));
-							newPlan = new PlanImpl(clonPerson);
-							clonPerson.addPlan(newPlan);
-						}						
-						newPlan.addActivity(act);
-					}else{
-						leg = (Leg)pe;
-						newPlan.addLeg(leg);
-						numOfLegs++;
-					}
-				}
+			List<Person> personList = this.run(person);
+			for (Person newPerson : personList){
+				newPopulation.addPerson(newPerson);
 			}
 		}
 		log.info("persons after fragmentation: " + newPopulation.getPersons().size());
 		return newPopulation;
 	}
 
+	public List<Person> run(Person person){
+		char suffix = 'a';
+		List<Person> personList = new ArrayList<Person>();
+		for (Plan plan: person.getPlans()){
+			Person clonPerson=null;
+			Plan newPlan=null;
+			Leg leg = null;
+			
+			int numOfLegs=0;
+			
+			for (PlanElement pe : plan.getPlanElements()){
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+
+					if (!PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {  // this is a normal act
+						if (newPlan!=null){
+							newPlan.addActivity(act);
+							
+							//add the clonPerson if he/she has a pt-connection
+							if (leg.getMode().equals(TransportMode.transit_walk)){	
+								clonPerson.setId(new IdImpl(clonPerson.getId().toString() + (suffix++)));
+								personList.add(clonPerson);
+							}
+
+						}
+						//start new plan
+						numOfLegs=0;
+						clonPerson = new PersonImpl(new IdImpl(person.getId().toString() + SEP));
+						newPlan = new PlanImpl(clonPerson);
+						clonPerson.addPlan(newPlan);
+					}						
+					newPlan.addActivity(act);
+				}else{
+					leg = (Leg)pe;
+					newPlan.addLeg(leg);
+					numOfLegs++;
+				}
+			}
+		}
+		return personList;
+	}
 	
 	/**
 	* converts all plans into new "persons", each with new suffix in Id 
@@ -99,10 +109,10 @@ public class PlanFragmenter {
 	
 	
 	public static void main(String[] args) {
-		String populationFile = "../playgrounds/mmoyo/output/merge/routedPlan_walk10.0_dist0.6_tran1020.0.xml.gz";
-		populationFile = "../playgrounds/mmoyo/output/alltest/routedPlanplans1.xml";
-		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String outputFile = "../playgrounds/mmoyo/output/alltest/fragmentedPlan.xml";
+		String populationFile = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml.gz";
+		populationFile = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml.gz";
+		String networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+		String outputFile = "../mmoyo/output/tmp/fragmentedPlan.xml";
 		
 		Scenario scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
 		

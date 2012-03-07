@@ -28,6 +28,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
+import playground.mmoyo.utils.DataLoader;
+
 
 /**validates the correct sequence of links in the multimodal net for a given transitSchedule*/
 public class TransitLineValidator {
@@ -95,7 +97,7 @@ public class TransitLineValidator {
 			configFile= "../playgrounds/mmoyo/output/config.xml"; 
 		}
 		
-		ScenarioImpl scenarioImpl = new playground.mmoyo.utils.DataLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenarioImpl = new DataLoader().loadScenario(configFile);
 		new TransitLineValidator(scenarioImpl);
 	}
 }

@@ -23,6 +23,7 @@ package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -46,6 +47,7 @@ class NewPtBsePlanChanger implements PlanSelector
 
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator;
 
+	private boolean cadCorrMessGiven= false ;
 	private final String STR_CURRCORR = "currPlanCadytsCorr: ";
 	private final String STR_OTHERCORR = " otherPlanCadytsCorr: ";
 	
@@ -81,8 +83,9 @@ class NewPtBsePlanChanger implements PlanSelector
 		double otherPlanCadytsCorrection  = this.matsimCalibrator.getUtilityCorrection(otherPlanSteps)/ this.beta;
 		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection ;
 
-		if ( currentPlanCadytsCorrection != otherPlanCadytsCorrection) {
-			log.info( STR_CURRCORR + currentPlanCadytsCorrection + STR_OTHERCORR + otherPlanCadytsCorrection) ;
+		if ( currentPlanCadytsCorrection != otherPlanCadytsCorrection && !cadCorrMessGiven){
+			log.info( STR_CURRCORR + currentPlanCadytsCorrection + STR_OTHERCORR + otherPlanCadytsCorrection + Gbl.ONLYONCE) ;
+			cadCorrMessGiven = true;  //should be true to give the log info only once
 		}
 
 		double weight = Math.exp( 0.5 * this.beta * (otherScore - currentScore) );

@@ -66,8 +66,8 @@ public class TabOcupAnalysis {
 				String combName= children[i];
 				CountsReader countReader = new CountsReader(this.runsDirPath + combName + occupTextLoc);
 
-				double[] valuesStop1 =  countReader.getStopSimCounts(stopId_1);
-				double[] valuesStop2 =  countReader.getStopSimCounts(stopId_2);
+				double[] valuesStop1 =  countReader.getSimulatedScaled(stopId_1);
+				double[] valuesStop2 =  countReader.getSimulatedScaled(stopId_2);
 				
 				sBuff1.append(CRL + combName + TAB);
 				sBuff2.append(CRL + combName + TAB);

@@ -19,8 +19,8 @@ public class CountsComparison {
 		for (Id id: countReader1.getStopsIds()){
 			System.out.println(id);
 			for (int h=0;h<24;h++){
-				double val1 = countReader1.getStopSimCounts(id)[h];	
-				double val2 = countReader2.getStopSimCounts(id)[h];
+				double val1 = countReader1.getSimulatedScaled(id)[h];
+				double val2 = countReader2.getSimulatedScaled(id)[h];
 				System.out.println((h+1) + tab + val1 +  tab + val2 + tab +((val1-val2)/10));
 			}
 		}

@@ -39,18 +39,26 @@ public class FirstPersonExtractorFromFile implements PersonAlgorithm{
 	}
 	
 	public static void main(String[] args) {
-		String populationFile = "../../input/juli/routedPlan_walk10.0_dist0.0_tran240.0.xml.gz";
-		String networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+		String popFile;
+		String netFile;
+		
+		if (args.length==0){
+			popFile = "../../input/juli/routedPlan_walk10.0_dist0.0_tran240.0.xml.gz";
+			netFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";	
+		}else{
+			popFile = args[0];
+			netFile = args[1];
+		}
 		int personNum = 100;
 		
 		DataLoader dataLoader = new DataLoader();
 		ScenarioImpl scn = (ScenarioImpl) dataLoader.createScenario();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scn);
-		matsimNetReader.readFile(networkFile);
+		matsimNetReader.readFile(netFile);
 		
-		FirstPersonExtractorFromFile firstPersonExtractorFromFile = new FirstPersonExtractorFromFile(scn.getNetwork(), personNum, new File(populationFile).getParent()); 
+		FirstPersonExtractorFromFile firstPersonExtractorFromFile = new FirstPersonExtractorFromFile(scn.getNetwork(), personNum, new File(popFile).getParent()); 
 		PopSecReader popSecReader = new PopSecReader (scn, firstPersonExtractorFromFile);
-		popSecReader.readFile(populationFile);
+		popSecReader.readFile(popFile);
 	}
 
 }

@@ -23,7 +23,7 @@ public class TransitRouteUtil {
 	}
 	
 	/**
-	 * returns the transit route link list including star and end Links
+	 * returns the transit route link list including starting and ending Links
 	 */
 	public List<Link> getAllLinks (){
 		List<Link> allLinkList  = new ArrayList<Link>();
@@ -90,12 +90,12 @@ public class TransitRouteUtil {
 		String strTrRoute = "B-100.101.001.H";
 			
 		DataLoader dloader = new DataLoader();
-		Network net = dloader.readNetwork(netFilePath);
-		TransitSchedule trSchedule = dloader.readTransitSchedule(net, scheduleFilePath);
+		TransitSchedule trSchedule = dloader.readTransitSchedule(scheduleFilePath);
 		TransitRoute route = dloader.getTransitRoute(strTrRoute, trSchedule);
-		dloader = null;
 		
+		Network net = dloader.readNetwork(netFilePath);
 		TransitRouteUtil transitRouteUtil = new TransitRouteUtil(net, route );
+		dloader = null;
 		
 		//get all links
 		System.out.println("========================== \n expRoute links");

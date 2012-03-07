@@ -70,13 +70,11 @@ public class NodeId2StopName {
 	}
 	
 	public static void main(String[] args) {
-		String netFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 		String countsFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/lines344_M44/counts/chen/counts_occupancy_M44_344.xml"; 
 		String scheduleFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
 	
 		DataLoader dataLoader = new DataLoader();
-		Network net = dataLoader.readNetwork(netFile);
-		TransitSchedule schedule = dataLoader.readTransitSchedule(net, scheduleFile);
+		TransitSchedule schedule = dataLoader.readTransitSchedule(scheduleFile);
 		
 		final Counts counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);

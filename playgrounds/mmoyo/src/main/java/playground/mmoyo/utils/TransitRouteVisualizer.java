@@ -37,7 +37,7 @@ public class TransitRouteVisualizer {
 	
 	public TransitRouteVisualizer(String configfile,String strTrRouteId){
 		DataLoader dataLoader = new DataLoader();
-		ScenarioImpl scenario = dataLoader.loadScenarioWithTrSchedule(configfile);
+		ScenarioImpl scenario = dataLoader.loadScenario(configfile);
 		TransitRoute transitRoute = dataLoader.getTransitRoute(strTrRouteId, scenario.getTransitSchedule());
 		if (transitRoute==null){
 			throw new java.lang.NullPointerException("transit route does not exist: " + strTrRouteId);

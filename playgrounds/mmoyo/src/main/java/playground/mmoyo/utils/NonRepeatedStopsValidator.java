@@ -21,7 +21,6 @@
 package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -32,12 +31,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class NonRepeatedStopsValidator {
 	
 	public static void main(String[] args) {
-		String netFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 		String scheduleFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
 		
 		DataLoader dataLoader = new DataLoader();
-		Network net = dataLoader.readNetwork(netFile);
-		TransitSchedule schedule = dataLoader.readTransitSchedule(net, scheduleFile);
+		TransitSchedule schedule = dataLoader.readTransitSchedule(scheduleFile);
 		
 		TransitLine line344 = schedule.getTransitLines().get(new IdImpl("B-344"));
 		TransitRoute route344H = line344.getRoutes().get(new IdImpl("B-344.101.901.H"));

@@ -153,31 +153,27 @@ public class LinkCostOffsetbars {
     }
 
 	public static void main(String[] args) {
-		String netFilePath;
 		String linkCostOffsetFilePath;
 		String countsFilePath;
 		String transitScheduleFilePath;
 		String strRouteId;
 
 		if (args.length ==0){
-			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 			countsFilePath = "../../berlin-bvg09/ptManuel/lines344_M44/counts/chen/counts_occupancy_M44.xml";
 			transitScheduleFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
 			strRouteId = "B-M44.101.901.H";
 			linkCostOffsetFilePath = "../../input/juli/500/500.linkCostOffsets.xml";
 		}else{
-			netFilePath = args[0];
 			linkCostOffsetFilePath = args[1];
 			countsFilePath = args[2];
 			transitScheduleFilePath = args[3];
 			strRouteId = args[4];
 		}
 
-
 		//load data
 		DataLoader dLoader = new DataLoader();
 		Counts counts = dLoader.readCounts(countsFilePath);
-		TransitSchedule schedule = dLoader.readTransitSchedule(netFilePath, transitScheduleFilePath);
+		TransitSchedule schedule = dLoader.readTransitSchedule(transitScheduleFilePath);
 		PtBseLinkCostOffsetsXMLFileIO reader = new PtBseLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 		TransitRoute trRoute = dLoader.getTransitRoute(strRouteId, schedule);

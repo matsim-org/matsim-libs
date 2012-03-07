@@ -77,10 +77,10 @@ public class MATSimRouterLauncher {
 		if (args.length>0){
 			configFile = args[0];
 		}else {
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFile = "../mmoyo/src/main/java/playground/mmoyo/demo/X5/waitTime/config.xml";
 		}
 
-		ScenarioImpl scenarioImpl = new DataLoader ().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenarioImpl = new DataLoader().loadScenario(configFile);
 
 		new MATSimRouterLauncher(scenarioImpl);
 		System.out.println("total duration: " + (System.currentTimeMillis()-startTime));

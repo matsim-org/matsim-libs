@@ -45,12 +45,14 @@ public class SelectedPlanLister2 implements PersonAlgorithm {
 		}
 	}
 	
+	
 	public static void main(String[] args) {
 		String popFilePath;
 		if (args.length>0){
 			popFilePath = args[0];
 		}else{
-			popFilePath = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml.gz";
+			popFilePath = "../mmoyo/output/taste/seeds/3/10.plans.xml.gz";
+			//popFilePath = "../mmoyo/output/taste/inputPlans/500.plans_fromCalibM44.xml.gzprobDistribSelectPlan.xml.gz";
 		}
 
 		DataLoader dataLoader = new DataLoader ();

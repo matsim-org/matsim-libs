@@ -24,15 +24,14 @@ import playground.mmoyo.utils.Generic2ExpRouteConverter;
 /** tracks passenger traveling along the given stops of a transit route based on population*/
 public class PassengerTracker2 extends AbstractPersonFilter {
 	
-	private Generic2ExpRouteConverter converter = new Generic2ExpRouteConverter();
+	private Generic2ExpRouteConverter converter;
 	final TransitLine line;
 	final Network net;
-	final TransitSchedule schedule;
 		
 	public PassengerTracker2 (final TransitLine line, final Network net, final TransitSchedule schedule){
 		this.line = line;
 		this.net= net;
-		this.schedule= schedule;
+		converter = new Generic2ExpRouteConverter(schedule);
 	}
 
 	public List<Id> getTrackedPassengers(Population[] popArray) {
@@ -68,7 +67,7 @@ public class PassengerTracker2 extends AbstractPersonFilter {
 					Leg leg = (Leg)pe;
 					if(leg.getMode().equals(TransportMode.pt)){
 						if (leg.getRoute()!= null && (leg.getRoute() instanceof org.matsim.api.core.v01.population.Route)){
-							ExperimentalTransitRoute expRoute = converter.convert((GenericRouteImpl) leg.getRoute(), schedule);
+							ExperimentalTransitRoute expRoute = converter.convert((GenericRouteImpl) leg.getRoute());
 							
 							if (expRoute.getLineId().equals(line.getId())){  
 								return true;

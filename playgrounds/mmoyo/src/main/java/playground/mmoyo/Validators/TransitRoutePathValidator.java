@@ -233,7 +233,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 			//eventFile = "../playgrounds/mmoyo/output/input/10.events.xml.gz";
 		}
 		
-		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
 		new TransitRoutePathValidator(scenario).run(eventFile);
 	}
 

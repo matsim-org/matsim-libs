@@ -23,6 +23,8 @@
  */
 package playground.mmoyo.cadyts_integration;
 
+import java.io.IOException;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.config.ConfigUtils;
@@ -34,7 +36,9 @@ public class Z_Launcher {
 		if (args.length==1){
 			configFile = args[0];
 		}else{
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFile = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			//configFile = "../mmoyo/test/input/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/testCalibration/equil_config.xml";
+			//configFile = "../mmoyo/src/main/java/playground/mmoyo/demo/X5/waitTime/config.xml";
 			// the launch root needs to be at a place from where this path is found.  Changing it here by itself will not be enough
 			// since the input files mentioned in the config file also rely on "../".  With materialized maven modules, the
 			// correct root seems to be ${workspace_loc:playgrounds}, which is not the default.  kai, jul'11
@@ -54,5 +58,6 @@ public class Z_Launcher {
 		//<param name="Module_1" value="playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.NewPtBsePlanStrategy" />
 		
 		controler.run();
+		
 	}
 }

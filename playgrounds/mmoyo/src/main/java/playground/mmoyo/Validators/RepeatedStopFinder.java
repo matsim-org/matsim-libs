@@ -17,7 +17,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.utils.DataLoader;
 
 /**
- * Identifies isolated TransitRoutes
+ * Looks for repeated stops in a transit route
  */
 public class RepeatedStopFinder {
 	private TransitSchedule transitSchedule;
@@ -74,7 +74,7 @@ public class RepeatedStopFinder {
 		}else{
 			config= "../playgrounds/mmoyo/output/trRoutVis/config.xml";
 		}
-		ScenarioImpl scenarioImpl = new DataLoader().loadScenarioWithTrSchedule(config);
+		ScenarioImpl scenarioImpl = new DataLoader().loadScenario(config);
 		new RepeatedStopFinder(scenarioImpl.getTransitSchedule()).run();
 	}
 	

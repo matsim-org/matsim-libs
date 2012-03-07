@@ -32,7 +32,16 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
  */
 public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetworkTravelTimeCost {
 	private final static double MIDNIGHT = 24.0*3600;
-
+	
+	//these variables are protected in super class
+	private Link previousLink = null;
+	private double previousTime = Double.NaN;
+	private double cachedTravelTime = Double.NaN;
+	
+	//for cached stopWaitTime
+	private double waitPreviousTime = Double.NaN;
+	private double waitCachedTravelTime = Double.NaN;
+	private Link waitPreviousLink = null;
 	
 	private static final Logger log = Logger.getLogger(AdaptedTransitRouterNetworkTravelTimeCost.class);
 
@@ -47,19 +56,85 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
-			// transfer link
-//			cost = -getLinkTravelTime(link, time) * this.myConfig.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.myConfig.getUtilityOfLineSwitch_utl();
-			cost = -getLinkTravelTime(link, time) * this.myConfig.getMarginalUtilityOfTravelTimeWalk_utl_s() - this.myConfig.getUtilityOfLineSwitch_utl();
+
+			double transfertime = getLinkTravelTime(link, time);
+			double waittime = this.config.additionalTransferTime;
+			double walktime = transfertime - waittime; // say that the effective walk time is the transfer time minus some "buffer"
+			cost = 	-walktime * this.myConfig.getMarginalUtilityOfTravelTimeWalk_utl_s()
+		       		-waittime * this.myConfig.getMarginalUtiltityOfWaiting_utl_s()
+		       		- this.myConfig.getUtilityOfLineSwitch_utl();
+			
 		} else {
 			//pt link
-			cost = -getLinkTravelTime(link, time) * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
-			- link.getLength() * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+			//original
+			//cost = -getLinkTravelTime(link, time) * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
+			//- link.getLength() * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+			
+			log.info("waitTime: " + -getWaitingTimeAtStop(link, time) + " utility of wait:" + this.config.getMarginalUtiltityOfWaiting_utl_s());
+			
+			//new version with separated effectiveWaitingtime as new parameter 
+			cost = -getLinkTravelTime(link, time)    * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
+			       -getWaitingTimeAtStop(link, time) * this.config.getMarginalUtiltityOfWaiting_utl_s()  //create setters/getters in myConfig
+			       -link.getLength()                 * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+			
 		}
 		return cost;
 	}
 	
-	private Double getPtVehicleDepartureTime(final Link link, final double time) {
+	@Override
+	public double getLinkTravelTime(final Link link, final double time) {
+		if ((link == this.previousLink) && (time == this.previousTime)) {
+			return this.cachedTravelTime;
+		}
+		this.previousLink = link;
+		this.previousTime = time;
 
+		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+		TransitRouteStop fromStop = wrapped.fromNode.stop;
+		TransitRouteStop toStop = wrapped.toNode.stop;
+		if (wrapped.getRoute() != null) { // (agent is on board, so use transit route travel time)
+			
+			// this modified version considers only effective travel time in vehicle, not waiting time at station, Manuel
+
+			// the travel time on the link is 
+			//   the time until the departure (``dpTime - now'')
+			//   + the travel time on the link (there.arrivalTime - here.departureTime)
+			// But quite often, we only have the departure time at the next stop.  Then we use that:
+			double toStopArrivalOffset = (toStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? toStop.getArrivalOffset() : toStop.getDepartureOffset();
+			double time2 = toStopArrivalOffset - fromStop.getDepartureOffset();
+			if (time2 < 0) {
+				// ( this can only happen, I think, when ``bestDepartureTime'' is after midnight but ``time'' was before )
+				time2 += MIDNIGHT;
+			}
+			this.cachedTravelTime = time2;
+			return time2;
+		}
+		// different transit routes, so it must be a line switch
+		double distance = wrapped.getLength();
+		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
+		this.cachedTravelTime = time2;
+		return time2;
+	}
+	
+	private double getWaitingTimeAtStop(final Link link, final double time){
+		if ((link == this.waitPreviousLink) && (time == this.waitPreviousTime)) {
+			return this.waitCachedTravelTime;
+		}
+		this.waitPreviousLink = link;
+		this.waitPreviousTime = time;
+		
+		double waitTimeAtStop=0;
+		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+		if (wrapped.getRoute() != null) { //this should not be necessary because getWaitingTimeAtStop is called with the condition "else" of (((TransitRouterNetworkLink) link).getRoute() == null)  
+			waitTimeAtStop= getNextDepartureTime(wrapped.getRoute(), wrapped.fromNode.stop , time)  -  time; 
+		} //else.. at transfer links waiting time = 0. Waiting time is stored in transit links, not in transfers
+		this.waitCachedTravelTime = waitTimeAtStop;
+		
+		return waitTimeAtStop;
+	}
+	
+	//this class is not necessary now
+	private Double getPtVehicleDepartureTime(final Link link, final double time) {
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
 		TransitRouteStop toStop = wrapped.toNode.stop;

@@ -145,7 +145,7 @@ public class LinkCostOffsets2QGIS {
 		DataLoader dLoader = new DataLoader();
 		Network net =dLoader.readNetwork(netFilePath);
 		Counts counts = dLoader.readCounts(countsFilePath);
-		TransitSchedule schedule = dLoader.readTransitSchedule(net, transitScheduleFilePath);
+		TransitSchedule schedule = dLoader.readTransitSchedule(transitScheduleFilePath);
 		PtBseLinkCostOffsetsXMLFileIO reader = new PtBseLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 		TransitRoute trRoute = dLoader.getTransitRoute(strRouteId, schedule);

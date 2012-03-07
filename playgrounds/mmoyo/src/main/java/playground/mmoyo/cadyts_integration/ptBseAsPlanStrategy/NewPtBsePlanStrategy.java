@@ -39,8 +39,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-//import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
-//import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -71,7 +69,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	private final static Logger log = Logger.getLogger(NewPtBsePlanStrategy.class);
 
 	private PlanStrategy delegate = null ;
-	private Controler controler;
+	//private Controler controler;
 	private SimResultsContainerImpl simResults;
 	final static String MODULE_NAME = "ptCounts";
 	final static String BSE_MOD_NAME = "bse";
@@ -83,37 +81,42 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	private final Counts alightCounts = new Counts();
 	private PtBseOccupancyAnalyzer ptBseOccupAnalyzer;
 	static TransitSchedule trSched ;
-
+	private final boolean writeAnalysisFile;
+	final String STR_ANALYSISFILE;	
+	NewPtBsePlanChanger ptBsePlanChanger;
+		
 	public NewPtBsePlanStrategy( Controler controler ) {
 		// IMPORTANT: Do not change this constructor.  It needs to be like this in order to be callable as a "Module"
 		// from the config file.  kai/manuel, dec'10
 
-		// remember the controler:  (yyyy I don't think this is necessary.  kai, jul'11)
-		this.controler = controler ; 
+		// remember the controler:  (yyyy I don't think this is necessary.  kai, jul'11)  done manuel.
+		//this.controler = controler ; 
 
 		// add "this" to the events channel so that reset is called between iterations
 		// (yyyy I think this should now be better done by the controler listener mechanics.  kai, jul'11)
 		/*this.controler.getEvents().addHandler( this ) ; no more*/
-		this.controler.addControlerListener(this) ;
+		/*this.*/controler.addControlerListener(this) ;
 
 		// set up the bus occupancy analyzer ...  
 		this.ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
-		//this.controler.getEvents().addHandler(ptBseOccupAnalyzer); //not here, it is added in notifyBeforeMobsim
+		/*this.*/controler.getEvents().addHandler(ptBseOccupAnalyzer); //only here, and removed from notifyBeforeMobsim and notifyAfterMobsim. 
 		// ... and connect it to the simResults container:
 		this.simResults = new SimResultsContainerImpl( ptBseOccupAnalyzer );
 
 		// this collects events and generates cadyts plans from it
-		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents( this.controler.getScenario() /*,  ptBseOccupAnalyzer 18.jul.2011*/ ) ;
+		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(/*this.*/controler.getScenario() /*,  ptBseOccupAnalyzer 18.jul.2011*/ ) ;
 		// yyyyyy passing ptBseOccupAnalyzer into PtPlanToPlanStepBasedOnEvents is, I think, unnecessary and should be avoided.
 		// See there.  kai, jul'11
-		this.controler.getEvents().addHandler( ptStep ) ;
+		/*this.*/controler.getEvents().addHandler( ptStep ) ;
 
 		// build the calibrator.  This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator( this.controler.getScenario() );
+		this.calibrator = CadytsBuilder.buildCalibrator( /*this.*/controler.getScenario() );
 
 		// finally, we create the PlanStrategy, with the bse-based plan selector:
-		this.delegate = new PlanStrategyImpl( new NewPtBsePlanChanger( ptStep, this.calibrator ) ) ;
-
+		//Original this.delegate = new PlanStrategyImpl( new NewPtBsePlanChanger( ptStep, this.calibrator ) ) ;
+		ptBsePlanChanger = new NewPtBsePlanChanger( ptStep, this.calibrator ); //8 sep
+		this.delegate = new PlanStrategyImpl( ptBsePlanChanger ) ; //8 sep
+		
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
 		
 		// ===========================
@@ -121,7 +124,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 
 		//read occup counts from file
 		//String occupancyCountsFilename = this.controler.getConfig().findParam("ptCounts", "inputOccupancyCountsFile"); //better read it from config object like below
-		String occupancyCountsFilename = this.controler.getConfig().ptCounts().getOccupancyCountsFileName();
+		String occupancyCountsFilename = /*this.*/controler.getConfig().ptCounts().getOccupancyCountsFileName();
 		if (occupancyCountsFilename != null) {
 			new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 		}
@@ -129,8 +132,14 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		// and confuses the reader of the program.  kai, jul'11
 		
 		//countsScaleFactor = Double.parseDouble(this.controler.getConfig().ptCounts().getCountsScaleFactor() //better read it from config object like below
-		countsScaleFactor = this.controler.getConfig().ptCounts().getCountsScaleFactor();
+		countsScaleFactor = /*this.*/controler.getConfig().ptCounts().getCountsScaleFactor();
 
+		//set flowAnalysisFile 
+		String strWriteAnalysisFile = controler.getConfig().findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "writeAnalysisFile");
+		this.writeAnalysisFile= strWriteAnalysisFile!= null && Boolean.parseBoolean(strWriteAnalysisFile);
+		this.STR_ANALYSISFILE=this.writeAnalysisFile? "flowAnalysis.txt":null; 
+		strWriteAnalysisFile= null;
+		
 		controler.getScenario().addScenarioElement(this.occupCounts) ;
 	}
 
@@ -169,18 +178,17 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		int iter = event.getIteration();
-		if ( isActiveInThisIteration( iter, event.getControler() ) ) {
-			ptBseOccupAnalyzer.reset(iter);
-			event.getControler().getEvents().addHandler(ptBseOccupAnalyzer);  //Necessary because it is removed in notifyAfterMobsim 18.jul.2011
-		}
+		//The calibrator need the counts of ptBseOccupAnalyzer in every iteration not only in the active iterations, so it is only added at the beginning and uses its own reset in every iteration
+		//if ( isActiveInThisIteration( iter, event.getControler() ) ) {
+		ptBseOccupAnalyzer.reset(iter);
+			//event.getControler().getEvents().addHandler(ptBseOccupAnalyzer);  //Necessary because it is removed in notifyAfterMobsim 18.jul.2011
+		//}	
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		int it = event.getIteration();
 		if ( isActiveInThisIteration( it, event.getControler() ) ) {
-			event.getControler().getEvents().removeHandler(ptBseOccupAnalyzer);
-
 			//Get all M44 stations and invoke the method write to get all information of them
 			TransitLine specificLine = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(new IdImpl("B-M44"));
 			List<Id> stopIds = new ArrayList<Id>();
@@ -202,12 +210,20 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
+		if (this.writeAnalysisFile){
+			String analysisFilepath= null;
+			if (isActiveInThisIteration(event.getIteration(),event.getControler())){
+				analysisFilepath= event.getControler().getControlerIO().getIterationFilename(event.getIteration(), this.STR_ANALYSISFILE);
+			}
+			this.calibrator.setFlowAnalysisFile(analysisFilepath);
+		}
+		
 		///////originally this was in reset method//////////////
 		this.calibrator.afterNetworkLoading(this.simResults);
 		// the remaining material is, in my view, "just" output:
-		String filename = this.controler.getControlerIO().getIterationFilename(event.getIteration(), STR_LINKOFFSETFILE) ;
+		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), STR_LINKOFFSETFILE) ;
 		try {
-			PtBseLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new PtBseLinkCostOffsetsXMLFileIO( this.controler.getScenario().getTransitSchedule() );
+			PtBseLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new PtBseLinkCostOffsetsXMLFileIO( trSched /*this.controler.getScenario().getTransitSchedule()*/ );
 			ptBseLinkCostOffsetsXMLFileIO.write( filename , this.calibrator.getLinkCostOffsets());
 			ptBseLinkCostOffsetsXMLFileIO = null;
 		}catch(IOException e) {

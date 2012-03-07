@@ -70,7 +70,7 @@ public class FindRoundaboutConnections {
 	public static void main(String[] args) {
 		String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		
-		ScenarioImpl scenario = new DataLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
 		Population detouredPopulation = new FindRoundaboutConnections().createDetouredPlan(scenario);
 		
 		System.out.println("writing detoured population plan file in output folder..." );

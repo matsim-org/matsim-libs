@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -40,6 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 
 import playground.mmoyo.Validators.PlanValidator;
+import playground.mmoyo.algorithms.PersonClonner;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FirstPersonsExtractor;
 import playground.mmoyo.utils.PlansMerger;
@@ -68,6 +68,7 @@ public class OverDemandPlanCreator {
 			throw new RuntimeException("this may not work, it assumes that the first PlanElement is home!! what about fragmnted plans? or other plans at all?" );
 		}	
 
+		PersonClonner clonner = new PersonClonner();
 		for (Person person : this.population.getPersons().values()) {
 			// create and add "home" plan
 			for (int i=0; i<homePlanNum;i++){
@@ -80,10 +81,12 @@ public class OverDemandPlanCreator {
 			//create and add clones
 			for (int i=0; i<cloneNum;i++){
 				Id newId = new IdImpl(person.getId().toString() + SEP + (i+2));
+				/*old, simple, ineffective cloning 
 				Person personClon = new PersonImpl(newId);
 				for (Plan plan :person.getPlans()){
 					personClon.addPlan(plan);
-				}
+				}*/
+				Person personClon = clonner.run(person, newId);
 				outPop.addPerson(personClon);
 			}
 			
@@ -140,7 +143,7 @@ public class OverDemandPlanCreator {
 		Scenario scn = dataLoader.readNetwork_Population(networkFile, popFilePath); 
 		
 		pop = scn.getPopulation();
-		pop =  new OverDemandPlanCreator(pop).run(1, 0);
+		pop =  new OverDemandPlanCreator(pop).run(1, 1);
 
 		//write the plan with over demand
 		Network net = scn.getNetwork();

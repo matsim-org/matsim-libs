@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtPlanToPlanStepBasedOnEvents.java
+ * PtBseOccupancyAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -219,7 +219,7 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 			countValBuff = new StringBuffer(stopId.toString() + CHR_HT);
 			simValBuff = new StringBuffer();	
 			for (int i = 0; i < 24; i++) {
-				countValBuff.append(count.getVolume(i+1).getValue() + CHR_HT);
+				countValBuff.append(count.getVolume(i+1).getValue() + CHR_HT); //all volumes from 1 to 24 must be given in counts file, even with 0 as value.
 				simValBuff.append((ocuppancy != null ? ocuppancy[i]: 0) + CHR_HT);
 			}
 			countValBuff.append(simValBuff.toString() + count.getCoord().toString() + CHR_HT + count.getCsId() + CHR_NL);

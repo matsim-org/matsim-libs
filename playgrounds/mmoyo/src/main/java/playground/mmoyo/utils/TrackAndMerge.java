@@ -84,8 +84,7 @@ public class TrackAndMerge {
 		}
 		//load data
 		DataLoader dataLoader = new DataLoader();
-		NetworkImpl net = (NetworkImpl)dataLoader.readNetwork(netFilePath);
-		TransitSchedule schedule = dataLoader.readTransitSchedule(net, trScheduleFile);
+		TransitSchedule schedule = dataLoader.readTransitSchedule(trScheduleFile);
 		TransitLine line = schedule.getTransitLines().get(new IdImpl(strLine));		
 		
 		//execute
@@ -96,6 +95,7 @@ public class TrackAndMerge {
 		
 		//write population
 		System.out.println("writing output plan file...");
+		Network net = dataLoader.readNetwork(netFilePath);
 		PopulationWriter popwriter = new PopulationWriter(pop, net);
 		File file = new File(popFilesArray[0]);
 		popwriter.write(file.getParent() + "/" + file.getName() + "TrackedAndMergedAndHomPlan.xml.gz") ;

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -47,14 +48,19 @@ public class PopulationList extends AbstractPersonAlgorithm {
 	}
 	
 	public static void main(String[] args) {
-		String popFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/baseplan_10x_subset_xy2links.xml.gz";
+		String netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";   // "../../input/newDemand/multimodalNet.xml.gz";
+		String popFilePath = "../../input/newDemand/routed/routedTrackedAndMergedAndHomPlan.xml.gz";
 		log.info("counting...");
 		
-		ScenarioImpl scn = (ScenarioImpl) new DataLoader().createScenario();
-		PopulationList popList2 = new PopulationList (); 
+		ScenarioImpl scn = (ScenarioImpl) new DataLoader().createScenario(); 
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scn);
+		matsimNetReader.readFile(netFilePath);
+		
+		PopulationList popList2 = new PopulationList(); 
 		PopSecReader popSecReader = new PopSecReader (scn, popList2);
 		popSecReader.readFile(popFilePath);
 		
+		//popList2.saveIds(popFilePath);
 		popList2.printIds();
 	}
 	

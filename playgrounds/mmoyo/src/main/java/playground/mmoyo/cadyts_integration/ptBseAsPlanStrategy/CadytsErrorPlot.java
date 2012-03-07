@@ -143,15 +143,13 @@ class CadytsErrorPlot {
 		
 		//load data
 		DataLoader dataloader = new DataLoader();
-		Network net = dataloader.readNetwork(netfilepath);
-		TransitSchedule schedule = dataloader.readTransitSchedule(net, trScheduleFilePath);
 		Counts realCounts = dataloader.readCounts(realOccupFilePath);
 		
 		/////create a PtBseOccupancyAnalyzer with simulated occupancy values
 		CountsReader countsReader = new CountsReader (ocupFilePath);
 		Map<Id, int[]> SimOccupancies = new HashMap<Id, int[]>();
 		for (Id stopId : countsReader.getStopsIds()){
-			double[] dblSimValues = countsReader.getStopSimCounts(stopId);
+			double[] dblSimValues = countsReader.getSimulatedScaled(stopId);
 			int[] intSimValues = new int[24];
 			System.out.println("\n"+ stopId);
 			for (int i=0;i<24;i++){  
@@ -166,10 +164,12 @@ class CadytsErrorPlot {
 		PtBseOccupancyAnalyzer ptBseOccupancyAnalyzer = new PtBseOccupancyAnalyzer();;
 		ptBseOccupancyAnalyzer.setOccupancies(SimOccupancies);
 		////////////////////////////////////////////////////////
-		
+
+		Network net = dataloader.readNetwork(netfilepath);
 		PtBseCountsComparisonAlgorithm ptBseCountsComparisonAlgorithm = new PtBseCountsComparisonAlgorithm(ptBseOccupancyAnalyzer, realCounts, net, 0.0);  //scaleFactor 0 because scaled value is read
 
 		CadytsErrorPlot cadytsErrorPlot = new CadytsErrorPlot();
+		TransitSchedule schedule = dataloader.readTransitSchedule(trScheduleFilePath);
 		cadytsErrorPlot.createPlot(schedule, ptBseCountsComparisonAlgorithm, minstrdv, outputDir);
 		
 	}

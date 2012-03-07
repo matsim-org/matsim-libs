@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.pt.router.TransitActsRemover;
 
 /**
- * Compares person per person two populations 
+ * Compares person per person two populations: time, scores, and plan elements
  */
 public class PlansComparator {
 	private final static Logger log = Logger.getLogger(PlansComparator.class);

@@ -4,9 +4,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
-
 
 public class CarPlansRemover {
 
@@ -28,13 +26,12 @@ public class CarPlansRemover {
 
 		CarPlansRemover carPlansRemover = new CarPlansRemover();
 		for (byte i=0; i<configs.length; i++ ){
-			ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configs[i]);
-			ScenarioImpl scenario = (ScenarioImpl) sl.loadScenario();
+			DataLoader dataLoader = new DataLoader();
+			ScenarioImpl scenario = dataLoader.loadScenario(configs[i]);
 			
-			scenario.setPopulation(new PlanFragmenter().run(scenario.getPopulation()));
 			carPlansRemover.run(scenario.getPopulation());
 
-			String outputFile = scenario.getConfig().plans().getInputFile() + ".NoCarPlans.xml";
+			String outputFile = scenario.getConfig().plans().getInputFile() + "NoCarPlans.xml.gz";
 			System.out.println("writing output plan file..." + outputFile);
 			PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 			popwriter.write(outputFile) ;

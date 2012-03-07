@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
@@ -80,14 +81,13 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	private final static String STR_M44 = "M44";
 	private final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private final String STR_ITERATION = "iteration";
-	
 	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
-
+	private final Set<Id> popIdSet;
 	
 	PtPlanToPlanStepBasedOnEvents(Scenario sc/*, PtBseOccupancyAnalyzer delOcupAnalizer 18.jul.2011*/) {
 		this.sc = sc ;
 		this.net = sc.getNetwork();
-		
+		popIdSet = sc.getPopulation().getPersons().keySet();
 		this.schedule = ((ScenarioImpl) sc).getTransitSchedule() ;
 		
 		NET = this.net ;
@@ -133,7 +133,10 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
 		}
-		addPersonToVehicleContainer(event.getPersonId(), event.getVehicleId());
+		
+		if(popIdSet.contains(event.getPersonId())){  //exclude driver agents that don't belong to population file
+			addPersonToVehicleContainer(event.getPersonId(), event.getVehicleId());			
+		}
 		//this.delegOcupAnalizer.handleEvent(event);     //it is not needed 18.jul.2011
 	}
 
@@ -143,7 +146,10 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
 		}
-		removePersonFromVehicleContainer(event.getPersonId(), event.getVehicleId());
+		if(popIdSet.contains(event.getPersonId())){ //ignore pt vchicle driver
+			removePersonFromVehicleContainer(event.getPersonId(), event.getVehicleId());
+		}
+		
 		//this.delegOcupAnalizer.handleEvent(event);      //it is not needed 18.jul.2011
 	}
 
@@ -165,7 +171,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		for ( Id personId : this.personsFromVehId.get(vehId) ) {
 			// get the "Person" behind the id:
 			Person person = this.sc.getPopulation().getPersons().get( personId ) ;
-
+			
 			// get the selected plan:
 			Plan selectedPlan = person.getSelectedPlan() ;
 

@@ -15,12 +15,11 @@ public class LinkOffsetScaler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 		String transitScheduleFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
 		String linkCostOffsetFilePath = "../../input/juli/elMejor/500.linkCostOffsets.xml";
 
 		DataLoader dLoader = new DataLoader();
-		TransitSchedule schedule = dLoader.readTransitSchedule(netFilePath, transitScheduleFilePath);
+		TransitSchedule schedule = dLoader.readTransitSchedule(transitScheduleFilePath);
 
 		PtBseLinkCostOffsetsXMLFileIO reader = new PtBseLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
@@ -33,7 +32,6 @@ public class LinkOffsetScaler {
 		}
 
 		//write
-		// the remaining material is, in my view, "just" output:
 		File file = new File(linkCostOffsetFilePath);
 		String filename = file.getParent() + "/" + file.getName() + "scaled.xml";
 		try {
@@ -44,8 +42,5 @@ public class LinkOffsetScaler {
 			e.printStackTrace();
 		}
 
-
-
 	}
-
 }

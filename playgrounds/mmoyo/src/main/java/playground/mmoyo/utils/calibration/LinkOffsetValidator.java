@@ -18,13 +18,12 @@ public class LinkOffsetValidator {
 	}
 
 	public static void main(String[] args) {
-		String netFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 		String trScheduleFile= "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
 		String linkCostOffsetFilePath = "../../input/juli/completeRun/500.linkCostOffsets.xml";
 		String ocuppFilePath = "../../input/juli/completeRun/500.simBseCountCompareOccupancy.txt";
 
 		DataLoader dataLoader= new DataLoader();
-		TransitSchedule schedule = dataLoader.readTransitSchedule(netFile, trScheduleFile);
+		TransitSchedule schedule = dataLoader.readTransitSchedule(trScheduleFile);
 
 		PtBseLinkCostOffsetsXMLFileIO reader = new PtBseLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
@@ -32,8 +31,8 @@ public class LinkOffsetValidator {
 		/////create a PtBseOccupancyAnalyzer with simulated occupancy values
 		CountsReader countsReader = new CountsReader (ocuppFilePath);
 		for (Id stopId : countsReader.getStopsIds()){
-			double[] dblSimValues = countsReader.getStopSimCounts(stopId);
-			double[] dblRealValues = countsReader.getStopCounts(stopId);
+			double[] dblSimValues = countsReader.getSimulatedScaled(stopId);
+			double[] dblRealValues = countsReader.getRealValues(stopId);
 
 			System.out.println("\n" + stopId);
 			for (int i=0;i<24;i++){  //convert from double to integer

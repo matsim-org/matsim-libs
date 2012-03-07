@@ -49,10 +49,10 @@ public class TransportModeCounter {
 		if (args.length>0){
 			configFile = args[0];
 		}else{
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFile = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		}
 
-		ScenarioImpl scenarioImpl = new DataLoader().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenarioImpl = new DataLoader().loadScenario(configFile);
 		new TransportModeCounter().count(scenarioImpl.getTransitSchedule());
 	}
 

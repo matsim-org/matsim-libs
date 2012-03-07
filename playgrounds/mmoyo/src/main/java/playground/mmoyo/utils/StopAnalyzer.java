@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import javax.imageio.ImageIO;
 /**Creates a sequence of graphs of a stop showing its evolution through iterations*/
 public class StopAnalyzer {
 	private String iterDir;
-	private final String zero = "0";
+	private final String STR_ZERO = "0";
 	
 	public StopAnalyzer(final String iterDir){
 		this.iterDir = iterDir;
@@ -30,7 +31,10 @@ public class StopAnalyzer {
 	
 	public void createSequence (final String errorGraphName , final int maxGraphsNum) throws IOException{
 		
-		File dir = new File(this.iterDir); 
+		File dir = new File(iterDir); 
+		if (!dir.exists()){
+			throw new FileNotFoundException("The iterations directory does not exists: " + iterDir);
+		}
 		String[] children = dir.list(new IterarionFileFilter()); //list only iteration ending with "0" of occupancy
 
 		//sort the children numeric ascending 
@@ -45,9 +49,11 @@ public class StopAnalyzer {
 		}
 		Collections.sort(iterNumList);
 		
-		//reduce the size of the list to have only maxGraphsNum
-		while (iterNumList.size() > maxGraphsNum){
-			iterNumList.remove(iterNumList.size()-1);
+		if (maxGraphsNum>0){
+			//reduce the size of the list to have only maxGraphsNum
+			while (iterNumList.size() > maxGraphsNum){
+				iterNumList.remove(iterNumList.size()-1);
+			}
 		}
 		
 		//look for kmz files in all iteration folders
@@ -87,11 +93,12 @@ public class StopAnalyzer {
 
 		File outputGraphFile = new File(this.iterDir + stopFileName);
 		ImageIO.write(bufferedImage,"png", outputGraphFile);
+		System.out.println("graph series was written at: " + outputGraphFile.getCanonicalPath());
 	}
 	
 	class IterarionFileFilter implements FilenameFilter {
 	    public boolean accept(File dir, String name) {
-	        return (name.endsWith(zero));
+	        return (name.endsWith(STR_ZERO));
 	    }
 	}
 	
@@ -140,14 +147,24 @@ public class StopAnalyzer {
 		*/
 	}
 	
-	
 	public static void main(String[] args) throws IOException {
-		String itDir = "I:/z_Runs/";
-		int maxGraphsNum = 9;
-		String graphName = "812550.1o.png"; //"812030.1o.png"; //"errorGraphErrorBiasOccupancy.png";  //"812550.1o.png";  //"errorGraphErrorBiasOccupancy.png"
-		String outDir = "C:/Users/omicron/Desktop/graphsBerlin5xb/"; 
+		String itDir= null;
+		int maxGraphsNum = 0;     //zero if all plots are desired for analysis. Otherwise, the maximum number must be set.
+		String graphName = null;
+		//String outDir;
 		
-		//new StopAnalyzer(itDir).createSequence(graphName , maxGraphsNum );
-		new StopAnalyzer(itDir).ExtractGraphs(graphName, outDir);
+		if (args.length>0){
+			itDir = args[0];
+			maxGraphsNum = Integer.valueOf (args[1]);;
+			graphName = args[2];
+			//outDir = args[3];	
+		}else{
+			itDir = "../../runs_manuel/cad_FastestRoutes/output/ITERS/";
+			maxGraphsNum = 26;
+			graphName = "errorGraphErrorBiasOccupancy.png"; //"812030.1o.png"; //"errorGraphErrorBiasOccupancy.png";
+			//outDir = "C:/Users/omicron/workspace/playgrounds/mmoyo/output/taste/changeExpGraphs/evolution/"; 
+		}
+		new StopAnalyzer(itDir).createSequence(graphName , maxGraphsNum );
+		//new StopAnalyzer(itDir).ExtractGraphs(graphName, outDir);
 	}
 }

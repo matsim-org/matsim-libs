@@ -113,24 +113,21 @@ public class RouteStopGraphs2 {
 	
 	public static void main(String[] args) {
 		final String scheduleFile; 
-		final String networkFile; 
 		final String occupCountFile;
 		final String kmzFile;
 		
 		if (args.length>0){
 			scheduleFile = args[0];
-			networkFile = args[1];
-			occupCountFile =args[2];
-			kmzFile = args[3];			
+			occupCountFile =args[1];
+			kmzFile = args[2];			
 		}else{
 			scheduleFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
-			networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 			occupCountFile = "../../berlin-bvg09/ptManuel/lines344_M44/counts/chen/counts_occupancy_M44_344.xml";
-			kmzFile = "../../input/RouteStopGraphs/770.ptBseCountscompare.kmz";			
+			kmzFile = "../mmoyo/output/taste/seeds/3/10.ptcountscompare.kmz";			
 		}
 		
 		DataLoader dataLoader = new DataLoader();
-		TransitSchedule schedule = dataLoader.readTransitSchedule(networkFile, scheduleFile);
+		TransitSchedule schedule = dataLoader.readTransitSchedule(scheduleFile);
 		Counts counts = dataLoader.readCounts(occupCountFile);
 		RouteStopGraphs2 routeStopGraphs = new RouteStopGraphs2(kmzFile, schedule, counts);
 		

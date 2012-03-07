@@ -31,11 +31,13 @@ public class AdaptedLauncher {
 	double betaDistance;
 	double betaTransfer;
 	double betaTime;
+	double betaWait;
 	
 	final String sep = "_";
 	final String strDist = "dist";
 	final String strWalk = "walk";
 	final String strTr = "tran";
+	final String strWait = "wait";
 	final String routing = "routing ";
 	
 	public AdaptedLauncher(final String configFile) {
@@ -68,7 +70,8 @@ public class AdaptedLauncher {
 		this.set_betaWalk(Double.parseDouble(cfg.getParam("ptRouter", "walkValue")));
 		this.set_betaTransfer(Double.parseDouble(cfg.getParam("ptRouter", "transferValue")));
 		this.set_betaDistance(Double.parseDouble(cfg.getParam("ptRouter", "distanceValue")));
-		this.set_betaTime(Double.parseDouble(cfg.getParam("ptRouter", "timeValue")));		
+		this.set_betaTime(Double.parseDouble(cfg.getParam("ptRouter", "timeValue")));
+		this.set_betaWait(Double.parseDouble(cfg.getParam("ptRouter", "waitValue")));
 	}
 	
 	public String route(){
@@ -76,18 +79,22 @@ public class AdaptedLauncher {
 		this.betaWalk = 	Math.round(this.betaWalk    *100)/100.0;
 		this.betaDistance = Math.round(this.betaDistance*100)/100.0;
 		this.betaTransfer= 	Math.round(this.betaTransfer*100)/100.0;
-
+		this.betaWait= 		Math.round(this.betaWait*100)/100.0;
+		
 		//set margin utility values
 		myTransitRouterConfig.setMarginalUtilityOfTravelTimePt_utl_s( -this.betaTime / 3600.0);
 		myTransitRouterConfig.setMarginalUtilityOfTravelTimeWalk_utl_s(-this.betaWalk     / 3600.0);
 		myTransitRouterConfig.setMarginalUtilityOfTravelDistancePt_utl_m(-this.betaDistance / 1000.0);
-//		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * -myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());
+		myTransitRouterConfig.setMarginalUtiltityOfWaiting_utl_s(-this.betaWait / 3600.0);
+		
+		//		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * -myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());
 		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * myTransitRouterConfig.getMarginalUtilityOfTravelTimePt_utl_s());
-
-		myTransitRouterConfig.scenarioName = strWalk + this.betaWalk + sep+ strDist + this.betaDistance + sep +  strTr + this.betaTransfer ;
+		
+		myTransitRouterConfig.scenarioName = strWalk + this.betaWalk + sep+ strDist + this.betaDistance + sep +  strTr + this.betaTransfer + sep + strWait + this.betaWait;
 		System.out.println("routing: " + myTransitRouterConfig.scenarioName);
 		
 		Population pop = scenario.getPopulation();
+		new PlanScoreNullifier().run(pop);
 		if (this.noCarPlans){
 			PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.car, PlansFilterByLegMode.FilterType.removeAllPlansWithMode) ;
 			plansFilter.run(pop);
@@ -106,9 +113,6 @@ public class AdaptedLauncher {
 		//Yes, it uses matsim.pt.router.PlansCalcTransitRoute class to keep the compatibility of potentially handling many TransportMode types. Manuel,.
 		AdaptedPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new AdaptedPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
 				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, routeFactory, scenario.getTransitSchedule(), transitConfig, myTransitRouterConfig);
-
-		
-		new PlanScoreNullifier().run(pop);
 		adaptedPlansCalcTransitRoute.run(pop);
 
 		if (this.fragmentPlans){
@@ -142,6 +146,10 @@ public class AdaptedLauncher {
 		this.betaTime = betaTime;
 	}
 	
+	public void set_betaWait(double betaWait){
+		this.betaWait = betaWait;
+	}
+
 	public double get_betaWalk(){
 		return this.betaWalk;
 	}
@@ -158,6 +166,10 @@ public class AdaptedLauncher {
 		return this.betaTime;
 	}
 
+	public double get_betaWait(){
+		return this.betaWait;
+	}
+	
 	public void setNoCarPlans(boolean noCarPlans){
 		this.noCarPlans = noCarPlans;
 	}
@@ -168,10 +180,15 @@ public class AdaptedLauncher {
 	
 	public static void main(String[] args) throws FileNotFoundException{
 		String configFilePath = null;
+		String walkValue;
+		
 		if (args.length ==0){
-			configFilePath = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFilePath = "../mmoyo/src/main/java/playground/mmoyo/demo/X5/waitTime/config.xml";
+			//configFilePath = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			walkValue = "3.0";
 		}else{
 			configFilePath = args[0];
+			walkValue = args[1];
 		}
 		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(configFilePath);
 		adaptedLauncher.setFragmentPlans(false);

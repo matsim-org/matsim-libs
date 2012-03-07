@@ -32,10 +32,11 @@ public class ExpTransRouteUtils {
 	
 	public double getExpRouteDistance(){
 		double distance= 0;
-		for (Link link : this.getLinks()){
-			distance += link.getLength();
+		//for (Link link : this.getLinks()){    //wrong. the first link does not count for route distance because it is the incoming link of departing node
+		for(int i=1; i<this.getLinks().size();i++ ){      //in transit schedule, the stop linkRefId is the incoming link. Then, the last link does count for distance
+			distance += this.getLinks().get(i).getLength();
 		}
-		return distance;  	//<-compare result with org.matsim.core.utils.misc.RouteUtils.calcDistance
+		return distance; //since this method include the last transit link in distance calculation, it does not match with org.matsim.core.utils.misc.RouteUtils.calcDistance. 
 	}
 	
 	public TransitRouteStop getAccessStop (){
@@ -91,9 +92,10 @@ public class ExpTransRouteUtils {
 		return transitRoute.getStops().subList(accessStopIndex, egressStopIndex + 1); //"sublist" excludes the last index, so this is necessary		
 	}
 
+	/**includes first and last link of the exp transit route*/  
 	public List<Link> getLinks(){
 		List<Id> completeIdList = new ArrayList<Id>();
-		completeIdList.add(this.transitRoute.getRoute().getStartLinkId());
+		completeIdList.add(this.transitRoute.getRoute().getStartLinkId()); 
 		completeIdList.addAll(1, this.transitRoute.getRoute().getLinkIds());
 		completeIdList.add(this.transitRoute.getRoute().getEndLinkId());
 		
@@ -120,7 +122,7 @@ public class ExpTransRouteUtils {
 	}
 	
 	/**
-	 * returns the transit route link list including star and end Links
+	 * returns the complete transit route link list including star and end Links
 	 */
 	public List<Link> getAllLinks (){
 		List<Link> allLinkList  = new ArrayList<Link>();
@@ -147,7 +149,7 @@ public class ExpTransRouteUtils {
 		String strAccessFacility = "1605170.1";  // "1600045.2"; //"1625150.1";
 		String strEgressFacility = "1605370.3";  // "1600045.1"; //"1610024.1";
 			
-		ScenarioImpl scenario = new DataLoader ().loadScenarioWithTrSchedule(configFile);
+		ScenarioImpl scenario = new DataLoader ().loadScenario(configFile);
 		TransitSchedule trSchedule = scenario.getTransitSchedule();
 		TransitLine line = trSchedule.getTransitLines().get(new IdImpl(strTrLine));
 		TransitRoute route = line.getRoutes().get(new IdImpl(strTrRoute));

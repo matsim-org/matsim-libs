@@ -17,7 +17,7 @@ import org.xml.sax.InputSource;
 
 import playground.mmoyo.utils.DataLoader;
 
-/**Reads and creates only one person sequencially from the population file. Useful for filter algorithms*/
+/**Reads and creates only one person sequentially from the population file. Useful for filter algorithms*/
 public class PopSecReader  extends MatsimXmlParser implements PopulationReader {
 	private final static String PERSON = "person";
 	private MatsimXmlParser delegPopReader;

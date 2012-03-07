@@ -1,5 +1,5 @@
 /* *********************************************************************** *
-OTFVisMobsimFeature * project: org.matsim.*
+ * project: org.matsim.*
  * ScenarioPlayer.java
  *                                                                         *
  * *********************************************************************** *
@@ -54,7 +54,7 @@ public class ScenarioPlayer {
 	public static void main(final String[] args) {
 		String configFile = null;
 		if (args.length==0){
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml"; 
+			configFile = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml"; 
 		}else{
 			configFile = args[0];
 		}

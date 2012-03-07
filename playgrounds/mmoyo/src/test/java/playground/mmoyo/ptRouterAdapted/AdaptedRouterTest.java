@@ -80,7 +80,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		Assert.assertEquals("different leg mode:",TransportMode.pt, trLeg.getMode());
 		Assert.assertEquals("different travel time:",80.52668077979615, trLeg.getTravelTime(), MatsimTestUtils.EPSILON);
 		
-		ExperimentalTransitRoute expRoute = new Generic2ExpRouteConverter().convert((GenericRouteImpl) trLeg.getRoute(), scenarioImpl.getTransitSchedule());
+		ExperimentalTransitRoute expRoute = new Generic2ExpRouteConverter(scenarioImpl.getTransitSchedule()).convert((GenericRouteImpl) trLeg.getRoute());
 		assertNotNull(expRoute);
 		Assert.assertEquals("different route id:",new IdImpl("Blue Line.Blue.101.H"), expRoute.getRouteId());
 		Assert.assertEquals("different route description:","PT1===stop1===Blue Line===Blue Line.Blue.101.H===stop4", expRoute.getRouteDescription());

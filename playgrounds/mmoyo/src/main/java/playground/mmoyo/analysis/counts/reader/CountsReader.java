@@ -46,7 +46,7 @@ public class CountsReader {
 						if (!count.containsKey(id)){
 							count.put(id, new TreeMap< String, double[]>() );   
 						}
-						count.get(id).put(values[0], new double[] {Double.parseDouble(values[3]), Double.parseDouble(values[2])} );
+						count.get(id).put(values[0], new double[] {Double.parseDouble(values[1]), Double.parseDouble(values[2]), Double.parseDouble(values[3])} );
 					}
 				}
 			}
@@ -58,24 +58,31 @@ public class CountsReader {
 	    }
 	}
 	
-	public double[]getStopSimCounts(final Id stopId){ 
-		return getStopValues(stopId, true);
+	public double[]getSimulatedValues(final Id stopId) {
+		return this.getCountValues(stopId, 0);
 	}
-	
-	public double[]getStopCounts(final Id stopId){ 
-		return getStopValues(stopId, false);
+
+	public double[]getSimulatedScaled(final Id stopId) {
+		return this.getCountValues(stopId, 1);
 	}
-	
-	private double[]getStopValues(final Id stopId, final boolean simValues){ 
+
+	public double[]getRealValues(final Id stopId) {
+		return this.getCountValues(stopId, 2);
+	}
+
+	private double[]getCountValues(final Id stopId, final int col){ 
 		double[] valueArray = new double[24];      
 		for (byte i= 0; i<24 ; i++)   {  
 			String hour = String.valueOf(i+1);
-			double[] value = count.get(stopId).get(hour);
-			if (value == null){
-				valueArray[i] = 0.0;
+			if (count.keySet().contains(stopId)){
+				double[] value = count.get(stopId).get(hour);
+				if (value == null){
+					valueArray[i] = 0.0;
+				}else{
+ 					valueArray[i] = value[col] ;  //0 = simulated; 1= simulatedEscaled ;  2=realValues    
+				}
 			}else{
-				int index= (simValues)?1:0; //converts from boolean into integer: //0 = countValue   1 = simValue(scaled)  
-				valueArray[i] = value[index] ;   
+				valueArray = null;
 			}
 		}
 		return valueArray;
@@ -89,20 +96,25 @@ public class CountsReader {
 	}
 	
 	public static void main(String[] args) {
-		String tabConfigFile;
+		String countComparisonFile;
 		if(args.length == 1){
-			tabConfigFile = args[0];
+			countComparisonFile = args[0];
 		}else{
-			tabConfigFile ="../playgrounds/mmoyo/output/cadyts_onlyM44counts/ITERS/it.10/10.simCountCompareOccupancy.txt";
+			countComparisonFile ="../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.simBseCountCompareOccupancy.txt";
 		}
 			
-		CountsReader countReader = new CountsReader(tabConfigFile);
-		Id stopId = new IdImpl("812550.1");
-		for (double d : countReader.getStopSimCounts(stopId)){
-			System.out.println(d);	
+		CountsReader countReader = new CountsReader(countComparisonFile);
+
+		String tab= "\t";
+		for (Id id : countReader.getStopsIds()){
+			System.out.println(id);
+			for (int h=0; h<24; h++ ){
+				double sim  = countReader.getSimulatedValues(id)[h];
+				double simEscaled = countReader.getSimulatedScaled(id)[h];
+				double real = countReader.getRealValues(id)[h];
+				System.out.println((h+1) + tab + sim + tab + simEscaled + tab + real);
+			}
 		}
-		
-		
 		
 	}
 	

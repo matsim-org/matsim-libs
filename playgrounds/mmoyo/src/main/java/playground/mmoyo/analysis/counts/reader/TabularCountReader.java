@@ -108,7 +108,7 @@ public class TabularCountReader implements TabularFileHandler {
 
 	public static void main(String[] args) throws IOException {
 		String tabularFile = "../playgrounds/mmoyo/output/@counts/1.txt";           //<-change
-		TransitSchedule transitSchedule = new DataLoader().readTransitSchedule("../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_network.xml.gz", "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz");
+		TransitSchedule transitSchedule = new DataLoader().readTransitSchedule("../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz");
 		TabularCountReader countReader = new TabularCountReader("occupancy counts", transitSchedule) ;   //<-set name
 		countReader.readFile(tabularFile);
 		countReader.writeCounts("../playgrounds/mmoyo/output/@counts/counts.xml");   //<-output file name

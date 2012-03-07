@@ -228,16 +228,16 @@ public class CalibrationStatReader implements TabularFileHandler {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String calibStatFile = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/input_calibration-stats.txt";
+		String calibStatFile = "../mmoyo/test/input/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/testCalibration/input_calibration-stats.txt";
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
 		new TabularFileParser().parse(calibStatFile, calibrationStatReader);
 		System.out.println(calibrationStatReader.getCalStatMap().get(Integer.valueOf(2)).count_ll);
 	}
 
 	@Override
-	public String preprocess(String line) {
-		// just dummy
-		return null;
+	public String preprocess(String arg0) {
+		return arg0;
 	}
+
 
 }

@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,6 +31,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Counts;
@@ -38,43 +40,20 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.utils.CreateVehiclesForSchedule;
 
 public class DataLoader {
 
-	//this is to be used when one need to work with a scenario outside a controler. v.gr. at util classes
-	public ScenarioImpl loadScenarioWithTrSchedule(final String configFile) {
-		ScenarioImpl scenario = this.loadScenario(configFile);
-		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
-		
-		//load transit schedule by config
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, scenario.getNetwork(), scenario).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
-		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
-
-		return scenario;
-	}
-
-	public TransitSchedule readTransitSchedule(final String networkFile, final String transitScheduleFile) {
-		ScenarioImpl scenario = (ScenarioImpl)this.createScenario();
-		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
-		matsimNetReader.readFile(networkFile);
-		TransitSchedule schedule = this.readTransitSchedule(scenario.getNetwork(), transitScheduleFile);
-		scenario = null;
-		matsimNetReader = null;
-		return schedule;
-	}
-
-	public TransitSchedule readTransitSchedule(final Network network, final String transitScheduleFile) {
+	public TransitSchedule readTransitSchedule(final String transitScheduleFile) {
 		TransitScheduleFactoryImpl transitScheduleFactoryImpl = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = transitScheduleFactoryImpl.createTransitSchedule();
-		Scenario scn = this.createScenario();
-		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, network, scn);
+		ModeRouteFactory routeFactory = new ModeRouteFactory();
+		IdFactory idf =	this.createScenario();
+		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, routeFactory, idf);
 		transitScheduleReaderV1.readFile(transitScheduleFile);
 		transitScheduleFactoryImpl = null;
 		transitScheduleReaderV1 = null;
-		scn = null;
+		routeFactory = null;
+		idf= null;
 		return transitSchedule;
 	}
 

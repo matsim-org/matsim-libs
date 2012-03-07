@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: mmoyo
+ * org.matsim.*
  * CadytsBuilder.java
  *                                                                         *
  * *********************************************************************** *
@@ -21,7 +21,6 @@
 package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

@@ -36,9 +36,12 @@ public class MyTransitRouterConfig extends TransitRouterConfig {
 //	public double marginalUtilityOfTravelDistanceTransit = -0.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
 //	public double costLineSwitch = 60.0 * -this.marginalUtilityOfTravelTimeTransit;	//* -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
 
+	private PlansCalcRouteConfigGroup pcrConfig;
+	
 	public MyTransitRouterConfig(PlanCalcScoreConfigGroup pcsConfig, PlansCalcRouteConfigGroup pcrConfig, 
 			TransitRouterConfigGroup trConfig, VspExperimentalConfigGroup vspConfig ) {
 		super(pcsConfig, pcrConfig, trConfig, vspConfig);
+		this.pcrConfig = pcrConfig;
 	}
 	
 	//additional config variables
@@ -46,4 +49,10 @@ public class MyTransitRouterConfig extends TransitRouterConfig {
 	public int minStationsNum= 2; 							//minimal number of stations to find, before start the routing
 	public String scenarioName = null;						//name of scenario or parameter set
 
+	
+	public PlansCalcRouteConfigGroup getPcrConfig(){
+		return this.pcrConfig;
+	}
+	
+	
 }

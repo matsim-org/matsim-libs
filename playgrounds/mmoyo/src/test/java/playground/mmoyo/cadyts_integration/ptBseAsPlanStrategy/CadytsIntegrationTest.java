@@ -34,6 +34,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.counts.MatsimCountsReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -53,13 +54,14 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		System.out.println(" Output Dir " + getOutputDirectory() );
 
 		String configFile = inputDir + "equil_config.xml";
+		//configFile = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		Config config = ConfigUtils.loadConfig(configFile);
 
 
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
-		controler.setDumpDataAtEnd(false);
+		controler.setDumpDataAtEnd(true);
 		controler.setOverwriteFiles(true);
 		controler.run();
 
@@ -77,8 +79,8 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
-		Counts occupCounts = controler.getScenario().getScenarioElement(org.matsim.counts.Counts.class);
-		controler.getCounts();
+		Counts occupCounts = new Counts() ;
+		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
 		Count count =  occupCounts.getCount(new IdImpl("stop1"));
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
 		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
@@ -156,26 +158,26 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Id stopId;
 
 		stopId= new IdImpl("stop1");
-		simValues = reader.getStopSimCounts(stopId);
-		realValues= reader.getStopCounts(stopId);
+		simValues = reader.getSimulatedValues(stopId);
+		realValues= reader.getRealValues(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 4.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 4.0 , MatsimTestUtils.EPSILON);
 
 		stopId= new IdImpl("stop2");
-		simValues = reader.getStopSimCounts(stopId);
-		realValues= reader.getStopCounts(stopId);
+		simValues = reader.getSimulatedValues(stopId);
+		realValues= reader.getRealValues(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
 
 		stopId= new IdImpl("stop6");
-		simValues = reader.getStopSimCounts(stopId);
-		realValues= reader.getStopCounts(stopId);
+		simValues = reader.getSimulatedValues(stopId);
+		realValues= reader.getRealValues(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 2.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 2.0 , MatsimTestUtils.EPSILON);
 
 		stopId= new IdImpl("stop10");
-		simValues = reader.getStopSimCounts(stopId);
-		realValues= reader.getStopCounts(stopId);
+		simValues = reader.getSimulatedValues(stopId);
+		realValues= reader.getRealValues(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
 
