@@ -77,7 +77,9 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 		if (PLANS_V4.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV4(this.scenario);
+			// Replaced non-parallel reader with parallel implementation. cdobler, mar'12.
+//			this.delegate = new PopulationReaderMatsimV4(this.scenario);
+			this.delegate = new ParallelPopulationReaderMatsimV4(this.scenario);
 			log.info("using plans_v4-reader.");
 		} else if (POPULATION_V5.equals(doctype)) {
 			this.delegate = new PopulationReaderMatsimV5(this.scenario);

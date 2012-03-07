@@ -52,14 +52,14 @@ import org.xml.sax.Attributes;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
- *
+ * 
  * @author mrieser
  * @author balmermi
  */
-/*package*/ class PopulationReaderMatsimV4 extends MatsimXmlParser implements PopulationReader {
+/* package */class PopulationReaderMatsimV4 extends MatsimXmlParser implements PopulationReader {
 
-	private final static String PLANS = "plans";
-	private final static String PERSON = "person";
+	/* package */final static String PLANS = "plans";
+	/* package */final static String PERSON = "person";
 	private final static String TRAVELCARD = "travelcard";
 	private final static String DESIRES = "desires";
 	private final static String ACTDUR = "actDur";
@@ -76,13 +76,13 @@ import org.xml.sax.Attributes;
 
 	private final static String ATTR_TYPE = "type";
 
-	private final Scenario scenario;
-	private final Population plans;
+	/* package*/ final Scenario scenario;
+	/* package*/ final Population plans;
 	private final Network network;
 	private final ActivityFacilities facilities;
-	private final Knowledges knowledges;
+	/* package*/ final Knowledges knowledges;
 
-	private PersonImpl currperson = null;
+	/*package*/ PersonImpl currperson = null;
 	private Desires currdesires = null;
 	private KnowledgeImpl currknowledge = null;
 	private String curracttype = null;
@@ -118,7 +118,8 @@ import org.xml.sax.Attributes;
 	}
 
 	@Override
-	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+	public void startTag(final String name, final Attributes atts,
+			final Stack<String> context) {
 		if (PLANS.equals(name)) {
 			startPlans(atts);
 		} else if (PERSON.equals(name)) {
@@ -155,7 +156,8 @@ import org.xml.sax.Attributes;
 	}
 
 	@Override
-	public void endTag(final String name, final String content, final Stack<String> context) {
+	public void endTag(final String name, final String content,
+			final Stack<String> context) {
 		if (PERSON.equals(name)) {
 			if (this.plans instanceof PopulationImpl) {
 				((PopulationImpl) this.plans).addPerson(this.currperson);
@@ -167,7 +169,7 @@ import org.xml.sax.Attributes;
 			this.currdesires = null;
 		} else if (KNOWLEDGE.equals(name)) {
 
-				this.currknowledge = null;
+			this.currknowledge = null;
 		} else if (ACTIVITY.equals(name)) {
 			this.curracttype = null;
 		} else if (LOCATION.equals(name)) {
@@ -186,16 +188,18 @@ import org.xml.sax.Attributes;
 	}
 
 	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}.
-	 *
-	 * @param filename The name of the file to parse.
+	 * Parses the specified plans file. This method calls {@link #parse(String)}
+	 * .
+	 * 
+	 * @param filename
+	 *            The name of the file to parse.
 	 */
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
 		parse(filename);
 	}
 
-	private void startPlans(final Attributes atts) {
+	/* package */void startPlans(final Attributes atts) {
 		this.plans.setName(atts.getValue("name"));
 		if (atts.getValue("reference_layer") != null) {
 			log.warn("plans.reference_layer is no longer supported.");
@@ -205,8 +209,7 @@ import org.xml.sax.Attributes;
 	private void startPerson(final Attributes atts) {
 		String ageString = atts.getValue("age");
 		int age = Integer.MIN_VALUE;
-		if (ageString != null)
-			age = Integer.parseInt(ageString);
+		if (ageString != null) age = Integer.parseInt(ageString);
 		this.currperson = new PersonImpl(this.scenario.createId(atts.getValue("id")));
 		this.currperson.setSex(atts.getValue("sex"));
 		this.currperson.setAge(age);
@@ -229,7 +232,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startActDur(final Attributes atts) {
-		this.currdesires.putActivityDuration(atts.getValue(ATTR_TYPE),atts.getValue("dur"));
+		this.currdesires.putActivityDuration(atts.getValue(ATTR_TYPE), atts.getValue("dur"));
 	}
 
 	private void startKnowledge(final Attributes atts) {
@@ -249,18 +252,32 @@ import org.xml.sax.Attributes;
 		String freq = atts.getValue("freq");
 		String iP = atts.getValue("isPrimary");
 		boolean isPrimary = false;
-		if ("yes".equals(iP)) { isPrimary = true; }
+		if ("yes".equals(iP)) {
+			isPrimary = true;
+		}
 
-		if (type != null) { log.info("Attribute type in <location> is deprecated!"); }
-		if (id == null) { Gbl.errorMsg("NEW: location must have an id!"); }
-		if ((x != null) || (y != null)) { log.info("NEW: coords in <location> will be ignored!"); }
-		if (freq != null) { log.info("NEW: Attribute freq in <location> is not supported at the moment!"); }
+		if (type != null) {
+			log.info("Attribute type in <location> is deprecated!");
+		}
+		if (id == null) {
+			Gbl.errorMsg("NEW: location must have an id!");
+		}
+		if ((x != null) || (y != null)) {
+			log.info("NEW: coords in <location> will be ignored!");
+		}
+		if (freq != null) {
+			log.info("NEW: Attribute freq in <location> is not supported at the moment!");
+		}
 
 		ActivityFacility currfacility = this.facilities.getFacilities().get(this.scenario.createId(id));
-		if (currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
+		if (currfacility == null) {
+			Gbl.errorMsg("facility id=" + id + " does not exist!");
+		}
 		this.curractivity = currfacility.getActivityOptions().get(this.curracttype);
-		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
-		this.currknowledge.addActivityOption(this.curractivity,isPrimary);
+		if (this.curractivity == null) {
+			Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!");
+		}
+		this.currknowledge.addActivityOption(this.curractivity, isPrimary);
 	}
 
 	private void startPlan(final Attributes atts) {
@@ -268,13 +285,10 @@ import org.xml.sax.Attributes;
 		boolean selected;
 		if (sel.equals("yes")) {
 			selected = true;
-		}
-		else if (sel.equals("no")) {
+		} else if (sel.equals("no")) {
 			selected = false;
-		}
-		else {
-			throw new NumberFormatException(
-					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+		} else {
+			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
 		this.currplan = this.currperson.createAndAddPlan(selected);
@@ -288,24 +302,18 @@ import org.xml.sax.Attributes;
 		String type = atts.getValue(ATTR_TYPE);
 		if (type == null) {
 			this.currplan.setType("undefined");
-		}
-		else if ("car".equalsIgnoreCase(type)) {
-				this.currplan.setType("car");
-		}
-		else if ("pt".equalsIgnoreCase(type)) {
+		} else if ("car".equalsIgnoreCase(type)) {
+			this.currplan.setType("car");
+		} else if ("pt".equalsIgnoreCase(type)) {
 			this.currplan.setType("pt");
-		}
-		else if ("ride".equalsIgnoreCase(type)) {
+		} else if ("ride".equalsIgnoreCase(type)) {
 			this.currplan.setType("ride");
-		}
-		else if ("bike".equalsIgnoreCase(type)) {
+		} else if ("bike".equalsIgnoreCase(type)) {
 			this.currplan.setType("bike");
-		}
-		else if ("walk".equalsIgnoreCase(type)) {
+		} else if ("walk".equalsIgnoreCase(type)) {
 			this.currplan.setType("walk");
-		}
-		else {
-			if (this.warnPlanTypeCount < 10 ) {
+		} else {
+			if (this.warnPlanTypeCount < 10) {
 				log.warn("Type " + type + " of plan not known! Setting plan to type undefined!");
 				this.warnPlanTypeCount++;
 			}
@@ -317,16 +325,19 @@ import org.xml.sax.Attributes;
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
 			Id linkId = this.scenario.createId(atts.getValue("link"));
-			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_TYPE), linkId);
+			this.curract = this.currplan.createAndAddActivity(
+					atts.getValue(ATTR_TYPE), linkId);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
-			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_TYPE), coord);
+			this.curract = this.currplan.createAndAddActivity(
+					atts.getValue(ATTR_TYPE), coord);
 		} else {
-			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
+			throw new IllegalArgumentException(
+					"In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
 		this.curract.setStartTime(Time.parseTime(atts.getValue("start_time")));
 		this.curract.setMaximumDuration(Time.parseTime(atts.getValue("dur")));
@@ -345,11 +356,17 @@ import org.xml.sax.Attributes;
 				endLinkId = this.curract.getLinkId();
 			}
 			if (this.currRoute instanceof GenericRoute) {
-				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
+				((GenericRoute) this.currRoute).setRouteDescription(
+						startLinkId, this.routeDescription.trim(), endLinkId);
 			} else if (this.currRoute instanceof NetworkRoute) {
-				((NetworkRoute) this.currRoute).setLinkIds(startLinkId, NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeDescription))), endLinkId);
+				((NetworkRoute) this.currRoute).setLinkIds(startLinkId,
+						NetworkUtils.getLinkIds(RouteUtils
+								.getLinksFromNodes(NetworkUtils.getNodes(
+										this.network, this.routeDescription))),
+						endLinkId);
 			} else {
-				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
+				throw new RuntimeException("unknown route type: "
+						+ this.currRoute.getClass().getName());
 			}
 			this.routeDescription = null;
 			this.currRoute = null;
