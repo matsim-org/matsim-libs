@@ -76,11 +76,19 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 		double linkFuzzyFactor = calcLinkFuzzyFactor(link);
 		
 		/*
-		 * Sum of the three factors is between ~0.0 and 3.0
-		 * Shift it by -1.5 and scale it by 3 to have an interval 
-		 * between -0.50..0.50
+		 * personFuzzyFactor and linkFuzzyFactor are uniform distributed,
+		 * combined they result in a normal distribution.
+		 * 
+		 * "(personFuzzyFactor + linkFuzzyFactor - 1)/4" results in a 
+		 * normal distribution with values between -0.25..0.25.
+		 * 
+		 * distanceFuzzyFactor is used to increase the fuzzyness for link
+		 * that are far away. Its range is from 0..1.
+		 * 
+		 * Multiplying the factor with "distanceFuzzyFactor + 1" (1..2)
+		 * results in a range of -0.50 .. 0.50 for the factor.
 		 */
-		double factor = (personFuzzyFactor + distanceFuzzyFactor + linkFuzzyFactor - 1.5)/3;
+		double factor = ((personFuzzyFactor + linkFuzzyFactor - 1.0) / 4) * (distanceFuzzyFactor + 1);
 		double ttError = tt * factor;
 		
 		return tt + ttError;

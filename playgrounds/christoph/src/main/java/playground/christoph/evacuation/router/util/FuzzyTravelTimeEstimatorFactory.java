@@ -32,7 +32,7 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 	private final PersonalizableTravelTimeFactory timeFactory;
 	private final AgentsTracker agentsTracker;
 	private final VehiclesTracker vehiclesTracker;
-	private final DistanceFuzzyFactorProvider distanceFuzzyFactorProvider;
+	private final DistanceFuzzyFactorProviderFactory distanceFuzzyFactorProviderFactory;
 	
 	public FuzzyTravelTimeEstimatorFactory(Scenario scenario, PersonalizableTravelTimeFactory timeFactory, AgentsTracker agentsTracker,
 			VehiclesTracker vehiclesTracker) {
@@ -41,11 +41,12 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 		this.agentsTracker = agentsTracker;
 		this.vehiclesTracker = vehiclesTracker;
 
-		this.distanceFuzzyFactorProvider = new DistanceFuzzyFactorProvider(scenario);
+		this.distanceFuzzyFactorProviderFactory = new DistanceFuzzyFactorProviderFactory(scenario);
 	}
 	
 	@Override
 	public FuzzyTravelTimeEstimator createTravelTime() {
-		return new FuzzyTravelTimeEstimator(scenario, timeFactory.createTravelTime(), agentsTracker, vehiclesTracker, distanceFuzzyFactorProvider);
+		return new FuzzyTravelTimeEstimator(scenario, timeFactory.createTravelTime(), agentsTracker, vehiclesTracker, 
+				distanceFuzzyFactorProviderFactory.createInstance());
 	}
 }
