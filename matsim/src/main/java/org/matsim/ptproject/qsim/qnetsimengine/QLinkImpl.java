@@ -205,7 +205,9 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.vehQueue.add(veh);
 		this.linkEnterTimeMap.put(veh, now);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
-		double earliestExitTime = now + this.freespeedTravelTime;
+		double vehicleTravelTime = this.length / veh.getMaximumVelocity();
+		double earliestExitTime = now + Math.max(this.freespeedTravelTime, vehicleTravelTime);
+		
 		earliestExitTime = Math.floor(earliestExitTime);
 		veh.setEarliestLinkExitTime(earliestExitTime);
 	}

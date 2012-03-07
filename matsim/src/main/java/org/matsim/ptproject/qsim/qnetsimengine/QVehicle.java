@@ -144,4 +144,8 @@ public class QVehicle extends QItem implements MobsimVehicle {
 				+ ", on link " + this.currentLink.getId();
 	}
 
+	public double getMaximumVelocity() {
+		return basicVehicle.getType().getMaximumVelocity();
+	}
+
 }

@@ -102,4 +102,9 @@ public interface VehicleType {
 	public DoorOperationMode getDoorOperationMode();
 	
 	public void setDoorOperationMode(DoorOperationMode mode);
+	
+	public double getPcuEquivalents();
+
+	public void setPcuEquivalents(double pcuEquivalents);
+	
 }

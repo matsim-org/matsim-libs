@@ -97,7 +97,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 				atts.add(this.createTuple(VehicleSchemaV1Names.METER, Double.toString(vt.getWidth())));
 				this.writeStartTag(VehicleSchemaV1Names.WIDTH, atts, true);
 			}
-			if (!Double.isNaN(vt.getMaximumVelocity())){
+			if (!Double.isNaN(vt.getMaximumVelocity()) && !Double.isInfinite(vt.getMaximumVelocity())){
 				atts.clear();
 				atts.add(this.createTuple(VehicleSchemaV1Names.METERPERSECOND, Double.toString(vt.getMaximumVelocity())));
 				this.writeStartTag(VehicleSchemaV1Names.MAXIMUMVELOCITY, atts, true);

@@ -654,6 +654,7 @@ public class QSimTest {
 	public void testWaitingForCar() {
 		Fixture f = new Fixture();
 		f.scenario.getConfig().getQSimConfigGroup().setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT);
+		f.scenario.getConfig().getQSimConfigGroup().setEndTime(24.0 * 60.0 * 60.0);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());

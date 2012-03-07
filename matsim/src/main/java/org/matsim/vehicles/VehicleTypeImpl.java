@@ -27,24 +27,27 @@ import org.matsim.api.core.v01.Id;
 public class VehicleTypeImpl implements VehicleType {
 
 	private double width = 1.0;
-	private double maxVelocity = 1.0;
+	private double maxVelocity = Double.POSITIVE_INFINITY; // default: constrained only by the link speed
 	private double length = 7.5;
+	private double pcuEquivalents = 1.0;
 	private EngineInformation engineInformation;
 	private String description;
 	private VehicleCapacity capacity;
+
 	/**
 	 * default from xml schema
 	 */
 	private double accessTime = 1.0;
-  /**
-   * default from xml schema
-   */
-	private double egressTime = 1.0;
 	
+	/**
+	 * default from xml schema
+	 */
+	private double egressTime = 1.0;
+
 	private Id id;
 
 	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
-	
+
 	public VehicleTypeImpl(Id typeId) {
 		this.id = typeId;
 	}
@@ -78,7 +81,7 @@ public class VehicleTypeImpl implements VehicleType {
 	public void setWidth(double width) {
 		this.width = width;
 	}
-	
+
 	@Override
 	public double getWidth() {
 		return width;
@@ -114,25 +117,25 @@ public class VehicleTypeImpl implements VehicleType {
 		return id;
 	}
 
-  @Override
-  public double getAccessTime() {
-    return this.accessTime;
-  }
+	@Override
+	public double getAccessTime() {
+		return this.accessTime;
+	}
 
-  @Override
-  public double getEgressTime() {
-    return this.egressTime;
-  }
+	@Override
+	public double getEgressTime() {
+		return this.egressTime;
+	}
 
-  @Override
-  public void setAccessTime(double seconds) {
-    this.accessTime = seconds;
-  }
+	@Override
+	public void setAccessTime(double seconds) {
+		this.accessTime = seconds;
+	}
 
-  @Override
-  public void setEgressTime(double seconds) {
-    this.egressTime = seconds;
-  }
+	@Override
+	public void setEgressTime(double seconds) {
+		this.egressTime = seconds;
+	}
 
 	@Override
 	public DoorOperationMode getDoorOperationMode() {
@@ -142,6 +145,14 @@ public class VehicleTypeImpl implements VehicleType {
 	@Override
 	public void setDoorOperationMode(DoorOperationMode mode) {
 		this.doorOperationMode = mode;
+	}
+
+	public double getPcuEquivalents() {
+		return pcuEquivalents;
+	}
+
+	public void setPcuEquivalents(double pcuEquivalents) {
+		this.pcuEquivalents = pcuEquivalents;
 	}
 
 }
