@@ -168,8 +168,7 @@ public class CreatePopulation {
 		double endTime = Math.max(0.0, this.random.nextGaussian() * 2.0 * 3600.0 + 7.0 * 3600.0);
 		act.setEndTime(endTime);
 		plan.addActivity(act);
-		plan.addLeg(new LegImpl("car"));
-		
+				
 		endTime = this.addWorkingAct(plan, person, day, endTime);
 		endTime = this.addOtherActs(plan, person, day, endTime);
 		
@@ -190,16 +189,17 @@ public class CreatePopulation {
 		}
 				
 		if (decisionModel.doesAct("shop", day) && checkShopping) {
+			plan.addLeg(new LegImpl("car"));
 			ActivityFacility facility = this.memories.getMemory(person.getId()).getHomeZone().getRandomLocationInZone(random);
 			ActivityImpl act = new ActivityImpl("shop", facility.getCoord());
 			endTime += Math.max(0.1 * 3600.0, this.random.nextGaussian() * 1.5 * 3600.0 + 1.0 * 3600.0);
 			act.setEndTime(endTime);
 			act.setFacilityId(facility.getId());
 			plan.addActivity(act);
-			plan.addLeg(new LegImpl("car"));
 		}
 		// check leisure
 		if (decisionModel.doesAct("leisure", day) && checkLeisure) {
+			plan.addLeg(new LegImpl("car"));
 			TreeMap<Id, ActivityFacility> facilitiesLeisure = this.scenario.getActivityFacilities().getFacilitiesForActivityType("leisure");
 			ActivityFacility facility = (ActivityFacility) facilitiesLeisure.values().toArray()[random.nextInt(facilitiesLeisure.size())];
 			ActivityImpl act = new ActivityImpl("leisure", facility.getCoord());
@@ -207,7 +207,6 @@ public class CreatePopulation {
 			act.setEndTime(endTime);
 			act.setFacilityId(facility.getId());
 			plan.addActivity(act);
-			plan.addLeg(new LegImpl("car"));
 		}
 		return endTime;
 	}
@@ -216,18 +215,19 @@ public class CreatePopulation {
 		DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
 		
 		if (decisionModel.doesAct("work", day)) {
+			plan.addLeg(new LegImpl("car"));
 			ActivityFacility facility = this.workLocations.get(person.getId());
 			ActivityImpl workAct = new ActivityImpl("work", facility.getCoord());
 			endTime += Math.max(0.5 * 3600.0, this.random.nextGaussian() * 1.5 * 3600.0 + 8.0 * 3600.0);
 			workAct.setEndTime(endTime);
 			workAct.setFacilityId(facility.getId());
 			plan.addActivity(workAct);
-			plan.addLeg(new LegImpl("car"));
 		}
 		return endTime;
 	}
 	
-	private void finishPlan(PlanImpl plan, PersonImpl person) {
+	private void finishPlan(PlanImpl plan, PersonImpl person) {			
+		plan.addLeg(new LegImpl("car"));
 		ActivityFacility home = this.homeLocations.get(person.getId());
 		ActivityImpl homeAct = new ActivityImpl("home", home.getCoord());
 		homeAct.setFacilityId(home.getId());
