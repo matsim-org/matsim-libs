@@ -59,6 +59,8 @@ import playground.thibautd.router.TripRouter;
 public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 	private static final Logger log =
 		Logger.getLogger(ParkAndRideChooseModeForSubtour.class);
+	// enable during developement to get more checks
+	private static final boolean SELF_CHECKING = true;
 
 	private static class Candidate {
 		Integer subTourIndex;
@@ -103,6 +105,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 	@Override
 	public void run(final Plan plan) {
 		List<PlanElement> planStructure = includer.extractPlanStructure( plan );
+		checkSequence( planStructure );
 		Id homeLocation = null;
 
 		if (plan.getPlanElements().size() > 1) {
@@ -132,6 +135,8 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 						whatToDo.newTransportMode);
 			}
 		}
+
+		checkSequence( plan.getPlanElements() );
 	}
 
 	private static Plan wrapPlanStructure(final List<PlanElement> planStructure) {
@@ -411,5 +416,29 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		}
 
 		return endTime;
+	}
+
+	private static void checkSequence(final List<PlanElement> sequence) {
+		if (SELF_CHECKING) {
+			boolean lastWasActivity = false;
+
+			for (PlanElement pe : sequence) {
+				if (pe instanceof Activity) {
+					if (lastWasActivity) {
+						throw new RuntimeException( "wrong plan element sequence in "+sequence );
+					}
+					lastWasActivity = true;
+				}
+				else if (pe instanceof Leg) {
+					if (!lastWasActivity) {
+						throw new RuntimeException( "wrong plan element sequence in "+sequence );
+					}
+					lastWasActivity = false;
+				}
+				else {
+					throw new RuntimeException( "unexpected plan element type "+pe.getClass()+" for plan element "+pe+" in "+sequence );
+				}
+			}
+		}
 	}
 }

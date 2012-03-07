@@ -45,13 +45,10 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.MultiNodeDijkstra;
@@ -335,15 +332,51 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		return act;
 	}
 
-	// adapted from TransitRouterImpl.convert(...)
 	private List<PlanElement> parsePtSubTrip(
 			final Facility fromFacility,
 			final Facility toFacility,
 			final LinkIterator links) {
-		double time = links.now();
-
+		List<Leg> legs = parsePtSubTripLegs( fromFacility , toFacility , links );
 		List<PlanElement> trip = new ArrayList<PlanElement>();
+
+		boolean isFirst = true;
+		for (Leg leg : legs) {
+			if (!isFirst) {
+				Id startId = leg.getRoute().getStartLinkId();
+				Link startLink = routingNetwork.getLinks().get( startId );
+				trip.add( createInteraction( startLink.getCoord() ) );
+			}
+			else {
+				isFirst = false;
+			}
+			trip.add( leg );
+		}
+
+		return trip;
+	}
+
+	// adapted from TransitRouterImpl.convert(...)
+	private List<Leg> parsePtSubTripLegs(
+			final Facility fromFacility,
+			final Facility toFacility,
+			final LinkIterator links) {
+		double time = links.now();
+		List<Leg> legs = new ArrayList<Leg>();
 		Leg leg = null;
+
+		if (!links.hasNext()) {
+			// it seems, the agent only walked
+			legs.clear();
+			leg = new LegImpl(TransportMode.transit_walk);
+			double walkTime =
+				CoordUtils.calcDistance(
+						fromFacility.getCoord(),
+						toFacility.getCoord()) /
+				transitRouterConfig.getBeelineWalkSpeed();
+			leg.setTravelTime(walkTime);
+			legs.add(leg);
+			return legs;
+		}
 
 		TransitLine line = null;
 		TransitRoute route = null;
@@ -351,93 +384,52 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		TransitRouteStop transitRouteStart = null;
 		TransitRouterNetworkLink prevLink = null;
 
-		if ( !links.hasNext() ) {
-			// it seems the agent only walked
-			trip.clear();
-			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime =
-				CoordUtils.calcDistance(
-						fromFacility.getCoord(),
-						toFacility.getCoord()) /
-				transitRouterConfig.getBeelineWalkSpeed();
-			setWalkRoute(
-					leg,
-					walkTime,
-					fromFacility.getLinkId(),
-					toFacility.getLinkId());
-			trip.add(leg);
-			return trip;
-		}
+		for (Link link = links.next(); links.hasNext(); link = links.next()) {
+			TransitRouterNetworkLink l = (TransitRouterNetworkLink) link;
 
-		boolean isFirst = true;
-		for (Link genericLink = links.next(); links.hasNext(); genericLink = links.next()) {
-			TransitRouterNetworkLink link = (TransitRouterNetworkLink) genericLink;
+			if (l.getLine() == null) {
+				TransitStopFacility egressStop = l.fromNode.stop.getStopFacility();
 
-			if ( isFirst ) {
-				isFirst = false;
-				leg = new LegImpl(TransportMode.transit_walk);
-				double walkTime =
-					CoordUtils.calcDistance(
-							fromFacility.getCoord(),
-							link.getFromNode().getCoord()) /
-					transitRouterConfig.getBeelineWalkSpeed();
-				setWalkRoute(
-						leg,
-						walkTime,
-						fromFacility.getLinkId(),
-						link.getFromNode().getStop().getStopFacility().getLinkId());
-				trip.add(leg);
-				trip.add( createInteraction( link.getFromNode().getCoord() ) );
-			}
-
-			if (link.getLine() == null) {
-				TransitStopFacility egressStop = link.fromNode.stop.getStopFacility();
 				// it must be one of the "transfer" links. finish the pt leg, if there was one before...
 				if (route != null) {
 					leg = new LegImpl(TransportMode.pt);
-					ExperimentalTransitRoute ptRoute =
-						new ExperimentalTransitRoute(
-								accessStop,
-								line,
-								route,
-								egressStop);
+					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 					leg.setRoute(ptRoute);
 					double arrivalOffset =
-						(link.getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
-						link.fromNode.stop.getArrivalOffset() :
-						link.fromNode.stop.getDepartureOffset();
-					double arrivalTime =
-						this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+						(((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
+						((TransitRouterNetworkLink) link).fromNode.stop.getArrivalOffset() :
+						((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
+					double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
-					trip.add(leg);
+					legs.add(leg);
 					accessStop = egressStop;
-
-					Activity interaction = createInteraction( link.getToNode().getCoord() );
-					trip.add( interaction );
 				}
 				line = null;
 				route = null;
 				transitRouteStart = null;
 			}
 			else {
-				if (link.getRoute() != route) {
+				if (l.getRoute() != route) {
 					// the line changed
-					TransitStopFacility egressStop = link.fromNode.stop.getStopFacility();
+					TransitStopFacility egressStop = l.fromNode.stop.getStopFacility();
+
 					if (route == null) {
 						// previously, the agent was on a transfer, add the walk leg
-						transitRouteStart = link.getFromNode().stop;
+						transitRouteStart = ((TransitRouterNetworkLink) link).getFromNode().stop;
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / transitRouterConfig.getBeelineWalkSpeed();
-								setWalkRoute(
-										leg,
-										walkTime,
-										accessStop.getLinkId(),
-										egressStop.getLinkId());
+								double walkTime =
+									CoordUtils.calcDistance(
+											accessStop.getCoord(),
+											egressStop.getCoord()) /
+									transitRouterConfig.getBeelineWalkSpeed();
+								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
+								leg.setRoute(walkRoute);
+								leg.setTravelTime(walkTime);
 								time += walkTime;
-								trip.add(leg);
+								legs.add(leg);
 							}
 							else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
@@ -446,22 +438,19 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 											fromFacility.getCoord(),
 											egressStop.getCoord()) /
 									transitRouterConfig.getBeelineWalkSpeed();
-								setWalkRoute(
-										leg,
-										walkTime,
-										fromFacility.getLinkId(),
-										egressStop.getLinkId());
+								leg.setTravelTime(walkTime);
 								time += walkTime;
-								trip.add(leg);
+								legs.add(leg);
 							}
 						}
 					}
-					line = link.getLine();
-					route = link.getRoute();
+
+					line = l.getLine();;
+					route = l.getRoute();
 					accessStop = egressStop;
 				}
 			}
-			prevLink = link;
+			prevLink = l;
 		}
 
 		if (route != null) {
@@ -476,11 +465,8 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
-			trip.add(leg);
+			legs.add(leg);
 			accessStop = egressStop;
-
-			Activity interaction = createInteraction( prevLink.getToNode().getCoord() );
-			trip.add( interaction );
 		}
 
 		if (prevLink != null) {
@@ -492,11 +478,6 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 							fromFacility.getCoord(),
 							toFacility.getCoord()) /
 					transitRouterConfig.getBeelineWalkSpeed();
-				setWalkRoute(
-						leg,
-						walkTime,
-						fromFacility.getLinkId(),
-						toFacility.getLinkId());
 			}
 			else {
 				walkTime =
@@ -504,17 +485,12 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 							accessStop.getCoord(),
 							toFacility.getCoord()) /
 					transitRouterConfig.getBeelineWalkSpeed();
-				setWalkRoute(
-						leg,
-						walkTime,
-						fromFacility.getLinkId(),
-						toFacility.getLinkId());
 			}
-
-			trip.add(leg);
+			leg.setTravelTime(walkTime);
+			legs.add(leg);
 		}
 
-		return trip;
+		return legs;
 	}
 
 	private static void setWalkRoute(
