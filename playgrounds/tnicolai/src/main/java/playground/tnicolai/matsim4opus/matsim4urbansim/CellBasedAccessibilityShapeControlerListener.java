@@ -227,7 +227,7 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				// captures the eulidean distance between a square centroid and its nearest node
+				// captures the euclidean distance between a square centroid and its nearest node
 				LinkImpl nearestLink = network.getNearestLink( coordFromZone );
 				double distCentroid2Link = nearestLink.calcDistance(coordFromZone);
 				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
