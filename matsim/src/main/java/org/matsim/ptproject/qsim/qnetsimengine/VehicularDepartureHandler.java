@@ -19,6 +19,8 @@
 
 package org.matsim.ptproject.qsim.qnetsimengine;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -43,22 +45,22 @@ class VehicularDepartureHandler implements DepartureHandler {
 
 	private QNetsimEngine qNetsimEngine;
 
-	private String transportMode ;
+	private Collection<String> transportModes;
 
 	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
-		this.transportMode = qNetsimEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getMainMode() ;
+		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getMainMode() ;
 	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
-		if (agent.getMode().equals(this.transportMode)) {
+		if (this.transportModes.contains(agent.getMode())) {
 			if ( agent instanceof MobsimDriverAgent ) {
 				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
 				return true ;
 			} else {
-				throw new UnsupportedOperationException("wrong agent type to use a car") ;
+				throw new UnsupportedOperationException("wrong agent type to depart on a network mode") ;
 			}
 		}
 		return false ;

@@ -20,12 +20,16 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
@@ -82,7 +86,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	// ---
 	
 	private static final String MAIN_MODE = "mainMode" ;
-	private String mainMode = TransportMode.car ;
+	private Collection<String> mainModes = Arrays.asList(TransportMode.car) ;
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -117,7 +121,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		} else if (VEHICLE_BEHAVIOR.equals(key)) {
 			setVehicleBehavior(value);
 		} else if (MAIN_MODE.equals(key)) {
-			setMainMode(value) ;
+			setMainModes(Arrays.asList(value.split(","))) ;
 		} else if ("writeSnapshotsInterval".equals(key)) {
 			log.error("The config entry `writeSnapshotsInterval' was removed from the qsim config group. " +
 					"It is now in the controler config group; please move it there.  Aborting ...");
@@ -153,7 +157,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
-		map.put(MAIN_MODE, getMainMode()) ;
+		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainMode()))) ;
 		return map;
 	}
 
@@ -319,12 +323,12 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		return this.vehicleBehavior;
 	}
 
-	public void setMainMode(String mainMode) {
-		this.mainMode = mainMode;
+	public void setMainModes(Collection<String> mainModes) {
+		this.mainModes = mainModes;
 	}
 
-	public String getMainMode() {
-		return mainMode;
+	public Collection<String> getMainMode() {
+		return mainModes;
 	}
 	
 }
