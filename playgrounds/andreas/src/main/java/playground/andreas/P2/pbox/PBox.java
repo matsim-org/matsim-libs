@@ -205,13 +205,16 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		
 		if(this.pConfig.getUseAdaptiveNumberOfCooperatives()){
 			// adapt the number of cooperatives
-			if((double) nonBankruptCooperatives.size() / (double) this.cooperatives.size() < this.pConfig.getShareOfCooperativesWithProfit()){
-				// too few with profit, decrease number of new cooperatives by one
-				numberOfNewCoopertives--;
-			} else {
-				// too many with profit, there should be some market niche left, increase number of new cooperatives by one
-				numberOfNewCoopertives++;
-			}
+//			if((double) nonBankruptCooperatives.size() / (double) this.cooperatives.size() < this.pConfig.getShareOfCooperativesWithProfit()){
+//				// too few with profit, decrease number of new cooperatives by one
+//				numberOfNewCoopertives--;
+//			} else {
+//				// too many with profit, there should be some market niche left, increase number of new cooperatives by one
+//				numberOfNewCoopertives++;
+//			}
+			
+			// calculate the exact number necessary
+			numberOfNewCoopertives = (int) (nonBankruptCooperatives.size() * (1.0/this.pConfig.getShareOfCooperativesWithProfit() - 1.0) + 0.0000000000001);
 		}
 		
 		// delete bankrupt ones
