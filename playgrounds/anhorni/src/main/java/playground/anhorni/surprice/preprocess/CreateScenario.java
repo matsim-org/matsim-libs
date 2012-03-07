@@ -25,13 +25,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.anhorni.surprice.Surprice;
+
 public class CreateScenario {
 
 	private final static Logger log = Logger.getLogger(CreateScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	public static final String SURPRICE = "preprocess";
 	private String configFile;
-	public static String [] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+	
 				
 	public static void main(final String[] args) {		
 		if (args.length != 1) {
@@ -64,6 +65,6 @@ public class CreateScenario {
 		populationCreator.createPopulation(this.scenario, config);	
 		
 		CreateToll tollCreator = new CreateToll();
-		tollCreator.create(config.findParam(CreateScenario.SURPRICE, "outPath"), populationCreator.getTollZone()); // TODO: different schemes for different days
+		tollCreator.create(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"), populationCreator.getTollZone()); // TODO: different schemes for different days
 	}
 }

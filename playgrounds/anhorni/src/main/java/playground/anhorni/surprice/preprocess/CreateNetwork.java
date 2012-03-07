@@ -37,6 +37,8 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.anhorni.surprice.Surprice;
+
 public class CreateNetwork {
 	private ScenarioImpl scenario = null;	
 	private Config config = null;
@@ -51,7 +53,7 @@ public class CreateNetwork {
 		this.addNodes(networkFactory);
 		this.addLinks(networkFactory);
 		
-		this.write(config.findParam(CreateScenario.SURPRICE, "outPath"));
+		this.write(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 	}
 			
 	private void addLinks(NetworkFactoryImpl networkFactory) {		
@@ -59,9 +61,9 @@ public class CreateNetwork {
 		int facilityCnt = 0;
 		double freeSpeed = 35.0 / 3.6;
 		
-		double sideLength = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "sideLength"));
-		double spacing = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "spacing"));
-		double linkCapacity = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "linkCapacity"));
+		double sideLength = Double.parseDouble(config.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
+		double spacing = Double.parseDouble(config.findParam(Surprice.SURPRICE_PREPROCESS, "spacing"));
+		double linkCapacity = Double.parseDouble(config.findParam(Surprice.SURPRICE_PREPROCESS, "linkCapacity"));
 		
 		int stepsPerSide = (int)(sideLength / spacing);
 		
@@ -151,8 +153,8 @@ public class CreateNetwork {
 	}
 			
 	private void addNodes(NetworkFactoryImpl networkFactory) {		
-		double sideLength = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "sideLength"));
-		double spacing = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "spacing"));
+		double sideLength = Double.parseDouble(config.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
+		double spacing = Double.parseDouble(config.findParam(Surprice.SURPRICE_PREPROCESS, "spacing"));
 		
 		int nodeCnt = 0;
 		int stepsPerSide = (int)(sideLength/ spacing);

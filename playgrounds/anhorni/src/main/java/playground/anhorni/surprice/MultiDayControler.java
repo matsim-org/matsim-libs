@@ -19,22 +19,16 @@
 
 package playground.anhorni.surprice;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-
-import playground.anhorni.surprice.preprocess.CreateScenario;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class MultiDayControler {
 	
 	private final static Logger log = Logger.getLogger(MultiDayControler.class);
-	
-	public static ArrayList<String> days = new ArrayList<String>(Arrays.asList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
-	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "bike", "walk"));
-		
+			
 	public static void main (final String[] args) {		
 		if (args.length != 1) {
 			log.error("Provide correct number of arguments ...");
@@ -44,17 +38,22 @@ public class MultiDayControler {
 		
 		AgentMemories memories = new AgentMemories();
 				
-		for (String day : CreateScenario.days) {
+		for (String day : Surprice.days) {
 			Config config = ConfigUtils.loadConfig(configFile);
 			
 			String outPath = config.controler().getOutputDirectory();
-			String plansPath = config.plans().getInputFile();
+			String path = config.plans().getInputFile();
 			
 			config.setParam("controler", "outputDirectory", outPath + "/" + day);
-			config.setParam("plans", "inputPlansFile", plansPath + "/" + day + "/plans.xml");
+			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
 			
-			DayControler controler = new DayControler(config, memories, day);
+		    ObjectAttributes incomes = new ObjectAttributes();
+		    
+		    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(incomes);
+			attributesReader.parse(path + "incomes.xml");
+			
+			DayControler controler = new DayControler(config, memories, day, incomes);
 			controler.run();
 		}
 		log.info("Week simulated, yep, .................................................................");

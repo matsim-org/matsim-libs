@@ -128,7 +128,7 @@ public class AgentMemory {
 		String mode = "";
 		int [] modeCounts = {0, 0, 0, 0};
 		
-		int dayIndex = MultiDayControler.days.indexOf(day);
+		int dayIndex = Surprice.days.indexOf(day);
 		if (dayIndex > 0) { 
 			dayIndex--;
 		}
@@ -136,13 +136,13 @@ public class AgentMemory {
 			return mode;
 		}
 		
-		Plan plan = this.plans.get(MultiDayControler.days.get(dayIndex));
+		Plan plan = this.plans.get(Surprice.days.get(dayIndex));
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				LegImpl leg = (LegImpl)pe;
 				String m = leg.getMode();
-				modeCounts[MultiDayControler.modes.indexOf(m)] += 1;
+				modeCounts[Surprice.modes.indexOf(m)] += 1;
 			}
 		}
 		int maxVal = 0;
@@ -153,7 +153,7 @@ public class AgentMemory {
 				maxIndex = i;
 			}
 		}
-		mode = MultiDayControler.modes.get(maxIndex);	// TODO: handle equal numbers
+		mode = Surprice.modes.get(maxIndex);	// TODO: handle equal numbers
 		return mode;
 	}
 	

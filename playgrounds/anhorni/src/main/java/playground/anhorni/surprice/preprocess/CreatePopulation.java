@@ -38,11 +38,14 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.anhorni.surprice.AgentMemories;
 import playground.anhorni.surprice.AgentMemory;
 import playground.anhorni.surprice.DecisionModel;
 import playground.anhorni.surprice.DecisionModels;
+import playground.anhorni.surprice.Surprice;
 
 public class CreatePopulation {
 	private ScenarioImpl scenario = null;	
@@ -58,20 +61,22 @@ public class CreatePopulation {
 	private Random random = new Random(37835409);
 	
 	private Zone tollZone;
+	
+	private ObjectAttributes incomes = new ObjectAttributes();
 			
 	public void createPopulation(ScenarioImpl scenario, Config config) {		
 		this.scenario = scenario;
 		this.config = config;		
 		this.createPersons();
-				
-		for (String day : CreateScenario.days) {
+						
+		for (String day : Surprice.days) {
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {	
 				DecisionModel decisionModel = this.decisionModelCreator.createDecisionModelForAgent((PersonImpl)p, this.memories.getMemory(p.getId()));
 				this.decisionModels.addDecsionModelForAgent(decisionModel, p.getId());
 				this.createDemandForPerson((PersonImpl)p, day);	
 			}
 		}
-		for (String day : CreateScenario.days) {
+		for (String day : Surprice.days) {
 			// choose random plan for day
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
 				// set plan and remove it from memory
@@ -79,7 +84,7 @@ public class CreatePopulation {
 				((PersonImpl)person).addPlan(plan);
 				((PersonImpl)person).setSelectedPlan(plan);
 			}
-			String outPath = config.findParam(CreateScenario.SURPRICE, "outPath") + day;
+			String outPath = config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath") + day;
 			new File(outPath).mkdirs();
 			this.write(outPath);
 			
@@ -88,6 +93,7 @@ public class CreatePopulation {
 				((PersonImpl)person).getPlans().clear();
 			}
 		}
+		this.writeIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 	}
 	
 	private void initZone(Zone zone) {
@@ -100,7 +106,7 @@ public class CreatePopulation {
 	}
 	
 	private void createPersons() {
-		double sideLength = Double.parseDouble(config.findParam(CreateScenario.SURPRICE, "sideLength"));
+		double sideLength = Double.parseDouble(config.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
 		Zone centerZone = new Zone("centerZone", (Coord) new CoordImpl(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 1000.0, 1000.0);	
 		this.initZone(centerZone);
 		
@@ -127,7 +133,7 @@ public class CreatePopulation {
 	}
 			
 	private int addPersons(Zone origin, Zone destination, int offset) {				
-		int personsPerLocation = Integer.parseInt(config.findParam(CreateScenario.SURPRICE, "personsPerZone"));
+		int personsPerLocation = Integer.parseInt(config.findParam(Surprice.SURPRICE_PREPROCESS, "personsPerZone"));
 		int personCnt = 0;
 		for (int j = 0; j < personsPerLocation; j++) {
 			PersonImpl p = new PersonImpl(new IdImpl(personCnt + offset));			
@@ -138,6 +144,13 @@ public class CreatePopulation {
 						
 			ActivityFacility work = destination.getRandomLocationInZone(this.random);
 			this.workLocations.put(p.getId(), work);
+			
+			// assign daily income according to Gauss distribution. 
+			// TODO: check Gini coefficient, Lorenz distribution
+			double mean = 150.0;
+			double stdDev = 100.0;
+			String income = Double.toString(Math.max(10.0, random.nextGaussian() * stdDev + mean));
+			this.incomes.putAttribute(p.getId().toString(), "income", income);
 			
 			this.memories.addMemory(p.getId(), new AgentMemory());
 			this.memories.getMemory(p.getId()).setHomeZone(origin);
@@ -222,8 +235,14 @@ public class CreatePopulation {
 	}
 							
 	public void write(String path) {
-		log.info("Writing population ...");
+		log.info("Writing plans ...");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(path + "/plans.xml");
+	}
+	
+	private void writeIncomes(String path) {
+		log.info("Writing incomes to " + path + "incomes.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.incomes);
+		attributesWriter.writeFile(path + "/incomes.xml"); 
 	}
 
 	public Zone getTollZone() {

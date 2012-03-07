@@ -21,27 +21,29 @@ package playground.anhorni.surprice;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.anhorni.surprice.scoring.LaggedScoringFunctionFactory;
 import playground.anhorni.surprice.scoring.ScoringFunctionResetter;
 
 public class DayControler extends Controler {
 	
 	private AgentMemories memories = new AgentMemories();
-	private String day;
+	private String day;	
+	ObjectAttributes incomes;
 	
-	
-	public DayControler(final Config config, AgentMemories memories, String day) {
+	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes incomes) {
 		super(config);	
 		super.setOverwriteFiles(true);
 		this.memories = memories;	
 		this.day = day;
+		this.incomes = incomes;
 	} 
 		
 	protected void setUp() {
-	    super.setUp();	           
+	    super.setUp();	
+	    	    
 	  	LaggedScoringFunctionFactory scoringFunctionFactory = new LaggedScoringFunctionFactory(
-	  			this, this.config.planCalcScore(), this.network, this.memories, this.day);	  		
+	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.incomes);	  		
 	  	this.setScoringFunctionFactory(scoringFunctionFactory);
 	  	
 	  	this.addControlerListener(new ScoringFunctionResetter());
