@@ -409,7 +409,7 @@ public class Sim2DConfigGroup extends Module {
 	 * 
 	 * @param value
 	 */
-	private void setTimeStepSize(String value) {
+	public void setTimeStepSize(String value) {
 		this.timeStepSize = Double.parseDouble(value);
 
 	}
