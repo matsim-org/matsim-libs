@@ -1,38 +1,32 @@
-/*
- *  *********************************************************************** *
- *  * project: org.matsim.*
- *  * ${file_name}
- *  *                                                                         *
- *  * *********************************************************************** *
- *  *                                                                         *
- *  * copyright       : (C) ${year} by the members listed in the COPYING,        *
- *  *                   LICENSE and WARRANTY file.                            *
- *  * email           : info at matsim dot org                                *
- *  *                                                                         *
- *  * *********************************************************************** *
- *  *                                                                         *
- *  *   This program is free software; you can redistribute it and/or modify  *
- *  *   it under the terms of the GNU General Public License as published by  *
- *  *   the Free Software Foundation; either version 2 of the License, or     *
- *  *   (at your option) any later version.                                   *
- *  *   See also COPYING, LICENSE and WARRANTY file                           *
- *  *                                                                         *
- *  * ***********************************************************************
- *
- * ${filecomment}
- * ${package_declaration}
- *
- * ${typecomment}
- * ${type_declaration}
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * KTIEnergyFlowsController.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package playground.christoph.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -84,6 +78,9 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;
 		}
+		
+		// connect facilities to links
+		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
 	}
 	
 	private void loadHouseholds() {
@@ -120,7 +117,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		super.loadControlerListeners();
 
 		// the scoring function processes facility loads
-//		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
+		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
 		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));
