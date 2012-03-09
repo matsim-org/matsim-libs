@@ -27,6 +27,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import herbie.running.config.HerbieConfigGroup;
 
+import playground.thibautd.analysis.listeners.ActivityTypesAnalysis;
+import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.parknride.ParkAndRideFacilitiesXmlWriter;
 import playground.thibautd.parknride.ParkAndRideUtils;
 import playground.thibautd.parknride.scoring.CenteredTimeProportionalPenaltyFactory;
@@ -40,7 +42,8 @@ import playground.thibautd.router.controler.MultiLegRoutingControler;
 public class Run {
 	private static final Coord center = RelevantCoordinates.HAUPTBAHNHOF;
 	private static final Coord boundaryPoint = RelevantCoordinates.SEEBACH;
-	private static final double costPerSecondAtCenter = 0.1;
+	// cost at parkaus hauptbahnof
+	private static final double costPerSecondAtCenter = 4.4 / 3600d;
 
 	public static void main(final String[] args) {
 		String configFile = args[0];
@@ -60,6 +63,8 @@ public class Run {
 
 		MultiLegRoutingControler controler = new UglyHerbieMultilegControler( scenario );
 		controler.addControlerListener( ParkAndRideScoringFunctionFactory.createFactoryListener( penalty ) );
+		controler.addControlerListener(new ModeAnalysis( true ));
+		controler.addControlerListener(new ActivityTypesAnalysis( true ));
 		controler.run();
 
 		String outputFacilities =

@@ -25,6 +25,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.thibautd.analysis.listeners.ActivityTypesAnalysis;
+import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.parknride.scoring.CenteredTimeProportionalPenaltyFactory;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
@@ -56,6 +58,8 @@ public class Run {
 
 		MultiLegRoutingControler controler = new MultiLegRoutingControler( scenario );
 		controler.addControlerListener( ParkAndRideScoringFunctionFactory.createFactoryListener( penalty ) );
+		controler.addControlerListener(new ActivityTypesAnalysis( true ));
+		controler.addControlerListener(new ModeAnalysis( true ));
 		controler.run();
 
 		String outputFacilities =
