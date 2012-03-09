@@ -339,39 +339,85 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final Facility fromFacility,
 			final Facility toFacility,
 			final LinkIterator links) {
-		List< Tuple<Leg, Coord> > legs = parsePtSubTripLegs( fromFacility , toFacility , links );
+		List< Leg > baseTrip = parsePtSubTripLegs( fromFacility , toFacility , links );
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		boolean isFirst = true;
-		for (Tuple<Leg, Coord> leg : legs) {
-			if (!isFirst) {
-				trip.add( createInteraction( leg.getSecond() ) );
-			}
-			else {
-				isFirst = false;
-			}
-
-			trip.add( leg.getFirst() );
+		// the following was executed in PlansCalcTransitRoute at plan insertion.
+		Leg firstLeg = baseTrip.get(0);
+		Id fromLinkId = fromFacility.getLinkId();
+		Id toLinkId = null;
+		if (baseTrip.size() > 1) { // at least one pt leg available
+			toLinkId = (baseTrip.get(1).getRoute()).getStartLinkId();
+		} else {
+			toLinkId = toFacility.getLinkId();
 		}
 
+		//XXX: use ModeRouteFactory instead?
+		Route route = new GenericRouteImpl(fromLinkId, toLinkId);
+		route.setTravelTime( firstLeg.getTravelTime() );
+		firstLeg.setRoute( route );
+
+		Leg lastLeg = baseTrip.get(baseTrip.size() - 1);
+		toLinkId = toFacility.getLinkId();
+		if (baseTrip.size() > 1) { // at least one pt leg available
+			fromLinkId = (baseTrip.get(baseTrip.size() - 2).getRoute()).getEndLinkId();
+		}
+
+		//XXX: use ModeRouteFactory instead?
+		route = new GenericRouteImpl(fromLinkId, toLinkId);
+		route.setTravelTime( lastLeg.getTravelTime() );
+		lastLeg.setRoute( route );
+
+		boolean isFirstLeg = true;
+		Coord nextCoord = null;
+		for (Leg leg2 : baseTrip) {
+			if (isFirstLeg) {
+				trip.add( leg2 );
+				isFirstLeg = false;
+			}
+			else {
+				if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
+					ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();
+					ActivityImpl act =
+						new ActivityImpl(
+								PtConstants.TRANSIT_ACTIVITY_TYPE, 
+								transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
+								tRoute.getStartLinkId());
+					act.setMaximumDuration(0.0);
+					trip.add(act);
+					nextCoord = transitSchedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
+				}
+				else { // walk legs don't have a coord, use the coord from the last egress point
+					ActivityImpl act =
+						new ActivityImpl(
+								PtConstants.TRANSIT_ACTIVITY_TYPE,
+								nextCoord, 
+								leg2.getRoute().getStartLinkId());
+					act.setMaximumDuration(0.0);
+					trip.add(act);
+				}
+
+				trip.add( leg2 );
+			}
+		}
 		return trip;
 	}
 
 	// adapted from TransitRouterImpl.convert(...)
 	// returns a list of tuples leg/arrival coord of the leg
-	private List<Tuple<Leg, Coord>> parsePtSubTripLegs(
+	private List<Leg> parsePtSubTripLegs(
 			final Facility fromFacility,
 			final Facility toFacility,
 			final LinkIterator links) {
 		double time = links.now();
-		List<Tuple<Leg, Coord>> legs = new ArrayList<Tuple<Leg, Coord>>();
+		List<Leg> legs = new ArrayList<Leg>();
 		Leg leg = null;
 
 		if (!links.hasNext()) {
 			// it seems, the agent only walked
 			legs.clear();
 			leg = createFullWalk( fromFacility , toFacility );
-			legs.add( new Tuple<Leg, Coord>( leg , toFacility.getCoord() ) );
+			legs.add( leg );
 			return legs;
 		}
 
@@ -400,7 +446,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 					double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
-					legs.add( new Tuple<Leg, Coord> ( leg , egressStop.getCoord() ) );
+					legs.add( leg );
 					transitLegCount++;
 					accessStop = egressStop;
 				}
@@ -426,7 +472,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 									transitRouterConfig.getBeelineWalkSpeed();
 								setWalkRoute( leg , walkTime , accessStop.getLinkId() , egressStop.getLinkId() );
 								time += walkTime;
-								legs.add( new Tuple<Leg, Coord>( leg , egressStop.getCoord() ) );
+								legs.add( leg );
 							}
 							else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
@@ -437,7 +483,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 									transitRouterConfig.getBeelineWalkSpeed();
 								setWalkRoute( leg , walkTime , fromFacility.getLinkId() , egressStop.getLinkId() );
 								time += walkTime;
-								legs.add( new Tuple<Leg, Coord>( leg , egressStop.getCoord() ) );
+								legs.add( leg );
 							}
 						}
 					}
@@ -462,7 +508,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
-			legs.add( new Tuple<Leg, Coord>( leg , egressStop.getCoord() ) );
+			legs.add( leg );
 			transitLegCount++;
 			accessStop = egressStop;
 		}
@@ -485,14 +531,14 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 					transitRouterConfig.getBeelineWalkSpeed();
 				setWalkRoute( leg , walkTime , accessStop.getLinkId() , toFacility.getLinkId() );
 			}
-			legs.add( new Tuple<Leg , Coord>( leg , toFacility.getCoord() ) );
+			legs.add( leg );
 		}
 
 		if ( transitLegCount == 0 ) {
 			// it seems, the agent only walked
 			legs.clear();
 			leg = createFullWalk( fromFacility , toFacility );
-			legs.add( new Tuple<Leg , Coord>( leg , toFacility.getCoord() ) );
+			legs.add( leg );
 		}
 
 		return legs;
@@ -521,13 +567,13 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		leg.getRoute().setTravelTime( travelTime );
 	}
 
-	private final Activity createInteraction(final Coord coord) {
-		Activity interact = populationFactory.createActivityFromCoord(
-					PtConstants.TRANSIT_ACTIVITY_TYPE,
-					coord);
-		interact.setMaximumDuration( 0 );
-		return interact;
-	}
+	//private final Activity createInteraction(final Coord coord) {
+	//	Activity interact = populationFactory.createActivityFromCoord(
+	//				PtConstants.TRANSIT_ACTIVITY_TYPE,
+	//				coord);
+	//	interact.setMaximumDuration( 0 );
+	//	return interact;
+	//}
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
