@@ -181,7 +181,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		int srid = Constants.SRID_SWITZERLAND; // Constants.SRID_WASHINGTON_NORTH
 		// tnicolai: make this configurable 
 		boolean computeGridBasedAccessibilitiesShapeFile = true;
-		boolean computeGridBasedAccessibilitiesNetwork 	 = true; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
+		boolean computeGridBasedAccessibilitiesNetwork 	 = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
 		
 		// The following lines register what should be executed _after_ the iterations are done:
 		

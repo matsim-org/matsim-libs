@@ -8,6 +8,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -42,6 +43,8 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 	
 	private ActivityFacilitiesImpl zones; 
 	private ClusterObject[] aggregatedWorkplaces;
+	
+	private double walkSpeedMeterPerMin = -1;
 	
 	private Benchmark benchmark;
 	
@@ -97,6 +100,9 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		// this calculates a least cost path tree only based on link.getLength() (without marginalCostOfDistance since it's zero)
 		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() );
 		
+		// 1.38888889m/s corresponds to 5km/h
+		this.walkSpeedMeterPerMin = 1.38888889 * 60.; // sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		
@@ -119,6 +125,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			log.info("Beta car traveling per min: " + betaCarMin);
 			log.info("Beta walk traveling per h: " + betaWalkHour);
 			log.info("Beta walk traveling per min: " + betaWalkMin);
+			log.info("Walk speed (meter/min): " + this.walkSpeedMeterPerMin);
 			
 			// gather zone information like zone id, nearest node and coordinate (zone centroid)
 			ZoneObject[] zones = ZoneMapper.mapZoneCentroid2NearestNode(this.zones, network);
@@ -143,7 +150,10 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				// from here: accessibility computation for current starting point ("fromNode")
 				
 				// captures the eulidean distance between a zone centroid and its nearest node
-				double walkTimeOffset_min = EuclideanDistance.getEuclideanDistanceAsWalkTimeInSeconds(zones[fromIndex].getZoneCoordinate(), fromNode.getCoord()) / 60.;
+				LinkImpl nearestLink = network.getNearestLink( zones[fromIndex].getZoneCoordinate() );
+				double distCentroid2Link = nearestLink.calcDistance( zones[fromIndex].getZoneCoordinate() );
+				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
+//				double walkTimeOffset_min = EuclideanDistance.getEuclideanDistanceAsWalkTimeInSeconds(zones[fromIndex].getZoneCoordinate(), fromNode.getCoord()) / 60.;
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;
 				double travelTimesWalkSum 		  = 0.; // substitute for travel distance

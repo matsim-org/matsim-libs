@@ -41,9 +41,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimZoneModel;
-import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
 
 
 /**
@@ -68,7 +66,7 @@ import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
  *  in the MATSim output folder. If the backup is activated the most imported files (see BackupRun class) are saved in a new folder. In order 
  *  to match the saved data with the corresponding run or year the folder names contain the "simulation year" and a time stamp.
  * - Other improvements:
- * 	For a better readability of code some functionality is outsourced into helper classes
+ * 	For a better readability some functionality is outsourced into helper classes
  */
 public class MATSim4UrbanSimZone {
 
@@ -152,14 +150,6 @@ public class MATSim4UrbanSimZone {
 
 		// running mobsim and assigned controller listener
 		runControler(zones);
-		
-		// tnicolai: test
-//		Iterator<? extends Person> persons = scenario.getPopulation().getPersons().values().iterator();
-//		while(persons.hasNext()){
-//			Person p = persons.next();
-//			
-//			p.getPlans().
-//		}
 	}
 	
 	void isTestTun(){
