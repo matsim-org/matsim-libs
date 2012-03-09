@@ -49,8 +49,6 @@ import playground.thibautd.router.TripRouterFactory;
  * @author thibautd
  */
 public class ParkAndRideModule extends AbstractMultithreadedModule {
-	private static final double TRANSFER_MAX_WALK = 10;
-
 	private final MultiLegRoutingControler controler;
 	private final PersonalizableTravelTime pnrTime;
 	private final PersonalizableTravelCost pnrCost;
@@ -88,7 +86,7 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					controler.getPopulation().getFactory(),
 					controler.getNetwork(),
 					controler.getTransitRouterFactory().createTransitRouter().getSchedule(),
-					TRANSFER_MAX_WALK,
+					transitConfig.beelineWalkConnectionDistance,
 					ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() ),
 					transitConfig,
 					carCost,

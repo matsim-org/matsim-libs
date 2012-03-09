@@ -48,6 +48,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -90,6 +91,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 	private final ModeRouteFactory routeFactory;
 	private final PopulationFactory populationFactory;
 	private final TransitRouterNetworkTravelTimeCost ttCalculator;
+	private final TransitSchedule transitSchedule;
 
 	public ParkAndRideRoutingModule(
 			final ModeRouteFactory routeFactory,
@@ -104,6 +106,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final TransitRouterNetworkTravelTimeCost ptTimeCost,
 			final PersonalizableTravelCost pnrCost,
 			final PersonalizableTravelTime pnrTime) {
+		this.transitSchedule = schedule;
 		this.ttCalculator = ptTimeCost;
 		this.facilities = parkAndRideFacilities;
 		this.routeFactory = routeFactory;
@@ -336,45 +339,39 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final Facility fromFacility,
 			final Facility toFacility,
 			final LinkIterator links) {
-		List<Leg> legs = parsePtSubTripLegs( fromFacility , toFacility , links );
+		List< Tuple<Leg, Coord> > legs = parsePtSubTripLegs( fromFacility , toFacility , links );
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
 		boolean isFirst = true;
-		for (Leg leg : legs) {
+		for (Tuple<Leg, Coord> leg : legs) {
 			if (!isFirst) {
-				Id startId = leg.getRoute().getStartLinkId();
-				Link startLink = routingNetwork.getLinks().get( startId );
-				trip.add( createInteraction( startLink.getCoord() ) );
+				trip.add( createInteraction( leg.getSecond() ) );
 			}
 			else {
 				isFirst = false;
 			}
-			trip.add( leg );
+
+			trip.add( leg.getFirst() );
 		}
 
 		return trip;
 	}
 
 	// adapted from TransitRouterImpl.convert(...)
-	private List<Leg> parsePtSubTripLegs(
+	// returns a list of tuples leg/arrival coord of the leg
+	private List<Tuple<Leg, Coord>> parsePtSubTripLegs(
 			final Facility fromFacility,
 			final Facility toFacility,
 			final LinkIterator links) {
 		double time = links.now();
-		List<Leg> legs = new ArrayList<Leg>();
+		List<Tuple<Leg, Coord>> legs = new ArrayList<Tuple<Leg, Coord>>();
 		Leg leg = null;
 
 		if (!links.hasNext()) {
 			// it seems, the agent only walked
 			legs.clear();
-			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime =
-				CoordUtils.calcDistance(
-						fromFacility.getCoord(),
-						toFacility.getCoord()) /
-				transitRouterConfig.getBeelineWalkSpeed();
-			leg.setTravelTime(walkTime);
-			legs.add(leg);
+			leg = createFullWalk( fromFacility , toFacility );
+			legs.add( new Tuple<Leg, Coord>( leg , toFacility.getCoord() ) );
 			return legs;
 		}
 
@@ -384,6 +381,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		TransitRouteStop transitRouteStart = null;
 		TransitRouterNetworkLink prevLink = null;
 
+		int transitLegCount = 0;
 		for (Link link = links.next(); links.hasNext(); link = links.next()) {
 			TransitRouterNetworkLink l = (TransitRouterNetworkLink) link;
 
@@ -402,7 +400,8 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 					double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
-					legs.add(leg);
+					legs.add( new Tuple<Leg, Coord> ( leg , egressStop.getCoord() ) );
+					transitLegCount++;
 					accessStop = egressStop;
 				}
 				line = null;
@@ -425,11 +424,9 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 											accessStop.getCoord(),
 											egressStop.getCoord()) /
 									transitRouterConfig.getBeelineWalkSpeed();
-								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
-								leg.setRoute(walkRoute);
-								leg.setTravelTime(walkTime);
+								setWalkRoute( leg , walkTime , accessStop.getLinkId() , egressStop.getLinkId() );
 								time += walkTime;
-								legs.add(leg);
+								legs.add( new Tuple<Leg, Coord>( leg , egressStop.getCoord() ) );
 							}
 							else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
@@ -438,9 +435,9 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 											fromFacility.getCoord(),
 											egressStop.getCoord()) /
 									transitRouterConfig.getBeelineWalkSpeed();
-								leg.setTravelTime(walkTime);
+								setWalkRoute( leg , walkTime , fromFacility.getLinkId() , egressStop.getLinkId() );
 								time += walkTime;
-								legs.add(leg);
+								legs.add( new Tuple<Leg, Coord>( leg , egressStop.getCoord() ) );
 							}
 						}
 					}
@@ -465,32 +462,53 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
-			legs.add(leg);
+			legs.add( new Tuple<Leg, Coord>( leg , egressStop.getCoord() ) );
+			transitLegCount++;
 			accessStop = egressStop;
 		}
 
 		if (prevLink != null) {
 			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime;
 			if (accessStop == null) {
-				walkTime =
+				double walkTime =
 					CoordUtils.calcDistance(
 							fromFacility.getCoord(),
 							toFacility.getCoord()) /
 					transitRouterConfig.getBeelineWalkSpeed();
+				setWalkRoute( leg , walkTime , fromFacility.getLinkId() , toFacility.getLinkId() );
 			}
 			else {
-				walkTime =
+				double walkTime =
 					CoordUtils.calcDistance(
 							accessStop.getCoord(),
 							toFacility.getCoord()) /
 					transitRouterConfig.getBeelineWalkSpeed();
+				setWalkRoute( leg , walkTime , accessStop.getLinkId() , toFacility.getLinkId() );
 			}
-			leg.setTravelTime(walkTime);
-			legs.add(leg);
+			legs.add( new Tuple<Leg , Coord>( leg , toFacility.getCoord() ) );
+		}
+
+		if ( transitLegCount == 0 ) {
+			// it seems, the agent only walked
+			legs.clear();
+			leg = createFullWalk( fromFacility , toFacility );
+			legs.add( new Tuple<Leg , Coord>( leg , toFacility.getCoord() ) );
 		}
 
 		return legs;
+	}
+
+	private Leg createFullWalk(
+			final Facility fromFacility,
+			final Facility toFacility) {
+		Leg leg = new LegImpl(TransportMode.transit_walk);
+		double walkTime =
+			CoordUtils.calcDistance(
+					fromFacility.getCoord(),
+					toFacility.getCoord()) /
+			transitRouterConfig.getBeelineWalkSpeed();
+		setWalkRoute( leg , walkTime , fromFacility.getLinkId() , toFacility.getLinkId() );
+		return leg;
 	}
 
 	private static void setWalkRoute(
