@@ -204,14 +204,14 @@ public class NetworkSimplifier {
 
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("./bb_5.xml.gz");
+		new MatsimNetworkReader(scenario).readFile("/Users/thomas/Downloads/belgiumResidential.xml.gz");
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
-//		nsimply.setMergeLinkStats(true);
+		nsimply.setMergeLinkStats(false); //default = false
 		nsimply.run(network);
 
-		new NetworkWriter(network).write("./bb_5.out.xml.gz");
+		new NetworkWriter(network).write("/Users/thomas/Downloads/belgiumResidentialSimplifyed2.xml.gz");
 
 	}
 }
