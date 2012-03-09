@@ -40,16 +40,15 @@ public class Network2ShapeFile {
 	public static void main(String[] args) {
 		String netFile = "/Users/thomas/Downloads/belgiumReduced.xml.gz";//"/Users/thomas/Desktop/zurich_ivtch-osm_network/1000it/schwamendingertunnel/matsim/output_network.xml.gz";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network net = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 
 		// WGS84 isn't correct and may affects the transformation, but this isn't important to see the link id's
-		// use CH1903_LV03_GT for switzerland
-		// tnicolai: get name from projection identifiyer (EPSG)
+		// use CH1903_LV03_GT for switzerland or "EPSG:31300" for belgium
 		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:31300");
 		String transformation = crs.getName().toString();
-		// new Links2ESRIShape(net, "/Users/thomas/Development/opus_home/data/brussels_zone/shapefiles/belgium_incl_borderArea_clean_simple.shp", TransformationFactory.WGS84).write();
-		new Links2ESRIShape(net, "/Users/thomas/Downloads/belgiumReduced.shp", transformation).write();
+		// new Links2ESRIShape(net, "/Users/thomas/Downloads/belgiumReduced.shp", TransformationFactory.WGS84).write();
+		new Links2ESRIShape(network, "/Users/thomas/Downloads/belgiumReduced.shp", transformation).write();
 	}
 
 }

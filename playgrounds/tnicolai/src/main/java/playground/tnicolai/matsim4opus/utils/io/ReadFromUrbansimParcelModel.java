@@ -201,71 +201,6 @@ public class ReadFromUrbansimParcelModel {
 			protected long count = 0;	// denominator of x and y coordinate
 	}
 	
-	/**
-	 * dumps out raw and aggregated population data as csv
-	 * @param parcels
-	 * @param network
-	 */
-	public void readAndDumpPersons2CSV(final ActivityFacilitiesImpl parcels, final Network network){
-		
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
-		log.info( "Starting to read persons table from " + filename );
-		
-		Map<Id, PersonAndJobsObject> personLocations = new HashMap<Id, PersonAndJobsObject>();
-		Map<Id, ClusterObject> personClusterMap = new HashMap<Id, ClusterObject>();
-		
-		try {
-			BufferedReader reader = IOUtils.getBufferedReader( filename );
-
-			String line = reader.readLine();
-			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
-			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
-			
-			while ( (line=reader.readLine()) != null ) {
-				
-				String[] parts = line.split( Constants.TAB_SEPERATOR );
-				
-				// check if home location is available
-				if( Integer.parseInt(parts[ indexParcelID_HOME ]) >=  0){
-					// create new person
-					Id personId = new IdImpl( parts[ indexPersonID ] );
-					// get home location id
-					Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] );
-					ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId );
-					
-					
-					if(homeLocation != null){
-						personLocations.put(personId, new PersonAndJobsObject(personId, homeParcelId, null, homeLocation.getCoord()));
-						
-						{ // aggregating persons to nearest network nodes
-							assert( homeLocation.getCoord() != null );
-							Node nearestNode = ((NetworkImpl)network).getNearestNode( homeLocation.getCoord() );
-							assert( nearestNode != null );
-	
-							if( personClusterMap.containsKey( nearestNode.getId() ) ){
-								ClusterObject co = personClusterMap.get( nearestNode.getId() );
-								co.addObject( personId );
-							}
-							else
-								personClusterMap.put( nearestNode.getId(), new ClusterObject(personId,
-																							 homeParcelId,
-																						  	 null,
-																						  	 nearestNode.getCoord(),
-																						  	 nearestNode) );
-						}
-					}
-				}
-			}
-			// dump population data
-			PopulationCSVWriter.writePopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "population.csv", personLocations);
-			// dump aggregated population data
-			PopulationCSVWriter.writeAggregatedPopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
-			
-			
-		} catch (Exception e) {e.printStackTrace();}
-	}
 
 	/**
 	 *
@@ -705,7 +640,7 @@ public class ReadFromUrbansimParcelModel {
 		for(int i = 0; jobClusterIterator.hasNext(); i++)
 			jobClusterArray[i] = jobClusterIterator.next();
 		
-		log.info("Aggregated " + jobSampleList.size() + " number of workplaces (sampling rate: " + jobSample + ") to " + jobClusterArray.length);
+		log.info("Aggregated " + jobSampleList.size() + " number of workplaces (sampling rate: " + jobSample + ") to " + jobClusterArray.length + " nodes.");
 		
 		return jobClusterArray;
 	}
@@ -893,6 +828,72 @@ public class ReadFromUrbansimParcelModel {
 	 */
 	public int getYear(){
 		return this.year;
+	}
+	
+	/**
+	 * dumps out raw and aggregated population data as csv
+	 * @param parcels
+	 * @param network
+	 */
+	public void readAndDumpPersons2CSV(final ActivityFacilitiesImpl parcels, final Network network){
+		
+		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		log.info( "Starting to read persons table from " + filename );
+		
+		Map<Id, PersonAndJobsObject> personLocations = new HashMap<Id, PersonAndJobsObject>();
+		Map<Id, ClusterObject> personClusterMap = new HashMap<Id, ClusterObject>();
+		
+		try {
+			BufferedReader reader = IOUtils.getBufferedReader( filename );
+
+			String line = reader.readLine();
+			// get columns for home, work and person id
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
+			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
+			
+			while ( (line=reader.readLine()) != null ) {
+				
+				String[] parts = line.split( Constants.TAB_SEPERATOR );
+				
+				// check if home location is available
+				if( Integer.parseInt(parts[ indexParcelID_HOME ]) >=  0){
+					// create new person
+					Id personId = new IdImpl( parts[ indexPersonID ] );
+					// get home location id
+					Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] );
+					ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId );
+					
+					
+					if(homeLocation != null){
+						personLocations.put(personId, new PersonAndJobsObject(personId, homeParcelId, null, homeLocation.getCoord()));
+						
+						{ // aggregating persons to nearest network nodes
+							assert( homeLocation.getCoord() != null );
+							Node nearestNode = ((NetworkImpl)network).getNearestNode( homeLocation.getCoord() );
+							assert( nearestNode != null );
+	
+							if( personClusterMap.containsKey( nearestNode.getId() ) ){
+								ClusterObject co = personClusterMap.get( nearestNode.getId() );
+								co.addObject( personId );
+							}
+							else
+								personClusterMap.put( nearestNode.getId(), new ClusterObject(personId,
+																							 homeParcelId,
+																						  	 null,
+																						  	 nearestNode.getCoord(),
+																						  	 nearestNode) );
+						}
+					}
+				}
+			}
+			// dump population data
+			PopulationCSVWriter.writePopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "population.csv", personLocations);
+			// dump aggregated population data
+			PopulationCSVWriter.writeAggregatedPopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
+			
+			
+		} catch (Exception e) {e.printStackTrace();}
 	}
 
 	public class PopulationCounter{

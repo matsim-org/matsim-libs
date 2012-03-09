@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.matsim4urbansim.controlerinterface;
+package playground.tnicolai.matsim4opus.interfaces.controlerinterface;
 
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;

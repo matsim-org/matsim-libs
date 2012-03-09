@@ -42,6 +42,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimZoneModel;
+import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
 
 
 /**
@@ -174,8 +175,8 @@ public class MATSim4UrbanSimZone {
 	 * 
 	 * @return JobClusterObject[] 
 	 */
-	ClusterObject[] readUrbansimJobs(ActivityFacilitiesImpl parcels, double jobSample){
-		return readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl) scenario.getNetwork());
+	ClusterObject[] readUrbansimJobs(ActivityFacilitiesImpl zones, double jobSample){
+		return readFromUrbansim.getAggregatedWorkplaces(zones, jobSample, (NetworkImpl) scenario.getNetwork());
 	}
 	
 	/**
@@ -254,8 +255,8 @@ public class MATSim4UrbanSimZone {
 	void addControlerListener(ActivityFacilitiesImpl zones, Controler controler) {
 		
 		// tnicolai: make this configurable 
-		boolean computeZone2ZoneImpedance = true;
-		boolean computeZoneBasedAccessibilities = true;
+		boolean computeZone2ZoneImpedance = false;
+		boolean computeZoneBasedAccessibilities = false;
 		boolean dumpPopulationData = true;
 		boolean dumpAggegatedWorkplaceData = true;
 		
@@ -265,25 +266,25 @@ public class MATSim4UrbanSimZone {
 			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
 																					  null) ); 
 		
-//		if(computeZoneBasedAccessibilities){
-//			
-//			// init aggregatedWorkplaces
-//			if(aggregatedWorkplaces == null)
-//				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
-//			// creates zone based table of log sums (workplace accessibility)
-//			// uses always a 100% jobSample size (see readUrbansimJobs below)
-//			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
-//																						aggregatedWorkplaces, 
-//																						benchmark));
-//		}
-//		
-//		if(dumpPopulationData)
-//			readFromUrbansim.readAndDumpPersons2CSV(parcels, 
-//												 	controler.getNetwork());
-//		
-//		if(dumpAggegatedWorkplaceData)
-//			WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
-//																aggregatedWorkplaces);
+		if(computeZoneBasedAccessibilities){
+			
+			// init aggregatedWorkplaces
+			if(aggregatedWorkplaces == null)
+				aggregatedWorkplaces = readUrbansimJobs(zones, jobSample);
+			// creates zone based table of log sums (workplace accessibility)
+			// uses always a 100% jobSample size (see readUrbansimJobs below)
+			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
+																						aggregatedWorkplaces, 
+																						benchmark));
+		}
+		
+		if(dumpPopulationData)
+			readFromUrbansim.readAndDumpPersons2CSV(zones, 
+												 	controler.getNetwork());
+		
+		if(dumpAggegatedWorkplaceData)
+			WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
+					                                            aggregatedWorkplaces);
 	}
 	
 	/**
