@@ -19,8 +19,6 @@
 package playground.andreas.P2.schedule;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -30,8 +28,6 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.pt.router.TransitActsRemover;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -64,12 +60,15 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	private TransitSchedule schedule;
 	private TransitRouterConfig config;
 	private TransitRouterNetwork routerNetwork;
-
+	
+	private AgentsStuckHandlerImpl agentsStuckHandler;
 	private PBox pBox;
+	private double shareOfAgentsToReRouteAdditionally;
 
 	public PTransitRouterImplFactory(Controler controler) {
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
+		this.shareOfAgentsToReRouteAdditionally = pConfig.getShareOfAgentsToReRouteAdditionally();
 		controler.addControlerListener(new PStats(this.pBox, pConfig));
 	}
 
@@ -92,6 +91,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		this.config = new TransitRouterConfig(event.getControler().getScenario().getConfig().planCalcScore()
 				, event.getControler().getScenario().getConfig().plansCalcRoute(), event.getControler().getScenario().getConfig().transitRouter(),
 				event.getControler().getScenario().getConfig().vspExperimental());
+		this.agentsStuckHandler = new AgentsStuckHandlerImpl();
+		event.getControler().getEvents().addHandler(this.agentsStuckHandler);
 	}
 
 	@Override
@@ -106,23 +107,13 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 			((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
 			this.addPVehiclesToOriginalOnes(event.getControler());
 			
-			TransitActsRemover transitActsRemover = new TransitActsRemover();
-			for (Person person : event.getControler().getPopulation().getPersons().values()) {
-				for (Plan plan : person.getPlans()) {
-					transitActsRemover.run(plan);
-				}
-				// TODO AN Add BeforeMobsimListener and only reroute the selected plan - speedup
-//				transitActsRemover.run(person.getSelectedPlan());
+			ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@Override
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				return new PersonReRouteStuckAndSome(controler.createRoutingAlgorithm(), controler.getScenario(), agentsStuckHandler.getAgentsStuck(), shareOfAgentsToReRouteAdditionally);
 			}
-
-			ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(),
-					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-				@Override
-				public AbstractPersonAlgorithm getPersonAlgorithm() {
-					return new PersonPrepareForSim(controler.createRoutingAlgorithm(), controler.getNetwork());
-				}
-			});
-
+		});
+			
 			this.dumpTransitScheduleAndVehicles(event);
 		}
 	}
