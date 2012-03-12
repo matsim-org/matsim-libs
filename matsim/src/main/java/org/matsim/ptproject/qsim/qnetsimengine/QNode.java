@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.events.AgentStuckEventImpl;
 
 /**
  * Represents a node in the QSimulation.
@@ -58,7 +57,7 @@ public class QNode implements NetsimNode {
 
 	private QNetwork network;
 
-	/*package*/ QNode(final Node n, final QNetwork network) {
+	public QNode(final Node n, final QNetwork network) {
 		this.node = n;
 		this.network = network; 
 		this.activator = network.simEngine;	// by default (single threaded QSim)
@@ -225,7 +224,7 @@ public class QNode implements NetsimNode {
 			moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now);
 			return true;
 		}
-		
+
 		QLinkInternalI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
 		this.checkNextLinkSemantics(currentLink, nextQueueLink.getLink(), veh);
 

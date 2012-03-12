@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
-import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
  *
@@ -40,7 +39,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dgrether
  */
 
-class QNetwork implements NetsimNetwork {
+public class QNetwork implements NetsimNetwork {
 
 	private final Map<Id, QLinkInternalI> links;
 
@@ -48,16 +47,16 @@ class QNetwork implements NetsimNetwork {
 
 	private final Network network;
 
-	private final NetsimNetworkFactory<QNode, QLinkInternalI> queueNetworkFactory;
+	private final NetsimNetworkFactory<QNode, ? extends QLinkInternalI> queueNetworkFactory;
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 	
 	QNetsimEngine simEngine;
 
-	QNetwork(final Network network, final NetsimNetworkFactory<QNode, QLinkInternalI> factory ) {
+	QNetwork(final Network network, final NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
 		this.network = network;
-		this.queueNetworkFactory = factory;
+		this.queueNetworkFactory = netsimNetworkFactory;
 		this.links = new LinkedHashMap<Id, QLinkInternalI>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<Id, QNode>((int)(network.getLinks().size()*1.1), 0.95f);
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){

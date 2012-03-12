@@ -122,7 +122,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		this( sim, random, null ) ;
 	}
 
-	public QNetsimEngine(final QSim sim, final Random random, NetsimNetworkFactory<QNode, QLinkInternalI> netsimNetworkFactory ) {
+	public QNetsimEngine(final QSim sim, final Random random, NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
 		this.random = random;
 		this.qsim = sim;
 
