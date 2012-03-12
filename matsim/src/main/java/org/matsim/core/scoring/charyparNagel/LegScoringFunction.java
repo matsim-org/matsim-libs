@@ -120,13 +120,12 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += this.params.constantBike ;
 		} else {
 			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (this.params.marginalUtilityOfDistanceOther_m != 0.0) {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
-			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
-			tmpScore += this.params.constantCar ;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingOther_s + this.params.marginalUtilityOfDistanceOther_m * dist;
+			tmpScore += this.params.constantOther ;
 		}
 		return tmpScore;
 	}

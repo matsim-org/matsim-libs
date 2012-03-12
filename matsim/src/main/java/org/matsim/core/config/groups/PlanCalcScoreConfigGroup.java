@@ -60,11 +60,13 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String TRAVELING_PT = "travelingPt";
 	private static final String TRAVELING_BIKE = "travelingBike";
 	private static final String TRAVELING_WALK = "travelingWalk";
+	private static final String TRAVELING_OTHER = "travelingOther";
 	private static final String WAITING  = "waiting";
 	
 	private static final String CONSTANT_CAR = "constantCar" ;
 	private static final String CONSTANT_BIKE = "constantBike" ;
 	private static final String CONSTANT_WALK = "constantWalk" ;
+	private static final String CONSTANT_OTHER = "constantOther" ;
 	private static final String CONSTANT_PT = "constantPt" ;
 	
 
@@ -75,6 +77,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
 
 	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
+	private static final String MARGINAL_UTL_OF_DISTANCE_OTHER = "marginalUtlOfDistanceOther";
 
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
 	private static final String MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar" ;
@@ -128,6 +131,12 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private final HashMap<String, ActivityParams> activityTypes = new LinkedHashMap<String, ActivityParams>();
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
+	private double marginalUtlOfDistanceOther = 0.0 ;
+
+	private double constantOther = constantCar ;
+
+	private double travelingOther_utils_hr = traveling ;
+
 	@Override
 	public String getValue(final String key) {
 		if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
@@ -179,6 +188,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 			setTravelingPt_utils_hr(Double.parseDouble(value));
 		} else if (TRAVELING_WALK.equals(key)) {
 			setTravelingWalk_utils_hr(Double.parseDouble(value));
+		} else if (TRAVELING_OTHER.equals(key)) {
+			setTravelingOther_utils_hr(Double.parseDouble(value));
 		} else if (TRAVELING_BIKE.equals(key)) {
 			setTravelingBike_utils_hr(Double.parseDouble(value));
 		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
@@ -187,6 +198,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 			setMarginalUtlOfDistancePt(Double.parseDouble(value));
 		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
 			setMarginalUtlOfDistanceWalk(Double.parseDouble(value));
+		} else if (MARGINAL_UTL_OF_DISTANCE_OTHER.equals(key)){
+			setMarginalUtlOfDistanceOther(Double.parseDouble(value));
 		} else if ( MARGINAL_UTL_OF_MONEY.equals(key) ) {
 			setMarginalUtilityOfMoney( Double.parseDouble(value) ) ;
 		} else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
@@ -201,6 +214,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 			this.setConstantCar(Double.parseDouble(value)) ;
 		} else if ( CONSTANT_WALK.equals(key)) {
 			this.setConstantWalk(Double.parseDouble(value)) ;
+		} else if ( CONSTANT_OTHER.equals(key)) {
+			this.setConstantOther(Double.parseDouble(value)) ;
 		} else if ( CONSTANT_PT.equals(key)) {
 			this.setConstantPt(Double.parseDouble(value)) ;
 		} else if ( CONSTANT_BIKE.equals(key)) {
@@ -249,17 +264,20 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(TRAVELING, Double.toString(this.getTraveling_utils_hr()) );
 		map.put(TRAVELING_PT, Double.toString(this.getTravelingPt_utils_hr()));
 		map.put(TRAVELING_WALK, Double.toString(this.getTravelingWalk_utils_hr()));
+		map.put(TRAVELING_OTHER, Double.toString(this.getTravelingOther_utils_hr()));
 		map.put(TRAVELING_BIKE, Double.toString(this.getTravelingBike_utils_hr()));
 		map.put(WAITING, Double.toString(this.getWaiting_utils_hr()));
 //		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
 //		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));
+		map.put(MARGINAL_UTL_OF_DISTANCE_OTHER, Double.toString(this.getMarginalUtlOfDistanceOther()));
 		map.put(MARGINAL_UTL_OF_MONEY, Double.toString( this.getMarginalUtilityOfMoney() ) ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, Double.toString( this.getMonetaryDistanceCostRateCar() ) ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_PT, Double.toString( this.getMonetaryDistanceCostRatePt() ) ) ;
 		map.put(UTL_OF_LINE_SWITCH, Double.toString( this.getUtilityOfLineSwitch() )) ;
 		map.put(CONSTANT_CAR, Double.toString( this.getConstantCar() )) ;
 		map.put(CONSTANT_WALK, Double.toString( this.getConstantWalk() )) ;
+		map.put(CONSTANT_OTHER, Double.toString( this.getConstantOther() )) ;
 		map.put(CONSTANT_BIKE, Double.toString( this.getConstantBike() )) ;
 		map.put(CONSTANT_PT, Double.toString( this.getConstantPt() )) ;
 		int index = 0;
@@ -660,6 +678,30 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	public void setConstantBike(double constantBike) {
 		this.constantBike = constantBike;
+	}
+
+	public double getTravelingOther_utils_hr() {
+		return this.travelingOther_utils_hr ;
+	}
+
+	public double getConstantOther() {
+		return this.constantOther ;
+	}
+
+	public double getMarginalUtlOfDistanceOther() {
+		return this.marginalUtlOfDistanceOther ;
+	}
+
+	public void setMarginalUtlOfDistanceOther(double marginalUtlOfDistanceOther) {
+		this.marginalUtlOfDistanceOther = marginalUtlOfDistanceOther;
+	}
+
+	public void setConstantOther(double constantOther) {
+		this.constantOther = constantOther;
+	}
+
+	public void setTravelingOther_utils_hr(double travelingOtherUtilsHr) {
+		travelingOther_utils_hr = travelingOtherUtilsHr;
 	}
 
 }

@@ -35,17 +35,21 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final double marginalUtilityOfTravelingPT_s; // public transport
 	public final double marginalUtilityOfTravelingBike_s;
 	public final double marginalUtilityOfTravelingWalk_s;
+	public final double marginalUtilityOfTravelingOther_s;
 	public final double marginalUtilityOfPerforming_s;
 	
 	public final double constantCar ;
 	public final double constantWalk ;
 	public final double constantBike ;
 	public final double constantPt ;
+	public final double constantOther ;
 
 	@Deprecated
 	public final double marginalUtilityOfDistanceCar_m;
 	@Deprecated
 	public final double marginalUtilityOfDistancePt_m;
+	@Deprecated
+	public final double marginalUtilityOfDistanceOther_m;
 
 	@Deprecated // not really deprecated, but discouraged.  benjamin/kai, dec'10
 	public final double marginalUtilityOfDistanceWalk_m;
@@ -67,17 +71,20 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		marginalUtilityOfTravelingPT_s = config.getTravelingPt_utils_hr() / 3600.0;
 		marginalUtilityOfTravelingBike_s = config.getTravelingBike_utils_hr() / 3600.0;
 		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk_utils_hr() / 3600.0;
+		marginalUtilityOfTravelingOther_s = config.getTravelingOther_utils_hr() / 3600.0;
 		marginalUtilityOfPerforming_s = config.getPerforming_utils_hr() / 3600.0;
 		
 		constantCar = config.getConstantCar() ;
 		constantBike = config.getConstantBike() ;
 		constantWalk = config.getConstantWalk() ;
 		constantPt = config.getConstantPt() ;
+		constantOther = config.getConstantOther() ;
 
 		marginalUtilityOfDistanceCar_m = config.getMonetaryDistanceCostRateCar() * config.getMarginalUtilityOfMoney() ;
 		marginalUtilityOfDistancePt_m = config.getMonetaryDistanceCostRatePt() * config.getMarginalUtilityOfMoney() ;
 
 		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
+		marginalUtilityOfDistanceOther_m = config.getMarginalUtlOfDistanceOther();
 
 		monetaryDistanceCostRateCar = config.getMonetaryDistanceCostRateCar() ;
 		monetaryDistanceCostRatePt = config.getMonetaryDistanceCostRatePt();
