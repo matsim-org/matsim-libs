@@ -148,7 +148,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 			wrappedFromNodes.put(
 					fromNode,
-					new InitialNode( 0 , 0 ) );
+					new InitialNode( 0 , departureTime ) );
 
 			// find possible end stops
 			Coord toCoord = toFacility.getCoord();
