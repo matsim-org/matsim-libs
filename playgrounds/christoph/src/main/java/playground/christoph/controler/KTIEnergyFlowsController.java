@@ -20,8 +20,11 @@
 
 package playground.christoph.controler;
 
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.Module;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -54,21 +57,42 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
-	private final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
+	private final KtiConfigGroup ktiConfigGroup;
+	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	
 	public KTIEnergyFlowsController(String[] args) {
 		super(args);
-		
-		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
-		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
-		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+		/*
+		 * Create the empty object. They are filled in the loadData() method.
+		 */
+		this.ktiConfigGroup = new KtiConfigGroup();
+		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(this.ktiConfigGroup);
 	}
 	
 	@Override
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
+			
+			/*
+			 * The KTIConfigGroup is loaded as generic Module. We replace this
+			 * generic object with a KtiConfigGroup object and copy all its parameter.
+			 */
+			Module module = this.config.getModule(KtiConfigGroup.GROUP_NAME);
+			this.config.removeModule(KtiConfigGroup.GROUP_NAME);
+			this.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+			
+			for (Entry<String, String> entry : module.getParams().entrySet()) {
+				this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());
+			}
+				
+			/*
+			 * Use KTI route factories.
+			 */
+			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
+			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+
+			
 			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
 			loader.loadScenario();
 			if (this.config.scenario().isUseHouseholds()) {
