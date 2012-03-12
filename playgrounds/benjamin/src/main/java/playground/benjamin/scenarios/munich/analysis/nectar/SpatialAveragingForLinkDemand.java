@@ -72,6 +72,9 @@ public class SpatialAveragingForLinkDemand {
 	WeightedDemandPerLinkHandler weightedDemandPerLinkHandler;
 	DemandPerLinkHandler demandHandler; 
 	SortedSet<String> listOfPollutants;
+	
+	Map<Double, Map<Id, Integer>> time2Counts1;
+	Map<Double, Map<Id, Integer>> time2Counts2;
 
 	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static int noOfTimeBins = 1;
@@ -86,7 +89,7 @@ public class SpatialAveragingForLinkDemand {
 	static int noOfYbins = 120;
 	static int minimumNoOfLinksInCell = 0;
 	private final double smoothingRadius_m = 500.;
-	static boolean baseCaseOnly = true;
+	static boolean baseCaseOnly = false;
 	static boolean calculateRelativeChange = false;
 
 	private String outPathStub;
@@ -99,33 +102,41 @@ public class SpatialAveragingForLinkDemand {
 		this.featuresInMunich = readShape(munichShapeFile);
 
 		processEvents(eventsFile1);
-		Map<Double, Map<Id, Integer>> time2Demand1 = this.demandHandler.getDemandPerLinkAndTimeInterval();
-		Map<Double, Map<Id, Integer>> time2DemandFiltered1 = setNonCalculatedDemandAndFilter(time2Demand1);
+//		Map<Double, Map<Id, Integer>> time2Demand1 = this.demandHandler.getDemandPerLinkAndTimeInterval();
+//		Map<Double, Map<Id, Double>> time2Demand1 = this.demandHandler.getCongestionTimePerLinkAndTimeInterval();
+		time2Counts1 = this.demandHandler.getDemandPerLinkAndTimeInterval();
+		time2Counts1 = setNonCalculatedCountsAndFilter(time2Counts1);
+//		Map<Double, Map<Id, Integer>> time2DemandFiltered1 = setNonCalculatedDemandAndFilter(time2Demand1);
 //		Map<Double, Map<Id, Double>> time2Demand1 = this.weightedDemandPerLinkHandler.getDemandPerLinkAndTimeInterval();
 //		Map<Double, Map<Id, Double>> time2DemandFiltered1 = setNonCalculatedDemandAndFilterDouble(time2Demand1);
-
 		this.demandHandler.reset(0);
 //		this.weightedDemandPerLinkHandler.reset(0);
 		
 		processEvents(eventsFile2);
-		Map<Double, Map<Id, Integer>> time2Demand2 = this.demandHandler.getDemandPerLinkAndTimeInterval();
-		Map<Double, Map<Id, Integer>> time2DemandFiltered2 = setNonCalculatedDemandAndFilter(time2Demand2);
+//		Map<Double, Map<Id, Integer>> time2Demand2 = this.demandHandler.getDemandPerLinkAndTimeInterval();
+//		Map<Double, Map<Id, Double>> time2Demand2 = this.demandHandler.getCongestionTimePerLinkAndTimeInterval();
+		time2Counts2 = this.demandHandler.getDemandPerLinkAndTimeInterval();
+		time2Counts2 = setNonCalculatedCountsAndFilter(time2Counts2);
+//		Map<Double, Map<Id, Integer>> time2DemandFiltered2 = setNonCalculatedDemandAndFilter(time2Demand2);
 //		Map<Double, Map<Id, Double>> time2Demand2 = this.weightedDemandPerLinkHandler.getDemandPerLinkAndTimeInterval();
 //		Map<Double, Map<Id, Double>> time2DemandFiltered2 = setNonCalculatedDemandAndFilterDouble(time2Demand2);
 		
 		Map<Double, Map<Id, Double>> time2DemandMapToAnalyze;
 		
 		if(baseCaseOnly){
-			time2DemandMapToAnalyze = convertMapToDoubleValues(time2DemandFiltered1);
+//			time2DemandMapToAnalyze = convertMapToDoubleValues(time2DemandFiltered1);
+			time2DemandMapToAnalyze = convertMapToDoubleValues(time2Counts1);
 //			time2DemandMapToAnalyze = time2DemandFiltered1;
 			outPathStub = runDirectory1 + runNumber1 + "." + lastIteration1;
 		} else {
 			if(calculateRelativeChange){
-				time2DemandMapToAnalyze = calculateRelativeDemandDifferences(time2DemandFiltered1, time2DemandFiltered2);
+//				time2DemandMapToAnalyze = calculateRelativeDemandDifferences(time2DemandFiltered1, time2DemandFiltered2);
+				time2DemandMapToAnalyze = calculateRelativeDemandDifferences(time2Counts1, time2Counts2);
 //				time2DemandMapToAnalyze = calculateRelativeDemandDifferencesDouble(time2DemandFiltered1, time2DemandFiltered2);
 				outPathStub = runDirectory1 + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".relativeDelta";
 			} else {
-				time2DemandMapToAnalyze = calcualateAbsoluteEmissionDifferences(time2DemandFiltered1, time2DemandFiltered2);
+//				time2DemandMapToAnalyze = calcualateAbsoluteDemandDifferences(time2DemandFiltered1, time2DemandFiltered2);
+				time2DemandMapToAnalyze = calcualateAbsoluteDemandDifferences(time2Counts1, time2Counts2);
 //				time2DemandMapToAnalyze = calcualateAbsoluteEmissionDifferencesDouble(time2DemandFiltered1, time2DemandFiltered2);
 				outPathStub = runDirectory1 + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
 			}
@@ -176,9 +187,11 @@ public class SpatialAveragingForLinkDemand {
 						if(isInMunichShape(cellCentroid)){
 					//	if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
 							
-//							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
+//							ddouble averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex]; // average of vehkm per cell
 							
-							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m);
+//							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m); // sum of vehkm per cell normalized to vehkm per m²
+							
+							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) * 1000. * 1000.; // sum of vehkm per cell normalized to vehkm per km²
 							
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 						
@@ -197,8 +210,10 @@ public class SpatialAveragingForLinkDemand {
 				}
 			}
 		}
-		ShapeFileWriter.writeGeometries(features, outPathStub + ".movie.demandPerLinkSmoothed.shp");
-		logger.info("Finished writing output to " + outPathStub + ".movie.demandPerLinkSmoothed.shp");
+		ShapeFileWriter.writeGeometries(features, outPathStub + ".congestionTime.movie.demandPerLinkSmoothed.shp");
+		logger.info("Finished writing output to " + outPathStub + ".congestionTime.movie.demandPerLinkSmoothed.shp");
+//		ShapeFileWriter.writeGeometries(features, outPathStub + ".vehKmPerKmSquare.movie.demandPerLinkSmoothed.shp");
+//		logger.info("Finished writing output to " + outPathStub + ".vehKmPerKmSquare.movie.demandPerLinkSmoothed.shp");
 	}
 	
 	private boolean isInMunichShape(Coord cellCentroid) {
@@ -295,7 +310,7 @@ public class SpatialAveragingForLinkDemand {
 		return time2RelativeDelta;
 	}
 
-	private Map<Double, Map<Id, Double>> calcualateAbsoluteEmissionDifferences(
+	private Map<Double, Map<Id, Double>> calcualateAbsoluteDemandDifferences(
 			Map<Double, Map<Id, Integer>> time2Demand1,
 			Map<Double, Map<Id, Integer>> time2Demand2) {
 		
@@ -334,7 +349,6 @@ public class SpatialAveragingForLinkDemand {
 
 			for(Entry<Id, Double> entry1 : linkId2Demand.entrySet()){
 				Id linkId = entry1.getKey();
-				double demandDifferenceRatio;
 				double demandBefore = entry1.getValue();
 				double demandAfter = time2Demand2.get(endOfTimeInterval).get(linkId);
 				if (demandBefore == 0.0){// cannot calculate relative change if "before" value is 0 ...
@@ -343,7 +357,29 @@ public class SpatialAveragingForLinkDemand {
 				} else {
 					// do nothing
 				}
-				demandDifferenceRatio = (demandAfter - demandBefore) / demandBefore;
+//				double demandDifferenceRatio = (demandAfter - demandBefore) / demandBefore;
+//				delta.put(linkId, demandDifferenceRatio);
+				
+				//===
+				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
+				
+				double congestionTimePerVehKmBefore; 
+				double countBefore = this.time2Counts1.get(endOfTimeInterval).get(linkId);
+				if(countBefore == 0.){
+					countBefore = 1.;
+					logger.warn("setting count in baseCase for link " + linkId + " from " + countBefore + " to 1.0 ...");
+				}
+				congestionTimePerVehKmBefore = demandBefore / (countBefore * linkLength_km);
+				
+				double congestionTimePerVehKmAfter;
+				double countAfter = this.time2Counts2.get(endOfTimeInterval).get(linkId);
+				if(countAfter == 0.){
+					countAfter = 1.;
+					logger.warn("setting count in policyCase for link " + linkId + " from " + countAfter + " to 1.0 ...");
+				}
+				congestionTimePerVehKmAfter = demandAfter / (countAfter * linkLength_km);
+
+				double demandDifferenceRatio = (congestionTimePerVehKmAfter - congestionTimePerVehKmBefore) / congestionTimePerVehKmBefore;
 				delta.put(linkId, demandDifferenceRatio);
 			}
 			time2RelativeDelta.put(endOfTimeInterval, delta);
@@ -365,9 +401,37 @@ public class SpatialAveragingForLinkDemand {
 				Id linkId = entry1.getKey();
 				double demandBefore = entry1.getValue();
 				double demandAfter = time2Demand2.get(endOfTimeInterval).get(linkId);
-				double demandDifference = demandAfter - demandBefore;
+
+//				double demandDifference = demandAfter - demandBefore;
+				
+				//===
+				double linkLength = this.network.getLinks().get(linkId).getLength() / 1000.;
+				double demandDifference= ((demandAfter * linkLength) - (demandBefore * linkLength));
 				delta.put(linkId, demandDifference);
+
+				//===
+//				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
+//				
+//				double congestionTimePerVehKmBefore; 
+//				int countBefore = this.time2Counts1.get(endOfTimeInterval).get(linkId);
+//				if(countBefore != 0){
+//					congestionTimePerVehKmBefore = demandBefore / (countBefore * linkLength_km);
+//				} else {
+//					congestionTimePerVehKmBefore = 0.0;
+//				}
+//				
+//				double congestionTimePerVehKmAfter;
+//				double countAfter = this.time2Counts2.get(endOfTimeInterval).get(linkId);
+//				if(countAfter != 0){
+//					congestionTimePerVehKmAfter = demandAfter / (countAfter * linkLength_km);
+//				} else {
+//					congestionTimePerVehKmAfter = 0.0;
+//				}
+//
+//				double congestionTimePerVehKmDifference = congestionTimePerVehKmAfter - congestionTimePerVehKmBefore;
+//				delta.put(linkId, congestionTimePerVehKmDifference);
 			}
+			
 			time2AbsoluteDelta.put(endOfTimeInterval, delta);
 		}
 		return time2AbsoluteDelta;
@@ -382,14 +446,9 @@ public class SpatialAveragingForLinkDemand {
 			for(Id linkId : linkId2Value.keySet()){
 				int intValue = linkId2Value.get(linkId);
 				double doubleValue = intValue;
-				
-				
-				
 				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
 				double vehicleKm = doubleValue * linkLength_km;
 				linkId2DoubleValue.put(linkId, vehicleKm);
-				
-				
 //				linkId2DoubleValue.put(linkId, doubleValue);
 			}
 			mapOfDoubleValues.put(endOfTimeInterval, linkId2DoubleValue);
@@ -426,6 +485,34 @@ public class SpatialAveragingForLinkDemand {
 	return time2DemandFiltered;
 }
 
+	private Map<Double, Map<Id, Integer>> setNonCalculatedCountsAndFilter(Map<Double, Map<Id, Integer>> time2Counts1) {
+		Map<Double, Map<Id, Integer>> time2CountsTotalFiltered = new HashMap<Double, Map<Id,Integer>>();
+
+		for(Double endOfTimeInterval : time2Counts1.keySet()){
+			Map<Id, Integer> linkId2Count = time2Counts1.get(endOfTimeInterval);
+			Map<Id, Integer> linkId2CountFiltered = new HashMap<Id, Integer>();
+			for(Link link : network.getLinks().values()){
+				Coord linkCoord = link.getCoord();
+				Double xLink = linkCoord.getX();
+				Double yLink = linkCoord.getY();
+
+				if(xLink > xMin && xLink < xMax){
+					if(yLink > yMin && yLink < yMax){
+						Id linkId = link.getId();
+						if(linkId2Count.get(linkId) == null){
+							linkId2CountFiltered.put(linkId, 0);
+						} else {
+							linkId2CountFiltered = linkId2Count;
+						}
+					}
+				}
+			}
+			time2CountsTotalFiltered.put(endOfTimeInterval, linkId2CountFiltered);
+		}
+
+		return time2CountsTotalFiltered;
+	}
+	
 	private Map<Double, Map<Id, Double>> setNonCalculatedDemandAndFilterDouble(Map<Double, Map<Id, Double>> time2Demand) {
 		Map<Double, Map<Id, Double>> time2DemandFiltered = new HashMap<Double, Map<Id, Double>>();
 
@@ -460,7 +547,7 @@ public class SpatialAveragingForLinkDemand {
 		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 //		this.weightedDemandPerLinkHandler = new WeightedDemandPerLinkHandler(this.network, this.simulationEndTime, noOfTimeBins);
 //		eventsManager.addHandler(this.weightedDemandPerLinkHandler);
-		this.demandHandler = new DemandPerLinkHandler(this.simulationEndTime, noOfTimeBins);
+		this.demandHandler = new DemandPerLinkHandler(this.network, this.simulationEndTime, noOfTimeBins);
 		eventsManager.addHandler(this.demandHandler);
 		reader.readFile(eventsFile);
 	}

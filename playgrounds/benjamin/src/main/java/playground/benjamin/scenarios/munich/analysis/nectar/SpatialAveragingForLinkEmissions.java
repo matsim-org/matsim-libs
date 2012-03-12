@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.nectar;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,7 +54,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -120,7 +118,7 @@ public class SpatialAveragingForLinkEmissions {
 	static int minimumNoOfLinksInCell = 0;
 	private final double smoothingRadius_m = 500.; 
 	static String pollutant = WarmPollutant.NO2.toString();
-	static boolean baseCaseOnly = false;
+	static boolean baseCaseOnly = true;
 	static boolean calculateRelativeChange = false;
 
 	// OUTPUT
@@ -170,9 +168,9 @@ public class SpatialAveragingForLinkEmissions {
 			}
 		}
 
-		// EmissionWriter eWriter = new EmissionWriter();
-		BufferedWriter writer = IOUtils.getBufferedWriter(outPathStub + "." + pollutant + ".smoothed.txt");
-		writer.append("xCentroid\tyCentroid\t" + pollutant + "\tTIME\n");
+// 		EmissionWriter eWriter = new EmissionWriter();
+//		BufferedWriter writer = IOUtils.getBufferedWriter(outPathStub + "." + pollutant + ".smoothed.txt");
+//		writer.append("xCentroid\tyCentroid\t" + pollutant + "\tTIME\n");
 
 		Collection<Feature> features = new ArrayList<Feature>();
 
@@ -215,13 +213,15 @@ public class SpatialAveragingForLinkEmissions {
 						if(isInMunichShape(cellCentroid)){
 // 							if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
 
-//							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
+//							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex]; // average of emissions per cell
 							
-							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m);
+//							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m); // sum of emissions per cell normalized to emissions per m²
+							
+							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) * 1000. * 1000.; // sum of emissions per cell normalized to emissions per km²
 							
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
-							String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";
-							writer.append(outString);
+//							String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";
+//							writer.append(outString);
 
 							Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
 							try {
@@ -238,9 +238,11 @@ public class SpatialAveragingForLinkEmissions {
 				}
 			}
 		}
-		writer.close();
-		logger.info("Finished writing output to " + outPathStub + "." + pollutant + ".smoothed.txt");
+//		writer.close();
+//		logger.info("Finished writing output to " + outPathStub + "." + pollutant + ".smoothed.txt");
 
+//		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant + "perKmSquare.movie.emissionsPerLinkSmoothed.shp");
+//		logger.info("Finished writing output to " + outPathStub +  "." + pollutant + ".perKmSquare.movie.emissionsPerLinkSmoothed.shp");
 		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant + ".movie.emissionsPerLinkSmoothed.shp");
 		logger.info("Finished writing output to " + outPathStub +  "." + pollutant + ".movie.emissionsPerLinkSmoothed.shp");
 	}
@@ -266,7 +268,7 @@ public class SpatialAveragingForLinkEmissions {
 	}
 
 	private double calculateWeightOfPersonForCell(double x1, double y1, double x2, double y2) {
-		double distance = Math.abs(Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
+		double distance = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 		return Math.exp((-distance * distance) / (smoothingRadius_m * smoothingRadius_m));
 	}
 
