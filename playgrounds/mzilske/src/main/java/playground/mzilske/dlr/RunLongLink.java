@@ -2,11 +2,16 @@ package playground.mzilske.dlr;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.AbstractQueue;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
@@ -41,21 +46,116 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
-import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.qnetsimengine.FIFOVehicleQ;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.QNode;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
+import org.matsim.ptproject.qsim.qnetsimengine.VehicleQ;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 public class RunLongLink {
+	
+	private static class LongId implements Id {
+		
+		private static final long serialVersionUID = 1L;
+
+		private final Long id;
+
+		public LongId(final long id) {
+			this.id = id;
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			/*
+			 * This is not consistent with compareTo(Id)! compareTo(Id) states that
+			 * o1 and o2 are equal (in terms of order) if toString() returns the
+			 * same character sequence. However equals() can return false even if
+			 * other.toString() equals this.id (in case other is not of type IdImpl)!
+			 * joh aug09
+			 */
+			if (!(other instanceof LongId)) return false;
+			if (other == this) return true;
+			return this.id.equals(((LongId)other).id);
+		}
+
+		@Override
+		public int hashCode() {
+			return this.id.hashCode();
+		}
+
+		@Override
+		public int compareTo(final Id o) {
+			return -1 * this.id.compareTo(((LongId) o).id);
+		}
+
+
+		@Override
+		public String toString() {
+			return this.id.toString();
+		}
+
+		
+	}
+
+	private final class MyVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
+
+
+		private final Queue<QVehicle> delegate = new PriorityQueue<QVehicle>(11, new Comparator<QVehicle>() {
+
+			@Override
+			public int compare(QVehicle arg0, QVehicle arg1) {
+				return Double.compare(arg0.getEarliestLinkExitTime(), arg1.getEarliestLinkExitTime());
+			}
+
+		});
+
+		@Override
+		public boolean offer(QVehicle e) {
+			return delegate.offer(e);
+		}
+
+		@Override
+		public QVehicle peek() {
+			return delegate.peek();
+		}
+
+		@Override
+		public QVehicle poll() {
+			return delegate.poll();
+		}
+
+		@Override
+		public void addFirst(QVehicle previous) {
+			throw new RuntimeException();
+		}
+
+		@Override
+		public Iterator<QVehicle> iterator() {
+			return delegate.iterator();
+		}
+
+		@Override
+		public int size() {
+			return delegate.size();
+		}
+
+	}
 
 	private static final int CUTOFF = 500;
 	private static final Random RANDOM = new Random();
 	private static final double N_LANES = 2.0;
 	private static final double CAP_PER_LANE = 0.4;
-	private static final int N_VEH = 15000;
+	private static final int N_VEH = 1500;
 	private static final double FREESPEED = 100.0;
 	private static final double P_TRUCK = 0.1;
 	private static final double P_MED = 0.5;
@@ -65,7 +165,7 @@ public class RunLongLink {
 	public static void main(String[] args) {
 		RunLongLink runLongLink = new RunLongLink();
 		runLongLink.openFile();
-		for (double p = 0.3; p <= 1.2; p += 0.03) {
+		for (double p = 0.03; p <= 1.2; p += 0.03) {
 			runLongLink.run(p);
 		}
 		runLongLink.closeFile();
@@ -96,16 +196,16 @@ public class RunLongLink {
 		//		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write("/Users/zilske/dlr/population.xml");
 
 		EventsManager events = EventsUtils.createEventsManager();
-				EventWriterXML handler = new EventWriterXML("/Users/zilske/dlr/events.xml");
-				events.addHandler(handler);
+		EventWriterXML handler = new EventWriterXML("/Users/zilske/dlr/events.xml");
+		events.addHandler(handler);
 		final Map<String, Integer> ns = new HashMap<String, Integer>();
 		final Map<String, Integer> ttsums = new HashMap<String, Integer>();
 
 		final int[] outqueue = new int[N_VEH - CUTOFF];
-		
+
 		EventsToLegs eventsToLegs = new EventsToLegs();
 		eventsToLegs.setLegHandler(new LegHandler() {
-			
+
 			int idx = 0;
 
 			@Override
@@ -126,7 +226,29 @@ public class RunLongLink {
 		});
 		events.addHandler(eventsToLegs);
 
-		QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+		QSim qSim = new QSim(scenario, events, new QNetsimEngineFactory() {
+
+			@Override
+			public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
+				NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
+
+					@Override
+					public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+						return new QLinkImpl(link, network, toQueueNode, new FIFOVehicleQ());
+					}
+
+					@Override
+					public QNode createNetsimNode(final Node node, QNetwork network) {
+						return new QNode(node, network);
+					}
+
+
+				};
+				return new QNetsimEngine((QSim) sim, random, netsimNetworkFactory) ;
+			}
+		});
+
+		//		QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 		VehicleType truck = VehicleUtils.getFactory().createVehicleType(new IdImpl("truck"));
@@ -147,12 +269,12 @@ public class RunLongLink {
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
 
-//				OnTheFlyServer server = startServerAndRegisterWithQSim(config,scenario, events, qSim);
-//				OTFClientLive.run(config, server);
+		//				OnTheFlyServer server = startServerAndRegisterWithQSim(config,scenario, events, qSim);
+		//				OTFClientLive.run(config, server);
 
 
 		qSim.run();
-		 handler.closeFile();
+		handler.closeFile();
 
 		writer.format("%.2f\t",p);
 		writer.format("%.2f\t",(double) ttsums.get("truck") / (double) ns.get("truck"));
@@ -211,7 +333,9 @@ public class RunLongLink {
 	}
 
 	private static void makeDeparture(int t, int vehId, int lane, String carType, Population population, Network network) {
-		Person person = population.getFactory().createPerson(new IdImpl(vehId));
+		// Person person = population.getFactory().createPerson(new IdImpl(vehId));
+		Person person = population.getFactory().createPerson(new LongId(vehId));
+		
 		Plan plan = population.getFactory().createPlan();
 		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
 		a1.setEndTime(t);
