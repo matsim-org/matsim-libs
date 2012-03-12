@@ -29,7 +29,7 @@ class Main {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig("examples/tutorial/singleIteration.xml") ;
+			config = ConfigUtils.loadConfig("examples/tutorial/obsolete/singleIteration.xml") ;
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}
