@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EvolutionPlotter.java
+ * CompositeMoveGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,64 +20,28 @@
 package playground.thibautd.tsplanoptimizer.framework;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.matsim.core.utils.charts.XYLineChart;
-
 /**
- * A {@link AppliedMoveListener} which plots the evolution of the fitness,
- * for debugging/analysis purpose.
- *
  * @author thibautd
  */
-public class EvolutionPlotter implements AppliedMoveListener , StartListener , EndListener {
-	private final String outputFile;
-	private final String title;
-	private final List<Double> values = new ArrayList<Double>();
+public class CompositeMoveGenerator implements MoveGenerator {
+	private final List<MoveGenerator> generators = new ArrayList<MoveGenerator>();
 
-	private static final int WIDTH = 800;
-	private static final int HEIGHT = 600;
-
-	public EvolutionPlotter(
-			final String title,
-			final String outputFile) {
-		this.outputFile = outputFile;
-		this.title = title;
+	public void add( final MoveGenerator generator ) {
+		generators.add( generator );
 	}
 
 	@Override
-	public void notifyMove(
-			final Solution currentSolution,
-			final Move toApply,
-			final double newFitness) {
-		values.add( toApply != null ? newFitness : Double.NaN );
-	}
+	public Collection<Move> generateMoves() {
+		List<Move> moves = new ArrayList<Move>();
 
-	@Override
-	public void notifyEnd(
-			final Solution bestSolution,
-			final double bestScore,
-			final int nIterations) {
-		double[] iterationNumbers = new double[ values.size() ];
-		double[] scores =  new double[ values.size() ];
-
-		int count = 0;
-		for (Double value : values) {
-			iterationNumbers[ count ] = count;
-			scores[ count ] = value;
-			count++;
+		for (MoveGenerator generator : generators) {
+			moves.addAll( generator.generateMoves() );
 		}
 
-		XYLineChart chart = new XYLineChart( title , "iteration" , "score" );
-		chart.addSeries( title , iterationNumbers , scores );
-		chart.saveAsPng( outputFile , WIDTH , HEIGHT );
-	}
-
-	@Override
-	public void notifyStart(
-			final Solution startSolution,
-			final double startScore) {
-		values.add( startScore );
+		return moves;
 	}
 }
 

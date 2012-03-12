@@ -36,7 +36,7 @@ public class TabuSearchRunner {
 	 * for the run.
 	 * @return the best {@link Solution} found during the search
 	 */
-	public Solution runTabuSearch(
+	public static Solution runTabuSearch(
 			final ConfigurationBuilder configurationBuilder) {
 		// create config
 		// ---------------------------------------------------------------------
