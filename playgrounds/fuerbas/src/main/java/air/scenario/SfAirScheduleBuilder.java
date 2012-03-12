@@ -135,10 +135,10 @@ public class SfAirScheduleBuilder {
 				}
 
 				if (origin && destination) {
+					
+
 
 					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {
-
-
 
 						String carrier = lineEntries[0];
 						String flightNumber = lineEntries[1].replaceAll(" ", "0");
@@ -185,6 +185,14 @@ public class SfAirScheduleBuilder {
 						String aircraftType = lineEntries[21];
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
 
+//						use this line to filter desired airports: currently all flights to/from FRA, MUC, DUS
+//						for fixed city pairs use: originAirport.equalsIgnoreCase("FRA") && destinationAirport.equalsIgnoreCase("MUC") and vice versa
+//						if ((originAirport.equalsIgnoreCase("FRA") 
+//								|| destinationAirport.equalsIgnoreCase("MUC")
+//								|| originAirport.equalsIgnoreCase("MUC")
+//								&& destinationAirport.equalsIgnoreCase("MUC"))
+//								|| (originAirport.equalsIgnoreCase("MUC")
+//								&& destinationAirport.equalsIgnoreCase("FRA"))) {
 						
 						//some error correction code
 						if (lineEntries[14].contains("2") && !flights.containsKey(flightDesignator)
@@ -226,6 +234,7 @@ public class SfAirScheduleBuilder {
 						}
 					}
 				}
+//				}
 			}
 
 			lines++;
