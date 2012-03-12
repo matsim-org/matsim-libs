@@ -48,7 +48,7 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 	public ScoringFunction createNewScoringFunction(Plan plan) {			
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		LaggedScoringFunction scoringFunction = new LaggedScoringFunction(plan, super.getParams(), this.controler.getFacilities());
+		LaggedActivityScoringFunction scoringFunction = new LaggedActivityScoringFunction(plan, super.getParams(), this.controler.getFacilities());
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		
 		scoringFunctionAccumulator.addScoringFunction(new LaggedLegScoringFunction(

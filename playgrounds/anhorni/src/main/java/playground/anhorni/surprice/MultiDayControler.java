@@ -48,12 +48,12 @@ public class MultiDayControler {
 			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
 			
-		    ObjectAttributes incomes = new ObjectAttributes();
+		    ObjectAttributes votFactors = new ObjectAttributes();
 		    
-		    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(incomes);
-			attributesReader.parse(path + "incomes.xml");
+		    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(votFactors);
+			attributesReader.parse(path + "votFactors.xml");
 			
-			DayControler controler = new DayControler(config, memories, day, incomes);
+			DayControler controler = new DayControler(config, memories, day, votFactors);
 			controler.run();
 		}
 		log.info("Week simulated, yep, .................................................................");

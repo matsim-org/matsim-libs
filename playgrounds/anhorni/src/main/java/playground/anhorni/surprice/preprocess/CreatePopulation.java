@@ -62,7 +62,7 @@ public class CreatePopulation {
 	
 	private Zone tollZone;
 	
-	private ObjectAttributes incomes = new ObjectAttributes();
+	private ObjectAttributes votFactors = new ObjectAttributes();
 			
 	public void createPopulation(ScenarioImpl scenario, Config config) {		
 		this.scenario = scenario;
@@ -145,12 +145,11 @@ public class CreatePopulation {
 			ActivityFacility work = destination.getRandomLocationInZone(this.random);
 			this.workLocations.put(p.getId(), work);
 			
-			// assign daily income according to Gauss distribution. 
+			// assign daily income according to one-sided Gauss distribution. 
 			// TODO: check Gini coefficient, Lorenz distribution
-			double mean = 150.0;
-			double stdDev = 100.0;
-			String income = Double.toString(Math.max(10.0, random.nextGaussian() * stdDev + mean));
-			this.incomes.putAttribute(p.getId().toString(), "income", income);
+			double r = Math.abs(random.nextGaussian() * Surprice.stdDev + Surprice.mean);						
+			String votFactor = Double.toString(r);
+			this.votFactors.putAttribute(p.getId().toString(), "income", votFactor);
 			
 			this.memories.addMemory(p.getId(), new AgentMemory());
 			this.memories.getMemory(p.getId()).setHomeZone(origin);
@@ -184,11 +183,18 @@ public class CreatePopulation {
 		if (this.random.nextBoolean()) {
 			checkShopping = true;
 		}
+		else {
+			checkLeisure = true;
+		}
 		if (this.random.nextBoolean()) {
 			checkLeisure = true;
 		}
+		else {
+			checkShopping = true;
+		}
 				
-		if (decisionModel.doesAct("shop", day) && checkShopping) {
+		//if (decisionModel.doesAct("shop", day) && checkShopping) {
+		if (checkShopping) {
 			plan.addLeg(new LegImpl("car"));
 			ActivityFacility facility = this.memories.getMemory(person.getId()).getHomeZone().getRandomLocationInZone(random);
 			ActivityImpl act = new ActivityImpl("shop", facility.getCoord());
@@ -198,7 +204,8 @@ public class CreatePopulation {
 			plan.addActivity(act);
 		}
 		// check leisure
-		if (decisionModel.doesAct("leisure", day) && checkLeisure) {
+		//if (decisionModel.doesAct("leisure", day) && checkLeisure) {
+		if (checkLeisure) {
 			plan.addLeg(new LegImpl("car"));
 			TreeMap<Id, ActivityFacility> facilitiesLeisure = this.scenario.getActivityFacilities().getFacilitiesForActivityType("leisure");
 			ActivityFacility facility = (ActivityFacility) facilitiesLeisure.values().toArray()[random.nextInt(facilitiesLeisure.size())];
@@ -240,9 +247,9 @@ public class CreatePopulation {
 	}
 	
 	private void writeIncomes(String path) {
-		log.info("Writing incomes to " + path + "incomes.xml");
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.incomes);
-		attributesWriter.writeFile(path + "/incomes.xml"); 
+		log.info("Writing incomes to " + path + "votFactor.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.votFactors);
+		attributesWriter.writeFile(path + "/votFactors.xml"); 
 	}
 
 	public Zone getTollZone() {

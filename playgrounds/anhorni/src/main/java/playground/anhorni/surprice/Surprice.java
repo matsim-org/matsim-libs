@@ -10,4 +10,8 @@ public class Surprice {
 	public static final String SURPRICE_RUN = "surprice_run";
 	public static final String SURPRICE_PREPROCESS = "surprice_preprocess";
 	
+	// income params
+	public static double mean = 0.0;
+	public static double stdDev = 1.0;
+	
 }

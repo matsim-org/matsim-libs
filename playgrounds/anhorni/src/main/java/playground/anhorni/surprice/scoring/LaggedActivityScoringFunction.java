@@ -24,9 +24,9 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
-public class LaggedScoringFunction extends CharyparNagelOpenTimesScoringFunction {
+public class LaggedActivityScoringFunction extends CharyparNagelOpenTimesScoringFunction {
 		
-	public LaggedScoringFunction(Plan plan, CharyparNagelScoringParameters params, ActivityFacilities facilities) {
+	public LaggedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, ActivityFacilities facilities) {
 		super(plan, params, facilities);
 	}
 }
