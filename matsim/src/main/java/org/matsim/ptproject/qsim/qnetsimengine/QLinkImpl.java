@@ -731,7 +731,9 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	@Override
 	public void setSignalStateAllTurningMoves(SignalGroupState state) {
 		this.qSignalizedItem.setSignalStateAllTurningMoves(state);
+		
 		this.thisTimeStepGreen  = this.qSignalizedItem.isLinkGreen();
+		// (this is only for capacity accumulation)
 	}
 
 	@Override
@@ -740,7 +742,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " + this.getLink().getId());
 		}
 		this.qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
+
 		this.thisTimeStepGreen = this.qSignalizedItem.isLinkGreen();
+		// (this is only for capacity accumulation.  As soon as at least one turning relation is green, the "link" is considered
+		// green).
 	}
 
 	@Override
