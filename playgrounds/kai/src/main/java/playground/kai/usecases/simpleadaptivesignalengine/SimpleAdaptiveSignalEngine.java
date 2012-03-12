@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.myownnode;
+package playground.kai.usecases.simpleadaptivesignalengine;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -90,16 +90,16 @@ class SimpleAdaptiveSignalEngine implements MobsimEngine, LinkEnterEventHandler,
 
 	@Override
 	public void doSimStep(double time) {
-//		SignalizeableItem link4 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("4")) ;
-//		SignalizeableItem link5 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("5")) ;
-//		final Double dpTime = this.vehicleExitTimesOnLink5.peek();
-//		if ( dpTime !=null && dpTime < time && (long)time%4 < 4  ) {
-//			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
-//			link5.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
-//		} else {
-//			link4.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
-//			link5.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
-//		}
+		SignalizeableItem link4 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("4")) ;
+		SignalizeableItem link5 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("5")) ;
+		final Double dpTime = this.vehicleExitTimesOnLink5.peek();
+		if ( dpTime !=null && dpTime < time && (long)time%4 < 4  ) {
+			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
+			link5.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
+		} else {
+			link4.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
+			link5.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
+		}
 
 //		if ( time<20.*60 && (long)time%2==0 ) { 
 //			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
@@ -113,6 +113,7 @@ class SimpleAdaptiveSignalEngine implements MobsimEngine, LinkEnterEventHandler,
 		if ( event.getLinkId().equals(new IdImpl("5")) ) {
 			this.vehicleExitTimesOnLink5.add( event.getTime() + 100. ) ;
 			// yy replace "100" by freeSpeedTravelTime
+			// jedes Fahrzeug, welches die Kante betritt, erhöht den Zähler um 1:
 			cnt5++ ;
 		} 
 		if ( event.getLinkId().equals(new IdImpl("4")) ) {
@@ -122,6 +123,7 @@ class SimpleAdaptiveSignalEngine implements MobsimEngine, LinkEnterEventHandler,
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if ( event.getLinkId().equals(new IdImpl("5")) ) {
+			// jedes Fahrzeug, welches die Kante verlässg, erniedrigt den Zähler um 1:
 			this.vehicleExitTimesOnLink5.remove() ;
 		}
 	}
