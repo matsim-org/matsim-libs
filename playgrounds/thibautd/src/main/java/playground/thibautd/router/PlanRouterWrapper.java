@@ -69,10 +69,32 @@ public class PlanRouterWrapper extends PlansCalcRoute {
 			final LeastCostPathCalculatorFactory factory,
 			final ModeRouteFactory routeFactory,
 			// this argument is the only one really used!
-			final TripRouterFactory tripRouterFactory) {
+			final TripRouterFactory tripRouterFactory,
+			final PlanRouter planRouter) {
 		super(group, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.tripRouterFactory = tripRouterFactory;
-		this.planRouter = new PlanRouter( tripRouterFactory.createTripRouter() );
+		this.planRouter = planRouter;
+	}
+
+	public PlanRouterWrapper(
+			// just used to initialise unused fields in superclass...
+			final PlansCalcRouteConfigGroup group,
+			final Network network,
+			final PersonalizableTravelCost costCalculator,
+			final PersonalizableTravelTime timeCalculator,
+			final LeastCostPathCalculatorFactory factory,
+			final ModeRouteFactory routeFactory,
+			// this argument is the only one really used!
+			final TripRouterFactory tripRouterFactory) {
+		this(
+			group,
+			network,
+			costCalculator,
+			timeCalculator,
+			factory,
+			routeFactory,
+			tripRouterFactory,
+		 	new PlanRouter( tripRouterFactory.createTripRouter() ) );
 	}
 
 	//@Override
@@ -115,6 +137,15 @@ public class PlanRouterWrapper extends PlansCalcRoute {
 
 		for (PlanElement pe : trip) {
 			now = updateNow( now , pe );
+		}
+
+		if (trip.size() == 1) {
+			// backward compatibility: modify argument
+			Leg newLeg = (Leg) trip.get( 0 );
+
+			leg.setDepartureTime( newLeg.getDepartureTime() );
+			leg.setTravelTime( newLeg.getTravelTime() );
+			leg.setRoute( newLeg.getRoute() );
 		}
 
 		return now - depTime;

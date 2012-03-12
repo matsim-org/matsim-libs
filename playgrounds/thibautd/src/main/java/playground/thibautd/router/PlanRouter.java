@@ -177,7 +177,7 @@ public class PlanRouter implements PlanAlgorithm {
 		}
 	}
 
-	private static void updatePlanElements(
+	protected void updatePlanElements(
 			final Plan plan,
 			final List<PlanElement> newPlanElements) {
 		List<PlanElement> pes = plan.getPlanElements();
