@@ -39,6 +39,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
@@ -58,8 +59,8 @@ public class ParkAndRideRouterNetwork implements Network {
 	private static final Logger log =
 		Logger.getLogger(ParkAndRideRouterNetwork.class);
 
-	private final Map<Id, TransitRouterNetworkNode> ptNodesPerStopId =
-		new HashMap<Id, TransitRouterNetworkNode>();
+	// private final Map<Id, TransitRouterNetworkNode> ptNodesPerStopId =
+	// 	new HashMap<Id, TransitRouterNetworkNode>();
 	private final Map<Id, Node> nodes = new HashMap<Id, Node>();
 	private final Map<Id, Link> links = new HashMap<Id, Link>();
 	private final IdFactory ptLinkIdFactory = new IdFactory( "pt-link-" );
@@ -68,7 +69,7 @@ public class ParkAndRideRouterNetwork implements Network {
 
 	// TODO: final!
 	private final QuadTree<TransitRouterNetworkNode> transitNodesQuadTree;
-	private final QuadTree<Node> carQuadTree;
+	// private final QuadTree<Node> carQuadTree;
 	//private QuadTree<Node> carNodesQuadTree = null;
 
 	/**
@@ -81,12 +82,14 @@ public class ParkAndRideRouterNetwork implements Network {
 			final Network carNetwork,
 			final TransitSchedule schedule,
 			final double maxBeelineWalkConnectionDistance,
+			final double pnrConnectionSearchRadius,
 			final ParkAndRideFacilities parkAndRideFacilities) {
 		// TODO: decrease a little the uglyness by separating in mono-purpose methods
+		// XXX: a lot of redundant code here. to refactor!
 		log.info("registering car network");
 		copyCarNetwork( carNetwork );
 
-		carQuadTree = createCarQuadTree();
+		// carQuadTree = createCarQuadTree();
 
 		log.info("start creating transit sub-network");
 		final Counter linkCounter = new Counter(" new link #");
@@ -159,13 +162,33 @@ public class ParkAndRideRouterNetwork implements Network {
 			// otherwise.
 			Node carNode = links.get( facility.getLinkId() ).getToNode();
 
-			for (Id stopId : stops) {
-				createPnrLink(
-							carNode,
-							ptNodesPerStopId.get( stopId ),
-							facility.getId());
-				pnrLinksCount++;
-				linkCounter.incCounter();
+			// do not actually use the stop list
+			//for (Id stopId : stops) {
+			//	createPnrLink(
+			//				carNode,
+			//				ptNodesPerStopId.get( stopId ),
+			//				facility.getId());
+			//	pnrLinksCount++;
+			//	linkCounter.incCounter();
+			//}
+			if (carNode.getInLinks().size() > 0) {
+				// only add links from this node to other nodes if agents actually can arrive here
+				for (TransitRouterNetworkNode node2 :
+						getNearestTransitNodes(
+							carNode.getCoord(),
+							pnrConnectionSearchRadius)) {
+
+					if ((carNode != node2) && (node2.getOutLinks().size() > 0)) {
+						// only add links to other nodes when agents can depart there
+						// do not yet add them to the network, as this would change in/out-links
+						createPnrLink(
+									carNode,
+									node2,
+									facility.getId());
+						pnrLinksCount++;
+						linkCounter.incCounter();
+					}
+				}
 			}
 		}
 
@@ -199,40 +222,40 @@ public class ParkAndRideRouterNetwork implements Network {
 		}
 	}
 
-	private QuadTree<Node> createCarQuadTree() {
-		double minX = Double.POSITIVE_INFINITY;
-		double minY = Double.POSITIVE_INFINITY;
-		double maxX = Double.NEGATIVE_INFINITY;
-		double maxY = Double.NEGATIVE_INFINITY;
-
-		for (Node node : this.nodes.values()) {
-			if (node instanceof WrappingNode) {
-				Coord c = node.getCoord();
-				if (c.getX() < minX) {
-					minX = c.getX();
-				}
-				if (c.getY() < minY) {
-					minY = c.getY();
-				}
-				if (c.getX() > maxX) {
-					maxX = c.getX();
-				}
-				if (c.getY() > maxY) {
-					maxY = c.getY();
-				}
-			}
-		}
-
-		QuadTree<Node> quadTree = new QuadTree<Node>(minX, minY, maxX, maxY);
-		for (Node node : this.nodes.values()) {
-			if (node instanceof WrappingNode) {
-				Coord c = node.getCoord();
-				quadTree.put(c.getX(), c.getY(), node);
-			}
-		}
-
-		return quadTree;
-	}
+//	private QuadTree<Node> createCarQuadTree() {
+//		double minX = Double.POSITIVE_INFINITY;
+//		double minY = Double.POSITIVE_INFINITY;
+//		double maxX = Double.NEGATIVE_INFINITY;
+//		double maxY = Double.NEGATIVE_INFINITY;
+//
+//		for (Node node : this.nodes.values()) {
+//			if (node instanceof WrappingNode) {
+//				Coord c = node.getCoord();
+//				if (c.getX() < minX) {
+//					minX = c.getX();
+//				}
+//				if (c.getY() < minY) {
+//					minY = c.getY();
+//				}
+//				if (c.getX() > maxX) {
+//					maxX = c.getX();
+//				}
+//				if (c.getY() > maxY) {
+//					maxY = c.getY();
+//				}
+//			}
+//		}
+//
+//		QuadTree<Node> quadTree = new QuadTree<Node>(minX, minY, maxX, maxY);
+//		for (Node node : this.nodes.values()) {
+//			if (node instanceof WrappingNode) {
+//				Coord c = node.getCoord();
+//				quadTree.put(c.getX(), c.getY(), node);
+//			}
+//		}
+//
+//		return quadTree;
+//	}
 
 	private QuadTree<TransitRouterNetworkNode> createTransitQuadTree() {
 		double minX = Double.POSITIVE_INFINITY;
@@ -339,9 +362,9 @@ public class ParkAndRideRouterNetwork implements Network {
 		this.nodes.put(
 				node.getId(),
 				node);
-		this.ptNodesPerStopId.put(
-				stop.getStopFacility().getId(),
-				node);
+		// this.ptNodesPerStopId.put(
+		// 		stop.getStopFacility().getId(),
+		// 		node);
 		return node;
 	}
 
@@ -412,6 +435,7 @@ public class ParkAndRideRouterNetwork implements Network {
 		private final Node fromNode;
 		private final Node toNode;
 		private final Id pnrFacilityId;
+		private final double length;
 
 		private ParkAndRideLink(
 				final Id id,
@@ -425,6 +449,7 @@ public class ParkAndRideRouterNetwork implements Network {
 			this.coord = new CoordImpl(
 					(fromNode.getCoord().getX() + toNode.getCoord().getX()) / 2d,
 					(fromNode.getCoord().getY() + toNode.getCoord().getY()) / 2d);
+			this.length = CoordUtils.calcDistance( fromNode.getCoord() , toNode.getCoord() );
 
 			this.pnrFacilityId = pnrFacilityId;
 		}
@@ -458,6 +483,10 @@ public class ParkAndRideRouterNetwork implements Network {
 			return pnrFacilityId;
 		}
 
+		@Override
+		public double getLength() {
+			return length;
+		}
 		// ////////////////////////////////////////////////////////////
 		// unsupported
 		// ////////////////////////////////////////////////////////////
@@ -468,11 +497,6 @@ public class ParkAndRideRouterNetwork implements Network {
 
 		@Override
 		public boolean setToNode(final Node node) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public double getLength() {
 			throw new UnsupportedOperationException();
 		}
 

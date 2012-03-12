@@ -50,16 +50,10 @@ import playground.thibautd.router.TripRouterFactory;
  */
 public class ParkAndRideModule extends AbstractMultithreadedModule {
 	private final MultiLegRoutingControler controler;
-	private final PersonalizableTravelTime pnrTime;
-	private final PersonalizableTravelCost pnrCost;
 
 	public ParkAndRideModule(final MultiLegRoutingControler controler) {
 		super( controler.getConfig().global() );
 		this.controler = controler;
-
-		ParkAndRideTravelTimeCost timeCost = new ParkAndRideTravelTimeCost();
-		this.pnrTime = timeCost;
-		this.pnrCost = timeCost;
 	}
 
 	@Override
@@ -72,6 +66,7 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					controler.getConfig().plansCalcRoute(),
 					controler.getConfig().transitRouter(),
 					controler.getConfig().vspExperimental());
+		ParkAndRideTravelTimeCost timeCost = new ParkAndRideTravelTimeCost( transitConfig );
 
 		PersonalizableTravelTime carTime = tripRouterFactory.getTravelTimeCalculatorFactory().createTravelTime();
 		PersonalizableTravelCost carCost =
@@ -87,13 +82,14 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					controler.getNetwork(),
 					controler.getTransitRouterFactory().createTransitRouter().getSchedule(),
 					transitConfig.beelineWalkConnectionDistance,
+					transitConfig.searchRadius,
 					ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() ),
 					transitConfig,
 					carCost,
 					carTime,
 					ptTimeCost,
-					pnrCost,
-					pnrTime);
+					timeCost,
+					timeCost);
 
 		ParkAndRideIncluder includer =
 			new ParkAndRideIncluder(

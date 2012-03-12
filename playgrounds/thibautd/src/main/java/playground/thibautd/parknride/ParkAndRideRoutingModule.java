@@ -99,6 +99,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final Network carNetwork,
 			final TransitSchedule schedule,
 			final double maxBeelineWalkConnectionDistance,
+			final double pnrConnectionDistance,
 			final ParkAndRideFacilities parkAndRideFacilities,
 			final TransitRouterConfig transitRouterConfig,
 			final PersonalizableTravelCost carCost,
@@ -116,6 +117,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 					carNetwork,
 					schedule,
 					maxBeelineWalkConnectionDistance,
+					pnrConnectionDistance,
 					parkAndRideFacilities);
 		this.timeCost =
 			new ParkAndRideCostAggregator(
@@ -141,7 +143,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		try {
 			timeCost.setPerson( person );
 
-			// find possible start stops
+			// start is unique: it is a car linkstart is unique: it is a car link
 			Node fromNode = this.routingNetwork.getLinks().get( fromFacility.getLinkId() ).getToNode();
 			Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 			wrappedFromNodes.put(
