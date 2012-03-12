@@ -12,7 +12,7 @@ public class SfAirController {
 	 */
 	public static void main(String[] args) {
 
-		Controler con = new Controler(args);		//args: configfile
+		Controler con = new Controler("Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\air_config.xml");		//args: configfile
 		con.setOverwriteFiles(true);
 		ControlerListener lis = new SfFlightTimeControlerListener();
 		con.addControlerListener(lis);

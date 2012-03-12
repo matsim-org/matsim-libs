@@ -20,9 +20,9 @@ public class SfFlightDelayAnalysis {
 	private Map<String, Double> scheduledArrival;
 	private Map<Integer, Integer> delay;	
 	
-	private static String actualTimes = "/home/soeren/runs-svn/run1240/ITERS/it.0/0.statistic.csv";
-	private static String scheduledTimes= "/home/soeren/workspace/oagEuroFlights.txt";
-	private static String delayOutput = "/home/soeren/Desktop/delayOutput.csv";
+	private static String actualTimes = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\output\\ITERS\\it.0\\0.statistic.csv";
+	private static String scheduledTimes= "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\oag_flights.txt";
+	private static String delayOutput = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\output\\delay.csv";
 	
 	public SfFlightDelayAnalysis() {
 		this.actualArrival = new HashMap<String, Double>(); 
@@ -46,7 +46,7 @@ public class SfFlightDelayAnalysis {
 		BufferedReader brActual = new BufferedReader(new FileReader(new File(actualTimes)));
 		BufferedReader brScheduled = new BufferedReader(new FileReader(new File(scheduledTimes)));
 		BufferedWriter bwDelay = new BufferedWriter(new FileWriter(new File(delayOutput)));
-		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File("/home/soeren/Desktop/delayByFlight.csv")));
+		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File("Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\delayByFlight.csv")));
 		
 		this.delay.put(0, 0);
 		this.delay.put(1, 0);
