@@ -12,7 +12,7 @@ import org.geotools.feature.Feature;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.io.FeatureKMLWriter;
 import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
-import playground.tnicolai.matsim4opus.matsim4urbansim.controlerinterface.AccessibilityControlerInterface;
+import playground.tnicolai.matsim4opus.interfaces.controlerinterface.AccessibilityControlerInterface;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriter;
