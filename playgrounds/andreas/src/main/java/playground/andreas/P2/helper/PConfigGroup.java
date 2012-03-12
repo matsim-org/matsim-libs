@@ -50,6 +50,7 @@ public class PConfigGroup extends Module{
 	
 	public static final String GROUP_NAME = "p";
 	
+	private static final String P_IDENTIFIER = "pIdentifier";
 	private static final String MIN_X = "minX";
 	private static final String MIN_Y = "minY";
 	private static final String MAX_X = "maxX";
@@ -73,6 +74,7 @@ public class PConfigGroup extends Module{
 	private static final String PMODULE_PARAMETER = "ModuleParameter_";
 	
 	// Defaults
+	private String pIdentifier = "p_";
 	private double minX = Double.MIN_VALUE;	
 	private double minY = Double.MIN_VALUE;	
 	private double maxX = Double.MAX_VALUE;
@@ -105,7 +107,9 @@ public class PConfigGroup extends Module{
 	
 	@Override
 	public void addParam(final String key, final String value) {
-		if (MIN_X.equals(key)) {
+		if (P_IDENTIFIER.equals(key)){
+			this.pIdentifier = value;
+		} else if (MIN_X.equals(key)) {
 			this.minX = Double.parseDouble(value);
 		} else if (MIN_Y.equals(key)) {
 			this.minY = Double.parseDouble(value);
@@ -157,6 +161,7 @@ public class PConfigGroup extends Module{
 	public TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		
+		map.put(P_IDENTIFIER, this.pIdentifier);
 		map.put(MIN_X, Double.toString(this.minX));
 		map.put(MIN_Y, Double.toString(this.minY));
 		map.put(MAX_X, Double.toString(this.maxX));
@@ -188,6 +193,7 @@ public class PConfigGroup extends Module{
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		
+		map.put(P_IDENTIFIER, "This String will be used to identify all components of the paratransit system, e.g. vehicles and drivers");
 		map.put(MIN_X, "min x coordinate for service area");
 		map.put(MIN_Y, "min y coordinate for service area");
 		map.put(MAX_X, "max x coordinate for service area");
@@ -213,6 +219,10 @@ public class PConfigGroup extends Module{
 		}
 
 		return map;
+	}
+	
+	public String getPIdentifier(){
+		return this.pIdentifier;
 	}
 	
 	public double getMinX() {

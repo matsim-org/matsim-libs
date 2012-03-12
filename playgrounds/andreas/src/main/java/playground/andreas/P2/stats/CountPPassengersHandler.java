@@ -21,10 +21,12 @@ public class CountPPassengersHandler implements LinkEnterEventHandler, PersonEnt
 	
 	private static final Logger log = Logger.getLogger(CountPPassengersHandler.class);
 	
+	private String pIdentifier;
 	private HashMap<Id, Integer> linkId2CountsTable;
 	private HashMap<Id, Integer> vehId2CountsMap;
 
-	public CountPPassengersHandler() {
+	public CountPPassengersHandler(String pIdentifier) {
+		this.pIdentifier = pIdentifier;
 		this.linkId2CountsTable = new HashMap<Id, Integer>();
 		this.vehId2CountsMap =  new HashMap<Id, Integer>();
 	}
@@ -52,7 +54,7 @@ public class CountPPassengersHandler implements LinkEnterEventHandler, PersonEnt
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		// add the number of passengers of the vehicle to the total amount of that link. ignore every non paratransit vehicle
-		if(event.getVehicleId().toString().contains("p_")){
+		if(event.getVehicleId().toString().contains(this.pIdentifier)){
 			if(this.linkId2CountsTable.get(event.getLinkId()) == null){
 				this.linkId2CountsTable.put(event.getLinkId(), new Integer(0));
 			}
@@ -68,8 +70,8 @@ public class CountPPassengersHandler implements LinkEnterEventHandler, PersonEnt
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		// add a passenger to the vehicle counts data, but ignore every non paratransit vehicle and every driver
-		if(event.getVehicleId().toString().contains("p_")){
-			if(!event.getPersonId().toString().contains("p_")){
+		if(event.getVehicleId().toString().contains(this.pIdentifier)){
+			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				if(this.vehId2CountsMap.get(event.getVehicleId()) == null){
 					this.vehId2CountsMap.put(event.getVehicleId(), new Integer(0));
 				}
@@ -82,8 +84,8 @@ public class CountPPassengersHandler implements LinkEnterEventHandler, PersonEnt
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		// subtract a passenger to the vehicle counts data, but ignore every non paratransit vehicle and every driver
-		if(event.getVehicleId().toString().contains("p_")){
-			if(!event.getPersonId().toString().contains("p_")){
+		if(event.getVehicleId().toString().contains(this.pIdentifier)){
+			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				this.vehId2CountsMap.put(event.getVehicleId(), this.vehId2CountsMap.get(event.getVehicleId()).intValue() - 1);
 			}
 		}		

@@ -71,7 +71,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		this.pBox = new PBox(pConfig);
 		this.shareOfAgentsToReRouteAdditionally = pConfig.getShareOfAgentsToReRouteAdditionally();
 		controler.addControlerListener(new PStats(this.pBox, pConfig));
-		controler.addControlerListener(new GexfOutput(pConfig.getGexfInterval()));
+		controler.addControlerListener(new GexfOutput(pConfig));
 	}
 
 	@Override

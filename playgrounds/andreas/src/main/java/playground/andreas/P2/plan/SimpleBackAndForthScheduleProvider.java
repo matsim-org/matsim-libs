@@ -54,10 +54,12 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	private final static Logger log = Logger.getLogger(SimpleBackAndForthScheduleProvider.class);
 	public final static String NAME = "SimpleBackAndForthScheduleProvider";
 	
+	private String pIdentifier;
 	private Network net;
 	private TransitSchedule scheduleWithStopsOnly;
 	
-	public SimpleBackAndForthScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, int iteration) {
+	public SimpleBackAndForthScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, int iteration) {
+		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 	}
@@ -122,10 +124,10 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		// additional stops
 		for (Link link : path.links) {
 			startTime += link.getLength() / link.getFreespeed();
-			if(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl("p_" + link.getId())) == null){
+			if(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl(this.pIdentifier + link.getId())) == null){
 				continue;
 			}
-			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl("p_" + link.getId())), startTime, startTime);
+			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl(this.pIdentifier + link.getId())), startTime, startTime);
 			stops.add(routeStop);
 		}
 		

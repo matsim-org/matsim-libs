@@ -23,8 +23,10 @@ public class PStrategyManager {
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	
-	public PStrategyManager(){
-		
+	private String pIdentifier;	
+	
+	public PStrategyManager(PConfigGroup pConfig){
+		this.pIdentifier = pConfig.getPIdentifier();
 	}
 	
 	public void init(PConfigGroup pConfig, EventsManager eventsManager) {
@@ -58,6 +60,7 @@ public class PStrategyManager {
 			strategy = new IncreaseNumberOfVehicles(settings.getParametersAsArrayList());
 		} else if (name.equals(TimeReduceDemand.STRATEGY_NAME)) {
 			TimeReduceDemand strat = new TimeReduceDemand(settings.getParametersAsArrayList());
+			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
 		}

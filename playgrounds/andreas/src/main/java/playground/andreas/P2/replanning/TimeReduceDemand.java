@@ -26,6 +26,8 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Person
 	
 	private final int timeBinSize;
 	private HashMap<String, int[]> lineId2DemandTimeBins = new HashMap<String, int[]>();
+
+	private String pIdentifier;
 	
 	public TimeReduceDemand(ArrayList<String> parameter) {
 		super(parameter);
@@ -85,8 +87,8 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Person
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(event.getVehicleId().toString().startsWith("p_")){
-			if(!event.getPersonId().toString().contains("p_")){
+		if(event.getVehicleId().toString().startsWith(this.pIdentifier)){
+			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				String lineId = event.getVehicleId().toString().split("-")[0];
 
 				if(this.lineId2DemandTimeBins.get(lineId) == null){
@@ -101,6 +103,10 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Person
 				}
 			}
 		}
+	}
+
+	public void setPIdentifier(String pIdentifier) {
+		this.pIdentifier = pIdentifier;		
 	}
 
 }

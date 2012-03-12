@@ -83,9 +83,9 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	
 	public PBox(PConfigGroup pConfig) {
 		this.pConfig = pConfig;		
-		this.scorePlansHandler = new ScorePlansHandler(this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0, this.pConfig.getCostPerKilometer() / 1000.0);
+		this.scorePlansHandler = new ScorePlansHandler(this.pConfig.getPIdentifier(), this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0, this.pConfig.getCostPerKilometer() / 1000.0);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
-		this.strategyManager = new PStrategyManager();
+		this.strategyManager = new PStrategyManager(this.pConfig);
 	}
 
 	@Override
@@ -171,9 +171,9 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 
 	private PRouteProvider initRouteProvider(Network network, PConfigGroup pConfig, TransitSchedule pStopsOnly) {
 		if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)){
-			return new SimpleBackAndForthScheduleProvider(pStopsOnly, network, 0);
+			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, 0);
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
-			return new SimpleCircleScheduleProvider(pStopsOnly, network, 0);
+			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, 0);
 		} else {
 			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
 			return null;
@@ -184,7 +184,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
 			this.counter++;
-			Cooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig, this.franchise);
+			Cooperative cooperative = new BasicCooperative(new IdImpl(this.pConfig.getPIdentifier() + this.counter), this.pConfig, this.franchise);
 			cooperatives.add(cooperative);
 		}		
 	}
@@ -223,7 +223,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// recreate all other
 		for (int i = 0; i < numberOfNewCoopertives; i++) {
 			this.counter++;
-			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig, this.franchise);
+			BasicCooperative cooperative = new BasicCooperative(new IdImpl(this.pConfig.getPIdentifier() + this.counter), this.pConfig, this.franchise);
 			cooperative.init(this.routeProvider, iteration - 1);
 			this.cooperatives.add(cooperative);
 		}
@@ -231,7 +231,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// too few cooperatives in play, increase to the minimum specified in the config
 		for (int i = this.cooperatives.size(); i < this.pConfig.getNumberOfCooperatives(); i++) {
 			this.counter++;
-			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig, this.franchise);
+			BasicCooperative cooperative = new BasicCooperative(new IdImpl(this.pConfig.getPIdentifier() + this.counter), this.pConfig, this.franchise);
 			cooperative.init(this.routeProvider, iteration - 1);
 			this.cooperatives.add(cooperative);
 		}

@@ -43,6 +43,7 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
 	
+	private String pIdentifier;
 	private double earningsPerMeterAndPassenger = 0.05;
 	private double expensesPerMeter = 0.03;
 	
@@ -51,7 +52,8 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 	TreeMap<Id, Id> driverId2VehIdMap = new TreeMap<Id, Id>();
 	TreeMap<Id, ScoreContainer> vehicleId2ScoreMap = new TreeMap<Id, ScoreContainer>();
 
-	public ScorePlansHandler(double earningsPerMeterAndPassenger, double expensesPerMeter){
+	public ScorePlansHandler(String pIdentifier, double earningsPerMeterAndPassenger, double expensesPerMeter){
+		this.pIdentifier = pIdentifier;
 		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
 		this.expensesPerMeter = expensesPerMeter;
 	}
@@ -82,8 +84,8 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(event.getVehicleId().toString().contains("p_")){
-			if(!event.getPersonId().toString().contains("p_")){
+		if(event.getVehicleId().toString().contains(this.pIdentifier)){
+			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				this.vehicleId2ScoreMap.get(event.getVehicleId()).addPassenger();
 			}
 		}
@@ -91,8 +93,8 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(event.getVehicleId().toString().contains("p_")){
-			if(!event.getPersonId().toString().contains("p_")){
+		if(event.getVehicleId().toString().contains(this.pIdentifier)){
+			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				this.vehicleId2ScoreMap.get(event.getVehicleId()).removePassenger();
 			}
 		}

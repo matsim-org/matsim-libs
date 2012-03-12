@@ -25,6 +25,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
+import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.gexf.ObjectFactory;
 import playground.andreas.gexf.XMLAttributeContent;
 import playground.andreas.gexf.XMLAttributesContent;
@@ -60,14 +61,17 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 	private ObjectFactory gexfFactory;
 	private XMLGexfContent gexfContainer;
 
-	private CountPPassengersHandler eventsHandler;	
+	private CountPPassengersHandler eventsHandler;
+	private String pIdentifier;
 	private int getWriteGexfStatsInterval;
 
 	private HashMap<Id,XMLEdgeContent> edgeMap;
 	private HashMap<Id,XMLAttvaluesContent> attValueContentMap;
 
-	public GexfOutput(int getWriteGexfStatsInterval){
-		this.getWriteGexfStatsInterval = getWriteGexfStatsInterval;
+	public GexfOutput(PConfigGroup pConfig){
+		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
+		this.pIdentifier = pConfig.getPIdentifier();
+		
 		if (this.getWriteGexfStatsInterval > 0) {
 			log.info("enabled");
 
@@ -100,7 +104,7 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addNetworkAsLayer(event.getControler().getNetwork(), 0);
 			this.createAttValues();
-			this.eventsHandler = new CountPPassengersHandler();
+			this.eventsHandler = new CountPPassengersHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.eventsHandler);
 		}
 	}
