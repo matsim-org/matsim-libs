@@ -95,7 +95,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	private final VehicleQ<QVehicle> vehQueue = new FIFOVehicleQ();
+	private final VehicleQ<QVehicle> vehQueue;
 
 	private final Map<QVehicle, Double> linkEnterTimeMap = new HashMap<QVehicle, Double>();
 
@@ -160,6 +160,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue) {
 		super(link2, network) ;
 		this.toQueueNode = toNode;
+		this.vehQueue = vehicleQueue;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
 		if (Double.isNaN(this.freespeedTravelTime)) {
