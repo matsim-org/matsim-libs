@@ -703,7 +703,8 @@ public final class QSim implements VisMobsim, Netsim {
         				"there can only be one TransitQSimEngine") ;
         	}
             this.transitEngine = (TransitQSimEngine) mobsimEngine;
-        } if (mobsimEngine instanceof MultiModalSimEngine) {
+        } 
+        if (mobsimEngine instanceof MultiModalSimEngine) {
         	if ( this.multiModalEngine != null ) {
         		log.warn("pre-existing multiModalEngine != null; will be overwritten; with the current design, " +
         				"there can only be one MultiModalSimEngine") ;
