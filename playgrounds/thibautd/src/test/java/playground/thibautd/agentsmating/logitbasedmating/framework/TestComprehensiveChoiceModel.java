@@ -103,32 +103,32 @@ public class TestComprehensiveChoiceModel {
 		plan4.createAndAddActivity( "h" , id1 );
 
 		// long plan
-		PlanImpl plan5 = new PlanImpl( person );
-		plan5.createAndAddActivity( "h" , id1 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "pt" );
-		plan5.createAndAddActivity( "s" , id3 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "bike" );
-		plan5.createAndAddActivity( "h" , id1 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "pt" );
-		plan5.createAndAddActivity( "s" , id3 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "bike" );
-		plan5.createAndAddActivity( "h" , id1 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "pt" );
-		plan5.createAndAddActivity( "s" , id3 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "bike" );
-		plan5.createAndAddActivity( "h" , id1 );
+		// PlanImpl plan5 = new PlanImpl( person );
+		// plan5.createAndAddActivity( "h" , id1 );
+		// plan5.createAndAddLeg( "car" );
+		// plan5.createAndAddActivity( "w" , id2 );
+		// plan5.createAndAddLeg( "pt" );
+		// plan5.createAndAddActivity( "s" , id3 );
+		// plan5.createAndAddLeg( "car" );
+		// plan5.createAndAddActivity( "w" , id2 );
+		// plan5.createAndAddLeg( "bike" );
+		// plan5.createAndAddActivity( "h" , id1 );
+		// plan5.createAndAddLeg( "car" );
+		// plan5.createAndAddActivity( "w" , id2 );
+		// plan5.createAndAddLeg( "pt" );
+		// plan5.createAndAddActivity( "s" , id3 );
+		// plan5.createAndAddLeg( "car" );
+		// plan5.createAndAddActivity( "w" , id2 );
+		// plan5.createAndAddLeg( "bike" );
+		// plan5.createAndAddActivity( "h" , id1 );
+		// plan5.createAndAddLeg( "car" );
+		// plan5.createAndAddActivity( "w" , id2 );
+		// plan5.createAndAddLeg( "pt" );
+		// plan5.createAndAddActivity( "s" , id3 );
+		// plan5.createAndAddLeg( "car" );
+		// plan5.createAndAddActivity( "w" , id2 );
+		// plan5.createAndAddLeg( "bike" );
+		// plan5.createAndAddActivity( "h" , id1 );
 
 		// plan with complicated subtour structure
 		PlanImpl plan6 = new PlanImpl( person );
@@ -164,7 +164,7 @@ public class TestComprehensiveChoiceModel {
 		plan6.createAndAddLeg( "car" );
 		plan6.createAndAddActivity( "h" , id1 );
 
-		plans = Arrays.asList( plan1 , plan2 , plan3 , plan5 , plan6 );
+		plans = Arrays.asList( plan1 , plan2 , plan3 , /*plan5 ,*/ plan6 );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
