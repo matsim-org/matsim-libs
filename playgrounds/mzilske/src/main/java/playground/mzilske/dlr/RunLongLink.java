@@ -2,16 +2,11 @@ package playground.mzilske.dlr;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.AbstractQueue;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
@@ -54,8 +49,6 @@ import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.VehicleQ;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
@@ -105,50 +98,6 @@ public class RunLongLink {
 		}
 
 		
-	}
-
-	private final class MyVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
-
-
-		private final Queue<QVehicle> delegate = new PriorityQueue<QVehicle>(11, new Comparator<QVehicle>() {
-
-			@Override
-			public int compare(QVehicle arg0, QVehicle arg1) {
-				return Double.compare(arg0.getEarliestLinkExitTime(), arg1.getEarliestLinkExitTime());
-			}
-
-		});
-
-		@Override
-		public boolean offer(QVehicle e) {
-			return delegate.offer(e);
-		}
-
-		@Override
-		public QVehicle peek() {
-			return delegate.peek();
-		}
-
-		@Override
-		public QVehicle poll() {
-			return delegate.poll();
-		}
-
-		@Override
-		public void addFirst(QVehicle previous) {
-			throw new RuntimeException();
-		}
-
-		@Override
-		public Iterator<QVehicle> iterator() {
-			return delegate.iterator();
-		}
-
-		@Override
-		public int size() {
-			return delegate.size();
-		}
-
 	}
 
 	private static final int CUTOFF = 500;
