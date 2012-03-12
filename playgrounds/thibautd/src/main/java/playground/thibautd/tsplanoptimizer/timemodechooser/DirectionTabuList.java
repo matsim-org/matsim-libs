@@ -44,8 +44,12 @@ public class DirectionTabuList implements TabuChecker {
 			final Solution solution,
 			final Move move,
 			final double newFitness) {
-		if (move instanceof IntegerValueChanger) {
-			tabuList.addLast( move != null ? new Direction( move ) : null );
+		if (move != null && move instanceof IntegerValueChanger) {
+			tabuList.addLast( new Direction( move ) );
+		}
+		else {
+			// fill anyway, to enforce discarding old values
+			tabuList.addLast( null );
 		}
 
 		while (tabuList.size() > capacity) {

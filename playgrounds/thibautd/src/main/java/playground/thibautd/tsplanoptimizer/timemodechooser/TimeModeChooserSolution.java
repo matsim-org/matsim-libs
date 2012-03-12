@@ -29,9 +29,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.thibautd.router.PlanRouter;
 import playground.thibautd.router.TripRouter;
@@ -51,8 +52,9 @@ public class TimeModeChooserSolution implements Solution {
 	// maintain two lists: the values, and the plan elements they are
 	// related to, in the same order. Compared to a map, this allows to
 	// ensure iteration order.
-	private final List<Value> values;
-	private final List<PlanElement> elements;
+	//private final List<Value> values;
+	//private final List<PlanElement> elements;
+	private final Values values;
 
 	/**
 	 * Creates a solution for the given plan.
@@ -64,45 +66,53 @@ public class TimeModeChooserSolution implements Solution {
 	public TimeModeChooserSolution(
 			final Plan plan,
 			final TripRouter tripRouter) {
-		this.plan = plan;
-		this.planRouter = new PlanRouter( tripRouter );
-
-		Tuple<List<Value>, List<PlanElement>> tuple = extractValues( plan );
-
-		this.values = tuple.getFirst();
-		this.elements = tuple.getSecond();
+		this(
+			plan,
+			extractValues( plan , tripRouter ),
+			new PlanRouter( tripRouter ));
 	}
 
 	private TimeModeChooserSolution(
 			final Plan plan,
-			final List<Value> values,
-			final List<PlanElement> elements,
+			final Values values,
 			final PlanRouter planRouter) {
 		this.plan = plan;
 		this.values = values;
-		this.elements = elements;
 		this.planRouter = planRouter;
 	}
 
 	@Override
 	public List<? extends Value> getRepresentation() {
-		return values;
+		return values.values;
 	}
 
 	@Override
 	public Plan getRepresentedPlan() {
-		Iterator<Value> valuesIter = values.iterator();
-		Iterator<PlanElement> elementsIter = elements.iterator();
+		Iterator<Value> valuesIter = values.values.iterator();
+		Iterator<PlanElement> elementsIter = values.associatedPlanElements.iterator();
 
 		while (valuesIter.hasNext()) {
-			int endTime = (Integer) valuesIter.next().getValue();
-			((Activity) elementsIter.next()).setEndTime( endTime );
+			Value value = valuesIter.next();
+			PlanElement pe = elementsIter.next();
+
+			if (pe instanceof Activity) {
+				int endTime = (Integer) value.getValue();
+				((Activity) pe).setEndTime( endTime );
+			}
+			else {
+				((Subtour) pe).setMode( (String) value.getValue() );
+			}
 		}
 
-		planRouter.run( plan );
+		List<PlanElement> elements = planRouter.run( plan.getPerson() , values.planStructure );
+		plan.getPlanElements().clear();
+		plan.getPlanElements().addAll( elements );
 
 		// make sure time are consistent (activities start at the arrival time, etc.)
 		enforceTimeConsistency( plan );
+
+		// System.out.println(  );
+		// System.out.println( plan.getPlanElements() );
 
 		// sufficient, as the referenced elements are the ones of the plan.
 		return plan;
@@ -112,40 +122,57 @@ public class TimeModeChooserSolution implements Solution {
 	public Solution createClone() {
 		List<Value> newValues = new ArrayList<Value>();
 
-		for (Value val : values) {
+		for (Value val : values.values) {
 			newValues.add( val.createClone() );
 		}
 
 		return new TimeModeChooserSolution(
 				plan,
-				Collections.unmodifiableList( newValues ),
-				elements,
+				new Values(
+					Collections.unmodifiableList( newValues ),
+					values.associatedPlanElements,
+					values.planStructure),
 				planRouter);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
-	private static Tuple<List<Value>, List<PlanElement>> extractValues(final Plan plan) {
+	private static Values extractValues(
+			final Plan plan,
+			final TripRouter tripRouter) {
 		List<Value> values = new ArrayList<Value>();
-		List<PlanElement> planElements = new ArrayList<PlanElement>();
-
+		List<PlanElement> planStructure = tripRouter.tripsToLegs( plan );
+		List<PlanElement> codedPlanElements = new ArrayList<PlanElement>();
+		
 		double now = 0;
-		for (PlanElement pe : plan.getPlanElements().subList(0 , plan.getPlanElements().size() - 1)) {
+		int lastValue = Integer.MIN_VALUE;
+		for (PlanElement pe : planStructure.subList(0 , planStructure.size() - 1)) {
 			now = updateNow( now , pe );
+
 			if (pe instanceof Activity) {
 				if (now == Time.UNDEFINED_TIME) {
 					throw new RuntimeException( "cannot infer activitiy end time: "+pe );
 				}
 
-				values.add( new ValueImpl<Integer>( (int) now ) );
-				planElements.add( pe );
+				// enforce the values to be consistent (ie end time do not produce negative durations)
+				int value = Math.max( (int) now , lastValue );
+				lastValue = value;
+				values.add( new ValueImpl<Integer>( value ) );
+				codedPlanElements.add( pe );
 			}
 		}
 
-		return new Tuple<List<Value>, List<PlanElement>>(
+		for (List<PlanElement> subtour : analyseSubtours( planStructure )) {
+			Subtour subtourElement = new Subtour( subtour );
+			codedPlanElements.add( subtourElement );
+			values.add( new ValueImpl<String>( subtourElement.getMode() ) );
+		}
+
+		return new Values(
 				Collections.unmodifiableList( values ),
-				Collections.unmodifiableList( planElements ));
+				Collections.unmodifiableList( codedPlanElements ),
+				Collections.unmodifiableList( planStructure ));
 	}
 
 	private static double updateNow(
@@ -192,18 +219,83 @@ public class TimeModeChooserSolution implements Solution {
 		}
 	}	
 
-	private static void enforceTimeConsistency(final Plan plan) {
+	private void enforceTimeConsistency(final Plan plan) {
 		double now = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				((Activity) pe).setStartTime( now );
+				if ( now == Time.UNDEFINED_TIME ) {
+					throw new RuntimeException( "got an undefined score for plan element "+pe+" in plan "+plan.getPlanElements() );
+				}
+				Activity act = (Activity) pe;
 
-				double endTime = ((Activity) pe).getEndTime();
-				if (endTime != Time.UNDEFINED_TIME) {
-					((Activity) pe).setMaximumDuration( endTime - now );
+				if ( !planRouter.getTripRouter().getStageActivityTypes().isStageActivity( act.getType() ) ) {
+					// router is supposed to set the time properly for activities.
+					// setting time consistencies for them could break some
+					// properties of the trip (for example, pt interactions have
+					// no start nor end time)
+					act.setStartTime( now );
+
+					double endTime = act.getEndTime();
+					if (endTime != Time.UNDEFINED_TIME) {
+						act.setMaximumDuration( endTime - now );
+					}
 				}
 			}
 			now = updateNow( now , pe );
+		}
+	}
+
+	private static List<List<PlanElement>> analyseSubtours(
+			final List<PlanElement> planStructure) {
+		PlanAnalyzeSubtours analyzer = new PlanAnalyzeSubtours();
+		analyzer.setTripStructureAnalysisLayer( TripStructureAnalysisLayerOption.link );
+
+		// XXX: quick workaround: change that
+		Plan fakePlan = new PlanImpl();
+		fakePlan.getPlanElements().addAll( planStructure );
+		analyzer.run( fakePlan );
+
+		return analyzer.getSubtours();
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// class
+	// /////////////////////////////////////////////////////////////////////////
+	// allows to set mode for a whole subtour in the plan structure
+	private static class Subtour implements PlanElement {
+		private final List<Leg> legs = new ArrayList<Leg>();
+
+		public Subtour(final List<PlanElement> elements) {
+			for (PlanElement pe : elements) {
+				if (pe instanceof Leg) {
+					legs.add( (Leg) pe );
+				}
+			}
+		}
+
+		public void setMode(final String mode) {
+			for (Leg leg : legs) {
+				leg.setMode( mode );
+			}
+		}
+
+		public String getMode() {
+			return legs.get(0).getMode();
+		}
+	}
+
+	private static class Values {
+		public final List<Value> values;
+		public final List<PlanElement> associatedPlanElements;
+		public final List<PlanElement> planStructure;
+
+		public Values(
+				final List<Value> values,
+				final List<PlanElement> associatedPlanElements,
+				final List<PlanElement> planStructure) {
+			this.values = values;
+			this.associatedPlanElements = associatedPlanElements;
+			this.planStructure = planStructure;
 		}
 	}
 }

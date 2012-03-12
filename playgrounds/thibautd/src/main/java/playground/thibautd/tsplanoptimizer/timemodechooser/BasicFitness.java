@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -36,6 +38,12 @@ import playground.thibautd.tsplanoptimizer.framework.Solution;
  * @author thibautd
  */
 public class BasicFitness implements FitnessFunction {
+	private static final Logger log =
+		Logger.getLogger(BasicFitness.class);
+
+	// print a lot of information.
+	// to use with one thread only.
+	private final static boolean DEBUG = false;
 	private final ScoringFunctionFactory factory;
 	private final double NEGATIVE_DURATION_PENALTY = 100;
 
@@ -52,8 +60,12 @@ public class BasicFitness implements FitnessFunction {
 
 		ScoringFunction scoringFunction = factory.createNewScoringFunction( plan );
 
+		if (DEBUG) log.debug( "start scoring" );
+
 		double accumulatedNegativeDuration = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
+			if (DEBUG) log.debug( "handle plan element "+pe );
+
 			if (pe instanceof Activity) {
 				scoringFunction.handleActivity( (Activity) pe );
 
@@ -79,6 +91,11 @@ public class BasicFitness implements FitnessFunction {
 			throw new RuntimeException( "got a NaN score for plan "+plan );
 		}
 
+		if (DEBUG) {
+			log.debug( "scoring ended." );
+			log.debug( "score: "+score );
+			log.debug( "accumulated negative duration: "+accumulatedNegativeDuration );
+		}
 		return score + (accumulatedNegativeDuration * NEGATIVE_DURATION_PENALTY);
 	}
 }

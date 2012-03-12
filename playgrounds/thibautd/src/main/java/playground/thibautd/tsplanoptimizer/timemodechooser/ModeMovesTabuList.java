@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InvalidSolutionsTabuList.java
+ * ModeMovesTabuList.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,43 +19,70 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
+import java.util.LinkedList;
+
+import org.matsim.core.utils.collections.Tuple;
+
 import playground.thibautd.tsplanoptimizer.framework.Move;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 
 /**
+ * {@link TabuChecker} verifying that previously changed modes are not re-examined
+ * during a given number of iterations. Moves resulting in no change are also considered
+ * tabu.
+ *
  * @author thibautd
  */
-public class InvalidSolutionsTabuList implements TabuChecker {
+public class ModeMovesTabuList implements TabuChecker {
+	private final LinkedList<Tuple<Integer, String>> tabuList = new LinkedList<Tuple<Integer, String>>();
+	private final int length;
+
+	public ModeMovesTabuList(
+			final int length) {
+		this.length = length;
+	}
 
 	@Override
 	public void notifyMove(
-			final Solution solution,
-			final Move move,
-			final double newScore) {
-		// nothing to do
+			final Solution currentSolution,
+			final Move toApply,
+			final double resultingFitness) {
+		if (toApply != null && toApply instanceof ModeMove) {
+			ModeMove modeMove = (ModeMove) toApply;
+			Value toChange = currentSolution.getRepresentation().get( modeMove.getIndex() );
+			tabuList.addLast(
+					new Tuple<Integer, String>(
+						modeMove.getIndex(),
+						(String) toChange.getValue()));
+		}
+		else {
+			tabuList.addLast( null );
+		}
+
+		while (tabuList.size() > length) {
+			tabuList.removeFirst();
+		}
 	}
 
 	@Override
 	public boolean isTabu(
 			final Solution solution,
 			final Move move) {
-		if (move instanceof IntegerValueChanger) {
-			Solution result = move.apply( solution );
+		if (move instanceof ModeMove) {
+			ModeMove modeMove = (ModeMove) move;
+			Value toChange = solution.getRepresentation().get( modeMove.getIndex() );
 
-			int now = 0;
-			for (Value val : result.getRepresentation()) {
-				Object value = val.getValue();
-
-				if (value instanceof Integer) {
-					if (((Integer) value) < now) {
-						return true;
-					}
-
-					now = (Integer) value;
-				}
+			if (toChange.getValue().equals( modeMove.getMode() )) {
+				// prevent "identity" moves
+				return true;
 			}
+
+			return tabuList.contains(
+					new Tuple<Integer, String>(
+						modeMove.getIndex(),
+						modeMove.getMode()));
 		}
 
 		return false;

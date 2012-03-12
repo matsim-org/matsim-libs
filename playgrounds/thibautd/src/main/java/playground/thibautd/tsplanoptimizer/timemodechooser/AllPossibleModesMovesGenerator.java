@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InvalidSolutionsTabuList.java
+ * AllPossibleModesMovesGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,46 +19,38 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import playground.thibautd.tsplanoptimizer.framework.Move;
+import playground.thibautd.tsplanoptimizer.framework.MoveGenerator;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 
 /**
  * @author thibautd
  */
-public class InvalidSolutionsTabuList implements TabuChecker {
+public class AllPossibleModesMovesGenerator implements MoveGenerator {
+	private final List<Move> moves = new ArrayList<Move>();
 
-	@Override
-	public void notifyMove(
-			final Solution solution,
-			final Move move,
-			final double newScore) {
-		// nothing to do
+	public AllPossibleModesMovesGenerator(
+			final Solution initialSolution,
+			final Collection<String> possibleModes) {
+		int i = 0;
+		for (Value value : initialSolution.getRepresentation()) {
+			if (value.getValue() instanceof String) {
+				for (String mode : possibleModes) {
+					moves.add( new ModeMove( i , mode ) );
+				}
+			}
+			i++;
+		}
 	}
 
 	@Override
-	public boolean isTabu(
-			final Solution solution,
-			final Move move) {
-		if (move instanceof IntegerValueChanger) {
-			Solution result = move.apply( solution );
-
-			int now = 0;
-			for (Value val : result.getRepresentation()) {
-				Object value = val.getValue();
-
-				if (value instanceof Integer) {
-					if (((Integer) value) < now) {
-						return true;
-					}
-
-					now = (Integer) value;
-				}
-			}
-		}
-
-		return false;
+	public Collection<Move> generateMoves() {
+		return moves;
 	}
 }
 

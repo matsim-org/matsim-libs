@@ -28,17 +28,23 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.RoutingModuleFactory;
+import playground.thibautd.router.TransitRouterWrapper;
+import playground.thibautd.router.TransitRoutingModuleFactory;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.FixedRouteNetworkRoutingModule;
+import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.FixedTransitRouteRoutingModule;
 
 /**
  * @author thibautd
  */
 public class TimeModeChooserAlgorithm implements PlanAlgorithm {
-	private static final boolean DEBUG = true;
+	// if true, graphs of score evolution across TS iterations will
+	// be created. This takes a LOT of ressources and creates a lot
+	// of files. Use with care!
+	private static final boolean DEBUG = false;
 
 	private final MultiLegRoutingControler controler;
 	private final TabuSearchRunner runner = new TabuSearchRunner();
@@ -77,6 +83,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 		}
 	}
 
+	// TODO: pass it to an helper class in the "estimation" package
 	private static TripRouterFactory getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
@@ -89,11 +96,21 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 					controler.getConfig().planCalcScore(),
 					controler.getPopulation().getFactory(),
 					delay,
-					// todo: import from somewhere
+					// TODO: import from somewhere, or detect from the mobsim
 					false,
 					true);
 
 		factory.setRoutingModuleFactory( TransportMode.car , moduleFactory );
+
+		RoutingModuleFactory ptFactory = factory.getRoutingModuleFactories().get( TransportMode.pt );
+		if (ptFactory instanceof TransitRoutingModuleFactory) {
+			factory.setRoutingModuleFactory(
+					TransportMode.pt,
+					FixedTransitRouteRoutingModule.createFactory(
+						plan,
+						controler.getTransitRouterFactory().createTransitRouter().getSchedule(),
+						(TransitRoutingModuleFactory) ptFactory ));
+		}
 
 		return factory;
 	}

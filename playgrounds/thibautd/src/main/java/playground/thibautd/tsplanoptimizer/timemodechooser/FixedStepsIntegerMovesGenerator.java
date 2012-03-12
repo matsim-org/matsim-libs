@@ -35,10 +35,13 @@ import playground.thibautd.tsplanoptimizer.framework.Value;
 public class FixedStepsIntegerMovesGenerator implements MoveGenerator {
 	private List<Integer> steps;
 	private List<Integer> integerIndices;
+	private ModeOptimizingMoveConfigBuilder configBuilder;
 
 	public FixedStepsIntegerMovesGenerator(
 			final Solution initialSolution,
-			final List<Integer> steps) {
+			final List<Integer> steps,
+			final ModeOptimizingMoveConfigBuilder configBuilder) {
+		this.configBuilder = configBuilder;
 		this.steps = steps;
 
 		integerIndices = new ArrayList<Integer>();
@@ -58,8 +61,8 @@ public class FixedStepsIntegerMovesGenerator implements MoveGenerator {
 
 		for (int index : integerIndices) {
 			for (int step : steps) {
-				moves.add( new IntegerValueChanger( index , step ) );
-				moves.add( new IntegerValueChanger( index , -step ) );
+				moves.add( new IntegerValueChanger( index , step , configBuilder ) );
+				moves.add( new IntegerValueChanger( index , -step , configBuilder ) );
 			}
 		}
 

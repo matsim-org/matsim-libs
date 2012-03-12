@@ -26,9 +26,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.router.TripRouterFactory;
+import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
 import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.EvolutionPlotter;
+import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
@@ -38,11 +40,13 @@ import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
  */
 public class TimeModeChooserConfigBuilder implements ConfigurationBuilder {
 	private static final List<Integer> STEPS = Arrays.asList( new Integer[]{ 1 * 60 , 5 * 60 , 30 * 60, 2 * 3600 });
+	private static final List<String> POSSIBLE_MODES = Arrays.asList( new String[]{ "car" , "pt" , "walk" , "bike" } );
 	private static final int N_ITER = 1000;
 	// TODO: function of the number of activities
-	private static final int N_TABU = 3;
+	private static final int N_TABU_DIRECTION = 10;
+	private static final int N_TABU_MODE = N_TABU_DIRECTION;
 	// TODO: function of the length of the tabu list
-	private static final int IMPROVEMENT_DELAY = 5;
+	private static final int IMPROVEMENT_DELAY = 100;
 
 	private final Plan plan;
 	private final ScoringFunctionFactory scoringFunctionFactory;
@@ -81,23 +85,31 @@ public class TimeModeChooserConfigBuilder implements ConfigurationBuilder {
 					tripRouterFactory.createTripRouter() );
 		configuration.setInitialSolution( initialSolution );
 
-		configuration.setFitnessFunction(
-				new BasicFitness(
-					scoringFunctionFactory ) );
+		FitnessFunction fitness = new BasicFitness( scoringFunctionFactory );
+		configuration.setFitnessFunction( fitness );
 
 		configuration.setEvolutionMonitor(
 				new ImprovementDelayMonitor(
 					IMPROVEMENT_DELAY,
 					N_ITER ));
 
-		configuration.setMoveGenerator(
-				new FixedStepsIntegerMovesGenerator(
+		CompositeMoveGenerator generator = new CompositeMoveGenerator();
+		generator.add( new FixedStepsIntegerMovesGenerator(
 					initialSolution,
-					STEPS ) );
+					STEPS,
+					null));
+					//new ModeOptimizingMoveConfigBuilder(
+					//	fitness,
+					//	POSSIBLE_MODES)) );
+		generator.add( new AllPossibleModesMovesGenerator(
+					initialSolution,
+					POSSIBLE_MODES) );
+		configuration.setMoveGenerator( generator );
 
 		CompositeTabuChecker tabuChecker = new CompositeTabuChecker();
-		tabuChecker.add( new DirectionTabuList( N_TABU ) );
+		tabuChecker.add( new DirectionTabuList( N_TABU_DIRECTION ) );
 		tabuChecker.add( new InvalidSolutionsTabuList() );
+		tabuChecker.add( new ModeMovesTabuList( N_TABU_MODE ) );
 		configuration.setTabuChecker( tabuChecker );
 
 		if (outputDir != null) {

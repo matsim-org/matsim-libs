@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InvalidSolutionsTabuList.java
+ * package-info.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,48 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.tsplanoptimizer.timemodechooser;
-
-import playground.thibautd.tsplanoptimizer.framework.Move;
-import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
-import playground.thibautd.tsplanoptimizer.framework.Value;
 
 /**
+ * This package contains classes useful to compute time-dependent travel times
+ * in best-response modules.
+ *
+ * The idea is that special "replacement" {@link RoutingModule}s are provided,
+ * which are designed so as to be faster than the "core" ones, for example by using
+ * fixed route for given O/D pairs, and only updating travel time for new departure
+ * times.
+ *
  * @author thibautd
  */
-public class InvalidSolutionsTabuList implements TabuChecker {
-
-	@Override
-	public void notifyMove(
-			final Solution solution,
-			final Move move,
-			final double newScore) {
-		// nothing to do
-	}
-
-	@Override
-	public boolean isTabu(
-			final Solution solution,
-			final Move move) {
-		if (move instanceof IntegerValueChanger) {
-			Solution result = move.apply( solution );
-
-			int now = 0;
-			for (Value val : result.getRepresentation()) {
-				Object value = val.getValue();
-
-				if (value instanceof Integer) {
-					if (((Integer) value) < now) {
-						return true;
-					}
-
-					now = (Integer) value;
-				}
-			}
-		}
-
-		return false;
-	}
-}
-
+package playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation;

@@ -61,6 +61,10 @@ import playground.thibautd.router.TripRouterFactory;
  * A {@link RoutingModule} which caches routes for link-to-link ODs, so that it does not
  * have to re-reoute every time. The routes may be sub-optimal.
  *
+ * <br>
+ * XXX: it does NOT currently use facilities, but only link ids gotten via {@link Activity#getLinkId()}!
+ * <br>
+ *
  * The used route is:
  * <ul>
  * <li> the route of the plan to optimise, if the OD exists (the last found route is used)
@@ -245,7 +249,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 		return linkEnd;
 	}
 
-
 	private NetworkRoute route(
 			final Facility fromFacility,
 			final Facility toFacility,
@@ -266,8 +269,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 
 		return (NetworkRoute) leg.getRoute();
 	}
-
-
 
 	// /////////////////////////////////////////////////////////////////////////
 	// classes
@@ -325,7 +326,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 					isLastLinkSimulated );
 		}
 	}
-
 
 	private static class FacilityWrapper implements Activity {
 		private final Facility wrapped;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InvalidSolutionsTabuList.java
+ * ModeOptimizingMoveConfigBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,46 +19,51 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
-import playground.thibautd.tsplanoptimizer.framework.Move;
+import java.util.List;
+
+import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
+import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
+import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
+import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
+import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
-import playground.thibautd.tsplanoptimizer.framework.Value;
+import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
 
 /**
  * @author thibautd
  */
-public class InvalidSolutionsTabuList implements TabuChecker {
+public class ModeOptimizingMoveConfigBuilder implements ConfigurationBuilder {
+	private Solution solution = null;
+	private final FitnessFunction fitness;
+	private final List<String> possibleModes;
 
-	@Override
-	public void notifyMove(
-			final Solution solution,
-			final Move move,
-			final double newScore) {
-		// nothing to do
+	public ModeOptimizingMoveConfigBuilder(
+			final FitnessFunction fitness,
+			final List<String> possibleModes) {
+		this.fitness = fitness;
+		this.possibleModes = possibleModes;
 	}
 
 	@Override
-	public boolean isTabu(
-			final Solution solution,
-			final Move move) {
-		if (move instanceof IntegerValueChanger) {
-			Solution result = move.apply( solution );
+	public void buildConfiguration(final TabuSearchConfiguration configuration) {
+		configuration.setInitialSolution( solution );
+		configuration.setFitnessFunction( fitness );
 
-			int now = 0;
-			for (Value val : result.getRepresentation()) {
-				Object value = val.getValue();
+		configuration.setEvolutionMonitor(
+				new ImprovementDelayMonitor(
+					100,
+					Integer.MAX_VALUE ));
 
-				if (value instanceof Integer) {
-					if (((Integer) value) < now) {
-						return true;
-					}
+		configuration.setMoveGenerator( 
+				new AllPossibleModesMovesGenerator(
+					solution,
+					possibleModes) );
 
-					now = (Integer) value;
-				}
-			}
-		}
+		configuration.setTabuChecker( new ModeMovesTabuList( 10 ) );
+	}
 
-		return false;
+	public void setSolution(final Solution solution) {
+		this.solution = solution;
 	}
 }
 

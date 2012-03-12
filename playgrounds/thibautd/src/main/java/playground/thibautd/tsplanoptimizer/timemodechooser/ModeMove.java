@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InvalidSolutionsTabuList.java
+ * ModeMove.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,44 +21,41 @@ package playground.thibautd.tsplanoptimizer.timemodechooser;
 
 import playground.thibautd.tsplanoptimizer.framework.Move;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
-import playground.thibautd.tsplanoptimizer.framework.Value;
 
 /**
  * @author thibautd
  */
-public class InvalidSolutionsTabuList implements TabuChecker {
+public class ModeMove implements Move {
+	private final int index;
+	private final String newMode;
 
-	@Override
-	public void notifyMove(
-			final Solution solution,
-			final Move move,
-			final double newScore) {
-		// nothing to do
+	public ModeMove(
+			final int index,
+			final String newMode) {
+		this.index = index;
+		this.newMode = newMode;
 	}
 
 	@Override
-	public boolean isTabu(
-			final Solution solution,
-			final Move move) {
-		if (move instanceof IntegerValueChanger) {
-			Solution result = move.apply( solution );
+	public Solution apply(final Solution solution) {
+		Solution newSolution = solution.createClone();
 
-			int now = 0;
-			for (Value val : result.getRepresentation()) {
-				Object value = val.getValue();
+		newSolution.getRepresentation().get( index ).setValue( newMode );
 
-				if (value instanceof Integer) {
-					if (((Integer) value) < now) {
-						return true;
-					}
+		return newSolution;
+	}
 
-					now = (Integer) value;
-				}
-			}
-		}
+	@Override
+	public Move getReverseMove() {
+		throw new UnsupportedOperationException();
+	}
 
-		return false;
+	public int getIndex() {
+		return index;
+	}
+
+	public String getMode() {
+		return newMode;
 	}
 }
 

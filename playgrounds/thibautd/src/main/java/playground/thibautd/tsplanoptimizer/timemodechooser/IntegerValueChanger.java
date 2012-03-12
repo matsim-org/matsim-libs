@@ -21,6 +21,7 @@ package playground.thibautd.tsplanoptimizer.timemodechooser;
 
 import playground.thibautd.tsplanoptimizer.framework.Move;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
+import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 
 /**
@@ -28,8 +29,10 @@ import playground.thibautd.tsplanoptimizer.framework.Value;
  * @author thibautd
  */
 public class IntegerValueChanger implements Move {
+	private static final boolean DURATION_ENCODING = true;
 	private final int index;
 	private final int amount;
+	private final ModeOptimizingMoveConfigBuilder configBuilder;
 
 	/**
 	 * @param index the index of the representation value to change
@@ -37,9 +40,11 @@ public class IntegerValueChanger implements Move {
 	 */
 	public IntegerValueChanger(
 			final int index,
-			final int amount) {
+			final int amount,
+			final ModeOptimizingMoveConfigBuilder configBuilder) {
 		this.index = index;
 		this.amount = amount;
+		this.configBuilder = configBuilder;
 	}
 
 	/**
@@ -53,12 +58,29 @@ public class IntegerValueChanger implements Move {
 		Value<Integer> val = (Value<Integer>) newSolution.getRepresentation().get( index );
 		val.setValue( val.getValue().intValue() + amount );
 
+		if (DURATION_ENCODING) {
+			// emulate a duration-based encoding by modifying all subsequent end times.
+			for (int i=index+1; i < newSolution.getRepresentation().size(); i++) {
+				val = (Value<Integer>) newSolution.getRepresentation().get( index );
+				val.setValue( val.getValue().intValue() + amount );
+			}
+		}
+
+		if (configBuilder != null) {
+			configBuilder.setSolution( newSolution );
+			newSolution = TabuSearchRunner.runTabuSearch( configBuilder );
+		}
+
 		return newSolution;
 	}
 
 	@Override
 	public Move getReverseMove() {
-		return new IntegerValueChanger( index , -amount );
+		if (configBuilder == null) {
+			return new IntegerValueChanger( index , -amount , configBuilder );
+		}
+		// if optimizing move, not reversible
+		throw new UnsupportedOperationException();
 	}
 
 	public int getIndex() {
