@@ -30,6 +30,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.TeleportationLegRouter;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -41,12 +42,19 @@ import playground.thibautd.jointtrips.population.ScenarioWithCliques;
 import playground.thibautd.jointtrips.replanning.JointPlansReplanning;
 import playground.thibautd.jointtrips.replanning.JointStrategyManager;
 import playground.thibautd.jointtrips.router.CarPassengerLegRouter;
+import playground.thibautd.jointtrips.router.JointPlanRouter;
+import playground.thibautd.router.controler.MultiLegRoutingControler;
+import playground.thibautd.router.LegRouterWrapper;
+import playground.thibautd.router.PlanRouterWrapper;
+import playground.thibautd.router.RoutingModule;
+import playground.thibautd.router.RoutingModuleFactory;
+import playground.thibautd.router.TripRouterFactory;
 
 /**
  * Custom controler for handling clique replanning
  * @author thibautd
  */
-public class JointControler extends Controler {
+public class JointControler extends MultiLegRoutingControler {
 	private static final Logger log =
 		Logger.getLogger(JointControler.class);
 
@@ -127,40 +135,59 @@ public class JointControler extends Controler {
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}
-	
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		 return createRoutingAlgorithm(
-				 this.createTravelCostCalculator(),
-				 this.getTravelTimeCalculator());
-	}
 
-	/**
-	 * Creates a routing algorithm, which takes explicitly car passenger mode
-	 * into account.
-	 *
-	 * @param travelCosts
-	 *            the travel costs to be used for the routing
-	 * @param travelTimes
-	 *            the travel times to be used for the routing
-	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
-	 *         of plans with the specified travelCosts and travelTimes. Only to
-	 *         be used by a single thread, use multiple instances for multiple
-	 *         threads!
-	 */
+	@Override
+	public TripRouterFactory getTripRouterFactory() {
+		TripRouterFactory routerFactory = super.getTripRouterFactory();
+
+		routerFactory.setRoutingModuleFactory(
+				JointActingTypes.PASSENGER,
+				new RoutingModuleFactory() {
+					@Override
+					public RoutingModule createModule(
+							final String mainMode,
+							final TripRouterFactory factory) {
+						return new LegRouterWrapper(
+							mainMode,
+							getPopulation().getFactory(),
+							// "fake" router to avoid exceptions
+							new TeleportationLegRouter(
+								factory.getModeRouteFactory(),
+								1,
+								1),
+							null,
+							null);
+					}
+				});
+
+		return routerFactory;
+	}
+	
+	//@Override
+	//public PlanAlgorithm createRoutingAlgorithm() {
+	//	 return createRoutingAlgorithm(
+	//			 this.createTravelCostCalculator(),
+	//			 this.getTravelTimeCalculator());
+	//}
+
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(
 			final PersonalizableTravelCost travelCosts,
 			final PersonalizableTravelTime travelTimes) {
-		// log.debug("routing algorithm created");
-		PlansCalcRoute router = (PlansCalcRoute) 
-			super.createRoutingAlgorithm(travelCosts, travelTimes);
+		PlansCalcRoute plansCalcRoute = null;
 
-		router.addLegHandler(
-				JointActingTypes.PASSENGER,
-				new CarPassengerLegRouter());
+		TripRouterFactory tripRouterFactory = getTripRouterFactory();
+		plansCalcRoute = new PlanRouterWrapper(
+				getConfig().plansCalcRoute(),
+				getNetwork(),
+				travelCosts,
+				travelTimes,
+				getLeastCostPathCalculatorFactory(),
+				tripRouterFactory.getModeRouteFactory(),
+				tripRouterFactory,
+				new JointPlanRouter( tripRouterFactory.createTripRouter() ));
 
-		return router;
+		return plansCalcRoute;
 	}
 
 	/**
