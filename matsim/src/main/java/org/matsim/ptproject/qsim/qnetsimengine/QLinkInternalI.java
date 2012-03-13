@@ -52,26 +52,51 @@ abstract class QLinkInternalI extends AbstractQLane implements NetsimLink {
 	
 	abstract boolean doSimStep(double now);
 
-	abstract void addFromIntersection(final QVehicle veh);
-	
 	abstract QNode getToNode() ;
 
+	/**
+	 * add vehicle at "activity" location
+	 */
 	abstract void addParkedVehicle(MobsimVehicle vehicle) ;
 
+	/**
+	 * remove vehicle from "activity" location
+	 */
 	abstract QVehicle removeParkedVehicle(Id vehicleId) ;
 
+	/**
+	 * if you want an agent visualized while he/she is computationally not on the link, register him/her here
+	 * (has --hopefully-- no effect on dynamics)
+	 */
 	abstract void registerAdditionalAgentOnLink(MobsimAgent planAgent) ;
 
+	/**
+	 * inverse of "registerAdditionalAgentOnlyLink"
+	 */
 	abstract MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) ;
 
+	/**
+	 * return all agents/vehicles/... that are NOT in traffic.
+	 * Probably only used for visualization, but no guarantee.
+	 */
 	abstract Collection<MobsimAgent> getAdditionalAgentsOnLink() ;
 	
+	/**
+	 * at simulation end for shutdown.
+	 */
 	abstract void clearVehicles() ;
 
+	/**
+	 * Agent that ends a leg or an activity is computationally passed to the QSim.  If the next PlanElement is a leg,
+	 * and the leg is treated by _this_ NetsimEngine, then the QSim passes it to the NetsimEngine, which inserts it here.
+	 */
 	abstract void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) ;
 
 	abstract QVehicle getVehicle(Id vehicleId) ;
 	
+	/**
+	 * this is for agents who want to depart but their car is not (yet) there.  Subject to design change.
+	 */
 	abstract void registerAgentWaitingForCar(MobsimDriverAgent agent) ;
 	
 }

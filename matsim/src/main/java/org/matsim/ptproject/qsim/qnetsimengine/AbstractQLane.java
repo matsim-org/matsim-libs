@@ -41,6 +41,13 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  */
 abstract class AbstractQLane {
+	
+	/**
+	 * upstream add
+	 */
+	abstract void addFromIntersection(final QVehicle veh);
+	
+
 	/**
 	 * equivalent to a Buffer.isEmpty() operation
 	 */

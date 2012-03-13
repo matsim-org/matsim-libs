@@ -519,8 +519,9 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 
-	
-	/*package*/ void addFromIntersection(final QVehicle veh, final double now){
+	@Override
+	/*package*/ void addFromIntersection(final QVehicle veh ){
+		double now = this.qLink.network.simEngine.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
 		/* It's the first lane,
 		 * so we need to start with a 'clean' freeSpeedTravelTime */
 		double earliestExitTime = (now + this.freespeedTravelTime);
