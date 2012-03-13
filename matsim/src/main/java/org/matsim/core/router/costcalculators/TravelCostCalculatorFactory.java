@@ -25,6 +25,11 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 /**
+ * Design remark(s):<ul>
+ * <li> These need to be factories since, at least for threads, we may need multiple
+ * instances.  (If nothing else, each may set its own person.) kai, mar'12
+ * </ul>
+ * 
  * @author dgrether
  *
  */
