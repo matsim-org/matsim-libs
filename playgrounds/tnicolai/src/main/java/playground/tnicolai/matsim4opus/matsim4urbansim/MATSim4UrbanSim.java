@@ -45,7 +45,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
 import playground.tnicolai.matsim4opus.utils.DateUtil;
-import playground.tnicolai.matsim4opus.utils.InitMATSimScenario;
+import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConnector;
 import playground.tnicolai.matsim4opus.utils.JAXBUnmaschal;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
@@ -87,7 +87,7 @@ public class MATSim4UrbanSim {
 
 		// get default scenario
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		if( !(new InitMATSimScenario(scenario, matsimConfiFile)).init() ){
+		if( !(new MATSim4UrbanSimConfigurationConnector(scenario, matsimConfiFile)).init() ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
 		}			

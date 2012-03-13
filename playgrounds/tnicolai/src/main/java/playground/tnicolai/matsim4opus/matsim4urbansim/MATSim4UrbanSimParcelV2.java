@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.InitMATSimScenario;
+import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConnectorV2;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
@@ -84,9 +84,10 @@ public class MATSim4UrbanSimParcelV2 {
 	double jobSample = 1.;
 	// indicates if MATSim run was successful
 	static boolean isSuccessfulMATSimRun = Boolean.FALSE;
-	// needed for controler listerners
+	// needed for controler listeners
 	ClusterObject[] aggregatedWorkplaces = null;
 	
+	MATSim4UrbanSimConfigurationConnectorV2 connector = null;
 	
 	/**
 	 * constructor
@@ -101,13 +102,11 @@ public class MATSim4UrbanSimParcelV2 {
 		// checks if args parameter contains a valid path
 		Paths.isValidPath(matsimConfiFile);
 		
-		// get default scenario
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		// init scenario
-		if( !(new InitMATSimScenario(scenario, matsimConfiFile)).init() ){
+		if( !(connector = new MATSim4UrbanSimConfigurationConnectorV2( matsimConfiFile )).init() ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
-		}		
+		}
+		scenario = connector.getScenario();
 		ScenarioUtils.loadScenario(scenario);
 		
 		// init Benchmark as default

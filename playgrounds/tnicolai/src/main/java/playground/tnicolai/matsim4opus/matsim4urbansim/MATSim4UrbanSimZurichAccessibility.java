@@ -69,46 +69,46 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		super(args);
 		// set the resolution, this is used for setting 
 		// the starting points for accessibility measures
-		checkAndSetShapeFile(args);
-		checkAndSetGridSize(args);
+//		checkAndSetShapeFile(args);
+//		checkAndSetGridSize(args);
 		checkAndSetJobSample(args);
-		checkAndSetBoundingBox(args);
+//		checkAndSetBoundingBox(args);
 	}
 
-	/**
-	 * Set the shape file path in order to determine 
-	 * the starting points for accessibility computation
-	 * 
-	 * @param args
-	 */
-	private void checkAndSetShapeFile(String[] args) {
-
-		if( args.length >= 2 ){
-			shapeFile = args[1].trim();
-			log.info("The shape file path was set to " + shapeFile);
-			if(!Paths.pathExsits(shapeFile))
-				throw new RuntimeException("Given path to shape file does not exist: " + shapeFile);
-		} else{
-			log.error("Missing shape file!!!");
-			System.exit(-1);
-		}
-	}
-	
-	/**
-	 * Set the grid size for the starting points
-	 * 
-	 * @param args
-	 */
-	private void checkAndSetGridSize(String[] args) {
-		
-		if(args.length >= 3){
-			gridSizeInMeter = Double.parseDouble( args[2].trim() );
-			log.info("The resolution was set to " + String.valueOf(gridSizeInMeter) );
-		} else{
-			log.error("Missing resolution!!!");
-			System.exit(-1);
-		}
-	}
+//	/**
+//	 * Set the shape file path in order to determine 
+//	 * the starting points for accessibility computation
+//	 * 
+//	 * @param args
+//	 */
+//	private void checkAndSetShapeFile(String[] args) {
+//
+//		if( args.length >= 2 ){
+//			shapeFile = args[1].trim();
+//			log.info("The shape file path was set to " + shapeFile);
+//			if(!Paths.pathExsits(shapeFile))
+//				throw new RuntimeException("Given path to shape file does not exist: " + shapeFile);
+//		} else{
+//			log.error("Missing shape file!!!");
+//			System.exit(-1);
+//		}
+//	}
+//	
+//	/**
+//	 * Set the grid size for the starting points
+//	 * 
+//	 * @param args
+//	 */
+//	private void checkAndSetGridSize(String[] args) {
+//		
+//		if(args.length >= 3){
+//			gridSizeInMeter = Double.parseDouble( args[2].trim() );
+//			log.info("The resolution was set to " + String.valueOf(gridSizeInMeter) );
+//		} else{
+//			log.error("Missing resolution!!!");
+//			System.exit(-1);
+//		}
+//	}
 	
 	/**
 	 * Set the jobSample for the starting points
@@ -126,16 +126,16 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		}
 	}
 	
-	/**
-	 * Set custom bounding box to determine the area to process
-	 * 
-	 * @param args
-	 */
-	private void checkAndSetBoundingBox(String args[]){
-		// tnicolai: get bounding box via config
-		// minX, minY, maxX, maxY
-		NetworkBoundaryBox.setCustomBoundaryBox(676223.42, 241583.83, 689664.05, 254305.72); // this is for the Zurich application
-	}
+//	/**
+//	 * Set custom bounding box to determine the area to process
+//	 * 
+//	 * @param args
+//	 */
+//	private void checkAndSetBoundingBox(String args[]){
+//		// tnicolai: get bounding box via config
+//		// minX, minY, maxX, maxY
+//		NetworkBoundaryBox.setCustomBoundaryBox(676223.42, 241583.83, 689664.05, 254305.72); // this is for the Zurich application
+//	}
 	
 	/**
 	 * This modifies the MATSim network according to the given

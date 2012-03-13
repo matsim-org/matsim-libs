@@ -193,7 +193,7 @@ public class Constants {
 	public static final String COMPUTE_ZONE_2_ZONE_IMPEDANCE = "compute_zone2zone_impedance";
 	public static final String COMPUTE_LOGSUM = "compute_logsum";
 	public static final String RETURN_RAW_SUM = "return_raw_sum";
-	public static final String BETA = "beta";
+	public static final String BETA_BRAIN = "beta_brain";
 	public static final String BETA_TRAVEL_TIMES = "beta_travel_times";
 	public static final String BETA_LN_TRAVEL_TIMES = "beta_ln_travel_times";
 	public static final String BETA_POWER_TRAVEL_TIMES = "beta_power_travel_times";

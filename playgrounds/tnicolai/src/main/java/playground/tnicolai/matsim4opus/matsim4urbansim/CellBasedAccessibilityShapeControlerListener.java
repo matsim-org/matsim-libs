@@ -173,8 +173,7 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
 		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() );
 		
-		// 1.38888889m/s corresponds to 5km/h
-		this.walkSpeedMeterPerMin = 1.38888889 * 60.; // sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		this.walkSpeedMeterPerMin = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable

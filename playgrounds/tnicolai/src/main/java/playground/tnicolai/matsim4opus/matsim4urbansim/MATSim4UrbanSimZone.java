@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.InitMATSimScenario;
+import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConnector;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
@@ -104,7 +104,7 @@ public class MATSim4UrbanSimZone {
 		// get default scenario
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// init scenario
-		if( !(new InitMATSimScenario(scenario, matsimConfiFile)).init() ){
+		if( !(new MATSim4UrbanSimConfigurationConnector(scenario, matsimConfiFile)).init() ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
 		}		

@@ -40,8 +40,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
-import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ObjectFactory;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig2.MatsimConfigType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig2.ObjectFactory;
 import playground.tnicolai.matsim4opus.utils.io.LoadFile;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
 
@@ -49,10 +49,10 @@ import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
  * @author thomas
  *
  */
-public class JAXBUnmaschal {
+public class JAXBUnmaschalV2{
 	
 	// logger
-	private static final Logger log = Logger.getLogger(JAXBUnmaschal.class);
+	private static final Logger log = Logger.getLogger(JAXBUnmaschalV2.class);
 	
 	private String matsimConfigFile = null;
 	
@@ -60,7 +60,7 @@ public class JAXBUnmaschal {
 	 * default constructor
 	 * @param configFile
 	 */
-	public JAXBUnmaschal(String configFile){
+	public JAXBUnmaschalV2(String configFile){
 		this.matsimConfigFile = configFile;
 	}
 	
@@ -90,7 +90,7 @@ public class JAXBUnmaschal {
 			LoadFile loadFile = new LoadFile(Constants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG , tempDir , Constants.CURRENT_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			// tnicolai: debugging
-			// file2XSD = new File("/Users/thomas/Development/workspace/matsim/dtd/matsim4urbansim_v2.xsd");
+			file2XSD = new File("/Users/thomas/Development/workspace/matsim/dtd/matsim4urbansim_v2.xsd");
 			
 			if(file2XSD == null || !file2XSD.exists())
 				return null;
@@ -125,7 +125,7 @@ public class JAXBUnmaschal {
 			e.printStackTrace();
 			return null;
 		} finally{
-			// clean up temp files/dirs
+			// clean up temp files
 			TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		}
 
