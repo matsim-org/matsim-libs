@@ -1,9 +1,12 @@
 Todos:
 
-- orthogonal mapping of workplaces
+- implement normal MATSim config as input
+- orthogonal mapping of workplaces (consider walk distance to link rather than to node (as approximation))
 - output of travel time/distances for each person ?
-- Brussel scenario: matching coordinates of zone centroids and network
 - test different beta values
 - test accessibility measure paired with workers or 1-person hh or income in UrbanSim
-
+- implement controler for agent-based performance feedback (time spent travelling, money spent travelling, etc.)
 - Schnittstelle SpatialGrid für Interpolation
+
+Tasks Done:
+- Brussel scenario: matching coordinates of zone centroids and network -> created new network with right projection

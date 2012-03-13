@@ -255,10 +255,11 @@ public class MATSim4UrbanSimZone {
 	void addControlerListener(ActivityFacilitiesImpl zones, Controler controler) {
 		
 		// tnicolai: make this configurable 
-		boolean computeZone2ZoneImpedance = false;
-		boolean computeZoneBasedAccessibilities = false;
-		boolean dumpPopulationData = true;
-		boolean dumpAggegatedWorkplaceData = true;
+		boolean computeZone2ZoneImpedance = true;
+		boolean computeZoneBasedAccessibilities = true;
+		boolean computeAgentPerformanceFeedback = false;
+		boolean dumpPopulationData = false;
+		boolean dumpAggegatedWorkplaceData = false;
 		
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
