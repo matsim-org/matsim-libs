@@ -80,7 +80,7 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 	private MultinomialLogit mnl;
 	// private boolean outputCalcDetail = false;
 	private SimpleWriter writer = null;
-	boolean setUCinMNL = true;
+	boolean setUCinMNL = false, addUCtoScore = true;
 
 	public Events2Score4PC(Config config, ScoringFunctionFactory sfFactory,
 			Scenario scenario) {
@@ -96,6 +96,16 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		} else {
 			System.out.println("BSE:\tsetUCinMNL\t= default value\t"
 					+ setUCinMNL);
+		}
+
+		String addUCtoScoreStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "addUCtoScore");
+		if (addUCtoScoreStr != null) {
+			addUCtoScore = Boolean.parseBoolean(addUCtoScoreStr);
+			System.out.println("BSE:\taddUCtoScore\t=\t" + addUCtoScore);
+		} else {
+			System.out.println("BSE:\taddUCtoScore\t= default value\t"
+					+ addUCtoScore);
 		}
 	}
 
@@ -277,7 +287,6 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 						BseStrategyManager.UTILITY_CORRECTION);
 
 				// add UC as ASC into MNL
-
 				if (setUCinMNL) {
 					mnl.setASC(choiceIdx, uc != null ? (Double) uc : 0d);
 				}
@@ -303,7 +312,8 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 
 			Object uc = plan.getCustomAttributes().get(
 					BseStrategyManager.UTILITY_CORRECTION);
-			double utilCorrection = uc != null ? (Double) uc : 0d;
+			double utilCorrection = addUCtoScore ? (uc != null ? (Double) uc
+					: 0d) : 0d;
 
 			Vector coeff = mnl.getCoeff();
 			double util = coeff/*
