@@ -77,6 +77,7 @@
 			<xs:element name="workActivityTypicalDuration" type="xs:nonNegativeInteger"/>
 			<xs:element name="workActivityOpeningTime" type="xs:nonNegativeInteger"/>
 			<xs:element name="workActivityLatestStartTime" type="xs:nonNegativeInteger"/>
+			<xs:element name="betaBrain" type="xs:double"/>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -121,7 +122,6 @@
 			<xs:element name="boundingBoxRight" type="xs:double"/>
 			<xs:element name="boundingBoxBottom" type="xs:double"/>
 			<xs:element name="agentPerformance" type="xs:boolean"/>
-			<xs:element name="betaBrain" type="xs:double"/>
 		</xs:sequence>
 	</xs:complexType>
 	
