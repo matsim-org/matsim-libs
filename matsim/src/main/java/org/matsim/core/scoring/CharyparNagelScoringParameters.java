@@ -51,7 +51,6 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	@Deprecated
 	public final double marginalUtilityOfDistanceOther_m;
 
-	@Deprecated // not really deprecated, but discouraged.  benjamin/kai, dec'10
 	public final double marginalUtilityOfDistanceWalk_m;
 
 	public final double monetaryDistanceCostRateCar;
