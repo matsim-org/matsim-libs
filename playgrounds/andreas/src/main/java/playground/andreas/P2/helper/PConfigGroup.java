@@ -67,7 +67,7 @@ public class PConfigGroup extends Module{
 	private static final String ROUTE_PROVIDER = "routeProvider";
 	private static final String USE_ADAPTIVE_NUMBER_OF_COOPERATIVES = "useAdaptiveNumberOfCooperatives";
 	private static final String SHARE_OF_COOPERATIVES_WITH_PROFIT = "shareOfCooperativesWithProfit";
-	private static final String SHARE_OF_AGENTS_TO_REROUTE_ADDITIONALLY = "shareOfAgentsToReRouteAdditionally";
+	private static final String REROUTE_AGENTS_STUCK = "reRouteAgentsStuck";
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
@@ -91,7 +91,7 @@ public class PConfigGroup extends Module{
 	private String routeProvider = "SimpleCircleScheduleProvider";
 	private boolean useAdaptiveNumberOfCooperatives = false;
 	private double shareOfCooperativesWithProfit = 0.50;
-	private double shareOfAgentsToReRouteAdditionally = 0.10;
+	private boolean reRouteAgentsStuck = false;
 
 	// Strategies
 	private final LinkedHashMap<Id, PStrategySettings> strategies = new LinkedHashMap<Id, PStrategySettings>();
@@ -141,8 +141,8 @@ public class PConfigGroup extends Module{
 			this.useAdaptiveNumberOfCooperatives = Boolean.parseBoolean(value);
 		} else if (SHARE_OF_COOPERATIVES_WITH_PROFIT.equals(key)){
 			this.shareOfCooperativesWithProfit = Double.parseDouble(value);
-		} else if (SHARE_OF_AGENTS_TO_REROUTE_ADDITIONALLY.equals(key)){
-			this.shareOfAgentsToReRouteAdditionally = Double.parseDouble(value);
+		} else if (REROUTE_AGENTS_STUCK.equals(key)){
+			this.reRouteAgentsStuck = Boolean.parseBoolean(value);
 		} else if (key != null && key.startsWith(PMODULE)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE.length())), true);
 			settings.setModuleName(value);
@@ -178,7 +178,7 @@ public class PConfigGroup extends Module{
 		map.put(ROUTE_PROVIDER, this.routeProvider);
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, Boolean.toString(this.useAdaptiveNumberOfCooperatives));
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, Double.toString(this.shareOfCooperativesWithProfit));
-		map.put(SHARE_OF_AGENTS_TO_REROUTE_ADDITIONALLY, Double.toString(this.shareOfAgentsToReRouteAdditionally));
+		map.put(REROUTE_AGENTS_STUCK, Boolean.toString(this.reRouteAgentsStuck));
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
@@ -210,7 +210,7 @@ public class PConfigGroup extends Module{
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, "Target share of profitable cooperatives - Set " + USE_ADAPTIVE_NUMBER_OF_COOPERATIVES + "=true to enable this feature");
-		map.put(SHARE_OF_AGENTS_TO_REROUTE_ADDITIONALLY, "Share of additionally rerouted agents. 0.0 means only stuck agents are rerouted. 0.5 means 50% of agents (inlcuding the stuck agents) are rerouted. 1.0 means all agents are rerouted.");
+		map.put(REROUTE_AGENTS_STUCK, "All agents stuck will be rerouted at the beginning of an iteration, if set to true.");
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
@@ -289,8 +289,8 @@ public class PConfigGroup extends Module{
 		return this.shareOfCooperativesWithProfit;
 	}
 	
-	public double getShareOfAgentsToReRouteAdditionally() {
-		return this.shareOfAgentsToReRouteAdditionally;
+	public boolean getReRouteAgentsStuck() {
+		return this.reRouteAgentsStuck;
 	}
 
 	public Collection<PStrategySettings> getStrategySettings() {

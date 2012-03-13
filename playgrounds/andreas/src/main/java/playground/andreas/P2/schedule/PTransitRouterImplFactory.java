@@ -64,12 +64,13 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	
 	private AgentsStuckHandlerImpl agentsStuckHandler;
 	private PBox pBox;
-	private double shareOfAgentsToReRouteAdditionally;
 
 	public PTransitRouterImplFactory(Controler controler) {
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
-		this.shareOfAgentsToReRouteAdditionally = pConfig.getShareOfAgentsToReRouteAdditionally();
+		if(pConfig.getReRouteAgentsStuck()){
+			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
+		}
 		controler.addControlerListener(new PStats(this.pBox, pConfig));
 		controler.addControlerListener(new GexfOutput(pConfig));
 	}
@@ -93,8 +94,9 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		this.config = new TransitRouterConfig(event.getControler().getScenario().getConfig().planCalcScore()
 				, event.getControler().getScenario().getConfig().plansCalcRoute(), event.getControler().getScenario().getConfig().transitRouter(),
 				event.getControler().getScenario().getConfig().vspExperimental());
-		this.agentsStuckHandler = new AgentsStuckHandlerImpl();
-		event.getControler().getEvents().addHandler(this.agentsStuckHandler);
+		if(this.agentsStuckHandler != null){
+			event.getControler().getEvents().addHandler(this.agentsStuckHandler);
+		}
 	}
 
 	@Override
@@ -109,13 +111,14 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 			((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
 			this.addPVehiclesToOriginalOnes(event.getControler());
 			
-			ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@Override
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonReRouteStuckAndSome(controler.createRoutingAlgorithm(), controler.getScenario(), agentsStuckHandler.getAgentsStuck(), shareOfAgentsToReRouteAdditionally);
+			if(this.agentsStuckHandler != null){
+				ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+					@Override
+					public AbstractPersonAlgorithm getPersonAlgorithm() {
+						return new PersonReRouteStuck(controler.createRoutingAlgorithm(), controler.getScenario(), agentsStuckHandler.getAgentsStuck());
+					}
+				});
 			}
-		});
-			
 			this.dumpTransitScheduleAndVehicles(event);
 		}
 	}

@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -19,22 +18,21 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitActsRemover;
 
 /**
- * ReRoutes every person from a given set of person ids and additionally a given share of person, drawn randomly
+ * ReRoutes every person from a given set of person ids
  *
  * @author aneumann
  */
-public class PersonReRouteStuckAndSome extends AbstractPersonAlgorithm {
+public class PersonReRouteStuck extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithm router;
 	private final Network  network;
 
-	private static final Logger log = Logger.getLogger(PersonReRouteStuckAndSome.class);
+	private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);
 	
 	private TransitActsRemover transitActsRemover;
 	private Set<Id> agentsStuck;
-	private double shareshareToReRouteAdditionally;
 
-	public PersonReRouteStuckAndSome(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck, double shareToReRouteAdditionally) {
+	public PersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
 		super();
 		this.router = router;
 		this.network = scenario.getNetwork();
@@ -48,7 +46,6 @@ public class PersonReRouteStuckAndSome extends AbstractPersonAlgorithm {
 			filter.filter(net, modes);
 		}
 		this.agentsStuck = agentsStuck;
-		this.shareshareToReRouteAdditionally = shareToReRouteAdditionally;
 		this.transitActsRemover = new TransitActsRemover(); 
 		log.info("initialized");
 	}
@@ -62,7 +59,7 @@ public class PersonReRouteStuckAndSome extends AbstractPersonAlgorithm {
 			return;
 		}
 		
-		if(this.agentsStuck.contains(person.getId()) || MatsimRandom.getRandom().nextDouble() < this.shareshareToReRouteAdditionally){
+		if(this.agentsStuck.contains(person.getId())){
 			this.transitActsRemover.run(selectedPlan);
 			this.router.run(selectedPlan);
 		}
