@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PenaltyTravelTime.java
+ * PenaltyTravelCostFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,30 +20,25 @@
 
 package playground.christoph.evacuation.router.util;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
-public class PenaltyTravelTime implements PersonalizableTravelTime {
+public class PenaltyTravelCostFactory implements TravelCostCalculatorFactory {
 
-	private final PersonalizableTravelTime travelTime;
-	private final PenaltyCalculator penaltyCalculator;
+	private final TravelCostCalculatorFactory costFactory;
+	private final AffectedAreaPenaltyCalculator penaltyCalculator;
 	
-	public PenaltyTravelTime(PersonalizableTravelTime travelTime, PenaltyCalculator penaltyCalculator) {
-		this.travelTime = travelTime;
+	public PenaltyTravelCostFactory(TravelCostCalculatorFactory costFactory, AffectedAreaPenaltyCalculator penaltyCalculator) {
+		this.costFactory = costFactory;
 		this.penaltyCalculator = penaltyCalculator;
 	}
+
+	@Override
+	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
+		PersonalizableTravelCost travelCost = this.costFactory.createTravelCostCalculator(travelTime, cnScoringGroup);
+		return new PenaltyTravelCost(travelCost, penaltyCalculator.getPenaltyCalculatorInstance());
+	}
 	
-	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		double tt = travelTime.getLinkTravelTime(link, time);
-		double penaltyFactor = penaltyCalculator.getPenaltyFactor(link.getId(), time);
-		return tt*penaltyFactor;
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		travelTime.setPerson(person);
-	}
-
 }

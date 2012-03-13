@@ -98,7 +98,7 @@ import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
-import playground.christoph.evacuation.router.util.PenaltyTravelTimeFactory;
+import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
@@ -471,22 +471,20 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		// use fuzzyTravelTimes
 		FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.travelTimeCollectorWrapperFactory, this.householdsTracker, this.vehiclesTracker);
 			
-		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
+		// create a copy of the MultiModalTravelTimeWrapperFactory...
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
 		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
-//			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
-			
-			// add penalties to travel times within the affected area
-			PenaltyTravelTimeFactory penaltyTravelTimeFactory = new PenaltyTravelTimeFactory(entry.getValue(), penaltyCalculator.getPenaltyCalculatorInstance());
-			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), penaltyTravelTimeFactory);
+			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());			
 		}
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car,  new PenaltyTravelTimeFactory(fuzzyTravelTimeEstimatorFactory, penaltyCalculator.getPenaltyCalculatorInstance()));
-//		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, fuzzyTravelTimeEstimatorFactory);
-		
+		// ... and set the TravelTimeCollector for car mode
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, fuzzyTravelTimeEstimatorFactory);
+
+		// add time dependent penalties to travel costs within the affected area
 		TravelCostCalculatorFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		TravelCostCalculatorFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, penaltyCalculator);
 		
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, penaltyCostFactory, timeFactory, factory, routeFactory);
 
 		/*
 		 * During Activity Replanners
