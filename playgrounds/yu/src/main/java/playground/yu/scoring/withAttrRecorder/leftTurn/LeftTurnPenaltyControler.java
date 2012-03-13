@@ -69,7 +69,7 @@ public class LeftTurnPenaltyControler extends Controler4AttrRecorder {
 
 		addCoreControlerListener(new PlansReplanning());
 		addCoreControlerListener(new PlansDumping());
-		// EventsHanding ... very important
+		// EventsHandling ... very important
 		addCoreControlerListener(new EventsHandling(events));
 	}
 

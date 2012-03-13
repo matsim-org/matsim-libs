@@ -39,11 +39,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Counts;
@@ -57,10 +55,29 @@ import utilities.misc.DynamicData;
 
 /**
  * @author yu
- *
+ * 
  */
 public class DestinationTripUtilOffsetDistribution implements
 		ActivityStartEventHandler, LinkEnterEventHandler {
+	protected static int getTimeStep(double time) {
+		return (int) time / 3600 + 1;
+	}
+
+	private static boolean isInRange(final Id linkId, final Network net) {
+		return true;
+		// Coord distanceFilterCenterNodeCoord = net.getNodes()
+		// .get(new IdImpl("2531")).getCoord();
+		// double distanceFilter = 30000;
+		// Link l = net.getLinks().get(linkId);
+		// if (l == null) {
+		// System.out.println("Cannot find requested link: "
+		// + linkId.toString());
+		// return false;
+		// }
+		// return ((LinkImpl) l).calcDistance(distanceFilterCenterNodeCoord) <
+		// distanceFilter;
+	}
+
 	/**
 	 * @param args
 	 */
@@ -70,17 +87,30 @@ public class DestinationTripUtilOffsetDistribution implements
 	}
 
 	private static void run(String[] args) {
-		String linkOffsetUtilOffsetFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.linkCostOffsets.xml"//
-		, networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml"//
-		, countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml"//
-		, eventsFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.events.txt.gz"//
-		, outputFilenameBase = "../integration-demandCalibration/test/DestinationUtilOffset2/tmp/UOD.allday."//
+		// String linkOffsetUtilOffsetFilename =
+		// "../integration-demandCalibration/test/DestinationUtilOffset/1000.linkCostOffsets.xml"//
+		// , networkFilename =
+		// "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml"//
+		// , countsFilename =
+		// "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml"//
+		// , eventsFilename =
+		// "../integration-demandCalibration/test/DestinationUtilOffset/1000.events.txt.gz"//
+		// , outputFilenameBase =
+		// "../integration-demandCalibration/test/DestinationUtilOffset2/tmp/UOD.allday."//
+		// ;
+
+		String linkOffsetUtilOffsetFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/analysis/1536.2500.linkUtilOffsets.xml"//
+		, networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
+		, countsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml"//
+		, eventsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/analysis/1536.2500.events.xml.gz"//
+		, outputFilenameBase = "D:/Daten/work/shared-svn/studies/countries/de/berlin/analysis/UOD.allday."//
 		;
 
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 		double interval = 0.25;
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -119,7 +149,8 @@ public class DestinationTripUtilOffsetDistribution implements
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 		double interval = 0.25;
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -157,19 +188,21 @@ public class DestinationTripUtilOffsetDistribution implements
 	}
 
 	protected List<Double> destTripUtilOffsetList = new ArrayList<Double>();
-	private Map<String, List<Double>> actType_destTripUtilOffsetLists = new HashMap<String, List<Double>>();
+	private final Map<String, List<Double>> actType_destTripUtilOffsetLists = new HashMap<String, List<Double>>();
 	private Map<Integer/* timeBin */, Map<String, List<Double>>> time_actType_destTripUtilOffsetLists = null;
 	private Map<Integer, Set<Coord>> time_centerCoords = null;
 	private int timeBinSize = 3600;
 	protected Map<Id/* agentId */, Double/* legUtilOffset */> tmpAgentLegUtilOffsets = new HashMap<Id, Double>();
-	private Network net;
+	private final Network net;
 	// for grid version
-	private Counts counts;
-	private DynamicData<Link> linkUtilOffsets;
-	private int caliStartTime;
-	private int caliEndTime;
-	private int lowerLimit;
-	private double gridLength;
+	private final Counts counts;
+	private final DynamicData<Link> linkUtilOffsets;
+	private final int caliStartTime;
+	private final int caliEndTime;
+
+	private final int lowerLimit;
+
+	private final double gridLength;
 
 	public DestinationTripUtilOffsetDistribution(Network net, Counts counts,
 			DynamicData<Link> linkUtilOffsets, int caliStartTime,
@@ -204,29 +237,8 @@ public class DestinationTripUtilOffsetDistribution implements
 		time_actType_destTripUtilOffsetLists = new HashMap<Integer, Map<String, List<Double>>>();
 	}
 
-	protected static int getTimeStep(double time) {
-		return (int) time / 3600 + 1;
-	}
-
 	public List<Double> getDestTripUtilOffsetList() {
 		return destTripUtilOffsetList;
-	}
-
-	public void setTimeBinSize(int timeBinSize) {
-		this.timeBinSize = timeBinSize;
-	}
-
-	private static boolean isInRange(final Id linkId, final Network net) {
-		Coord distanceFilterCenterNodeCoord = net.getNodes().get(
-				new IdImpl("2531")).getCoord();
-		double distanceFilter = 30000;
-		Link l = net.getLinks().get(linkId);
-		if (l == null) {
-			System.out.println("Cannot find requested link: "
-					+ linkId.toString());
-			return false;
-		}
-		return ((LinkImpl) l).calcDistance(distanceFilterCenterNodeCoord) < distanceFilter;
 	}
 
 	protected double getLinkUtilOffset(Id linkId, int time) {
@@ -237,24 +249,6 @@ public class DestinationTripUtilOffsetDistribution implements
 			}
 		}
 		return 0d;
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		Id linkId = event.getLinkId();
-		Id agentId = event.getPersonId();
-		int timeStep = getTimeStep(event.getTime());
-
-		// if (timeStep >= caliStartTime && timeStep <= caliEndTime) {
-		double linkUtilOffset = getLinkUtilOffset(linkId, timeStep);
-
-		Double legUtilOffset = tmpAgentLegUtilOffsets.get(agentId);
-		if (legUtilOffset == null) {
-			tmpAgentLegUtilOffsets.put(agentId, linkUtilOffset);
-		} else {
-			tmpAgentLegUtilOffsets.put(agentId, legUtilOffset + linkUtilOffset);
-		}
-		// }
 	}
 
 	@Override
@@ -284,8 +278,8 @@ public class DestinationTripUtilOffsetDistribution implements
 
 						int timeBin = (int) event.getTime() / timeBinSize + 1;
 						if (time_centerCoords.containsKey(timeBin)) {
-							Coord actCoord = net.getLinks().get(
-									event.getLinkId()).getCoord();
+							Coord actCoord = net.getLinks()
+									.get(event.getLinkId()).getCoord();
 							Set<Coord> centers = time_centerCoords.get(timeBin);
 
 							// check, if activity location coord in a squre with
@@ -337,6 +331,34 @@ public class DestinationTripUtilOffsetDistribution implements
 			}
 
 		}
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		Id linkId = event.getLinkId();
+		Id agentId = event.getPersonId();
+		int timeStep = getTimeStep(event.getTime());
+
+		// if (timeStep >= caliStartTime && timeStep <= caliEndTime) {
+		double linkUtilOffset = getLinkUtilOffset(linkId, timeStep);
+
+		Double legUtilOffset = tmpAgentLegUtilOffsets.get(agentId);
+		if (legUtilOffset == null) {
+			tmpAgentLegUtilOffsets.put(agentId, linkUtilOffset);
+		} else {
+			tmpAgentLegUtilOffsets.put(agentId, legUtilOffset + linkUtilOffset);
+		}
+		// }
+	}
+
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void setTimeBinSize(int timeBinSize) {
+		this.timeBinSize = timeBinSize;
 	}
 
 	public void write(String filenameBase, double interval) {
@@ -392,13 +414,12 @@ public class DestinationTripUtilOffsetDistribution implements
 
 			DistributionCreator creator2 = new DistributionCreator(
 					destTripUtilOffsetList2, interval);
-			creator2
-					.createChart(
-							filenameBase + "totalUn0.png",
-							"total \"unzero\" destination trip Utility offset distribution",
-							"\"non-zero\" value of destination trip utility offset",
-							"number of trips with value (!=0) in (interval = "
-									+ interval + ") range of x");
+			creator2.createChart(
+					filenameBase + "totalUn0.png",
+					"total \"unzero\" destination trip Utility offset distribution",
+					"\"non-zero\" value of destination trip utility offset",
+					"number of trips with value (!=0) in (interval = "
+							+ interval + ") range of x");
 
 			DistributionCreator creator3 = new DistributionCreator(
 					actType_destTripUtilOffsetLists, interval);
@@ -423,22 +444,19 @@ public class DestinationTripUtilOffsetDistribution implements
 			DistributionCreator creator4 = new DistributionCreator(
 					actType_destTripUtilOffsetLists4, interval);
 			creator4.write2(filenameBase + "totalNon0AllActs.log");
-			creator4
-					.createChart2(
-							filenameBase + "totalNon0AllActs.png",
-							"total nonzero destination trip Utility offset distribution",
-							"value of destination trip utility offset",
-							"number of trips with value (!= 0) in (interval = "
-									+ interval + ") range of x", false/*
-																	 * not time
-																	 * xAxis
-																	 */);
+			creator4.createChart2(
+					filenameBase + "totalNon0AllActs.png",
+					"total nonzero destination trip Utility offset distribution",
+					"value of destination trip utility offset",
+					"number of trips with value (!= 0) in (interval = "
+							+ interval + ") range of x", false/*
+															 * not time xAxis
+															 */);
 			creator4.createChart2percent(filenameBase
 					+ "totalNon0AllActsPercent.png", "",
 					"value of destination trip utility offset",
 					"frequency (in percent)", false);
-			creator4
-					.write2percent(filenameBase + "totalNon0AllActsPercent.txt");
+			creator4.write2percent(filenameBase + "totalNon0AllActsPercent.txt");
 
 		} else {
 			// plots for each timeBin and all actTypes arriving into grids
@@ -488,30 +506,21 @@ public class DestinationTripUtilOffsetDistribution implements
 			DistributionCreator creator4 = new DistributionCreator(
 					actType_destTripUtilOffsetLists4, interval);
 			creator4.write2(filenameBase + "totalNon0AllActsInGrids.log");
-			creator4
-					.createChart2(
-							filenameBase + "totalNon0AllActsInGrids.png",
-							"Utility offset distribution of total nonzero trip arriving into grids",
-							"value of destination trip utility offset",
-							"number of trips with value (!= 0) in (interval = "
-									+ interval + ") range of x", false/*
-																	 * not time
-																	 * xAxis
-																	 */);
-			creator4
-					.createChart2percent(
-							filenameBase + "totalNon0AllActsInGridsPercent.png",
-							"Utility offset distribution of total nonzero trip arriving into grids (%)",
-							"value of destination trip utility offset",
-							"fraction of trips with value (!= 0) in (interval = "
-									+ interval + ") range of x", false);
+			creator4.createChart2(
+					filenameBase + "totalNon0AllActsInGrids.png",
+					"Utility offset distribution of total nonzero trip arriving into grids",
+					"value of destination trip utility offset",
+					"number of trips with value (!= 0) in (interval = "
+							+ interval + ") range of x", false/*
+															 * not time xAxis
+															 */);
+			creator4.createChart2percent(
+					filenameBase + "totalNon0AllActsInGridsPercent.png",
+					"Utility offset distribution of total nonzero trip arriving into grids (%)",
+					"value of destination trip utility offset",
+					"fraction of trips with value (!= 0) in (interval = "
+							+ interval + ") range of x", false);
 
 		}
-	}
-
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
 	}
 }
