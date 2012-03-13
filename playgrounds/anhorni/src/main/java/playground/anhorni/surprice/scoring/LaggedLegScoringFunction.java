@@ -66,6 +66,7 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
         
         this.memory = memory;
         this.day = day;
+        
         this.votFactor = votFactor;
         
         this.config = config;
@@ -129,7 +130,13 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
 	}
 
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {		
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
+		
+		double f = 1.0;
+		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useVoT"))) {
+			f = this.votFactor;
+		}
+		
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
 		if (TransportMode.car.equals(leg.getMode())) {
@@ -138,7 +145,7 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * votFactor + this.params.marginalUtilityOfDistanceCar_m * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * f + this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.constantCar;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			double dist = 0.0; // distance in meters
@@ -146,7 +153,7 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s * votFactor + this.params.marginalUtilityOfDistancePt_m * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s * f + this.params.marginalUtilityOfDistancePt_m * dist;
 			tmpScore += this.constantPt;
 		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
 			double dist = 0.0; // distance in meters
@@ -154,7 +161,7 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s * votFactor + this.params.marginalUtilityOfDistanceWalk_m * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s * f + this.params.marginalUtilityOfDistanceWalk_m * dist;
 			tmpScore +=  this.constantWalk;
 		} else if (TransportMode.bike.equals(leg.getMode())) {
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
@@ -166,7 +173,7 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
 				dist = getDistance(route);
 			}
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * votFactor + this.params.marginalUtilityOfDistanceCar_m * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * f + this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.constantCar;
 		}
 		return tmpScore;

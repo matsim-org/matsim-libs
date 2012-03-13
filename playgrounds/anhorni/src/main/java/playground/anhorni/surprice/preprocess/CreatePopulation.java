@@ -148,6 +148,16 @@ public class CreatePopulation {
 			// assign daily income according to one-sided Gauss distribution. 
 			// TODO: check Gini coefficient, Lorenz distribution
 			double r = Math.abs(random.nextGaussian() * Surprice.stdDev + Surprice.mean);						
+			
+			if (Boolean.parseBoolean(config.findParam(Surprice.SURPRICE_PREPROCESS, "richpoor"))) {
+				if (origin.getName().equals("centerZone")) { // poor area
+					r *= 0.8;
+				} 
+				else if (origin.getName().equals("bottomLeftZone")) { // rich area
+					r *= 1.0 / 0.8;
+				}
+			}
+			
 			String votFactor = Double.toString(r);
 			this.votFactors.putAttribute(p.getId().toString(), "income", votFactor);
 			
