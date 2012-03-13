@@ -43,6 +43,9 @@ public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFa
 	}
 	
 	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		// yy why not just "return new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping)"?
+		// Am I overlooking something? kai, mar'12
+		
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		
 		return new PersonalizableTravelCost() {
