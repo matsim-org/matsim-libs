@@ -27,7 +27,7 @@
 	<!-- MATSim config element definition -->
 	<xs:complexType name="configType">
 		<xs:sequence>
-		    <xs:element name="matsim_config" type="networkType" minOccurs="1" 
+		    <xs:element name="matsim_config" type="matsim_config" minOccurs="1" 
 				maxOccurs="1"/>
 			<xs:element name="network" type="networkType" minOccurs="1" 
 				maxOccurs="1"/>
@@ -44,7 +44,7 @@
 		</xs:sequence>
 	</xs:complexType>
 	
-	<!-- network element definition -->
+	<!-- matsim configuration element definition -->
 	<xs:complexType name="matsim_config">
 		<xs:sequence>
 			<xs:element name="inputFile" type="xs:token"/>
