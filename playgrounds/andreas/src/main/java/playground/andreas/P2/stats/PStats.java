@@ -84,7 +84,6 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 	private PConfigGroup pConfig;
 
 	public PStats(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
-		log.info("enabled");
 		this.pBox = pBox;
 		this.pConfig = pConfig;
 	}
@@ -94,6 +93,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 		Controler controler = event.getControler();
 		
 		if(this.pConfig.getWriteStats()){
+			log.info("enabled");
 			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pStats.txt"));
 			try {
 				this.pStatsWriter.write("iter\tcoops\t+coops\tpax\t+pax\tveh\t+veh\tbudget\t+budget\tscore\t+score\tsharePosCoop\tsharePosPax\tsharePosVeh\t\n");
