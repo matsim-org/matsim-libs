@@ -45,6 +45,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.stats.GexfOutput;
+import playground.andreas.P2.stats.PCoopLogger;
 import playground.andreas.P2.stats.PStats;
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
 
@@ -72,6 +73,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
 		}
 		controler.addControlerListener(new PStats(this.pBox, pConfig));
+		controler.addControlerListener(new PCoopLogger(this.pBox, pConfig));
 		controler.addControlerListener(new GexfOutput(pConfig));
 	}
 

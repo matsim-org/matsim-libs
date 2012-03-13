@@ -63,6 +63,7 @@ public class PConfigGroup extends Module{
 	private static final String MIN_OPERATION_TIME = "minOperationTime";
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS = "writeStats";
+	private static final String LOGCOOPS = "logCoops";
 	private static final String WRITE_GEXF_STATS_INTERVAL = "writeGexfStatsInterval";
 	private static final String ROUTE_PROVIDER = "routeProvider";
 	private static final String USE_ADAPTIVE_NUMBER_OF_COOPERATIVES = "useAdaptiveNumberOfCooperatives";
@@ -87,6 +88,7 @@ public class PConfigGroup extends Module{
 	private double pricePerVehicleSold = 1000.0;
 	private boolean useFranchise = false;
 	private boolean writeStats = false;
+	private boolean logCoops = false;
 	private int writeGexfStatsInterval = 0;
 	private String routeProvider = "SimpleCircleScheduleProvider";
 	private boolean useAdaptiveNumberOfCooperatives = false;
@@ -133,6 +135,8 @@ public class PConfigGroup extends Module{
 			this.useFranchise = Boolean.parseBoolean(value);
 		} else if (WRITESTATS.equals(key)){
 			this.writeStats = Boolean.parseBoolean(value);
+		} else if (LOGCOOPS.equals(key)){
+			this.logCoops = Boolean.parseBoolean(value);			
 		} else if (WRITE_GEXF_STATS_INTERVAL.equals(key)) {
 			this.writeGexfStatsInterval = Integer.parseInt(value);
 		} else if (ROUTE_PROVIDER.equals(key)){
@@ -174,6 +178,7 @@ public class PConfigGroup extends Module{
 		map.put(MIN_OPERATION_TIME, Double.toString(this.minOperationTime));
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS, Boolean.toString(this.writeStats));
+		map.put(LOGCOOPS, Boolean.toString(this.logCoops));
 		map.put(WRITE_GEXF_STATS_INTERVAL, Integer.toString(this.writeGexfStatsInterval));
 		map.put(ROUTE_PROVIDER, this.routeProvider);
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, Boolean.toString(this.useAdaptiveNumberOfCooperatives));
@@ -206,6 +211,7 @@ public class PConfigGroup extends Module{
 		map.put(MIN_OPERATION_TIME, "min time of operation of each cooperative in seconds");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS, "will write statistics if set to true");
+		map.put(LOGCOOPS, "will log coops individually if set to true");
 		map.put(WRITE_GEXF_STATS_INTERVAL, "number of iterations the gexf output gets updated. Set to zero to turn this feature off");
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
@@ -271,6 +277,10 @@ public class PConfigGroup extends Module{
 	
 	public boolean getWriteStats() {
 		return this.writeStats;
+	}
+	
+	public boolean getLogCoops() {
+		return this.logCoops;
 	}
 	
 	public int getGexfInterval(){
