@@ -460,18 +460,16 @@ public class PlanCalcScoreConfigGroup extends Module {
 	/**
 	 * @return the marginal utility of distance for mode walk per meter
 	 * <p/>
-	 * It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
+	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
 	 */
-	@Deprecated // It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
 	public double getMarginalUtlOfDistanceWalk() {
 		return this.marginalUtlOfDistanceWalk;
 	}
 	/**
 	 * @param marginalUtlOfDistanceWalk the marginal utility of distance for mode walk per meter
 	 * <p/>
-	 * It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
+	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
 	 */
-	@Deprecated // It is discouraged to use this but in some cases it may make sense.  benjamin/kai, dec'10
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
 		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
 	}
