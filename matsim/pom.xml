@@ -137,6 +137,7 @@
 					</descriptorRefs>
 				</configuration>
 			</plugin>
+			
 		</plugins>
 	</build>
 
@@ -148,6 +149,45 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.8</version>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<quiet>true</quiet>
+					<header>MATSim API</header>
+					<groups>
+						<group>
+							<title>api</title>
+							<packages>org.matsim.api*</packages>
+						</group>
+						<group>
+							<title>run</title>
+							<packages>org.matsim.run*</packages>
+						</group>
+						<group>
+							<title>core</title>
+							<packages>org.matsim.core*</packages>
+						</group>
+						<group>
+							<title>utils</title>
+							<packages>org.matsim.utils*</packages>
+						</group>
+						<group>
+							<title>vis</title>
+							<packages>org.matsim.vis*</packages>
+						</group>
+						<group>
+							<title>tutorial</title>
+							<packages>org.matsim.tutorial*</packages>
+						</group>
+
+					</groups>
+					<stylesheetfile>{$basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</reporting>
 

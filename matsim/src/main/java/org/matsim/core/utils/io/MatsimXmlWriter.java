@@ -166,7 +166,6 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * Writes a start tag with all attributes on the writer
 	 * @param tagname
 	 * @param attributes
-	 * @param out
 	 * @throws UncheckedIOException
 	 */
 	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes) throws UncheckedIOException{
@@ -231,7 +230,6 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	/**
 	 * Writes a XML end tag with the given name to the given writer instance
 	 * @param tagname
-	 * @param out
 	 * @throws UncheckedIOException
 	 */
 	protected void writeEndTag(String tagname) throws UncheckedIOException {
@@ -256,7 +254,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * Encodes the given string in such a way that it no longer contains
 	 * characters that have a special meaning in xml.
 	 * 
-	 * @see http://www.w3.org/International/questions/qa-escapes#use
+	 * @see <a href="http://www.w3.org/International/questions/qa-escapes#use">http://www.w3.org/International/questions/qa-escapes#use</a>
 	 * @param attributeValue
 	 * @return String with some characters replaced by their xml-encoding.
 	 */

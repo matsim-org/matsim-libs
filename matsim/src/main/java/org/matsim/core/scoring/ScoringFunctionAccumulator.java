@@ -22,7 +22,6 @@ package org.matsim.core.scoring;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -33,12 +32,10 @@ import org.matsim.core.scoring.interfaces.MoneyScoring;
 
 /**
  * The accumulator adds up the different parts of the score.
- * @see http://www.matsim.org/node/263
+ * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
 public class ScoringFunctionAccumulator extends ScoringFunctionAdapter {
-
-    private static Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();

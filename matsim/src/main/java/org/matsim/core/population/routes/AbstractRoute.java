@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * Default, abstract implementation of the {@link RouteWRefs}-interface.
+ * Default, abstract implementation of the {@link Route}-interface.
  *
  * @author mrieser
  */

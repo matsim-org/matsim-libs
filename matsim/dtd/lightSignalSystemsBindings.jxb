@@ -15,7 +15,7 @@
 <jxb:schemaBindings>
   <jxb:package name="org.matsim.jaxb.lightsignalsystems10">
     	<jxb:javadoc>
-    	<![CDATA[<p>This package was automatically generated and is part of MATSim. (c) 2011 by the members listed in the COPYING, LICENSE and WARRANTY file. Available under the terms of the GNU General Public License, version 2 or later.</p>]]>
+    	<![CDATA[<body><p>This package was automatically generated and is part of MATSim. (c) 2011 by the members listed in the COPYING, LICENSE and WARRANTY file. Available under the terms of the GNU General Public License, version 2 or later.</p></body>]]>
     </jxb:javadoc>
   </jxb:package>
   

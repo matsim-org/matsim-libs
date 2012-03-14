@@ -22,7 +22,7 @@ package org.matsim.core.scoring.interfaces;
 
 /**
  * The scoring methods related to money.
- * @see http://www.matsim.org/node/263
+ * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
 public interface MoneyScoring {

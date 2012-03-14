@@ -52,9 +52,9 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 	private static int wrnCnt = 0 ;
 	/**
 	 *
-	 * @param scaledMarginalUtilityOfTraveling. Must be scaled, i.e. per second.  Usually negative.
-	 * @param scaledMarginalUtilityOfPerforming. Must be scaled, i.e. per second.  Usually positive.
-	 * @param scaledMarginalUtilityOfDistance. Must be scaled, i.e. per meter.  Usually negative.
+	 * @param scaledMarginalUtilityOfTraveling Must be scaled, i.e. per second.  Usually negative.
+	 * @param scaledMarginalUtilityOfPerforming Must be scaled, i.e. per second.  Usually positive.
+	 * @param scaledMarginalUtilityOfDistance Must be scaled, i.e. per meter.  Usually negative.
 	 */
 	public FreespeedTravelTimeCost(double scaledMarginalUtilityOfTraveling, double scaledMarginalUtilityOfPerforming,
 			double scaledMarginalUtilityOfDistance){

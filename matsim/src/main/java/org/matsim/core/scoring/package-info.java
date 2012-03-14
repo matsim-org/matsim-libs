@@ -20,9 +20,7 @@
  * activity, usually comes from {@linkplain org.matsim.core.events MATSim-Events}.
  * {@link org.matsim.core.scoring.EventsToScore} feeds the information from the
  * simulation to the agents' ScoringFunction-instance, which then calculates
- * the effective score. For the few cases where the expected (not the actual,
- * experienced) score of a plan should be calculated,
- * {@link playground.mfeil.PlanScorer} may be of help.
+ * the effective score.
  *
  * <h3>Typical Usage</h3>
  * If you are using the MATSim-{@linkplain org.matsim.core.controler.Controler} but

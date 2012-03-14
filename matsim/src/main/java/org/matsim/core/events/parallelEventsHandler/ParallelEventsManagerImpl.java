@@ -53,7 +53,7 @@ import org.matsim.core.events.handler.EventHandler;
  * (not really needed, but can make performance slightly faster in larger
  * simulations).
  *
- * @see http://www.matsim.org/node/238
+ * @see <a href="http://www.matsim.org/node/238">http://www.matsim.org/node/238</a>
  * @author rashid_waraich
  *
  */

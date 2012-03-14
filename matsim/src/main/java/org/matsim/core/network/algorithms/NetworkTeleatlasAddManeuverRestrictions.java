@@ -45,7 +45,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 /**
- * Adds maneuver restrictions to a MATSim {@link NetworkLayer network} created
+ * Adds maneuver restrictions to a MATSim {@link Network network} created
  * by {@link NetworkReaderTeleatlas}. The input maneuver shape file and the maneuver path DBF file
  * is based on <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
  * document version Final v1.0, June 2007</strong>.
