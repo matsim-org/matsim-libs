@@ -23,7 +23,7 @@
 				minOccurs="1" maxOccurs="1"/>
 			<xs:element name="matsim4urbansimContoler" type="matsim4urbansimContolerType" 
 				minOccurs="1" maxOccurs="1"/>
-			<xs:element name="matsim4urbansimContoler" type="accessibilityParameterType" 
+			<xs:element name="accessibilityParameter" type="accessibilityParameterType" 
 				minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
