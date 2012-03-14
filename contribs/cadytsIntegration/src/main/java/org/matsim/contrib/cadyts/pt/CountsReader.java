@@ -1,0 +1,140 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.contrib.cadyts.pt;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+
+/** parses a output text file containing counts comparisons */
+public class CountsReader {
+
+	final String SEPARATOR = "\\t";
+	final String NULL_STRING = "";
+	final String STOP_ID_STRING_0 = "StopId :";
+	final String HEAD_STRING_0 = "hour";
+	final String ZERO = "0.0";
+
+	String countsTextFile;
+	Map<Id, Map<String, double[]>> count = new TreeMap<Id, Map<String, double[]>>(); // TODO : make Map <Id, Map<double[24][2]>>
+
+	public CountsReader(final String countsTextFile) {
+		this.countsTextFile = countsTextFile;
+		readValues();
+	}
+
+	private void readValues() {
+		try {
+			FileReader fileReader = new FileReader(this.countsTextFile);
+			// ->:correct this : reads first row
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			String row = bufferedReader.readLine(); // TODO : include the first row inside the iteration
+			String[] values = row.split(this.SEPARATOR);
+			Id id = new IdImpl(values[1]);
+			while (row != null) {
+				row = bufferedReader.readLine();
+				if (row != null && row != this.NULL_STRING) {
+					values = row.split(this.SEPARATOR);
+					if (values[0].equals(this.STOP_ID_STRING_0)) {
+						id = new IdImpl(values[1]);
+					} else if (values[0].equals(this.HEAD_STRING_0)) {
+						// it does nothing, correct this condition
+					} else {
+						if (!this.count.containsKey(id)) {
+							this.count.put(id, new TreeMap<String, double[]>());
+						}
+						this.count.get(id).put(values[0], new double[] { Double.parseDouble(values[1]), Double.parseDouble(values[2]), Double.parseDouble(values[3]) });
+					}
+				}
+			}
+			bufferedReader.close();
+			fileReader.close();
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	public double[] getSimulatedValues(final Id stopId) {
+		return this.getCountValues(stopId, 0);
+	}
+
+	public double[] getSimulatedScaled(final Id stopId) {
+		return this.getCountValues(stopId, 1);
+	}
+
+	public double[] getRealValues(final Id stopId) {
+		return this.getCountValues(stopId, 2);
+	}
+
+	private double[] getCountValues(final Id stopId, final int col) {
+		double[] valueArray = new double[24];
+		for (byte i = 0; i < 24; i++) {
+			String hour = String.valueOf(i + 1);
+			if (this.count.keySet().contains(stopId)) {
+				double[] value = this.count.get(stopId).get(hour);
+				if (value == null) {
+					valueArray[i] = 0.0;
+				} else {
+					valueArray[i] = value[col]; // 0 = simulated; 1= simulatedEscaled ; 2=realValues
+				}
+			} else {
+				valueArray = null;
+			}
+		}
+		return valueArray;
+	}
+
+	/**
+	 * @return returns a id set of stops listed in the text file
+	 */
+	public Set<Id> getStopsIds() {
+		return this.count.keySet();
+	}
+
+	public static void main(final String[] args) {
+		String countComparisonFile;
+		if (args.length == 1) {
+			countComparisonFile = args[0];
+		} else {
+			countComparisonFile = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.simBseCountCompareOccupancy.txt";
+		}
+
+		CountsReader countReader = new CountsReader(countComparisonFile);
+
+		String tab = "\t";
+		for (Id id : countReader.getStopsIds()) {
+			System.out.println(id);
+			for (int h = 0; h < 24; h++) {
+				double sim = countReader.getSimulatedValues(id)[h];
+				double simEscaled = countReader.getSimulatedScaled(id)[h];
+				double real = countReader.getRealValues(id)[h];
+				System.out.println((h + 1) + tab + sim + tab + simEscaled + tab + real);
+			}
+		}
+
+	}
+
+}
