@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mzilske.pipeline;
 
 import org.matsim.api.core.v01.Scenario;
@@ -27,7 +46,7 @@ public class AStarLandmarksTask implements ScenarioSinkSourceLeastCostPathCalcul
 
 	@Override
 	public void initialize(Scenario scenario) {
-		factory.processNetwork(scenario.getNetwork(), travelMinCost);
+		factory.processNetwork(scenario.getNetwork(), travelMinCost, scenario.getConfig().global().getNumberOfThreads());
 		sink.initialize(scenario);
 	}
 
@@ -36,6 +55,7 @@ public class AStarLandmarksTask implements ScenarioSinkSourceLeastCostPathCalcul
 		sink.process(scenario);
 	}
 
+	@Override
 	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
 		return factory;
 	}

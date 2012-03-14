@@ -604,7 +604,7 @@ public class Controler {
 				this.leastCostPathCalculatorFactory = new DijkstraFactory();
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
 				this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(
-						this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
+						this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()), this.config.global().getNumberOfThreads());
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastDijkstra)) {
 				this.leastCostPathCalculatorFactory = new FastDijkstraFactory();
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastAStarLandmarks)) {

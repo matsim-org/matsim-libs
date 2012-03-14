@@ -40,7 +40,7 @@ public class ReRouteLandmarks extends ReRouteDijkstra {
 	public ReRouteLandmarks(Config config, Network network, PersonalizableTravelCost costCalculator,
 			PersonalizableTravelTime timeCalculator, TravelMinCost minCostCalculator, final ModeRouteFactory routeFactory) {
 		super(config, network, costCalculator, timeCalculator, routeFactory);
-		this.factory = new AStarLandmarksFactory(network, minCostCalculator);
+		this.factory = new AStarLandmarksFactory(network, minCostCalculator, config.global().getNumberOfThreads());
 		this.routeFactory = routeFactory;
 		this.configGroup = config.plansCalcRoute();
 	}
