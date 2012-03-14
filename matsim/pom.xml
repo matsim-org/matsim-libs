@@ -13,7 +13,7 @@
 	<licenses>
 		<license>
 			<name>GNU General Public License</name>
-			<url>{BASEDIR}/COPYING</url>
+			<url>${basedir}/COPYING</url>
 			<comments>See also the LICENSE file</comments>
 		</license>
 	</licenses>
@@ -184,7 +184,7 @@
 						</group>
 
 					</groups>
-					<stylesheetfile>{$basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+					<stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
 				</configuration>
 			</plugin>
 
