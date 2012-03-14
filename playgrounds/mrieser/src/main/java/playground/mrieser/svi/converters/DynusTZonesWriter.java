@@ -32,49 +32,49 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * @author mrieser / senozon
+ * @author mrieser
  */
 public class DynusTZonesWriter {
 
 	private final static Logger log = Logger.getLogger(DynusTZonesWriter.class);
-	
+
 	private final Zones zones;
 	private final String attrName;
-	
+
 	public DynusTZonesWriter(final Zones zones, final String zoneIdAttributeName) {
 		this.zones = zones;
 		this.attrName = zoneIdAttributeName;
 	}
-	
+
 	public void writeToDirectory(final String targetDir) {
-		
+
 		// write zone.dat
-		
+
 		final String filename = targetDir + "/zone.dat";
 		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 		try {
 			writer.write(" This file defines zone regions\r\n");
 			writer.write(" number of feature points, number of zones\r\n");
-			
+
 			int cntFeatures = 0;
 			int cntCoords = 0;
-			for (Feature f : zones.getAllZones()) {
+			for (Feature f : this.zones.getAllZones()) {
 				cntFeatures++;
 				Object g = f.getDefaultGeometry();
 				if (g instanceof Geometry) {
 					cntCoords += ((Geometry) g).getCoordinates().length;
 				}
 			}
-			
+
 			writer.write(Integer.toString(cntCoords));
 			writer.write(" ");
 			writer.write(Integer.toString(cntFeatures));
 			writer.write("\r\n");
-			
+
 			writer.write("node #, x-coordinate, y-coordinate\r\n");
 
 			int idx = 0;
-			for (Feature f : zones.getAllZones()) {
+			for (Feature f : this.zones.getAllZones()) {
 				Object g = f.getDefaultGeometry();
 				if (g instanceof Geometry) {
 					for (Coordinate c : ((Geometry) g).getCoordinates()) {
@@ -90,10 +90,10 @@ public class DynusTZonesWriter {
 			}
 
 			writer.write(" zone #, number of nodes, node #'s\r\n");
-			
+
 			int zoneIdx = 0;
 			idx = 0;
-			for (Feature f : zones.getAllZones()) {
+			for (Feature f : this.zones.getAllZones()) {
 				zoneIdx++;
 				Object g = f.getDefaultGeometry();
 				if (g instanceof Geometry) {
@@ -110,7 +110,7 @@ public class DynusTZonesWriter {
 					writer.write("\r\n");
 				}
 			}
-			
+
 		} catch (IOException e) {
 			log.error("Could not write file " + filename);
 		} finally {
@@ -120,15 +120,15 @@ public class DynusTZonesWriter {
 				log.error("Could not close file " + filename);
 			}
 		}
-		
+
 		// write zone_mapping.csv
-		
+
 		final String mappingFilename = targetDir + "/zone_mapping.csv";
 		BufferedWriter mappingWriter = IOUtils.getBufferedWriter(mappingFilename);
 		try {
 			mappingWriter.write("ZONENO,TAZ\r\n");
 			int zoneIdx = 0;
-			for (Feature f : zones.getAllZones()) {
+			for (Feature f : this.zones.getAllZones()) {
 				zoneIdx++;
 				mappingWriter.write(Integer.toString(zoneIdx));
 				mappingWriter.write(",");

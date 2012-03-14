@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data;
+package playground.mrieser.svi.controller2;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Simulation;
 
 /**
  * @author mrieser
  */
-public class ActivityToZoneMapping {
+public class DynusTMobsimFactory implements MobsimFactory {
 
-	private final Map<Id, String[]> actZonesPerAgent = new LinkedHashMap<Id, String[]>();
+	private final DynusTConfig dc;
 
-	public ActivityToZoneMapping() {
+	public DynusTMobsimFactory(final DynusTConfig dc) {
+		this.dc = dc;
 	}
 
-	public void addAgentActivityZones(final Id agentId, final String[] zones) {
-		this.actZonesPerAgent.put(agentId, zones.clone());
+	@Override
+	public Simulation createMobsim(final Scenario sc, final EventsManager eventsManager) {
+		return new DynusTMobsim(this.dc, sc, eventsManager);
 	}
 
-	public String[] getAgentActivityZones(final Id agentId) {
-		return this.actZonesPerAgent.get(agentId);
-	}
-
-	/*package*/ Set<Id> getAgentIds() {
-		return this.actZonesPerAgent.keySet();
-	}
 }

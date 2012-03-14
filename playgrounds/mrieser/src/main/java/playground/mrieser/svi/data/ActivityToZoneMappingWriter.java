@@ -31,7 +31,7 @@ public class ActivityToZoneMappingWriter {
 
 	private final static Logger log = Logger.getLogger(ActivityToZoneMappingWriter.class);
 	private final ActivityToZoneMapping mapping;
-	
+
 	public ActivityToZoneMappingWriter(final ActivityToZoneMapping mapping) {
 		this.mapping = mapping;
 	}
@@ -43,7 +43,11 @@ public class ActivityToZoneMappingWriter {
 				writer.write(agentId.toString());
 				for (String zoneId : this.mapping.getAgentActivityZones(agentId)) {
 					writer.write(" ");
-					writer.write(zoneId);
+					if (zoneId == null) {
+						writer.write("null");
+					} else {
+						writer.write(zoneId);
+					}
 				}
 				writer.write("\r\n");
 			}

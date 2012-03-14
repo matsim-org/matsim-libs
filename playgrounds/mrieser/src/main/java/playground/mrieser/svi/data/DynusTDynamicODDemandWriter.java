@@ -36,10 +36,15 @@ public class DynusTDynamicODDemandWriter {
 
 	private final ZoneIdToIndexMapping zoneMapping;
 	private final DynamicODMatrix demand;
+	private double multiplyFactor = 1.0;
 
 	public DynusTDynamicODDemandWriter(final DynamicODMatrix demand, final ZoneIdToIndexMapping zoneMapping) {
 		this.demand = demand;
 		this.zoneMapping = zoneMapping;
+	}
+
+	public void setMultiplyFactor(final double multiplyFactory) {
+		this.multiplyFactor = multiplyFactory;
 	}
 
 	public void writeTo(final String filename) {
@@ -50,12 +55,11 @@ public class DynusTDynamicODDemandWriter {
 		int timeBinSize = this.demand.getBinSize();
 		int nOfZones = this.zoneMapping.getNumberOfZones();
 		String[] zoneIds = this.zoneMapping.getIndexToIdMapping();
-		double overallMultiplicationFactor = 1.0;
 
 		try {
 			writer.write(Integer.toString(nOfTimeBins));
 			writer.write(" ");
-			writer.write(Double.toString(overallMultiplicationFactor));
+			writer.write("1.0000");//Double.toString(this.multiplyFactor));
 			writer.write("\r\n");
 			double time = 0.0;
 			for (int i = 0; i < nOfTimeBins; i++) {
@@ -87,8 +91,7 @@ public class DynusTDynamicODDemandWriter {
 						if (value == null) {
 							writer.write("    0.0000");
 						} else {
-							formatter.format("%10.4f", value.floatValue());
-							writer.write(value.toString());
+							formatter.format("%10.4f", this.multiplyFactor * value.floatValue());
 						}
 						cnt++;
 						if (cnt == 6 || toZoneIndex == (nOfZones)) {

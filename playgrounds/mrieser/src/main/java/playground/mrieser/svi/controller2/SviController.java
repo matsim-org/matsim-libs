@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data;
+package playground.mrieser.svi.controller2;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.Controler;
 
 /**
  * @author mrieser
  */
-public class ActivityToZoneMapping {
+public class SviController {
 
-	private final Map<Id, String[]> actZonesPerAgent = new LinkedHashMap<Id, String[]>();
+	public static void main(final String[] args) {
 
-	public ActivityToZoneMapping() {
-	}
+//		args = new String[] {"src/main/java/playground/mrieser/svi/configZH.xml"};
 
-	public void addAgentActivityZones(final Id agentId, final String[] zones) {
-		this.actZonesPerAgent.put(agentId, zones.clone());
-	}
+		Controler controler = new Controler(args);
 
-	public String[] getAgentActivityZones(final Id agentId) {
-		return this.actZonesPerAgent.get(agentId);
-	}
+		// only for demo
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		// ------------
 
-	/*package*/ Set<Id> getAgentIds() {
-		return this.actZonesPerAgent.keySet();
+		DynusTUtils.integrate(controler);
+		controler.run();
 	}
 }

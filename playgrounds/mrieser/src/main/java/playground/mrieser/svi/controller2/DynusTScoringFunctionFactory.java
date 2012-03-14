@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data;
+package playground.mrieser.svi.controller2;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
  * @author mrieser
  */
-public class ActivityToZoneMapping {
+public class DynusTScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final Map<Id, String[]> actZonesPerAgent = new LinkedHashMap<Id, String[]>();
-
-	public ActivityToZoneMapping() {
+	@Override
+	public ScoringFunction createNewScoringFunction(final Plan plan) {
+		return new DynusTScoringFunction();
 	}
 
-	public void addAgentActivityZones(final Id agentId, final String[] zones) {
-		this.actZonesPerAgent.put(agentId, zones.clone());
-	}
-
-	public String[] getAgentActivityZones(final Id agentId) {
-		return this.actZonesPerAgent.get(agentId);
-	}
-
-	/*package*/ Set<Id> getAgentIds() {
-		return this.actZonesPerAgent.keySet();
-	}
 }

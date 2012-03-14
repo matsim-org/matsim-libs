@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,47 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data;
+package playground.mrieser.svi.controller2;
 
-import java.util.ArrayList;
-
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * @author mrieser
  */
-public class CalculateActivityToZoneMapping {
+public class DynusTScoringFunction implements ScoringFunction {
 
-	private final ActivityToZoneMapping mapping;
-	private final Zones zones;
-
-	public CalculateActivityToZoneMapping(final ActivityToZoneMapping mapping, final Zones zones) {
-		this.mapping = mapping;
-		this.zones = zones;
+	@Override
+	public void handleActivity(final Activity activity) {
 	}
 
-	public void run(final Population population) {
-		for (Person person : population.getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			ArrayList<String> zoneIds = new ArrayList<String>();
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity act = (Activity) pe;
-					Feature zone = this.zones.getContainingZone(act.getCoord().getX(), act.getCoord().getY());
-					if (zone != null) {
-						zoneIds.add(zone.getAttribute("id").toString());
-					} else {
-						zoneIds.add(null);
-					}
-				}
-			}
-			String[] tmp = zoneIds.toArray(new String[zoneIds.size()]);
-			this.mapping.addAgentActivityZones(person.getId(), tmp);
-		}
+	@Override
+	public void handleLeg(final Leg leg) {
 	}
+
+	@Override
+	public void agentStuck(final double time) {
+		// TODO
+	}
+
+	@Override
+	public void addMoney(final double amount) {
+		// TODO
+	}
+
+	@Override
+	public void finish() {
+
+	}
+
+	@Override
+	public double getScore() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void reset() {
+		// TODO
+	}
+
+
 }
