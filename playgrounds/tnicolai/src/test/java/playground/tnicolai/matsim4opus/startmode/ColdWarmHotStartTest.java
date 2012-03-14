@@ -37,7 +37,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
 import playground.tnicolai.matsim4opus.matsimTestData.MATSimRunMode;
-import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConnector;
+import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConverter;
 import playground.tnicolai.matsim4opus.utils.JAXBUnmaschal;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel.PopulationCounter;
@@ -139,7 +139,7 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 		// 1 Step: assign information to jaxb binding classes 
 		JAXBUnmaschal jaxbU = new JAXBUnmaschal(matsimConfigPath);
 		// 2 Step: import/extract into MATSim scenario 
-		MATSim4UrbanSimConfigurationConnector ims = new MATSim4UrbanSimConfigurationConnector(scenario, jaxbU.unmaschalMATSimConfig());
+		MATSim4UrbanSimConfigurationConverter ims = new MATSim4UrbanSimConfigurationConverter(scenario, jaxbU.unmaschalMATSimConfig());
 		ims.init();
 
 		// 3 Step: init/loading scenario

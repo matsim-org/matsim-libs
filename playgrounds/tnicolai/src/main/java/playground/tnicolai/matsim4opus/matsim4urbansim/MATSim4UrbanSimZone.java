@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConnector;
+import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConverter;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
@@ -51,7 +51,7 @@ import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
  * improvements jan'12:
  * 
  * - This class is a revised version of "MATSim4UrbanSim".
- * - Increased Configurability: 
+ * - Increased configurability: 
  * 	First approach to increase the configurability of MATSim4UrbanSim modules such as
  * 	the zonz2zone impedance matrix, zone based- and grid based accessibility computation. Modules can be en-disabled
  * 	additional modules can be added by other classes extending MATSim4UrbanSimV2.
@@ -104,7 +104,7 @@ public class MATSim4UrbanSimZone {
 		// get default scenario
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// init scenario
-		if( !(new MATSim4UrbanSimConfigurationConnector(scenario, matsimConfiFile)).init() ){
+		if( !(new MATSim4UrbanSimConfigurationConverter(scenario, matsimConfiFile)).init() ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
 		}		

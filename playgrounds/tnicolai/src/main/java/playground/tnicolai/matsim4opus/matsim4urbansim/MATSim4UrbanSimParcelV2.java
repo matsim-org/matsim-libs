@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConnectorV2;
+import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConverterV2;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
@@ -87,7 +87,7 @@ public class MATSim4UrbanSimParcelV2 {
 	// needed for controler listeners
 	ClusterObject[] aggregatedWorkplaces = null;
 	
-	MATSim4UrbanSimConfigurationConnectorV2 connector = null;
+	MATSim4UrbanSimConfigurationConverterV2 connector = null;
 	
 	/**
 	 * constructor
@@ -102,7 +102,7 @@ public class MATSim4UrbanSimParcelV2 {
 		// checks if args parameter contains a valid path
 		Paths.isValidPath(matsimConfiFile);
 		
-		if( !(connector = new MATSim4UrbanSimConfigurationConnectorV2( matsimConfiFile )).init() ){
+		if( !(connector = new MATSim4UrbanSimConfigurationConverterV2( matsimConfiFile )).init() ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
 		}
@@ -151,14 +151,6 @@ public class MATSim4UrbanSimParcelV2 {
 
 		// running mobsim and assigned controller listener
 		runControler(zones, parcels);
-		
-		// tnicolai: test
-//		Iterator<? extends Person> persons = scenario.getPopulation().getPersons().values().iterator();
-//		while(persons.hasNext()){
-//			Person p = persons.next();
-//			
-//			p.getPlans().
-//		}
 	}
 	
 	void isTestTun(){
@@ -262,7 +254,7 @@ public class MATSim4UrbanSimParcelV2 {
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler) {
 		
-		// tnicolai: make this configurable 
+		// tnicolai: get parameter from MATSim4UrbanSimConfigurationConnector
 		boolean computeZone2ZoneImpedance = true;
 		boolean computeZoneBasedAccessibilities = true;
 		boolean dumpPopulationData = true;
