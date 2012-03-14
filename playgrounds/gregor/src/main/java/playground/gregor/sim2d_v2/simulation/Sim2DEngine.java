@@ -35,7 +35,6 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.PedestrianSignal;
-import playground.gregor.sim2d_v2.events.TickEvent;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 
@@ -90,7 +89,7 @@ public class Sim2DEngine implements MobsimEngine {
 		double sim2DTime = time;
 		while (sim2DTime < time + this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize()) {
 			handleDepartures(sim2DTime);
-			this.sim.getEventsManager().processEvent(new TickEvent(sim2DTime));
+//			this.sim.getEventsManager().processEvent(new TickEvent(sim2DTime));
 			this.floor.move(sim2DTime);
 
 //			this.floor.drawGeometries(sim2DTime);

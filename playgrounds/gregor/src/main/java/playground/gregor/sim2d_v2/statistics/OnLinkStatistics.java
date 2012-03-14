@@ -7,17 +7,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-import playground.gregor.sim2d_v2.events.TickEvent;
-import playground.gregor.sim2d_v2.events.TickEventHandler;
 
 
-
-public class OnLinkStatistics implements LinkEnterEventHandler, LinkLeaveEventHandler, TickEventHandler{
+public class OnLinkStatistics implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 
 	private final Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
@@ -31,8 +29,7 @@ public class OnLinkStatistics implements LinkEnterEventHandler, LinkLeaveEventHa
 		}
 	}
 
-	@Override //TODO should be before or after sim step listener
-	public void handleEvent(TickEvent event) {
+	public void handleEventH(Event event) {
 		int t = (int)(0.5+event.getTime());
 		if (t > this.time) {
 			for (LinkInfo li : this.linkInfos.values()) {
@@ -49,6 +46,7 @@ public class OnLinkStatistics implements LinkEnterEventHandler, LinkLeaveEventHa
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		handleEventH(event);
 		LinkInfo li = this.linkInfos.get(event.getLinkId());
 		if (li != null) {
 			if (!li.agents.containsKey(event.getPersonId())) {
@@ -74,7 +72,7 @@ public class OnLinkStatistics implements LinkEnterEventHandler, LinkLeaveEventHa
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-
+		handleEventH(event);
 		LinkInfo li = this.linkInfos.get(event.getLinkId());
 		if (li != null) {
 			int time = (int)(0.5+event.getTime());

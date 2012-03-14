@@ -54,19 +54,19 @@ public class ScenarioGenerator {
 
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(300);
-//				qsim.setTimeStepSize(1./25.);
+				qsim.setTimeStepSize(1./25.);
 		c.addModule("qsim", qsim);
 
 		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
 		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 
-		s2d.setEnableCircularAgentInterActionModule("true");
+		s2d.setEnableCircularAgentInterActionModule("false");
 		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
 		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
-		s2d.setEnableDrivingForceModule("true");
-		s2d.setEnableEnvironmentForceModule("true");
-		s2d.setEnablePathForceModule("true");
-		s2d.setEnableVelocityObstacleModule("false");
+		s2d.setEnableDrivingForceModule("false");
+		s2d.setEnableEnvironmentForceModule("false");
+		s2d.setEnablePathForceModule("false");
+		s2d.setEnableVelocityObstacleModule("true");
 		s2d.setEnablePhysicalEnvironmentForceModule("false");
 
 

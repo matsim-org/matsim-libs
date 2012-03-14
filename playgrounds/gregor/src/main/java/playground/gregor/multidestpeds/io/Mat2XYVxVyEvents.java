@@ -167,6 +167,7 @@ public class Mat2XYVxVyEvents {
 	}
 
 	private  boolean checkForNextLink(Ped ped, Coordinate c) {
+		
 		Id currLinkId = ped.path.links.get(ped.currLink).getId();
 		LineString finishLine = this.finishLines.get(currLinkId);
 		LineString trajectory = this.geofac.createLineString(new Coordinate[] { ped.lastPos, c });

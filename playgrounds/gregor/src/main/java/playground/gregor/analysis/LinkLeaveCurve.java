@@ -52,12 +52,12 @@ public class LinkLeaveCurve implements LinkLeaveEventHandler {
 	
 	public static void main(String [] args) {
 		String events = "/Users/laemmel/devel/gr90/output/ITERS/it.0/0.events.xml.gz";
-//		String events = "/Users/laemmel/devel/gr90/input/events_walk2d.xml.gz";
+//		String events = "/Users/laemmel/devel/gr90/input/events.xml";
 		EventsManager mgr = EventsUtils.createEventsManager();
 		
 		BufferedWriter w = null;
 		try {
-			w = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/gr90/dbg/SVM")));
+			w = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/gr90/dbg/pq_walk2d")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

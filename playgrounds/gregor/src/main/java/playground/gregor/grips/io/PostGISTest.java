@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.postgis.*;
-import org.postgis.binary.BinaryParser;
 
 public class PostGISTest {
 
@@ -85,18 +83,18 @@ public class PostGISTest {
 					resultSetMetaData.getColumnLabel (2) + " " +
 					resultSetMetaData.getColumnLabel (3));
 
-			BinaryParser bp = new BinaryParser();
+//			BinaryParser bp = new BinaryParser();
 
 			while (resultSet.next ())
 			{
 				System.out.println (resultSet.getString (1) + " " + resultSet.getString (2) + " " + resultSet.getString (3) + resultSet.getString (4) + " " + resultSet.getString (5) + " " + resultSet.getString (6));
-				Geometry ggg = bp.parse(resultSet.getString(2));
-				if (ggg instanceof Point) {
-					Point p = (Point)ggg;
-					System.out.print("dim = " + p.getDimension() + " ");
-				}
-
-				System.out.println(ggg);
+//				Geometry ggg = bp.parse(resultSet.getString(2));
+//				if (ggg instanceof Point) {
+//					Point p = (Point)ggg;
+//					System.out.print("dim = " + p.getDimension() + " ");
+//				}
+//
+//				System.out.println(ggg);
 			}
 
 			resultSet.close ();

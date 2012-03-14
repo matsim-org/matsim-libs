@@ -193,7 +193,12 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 			float fromY = (float) ((l.getFromNode().getCoord().getY()-this.ofY) * this.scale);
 			float toX = (float) ((l.getToNode().getCoord().getX()-this.ofX)  * this.scale);
 			float toY = (float) ((l.getToNode().getCoord().getY()-this.ofY) * this.scale);
-			this.pc.drawLink(Integer.parseInt(l.getId().toString()), 0, 0, fromX, fromY, toX, toY);
+			try {
+				this.pc.drawLink(Integer.parseInt(l.getId().toString()), 0, 0, fromX, fromY, toX, toY);
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+			}
 
 		}
 	}
@@ -418,7 +423,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.10/10.events.xml.gz", true, 1);
 		//				PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/counter/output/ITERS/it.0/0.events.xml.gz", true, 1.);
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/output/ITERS/it.0/0.events.xml.gz", true, 1.);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/pt_evac_demo/ma_input/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 //		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/input/events.xml", true, 1);
 		vis.play(true);
 	}

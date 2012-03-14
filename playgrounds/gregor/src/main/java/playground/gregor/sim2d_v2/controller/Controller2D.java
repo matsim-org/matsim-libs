@@ -72,8 +72,11 @@ public class Controller2D extends Controler {
 	public PlanAlgorithm createRoutingAlgorithm(
 			PersonalizableTravelCost travelCosts,
 			PersonalizableTravelTime travelTimes) {
-		PlansCalcRoute a = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory());
-		a.addLegHandler("walk2d", new NetworkLegRouter(this.network, a.getLeastCostPathCalculator(), a.getRouteFactory()));
+		
+//		PlansCalcRoute a = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory());
+		PlansCalcRoute a = (PlansCalcRoute) super.createRoutingAlgorithm(travelCosts, travelTimes);
+		a.addLegHandler("walk2d", new NetworkLegRouter(this.network, a.getLeastCostPathCalculator(), a.getRouteFactory())); //PT nochmal drumherum wrappen 
+		
 		return a;
 	}
 
