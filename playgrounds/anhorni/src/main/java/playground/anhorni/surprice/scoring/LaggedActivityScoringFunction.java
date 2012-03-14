@@ -28,5 +28,6 @@ public class LaggedActivityScoringFunction extends CharyparNagelOpenTimesScoring
 		
 	public LaggedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, ActivityFacilities facilities) {
 		super(plan, params, facilities);
+		super.reset();
 	}
 }
