@@ -23,6 +23,8 @@
 				minOccurs="1" maxOccurs="1"/>
 			<xs:element name="matsim4urbansimContoler" type="matsim4urbansimContolerType" 
 				minOccurs="1" maxOccurs="1"/>
+			<xs:element name="matsim4urbansimContoler" type="accessibilityParameterType" 
+				minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -77,7 +79,6 @@
 			<xs:element name="workActivityTypicalDuration" type="xs:nonNegativeInteger"/>
 			<xs:element name="workActivityOpeningTime" type="xs:nonNegativeInteger"/>
 			<xs:element name="workActivityLatestStartTime" type="xs:nonNegativeInteger"/>
-			<xs:element name="betaBrain" type="xs:double"/>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -112,6 +113,7 @@
 	<xs:complexType name="matsim4urbansimContolerType">
 		<xs:sequence>
 			<xs:element name="zone2zoneImpedance" type="xs:boolean"/>
+			<xs:element name="agentPerformance" type="xs:boolean"/>
 			<xs:element name="zoneBasedAccessibility" type="xs:boolean"/>
 			<xs:element name="cellBasedAccessibility" type="xs:boolean"/>
 			<xs:element name="cellSizeCellBasedAccessibility" type="xs:nonNegativeInteger"/>
@@ -121,7 +123,35 @@
 			<xs:element name="boundingBoxLeft" type="xs:double"/>
 			<xs:element name="boundingBoxRight" type="xs:double"/>
 			<xs:element name="boundingBoxBottom" type="xs:double"/>
-			<xs:element name="agentPerformance" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- accessibilityParameter element definition -->
+	<xs:complexType name="accessibilityParameterType">
+		<xs:sequence>
+			<xs:element name="useLogitScaleParameterFromMATSim" type="xs:boolean"/>
+			<xs:element name="useCarParameterFromMATSim" type="xs:boolean"/>
+			<xs:element name="useWalkParameterFromMATSim" type="xs:boolean"/>
+			<xs:element name="useRawSumsWithoutLn" type="xs:boolean"/>
+			<xs:element name="logitScaleParameter" type="xs:double"/>
+			<xs:element name="betaCarTravelTime" type="xs:double"/>
+			<xs:element name="betaCarTravelTimePower2" type="xs:double"/>
+			<xs:element name="betaCarLnTravelTime" type="xs:double"/>
+			<xs:element name="betaCarTravelDistance" type="xs:double"/>
+			<xs:element name="betaCarTravelDistancePower2" type="xs:double"/>
+			<xs:element name="betaCarLnTravelDistance" type="xs:double"/>
+			<xs:element name="betaCarTravelCost" type="xs:double"/>
+			<xs:element name="betaCarTravelCostPower2" type="xs:double"/>
+			<xs:element name="betaCarLnTravelCost" type="xs:double"/>
+			<xs:element name="betaWalkTravelTime" type="xs:double"/>
+			<xs:element name="betaWalkTravelTimePower2" type="xs:double"/>
+			<xs:element name="betaWalkLnTravelTime" type="xs:double"/>
+			<xs:element name="betaWalkTravelDistance" type="xs:double"/>
+			<xs:element name="betaWalkTravelDistancePower2" type="xs:double"/>
+			<xs:element name="betaWalkLnTravelDistance" type="xs:double"/>
+			<xs:element name="betaWalkTravelCost" type="xs:double"/>
+			<xs:element name="betaWalkTravelCostPower2" type="xs:double"/>
+			<xs:element name="betaWalkLnTravelCost" type="xs:double"/>
 		</xs:sequence>
 	</xs:complexType>
 	
