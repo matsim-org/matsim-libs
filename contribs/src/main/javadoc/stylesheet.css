@@ -4,7 +4,7 @@
 
 /* Page background color */
 body { 
-	background-image:url(http://www.matsim.org/themes/matsim/images/body.png);
+	background-image:url(http://www.matsim.org/sites/all/themes/matsim/images/body.png);
 	background-repeat: repeat-x;
 	background-color: #FFFFFF;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
