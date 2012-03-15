@@ -34,10 +34,12 @@ import org.matsim.core.events.handler.BasicEventHandler;
 public class EventsCollector implements BasicEventHandler {
 	private final List<Event> events = new ArrayList<Event>(50);
 
+	@Override
 	public void handleEvent(final Event event) {
 		this.events.add(event);
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.events.clear();
 	}

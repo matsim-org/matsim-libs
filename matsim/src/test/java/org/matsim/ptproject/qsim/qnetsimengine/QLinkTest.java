@@ -19,12 +19,19 @@
 
 package org.matsim.ptproject.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,6 +52,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
@@ -348,7 +356,58 @@ public class QLinkTest extends MatsimTestCase {
 		f.qlink2.addFromIntersection(veh25); // used vehicle equivalents: 9.0
 		f.qlink2.addFromIntersection(veh1);  // used vehicle equivalents: 10.0
 		assertFalse(f.qlink2.hasSpace());
+	}
 
+	public void testStuckEvents() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().getQSimConfigGroup().setStuckTime(100);
+		scenario.getConfig().getQSimConfigGroup().setRemoveStuckVehicles(true);
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		network.setCapacityPeriod(3600.0);
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1001, 0));
+		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
+		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 7.5, 3600.0, 1.0);
+		Link link3 = network.createAndAddLink(new IdImpl("3"), node2, node2, 2 * 7.5, 7.5, 3600.0, 1.0);
+		
+		for (int i = 0; i < 5; i++) {
+			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = new PlanImpl();
+			Activity act = new ActivityImpl("h", link1.getId());
+			act.setEndTime(7*3600);
+			plan.addActivity(act);
+			Leg leg = new LegImpl("car");
+			NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
+			List<Id> links = new ArrayList<Id>();
+			links.add(link3.getId()); // let the person(s) drive around in circles to generate a traffic jam
+			links.add(link3.getId());
+			links.add(link3.getId());
+			links.add(link3.getId());
+			route.setLinkIds(link1.getId(), links, link2.getId());
+			leg.setRoute(route);
+			plan.addLeg(leg);
+			plan.addActivity(new ActivityImpl("w", link2.getId()));
+			p.addPlan(plan);
+			scenario.getPopulation().addPerson(p);
+		}
+
+		QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager(), new DefaultQSimEngineFactory());
+		
+		EventsCollector collector = new EventsCollector();
+		sim.getEventsManager().addHandler(collector);
+		
+		sim.run();
+
+		int stuckCnt = 0;
+		for (Event e : collector.getEvents()) {
+			if (e instanceof AgentStuckEvent) {
+				stuckCnt++;
+			}
+		}
+
+		assertEquals(3, stuckCnt);
 	}
 
 	/**
@@ -369,6 +428,8 @@ public class QLinkTest extends MatsimTestCase {
 		/*package*/ Fixture() {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+			this.scenario.getConfig().getQSimConfigGroup().setStuckTime(100);
+			this.scenario.getConfig().getQSimConfigGroup().setRemoveStuckVehicles(true);
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
