@@ -32,6 +32,9 @@ public interface Household {
 	
 	public List<Id> getMemberIds();
 	
+	/**
+	 * This returns an Income, not a number.  The Income type contains a method `getIncomePeriod()'. 
+	 */
 	public Income getIncome();
 	
 	public List<Id> getVehicleIds();
