@@ -260,6 +260,11 @@ public class JointPlan implements Plan {
 				examineNextActivity(id, individualValues, accessedLegs);
 			}
 		}
+
+		for (List<PlanElement> pes : getIndividualPlanElements().values()) {
+			((Activity) pes.get( 0 )).setStartTime( Time.UNDEFINED_TIME );
+			((Activity) pes.get( pes.size() - 1 )).setEndTime( Time.UNDEFINED_TIME );
+		}
 	}
 
 	private Map<Id, IndividualValuesWrapper> getIndividualValueWrappers() {
@@ -692,7 +697,7 @@ public class JointPlan implements Plan {
 			travelTime = leg.getTravelTime();
 			currentIndividualValues.now += (travelTime == Time.UNDEFINED_TIME ?
 					0d : travelTime);
-			leg.setArrivalTime(currentIndividualValues.now);
+			// leg.setArrivalTime(currentIndividualValues.now);
 			// ensures that passenger legs with new times will be copied again.
 			leg.routeToCopy();
 
