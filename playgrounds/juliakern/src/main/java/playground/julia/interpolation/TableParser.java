@@ -86,7 +86,8 @@ public class TableParser {
 			e.printStackTrace();
 		}
 	
-		//TODO an dieser Stelle interpolieren
+		//TODO an dieser Stelle evtl interpolieren
+		//mainarray=NeighbourInterpolation.getNeighbourMatrix(mainarray);
 		
 		//TODO ueberlegen, ob kopfzeile und kopfspalte im array stehen sollen
 		//kopfzeile und kopfspalte schreiben
