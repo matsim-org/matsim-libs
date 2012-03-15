@@ -147,10 +147,12 @@ public class VehicleTypeImpl implements VehicleType {
 		this.doorOperationMode = mode;
 	}
 
+	@Override
 	public double getPcuEquivalents() {
 		return pcuEquivalents;
 	}
 
+	@Override
 	public void setPcuEquivalents(double pcuEquivalents) {
 		this.pcuEquivalents = pcuEquivalents;
 	}

@@ -679,13 +679,25 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
 				);
 	}
+	
+	private double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
+//		return Math.min(1.0, veh.getSizeInEquivalents() ) ;
+		return veh.getSizeInEquivalents();
+	}
 
 	private void addToBuffer(final QVehicle veh, final double now) {
+		// We are trying to modify this so it also works for vehicles different from size one.  The idea is that vehicles
+		// _larger_ than size one can move as soon as at least one unit of flow or storage capacity is available.  
+		// kai/mz/amit, mar'12
+		
+		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
+		// kai/mz/amit, mar'12
+		
 		if (this.remainingflowCap >= 1.0) {
-			this.remainingflowCap--;
+			this.remainingflowCap -= this.effectiveVehicleFlowConsumptionInPCU(veh); 
 		}
 		else if (this.flowcap_accumulate >= 1.0) {
-			this.flowcap_accumulate--;
+			this.flowcap_accumulate -= this.effectiveVehicleFlowConsumptionInPCU(veh);
 		}
 		else {
 			throw new IllegalStateException("Buffer of link " + this.getLink().getId() + " has no space left!");
