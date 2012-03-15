@@ -43,6 +43,10 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	private double waitCachedTravelTime = Double.NaN;
 	private Link waitPreviousLink = null;
 	
+	//for cached offset vechicle departure
+	double cachedOffsetTime= Double.NaN;
+	private Link prevOffsetLink = null;
+	
 	private static final Logger log = Logger.getLogger(AdaptedTransitRouterNetworkTravelTimeCost.class);
 
 	private MyTransitRouterConfig myConfig;	
@@ -60,6 +64,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 			double transfertime = getLinkTravelTime(link, time);
 			double waittime = this.config.additionalTransferTime;
 			double walktime = transfertime - waittime; // say that the effective walk time is the transfer time minus some "buffer"
+			
 			cost = 	-walktime * this.myConfig.getMarginalUtilityOfTravelTimeWalk_utl_s()
 		       		-waittime * this.myConfig.getMarginalUtiltityOfWaiting_utl_s()
 		       		- this.myConfig.getUtilityOfLineSwitch_utl();
@@ -69,13 +74,21 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 			//original
 			//cost = -getLinkTravelTime(link, time) * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
 			//- link.getLength() * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+
+			double waitingTime = -getWaitingTimeAtStop(link, time);  //we don't know yet if the agent is waiting inside or outside a pt veh
+			double linkTravelTime = getLinkTravelTime(link, time);  //real veh travel time from (fromStop) departure until (toStop) arrival
 			
-			log.info("waitTime: " + -getWaitingTimeAtStop(link, time) + " utility of wait:" + this.config.getMarginalUtiltityOfWaiting_utl_s());
+			//in case the agent is already inside the pt vehicle, the waiting time is added to the link travel time
+			double vehDepartureOffset = getVehDepartureOffset(link); //time that veh stops at station
+			if (vehDepartureOffset == waitingTime ){  				 //are waiting times of agent and pt-veh the same? it means the agent is inside the veh
+				linkTravelTime = linkTravelTime + vehDepartureOffset; //the waiting time is here part of link travel time
+				waitingTime=0;   
+			}
 			
-			//new version with separated effectiveWaitingtime as new parameter 
-			cost = -getLinkTravelTime(link, time)    * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
-			       -getWaitingTimeAtStop(link, time) * this.config.getMarginalUtiltityOfWaiting_utl_s()  //create setters/getters in myConfig
-			       -link.getLength()                 * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+			//new version with separated effectiveWaitingTime as new parameter 
+			cost = -linkTravelTime    	* this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
+			       -waitingTime			* this.myConfig.getMarginalUtiltityOfWaiting_utl_s()  //create setters/getters in myConfig
+			       -link.getLength()    * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
 			
 		}
 		return cost;
@@ -116,23 +129,49 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		return time2;
 	}
 	
-	private double getWaitingTimeAtStop(final Link link, final double time){
+	/**this is the time that the pt vehicle stops at the station (at from node)*/
+	private double getVehDepartureOffset(Link link){
+		//return cached value
+		if (link == this.prevOffsetLink) {
+			return this.cachedOffsetTime;
+		}
+		
+		//calculate according to transit schedule
+		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;		
+		TransitRouteStop fromStop = wrapped.fromNode.stop;
+		double vehDepartureOffset = fromStop.getDepartureOffset() - fromStop.getArrivalOffset();
+
+		//caching
+		this.cachedOffsetTime = vehDepartureOffset;
+		this.prevOffsetLink = link;
+		
+		return vehDepartureOffset;
+	}
+	
+	double getWaitingTimeAtStop(final Link link, final double time){
+		//return cached value
 		if ((link == this.waitPreviousLink) && (time == this.waitPreviousTime)) {
 			return this.waitCachedTravelTime;
 		}
 		this.waitPreviousLink = link;
 		this.waitPreviousTime = time;
 		
-		double waitTimeAtStop=0;
+		//waiting time can't be calculated on a transfer link, throw an error
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
-		if (wrapped.getRoute() != null) { //this should not be necessary because getWaitingTimeAtStop is called with the condition "else" of (((TransitRouterNetworkLink) link).getRoute() == null)  
-			waitTimeAtStop= getNextDepartureTime(wrapped.getRoute(), wrapped.fromNode.stop , time)  -  time; 
-		} //else.. at transfer links waiting time = 0. Waiting time is stored in transit links, not in transfers
-		this.waitCachedTravelTime = waitTimeAtStop;
+		if (wrapped.getRoute() == null) {   
+			throw new NullPointerException("The waiting time must be calculated always on a transit link" );
+		} 
 		
+		//waiting time is the difference of (vehicle next departure) minus (now-time)
+		double waitTimeAtStop=0;		
+		waitTimeAtStop= getNextDepartureTime(wrapped.getRoute(), wrapped.fromNode.stop , time)  -  time;
+		
+		//cached value stored
+		this.waitCachedTravelTime = waitTimeAtStop;
 		return waitTimeAtStop;
 	}
 	
+	/*
 	//this class is not necessary now
 	private Double getPtVehicleDepartureTime(final Link link, final double time) {
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
@@ -149,5 +188,5 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		// no transit route, so we must be on a transfer link.
 		return null ;
 	}
-
+	*/
 }
