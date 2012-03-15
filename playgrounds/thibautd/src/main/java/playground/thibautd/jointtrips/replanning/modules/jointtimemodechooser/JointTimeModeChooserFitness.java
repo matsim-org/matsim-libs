@@ -1,0 +1,145 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * JointTimeModeChooserFitness.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.misc.Time;
+
+import playground.thibautd.jointtrips.population.JointLeg;
+import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
+import playground.thibautd.tsplanoptimizer.framework.Solution;
+
+/**
+ * @author thibautd
+ */
+public class JointTimeModeChooserFitness implements FitnessFunction {
+	private static final Logger log =
+		Logger.getLogger(JointTimeModeChooserFitness.class);
+
+	// print a lot of information.
+	// to use with one thread only.
+	private final static boolean DEBUG = false;
+	private final ScoringFunctionFactory factory;
+	private final double NEGATIVE_DURATION_PENALTY = 100;
+	private final double UNSYNCHRONIZED_PENALTY = 1E-5;
+
+	public JointTimeModeChooserFitness(
+			final ScoringFunctionFactory scoringFunctionFactory) {
+		this.factory = scoringFunctionFactory;
+	}
+
+	@Override
+	public double computeFitnessValue(final Solution solution) {
+		JointPlan plan = (JointPlan) solution.getRepresentedPlan();
+
+		if (DEBUG) log.debug( "start scoring" );
+
+		double accumulatedNegativeDuration = 0;
+		LinkedList<JointLeg> sharedLegs = new LinkedList<JointLeg>();
+
+		for (Plan individualPlan : plan.getIndividualPlans().values()) {
+			double score;
+			ScoringFunction scoringFunction = factory.createNewScoringFunction( individualPlan );
+
+			for (PlanElement pe : individualPlan.getPlanElements()) {
+				if (DEBUG) log.debug( "handle plan element "+pe );
+
+				if (pe instanceof Activity) {
+					scoringFunction.handleActivity( (Activity) pe );
+
+					double duration = ((Activity) pe).getEndTime() - ((Activity) pe).getStartTime();
+					if (duration != Time.UNDEFINED_TIME && duration < 0) {
+						// all matsim scoring functions do not take that into account
+						accumulatedNegativeDuration += duration;
+					}
+				}
+				else if (pe instanceof Leg) {
+					scoringFunction.handleLeg( (Leg) pe );
+
+					if (((JointLeg) pe).getJoint()) {
+						sharedLegs.add( (JointLeg) pe );
+					}
+				}
+				else {
+					throw new RuntimeException( "unknown PlanElement type "+pe.getClass() );
+				}
+			}
+
+			scoringFunction.finish();
+
+			score = scoringFunction.getScore();
+			if (DEBUG) {
+				log.debug( "individual score: "+score );
+			}
+
+			if (Double.isNaN( score )) {
+				throw new RuntimeException( "got a NaN score for plan "+plan );
+			}
+
+			individualPlan.setScore( score );
+		}
+
+		double accumulatedUnsynchronizedTime = 0;
+		while (sharedLegs.size() > 0) {
+			List<JointLeg> linkedLegs = new ArrayList<JointLeg>();
+			JointLeg leg = sharedLegs.removeFirst();
+			linkedLegs.addAll( leg.getLinkedElements().values() );
+
+			for (JointLeg linkedLeg : linkedLegs) {
+				sharedLegs.remove( linkedLeg );
+			}
+
+			linkedLegs.add( leg );
+
+			double minDepartureTime = Double.POSITIVE_INFINITY;
+			double maxDepartureTime = Double.NEGATIVE_INFINITY;
+
+			for (JointLeg currLeg : linkedLegs) {
+				minDepartureTime = Math.min( minDepartureTime , currLeg.getDepartureTime() );
+				maxDepartureTime = Math.max( maxDepartureTime , currLeg.getDepartureTime() );
+			}
+
+			accumulatedUnsynchronizedTime += maxDepartureTime - minDepartureTime;
+		}
+
+		if (DEBUG) {
+			log.debug( "scoring ended." );
+			log.debug( "score: "+plan.getScore() );
+			log.debug( "accumulated negative duration: "+accumulatedNegativeDuration );
+			log.debug( "accumulated unsynchronized duration: "+accumulatedUnsynchronizedTime );
+		}
+
+		return plan.getScore() +
+			(accumulatedNegativeDuration * NEGATIVE_DURATION_PENALTY) -
+			(accumulatedUnsynchronizedTime * UNSYNCHRONIZED_PENALTY);
+	}
+}
