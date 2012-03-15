@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.Math;
 
 public class TableParser {
 
@@ -17,9 +18,9 @@ public class TableParser {
 	public static void main(String[] args) throws IOException {
 		String inputfile = "interpolation/no2export.txt";
 		//static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
-		String outputfile = new String ("interpolation/outputWithoutMinus.txt");
-		int gridsizex = 135; //Zeilen was 135
-		int gridsizey = 135; //Spalten was 135
+		String outputfile = new String ("interpolation/out.txt");
+		int gridsizex = 120; //Zeilen was 100
+		int gridsizey = 160; //Spalten was 100
 		
 		//initiate variables to find min and max values on both axes
 		Double minx = new Double(Double.MAX_VALUE);
@@ -44,8 +45,8 @@ public class TableParser {
 				//TODO numberformatexception
 				try {
 					//TODO ordentlich trennen
-					Double potMinMaxX = Double.parseDouble(line.substring(6, 20)); 
-					Double potMinMaxY = Double.parseDouble(line.substring(21, 35));
+					Double potMinMaxY = Double.parseDouble(line.substring(6, 20)); 
+					Double potMinMaxX = Double.parseDouble(line.substring(21, 35));
 					if(potMinMaxX<minx)minx=potMinMaxX;
 					if(potMinMaxX>maxx)maxx=potMinMaxX;
 					if(potMinMaxY<miny)miny=potMinMaxY;
@@ -63,19 +64,19 @@ public class TableParser {
 			line=in2.readLine();
 			while((line=in2.readLine())!= null){
 				//Koordinaten rausfinden
-				Double xCoordinate = Double.parseDouble(line.substring(6, 20));
-				Double yCoordinate = Double.parseDouble(line.substring(21, 35));
+				Double yCoordinate = Double.parseDouble(line.substring(6, 20));
+				Double xCoordinate = Double.parseDouble(line.substring(21, 35));
 				//arrayindizes ermitteln
 				int arrayx= (int) (((xCoordinate-minx)/(maxx-minx))*gridsizex);
 				int arrayy= (int) (((yCoordinate-miny)/(maxy-miny))*gridsizey);
 				//wert im array eintragen
 				String substring = line.substring(55);
-				//TODO mit exponentialwerten umgehen
-				if (!(substring.contains("e-"))){
-					if(!(substring.contains("E"))){
-						mainarray[arrayx][arrayy]=Double.parseDouble(line.substring(54));
-						if(mainarray[arrayx][arrayy]<0)mainarray[arrayx][arrayy]=mainarray[arrayx][arrayy]*(-1);
-					}
+				//mit exponentialwerten umgehen
+				if ((substring.contains("e-")||substring.contains("E"))){
+					mainarray[arrayx][arrayy]=getDoubleFromEString(substring);
+				} else {
+					mainarray[arrayx][arrayy]=Double.parseDouble(line.substring(54));
+					if(mainarray[arrayx][arrayy]<0)mainarray[arrayx][arrayy]=mainarray[arrayx][arrayy]*(-1);
 				}
 			}
 			
@@ -85,34 +86,43 @@ public class TableParser {
 			e.printStackTrace();
 		}
 	
-		//TODO an dieser Stelle ggf interpolieren
+		//TODO an dieser Stelle interpolieren
 		
+		//TODO ueberlegen, ob kopfzeile und kopfspalte im array stehen sollen
 		//kopfzeile und kopfspalte schreiben
-		for(int i=0; i<mainarray.length;i++)mainarray[0][i]=(i+1)*1.0;
-		for(int i=0; i<mainarray[0].length;i++)mainarray[i][0]=(i+1)*1.0;
-		
+		for(int i=0; i<gridsizey+1;i++)mainarray[0][i]=(i)*1.0;
+		for(int i=0; i<gridsizex+1;i++){
+			mainarray[i][0]=(i+1)*1.0;
+		}
+		System.out.println(mainarray[0][1]);
 		//TODO: in der ersten Zeile den letzten Eintrag loeschen
 		
 		//array in Textdatei schreiben
 		BufferedWriter buff = new BufferedWriter (new FileWriter (outputfile));
 		//inhalt schreiben
-		String valueString = "\t";
-		System.out.println(mainarray.length+" "+mainarray[20].length);
+		String valueString = new String();
 		for(int i = 0; i< mainarray.length; i++){
-			
 			//Tabelleninhalt
 			for(int j = 0; j<mainarray[0].length; j++){
-				if(mainarray[i][j]==null){
-					valueString+="NA";
-				} else{
-					//write value in table
-					if(!Double.toString(mainarray[i][j]).contains("E")){
-						valueString+=Double.toString(mainarray[i][j]);
-					}
-					else valueString+="NA";
+				if(i==j&&j==0){
+					//valueString+="\t";
 				}
+				else{
+					if(mainarray[i][j]==null){
+					valueString+="NA";
+					} else{
+					//write value in table
+					//TODO runden?
+						if(!Double.toString(mainarray[i][j]).contains("E")){
+						valueString+=Double.toString(mainarray[i][j]);
+						}
+						else{
+							valueString+=getStringFromEValue(mainarray[i][j]);
+						}
+					}
+				}
+			
 				//tabulator
-				//TODO pruefen, ob tab richtig ist
 				valueString+="\t";
 				
 			}
@@ -122,6 +132,26 @@ public class TableParser {
 			valueString="";
 		}
 		buff.close();
+	}
+
+	private static String getStringFromEValue(Double value) {
+		if(value<1){
+			int i =Math.getExponent(value);
+			String tore = value.toString().split("E")[0];
+			tore = tore.replace(".", "");
+			for (int j=-1;j>i; j--){tore= "0"+tore;}
+			tore="0."+tore;
+			return tore;
+		}
+		else System.out.println("big exponent. this case is not handled. treated as not a number");
+		return "NA";
+	}
+
+	private static Double getDoubleFromEString(String substring) {
+		String[] strArray =substring.split("e-");
+		Double value = Double.parseDouble(strArray[0]);
+		Double exponent = Math.pow(10.0, Double.parseDouble(strArray[1]));
+		return (value/exponent);
 	}
 
 }
