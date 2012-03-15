@@ -44,7 +44,7 @@ import org.matsim.core.utils.misc.Time;
 public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFunction {
 
 	private final ActivityFacilities facilities;
-	protected Plan plan;
+	protected /* :-( yyyy */ Plan plan;
 
 	public CharyparNagelOpenTimesScoringFunction(Plan plan, final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		super(params);
