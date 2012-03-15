@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
-import playground.benjamin.scenarios.munich.analysis.EmissionSummarizer;
+import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonColdEventHandler;
@@ -182,7 +182,7 @@ public class MultiAnalyzer {
 	}
 
 	private void calculateEmissionChangesByUserGroup(String initialEmissionEventsFile, String finalEmissionEventsFile) {
-		EmissionSummarizer summarizer = new EmissionSummarizer();
+		EmissionUtils summarizer = new EmissionUtils();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
@@ -194,7 +194,7 @@ public class MultiAnalyzer {
 		
 		Map<Id, Map<WarmPollutant, Double>> person2FinalWarmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		Map<Id, Map<ColdPollutant, Double>> person2FinalColdEmissions = coldHandler.getColdEmissionsPerPerson();
-		Map<Id, SortedMap<String, Double>> person2FinalTotalEmissions = summarizer.sumUpEmissionsPerPerson(person2FinalWarmEmissions, person2FinalColdEmissions);
+		Map<Id, SortedMap<String, Double>> person2FinalTotalEmissions = summarizer.sumUpEmissionsPerId(person2FinalWarmEmissions, person2FinalColdEmissions);
 		SortedMap<UserGroup, SortedMap<String, Double>> group2FinalTotalEmissions = summarizer.getEmissionsPerGroup(person2FinalTotalEmissions);
 
 		warmHandler.reset(0);
@@ -203,7 +203,7 @@ public class MultiAnalyzer {
 		
 		Map<Id, Map<WarmPollutant, Double>> person2InitialWarmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		Map<Id, Map<ColdPollutant, Double>> person2InitialColdEmissions = coldHandler.getColdEmissionsPerPerson();
-		Map<Id, SortedMap<String, Double>> person2InitialTotalEmissions = summarizer.sumUpEmissionsPerPerson(person2InitialWarmEmissions, person2InitialColdEmissions);
+		Map<Id, SortedMap<String, Double>> person2InitialTotalEmissions = summarizer.sumUpEmissionsPerId(person2InitialWarmEmissions, person2InitialColdEmissions);
 		SortedMap<UserGroup, SortedMap<String, Double>> group2InitialTotalEmissions = summarizer.getEmissionsPerGroup(person2InitialTotalEmissions);
 		
 		for(UserGroup userGroup : group2FinalTotalEmissions.keySet()){

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import playground.benjamin.emissions.events.ColdEmissionEvent;
 import playground.benjamin.emissions.events.ColdEmissionEventHandler;
 import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 
 /**
  * @author benjamin
@@ -39,12 +40,20 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 
 	Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal = new HashMap<Double, Map<Id, Map<ColdPollutant, Double>>>();
 
-	private final int noOfTimeBins;
-	private final double timeBinSize;
+	final int noOfTimeBins;
+	final double timeBinSize;
+	EmissionUtils emissionUtils;
 
 	public EmissionsPerLinkColdEventHandler(double simulationEndTime, int noOfTimeBins) {
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
+		this.emissionUtils = new EmissionUtils();
+	}
+
+	@Override
+	public void reset(int iteration) {
+		this.time2coldEmissionsTotal.clear();
+		logger.info("Resetting cold emission aggregation to " + this.time2coldEmissionsTotal);
 	}
 
 	@Override
@@ -54,13 +63,13 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 		Map<ColdPollutant, Double> coldEmissionsOfEvent = event.getColdEmissions();
 		double endOfTimeInterval = 0.0;
 
-		for(int i = 0; i < noOfTimeBins; i++){
-			if(time > i * timeBinSize && time <= (i + 1) * timeBinSize){
-				endOfTimeInterval = (i + 1) * timeBinSize;
+		for(int i = 0; i < this.noOfTimeBins; i++){
+			if(time > i * this.timeBinSize && time <= (i + 1) * this.timeBinSize){
+				endOfTimeInterval = (i + 1) * this.timeBinSize;
 				Map<Id, Map<ColdPollutant, Double>> coldEmissionsTotal = new HashMap<Id, Map<ColdPollutant, Double>>();
 
-				if(time2coldEmissionsTotal.get(endOfTimeInterval) != null){
-					coldEmissionsTotal = time2coldEmissionsTotal.get(endOfTimeInterval);
+				if(this.time2coldEmissionsTotal.get(endOfTimeInterval) != null){
+					coldEmissionsTotal = this.time2coldEmissionsTotal.get(endOfTimeInterval);
 
 					if(coldEmissionsTotal.get(linkId) != null){
 						Map<ColdPollutant, Double> coldEmissionsSoFar = coldEmissionsTotal.get(linkId);
@@ -79,40 +88,13 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 				} else {
 					coldEmissionsTotal.put(linkId, coldEmissionsOfEvent);
 				}
-				time2coldEmissionsTotal.put(endOfTimeInterval, coldEmissionsTotal);
+				this.time2coldEmissionsTotal.put(endOfTimeInterval, coldEmissionsTotal);
 			}
 		}
 	}
 
-	public Map<Double, Map<Id, Map<String, Double>>> getColdEmissionsPerLinkAndTimeInterval() {
-		Map<Double, Map<Id, Map<String, Double>>> time2coldEmissionsTotal = new HashMap<Double, Map<Id, Map<String, Double>>>();
-
-		for(Entry<Double, Map<Id, Map<ColdPollutant, Double>>> entry0 : this.time2coldEmissionsTotal.entrySet()){
-			Double endOfTimeInterval = entry0.getKey();
-			Map<Id, Map<ColdPollutant, Double>> linkId2coldEmissions = entry0.getValue();
-			Map<Id, Map<String, Double>> linkId2coldEmissionsAsString = new HashMap<Id, Map<String, Double>>();
-
-			for (Entry<Id, Map<ColdPollutant, Double>> entry1: linkId2coldEmissions.entrySet()){
-				Id linkId = entry1.getKey();
-				Map<ColdPollutant, Double> pollutant2Values = entry1.getValue();
-				Map<String, Double> pollutantString2Values = new HashMap<String, Double>();
-
-				for (Entry<ColdPollutant, Double> entry2: pollutant2Values.entrySet()){
-					String pollutant = entry2.getKey().toString();
-					Double value = entry2.getValue();
-					pollutantString2Values.put(pollutant, value);
-				}
-				linkId2coldEmissionsAsString.put(linkId, pollutantString2Values);
-			}
-			time2coldEmissionsTotal.put(endOfTimeInterval, linkId2coldEmissionsAsString);
-		}
+	public Map<Double, Map<Id, Map<ColdPollutant, Double>>> getColdEmissionsPerLinkAndTimeInterval() {
 		return time2coldEmissionsTotal;
-	}
-
-	@Override
-	public void reset(int iteration) {
-		this.time2coldEmissionsTotal.clear();
-		logger.info("Resetting cold emission aggregation to " + this.time2coldEmissionsTotal);
 	}
 
 }

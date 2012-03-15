@@ -30,7 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
-import playground.benjamin.scenarios.munich.analysis.EmissionSummarizer;
+import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonWarmEventHandler;
@@ -48,7 +48,7 @@ public class EmissionsPerGroupAnalysis {
 	private final String emissionEventsFile = runDirectory + runNumber + "." + "1500.emission.events.xml.gz";
 	
 	private void run(String[] args) {
-		EmissionSummarizer summarizer = new EmissionSummarizer();
+		EmissionUtils summarizer = new EmissionUtils();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
@@ -60,7 +60,7 @@ public class EmissionsPerGroupAnalysis {
 		
 		Map<Id, Map<WarmPollutant, Double>> person2FinalWarmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		Map<Id, Map<ColdPollutant, Double>> person2FinalColdEmissions = coldHandler.getColdEmissionsPerPerson();
-		Map<Id, SortedMap<String, Double>> person2FinalTotalEmissions = summarizer.sumUpEmissionsPerPerson(person2FinalWarmEmissions, person2FinalColdEmissions);
+		Map<Id, SortedMap<String, Double>> person2FinalTotalEmissions = summarizer.sumUpEmissionsPerId(person2FinalWarmEmissions, person2FinalColdEmissions);
 		SortedMap<UserGroup, SortedMap<String, Double>> group2FinalTotalEmissions = summarizer.getEmissionsPerGroup(person2FinalTotalEmissions);
 		
 		for(UserGroup userGroup : group2FinalTotalEmissions.keySet()){

@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
-import playground.benjamin.scenarios.munich.analysis.EmissionSummarizer;
+import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 import playground.benjamin.scenarios.munich.analysis.EmissionWriter;
 
 
@@ -74,9 +74,9 @@ public class EmissionsPerPersonAnalysis {
 		Map<Id, Map<WarmPollutant, Double>> warmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		Map<Id, Map<ColdPollutant, Double>> coldEmissions = coldHandler.getColdEmissionsPerPerson();
 		
-		EmissionSummarizer ems = new EmissionSummarizer();
-		Map<Id, SortedMap<String, Double>> totalEmissions = ems.sumUpEmissionsPerPerson(warmEmissions, coldEmissions);
-		Map<Id, SortedMap<String, Double>> filledTotalEmissions = ems.setNonCalculatedEmissions(population, totalEmissions);
+		EmissionUtils ems = new EmissionUtils();
+		Map<Id, SortedMap<String, Double>> totalEmissions = ems.sumUpEmissionsPerId(warmEmissions, coldEmissions);
+		Map<Id, SortedMap<String, Double>> filledTotalEmissions = ems.setNonCalculatedEmissionsForPopulation(population, totalEmissions);
 		
 		SortedSet<String> listOfPollutants = ems.getListOfPollutants();
 		EmissionWriter emissionWriter = new EmissionWriter();
