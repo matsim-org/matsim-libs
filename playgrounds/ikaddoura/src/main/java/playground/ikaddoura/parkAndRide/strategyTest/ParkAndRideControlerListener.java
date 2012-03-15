@@ -55,8 +55,6 @@ public class ParkAndRideControlerListener implements StartupListener {
 		// Park&Ride
 		strategy.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategy.addStrategyModule(new ParkAndRidePlanStrategyModule(controler));
-//		// - add Activity: parkAndRide mit zufälligen Koordinaten
-//		// - die an HomeActivity liegende Subtour: car mode, alle anderen legs: pt
 //		strategy.addStrategyModule(new ReRoute(controler));
 		//-------------------------
 

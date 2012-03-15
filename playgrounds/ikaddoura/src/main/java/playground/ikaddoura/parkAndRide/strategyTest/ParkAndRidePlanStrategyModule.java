@@ -83,7 +83,7 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 				Leg ptLeg = pop.getFactory().createLeg(TransportMode.pt);
 				Leg carLeg = pop.getFactory().createLeg(TransportMode.car);
 				
-				// splits a Leg into carLeg - parkAndRideActivity - ptLeg
+				// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
 				for (int i = 0; i < planElements.size(); i++) {
 					PlanElement pe = planElements.get(i);
 					if (pe instanceof Activity) {
@@ -94,13 +94,20 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 							planElements.add(2, parkAndRide);
 							planElements.add(3, ptLeg);
 						}
-						
+					}
+				}
+				
+				// splits first Leg before homeActivity into ptLeg - parkAndRideActivity - carLeg
+				int size = planElements.size();
+				for (int i = 0; i < size; i++) {
+					PlanElement pe = planElements.get(i);
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						if (act.getType().equals("home") && i==planElements.size()-1) {
-							planElements.remove(planElements.size()-2);
-							planElements.add(planElements.size()-2, ptLeg);
-							planElements.add(planElements.size()-2, parkAndRide);
-							planElements.add(planElements.size()-2, carLeg);
-							
+							planElements.remove(size-2);
+							planElements.add(size-2, carLeg);
+							planElements.add(size-2, parkAndRide);
+							planElements.add(size-2, ptLeg);	
 						}
 					} 
 				}
