@@ -79,7 +79,8 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 				double xCoord = 2500;
 				double yCoord = 0;
 				Coord parkAndRideCoord = this.sc.createCoord(xCoord, yCoord);
-				Activity parkAndRide = pop.getFactory().createActivityFromCoord("parkAndRide", parkAndRideCoord);
+				Activity parkAndRide1 = pop.getFactory().createActivityFromCoord("parkAndRide", parkAndRideCoord);
+				Activity parkAndRide2 = pop.getFactory().createActivityFromCoord("parkAndRide", parkAndRideCoord);
 				Leg ptLeg = pop.getFactory().createLeg(TransportMode.pt);
 				Leg carLeg = pop.getFactory().createLeg(TransportMode.car);
 				
@@ -91,7 +92,8 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 						if (act.getType().equals("home") && i==0){
 							planElements.remove(1);
 							planElements.add(1, carLeg);
-							planElements.add(2, parkAndRide);
+							parkAndRide1.setEndTime(act.getEndTime()); // same endTime like activity before
+							planElements.add(2, parkAndRide1);
 							planElements.add(3, ptLeg);
 						}
 					}
@@ -106,7 +108,9 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 						if (act.getType().equals("home") && i==planElements.size()-1) {
 							planElements.remove(size-2);
 							planElements.add(size-2, carLeg);
-							planElements.add(size-2, parkAndRide);
+							Activity actBefore = (Activity) planElements.get(i-2);
+							parkAndRide2.setEndTime(actBefore .getEndTime()); // same endTime like activity before
+							planElements.add(size-2, parkAndRide2);
 							planElements.add(size-2, ptLeg);	
 						}
 					} 
