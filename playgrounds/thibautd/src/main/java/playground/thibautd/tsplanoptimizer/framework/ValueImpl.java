@@ -61,5 +61,10 @@ public class ValueImpl<T> implements Value<T> {
 	public Value<T> createClone() {
 		return new ValueImpl<T>( value );
 	}
+
+	@Override
+	public String toString() {
+		return "ValueImpl<"+value.getClass().getSimpleName()+">="+value;
+	}
 }
 
