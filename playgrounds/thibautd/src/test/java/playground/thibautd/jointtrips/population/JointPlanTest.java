@@ -38,6 +38,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
@@ -102,10 +103,13 @@ public class JointPlanTest {
 		List<PlanElement> pes = testPlan.getIndividualPlan(pers1).getPlanElements();
 		double oldNow = Double.NEGATIVE_INFINITY;
 		double now;
-		for (int i=0; i < pes.size(); i+=2) {
+		// examine activities, except the last one (which should have an undefined end time)
+		for (int i=0; i < pes.size() - 1; i+=2) {
 			now = ((Activity) pes.get(i)).getEndTime();
 			Assert.assertTrue(
-					"inconsistent durations after synchronisation",
+					"inconsistent durations after synchronisation: last end time: "
+					+oldNow+" ("+Time.writeTime( oldNow )+")"
+					+", current end time: "+now+" ("+Time.writeTime( now ),
 					now > oldNow);
 			oldNow = now;
 		}
