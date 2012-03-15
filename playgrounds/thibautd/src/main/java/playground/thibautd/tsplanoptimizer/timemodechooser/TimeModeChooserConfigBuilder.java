@@ -97,7 +97,7 @@ public class TimeModeChooserConfigBuilder implements ConfigurationBuilder {
 		generator.add( new FixedStepsIntegerMovesGenerator(
 					initialSolution,
 					STEPS,
-					null));
+					true));
 					//new ModeOptimizingMoveConfigBuilder(
 					//	fitness,
 					//	POSSIBLE_MODES)) );

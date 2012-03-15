@@ -57,5 +57,10 @@ public class ModeMove implements Move {
 	public String getMode() {
 		return newMode;
 	}
+
+	@Override
+	public String toString() {
+		return "ModeMove{index="+index+", mode="+newMode+"}";
+	}
 }
 

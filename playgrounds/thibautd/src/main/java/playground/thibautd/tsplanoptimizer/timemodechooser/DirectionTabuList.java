@@ -70,7 +70,7 @@ public class DirectionTabuList implements TabuChecker {
 
 	private static class Direction {
 		private final int index;
-		private final int amount;
+		private final int sign;
 
 		public Direction(final Move move) {
 			this( (IntegerValueChanger) move );
@@ -78,11 +78,11 @@ public class DirectionTabuList implements TabuChecker {
 
 		public Direction(final IntegerValueChanger move) {
 			index = move.getIndex();
-			amount = move.getAmount();
+			sign = move.getAmount() > 0 ? 1 : -1;
 		}
 
 		public int hashCode() {
-			return index + 1000 * amount;
+			return index + 1000 * sign;
 		}
 
 		public boolean equals(final Object other) {
@@ -90,7 +90,7 @@ public class DirectionTabuList implements TabuChecker {
 				Direction direction = (Direction) other;
 
 				if ((direction.index == index) &&
-						(direction.amount * amount > 0)) {
+						(direction.sign * sign > 0)) {
 					return true;
 				}
 			}

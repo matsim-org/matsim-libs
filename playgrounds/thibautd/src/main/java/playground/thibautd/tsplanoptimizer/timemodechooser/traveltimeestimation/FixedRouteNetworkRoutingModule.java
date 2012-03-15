@@ -105,7 +105,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 		this.travelTime = routerFactory.getTravelTimeCalculatorFactory().createTravelTime();
 		this.travelCost = routerFactory.getTravelCostCalculatorFactory().createTravelCostCalculator( travelTime , scoreConfigGroup );
 
-		// TODO: cache initial routes
 		routes = extractRoutes( plan );
 
 		// if no route is found, the shortest path without congestion will be used
@@ -124,23 +123,29 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	private static Map<Tuple<Id, Id>, NetworkRoute> extractRoutes(final Plan plan) {
 		Map<Tuple<Id, Id>, NetworkRoute> routes = new HashMap<Tuple<Id, Id>, NetworkRoute>();
 
-		// assume strict act/leg experience
-		Iterator<PlanElement> elementIterator = plan.getPlanElements().iterator();
-		Activity origin = (Activity) elementIterator.next();
+		// assume strict act/leg alternance.
+		// if not, abort and only keep found routes.
+		try {
+			Iterator<PlanElement> elementIterator = plan.getPlanElements().iterator();
+			Activity origin = (Activity) elementIterator.next();
 
-		while ( elementIterator.hasNext() ) {
-			Leg leg = (Leg) elementIterator.next();
-			Activity destination = (Activity) elementIterator.next();
+			while ( elementIterator.hasNext() ) {
+				Leg leg = (Leg) elementIterator.next();
+				Activity destination = (Activity) elementIterator.next();
 
-			Route route = leg.getRoute();
+				Route route = leg.getRoute();
 
-			if (route instanceof NetworkRoute) {
-				routes.put(
-						extractOD( origin , destination ),
-						(NetworkRoute) route.clone());
+				if (route instanceof NetworkRoute) {
+					routes.put(
+							extractOD( origin , destination ),
+							(NetworkRoute) route.clone());
+				}
+
+				origin = destination;
 			}
-
-			origin = destination;
+		}
+		catch (ClassCastException e) {
+			return routes;
 		}
 
 		return routes;

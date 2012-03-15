@@ -21,7 +21,6 @@ package playground.thibautd.tsplanoptimizer.timemodechooser;
 
 import playground.thibautd.tsplanoptimizer.framework.Move;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 
 /**
@@ -29,10 +28,9 @@ import playground.thibautd.tsplanoptimizer.framework.Value;
  * @author thibautd
  */
 public class IntegerValueChanger implements Move {
-	private static final boolean DURATION_ENCODING = true;
+	private final boolean durationEncoding;
 	private final int index;
 	private final int amount;
-	private final ModeOptimizingMoveConfigBuilder configBuilder;
 
 	/**
 	 * @param index the index of the representation value to change
@@ -41,10 +39,16 @@ public class IntegerValueChanger implements Move {
 	public IntegerValueChanger(
 			final int index,
 			final int amount,
-			final ModeOptimizingMoveConfigBuilder configBuilder) {
+			final boolean switchSubsequentValues) {
 		this.index = index;
 		this.amount = amount;
-		this.configBuilder = configBuilder;
+		this.durationEncoding = switchSubsequentValues;
+	}
+
+	public IntegerValueChanger(
+			final int index,
+			final int amount) {
+		this( index , amount , false );
 	}
 
 	/**
@@ -58,7 +62,7 @@ public class IntegerValueChanger implements Move {
 		Value<Integer> val = (Value<Integer>) newSolution.getRepresentation().get( index );
 		val.setValue( val.getValue().intValue() + amount );
 
-		if (DURATION_ENCODING) {
+		if (durationEncoding) {
 			// emulate a duration-based encoding by modifying all subsequent end times.
 			for (int i=index+1; i < newSolution.getRepresentation().size(); i++) {
 				val = (Value<Integer>) newSolution.getRepresentation().get( index );
@@ -66,21 +70,12 @@ public class IntegerValueChanger implements Move {
 			}
 		}
 
-		if (configBuilder != null) {
-			configBuilder.setSolution( newSolution );
-			newSolution = TabuSearchRunner.runTabuSearch( configBuilder );
-		}
-
 		return newSolution;
 	}
 
 	@Override
 	public Move getReverseMove() {
-		if (configBuilder == null) {
-			return new IntegerValueChanger( index , -amount , configBuilder );
-		}
-		// if optimizing move, not reversible
-		throw new UnsupportedOperationException();
+		return new IntegerValueChanger( index , -amount , durationEncoding );
 	}
 
 	public int getIndex() {
@@ -89,6 +84,11 @@ public class IntegerValueChanger implements Move {
 
 	public int getAmount() {
 		return amount;
+	}
+
+	@Override
+	public String toString() {
+		return "IntegerMove{index="+index+", amount="+amount+"}";
 	}
 }
 
