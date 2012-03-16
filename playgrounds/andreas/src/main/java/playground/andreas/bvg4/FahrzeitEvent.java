@@ -20,6 +20,7 @@
 package playground.andreas.bvg4;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * Corresponds to Golden Spool File fahrzeit_ist
@@ -49,7 +50,7 @@ public class FahrzeitEvent {
 	private final int runningNumber;
 	
 	// Tagged PUNKT_NR
-	private final Id stopId;
+	private Id stopId;
 	
 	// Tagged KUERZEL
 	private final String stopNameShort;
@@ -73,6 +74,8 @@ public class FahrzeitEvent {
 	
 	// Tagged STATUS_LOKALISIERUNG
 	private final boolean statusLokalisierung;
+
+	private FahrtEvent fahrtEvent;
 	
 	public FahrzeitEvent(int rblDate, int kurs, String departureDateIst, double departureTimeIst,
 			String zeitBasis, Id vehId, int runningNumber, Id stopId, String stopNameShort,
@@ -99,6 +102,9 @@ public class FahrzeitEvent {
 		this.statusLokalisierung = statusLokalisierung;
 	}
 
+	public void setNewStopId(String newStopName){
+		this.stopId = new IdImpl(newStopName);
+	}
 
 	public int getRblDate() {
 		return rblDate;
@@ -167,6 +173,10 @@ public class FahrzeitEvent {
 	public boolean isStatusLokalisierung() {
 		return statusLokalisierung;
 	}
+	
+	public FahrtEvent getFahrtEvent() {
+		return fahrtEvent;
+	}
 
 	@Override
 	public String toString() {
@@ -188,6 +198,11 @@ public class FahrzeitEvent {
 		strB.append(this.distanceStreckeIst); strB.append(", ");
 		strB.append(this.statusOfDoor); strB.append(", ");
 		strB.append(this.statusLokalisierung); strB.append(", ");
+		strB.append(this.fahrtEvent);
 		return strB.toString();
+	}
+
+	public void add(FahrtEvent fahrtEvent) {
+		this.fahrtEvent = fahrtEvent;		
 	}
 }
