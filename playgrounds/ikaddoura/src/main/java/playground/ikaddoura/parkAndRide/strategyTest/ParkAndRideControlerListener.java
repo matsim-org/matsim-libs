@@ -50,7 +50,7 @@ public class ParkAndRideControlerListener implements StartupListener {
 		PlanStrategy strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy2.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategy2.addStrategyModule(new ParkAndRidePlanStrategyModule(controler));
-		strategy2.addStrategyModule(new ReRoute(controler)); // this is not working... ???
+		strategy2.addStrategyModule(new ReRoute(controler));
 
 		StrategyManager manager = this.controler.getStrategyManager() ;
 //		manager.addStrategy(strategy1, 0.2);
