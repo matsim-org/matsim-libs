@@ -67,7 +67,7 @@ class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 
 		// checking for if this is only a test run
 		// a test run only validates the xml config file by initializing the xml config via the xsd.
-		if(scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
+		if(scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
 			log.info("TestRun was successful...");
 			return;
 		}
@@ -81,7 +81,7 @@ class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 			modifyLinks(network, testParam);
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ) );
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");

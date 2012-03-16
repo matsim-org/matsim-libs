@@ -174,44 +174,43 @@ public class MATSim4UrbanSimConfigurationConverter {
 		boolean backupRunData = matsim4UrbanSimParameter.getUrbansimParameter().isBackupRunData();
 		String testParameter = matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
 		
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN, isTestRun ? "TRUE" : "FALSE");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE, samplingRate + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.OPUS_HOME_PARAM, opusHome );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.OPUS_DATA_PATH_PARAM, opusDataPath );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_PARAM, matsim4Opus );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_CONFIG_PARAM, matsim4OpusConfig );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_OUTPUT_PARAM, matsim4OpusOutput );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM, matsim4OpusTemp );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_BACKUP_PARAM, matsim4OpusBackup );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR, year + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM, backupRunData ? "TRUE" : "FALSE");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TEST_PARAMETER_PARAM, testParameter);
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN, isTestRun ? "TRUE" : "FALSE");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE, samplingRate + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.OPUS_HOME_PARAM, opusHome );
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.OPUS_DATA_PATH_PARAM, opusDataPath );
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_PARAM, matsim4Opus );
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_CONFIG_PARAM, matsim4OpusConfig );
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_OUTPUT_PARAM, matsim4OpusOutput );
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_TEMP_PARAM, matsim4OpusTemp );
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_BACKUP_PARAM, matsim4OpusBackup );
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.YEAR, year + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM, backupRunData ? "TRUE" : "FALSE");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.TEST_PARAMETER_PARAM, testParameter);
 		// tnicolai: implement/make configurable the following flags (matsim4urbansim config/JAXB)
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.LOGIT_SCALE_PARAMETER, 1 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_TIMES, 1 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_LN_TRAVEL_TIMES, 0 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_TIMES_POWER, 0 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_COSTS, 0 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_LN_TRAVEL_COSTS, 0 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_COSTS_POWER, 0 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_DISTANCE, 0 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_LN_TRAVEL_DISTANCE, 0 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_DISTANCE_POWER, 0 + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TEST_PARAMETER, "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MEASUREMENT_LOGFILE, Constants.MATSIM_4_OPUS_TEMP + Constants.MEASUREMENT_LOGFILE);
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.LOGIT_SCALE_PARAMETER, 1 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES, 1 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_TIMES, 0 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES_POWER, 0 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS, 0 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_COSTS, 0 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS_POWER, 0 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE, 0 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_DISTANCE, 0 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE_POWER, 0 + "");
+		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MEASUREMENT_LOGFILE, Constants.MATSIM_4_OPUS_TEMP + Constants.MEASUREMENT_LOGFILE);
 		
 		// setting opus paths internally
-		Constants.OPUS_HOME = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.OPUS_HOME_PARAM);
-		Constants.OPUS_DATA_PATH = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.OPUS_DATA_PATH_PARAM);
-		Constants.MATSIM_4_OPUS = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_PARAM);
-		Constants.MATSIM_4_OPUS_CONFIG = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_CONFIG_PARAM);
-		Constants.MATSIM_4_OPUS_OUTPUT = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_OUTPUT_PARAM);
-		Constants.MATSIM_4_OPUS_TEMP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM);
-		Constants.MATSIM_4_OPUS_BACKUP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_BACKUP_PARAM);
+		Constants.OPUS_HOME = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.OPUS_HOME_PARAM);
+		Constants.OPUS_DATA_PATH = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.OPUS_DATA_PATH_PARAM);
+		Constants.MATSIM_4_OPUS = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_PARAM);
+		Constants.MATSIM_4_OPUS_CONFIG = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_CONFIG_PARAM);
+		Constants.MATSIM_4_OPUS_OUTPUT = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_OUTPUT_PARAM);
+		Constants.MATSIM_4_OPUS_TEMP = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_TEMP_PARAM);
+		Constants.MATSIM_4_OPUS_BACKUP = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_BACKUP_PARAM);
 		
 		log.info("MATSim4UrbanSim settings:");
-		log.info("SamplingRate: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE) );
-		log.info("Year: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ); 
+		log.info("SamplingRate: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE) );
+		log.info("Year: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ); 
 		log.info("OPUS_HOME: " + Constants.OPUS_HOME );
 		log.info("OPUS_DATA_PATH: " + Constants.OPUS_DATA_PATH );
 		log.info("MATSIM_4_OPUS: " + Constants.MATSIM_4_OPUS );
@@ -219,20 +218,19 @@ public class MATSim4UrbanSimConfigurationConverter {
 		log.info("MATSIM_4_OPUS_OUTPUT: " + Constants.MATSIM_4_OPUS_OUTPUT );
 		log.info("MATSIM_4_OPUS_TEMP: " + Constants.MATSIM_4_OPUS_TEMP ); 
 		log.info("MATSIM_4_OPUS_BACKUP: " + Constants.MATSIM_4_OPUS_BACKUP );
-		log.info("TestRun: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN) );
-		log.info("BACKUP_RUN_DATA: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM) );
-		log.info("TEST_PARAMETER: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TEST_PARAMETER_PARAM) );
-		log.info("Beta: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.LOGIT_SCALE_PARAMETER) );
-		log.info("Beta Travel Times: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_TIMES) );
-		log.info("Beta ln(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_LN_TRAVEL_TIMES) );
-		log.info("Beta power(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_TIMES_POWER) );
-		log.info("Beta Travel Costs: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_COSTS) );
-		log.info("Beta ln(Travel Costs): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_LN_TRAVEL_COSTS) );
-		log.info("Beta power(Travel Costs): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_COSTS_POWER) );
-		log.info("Beta Travel Distance: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_DISTANCE) );
-		log.info("Beta ln(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_LN_TRAVEL_DISTANCE) );
-		log.info("Beta power(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_CAR_TRAVEL_DISTANCE_POWER) );
-		log.info("Custom Parameter: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TEST_PARAMETER) );
+		log.info("TestRun: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN) );
+		log.info("BACKUP_RUN_DATA: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM) );
+		log.info("TEST_PARAMETER: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TEST_PARAMETER_PARAM) );
+		log.info("Beta: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.LOGIT_SCALE_PARAMETER) );
+		log.info("Beta Travel Times: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES) );
+		log.info("Beta ln(Travel Times): " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_TIMES) );
+		log.info("Beta power(Travel Times): " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES_POWER) );
+		log.info("Beta Travel Costs: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS) );
+		log.info("Beta ln(Travel Costs): " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_COSTS) );
+		log.info("Beta power(Travel Costs): " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS_POWER) );
+		log.info("Beta Travel Distance: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE) );
+		log.info("Beta ln(Travel Distance): " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_DISTANCE) );
+		log.info("Beta power(Travel Distance): " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE_POWER) );
 		log.info("... done!");
 	}
 	
@@ -270,25 +268,25 @@ public class MATSim4UrbanSimConfigurationConverter {
 		  (new File(hotStart)).exists() ){
 			log.info("Hot Start detcted!");
 			setPlansFile( hotStart );
-			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.HOT_START);
+			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE, Constants.HOT_START);
 		}
 		else if( !warmStart.equals("") ){
 			log.info("Warm Start detcted!");
 			setPlansFile( warmStart );
-			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.WARM_START);
+			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE, Constants.WARM_START);
 		}
 		else{
 			log.info("Cold Start (no plans file) detected!");
-			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.COLD_START);
+			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE, Constants.COLD_START);
 		}
 		
 		// setting target location for hot start plans file
 		if(!hotStart.equals("")){
 			log.info("Storing plans file from current run. This enables hot start for next MATSim run.");
-			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE, hotStart);
+			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE, hotStart);
 		}
 		else
-			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE, "");
+			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE, "");
 	}
 
 	/**

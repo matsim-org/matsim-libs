@@ -18,7 +18,11 @@ public class TravelWalkTimeCostCalculator implements TravelCost{
 	
 	private static final Logger log = Logger.getLogger(TravelWalkTimeCostCalculator.class);
 	
-	private double meterPerSecWalkSpeed = 1.38888889; // 1,38888889 m/s corresponds to 5km/h
+	private double meterPerSecWalkSpeed;
+	
+	public TravelWalkTimeCostCalculator(double meterPerSecWalkSpeed){
+		this.meterPerSecWalkSpeed = meterPerSecWalkSpeed;
+	}
 	
 	/**
 	 * uses network link lengths * walk speed as costs. 
@@ -27,9 +31,7 @@ public class TravelWalkTimeCostCalculator implements TravelCost{
 	@Override
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		if(link != null){
-			double meterLength = link.getLength();
-			double secondWalkTime = meterLength / meterPerSecWalkSpeed;
-			
+			double secondWalkTime = link.getLength() / meterPerSecWalkSpeed;
 			return secondWalkTime;
 		}
 		log.warn("Link is null. Returned 0 as walk time.");

@@ -114,7 +114,7 @@ public class MATSim4UrbanSim {
 		cleanNetwork(network);
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ) );
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -136,7 +136,7 @@ public class MATSim4UrbanSim {
 
 		runControler(zones, parcels, numberOfWorkplacesPerZone, readFromUrbansim);
 		
-		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){
+		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){
 			// saving results from current run
 			saveRunOutputs();			
 			cleanUrbanSimOutput();
@@ -145,7 +145,7 @@ public class MATSim4UrbanSim {
 	}
 	
 	void isTestTun(){
-		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
+		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
 			log.info("TestRun was successful...");
 			return;
 		}
@@ -175,7 +175,7 @@ public class MATSim4UrbanSim {
 		Population oldPopulation = null;
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
 			
-			String mode = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE);
+			String mode = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE);
 			if(mode.equals(Constants.HOT_START))
 				log.info("MATSim is running in HOT start mode, i.e. MATSim starts with pop file from previous run: " + scenario.getConfig().plans().getInputFile());
 			else if(mode.equals(Constants.WARM_START))
@@ -194,7 +194,7 @@ public class MATSim4UrbanSim {
 		}
 
 		// read urbansim persons.  Generates hwh acts as side effect
-		Population newPopulation = readFromUrbansim.readPersons( oldPopulation, parcels, network, Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE)) ) ;
+		Population newPopulation = readFromUrbansim.readPersons( oldPopulation, parcels, network, Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE)) ) ;
 		
 		// clean
 		oldPopulation=null;
@@ -300,7 +300,7 @@ public class MATSim4UrbanSim {
 	void saveRunOutputs() {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 		
-		String saveDirectory = "run" + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) + "-" + DateUtil.now();
+		String saveDirectory = "run" + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) + "-" + DateUtil.now();
 		String savePath = Paths.checkPathEnding( Constants.MATSIM_4_OPUS_BACKUP + saveDirectory );
 		FileCopy.copyTree(Constants.MATSIM_4_OPUS_TEMP, savePath);
 		
@@ -319,7 +319,7 @@ public class MATSim4UrbanSim {
 		
 		log.info("Saving UrbanSim and MATSim outputs done!");
 		
-		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
+		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
 		if(!targetLocationHotStartFile.equals("")){
 			
 			log.info("Preparing hot start for next MATSim run ...");

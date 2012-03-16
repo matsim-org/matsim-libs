@@ -146,7 +146,7 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 		ScenarioUtils.loadScenario(scenario);
 		
 		// save detected MATSim run Mode
-		this.currentMode = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE);
+		this.currentMode = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE);
 		
 		// init class ReadFromUrbansimParcelModel
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( 2001 );

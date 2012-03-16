@@ -94,7 +94,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		// tnicolai: calculate "distance" as walk time -> add "am_walk_time_in_minutes:f4" to header
-		LeastCostPathTree lcptWalkTime = new LeastCostPathTree(ttc, new TravelWalkTimeCostCalculator());
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree(ttc, new TravelWalkTimeCostCalculator( sc.getConfig().plansCalcRoute().getWalkSpeed() ));
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable

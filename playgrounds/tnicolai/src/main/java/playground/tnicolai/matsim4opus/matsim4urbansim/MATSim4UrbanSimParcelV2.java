@@ -27,7 +27,6 @@ package playground.tnicolai.matsim4opus.matsim4urbansim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -37,12 +36,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConverterV2;
+import playground.tnicolai.matsim4opus.utils.String2BooleanConverter;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
 
 
 /**
@@ -76,18 +77,28 @@ public class MATSim4UrbanSimParcelV2 {
 
 	// MATSim scenario
 	ScenarioImpl scenario = null;
-	// Reads UrbanSim outputfiles
+	// MATSim4UrbanSim configuration converter
+	MATSim4UrbanSimConfigurationConverterV2 connector = null;
+	// Reads UrbanSim output files
 	ReadFromUrbansimParcelModel readFromUrbansim = null;
 	// Benchmarking computation times and hard disc space ... 
 	Benchmark benchmark = null;
-	// needed for aggregating workplaces
-	double jobSample = 1.;
 	// indicates if MATSim run was successful
-	static boolean isSuccessfulMATSimRun = Boolean.FALSE;
+	static boolean isSuccessfulMATSimRun 			 = false;
 	// needed for controler listeners
-	ClusterObject[] aggregatedWorkplaces = null;
+	ClusterObject[] aggregatedWorkplaces 			 = null;
 	
-	MATSim4UrbanSimConfigurationConverterV2 connector = null;
+	// run selected controler
+	boolean computeGridBasedAccessibilitiesShapeFile = false;
+	boolean computeZone2ZoneImpedance		   		 = false;
+	boolean computeGridBasedAccessibilitiesNetwork 	 = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
+	boolean computeZoneBasedAccessibilities			 = false;
+	boolean computeAgentPerformance					 = false;
+	boolean dumpPopulationData 						 = false;
+	boolean dumpAggegatedWorkplaceData 			  	 = false;
+	String shapeFile 						 		 = null;
+	double cellSizeInMeter 							 = -1;
+	double jobSampleRate 							 = 1.;
 	
 	/**
 	 * constructor
@@ -108,6 +119,8 @@ public class MATSim4UrbanSimParcelV2 {
 		}
 		scenario = connector.getScenario();
 		ScenarioUtils.loadScenario(scenario);
+		
+		setControlerSettings(scenario, args);
 		
 		// init Benchmark as default
 		benchmark = new Benchmark();
@@ -130,7 +143,7 @@ public class MATSim4UrbanSimParcelV2 {
 		cleanNetwork(network);
 		
 		// get the data from UrbanSim (parcels and persons)
-		readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ) );
+		readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -154,7 +167,7 @@ public class MATSim4UrbanSimParcelV2 {
 	}
 	
 	void isTestTun(){
-		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
+		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
 			log.info("TestRun was successful...");
 			return;
 		}
@@ -194,7 +207,7 @@ public class MATSim4UrbanSimParcelV2 {
 		// check for existing plans file
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
 			
-			String mode = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE);
+			String mode = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE);
 			if(mode.equals(Constants.HOT_START))
 				log.info("MATSim is running in HOT start mode, i.e. MATSim starts with pop file from previous run: " + scenario.getConfig().plans().getInputFile());
 			else if(mode.equals(Constants.WARM_START))
@@ -211,7 +224,7 @@ public class MATSim4UrbanSimParcelV2 {
 		}
 
 		// read UrbanSim persons.  Generates hwh acts as side effect
-		double populationSampleRate = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE));
+		double populationSampleRate = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE));
 		Population newPopulation = readFromUrbansim.readPersons( oldPopulation, parcels, network, populationSampleRate ) ;
 		
 		// clean
@@ -253,13 +266,7 @@ public class MATSim4UrbanSimParcelV2 {
 	 * @param controler
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler) {
-		
-		// tnicolai: get parameter from MATSim4UrbanSimConfigurationConnector
-		boolean computeZone2ZoneImpedance = true;
-		boolean computeZoneBasedAccessibilities = true;
-		boolean dumpPopulationData = true;
-		boolean dumpAggegatedWorkplaceData = true;
-		
+
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
 			// creates zone2zone impedance matrix
@@ -270,7 +277,7 @@ public class MATSim4UrbanSimParcelV2 {
 			
 			// init aggregatedWorkplaces
 			if(aggregatedWorkplaces == null)
-				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
+				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSampleRate);
 			// creates zone based table of log sums (workplace accessibility)
 			// uses always a 100% jobSample size (see readUrbansimJobs below)
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
@@ -294,6 +301,63 @@ public class MATSim4UrbanSimParcelV2 {
 	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by an inherited class
+	}
+	
+	void setControlerSettings(ScenarioImpl scenario, String[] args) {
+		// setting workplace/job sample rate
+		checkAndSetJobSample(args);
+
+		this.computeAgentPerformance = String2BooleanConverter
+				.getBoolean(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.COMPUTE_AGENT_PERFORMANCE));
+		this.computeZone2ZoneImpedance = String2BooleanConverter
+				.getBoolean(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.COMPUTE_ZONE_2_ZONE_IMPEDANCE));
+		this.computeZoneBasedAccessibilities = String2BooleanConverter
+				.getBoolean(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.COMPUTE_ZONE_BASED_ACCESSIBILITY));
+		this.computeGridBasedAccessibilitiesShapeFile = String2BooleanConverter
+				.getBoolean(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.COMPUTE_CELL_BASED_ACCESSIBILITY_SHAPEFILE));
+		this.computeGridBasedAccessibilitiesNetwork = String2BooleanConverter
+				.getBoolean(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.COMPUTE_CELL_BASED_ACCESSIBILITY_NETWORK));
+		this.dumpPopulationData = false;
+		this.dumpAggegatedWorkplaceData = true;
+
+		this.cellSizeInMeter = Integer.parseInt(scenario.getConfig().getParam(
+				Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.CELL_SIZE));
+		NetworkBoundaryBox.setCustomBoundaryBox(
+				Double.parseDouble(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.BOUNDING_BOX_LEFT)),
+				Double.parseDouble(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.BOUNDING_BOX_BOTTOM)),
+				Double.parseDouble(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.BOUNDING_BOX_RIGHT)),
+				Double.parseDouble(scenario.getConfig().getParam(
+						Constants.MATSIM_4_URBANSIM_CONTROLER,
+						Constants.BOUNDING_BOX_TOP)));
+		this.shapeFile 		= scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.CELL_BASED_ACCESSIBILITY_SHAPEFILE);
+	}
+	
+	/**
+	 * Set the jobSample for the starting points
+	 * 
+	 * @param args
+	 */
+	private void checkAndSetJobSample(String[] args) {
+
+		if (args.length >= 2) 
+			jobSampleRate = Double.parseDouble(args[1].trim());
+		log.info("The jobSampleRate is set to " + String.valueOf(jobSampleRate));
 	}
 	
 	/**

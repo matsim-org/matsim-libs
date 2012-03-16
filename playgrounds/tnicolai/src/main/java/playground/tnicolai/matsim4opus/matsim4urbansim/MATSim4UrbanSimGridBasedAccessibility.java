@@ -32,7 +32,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 	
 	private void initResolutionAndJobSample(){
 		try{
-			String params[] = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TEST_PARAMETER_PARAM).split(",");
+			String params[] = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TEST_PARAMETER_PARAM).split(",");
 			
 			for(int i = 0; i < params.length; i++){
 				
@@ -64,7 +64,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		modifyNetwork(network);
 		cleanNetwork(network);
 		
-		ReadFromUrbansimParcelModel readUrbanSimData = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ) );
+		ReadFromUrbansimParcelModel readUrbanSimData = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -89,7 +89,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		controler.run();
 		// Controller done!
 		
-		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){ // tnicolai: Experimental, comment out for MATSim4UrbanSim release
+		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){ // tnicolai: Experimental, comment out for MATSim4UrbanSim release
 			// saving results from current run
 			saveRunOutputs();			
 			cleanUrbanSimOutput();

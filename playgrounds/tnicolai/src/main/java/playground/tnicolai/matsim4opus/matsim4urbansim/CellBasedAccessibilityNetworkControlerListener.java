@@ -163,6 +163,9 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		
+		double walkSpeedMeterPerSec = sc.getConfig().plansCalcRoute().getWalkSpeed();
+		this.walkSpeedMeterPerMin = walkSpeedMeterPerSec * 60.;
+		
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		// calculates the workplace accessibility based on congested travel times:
 		// (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
@@ -171,14 +174,13 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		// link.getLength() * link.getFreespeed()
 		LeastCostPathTree lcptFreespeedTravelTime = new LeastCostPathTree(ttc, new FreeSpeedTravelTimeCostCalculator());
 		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
-		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() );
-		
-		this.walkSpeedMeterPerMin = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator( walkSpeedMeterPerSec ) );
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		
 		double betaBrain = sc.getConfig().planCalcScore().getBrainExpBeta(); // scale parameter. tnicolai: test different beta brains (e.g. 02, 1, 10 ...)
+		double betaBrainPerMinPreFactor = 1/(betaBrain / 60.);
 		double betaCarHour = betaBrain * (sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
 		double betaCarMin = betaCarHour / 60.; // get utility per minute. this is done for urbansim that e.g. takes travel times in minutes (tnicolai feb'12)
 		double betaWalkHour = betaBrain * (sc.getConfig().planCalcScore().getTravelingWalk_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
@@ -262,9 +264,9 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 				}
 				
 				// get log sum 
-				double congestedTravelTimesCarLogSum = setZeroIfNegative( Math.log( congestedTravelTimesCarSum ) );
-				double freespeedTravelTimesCarLogSum = setZeroIfNegative( Math.log( freespeedTravelTimesCarSum ) );
-				double travelTimesWalkLogSum 		 = setZeroIfNegative( Math.log( travelTimesWalkSum ) );
+				double congestedTravelTimesCarLogSum = betaBrainPerMinPreFactor * Math.log( congestedTravelTimesCarSum );
+				double freespeedTravelTimesCarLogSum = betaBrainPerMinPreFactor * Math.log( freespeedTravelTimesCarSum );
+				double travelTimesWalkLogSum 		 = betaBrainPerMinPreFactor * Math.log( travelTimesWalkSum );
 				
 				// assign log sums to current starZone object and spatial grid
 				setAccessibilityValues2StartZoneAndSpatialGrid(startZone,
@@ -294,10 +296,6 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private double setZeroIfNegative(double logsum){
-		return (logsum < 0.0) ? 0.0 : logsum;
 	}
 	
 	private void dumpResults() throws IOException{

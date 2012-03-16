@@ -131,7 +131,7 @@ public class MATSim4UrbanSimZone {
 		cleanNetwork(network);
 		
 		// get the data from UrbanSim (parcels and persons)
-		readFromUrbansim = new ReadFromUrbansimZoneModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ) );
+		readFromUrbansim = new ReadFromUrbansimZoneModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		// initializing parcels and zones from UrbanSim input
@@ -154,7 +154,7 @@ public class MATSim4UrbanSimZone {
 	}
 	
 	void isTestTun(){
-		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
+		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
 			log.info("TestRun was successful...");
 			return;
 		}
@@ -194,7 +194,7 @@ public class MATSim4UrbanSimZone {
 		// check for existing plans file
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
 			
-			String mode = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE);
+			String mode = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE);
 			if(mode.equals(Constants.HOT_START))
 				log.info("MATSim is running in HOT start mode, i.e. MATSim starts with pop file from previous run: " + scenario.getConfig().plans().getInputFile());
 			else if(mode.equals(Constants.WARM_START))
@@ -211,7 +211,7 @@ public class MATSim4UrbanSimZone {
 		}
 
 		// read UrbanSim persons.  Generates hwh acts as side effect
-		double populationSampleRate = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE));
+		double populationSampleRate = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE));
 		Population newPopulation = readFromUrbansim.readPersons( oldPopulation, zones, network, populationSampleRate ) ;
 		
 		// clean

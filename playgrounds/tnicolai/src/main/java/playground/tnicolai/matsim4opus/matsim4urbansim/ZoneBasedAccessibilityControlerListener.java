@@ -98,10 +98,9 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		// link.getLength() * link.getFreespeed()
 		LeastCostPathTree lcptFreespeedTravelTime = new LeastCostPathTree(ttc, new FreeSpeedTravelTimeCostCalculator());
 		// this calculates a least cost path tree only based on link.getLength() (without marginalCostOfDistance since it's zero)
-		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() );
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator(sc.getConfig().plansCalcRoute().getWalkSpeed()) );
 		
-		// 1.38888889m/s corresponds to 5km/h
-		this.walkSpeedMeterPerMin = 1.38888889 * 60.; // sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		this.walkSpeedMeterPerMin = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable

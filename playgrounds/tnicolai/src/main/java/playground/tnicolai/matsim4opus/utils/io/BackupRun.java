@@ -18,7 +18,7 @@ public class BackupRun {
 	
 	public static void runBackup(ScenarioImpl scenario){
 		
-		String value = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM);
+		String value = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM);
 		
 		if( value.equalsIgnoreCase("TRUE") ){
 			// saving results from current run
@@ -34,7 +34,7 @@ public class BackupRun {
 	private static void saveRunOutputs(ScenarioImpl scenario) {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 		
-		String currentYear = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR);
+		String currentYear = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR);
 		int lastIteration = scenario.getConfig().controler().getLastIteration();
 		
 		String saveDirectory = "run" + currentYear + "-" + DateUtil.now();
@@ -72,7 +72,7 @@ public class BackupRun {
 	 */
 	private static void prepareHotStart(ScenarioImpl scenario){
 		
-		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
+		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
 		
 		if(!targetLocationHotStartFile.equals("")){
 			

@@ -1,6 +1,5 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelMinCost;
@@ -13,8 +12,6 @@ import org.matsim.core.router.util.TravelMinCost;
  *
  */
 public class FreeSpeedTravelTimeCostCalculator implements TravelMinCost, TravelCost{
-	
-	private static final Logger log = Logger.getLogger(FreeSpeedTravelTimeCostCalculator.class);
 	
 	@Override
 	public double getLinkGeneralizedTravelCost(Link link, double time) {

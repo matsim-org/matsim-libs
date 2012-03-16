@@ -158,7 +158,7 @@ public class Constants {
 	public static final String PATH_TO_GENERATED_MATSIM_CONFIG_FILE = "generatedMATSimConfigPath";
 	
 	/** MATSim config modules */
-	public static final String MATSIM_CONFIG_MODULE_CONTROLLER = "controler";
+	public static final String MATSIM_CONFIG_MODULE_CONTROLLER = "matsimControler";
 	public static final String MATSIM_CONFIG_MODULE_PLANS = "plans";
 	public static final String MATSIM_CONFIG_MODULE_URBANSIM_PARAMETER = "urbansimParameter";
 	public static final String MATSIM_CONFIG_PARAMETER_SAMPLING_RATE = "samplingRate";
@@ -167,17 +167,17 @@ public class Constants {
 	
 	/** test run */
 	public static final int TEST_RUN_SUCCESSFUL = 0;
-	public static final int TEST_RUN_FAILD = -1;
+	public static final int TEST_RUN_FAILD 		= -1;
 	
 	/** exit codes */
-	public static final int NOT_VALID_PATH	= 0;
-	public static final int MATSIM_PROPERTIES_FILE_NOT_FOUND	= 1;
+	public static final int NOT_VALID_PATH		= 0;
+	public static final int MATSIM_PROPERTIES_FILE_NOT_FOUND = 1;
 	public static final int CONFIG_OBJECT_NOT_INITIALIZED = 2;
 	public static final int EXCEPTION_OCCURED	= 3;
-	public static final int UNMARSCHALLING_FAILED	= 4;
+	public static final int UNMARSCHALLING_FAILED = 4;
 	
-	/** MATSim 4 UrbanSim parameter names **/
-	public static final String MATSIM_4_URBANSIM_PARAM = "matsim4urbansim";
+	/** MATSim 4 UrbanSim (urbansimParameter) parameter names **/
+	public static final String URBANSIM_PARAMETER = "urbansimParameter";
 	public static final String IS_TEST_RUN = "isTestRun";
 	public static final String SAMPLING_RATE = "samplingRate";
 	public static final String OPUS_HOME_PARAM = "opusHomeParam";
@@ -190,9 +190,30 @@ public class Constants {
 	public static final String YEAR = "year";
 	public static final String BACKUP_RUN_DATA_PARAM = "backupRunDataParam";
 	public static final String TEST_PARAMETER_PARAM = "testParameter";
+	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
+	public static final String MATSIM_MODE = "matsim_mode";
+	public static final String TARGET_LOCATION_HOT_START_PLANS_FILE = "target_location_for_hotstart_plans_file";
+	
+	/** MATSim 4 UrbanSim (matsim4urbansimContoler) parameter names **/
+	public static final String MATSIM_4_URBANSIM_CONTROLER = "matsim4urbansimContoler";
+	public static final String COMPUTE_AGENT_PERFORMANCE = "compute_agent_performance";
 	public static final String COMPUTE_ZONE_2_ZONE_IMPEDANCE = "compute_zone2zone_impedance";
-	public static final String COMPUTE_LOGSUM = "compute_logsum";
-	public static final String RETURN_RAW_SUM = "return_raw_sum";
+	public static final String COMPUTE_ZONE_BASED_ACCESSIBILITY = "compute_zonebased_accessibility";
+	public static final String COMPUTE_CELL_BASED_ACCESSIBILITY_SHAPEFILE = "compute_cellbased_accessibility_with_shapefile";
+	public static final String COMPUTE_CELL_BASED_ACCESSIBILITY_NETWORK = "compute_cellbased_accessibility_with_networkboundary";
+	public static final String CELL_SIZE = "cell_size";
+	public static final String BOUNDING_BOX_TOP = "bb_top";
+	public static final String BOUNDING_BOX_LEFT= "bb_left";
+	public static final String BOUNDING_BOX_RIGHT = "bb_right";
+	public static final String BOUNDING_BOX_BOTTOM = "bb_bottom";
+	public static final String CELL_BASED_ACCESSIBILITY_SHAPEFILE = "cell_based_accessibility_shapefile";
+	public static final String COMPUTE_RAW_SUM = "compute_raw_sum";
+	public static final String USE_MATSIM_CAR_PARAMETER = "use_matsim_car_parameter";
+	public static final String USE_MATSIM_WALK_PARAMETER = "use_matsim_walk_parameter";
+	public static final String USE_MATSIM_LOGIT_SCALE_PARAMETER = "use_matsim_logit_scale_parameter";
+	
+	/** MATSim 4 UrbanSim (accessibilityParameter) parameter names **/
+	public static final String ACCESSIBILITY_PARAMETER = "accessibility_parameter";
 	public static final String LOGIT_SCALE_PARAMETER = "logitScaleParameter"; // Formally known as "beta_brain"
 	public static final String BETA_CAR_TRAVEL_TIMES = "betaCarTravelTime";
 	public static final String BETA_CAR_LN_TRAVEL_TIMES = "betaCarLnTravelTime";
@@ -212,10 +233,6 @@ public class Constants {
 	public static final String BETA_WALK_TRAVEL_COSTS = "betaWalkTravelCost";
 	public static final String BETA_WALK_LN_TRAVEL_COSTS = "betaWalkTravelCostPower2";
 	public static final String BETA_WALK_TRAVEL_COSTS_POWER = "betaWalkLnTravelCost";
-	public static final String TEST_PARAMETER = "testParameter";
-	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
-	public static final String MATSIM_MODE = "matsim_mode";
-	public static final String TARGET_LOCATION_HOT_START_PLANS_FILE = "target_location_for_hotstart_plans_file";
 	
 	/** ERSA output file header items */
 	public static final String ERSA_ZONE_ID = "zone_id";

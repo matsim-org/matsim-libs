@@ -129,7 +129,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		// this calculates the workplace accessibility travel times
 		LeastCostPathTree lcptTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
 		// this calculates the workplace accessibility distances
-		LeastCostPathTree lcptDistance = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
+		LeastCostPathTree lcptDistance = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator(sc.getConfig().plansCalcRoute().getWalkSpeed()) ); // tnicolai: this is experimental, check with Kai, sep'2011
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
@@ -390,7 +390,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 */
 	private BufferedWriter initCSVWriter(Scenario sc)
 			throws FileNotFoundException, IOException {
-		String filename = sc.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM) + "accessibility_indicators_ersa.csv";
+		String filename = sc.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_TEMP_PARAM) + "accessibility_indicators_ersa.csv";
 		csvID = benchmark.addMeasure("Writing CSV File (Accessibility Measures)", filename, false);
 		
 		BufferedWriter accessibilityIndicatorWriter = IOUtils.getBufferedWriter( filename );
