@@ -17,12 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia;
+package playground.dgrether.signalsystems.sylvia.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
-import playground.dgrether.DgPaths;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
 
@@ -41,9 +41,7 @@ public class SylviaMain {
 		log.info("Running SylviaMain...");
 		String[] args2 = null;
 		if (args == null || args.length == 0){
-			log.info("No args given, running local config...");
-			args2 = new String[1];
-			args2[0] = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config.xml";
+			throw new RuntimeException("No arguments given, expecting path to config!");
 		}
 		else {
 			args2 = args;

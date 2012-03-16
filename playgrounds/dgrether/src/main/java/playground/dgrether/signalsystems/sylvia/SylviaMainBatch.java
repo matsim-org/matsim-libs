@@ -36,6 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
 

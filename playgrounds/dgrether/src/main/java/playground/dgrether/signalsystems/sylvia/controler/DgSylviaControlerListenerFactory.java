@@ -22,7 +22,6 @@ package playground.dgrether.signalsystems.sylvia.controler;
 import org.matsim.signalsystems.controler.SignalsControllerListener;
 import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 
-import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
 
 
 /**

@@ -21,7 +21,10 @@ package playground.dgrether.daganzo2012;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -31,9 +34,13 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
-import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
+import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
+import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
+import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
 
@@ -43,10 +50,14 @@ import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListe
  */
 public class Daganzo2012Run {
 
+	private static final String SEPARATOR = "\t";
+
 	private TTInOutflowEventHandler handler3;
 	private TTInOutflowEventHandler handler4;
+	private DgSignalGreenSplitHandler greenSplitHandler;
 	private String outfile;
 	private BufferedWriter writer;
+	private BufferedWriter splitWriter;
 	
 	public static void main(String[] args) {
 		String config = args[0];
@@ -56,7 +67,8 @@ public class Daganzo2012Run {
 	private void run(String config) {
 		Controler controler = new Controler(config);
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
-		sylviaConfig.setMaxGreenScale(2.0);
+		sylviaConfig.setSignalGroupMaxGreenScale(2.0);
+		sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(false);
 		controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(sylviaConfig));
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
@@ -67,7 +79,9 @@ public class Daganzo2012Run {
 	private void addControlerListener(Controler c) {
 		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
-	
+		greenSplitHandler = new DgSignalGreenSplitHandler();
+		greenSplitHandler.addSignalSystem(new IdImpl("1"));
+		
 		c.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent e) {
 				e.getControler().getEvents().addHandler(handler3);
@@ -81,6 +95,21 @@ public class Daganzo2012Run {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+				
+				
+				//green splits
+				e.getControler().getEvents().addHandler(greenSplitHandler);
+				outfile = e.getControler().getControlerIO().getOutputFilename("splits.txt");
+				splitWriter = IOUtils.getBufferedWriter(outfile);
+				String splitHeader = DgGreenSplitWriter.createHeader();
+				splitHeader = "Iteration \t" + splitHeader;
+				try {
+					splitWriter.append(splitHeader);
+					splitWriter.newLine();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
 			}
 		});
 
@@ -102,6 +131,36 @@ public class Daganzo2012Run {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+				
+				
+				for (Id ssid : greenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
+					Map<Id, DgSignalGroupAnalysisData> signalGroupMap = greenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap();
+					for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGroupMap.entrySet()) {
+						// logg.info("for signalgroup: "+entry.getKey());
+						for (Entry<SignalGroupState, Double> ee : entry.getValue().getStateTimeMap().entrySet()) {
+							// logg.info(ee.getKey()+": "+ee.getValue());
+							StringBuilder line = new StringBuilder();
+							line.append(e.getIteration());
+							line.append(SEPARATOR);
+							line.append(ssid);
+							line.append(SEPARATOR);
+							line.append(entry.getKey());
+							line.append(SEPARATOR);
+							line.append(ee.getKey());
+							line.append(SEPARATOR);
+							line.append(ee.getValue());
+							try {
+								splitWriter.append(line.toString());
+								splitWriter.newLine();
+								splitWriter.flush();
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+				}
+				
+				
 			}
 		});
 		
@@ -110,6 +169,8 @@ public class Daganzo2012Run {
 				try {
 					writer.flush();
 					writer.close();
+					splitWriter.flush();
+					splitWriter.close();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

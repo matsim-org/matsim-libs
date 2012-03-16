@@ -20,6 +20,7 @@
 package playground.dgrether.utils;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -51,10 +52,10 @@ public class DgOTFVisUtils {
 		((PopulationImpl)scenario.getPopulation()).runAlgorithms();
 	}
 	
-	public static void preparePopulation4Simulation(ScenarioImpl scenario) {
+	public static void preparePopulation4Simulation(Scenario scenario) {
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		PlansCalcRoute router = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
-		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
+		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (ScenarioImpl) scenario);
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			pp4s.run(p);
 		}

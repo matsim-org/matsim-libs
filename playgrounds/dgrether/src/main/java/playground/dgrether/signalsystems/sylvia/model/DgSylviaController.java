@@ -38,7 +38,7 @@ import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.signalsystems.DgSensorManager;
-import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
@@ -53,7 +53,7 @@ public class DgSylviaController implements SignalController {
 	
 	public final static String CONTROLLER_IDENTIFIER = "SylviaSignalControl";
 
-	private static int extensionPointsDumpCount = 0;
+	private static int sylviaPlanDumpCount = 0;
 	
 	private SignalSystem system = null;
 	private Map<Id, SignalPlan> signalPlans = new HashMap<Id, SignalPlan>();
@@ -61,12 +61,12 @@ public class DgSylviaController implements SignalController {
 	private DgSylviaSignalPlan activeSylviaPlan = null;
 	private boolean extensionActive = false;
 	private boolean forcedExtensionActive = false;
-	private int secondInSylviaCycle = 0;
+	private int secondInSylviaCycle = -1;
 	private Map<Integer, DgExtensionPoint> extensionPointMap = null;
 	private Map<Integer, DgExtensionPoint> forcedExtensionPointMap = null;
 	private Map<Id, Double> greenGroupId2OnsetMap = null;
 	private int extensionTime = 0;
-	private int secondInCycle = 0;
+	private int secondInCycle = -1; //used for debug output
 
 	private DgSylviaConfig sylviaConfig;
 	
@@ -110,25 +110,25 @@ public class DgSylviaController implements SignalController {
 
 	private void initCylce() {
 		this.secondInSylviaCycle = -1; //as this is incremented before use
+		this.secondInCycle = -1;
 		this.extensionTime = 0;
-		this.secondInCycle = 0;
 	}
 	
 	
 	@Override
 	public void updateState(double timeSeconds) {
-		this.secondInCycle++;
 		//TODO check sylvia timer reset
 //		log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle + " ext time: " + this.extensionTime + " of " + this.activeSylviaPlan.getMaxExtensionTime());
 		int secondInFixedTimeCycle = (int) (timeSeconds % this.activeSylviaPlan.getFixedTimeCycle());
 //		if (secondInFixedTimeCycle == 0){
-		if (this.secondInSylviaCycle == this.activeSylviaPlan.getCycleTime()){
+		if (this.secondInSylviaCycle == this.activeSylviaPlan.getCycleTime() - 1){
 //			log.error("Reset cycle timers at " + timeSeconds);
 //			log.error("  sylvia timer: " + this.secondInSylviaCycle + " sylvia cycle: " + this.activeSylviaPlan.getCycleTime());
 //			log.error("  fixed-time timer: " + secondInFixedTimeCycle + " fixed-time cycle: " + this.activeSylviaPlan.getFixedTimeCycle());
 //			log.error("  cylce length: " + this.secondInCycle);
 			this.initCylce();
 		}
+		this.secondInCycle++;
 		
 		if (this.forcedExtensionActive){
 			this.forcedExtensionActive = this.checkForcedExtensionCondition();
@@ -144,8 +144,7 @@ public class DgSylviaController implements SignalController {
 		}
 		else {
 			this.secondInSylviaCycle++;
-//			log.info("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle);
-//			log.info("sylvia timer: " + this.secondInSylviaCycle);
+//			log.error("time: " + timeSeconds + " sylvia timer: " + this.secondInSylviaCycle + " fixed-time timer: " + this.secondInCycle);
 			//check for forced extension trigger
 			if (this.forcedExtensionPointMap.containsKey(this.secondInSylviaCycle)){
 				if (this.checkForcedExtensionCondition()){
@@ -192,7 +191,10 @@ public class DgSylviaController implements SignalController {
 
 	
 	private boolean isExtensionTimeLeft(){
-		return this.extensionTime < this.activeSylviaPlan.getMaxExtensionTime();
+		if (this.sylviaConfig.isUseFixedTimeCycleAsMaximalExtension()){
+			return this.extensionTime < this.activeSylviaPlan.getMaxExtensionTime();
+		}
+		return true;
 	}
 	
 	private boolean isGreenTimeLeft(double timeSeconds, Id groupId, int maxGreenTime){
@@ -319,9 +321,9 @@ public class DgSylviaController implements SignalController {
 		this.activeSylviaPlan.setFixedTimeCycle(plans.getFirst().getCycleTime());
 		this.setMaxExtensionTimeInSylviaPlan(plans);
 		this.calculateExtensionPoints(plans);
-		if (extensionPointsDumpCount < 1){
-			this.dumpExtensionPoints();
-			extensionPointsDumpCount++;
+		if (sylviaPlanDumpCount < 1){
+			this.dumpSylviaPlan();
+			sylviaPlanDumpCount++;
 		}
 		this.initializeSensoring();
 	}
@@ -361,7 +363,7 @@ public class DgSylviaController implements SignalController {
 		for (SignalGroupSettingsData settings : sylvia.getPlanData().getSignalGroupSettingsDataByGroupId().values()){
 			Integer dropping;
 			if (settings.getDropping() == 0) {
-				dropping = sylvia.getCycleTime() - 1;
+				dropping = sylvia.getCycleTime() - 1; //TODO check this, what's about offset
 			}
 			else {
 				//set the extension point one second before the dropping
@@ -379,7 +381,7 @@ public class DgSylviaController implements SignalController {
 			//calculate max green time
 			SignalGroupSettingsData fixedTimeSettings = ((DatabasedSignalPlan)fixedTime).getPlanData().getSignalGroupSettingsDataByGroupId().get(settings.getSignalGroupId());
 			int fixedTimeGreen = DgSignalsUtils.calculateGreenTimeSeconds(fixedTimeSettings, fixedTime.getCycleTime());
-			int maxGreen = (int) (fixedTimeGreen * this.sylviaConfig.getMaxGreenScale());
+			int maxGreen = (int) (fixedTimeGreen * this.sylviaConfig.getSignalGroupMaxGreenScale());
 			if (maxGreen >= fixedTime.getCycleTime()){
 				maxGreen = fixedTimeGreen;
 			}
@@ -388,8 +390,9 @@ public class DgSylviaController implements SignalController {
 		//TODO add last extension point in cylce as a forced extension point
 	}
 
-	private void dumpExtensionPoints() {
+	private void dumpSylviaPlan() {
 		log.debug("Signal System: "+ this.system.getId() + " Plan: " + this.activeSylviaPlan.getPlanData().getId());
+		log.debug("  Maximal time for extension: " + this.activeSylviaPlan.getMaxExtensionTime());
 		for (DgExtensionPoint p : this.extensionPointMap.values()){
 			log.debug("  ExtensionPoint at: " + p.getSecondInPlan() + " groups: ");
 			for (Id sgId : p.getSignalGroupIds()){

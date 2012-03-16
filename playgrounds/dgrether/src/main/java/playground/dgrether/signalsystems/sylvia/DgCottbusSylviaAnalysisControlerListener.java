@@ -19,13 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -35,11 +29,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.signalsystems.model.SignalGroupState;
 
+import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
-import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
 
 /**
  * 
@@ -57,7 +49,6 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 
 	private DgSignalGreenSplitHandler signalGreenSplitHandler;
 
-	private static final String SEPARATOR = "\t";
 	
 	@Override
 	public void notifyStartup(StartupEvent e) {
@@ -105,34 +96,9 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 	
 	
 	private void writeSignalStats(IterationEndsEvent event){
-		try {
 			String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "signal_statistic.csv");
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			String header = "Signal System Id" + SEPARATOR + "Signal Group Id" + SEPARATOR + "Signal Group State" + SEPARATOR + "Time sec.";
-			writer.append(header);
-			for (Id ssid : signalGreenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
-				Map<Id, DgSignalGroupAnalysisData> signalGroupMap = signalGreenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap();
-				for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGroupMap.entrySet()) {
-					// logg.info("for signalgroup: "+entry.getKey());
-					for (Entry<SignalGroupState, Double> ee : entry.getValue().getStateTimeMap().entrySet()) {
-						// logg.info(ee.getKey()+": "+ee.getValue());
-						StringBuilder line = new StringBuilder();
-						line.append(ssid);
-						line.append(SEPARATOR);
-						line.append(entry.getKey());
-						line.append(SEPARATOR);
-						line.append(ee.getKey());
-						line.append(SEPARATOR);
-						line.append(ee.getValue());
-						writer.append(line.toString());
-						writer.newLine();
-					}
-				}
-			}				
-			writer.close();
+			new DgGreenSplitWriter(signalGreenSplitHandler).writeFile(filename);
+			
 			log.info("Wrote signalsystemstats.");
-		} catch (IOException e){
-			e.printStackTrace();
-		}
 	}
 }

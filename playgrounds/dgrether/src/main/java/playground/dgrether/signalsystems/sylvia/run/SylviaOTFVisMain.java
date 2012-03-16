@@ -17,12 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia;
+package playground.dgrether.signalsystems.sylvia.run;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
@@ -35,6 +37,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
 import playground.dgrether.utils.DgOTFVisUtils;
 
@@ -46,17 +49,27 @@ import playground.dgrether.utils.DgOTFVisUtils;
  */
 public class SylviaOTFVisMain {
 
-	public void playCottbus(String configFileName){
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFileName);
-		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
-		this.playCottbus(scenario);
+	public void prepare4SimAndPlay(String configFileName){
+		Config config = ConfigUtils.loadConfig(configFileName);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		this.prepare4SimAndPlay(scenario);
 	}	
+
+	public void playConfig(String configFileName) {
+		Config config = ConfigUtils.loadConfig(configFileName);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		this.playScenario(scenario);
+	}
+
 	
-	public void playCottbus(ScenarioImpl scenario){
+	public void prepare4SimAndPlay(Scenario scenario){
 		DgOTFVisUtils.preparePopulation4Simulation(scenario);
-		
+		this.playScenario(scenario);
+	}
+
+	public void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
-		scenario.getConfig().otfVis().setAgentSize(40.0f);
+//		scenario.getConfig().otfVis().setAgentSize(40.0f);
 
 		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
 		sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitions20.class));
@@ -74,18 +87,26 @@ public class SylviaOTFVisMain {
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		otfVisQSim.run();
-
 	}
 	
-
-
-
-	/**
-	 * @param args
-	 */
+	
 	public static void main(String[] args) {
+		if (args.length < 1){
+			System.out.println("Expecting config as first parameter");
+			System.out.println("Optionally use --doPrepare4Sim to call PersonPrepareForSim before playing the config.");
+			System.exit(0);
+		}
+		String configFileName = args[0];
 		SylviaOTFVisMain sylviaMain = new SylviaOTFVisMain();
-		sylviaMain.playCottbus("/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config.xml");
+		if (args.length < 2){
+			sylviaMain.playConfig(configFileName);
+		}
+		else if (args.length == 2){
+			if (args[1].equalsIgnoreCase("--doPrepare4Sim")){
+				sylviaMain.prepare4SimAndPlay(configFileName);
+			}
+		}
 	}
+
 
 }

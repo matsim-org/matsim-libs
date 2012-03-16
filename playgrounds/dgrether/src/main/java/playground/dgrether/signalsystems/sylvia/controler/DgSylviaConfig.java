@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia;
+package playground.dgrether.signalsystems.sylvia.controler;
 
 
 /**
@@ -26,22 +26,32 @@ package playground.dgrether.signalsystems.sylvia;
  */
 public class DgSylviaConfig {
 	
-	private boolean useMaximalExtension = true;
-	
+	/**
+	 * limits the total amount of available extension time to the cycle time of the corresponding fixed-time signal plan
+	 */
+	private boolean useFixedTimeCycleAsMaximalExtension = true;
+	/**
+	 * The distance from the downstream node where sensors are located on a link.
+	 */
 	private double sensorDistanceMeter= 10.0;
-	
-	private double gapSeconds = 5.0;
-	
+	/**
+	 * The maximal green time for each signal group is determined by multiplying this parameter with the green
+	 * time of the signal group in the fixed-time signal plan that belongs to the sylvia signal plan.
+	 */
 	private double signalGroupMaxGreenScale = 1.5;
 
+	/**
+	 * currently not used
+	 */
+	private double gapSeconds = 5.0;
 	
-//	public boolean isUseMaximalExtension() {
-//		return useMaximalExtension;
-//	}
-//
-//	public void setUseMaximalExtension(boolean useMaximalExtension) {
-//		this.useMaximalExtension = useMaximalExtension;
-//	}
+	public boolean isUseFixedTimeCycleAsMaximalExtension() {
+		return useFixedTimeCycleAsMaximalExtension;
+	}
+
+	public void setUseFixedTimeCycleAsMaximalExtension(boolean useMaximalExtension) {
+		this.useFixedTimeCycleAsMaximalExtension = useMaximalExtension;
+	}
 
 	
 	public double getSensorDistanceMeter() {
@@ -64,12 +74,12 @@ public class DgSylviaConfig {
 	}
 
 	
-	public double getMaxGreenScale() {
+	public double getSignalGroupMaxGreenScale() {
 		return signalGroupMaxGreenScale;
 	}
 
 	
-	public void setMaxGreenScale(double maxGreenScale) {
+	public void setSignalGroupMaxGreenScale(double maxGreenScale) {
 		this.signalGroupMaxGreenScale = maxGreenScale;
 	}
 	

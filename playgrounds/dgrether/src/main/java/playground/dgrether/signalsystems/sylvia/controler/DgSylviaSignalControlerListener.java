@@ -35,7 +35,6 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
-import playground.dgrether.signalsystems.sylvia.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
 
 
