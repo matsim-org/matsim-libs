@@ -19,6 +19,7 @@
 
 package playground.ikaddoura.parkAndRide.strategyTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -30,10 +31,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
@@ -76,14 +80,18 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 			
 			if (hasParkAndRide == false){ // if plan doesn't contain Park and Ride
 				
-				double xCoord = 2500;
-				double yCoord = 0;
-				Coord parkAndRideCoord = this.sc.createCoord(xCoord, yCoord);
-				Activity parkAndRide1 = pop.getFactory().createActivityFromCoord("parkAndRide", parkAndRideCoord);
-				Activity parkAndRide2 = pop.getFactory().createActivityFromCoord("parkAndRide", parkAndRideCoord);
-				Leg ptLeg = pop.getFactory().createLeg(TransportMode.pt);
-				Leg carLeg = pop.getFactory().createLeg(TransportMode.car);
+				double xCoord1 = 2500;
+				double yCoord1 = 0;
+				Coord parkAndRideCoord1 = this.sc.createCoord(xCoord1, yCoord1);
+				ActivityImpl parkAndRide1 = new ActivityImpl("parkAndRide", parkAndRideCoord1, new IdImpl("4to5")); 
+				parkAndRide1.setMaximumDuration(0.0);
 				
+				double xCoord2 = 2000;
+				double yCoord2 = 0;
+				Coord parkAndRideCoord2 = this.sc.createCoord(xCoord2, yCoord2);
+				ActivityImpl parkAndRide2 = new ActivityImpl("parkAndRide", parkAndRideCoord2, new IdImpl("5to4")); 
+				parkAndRide2.setMaximumDuration(0.0);
+
 				// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
 				for (int i = 0; i < planElements.size(); i++) {
 					PlanElement pe = planElements.get(i);
@@ -91,10 +99,9 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 						Activity act = (Activity) pe;
 						if (act.getType().equals("home") && i==0){
 							planElements.remove(1);
-							planElements.add(1, carLeg);
-							parkAndRide1.setEndTime(act.getEndTime()); // same endTime like activity before
+							planElements.add(1, pop.getFactory().createLeg(TransportMode.car));
 							planElements.add(2, parkAndRide1);
-							planElements.add(3, ptLeg);
+							planElements.add(3, pop.getFactory().createLeg(TransportMode.pt));
 						}
 					}
 				}
@@ -107,27 +114,36 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 						Activity act = (Activity) pe;
 						if (act.getType().equals("home") && i==planElements.size()-1) {
 							planElements.remove(size-2);
-							planElements.add(size-2, carLeg);
-							Activity actBefore = (Activity) planElements.get(i-2);
-							parkAndRide2.setEndTime(actBefore .getEndTime()); // same endTime like activity before
+							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.car));
 							planElements.add(size-2, parkAndRide2);
-							planElements.add(size-2, ptLeg);	
+							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.pt));	
 						}
 					} 
 				}
 				
-//				// change all carLegs between parkAndRideActivities to ptLegs
-//				for (int i = 0; i < planElements.size(); i++) {
-//					PlanElement pe = planElements.get(i);
-//					if (i>3 && i < planElements.size()-3){
-//						if (pe instanceof Leg){
-//							Leg leg = (Leg) pe;
-//							if (TransportMode.car.equals(leg.getMode())){
-//								leg.setMode(TransportMode.pt);
-//							}
-//						}
-//					}
-//				}
+				// change all carLegs between parkAndRideActivities to ptLegs
+				List<Integer> parkAndRidePlanElementIndex = new ArrayList<Integer>();
+				for (int i = 0; i < planElements.size(); i++) {
+					PlanElement pe = planElements.get(i);
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
+						if (act.getType().toString().equals("parkAndRide")){
+							parkAndRidePlanElementIndex.add(i);
+						}
+					}
+				}
+				if (parkAndRidePlanElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
+				for (int i = 0; i < planElements.size(); i++) {
+					PlanElement pe = planElements.get(i);
+					if (i>parkAndRidePlanElementIndex.get(0) && i < parkAndRidePlanElementIndex.get(1)){
+						if (pe instanceof Leg){
+							Leg leg = (Leg) pe;
+							if (TransportMode.car.equals(leg.getMode())){
+								leg.setMode(TransportMode.pt);
+							}
+						}
+					}
+				}
 				
 			}
 			else {

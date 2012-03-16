@@ -26,6 +26,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
@@ -41,26 +42,22 @@ public class ParkAndRideControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
-		PlanStrategy strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		// PlanStrategyImpl hat einen PlanSelector, 0 oder mehr StrategyModules
-		// der PlanSelector wählt einen der existierenden Pläne
-		// StrategyModule verändert einen Plan
+//		PlanStrategy strategy1 = new PlanStrategyImpl(new RandomPlanSelector());
+//		strategy1.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+//		strategy1.addStrategyModule(new SubtourModeChoice(controler.getConfig()));
+//		strategy1.addStrategyModule(new ReRoute(controler));
 		
-//		// TransitSubtourModeChoice
-//		strategy.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-//		strategy.addStrategyModule(new SubtourModeChoice(controler.getConfig()));
-//		strategy.addStrategyModule(new ReRoute(controler));
-//		//-------------------------
-		
-		// Park&Ride
-		strategy.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategy.addStrategyModule(new ParkAndRidePlanStrategyModule(controler));
-//		strategy.addStrategyModule(new ReRoute(controler));
-		//-------------------------
+		PlanStrategy strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+		strategy2.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+		strategy2.addStrategyModule(new ParkAndRidePlanStrategyModule(controler));
+		strategy2.addStrategyModule(new ReRoute(controler)); // this is not working... ???
 
 		StrategyManager manager = this.controler.getStrategyManager() ;
-		manager.addStrategy(strategy, 1.0 );
-		// Strategie und Auswahlgewichtung werden dem StrategyManager hinzugefügt
+//		manager.addStrategy(strategy1, 0.2);
+		manager.addStrategy(strategy2, 0.2);
+		
+//		manager.addChangeRequest(10, strategy1, 0.0);
+//		manager.addChangeRequest(7, strategy2, 0.0);
 	}
 
 }
