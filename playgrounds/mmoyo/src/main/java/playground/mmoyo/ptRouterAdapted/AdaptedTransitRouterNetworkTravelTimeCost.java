@@ -95,12 +95,12 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	}
 	
 	@Override
-	public double getLinkTravelTime(final Link link, final double time) {
-		if ((link == this.previousLink) && (time == this.previousTime)) {
+	public double getLinkTravelTime(final Link link, final double now) {
+		if ((link == this.previousLink) && (now == this.previousTime)) {
 			return this.cachedTravelTime;
 		}
 		this.previousLink = link;
-		this.previousTime = time;
+		this.previousTime = now;
 
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
@@ -112,15 +112,17 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 			// the travel time on the link is 
 			//   the time until the departure (``dpTime - now'')
 			//   + the travel time on the link (there.arrivalTime - here.departureTime)
+			
 			// But quite often, we only have the departure time at the next stop.  Then we use that:
 			double toStopArrivalOffset = (toStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? toStop.getArrivalOffset() : toStop.getDepartureOffset();
-			double time2 = toStopArrivalOffset - fromStop.getDepartureOffset();
-			if (time2 < 0) {
+
+			double trueVehicleInMotionTimeToNextStop = toStopArrivalOffset - fromStop.getDepartureOffset();
+			if (trueVehicleInMotionTimeToNextStop < 0) {
 				// ( this can only happen, I think, when ``bestDepartureTime'' is after midnight but ``time'' was before )
-				time2 += MIDNIGHT;
+				trueVehicleInMotionTimeToNextStop += MIDNIGHT;
 			}
-			this.cachedTravelTime = time2;
-			return time2;
+			this.cachedTravelTime = trueVehicleInMotionTimeToNextStop;
+			return trueVehicleInMotionTimeToNextStop;
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
