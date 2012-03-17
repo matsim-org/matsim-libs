@@ -326,19 +326,30 @@ public final class QSim implements VisMobsim, Netsim {
 		this.teleportationList.clear();
 
 		for (MobsimAgent agent : this.activityEndsList) {
-			if (agent instanceof UmlaufDriver) {
-				log.error("this does not terminate correctly for UmlaufDrivers; needs to be "
-						+ "fixed but for the time being we skip the next couple of lines.  kai, dec'10");
-			} else {
+
+			//			if (agent instanceof UmlaufDriver) {
+//				log.error("this does not terminate correctly for UmlaufDrivers; needs to be "
+//						+ "fixed but for the time being we skip the next couple of lines.  kai, dec'10");
+//			} else {
+			
 				if ( agent.getActivityEndTime()!=Double.POSITIVE_INFINITY 
 						&& agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
-					if (agent.getDestinationLinkId() != null) {
-						events.processEvent(events.getFactory()
-								.createAgentStuckEvent(now, agent.getId(),
-										agent.getDestinationLinkId(), null));
-					}
+					
+					// since we are at an activity, it is not plausible to assume that the agents know mode or destination 
+					// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
+					events.processEvent(events.getFactory().createAgentStuckEvent(now, agent.getId(),null, null));
+					
+
+//					if (agent.getDestinationLinkId() != null) {
+//						// (yy what is the meaning of this condition?  kai, mar'12)
+//						
+//						events.processEvent(events.getFactory()
+//								.createAgentStuckEvent(now, agent.getId(),
+//										agent.getDestinationLinkId(), null));
+//					}
+
 				}
-			}
+//			}
 		}
 		this.activityEndsList.clear();
 	}
@@ -350,8 +361,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 *            the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	 final boolean doSimStep(final double time) { // do not overwrite
-		// in inheritance.
+	 final boolean doSimStep(final double time) {
 			
 		// teleportation "engine":
 		this.handleTeleportationArrivals();
@@ -415,8 +425,8 @@ public final class QSim implements VisMobsim, Netsim {
 			// (yyyy returning ``null'' for mode since not every agent in this state can answer this here. kai, feb'12)
 			
 			this.agents.remove(agent) ;
-			this.getAgentCounter().decLiving();
-			this.getAgentCounter().incLost();
+			this.agentCounter.decLiving();
+			this.agentCounter.incLost();
 			break ;
 		default:
 			throw new RuntimeException("agent with unknown state (possibly null)") ;
@@ -435,6 +445,8 @@ public final class QSim implements VisMobsim, Netsim {
 	private final void arrangeActivityStart(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
 		if (!(agent instanceof AbstractTransitDriver)) {
+			// yy why?  kai, mar'12
+			
 			netEngine.registerAdditionalAgentOnLink(agent);
 		}
 		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
@@ -444,8 +456,9 @@ public final class QSim implements VisMobsim, Netsim {
 
 	@Override
 	public final void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
-		// yyyy quite possibly, this should be "notifyChangedPlan".  kai, oct'10
-		// yy the "newTime" is strictly speaking not necessary.  kai, oct'10
+		// yyyy possibly, this should be "notifyChangedPlan".  kai, oct'10
+		// yy the "newTime" is strictly speaking not necessary.  It is there so people do not put in the 
+		// new time instead of the old time, since then it will not work.  kai, oct'10
 
 		internalRescheduleActivityEnd(agent, oldTime, newTime);
 	}

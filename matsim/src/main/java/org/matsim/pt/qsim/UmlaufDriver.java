@@ -22,6 +22,7 @@ package org.matsim.pt.qsim;
 import java.util.Iterator;
 import java.util.ListIterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -138,9 +139,14 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 
 		} else {
-			this.state = MobsimAgent.State.ABORT ;
-//			this.getSimulation().getAgentCounter().decLiving();
-//			this.sim.reInsertAgentIntoMobsim(this) ;
+			// inserting an activity with end time infinity.  one can debate if this is a hack:
+			// * in general, a MobsimAgent can construct its path through the day on the fly
+			// * in this particular instance, the agent pretends to have a plan
+			// kai, mar'12
+			
+			this.state = MobsimAgent.State.ACTIVITY ;
+			this.departureTime = Double.POSITIVE_INFINITY ;
+			
 		}
 	}
 

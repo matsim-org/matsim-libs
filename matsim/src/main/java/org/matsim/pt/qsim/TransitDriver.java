@@ -20,6 +20,7 @@
 
 package org.matsim.pt.qsim;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -50,7 +51,7 @@ public class TransitDriver extends AbstractTransitDriver {
 
 	final Departure departure;
 
-	final double departureTime;
+	double departureTime;
 
 	private final Leg currentLeg;
 	
@@ -89,7 +90,8 @@ public class TransitDriver extends AbstractTransitDriver {
 		this.getSimulation().getEventsManager().processEvent(
 				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
-		this.state = MobsimAgent.State.ABORT ;
+		this.state = MobsimAgent.State.ACTIVITY ;
+		this.departureTime = Double.POSITIVE_INFINITY ;
 	}
 
 	@Override
