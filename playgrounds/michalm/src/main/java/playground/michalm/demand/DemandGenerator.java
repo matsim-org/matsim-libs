@@ -1,60 +1,28 @@
 package playground.michalm.demand;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Arrays;
 
-import javax.naming.*;
-import javax.xml.parsers.*;
+import javax.naming.ConfigurationException;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.*;
-import org.geotools.feature.*;
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.*;
-import org.matsim.core.network.*;
-import org.matsim.core.scenario.*;
-import org.matsim.core.utils.geometry.geotools.*;
-import org.xml.sax.*;
+import org.xml.sax.SAXException;
 
 import playground.michalm.demand.Zone.Act;
 import playground.michalm.demand.Zone.Group;
-import cern.jet.random.*;
-import cern.jet.random.engine.*;
-
-import com.vividsolutions.jts.geom.*;
 
 
 public class DemandGenerator
+    extends AbstractDemandGenerator
 {
-    private static final Logger log = Logger.getLogger(DemandGenerator.class);
-
-    protected Uniform uniform = new Uniform(new MersenneTwister());
-
-    Scenario scenario;
-    private PopulationFactory pf;
-
-    Map<Id, Zone> zones;
-    List<Zone> fileOrderedZones;
-
-
     public DemandGenerator(String networkFileName, String zonesXMLFileName,
             String zonesShpFileName, String idField)
         throws IOException, SAXException, ParserConfigurationException
 
     {
-        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        pf = scenario.getPopulation().getFactory();
-        MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-        nr.readFile(networkFileName);
-
-        ZoneXMLReader xmlReader = new ZoneXMLReader(scenario);
-        xmlReader.parse(zonesXMLFileName);
-        zones = xmlReader.getZones();
-        fileOrderedZones = xmlReader.getZoneFileOrder();
-
-        ZoneShpReader shpReader = new ZoneShpReader(scenario, zones);
-        shpReader.readZones(zonesShpFileName, idField);
+        super(networkFileName, zonesXMLFileName, zonesShpFileName, idField);
     }
 
 
@@ -71,8 +39,7 @@ public class DemandGenerator
             lDistrib.add(z, z.getActPlaces(Act.L).intValue());
         }
 
-        Population popul = scenario.getPopulation();
-        PopulationFactory pf = popul.getFactory();
+        PopulationFactory pf = getPopulationFactory();
 
         for (Zone z : zones.values()) {
             // S - students: h-s-h-l-h
@@ -88,13 +55,13 @@ public class DemandGenerator
 
                 plan.addLeg(pf.createLeg(TransportMode.car));
 
-                act = createActivity(plan, "s", sDistrib);
+                act = createActivity(plan, "s", getRandomCoordInZone(sDistrib.draw()));
                 act.setStartTime(9 * 3600 + timeShift);
                 act.setEndTime(15 * 3600 + timeShift);
 
                 plan.addLeg(pf.createLeg(TransportMode.car));
 
-                act = createActivity(plan, "l", lDistrib);
+                act = createActivity(plan, "l", getRandomCoordInZone(lDistrib.draw()));
                 act.setStartTime(16 * 3600 + timeShift);
                 act.setEndTime(18 * 3600 + timeShift);
 
@@ -118,19 +85,19 @@ public class DemandGenerator
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    act = createActivity(plan, "w", wDistrib);
+                    act = createActivity(plan, "w", getRandomCoordInZone(wDistrib.draw()));
                     act.setStartTime(8 * 3600 + timeShift);
                     act.setEndTime(12 * 3600 + timeShift);
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    act = createActivity(plan, "l", lDistrib);
+                    act = createActivity(plan, "l", getRandomCoordInZone(lDistrib.draw()));
                     act.setStartTime(13 * 3600 + timeShift);
                     act.setEndTime(14 * 3600 + timeShift);
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    act = createActivity(plan, "w", wDistrib);
+                    act = createActivity(plan, "w", getRandomCoordInZone(wDistrib.draw()));
                     act.setStartTime(15 * 3600 + timeShift);
                     act.setEndTime(18 * 3600 + timeShift);
 
@@ -146,7 +113,7 @@ public class DemandGenerator
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    act = createActivity(plan, "w", wDistrib);
+                    act = createActivity(plan, "w", getRandomCoordInZone(wDistrib.draw()));
                     act.setStartTime(9 * 3600 + timeShift);
                     act.setEndTime(17 * 3600 + timeShift);
 
@@ -176,7 +143,7 @@ public class DemandGenerator
 
                 plan.addLeg(pf.createLeg(TransportMode.car));
 
-                act = createActivity(plan, "l", lDistrib);
+                act = createActivity(plan, "l", getRandomCoordInZone(lDistrib.draw()));
                 act.setStartTime(12 * 3600 + timeShift);
                 act.setEndTime(15 * 3600 + timeShift);
 
@@ -186,68 +153,6 @@ public class DemandGenerator
                 act.setStartTime(16 * 3600 + timeShift);
             }
         }
-    }
-
-
-    public void write(String plansfileName)
-    {
-        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork())
-                .writeV4(plansfileName);
-        log.info("Generated population written to: " + plansfileName);
-    }
-
-
-    Activity createActivity(Plan plan, String actType, Coord coord)
-    {
-        NetworkImpl network = (NetworkImpl)scenario.getNetwork();
-        Link link = network.getNearestLink(coord);
-        Activity act = pf.createActivityFromLinkId(actType, link.getId());
-        plan.addActivity(act);
-        return act;
-    }
-
-
-    private Activity createActivity(Plan plan, String actType, Distribution<Zone> zoneDistrib)
-    {
-        Zone zone = zoneDistrib.draw();
-        return createActivity(plan, actType, getRandomCoordInZone(zone));
-    }
-
-
-    Coord getRandomCoordInZone(Zone zone)
-    {
-        Feature ft = zone.getZonePolygon();
-
-        Envelope bounds = ft.getBounds();
-        double minX = bounds.getMinX();
-        double maxX = bounds.getMaxX();
-        double minY = bounds.getMinY();
-        double maxY = bounds.getMaxY();
-
-        Geometry geometry = ft.getDefaultGeometry();
-        Point p = null;
-        do {
-            double x = uniform.nextDoubleFromTo(minX, maxX);
-            double y = uniform.nextDoubleFromTo(minY, maxY);
-            p = MGC.xy2Point(x, y);
-        }
-        while (!geometry.contains(p));
-
-        return scenario.createCoord(p.getX(), p.getY());
-    }
-
-
-    private int id = 0;
-
-
-    Plan createPlan()
-    {
-        Person person = pf.createPerson(scenario.createId(Integer.toString(id++)));
-        scenario.getPopulation().addPerson(person);
-
-        Plan plan = pf.createPlan();
-        person.addPlan(plan);
-        return plan;
     }
 
 

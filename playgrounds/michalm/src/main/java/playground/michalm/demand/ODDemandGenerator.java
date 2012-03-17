@@ -18,7 +18,7 @@ public class ODDemandGenerator
     // private static final Logger log = Logger.getLogger(ODDemandGenerator.class);
 
     private final int zoneCount;
-    private final int[][] odMatrix;
+    private final double[][] odMatrix;
 
     private final double hours; // time of simulation (i.e. 1.5 hours)
     private final double flowCoeff; // artificial increase/decrease of the flow
@@ -38,7 +38,7 @@ public class ODDemandGenerator
 
         // read OD matrix
         zoneCount = fileOrderedZones.size();
-        odMatrix = Array2DReader.getIntArray(new File(odMatrixFileName), zoneCount);
+        odMatrix = Array2DReader.getDoubleArray(new File(odMatrixFileName), zoneCount);
 
     }
 
@@ -46,8 +46,7 @@ public class ODDemandGenerator
     @Override
     public void generate()
     {
-        Population popul = scenario.getPopulation();
-        PopulationFactory pf = popul.getFactory();
+        PopulationFactory pf = getPopulationFactory();
 
         for (int i = 0; i < zoneCount; i++) {
             Zone oZone = fileOrderedZones.get(i);
@@ -55,10 +54,11 @@ public class ODDemandGenerator
             for (int j = 0; j < zoneCount; j++) {
                 Zone dZone = fileOrderedZones.get(j);
 
-                int odFlow = (int)Math.round(flowCoeff * odMatrix[i][j]);
+                double odFlow = flowCoeff * odMatrix[i][j];
                 boolean isInternalFlow = i < 9 && j < 9;
+                int count = (int)Math.ceil(hours * odFlow);
 
-                for (int k = 0; k < hours * odFlow; k++) {
+                for (int k = 0; k < count; k++) {
                     Plan plan = createPlan();
 
                     Coord oCoord = getRandomCoordInZone(oZone);
