@@ -80,17 +80,11 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 			
 			if (hasParkAndRide == false){ // if plan doesn't contain Park and Ride
 				
-				double xCoord1 = 2500;
-				double yCoord1 = 0;
-				Coord parkAndRideCoord1 = this.sc.createCoord(xCoord1, yCoord1);
-				ActivityImpl parkAndRide1 = new ActivityImpl("parkAndRide", parkAndRideCoord1, new IdImpl("4to5")); 
-				parkAndRide1.setMaximumDuration(0.0);
-				
-				double xCoord2 = 2000;
-				double yCoord2 = 0;
-				Coord parkAndRideCoord2 = this.sc.createCoord(xCoord2, yCoord2);
-				ActivityImpl parkAndRide2 = new ActivityImpl("parkAndRide", parkAndRideCoord2, new IdImpl("5to4")); 
-				parkAndRide2.setMaximumDuration(0.0);
+				double xCoord = 2500;
+				double yCoord = 0;
+				Coord parkAndRideCoord = this.sc.createCoord(xCoord, yCoord);
+				ActivityImpl parkAndRide = new ActivityImpl("parkAndRide", parkAndRideCoord, new IdImpl("4to5")); 
+				parkAndRide.setMaximumDuration(0.0);
 
 				// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
 				for (int i = 0; i < planElements.size(); i++) {
@@ -100,7 +94,7 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 						if (act.getType().equals("home") && i==0){
 							planElements.remove(1);
 							planElements.add(1, pop.getFactory().createLeg(TransportMode.car));
-							planElements.add(2, parkAndRide1);
+							planElements.add(2, parkAndRide);
 							planElements.add(3, pop.getFactory().createLeg(TransportMode.pt));
 						}
 					}
@@ -115,7 +109,7 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 						if (act.getType().equals("home") && i==planElements.size()-1) {
 							planElements.remove(size-2);
 							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.car));
-							planElements.add(size-2, parkAndRide2);
+							planElements.add(size-2, parkAndRide);
 							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.pt));	
 						}
 					} 
