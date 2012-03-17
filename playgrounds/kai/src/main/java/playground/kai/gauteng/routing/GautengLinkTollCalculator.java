@@ -29,14 +29,22 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.TollTravelCostCalculator;
 
 /**
- * @author bkick
- * @author michaz
+ * The regular TollTravelCostCalculator assumes that generalized travel cost is already converted into money terms,
+ * and adds toll payments without additional conversion.  This is incomplete at two fronts:<ul>
+ * <li> Matsim now "thinks" in terms of utils, not monetary units.
+ * <li> The relation between money and time may vary from agent to agent or between agent classes (often "value of time"
+ * or "value of travel time savings", in matsim now in fact "utility of money" = person-dependent conversion factor of money
+ * into utility)
+ * </ul>
+ * For those reasons the addition of toll to travel disutility needs to be redone her and in the factory. 
  * 
+ * @author kn after
+ * @author bkick after
+ * @author michaz
  */
+class GautengLinkTollCalculator {
 
-// a dummy class in order to meet the framework
-class GautengTollTravelCostCalculator implements PersonalizableTravelCost {
-
+	// a dummy class in order to meet the framework
 	class NullTravelCostCalculator implements PersonalizableTravelCost {
 
 		@Override
@@ -53,22 +61,21 @@ class GautengTollTravelCostCalculator implements PersonalizableTravelCost {
 
 	private TollTravelCostCalculator tollTravelCostCalculator;
 	
-	public GautengTollTravelCostCalculator(RoadPricingScheme scheme) {
+	GautengLinkTollCalculator(RoadPricingScheme scheme) {
 		this.tollTravelCostCalculator = new TollTravelCostCalculator(new NullTravelCostCalculator(), scheme);
+		// (because of the NullTravelCostCalculator, this will return the monetary amount of the toll for the link)
 	}
 
-	@Override
-	public void setPerson(Person person) {
+	void setPerson(Person person) {
 	}
 
-	//calculating additional generalized toll costs
-	@Override
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
-		double amount = tollTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
-		int betaIncomeCar = 0;
-		int incomePerDay = 0;
-		double additionalGeneralizedTollCost = (betaIncomeCar / incomePerDay) * amount;
-		return additionalGeneralizedTollCost;
+	double getLinkTollForCars(Link link, double time) {
+
+		return tollTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
+		// yyyyyy despite what this seems, it is most probably not possible to construct a toll scheme where
+		// toll rates vary by vehicle type.  Reason is that the scoring will use a different toll calculator class, unaffected
+		// by the changes here.  kai, mar'12
+		
 	}
 
 }

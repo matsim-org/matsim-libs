@@ -22,46 +22,57 @@ package playground.kai.gauteng.routing;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
- * @author bkick after dgrether
+ * @author kn after bkick after dgrether
  *
  */
 public class GautengTollTravelCostCalculatorFactory implements TravelCostCalculatorFactory {
 
-	private RoadPricingScheme scheme;
+	final boolean isUsingRoadpricing ;
+	final private RoadPricingScheme scheme;
 
-	public GautengTollTravelCostCalculatorFactory(RoadPricingScheme roadPricingScheme) {
-		this.scheme = roadPricingScheme;
+	public GautengTollTravelCostCalculatorFactory(boolean isUsingRoadPricing, RoadPricing roadPricing) {
+		this.isUsingRoadpricing = isUsingRoadPricing ;
+		if ( isUsingRoadPricing ) {
+			this.scheme = roadPricing.getRoadPricingScheme() ;
+		} else {
+			this.scheme = null ;
+		}
 	}
 	
 	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		final GautengTravelCostCalculator incomeTravelCostCalculator = new GautengTravelCostCalculator(timeCalculator, cnScoringGroup);
-		final GautengTollTravelCostCalculator incomeTollTravelCostCalculator = new GautengTollTravelCostCalculator(scheme);
-		
-		return new PersonalizableTravelCost() {
+		final PersonalizableTravelCost delegate = new TravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
 
-			@Override
-			public void setPerson(Person person) {
-				incomeTravelCostCalculator.setPerson(person);
-				incomeTollTravelCostCalculator.setPerson(person);
-			}
-
-			//somehow summing up the income related generalized travel costs and the income related toll costs for the router...
-			//remark: this method should be named "getLinkGeneralizedTravelCosts" or "getLinkDisutilityFromTraveling"
-			@Override
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				double generalizedTravelCost = incomeTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
-				double additionalGeneralizedTollCost = incomeTollTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
-				return generalizedTravelCost + additionalGeneralizedTollCost;
-			}
+		if ( !isUsingRoadpricing ) {
 			
-		};
+			return delegate ;
+			
+		} else {
+			final GautengLinkTollCalculator tollCostCalculator = new GautengLinkTollCalculator(scheme);
+
+			return new PersonalizableTravelCost() {
+				@Override
+				public void setPerson(Person person) {
+					delegate.setPerson(person);
+					tollCostCalculator.setPerson(person);
+				}
+				@Override
+				public double getLinkGeneralizedTravelCost(Link link, double time) {
+					double linkTravelDisutility = delegate.getLinkGeneralizedTravelCost(link, time);
+					double utilityOfMoney = 1. ;
+					linkTravelDisutility += utilityOfMoney * tollCostCalculator.getLinkTollForCars(link, time);
+					return linkTravelDisutility ;
+				}
+			};
+
+		}
 	}
 
 }

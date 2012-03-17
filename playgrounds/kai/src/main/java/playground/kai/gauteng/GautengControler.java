@@ -3,18 +3,15 @@ package playground.kai.gauteng;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.kai.gauteng.routing.GautengTollTravelCostCalculatorFactory;
-import playground.kai.gauteng.routing.GautengTravelCostCalculatorFactory;
 import playground.kai.gauteng.scoring.GautengScoringFunctionFactory;
 
 class MyControlerListener implements StartupListener, AfterMobsimListener {
@@ -41,7 +38,7 @@ class MyControlerListener implements StartupListener, AfterMobsimListener {
 				+ " seconds = " + Time.writeTime(this.calcLegTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
 
 		// trips are from "true" activity to "true" activity.  legs may also go
-		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
+		// from/to ptInteraction activity.  Thus, in my opinion "legs" is the correct (matsim) term
 		// kai, jul'11
 
 	}
@@ -71,20 +68,30 @@ class GautengControler {
 		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory(sc.getConfig(), sc.getNetwork()));
 	}
 	
+	/**
+	 * Explanation:<ul>
+	 * <li> This factory is installed very early in the initialization sequence.
+	 * <li> controler.run() then calls init() which calls loadCoreListeners() which calls
+	 * <pre> new RoadPricing() </pre>
+	 * and add this as a CoreListener.
+	 * <li> The RoadPricing object, when called by notifyStartup(event), pulls the initialization
+	 * information from the event and instantiates itself.  While doing that, it constructs an object
+	 * <pre> new CalcPaidToll( network, tollingScheme ) </pre>
+	 * which is added as an events handler.  
+	 * <li> CalcPaidToll will then collect events for every agent and accumulate the resulting toll.
+	 * <li> Just after this, controler.setTravelCostCalculatorFactory(...) is set with a factory that
+	 * adds the toll to the already existing travel cost object. <i> Which implies to me that in the situation here
+	 * the toll is added twice for routing. yyyyyy </i>
+	 * <li> A notifyAfterMobsim(...) makes the CalcPaidToll object send the accumulated toll to the agents.
+	 * </ul>
+	 */
 	private static void installTravelCostCalculatorFactory(Controler controler) {
-		// returns null, if there is no road pricing
-		// really? not `false'?  kai, mar'12
 		
-		// there is some asymmetry here: installScoringFunctionFactory solves the difference between toll and non-toll in
-		// the factory.  The present method, however, solves it here.  kai, mar'12
-		
-		if (controler.getConfig().scenario().isUseRoadpricing()){
-			RoadPricingScheme roadPricingScheme = controler.getRoadPricing().getRoadPricingScheme();
-			controler.setTravelCostCalculatorFactory(new GautengTollTravelCostCalculatorFactory(roadPricingScheme));
-		}
-		else{
-			controler.setTravelCostCalculatorFactory(new GautengTravelCostCalculatorFactory());
-		}
+		final boolean isUsingRoadpricing = controler.getConfig().scenario().isUseRoadpricing();
+		controler.setTravelCostCalculatorFactory(
+				new GautengTollTravelCostCalculatorFactory(isUsingRoadpricing, controler.getRoadPricing())
+				);
+
 	}
 
 
