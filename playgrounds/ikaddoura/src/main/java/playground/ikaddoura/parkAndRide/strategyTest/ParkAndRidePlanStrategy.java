@@ -74,12 +74,11 @@ public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 	@Override
 	public void handlePlan(Plan plan) {
 		if (plan.getPerson().getId().toString().contains("car")) { // checks if car is available
-			log.info("Car is available --> Adding park and ride to the plan.");
+			log.info("Car is available. Park and Ride is possible.");
 			
 			List<PlanElement> planElements = plan.getPlanElements();
-			
-			// checks if plan contains already Park and Ride
 			boolean hasParkAndRide = false;
+			
 			for (int i = 0; i < planElements.size(); i++) {
 				PlanElement pe = planElements.get(i);
 				if (pe instanceof Activity) {
@@ -90,7 +89,8 @@ public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 				}
 			}
 			
-			if (hasParkAndRide == false){ // if plan doesn't contain Park and Ride
+			if (hasParkAndRide == false){
+				log.info("Plan doesn't contain Park and Ride. Adding Park and Ride...");
 
 				// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus der Liste möglicher P+R Links)
 				Activity parkAndRide = createParkAndRideActivity(Math.random());
@@ -141,23 +141,32 @@ public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 				
 			}
 			else {
-				log.info("Plan contains already a parkAndRide Activity. Changing the ParkAndRide Location...");
+				log.info("Plan contains already Park and Ride. Changing the Park and Ride Location...");
 							
 				List<Integer> planElementIndex = getPlanElementIndex(planElements);
 				if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
 				
-				planElements.remove(planElementIndex.get(0));
-				Activity parkAndRide1 = createParkAndRideActivity(Math.random());
-				planElements.add(planElementIndex.get(0), parkAndRide1);
+				Activity parkAndRide = createParkAndRideActivity(Math.random());
+
+				for (int i = 0; i < planElements.size(); i++) {
+					if (i==planElementIndex.get(0)){ // first Park and Ride Activity
+						planElements.set(i, parkAndRide);
+					}
+					else if (i==planElementIndex.get(1)){ // second Park and Ride Activity
+						planElements.set(i, parkAndRide);
+					}
+				}
 				
-				planElements.remove(planElementIndex.get(1));
-				Activity parkAndRide2 = createParkAndRideActivity(Math.random());
-				planElements.add(planElementIndex.get(1), parkAndRide2);
+//				for (int i = 0; i < planElements.size(); i++) {
+//					if (i==planElementIndex.get(1)){ // second Park and Ride Activity
+//						planElements.set(i, parkAndRide);
+//					}
+//				}
 			}
 			
 		}
 		else {
-			log.info("Person has no car.");
+			log.info("Person has no car. Park and Ride is not possible.");
 			// do nothing!
 		}
 	}
