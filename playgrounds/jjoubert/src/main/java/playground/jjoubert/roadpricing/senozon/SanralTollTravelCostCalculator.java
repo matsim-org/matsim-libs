@@ -65,7 +65,7 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
+			Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}
@@ -76,7 +76,7 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			RoadPricingScheme.Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
+			RoadPricingScheme.Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}
@@ -90,7 +90,7 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			RoadPricingScheme.Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
+			RoadPricingScheme.Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}

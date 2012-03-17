@@ -167,7 +167,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 				 * arriving at this link.  */
 				return;
 			}
-			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost(link.getId(),
+			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(),
 					event.getTime());
 			if (baseCost != null) {
 				double newToll = link.getLength() * baseCost.amount * SanralTollFactor.getTollFactor(event.getPersonId(), link.getId(), event.getTime());
@@ -186,7 +186,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost(link.getId(), event.getTime());
+			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(), event.getTime());
 			if (baseCost != null) {
 				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
@@ -205,7 +205,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	class CordonTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost(link.getId(), event.getTime());
+			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(), event.getTime());
 			if (baseCost != null) {
 				// this is a link inside the toll area.
 				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getPersonId());

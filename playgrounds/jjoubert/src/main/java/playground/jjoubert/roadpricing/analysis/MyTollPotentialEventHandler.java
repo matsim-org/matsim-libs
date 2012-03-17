@@ -80,7 +80,7 @@ public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 					 * it to the map with first toll value.
 					 */
 					double tollFactor = SanralTollFactor.getTollFactor(event.getPersonId(), event.getLinkId(), event.getTime());
-					double toll = tollFactor * this.scheme.getLinkCost(event.getLinkId(), event.getTime()).amount;
+					double toll = tollFactor * this.scheme.getLinkCost_per_m(event.getLinkId(), event.getTime()).amount;
 					if(maps.get(breakIndex).containsKey(event.getPersonId())){
 						maps.get(breakIndex).put(event.getPersonId(), maps.get(breakIndex).get(event.getPersonId()) + toll);
 					} else{
