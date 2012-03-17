@@ -143,7 +143,7 @@ public class RoadPricingScheme {
 	 * <code>null</code> if the link is either not part of the tolling scheme
 	 * or there is no toll at the specified time for the link.
 	 */
-	public Cost getLinkCost(final Id linkId, final double time) {
+	public Cost getLinkCost_per_m(final Id linkId, final double time) {
 		if (this.cacheIsInvalid) buildCache();
 		if (this.linkIds.containsKey(linkId)) {
 		  List<Cost> costs = this.linkIds.get(linkId);
