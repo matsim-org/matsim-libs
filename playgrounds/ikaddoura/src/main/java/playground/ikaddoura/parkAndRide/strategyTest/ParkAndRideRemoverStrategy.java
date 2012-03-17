@@ -32,27 +32,18 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
  */
 public class ParkAndRideRemoverStrategy implements PlanStrategyModule {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#prepareReplanning()
-	 */
 	@Override
 	public void prepareReplanning() {
 		// TODO Auto-generated method stub
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#handlePlan(org.matsim.api.core.v01.population.Plan)
-	 */
 	@Override
 	public void handlePlan(Plan plan) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#finishReplanning()
-	 */
 	@Override
 	public void finishReplanning() {
 		// TODO Auto-generated method stub

@@ -48,12 +48,12 @@ public class ParkAndRideControlerListener implements StartupListener {
 //		strategy1.addStrategyModule(new SubtourModeChoice(controler.getConfig()));
 //		strategy1.addStrategyModule(new ReRoute(controler));
 		
-		// verändert einen Plan nur wenn ein auto verfügbar ist ("car" in person Id)
-		// wenn Plan noch kein ParkAndRide enthält: ParkAndRide wird eingebaut, normaler leg wird in [car-ParkAndRide-pt] bzw. [pt-ParkAndRide-car] umgewandelt 
+		// verändert einen Plan nur wenn ein pkw verfügbar ist ("car" in personId)
+		// wenn Plan noch kein ParkAndRide enthält: ParkAndRide wird eingebaut, normaler leg (beliebiger mode) wird in [car-ParkAndRide-pt] bzw. [pt-ParkAndRide-car] umgewandelt 
 		// wenn Plan bereits ParkAndRide enthält: zufällige Auswahl einer anderen ParkAndRide Facility
 		PlanStrategy strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy2.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategy2.addStrategyModule(new ParkAndRidePlanStrategyModule(controler));
+		strategy2.addStrategyModule(new ParkAndRidePlanStrategy(controler));
 		strategy2.addStrategyModule(new ReRoute(controler));
 		
 		// eine SubtourModeChoice-Strategie, welche die parkAndRide Aktivitäten und ptLegs rauswirft

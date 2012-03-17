@@ -44,15 +44,15 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
 
-public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
-	private static final Logger log = Logger.getLogger(ParkAndRidePlanStrategyModule.class);
+public class ParkAndRidePlanStrategy implements PlanStrategyModule {
+	private static final Logger log = Logger.getLogger(ParkAndRidePlanStrategy.class);
 
 	ScenarioImpl sc;
 	Network net;
 	Population pop;
 	private List<Id> parkAndRideLinkIDs = new ArrayList<Id>();
 
-	public ParkAndRidePlanStrategyModule(Controler controler) {
+	public ParkAndRidePlanStrategy(Controler controler) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
