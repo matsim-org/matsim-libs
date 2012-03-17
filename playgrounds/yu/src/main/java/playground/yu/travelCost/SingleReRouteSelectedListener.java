@@ -51,7 +51,7 @@ public class SingleReRouteSelectedListener implements IterationStartsListener,
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
+					.setTravelDisutilityFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
 							A/* travelTime */));
 		}
 	}

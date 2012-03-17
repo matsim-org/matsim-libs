@@ -32,7 +32,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.telaviv.locationchoice.ExtendedLocationChoicePlanModule;
@@ -51,7 +51,7 @@ public class ExtendedLocationChoiceReRouteDijkstraPlanStrategy implements PlanSt
 		
 		Scenario scenario = controler.getScenario();
 		Network network = controler.getNetwork();
-		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
+		PersonalizableTravelDisutility travelCostCalc = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		Config config = controler.getConfig();
 		

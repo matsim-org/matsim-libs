@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
@@ -19,17 +19,17 @@ import playground.christoph.router.util.KnowledgeTools;
  * that it is checked if a Person knows a Link or not. If not, the
  * returned TravelCost is Double.MAX_VALUE. 
  */
-public class KnowledgeTravelCostWrapper implements PersonalizableTravelCost, Cloneable{
+public class KnowledgeTravelCostWrapper implements PersonalizableTravelDisutility, Cloneable{
 	
 	protected Person person;
-	protected TravelCost travelCostCalculator;
+	protected TravelDisutility travelCostCalculator;
 	protected boolean checkNodeKnowledge = true;
 	protected KnowledgeTools knowledgeTools;
 	protected Network network;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostWrapper.class);
 	
-	public KnowledgeTravelCostWrapper(TravelCost travelCost)
+	public KnowledgeTravelCostWrapper(TravelDisutility travelCost)
 	{
 		this.travelCostCalculator = travelCost;		
 		this.knowledgeTools = new KnowledgeTools();
@@ -44,13 +44,13 @@ public class KnowledgeTravelCostWrapper implements PersonalizableTravelCost, Clo
 	public void setPerson(Person person)
 	{
 		this.person = person;
-		if (travelCostCalculator instanceof PersonalizableTravelCost)
+		if (travelCostCalculator instanceof PersonalizableTravelDisutility)
 		{
-			((PersonalizableTravelCost)travelCostCalculator).setPerson(person);
+			((PersonalizableTravelDisutility)travelCostCalculator).setPerson(person);
 		}
 	}
 	
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) 
+	public double getLinkTravelDisutility(final Link link, final double time) 
 	{	
 		NodeKnowledge nodeKnowledge = null;
 		if (checkNodeKnowledge && person != null)
@@ -68,14 +68,14 @@ public class KnowledgeTravelCostWrapper implements PersonalizableTravelCost, Clo
 		else
 		{
 //			log.info("Get Costs from TravelCostCalculator");
-			return travelCostCalculator.getLinkGeneralizedTravelCost(link, time);
+			return travelCostCalculator.getLinkTravelDisutility(link, time);
 		}
 	}
 	
 	@Override
 	public KnowledgeTravelCostWrapper clone()
 	{
-		TravelCost travelCostCalculatorClone = null;
+		TravelDisutility travelCostCalculatorClone = null;
 		if (travelCostCalculator instanceof Cloneable)
 		{
 			try

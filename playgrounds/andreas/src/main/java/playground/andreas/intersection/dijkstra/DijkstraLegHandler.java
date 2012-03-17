@@ -36,7 +36,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -59,7 +59,7 @@ public class DijkstraLegHandler implements LegRouter {
 	 */
 	private final LeastCostPathCalculator routeAlgo;
 	
-	public DijkstraLegHandler(final Network originalNetwork, final Network wrappedNetwork, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
+	public DijkstraLegHandler(final Network originalNetwork, final Network wrappedNetwork, final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator) {
 		this.routeAlgo = new DijkstraFactory().createPathCalculator(wrappedNetwork, costCalculator, timeCalculator);
 	}
 	

@@ -2,19 +2,19 @@ package playground.mmoyo.zz_archive.PTRouter;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 
 /**
  * Calculates the cost of links for the routing algorithm
  */
-public class PTTravelCost implements TravelCost{
+public class PTTravelCost implements TravelDisutility{
 	private PTTravelTime ptTravelTime;
 	
 	public PTTravelCost(final PTTravelTime ptTravelTime) {
 		this.ptTravelTime = ptTravelTime;
 	}
 	
-	public double getLinkGeneralizedTravelCost(Link link, double time){
+	public double getLinkTravelDisutility(Link link, double time){
 		double cost = ptTravelTime.getLinkTravelTime(link, time) ;  
 
 		String type = ((LinkImpl)link).getType();

@@ -33,10 +33,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 
@@ -78,14 +78,14 @@ public class IterativeKnowledgeControler extends Controler{
 
 	private void setCalculators() {
 		// Use knowledge when Re-Routing
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
+		OnlyTimeDependentTravelDisutilityCalculator travelCost = new OnlyTimeDependentTravelDisutilityCalculator(this.getTravelTimeCalculator());
 		final KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
 
-		this.setTravelCostCalculatorFactory(new TravelCostCalculatorFactory() {
+		this.setTravelDisutilityFactory(new TravelDisutilityFactory() {
 
 			@Override
-			public PersonalizableTravelCost createTravelCostCalculator(
+			public PersonalizableTravelDisutility createTravelDisutility(
 					PersonalizableTravelTime timeCalculator,
 					PlanCalcScoreConfigGroup cnScoringGroup) {
 				return travelCostWrapper;
@@ -112,8 +112,8 @@ public class IterativeKnowledgeControler extends Controler{
 		/*
 		 * We don't use the knowledge here - the initial routes will be anyway on the shortest path.
 		 */
-		PersonalizableTravelTime travelTime = new FreespeedTravelTimeCost(this.config.planCalcScore());
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+		PersonalizableTravelTime travelTime = new FreespeedTravelTimeAndDisutility(this.config.planCalcScore());
+		OnlyTimeDependentTravelDisutilityCalculator travelCost = new OnlyTimeDependentTravelDisutilityCalculator(travelTime);
 		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime, routeFactory);
 		
 		for (Person person : this.getPopulation().getPersons().values())

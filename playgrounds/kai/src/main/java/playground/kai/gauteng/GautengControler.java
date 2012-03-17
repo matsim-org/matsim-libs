@@ -88,7 +88,7 @@ class GautengControler {
 	private static void installTravelCostCalculatorFactory(Controler controler) {
 		
 		final boolean isUsingRoadpricing = controler.getConfig().scenario().isUseRoadpricing();
-		controler.setTravelCostCalculatorFactory(
+		controler.setTravelDisutilityFactory(
 				new GautengTollTravelCostCalculatorFactory(isUsingRoadpricing, controler.getRoadPricing())
 				);
 

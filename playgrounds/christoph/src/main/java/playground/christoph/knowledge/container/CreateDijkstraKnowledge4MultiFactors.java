@@ -48,8 +48,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -84,7 +84,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	 * The selected Nodes depend on the used Cost Calculator
 	 */
 	// null as Argument: -> no TimeCalculator -> use FreeSpeedTravelTime
-	private final TravelCost costCalculator = new OnlyTimeDependentTravelCostCalculator(null);
+	private final TravelDisutility costCalculator = new OnlyTimeDependentTravelDisutilityCalculator(null);
 
 	/*
 	 * How to call the Table in the Database. Additionally the used size
@@ -157,7 +157,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		 */
 		for (Link link : network.getLinks().values())
 		{
-			double travelCosts = costCalculator.getLinkGeneralizedTravelCost(link, Time.UNDEFINED_TIME);
+			double travelCosts = costCalculator.getLinkTravelDisutility(link, Time.UNDEFINED_TIME);
 			((MyLinkImpl)link).setTravelCost(travelCosts);
 		}
 

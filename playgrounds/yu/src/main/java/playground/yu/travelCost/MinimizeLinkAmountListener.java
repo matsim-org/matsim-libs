@@ -31,10 +31,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.utils.NotAnIntersection;
@@ -48,9 +48,9 @@ import playground.yu.utils.NotAnIntersection;
  */
 public class MinimizeLinkAmountListener implements IterationStartsListener {
 	public static class MinimizeLinkAmountTravelCostCalculatorFactoryImpl
-			implements TravelCostCalculatorFactory {
+			implements TravelDisutilityFactory {
 
-		public PersonalizableTravelCost createTravelCostCalculator(
+		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new MinimizeLinkAmountTravelCostCalculator(timeCalculator);
@@ -59,7 +59,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 	}
 
 	public static class MinimizeLinkAmountTravelCostCalculator implements
-			TravelMinCost, PersonalizableTravelCost {
+			TravelMinDisutility, PersonalizableTravelDisutility {
 		protected final TravelTime timeCalculator;
 
 		public MinimizeLinkAmountTravelCostCalculator(TravelTime timeCalculator) {
@@ -67,7 +67,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link,
+		public double getLinkTravelDisutility(final Link link,
 				final double time) {
 			double cost = timeCalculator.getLinkTravelTime(link, time);
 			Node from = link.getFromNode();
@@ -79,7 +79,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 		}
 
 		@Override
-		public double getLinkMinimumTravelCost(final Link link) {
+		public double getLinkMinimumTravelDisutility(final Link link) {
 			double cost = ((LinkImpl) link).getFreespeedTravelTime();
 			Node from = link.getFromNode();
 			if (!NotAnIntersection.notAnIntersection(from)) {
@@ -101,7 +101,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new MinimizeLinkAmountTravelCostCalculatorFactoryImpl());
+					.setTravelDisutilityFactory(new MinimizeLinkAmountTravelCostCalculatorFactoryImpl());
 
 		}
 	}

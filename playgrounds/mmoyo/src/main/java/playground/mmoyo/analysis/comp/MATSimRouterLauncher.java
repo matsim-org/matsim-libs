@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
@@ -40,7 +40,7 @@ public class MATSimRouterLauncher {
 
 		/**route plans*/
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
-		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		
 		TransitRouterConfig tRConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(), 

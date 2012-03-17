@@ -31,10 +31,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -46,7 +46,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class MinimizeV_CWeightedTimeListener implements IterationStartsListener {
 	public static class MinimizeV_CWeightedTimeTravelCostCalculatorFactoryImpl
-			implements TravelCostCalculatorFactory {
+			implements TravelDisutilityFactory {
 		private final VolumesAnalyzer volumes;
 		private final double flowCapFactor, capPeriod;
 
@@ -58,7 +58,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 			this.capPeriod = capPeriod;
 		}
 
-		public PersonalizableTravelCost createTravelCostCalculator(
+		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new MinimizeV_CWeightedTimeTravelCostCalculator(
@@ -68,7 +68,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 	}
 
 	public static class MinimizeV_CWeightedTimeTravelCostCalculator implements
-			TravelMinCost, PersonalizableTravelCost {
+			TravelMinDisutility, PersonalizableTravelDisutility {
 
 		protected final TravelTime timeCalculator;
 		private final VolumesAnalyzer volumes;
@@ -104,7 +104,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link,
+		public double getLinkTravelDisutility(final Link link,
 				final double time) {
 			int[] vols = volumes.getVolumesForLink(link.getId());
 			double vol = vols != null ? vols[(int) time / 3600] : 0d;
@@ -122,7 +122,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 		}
 
 		@Override
-		public double getLinkMinimumTravelCost(final Link link) {
+		public double getLinkMinimumTravelDisutility(final Link link) {
 			return ((LinkImpl) link).getFreespeedTravelTime();
 			// if (marginalUtlOfDistance == 0.0) {
 			// return link.getLength() / link.getFreespeed()
@@ -145,7 +145,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new MinimizeV_CWeightedTimeTravelCostCalculatorFactoryImpl(
+					.setTravelDisutilityFactory(new MinimizeV_CWeightedTimeTravelCostCalculatorFactoryImpl(
 							ctl.getVolumes(), ctl.getConfig()
 									.getQSimConfigGroup().getFlowCapFactor(),
 							ctl.getNetwork().getCapacityPeriod()));

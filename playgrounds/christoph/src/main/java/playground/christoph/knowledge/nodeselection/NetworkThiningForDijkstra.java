@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -35,7 +35,7 @@ public class NetworkThiningForDijkstra {
 	private double time = Time.UNDEFINED_TIME;
 	
 	// CostCalculator for the Dijkstra Algorithm
-	private TravelCost costCalculator = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
+	private TravelDisutility costCalculator = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 	private DijkstraForSelectNodes dijkstra;
 	
 	private Map<Id, Link> notUsedLinks;
@@ -73,12 +73,12 @@ public class NetworkThiningForDijkstra {
 		return this.network;
 	}
 	
-	public void setCostCalculator(TravelCost costCalculator)
+	public void setCostCalculator(TravelDisutility costCalculator)
 	{
 		this.costCalculator = costCalculator;
 	}
 	
-	public TravelCost getCostCalculator()
+	public TravelDisutility getCostCalculator()
 	{
 		return this.costCalculator;
 	}
@@ -162,7 +162,7 @@ public class NetworkThiningForDijkstra {
 				Node outNode = outLink.getToNode();
 				
 				// calculate costs for OutLink
-				double linkCosts = costCalculator.getLinkGeneralizedTravelCost(outLink, time);
+				double linkCosts = costCalculator.getLinkTravelDisutility(outLink, time);
 				
 				double minTravelCosts = travelCostsMap.get(outNode);
 				
@@ -219,7 +219,7 @@ public class NetworkThiningForDijkstra {
 	{
 		
 		// CostCalculator for the Dijkstra Algorithm
-		private TravelCost costCalculator = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
+		private TravelDisutility costCalculator = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 		private DijkstraForSelectNodes dijkstra;
 		
 		private Map<Id, Link> notUsedLinks;
@@ -274,7 +274,7 @@ public class NetworkThiningForDijkstra {
 					Node outNode = outLink.getToNode();
 					
 					// calculate costs for OutLink
-					double linkCosts = costCalculator.getLinkGeneralizedTravelCost(outLink, time);
+					double linkCosts = costCalculator.getLinkTravelDisutility(outLink, time);
 					
 					double minTravelCosts = travelCostsMap.get(outNode);
 					

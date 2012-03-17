@@ -24,13 +24,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 
-public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, PersonalizableTravelCost {
+public class KtiTravelTimeDistanceCostCalculator implements TravelMinDisutility, PersonalizableTravelDisutility {
 
 	private final static Logger log = Logger.getLogger(KtiTravelTimeDistanceCostCalculator.class);
 	protected final TravelTime timeCalculator;
@@ -52,14 +52,14 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, Perso
 	}
 
 	@Override
-	public double getLinkMinimumTravelCost(Link link) {
+	public double getLinkMinimumTravelDisutility(Link link) {
 		return
 		(link.getLength() / link.getFreespeed()) * this.travelCostFactor
 		- this.marginalUtlOfDistance * link.getLength();
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
+	public double getLinkTravelDisutility(Link link, double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}

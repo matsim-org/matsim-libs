@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 public class DijkstraWithTightTurnPenaltyFactory implements
@@ -42,7 +42,7 @@ public class DijkstraWithTightTurnPenaltyFactory implements
 	}
 
 	public LeastCostPathCalculator createPathCalculator(final Network network,
-			final TravelCost travelCosts, final TravelTime travelTimes) {
+			final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		if (preProcessData == null) {
 			return new DijkstraWithTightTurnPenalty(network, travelCosts,
 					travelTimes);

@@ -79,7 +79,7 @@ class MyWithinDayControler extends Controler {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		
 		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.getTravelTimeCalculator());
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.getTravelCostCalculatorFactory(), wrapper, new DijkstraFactory(), routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.getTravelDisutilityFactory(), wrapper, new DijkstraFactory(), routeFactory);
 		// ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute
 		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 

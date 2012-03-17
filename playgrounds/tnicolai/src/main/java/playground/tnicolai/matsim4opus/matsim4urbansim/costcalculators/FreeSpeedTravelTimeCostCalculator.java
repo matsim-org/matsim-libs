@@ -1,8 +1,8 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelMinDisutility;
 
 /**
  * This cost calulator is based on freespeed travel times 
@@ -11,15 +11,15 @@ import org.matsim.core.router.util.TravelMinCost;
  * @author thomas
  *
  */
-public class FreeSpeedTravelTimeCostCalculator implements TravelMinCost, TravelCost{
+public class FreeSpeedTravelTimeCostCalculator implements TravelMinDisutility, TravelDisutility{
 	
 	@Override
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
+	public double getLinkTravelDisutility(Link link, double time) {
 		return link.getLength() / link.getFreespeed();
 	}
 
 	@Override
-	public double getLinkMinimumTravelCost(Link link) {
+	public double getLinkMinimumTravelDisutility(Link link) {
 		return link.getLength() / link.getFreespeed();
 	}
 

@@ -36,7 +36,7 @@ public class SparseShortestPathFinder
 
     // TODO: maybe map: (n x n) => SP ?????
     public ShortestPathToArcTimeArcCostAdapter[][] findShortestPaths(TravelTime travelTime,
-            TravelCost travelCost, LeastCostPathCalculator router)
+            TravelDisutility travelCost, LeastCostPathCalculator router)
     {
         MATSimVRPGraph graph = data.getVrpGraph();
         int n = graph.getVertexCount();

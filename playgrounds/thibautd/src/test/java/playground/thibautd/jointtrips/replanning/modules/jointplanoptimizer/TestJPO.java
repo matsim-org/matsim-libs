@@ -51,7 +51,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -168,7 +168,7 @@ public class TestJPO {
 			.getCliques().getCliques().get(idSample);
 		this.samplePlan = (JointPlan) sampleClique.getSelectedPlan();
 		// XXX very ugly: find a nice way to get from the "real" code
-		PersonalizableTravelCost travelCost = controler.createTravelCostCalculator();
+		PersonalizableTravelDisutility travelCost = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTime = controler.getTravelTimeCalculator();
 		this.configGroup = (JointReplanningConfigGroup)
 			this.controler.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME);

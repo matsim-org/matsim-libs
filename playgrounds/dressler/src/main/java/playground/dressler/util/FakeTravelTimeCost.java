@@ -22,21 +22,21 @@ package playground.dressler.util;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 
 /**
  * always returns traveltime = 0 to avoid time expansion
  * travelcost is the actual freespeed time, rounded down to integers
  */
-public class FakeTravelTimeCost implements TravelMinCost, PersonalizableTravelTime, PersonalizableTravelCost {
+public class FakeTravelTimeCost implements TravelMinDisutility, PersonalizableTravelTime, PersonalizableTravelDisutility {
 
 	public FakeTravelTimeCost() {
 
 	}
 
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
+	public double getLinkTravelDisutility(Link link, double time) {
 		return Math.round((link.getLength() / link.getFreespeed()));
 	}
 
@@ -44,7 +44,7 @@ public class FakeTravelTimeCost implements TravelMinCost, PersonalizableTravelTi
 		return 0;
 	}
 
-	public double getLinkMinimumTravelCost(Link link) {
+	public double getLinkMinimumTravelDisutility(Link link) {
 		return Math.round((link.getLength() / link.getFreespeed()));
 	}
 

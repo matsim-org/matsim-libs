@@ -43,8 +43,8 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -104,7 +104,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 		
 		// init spannig tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		LeastCostPathTree lcptTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree lcptTravelTime = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()));
 		// tnicolai: calculate distance -> add "single_vehicle_to_work_travel_distance.lf4" to header
 		// SpanningTree stTravelDistance = new SpanningTree(ttc, new TravelDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		
@@ -387,7 +387,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 	
 	// From here Travel Distance Calculator
 	
-	class TravelDistanceCostCalculator implements TravelMinCost {
+	class TravelDistanceCostCalculator implements TravelMinDisutility {
 
 		protected final TravelTime timeCalculator;
 		private final double marginalCostOfDistance;
@@ -405,13 +405,13 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time) {
 			
 			return this.marginalCostOfDistance * link.getLength(); // link length in meter
 		}
 
 		@Override
-		public double getLinkMinimumTravelCost(final Link link) {
+		public double getLinkMinimumTravelDisutility(final Link link) {
 			return this.marginalCostOfDistance * link.getLength(); // link length in meter
 		}
 	} 

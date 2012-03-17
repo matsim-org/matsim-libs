@@ -31,7 +31,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,7 +50,7 @@ public class TestSpanningTree {
 		
 		// init spanning tree here
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator());
-		LeastCostPathTree lcpt = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().planCalcScore()));
+		LeastCostPathTree lcpt = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, scenario.getConfig().planCalcScore()));
 		
 		// than set the start node
 		Node origin = network.getNodes().get(new IdImpl(4224));

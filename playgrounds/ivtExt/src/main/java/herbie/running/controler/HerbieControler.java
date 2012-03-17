@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -81,9 +81,9 @@ public class HerbieControler extends Controler {
 		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
 		PersonalizableTravelTime timeCalculator = super.getTravelTimeCalculator();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
-		costCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup);
+		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
 		
-		this.setTravelCostCalculatorFactory(costCalculatorFactory);
+		this.setTravelDisutilityFactory(costCalculatorFactory);
 		
 		super.setUp();
 	}
@@ -113,7 +113,7 @@ public class HerbieControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
 		PlanAlgorithm router = null;
 		router = super.createRoutingAlgorithm(travelCosts, travelTimes);
 		return router;

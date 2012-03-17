@@ -24,7 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.studies.gis.SpanningTree;
@@ -51,7 +51,7 @@ public class TraveTimeCostFunction implements SpatialCostFunction {
 	public TraveTimeCostFunction(NetworkImpl network, double beta) {
 		this.network = network;
 //		double binsize = 60.0;
-		FreespeedTravelTimeCost cost = new FreespeedTravelTimeCost(beta, 0.0, 0.0);
+		FreespeedTravelTimeAndDisutility cost = new FreespeedTravelTimeAndDisutility(beta, 0.0, 0.0);
 		spanningTree = new SpanningTree(cost, cost);
 //		discretizer = new LinearDiscretizer(binsize);
 	}

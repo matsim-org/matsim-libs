@@ -23,9 +23,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.corelisteners.RoadPricing;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -33,7 +33,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
  * @author kn after bkick after dgrether
  *
  */
-public class GautengTollTravelCostCalculatorFactory implements TravelCostCalculatorFactory {
+public class GautengTollTravelCostCalculatorFactory implements TravelDisutilityFactory {
 
 	final boolean isUsingRoadpricing ;
 	final private RoadPricingScheme scheme;
@@ -47,8 +47,8 @@ public class GautengTollTravelCostCalculatorFactory implements TravelCostCalcula
 		}
 	}
 	
-	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		final PersonalizableTravelCost delegate = new TravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
+	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		final PersonalizableTravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
 
 		if ( !isUsingRoadpricing ) {
 			
@@ -57,15 +57,15 @@ public class GautengTollTravelCostCalculatorFactory implements TravelCostCalcula
 		} else {
 			final GautengLinkTollCalculator tollCostCalculator = new GautengLinkTollCalculator(scheme);
 
-			return new PersonalizableTravelCost() {
+			return new PersonalizableTravelDisutility() {
 				@Override
 				public void setPerson(Person person) {
 					delegate.setPerson(person);
 					tollCostCalculator.setPerson(person);
 				}
 				@Override
-				public double getLinkGeneralizedTravelCost(Link link, double time) {
-					double linkTravelDisutility = delegate.getLinkGeneralizedTravelCost(link, time);
+				public double getLinkTravelDisutility(Link link, double time) {
+					double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time);
 					double utilityOfMoney = 1. ;
 					linkTravelDisutility += utilityOfMoney * tollCostCalculator.getLinkTollForCars(link, time);
 					return linkTravelDisutility ;

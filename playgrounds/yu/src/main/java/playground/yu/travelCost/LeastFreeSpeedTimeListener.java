@@ -30,10 +30,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -46,9 +46,9 @@ import org.matsim.core.router.util.TravelTime;
 public class LeastFreeSpeedTimeListener implements
 		IterationStartsListener {
 	public static class LeastFreeSpeedTravelTimeTravelCostCalculatorFactoryImpl
-			implements TravelCostCalculatorFactory {
+			implements TravelDisutilityFactory {
 
-		public PersonalizableTravelCost createTravelCostCalculator(
+		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new LeastFreeSpeedTravelTimeCostCalculator(timeCalculator);
@@ -57,7 +57,7 @@ public class LeastFreeSpeedTimeListener implements
 	}
 
 	public static class LeastFreeSpeedTravelTimeCostCalculator implements
-			TravelMinCost, PersonalizableTravelCost {
+			TravelMinDisutility, PersonalizableTravelDisutility {
 
 		// protected final TravelTime timeCalculator;
 
@@ -90,7 +90,7 @@ public class LeastFreeSpeedTimeListener implements
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link,
+		public double getLinkTravelDisutility(final Link link,
 				final double time) {
 			return ((LinkImpl) link).getFreespeedTravelTime();
 			// double travelTime = timeCalculator.getLinkTravelTime(link, time);
@@ -104,7 +104,7 @@ public class LeastFreeSpeedTimeListener implements
 		}
 
 		@Override
-		public double getLinkMinimumTravelCost(final Link link) {
+		public double getLinkMinimumTravelDisutility(final Link link) {
 			return ((LinkImpl) link).getFreespeedTravelTime();
 			// if (marginalUtlOfDistance == 0.0) {
 			// return link.getLength() / link.getFreespeed()
@@ -127,7 +127,7 @@ public class LeastFreeSpeedTimeListener implements
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new LeastFreeSpeedTravelTimeTravelCostCalculatorFactoryImpl());
+					.setTravelDisutilityFactory(new LeastFreeSpeedTravelTimeTravelCostCalculatorFactoryImpl());
 		}
 	}
 

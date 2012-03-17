@@ -21,12 +21,12 @@ package playground.benjamin.scoring.income.old;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.households.Income;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.TollTravelCostCalculator;
+import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 
 /**
  * @author bkick
@@ -35,9 +35,9 @@ import org.matsim.roadpricing.TollTravelCostCalculator;
  */
 
 // a dummy class in order to meet the framework
-public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost {
+public class IncomeTollTravelCostCalculator implements PersonalizableTravelDisutility {
 
-	public class NullTravelCostCalculator implements PersonalizableTravelCost {
+	public class NullTravelCostCalculator implements PersonalizableTravelDisutility {
 
 		@Override
 		public void setPerson(Person person) {
@@ -45,7 +45,7 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost 
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(Link link, double time) {
+		public double getLinkTravelDisutility(Link link, double time) {
 			return 0;
 		}
 
@@ -61,13 +61,13 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost 
 	
 	private PersonHouseholdMapping hhdb;
 	
-	private TollTravelCostCalculator tollTravelCostCalculator;
+	private TravelDisutilityIncludingToll tollTravelCostCalculator;
 	
 	
 	public IncomeTollTravelCostCalculator(PersonHouseholdMapping hhdb, RoadPricingScheme scheme) {
 		this.hhdb = hhdb;
-		PersonalizableTravelCost nullTravelCostCalculator = new NullTravelCostCalculator();
-		this.tollTravelCostCalculator = new TollTravelCostCalculator(nullTravelCostCalculator, scheme);
+		PersonalizableTravelDisutility nullTravelCostCalculator = new NullTravelCostCalculator();
+		this.tollTravelCostCalculator = new TravelDisutilityIncludingToll(nullTravelCostCalculator, scheme);
 	}
 
 	@Override
@@ -77,8 +77,8 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelCost 
 
 	//calculating additional generalized toll costs
 	@Override
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
-		double amount = tollTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
+	public double getLinkTravelDisutility(Link link, double time) {
+		double amount = tollTravelCostCalculator.getLinkTravelDisutility(link, time);
 		double additionalGeneralizedTollCost = (betaIncomeCar / incomePerDay) * amount;
 		return additionalGeneralizedTollCost;
 	}

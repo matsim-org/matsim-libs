@@ -29,14 +29,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PseudoTransitLegRouter;
 import org.matsim.core.router.TeleportationLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 /**
@@ -78,12 +78,12 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 			final TripRouterFactory routerFactory) {
 		Network network = routerFactory.getNetwork();
 		PersonalizableTravelTime travelTime = routerFactory.getTravelTimeCalculatorFactory().createTravelTime();
-		PersonalizableTravelCost travelCost = routerFactory.getTravelCostCalculatorFactory().createTravelCostCalculator( travelTime , scoreConfigGroup );
+		PersonalizableTravelDisutility travelCost = routerFactory.getTravelCostCalculatorFactory().createTravelDisutility( travelTime , scoreConfigGroup );
 
 		LeastCostPathCalculatorFactory leastCostPathAlgoFactory = routerFactory.getLeastCostPathCalculatorFactory();
 		LeastCostPathCalculator routeAlgo = leastCostPathAlgoFactory.createPathCalculator(network, travelCost, travelTime);
 
-		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
+		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		LeastCostPathCalculator routeAlgoPtFreeFlow = leastCostPathAlgoFactory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 
 		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {

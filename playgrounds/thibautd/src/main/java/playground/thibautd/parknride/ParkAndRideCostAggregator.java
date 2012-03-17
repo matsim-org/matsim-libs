@@ -21,10 +21,10 @@ package playground.thibautd.parknride;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 
 import playground.thibautd.parknride.ParkAndRideRouterNetwork.ParkAndRideLink;
 
@@ -34,19 +34,19 @@ import playground.thibautd.parknride.ParkAndRideRouterNetwork.ParkAndRideLink;
  *
  * @author thibautd
  */
-public class ParkAndRideCostAggregator implements PersonalizableTravelTime , PersonalizableTravelCost {
+public class ParkAndRideCostAggregator implements PersonalizableTravelTime , PersonalizableTravelDisutility {
 	private final PersonalizableTravelTime carTravelTime;
-	private final PersonalizableTravelCost carTravelCost;
-	private final TransitRouterNetworkTravelTimeCost transitTravelTimeCost;
+	private final PersonalizableTravelDisutility carTravelCost;
+	private final TransitRouterNetworkTravelTimeAndDisutility transitTravelTimeCost;
 	private final PersonalizableTravelTime pnrTravelTime;
-	private final PersonalizableTravelCost pnrTravelCost;
+	private final PersonalizableTravelDisutility pnrTravelCost;
 
 	public ParkAndRideCostAggregator(
 			final PersonalizableTravelTime carTravelTime,
-			final PersonalizableTravelCost carTravelCost,
-			final TransitRouterNetworkTravelTimeCost transitTravelTimeCost,
+			final PersonalizableTravelDisutility carTravelCost,
+			final TransitRouterNetworkTravelTimeAndDisutility transitTravelTimeCost,
 			final PersonalizableTravelTime pnrTravelTime,
-			final PersonalizableTravelCost pnrTravelCost) {
+			final PersonalizableTravelDisutility pnrTravelCost) {
 		this.carTravelTime = carTravelTime;
 		this.carTravelCost = carTravelCost;
 		this.transitTravelTimeCost = transitTravelTimeCost;
@@ -68,16 +68,16 @@ public class ParkAndRideCostAggregator implements PersonalizableTravelTime , Per
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(
+	public double getLinkTravelDisutility(
 			final Link link,
 			final double time) {
 		if (link instanceof TransitRouterNetworkLink) {
-			return transitTravelTimeCost.getLinkGeneralizedTravelCost( link , time );
+			return transitTravelTimeCost.getLinkTravelDisutility( link , time );
 		}
 		if (link instanceof ParkAndRideLink) {
-			return pnrTravelCost.getLinkGeneralizedTravelCost( link , time );
+			return pnrTravelCost.getLinkTravelDisutility( link , time );
 		}
-		return carTravelCost.getLinkGeneralizedTravelCost( link , time );
+		return carTravelCost.getLinkTravelDisutility( link , time );
 	}
 
 	@Override

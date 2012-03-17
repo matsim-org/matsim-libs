@@ -3,7 +3,7 @@ package playground.ciarif.flexibletransports.controler;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -74,7 +74,7 @@ public class FlexibleTransportControler extends Controler
     this.setScoringFunctionFactory(ftScoringFunctionFactory);
 
     FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);
-    setTravelCostCalculatorFactory(costCalculatorFactory);
+    setTravelDisutilityFactory(costCalculatorFactory);
     super.setUp();
   }
 
@@ -92,7 +92,7 @@ public class FlexibleTransportControler extends Controler
   }
 
   @Override
-	public PlanAlgorithm createRoutingAlgorithm(PersonalizableTravelCost travelCosts, PersonalizableTravelTime travelTimes)
+	public PlanAlgorithm createRoutingAlgorithm(PersonalizableTravelDisutility travelCosts, PersonalizableTravelTime travelTimes)
   {
     PlanAlgorithm router = null;
 

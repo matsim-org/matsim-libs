@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -188,7 +188,7 @@ public class CreateODDistanceMatrix {
 		}
 	}
 	
-	private static class TravelTimeCost implements TravelTime, TravelMinCost {
+	private static class TravelTimeCost implements TravelTime, TravelMinDisutility {
 
 		@Override
 		public double getLinkTravelTime(Link link, double time) {
@@ -196,14 +196,14 @@ public class CreateODDistanceMatrix {
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(Link link, double time) {
+		public double getLinkTravelDisutility(Link link, double time) {
 //			return getLinkTravelTime(link, time);
 			return link.getLength();
 		}
 
 		@Override
-		public double getLinkMinimumTravelCost(Link link) {
-			return getLinkGeneralizedTravelCost(link, 0.0);
+		public double getLinkMinimumTravelDisutility(Link link) {
+			return getLinkTravelDisutility(link, 0.0);
 		}
 		
 	}

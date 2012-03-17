@@ -39,7 +39,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -127,7 +127,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		// init spannig tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		// this calculates the workplace accessibility travel times
-		LeastCostPathTree lcptTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
+		LeastCostPathTree lcptTravelTime = new LeastCostPathTree( ttc, new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()) );
 		// this calculates the workplace accessibility distances
 		LeastCostPathTree lcptDistance = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator(sc.getConfig().plansCalcRoute().getWalkSpeed()) ); // tnicolai: this is experimental, check with Kai, sep'2011
 		

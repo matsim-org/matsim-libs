@@ -35,7 +35,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -61,7 +61,7 @@ public class TestSubNetwork {
 
 	private KnowledgeTravelTimeCalculator travelTime;
 	private KnowledgeTravelTimeWrapper travelTimeWrapper;
-	private OnlyTimeDependentTravelCostCalculator travelCost;
+	private OnlyTimeDependentTravelDisutilityCalculator travelCost;
 	private KnowledgeTravelCostWrapper travelCostWrapper;
 
 	private PlansCalcRoute dijkstraRouter;
@@ -131,7 +131,7 @@ public class TestSubNetwork {
 		travelTime = new KnowledgeTravelTimeCalculator(qNetwork);
 		travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
 
-		travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
+		travelCost = new OnlyTimeDependentTravelDisutilityCalculator(travelTimeWrapper);
 		travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
 		travelTimeWrapper.checkNodeKnowledge(false);

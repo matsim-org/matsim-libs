@@ -23,13 +23,13 @@ package playground.christoph.router.costcalculators;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
 
-public class KnowledgeTravelCostCalculator implements PersonalizableTravelCost {
+public class KnowledgeTravelCostCalculator implements PersonalizableTravelDisutility {
 
 	protected Person person;
 	protected TravelTime timeCalculator;
@@ -58,7 +58,7 @@ public class KnowledgeTravelCostCalculator implements PersonalizableTravelCost {
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time) {
 		if (checkNodeKnowledge) {
 			// try getting NodeKnowledge from the Persons Knowledge
 			NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);

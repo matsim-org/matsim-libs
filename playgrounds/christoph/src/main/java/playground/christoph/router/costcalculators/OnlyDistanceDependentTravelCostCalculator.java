@@ -21,20 +21,20 @@
 package playground.christoph.router.costcalculators;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 
-public class OnlyDistanceDependentTravelCostCalculator implements TravelMinCost, Cloneable {
+public class OnlyDistanceDependentTravelCostCalculator implements TravelMinDisutility, Cloneable {
 	
 	public OnlyDistanceDependentTravelCostCalculator()
 	{
 	}
 
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) 
+	public double getLinkTravelDisutility(final Link link, final double time) 
 	{
 		return link.getLength();
 	}
 
-	public double getLinkMinimumTravelCost(final Link link) 
+	public double getLinkMinimumTravelDisutility(final Link link) 
 	{
 		return link.getLength();
 	}

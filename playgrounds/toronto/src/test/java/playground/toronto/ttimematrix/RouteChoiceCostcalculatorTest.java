@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -139,11 +139,11 @@ public class RouteChoiceCostcalculatorTest {
 	}
 
 	
-	public static class TravelDistanceCostCalculator implements TravelCost{
+	public static class TravelDistanceCostCalculator implements TravelDisutility{
 		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time) {
 			if(link != null)
 				return link.getLength();
 			log.warn("Link is null. Reurned 0 as link length.");
@@ -151,11 +151,11 @@ public class RouteChoiceCostcalculatorTest {
 		}
 	}
 	
-	public static class TravelCostCostCalculator implements TravelCost{
+	public static class TravelCostCostCalculator implements TravelDisutility{
 		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time) {
 			if(link != null)
 				return link.getLength();
 			log.warn("Link is null. Reurned 0 as link length.");
@@ -163,7 +163,7 @@ public class RouteChoiceCostcalculatorTest {
 		}
 	}
 	
-	public static class TravelTimeCostCalculator implements TravelCost{
+	public static class TravelTimeCostCalculator implements TravelDisutility{
 		
 		protected final TravelTime timeCalculator;
 		
@@ -172,7 +172,7 @@ public class RouteChoiceCostcalculatorTest {
 		}
 		
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time) {
 			return this.timeCalculator.getLinkTravelTime(link, time);
 		}
 	}

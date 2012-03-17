@@ -53,7 +53,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -95,7 +95,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 
 		Controler controler = event.getControler();
 		this.controlerFacilities = controler.getFacilities().getFacilities();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
 		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
 		String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }

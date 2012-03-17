@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.misc.Time;
 
@@ -46,18 +46,18 @@ public class RandomDijkstraRoute extends SimpleRouter {
 	protected boolean removeLoops = false;
 	protected double dijkstraWeightFactor = 0.5;
 	protected LeastCostPathCalculator leastCostPathCalculator;
-	protected TravelCostCalculatorFactory travelCostFactory;
-	protected PersonalizableTravelCost travelCost;
+	protected TravelDisutilityFactory travelCostFactory;
+	protected PersonalizableTravelDisutility travelCost;
 	protected PersonalizableTravelTime travelTime;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
 	private final static Logger log = Logger.getLogger(RandomDijkstraRoute.class);
 	
-	public RandomDijkstraRoute(Network network, TravelCostCalculatorFactory travelCostFactory, PersonalizableTravelTime travelTime) {
+	public RandomDijkstraRoute(Network network, TravelDisutilityFactory travelCostFactory, PersonalizableTravelTime travelTime) {
 		super(network);
 		this.travelCostFactory = travelCostFactory;
 		this.travelTime = travelTime;
-		this.travelCost = travelCostFactory.createTravelCostCalculator(travelTime, new PlanCalcScoreConfigGroup());
+		this.travelCost = travelCostFactory.createTravelDisutility(travelTime, new PlanCalcScoreConfigGroup());
 		this.leastCostPathCalculator = new DijkstraFactory().createPathCalculator(network, travelCost, travelTime);
 	}
 	

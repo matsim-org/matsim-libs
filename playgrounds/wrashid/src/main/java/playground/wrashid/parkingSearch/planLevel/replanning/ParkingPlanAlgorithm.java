@@ -34,7 +34,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -237,7 +237,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 	private static PlansCalcRoute getRoutingAlgorithm(Controler controler) {
 		PersonalizableTravelTime travelTime = controler.getTravelTimeCalculator();
-		PersonalizableTravelCost travelCost = controler.getTravelCostCalculatorFactory().createTravelCostCalculator(travelTime,
+		PersonalizableTravelDisutility travelCost = controler.getTravelDisutilityFactory().createTravelDisutility(travelTime,
 				controler.getConfig().planCalcScore());
 
 		LeastCostPathCalculatorFactory leastCostFactory = controler.getLeastCostPathCalculatorFactory();

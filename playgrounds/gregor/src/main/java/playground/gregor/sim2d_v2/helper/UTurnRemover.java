@@ -43,7 +43,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -60,7 +60,7 @@ public class UTurnRemover implements PersonAlgorithm, IterationStartsListener{
 	public UTurnRemover(Scenario sc){
 		Network network = sc.getNetwork();
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
-		PersonalizableTravelCost cost = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(fs,sc.getConfig().planCalcScore() );
+		PersonalizableTravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator routeAlgo = new Dijkstra(network, cost, fs);
 		this.router = new NetworkLegRouter(network, routeAlgo, ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory());
 		this.sc =sc;

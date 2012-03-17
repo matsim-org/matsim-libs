@@ -38,8 +38,8 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
@@ -130,8 +130,8 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 	protected WithinDayInitialReplanner randomDijkstraReplanner;
 
 	protected PersonalizableTravelTime travelTime = new FreeSpeedTravelTimeCalculator();
-	protected TravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-	protected PersonalizableTravelCost travelCost = travelCostFactory.createTravelCostCalculator(travelTime, null);
+	protected TravelDisutilityFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+	protected PersonalizableTravelDisutility travelCost = travelCostFactory.createTravelDisutility(travelTime, null);
 
 	/*
 	 * How many parallel Threads shall do the Replanning.

@@ -19,14 +19,14 @@ public class SparseShortestPath
     private SPEntry entries[];
 
     private TravelTime travelTime;
-    private TravelCost travelCost;
+    private TravelDisutility travelCost;
     private LeastCostPathCalculator router;
     private Link fromLink;
     private Link toLink;
 
 
     public SparseShortestPath(int numIntervals, int timeInterval, boolean cyclic,
-            LeastCostPathCalculator router, TravelTime travelTime, TravelCost travelCost,
+            LeastCostPathCalculator router, TravelTime travelTime, TravelDisutility travelCost,
             MATSimVertex fromVertex, MATSimVertex toVertex)
     {
         this.timeInterval = timeInterval;
@@ -80,13 +80,13 @@ public class SparseShortestPath
 
             if (ShortestPath.INCLUDE_TO_LINK) {
                 time += travelTime.getLinkTravelTime(toLink, departTime);
-                cost += travelCost.getLinkGeneralizedTravelCost(toLink, time);
+                cost += travelCost.getLinkTravelDisutility(toLink, time);
                 ids[idCount - 1] = toLink.getId();
                 idxShift = 0;
             }
             else {
                 time += travelTime.getLinkTravelTime(fromLink, departTime);
-                cost += travelCost.getLinkGeneralizedTravelCost(fromLink, time);
+                cost += travelCost.getLinkTravelDisutility(fromLink, time);
                 ids[0] = fromLink.getId();
                 idxShift = 1;
             }

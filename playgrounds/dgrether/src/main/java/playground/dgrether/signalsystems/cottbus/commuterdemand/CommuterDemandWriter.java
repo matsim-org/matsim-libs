@@ -42,7 +42,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -121,7 +121,7 @@ public class CommuterDemandWriter {
 	}
 
 	private void generatePopulation(Scenario scenario) {
-		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig()
+		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig()
 				.planCalcScore());
 		PlansCalcRoute router = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(),
 				scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(),

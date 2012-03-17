@@ -22,7 +22,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessEuclidean;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
@@ -586,25 +586,25 @@ public class RoutePath {
 	}
 	public void setWithShapeCost() {
 		withShapeCost = !withShapeCost;
-		TravelMinCost travelMinCost = null;
+		TravelMinDisutility travelMinCost = null;
 		PreProcessEuclidean preProcessData = null;
 		if(!withShapeCost || trip.getShape()==null) {
-			travelMinCost = new TravelMinCost() {
-				public double getLinkGeneralizedTravelCost(Link link, double time) {
-					return getLinkMinimumTravelCost(link);
+			travelMinCost = new TravelMinDisutility() {
+				public double getLinkTravelDisutility(Link link, double time) {
+					return getLinkMinimumTravelDisutility(link);
 				}
-				public double getLinkMinimumTravelCost(Link link) {
+				public double getLinkMinimumTravelDisutility(Link link) {
 					return link.getLength()/link.getFreespeed();
 				}
 			};
 			
 		}
 		else {
-			travelMinCost = new TravelMinCost() {
-				public double getLinkGeneralizedTravelCost(Link link, double time) {
-					return getLinkMinimumTravelCost(link);
+			travelMinCost = new TravelMinDisutility() {
+				public double getLinkTravelDisutility(Link link, double time) {
+					return getLinkMinimumTravelDisutility(link);
 				}
-				public double getLinkMinimumTravelCost(Link link) {
+				public double getLinkMinimumTravelDisutility(Link link) {
 					return (link.getLength()/link.getFreespeed())*Math.pow(trip.getShape().getDistance(link),1);
 				}
 			};

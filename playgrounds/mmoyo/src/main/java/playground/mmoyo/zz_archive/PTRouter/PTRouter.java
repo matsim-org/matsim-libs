@@ -18,7 +18,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -31,7 +31,7 @@ public class PTRouter{
 	private NetworkImpl logicNet;
 	//private MultiNodeDijkstra multiNodeDijkstra;
 	private LeastCostPathCalculator myDijkstra;
-	private TravelCost ptTravelCost;
+	private TravelDisutility ptTravelCost;
 	private NodeImpl originNode;
 	private NodeImpl destinationNode;
 	public PTTravelTime ptTravelTime;   //> make private

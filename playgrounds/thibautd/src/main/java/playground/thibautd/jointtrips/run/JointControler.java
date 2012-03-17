@@ -31,7 +31,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.TeleportationLegRouter;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -172,7 +172,7 @@ public class JointControler extends MultiLegRoutingControler {
 
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(
-			final PersonalizableTravelCost travelCosts,
+			final PersonalizableTravelDisutility travelCosts,
 			final PersonalizableTravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 

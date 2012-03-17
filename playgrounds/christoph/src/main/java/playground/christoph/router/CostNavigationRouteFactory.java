@@ -23,7 +23,7 @@ package playground.christoph.router;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -33,14 +33,14 @@ public class CostNavigationRouteFactory extends WithinDayDuringLegReplannerFacto
 
 	private Scenario scenario;
 	private Network network;
-	private TravelCostCalculatorFactory travelCostFactory;
+	private TravelDisutilityFactory travelCostFactory;
 	private PersonalizableTravelTime travelTime;
 	private CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
 	private LeastCostPathCalculatorFactory routerFactory;
 	
 	public CostNavigationRouteFactory(Scenario scenario, Network network, AbstractMultithreadedModule abstractMultithreadedModule, 
 			double replanningProbability, CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, 
-			TravelCostCalculatorFactory travelCostFactory, PersonalizableTravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
+			TravelDisutilityFactory travelCostFactory, PersonalizableTravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
 		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 		this.network = network;

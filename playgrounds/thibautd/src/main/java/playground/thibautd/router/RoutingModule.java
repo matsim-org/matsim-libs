@@ -24,7 +24,7 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 /**
@@ -42,7 +42,7 @@ public interface RoutingModule {
 	 * {@link #getStageActivityTypes()} method.
 	 * <br>
 	 * <b>important:</b> if route computation relies on a shortest path algorithm
-	 * using {@link PersonalizableTravelTime} and/or {@link PersonalizableTravelCost}
+	 * using {@link PersonalizableTravelTime} and/or {@link PersonalizableTravelDisutility}
 	 * estimators, this method is responsible for setting the person to the argument
 	 * person in those estimators before running the shortest path algorithm.
 	 *

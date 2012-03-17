@@ -2,10 +2,10 @@ package playground.tnicolai.matsim4opus.costcalculators;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-public class TravelDistanceCostCalculatorTest implements TravelMinCost {
+public class TravelDistanceCostCalculatorTest implements TravelMinDisutility {
 
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfDistance;
@@ -21,13 +21,13 @@ public class TravelDistanceCostCalculatorTest implements TravelMinCost {
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time) {
 		
 		return this.marginalCostOfDistance * link.getLength();
 	}
 
 	@Override
-	public double getLinkMinimumTravelCost(final Link link) {
+	public double getLinkMinimumTravelDisutility(final Link link) {
 		return this.marginalCostOfDistance * link.getLength();
 	}
 } 

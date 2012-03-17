@@ -24,7 +24,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.NetworkLegRouter;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,7 +62,7 @@ public class GISBasedPopulationGenerator {
 		this.ftsEnv = environment;
 		this.safeLinkId = destination;
 		DijkstraFactory fac = new DijkstraFactory();
-		FreespeedTravelTimeCost travelTimeCosts = new FreespeedTravelTimeCost(-1, 0, 0);
+		FreespeedTravelTimeAndDisutility travelTimeCosts = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
 		LeastCostPathCalculator dijkstra = fac.createPathCalculator(sc.getNetwork(), travelTimeCosts, travelTimeCosts);
 		this.router = new NetworkLegRouter(sc.getNetwork(), dijkstra, ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory());
 	}

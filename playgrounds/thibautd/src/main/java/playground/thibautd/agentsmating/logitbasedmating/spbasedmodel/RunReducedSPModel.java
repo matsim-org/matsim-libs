@@ -176,7 +176,7 @@ public class RunReducedSPModel {
 								controler.getConfig().travelTimeCalculator().getTraveltimeBinSize())),
 				controler.getLeastCostPathCalculatorFactory().createPathCalculator(
 					scenario.getNetwork(),
-					controler.getTravelCostCalculatorFactory().createTravelCostCalculator(
+					controler.getTravelDisutilityFactory().createTravelDisutility(
 						controler.getTravelTimeCalculator(),
 						config.planCalcScore()),
 					controler.getTravelTimeCalculator())

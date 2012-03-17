@@ -33,12 +33,12 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -59,7 +59,7 @@ public class Template implements MatsimModule {
 		// *** RoutingAlgorithm *********************
 		
 		LeastCostPathCalculatorFactory routerAlgoFactory = new LeastCostPathCalculatorFactory() {
-			public LeastCostPathCalculator createPathCalculator(Network network, TravelCost travelCosts, TravelTime travelTimes) {
+			public LeastCostPathCalculator createPathCalculator(Network network, TravelDisutility travelCosts, TravelTime travelTimes) {
 				return null;
 			}
 		};
@@ -134,15 +134,15 @@ public class Template implements MatsimModule {
 		
 		// *** TravelCostCalculator *********************
 		
-		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactory() {
+		TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 
 			@Override
-			public PersonalizableTravelCost createTravelCostCalculator(
+			public PersonalizableTravelDisutility createTravelDisutility(
 					PersonalizableTravelTime timeCalculator,
 					PlanCalcScoreConfigGroup cnScoringGroup) {
-				return new PersonalizableTravelCost() {
+				return new PersonalizableTravelDisutility() {
 
-					public double getLinkGeneralizedTravelCost(Link link, double time) {
+					public double getLinkTravelDisutility(Link link, double time) {
 						return 0;
 					}
 					
@@ -155,7 +155,7 @@ public class Template implements MatsimModule {
 			}
 			
 		};
-		c.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+		c.setTravelDisutilityFactory(travelCostCalculatorFactory);
 		
 		// DISCUSS directly set the calculator, or just register to be loaded depending on config?
 		

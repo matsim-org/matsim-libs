@@ -44,9 +44,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -73,7 +73,7 @@ public class CalculateTravelTimes {
 	
 	private Scenario scenario;
 	private TravelTime travelTime;
-	private TravelCost travelCost;
+	private TravelDisutility travelCost;
 	private LeastCostPathCalculator leastCostPathCalculator;
 	
 	private double connectorSpeed = 45 / 3.6;	// 45 km/h to reach the network
@@ -170,8 +170,8 @@ public class CalculateTravelTimes {
 				 */
 				if (fromLink.getFromNode().getId().equals(toLink.getToNode().getId())) {
 					
-					double fromCosts = 0.5 * travelCost.getLinkGeneralizedTravelCost(fromLink, 0.0);
-					double toCosts = 0.5 * travelCost.getLinkGeneralizedTravelCost(fromLink, 0.0);
+					double fromCosts = 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0);
+					double toCosts = 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0);
 					double costs = fromDistance/connectorSpeed + fromCosts + toCosts + toDistance/connectorSpeed;
 					travelTimes[from][to] = costs;
 					to++;
@@ -191,12 +191,12 @@ public class CalculateTravelTimes {
 				double pathTravelCost = path.travelCost;
 				if (links != null) {
 					boolean fromLinkIncluded = links.get(0).getId().equals(fromLink.getId());
-					if (fromLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkGeneralizedTravelCost(fromLink, 0.0);
-					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkGeneralizedTravelCost(fromLink, 0.0);
+					if (fromLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0);
+					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0);
 						
 					boolean toLinkIncluded = links.get(links.size() - 1).getId().equals(toLink.getId());
-					if (toLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkGeneralizedTravelCost(toLink, 0.0);
-					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkGeneralizedTravelCost(toLink, 0.0);
+					if (toLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkTravelDisutility(toLink, 0.0);
+					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkTravelDisutility(toLink, 0.0);
 				}
 				
 				double costs = fromDistance/connectorSpeed + pathTravelCost + toDistance/connectorSpeed;
@@ -308,7 +308,7 @@ public class CalculateTravelTimes {
 		Coord coordWGS84;
 	}
 		
-	public class FreeSpeedTravelCost implements PersonalizableTravelCost, TravelMinCost {
+	public class FreeSpeedTravelCost implements PersonalizableTravelDisutility, TravelMinDisutility {
 		private TravelTime travelTime;
 		
 		public FreeSpeedTravelCost(TravelTime travelTime) {
@@ -319,11 +319,11 @@ public class CalculateTravelTimes {
 			// nothing to do here
 		}
 
-		public double getLinkGeneralizedTravelCost(Link link, double time) {
+		public double getLinkTravelDisutility(Link link, double time) {
 			return travelTime.getLinkTravelTime(link, time);
 		}
 
-		public double getLinkMinimumTravelCost(Link link) {
+		public double getLinkMinimumTravelDisutility(Link link) {
 			return travelTime.getLinkTravelTime(link, 0.0);
 		}
 	}

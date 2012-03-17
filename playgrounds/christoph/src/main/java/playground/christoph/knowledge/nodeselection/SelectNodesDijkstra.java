@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -48,7 +48,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	private Node startNode;
 	private Node endNode;
 	private double costFactor = Double.MAX_VALUE;
-	private TravelCost costCalculator;
+	private TravelDisutility costCalculator;
 	private double time = Time.UNDEFINED_TIME;	// time for the CostCalculator
 	private Map<Id,? extends Node> networkNodesMap;
 	private DijkstraForSelectNodes dijkstra;
@@ -105,13 +105,13 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.costFactor = costFactor;
 	}
 	
-	public void setCostCalculator(TravelCost calculator)
+	public void setCostCalculator(TravelDisutility calculator)
 	{
 		this.costCalculator = calculator;
 		this.dijkstra.setCostCalculator(costCalculator);
 	}
 	
-	public TravelCost getCostCalculator()
+	public TravelDisutility getCostCalculator()
 	{
 		return costCalculator;
 	}

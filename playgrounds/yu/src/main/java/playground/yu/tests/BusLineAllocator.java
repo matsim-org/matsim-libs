@@ -55,7 +55,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -77,10 +77,10 @@ import playground.yu.utils.io.SimpleWriter;
  *
  */
 public class BusLineAllocator {
-	private class TravelCostFunctionDistance implements TravelCost {
+	private class TravelCostFunctionDistance implements TravelDisutility {
 		/** returns only the link length */
 		@Override
-		public double getLinkGeneralizedTravelCost(Link link, double time) {
+		public double getLinkTravelDisutility(Link link, double time) {
 			return link.getLength();
 		}
 	}

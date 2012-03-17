@@ -33,7 +33,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -82,7 +82,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		if(this.routerNetwork == null){
 			this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
 		}		
-		return new TransitRouterImpl(this.schedule, this.config, new TransitRouterNetworkTravelTimeCost(this.config), this.routerNetwork);
+		return new TransitRouterImpl(this.schedule, this.config, new TransitRouterNetworkTravelTimeAndDisutility(this.config), this.routerNetwork);
 	}
 
 	@Override

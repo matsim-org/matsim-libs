@@ -20,8 +20,8 @@
 package playground.benjamin.scoring.income.old;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 
@@ -29,9 +29,9 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
  * @author dgrether
  *
  */
-public class Income1TravelCostCalculatorFactory implements TravelCostCalculatorFactory {
+public class Income1TravelCostCalculatorFactory implements TravelDisutilityFactory {
 
-	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		return new BKickIncomeTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
 	}
 

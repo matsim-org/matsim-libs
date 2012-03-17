@@ -22,10 +22,10 @@ package playground.yu.travelCost;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -33,9 +33,9 @@ import org.matsim.core.router.util.TravelTime;
  *
  */
 public class ParameterizedTravelCostCalculatorFactoryImpl implements
-		TravelCostCalculatorFactory {
+		TravelDisutilityFactory {
 	public static class ParameterizedTravelTimeDistanceCostCalculator implements
-			TravelMinCost, PersonalizableTravelCost {
+			TravelMinDisutility, PersonalizableTravelDisutility {
 
 		protected final TravelTime timeCalculator;
 		private final double travelCostFactor;
@@ -68,7 +68,7 @@ public class ParameterizedTravelCostCalculatorFactoryImpl implements
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link,
+		public double getLinkTravelDisutility(final Link link,
 				final double time) {
 			double travelTime = timeCalculator.getLinkTravelTime(link, time);
 			if (marginalUtlOfDistance == 0.0) {
@@ -79,7 +79,7 @@ public class ParameterizedTravelCostCalculatorFactoryImpl implements
 		}
 
 		@Override
-		public double getLinkMinimumTravelCost(final Link link) {
+		public double getLinkMinimumTravelDisutility(final Link link) {
 			if (marginalUtlOfDistance == 0.0) {
 				return link.getLength() / link.getFreespeed()
 						* travelCostFactor;
@@ -105,7 +105,7 @@ public class ParameterizedTravelCostCalculatorFactoryImpl implements
 	}
 
 	@Override
-	public PersonalizableTravelCost createTravelCostCalculator(
+	public PersonalizableTravelDisutility createTravelDisutility(
 			PersonalizableTravelTime timeCalculator,
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		return new ParameterizedTravelTimeDistanceCostCalculator(

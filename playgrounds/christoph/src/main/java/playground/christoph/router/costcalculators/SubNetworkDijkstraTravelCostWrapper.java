@@ -26,8 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 
 import playground.christoph.router.SubNetworkDijkstra;
 
@@ -41,14 +41,14 @@ import playground.christoph.router.SubNetworkDijkstra;
  * We don't clone or copy the SubNetworkDijkstra - a new one 
  * has to be created elsewhere using a SubNetworkDijkstraFactory.
  */
-public class SubNetworkDijkstraTravelCostWrapper implements PersonalizableTravelCost, Cloneable{
+public class SubNetworkDijkstraTravelCostWrapper implements PersonalizableTravelDisutility, Cloneable{
 
-	private TravelCost travelCost;
+	private TravelDisutility travelCost;
 	private SubNetworkDijkstra subNetworkDijkstra = null;
 	
 	private static final Logger log = Logger.getLogger(SubNetworkDijkstraTravelCostWrapper.class);
 	
-	public SubNetworkDijkstraTravelCostWrapper(TravelCost travelCost)
+	public SubNetworkDijkstraTravelCostWrapper(TravelDisutility travelCost)
 	{
 		this.travelCost = travelCost;
 	}
@@ -62,21 +62,21 @@ public class SubNetworkDijkstraTravelCostWrapper implements PersonalizableTravel
 	{
 		if (subNetworkDijkstra != null) subNetworkDijkstra.setPerson(person);
 		
-		if (travelCost instanceof PersonalizableTravelCost)
+		if (travelCost instanceof PersonalizableTravelDisutility)
 		{
-			((PersonalizableTravelCost) travelCost).setPerson(person);
+			((PersonalizableTravelDisutility) travelCost).setPerson(person);
 		}
 	}
 
-	public double getLinkGeneralizedTravelCost(Link link, double time)
+	public double getLinkTravelDisutility(Link link, double time)
 	{
-		return travelCost.getLinkGeneralizedTravelCost(link, time);
+		return travelCost.getLinkTravelDisutility(link, time);
 	}
 	
 	@Override
 	public SubNetworkDijkstraTravelCostWrapper clone()
 	{
-		TravelCost travelCostClone = null;
+		TravelDisutility travelCostClone = null;
 		if (travelCost instanceof Cloneable)
 		{
 			try

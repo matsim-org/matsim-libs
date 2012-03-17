@@ -26,8 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
@@ -37,7 +37,7 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
  * 
  */
 
-public class HerbieTravelTimeDistanceCostCalculator implements TravelMinCost, PersonalizableTravelCost {
+public class HerbieTravelTimeDistanceCostCalculator implements TravelMinDisutility, PersonalizableTravelDisutility {
 
 	private final static Logger log = Logger.getLogger(HerbieTravelTimeDistanceCostCalculator.class);
 	protected final TravelTime timeCalculator;
@@ -67,7 +67,7 @@ public class HerbieTravelTimeDistanceCostCalculator implements TravelMinCost, Pe
 	}
 
 	@Override
-	public double getLinkMinimumTravelCost(Link link) {
+	public double getLinkMinimumTravelDisutility(Link link) {
 		
 		double travelTime = link.getLength() / link.getFreespeed();
 		double distance = link.getLength();
@@ -78,7 +78,7 @@ public class HerbieTravelTimeDistanceCostCalculator implements TravelMinCost, Pe
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
+	public double getLinkTravelDisutility(Link link, double time) {
 		
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		double distance = link.getLength();

@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.network.MyLinkImpl;
@@ -58,7 +58,7 @@ public class DijkstraForSelectNodes {
 	private Map<Node, DijkstraNode> dijkstraNodeMap;
 		
 	// CostCalculator for the Dijkstra Algorithm
-	private TravelCost costCalculator;
+	private TravelDisutility costCalculator;
 
 	// time for the cost calculator
 	double time = Time.UNDEFINED_TIME;
@@ -453,15 +453,15 @@ public class DijkstraForSelectNodes {
 	{   
 		if (link instanceof MyLinkImpl) return ((MyLinkImpl) link).getTravelCost();
 		
-		return costCalculator.getLinkGeneralizedTravelCost(link, time);
+		return costCalculator.getLinkTravelDisutility(link, time);
 	}
 
-	public void setCostCalculator(TravelCost calculator)
+	public void setCostCalculator(TravelDisutility calculator)
 	{
 		this.costCalculator = calculator;
 	}
 	
-	public TravelCost getCostCalculator()
+	public TravelDisutility getCostCalculator()
 	{
 		return costCalculator;
 	}

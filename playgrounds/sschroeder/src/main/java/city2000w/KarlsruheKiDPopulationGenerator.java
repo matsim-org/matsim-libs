@@ -24,7 +24,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
@@ -70,7 +70,7 @@ public class KarlsruheKiDPopulationGenerator {
 		planAgentCreator.setTransformation(KiDUtils.createTransformation_WGS84ToWGS84UTM33N());
 		planAgentCreator.setNetwork((NetworkImpl) scen.getNetwork());
 		PlansCalcRoute router = new PlansCalcRoute(null, scen.getNetwork(), 
-				new FreespeedTravelTimeCost(-1.0,0.0,0.0), new FreespeedTravelTimeCost(-1.0,0.0,0.0), ((PopulationFactoryImpl) scen.getPopulation().getFactory()).getModeRouteFactory());
+				new FreespeedTravelTimeAndDisutility(-1.0,0.0,0.0), new FreespeedTravelTimeAndDisutility(-1.0,0.0,0.0), ((PopulationFactoryImpl) scen.getPopulation().getFactory()).getModeRouteFactory());
 		planAgentCreator.setRouter(router);
 		planAgentCreator.createPlanAgents();
 		planAgentCreator.writePlans("output/karlsruhePlans.xml");

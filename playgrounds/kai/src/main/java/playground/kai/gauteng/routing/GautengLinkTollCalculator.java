@@ -21,12 +21,12 @@ package playground.kai.gauteng.routing;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.households.Income;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.TollTravelCostCalculator;
+import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 
 /**
  * The regular TollTravelCostCalculator assumes that generalized travel cost is already converted into money terms,
@@ -45,7 +45,7 @@ import org.matsim.roadpricing.TollTravelCostCalculator;
 class GautengLinkTollCalculator {
 
 	// a dummy class in order to meet the framework
-	class NullTravelCostCalculator implements PersonalizableTravelCost {
+	class NullTravelCostCalculator implements PersonalizableTravelDisutility {
 
 		@Override
 		public void setPerson(Person person) {
@@ -53,16 +53,16 @@ class GautengLinkTollCalculator {
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(Link link, double time) {
+		public double getLinkTravelDisutility(Link link, double time) {
 			return 0;
 		}
 
 	}
 
-	private TollTravelCostCalculator tollTravelCostCalculator;
+	private TravelDisutilityIncludingToll tollTravelCostCalculator;
 	
 	GautengLinkTollCalculator(RoadPricingScheme scheme) {
-		this.tollTravelCostCalculator = new TollTravelCostCalculator(new NullTravelCostCalculator(), scheme);
+		this.tollTravelCostCalculator = new TravelDisutilityIncludingToll(new NullTravelCostCalculator(), scheme);
 		// (because of the NullTravelCostCalculator, this will return the monetary amount of the toll for the link)
 	}
 
@@ -71,7 +71,7 @@ class GautengLinkTollCalculator {
 
 	double getLinkTollForCars(Link link, double time) {
 
-		return tollTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
+		return tollTravelCostCalculator.getLinkTravelDisutility(link, time);
 		// yyyyyy despite what this seems, it is most probably not possible to construct a toll scheme where
 		// toll rates vary by vehicle type.  Reason is that the scoring will use a different toll calculator class, unaffected
 		// by the changes here.  kai, mar'12

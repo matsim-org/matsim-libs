@@ -21,23 +21,23 @@
 package playground.christoph.evacuation.router.util;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
-public class PenaltyTravelCostFactory implements TravelCostCalculatorFactory {
+public class PenaltyTravelCostFactory implements TravelDisutilityFactory {
 
-	private final TravelCostCalculatorFactory costFactory;
+	private final TravelDisutilityFactory costFactory;
 	private final AffectedAreaPenaltyCalculator penaltyCalculator;
 	
-	public PenaltyTravelCostFactory(TravelCostCalculatorFactory costFactory, AffectedAreaPenaltyCalculator penaltyCalculator) {
+	public PenaltyTravelCostFactory(TravelDisutilityFactory costFactory, AffectedAreaPenaltyCalculator penaltyCalculator) {
 		this.costFactory = costFactory;
 		this.penaltyCalculator = penaltyCalculator;
 	}
 
 	@Override
-	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
-		PersonalizableTravelCost travelCost = this.costFactory.createTravelCostCalculator(travelTime, cnScoringGroup);
+	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
+		PersonalizableTravelDisutility travelCost = this.costFactory.createTravelDisutility(travelTime, cnScoringGroup);
 		return new PenaltyTravelCost(travelCost, penaltyCalculator.getPenaltyCalculatorInstance());
 	}
 	

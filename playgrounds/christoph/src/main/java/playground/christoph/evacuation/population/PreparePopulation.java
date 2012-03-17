@@ -41,11 +41,11 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.LegRouter;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -173,7 +173,7 @@ public class PreparePopulation {
 		MultiModalTravelTime multiModalTravelTime = multiModalTravelTimeFactory.createTravelTime(); 
 		
 		// create travel costs object and use a multi-model travel time calculator
-		PersonalizableTravelCost travelCost = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(multiModalTravelTime, 
+		PersonalizableTravelDisutility travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(multiModalTravelTime, 
 				this.scenario.getConfig().planCalcScore());
 
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getModeRouteFactory();
@@ -185,7 +185,7 @@ public class PreparePopulation {
 		}
 		
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(
-				this.scenario.getNetwork(), new FreespeedTravelTimeCost(this.scenario.getConfig().planCalcScore()));
+				this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore()));
 		
 		IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) 
 			leastCostPathCalculatorFactory.createPathCalculator(this.scenario.getNetwork(), travelCost, multiModalTravelTime);

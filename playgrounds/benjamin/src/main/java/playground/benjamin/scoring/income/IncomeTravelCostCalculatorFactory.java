@@ -22,8 +22,8 @@ package playground.benjamin.scoring.income;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.households.PersonHouseholdMapping;
 
@@ -34,7 +34,7 @@ import playground.benjamin.scoring.income.IncomeTravelCostCalculator;
  * @author bkick after dgrether
  *
  */
-public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFactory {
+public class IncomeTravelCostCalculatorFactory implements TravelDisutilityFactory {
 
 	private PersonHouseholdMapping personHouseholdMapping;
 
@@ -42,13 +42,13 @@ public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFa
 		this.personHouseholdMapping = personHouseholdMapping;
 	}
 	
-	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		// yy why not just "return new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping)"?
 		// Am I overlooking something? kai, mar'12
 		
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		
-		return new PersonalizableTravelCost() {
+		return new PersonalizableTravelDisutility() {
 
 			@Override
 			public void setPerson(Person person) {
@@ -56,8 +56,8 @@ public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFa
 			}
 
 			@Override
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				double generalizedTravelCost = incomeTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
+			public double getLinkTravelDisutility(Link link, double time) {
+				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelDisutility(link, time);
 				return generalizedTravelCost;
 			}
 			

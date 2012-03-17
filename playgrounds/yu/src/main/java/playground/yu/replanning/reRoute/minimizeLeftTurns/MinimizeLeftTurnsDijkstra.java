@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
@@ -88,7 +88,7 @@ public class MinimizeLeftTurnsDijkstra implements
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	final TravelCost costFunction;
+	final TravelDisutility costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and
@@ -137,7 +137,7 @@ public class MinimizeLeftTurnsDijkstra implements
 	 *            Determines the travel time on links.
 	 */
 	public MinimizeLeftTurnsDijkstra(final Network network,
-			final TravelCost costFunction, final TravelTime timeFunction) {
+			final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
 
@@ -154,7 +154,7 @@ public class MinimizeLeftTurnsDijkstra implements
 	 *            The pre processing data used during the routing phase.
 	 */
 	public MinimizeLeftTurnsDijkstra(final Network network,
-			final TravelCost costFunction, final TravelTime timeFunction,
+			final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 
 		this.network = network;
@@ -370,7 +370,7 @@ public class MinimizeLeftTurnsDijkstra implements
 			final double currTime, final double currCost, final Node toNode) {
 
 		double travelTime = timeFunction.getLinkTravelTime(l, currTime);
-		double travelCost = costFunction.getLinkGeneralizedTravelCost(l,
+		double travelCost = costFunction.getLinkTravelDisutility(l,
 				currTime);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();

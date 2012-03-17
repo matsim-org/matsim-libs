@@ -38,7 +38,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -186,7 +186,7 @@ public class MatchedLines2newSchedule {
 	 * @return
 	 */
 	private Collection<? extends Id> routeMe(NetworkImpl networkForThisRoute, TransitRouteStop start, TransitRouteStop end) {
-		FreespeedTravelTimeCost cost = new FreespeedTravelTimeCost(-1, 0, 0);
+		FreespeedTravelTimeAndDisutility cost = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
 		Dijkstra router = new Dijkstra(networkForThisRoute, cost, cost);
 		
 		Link startLink = networkForThisRoute.getLinks().get(start.getStopFacility().getLinkId());

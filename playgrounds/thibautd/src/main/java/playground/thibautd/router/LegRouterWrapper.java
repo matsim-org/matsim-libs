@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.LegRouter;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.thibautd.router.StageActivityTypes;
@@ -48,7 +48,7 @@ public class LegRouterWrapper implements RoutingModule {
 	private final String mode;
 	private final PopulationFactory populationFactory;
 	private final LegRouter wrapped;
-	private final PersonalizableTravelCost travelCost;
+	private final PersonalizableTravelDisutility travelCost;
 	private final PersonalizableTravelTime travelTime;
 
 	/**
@@ -57,7 +57,7 @@ public class LegRouterWrapper implements RoutingModule {
 	 * @param mode the mode to route
 	 * @param toWrap the {@link LegRouter} to wrap
 	 * @param travelCost if the {@link LegRouter} uses (probably indirectly) a
-	 * {@link PersonalizableTravelCost}, it should be provided here. Otherwise,
+	 * {@link PersonalizableTravelDisutility}, it should be provided here. Otherwise,
 	 * it can be null. The person will be set at each travel time estimation.
 	 * @param travelTime  if the {@link LegRouter} uses (probably indirectly) a
 	 * {@link PersonalizableTravelTime}, it should be provided here. Otherwise,
@@ -67,7 +67,7 @@ public class LegRouterWrapper implements RoutingModule {
 			final String mode,
 			final PopulationFactory populationFactory,
 			final LegRouter toWrap,
-			final PersonalizableTravelCost travelCost,
+			final PersonalizableTravelDisutility travelCost,
 			final PersonalizableTravelTime travelTime) {
 		this.mode = mode;
 		this.populationFactory = populationFactory;

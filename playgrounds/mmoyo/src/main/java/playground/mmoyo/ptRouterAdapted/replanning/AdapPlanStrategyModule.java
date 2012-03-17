@@ -25,7 +25,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -46,7 +46,7 @@ public class AdapPlanStrategyModule extends AbstractMultithreadedModule{ //imple
 	public PlanAlgorithm getPlanAlgoInstance() {
 		log.info("Creating adaptedRouter algo.");
 		Config config =  this.controler.getConfig();
-		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility freespeedTravelTimeCost = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 			
 		MyTransitRouterConfig myTransitRouterConfig = new MyTransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental() );

@@ -22,7 +22,7 @@ package playground.benjamin.scoring.income.old;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -78,14 +78,14 @@ public class BkControlerIncome extends BkControler {
 			
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
-			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
-			setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+			TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
+			setTravelDisutilityFactory(travelCostCalculatorFactory);
 		}
 		else{
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
-			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
-			setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+			TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
+			setTravelDisutilityFactory(travelCostCalculatorFactory);
 		}
 	}
 	

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -61,7 +61,7 @@ public class TravelTimeTask extends AnalyzerTask {
 	public TravelTimeTask(Network network) {
 		this.network = network;
 		
-		FreespeedTravelTimeCost freeSpeedTT = new FreespeedTravelTimeCost(-1, 0, 0);
+		FreespeedTravelTimeAndDisutility freeSpeedTT = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
 		router = new Dijkstra(network, freeSpeedTT, freeSpeedTT);
 		
 		

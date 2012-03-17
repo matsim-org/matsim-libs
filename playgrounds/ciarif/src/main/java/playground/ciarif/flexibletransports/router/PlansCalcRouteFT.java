@@ -13,7 +13,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.ciarif.flexibletransports.data.MyTransportMode;
@@ -28,7 +28,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute
 
   public PlansCalcRouteFT(PlansCalcRouteConfigGroup group, 
 		  Network network, 
-		  PersonalizableTravelCost costCalculator, 
+		  PersonalizableTravelDisutility costCalculator, 
 		  PersonalizableTravelTime timeCalculator, 
 		  LeastCostPathCalculatorFactory factory, 
 		  ModeRouteFactory routeFactory,

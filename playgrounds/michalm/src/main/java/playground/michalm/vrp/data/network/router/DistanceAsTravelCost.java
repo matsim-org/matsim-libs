@@ -5,10 +5,10 @@ import org.matsim.core.router.util.*;
 
 
 public class DistanceAsTravelCost
-    implements TravelCost
+    implements TravelDisutility
 {
     @Override
-    public double getLinkGeneralizedTravelCost(Link link, double time)
+    public double getLinkTravelDisutility(Link link, double time)
     {
         return link.getLength();
     }

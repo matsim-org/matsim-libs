@@ -50,7 +50,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 
 import playground.ciarif.retailers.IO.FileRetailerReader;
@@ -90,7 +90,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 
 		this.controler = event.getControler();
 		this.controlerFacilities = controler.getFacilities().getFacilities();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getPopulation().getFactory()).getModeRouteFactory();
 		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc), routeFactory);
 		

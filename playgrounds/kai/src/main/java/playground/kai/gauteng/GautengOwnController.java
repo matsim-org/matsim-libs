@@ -53,11 +53,11 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -116,10 +116,10 @@ public class GautengOwnController {
 
 	
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+	private TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 
 	private TravelTimeCalculator travelTimeCalculator;
-	private PersonalizableTravelCost travelCostCalculator;
+	private PersonalizableTravelDisutility travelCostCalculator;
 	// (yyyyyy one is just travel xxx, the other is travel xxx calculator, but both fields are called
 	// calculator.  Something is asymmetric???  kai, mar'12)
 	
@@ -259,7 +259,7 @@ public class GautengOwnController {
 //		}
 //		if (this.travelCostCalculator == null) {
 			this.travelCostCalculator = this.travelCostCalculatorFactory
-			.createTravelCostCalculator(this.travelTimeCalculator, this.config.planCalcScore());
+			.createTravelDisutility(this.travelTimeCalculator, this.config.planCalcScore());
 //		}
 		this.events.addHandler(this.travelTimeCalculator);
 

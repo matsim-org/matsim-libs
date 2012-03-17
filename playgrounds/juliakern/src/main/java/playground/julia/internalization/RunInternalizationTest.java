@@ -107,7 +107,7 @@ public class RunInternalizationTest {
 
 	private void installTravelCostCalculatorFactory() {
 		EmissionTravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory(emissionModule);
-		controler.setTravelCostCalculatorFactory(emissionTccf);
+		controler.setTravelDisutilityFactory(emissionTccf);
 	}
 
 	private void installScoringFunctionFactory() {

@@ -2,7 +2,7 @@ package playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 
 /**
  * this cost calculator is an attempt to substitute travel distances by travel times
@@ -14,7 +14,7 @@ import org.matsim.core.router.util.TravelCost;
  * @author thomas
  *
  */
-public class TravelWalkTimeCostCalculator implements TravelCost{
+public class TravelWalkTimeCostCalculator implements TravelDisutility{
 	
 	private static final Logger log = Logger.getLogger(TravelWalkTimeCostCalculator.class);
 	
@@ -29,7 +29,7 @@ public class TravelWalkTimeCostCalculator implements TravelCost{
 	 * lengths usually are given in meter and walk speed in meter/sec
 	 */
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time) {
 		if(link != null){
 			double secondWalkTime = link.getLength() / meterPerSecWalkSpeed;
 			return secondWalkTime;

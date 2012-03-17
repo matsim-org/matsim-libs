@@ -18,27 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.roadpricing.senozon;
+package playground.jjoubert.roadpricing.senozon.routing;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
+
+import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
 
 /**
  * Calculates the travel costs for links, including tolls. Currently supports distance, cordon and area tolls.
  *
  * @author mrieser
  */
-public class SanralTollTravelCostCalculator implements PersonalizableTravelCost {
+public class SanralTravelDisutilityIncludingToll implements PersonalizableTravelDisutility {
 
-	/*package*/ final RoadPricingScheme scheme;
+	private final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
-	private final PersonalizableTravelCost costHandler;
+	private final PersonalizableTravelDisutility costHandler;
 	private Person person = null;
 
-	public SanralTollTravelCostCalculator(final PersonalizableTravelCost costCalculator, final RoadPricingScheme scheme) {
+	public SanralTravelDisutilityIncludingToll(final PersonalizableTravelDisutility costCalculator, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 
@@ -52,8 +54,8 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
-		double baseCost = this.costHandler.getLinkGeneralizedTravelCost(link, time);
+	public double getLinkTravelDisutility(final Link link, final double time) {
+		double baseCost = this.costHandler.getLinkTravelDisutility(link, time);
 		double tollCost = this.tollCostHandler.getTollCost(link, time);
 		return baseCost + tollCost;
 	}
@@ -65,7 +67,7 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
+			Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}
@@ -76,7 +78,7 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			RoadPricingScheme.Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
+			RoadPricingScheme.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}
@@ -90,7 +92,7 @@ public class SanralTollTravelCostCalculator implements PersonalizableTravelCost 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			RoadPricingScheme.Cost cost = SanralTollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
+			RoadPricingScheme.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}

@@ -37,7 +37,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -145,7 +145,7 @@ public class TestCellKnowledge {
 	private void initNodeSelector()
 	{
 		this.selectNodesDijkstra = new SelectNodesDijkstra(this.scenario.getNetwork());
-		this.selectNodesDijkstra.setCostCalculator(new OnlyTimeDependentTravelCostCalculator(null));
+		this.selectNodesDijkstra.setCostCalculator(new OnlyTimeDependentTravelDisutilityCalculator(null));
 		this.selectNodesDijkstra.setCostFactor(20.0);
 	}
 

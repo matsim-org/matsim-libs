@@ -16,7 +16,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -119,7 +119,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 	}
 
 	private void insertWenden(Link fromLink, Link toLink, Umlauf umlauf) {
-		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(this.config);
+		FreespeedTravelTimeAndDisutility calculator = new FreespeedTravelTimeAndDisutility(this.config);
 		LeastCostPathCalculator routingAlgo = new Dijkstra(network, calculator, calculator);
 
 		Node startNode = fromLink.getToNode();

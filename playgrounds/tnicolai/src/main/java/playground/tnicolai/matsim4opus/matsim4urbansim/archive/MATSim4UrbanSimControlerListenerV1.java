@@ -40,7 +40,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -95,7 +95,7 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 		initCostfunctionParameter(sc);
 
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		LeastCostPathTree lcpt = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree lcpt = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()));
 
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;

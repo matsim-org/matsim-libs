@@ -68,7 +68,7 @@ public class TransitControler {
 	}
 
 	static class MyMobsimFactory implements MobsimFactory {
-		private boolean useOTFVis = true ;
+		private boolean useOTFVis = false ;
 
 		@Override
 		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -109,14 +109,14 @@ public class TransitControler {
 				otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
 				//				otfVisConfig.setShowParking(true) ; // this does not really work
 
-			}
 
+				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+				OTFClientLive.run(sc.getConfig(), server);
+			}
 			//			if(this.useHeadwayControler){
 			//				simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
 			//				this.events.addHandler(new FixedHeadwayControler(simulation));		
 			//			}
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-			OTFClientLive.run(sc.getConfig(), server);
 
 			return qSim ;
 		}

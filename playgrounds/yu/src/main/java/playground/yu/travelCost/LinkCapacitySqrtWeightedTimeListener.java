@@ -29,10 +29,10 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -45,9 +45,9 @@ import org.matsim.core.router.util.TravelTime;
 public class LinkCapacitySqrtWeightedTimeListener implements
 		IterationStartsListener {
 	public static class LinkCapacitySqrtWeightedTravelCostCalculatorFactoryImpl
-			implements TravelCostCalculatorFactory {
+			implements TravelDisutilityFactory {
 
-		public PersonalizableTravelCost createTravelCostCalculator(
+		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new LinkCapacitySqrtWeightedTravelTimeCostCalculator(
@@ -63,7 +63,7 @@ public class LinkCapacitySqrtWeightedTimeListener implements
 	 * 
 	 */
 	public static class LinkCapacitySqrtWeightedTravelTimeCostCalculator
-			implements TravelMinCost, PersonalizableTravelCost {
+			implements TravelMinDisutility, PersonalizableTravelDisutility {
 
 		protected final TravelTime timeCalculator;
 
@@ -97,7 +97,7 @@ public class LinkCapacitySqrtWeightedTimeListener implements
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link,
+		public double getLinkTravelDisutility(final Link link,
 				final double time) {
 			double travelTime = timeCalculator.getLinkTravelTime(link, time);
 			// if (marginalUtlOfDistance == 0.0) {
@@ -110,7 +110,7 @@ public class LinkCapacitySqrtWeightedTimeListener implements
 		}
 
 		@Override
-		public double getLinkMinimumTravelCost(final Link link) {
+		public double getLinkMinimumTravelDisutility(final Link link) {
 			// if (marginalUtlOfDistance == 0.0) {
 			return link.getLength() / link.getFreespeed()
 			// * travelCostFactor
@@ -132,7 +132,7 @@ public class LinkCapacitySqrtWeightedTimeListener implements
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new LinkCapacitySqrtWeightedTravelCostCalculatorFactoryImpl());
+					.setTravelDisutilityFactory(new LinkCapacitySqrtWeightedTravelCostCalculatorFactoryImpl());
 		}
 	}
 

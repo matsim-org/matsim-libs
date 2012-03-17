@@ -22,8 +22,8 @@ package playground.benjamin.internalization;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.benjamin.emissions.EmissionModule;
@@ -32,7 +32,7 @@ import playground.benjamin.emissions.EmissionModule;
  * @author benjamin
  *
  */
-public class EmissionTravelCostCalculatorFactory implements	TravelCostCalculatorFactory {
+public class EmissionTravelCostCalculatorFactory implements	TravelDisutilityFactory {
 
 	private final EmissionModule emissionModule;
 
@@ -41,10 +41,10 @@ public class EmissionTravelCostCalculatorFactory implements	TravelCostCalculator
 	}
 
 	@Override
-	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
+	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
 		final EmissionTravelCostCalculator etcc = new EmissionTravelCostCalculator(timeCalculator, cnScoringGroup, emissionModule);
 
-		return new PersonalizableTravelCost(){
+		return new PersonalizableTravelDisutility(){
 
 			@Override
 			public void setPerson(Person person) {
@@ -52,8 +52,8 @@ public class EmissionTravelCostCalculatorFactory implements	TravelCostCalculator
 			}
 
 			@Override
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				double generalizedTravelCost = etcc.getLinkGeneralizedTravelCost(link, time);
+			public double getLinkTravelDisutility(Link link, double time) {
+				double generalizedTravelCost = etcc.getLinkTravelDisutility(link, time);
 				return generalizedTravelCost;
 			}
 		};

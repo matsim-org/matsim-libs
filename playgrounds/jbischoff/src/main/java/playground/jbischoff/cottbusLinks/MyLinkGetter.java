@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -67,7 +67,7 @@ public class MyLinkGetter {
 	log.info("loading network from " + netfile);
 	network = scenario.getNetwork();
 	new MatsimNetworkReader(scenario).readFile(netfile);
-	FreespeedTravelTimeCost fs =new FreespeedTravelTimeCost(-6, 7,-100);
+	FreespeedTravelTimeAndDisutility fs =new FreespeedTravelTimeAndDisutility(-6, 7,-100);
 	lcp =  df.createPathCalculator(network, fs,fs);
 	
 	

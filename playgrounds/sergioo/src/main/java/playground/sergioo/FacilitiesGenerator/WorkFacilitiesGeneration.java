@@ -54,7 +54,7 @@ import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -538,11 +538,11 @@ public class WorkFacilitiesGeneration {
 			oos.writeObject(linksStops);
 			oos.close();
 		}
-		TravelMinCost travelMinCost = new TravelMinCost() {
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				return getLinkMinimumTravelCost(link);
+		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
+			public double getLinkTravelDisutility(Link link, double time) {
+				return getLinkMinimumTravelDisutility(link);
 			}
-			public double getLinkMinimumTravelCost(Link link) {
+			public double getLinkMinimumTravelDisutility(Link link) {
 				return link.getLength()/WALKING_SPEED;
 			}
 		};

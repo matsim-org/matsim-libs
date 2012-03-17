@@ -59,7 +59,7 @@ public class ReRouteWithDiffTimeDistWeight implements IterationStartsListener,
 		Controler ctl = event.getControler();
 		int iter = event.getIteration();/* firstIter+1, +2, +3 */
 		int firstIter = ctl.getFirstIteration();
-		ctl.setTravelCostCalculatorFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
+		ctl.setTravelDisutilityFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
 				1d - (iter - firstIter - 1) / (nbOfCombi - 1d)/* A -> travelTime */));
 	}
 

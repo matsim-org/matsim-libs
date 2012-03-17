@@ -39,8 +39,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -117,7 +117,7 @@ public class InsertParkingActivitiesTest extends TestCase {
 		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
 		PersonalizableTravelTime travelTime = ttCalcFactory.createTravelTimeCalculator(sc.getNetwork(), sc.getConfig().travelTimeCalculator()) ;
-		PersonalizableTravelCost travelCost = new TravelTimeDistanceCostCalculator(travelTime, sc.getConfig().planCalcScore());
+		PersonalizableTravelDisutility travelCost = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, sc.getConfig().planCalcScore());
 		
 		PlanAlgorithm plansAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), sc.getNetwork(), travelCost, travelTime, routeFactory);
 		

@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -53,14 +53,14 @@ public class SpanningTree {
 	private double dTime = Time.UNDEFINED_TIME;
 
 	private final TravelTime ttFunction;
-	private final TravelCost tcFunction;
+	private final TravelDisutility tcFunction;
 	private HashMap<Id,NodeData> nodeData;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public SpanningTree(TravelTime tt, TravelCost tc) {
+	public SpanningTree(TravelTime tt, TravelDisutility tc) {
 		log.info("init " + this.getClass().getName() + " module...");
 		this.ttFunction = tt;
 		this.tcFunction = tc;
@@ -124,7 +124,7 @@ public class SpanningTree {
 		return this.ttFunction;
 	}
 
-	public final TravelCost getTravelCostCalulator() {
+	public final TravelDisutility getTravelCostCalulator() {
 		return this.tcFunction;
 	}
 
@@ -148,7 +148,7 @@ public class SpanningTree {
 			Node nn = l.getToNode();
 			NodeData nnData = nodeData.get(nn.getId());
 			if (nnData == null) { nnData = new NodeData(); this.nodeData.put(nn.getId(),nnData); }
-			double visitCost = currCost+tcFunction.getLinkGeneralizedTravelCost(l,currTime);
+			double visitCost = currCost+tcFunction.getLinkTravelDisutility(l,currTime);
 			double visitTime = currTime+ttFunction.getLinkTravelTime(l,currTime);
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
@@ -192,7 +192,7 @@ public class SpanningTree {
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator());
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().planCalcScore()));
+		SpanningTree st = new SpanningTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, scenario.getConfig().planCalcScore()));
 		Node origin = network.getNodes().get(new IdImpl(1));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);

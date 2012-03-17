@@ -20,7 +20,7 @@ import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -84,7 +84,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 		sink.process(scenario);
 	}
 	
-	private PlanStrategyImpl loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, Network network, PersonalizableTravelTime travelTimeCalc, PersonalizableTravelCost travelCostCalc, final ModeRouteFactory routeFactory) {
+	private PlanStrategyImpl loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, Network network, PersonalizableTravelTime travelTimeCalc, PersonalizableTravelDisutility travelCostCalc, final ModeRouteFactory routeFactory) {
 		PlanStrategyImpl strategy = null;
 		if (name.equals("KeepLastSelected")) {
 			strategy = new PlanStrategyImpl(new KeepSelected());

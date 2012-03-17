@@ -40,8 +40,8 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -261,22 +261,22 @@ public class Simulator {
 	}
 	
 	private static NetworkLegRouter initRouter(final TravelTime travelTime) {
-		TravelCost travelCost = new TravelCost() {
+		TravelDisutility travelCost = new TravelDisutility() {
 			@Override
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
+			public double getLinkTravelDisutility(Link link, double time) {
 				return travelTime.getLinkTravelTime(link, time);
 			}
 		};
 		
-		TravelMinCost travelMinCost = new TravelMinCost() {
+		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
 			
 			@Override
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
+			public double getLinkTravelDisutility(Link link, double time) {
 				return travelTime.getLinkTravelTime(link, time);
 			}
 			
 			@Override
-			public double getLinkMinimumTravelCost(Link link) {
+			public double getLinkMinimumTravelDisutility(Link link) {
 				return travelTime.getLinkTravelTime(link, 0);
 			}
 		};

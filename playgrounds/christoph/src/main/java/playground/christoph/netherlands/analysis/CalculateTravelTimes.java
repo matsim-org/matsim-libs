@@ -44,9 +44,9 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -92,7 +92,7 @@ public class CalculateTravelTimes {
 	
 	private Scenario scenario;
 	private TravelTime travelTime;
-	private TravelCost travelCost;
+	private TravelDisutility travelCost;
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -296,7 +296,7 @@ public class CalculateTravelTimes {
 		}
 	}
 		
-	public class FreeSpeedTravelCost implements PersonalizableTravelCost, TravelMinCost {
+	public class FreeSpeedTravelCost implements PersonalizableTravelDisutility, TravelMinDisutility {
 		private TravelTime travelTime;
 		
 		public FreeSpeedTravelCost(TravelTime travelTime) {
@@ -307,11 +307,11 @@ public class CalculateTravelTimes {
 			// nothing to do here
 		}
 
-		public double getLinkGeneralizedTravelCost(Link link, double time) {
+		public double getLinkTravelDisutility(Link link, double time) {
 			return travelTime.getLinkTravelTime(link, time);
 		}
 
-		public double getLinkMinimumTravelCost(Link link) {
+		public double getLinkMinimumTravelDisutility(Link link) {
 			return travelTime.getLinkTravelTime(link, 0.0);
 		}
 	}

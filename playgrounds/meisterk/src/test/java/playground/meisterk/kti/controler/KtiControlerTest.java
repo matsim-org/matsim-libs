@@ -53,7 +53,7 @@ public class KtiControlerTest extends MatsimTestCase {
 				router.getLeastCostPathCalculator().getClass());
 		assertEquals(
 				KtiTravelCostCalculatorFactory.class,
-				testee.getTravelCostCalculatorFactory().getClass());
+				testee.getTravelDisutilityFactory().getClass());
 		assertEquals(
 				playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory.class, 
 				testee.getScoringFunctionFactory().getClass());

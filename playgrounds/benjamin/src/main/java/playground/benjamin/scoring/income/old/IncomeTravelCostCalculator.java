@@ -22,7 +22,7 @@ package playground.benjamin.scoring.income.old;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.Household;
 import org.matsim.households.Income;
@@ -34,7 +34,7 @@ import org.matsim.households.Income.IncomePeriod;
  * @author bkick after dgrether
  *
  */
-public class IncomeTravelCostCalculator implements PersonalizableTravelCost {
+public class IncomeTravelCostCalculator implements PersonalizableTravelDisutility {
 		
 //	private Double betaCost = null;
 	private double incomePerDay;
@@ -69,7 +69,7 @@ public class IncomeTravelCostCalculator implements PersonalizableTravelCost {
 	}
 
 	//calculate generalized travel costs
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
+	public double getLinkTravelDisutility(Link link, double time) {
 		double betaCost = betaIncomeCar / this.incomePerDay;
 		double distance   = link.getLength();
 		double distanceCost = this.distanceCostFactor * distance;

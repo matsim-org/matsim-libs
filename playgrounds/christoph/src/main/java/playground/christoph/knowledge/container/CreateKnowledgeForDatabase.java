@@ -35,8 +35,8 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -70,7 +70,7 @@ public class CreateKnowledgeForDatabase {
 	private final double[] dijkstraCostFactors = {1.05, 1.1, 1.15, 1.2, 1.3, 1.35, 1.4, 1.45};
 //	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0};
 //	private double[] dijkstraCostFactors = {1.0};
-	private TravelCost costCalculator;
+	private TravelDisutility costCalculator;
 
 	private final int parallelThreads = 8;
 
@@ -187,7 +187,7 @@ public class CreateKnowledgeForDatabase {
 		 * The selected Nodes depend on the used Cost Calculator
 		 */
 		// null as Argument: -> no TimeCalculator -> use FreeSpeedTravelTime
-		costCalculator = new OnlyTimeDependentTravelCostCalculator(null);
+		costCalculator = new OnlyTimeDependentTravelDisutilityCalculator(null);
 
 		SelectNodesDijkstra selectNodesDijkstra = new SelectNodesDijkstra(this.network);
 		selectNodesDijkstra.setCostCalculator(costCalculator);
@@ -292,7 +292,7 @@ public class CreateKnowledgeForDatabase {
 	{
 		for (Link link : network.getLinks().values())
 		{
-			((MyLinkImpl) link).setTravelCost(costCalculator.getLinkGeneralizedTravelCost(link, Time.UNDEFINED_TIME));
+			((MyLinkImpl) link).setTravelCost(costCalculator.getLinkTravelDisutility(link, Time.UNDEFINED_TIME));
 		}
 	}
 

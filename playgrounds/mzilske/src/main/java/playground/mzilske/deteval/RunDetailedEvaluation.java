@@ -14,7 +14,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -79,9 +79,9 @@ public class RunDetailedEvaluation {
 		
 		DijkstraFactory leastCostPathCalculatorFactory = new DijkstraFactory();
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+		TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-		final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), scenario.getNetwork(), travelCostCalculatorFactory.createTravelCostCalculator(travelTimeCalculator, config.planCalcScore()), travelTimeCalculator, leastCostPathCalculatorFactory, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
+		final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), scenario.getNetwork(), travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator, config.planCalcScore()), travelTimeCalculator, leastCostPathCalculatorFactory, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
 		ParallelPersonAlgorithmRunner.run(backgroundScenario.getPopulation(), 1,
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override

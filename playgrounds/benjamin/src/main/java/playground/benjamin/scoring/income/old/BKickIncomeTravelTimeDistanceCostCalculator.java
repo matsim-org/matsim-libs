@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
@@ -33,7 +33,7 @@ import org.matsim.households.Income.IncomePeriod;
  * @author dgrether
  *
  */
-public class BKickIncomeTravelTimeDistanceCostCalculator implements PersonalizableTravelCost {
+public class BKickIncomeTravelTimeDistanceCostCalculator implements PersonalizableTravelDisutility {
 
 	private static final Logger log = Logger.getLogger(BKickIncomeTravelTimeDistanceCostCalculator.class);
 	
@@ -59,9 +59,9 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements Personalizab
 	}
 
 	/**
-	 * @see org.matsim.core.router.util.TravelCost#getLinkGeneralizedTravelCost(org.matsim.core.network.LinkImpl, double)
+	 * @see org.matsim.core.router.util.TravelDisutility#getLinkTravelDisutility(org.matsim.core.network.LinkImpl, double)
 	 */
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
+	public double getLinkTravelDisutility(Link link, double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		if (this.marginalUtlOfDistance == 0.0) {
 			return travelTime * this.travelCostFactor;

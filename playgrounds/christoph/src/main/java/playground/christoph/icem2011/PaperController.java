@@ -148,7 +148,7 @@ public class PaperController extends WithinDayController implements StartupListe
 
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		LeastCostPathCalculatorFactory factory = new FastDijkstraFactory();
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, super.getTravelCostCalculatorFactory(), this.getTravelTimeCollectorFactory(), factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, super.getTravelDisutilityFactory(), this.getTravelTimeCollectorFactory(), factory, routeFactory);
 		
 //		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 //		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);

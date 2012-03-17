@@ -29,7 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -186,13 +186,13 @@ public class BkRouterTest extends MatsimTestCase {
 		// returns null, if there is no road pricing
 		if (controler.getConfig().scenario().isUseRoadpricing()){
 			RoadPricingScheme roadPricingScheme = controler.getRoadPricing().getRoadPricingScheme();
-			TravelCostCalculatorFactory travelCostCalculatorFactory = 
+			TravelDisutilityFactory travelCostCalculatorFactory = 
 				new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
-			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
 		}
 		else{
-			TravelCostCalculatorFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
-			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+			TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
+			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
 		}
 	}
 

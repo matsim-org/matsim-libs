@@ -22,13 +22,13 @@ package playground.christoph.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 public class FullNetworkDijkstraFactory implements LeastCostPathCalculatorFactory {
 
 	@Override
-	public FullNetworkDijkstra createPathCalculator(final Network network, final TravelCost travelCosts, final TravelTime travelTimes) {
+	public FullNetworkDijkstra createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		return new FullNetworkDijkstra(network, travelCosts, travelTimes);
 	}
 }

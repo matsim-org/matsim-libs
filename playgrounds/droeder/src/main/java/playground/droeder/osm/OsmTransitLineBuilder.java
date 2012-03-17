@@ -38,7 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -254,7 +254,7 @@ public class OsmTransitLineBuilder {
 	 * @return
 	 */
 	private HashMap<Id, Map<Id, List<Link>>> createNewRoutes(Map<Id, NetworkImpl> line2Net) {
-		FreespeedTravelTimeCost cost = new FreespeedTravelTimeCost(-1, 0, 0);
+		FreespeedTravelTimeAndDisutility cost = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
 		Dijkstra router;
 		
 		HashMap<Id, Map<Id, List<Link>>> newLines = new HashMap<Id, Map<Id, List<Link>>>();

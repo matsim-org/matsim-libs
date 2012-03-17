@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.roadpricing.senozon;
+package playground.jjoubert.roadpricing.senozon.scoring;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -36,6 +36,8 @@ import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
+
+import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
 
 /**
  * Calculates the toll agents pay during a simulation by analyzing events. To
@@ -167,7 +169,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 				 * arriving at this link.  */
 				return;
 			}
-			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(),
+			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(),
 					event.getTime());
 			if (baseCost != null) {
 				double newToll = link.getLength() * baseCost.amount * SanralTollFactor.getTollFactor(event.getPersonId(), link.getId(), event.getTime());
@@ -186,7 +188,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(), event.getTime());
+			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime());
 			if (baseCost != null) {
 				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
@@ -205,7 +207,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	class CordonTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(), event.getTime());
+			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime());
 			if (baseCost != null) {
 				// this is a link inside the toll area.
 				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getPersonId());

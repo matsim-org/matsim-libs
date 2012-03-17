@@ -48,7 +48,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -106,8 +106,8 @@ public class FitnessTest {
 		plan.createAndAddActivity( "h" , l1.getId() ).setEndTime( 24 * 3600 );
 		this.plan = plan;
 
-		FreespeedTravelTimeCost travelTimeCost =
-			new FreespeedTravelTimeCost( conf.planCalcScore() );
+		FreespeedTravelTimeAndDisutility travelTimeCost =
+			new FreespeedTravelTimeAndDisutility( conf.planCalcScore() );
 		PlansCalcRoute router =
 			new PlansCalcRoute(
 					conf.plansCalcRoute(),

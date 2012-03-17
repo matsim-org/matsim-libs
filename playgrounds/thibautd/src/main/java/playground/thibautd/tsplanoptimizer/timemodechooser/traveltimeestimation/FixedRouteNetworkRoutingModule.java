@@ -41,11 +41,11 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -83,7 +83,7 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 	private final NetworkLegRouter routingModule;
 	private final PersonalizableTravelTime travelTime;
-	private final PersonalizableTravelCost travelCost;
+	private final PersonalizableTravelDisutility travelCost;
 	private final DepartureDelayAverageCalculator tDepDelayCalc;
 
 	private FixedRouteNetworkRoutingModule(
@@ -103,12 +103,12 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 
 		this.network = routerFactory.getNetwork();
 		this.travelTime = routerFactory.getTravelTimeCalculatorFactory().createTravelTime();
-		this.travelCost = routerFactory.getTravelCostCalculatorFactory().createTravelCostCalculator( travelTime , scoreConfigGroup );
+		this.travelCost = routerFactory.getTravelCostCalculatorFactory().createTravelDisutility( travelTime , scoreConfigGroup );
 
 		routes = extractRoutes( plan );
 
 		// if no route is found, the shortest path without congestion will be used
-		FreespeedTravelTimeCost freeFlowTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
+		FreespeedTravelTimeAndDisutility freeFlowTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		LeastCostPathCalculatorFactory leastCostPathAlgoFactory = routerFactory.getLeastCostPathCalculatorFactory();
 		LeastCostPathCalculator routeAlgo = leastCostPathAlgoFactory.createPathCalculator(network, freeFlowTimeCostCalc, freeFlowTimeCostCalc);
 		ModeRouteFactory routeFactory = routerFactory.getModeRouteFactory();

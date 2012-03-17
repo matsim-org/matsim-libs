@@ -34,12 +34,12 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.TripRouter;
@@ -69,11 +69,11 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 		ParkAndRideTravelTimeCost timeCost = new ParkAndRideTravelTimeCost( transitConfig );
 
 		PersonalizableTravelTime carTime = tripRouterFactory.getTravelTimeCalculatorFactory().createTravelTime();
-		PersonalizableTravelCost carCost =
-			tripRouterFactory.getTravelCostCalculatorFactory().createTravelCostCalculator(
+		PersonalizableTravelDisutility carCost =
+			tripRouterFactory.getTravelCostCalculatorFactory().createTravelDisutility(
 					carTime, controler.getConfig().planCalcScore() );
-		TransitRouterNetworkTravelTimeCost ptTimeCost =
-					new TransitRouterNetworkTravelTimeCost( transitConfig );
+		TransitRouterNetworkTravelTimeAndDisutility ptTimeCost =
+					new TransitRouterNetworkTravelTimeAndDisutility( transitConfig );
 
 		ParkAndRideRoutingModule routingModule =
 			new ParkAndRideRoutingModule(

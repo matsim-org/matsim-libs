@@ -3,7 +3,7 @@ package playground.meisterk.kti.controler;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -71,7 +71,7 @@ public class KTIControler extends Controler {
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
-		this.setTravelCostCalculatorFactory(costCalculatorFactory);
+		this.setTravelDisutilityFactory(costCalculatorFactory);
 
 		super.setUp();
 	}
@@ -91,7 +91,7 @@ public class KTIControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
 
 		PlanAlgorithm router = null;
 

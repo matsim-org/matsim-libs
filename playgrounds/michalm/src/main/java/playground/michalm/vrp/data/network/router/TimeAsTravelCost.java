@@ -5,7 +5,7 @@ import org.matsim.core.router.util.*;
 
 
 public class TimeAsTravelCost
-    implements TravelCost
+    implements TravelDisutility
 {
     private TravelTime travelTime;
 
@@ -17,7 +17,7 @@ public class TimeAsTravelCost
 
 
     @Override
-    public double getLinkGeneralizedTravelCost(Link link, double time)
+    public double getLinkTravelDisutility(Link link, double time)
     {
         return travelTime.getLinkTravelTime(link, time);
     }

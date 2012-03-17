@@ -14,7 +14,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.mzilske.pipeline.PersonSink;
@@ -34,7 +34,7 @@ private Network network;
 	
 	public PersonRouterFilter(Network network) {
 		this.network = network;
-		FreespeedTravelTimeCost fttc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
+		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 		dijkstra = new Dijkstra(network, fttc, fttc);
 	}
 

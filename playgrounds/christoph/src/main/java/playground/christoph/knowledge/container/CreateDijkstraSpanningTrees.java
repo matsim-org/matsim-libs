@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -77,7 +77,7 @@ public class CreateDijkstraSpanningTrees {
 	 * The selected Nodes depend on the used Cost Calculator
 	 */
 	// null as Argument: -> no TimeCalculator -> use FreeSpeedTravelTime
-	private TravelCost costCalculator = new OnlyTimeDependentTravelCostCalculator(null);
+	private TravelDisutility costCalculator = new OnlyTimeDependentTravelDisutilityCalculator(null);
 	
 	private Map<Id, byte[]> forwardExecution;
 	private Map<Id, byte[]> backwardExecution;

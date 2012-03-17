@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
@@ -64,7 +64,7 @@ public class MultiLegRoutingControler extends Controler {
 
 	//TODO: check particular settings and handle them
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();
@@ -102,7 +102,7 @@ public class MultiLegRoutingControler extends Controler {
 
 		TripRouterFactory factory =  new TripRouterFactory(
 				getNetwork(),
-				getTravelCostCalculatorFactory(),
+				getTravelDisutilityFactory(),
 				persFactory,
 				getLeastCostPathCalculatorFactory(),
 				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory());

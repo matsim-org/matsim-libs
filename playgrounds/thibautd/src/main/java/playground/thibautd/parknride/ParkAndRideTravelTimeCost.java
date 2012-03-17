@@ -21,14 +21,14 @@ package playground.thibautd.parknride;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.pt.router.TransitRouterConfig;
 
 /**
  * @author thibautd
  */
-public class ParkAndRideTravelTimeCost implements PersonalizableTravelCost, PersonalizableTravelTime {
+public class ParkAndRideTravelTimeCost implements PersonalizableTravelDisutility, PersonalizableTravelTime {
 	private final TransitRouterConfig config;
 
 	public ParkAndRideTravelTimeCost(final TransitRouterConfig config) {
@@ -36,7 +36,7 @@ public class ParkAndRideTravelTimeCost implements PersonalizableTravelCost, Pers
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time) {
 		double transfertime = getLinkTravelTime(link, time);
 		double waittime = this.config.additionalTransferTime;
 		

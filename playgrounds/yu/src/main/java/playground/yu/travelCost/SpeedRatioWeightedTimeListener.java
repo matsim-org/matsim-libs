@@ -30,10 +30,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 
 /**
  * switch TravelCostCalculatorFactory evetually also PersonalizableTravelCost
@@ -44,9 +44,9 @@ import org.matsim.core.router.util.TravelMinCost;
  */
 public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 	public static class SpeedRatioWeightedTimeTravelCostCalculatorFactoryImpl
-			implements TravelCostCalculatorFactory {
+			implements TravelDisutilityFactory {
 
-		public PersonalizableTravelCost createTravelCostCalculator(
+		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new SpeedRatioWeightedTimeTravelCostCalculator(
@@ -56,7 +56,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 	}
 
 	public static class SpeedRatioWeightedTimeTravelCostCalculator implements
-			TravelMinCost, PersonalizableTravelCost {
+			TravelMinDisutility, PersonalizableTravelDisutility {
 		private PersonalizableTravelTime timeCalculator;
 
 		public SpeedRatioWeightedTimeTravelCostCalculator(
@@ -65,7 +65,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link,
+		public double getLinkTravelDisutility(final Link link,
 				final double time) {
 			double travelTime = timeCalculator.getLinkTravelTime(link, time);
 
@@ -74,7 +74,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 		}
 
 		@Override
-		public double getLinkMinimumTravelCost(final Link link) {
+		public double getLinkMinimumTravelDisutility(final Link link) {
 			double travelTime = ((LinkImpl) link).getFreespeedTravelTime();
 
 			return travelTime
@@ -93,7 +93,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getFirstIteration()) {
 			ctl
-					.setTravelCostCalculatorFactory(new SpeedRatioWeightedTimeTravelCostCalculatorFactoryImpl());
+					.setTravelDisutilityFactory(new SpeedRatioWeightedTimeTravelCostCalculatorFactoryImpl());
 			// ctl
 			// .setLeastCostPathCalculatorFactory(new
 			// MinimizeLinkAmountDijkstraFactory());

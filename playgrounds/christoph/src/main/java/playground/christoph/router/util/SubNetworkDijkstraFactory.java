@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.router.SubNetworkDijkstra;
@@ -36,7 +36,7 @@ public class SubNetworkDijkstraFactory extends DijkstraFactory {
 	private static final Logger log = Logger.getLogger(SubNetworkDijkstraFactory.class);
 	
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelCost travelCosts, final TravelTime travelTimes) {
+	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		
 		if (travelCosts instanceof SubNetworkDijkstraTravelCostWrapper)
 		{

@@ -2,8 +2,8 @@ package playground.mzilske.pipeline;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 
 public class TravelCostCalculatorTask implements ScenarioSinkSource {
 
@@ -13,9 +13,9 @@ public class TravelCostCalculatorTask implements ScenarioSinkSource {
 
 	private TravelTimeCalculatorTask travelTimeCalculator;
 
-	private TravelCostCalculatorFactory travelCostCalculatorFactory;
+	private TravelDisutilityFactory travelCostCalculatorFactory;
 
-	private PersonalizableTravelCost travelCostCalculator;
+	private PersonalizableTravelDisutility travelCostCalculator;
 	
 	@Override
 	public void setSink(ScenarioSink sink) {
@@ -29,17 +29,17 @@ public class TravelCostCalculatorTask implements ScenarioSinkSource {
 
 	@Override
 	public void process(Scenario scenario) {
-		travelCostCalculator = travelCostCalculatorFactory.createTravelCostCalculator(travelTimeCalculator.getTravelTimeCalculator(), group);	
+		travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getTravelTimeCalculator(), group);	
 		sink.process(scenario);
 	}
 
-	public TravelCostCalculatorTask(TravelCostCalculatorFactory travelCostCalculatorFactory, PlanCalcScoreConfigGroup group) {
+	public TravelCostCalculatorTask(TravelDisutilityFactory travelCostCalculatorFactory, PlanCalcScoreConfigGroup group) {
 		super();
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 		this.group = group;
 	}
 
-	PersonalizableTravelCost getTravelCostCalculator() {
+	PersonalizableTravelDisutility getTravelCostCalculator() {
 		return travelCostCalculator;
 	}
 

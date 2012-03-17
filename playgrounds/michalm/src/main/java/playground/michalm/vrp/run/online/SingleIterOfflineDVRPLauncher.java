@@ -55,7 +55,7 @@ public class SingleIterOfflineDVRPLauncher
     private TaxiOptimizerFactory optimizerFactory;
 
     private PersonalizableTravelTime ttimeCalc;
-    private PersonalizableTravelCost tcostCalc;
+    private PersonalizableTravelDisutility tcostCalc;
 
 
     private void processArgs()
@@ -89,7 +89,7 @@ public class SingleIterOfflineDVRPLauncher
 
         ttimeCalc = travelTimesFromEvents ? TravelTimeCalculators.createTravelTimeFromEvents(
                 eventsFileName, scenario) : new FreeSpeedTravelTimeCalculator();
-        tcostCalc = new OnlyTimeDependentTravelCostCalculator(ttimeCalc);
+        tcostCalc = new OnlyTimeDependentTravelDisutilityCalculator(ttimeCalc);
 
     }
 

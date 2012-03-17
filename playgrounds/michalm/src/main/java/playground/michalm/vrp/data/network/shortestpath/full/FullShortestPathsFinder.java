@@ -59,7 +59,7 @@ public class FullShortestPathsFinder
         // TravelTimeCalculatorConfigGroup
         // a. travelTimeCalculatorType: "TravelTimeCalculatorArray"
         // b. travelTimeAggregator: "optimistic"
-        TravelCost travelCost = new TimeAsTravelCost(travelTime);
+        TravelDisutility travelCost = new TimeAsTravelCost(travelTime);
 
         LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(
                 network, travelCost, travelTime);
@@ -102,13 +102,13 @@ public class FullShortestPathsFinder
 
                         if (ShortestPath.INCLUDE_TO_LINK) {
                             time += travelTime.getLinkTravelTime(toLink, departTime);
-                            cost += travelCost.getLinkGeneralizedTravelCost(toLink, time);
+                            cost += travelCost.getLinkTravelDisutility(toLink, time);
                             ids[idCount - 1] = toLink.getId();
                             idxShift = 0;
                         }
                         else {
                             time += travelTime.getLinkTravelTime(fromLink, departTime);
-                            cost += travelCost.getLinkGeneralizedTravelCost(fromLink, time);
+                            cost += travelCost.getLinkTravelDisutility(fromLink, time);
                             ids[0] = fromLink.getId();
                             idxShift = 1;
                         }

@@ -22,7 +22,7 @@ package playground.benjamin.scoring.income.old;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
@@ -61,7 +61,7 @@ public class BKickIncomeControler extends BkControler {
 	protected void setUp(){	
     this.scenarioData.getConfig().global().setNumberOfThreads(1);
 		this.hhdb = new PersonHouseholdMapping(this.scenarioData.getHouseholds());
-		this.setTravelCostCalculatorFactory(new Income1TravelCostCalculatorFactory());
+		this.setTravelDisutilityFactory(new Income1TravelCostCalculatorFactory());
 //		if (this.travelTimeCalculator == null) {
 //			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 //		}
@@ -70,7 +70,7 @@ public class BKickIncomeControler extends BkControler {
 	}
 	
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
 		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory(), this.hhdb);
 	}
 

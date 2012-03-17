@@ -26,7 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 
@@ -43,7 +43,7 @@ import playground.thibautd.router.TripRouterFactory;
  */
 public class TripRouterFactory implements MatsimFactory {
 	private final Network network;
-	private final TravelCostCalculatorFactory travelCostCalculatorFactory;
+	private final TravelDisutilityFactory travelCostCalculatorFactory;
 	private final PersonalizableTravelTimeFactory travelTimeFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
 	private final ModeRouteFactory modeRouteFactory;
@@ -62,7 +62,7 @@ public class TripRouterFactory implements MatsimFactory {
 	 */
 	public TripRouterFactory(
 			final Network network,
-			final TravelCostCalculatorFactory travelCostCalculatorFactory,
+			final TravelDisutilityFactory travelCostCalculatorFactory,
 			final PersonalizableTravelTimeFactory travelTimeFactory,
 			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
 			final ModeRouteFactory modeRouteFactory) {
@@ -80,7 +80,7 @@ public class TripRouterFactory implements MatsimFactory {
 		return network;
 	}
 
-	public TravelCostCalculatorFactory getTravelCostCalculatorFactory() {
+	public TravelDisutilityFactory getTravelCostCalculatorFactory() {
 		return travelCostCalculatorFactory;
 	}
 

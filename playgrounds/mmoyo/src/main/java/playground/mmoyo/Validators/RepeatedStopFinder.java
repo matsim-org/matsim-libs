@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -52,12 +52,12 @@ public class RepeatedStopFinder {
 		return minDistance;
 	}
 
-	class PseudoTimeCost implements TravelCost, TravelTime {
+	class PseudoTimeCost implements TravelDisutility, TravelTime {
 
 		public PseudoTimeCost() {
 		}
 
-		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time) {
 			return 1.0;
 		}
 		

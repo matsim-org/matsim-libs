@@ -13,7 +13,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
@@ -63,7 +63,7 @@ public class SingleIterOnlineDVRPLauncher
     private TaxiOptimizerFactory optimizerFactory;
 
     private PersonalizableTravelTime ttimeCalc;
-    private PersonalizableTravelCost tcostCalc;
+    private PersonalizableTravelDisutility tcostCalc;
 
     private boolean otfVis;
     public static OTFQueryControl queryControl;
@@ -100,7 +100,7 @@ public class SingleIterOnlineDVRPLauncher
 
         ttimeCalc = travelTimesFromEvents ? TravelTimeCalculators.createTravelTimeFromEvents(
                 eventsFileName, scenario) : new FreeSpeedTravelTimeCalculator();
-        tcostCalc = new OnlyTimeDependentTravelCostCalculator(ttimeCalc);
+        tcostCalc = new OnlyTimeDependentTravelDisutilityCalculator(ttimeCalc);
 
         DijkstraFactory leastCostPathCalculatorFactory = new DijkstraFactory();
 

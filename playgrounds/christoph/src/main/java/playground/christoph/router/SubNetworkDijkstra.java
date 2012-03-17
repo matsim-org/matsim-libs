@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.network.SubLink;
@@ -47,7 +47,7 @@ public class SubNetworkDijkstra extends Dijkstra {
 	private Person person;
 	private KnowledgeTools knowledgeTools = new KnowledgeTools();
 	
-	public SubNetworkDijkstra(Network network, TravelCost costFunction, TravelTime timeFunction) {
+	public SubNetworkDijkstra(Network network, TravelDisutility costFunction, TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
 	}
 

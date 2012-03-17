@@ -46,9 +46,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -137,8 +137,8 @@ public class WalkDistanceEstimator {
 		// Set up router.
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator ttc = ttcf.createTravelTimeCalculator(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
-		TravelCostCalculatorFactory tccf = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelCost tc = tccf.createTravelCostCalculator(ttc, sAll.getConfig().planCalcScore());
+		TravelDisutilityFactory tccf = new TravelCostCalculatorFactoryImpl();
+		PersonalizableTravelDisutility tc = tccf.createTravelDisutility(ttc, sAll.getConfig().planCalcScore());
 		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		em.addHandler(ttc);
 		new EventsReaderTXTv1(em).readFile(sb.getIterationEventsFile("100"));

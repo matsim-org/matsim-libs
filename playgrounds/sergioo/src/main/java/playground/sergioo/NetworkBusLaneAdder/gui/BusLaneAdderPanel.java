@@ -45,7 +45,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.xml.sax.SAXException;
@@ -96,11 +96,11 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 		addMouseWheelListener(this);
 		addKeyListener(this);
 		setFocusable(true);
-		TravelMinCost travelMinCost = new TravelMinCost() {
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				return getLinkMinimumTravelCost(link);
+		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
+			public double getLinkTravelDisutility(Link link, double time) {
+				return getLinkMinimumTravelDisutility(link);
 			}
-			public double getLinkMinimumTravelCost(Link link) {
+			public double getLinkMinimumTravelDisutility(Link link) {
 				if(link.getAllowedModes().contains("bus"))
 					return link.getLength()/BUS_SPEED;
 				else

@@ -28,8 +28,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
@@ -128,12 +128,12 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		super.createAndInitTravelTimeCollector();
 		travelTime = super.getTravelTimeCollector();
 						
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+		OnlyTimeDependentTravelDisutilityCalculator travelCost = new OnlyTimeDependentTravelDisutilityCalculator(travelTime);
 		SubNetworkDijkstraTravelCostWrapper subNetworkDijkstraTravelCostWrapper = new SubNetworkDijkstraTravelCostWrapper(travelCost);
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore())); 
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore())); 
 	
 		// TODO: fix this...
 		AbstractMultithreadedModule router = null;

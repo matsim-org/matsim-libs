@@ -33,13 +33,13 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarEuclideanFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -87,7 +87,7 @@ public class RouterPerformanceTest {
 
 	private interface RouterProvider {
 		public String getName();
-		public LeastCostPathCalculatorFactory getFactory(Network network, TravelMinCost costCalc, TravelTime timeCalc);
+		public LeastCostPathCalculatorFactory getFactory(Network network, TravelMinDisutility costCalc, TravelTime timeCalc);
 	}
 
 	private static class DijkstraProvider implements RouterProvider {
@@ -96,7 +96,7 @@ public class RouterPerformanceTest {
 			return "Dijkstra";
 		}
 		@Override
-		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
 			return new DijkstraFactory();
 		}
 	}
@@ -107,7 +107,7 @@ public class RouterPerformanceTest {
 			return "DijkstraPruneDeadends";
 		}
 		@Override
-		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
 			PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 			preProcessData.run(network);
 			return new DijkstraFactory(preProcessData);
@@ -120,7 +120,7 @@ public class RouterPerformanceTest {
 			return "AStarEuclidean";
 		}
 		@Override
-		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
 			return new AStarEuclideanFactory(network, costCalc);
 		}
 	}
@@ -131,7 +131,7 @@ public class RouterPerformanceTest {
 			return "AStarLandmarks";
 		}
 		@Override
-		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
 			return new AStarLandmarksFactory(network, costCalc);
 		}
 	}
@@ -151,7 +151,7 @@ public class RouterPerformanceTest {
 
 		log.info("### calcRoute with router \t" + provider.getName());
 
-		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility calculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 		measureMemory("### before creating Router Factory");
 		long start = System.currentTimeMillis();

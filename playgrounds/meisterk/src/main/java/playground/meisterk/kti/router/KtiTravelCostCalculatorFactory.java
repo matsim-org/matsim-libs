@@ -21,14 +21,14 @@
 package playground.meisterk.kti.router;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 public class KtiTravelCostCalculatorFactory implements
-		TravelCostCalculatorFactory {
+		TravelDisutilityFactory {
 
 	private KtiConfigGroup ktiConfigGroup = null;
 	
@@ -37,7 +37,7 @@ public class KtiTravelCostCalculatorFactory implements
 		this.ktiConfigGroup = ktiConfigGroup;
 	}
 
-	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator,	PlanCalcScoreConfigGroup cnScoringGroup) {
+	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator,	PlanCalcScoreConfigGroup cnScoringGroup) {
 		return new KtiTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, ktiConfigGroup);
 	}
 

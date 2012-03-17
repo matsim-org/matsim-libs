@@ -32,8 +32,8 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.telaviv.locationchoice.LocationChoicePlanModule;
@@ -52,13 +52,13 @@ public class LocationChoiceReRouteAStarPlanStrategy implements PlanStrategy {
 		
 		Scenario scenario = controler.getScenario();
 		Network network = controler.getNetwork();
-		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
+		PersonalizableTravelDisutility travelCostCalc = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		Config config = controler.getConfig();
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new LocationChoicePlanModule(scenario));
-		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore()), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory()));
+		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeAndDisutility(config.planCalcScore()), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory()));
 	}
 	
 	@Override

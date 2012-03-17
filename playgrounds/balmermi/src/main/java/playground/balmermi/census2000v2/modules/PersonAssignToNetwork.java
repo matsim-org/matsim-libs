@@ -31,7 +31,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -54,7 +54,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	public PersonAssignToNetwork(final Network network, final ActivityFacilities facilities, final Config config, final ModeRouteFactory routeFactory) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc,timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc), routeFactory);
 		log.info("    done.");
 	}

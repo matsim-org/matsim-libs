@@ -43,10 +43,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -129,8 +129,8 @@ public class NetworkDistance {
 		config.planCalcScore().setMarginalUtilityOfMoney(1.) ;
 
 		// create the router algorithm
-		TravelTime travelTime = new FreespeedTravelTimeCost(config.planCalcScore());
-		TravelCost linkCosts = new TravelTimeDistanceCostCalculator(travelTime, config.planCalcScore());
+		TravelTime travelTime = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		TravelDisutility linkCosts = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
 		Dijkstra router = new Dijkstra(network, linkCosts, travelTime);
 
 		// we need to transform the coordinate from wgs84 to gk4 for calculating distances

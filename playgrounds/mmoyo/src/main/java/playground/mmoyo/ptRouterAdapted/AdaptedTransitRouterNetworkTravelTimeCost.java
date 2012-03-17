@@ -23,14 +23,14 @@ package playground.mmoyo.ptRouterAdapted;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 /**
  *  This version of TransitRouterNetworkTravelTimeCost reads values from a MyTransitRouterConfig object
  */
-public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetworkTravelTimeCost {
+public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetworkTravelTimeAndDisutility {
 	private final static double MIDNIGHT = 24.0*3600;
 	
 	//these variables are protected in super class
@@ -57,7 +57,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 

@@ -1,14 +1,14 @@
 package playground.ciarif.flexibletransports.router;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 
 public class FtTravelCostCalculatorFactory
-  implements TravelCostCalculatorFactory
+  implements TravelDisutilityFactory
 {
   private FtConfigGroup ftConfigGroup = null;
 
@@ -20,7 +20,7 @@ public class FtTravelCostCalculatorFactory
 
 
 //@Override
-public PersonalizableTravelCost createTravelCostCalculator(
+public PersonalizableTravelDisutility createTravelDisutility(
 		PersonalizableTravelTime timeCalculator,
 		PlanCalcScoreConfigGroup cnScoringGroup) {
 	// TODO Auto-generated method stub

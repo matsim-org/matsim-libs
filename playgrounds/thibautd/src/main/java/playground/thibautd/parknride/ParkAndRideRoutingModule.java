@@ -46,7 +46,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -57,7 +57,7 @@ import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -90,7 +90,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 	private final TransitRouterConfig transitRouterConfig;
 	private final ModeRouteFactory routeFactory;
 	private final PopulationFactory populationFactory;
-	private final TransitRouterNetworkTravelTimeCost ttCalculator;
+	private final TransitRouterNetworkTravelTimeAndDisutility ttCalculator;
 	private final TransitSchedule transitSchedule;
 
 	public ParkAndRideRoutingModule(
@@ -102,10 +102,10 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final double pnrConnectionDistance,
 			final ParkAndRideFacilities parkAndRideFacilities,
 			final TransitRouterConfig transitRouterConfig,
-			final PersonalizableTravelCost carCost,
+			final PersonalizableTravelDisutility carCost,
 			final PersonalizableTravelTime carTime,
-			final TransitRouterNetworkTravelTimeCost ptTimeCost,
-			final PersonalizableTravelCost pnrCost,
+			final TransitRouterNetworkTravelTimeAndDisutility ptTimeCost,
+			final PersonalizableTravelDisutility pnrCost,
 			final PersonalizableTravelTime pnrTime) {
 		this.transitSchedule = schedule;
 		this.ttCalculator = ptTimeCost;
@@ -625,7 +625,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		public Link next() {
 			currentElement = iterator.next();
 			currentTravelTime = timeCost.getLinkTravelTime( currentElement , now );
-			currentTravelCost = timeCost.getLinkGeneralizedTravelCost( currentElement , now );
+			currentTravelCost = timeCost.getLinkTravelDisutility( currentElement , now );
 
 			now += currentTravelTime;
 			cost += currentTravelCost;

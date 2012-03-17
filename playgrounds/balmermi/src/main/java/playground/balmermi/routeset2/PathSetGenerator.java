@@ -39,7 +39,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.AStarLandmarks;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -62,7 +62,7 @@ public class PathSetGenerator {
 	private final double avIncidentNodeDensityPerNodeNetwork;
 	private final double avIncidentNodeDensityPerNonePassNodeNetwork;
 
-	private final FreespeedTravelTimeCost frespeedCost;
+	private final FreespeedTravelTimeAndDisutility frespeedCost;
 	private final LeastCostPathCalculator router;
 
 	private Node origin = null;
@@ -88,7 +88,7 @@ public class PathSetGenerator {
 	public PathSetGenerator(final Network network) {
 		if (network == null) { throw new RuntimeException("Network must exist."); }
 		this.network = network;
-		this.frespeedCost = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
+		this.frespeedCost = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(this.frespeedCost);
 		preProcessLandmarks.run(network);
 		this.router = new AStarLandmarks(this.network,preProcessLandmarks,this.frespeedCost);
