@@ -432,6 +432,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	
 	@Override
 	public final String getMode() {
+		if( this.currentPlanElementIndex >= this.plan.getPlanElements().size() ) {
+			// just having run out of plan elements it not an argument for not being able to answer the "mode?" question.
+			// this is in most cases called in "abort".  kai, mar'12
+			
+			return null ;
+		}
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;

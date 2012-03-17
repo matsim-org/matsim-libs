@@ -421,7 +421,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public AgentCounterI getAgentCounter() {
+	public AgentCounter getAgentCounter() {
 		return this.agentCounter ;
 	}
 

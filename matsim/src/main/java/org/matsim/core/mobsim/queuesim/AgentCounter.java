@@ -74,7 +74,7 @@ class AgentCounter implements AgentCounterI {
 	public final boolean isLiving() {return living.get() > 0;	}
 	@Override
 	public final int getLost() {return lost.get();	}
-	@Override
+
 	public final void incLost() {lost.incrementAndGet(); }
 
 	 final void incLost(final int count) {lost.addAndGet(count);}
