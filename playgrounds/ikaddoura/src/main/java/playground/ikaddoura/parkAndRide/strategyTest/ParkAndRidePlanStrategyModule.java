@@ -24,7 +24,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,11 +50,21 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 	ScenarioImpl sc;
 	Network net;
 	Population pop;
+	private List<Id> parkAndRideLinkIDs = new ArrayList<Id>();
 
 	public ParkAndRidePlanStrategyModule(Controler controler) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
+		
+		// all possible Park And Ride facilities
+		parkAndRideLinkIDs.add(new IdImpl("2to3"));
+		parkAndRideLinkIDs.add(new IdImpl("3to4"));
+		parkAndRideLinkIDs.add(new IdImpl("4to5"));
+		parkAndRideLinkIDs.add(new IdImpl("5to6"));
+		parkAndRideLinkIDs.add(new IdImpl("6to7"));
+		parkAndRideLinkIDs.add(new IdImpl("7to8"));
+
 	}
 
 	@Override
@@ -72,19 +84,16 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 				PlanElement pe = planElements.get(i);
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-					if (act.toString().contains("parkAndRide")){
+					if (act.toString().contains(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
 						hasParkAndRide = true;
 					}
 				}
 			}
 			
 			if (hasParkAndRide == false){ // if plan doesn't contain Park and Ride
-				
-				double xCoord = 2500;
-				double yCoord = 0;
-				Coord parkAndRideCoord = this.sc.createCoord(xCoord, yCoord);
-				ActivityImpl parkAndRide = new ActivityImpl("parkAndRide", parkAndRideCoord, new IdImpl("4to5")); 
-				parkAndRide.setMaximumDuration(0.0);
+
+				// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus der Liste möglicher P+R Links)
+				Activity parkAndRide = createParkAndRideActivity(Math.random());
 
 				// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
 				for (int i = 0; i < planElements.size(); i++) {
@@ -116,16 +125,7 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 				}
 				
 				// change all carLegs between parkAndRideActivities to ptLegs
-				List<Integer> parkAndRidePlanElementIndex = new ArrayList<Integer>();
-				for (int i = 0; i < planElements.size(); i++) {
-					PlanElement pe = planElements.get(i);
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (act.getType().toString().equals("parkAndRide")){
-							parkAndRidePlanElementIndex.add(i);
-						}
-					}
-				}
+				List <Integer> parkAndRidePlanElementIndex = getPlanElementIndex(planElements);
 				if (parkAndRidePlanElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
 				for (int i = 0; i < planElements.size(); i++) {
 					PlanElement pe = planElements.get(i);
@@ -141,13 +141,52 @@ public class ParkAndRidePlanStrategyModule implements PlanStrategyModule {
 				
 			}
 			else {
-				log.info("Plan contains already a parkAndRide Activity.");
+				log.info("Plan contains already a parkAndRide Activity. Changing the ParkAndRide Location...");
+							
+				List<Integer> planElementIndex = getPlanElementIndex(planElements);
+				if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
+				
+				planElements.remove(planElementIndex.get(0));
+				Activity parkAndRide1 = createParkAndRideActivity(Math.random());
+				planElements.add(planElementIndex.get(0), parkAndRide1);
+				
+				planElements.remove(planElementIndex.get(1));
+				Activity parkAndRide2 = createParkAndRideActivity(Math.random());
+				planElements.add(planElementIndex.get(1), parkAndRide2);
 			}
 			
 		}
 		else {
 			log.info("Person has no car.");
+			// do nothing!
 		}
+	}
+	
+	private Activity createParkAndRideActivity(double random) {
+
+		int max = this.parkAndRideLinkIDs.size();
+	    int rndInt = (int) (random * max);
+		Id rndLinkId = this.parkAndRideLinkIDs.get(rndInt);
+		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
+		
+		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getCoord(), rndLinkId); 
+		parkAndRide.setMaximumDuration(0.0);
+		
+		return parkAndRide;
+	}
+
+	private List<Integer> getPlanElementIndex(List<PlanElement> planElements) {
+		List<Integer> list = new ArrayList<Integer>();
+		for (int i = 0; i < planElements.size(); i++) {
+			PlanElement pe = planElements.get(i);
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (act.getType().toString().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
+					list.add(i);
+				}
+			}
+		}
+		return list;
 	}
 
 	@Override
