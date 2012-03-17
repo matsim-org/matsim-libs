@@ -26,6 +26,11 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * A simple interface to retrieve the generalized costs to travel on links.
+ * <br/>
+ * Design thoughts:<ul>
+ * <li> yy Since matsim now thinks in terms of "utils", this is really a Travel(Dis)Utility and not a travel cost. 
+ * Should this be renamed?  Similarly then "getLinkTravelDisutility".  kai, mar'12  
+ * </ul>
  *
  * @author mrieser
  */
