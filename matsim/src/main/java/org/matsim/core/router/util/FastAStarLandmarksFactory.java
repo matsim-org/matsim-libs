@@ -34,11 +34,11 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 		// Nothing to do.
 	}
 	
-	public FastAStarLandmarksFactory(Network network, final TravelMinCost fsttc){
+	public FastAStarLandmarksFactory(Network network, final TravelMinDisutility fsttc){
 		processNetwork(network, fsttc);
 	}
 
-	public void processNetwork(Network network, final TravelMinCost fsttc) {
+	public void processNetwork(Network network, final TravelMinDisutility fsttc) {
 		synchronized (this) {
 				this.preProcessData = new PreProcessLandmarks(fsttc);
 				this.preProcessData.run(network);
@@ -47,7 +47,7 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 	
 	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network,
-			TravelCost travelCosts, TravelTime travelTimes) {
+			TravelDisutility travelCosts, TravelTime travelTimes) {
 		return new FastAStarLandmarks(network, this.preProcessData, travelCosts, travelTimes);
 	}
 }

@@ -40,7 +40,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
@@ -57,12 +57,12 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
     private static final Logger log = Logger.getLogger("dummy");
 
 	
-	private PersonalizableTravelCost travCostCalc;
+	private PersonalizableTravelDisutility travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
 	private PlansCalcRoute routeAlgo ;
 	private Scenario scenario;
 
-	MyWithinDayMobsimListener2 ( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
+	MyWithinDayMobsimListener2 ( PersonalizableTravelDisutility travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
@@ -440,7 +440,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		}
 	}
 
-	/*package*/ static class TestTimeCost implements TravelTime, TravelCost {
+	/*package*/ static class TestTimeCost implements TravelTime, TravelDisutility {
 
 		private final Map<Id, Double> travelTimes = new HashMap<Id, Double>();
 		private final Map<Id, Double> travelCosts = new HashMap<Id, Double>();
@@ -456,7 +456,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		}
 
 		@Override
-		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time) {
 			return this.travelCosts.get(link.getId()).doubleValue();
 		}
 

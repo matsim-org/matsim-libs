@@ -41,13 +41,13 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 	// not change minTravelCostPerLength
 	private double minTravelCostPerLength = Double.POSITIVE_INFINITY;
 
-	protected TravelMinCost costFunction;
+	protected TravelMinDisutility costFunction;
 
 	/**
 	 * @param costFunction
 	 *          A cost function that returns the minimal possible cost for each link.
 	 */
-	public PreProcessEuclidean(final TravelMinCost costFunction) {
+	public PreProcessEuclidean(final TravelMinDisutility costFunction) {
 		this.costFunction = costFunction;
 	}
 
@@ -64,7 +64,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 
 	private void updateMinTravelCostPerLength(final Network network) {
 		for (Link link : network.getLinks().values()) {
-			double minCost = this.costFunction.getLinkMinimumTravelCost(link) / link.getLength();
+			double minCost = this.costFunction.getLinkMinimumTravelDisutility(link) / link.getLength();
 			if (getMinTravelCostPerLength() > minCost) {
 				setMinTravelCostPerLength(minCost);
 			}
@@ -101,7 +101,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 	 * @return The cost function that was used to calculate the minimal travel
 	 *         cost per length unit over all links in the network.
 	 */
-	public TravelCost getCostFunction() {
+	public TravelDisutility getCostFunction() {
 		return this.costFunction;
 	}
 }

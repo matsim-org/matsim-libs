@@ -42,7 +42,7 @@ import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.PtConstants;
@@ -84,7 +84,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	 * </ul>
 	 */
 	public PlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
-			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
+			final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory,
 			final TransitConfigGroup transitConfig, final TransitRouter transitRouter) {
 		super(config, network, costCalculator, timeCalculator, factory, routeFactory);

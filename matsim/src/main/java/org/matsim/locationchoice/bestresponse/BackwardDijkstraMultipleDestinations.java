@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
@@ -36,7 +36,7 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 
 	private final static Logger log = Logger.getLogger(BackwardDijkstraMultipleDestinations.class);
-	final TravelCost costFunction;
+	final TravelDisutility costFunction;
 	final TravelTime timeFunction;
 	private int iterationID = Integer.MIN_VALUE + 1;
 	private Node deadEndEntryNode;
@@ -44,11 +44,11 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 	
 	private double estimatedStartTime = 0.0;
 
-	public BackwardDijkstraMultipleDestinations(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
+	public BackwardDijkstraMultipleDestinations(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
 
-	public BackwardDijkstraMultipleDestinations(final Network network, final TravelCost costFunction, final TravelTime timeFunction,
+	public BackwardDijkstraMultipleDestinations(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 		
 		super(network, costFunction, timeFunction, preProcessData);
@@ -176,11 +176,11 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 		if (currTime < 0) {
 			double timeMod = 24.0 * 3600.0 - Math.abs(currTime % (24.0 * 3600.0));
 			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, timeMod);
-			travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, timeMod);			
+			travelCost = this.costFunction.getLinkTravelDisutility(l, timeMod);			
 		}
 		else {
 			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, currTime);
-			travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, currTime);
+			travelCost = this.costFunction.getLinkTravelDisutility(l, currTime);
 		}		
 		
 		DijkstraNodeData data = getData(n);

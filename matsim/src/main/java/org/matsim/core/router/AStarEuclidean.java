@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessEuclidean;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -125,7 +125,7 @@ public class AStarEuclidean extends Dijkstra {
 	 */
 	public AStarEuclidean(final Network network,
 			final PreProcessEuclidean preProcessData,
-			final TravelCost costFunction, final TravelTime timeFunction, final double overdoFactor) {
+			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, costFunction, timeFunction, preProcessData);
 
 		setMinTravelCostPerLength(preProcessData.getMinTravelCostPerLength());
@@ -161,7 +161,7 @@ public class AStarEuclidean extends Dijkstra {
 			final double currTime, final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
-		double travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, currTime);
+		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime);
 		AStarNodeData data = getData(n);
 		double nCost = data.getCost();
 		if (!data.isVisited(getIterationId())) {

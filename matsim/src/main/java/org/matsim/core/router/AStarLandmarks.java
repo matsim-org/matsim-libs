@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.misc.Time;
@@ -78,7 +78,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param costFunction Calculates the travel cost on links.
 	 */
 	public AStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-			final TravelCost costFunction, final TravelTime timeFunction) {
+			final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, preProcessData, costFunction, timeFunction, 1);
 	}
 
@@ -106,7 +106,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @see #AStarLandmarks(Network, PreProcessLandmarks, TravelTime)
 	 */
 	public AStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-			final TravelCost costFunction, final TravelTime timeFunction, final double overdoFactor) {
+			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 
 		this.landmarks = preProcessData.getLandmarks();

@@ -35,15 +35,15 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 		// Nothing to do.
 	}
 	
-	public AStarLandmarksFactory(Network network, final TravelMinCost fsttc) {
+	public AStarLandmarksFactory(Network network, final TravelMinDisutility fsttc) {
 		processNetwork(network, fsttc, 8);
 	}
 
-	public AStarLandmarksFactory(Network network, final TravelMinCost fsttc, final int numberOfThreads){
+	public AStarLandmarksFactory(Network network, final TravelMinDisutility fsttc, final int numberOfThreads){
 		processNetwork(network, fsttc, numberOfThreads);
 	}
 
-	public void processNetwork(Network network, final TravelMinCost fsttc, final int numberOfThreads) {
+	public void processNetwork(Network network, final TravelMinDisutility fsttc, final int numberOfThreads) {
 		synchronized (this) {
 				this.preProcessData = new PreProcessLandmarks(fsttc);
 				this.preProcessData.setNumberOfThreads(numberOfThreads);
@@ -53,7 +53,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 	
 	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network,
-			TravelCost travelCosts, TravelTime travelTimes) {
+			TravelDisutility travelCosts, TravelTime travelTimes) {
 		return new AStarLandmarks(network, this.preProcessData, travelCosts, travelTimes);
 	}
 

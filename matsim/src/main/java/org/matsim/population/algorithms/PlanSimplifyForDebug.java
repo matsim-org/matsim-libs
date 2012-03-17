@@ -36,7 +36,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 
 /**
@@ -81,7 +81,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		// this.eduActs.add("e0.5");
 		// this.eduActs.add("uni");
 
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 		this.router = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, timeCostCalc, timeCostCalc, new DijkstraFactory(), routeFactory);
 	}
 

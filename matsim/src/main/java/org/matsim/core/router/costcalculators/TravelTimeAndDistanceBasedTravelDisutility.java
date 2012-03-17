@@ -24,8 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -33,7 +33,7 @@ import org.matsim.core.router.util.TravelTime;
  *
  * @author mrieser
  */
-public class TravelTimeDistanceCostCalculator implements TravelMinCost, PersonalizableTravelCost {
+public class TravelTimeAndDistanceBasedTravelDisutility implements TravelMinDisutility, PersonalizableTravelDisutility {
 
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfTime;
@@ -41,7 +41,7 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost, Personal
 	
 	private static int wrnCnt = 0 ;
 
-	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelTimeAndDistanceBasedTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
@@ -59,7 +59,7 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost, Personal
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		
 //		if (this.marginalCostOfDistance == 0.0) {
@@ -71,7 +71,7 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost, Personal
 	}
 
 	@Override
-	public double getLinkMinimumTravelCost(final Link link) {
+	public double getLinkMinimumTravelDisutility(final Link link) {
 
 //		if (this.marginalCostOfDistance == 0.0) {
 //			return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;

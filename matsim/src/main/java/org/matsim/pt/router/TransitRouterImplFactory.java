@@ -38,6 +38,6 @@ public class TransitRouterImplFactory implements TransitRouterFactory {
 
 	@Override
 	public TransitRouter createTransitRouter() {
-		return new TransitRouterImpl(this.schedule, this.config, new TransitRouterNetworkTravelTimeCost(this.config), this.routerNetwork);
+		return new TransitRouterImpl(this.schedule, this.config, new TransitRouterNetworkTravelTimeAndDisutility(this.config), this.routerNetwork);
 	}
 }

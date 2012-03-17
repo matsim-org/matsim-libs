@@ -29,9 +29,9 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -42,13 +42,13 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 
 	protected Config config;
 	protected Network network;
-	protected TravelCostCalculatorFactory travelCostFactory;
+	protected TravelDisutilityFactory travelCostFactory;
 	protected PersonalizableTravelTimeFactory travelTimeFactory;
 	protected LeastCostPathCalculatorFactory pathFactory;
 	private final ModeRouteFactory routeFactory;
 	
 	public ReplanningModule(Config config, Network network,
-			TravelCostCalculatorFactory costFactory, PersonalizableTravelTimeFactory timeFactory,
+			TravelDisutilityFactory costFactory, PersonalizableTravelTimeFactory timeFactory,
 			LeastCostPathCalculatorFactory pathFactory, ModeRouteFactory routeFactory) {
 		super(config.global());
 
@@ -63,7 +63,7 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PersonalizableTravelTime travelTime = travelTimeFactory.createTravelTime();
-		PersonalizableTravelCost travelCost = travelCostFactory.createTravelCostCalculator(travelTime, config.planCalcScore());
+		PersonalizableTravelDisutility travelCost = travelCostFactory.createTravelDisutility(travelTime, config.planCalcScore());
 		
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, pathFactory, this.routeFactory);
 

@@ -38,7 +38,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -64,12 +64,12 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param factory
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
+	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingScheme scheme) {
 		super(configGroup, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;
-		this.tollRouter =	factory.createPathCalculator(network, new TollTravelCostCalculator(costCalculator, scheme), timeCalculator);
+		this.tollRouter =	factory.createPathCalculator(network, new TravelDisutilityIncludingToll(costCalculator, scheme), timeCalculator);
 	}
 
 	@Override
@@ -280,7 +280,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	}
 
 	private boolean isLinkTolled(final Link link, final double time) {
-		return this.scheme.getLinkCost_per_m(link.getId(), time) != null;
+		return this.scheme.getLinkCostInfo(link.getId(), time) != null;
 	}
 
 }

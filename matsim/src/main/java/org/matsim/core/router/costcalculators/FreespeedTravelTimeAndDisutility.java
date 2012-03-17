@@ -26,9 +26,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 
 /**<p>
  * CostCalculator and TravelTimeCalculator for Links based on freespeed on links and
@@ -43,9 +43,9 @@ import org.matsim.core.router.util.TravelMinCost;
  * @author mrieser
  * @author dgrether
  */
-public class FreespeedTravelTimeCost implements PersonalizableTravelCost, TravelMinCost, PersonalizableTravelTime, LinkToLinkTravelTime {
+public class FreespeedTravelTimeAndDisutility implements PersonalizableTravelDisutility, TravelMinDisutility, PersonalizableTravelTime, LinkToLinkTravelTime {
 	
-	private static final Logger log = Logger.getLogger(FreespeedTravelTimeCost.class);
+	private static final Logger log = Logger.getLogger(FreespeedTravelTimeAndDisutility.class);
 
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
@@ -56,7 +56,7 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 	 * @param scaledMarginalUtilityOfPerforming Must be scaled, i.e. per second.  Usually positive.
 	 * @param scaledMarginalUtilityOfDistance Must be scaled, i.e. per meter.  Usually negative.
 	 */
-	public FreespeedTravelTimeCost(double scaledMarginalUtilityOfTraveling, double scaledMarginalUtilityOfPerforming,
+	public FreespeedTravelTimeAndDisutility(double scaledMarginalUtilityOfTraveling, double scaledMarginalUtilityOfPerforming,
 			double scaledMarginalUtilityOfDistance){
 		// usually, the travel-utility should be negative (it's a disutility)
 		// but for the cost, the cost should be positive.
@@ -78,14 +78,14 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 		this.marginalUtlOfDistance = scaledMarginalUtilityOfDistance;
 	}
 
-	public FreespeedTravelTimeCost(PlanCalcScoreConfigGroup cnScoringGroup){
+	public FreespeedTravelTimeAndDisutility(PlanCalcScoreConfigGroup cnScoringGroup){
 		this(cnScoringGroup.getTraveling_utils_hr() / 3600.0, cnScoringGroup.getPerforming_utils_hr() / 3600.0,
 //				cnScoringGroup.getMarginalUtlOfDistanceCar());
 				cnScoringGroup.getMonetaryDistanceCostRateCar()*cnScoringGroup.getMarginalUtilityOfMoney());
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
+	public double getLinkTravelDisutility(Link link, double time) {
 		if (this.marginalUtlOfDistance == 0.0) {
 			return (link.getLength() / link.getFreespeed(time)) * this.travelCostFactor;
 		}
@@ -93,7 +93,7 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 	}
 
 	@Override
-	public double getLinkMinimumTravelCost(Link link) {
+	public double getLinkMinimumTravelDisutility(Link link) {
 		if (this.marginalUtlOfDistance == 0.0) {
 			return (link.getLength() / link.getFreespeed()) * this.travelCostFactor;
 		}

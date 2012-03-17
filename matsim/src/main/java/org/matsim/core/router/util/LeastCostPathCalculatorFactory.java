@@ -25,6 +25,6 @@ import org.matsim.core.api.internal.MatsimFactory;
 
 public interface LeastCostPathCalculatorFactory extends MatsimFactory {
 
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelCost travelCosts, final TravelTime travelTimes);
+	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
 
 }

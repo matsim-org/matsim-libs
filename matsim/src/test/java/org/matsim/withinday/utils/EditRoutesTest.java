@@ -44,9 +44,9 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
@@ -354,7 +354,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	 */
 	private void createPlanAlgorithm() {
 		PersonalizableTravelTime travelTime = new FreeSpeedTravelTimeCalculatorFactory().createFreeSpeedTravelTimeCalculator();
-		PersonalizableTravelCost travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+		PersonalizableTravelDisutility travelCost = new OnlyTimeDependentTravelDisutilityCalculator(travelTime);
 		planAlgorithm = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
 				travelCost, travelTime, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
 	}

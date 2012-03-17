@@ -34,7 +34,7 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.NetworkLegRouter;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 
 public class MultiModalLegRouter implements LegRouter {
@@ -50,12 +50,12 @@ public class MultiModalLegRouter implements LegRouter {
 	private final RouteFactory routeFactory;
 	
 	private final MultiModalTravelTime travelTime;
-	private final PersonalizableTravelCost travelCost;
+	private final PersonalizableTravelDisutility travelCost;
 
 	private final LegRouter legRouter;
 	
 	public MultiModalLegRouter(final Network network, final MultiModalTravelTime travelTime, 
-			final PersonalizableTravelCost travelCost, final IntermodalLeastCostPathCalculator routeAlgo) {
+			final PersonalizableTravelDisutility travelCost, final IntermodalLeastCostPathCalculator routeAlgo) {
 		
 		this.travelTime = travelTime;
 		this.travelCost = travelCost;

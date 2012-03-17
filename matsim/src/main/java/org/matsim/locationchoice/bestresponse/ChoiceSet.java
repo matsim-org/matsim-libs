@@ -21,7 +21,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 
@@ -83,7 +83,7 @@ public class ChoiceSet {
 	public Id getWeightedRandomChoice(int actlegIndex, Person person,
 			Coord coordPre, Coord coordPost, ActivityFacilities facilities, 
 			ScoringFunctionAccumulator scoringFunction, Plan plan, 
-			TravelTime travelTime, TravelCost travelCost, int iteration) {
+			TravelTime travelTime, TravelDisutility travelCost, int iteration) {
 				
 		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, facilities, scoringFunction, plan, travelTime, travelCost);
 		
@@ -105,7 +105,7 @@ public class ChoiceSet {
 	}
 	
 	private TreeMap<Double,Id> createChoiceSet(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
-			Plan plan, TravelTime travelTime, TravelCost travelCost) {
+			Plan plan, TravelTime travelTime, TravelDisutility travelCost) {
 		
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		

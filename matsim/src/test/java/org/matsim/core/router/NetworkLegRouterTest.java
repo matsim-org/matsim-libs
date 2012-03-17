@@ -38,10 +38,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,7 +55,7 @@ public class NetworkLegRouterTest {
 	public void testRouteLeg() {
 		Fixture f = new Fixture();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getModeRouteFactory();
-		FreespeedTravelTimeCost freespeed = new FreespeedTravelTimeCost(-6.0/3600, +6.0/3600, 0.0);
+		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
 		Person person = new PersonImpl(new IdImpl(1));
@@ -88,7 +88,7 @@ public class NetworkLegRouterTest {
 		TravelTime timeObject = ttCalcFactory.createTravelTimeCalculator(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()) ;
 
 		{
-			TravelCost costObject = new TravelTimeDistanceCostCalculator(timeObject, f.s.getConfig().planCalcScore() ) ;
+			TravelDisutility costObject = new TravelTimeAndDistanceBasedTravelDisutility(timeObject, f.s.getConfig().planCalcScore() ) ;
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
@@ -108,7 +108,7 @@ public class NetworkLegRouterTest {
 			f.s.getConfig().planCalcScore().setMonetaryDistanceCostRateCar(-1.) ;
 			// yyyyyy the above should be positive
 			
-			TravelCost costObject = new TravelTimeDistanceCostCalculator(timeObject, f.s.getConfig().planCalcScore() ) ;
+			TravelDisutility costObject = new TravelTimeAndDistanceBasedTravelDisutility(timeObject, f.s.getConfig().planCalcScore() ) ;
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 

@@ -104,15 +104,15 @@ import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.InvertedNetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -209,7 +209,7 @@ public class Controler {
 	private Counts counts = null;
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
-	private PersonalizableTravelCost travelCostCalculator = null;
+	private PersonalizableTravelDisutility travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
@@ -268,7 +268,7 @@ public class Controler {
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 	private MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
 
-	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+	private TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 	private ControlerIO controlerIO;
 
 	private MobsimFactory mobsimFactory = null;
@@ -593,7 +593,7 @@ public class Controler {
 			this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		if (this.travelCostCalculator == null) {
-			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.planCalcScore());
+			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelDisutility(this.travelTimeCalculator, this.config.planCalcScore());
 		}
 		this.events.addHandler(this.travelTimeCalculator);
 
@@ -604,12 +604,12 @@ public class Controler {
 				this.leastCostPathCalculatorFactory = new DijkstraFactory();
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
 				this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(
-						this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()), this.config.global().getNumberOfThreads());
+						this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()), this.config.global().getNumberOfThreads());
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastDijkstra)) {
 				this.leastCostPathCalculatorFactory = new FastDijkstraFactory();
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastAStarLandmarks)) {
 				this.leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(
-						this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
+						this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 			} else {
 				throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
 			}
@@ -1153,8 +1153,8 @@ public class Controler {
 	 * ===================================================================
 	 */
 
-	public final PersonalizableTravelCost createTravelCostCalculator() {
-		return this.travelCostCalculatorFactory.createTravelCostCalculator(
+	public final PersonalizableTravelDisutility createTravelCostCalculator() {
+		return this.travelCostCalculatorFactory.createTravelDisutility(
 				this.travelTimeCalculator, this.config.planCalcScore());
 	}
 
@@ -1228,7 +1228,7 @@ public class Controler {
 	 *         be used by a single thread, use multiple instances for multiple
 	 *         threads!
 	 */
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
@@ -1273,7 +1273,7 @@ public class Controler {
 		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
 			//Note that the inverted network is created once per thread
 			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.getScenario(),
-					this.getLeastCostPathCalculatorFactory(), this.getTravelCostCalculatorFactory(), travelTimes);
+					this.getLeastCostPathCalculatorFactory(), this.getTravelDisutilityFactory(), travelTimes);
 			plansCalcRoute.addLegHandler(TransportMode.car,	invertedNetLegRouter);
 			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
 		}
@@ -1460,12 +1460,12 @@ public class Controler {
 		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
 
-	public TravelCostCalculatorFactory getTravelCostCalculatorFactory() {
+	public TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.travelCostCalculatorFactory;
 	}
 
-	public void setTravelCostCalculatorFactory(
-			final TravelCostCalculatorFactory travelCostCalculatorFactory) {
+	public void setTravelDisutilityFactory(
+			final TravelDisutilityFactory travelCostCalculatorFactory) {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
 

@@ -32,14 +32,14 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.TollTravelCostCalculator;
+import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 
 /**
  * Integrates the RoadPricing functionality into the MATSim Controler.
@@ -82,19 +82,19 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 
 		// replace the travelCostCalculator with a toll-dependent one if required
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
-			final TravelCostCalculatorFactory previousTravelCostCalculatorFactory = controler.getTravelCostCalculatorFactory();
+			final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
 			// area-toll requires a regular TravelCost, no toll-specific one.
-			TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactory() {
+			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 
 				@Override
-				public PersonalizableTravelCost createTravelCostCalculator(
+				public PersonalizableTravelDisutility createTravelDisutility(
 						PersonalizableTravelTime timeCalculator,
 						PlanCalcScoreConfigGroup cnScoringGroup) {
-					return new TollTravelCostCalculator(previousTravelCostCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup), RoadPricing.this.scheme);
+					return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), RoadPricing.this.scheme);
 				}
 				
 			};
-			controler.setTravelCostCalculatorFactory(travelCostCalculatorFactory);
+			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
 		}
 
 		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);

@@ -23,21 +23,21 @@ package org.matsim.roadpricing;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 /**
- * Calculates the travel costs for links, including tolls. Currently supports distance, cordon and area tolls.
+ * Calculates the travel disutility for links, including tolls. Currently supports distance, cordon and area tolls.
  *
  * @author mrieser
  */
-public class TollTravelCostCalculator implements PersonalizableTravelCost {
+public class TravelDisutilityIncludingToll implements PersonalizableTravelDisutility {
 
 	/*package*/ final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
-	private final PersonalizableTravelCost costHandler;
+	private final PersonalizableTravelDisutility costHandler;
 
-	public TollTravelCostCalculator(final PersonalizableTravelCost costCalculator, final RoadPricingScheme scheme) {
+	public TravelDisutilityIncludingToll(final PersonalizableTravelDisutility costCalculator, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 
@@ -53,8 +53,8 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 	private static int wrnCnt = 0 ;
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
-		double baseCost = this.costHandler.getLinkGeneralizedTravelCost(link, time);
+	public double getLinkTravelDisutility(final Link link, final double time) {
+		double baseCost = this.costHandler.getLinkTravelDisutility(link, time);
 		double tollCost = this.tollCostHandler.getTollCost(link, time);
 		if ( wrnCnt < 1 ) {
 			wrnCnt++ ;
@@ -71,7 +71,7 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			Cost cost_per_m = TollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
+			Cost cost_per_m = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time);
 			if (cost_per_m == null) {
 				return 0.0;
 			}
@@ -84,7 +84,7 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			RoadPricingScheme.Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
+			RoadPricingScheme.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}
@@ -103,7 +103,7 @@ public class TollTravelCostCalculator implements PersonalizableTravelCost {
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time) {
-			RoadPricingScheme.Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost_per_m(link.getId(), time);
+			RoadPricingScheme.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}

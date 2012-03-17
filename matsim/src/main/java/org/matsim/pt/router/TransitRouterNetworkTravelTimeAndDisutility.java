@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
@@ -42,7 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
  *
  * @author mrieser
  */
-public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelCost {
+public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, TravelDisutility {
 
 	private final static double MIDNIGHT = 24.0*3600;
 
@@ -51,12 +51,12 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelCos
 	private double previousTime = Double.NaN;
 	private double cachedTravelTime = Double.NaN;
 
-	public TransitRouterNetworkTravelTimeCost(final TransitRouterConfig config) {
+	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
 		this.config = config;
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)

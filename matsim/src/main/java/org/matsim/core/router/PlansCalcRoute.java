@@ -36,11 +36,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
@@ -96,7 +96,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	protected final Network network;
 
-	private final PersonalizableTravelCost costCalculator;
+	private final PersonalizableTravelDisutility costCalculator;
 
 	private final PersonalizableTravelTime timeCalculator;
 
@@ -114,10 +114,10 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * [[old javadoc: Uses the speed factors from the config group and the rerouting of the factory]]
 	 */
 	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
-			final PersonalizableTravelCost costCalculator,
+			final PersonalizableTravelDisutility costCalculator,
 			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory, ModeRouteFactory routeFactory) {
 		this.routeAlgo = factory.createPathCalculator(network, costCalculator, timeCalculator);
-		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
+		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		this.routeAlgoPtFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 		this.network = network;
 		this.costCalculator = costCalculator;
@@ -140,7 +140,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * <li> sets configGroup to <tt>group</tt> but it is not clear where this will be used.
 	 * </ul>
 	 */
-	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator, ModeRouteFactory routeFactory) {
+	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator, ModeRouteFactory routeFactory) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory(), routeFactory);
 	}
 

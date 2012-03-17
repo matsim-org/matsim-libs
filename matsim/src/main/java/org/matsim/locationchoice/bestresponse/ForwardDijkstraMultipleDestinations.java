@@ -26,13 +26,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.DijkstraNodeData;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
 public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 		
-	public ForwardDijkstraMultipleDestinations(Network network, TravelCost costFunction, TravelTime timeFunction) {
+	public ForwardDijkstraMultipleDestinations(Network network, TravelDisutility costFunction, TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
 	}
 

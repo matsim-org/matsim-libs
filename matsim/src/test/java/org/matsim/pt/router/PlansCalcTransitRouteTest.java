@@ -36,7 +36,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -53,7 +53,7 @@ public class PlansCalcTransitRouteTest extends TestCase {
 		TransitRouterConfigGroup transitRouterConfigGroup = new TransitRouterConfigGroup();
 		VspExperimentalConfigGroup vspConfigGroup = new VspExperimentalConfigGroup() ;
 
-		FreespeedTravelTimeCost ttc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
+		FreespeedTravelTimeAndDisutility ttc = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scoreConfig, routerConfig, transitRouterConfigGroup,
 				vspConfigGroup);
 		

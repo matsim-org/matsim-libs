@@ -30,7 +30,7 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 
 	private PreProcessEuclidean preProcessData;
 
-	public FastAStarEuclideanFactory(Network network, final TravelMinCost fsttc){
+	public FastAStarEuclideanFactory(Network network, final TravelMinDisutility fsttc){
 		synchronized (this) {
 				this.preProcessData = new PreProcessEuclidean(fsttc);
 				this.preProcessData.run(network);
@@ -39,7 +39,7 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 
 	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network,
-			TravelCost travelCosts, TravelTime travelTimes) {
+			TravelDisutility travelCosts, TravelTime travelTimes) {
 		return new FastAStarEuclidean(network, this.preProcessData, travelCosts, travelTimes, 1);
 	}
 }

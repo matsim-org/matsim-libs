@@ -34,10 +34,10 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -45,7 +45,7 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- * Tests the correct working of {@link TollTravelCostCalculator} by using it
+ * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
  * to calculate some routes with {@link PlansCalcRoute}.
  *
  * @author mrieser
@@ -65,8 +65,8 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
-		PersonalizableTravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		PersonalizableTravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -120,8 +120,8 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
-		PersonalizableTravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		PersonalizableTravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 

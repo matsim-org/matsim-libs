@@ -9,7 +9,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -18,14 +18,14 @@ public class UmlaufInterpolator {
 
 	private final Network network;
 	private final PlanCalcScoreConfigGroup config;
-	private final FreespeedTravelTimeCost travelTimes;
+	private final FreespeedTravelTimeAndDisutility travelTimes;
 	private final LeastCostPathCalculator routingAlgo;
 
 	public UmlaufInterpolator(Network network, final PlanCalcScoreConfigGroup config) {
 		super();
 		this.network = network;
 		this.config = config;
-		this.travelTimes = new FreespeedTravelTimeCost(this.config);
+		this.travelTimes = new FreespeedTravelTimeAndDisutility(this.config);
 		this.routingAlgo = new Dijkstra(network, travelTimes, travelTimes);
 	}
 

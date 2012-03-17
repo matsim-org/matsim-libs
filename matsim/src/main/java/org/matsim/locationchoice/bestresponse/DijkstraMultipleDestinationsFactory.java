@@ -23,7 +23,7 @@ package org.matsim.locationchoice.bestresponse;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 public class DijkstraMultipleDestinationsFactory implements LeastCostPathCalculatorFactory {
@@ -35,7 +35,7 @@ public class DijkstraMultipleDestinationsFactory implements LeastCostPathCalcula
 	}
 	
 	@Override
-	public LeastCostPathCalculator createPathCalculator(Network network, TravelCost travelCosts, TravelTime travelTimes) {
+	public LeastCostPathCalculator createPathCalculator(Network network, TravelDisutility travelCosts, TravelTime travelTimes) {
 		if (type.equals("forward")) {
 			return new ForwardDijkstraMultipleDestinations(network, travelCosts, travelTimes);
 		}

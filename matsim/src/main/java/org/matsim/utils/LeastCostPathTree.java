@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,14 +56,14 @@ public class LeastCostPathTree {
 	private double dTime = Time.UNDEFINED_TIME;
 	
 	private final TravelTime ttFunction;
-	private final TravelCost tcFunction;
+	private final TravelDisutility tcFunction;
 	private HashMap<Id, NodeData> nodeData = null;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 
-	public LeastCostPathTree(TravelTime tt, TravelCost tc) {
+	public LeastCostPathTree(TravelTime tt, TravelDisutility tc) {
 		this.ttFunction = tt;
 		this.tcFunction = tc;
 	}
@@ -156,7 +156,7 @@ public class LeastCostPathTree {
 		return this.ttFunction;
 	}
 
-	public final TravelCost getTravelCostCalulator() {
+	public final TravelDisutility getTravelCostCalulator() {
 		return this.tcFunction;
 	}
 
@@ -186,7 +186,7 @@ public class LeastCostPathTree {
 				nnData = new NodeData();
 				this.nodeData.put(nn.getId(), nnData);
 			}
-			double visitCost = currCost + tcFunction.getLinkGeneralizedTravelCost(l, currTime);
+			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime);
 			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime);
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
@@ -206,7 +206,7 @@ public class LeastCostPathTree {
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 
 		TravelTime ttc = new TravelTimeCalculator(network, 60, 30 * 3600, scenario.getConfig().travelTimeCalculator());
-		LeastCostPathTree st = new LeastCostPathTree(ttc, new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig()
+		LeastCostPathTree st = new LeastCostPathTree(ttc, new TravelTimeAndDistanceBasedTravelDisutility(ttc, scenario.getConfig()
 				.planCalcScore()));
 		Node origin = network.getNodes().get(new IdImpl(1));
 		st.calculate(network, origin, 8*3600);

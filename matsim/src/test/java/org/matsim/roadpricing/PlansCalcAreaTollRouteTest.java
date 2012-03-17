@@ -30,7 +30,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -67,7 +67,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -122,7 +122,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -155,7 +155,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -184,7 +184,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 

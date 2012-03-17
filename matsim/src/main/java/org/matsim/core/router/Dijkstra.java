@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
@@ -85,7 +85,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	final TravelCost costFunction;
+	final TravelDisutility costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and time step.
@@ -132,7 +132,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * @param timeFunction
 	 *            Determines the travel time on links.
 	 */
-	public Dijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
+	public Dijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
 
@@ -148,7 +148,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * @param preProcessData
 	 *            The pre processing data used during the routing phase.
 	 */
-	public Dijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction,
+	public Dijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 
 		this.network = network;
@@ -366,7 +366,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
-		double travelCost = this.costFunction.getLinkGeneralizedTravelCost(l, currTime);
+		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();
 		if (!data.isVisited(getIterationId())) {

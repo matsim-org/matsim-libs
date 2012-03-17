@@ -23,24 +23,24 @@ package org.matsim.core.router.costcalculators;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 
 /**
- *  A Travel Cost Calculator that uses the travel times as travel costs.
+ *  A Travel Cost Calculator that uses the travel times as travel disutility.
  *  
  * @author cdobler
  */
-public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, PersonalizableTravelCost {
+public class OnlyTimeDependentTravelDisutilityCalculator implements TravelMinDisutility, PersonalizableTravelDisutility {
 
-	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelCostCalculator.class);
+	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelDisutilityCalculator.class);
 	
 	protected final PersonalizableTravelTime travelTime;
 
-	public OnlyTimeDependentTravelCostCalculator(final PersonalizableTravelTime travelTime) {
+	public OnlyTimeDependentTravelDisutilityCalculator(final PersonalizableTravelTime travelTime) {
 		if (travelTime == null) {
 			log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
 			this.travelTime = new FreeSpeedTravelTimeCalculator();
@@ -48,12 +48,12 @@ public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, Per
 	}
 
 	@Override
-	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time) {
 		return this.travelTime.getLinkTravelTime(link, time);
 	}
 
 	@Override
-	public double getLinkMinimumTravelCost(final Link link) {
+	public double getLinkMinimumTravelDisutility(final Link link) {
 		return this.travelTime.getLinkTravelTime(link, Time.UNDEFINED_TIME);
 	}
 	

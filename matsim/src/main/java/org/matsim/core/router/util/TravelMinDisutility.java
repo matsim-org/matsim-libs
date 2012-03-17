@@ -26,11 +26,11 @@ import org.matsim.api.core.v01.network.Link;
  * @author lnicolas
  *
  */
-public interface TravelMinCost extends TravelCost {
+public interface TravelMinDisutility extends TravelDisutility {
 
 	/**
-	 * @param link the link for which the minimal travel cost over all time slots is calculated
+	 * @param the link for which the minimal travel disutility over all time slots is calculated
 	 * @return Minimal costs to travel over the link <pre>link</pre>, departing at time <pre>time</pre>
 	 */
-	public double getLinkMinimumTravelCost(Link link);
+	public double getLinkMinimumTravelDisutility(Link link);
 }

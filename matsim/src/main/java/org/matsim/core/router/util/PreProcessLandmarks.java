@@ -55,11 +55,11 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 	private static final Logger log = Logger.getLogger(PreProcessLandmarks.class);
 
-	public PreProcessLandmarks(final TravelMinCost costFunction) {
+	public PreProcessLandmarks(final TravelMinDisutility costFunction) {
 		this(costFunction, new Rectangle2D.Double());
 	}
 
-	public PreProcessLandmarks(final TravelMinCost costFunction, final int landmarkCount) {
+	public PreProcessLandmarks(final TravelMinDisutility costFunction, final int landmarkCount) {
 		this(costFunction, new Rectangle2D.Double(), landmarkCount);
 	}
 
@@ -68,7 +68,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * @param travelZone The area within which the landmarks should lie. Narrowing the zone where the landmarks should
 	 * be put normally improves the routing speed of {@link org.matsim.core.router.AStarLandmarks}.
 	 */
-	public PreProcessLandmarks(final TravelMinCost costFunction,
+	public PreProcessLandmarks(final TravelMinDisutility costFunction,
 			final Rectangle2D.Double travelZone) {
 		this(costFunction, travelZone, 16);
 	}
@@ -89,7 +89,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * be put normally improves the routing speed of {@link org.matsim.core.router.AStarLandmarks}.
 	 * @param landmarkCount
 	 */
-	public PreProcessLandmarks(final TravelMinCost costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
+	public PreProcessLandmarks(final TravelMinDisutility costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
 		super(costFunction);
 
 		this.travelZone = travelZone;
@@ -159,9 +159,9 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		private final int landmarkIdx;
 		private final Node landmark;
 		private final Map<Node, DeadEndData> nodeData;
-		private final TravelMinCost costFunction;
+		private final TravelMinDisutility costFunction;
 		
-		public Calculator(final int landmarkIdx, final Node landmark, final Map<Node, DeadEndData> nodeData, final TravelMinCost costFunction) {
+		public Calculator(final int landmarkIdx, final Node landmark, final Map<Node, DeadEndData> nodeData, final TravelMinDisutility costFunction) {
 			this.landmarkIdx = landmarkIdx;
 			this.landmark = landmark;
 			this.nodeData = nodeData;
@@ -188,7 +188,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 				for (Link l : node.getOutLinks().values()) {
 					Node n;
 					n = l.getToNode();
-					double linkTravTime = this.costFunction.getLinkMinimumTravelCost(l);
+					double linkTravTime = this.costFunction.getLinkMinimumTravelDisutility(l);
 					role2 = (LandmarksData) this.nodeData.get(n);
 					double totalTravelTime = fromTravTime + linkTravTime;
 					if (role2.getFromLandmarkTravelTime(this.landmarkIdx) > totalTravelTime) {
@@ -212,7 +212,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 				LandmarksData role2;
 				for (Link l : node.getInLinks().values()) {
 					Node n = l.getFromNode();
-					double linkTravTime = this.costFunction.getLinkMinimumTravelCost(l);
+					double linkTravTime = this.costFunction.getLinkMinimumTravelDisutility(l);
 					role2 = (LandmarksData) this.nodeData.get(n);
 					double totalTravelTime = toTravTime + linkTravTime;
 					if (role2.getToLandmarkTravelTime(this.landmarkIdx) > totalTravelTime) {

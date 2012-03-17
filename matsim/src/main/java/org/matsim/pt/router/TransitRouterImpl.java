@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -57,19 +57,19 @@ public class TransitRouterImpl implements TransitRouter {
 
 	private final MultiNodeDijkstra dijkstra;
 	private final TransitRouterConfig config;
-	private final TransitRouterNetworkTravelTimeCost ttCalculator;
+	private final TransitRouterNetworkTravelTimeAndDisutility ttCalculator;
 
 	public TransitRouterImpl(final TransitSchedule schedule, final TransitRouterConfig config) {
-		this(schedule, config, new TransitRouterNetworkTravelTimeCost(config));
+		this(schedule, config, new TransitRouterNetworkTravelTimeAndDisutility(config));
 	}
 
 	public TransitRouterImpl(final TransitSchedule schedule, final TransitRouterConfig config,
-			final TransitRouterNetworkTravelTimeCost ttCalculator ) {
+			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator ) {
 		this(schedule, config, ttCalculator, TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance));
 	}
 
 	public TransitRouterImpl(final TransitSchedule schedule, final TransitRouterConfig config,
-			final TransitRouterNetworkTravelTimeCost ttCalculator, final TransitRouterNetwork routerNetwork) {
+			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator, final TransitRouterNetwork routerNetwork) {
 		this.schedule = schedule;
 		this.config = config;
 		this.transitNetwork = routerNetwork;
@@ -79,8 +79,8 @@ public class TransitRouterImpl implements TransitRouter {
 
 	@Override
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
-		if (this.ttCalculator instanceof PersonalizableTravelCost) {
-			((PersonalizableTravelCost) this.ttCalculator).setPerson(person);
+		if (this.ttCalculator instanceof PersonalizableTravelDisutility) {
+			((PersonalizableTravelDisutility) this.ttCalculator).setPerson(person);
 		}
 		if (this.ttCalculator instanceof PersonalizableTravelTime) {
 			((PersonalizableTravelTime) this.ttCalculator).setPerson(person);
@@ -265,7 +265,7 @@ public class TransitRouterImpl implements TransitRouter {
 		return config;
 	}
 
-	protected TransitRouterNetworkTravelTimeCost getTtCalculator() {
+	protected TransitRouterNetworkTravelTimeAndDisutility getTtCalculator() {
 		return ttCalculator;
 	}
 

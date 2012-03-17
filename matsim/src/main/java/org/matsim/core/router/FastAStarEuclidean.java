@@ -29,7 +29,7 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.RoutingNetwork;
 import org.matsim.core.router.util.RoutingNetworkNode;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
@@ -61,7 +61,7 @@ public class FastAStarEuclidean extends AStarEuclidean {
 
 	public FastAStarEuclidean(final Network network,
 			final PreProcessEuclidean preProcessData,
-			final TravelCost costFunction, final TravelTime timeFunction, final double overdoFactor) {
+			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 
 		this.routingNetwork = new RoutingNetworkFactory().createRoutingNetwork(network);

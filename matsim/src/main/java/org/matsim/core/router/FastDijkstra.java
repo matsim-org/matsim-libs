@@ -28,7 +28,7 @@ import org.matsim.core.router.util.RoutingNetworkFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.RoutingNetwork;
 import org.matsim.core.router.util.RoutingNetworkNode;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
@@ -48,7 +48,7 @@ public class FastDijkstra extends Dijkstra {
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
 	
-	public FastDijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
+	public FastDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
 
@@ -56,7 +56,7 @@ public class FastDijkstra extends Dijkstra {
 	 * Create the routing network here and clear the nodeData map 
 	 * which is not used by this implementation.
 	 */
-	public FastDijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction,
+	public FastDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 		super(network, costFunction, timeFunction, preProcessData);
 		

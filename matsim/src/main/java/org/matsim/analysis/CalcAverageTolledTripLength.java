@@ -60,7 +60,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 	public void handleEvent(final LinkEnterEvent event) {
 		
 		// getting the (monetary? generalized?) cost of the link
-		Cost cost = this.scheme.getLinkCost_per_m(event.getLinkId(), event.getTime());
+		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime());
 		
 		if (cost != null) {
 			// i.e. if there is a toll on the link

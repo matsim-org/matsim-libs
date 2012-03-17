@@ -38,7 +38,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -46,7 +46,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.NetworkInverter;
 import org.matsim.core.router.util.NetworkTurnInfoBuilder;
 import org.matsim.core.router.util.PersonalizableLinkToLinkTravelTime;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimesInvertedNetProxy;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -78,7 +78,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 
 	public InvertedNetworkLegRouter(Scenario sc,
 			LeastCostPathCalculatorFactory leastCostPathCalcFactory,
-			TravelCostCalculatorFactory travelCostCalculatorFactory, TravelTime travelTimes) {
+			TravelDisutilityFactory travelCostCalculatorFactory, TravelTime travelTimes) {
 		PlanCalcScoreConfigGroup cnScoringGroup = sc.getConfig().planCalcScore();
 		this.routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory())
 				.getModeRouteFactory();
@@ -107,7 +107,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 
 		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network,
 				(PersonalizableLinkToLinkTravelTime) travelTimes);
-		TravelCost travelCost = travelCostCalculatorFactory.createTravelCostCalculator(
+		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(
 				travelTimesProxy, cnScoringGroup);
 
 		this.leastCostPathCalculator = leastCostPathCalcFactory.createPathCalculator(

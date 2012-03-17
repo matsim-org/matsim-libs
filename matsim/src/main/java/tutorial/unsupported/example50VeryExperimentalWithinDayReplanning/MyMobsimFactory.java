@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
@@ -36,13 +36,13 @@ import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
  */
 public class MyMobsimFactory implements MobsimFactory {
 
-	private PersonalizableTravelCost travCostCalc;
+	private PersonalizableTravelDisutility travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
 
 	private enum ReplanningType { general, carPlans }
 	private ReplanningType replanningType = ReplanningType.general ;
 
-	MyMobsimFactory( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
+	MyMobsimFactory( PersonalizableTravelDisutility travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}

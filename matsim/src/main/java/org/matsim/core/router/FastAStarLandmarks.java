@@ -28,7 +28,7 @@ import org.matsim.core.router.util.RoutingNetworkFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.RoutingNetwork;
 import org.matsim.core.router.util.RoutingNetworkNode;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
@@ -49,7 +49,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	private final FastRouterDelegate fastRouter;
 
 	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-			final TravelCost costFunction, final TravelTime timeFunction) {
+			final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, preProcessData, costFunction, timeFunction, 1);
 	}
 
@@ -59,7 +59,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	}
 
 	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-			final TravelCost costFunction, final TravelTime timeFunction, final double overdoFactor) {
+			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 
 		this.routingNetwork = new RoutingNetworkFactory().createRoutingNetwork(network);

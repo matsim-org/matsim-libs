@@ -166,7 +166,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 				 * arriving at this link.  */
 				return;
 			}
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(),
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(),
 					event.getTime());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
@@ -185,7 +185,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(), event.getTime());
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime());
 			if (cost != null) {
 				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
@@ -204,7 +204,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	class CordonTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost_per_m(link.getId(), event.getTime());
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime());
 			if (cost != null) {
 				// this is a link inside the toll area.
 				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());

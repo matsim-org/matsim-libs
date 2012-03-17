@@ -147,7 +147,7 @@
  * carefully read the following remarks to correctly setup your road pricing scenario:
  * <ul>
  *   <li>When using a distance or cordon toll scheme, use {@link org.matsim.roadpricing.TollTravelCostCalculator}
- *    as {@link org.matsim.core.router.util.TravelCost}-object for routers.</li>
+ *    as {@link org.matsim.core.router.util.TravelDisutility}-object for routers.</li>
  *   <li>When using an area toll, make sure you use {@link org.matsim.roadpricing.PlansCalcAreaTollRoute} as
  *    routing algorithm, together with a non-toll TravelCost.</li>
  * </ul>

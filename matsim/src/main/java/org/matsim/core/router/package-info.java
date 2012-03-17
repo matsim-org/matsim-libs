@@ -9,8 +9,8 @@
  * <br>
  * As the routing algorithms are all time-dependent, they need not only weights on the links, but time-dependent
  * weights and additionally the (estimated) travel times on these links. This data is provided by the interfaces
- * {@link org.matsim.core.router.util.TravelTime}, {@link org.matsim.core.router.util.TravelCost} and
- * {@link org.matsim.core.router.util.TravelMinCost}. A few commonly used implementations of these interfaces can
+ * {@link org.matsim.core.router.util.TravelTime}, {@link org.matsim.core.router.util.TravelDisutility} and
+ * {@link org.matsim.core.router.util.TravelMinDisutility}. A few commonly used implementations of these interfaces can
  * be found in the subpackage {@link org.matsim.core.router.costcalculators costcalculators}.
  * <br>
  * Nearly in all cases, the routes of all legs of a plan should be calculated. Thus, for the most commonly used
