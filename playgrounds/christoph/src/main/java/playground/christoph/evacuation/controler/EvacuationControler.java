@@ -298,7 +298,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.householdsTracker, coordAnalyzer.createInstance());
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.householdsTracker, this.vehiclesTracker, coordAnalyzer.createInstance());
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
@@ -485,7 +485,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, penaltyCostFactory, timeFactory, factory, routeFactory);
-
+		
 		/*
 		 * During Activity Replanners
 		 */
