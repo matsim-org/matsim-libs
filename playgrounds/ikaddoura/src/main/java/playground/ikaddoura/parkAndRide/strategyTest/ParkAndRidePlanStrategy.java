@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -33,17 +32,16 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.PtConstants;
 
+/**
+ * @author Ihab
+ *
+ */
 public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 	private static final Logger log = Logger.getLogger(ParkAndRidePlanStrategy.class);
 
@@ -156,14 +154,7 @@ public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 						planElements.set(i, parkAndRide);
 					}
 				}
-				
-//				for (int i = 0; i < planElements.size(); i++) {
-//					if (i==planElementIndex.get(1)){ // second Park and Ride Activity
-//						planElements.set(i, parkAndRide);
-//					}
-//				}
 			}
-			
 		}
 		else {
 			log.info("Person has no car. Park and Ride is not possible.");
