@@ -26,6 +26,8 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -40,6 +42,10 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  * Calculates the toll agents pay during a simulation by analyzing events. To
  * fully function, add an instance of this class as EventHandler to your Events
  * object.
+ * <br/>
+ * This will class and its methods will pass the person to the toll calculation ...
+ * ... but the toll calculation must in fact use the person.  Standard RoadPricingScheme objects
+ * which are read from xml will not and in the current design cannot do this.  kai, mar'12
  *
  * @author mrieser
  */
@@ -50,15 +56,17 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		public boolean insideCordonArea = true;
 	}
 
-	final RoadPricingScheme scheme;
+	final RoadPricingSchemeI scheme;
 	final TreeMap<Id, AgentInfo> agents = new TreeMap<Id, AgentInfo>();
 	private final Network network;
+	private final Population population ;
 
 	private TollBehaviourI handler = null;
 
-	public CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
+	public CalcPaidToll(final Network network, final RoadPricingSchemeI scheme, Population population) {
 		super();
 		this.network = network;
+		this.population = population ;
 		this.scheme = scheme;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
 			this.handler = new DistanceTollBehaviour();
@@ -74,13 +82,15 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
-		this.handler.handleEvent(event, link);
+		Person person = this.population.getPersons().get(event.getPersonId()) ;
+		this.handler.handleEvent(event, link, person);
 	}
 
 	@Override
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
-		this.handler.handleEvent(event, link);
+		Person person = this.population.getPersons().get(event.getPersonId()) ;
+		this.handler.handleEvent(event, link, person);
 	}
 
 	/**
@@ -148,7 +158,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * A simple interface to implement different toll schemes.
 	 */
 	private interface TollBehaviourI {
-		public void handleEvent(PersonEvent event, Link link);
+		public void handleEvent(PersonEvent event, Link link, Person person );
 	}
 
 	/**
@@ -159,7 +169,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link) {
+		public void handleEvent(final PersonEvent event, final Link link, Person person) {
 			if (event instanceof AgentWait2LinkEventImpl) {
 				/* we do not handle wait2link-events for distance toll, because the agent
 				 * must not pay twice for this link, and he (likely) paid already when
@@ -167,7 +177,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 				return;
 			}
 			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(),
-					event.getTime());
+					event.getTime(), person);
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
 				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
@@ -184,8 +194,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * one of the tolled link, the constant toll amount has to be paid once. */
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime());
+		public void handleEvent(final PersonEvent event, final Link link, Person person) {
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), person);
 			if (cost != null) {
 				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
@@ -203,8 +213,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 */
 	class CordonTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime());
+		public void handleEvent(final PersonEvent event, final Link link, Person person) {
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), person);
 			if (cost != null) {
 				// this is a link inside the toll area.
 				AgentInfo info = CalcPaidToll.this.agents.get(event.getPersonId());

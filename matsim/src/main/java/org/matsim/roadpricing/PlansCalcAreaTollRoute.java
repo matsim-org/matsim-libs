@@ -280,7 +280,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	}
 
 	private boolean isLinkTolled(final Link link, final double time) {
-		return this.scheme.getLinkCostInfo(link.getId(), time) != null;
+		return this.scheme.getLinkCostInfo(link.getId(), time, null) != null;
 	}
 
 }

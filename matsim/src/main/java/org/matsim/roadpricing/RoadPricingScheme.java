@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.Id;
  *
  * @author mrieser
  */
-public class RoadPricingScheme {
+public class RoadPricingScheme implements RoadPricingSchemeI {
 
 	/** The type to be used for distance tolls. */
 	public static final String TOLL_TYPE_DISTANCE = "distance";
@@ -68,6 +69,9 @@ public class RoadPricingScheme {
 		this.name = name;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getName()
+	 */
 	public String getName() {
 		return this.name;
 	}
@@ -76,6 +80,9 @@ public class RoadPricingScheme {
 		this.type = type.intern();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getType()
+	 */
 	public String getType() {
 		return this.type;
 	}
@@ -84,6 +91,9 @@ public class RoadPricingScheme {
 		this.description = description;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getDescription()
+	 */
 	public String getDescription() {
 		return this.description;
 	}
@@ -115,10 +125,16 @@ public class RoadPricingScheme {
 	  return (c != null) ? c.remove(cost) : false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getLinkIdSet()
+	 */
 	public Set<Id> getLinkIdSet() {
 		return this.linkIds.keySet();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getLinkIds()
+	 */
 	public Map<Id, List<Cost>> getLinkIds(){
 	  return this.linkIds;
 	}
@@ -133,17 +149,15 @@ public class RoadPricingScheme {
 		return this.costCache.clone();
 	}
 
-	/**
-	 * Returns the Cost object that contains the active costs for the given link
-	 * at the specified time.
-	 *
-	 * @param linkId
-	 * @param time
-	 * @return The cost object for the given link at the specified time,
-	 * <code>null</code> if the link is either not part of the tolling scheme
-	 * or there is no toll at the specified time for the link.
+	/* (non-Javadoc)
+	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getLinkCostInfo(org.matsim.api.core.v01.Id, double)
 	 */
-	public Cost getLinkCostInfo(final Id linkId, final double time) {
+	public Cost getLinkCostInfo(final Id linkId, final double time, Person person) {
+		// this is the default road pricing scheme, which ignores the person.  kai, mar'12
+		// (I have decided to put the person into the method call rather than the setPerson construction in TravelDisutility etc.
+		// Reason: A big advantage of agent-based simulation over traditional methods is heterogeneity of agent population.
+		// But if we make this hard to use, the advantage shrinks.  kai, mar'12)
+		
 		if (this.cacheIsInvalid) buildCache();
 		if (this.linkIds.containsKey(linkId)) {
 		  List<Cost> costs = this.linkIds.get(linkId);

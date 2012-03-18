@@ -206,7 +206,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 
 	private void runTollSimulation(final Scenario scenario, final RoadPricingScheme toll, final PlanCalcScoreConfigGroup config) {
 		EventsManager events = EventsUtils.createEventsManager();
-		CalcPaidToll paidToll = new CalcPaidToll(scenario.getNetwork(), toll);
+		CalcPaidToll paidToll = new CalcPaidToll(scenario.getNetwork(), toll, scenario.getPopulation());
 		events.addHandler(paidToll);
 		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
 		events.addHandler(scoring);
