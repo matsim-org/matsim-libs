@@ -63,7 +63,7 @@ public class HRVOForce implements DynamicForceModule{
 		
 		Segment s1 = new Segment();
 		Segment s2 = new Segment();
-		Algorithms.computeTangentsThroughPoint(b.getPosition(), ra+rb, a.getPosition(),s1,s2);
+//		Algorithms.computeTangentsThroughPoint(b.getPosition(), ra+rb, a.getPosition(),s1,s2);
 		
 		
 		// TODO Auto-generated method stub
