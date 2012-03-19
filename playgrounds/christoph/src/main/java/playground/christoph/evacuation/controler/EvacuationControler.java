@@ -298,9 +298,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.householdsTracker, this.vehiclesTracker, coordAnalyzer.createInstance());
-		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
-		
+		this.initHouseholdMeetingPointSelector();
+				
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
 		
 		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, vehiclesTracker);
@@ -377,6 +376,34 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
 		this.initIdentifiers();
+	}
+	
+	/*
+	 * Initialize tool to select household meeting points.
+	 * We don't add any fuzzy values or additional disutility to travel time and costs
+	 * since households select their meeting point just when the evacuation
+	 * has started based on their experience from "normal" days.
+	 */
+	private void initHouseholdMeetingPointSelector() {
+		
+		// get route factory
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
+				
+		// create a copy of the MultiModalTravelTimeWrapperFactory...
+		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
+		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());			
+		}
+		// ... and set the TravelTimeCollector for car mode
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.travelTimeCollectorWrapperFactory);
+
+		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		
+		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+		ReplanningModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
+
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, router, this.householdsTracker, this.vehiclesTracker, coordAnalyzer.createInstance());
+		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 	
 	/*
