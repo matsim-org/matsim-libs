@@ -61,7 +61,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		double minY = -1000 + this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinNorthing();
 		this.agentsQuad = new QuadTree<Agent2D>(minX, minY, maxX, maxY);
 
-		this.velocityChooser = new RandomAlternativeVelocityChooser();
+		this.velocityChooser = new RandomAlternativeVelocityChooser(sc);
 //		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
 	}
 

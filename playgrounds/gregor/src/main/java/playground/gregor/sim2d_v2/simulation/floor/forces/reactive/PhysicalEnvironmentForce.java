@@ -6,7 +6,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
-import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -46,7 +45,7 @@ public class PhysicalEnvironmentForce implements ForceModule{
 
 		Coordinate obj = this.quad.get(agent.getPosition().x, agent.getPosition().y);
 		double dist = obj.distance(agent.getPosition());
-		if (dist > PhysicalAgentRepresentation.AGENT_DIAMETER/2) {
+		if (dist > agent.getPhysicalAgentRepresentation().getAgentDiameter()/2) {
 			return;
 		}
 

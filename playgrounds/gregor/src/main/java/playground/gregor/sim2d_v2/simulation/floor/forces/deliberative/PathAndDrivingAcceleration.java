@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
@@ -42,7 +43,7 @@ public class PathAndDrivingAcceleration {
 
 	public PathAndDrivingAcceleration(PhysicalFloor floor, Scenario sc) {
 		this.floor = floor;
-		this.tau = 0.5; //1/1.52;
+		this.tau = ((Sim2DConfigGroup)sc.getConfig().getModule("sim2d")).getTau();
 		this.sc = sc;
 
 		init();
@@ -62,7 +63,8 @@ public class PathAndDrivingAcceleration {
 
 			double minWidth = getMinWidth(this.geofac.createLineString(new Coordinate[]{from,to}),link.getCoord());
 			LinkInfo li = new LinkInfo();
-			li.pathWidth = minWidth;
+//			li.pathWidth = minWidth;
+			li.pathWidth = link.getCapacity()/1.33;
 			li.c0 = from;
 			li.c1 = to;
 			li.perpendicularVector = perpendicularVec;
@@ -112,7 +114,7 @@ public class PathAndDrivingAcceleration {
 		double fpx = 0;
 		double fpy = 0;
 		if (pathDist > 0.1) {
-			double bpath = Math.max(1, li.pathWidth-PhysicalAgentRepresentation.AGENT_DIAMETER);
+			double bpath = Math.max(1, li.pathWidth-agent.getPhysicalAgentRepresentation().getAgentDiameter());
 			double f = Apath * Math.exp(pathDist / bpath);
 
 			boolean rightHandSide = Algorithms.isLeftOfLine(pos, li.c0, li.c1) > 0;

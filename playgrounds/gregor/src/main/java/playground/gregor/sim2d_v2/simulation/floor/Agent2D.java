@@ -41,8 +41,8 @@ public class Agent2D implements MobsimDriverAgent {
 	private Coordinate currentPosition;
 	private final Force force = new Force();
 	private final double desiredVelocity;
-	private double vx;
-	private double vy;
+//	private double vx;
+//	private double vy;
 	private final MobsimDriverAgent pda;
 	private final Scenario sc;
 	private double currentDesiredVelocity;
@@ -118,7 +118,7 @@ public class Agent2D implements MobsimDriverAgent {
 		setCurrentVelocity(vx2, vy2);
 		this.v = Math.sqrt(vx2*vx2+vy2*vy2);
 		if (vx2 != 0 || vy2 != 0) {
-			this.alpha = 360*Algorithms.getPolarAngle(this.vx, this.vy)/(2*Math.PI);
+			this.alpha = 360*Algorithms.getPolarAngle(this.force.getVx(), this.force.getVy())/(2*Math.PI);
 		}
 		
 		this.par.update(this.v,this.alpha, this.currentPosition);
@@ -139,17 +139,17 @@ public class Agent2D implements MobsimDriverAgent {
 
 	@Deprecated //should be private
 	public void setCurrentVelocity(double vx, double vy) {
-		this.vx = vx;
-		this.vy = vy;
+		this.force.setVx(vx);
+		this.force.setVy(vy);
 
 	}
 
 	public double getVx() {
-		return this.vx;
+		return this.force.getVx();
 	}
 
 	public double getVy() {
-		return this.vy;
+		return this.force.getVy();
 	}
 
 	public double getWeight() {

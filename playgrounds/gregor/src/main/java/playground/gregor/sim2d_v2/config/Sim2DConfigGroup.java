@@ -101,6 +101,8 @@ public class Sim2DConfigGroup extends Module {
 	private double Ai=1.13*PhysicalAgentRepresentation.AGENT_WEIGHT;
 	private double lambda=.35;
 
+	private final double tau = 0.5;
+
 	public Sim2DConfigGroup(Module sim2d) {
 		super(GROUP_NAME);
 		for (Entry<String, String> e : sim2d.getParams().entrySet()) {
@@ -421,5 +423,9 @@ public class Sim2DConfigGroup extends Module {
 	 */
 	public double getTimeStepSize() {
 		return this.timeStepSize;
+	}
+
+	public double getTau() {
+		return this.tau ;
 	}
 }

@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class ScenarioGenerator {
 
-	private static final String MODE = "walkPrioQ";
+	private static final String MODE = "walk2d";
 
 	private static int nodeId = 0;
 	private static int linkId = 0;
@@ -53,8 +53,8 @@ public class ScenarioGenerator {
 
 
 		QSimConfigGroup qsim = new QSimConfigGroup();
-		qsim.setEndTime(300);
-				qsim.setTimeStepSize(1./25.);
+		qsim.setEndTime(600);
+//				qsim.setTimeStepSize(1./25.);
 		c.addModule("qsim", qsim);
 
 		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
@@ -68,7 +68,7 @@ public class ScenarioGenerator {
 		s2d.setEnablePathForceModule("false");
 		s2d.setEnableVelocityObstacleModule("true");
 		s2d.setEnablePhysicalEnvironmentForceModule("false");
-
+s2d.setTimeStepSize(""+(1/25.));
 
 		String shpFile = s2d.getFloorShapeFile();
 		ShapeFileReader r = new ShapeFileReader();
@@ -98,7 +98,7 @@ public class ScenarioGenerator {
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", "0.9");
 
-		c.network().setTimeVariantNetwork(true);
+//		c.network().setTimeVariantNetwork(true);
 
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
@@ -182,11 +182,12 @@ public class ScenarioGenerator {
 		for (int i = 0; i < nodes.size()-1; i++) {
 			NodeImpl n0 = nodes.get(i);
 			NodeImpl n1 = nodes.get(i+1);
+			
 			Id lid = new IdImpl(linkId++);
 
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
-			double w = 2*estWidth(c0,c1,set);
+			double w = Math.min(2*estWidth(c0,c1,set),5);
 			double cap  = w * 1.33;
 			double lanes = 5.4*0.26 * w;
 			double freespeed = 1.34;
@@ -259,7 +260,7 @@ public class ScenarioGenerator {
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
 
-			double w = 2*estWidth(c0,c1,set);
+			double w = Math.min(2*estWidth(c0,c1,set),5);
 			double cap  = w * 1.33;
 			double lanes = 5.4*0.26 * w;
 			double freespeed = 1.34;

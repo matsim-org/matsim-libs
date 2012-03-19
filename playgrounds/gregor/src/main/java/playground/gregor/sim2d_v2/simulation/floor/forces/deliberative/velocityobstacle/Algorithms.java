@@ -54,6 +54,34 @@ public abstract class Algorithms {
 		return ret;
 	}
 	
+	public static Coordinate[] computeCircleIntersection(Coordinate c0, double r0, Coordinate c1, double r1) {
+		Coordinate[] ret = new Coordinate[2];
+		
+		double dx = (c1.x - c0.x);
+		double dy = (c1.y - c0.y);
+		
+//		double d = Math.hypot(dx, dy); // hypot avoids underflow/overflow  ... but it is to slow
+		double d =  Math.sqrt(dx*dx + dy*dy); //TODO already calculated in calling method, add to arguments!!
+		double a = ((r0*r0)-(r1*r1)+(d*d)) / (2.0 *d);
+		
+		double x2 = c0.x + (dx * a /d);
+		double y2 = c0.y + (dy * a /d);
+		
+		double h = Math.sqrt(r0*r0 - a*a);
+		
+		double rx = -dy * (h/d);
+		double ry = dx * (h/d);
+		
+		double xi = x2 + rx;
+		double yi = y2 + ry;
+		double xiPrime = x2 - rx;
+		double yiPrime = y2 -ry;
+		
+		ret[0] = new Coordinate(xi,yi);
+		ret[1] = new Coordinate(xiPrime, yiPrime);
+		
+		return ret;		
+	}
 	
 	/**
 	 * tests whether then polar angle of vector s0s1 is bigger than the polar angle of vector t0t1
@@ -431,13 +459,19 @@ public abstract class Algorithms {
 	}
 
 	public static boolean testForCollision(VelocityObstacle info, Coordinate c) {
-		if (info.getCollTime() <= 0) {
-			return true;
-		}
+//		if (info.getCollTime() <= 0) {
+//			return true;
+//		}
 		Coordinate[] vo = info.getVo();
 		boolean leftOfLeft = Algorithms.isLeftOfLine(c, vo[0], vo[1]) > 0;
 		boolean rightOfRight = Algorithms.isLeftOfLine(c, vo[0], vo[2]) < 0;
 		if (leftOfLeft && rightOfRight) {
+			if (info.getCollTime() == 0) {
+				return false;
+			}
+			return true;
+		}
+		if (info.getCollTime() == 0) {
 			return true;
 		}
 		return false;
@@ -451,4 +485,6 @@ public abstract class Algorithms {
 		}
 		return false;
 	}
+
+	
 }

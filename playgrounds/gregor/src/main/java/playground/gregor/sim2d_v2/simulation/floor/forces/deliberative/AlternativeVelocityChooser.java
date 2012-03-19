@@ -21,14 +21,13 @@ private static final double EPSILON = 0.000001;
 			Coordinate c1) {
 		double ret = Double.POSITIVE_INFINITY;
 		for (VelocityObstacle  info : vOs) {
-			if (info.getCollTime() == 0) {
-				return 0;
-			}
+
 			double tmpTime = Double.POSITIVE_INFINITY;
+			
 			if (Algorithms.testForCollision(info, c1)) {
-//				if (info.getCollTime() == 0) {
-//					return 0;
-//				}
+				if (info.getCollTime() == 0) {
+					return 0;
+				}
 
 				if (info instanceof PolygonalVelocityObstacle) {
 					tmpTime = computeCollisionTime((PolygonalVelocityObstacle)info,c0,c1);

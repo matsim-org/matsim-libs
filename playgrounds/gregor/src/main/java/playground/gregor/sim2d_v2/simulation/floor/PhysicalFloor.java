@@ -61,7 +61,6 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityO
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalAgentInteractionForce;
-import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalEnvironmentForce;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -126,7 +125,7 @@ public class PhysicalFloor implements Floor {
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
 			this.dynamicForceModules.add(new VelocityObstacleForceII(this, this.scenario));
 			this.dynamicForceModules.add(new PhysicalAgentInteractionForce(this, this.scenario));
-			this.forceModules.add(new PhysicalEnvironmentForce(this, this.scenario));
+//			this.forceModules.add(new PhysicalEnvironmentForce(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){
@@ -413,6 +412,13 @@ public class PhysicalFloor implements Floor {
 			agent.setPostion(new Coordinate(coord.getX()+MatsimRandom.getRandom().nextDouble()*2-1,coord.getY()+MatsimRandom.getRandom().nextDouble()*2-1));
 		}
 		this.agents.add(agent);
+		
+		if (agent.getId().toString().contains("r")) {
+			agent.getForce().setVx(1.34);
+		} else {
+			agent.getForce().setVy(-1.34);
+		}
+		
 		for (DynamicForceModule m : this.dynamicForceModules) {
 			m.forceUpdate();
 		}

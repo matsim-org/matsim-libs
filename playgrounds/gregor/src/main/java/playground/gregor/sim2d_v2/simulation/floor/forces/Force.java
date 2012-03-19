@@ -76,8 +76,15 @@ public class Force {
 
 
 	public void update(double weight, double deltaT) {
-		this.vx += (deltaT*this.fx)/weight;
-		this.vy += (deltaT*this.fy)/weight;
+		double dvx = (deltaT*this.fx)/weight;
+		double dvy = (deltaT*this.fy)/weight;
+//		double dv = Math.sqrt(dvx*dvx + dvy*dvy);
+//		if (dv > 1.34*deltaT/0.5) { //a > a_max
+//			dvx /= (dv/1.34*deltaT/0.5);
+//			dvy /= (dv/1.34*deltaT/0.5);
+//		}
+		this.vx += dvx;
+		this.vy += dvy;
 		reset();
 	}
 

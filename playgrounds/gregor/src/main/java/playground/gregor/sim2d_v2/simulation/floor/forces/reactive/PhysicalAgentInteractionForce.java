@@ -5,9 +5,9 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
-import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 
@@ -19,10 +19,11 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 	private final double quadUpdateInterval = 0.1;
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
 	private QuadTree<Agent2D> coordsQuad;
+	private final Sim2DConfigGroup s2d;
 
 	//Helbing constant
-	private static final double Bi=0.25;
-	private static final double Ai=25;
+	private static final double Bi=0.08;
+	private static final double Ai=2000;
 
 
 	/**
@@ -32,6 +33,7 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 	public PhysicalAgentInteractionForce(PhysicalFloor floor, Scenario scenario) {
 		this.floor = floor;
 		this.sc = scenario;
+		this.s2d = (Sim2DConfigGroup) scenario.getConfig().getModule("sim2d");
 	}
 
 	/*
@@ -54,7 +56,7 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 		double fx = 0;
 		double fy = 0;
 
-		Collection<Agent2D> l = this.coordsQuad.get(agent.getPosition().x, agent.getPosition().y, 2*PhysicalAgentRepresentation.AGENT_DIAMETER);
+		Collection<Agent2D> l = this.coordsQuad.get(agent.getPosition().x, agent.getPosition().y, 2*agent.getPhysicalAgentRepresentation().getAgentDiameter());
 
 		for (Agent2D other : l) {
 			if (other == agent) {
@@ -62,7 +64,10 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 			}
 
 			double dist = other.getPosition().distance(agent.getPosition());
-			if (dist > PhysicalAgentRepresentation.AGENT_DIAMETER) {
+			
+			double dv_max = agent.getDesiredVelocity() * this.s2d.getTau() * this.s2d.getTimeStepSize();
+			double csoR = other.getPhysicalAgentRepresentation().getAgentDiameter()/2 + agent.getPhysicalAgentRepresentation().getAgentDiameter()/2;
+			if (dist + dv_max > csoR+0.01) {
 				continue;
 			}
 			double dx = (agent.getPosition().x - other.getPosition().x) / dist;

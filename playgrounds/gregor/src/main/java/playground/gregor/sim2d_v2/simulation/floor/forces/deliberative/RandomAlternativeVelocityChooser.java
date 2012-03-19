@@ -3,8 +3,10 @@ package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.random.XORShiftRandom;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
@@ -15,15 +17,19 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser {
 
-	private static final int NUM_OF_CANDIDATES = 9;
+	private static final int NUM_OF_CANDIDATES = 50;
 	private static final double MAX_V_COEFF = 1.25;
 	private final XORShiftRandom random;
 
-	private static final double W_I = 5.; //TODO shouldn't this be a parameter of the agents?
+	private static final double W_I = 10.; //TODO shouldn't this be a parameter of the agents?
 	
 	private final List<C> cs = new ArrayList<C>();
+	private final double tau;
+	private final double timeStepSize;
 
-	public RandomAlternativeVelocityChooser() {
+	public RandomAlternativeVelocityChooser(Scenario sc) {
+		this.tau = ((Sim2DConfigGroup)sc.getConfig().getModule("sim2d")).getTau();
+		this.timeStepSize = ((Sim2DConfigGroup)sc.getConfig().getModule("sim2d")).getTimeStepSize();
 		this.random = new XORShiftRandom(MatsimRandom.getRandom().nextLong());
 		init();
 	}
@@ -57,15 +63,15 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 		double bestVx = 0;
 		double bestVy = 0;
 		double[] oldBest = agent.getOldBest();
-		double candX = oldBest[0];
-		double candY = oldBest[1];
+		double candX = 0; //oldBest[0];
+		double candY = 0; //oldBest[1];
 		for (int i = 0; i < NUM_OF_CANDIDATES; i++){
 
-			double vxNext = agent.getVx() + 0.04*(candX - agent.getVx())/0.5;
-			double vyNext = agent.getVy() + 0.04*(candY - agent.getVy())/0.5;
+			double vxNext = agent.getVx() + this.timeStepSize*(candX - agent.getVx())/this.tau;
+			double vyNext = agent.getVy() + this.timeStepSize*(candY - agent.getVy())/this.tau;
 		
 //			double stopTime = Math.hypot(vxNext, vyNext)/0.5;
-			double stopTime = Math.sqrt(vxNext*vxNext + vyNext*vyNext)/0.5; //TODO 0.5 has to be replaced by tau!!!
+			double stopTime = Math.sqrt(vxNext*vxNext + vyNext*vyNext)*this.tau; 
 			Coordinate candC = new Coordinate(c0.x + vxNext, c0.y + vyNext);
 			
 			//DEBUG
@@ -82,11 +88,10 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 				}
 			} else {
 				double colTime = timeToCollision(vOs, c0, candC);
-				double testPen = candC.distance(c1) + W_I/colTime;
+				double testPen = candC.distance(c1) + W_I/colTime;// + 0.5*MatsimRandom.getRandom().nextDouble();
 				
 //				GisDebugger.addGeometry(ls,"pen:"+(int)(100*testPen) + " time:" + colTime);
 
-				//FIXME use simStepTime instead of 0.04
 				if (colTime > stopTime && testPen < penalty) {
 					penalty = testPen;
 					bestVx = candX;
@@ -104,6 +109,12 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 		}
 		
 		
+//		double v = Math.sqrt(bestVx*bestVx + bestVy*bestVy);
+//		if (v > 1.34) {
+//			bestVx /= (v/1.34);
+//			bestVy /= (v/1.34);
+////			System.out.println("!!");
+//		}
 		df[0] = bestVx;
 		df[1] = bestVy;
 		agent.setOldBest(df);

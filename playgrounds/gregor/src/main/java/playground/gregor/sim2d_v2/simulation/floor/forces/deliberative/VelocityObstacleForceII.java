@@ -10,6 +10,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
@@ -24,12 +26,15 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityo
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.VelocityObstacle;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 public class VelocityObstacleForceII implements DynamicForceModule {
 
 	private final QuadTree<Agent2D> agentsQuad;
 	private final PhysicalFloor floor;
 
+	private final boolean debug = false;
 
 
 	private final double quadUpdateInterval = 0.1;
@@ -40,16 +45,17 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 
 	private final double timeHorizont = 5;
 
-	private final double tau = 0.5;
+	private final double tau;
 
 	private final Scenario sc;
 
 	private final AlternativeVelocityChooser velocityChooser;
-	
+
 	private final Map<CCWPolygon,Coordinate []> csos = new HashMap<CCWPolygon,Coordinate[]>();
 	private CCWPolygon aGeo;
-	
-	
+	private final double timeStepSize;
+
+
 	public VelocityObstacleForceII(PhysicalFloor floor, Scenario sc) {
 		this.floor = floor;
 		this.driver = new PathAndDrivingAcceleration(floor,sc);
@@ -60,16 +66,22 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 		double minY = -1000 + this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinNorthing();
 		this.agentsQuad = new QuadTree<Agent2D>(minX, minY, maxX, maxY);
 
-		this.velocityChooser = new RandomAlternativeVelocityChooser();
-//		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
+		this.velocityChooser = new RandomAlternativeVelocityChooser(sc);
+		this.timeStepSize = ((Sim2DConfigGroup)sc.getConfig().getModule("sim2d")).getTimeStepSize();
+		this.tau = ((Sim2DConfigGroup)sc.getConfig().getModule("sim2d")).getTau();
+		//		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
 	}
-	
+
 	@Override
 	public void run(Agent2D agent, double time) {
+		//		if (agent.getId().toString().equals("r120") && time >= 100) {
+		//			this.debug = true;
+		//		}
+
 		Force f = agent.getForce();
 		double[] df = this.driver.getDesiredVelocity(agent);
 		List<VelocityObstacle> VOs = new ArrayList<VelocityObstacle>();
-		if (!calcOtherAgentsVOs(VOs,agent)) {
+		if (!calcOtherAgentsVOs(VOs,agent,df)) {
 			double fx = PhysicalAgentRepresentation.AGENT_WEIGHT*(0 - agent.getVx())/this.tau;
 			double fy = PhysicalAgentRepresentation.AGENT_WEIGHT*(0 - agent.getVy())/this.tau;
 
@@ -79,32 +91,32 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 		}
 		calcEnvVOs(VOs,agent);
 		Coordinate c0 = agent.getPosition();
-		
-		double vxNext = agent.getVx() + 0.04*(df[0] - agent.getVx())/this.tau;
-		double vyNext = agent.getVy() + 0.04*(df[1] - agent.getVy())/this.tau;
-		
+
+		double vxNext = agent.getVx() + this.timeStepSize*(df[0] - agent.getVx())/this.tau;
+		double vyNext = agent.getVy() + this.timeStepSize*(df[1] - agent.getVy())/this.tau;
+
 		Coordinate c1 = new Coordinate(c0.x+vxNext,c0.y + vyNext);
-		
-//		//DEBUG
-//		GisDebugger.addCircle(agent.getPosition(),agent.getPhysicalAgentRepresentation().getAgentDiameter()/2,"A");
-//		Coordinate [] vA = {c0,new Coordinate(c0.x + agent.getVx(), c0.y + agent.getVy())};
-//		LineString ls = GisDebugger.geofac.createLineString(vA);
-//		GisDebugger.addGeometry(ls, "vA");
-		
-		
+
+		//		//DEBUG
+		//		GisDebugger.addCircle(agent.getPosition(),agent.getPhysicalAgentRepresentation().getAgentDiameter()/2,"A");
+		//		Coordinate [] vA = {c0,new Coordinate(c0.x + agent.getVx(), c0.y + agent.getVy())};
+		//		LineString ls = GisDebugger.geofac.createLineString(vA);
+		//		GisDebugger.addGeometry(ls, "vA");
+
+
 		if (Algorithms.testForCollision(VOs, c1)) {
-			
-			
+
+
 			this.velocityChooser.chooseAlterantiveVelocity(VOs,c0,c1,df,agent);
-			
+
 		}
-		
-//		try {
-//			//DEBUG
-//			GisDebugger.dump("/Users/laemmel/tmp/tangents.shp");
-//		} catch (Exception e) {
-//		}
-		
+
+		//		try {
+		//			//DEBUG
+		//			GisDebugger.dump("/Users/laemmel/tmp/tangents.shp");
+		//		} catch (Exception e) {
+		//		}
+
 		double fx = PhysicalAgentRepresentation.AGENT_WEIGHT*(df[0] - agent.getVx())/this.tau;
 		double fy = PhysicalAgentRepresentation.AGENT_WEIGHT*(df[1] - agent.getVy())/this.tau;
 
@@ -131,13 +143,13 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 				envObst = ConfigurationSpaceObstacle.getCObstacle(c, this.aGeo);
 				this.csos.put(c, envObst);
 			}
-					
+
 
 			int [] idx;
 			double collTime = Double.POSITIVE_INFINITY;
 			if (Algorithms.contains(agent.getPosition(),envObst)) {
 				//TODO no magic numbers here!!
-				double move = PhysicalAgentRepresentation.AGENT_DIAMETER;
+				double move = agent.getPhysicalAgentRepresentation().getAgentDiameter();
 				Coordinate cobst = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().get(agent.getPosition().x, agent.getPosition().y);
 
 				double x = move*(cobst.x - agent.getPosition().x);
@@ -174,39 +186,40 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 			//			GisDebugger.addGeometry(ranR,"VO");
 		}
 	}
-	
+
 	private boolean calcOtherAgentsVOs(List<VelocityObstacle> vOs,
-			Agent2D agent) {
+			Agent2D agent, double[] df) {
 		double sensingRange = agent.getSensingRange();
 		Collection<Agent2D> l = this.agentsQuad.get(agent.getPosition().x, agent.getPosition().y, sensingRange);
 
 
 		double r0 = agent.getPhysicalAgentRepresentation().getAgentDiameter()/2;
-		
+
 		double rotX = -agent.getVy();
 		double rotY = agent.getVx();
-		
-		
-		
+
+
+
 		Coordinate rot1 = new Coordinate(agent.getPosition().x+agent.getVx()+rotX,agent.getPosition().y+agent.getVy()+rotY);
 		Coordinate rot2 = new Coordinate(agent.getPosition().x+agent.getVx()-rotX,agent.getPosition().y+agent.getVy()-rotY);
-		
+
+		int colls = 0;
 		int close = 0;
 		for (Agent2D other : l) {
 			if (other == agent) {
 				continue;
 			}
 			double d = agent.getPosition().distance(other.getPosition());
-			
-			if (d > 2 && (Algorithms.isLeftOfLine(other.getPosition(), agent.getPosition(), rot1) >= 0 || Algorithms.isLeftOfLine(other.getPosition(), agent.getPosition(), rot2) <= 0)) {
-				continue;
-			} 
-			
-			
-			if (d < 2) {
-				close++;
-			}
-//			
+
+			//			if (d > 2 && (Algorithms.isLeftOfLine(other.getPosition(), agent.getPosition(), rot1) >= 0 || Algorithms.isLeftOfLine(other.getPosition(), agent.getPosition(), rot2) <= 0)) {
+			//				continue;
+			//			} 
+			//			
+			//			
+			//			if (d < 2) {
+			//				close++;
+			//			}
+			//			
 			double r1 = other.getPhysicalAgentRepresentation().getAgentDiameter()/2;
 
 			CircularVelocityObstacle info = new CircularVelocityObstacle();
@@ -215,43 +228,71 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 			vOs.add(info);
 			double csoR = r1 + r0;
 			info.setCso(other.getPosition(), csoR);
-			
+
 			Coordinate[] tan;
 			if (d <= r0+r1) {
-				return false;
-//				double vx = agent.getVx();
-//				double vy = agent.getVy();
-//				double v = Math.hypot(vx, vy);
-//				vx /= v;
-//				vy /= v;
-//				vx *= agent.getPhysicalAgentRepresentation().getAgentDiameter()/2;
-//				vy *= agent.getPhysicalAgentRepresentation().getAgentDiameter()/2;
-//				Coordinate projected = new Coordinate(agent.getPosition().x-vx, agent.getPosition().y-vy);
-//				tan = Algorithms.computeTangentsThroughPoint(other.getPosition(), csoR, projected);
-//				info.setCollTime(0);
+				//				return false;
+				//				double vx = agent.getVx();
+				//				double vy = agent.getVy();
+				//				double v = Math.hypot(vx, vy);
+				//				vx /= v;
+				//				vy /= v;
+				//				vx *= agent.getPhysicalAgentRepresentation().getAgentDiameter()/2;
+				//				vy *= agent.getPhysicalAgentRepresentation().getAgentDiameter()/2;
+				//				Coordinate projected = new Coordinate(agent.getPosition().x-vx, agent.getPosition().y-vy);
+				//				tan = Algorithms.computeTangentsThroughPoint(other.getPosition(), csoR, projected);
+				info.setCollTime(0);
+
+				Coordinate[] coords = Algorithms.computeCircleIntersection(other.getPosition(), csoR, agent.getPosition(), 1.34*0.04*2); //dv_max 
+
+				if (this.debug) {
+					colls++;
+					GisDebugger.addCircle(other.getPosition(), r1, "B");
+					GisDebugger.addCircle(other.getPosition(), csoR, "CSO");
+					GisDebugger.addCircle(agent.getPosition(), r0, "A");
+					GisDebugger.addCircle(agent.getPosition(), 1.34*0.04*2, "VA");
+					GeometryFactory geofac = new GeometryFactory();
+					LineString ls = geofac.createLineString(coords);
+					//				GisDebugger.addGeometry(ls,"intersection");
+
+					LineString ls2 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[0]});
+					GisDebugger.addGeometry(ls2, "right");
+					LineString ls3 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[1]});
+					GisDebugger.addGeometry(ls3, "left");
+					GisDebugger.dump("/Users/laemmel/tmp/!!dmp.shp");
+				}
+				tan = new Coordinate[]{agent.getPosition(),coords[1],coords[0]};
+				agent.getForce().setVx(0);
+				agent.getForce().setVy(0);
+				other.getForce().setVx(0);
+				other.getForce().setVy(0);
+//				df[0] = 0;
+//				df[1] = 0;
+				//				return false;
+
 			} else {
 				tan = Algorithms.computeTangentsThroughPoint(other.getPosition(), csoR, agent.getPosition());
+
+				double mvX = 0.5 * (agent.getVx() - other.getVx());
+				double mvY = 0.5 * (agent.getVy() - other.getVy());
+
+				double tX = other.getVx() + mvX;
+				double tY = other.getVy() + mvY;
+
+				Algorithms.translate(tX,tY, tan);
 			}
-			
-			double mvX = 0.5 * (agent.getVx() - other.getVx());
-			double mvY = 0.5 * (agent.getVy() - other.getVy());
 
-			double tX = other.getVx() + mvX;
-			double tY = other.getVy() + mvY;
-
-			Algorithms.translate(tX,tY, tan);
-			
 			info.setVo(tan);
 		}
-		
-	if (vOs.size() > 32+close) {
-		agent.setSensingRange(sensingRange*.9);
-	} else if (vOs.size() < 16+close) {
-		agent.setSensingRange(sensingRange *1.2);
-	}
-	
-	return true;
-		
+
+		if (vOs.size() > 32+close) {
+			agent.setSensingRange(sensingRange*.9);
+		} else if (vOs.size() < 16+close) {
+			agent.setSensingRange(sensingRange *1.2);
+		}
+
+		return true;
+
 	}
 
 	@Override
@@ -286,17 +327,19 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 		Coordinate[] e = new Coordinate[9]; 
 		int idx = 0;
 		for (double alpha = 0; alpha < 2*Math.PI; alpha += (2*Math.PI)/8) {
-			double x = Math.cos(alpha) * PhysicalAgentRepresentation.AGENT_DIAMETER/2;
-			double y = Math.sin(alpha) * PhysicalAgentRepresentation.AGENT_DIAMETER/2;
+//			double x = Math.cos(alpha) * PhysicalAgentRepresentation.AGENT_DIAMETER/2;
+//			double y = Math.sin(alpha) * PhysicalAgentRepresentation.AGENT_DIAMETER/2;
+			double x = Math.cos(alpha) * .7/2; //TODO repair this!! [GL Mar 2012]
+			double y = Math.sin(alpha) * .7/2;						
 			e[idx++] = new Coordinate(x,y);
-			
+
 		}
 		e[idx] = e[0];
-//		LineString ls = GisDebugger.geofac.createLineString(e);
-//		GisDebugger.addGeometry(ls, "?");
-//		GisDebugger.dump("/Users/laemmel/tmp/circle.shp");
+		//		LineString ls = GisDebugger.geofac.createLineString(e);
+		//		GisDebugger.addGeometry(ls, "?");
+		//		GisDebugger.dump("/Users/laemmel/tmp/circle.shp");
 		this.aGeo = new CCWPolygon(e, new Coordinate(0,0), 0);
-		
+
 	}
 
 }

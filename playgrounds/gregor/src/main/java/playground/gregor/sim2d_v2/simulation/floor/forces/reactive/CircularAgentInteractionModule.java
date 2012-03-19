@@ -27,7 +27,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
-import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 
 
@@ -99,7 +98,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 			double dx = (agent.getPosition().x - other.getPosition().x) / dist;
 			double dy = (agent.getPosition().y - other.getPosition().y) / dist;
 
-			double bounderyDist = PhysicalAgentRepresentation.AGENT_DIAMETER - dist;
+			double bounderyDist = agent.getPhysicalAgentRepresentation().getAgentDiameter() - dist;
 			double g = bounderyDist > 0 ? bounderyDist : 0;
 
 			double tanDvx = (other.getVx() - agent.getVx()) * dx;
