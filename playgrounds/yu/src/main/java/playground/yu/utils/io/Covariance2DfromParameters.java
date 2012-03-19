@@ -86,9 +86,9 @@ public class Covariance2DfromParameters {
 		int width;
 		if (args.length != 3) {
 			// paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
-			paramFilename = "test/input/bln2pct/c4checkBaseBasePureParams.log";
-			outputFilename = "test/output/bln2pct/c4checkBaseBasePureParams_700Windows.log";
-			width = 700;
+			paramFilename = "test/input/bln2pct/CDpui100pureParams.log";
+			outputFilename = "test/output/bln2pct/CDpui100varOfExp400Windows.log";
+			width = 400;
 		} else {
 			paramFilename = args[0];
 			outputFilename = args[1];
@@ -97,6 +97,8 @@ public class Covariance2DfromParameters {
 
 		Covariance2DfromParameters cfp = new Covariance2DfromParameters(
 				paramFilename, width, outputFilename);
+
+		System.out.println("Done!");
 	}
 
 	private final List<Integer> iterations;
