@@ -223,7 +223,7 @@ s2d.setTimeStepSize(""+(1/25.));
 		coords.add(new Coordinate(2,2));
 		coords.add(new Coordinate(2,-.5));
 		coords.add(new Coordinate(2,-2));
-		coords.add(new Coordinate(2,-5.5));
+		coords.add(new Coordinate(2,-7));
 		coords.add(new Coordinate(2,-8));
 		coords.add(new Coordinate(2,-10));
 		coords.add(new Coordinate(2,-12.5));

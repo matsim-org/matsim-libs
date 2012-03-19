@@ -54,7 +54,7 @@ public class ArrivalCurve implements AgentArrivalEventHandler{
 		
 		BufferedWriter w = null;
 		try {
-			w = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/gr90/dbg/SVM")));
+			w = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/gr90/dbg/walk2d")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

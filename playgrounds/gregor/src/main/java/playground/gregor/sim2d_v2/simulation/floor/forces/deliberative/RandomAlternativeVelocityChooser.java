@@ -17,11 +17,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser {
 
-	private static final int NUM_OF_CANDIDATES = 50;
+	private static final int NUM_OF_CANDIDATES = 20;
 	private static final double MAX_V_COEFF = 1.25;
 	private final XORShiftRandom random;
 
-	private static final double W_I = 10.; //TODO shouldn't this be a parameter of the agents?
+	private static final double W_I = 5.; //TODO shouldn't this be a parameter of the agents?
 	
 	private final List<C> cs = new ArrayList<C>();
 	private final double tau;
@@ -102,6 +102,11 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 //			C c = this.cs.get(i);
 //			candX = df[0]*.75 + r * agent.getDesiredVelocity() * c.x;
 //			candY = df[1]*.75 + r * agent.getDesiredVelocity() * c.y;
+//			double r1 = this.random.nextDouble();
+//			final double dv_max = 1.34*0.04*2; //TODO no magic numbers use tau simStepSize ... instead
+//			candX = df[0] + r1 * dv_max;
+//			double r2 = this.random.nextDouble();
+//			candY = df[1] + r2 * dv_max;
 			double r1 = this.random.nextDouble();
 			candX = df[0]*.75 + r1 * agent.getDesiredVelocity();
 			double r2 = this.random.nextDouble();

@@ -13,7 +13,7 @@ public abstract class PhysicalAgentRepresentation {
 
 	public PhysicalAgentRepresentation() {
 		super();
-		this.diameter = 0.4 + 0.2*MatsimRandom.getRandom().nextDouble();
+		this.diameter = 0.4 + 0.1*MatsimRandom.getRandom().nextDouble();
 	}
 
 	abstract public void update(double v, double alpha, Coordinate pos);

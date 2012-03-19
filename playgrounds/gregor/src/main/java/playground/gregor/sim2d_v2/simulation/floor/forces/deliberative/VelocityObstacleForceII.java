@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
@@ -26,8 +25,6 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityo
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.VelocityObstacle;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 public class VelocityObstacleForceII implements DynamicForceModule {
 
@@ -120,6 +117,10 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 		double fx = PhysicalAgentRepresentation.AGENT_WEIGHT*(df[0] - agent.getVx())/this.tau;
 		double fy = PhysicalAgentRepresentation.AGENT_WEIGHT*(df[1] - agent.getVy())/this.tau;
 
+//		double fx = PhysicalAgentRepresentation.AGENT_WEIGHT*df[0];
+//		double fy = PhysicalAgentRepresentation.AGENT_WEIGHT*df[1];
+
+		
 		f.incrementX(fx);
 		f.incrementY(fy);
 
@@ -156,6 +157,41 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 				double y = move*(cobst.y - agent.getPosition().y);
 				Coordinate agPos = new Coordinate(agent.getPosition().x-x,agent.getPosition().y-y);
 				idx = Algorithms.getTangentIndices(agPos,envObst);
+				Coordinate c0 = envObst[idx[0]];
+				Coordinate c1 = envObst[idx[1]];
+				double dx = c0.x - c1.x;
+				double dy = c0.y - c1.y;
+				
+				double l = Math.sqrt(dx*dx+dy*dy);
+				
+//				double mx = (move/2)*dy/l;
+//				double my = (move/2)*-dx/l;
+				
+//				Coordinate cO0 = new Coordinate(agent.getPosition().x+mx,agent.getPosition().y+my);
+				Coordinate cO0 = new Coordinate(agent.getPosition().x,agent.getPosition().y);
+				Coordinate cO1 =  new Coordinate(cO0.x+dx,cO0.y+dy);
+				Coordinate cO2 =  new Coordinate(cO0.x-dx,cO0.y-dy);
+				
+//				GisDebugger.addCircle(agent.getPosition(), agent.getPhysicalAgentRepresentation().getAgentDiameter()/2, "A");
+//				GisDebugger.addCircle(agent.getPosition(), 1.34*0.04*2, "VA");
+//				GeometryFactory geofac = new GeometryFactory();
+//				LineString ls = geofac.createLineString(envObst);
+//								GisDebugger.addGeometry(ls,"envObst");
+//
+//				LineString ls2 = geofac.createLineString(new Coordinate[]{cO0,cO1});
+//				GisDebugger.addGeometry(ls2, "right");
+//				LineString ls3 = geofac.createLineString(new Coordinate[]{cO0,cO2});
+//				GisDebugger.addGeometry(ls3, "left");
+//				GisDebugger.dump("/Users/laemmel/tmp/!!dmp.shp");
+				
+				
+				CircularVelocityObstacle info = new CircularVelocityObstacle();
+				info.setvBx(0);
+				info.setvBy(0);
+				VOs.add(info);
+				Coordinate[] tan = new Coordinate[]{cO0,cO2,cO1};
+				info.setCollTime(0);
+				info.setVo(tan);
 
 				//				//DEBUG
 				//				LineString lrO = geofac.createLineString(c.getCCWRing());
@@ -168,18 +204,19 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 
 			} else {
 				idx = Algorithms.getTangentIndices(agent.getPosition(),envObst);
-
+				Coordinate [] tan = new Coordinate []{new Coordinate(agent.getPosition()),new Coordinate(envObst[idx[0]]),new Coordinate(envObst[idx[1]])};
+				PolygonalVelocityObstacle info = new PolygonalVelocityObstacle();
+				info.setCso(envObst);
+				info.setVo(tan);
+				info.setvBx(0);
+				info.setvBy(0);
+				info.setCollTime(collTime);
+				VOs.add(info);
 			}
 
-			Coordinate [] tan = new Coordinate []{new Coordinate(agent.getPosition()),new Coordinate(envObst[idx[0]]),new Coordinate(envObst[idx[1]])};
-			PolygonalVelocityObstacle info = new PolygonalVelocityObstacle();
-			info.setCso(envObst);
-			info.setVo(tan);
-			info.setvBx(0);
-			info.setvBy(0);
-			info.setCollTime(collTime);
 
-			VOs.add(info);
+
+			
 
 			//			//DEBUG
 			//			LineString ranR = geofac.createLineString(new Coordinate []{tan[1],tan[0],tan[2],tan[1]});
@@ -243,24 +280,24 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 				//				tan = Algorithms.computeTangentsThroughPoint(other.getPosition(), csoR, projected);
 				info.setCollTime(0);
 
-				Coordinate[] coords = Algorithms.computeCircleIntersection(other.getPosition(), csoR, agent.getPosition(), 1.34*0.04*2); //dv_max 
+				Coordinate[] coords = Algorithms.computeCircleIntersection(other.getPosition(), csoR, agent.getPosition(), 1.34*0.04*2); //TODO no magic numbers use dv_max instead 
 
-				if (this.debug) {
-					colls++;
-					GisDebugger.addCircle(other.getPosition(), r1, "B");
-					GisDebugger.addCircle(other.getPosition(), csoR, "CSO");
-					GisDebugger.addCircle(agent.getPosition(), r0, "A");
-					GisDebugger.addCircle(agent.getPosition(), 1.34*0.04*2, "VA");
-					GeometryFactory geofac = new GeometryFactory();
-					LineString ls = geofac.createLineString(coords);
-					//				GisDebugger.addGeometry(ls,"intersection");
-
-					LineString ls2 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[0]});
-					GisDebugger.addGeometry(ls2, "right");
-					LineString ls3 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[1]});
-					GisDebugger.addGeometry(ls3, "left");
-					GisDebugger.dump("/Users/laemmel/tmp/!!dmp.shp");
-				}
+//				if (this.debug) {
+//					colls++;
+//					GisDebugger.addCircle(other.getPosition(), r1, "B");
+//					GisDebugger.addCircle(other.getPosition(), csoR, "CSO");
+//					GisDebugger.addCircle(agent.getPosition(), r0, "A");
+//					GisDebugger.addCircle(agent.getPosition(), 1.34*0.04*2, "VA");
+//					GeometryFactory geofac = new GeometryFactory();
+//					LineString ls = geofac.createLineString(coords);
+//					//				GisDebugger.addGeometry(ls,"intersection");
+//
+//					LineString ls2 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[0]});
+//					GisDebugger.addGeometry(ls2, "right");
+//					LineString ls3 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[1]});
+//					GisDebugger.addGeometry(ls3, "left");
+//					GisDebugger.dump("/Users/laemmel/tmp/!!dmp.shp");
+//				}
 				tan = new Coordinate[]{agent.getPosition(),coords[1],coords[0]};
 				agent.getForce().setVx(0);
 				agent.getForce().setVy(0);
