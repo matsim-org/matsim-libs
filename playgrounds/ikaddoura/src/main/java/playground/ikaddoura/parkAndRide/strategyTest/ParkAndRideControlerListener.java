@@ -29,6 +29,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
+import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 /**
  * @author Ihab
@@ -45,11 +46,11 @@ public class ParkAndRideControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
-// führt die Standard SubtourModeChoice für Pläne mit oder ohne ParkAndRide aus.
-		PlanStrategy strategy1 = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy1.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategy1.addStrategyModule(new SubtourModeChoice(controler.getConfig()));
-		strategy1.addStrategyModule(new ReRoute(controler));
+//// führt die Standard SubtourModeChoice für Pläne mit oder ohne ParkAndRide aus.
+//		PlanStrategy strategy1 = new PlanStrategyImpl(new RandomPlanSelector());
+//		strategy1.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+//		strategy1.addStrategyModule(new SubtourModeChoice(controler.getConfig()));
+//		strategy1.addStrategyModule(new ReRoute(controler));
 		
 // Verändert einen Plan nur wenn ein Pkw verfügbar ist ("car" in personId). Wenn Plan noch kein P+R enthält --> P+R wird eingebaut. Wenn Plan bereits P+R enthält --> zufällige Auswahl einer anderen P+R Location
 		PlanStrategy strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
@@ -64,12 +65,23 @@ public class ParkAndRideControlerListener implements StartupListener {
 		strategy3.addStrategyModule(new ReRoute(controler));
 		
 // außerdem benötigt: eine TransitTimeAllocation, welche nicht die parkAndRide Aktivitäten verschiebt
-
+		PlanStrategy strategy4 = new PlanStrategyImpl(new RandomPlanSelector());
+		strategy4.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig()));
+		
 		StrategyManager manager = this.controler.getStrategyManager() ;
 		
-		manager.addStrategy(strategy1, 0.3);
-		manager.addStrategy(strategy2, 0.3);		
-		manager.addStrategy(strategy3, 0.3);
+//		manager.addStrategy(strategy1, 0.3);
+		
+//		manager.addStrategy(strategy2, 0.15);
+//		manager.addChangeRequest(30, strategy2, 0);
+//		
+//		manager.addStrategy(strategy3, 0.15);
+//		manager.addChangeRequest(30, strategy3, 0);
+		
+		manager.addStrategy(strategy4, 0.8);
+		manager.addChangeRequest(30, strategy4, 0);
+
+
 	}
 
 }
