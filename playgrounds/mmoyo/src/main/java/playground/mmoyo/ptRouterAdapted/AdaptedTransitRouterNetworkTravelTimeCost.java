@@ -82,11 +82,11 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	//variables for caching offVehWaitTime
 	Link previousWaitLink;
 	double previousWaitTime;
-	double cachedOffVehWaitTime;
+	double cachedVehArrivalTime;
 	
 	double getVehArrivalTime(final Link link, final double now){
 		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
-			return this.cachedOffVehWaitTime;
+			return this.cachedVehArrivalTime;
 		}
 		this.previousWaitLink = link;
 		this.previousWaitTime = now;
@@ -103,7 +103,9 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		
 		double arrivalOffset = (toStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? toStop.getArrivalOffset() : toStop.getDepartureOffset();
 		double waitInVehTime = fromStop.getDepartureOffset()- arrivalOffset; //time in which the veh stops at station
-		return bestDepartureTime - waitInVehTime ;		//instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
+		double vehArrivalTime = bestDepartureTime - waitInVehTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
+		cachedVehArrivalTime = vehArrivalTime ;
+		return vehArrivalTime ;		
 	}
 	
 }
