@@ -49,7 +49,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		BseStrategyManager {
 	// private final static Logger log = Logger.getLogger(PCStrMn.class);
 	// private double delta;
-	private Config config;
+	private final Config config;
 	private Plan oldSelected = null;
 	private MultinomialLogit singleMnl = null;
 
@@ -191,7 +191,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					/*
 					 * Vector p = new Vector(1/* (single-)choiceSetSize /);
 					 * p.set(0, 1d/* 100% /);
-					 * 
+					 *
 					 * Matrix d = new Matrix(1/* n-choiceSetSize /,
 					 * paramDimension // m-size of parameters that has to be
 					 * calibrated ); for (int i = 0; i < paramDimension; i++) {
@@ -220,7 +220,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					/*
 					 * FUNCTIONS FOR CALIBRATOR 1,2 Vector probs =
 					 * mnl.getProbs();
-					 * 
+					 *
 					 * if (Double.isNaN(probs.sum())) {
 					 * log.fatal("mnl/probs/NaN"); System.out
 					 * .println("selecteIdx from ChangeExpBeta (MATSim)\t" +
@@ -231,15 +231,15 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					 * plans.get(i).getScore()); if (plans.get(i).isSelected())
 					 * { System.out.println("\tselected"); } else {
 					 * System.out.println(); } } }
-					 * 
+					 *
 					 * List<Integer> attrIndices = new ArrayList<Integer>(); for
 					 * (String paramName : PCCtlListener.paramNames) {
 					 * attrIndices.add(Events2Score4PC_mnl.attrNameList
 					 * .indexOf(paramName)); }
-					 * 
+					 *
 					 * Matrix dProb_dParameters = mnl.get_dProb_dParameters(
 					 * attrIndices, false// with/out ASC /);
-					 * 
+					 *
 					 * List<? extends Matrix> d2ChoiceProb_dParam2 = mnl
 					 * .get_d2P_dbdb(delta, attrIndices, false); FUNCTIONS FOR
 					 * CALIBRATOR 1,2

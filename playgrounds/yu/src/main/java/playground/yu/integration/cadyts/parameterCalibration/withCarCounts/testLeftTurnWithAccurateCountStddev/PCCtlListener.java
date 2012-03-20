@@ -18,7 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurnWithAccurateCountStddev;
+
+import static java.lang.Math.max;
+import static java.lang.Math.sqrt;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +58,8 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlVa
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.Events2ScoreWithLeftTurnPenalty4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.PCCtlwithLeftTurnPenalty;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
@@ -598,8 +603,20 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						int start_s = (hour - 1) * 3600;
 						int end_s = hour * 3600 - 1;
 						double val_veh_h = volume.getValue();
+						// -------------------------------------------------
+						// calibrator.addMeasurement(link, start_s, end_s,
+						// val_veh_h, TYPE.FLOW_VEH_H);
+						final double stddev = max(
+								calibrator.getMinStddev(TYPE.FLOW_VEH_H), sqrt(
+								// TODO this variance should be read from other
+								// resource with index countId \t hour ...
+								calibrator.getVarianceScale() * val_veh_h
+								// TODO this variance should be read from other
+								// resource
+								));
 						calibrator.addMeasurement(link, start_s, end_s,
-								val_veh_h, TYPE.FLOW_VEH_H);
+								val_veh_h, stddev, TYPE.FLOW_VEH_H);
+						// -------------------------------------------------
 					}
 				}
 			}

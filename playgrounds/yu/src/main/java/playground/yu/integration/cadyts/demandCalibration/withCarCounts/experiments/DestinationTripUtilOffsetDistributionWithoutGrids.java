@@ -55,53 +55,53 @@ import utilities.misc.DynamicData;
 
 /**
  * @author yu
- * 
+ *
  */
 public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		ActivityStartEventHandler, LinkEnterEventHandler {
-	public static class TripUtilityOffsets {
-		// private static double timeBinSize = 3600d;
-
-		// private String activityType;
-		// private int timeStep;
-
-		private int zeroUO_Counter = 0;// UO - Utility Offset
-
-		private final List<Double> nonZeroTUOs;// UO - Trip Utility Offset
-
-		public TripUtilityOffsets() {
-			nonZeroTUOs = new ArrayList<Double>();
-		}
-
-		// public static double getTimeBinSize() {
-		// return timeBinSize;
-		// }
-
-		// public static void setTimeBinSize(double timeBinSize) {
-		// TripUtilityOffsets.timeBinSize = timeBinSize;
-		// }
-
-		/**
-		 * adds {@code Leg} Utility Offset in this {@code TripUtilityOffset}
-		 * 
-		 * @param utilOffset
-		 */
-		public void add(double utilOffset) {
-			if (utilOffset == 0d) {
-				zeroUO_Counter++;
-			} else {
-				nonZeroTUOs.add(utilOffset);
-			}
-		}
-
-		public List<Double> getNonZeroTripUtilOffsets() {
-			return nonZeroTUOs;
-		}
-
-		public int getZeroUtilOffsetCounter() {
-			return zeroUO_Counter;
-		}
-	}
+	// public static class TripUtilityOffsets {
+	// // private static double timeBinSize = 3600d;
+	//
+	// // private String activityType;
+	// // private int timeStep;
+	//
+	// private int zeroUO_Counter = 0;// UO - Utility Offset
+	//
+	// private final List<Double> nonZeroTUOs;// UO - Trip Utility Offset
+	//
+	// public TripUtilityOffsets() {
+	// nonZeroTUOs = new ArrayList<Double>();
+	// }
+	//
+	// // public static double getTimeBinSize() {
+	// // return timeBinSize;
+	// // }
+	//
+	// // public static void setTimeBinSize(double timeBinSize) {
+	// // TripUtilityOffsets.timeBinSize = timeBinSize;
+	// // }
+	//
+	// /**
+	// * adds {@code Leg} Utility Offset in this {@code TripUtilityOffset}
+	// *
+	// * @param utilOffset
+	// */
+	// public void add(double utilOffset) {
+	// if (utilOffset == 0d) {
+	// zeroUO_Counter++;
+	// } else {
+	// nonZeroTUOs.add(utilOffset);
+	// }
+	// }
+	//
+	// public List<Double> getNonZeroTripUtilOffsets() {
+	// return nonZeroTUOs;
+	// }
+	//
+	// public int getZeroUtilOffsetCounter() {
+	// return zeroUO_Counter;
+	// }
+	// }
 
 	protected static int getTimeStep(double time) {
 		return (int) time / timeBinSize + 1;
@@ -177,18 +177,16 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 	private final Map<String, List<Double>> actType_dTUO_Lists = new HashMap<String, List<Double>>();
 	private static int timeBinSize = 3600;
 	protected Map<Id/* agentId */, Double/* legUtilOffset */> tmpAgent_TUOs = new HashMap<Id, Double>();
-	private final Network net;
-	// for grid version
+	private final Network net;// for grid version
 	private final Counts counts;
 	private final DynamicData<Link> linkUOs;
 	private final int caliStartTime;
 
-	// private int lowerLimit;
-	// private double gridLength;
+	// private int lowerLimit; // private double gridLength;
 
 	private final int caliEndTime;
 
-	private final Map<Integer/* time step */, TripUtilityOffsets> timeStep_UOs = new HashMap<Integer, TripUtilityOffsets>();
+	private final Map<Integer/* time step */, List<Double>> timeStep_UOs = new HashMap<Integer, List<Double>>();
 
 	public DestinationTripUtilOffsetDistributionWithoutGrids(Network net,
 			Counts counts, DynamicData<Link> linkUtilOffsets,
@@ -243,20 +241,14 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 				}
 				actType_dTUO_List.add(tripUO);
 
-				Integer key_ts = timeStep;
-				TripUtilityOffsets tsTUO = timeStep_UOs.get(key_ts);
-				if (tsTUO == null) {
-					tsTUO = new TripUtilityOffsets();
-					timeStep_UOs.put(key_ts, tsTUO);
+				List<Double> timeStep_dTUO_List = timeStep_UOs.get(timeStep);
+				if (timeStep_dTUO_List == null) {
+					timeStep_dTUO_List = new ArrayList<Double>();
+					timeStep_UOs.put(timeStep, timeStep_dTUO_List);
 				}
-				tsTUO.add(tripUO);
-				// }
-
+				timeStep_dTUO_List.add(tripUO);
 			}
-
 		}
-
-		// }
 	}
 
 	@Override
@@ -318,14 +310,12 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		// + ") of x");
 
 		for (String actType : actType_dTUO_Lists.keySet()) {
-
 			List<Double> act_destTripUtilOffsetList2 = new ArrayList<Double>();
 			for (Double d : actType_dTUO_Lists.get(actType)) {
 				if (d != 0d) {
 					act_destTripUtilOffsetList2.add(d);
 				}
 			}
-
 			DistributionCreator creatorAct2 = new DistributionCreator(
 					act_destTripUtilOffsetList2, interval);
 			creatorAct2.write(filenameBase + actType + ".Non0.log");
@@ -335,7 +325,23 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 					"number of trips with value (!=0) in range (interval = "
 							+ interval + ") of x");
 		}
-
+		for (Integer timeStep : timeStep_UOs.keySet()) {
+			List<Double> timeStep_UO_List2 = new ArrayList<Double>();
+			for (Double d : timeStep_UOs.get(timeStep)) {
+				if (d != 0d) {
+					timeStep_UO_List2.add(d);
+				}
+			}
+			DistributionCreator creatorTimeStep2 = new DistributionCreator(
+					timeStep_UO_List2, interval);
+			creatorTimeStep2.write(filenameBase + timeStep + ".Non0.log");
+			creatorTimeStep2.createChart(filenameBase + ".ts." + timeStep
+					+ ".Non0.png", "time step " + timeStep
+					+ " destination trip Utility offset distribution",
+					"value of nonzero destination trip utility offset",
+					"number of trips with value (!=0) in range (interval = "
+							+ interval + ") of x");
+		}
 		// List<Double> destTripUtilOffsetList2 = new ArrayList<Double>();
 		// for (Double d : dTUO_List) {
 		// if (d != 0d) {
