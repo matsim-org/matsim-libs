@@ -162,7 +162,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 			if (householdDeparture.getDepartureTime() == time) {
 				
 				Id facilityId = householdDeparture.getFacilityId();
-				Id meetingPointId = selectHouseholdMeetingPoint.selectRescueMeetingPoint(householdId);
+				Id meetingPointId = selectHouseholdMeetingPoint.selectNextMeetingPoint(householdId);
 				householdMeetingPointMapping.put(householdId, meetingPointId);
 				Household household = households.getHouseholds().get(householdId);
 				
@@ -356,6 +356,11 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 						if (!facilityIsSecure) {
 							HouseholdDeparture householdDeparture = createHouseholdDeparture(time, householdId, householdPosition.getPositionId());
 							this.householdDepartures.put(householdId, householdDeparture);
+							
+							/*
+							 * The initial meeting points have been selected by the SelectHouseholdMeetingPoint class.
+							 */
+							this.selectHouseholdMeetingPoint.getMeetingPoint(householdId);
 						}
 					}
 				}

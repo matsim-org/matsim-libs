@@ -110,6 +110,10 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		this.time = time;
 	}
 	
+	public void addHouseholdToCheck(Household household) {
+		this.householdsToCheck.add(household);
+	}
+	
 	/*
 	 * TODO implement a decision model based on the survey data...
 	 */
@@ -175,7 +179,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			mode = agentPosition.getTransportMode();
 			fromLinkId = agentPosition.getPositionId();
 			
-			Link link = this.scenario.getNetwork().getLinks().get(agentPosition.getPositionId());
+			Link link = this.scenario.getNetwork().getLinks().get(fromLinkId);
 			pdd.isAffected = this.coordAnalyzer.isLinkAffected(link);
 			
 		} else if (positionType == Position.FACILITY) {
@@ -210,11 +214,12 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			mode = this.modeAvailabilityChecker.identifyTransportMode(currentActivityIndex, executedPlan, possibleVehicleId);
 			fromLinkId = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
 		} else if (positionType == Position.VEHICLE) {
-			/*
-			 * Should not occur since passengers are only created after the evacuation has started.
-			 */
-			log.warn("Found passenger agent. Passengers should not be created before the evacuation has started!");
-			return;
+			mode = agentPosition.getTransportMode();
+			Id vehicleId = agentPosition.getPositionId();
+			fromLinkId = this.vehiclesTracker.getVehicleLinkId(vehicleId);
+			
+			Link link = this.scenario.getNetwork().getLinks().get(fromLinkId);
+			pdd.isAffected = this.coordAnalyzer.isLinkAffected(link);
 		} else {
 			log.error("Found unknown position type: " + positionType.toString());
 			return;						
@@ -223,7 +228,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		/*
 		 * Calculate the travel time from the agents current position to its home facility.
 		 */
-		double t = calculateTravelTime(fromLinkId, homeLinkId, mode, time);
+		double t = calculateTravelTime(personId, fromLinkId, homeLinkId, mode, time);
 		pdd.agentReturnHomeTime = t;
 	}
 	
@@ -249,11 +254,12 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		return 0.0;
 	}
 	
-	private double calculateTravelTime(Id fromLinkId, Id toLinkId, String mode, double time) {
+	private double calculateTravelTime(Id personId, Id fromLinkId, Id toLinkId, String mode, double time) {
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		
 		Plan plan = factory.createPlan();
+		plan.setPerson(scenario.getPopulation().getPersons().get(personId));
 		Activity fromActivity = factory.createActivityFromLinkId("current", fromLinkId);
 		Activity toActivity = factory.createActivityFromLinkId("home", toLinkId);
 		Leg leg = factory.createLeg(mode);

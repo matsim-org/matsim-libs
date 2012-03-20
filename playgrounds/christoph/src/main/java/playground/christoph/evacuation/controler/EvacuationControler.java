@@ -267,11 +267,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.ride, 
 				new RideTravelTimeFactory(travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
 		
-		super.createAndInitReplanningManager(numReplanningThreads);
-		super.createAndInitActivityReplanningMap();
-		MultiModalTravelTime linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
-		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
-		
 //		this.householdsUtils = new HouseholdsUtils(this.scenarioData, this.getEvents());
 //		this.getEvents().addHandler(householdsUtils);
 //		this.getFixedOrderSimulationListener().addSimulationListener(householdsUtils);
@@ -373,6 +368,14 @@ public class EvacuationControler extends WithinDayController implements Simulati
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
 			this.events.addHandler(agentsInEvacuationAreaCounter);	
 		}
+		
+		/*
+		 * Create and initialize replanning manager and replanning maps.
+		 */
+		super.createAndInitReplanningManager(numReplanningThreads);
+		super.createAndInitActivityReplanningMap();
+		MultiModalTravelTime linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
+		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
 		
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
 		this.initIdentifiers();

@@ -60,11 +60,23 @@ public class AgentPosition {
 	}
 	
 	public void entersLink(Id id) {
+		/*
+		 * If the agent is traveling by car, we keep the vehicleId
+		 * as position information.
+		 */
+		if (this.position == Position.VEHICLE) return;
+		
 		this.id = id;
 		this.position = Position.LINK;
 	}
 	
 	public void leavesLink() {
+		/*
+		 * If the agent is traveling by car, we keep the vehicleId
+		 * as position information.
+		 */
+		if (this.position == Position.VEHICLE) return;
+
 		this.id = null;
 		this.position = Position.UNDEFINED;
 	}

@@ -174,6 +174,7 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	 * it has to be registered as a passenger in a vehicle.
 	 */
 	public void addPassengerToVehicle(Id passengerId, Id vehicleId) {
+		
 		this.passengerVehicleMap.put(passengerId, vehicleId);
 		this.vehiclePassengerMap.get(vehicleId).add(passengerId);
 	}
