@@ -41,6 +41,8 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		myConfig= (MyTransitRouterConfig) this.config; 
 	}
 
+	private static int wrnCnt = 0 ;
+	
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double now) {
 		double cost;
@@ -48,6 +50,9 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 			// "route" here means "pt route".  If no pt route is attached, it means that it is a transfer link.
 
 			double transfertime = getLinkTravelTime(link, now);
+			
+			// one can configure an "additionalTransferTime" which leaves a bit more time between transfers.  That time
+			// is probably spent waiting, so we will weigh it with the waiting disutility.
 			double waittime = this.myConfig.additionalTransferTime;
 			double walktime = transfertime - waittime; // say that the effective walk time is the transfer time minus some "buffer"
 			
