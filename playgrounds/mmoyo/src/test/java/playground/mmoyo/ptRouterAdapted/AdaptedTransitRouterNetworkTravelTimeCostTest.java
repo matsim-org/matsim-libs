@@ -22,12 +22,8 @@ package playground.mmoyo.ptRouterAdapted;
 
 import junit.framework.TestCase;
 
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -61,12 +57,11 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 				testLink = link;
 			}
 		}
-		
-		// at 6am the travel time is 9 mins
+		//at 6:00 the link travel time = 540
 		assertEquals(9.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600), MatsimTestCase.EPSILON);
 	}
 
-	public void testWaitingTime() {
+	public void testVehArrivalTime() {
 		Fixture f = new Fixture();
 		f.init();
 		MyTransitRouterConfig myTRConfig = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
@@ -74,25 +69,42 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 				f.scenario.getConfig().vspExperimental());
 		AdaptedTransitRouterNetworkTravelTimeCost timecost = new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig);
 		AdaptedTransitRouter adaptedRouter = new AdaptedTransitRouter(myTRConfig, f.schedule) ;
-		TransitRouterNetwork routerNet = adaptedRouter.getTransitRouterNetwork();
+		TransitRouterNetwork adapRouterNet = adaptedRouter.getTransitRouterNetwork();
 	
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
-		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
+		for (TransitRouterNetworkLink link : adapRouterNet.getLinks().values()) {
 			if ((link.getLine() == f.blueLine) && (link.fromNode.stop.getStopFacility().getName().equals("C")) && (link.toNode.stop.getStopFacility().getName().equals("D"))) {
 				testLink = link;
 			}
 		}
 		
-		assertEquals(/*2.0*60 + */ 7.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600), MatsimTestCase.EPSILON);
-		assertEquals(/*1.0*60 + */7.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600 + 60), MatsimTestCase.EPSILON);
-		assertEquals(/*0.0*60 + */7.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600 + 120), MatsimTestCase.EPSILON);
-		assertEquals(/*20.0*60 -1 + */7.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600 + 121), MatsimTestCase.EPSILON);
+		//original MATSim
+		//assertEquals(2.0*60 + 7.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600), MatsimTestCase.EPSILON);
+		//with adaption   (link travel time is not departureTime dependent anymore) 
+		//link travel time = 11 mins  
+		assertEquals(11.0*60 , timecost.getLinkTravelTime(testLink, 6.0*3600) , MatsimTestCase.EPSILON);
+		
+		/*
+		//if the agents arrives to stop (in or outside the veh) before  06:02, his/her "arrrival veh time" is 05:58
+		//veh arrival time to stop= 05:58 
+		//veh departure from stop = 06:02 
+		//System.out.println("veh arr: " + timecost.getVehArrivalTime(testLink , (6.0*3600) + (1*60)));
+		//System.out.println("next departure: " + timecost.getNextDepartureTime(testLink.getRoute(), testLink.getFromNode().getStop(), (6.0*3600) + 60));
+		*/
+		
+		//this arrival would be for waiting outside the vehicle at the stop
+		assertEquals((5.0*3600) + (58*60) , timecost.getVehArrivalTime(testLink, (5.0*3600) + (56*60)), MatsimTestCase.EPSILON);
+		assertEquals((5.0*3600) + (58*60) , timecost.getVehArrivalTime(testLink, (5.0*3600) + (57*60)), MatsimTestCase.EPSILON);
+		
+		//this arrival would be for waiting inside the vehicle
+		assertEquals((5.0*3600) + (58*60) , timecost.getVehArrivalTime(testLink, (5.0*3600) + (58*60)), MatsimTestCase.EPSILON);
+		assertEquals((5.0*3600) + (58*60) , timecost.getVehArrivalTime(testLink, (5.0*3600) + (59*60)), MatsimTestCase.EPSILON);
+		assertEquals((5.0*3600) + (58*60) , timecost.getVehArrivalTime(testLink, (6.0*3600) + (1*60)), MatsimTestCase.EPSILON);
+		assertEquals((5.0*3600) + (58*60) , timecost.getVehArrivalTime(testLink, (6.0*3600) + (2*60)), MatsimTestCase.EPSILON);
 	
-		assertEquals(2.0*60 /*+ 7.0*60*/, timecost.getWaitingTimeAtStop(testLink, 6.0*3600), MatsimTestCase.EPSILON);
-		assertEquals(1.0*60 /*+ 7.0*60*/, timecost.getWaitingTimeAtStop(testLink, 6.0*3600 + 60), MatsimTestCase.EPSILON);
-		assertEquals(0.0*60 /*+ 7.0*60*/, timecost.getWaitingTimeAtStop(testLink, 6.0*3600 + 120), MatsimTestCase.EPSILON);
-		assertEquals(20.0*60 /*+ 7.0*60*/, timecost.getWaitingTimeAtStop(testLink, 6.0*3600 + 121), MatsimTestCase.EPSILON);
+		//if the agents arrives after to stop after 06:02, his/her "arrrival veh time" is displaced to 06:18
+		assertEquals((6.0*3600) + (18*60)  , timecost.getVehArrivalTime(testLink, (6.0*3600) + (3*60)), MatsimTestCase.EPSILON);
 	}
 
 	public void testTravelTimeAfterMidnight() {
@@ -113,28 +125,25 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 				testLink = link;
 			}
 		}
-		
-		
+		//original matsim (in current adaption link Travel Time is not dependent of departure time)
 		// planned departure at 25:00, has to wait until 05:22 = 29:22
-		//original for matsim router
-		//assertEquals(22.0*60 + 4.0*3600 + 7.0*60, timecost.getLinkTravelTime(testLink, 25.0*3600) , MatsimTestCase.EPSILON);
-		//with separate Waiting time
-		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, timecost.getLinkTravelTime(testLink, 25.0*3600) + timecost.getWaitingTimeAtStop(testLink, 25.0*3600), MatsimTestCase.EPSILON);
+		//assertEquals(22.0*60 + 4.0*3600 + 7.0*60, timecost.getLinkTravelTime(testLink, 25.0*3600), MatsimTestCase.EPSILON);
+		//after adaption : next veh arrival is in 29:18
+		assertEquals((29.0*3600) + (18*60.0) , timecost.getVehArrivalTime(testLink, 25.0*3600), MatsimTestCase.EPSILON);
 		
+		//original 
 		// planned departure at 47:00, has to wait until 05:22 = 53:22
-		//original for matsim router 
-		//assertEquals(22.0*60 + 6.0*3600 + 7.0*60, timecost.getLinkTravelTime(testLink, 47.0*3600), MatsimTestCase.EPSILON);
-		//with separate waiting time
-		assertEquals(22.0*60 + 6.0*3600 + 7.0*60, timecost.getLinkTravelTime(testLink, 47.0*3600) + timecost.getWaitingTimeAtStop(testLink, 47.0*3600), MatsimTestCase.EPSILON);
-		
+		//assertEquals(22.0*60 + 6.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 47.0*3600), MatsimTestCase.EPSILON);
+		//after adaption : next veh arrival is in 53:18
+		assertEquals((53.0*3600) + (18*60.0), timecost.getVehArrivalTime(testLink, 47.0*3600), MatsimTestCase.EPSILON);
+
+		//original 
 		// planned departure at 49:00, has to wait until 05:22 = 53:22, tests explicitly > 2*MIDNIGHT
-		//original for matsim router
 		//assertEquals(22.0*60 + 4.0*3600 + 7.0*60, timecost.getLinkTravelTime(testLink, 49.0*3600), MatsimTestCase.EPSILON);
-		//with separate waiting time
-		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, timecost.getLinkTravelTime(testLink, 49.0*3600) + timecost.getWaitingTimeAtStop(testLink, 49.0*3600), MatsimTestCase.EPSILON);
+		//after adaption : next veh arrival is in 53:18
+		assertEquals((53.0*3600) + (18*60.0), timecost.getVehArrivalTime(testLink, 49.0*3600), MatsimTestCase.EPSILON);
 	}
 
-	/*
 	public void testTravelCostLineSwitch() {
 		Fixture f = new Fixture();
 		f.init();
@@ -144,6 +153,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		AdaptedTransitRouterNetworkTravelTimeCost timecost = new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig);
 		AdaptedTransitRouter adaptedRouter = new AdaptedTransitRouter(myTRConfig, f.schedule) ;
 		TransitRouterNetwork routerNet = adaptedRouter.getTransitRouterNetwork();
+		
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
 		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
@@ -155,26 +165,26 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		}
 
 		double oldCost = - myTRConfig.getUtilityOfLineSwitch_utl();
-		double cost1 = timecost.getLinkGeneralizedTravelCost(testLink, 7.0*3600);
+		double cost1 = timecost.getLinkTravelDisutility(testLink, 7.0*3600);
 		myTRConfig.setUtilityOfLineSwitch_utl(0.0);
-		double cost2 = timecost.getLinkGeneralizedTravelCost(testLink, 6.0*3600); // use different time because of internal caching effects
+		double cost2 = timecost.getLinkTravelDisutility(testLink, 6.0*3600); // use different time because of internal caching effects
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
 		myTRConfig.setUtilityOfLineSwitch_utl(-40.125);
-		double cost3 = timecost.getLinkGeneralizedTravelCost(testLink, 5.0*3600);
+		double cost3 = timecost.getLinkTravelDisutility(testLink, 5.0*3600);
 		assertEquals(40.125, cost3 - cost2, MatsimTestCase.EPSILON);
 	}
-	*/
 
-	/*
+	
 	public void testTravelCostLineSwitch_AdditionalTransferTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		MyTransitRouterConfig myTRConfig = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
-		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
+		AdaptedTransitRouterNetworkTravelTimeCost timecost = new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig);
+		AdaptedTransitRouter adaptedRouter = new AdaptedTransitRouter(myTRConfig, f.schedule) ;
+		TransitRouterNetwork routerNet = adaptedRouter.getTransitRouterNetwork();
+		
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
 		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
@@ -185,19 +195,19 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 			}
 		}
 
-		double oldCost = - conf.getUtilityOfLineSwitch_utl();
-		double cost1 = tc.getLinkGeneralizedTravelCost(testLink, 7.0*3600);
-		conf.setUtilityOfLineSwitch_utl(0.0);
-		double cost2 = tc.getLinkGeneralizedTravelCost(testLink, 6.0*3600); // use different time because of internal caching effects
+		double oldCost = - myTRConfig.getUtilityOfLineSwitch_utl();
+		double cost1 = timecost.getLinkTravelDisutility(testLink, 7.0*3600);
+		myTRConfig.setUtilityOfLineSwitch_utl(0.0);
+		double cost2 = timecost.getLinkTravelDisutility(testLink, 6.0*3600); // use different time because of internal caching effects
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
-		conf.additionalTransferTime = 120.0;
-		double cost3 = tc.getLinkGeneralizedTravelCost(testLink, 5.0*3600);
-		assertEquals(-120.0 * conf.getMarginalUtiltityOfWaiting_utl_s(), cost3 - cost2, MatsimTestCase.EPSILON);
+		myTRConfig.additionalTransferTime = 120.0;
+		double cost3 = timecost.getLinkTravelDisutility(testLink, 5.0*3600);
+		assertEquals(-120.0 * myTRConfig.getMarginalUtiltityOfWaiting_utl_s(), cost3 - cost2, MatsimTestCase.EPSILON);
 		// test with custom value for utility of waiting, just in case too many of the default marginal utilities are 0.0
-		conf.setMarginalUtiltityOfWaiting_utl_s(-12.0 / 3600.0);
-		double cost4 = tc.getLinkGeneralizedTravelCost(testLink, 7.0*3600);
+		myTRConfig.setMarginalUtiltityOfWaiting_utl_s(-12.0 / 3600.0);
+		double cost4 = timecost.getLinkTravelDisutility(testLink, 7.0*3600);
 		assertEquals(120.0 * 12.0 / 3600.0, cost4 - cost2, MatsimTestCase.EPSILON);
 	}
-	*/
+
 
 }
