@@ -22,6 +22,7 @@ package playground.mmoyo.ptRouterAdapted;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -93,8 +94,12 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 			return 0;  //transfer link
 		}
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
+		TransitRouteStop toStop = wrapped.toNode.stop;
+		
 		double bestDepartureTime = getNextDepartureTime(wrapped.getRoute(), fromStop, now);
-		double waitInVehTime = fromStop.getDepartureOffset()- fromStop.getArrivalOffset(); //time in which the veh stops at station
+		
+		double arrivalOffset = (toStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? toStop.getArrivalOffset() : toStop.getDepartureOffset();
+		double waitInVehTime = fromStop.getDepartureOffset()- arrivalOffset; //time in which the veh stops at station
 		return bestDepartureTime - waitInVehTime ;		//instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
 	}
 	
