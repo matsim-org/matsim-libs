@@ -35,12 +35,18 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class ScenarioGenerator {
 
+
+	private enum SC {Helbing,Zanlungo,vanDenBerg};
+
 	private static final String MODE = "walk2d";
 
 	private static int nodeId = 0;
 	private static int linkId = 0;
 
 	public static void main(String [] args) {
+
+		SC model = SC.vanDenBerg;
+
 		String inputMat = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/joined/gr90.mat";
 		//		String inputMat = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/simulated/gr90_vo.mat";
 		String scDir = "/Users/laemmel/devel/gr90/";
@@ -54,22 +60,42 @@ public class ScenarioGenerator {
 
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(600);
-//				qsim.setTimeStepSize(1./25.);
+		//				qsim.setTimeStepSize(1./25.);
 		c.addModule("qsim", qsim);
 
 		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
 		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 
-		s2d.setEnableCircularAgentInterActionModule("false");
-		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
-		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
-		s2d.setEnableDrivingForceModule("false");
-		s2d.setEnableEnvironmentForceModule("false");
-		s2d.setEnablePathForceModule("false");
-		s2d.setEnableVelocityObstacleModule("true");
-		s2d.setEnablePhysicalEnvironmentForceModule("false");
-s2d.setTimeStepSize(""+(1/25.));
 
+		if (model == SC.Helbing) {
+			s2d.setEnableCircularAgentInterActionModule("true");
+			s2d.setEnableEnvironmentForceModule("true");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("true");
+			s2d.setEnableDrivingForceModule("true");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");
+		} else if (model == SC.Zanlungo) {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("true");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("true");
+			s2d.setEnablePathForceModule("true");
+			s2d.setEnableDrivingForceModule("true");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		} else if (model == SC.vanDenBerg) {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("false");
+			s2d.setEnableDrivingForceModule("false");
+			s2d.setEnableVelocityObstacleModule("true");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		}
+		//s2d.setTimeStepSize(""+(1/25.));
 		String shpFile = s2d.getFloorShapeFile();
 		ShapeFileReader r = new ShapeFileReader();
 		r.readFileAndInitialize(shpFile);
@@ -98,7 +124,7 @@ s2d.setTimeStepSize(""+(1/25.));
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", "0.9");
 
-//		c.network().setTimeVariantNetwork(true);
+		//		c.network().setTimeVariantNetwork(true);
 
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
@@ -182,7 +208,7 @@ s2d.setTimeStepSize(""+(1/25.));
 		for (int i = 0; i < nodes.size()-1; i++) {
 			NodeImpl n0 = nodes.get(i);
 			NodeImpl n1 = nodes.get(i+1);
-			
+
 			Id lid = new IdImpl(linkId++);
 
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());

@@ -160,7 +160,7 @@ public class XYVXVYEvents2Mat implements XYVxVyEventsHandler{
 	
 	public static void main(String [] args) {
 		String events = "/Users/laemmel/devel/gr90/output/ITERS/it.0/0.events.xml.gz";
-		String outputMat = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/simulated/gr90_zanlungo.mat";
+		String outputMat = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/simulated/gr90_van_den_Berg.mat";
 		
 		EventsManager mgr = EventsUtils.createEventsManager();
 		XYVXVYEvents2Mat handler = new XYVXVYEvents2Mat();

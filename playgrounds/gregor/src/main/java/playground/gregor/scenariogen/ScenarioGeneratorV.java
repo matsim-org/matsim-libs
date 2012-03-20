@@ -120,8 +120,7 @@ public class ScenarioGeneratorV {
 		//		GeometryFactory geofac = new GeometryFactory();
 
 		double length = 0;
-		//		for (int i = 0; i < links.size()/10; i++) {
-		for (int i = 0; i < links.size(); i++) {
+		for (int i = 0; i < links.size()/10; i++) {
 			Link link = links.get(i);
 			length += link.getLength();
 		}

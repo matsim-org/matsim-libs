@@ -99,7 +99,7 @@ public class Sim2DConfigGroup extends Module {
 	//Zanlungo et al constant
 	private double Bi=.71;
 	private double Ai=1.13*PhysicalAgentRepresentation.AGENT_WEIGHT;
-	private double lambda=.35;
+	private double lambda=.29;
 
 	private final double tau = 0.5;
 
