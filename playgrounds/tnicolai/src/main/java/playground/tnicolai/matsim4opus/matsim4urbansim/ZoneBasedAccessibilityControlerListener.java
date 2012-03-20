@@ -15,7 +15,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.gis.EuclideanDistance;
 import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
@@ -25,6 +24,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.ZoneBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.ZoneCSVWriter;
+import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**
  *  improvements feb'12
@@ -42,7 +42,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListener.class);
 	
 	private ActivityFacilitiesImpl zones; 
-	private ClusterObject[] aggregatedWorkplaces;
+	private ClusterObject[] aggregatedOpportunities;
 	
 	private double walkSpeedMeterPerMin = -1;
 	
@@ -51,19 +51,19 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 	/**
 	 * constructor
 	 * @param zones (origin)
-	 * @param aggregatedWorkplaces (destination)
+	 * @param aggregatedpportunities (destination)
 	 * @param benchmark
 	 */
 	public ZoneBasedAccessibilityControlerListener(ActivityFacilitiesImpl zones, 
-												   ClusterObject[] aggregatedWorkplaces, 
+												   ClusterObject[] aggregatedpportunities, 
 												   Benchmark benchmark){
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListener ...");
 		
 		assert(zones != null);
 		this.zones = zones;
-		assert(aggregatedWorkplaces != null);
-		this.aggregatedWorkplaces = aggregatedWorkplaces;
+		assert(aggregatedpportunities != null);
+		this.aggregatedOpportunities = aggregatedpportunities;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
 		
@@ -105,10 +105,11 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		
-		double betaBrain = sc.getConfig().planCalcScore().getBrainExpBeta(); // scale parameter. tnicolai: test different beta brains (e.g. 02, 1, 10 ...)
-		double betaCarHour = betaBrain * (sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
-		double betaCarMin = betaCarHour / 60.; // get utility per minute
-		double betaWalkHour = betaBrain * (sc.getConfig().planCalcScore().getTravelingWalk_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaScale = sc.getConfig().planCalcScore().getBrainExpBeta(); // scale parameter. tnicolai: test different beta brains (e.g. 02, 1, 10 ...)
+		double betaScalePreFactor = 1/betaScale;
+		double betaCarHour = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
+		double betaCarMin = betaCarHour / 60.; // get utility per minute. this is done for urbansim that e.g. takes travel times in minutes (tnicolai feb'12)
+		double betaWalkHour = sc.getConfig().planCalcScore().getTravelingWalk_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
 		double betaWalkMin = betaWalkHour / 60.; // get utility per minute.
 		
 		try{
@@ -119,7 +120,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			log.info("Beta car traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
 			log.info("Beta walk traveling utils/h: " + sc.getConfig().planCalcScore().getTravelingWalk_utils_hr());
 			log.info("Beta performing utils/h: " + sc.getConfig().planCalcScore().getPerforming_utils_hr());
-			log.info("Beta brain (scale factor): " + betaBrain);
+			log.info("Beta scale: " + betaScale);
 			log.info("Beta car traveling per h: " + betaCarHour);
 			log.info("Beta car traveling per min: " + betaCarMin);
 			log.info("Beta walk traveling per h: " + betaWalkHour);
@@ -148,24 +149,27 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				// captures the eulidean distance between a zone centroid and its nearest node
-				LinkImpl nearestLink = network.getNearestLink( zones[fromIndex].getZoneCoordinate() );
-				double distCentroid2Link = nearestLink.calcDistance( zones[fromIndex].getZoneCoordinate() );
-				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
-//				double walkTimeOffset_min = EuclideanDistance.getEuclideanDistanceAsWalkTimeInSeconds(zones[fromIndex].getZoneCoordinate(), fromNode.getCoord()) / 60.;
+				// captures the euclidean distance between a zone centroid and its nearest node
+//				LinkImpl nearestLink = network.getNearestLink( zones[fromIndex].getZoneCoordinate() );
+//				double distCentroid2Link = nearestLink.calcDistance( zones[fromIndex].getZoneCoordinate() );
+//				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
+				double walkTimeOffset_min = NetworkUtil.getDistance2Node(network.getNearestLink( zones[fromIndex].getZoneCoordinate()), 
+																		 zones[fromIndex].getZoneCoordinate(), 
+																		 fromNode)  / this.walkSpeedMeterPerMin ;
+//				double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(zones[fromIndex].getZoneCoordinate(), fromNode.getCoord()) / 60.;
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;
 				double travelTimesWalkSum 		  = 0.; // substitute for travel distance
 				
 				// iterate through all aggregated jobs (respectively their nearest network nodes) 
 				// and calculate workplace accessibility for current start/origin node.
-				for ( int toIndex = 0; toIndex < this.aggregatedWorkplaces.length; toIndex++ ) {
+				for ( int toIndex = 0; toIndex < this.aggregatedOpportunities.length; toIndex++ ) {
 					
 					// get stored network node (this is the nearest node next to an aggregated workplace)
-					Node destinationNode = this.aggregatedWorkplaces[toIndex].getNearestNode();
+					Node destinationNode = this.aggregatedOpportunities[toIndex].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					// using number of aggregated workplaces as weight for log sum measure
-					int jobWeight = this.aggregatedWorkplaces[toIndex].getNumberOfObjects();
+					int jobWeight = this.aggregatedOpportunities[toIndex].getNumberOfObjects();
 
 					double arrivalTime = lcptCongestedTravelTime.getTree().get( nodeID ).getTime();
 					
@@ -177,17 +181,17 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 					double walkTravelTime_min = lcptWalkTime.getTree().get( nodeID ).getCost() / 60.;
 
 					// sum congested travel times
-					congestedTravelTimesCarSum += Math.exp( (betaCarMin * congestedTravelTime_min) + (betaWalkMin * walkTimeOffset_min) ) * jobWeight;
+					congestedTravelTimesCarSum += Math.exp( betaScale * ((betaCarMin * congestedTravelTime_min) + (betaWalkMin * walkTimeOffset_min)) ) * jobWeight;
 					// sum freespeed travel times
-					freespeedTravelTimesCarSum += Math.exp( (betaCarMin * freespeedTravelTime_min) + (betaWalkMin * walkTimeOffset_min) ) * jobWeight;
+					freespeedTravelTimesCarSum += Math.exp( betaScale * ((betaCarMin * freespeedTravelTime_min) + (betaWalkMin * walkTimeOffset_min)) ) * jobWeight;
 					// sum walk travel times (substitute for distances)
-					travelTimesWalkSum 		   += Math.exp( betaWalkMin * (walkTravelTime_min + walkTimeOffset_min) ) * jobWeight;
+					travelTimesWalkSum 		   += Math.exp( betaScale * (betaWalkMin * (walkTravelTime_min + walkTimeOffset_min)) ) * jobWeight;
 				}
 				
 				// get log sum 
-				double congestedTravelTimesCarLogSum = Math.log( congestedTravelTimesCarSum );
-				double freespeedTravelTimesCarLogSum = Math.log( freespeedTravelTimesCarSum );
-				double travelTimesWalkLogSum 		 = Math.log( travelTimesWalkSum );
+				double congestedTravelTimesCarLogSum = betaScalePreFactor * Math.log( congestedTravelTimesCarSum );
+				double freespeedTravelTimesCarLogSum = betaScalePreFactor * Math.log( freespeedTravelTimesCarSum );
+				double travelTimesWalkLogSum 		 = betaScalePreFactor * Math.log( travelTimesWalkSum );
 
 				// writing accessibility measures of current node in csv format (UrbanSim input)
 				ZoneBasedAccessibilityCSVWriter.write(originZoneID,
@@ -206,7 +210,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			this.benchmark.stoppMeasurement(benchmarkID);
 			log.info("Accessibility computation with " + zones.length
 					+ " zones (origins) and "
-					+ this.aggregatedWorkplaces.length
+					+ this.aggregatedOpportunities.length
 					+ " destinations (workplaces) took "
 					+ this.benchmark.getDurationInSeconds(benchmarkID)
 					+ " seconds ("

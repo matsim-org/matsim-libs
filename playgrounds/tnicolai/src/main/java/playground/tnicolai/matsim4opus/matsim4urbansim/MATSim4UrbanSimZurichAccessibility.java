@@ -185,8 +185,8 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		if(computeGridBasedAccessibilitiesShapeFile){
 			
 			// init aggregatedWorkplaces
-			if(aggregatedWorkplaces == null)
-				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSampleRate);
+			if(aggregatedOpportunities == null)
+				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
 
 			
 			Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
@@ -196,7 +196,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 			
 			controler.addControlerListener( new CellBasedAccessibilityShapeControlerListener(GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, boundary, srid), 
-																	  						 aggregatedWorkplaces,
+																	  						 aggregatedOpportunities,
 																	  						 congestedTravelTimeAccessibilityGrid, 
 																	  						 freespeedTravelTimeAccessibilityGrid, 
 																	  						 walkTravelTimeAccessibilityGrid, 
@@ -206,8 +206,8 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		if(computeGridBasedAccessibilitiesNetwork){
 			
 			// init aggregatedWorkplaces
-			if(aggregatedWorkplaces == null)
-				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSampleRate);
+			if(aggregatedOpportunities == null)
+				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
 			
 			// set default boundary box for accessibility computation
 			// if a bounding box is already set it won't be overwritten!
@@ -218,7 +218,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			
 			controler.addControlerListener( new CellBasedAccessibilityNetworkControlerListener(GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, NetworkBoundaryBox.getBoundingBox(), srid), 
-																							   aggregatedWorkplaces, 
+																							   aggregatedOpportunities, 
 																							   congestedTravelTimeAccessibilityGrid, 
 																							   freespeedTravelTimeAccessibilityGrid, 
 																							   walkTravelTimeAccessibilityGrid, 

@@ -85,7 +85,7 @@ public class MATSim4UrbanSimZone {
 	// indicates if MATSim run was successful
 	static boolean isSuccessfulMATSimRun = Boolean.FALSE;
 	// needed for controler listerners
-	ClusterObject[] aggregatedWorkplaces = null;
+	ClusterObject[] aggregatedOpportunities = null;
 	
 	
 	/**
@@ -270,12 +270,12 @@ public class MATSim4UrbanSimZone {
 		if(computeZoneBasedAccessibilities){
 			
 			// init aggregatedWorkplaces
-			if(aggregatedWorkplaces == null)
-				aggregatedWorkplaces = readUrbansimJobs(zones, jobSample);
+			if(aggregatedOpportunities == null)
+				aggregatedOpportunities = readUrbansimJobs(zones, jobSample);
 			// creates zone based table of log sums (workplace accessibility)
 			// uses always a 100% jobSample size (see readUrbansimJobs below)
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
-																						aggregatedWorkplaces, 
+																						aggregatedOpportunities, 
 																						benchmark));
 		}
 		
@@ -285,7 +285,7 @@ public class MATSim4UrbanSimZone {
 		
 		if(dumpAggegatedWorkplaceData)
 			WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
-					                                            aggregatedWorkplaces);
+					                                            aggregatedOpportunities);
 	}
 	
 	/**

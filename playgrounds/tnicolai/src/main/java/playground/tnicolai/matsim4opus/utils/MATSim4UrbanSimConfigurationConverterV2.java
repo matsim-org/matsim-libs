@@ -657,7 +657,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 	 */
 	private void initPlanCalcRoute(){
 		log.info("Setting PlanCalcRouteGroup to config...");
-		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h
+		scenario.getConfig().plansCalcRoute().setWalkSpeed(0.833333333333333); // 1.38888889m/s corresponds to 5km/h -- and -- 0.833333333333333m/s corresponds to 3km/h
 		log.info("PlanCalcRouteGroup settings:");
 		log.info("WalkSpeed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
 		log.info("...done!");
