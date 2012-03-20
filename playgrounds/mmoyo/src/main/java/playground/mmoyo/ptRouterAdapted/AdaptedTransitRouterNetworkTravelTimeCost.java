@@ -94,16 +94,15 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		//first find out vehicle arrival time to fromStop according to transit schedule
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.getRoute() == null) { 
-			return 0;  //transfer link
+			throw new RuntimeException("should not happen") ;
 		}
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
-		TransitRouteStop toStop = wrapped.toNode.stop;
 		
-		double bestDepartureTime = getNextDepartureTime(wrapped.getRoute(), fromStop, now);
+		double nextDepartureTime = getNextDepartureTime(wrapped.getRoute(), fromStop, now);
 		
-		double arrivalOffset = (toStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? toStop.getArrivalOffset() : toStop.getDepartureOffset();
-		double waitInVehTime = fromStop.getDepartureOffset()- arrivalOffset; //time in which the veh stops at station
-		double vehArrivalTime = bestDepartureTime - waitInVehTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
+		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
+		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
+		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
 		cachedVehArrivalTime = vehArrivalTime ;
 		return vehArrivalTime ;		
 	}
