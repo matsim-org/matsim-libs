@@ -413,11 +413,22 @@ public class PhysicalFloor implements Floor {
 		}
 		this.agents.add(agent);
 		
-		if (agent.getId().toString().contains("r")) {
-			agent.getForce().setVx(1.34);
-		} else {
-			agent.getForce().setVy(-1.34);
-		}
+		
+		Id lid = act.getLinkId();
+		Link l = this.scenario.getNetwork().getLinks().get(lid);
+		double fromX = l.getFromNode().getCoord().getX();
+		double fromY = l.getFromNode().getCoord().getY();
+		double toX = l.getToNode().getCoord().getX();
+		double toY = l.getToNode().getCoord().getY();
+		double vx = agent.getDesiredVelocity()*((toX-fromX)/l.getLength());
+		double vy = agent.getDesiredVelocity()*((toY-fromY)/l.getLength());
+		agent.getForce().setVx(vx);
+		agent.getForce().setVy(vy);
+//		if (agent.getId().toString().contains("r")) {
+//			agent.getForce().setVx(1.34);
+//		} else {
+//			agent.getForce().setVy(-1.34);
+//		}
 		
 		for (DynamicForceModule m : this.dynamicForceModules) {
 			m.forceUpdate();
