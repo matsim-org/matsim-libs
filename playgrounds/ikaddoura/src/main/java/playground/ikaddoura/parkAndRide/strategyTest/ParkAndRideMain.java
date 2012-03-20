@@ -23,6 +23,7 @@
  */
 package playground.ikaddoura.parkAndRide.strategyTest;
 
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 
 /**
@@ -32,11 +33,18 @@ import org.matsim.core.controler.Controler;
 public class ParkAndRideMain {
 	
 	public static void main(String[] args) {
-			String config = "../../shared-svn/studies/ihab/parkAndRide/input/test_config.xml";
-			Controler controler = new Controler(config);
-			controler.setOverwriteFiles(true);
-			controler.addControlerListener(new ParkAndRideControlerListener(controler));
-			controler.run();
+			
+		String config = "../../shared-svn/studies/ihab/parkAndRide/input/test_config.xml";
+		Controler controler = new Controler(config);
+		controler.setOverwriteFiles(true);
+			
+		controler.addControlerListener(new ParkAndRideControlerListener(controler));
+			
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
+		ParkAndRideScoringFunctionFactory scoringfactory = new ParkAndRideScoringFunctionFactory(planCalcScoreConfigGroup, controler.getNetwork());
+		controler.setScoringFunctionFactory(scoringfactory);
+			
+		controler.run();
 	}
 }
 	
