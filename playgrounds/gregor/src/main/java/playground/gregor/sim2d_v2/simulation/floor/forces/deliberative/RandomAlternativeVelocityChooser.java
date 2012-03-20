@@ -13,11 +13,10 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityo
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.VelocityObstacle;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser {
 
-	private static final int NUM_OF_CANDIDATES = 20;
+	private static final int NUM_OF_CANDIDATES = 100;
 	private static final double MAX_V_COEFF = 1.25;
 	private final XORShiftRandom random;
 
@@ -55,16 +54,18 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 	public void chooseAlterantiveVelocity(List<? extends VelocityObstacle> vOs, Coordinate c0, Coordinate c1, double[] df, Agent2D agent) {
 
 //		//DEBUG
-		GeometryFactory geofac = new GeometryFactory();
+//		GeometryFactory geofac = new GeometryFactory();
 		
+		double dv_max = agent.getDesiredVelocity() * this.tau * this.timeStepSize;
+		double collPMin = dv_max;
 		
 		
 		double penalty = Double.POSITIVE_INFINITY;
 		double bestVx = 0;
 		double bestVy = 0;
 		double[] oldBest = agent.getOldBest();
-		double candX = 0; //oldBest[0];
-		double candY = 0; //oldBest[1];
+		double candX = 0; //df[0]; //oldBest[0];
+		double candY = 0; //df[1] ;//0; //oldBest[1];
 		for (int i = 0; i < NUM_OF_CANDIDATES; i++){
 
 			double vxNext = agent.getVx() + this.timeStepSize*(candX - agent.getVx())/this.tau;
@@ -76,8 +77,9 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 			
 			//DEBUG
 //			LineString ls = geofac.createLineString(new Coordinate[]{c0,candC});
+			double tToColl = timeToCollision(vOs, c0, candC);
 			
-			if (!Algorithms.testForCollision(vOs, candC)) {
+			if (!Algorithms.testForCollision(vOs, candC) ) {
 				double testDist = candC.distance(c1);
 //				GisDebugger.addGeometry(ls,"pen:"+(int)(100*testDist) + " time: NaN");
 				
@@ -87,9 +89,9 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 					bestVy = candY;
 				}
 			} else {
-				double colTime = timeToCollision(vOs, c0, candC);
+				double colTime = tToColl; //timeToCollision(vOs, c0, candC);
 				double testPen = candC.distance(c1) + W_I/colTime;// + 0.5*MatsimRandom.getRandom().nextDouble();
-				
+				testPen = Math.max(testPen, collPMin);
 //				GisDebugger.addGeometry(ls,"pen:"+(int)(100*testPen) + " time:" + colTime);
 
 				if (colTime > stopTime && testPen < penalty) {

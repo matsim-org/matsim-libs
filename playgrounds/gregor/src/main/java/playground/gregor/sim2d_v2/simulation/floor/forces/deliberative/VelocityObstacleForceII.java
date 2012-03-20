@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
@@ -25,13 +26,15 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityo
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.VelocityObstacle;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 public class VelocityObstacleForceII implements DynamicForceModule {
 
 	private final QuadTree<Agent2D> agentsQuad;
 	private final PhysicalFloor floor;
 
-	private final boolean debug = false;
+	private boolean debug = false;
 
 
 	private final double quadUpdateInterval = 0.1;
@@ -71,9 +74,9 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 
 	@Override
 	public void run(Agent2D agent, double time) {
-		//		if (agent.getId().toString().equals("r120") && time >= 100) {
-		//			this.debug = true;
-		//		}
+				if ((agent.getId().toString().equals("r124")) && time >= 93) {
+					this.debug = true;
+				}
 
 		Force f = agent.getForce();
 		double[] df = this.driver.getDesiredVelocity(agent);
@@ -282,22 +285,22 @@ public class VelocityObstacleForceII implements DynamicForceModule {
 
 				Coordinate[] coords = Algorithms.computeCircleIntersection(other.getPosition(), csoR, agent.getPosition(), 1.34*0.04*2); //TODO no magic numbers use dv_max instead 
 
-//				if (this.debug) {
-//					colls++;
-//					GisDebugger.addCircle(other.getPosition(), r1, "B");
-//					GisDebugger.addCircle(other.getPosition(), csoR, "CSO");
-//					GisDebugger.addCircle(agent.getPosition(), r0, "A");
-//					GisDebugger.addCircle(agent.getPosition(), 1.34*0.04*2, "VA");
-//					GeometryFactory geofac = new GeometryFactory();
-//					LineString ls = geofac.createLineString(coords);
-//					//				GisDebugger.addGeometry(ls,"intersection");
-//
-//					LineString ls2 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[0]});
-//					GisDebugger.addGeometry(ls2, "right");
-//					LineString ls3 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[1]});
-//					GisDebugger.addGeometry(ls3, "left");
-//					GisDebugger.dump("/Users/laemmel/tmp/!!dmp.shp");
-//				}
+				if (this.debug && (agent.getId().toString().equals("r56") || agent.getId().toString().equals("g48"))) {
+					colls++;
+					GisDebugger.addCircle(other.getPosition(), r1, "B");
+					GisDebugger.addCircle(other.getPosition(), csoR, "CSO");
+					GisDebugger.addCircle(agent.getPosition(), r0, "A");
+					GisDebugger.addCircle(agent.getPosition(), 1.34*0.04*2, "VA");
+					GeometryFactory geofac = new GeometryFactory();
+					LineString ls = geofac.createLineString(coords);
+					//				GisDebugger.addGeometry(ls,"intersection");
+
+					LineString ls2 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[0]});
+					GisDebugger.addGeometry(ls2, "right");
+					LineString ls3 = geofac.createLineString(new Coordinate[]{agent.getPosition(),coords[1]});
+					GisDebugger.addGeometry(ls3, "left");
+					GisDebugger.dump("/Users/laemmel/tmp/!!dmp.shp");
+				}
 				tan = new Coordinate[]{agent.getPosition(),coords[1],coords[0]};
 				agent.getForce().setVx(0);
 				agent.getForce().setVy(0);
