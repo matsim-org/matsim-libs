@@ -64,7 +64,7 @@ public class ParkAndRideControlerListener implements StartupListener {
 		strategy3.addStrategyModule(new ParkAndRideRemoverStrategy(controler));
 		strategy3.addStrategyModule(new ReRoute(controler));
 		
-// außerdem benötigt: eine TransitTimeAllocation, welche nicht die parkAndRide Aktivitäten verschiebt
+// TimeAllocation, welche die parkAndRide und pt interaction Aktivitäten berücksichtigt
 		PlanStrategy strategy4 = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy4.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig()));
 		
@@ -72,14 +72,14 @@ public class ParkAndRideControlerListener implements StartupListener {
 		
 //		manager.addStrategy(strategy1, 0.3);
 		
-//		manager.addStrategy(strategy2, 0.15);
-//		manager.addChangeRequest(30, strategy2, 0);
-//		
-//		manager.addStrategy(strategy3, 0.15);
-//		manager.addChangeRequest(30, strategy3, 0);
+		manager.addStrategy(strategy2, 0.15);
+		manager.addChangeRequest(45, strategy2, 0);
 		
-		manager.addStrategy(strategy4, 0.8);
-		manager.addChangeRequest(30, strategy4, 0);
+		manager.addStrategy(strategy3, 0.15);
+		manager.addChangeRequest(45, strategy3, 0);
+		
+		manager.addStrategy(strategy4, 0.15);
+		manager.addChangeRequest(45, strategy4, 0);
 
 
 	}

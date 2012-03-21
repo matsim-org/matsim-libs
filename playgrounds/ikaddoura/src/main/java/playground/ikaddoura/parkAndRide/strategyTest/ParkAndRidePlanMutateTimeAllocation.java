@@ -84,7 +84,6 @@ public class ParkAndRidePlanMutateTimeAllocation implements PlanAlgorithm {
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					if (act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) || act.getType().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)) {
-						 System.out.println("------"+act.getType());
 					} else {
 						if (this.useActivityDurations) {
 							if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
