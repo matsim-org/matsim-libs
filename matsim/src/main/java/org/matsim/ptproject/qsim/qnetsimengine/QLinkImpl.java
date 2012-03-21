@@ -312,6 +312,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 						// so allow them to return some non-null link id in chooseNextLink() in order to be
 						// placed on the link, and here we'll remove them again if needed...
 						// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
+						
+						// Beispiel: Kanzler-Ubahn in Berlin.  Im Visum-Netz mit nur 1 Kante, mit Haltestelle am Anfang und
+						// am Ende der Kante.  Zweite Haltestelle wird nur bedient, wenn das Fahrzeug im matsim-Sinne zum 
+						// zweiten Mal auf die Kante gesetzt wird (oder so ähnlich, aber wir brauchen "nextLink==currentLink").
+						// kai & marcel, mar'12
+						
 						network.simEngine.letAgentArrive(veh);
 						this.addParkedVehicle(veh);
 						makeVehicleAvailableToNextDriver(veh, now);
