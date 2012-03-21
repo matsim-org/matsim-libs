@@ -33,11 +33,11 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  */
 public class TravelDisutilityIncludingToll implements PersonalizableTravelDisutility {
 
-	/*package*/ final RoadPricingScheme scheme;
+	/*package*/ final RoadPricingSchemeI scheme;
 	private final TollRouterBehaviour tollCostHandler;
 	private final PersonalizableTravelDisutility costHandler;
 
-	public TravelDisutilityIncludingToll(final PersonalizableTravelDisutility costCalculator, final RoadPricingScheme scheme) {
+	public TravelDisutilityIncludingToll(final PersonalizableTravelDisutility costCalculator, final RoadPricingSchemeI scheme) {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 
