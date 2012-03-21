@@ -32,7 +32,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -447,7 +447,7 @@ public class RblMerger {
 		HashMap<Id, HashMap<Id, NetworkRoute>> line2route2networkRouteMap = new HashMap<Id, HashMap<Id,NetworkRoute>>();
 		
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-		PersonalizableTravelCost travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(travelTimeCalculator, scenario.getConfig().planCalcScore());
+		PersonalizableTravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, scenario.getConfig().planCalcScore());
 		LeastCostPathCalculator routeAlgo = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCostCalculator, travelTimeCalculator);
 		
 		// for all lines
