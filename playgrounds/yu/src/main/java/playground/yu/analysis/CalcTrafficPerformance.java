@@ -49,24 +49,27 @@ public class CalcTrafficPerformance implements LinkEnterEventHandler {
 		this.toll = toll;
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
-		Link l = this.network.getLinks().get(event.getLinkId());
-		if (l != null) {
-			if (toll == null)
-				this.lengthSum += l.getLength() / 1000.0;
-			else if (TollTools.isInRange(l.getId(), toll))
-				this.lengthSum += l.getLength() / 1000.0;
-		}
-	}
-
-	public void reset(int iteration) {
-		this.lengthSum = 0;
-	}
-
 	/**
 	 * @return Traffic performance [Per*km]
 	 */
 	public double getTrafficPerformance() {
-		return this.lengthSum;
+		return lengthSum;
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		Link l = network.getLinks().get(event.getLinkId());
+		if (l != null) {
+			if (toll == null) {
+				lengthSum += l.getLength() / 1000.0;
+			} else if (TollTools.isInRange(l.getId(), toll)) {
+				lengthSum += l.getLength() / 1000.0;
+			}
+		}
+	}
+
+	@Override
+	public void reset(int iteration) {
+		lengthSum = 0;
 	}
 }

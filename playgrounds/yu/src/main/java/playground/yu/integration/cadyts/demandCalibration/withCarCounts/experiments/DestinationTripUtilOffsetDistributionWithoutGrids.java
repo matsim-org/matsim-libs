@@ -55,7 +55,7 @@ import utilities.misc.DynamicData;
 
 /**
  * @author yu
- *
+ * 
  */
 public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		ActivityStartEventHandler, LinkEnterEventHandler {

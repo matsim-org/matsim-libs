@@ -29,8 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -60,6 +60,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scori
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.Events2ScoreWithLeftTurnPenalty4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.PCCtlwithLeftTurnPenalty;
+import playground.yu.integration.cadyts.utils.SampleVarianceReader;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
@@ -96,7 +97,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private boolean writeQGISFile = true;
 
 	private void initializeCalibrator(Controler ctl) {
-		Config config = ctl.getConfig();
+		org.matsim.core.config.Config config = ctl.getConfig();
 		ControlerIO ctlIO = ctl.getControlerIO();
 
 		// SETTING "parameter calibration" parameters
@@ -298,7 +299,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		writerCV.flush();
 
 		// ###################################################
-		Vector avgParams = calibrator.getAvgParameters();
+		utilities.math.Vector avgParams = calibrator.getAvgParameters();
 		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 		// ScoringConfigGetSetValues.setConfig(config);
@@ -354,7 +355,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 			// ********calibrator.getParameters() JUST FOR
 			// ANALYSIS********
-			Vector params = calibrator.getParameters();
+			utilities.math.Vector params = calibrator.getParameters();
 			for (int i1 = 0; i1 < paramNames.length; i1++) {
 				sb.append("\t");
 				sb.append(params.get(i1));
@@ -586,12 +587,26 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
 				"endTime"));
 
+		Map<String/* countId */, Map<Integer/* timeStep */, Double/* sample variance */>> countsSampleVariances = null;
+		String countsSampleVarianceFilename = config.findParam(
+				BSE_CONFIG_MODULE_NAME, "countsSampleVarianceFile");
+		if (countsSampleVarianceFilename != null) {
+			SampleVarianceReader svReader = new SampleVarianceReader(
+					countsSampleVarianceFilename);
+			svReader.read();
+			countsSampleVariances = svReader.getCountsSampleVariances();
+		} else {
+			Logger.getLogger(this.getClass().getName())
+					.warning(
+							"BSE:\tThere is not countsSampleVarianceFilename set in configfile, this means, the variance for each count will be replaced with the count value by using poisson distribution in substitution for gauss distribution.");
+		}
 		Map<Id, Count> countsMap = counts.getCounts();
 		for (Id countId : countsMap.keySet()) {
 			Link link = network.getLinks().get(countId);
 			if (link == null) {
 				System.err.println("could not find link " + countId.toString());
 			} else if (isInRange(countId, network)) {
+
 				// for ...2QGIS
 				links.add(network.getLinks().get(countId));
 				linkIds.add(countId);
@@ -608,12 +623,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						// val_veh_h, TYPE.FLOW_VEH_H);
 						final double stddev = max(
 								calibrator.getMinStddev(TYPE.FLOW_VEH_H), sqrt(
-								// TODO this variance should be read from other
+								// this variance should be read from other
 								// resource with index countId \t hour ...
-								calibrator.getVarianceScale() * val_veh_h
-								// TODO this variance should be read from other
-								// resource
-								));
+								countsSampleVariances != null ? countsSampleVariances
+										.get(countId.toString()).get(hour)
+										: calibrator.getVarianceScale()
+												* val_veh_h));
 						calibrator.addMeasurement(link, start_s, end_s,
 								val_veh_h, stddev, TYPE.FLOW_VEH_H);
 						// -------------------------------------------------
