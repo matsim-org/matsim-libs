@@ -51,6 +51,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 	private final OccupancyAnalyzer occupancyAnalyzer;
 
 	public PtCountControlerListener(final Config config) {
+		log.info("Using pt counts.");
 		this.config = config;
 		this.boardCounts = new Counts();
 		this.alightCounts = new Counts();

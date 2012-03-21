@@ -355,13 +355,13 @@ public class Controler {
 			this.scenarioData = (ScenarioImpl) scenario;
 			this.config = scenario.getConfig();
 		} else {
-			if (configFileName == null) {
+			if (this.configFileName == null) {
 				if (config == null) {
 					throw new IllegalArgumentException("Either the config or the filename of a configfile must be set to initialize the Controler.");
 				}
 				this.config = config;
 			} else {
-				this.config = ConfigUtils.loadConfig(configFileName);
+				this.config = ConfigUtils.loadConfig(this.configFileName);
 				this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			}
 			this.scenarioData = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
@@ -694,6 +694,9 @@ public class Controler {
 		if (this.configFileName != null) {
 			new MatsimConfigReader(this.config).readFile(this.configFileName,
 					this.dtdFileName);
+			// yyyy I have to say that I do not understand this.  It seems to me that the
+			// config file was already read in the constructor.  Isn't this here overriding
+			// config settings that were entered between construction and run()?  kai, mar'12
 		}
 		checkConfigConsistencyAndWriteToLog("Complete config dump after reading the config file:");
 
@@ -899,7 +902,7 @@ public class Controler {
 			addControlerListener(new TransitControlerListener());
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {
 				// only works when all three files are defined! kai, oct'10
-				addPtCountControlerListener();
+				addControlerListener(new PtCountControlerListener(this.config));
 			}
 		}
 
@@ -913,19 +916,6 @@ public class Controler {
 			addControlerListener(new VspPlansCleaner());
 		}
 
-	}
-
-	private void addPtCountControlerListener() {
-		// yyyy seems to me that in the following the OccupancyAnalyser could be
-		// completely pushed into the PtCountControlerListener.
-		// kai, oct'10
-
-		// OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24
-		// * 3600 - 1);
-		log.info("Using pt counts.");
-		// addControlerListener(new
-		// OccupancyAnalyzerListener(occupancyAnalyzer));
-		addControlerListener(new PtCountControlerListener(this.config));
 	}
 
 	/**
