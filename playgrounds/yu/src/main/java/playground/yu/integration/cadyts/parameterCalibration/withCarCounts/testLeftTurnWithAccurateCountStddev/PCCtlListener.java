@@ -59,7 +59,6 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.param
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.Events2ScoreWithLeftTurnPenalty4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.PCCtlwithLeftTurnPenalty;
 import playground.yu.integration.cadyts.utils.SampleVarianceReader;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
