@@ -23,6 +23,38 @@ public class TransitScheduleCleaner {
 	
 	private static final Logger log = Logger.getLogger(TransitScheduleCleaner.class);
 	
+	public static TransitSchedule removeRoutesWithoutDepartures(TransitSchedule transitSchedule){
+		
+		log.info("Removing all routes without any departure");		
+		TransitSchedule tS = TransitScheduleCleaner.makeTransitScheduleModifiable(transitSchedule);
+		printStatistic(tS);
+		
+		StringBuffer sB = new StringBuffer();
+		int nOfRouteRemoved = 0;
+		
+		for (TransitLine line : tS.getTransitLines().values()) {
+			List<TransitRoute> routesToRemove = new LinkedList<TransitRoute>();
+			
+			for (TransitRoute route : line.getRoutes().values()) {				
+				if (route.getDepartures().size() == 0) {
+					routesToRemove.add(route);					
+				}				
+			}
+			
+			for (TransitRoute transitRoute : routesToRemove) {
+				line.removeRoute(transitRoute);
+				sB.append(line.getId() + "-" + transitRoute.getId());
+				sB.append(", ");
+				nOfRouteRemoved++;
+			}			
+		}
+		
+		printStatistic(tS);
+		log.info("Removed " + nOfRouteRemoved + " routes from transitSchedule: " + sB.toString());	
+		
+		return tS;
+	}
+	
 	public static TransitSchedule removeEmptyLines(TransitSchedule transitSchedule){
 		
 		log.info("Removing empty lines");		

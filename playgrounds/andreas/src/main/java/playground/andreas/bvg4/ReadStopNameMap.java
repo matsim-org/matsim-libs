@@ -32,7 +32,7 @@ public class ReadStopNameMap implements TabularFileHandler {
 	public ReadStopNameMap(String filename) {
 		tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
-		tabFileParserConfig.setDelimiterTags(new String[] {"\t"}); // \t
+		tabFileParserConfig.setDelimiterTags(new String[] {";"}); // \t
 	}
 
 	public static Map<String, String> readStopNameMap(String filename){
@@ -53,8 +53,16 @@ public class ReadStopNameMap implements TabularFileHandler {
 	public void startRow(String[] row) {
 		if(!row[0].trim().startsWith("#")){
 			try {
-				String oldStopName = row[0].trim();
-				String newStopName = row[1].trim();
+				String oldStopName = row[1].trim();
+				String newStopName = row[0].trim();
+				
+				if(oldStopName.equalsIgnoreCase("")){
+					oldStopName = null;
+				}
+				
+				if(newStopName.equalsIgnoreCase("")){
+					newStopName = null;
+				}
 
 				sink.process(oldStopName, newStopName);
 			} catch (NumberFormatException e) {
