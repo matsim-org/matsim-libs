@@ -9,6 +9,8 @@
  * <h2>Parameters:<a name="locationchoice_parameters"></a></h2>
  * Two basic versions of the destination choice module exist, one (v0) based on local search and Haegerstrand's time geography and the other (v1) based on best response including error terms.
  * Parameters required for v0 are given in <strong><font color="blue">blue</font></strong>, the ones used in v1 are given in <strong><font color="red">red</font></strong> and parameters applied in both versions are given in <strong>black</strong>.
+ * <br/>
+ * [[<i>How do I select if I use v0 or v1?  kai, mar'12</i>]]
  * <h3>General Parameters</h3>
  * <ul>
  * 	<li><strong><font color="black">flexible_types</font></strong><br>
