@@ -19,6 +19,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -38,16 +39,17 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class ScenarioGeneratorV {
 
-
+	private enum SC {Helbing,Zanlungo,vanDenBerg};
 	private static int persId = 0;
 
 	public static void main(String [] args) {
 		String scDir = "/Users/laemmel/devel/oval/";
 		String inputDir = scDir + "/input/";
+		SC model = SC.Helbing;
 
 		double length = 6;
 		double r = 3;
-		double width = 1.;
+		double width = .7;
 
 
 		Config c = ConfigUtils.createConfig();
@@ -77,16 +79,41 @@ public class ScenarioGeneratorV {
 		//		s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
 		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 
-		s2d.setEnableCircularAgentInterActionModule("false");
-		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
-		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
-		s2d.setEnableDrivingForceModule("false");
-		s2d.setEnableEnvironmentForceModule("false");
-		s2d.setEnablePathForceModule("false");
-		s2d.setEnableVelocityObstacleModule("true");
-		s2d.setEnablePhysicalEnvironmentForceModule("false");
+		if (model == SC.Helbing) {
+			s2d.setEnableCircularAgentInterActionModule("true");
+			s2d.setEnableEnvironmentForceModule("true");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("true");
+			s2d.setEnableDrivingForceModule("true");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");
+		} else if (model == SC.Zanlungo) {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("true");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("true");
+			s2d.setEnablePathForceModule("true");
+			s2d.setEnableDrivingForceModule("true");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		} else if (model == SC.vanDenBerg) {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("false");
+			s2d.setEnableDrivingForceModule("false");
+			s2d.setEnableVelocityObstacleModule("true");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		}
 
 
+		QSimConfigGroup qsim = new QSimConfigGroup();
+		qsim.setEndTime(300);
+		//				qsim.setTimeStepSize(1./25.);
+		c.addModule("qsim", qsim);
+		
 		c.addModule("sim2d", s2d);
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
@@ -120,7 +147,7 @@ public class ScenarioGeneratorV {
 		//		GeometryFactory geofac = new GeometryFactory();
 
 		double length = 0;
-		for (int i = 0; i < links.size()/10; i++) {
+		for (int i = 0; i < links.size()/2; i++) {
 			Link link = links.get(i);
 			length += link.getLength();
 		}
@@ -179,21 +206,21 @@ public class ScenarioGeneratorV {
 //		//		createPersons(sc,pb,pop,links,1,435*60);
 //		//		createPersons(sc,pb,pop,links,107,440*60);
 
-				createPersons(sc,pb,pop,links,83,0*60);
-				createPersons(sc,pb,pop,links,72,120*60);
-				createPersons(sc,pb,pop,links,59,180*60);
-				createPersons(sc,pb,pop,links,49,240*60);
-				createPersons(sc,pb,pop,links,37,300*60);
-				createPersons(sc,pb,pop,links,23,360*60);
-				createPersons(sc,pb,pop,links,18,400*60);
-				createPersons(sc,pb,pop,links,14,405*60);
-				createPersons(sc,pb,pop,links,12,410*60);
-				createPersons(sc,pb,pop,links,10,415*60);
-				createPersons(sc,pb,pop,links,8,420*60);
-				createPersons(sc,pb,pop,links,2,425*60);
-				createPersons(sc,pb,pop,links,1,430*60);
-				createPersons(sc,pb,pop,links,1,435*60);
-				createPersons(sc,pb,pop,links,107,440*60);
+				createPersons(sc,pb,pop,links,107,0*60);
+//				createPersons(sc,pb,pop,links,72,120*60);
+//				createPersons(sc,pb,pop,links,59,180*60);
+//				createPersons(sc,pb,pop,links,49,240*60);
+//				createPersons(sc,pb,pop,links,37,300*60);
+//				createPersons(sc,pb,pop,links,23,360*60);
+//				createPersons(sc,pb,pop,links,18,400*60);
+//				createPersons(sc,pb,pop,links,14,405*60);
+//				createPersons(sc,pb,pop,links,12,410*60);
+//				createPersons(sc,pb,pop,links,10,415*60);
+//				createPersons(sc,pb,pop,links,8,420*60);
+//				createPersons(sc,pb,pop,links,2,425*60);
+//				createPersons(sc,pb,pop,links,1,430*60);
+//				createPersons(sc,pb,pop,links,1,435*60);
+//				createPersons(sc,pb,pop,links,107,440*60);
 		String outputPopulationFile = inputDir + "/plans.xml";
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), 1).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
@@ -235,8 +262,8 @@ public class ScenarioGeneratorV {
 
 		double xm = r;
 		double ym = 0;
-		List<Coordinate> oval = getOval(r,xm,ym,length,0.1);
-		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		List<Coordinate> oval = getOval(r,xm,ym,length,0.5);
+				oval.addAll(getOval(r,xm,ym,length,0.5));
 		//		oval.addAll(getOval(r,xm,ym,length,0.1));
 		//		oval.addAll(getOval(r,xm,ym,length,0.1));
 		//		oval.addAll(getOval(r,xm,ym,length,0.1));
@@ -342,7 +369,7 @@ public class ScenarioGeneratorV {
 		double r0 = r + width/2;
 		double xm = r;
 		double ym = 0;
-		List<Coordinate> o1 = getOval(r0, xm, ym, length,0.1);
+		List<Coordinate> o1 = getOval(r0, xm, ym, length,0.5);
 		Coordinate[] c1 = new Coordinate[o1.size()+1];
 		for (int i = 0; i < o1.size(); i++) {
 			c1[i] = o1.get(i);
