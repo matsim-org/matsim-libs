@@ -1,0 +1,176 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * HomelocUtilOffsetExtractor.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+/**
+ * 
+ */
+package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forHomeLocation;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.counts.Counts;
+import org.matsim.counts.MatsimCountsReader;
+
+import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
+import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.DestinationTripUtilOffsetDistributionWithoutGrids;
+import utilities.misc.DynamicData;
+
+/**
+ * tries to
+ * 
+ * @author yu
+ * 
+ */
+public class HomelocUtilOffsetDistribution implements ActivityEndEventHandler,
+		LinkEnterEventHandler {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		run(args);
+	}
+
+	private static void run(String[] args) {
+		String linkOffsetUtilOffsetFilename = "test/input/bln2pct/1536.2500.linkUtilOffsets.xml"//
+		, networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
+		, countsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml"//
+		, eventsFilename = "test/input/bln2pct/1536.2500.events.xml.gz"//
+		, outputFilenameBase = "test/output/bln2pct/UOD.allday."// UOD.9.
+
+		;
+
+		int arStartTime = 7, arEndTime = 24;// lowerLimit = 50;
+		double interval = 0.25;
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
+		Network net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+
+		Counts counts = new Counts();
+		new MatsimCountsReader(counts).readFile(countsFilename);
+
+		BseLinkCostOffsetsXMLFileIO utilOffsetIO = new BseLinkCostOffsetsXMLFileIO(
+				net);
+		DynamicData<Link> linkUtilOffsets = utilOffsetIO
+				.read(linkOffsetUtilOffsetFilename);
+
+		HomelocUtilOffsetDistribution hluod = new HomelocUtilOffsetDistribution(
+				net, counts, linkUtilOffsets, arStartTime, arEndTime);
+
+		EventsManager events = EventsUtils.createEventsManager();
+		// /////////////////////////////////
+		events.addHandler(hluod);
+		// /////////////////////////////////
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		// aluoe.write(outputFilenameBase, interval);
+
+		hluod.output(outputFilenameBase);
+	}
+
+	private final Map<Id/* personId */, Coord/* home Location */> recordedPopHomeLocs;
+	private final Network net;
+	private final Map<Id/* personId */, Double/* dayUtilOffset */> dayUtilOffsets;
+	private final DynamicData<Link> linkUOs;
+	private static int timeBinSize = 3600;
+
+	public HomelocUtilOffsetDistribution(Network net, Counts counts,
+			DynamicData<Link> linkUtilOffsets, int arStartTime, int arEndTime) {
+		recordedPopHomeLocs = new HashMap<Id, Coord>();
+		this.net = net;
+		dayUtilOffsets = new HashMap<Id, Double>();
+		linkUOs = linkUtilOffsets;
+	}
+
+	/**
+	 * each home location has an AVG. dayUtilOffset and their size
+	 * 
+	 */
+	private void calcDayUtilOffsetDistributionOfHome() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private double getLinkUtilOffset(Id linkId, int timeStep) {
+		return linkUOs.getSum(net.getLinks().get(linkId), (timeStep - 1)
+				* timeBinSize, timeStep * timeBinSize - 1);
+	}
+
+	/**
+	 * registers the home location of each agent
+	 */
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		Id personId = event.getPersonId();
+		Coord homeLoc = recordedPopHomeLocs.get(personId);
+		if (homeLoc == null) {// first time
+			recordedPopHomeLocs.put(personId,
+					net.getLinks().get(event.getLinkId()).getCoord());
+		}
+	}
+
+	/**
+	 * adds LinkUtilOffset of the link, where the event happens, to the
+	 * dayUtilOffset of the agent
+	 */
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		Id linkId = event.getLinkId();
+		Id agentId = event.getPersonId();
+		int timeStep = DestinationTripUtilOffsetDistributionWithoutGrids
+				.getTimeStep(event.getTime());
+
+		// if (timeStep >= caliStartTime && timeStep <= caliEndTime) {
+		double linkUtilOffset = getLinkUtilOffset(linkId, timeStep);
+		Double duo = dayUtilOffsets.get(agentId);
+		if (duo == null) {
+			dayUtilOffsets.put(agentId, linkUtilOffset);
+		} else {
+			duo += linkUtilOffset;
+		}
+	}
+
+	private void output(String outputFilenameBase) {
+		calcDayUtilOffsetDistributionOfHome();
+	}
+
+	@Override
+	public void reset(int iteration) {
+
+	}
+
+}

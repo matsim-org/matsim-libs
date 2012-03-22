@@ -51,6 +51,8 @@ import org.matsim.counts.MatsimCountsReader;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.utils.io.DistributionCreator;
+import playground.yu.utils.io.SimpleWriter;
+import utilities.math.BasicStatistics;
 import utilities.misc.DynamicData;
 
 /**
@@ -103,7 +105,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 	// }
 	// }
 
-	protected static int getTimeStep(double time) {
+	public static int getTimeStep(double time) {
 		return (int) time / timeBinSize + 1;
 	}
 
@@ -134,8 +136,8 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 
 	private static void run(String[] args) {
 		String linkOffsetUtilOffsetFilename = "test/input/bln2pct/1536.2500.linkUtilOffsets.xml"//
-		, networkFilename = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
-		, countsFilename = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml"//
+		, networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
+		, countsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml"//
 		, eventsFilename = "test/input/bln2pct/1536.2500.events.xml.gz"//
 		, outputFilenameBase = "test/output/bln2pct/UOD.allday."// UOD.9.
 
@@ -168,8 +170,10 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		// /////////////////////////////////
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
-		// aluoe.output(outputFilenameBase);
-		aluoe.write(outputFilenameBase, interval);
+		// aluoe.write(outputFilenameBase, interval);
+
+		aluoe.calcAvgTUOonActLoc(outputFilenameBase);
+
 		// System.out.println(aluoe.output());
 	}
 
@@ -181,7 +185,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 	private final Counts counts;
 	private final DynamicData<Link> linkUOs;
 	private final int caliStartTime;
-
+	private final Map<Coord/* linkCenter */, BasicStatistics/* statistics */> actLocStat = new HashMap<Coord, BasicStatistics>();
 	// private int lowerLimit; // private double gridLength;
 
 	private final int caliEndTime;
@@ -200,6 +204,43 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		this.caliEndTime = caliEndTime;
 		// this.lowerLimit = lowerLimit;
 		// this.gridLength = gridLength;
+	}
+
+	// public String output() {
+	// StringBuffer toReturn = new StringBuffer();
+	// // for (int timeStep = caliStartTime; timeStep <= caliEndTime;
+	// // timeStep++) {
+	// toReturn.append("----------------------\nTimeStep\tno. of trips with nonzero utility offsets\tno. of all trips\n");
+	// for (Entry<Integer, TripUtilityOffsets> entry : timeStep_UOs.entrySet())
+	// {
+	// Integer timeStep = entry.getKey();
+	// TripUtilityOffsets tuo = entry.getValue();
+	// int nonzeroUtilOffsetsSize = tuo.getNonZeroTripUtilOffsets().size();
+	// toReturn.append(timeStep + "\t" + nonzeroUtilOffsetsSize + "\t"
+	// + (tuo.getZeroUtilOffsetCounter() + nonzeroUtilOffsetsSize)
+	// + "\n");
+	// }
+	// // }
+	// return toReturn.toString();
+	// }
+	public void calcAvgTUOonActLoc(String filenameBase) {
+		SimpleWriter writer = new SimpleWriter(filenameBase + "destActLoc.log");
+		writer.writeln("x\ty\tavg.TUO\tvolumes");
+		for (Coord crd : actLocStat.keySet()) {
+			BasicStatistics bs = actLocStat.get(crd);
+			double avgTUO = bs.getAvg();
+			int size = bs.size();
+			if (avgTUO != 0d && size > 1/*
+										 * 50 times a day, that means this place
+										 * should be visited at least 100 times
+										 * in a day
+										 */) {
+				writer.writeln(crd.getX() + "\t" + crd.getY() + "\t" + avgTUO
+						+ "\t" + bs.size());
+				writer.flush();
+			}
+		}
+		writer.close();
 	}
 
 	public List<Double> getDestTripUtilOffsetList() {
@@ -224,11 +265,18 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 			// trip arriving in appropriate time
 			Id agentId = event.getPersonId();
 			Double tripUO = tmpAgent_TUOs./**/remove(agentId)/**/;
-			String actType = event.getActType()
-			// .substring(0, 1)
-			;
+			String actType = event.getActType().substring(0, 1);
+			// TODO
 
 			if (tripUO != null) {
+				Coord actLoc = net.getLinks().get(event.getLinkId()).getCoord();
+				BasicStatistics ba = actLocStat.get(actLoc);
+				if (ba == null) {
+					ba = new BasicStatistics();
+					actLocStat.put(actLoc, ba);
+				}
+				ba.add(tripUO);
+
 				// if (time_centerCoords == null) {
 
 				dTUO_List.add(tripUO)/**/;
@@ -279,25 +327,8 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		DestinationTripUtilOffsetDistributionWithoutGrids.timeBinSize = timeBinSize;
 	}
 
-	// public String output() {
-	// StringBuffer toReturn = new StringBuffer();
-	// // for (int timeStep = caliStartTime; timeStep <= caliEndTime;
-	// // timeStep++) {
-	// toReturn.append("----------------------\nTimeStep\tno. of trips with nonzero utility offsets\tno. of all trips\n");
-	// for (Entry<Integer, TripUtilityOffsets> entry : timeStep_UOs.entrySet())
-	// {
-	// Integer timeStep = entry.getKey();
-	// TripUtilityOffsets tuo = entry.getValue();
-	// int nonzeroUtilOffsetsSize = tuo.getNonZeroTripUtilOffsets().size();
-	// toReturn.append(timeStep + "\t" + nonzeroUtilOffsetsSize + "\t"
-	// + (tuo.getZeroUtilOffsetCounter() + nonzeroUtilOffsetsSize)
-	// + "\n");
-	// }
-	// // }
-	// return toReturn.toString();
-	// }
-
 	public void write(String filenameBase, double interval) {
+		// calcAvgTUOonActLoc(filenameBase);
 		// if (time_centerCoords == null) {
 
 		// DistributionCreator creator = new DistributionCreator(
@@ -396,8 +427,33 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		creator4.write2percent(filenameBase + "totalNon0AllActsPercent.txt");
 
 		// /////////////////////////////////////////////TODO the next 2 lines
-		// Map<Integer,List<Double>> timeStep_UOs_List
-		// DistributionCreator creator5=new DistributionCreator();
+		Map<String, List<Double>> timeStep_UOs_List4 = new HashMap<String, List<Double>>();
+		for (Integer key : timeStep_UOs.keySet()) {
+			List<Double> list = new ArrayList<Double>();
+			timeStep_UOs_List4.put(key.toString(), list);
+			for (Double d : timeStep_UOs.get(key)) {
+				if (d != 0d) {
+					list.add(d);
+				}
+			}
+		}
+
+		DistributionCreator creator5 = new DistributionCreator(
+				timeStep_UOs_List4, interval);
+		creator5.write2(filenameBase + "totalNon0AllTimeSteps.log");
+		creator5.createChart2(filenameBase + "totalNon0AllTimeSteps.png",
+				"total nonzero destination trip Utility offset distribution",
+				"value of destination trip utility offset",
+				"number of trips with value (!= 0) in (interval = " + interval
+						+ ") range of x", false/*
+												 * not time xAxis
+												 */);
+		creator5.createChart2percent(filenameBase
+				+ "totalNon0AllTimeStepsPercent.png", "",
+				"value of destination trip utility offset",
+				"frequency (in percent)", false);
+		creator5.write2percent(filenameBase
+				+ "totalNon0AllTimeStepsPercent.txt");
 		// }
 	}
 }
