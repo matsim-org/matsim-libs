@@ -8,6 +8,7 @@ import org.xml.sax.*;
 
 import playground.michalm.demand.Zone.Act;
 import playground.michalm.demand.Zone.Group;
+import playground.michalm.demand.Zone.Type;
 
 
 public class ZoneXMLReader
@@ -67,7 +68,8 @@ public class ZoneXMLReader
     private void startZone(Attributes atts)
     {
         Id id = scenario.createId(atts.getValue("id"));
-        currentZone = new Zone(id);
+        Type type = Type.valueOf(atts.getValue("type").toUpperCase()); 
+        currentZone = new Zone(id, type);
 
         zones.put(id, currentZone);
         fileOrderedZones.add(currentZone);

@@ -12,7 +12,8 @@
 <!ELEMENT zone (groups, activities)?>
 
 <!ATTLIST zone
-	id	CDATA	#REQUIRED>
+	id	CDATA	#REQUIRED
+	type (internal|external|special) "internal">
 
 <!ELEMENT groups (group)*>
 

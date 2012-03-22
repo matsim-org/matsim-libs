@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.*;
 import org.xml.sax.SAXException;
 
 import pl.poznan.put.util.array2d.Array2DReader;
+import playground.michalm.demand.Zone.Type;
 
 
 public class ODDemandGenerator
@@ -54,9 +55,16 @@ public class ODDemandGenerator
             for (int j = 0; j < zoneCount; j++) {
                 Zone dZone = fileOrderedZones.get(j);
 
-                double odFlow = flowCoeff * odMatrix[i][j];
-                boolean isInternalFlow = i < 9 && j < 9;
-                int count = (int)Math.ceil(hours * odFlow);
+                int odFlow = (int)Math.round(flowCoeff * odMatrix[i][j]);
+
+                if (odFlow == 0) {
+                    continue;
+                }
+
+                boolean isInternalFlow = oZone.getType() == Type.INTERNAL
+                        && dZone.getType() == Type.INTERNAL;
+                
+                int count = (int)Math.round(hours * odFlow);
 
                 for (int k = 0; k < count; k++) {
                     Plan plan = createPlan();

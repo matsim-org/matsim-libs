@@ -21,7 +21,14 @@ public class Zone
     }
 
 
+    public static enum Type
+    {
+        INTERNAL, EXTERNAL, SPECIAL
+    }
+
+
     private Id id;
+    private Type type;
     private Feature zonePolygon;
 
     private EnumMap<Group, Integer> groupSizes = new EnumMap<Group, Integer>(Group.class);
@@ -29,9 +36,10 @@ public class Zone
     private EnumMap<Act, Integer> actPlaces = new EnumMap<Act, Integer>(Act.class);
 
 
-    public Zone(Id id)
+    public Zone(Id id, Type type)
     {
         this.id = id;
+        this.type = type;
     }
 
 
@@ -39,6 +47,12 @@ public class Zone
     public Id getId()
     {
         return id;
+    }
+
+
+    public Type getType()
+    {
+        return type;
     }
 
 
