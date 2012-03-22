@@ -19,8 +19,8 @@
 
 package playground.kai.gauteng.scoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -28,11 +28,9 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.households.Income;
-import org.matsim.households.PersonHouseholdMapping;
-import org.matsim.households.Income.IncomePeriod;
+import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.core.scoring.interfaces.MoneyScoring;
 
 /**
  * @author nagel after
@@ -63,21 +61,69 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		//utility earned from activities
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.ActivityScoringFunction(params));
 
 		//utility spend for traveling (in this case: travel time and distance costs)
-		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(params, this.network, householdIncomePerDay, plan.getPerson().getId() ));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
+		// yy careful: The standard leg scoring function assumes uniform utilities of time.  If this does not hold, the leg
+		// scoring function needs to be replaced.  (But then, presumably, also the activity scoring function
+		// needs to be replaced.)  kai, mar'12
 
 		//utility spend for traveling (toll costs) if there is a toll
-		if(config.scenario().isUseRoadpricing()){
-			scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, householdIncomePerDay));
-		}
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll());
 		
 		//utility spend for being stuck
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(params));
 
 		return scoringFunctionAccumulator;
 
 	}
 
 }
+
+/**
+ * This is a re-implementation of the original CharyparNagel function, based on a
+ * modular approach.
+ * <br/>
+ * Notes:<ul>
+ * <li> This class is only supposed to work as expected if there are NO OTHER money events than those from road pricing!
+ * [[I don't see why that should be so.  Only problem: The logging statement would be wrong. kai, mar'12]]
+ * <li> One may be tempted to include this into the standard Charypar Nagel scoring function.  However, it is currently 
+ * not possible/not useful to have person-specific values of money in that scoring function.  So it is better to leave it here.
+ * kai, mar'12
+ * </ul>
+ * 
+ * @see http://www.matsim.org/node/263
+ * @author bkick and michaz after rashid_waraich
+ */
+class ScoringFromToll implements MoneyScoring, BasicScoring {
+	final static private Logger log = Logger.getLogger(ScoringFromToll.class);
+
+	private double score = 0.0;
+	
+	@Override
+	public void reset() {
+		
+	}
+
+	@Override
+	public void addMoney(final double amount) {
+		
+		this.score += -amount;
+		log.info("toll paid: " + amount + "; resulting accumulated toll utility: " + this.score );
+		log.error("utility of money == one for everybody; needs to be fixed ...") ;
+
+	}
+
+	@Override
+	public void finish() {
+
+	}
+	
+	@Override
+	public double getScore() {
+		return this.score;
+	}
+
+}
+

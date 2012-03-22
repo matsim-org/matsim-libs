@@ -22,57 +22,55 @@ package playground.kai.gauteng.routing;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeI;
+import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 /**
  * @author kn after bkick after dgrether
  *
  */
-public class GautengTollTravelCostCalculatorFactory implements TravelDisutilityFactory {
+public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityFactory {
 
-	final boolean isUsingRoadpricing ;
-	final private RoadPricingScheme scheme;
+	final private RoadPricingSchemeI scheme;
 
-	public GautengTollTravelCostCalculatorFactory(boolean isUsingRoadPricing, RoadPricing roadPricing) {
-		this.isUsingRoadpricing = isUsingRoadPricing ;
-		if ( isUsingRoadPricing ) {
-			this.scheme = roadPricing.getRoadPricingScheme() ;
-		} else {
-			this.scheme = null ;
-		}
+	public GautengTravelDisutilityInclTollFactory( RoadPricingSchemeI scheme ) {
+		this.scheme = scheme ;
 	}
-	
+
 	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		final PersonalizableTravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
+		final RoadPricingSchemeI localScheme = this.scheme ;
 
-		if ( !isUsingRoadpricing ) {
-			
-			return delegate ;
-			
-		} else {
-			final GautengLinkTollCalculator tollCostCalculator = new GautengLinkTollCalculator(scheme);
-
-			return new PersonalizableTravelDisutility() {
-				@Override
-				public void setPerson(Person person) {
-					delegate.setPerson(person);
-					tollCostCalculator.setPerson(person);
+		return new PersonalizableTravelDisutility() {
+			private Person person = null ;
+			@Override
+			public void setPerson(Person person) {
+				this.person = person ;
+				delegate.setPerson(person);
+			}
+			@Override
+			public double getLinkTravelDisutility(Link link, double time) {
+				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time);
+				
+				if ( !localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
+					throw new RuntimeException("not set up for anything but distance toll. aborting ...") ;
 				}
-				@Override
-				public double getLinkTravelDisutility(Link link, double time) {
-					double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time);
-					double utilityOfMoney = 1. ;
-					linkTravelDisutility += utilityOfMoney * tollCostCalculator.getLinkTollForCars(link, time);
-					return linkTravelDisutility ;
-				}
-			};
+				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, this.person) ;
+				double toll = link.getLength() * cost.amount ;
 
-		}
+				double utilityOfMoney = 1. ;
+
+				linkTravelDisutility += - utilityOfMoney * toll ;
+
+				return linkTravelDisutility ;
+			}
+		};
+
 	}
 
 }

@@ -1,20 +1,26 @@
 package playground.kai.gauteng;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.roadpricing.CalcPaidToll;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeI;
 
-import playground.kai.gauteng.routing.GautengTollTravelCostCalculatorFactory;
+import playground.kai.gauteng.roadpricingscheme.GautengRoadPricingScheme;
+import playground.kai.gauteng.routing.GautengTravelDisutilityInclTollFactory;
 import playground.kai.gauteng.scoring.GautengScoringFunctionFactory;
 
-class MyControlerListener implements StartupListener, AfterMobsimListener {
+class MyAnalysisControlerListener implements StartupListener, AfterMobsimListener {
 	
 	playground.kai.analysis.MyCalcLegTimes calcLegTimes = null ;
 	
@@ -46,52 +52,96 @@ class MyControlerListener implements StartupListener, AfterMobsimListener {
 }
 
 class GautengControler {
+	static Logger log = Logger.getLogger(GautengControler.class) ;
 	
 	public static void main ( String[] args ) {
 
-		Controler controler = new Controler( args ) ;
+		final Controler controler = new Controler( args ) ;
 
 		controler.setOverwriteFiles(true) ;
 		
-		installScoringFunctionFactory(controler) ;
-		installTravelCostCalculatorFactory(controler) ;
+		if (controler.getConfig().scenario().isUseRoadpricing()) {
+			throw new RuntimeException("roadpricing must not be enabled in config.scenario in order to use special " +
+					"road pricing features.  aborting ...");
+		}
+
+		Scenario sc = controler.getScenario();
+
+		// CONSTRUCT ROAD PRICING SCHEME:
+		RoadPricingSchemeI vehDepScheme = constructRoadPricingScheme(controler);		
+
+		// INSERT INTO SCORING:
+		insertRoadPricingIntoScoring(controler, vehDepScheme);
+
+		// INSERT INTO ROUTING:
+		controler.setTravelDisutilityFactory( new GautengTravelDisutilityInclTollFactory( vehDepScheme ) );
 		
-		ControlerListener myControlerListener = new MyControlerListener() ;
-		controler.addControlerListener(myControlerListener) ;
+		// ADDITIONAL ANALYSIS:
+		controler.addControlerListener(new MyAnalysisControlerListener()) ;
 		
+		// RUN:
 		controler.run();
 	
 	}
-	
-	private static void installScoringFunctionFactory(Controler controler) {
-		Scenario sc = controler.getScenario();
-		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory(sc.getConfig(), sc.getNetwork()));
-	}
-	
-	/**
-	 * Explanation:<ul>
-	 * <li> This factory is installed very early in the initialization sequence.
-	 * <li> controler.run() then calls init() which calls loadCoreListeners() which calls
-	 * <pre> new RoadPricing() </pre>
-	 * and add this as a CoreListener.
-	 * <li> The RoadPricing object, when called by notifyStartup(event), pulls the initialization
-	 * information from the event and instantiates itself.  While doing that, it constructs an object
-	 * <pre> new CalcPaidToll( network, tollingScheme ) </pre>
-	 * which is added as an events handler.  
-	 * <li> CalcPaidToll will then collect events for every agent and accumulate the resulting toll.
-	 * <li> Just after this, controler.setTravelCostCalculatorFactory(...) is set with a factory that
-	 * adds the toll to the already existing travel cost object. <i> Which implies to me that in the situation here
-	 * the toll is added twice for routing. yyyyyy </i>
-	 * <li> A notifyAfterMobsim(...) makes the CalcPaidToll object send the accumulated toll to the agents.
-	 * </ul>
-	 */
-	private static void installTravelCostCalculatorFactory(Controler controler) {
-		
-		final boolean isUsingRoadpricing = controler.getConfig().scenario().isUseRoadpricing();
-		controler.setTravelDisutilityFactory(
-				new GautengTollTravelCostCalculatorFactory(isUsingRoadpricing, controler.getRoadPricing())
-				);
 
+	private static void insertRoadPricingIntoScoring(final Controler controler, RoadPricingSchemeI vehDepScheme) {
+		final CalcPaidToll calcPaidToll = new CalcPaidToll(controler.getNetwork(), vehDepScheme, controler.getPopulation() ) ;
+		final CalcAverageTolledTripLength cattl = new CalcAverageTolledTripLength(controler.getNetwork(), vehDepScheme );
+
+		// accumulate toll for agent:
+		controler.addControlerListener( new StartupListener() {
+			@Override
+			public void notifyStartup(final StartupEvent event) {
+				Controler localControler = event.getControler() ;
+
+				// add the events handler to calculate the tolls paid by agents
+				localControler.getEvents().addHandler(calcPaidToll);
+				// analysis:
+				localControler.getEvents().addHandler(cattl);
+
+			}
+		} ) ;
+		// send money event at end of iteration:
+		controler.addControlerListener( new AfterMobsimListener() {
+			@Override
+			public void notifyAfterMobsim(final AfterMobsimEvent event) {
+				// evaluate the final tolls paid by the agents and add them to their scores
+				calcPaidToll.sendUtilityEvents(Time.MIDNIGHT, event.getControler().getEvents());
+				// yyyyyy I would, in fact, prefer if agents did this at their arrival!!!!
+			}
+		} ) ;
+		// print some statistics (why not right after the mobsim?):
+		controler.addControlerListener( new IterationEndsListener() {
+			@Override
+			public void notifyIterationEnds(final IterationEndsEvent event) {
+				log.info("The sum of all paid tolls : " + calcPaidToll.getAllAgentsToll() + " Euro.");
+				log.info("The number of people, who paid toll : " + calcPaidToll.getDraweesNr());
+				log.info("The average paid trip length : " + cattl.getAverageTripLength() + " m.");
+			}
+		} ) ;
+		
+		// catch money event with special scoring function:
+		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory(controler.getConfig(), controler.getNetwork()));
+	}
+
+	private static RoadPricingSchemeI constructRoadPricingScheme(final Controler controler) {
+		RoadPricingSchemeI vehDepScheme = null ;
+		{
+			// read the road pricing scheme from file
+			RoadPricingScheme scheme = new RoadPricingScheme();
+			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
+			try {
+				rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			if ( !scheme.getType().equals( RoadPricingScheme.TOLL_TYPE_DISTANCE ) ) {
+				throw new RuntimeException("this will not work for anything but distance toll.  aborting ...") ;
+			}
+			// wrapper that computes time dependent scheme:
+			vehDepScheme = new GautengRoadPricingScheme( scheme, controler.getScenario().getNetwork() ) ;
+		}
+		return vehDepScheme;
 	}
 
 
