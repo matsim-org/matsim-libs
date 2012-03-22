@@ -46,6 +46,7 @@ import org.matsim.counts.MatsimCountsReader;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.DestinationTripUtilOffsetDistributionWithoutGrids;
+import utilities.math.BasicStatistics;
 import utilities.misc.DynamicData;
 
 /**
@@ -107,6 +108,7 @@ public class HomelocUtilOffsetDistribution implements ActivityEndEventHandler,
 	private final Map<Id/* personId */, Double/* dayUtilOffset */> dayUtilOffsets;
 	private final DynamicData<Link> linkUOs;
 	private static int timeBinSize = 3600;
+	private final Map<Coord/* home location */, BasicStatistics> homeStats;
 
 	public HomelocUtilOffsetDistribution(Network net, Counts counts,
 			DynamicData<Link> linkUtilOffsets, int arStartTime, int arEndTime) {
@@ -114,6 +116,7 @@ public class HomelocUtilOffsetDistribution implements ActivityEndEventHandler,
 		this.net = net;
 		dayUtilOffsets = new HashMap<Id, Double>();
 		linkUOs = linkUtilOffsets;
+		homeStats = new HashMap<Coord, BasicStatistics>();
 	}
 
 	/**
@@ -121,8 +124,12 @@ public class HomelocUtilOffsetDistribution implements ActivityEndEventHandler,
 	 * 
 	 */
 	private void calcDayUtilOffsetDistributionOfHome() {
-		// TODO Auto-generated method stub
-
+		for (Id personId : dayUtilOffsets.keySet()) {
+			Double duo = dayUtilOffsets.get(personId);
+			if (duo != 0d) {
+				// TODO
+			}
+		}
 	}
 
 	private double getLinkUtilOffset(Id linkId, int timeStep) {
