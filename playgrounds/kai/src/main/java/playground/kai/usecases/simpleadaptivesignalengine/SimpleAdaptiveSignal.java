@@ -34,6 +34,8 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
@@ -45,9 +47,8 @@ import org.matsim.signalsystems.model.SignalGroupState;
  * @author nagel
  *
  */
-class SimpleAdaptiveSignalEngine implements MobsimEngine, LinkEnterEventHandler, LinkLeaveEventHandler {
+class SimpleAdaptiveSignal implements SimulationBeforeSimStepListener, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	private InternalInterface internalInterface;
 	private Queue<Double> vehicleExitTimesOnLink5 = new LinkedList<Double>() ;
 	private long cnt4 = 0 ;
 	private long cnt5 = 0 ;
@@ -62,38 +63,19 @@ class SimpleAdaptiveSignalEngine implements MobsimEngine, LinkEnterEventHandler,
 	
 	private List<Result> results = new ArrayList<Result>() ;
 	
-	public SimpleAdaptiveSignalEngine(Controler controler) {
+	public SimpleAdaptiveSignal(Controler controler) {
 		this.controler = controler ;
 	}
 
 	@Override
-	public void afterSim() {
-	}
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		Netsim mobsim = (Netsim) e.getQueueSimulation() ;
+		double now = mobsim.getSimTimer().getTimeOfDay() ;
 
-	@Override
-	public Netsim getMobsim() {
-		return internalInterface.getMobsim() ;
-	}
-
-	@Override
-	public void onPrepareSim() {
-//		SignalizeableItem link4 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("4")) ;
-//		link4.setSignalized(true) ;
-//		SignalizeableItem link5 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("5")) ;
-//		link5.setSignalized(true) ;
-	}
-
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface ;
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		SignalizeableItem link4 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("4")) ;
-		SignalizeableItem link5 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("5")) ;
+		SignalizeableItem link4 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(new IdImpl("4")) ;
+		SignalizeableItem link5 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(new IdImpl("5")) ;
 		final Double dpTime = this.vehicleExitTimesOnLink5.peek();
-		if ( dpTime !=null && dpTime < time && (long)time%4 < 4  ) {
+		if ( dpTime !=null && dpTime < now && (long)now%4 < 4  ) {
 			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
 			link5.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
 		} else {

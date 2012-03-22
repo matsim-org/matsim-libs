@@ -38,13 +38,13 @@ public class Main {
 		
 		Controler controler = new Controler( "examples/config/daganzo-config.xml" ) ;
 
-		final SimpleAdaptiveSignalEngine simpleAdaptiveSignalEngine = new SimpleAdaptiveSignalEngine(controler) ;
+		final SimpleAdaptiveSignal simpleAdaptiveSignalEngine = new SimpleAdaptiveSignal(controler) ;
 
 		final MobsimFactory mobsimFactory = new MobsimFactory() {
 			@Override
 			public Simulation createMobsim(Scenario sc, EventsManager events) {
 				QSim qsim = QSim.createQSimAndAddAgentSource(sc, events ) ;
-				qsim.addMobsimEngine(simpleAdaptiveSignalEngine) ;
+				qsim.addQueueSimulationListeners(simpleAdaptiveSignalEngine) ;
 				events.addHandler(simpleAdaptiveSignalEngine) ;
 				if ( useOTFVis ) {
 					OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, qsim);
