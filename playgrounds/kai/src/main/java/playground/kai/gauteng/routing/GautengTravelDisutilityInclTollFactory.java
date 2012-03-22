@@ -30,6 +30,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeI;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
+import playground.kai.gauteng.roadpricingscheme.SanralTollFactor;
+
 /**
  * @author kn after bkick after dgrether
  *
@@ -45,7 +47,8 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		final PersonalizableTravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
 		final RoadPricingSchemeI localScheme = this.scheme ;
-
+		final PlanCalcScoreConfigGroup localCnScoringGroup = cnScoringGroup ;
+		
 		return new PersonalizableTravelDisutility() {
 			private Person person = null ;
 			@Override
@@ -56,17 +59,19 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 			@Override
 			public double getLinkTravelDisutility(Link link, double time) {
 				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time);
-				
-				if ( !localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
-					throw new RuntimeException("not set up for anything but distance toll. aborting ...") ;
-				}
+				double toll = 0. ;
 				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, this.person) ;
-				double toll = link.getLength() * cost.amount ;
+				if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
+					toll = link.getLength() * cost.amount ;
+				} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_CORDON ) ) {
+						toll = cost.amount ;
+				} else {
+					throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
+				}
 
-				double utilityOfMoney = 1. ;
-
+				double utilityOfMoney = SanralTollFactor.getUtilityOfMoney(this.person.getId(),localCnScoringGroup) ; 
+				
 				linkTravelDisutility += - utilityOfMoney * toll ;
-
 				return linkTravelDisutility ;
 			}
 		};

@@ -20,6 +20,7 @@
 package playground.kai.gauteng.roadpricingscheme;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
 public abstract class SanralTollFactor {
 	private final static int carStartId = 0;
@@ -33,60 +34,153 @@ public abstract class SanralTollFactor {
 	private final static int extStartId = 4000000;
 	private final static int extEndId = 4020181;
 	
+	enum Type { carWithTag, carWithoutTag, commercialClassCWithTag, commercialClassBWithTag, commercialClassCWithoutTag, 
+		commercialClassBWithoutTag, busWithTag, busWithoutTag, taxiWithTag, taxiWithoutTag, extWithTag, extWithoutTag } ;
+	public static Type typeOf ( Id idObj ) {
+		long id = Long.parseLong(idObj.toString());
+
+		if (id < carStartId + (carEndId - carStartId)*TagPenetration.CAR) { 
+			/* It is a private vehicle with a tag. */
+			return Type.carWithTag ;
+		} else if (id <= carEndId) {
+			/* It is a private car without a tag. */
+			return Type.carWithoutTag ;
+		} else if (id < comStartId + fractionClassB*((comEndId - comStartId)*TagPenetration.COMMERCIAL)){
+			/* It is a Class B commercial vehicle with a tag. */
+			return Type.commercialClassBWithTag ;
+		} else if (id < comStartId + (comEndId - comStartId)*TagPenetration.COMMERCIAL){
+			/* It is a Class C commercial vehicle with a tag. */
+			return Type.commercialClassCWithTag ;
+		} else if (id < comEndId - (comEndId - comStartId)*(1-TagPenetration.COMMERCIAL)*fractionClassB){
+			/* It is a Class B commercial vehicle without a tag. */
+			return Type.commercialClassBWithoutTag ;
+		} else if (id <= comEndId){
+			/* It is a Class C commercial vehicle without a tag. */
+			return Type.commercialClassCWithoutTag ;
+		} else if (id < busStartId + (busEndId - busStartId)*TagPenetration.BUS) {
+			/* It is a bus with a tag. */
+			return Type.busWithTag ;
+		} else if (id <= busEndId){
+			/* It is a bus without a tag. */
+			return Type.busWithoutTag ;
+		} else if (id < taxiStartId + (taxiEndId - taxiStartId)*TagPenetration.TAXI){
+			/* It is a minibus taxi with a tag. */
+			return Type.taxiWithTag ;
+		} else if (id <= taxiEndId) {
+			/* It is a minibus taxi without a tag. */
+			return Type.taxiWithoutTag ;
+		} else if (id < extStartId + (extEndId - extStartId)*TagPenetration.EXTERNAL){
+			/* It is an external (light) vehicle with a tag. */
+			return Type.extWithTag ;
+		} else {
+			/* It is an external (light) vehicle without a tag.*/
+			return Type.extWithoutTag ;
+		}
+
+	}
+	
 	/* From the counting station data I've inferred that the split between 
 	 * Class B and C is about 50:50, assuming that `Short' represents Class B, 
 	 * and `Medium' and `Long' combined represent Class C vehicles. */
 	private final static double fractionClassB = 0.50;
+	
+	public static double getUtilityOfMoney(final Id vehicleId, final PlanCalcScoreConfigGroup cnScoringGroup) {
+		double valueOfTime_hr = 100 ;
+		switch( typeOf(vehicleId) ) {
+		case carWithTag:
+			break ;
+		case carWithoutTag:
+			break ;
+		case commercialClassBWithTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case commercialClassCWithTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case commercialClassBWithoutTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case commercialClassCWithoutTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case busWithTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case busWithoutTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case taxiWithTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case taxiWithoutTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case extWithTag:
+			valueOfTime_hr = 200.;
+			break ;
+		case extWithoutTag:
+			valueOfTime_hr = 200.;
+			break ;
+		}
+		final double utilityOfTime_hr = - cnScoringGroup.getPerforming_utils_hr() + cnScoringGroup.getTraveling_utils_hr() ;
+		// "performing" is normally positive, but needs to be counted negative
+		// "traveling" is normally negative, and needs to be counted negative
+
+		double utilityOfMoney = utilityOfTime_hr / valueOfTime_hr ;
+		
+		return utilityOfMoney ;
+	}
 
 	public static double getTollFactor(final Id vehicleId, final Id linkId, final double time) {
-		long id = Long.parseLong(vehicleId.toString());
 		double timeDiscount = getTimeDiscount(time);
 		double tagDiscount = 0.00;
 		double ptDiscount = 0.00;
 		double sizeFactor = 1.00;
-				
-		if (id < carStartId + (carEndId - carStartId)*TagPenetration.CAR) { 
-			/* It is a private vehicle with a tag. */
-			tagDiscount = 0.25;
-		} else if (id <= carEndId) {
-			/* It is a private car without a tag. */
-		} else if (id < comStartId + fractionClassB*((comEndId - comStartId)*TagPenetration.COMMERCIAL)){
-			/* It is a Class B commercial vehicle with a tag. */
-			sizeFactor = 3;
-			tagDiscount = 0.25;
-		} else if (id < comStartId + (comEndId - comStartId)*TagPenetration.COMMERCIAL){
-			/* It is a Class C commercial vehicle with a tag. */
-			sizeFactor = 6;
-			tagDiscount = 0.25;
-		} else if (id < comEndId - (comEndId - comStartId)*(1-TagPenetration.COMMERCIAL)*fractionClassB){
-			/* It is a Class B commercial vehicle without a tag. */
-			sizeFactor = 3;
-		} else if (id <= comEndId){
-			/* It is a Class C commercial vehicle without a tag. */
-			sizeFactor = 6;
-		} else if (id < busStartId + (busEndId - busStartId)*TagPenetration.BUS) {
-			/* It is a bus with a tag. */
-			sizeFactor = 3;
-			tagDiscount = 0.25;
-			ptDiscount = 0.55;
-		} else if (id <= busEndId){
-			/* It is a bus without a tag. */
-			sizeFactor = 3;
-			ptDiscount = 0.55;
-		} else if (id < taxiStartId + (taxiEndId - taxiStartId)*TagPenetration.TAXI){
-			/* It is a minibus taxi with a tag. */
-			tagDiscount = 0.25;
-			ptDiscount = 0.30;
-		} else if (id <= taxiEndId) {
-			/* It is a minibus taxi without a tag. */
-			ptDiscount = 0.30;
-		} else if (id < extStartId + (extEndId - extStartId)*TagPenetration.EXTERNAL){
-			/* It is an external (light) vehicle with a tag. */
-			tagDiscount = 0.25;
-		} else {
-			/* It is an external (light) vehicle without a tag.*/
-		}
 		
+		switch( typeOf( vehicleId) ) {
+		case carWithTag:
+			tagDiscount = 0.25;
+			break ;
+		case carWithoutTag:
+			// nothing
+			break ;
+		case commercialClassBWithTag:
+			sizeFactor = 3;
+			tagDiscount = 0.25;
+			break ;
+		case commercialClassCWithTag:
+			sizeFactor = 6;
+			tagDiscount = 0.25;
+			break ;
+		case commercialClassBWithoutTag:
+			sizeFactor = 3;
+			break ;
+		case commercialClassCWithoutTag:
+			sizeFactor = 6;
+			break ;
+		case busWithTag:
+			sizeFactor = 3;
+			tagDiscount = 0.25;
+			ptDiscount = 0.55;
+			break ;
+		case busWithoutTag:
+			sizeFactor = 3;
+			ptDiscount = 0.55;
+			break ;
+		case taxiWithTag:
+			tagDiscount = 0.25;
+			ptDiscount = 0.30;
+			break ;
+		case taxiWithoutTag:
+			ptDiscount = 0.30;
+			break ;
+		case extWithTag:
+			tagDiscount = 0.25;
+			break ;
+		case extWithoutTag:
+			// nothing
+			break ;
+		}
 		return getDiscountEligibility(linkId) ? sizeFactor*(1 - Math.min(1.0, timeDiscount + tagDiscount + ptDiscount)) : sizeFactor;
 	}
 	

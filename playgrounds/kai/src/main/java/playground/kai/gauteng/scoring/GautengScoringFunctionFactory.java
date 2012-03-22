@@ -20,6 +20,7 @@
 package playground.kai.gauteng.scoring;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -31,6 +32,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
+
+import playground.kai.gauteng.roadpricingscheme.SanralTollFactor;
 
 /**
  * @author nagel after
@@ -55,8 +58,6 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		// Design comment: This is the only place where the person is available (via plan.getPerson()).  Thus, all 
 		// person-specific scoring actions need to be injected from here. kai, mar'12
 
-		double householdIncomePerDay = -1. ;
-		
 		//summing up all relevant ulitlites
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
@@ -70,7 +71,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		// needs to be replaced.)  kai, mar'12
 
 		//utility spend for traveling (toll costs) if there is a toll
-		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll());
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll( plan.getPerson().getId(), this.configGroup ) ) ;
 		
 		//utility spend for being stuck
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(params));
@@ -82,9 +83,6 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 }
 
 /**
- * This is a re-implementation of the original CharyparNagel function, based on a
- * modular approach.
- * <br/>
  * Notes:<ul>
  * <li> This class is only supposed to work as expected if there are NO OTHER money events than those from road pricing!
  * [[I don't see why that should be so.  Only problem: The logging statement would be wrong. kai, mar'12]]
@@ -100,6 +98,13 @@ class ScoringFromToll implements MoneyScoring, BasicScoring {
 	final static private Logger log = Logger.getLogger(ScoringFromToll.class);
 
 	private double score = 0.0;
+	private Id vehicleId ;
+	private PlanCalcScoreConfigGroup cnScoringGroup ;
+	
+	ScoringFromToll( Id vehicleId, PlanCalcScoreConfigGroup cnScoringGroup ) {
+		this.vehicleId = vehicleId ;
+		this.cnScoringGroup = cnScoringGroup ;
+	}
 	
 	@Override
 	public void reset() {
@@ -109,7 +114,7 @@ class ScoringFromToll implements MoneyScoring, BasicScoring {
 	@Override
 	public void addMoney(final double amount) {
 		
-		this.score += -amount;
+		this.score += - SanralTollFactor.getUtilityOfMoney(vehicleId, cnScoringGroup) * amount;
 		log.info("toll paid: " + amount + "; resulting accumulated toll utility: " + this.score );
 		log.error("utility of money == one for everybody; needs to be fixed ...") ;
 

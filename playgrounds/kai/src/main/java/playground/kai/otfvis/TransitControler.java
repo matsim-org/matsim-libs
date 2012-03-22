@@ -68,7 +68,7 @@ public class TransitControler {
 	}
 
 	static class MyMobsimFactory implements MobsimFactory {
-		private boolean useOTFVis = false ;
+		private boolean useOTFVis = true ;
 
 		@Override
 		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {

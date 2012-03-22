@@ -19,37 +19,7 @@ import org.matsim.roadpricing.RoadPricingSchemeI;
 import playground.kai.gauteng.roadpricingscheme.GautengRoadPricingScheme;
 import playground.kai.gauteng.routing.GautengTravelDisutilityInclTollFactory;
 import playground.kai.gauteng.scoring.GautengScoringFunctionFactory;
-
-class MyAnalysisControlerListener implements StartupListener, AfterMobsimListener {
-	
-	playground.kai.analysis.MyCalcLegTimes calcLegTimes = null ;
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		
-		this.calcLegTimes = new playground.kai.analysis.MyCalcLegTimes( event.getControler().getScenario() ) ;
-		event.getControler().getEvents().addHandler( this.calcLegTimes ) ;
-
-	}
-
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-
-		int iteration = event.getIteration() ;
-
-		this.calcLegTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "mytripdurations.txt"));
-
-		Logger.getLogger(this.getClass()).info("[" + iteration + "] average trip (probably: leg) duration is: " 
-				+ (int) this.calcLegTimes.getAverageTripDuration()
-				+ " seconds = " + Time.writeTime(this.calcLegTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
-
-		// trips are from "true" activity to "true" activity.  legs may also go
-		// from/to ptInteraction activity.  Thus, in my opinion "legs" is the correct (matsim) term
-		// kai, jul'11
-
-	}
-
-}
+import playground.kai.run.KaiAnalysisListener;
 
 class GautengControler {
 	static Logger log = Logger.getLogger(GautengControler.class) ;
@@ -61,7 +31,7 @@ class GautengControler {
 		controler.setOverwriteFiles(true) ;
 		
 		if (controler.getConfig().scenario().isUseRoadpricing()) {
-			throw new RuntimeException("roadpricing must not be enabled in config.scenario in order to use special " +
+			throw new RuntimeException("roadpricing must NOT be enabled in config.scenario in order to use special " +
 					"road pricing features.  aborting ...");
 		}
 
@@ -77,7 +47,7 @@ class GautengControler {
 		controler.setTravelDisutilityFactory( new GautengTravelDisutilityInclTollFactory( vehDepScheme ) );
 		
 		// ADDITIONAL ANALYSIS:
-		controler.addControlerListener(new MyAnalysisControlerListener()) ;
+		controler.addControlerListener(new KaiAnalysisListener()) ;
 		
 		// RUN:
 		controler.run();
@@ -125,22 +95,19 @@ class GautengControler {
 	}
 
 	private static RoadPricingSchemeI constructRoadPricingScheme(final Controler controler) {
-		RoadPricingSchemeI vehDepScheme = null ;
-		{
-			// read the road pricing scheme from file
-			RoadPricingScheme scheme = new RoadPricingScheme();
-			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
-			try {
-				rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			if ( !scheme.getType().equals( RoadPricingScheme.TOLL_TYPE_DISTANCE ) ) {
-				throw new RuntimeException("this will not work for anything but distance toll.  aborting ...") ;
-			}
-			// wrapper that computes time dependent scheme:
-			vehDepScheme = new GautengRoadPricingScheme( scheme, controler.getScenario().getNetwork() ) ;
+
+		// read the road pricing scheme from file
+		RoadPricingScheme scheme = new RoadPricingScheme();
+		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
+		try {
+			rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
+
+		// wrapper that provides vehicle dependent scheme:
+		RoadPricingSchemeI vehDepScheme = new GautengRoadPricingScheme( scheme, controler.getScenario().getNetwork() );
+
 		return vehDepScheme;
 	}
 
