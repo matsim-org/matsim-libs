@@ -54,11 +54,11 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	protected final HouseholdsTracker householdsTracker;
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
 	
-	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario, HouseholdsTracker householdsTracker, 
-			ModeAvailabilityChecker modeAvailabilityChecker) {
+	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
+			HouseholdsTracker householdsTracker, ModeAvailabilityChecker modeAvailabilityChecker) {
 		super(id, scenario);
 		this.householdsTracker = householdsTracker;
-		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.modeAvailabilityChecker = modeAvailabilityChecker;		
 	}
 	
 	@Override

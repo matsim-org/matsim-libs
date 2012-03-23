@@ -46,7 +46,7 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario, 
-				householdsTracker, modeAvailabilityChecker);
+				householdsTracker, modeAvailabilityChecker.createInstance());
 		super.initNewInstance(replanner);
 		return replanner;
 	}

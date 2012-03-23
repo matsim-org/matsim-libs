@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.Facility;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -37,6 +38,7 @@ public class CoordAnalyzer {
 
 	private final Geometry affectedArea;
 	private final GeometryFactory factory;
+	private final Map<Id, Boolean> nodeCache;
 	private final Map<Id, Boolean> linkCache;
 	private final Map<Id, Boolean> facilityCache;
 	
@@ -44,13 +46,15 @@ public class CoordAnalyzer {
 		this.affectedArea = affectedArea;
 		
 		this.factory = new GeometryFactory();
+		this.nodeCache = new ConcurrentHashMap<Id, Boolean>();
 		this.linkCache = new ConcurrentHashMap<Id, Boolean>();
 		this.facilityCache = new ConcurrentHashMap<Id, Boolean>();
 	}
 	
-	private CoordAnalyzer(Geometry affectedArea, Map<Id, Boolean> linkCache, Map<Id, Boolean> facilityCache) {
+	private CoordAnalyzer(Geometry affectedArea, Map<Id, Boolean> nodeCache, Map<Id, Boolean> linkCache, Map<Id, Boolean> facilityCache) {
 		this.affectedArea = affectedArea;
 		this.factory = new GeometryFactory();
+		this.nodeCache = nodeCache;
 		this.linkCache = linkCache;
 		this.facilityCache = facilityCache;
 	}
@@ -60,19 +64,20 @@ public class CoordAnalyzer {
 	 * ConcurrentHashMaps and therefore thread-safe.
 	 */
 	public CoordAnalyzer createInstance() {
-		return new CoordAnalyzer((Geometry) this.affectedArea.clone(), this.linkCache, this.facilityCache);
+		return new CoordAnalyzer((Geometry) this.affectedArea.clone(), this.nodeCache, this.linkCache, this.facilityCache);
 	}
 	
 	public void clearCache() {
+		nodeCache.clear();
 		linkCache.clear();
 		facilityCache.clear();
 	}
-	
-	public boolean isFacilityAffected(Facility facility) {
-		Boolean isAffected = facilityCache.get(facility.getId());
+
+	public boolean isNodeAffected(Node node) {
+		Boolean isAffected = nodeCache.get(node.getId());
 		if (isAffected == null) {
-			isAffected = isCoordAffected(facility.getCoord());
-			facilityCache.put(facility.getId(), isAffected);
+			isAffected = isCoordAffected(node.getCoord());
+			nodeCache.put(node.getId(), isAffected);
 			return isAffected;
 		} else return isAffected;
 	}
@@ -82,6 +87,15 @@ public class CoordAnalyzer {
 		if (isAffected == null) {
 			isAffected = isCoordAffected(link.getCoord());
 			linkCache.put(link.getId(), isAffected);
+			return isAffected;
+		} else return isAffected;
+	}
+	
+	public boolean isFacilityAffected(Facility facility) {
+		Boolean isAffected = facilityCache.get(facility.getId());
+		if (isAffected == null) {
+			isAffected = isCoordAffected(facility.getCoord());
+			facilityCache.put(facility.getId(), isAffected);
 			return isAffected;
 		} else return isAffected;
 	}

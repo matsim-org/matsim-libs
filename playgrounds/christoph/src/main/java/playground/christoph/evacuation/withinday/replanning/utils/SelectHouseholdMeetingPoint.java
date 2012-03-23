@@ -20,15 +20,37 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -36,6 +58,7 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 
 /**
  * Decides where a household will meet after the evacuation order has been given.
@@ -53,25 +76,139 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPoint.class);
 	
 	private final Scenario scenario;
-	private final ReplanningModule replanningModule;
+	private final MultiModalTravelTimeFactory timeFactory;
 	private final HouseholdsTracker householdsTracker;
 	private final VehiclesTracker vehiclesTracker;
 	private final CoordAnalyzer coordAnalyzer;
-
+	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final int numOfThreads;
+
+	private ReplanningModule toHomeFacilityRouter;
+	private ReplanningModule fromHomeFacilityRouter;
 	
 	private Thread[] threads;
 	private Runnable[] runnables;
 	
-	public SelectHouseholdMeetingPoint(Scenario scenario, ReplanningModule replanningModule,
-			HouseholdsTracker householdsTracker, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer) {
+	public SelectHouseholdMeetingPoint(Scenario scenario, MultiModalTravelTimeFactory timeFactory,
+			HouseholdsTracker householdsTracker, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer,
+			ModeAvailabilityChecker modeAvailabilityChecker) {
 		this.scenario = scenario;
-		this.replanningModule = replanningModule;
+		this.timeFactory = timeFactory;
 		this.householdsTracker = householdsTracker;
 		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
+		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
+		
+		init();
+	}
+	
+	private void init() {
+		
+		Config config = scenario.getConfig();
+		
+		// get route factory
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory();
+		
+		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		
+		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+		this.toHomeFacilityRouter = new ReplanningModule(config, scenario.getNetwork(), costFactory, timeFactory, factory, routeFactory);
+
+		/*
+		 * Create a subnetwork that only contains the Evacuation area plus some exit nodes.
+		 * This network is used to calculate estimated evacuation times starting from the 
+		 * home locations which are located inside the evacuation zone.
+		 */
+		Scenario subScenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(subScenario).readFile(config.network().getInputFile());
+		Network subNetwork = subScenario.getNetwork();
+		
+		/*
+		 * Adding z-coordinates to the network
+		 */
+		AddZCoordinatesToNetwork zCoordinateAdder = new AddZCoordinatesToNetwork(subScenario, EvacuationConfig.dhm25File, EvacuationConfig.srtmFile);
+		zCoordinateAdder.addZCoordinatesToNetwork();
+		
+		/*
+		 * Identify affected nodes.
+		 */
+		Set<Id> affectedNodes = new HashSet<Id>();
+		for (Node node : subNetwork.getNodes().values()) {
+			if (this.coordAnalyzer.isNodeAffected(node)) affectedNodes.add(node.getId());
+		}
+		log.info("Found " + affectedNodes.size() + " nodes inside affected area.");
+		
+		/*
+		 * Identify link that cross the evacuation line and their start and
+		 * end nodes which are located right after the evacuation line.
+		 */
+		Set<Id> crossEvacuationLineNodes = new HashSet<Id>();
+		Set<Id> crossEvacuationLineLinks = new HashSet<Id>();
+		for (Link link : subNetwork.getLinks().values()) {
+			boolean fromNodeInside = affectedNodes.contains(link.getFromNode().getId());
+			boolean toNodeInside = affectedNodes.contains(link.getToNode().getId());
+			
+			if (fromNodeInside && !toNodeInside) {
+				crossEvacuationLineLinks.add(link.getId());
+				crossEvacuationLineNodes.add(link.getToNode().getId());
+			} else if (!fromNodeInside && toNodeInside) {
+				crossEvacuationLineLinks.add(link.getId());
+				crossEvacuationLineNodes.add(link.getFromNode().getId());
+			}
+		}
+		log.info("Found " + crossEvacuationLineLinks.size() + " links crossing the evacuation boarder.");
+		log.info("Found " + crossEvacuationLineNodes.size() + " nodes outside the evacuation boarder.");
+		
+		/*
+		 * Remove links and nodes.
+		 */
+		Set<Id> nodesToRemove = new HashSet<Id>();
+		for (Node node : subNetwork.getNodes().values()) {
+			if (!crossEvacuationLineNodes.contains(node.getId()) && !affectedNodes.contains(node.getId())) {
+				nodesToRemove.add(node.getId());
+			}
+		}
+		for (Id id : nodesToRemove) subNetwork.removeNode(id);
+		
+		log.info("Remaining nodes " + subNetwork.getNodes().size());
+		log.info("Remaining links " + subNetwork.getLinks().size());
+		
+		Set<String> transportModes = new HashSet<String>();
+		transportModes.add(TransportMode.bike);
+		transportModes.add(TransportMode.car);
+		transportModes.add(TransportMode.pt);
+		transportModes.add(TransportMode.walk);
+		
+		NetworkFactory networkFactory = subNetwork.getFactory();
+		Coord exitNode1Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0); 
+		Coord exitNode2Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
+		Node exitNode1 = networkFactory.createNode(subScenario.createId("exitNode1"), exitNode1Coord);
+		Node exitNode2 = networkFactory.createNode(subScenario.createId("exitNode2"), exitNode2Coord);
+		Link exitLink = networkFactory.createLink(subScenario.createId("exitLink"), exitNode1, exitNode2);
+		exitLink.setAllowedModes(transportModes);
+		exitLink.setLength(1.0);
+		subNetwork.addNode(exitNode1);
+		subNetwork.addNode(exitNode2);
+		subNetwork.addLink(exitLink);
+		
+		int i = 0;
+		for (Id id : crossEvacuationLineNodes) {
+			Node node = subNetwork.getNodes().get(id);
+			Link link = networkFactory.createLink(subScenario.createId("exitLink" + i), node, exitNode1);
+			link.setAllowedModes(transportModes);
+			link.setLength(1.0);
+			subNetwork.addLink(link);
+			i++;
+		}
+		
+		/*
+		 * Use a Wrapper that returns travel times for exit links because
+		 * the travel time collector does not know them. 
+		 */
+		TravelTimeWrapperFactory wrapperTimeFactory = new TravelTimeWrapperFactory(timeFactory);
+		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, wrapperTimeFactory, factory, routeFactory);
 	}
 	
 	/*
@@ -110,8 +247,8 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 		
 		for (int i = 0; i < this.numOfThreads; i++) {
 			
-			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, 
-					replanningModule, householdsTracker, vehiclesTracker, coordAnalyzer.createInstance());
+			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, toHomeFacilityRouter, 
+					fromHomeFacilityRouter, householdsTracker, vehiclesTracker, coordAnalyzer.createInstance(), modeAvailabilityChecker.createInstance());
 			runner.setTime(time);
 			runnables[i] = runner; 
 					
@@ -169,5 +306,50 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 		log.info("Households meet at rescue facility: " + meetAtRescue);
 		log.info("Households meet at secure place:   " + meetSecure);
 		log.info("Households meet at insecure place: " + meetInsecure);
+	}
+	
+	private static class TravelTimeWrapperFactory implements MultiModalTravelTimeFactory {
+
+		private final MultiModalTravelTimeFactory factory;
+		
+		public TravelTimeWrapperFactory(MultiModalTravelTimeFactory factory) {
+			this.factory = factory;
+		}
+		
+		@Override
+		public MultiModalTravelTime createTravelTime() {
+			return new TravelTimeWrapper(factory.createTravelTime());
+		}
+	}
+	
+	private static class TravelTimeWrapper implements MultiModalTravelTime {
+
+		private final MultiModalTravelTime travelTime;
+		
+		public TravelTimeWrapper(MultiModalTravelTime travelTime) {
+			this.travelTime = travelTime;
+		}
+		
+		@Override
+		public void setPerson(Person person) {
+			travelTime.setPerson(person);
+		}
+
+		@Override
+		public double getLinkTravelTime(Link link, double time) {
+			if (link.getId().toString().contains("exit")) return 1.0;
+			else return travelTime.getLinkTravelTime(link, time);
+		}
+
+		@Override
+		public double getModalLinkTravelTime(Link link, double time, String transportMode) {
+			if (link.getId().toString().contains("exit")) return 1.0;
+			else return travelTime.getModalLinkTravelTime(link, time, transportMode);
+		}
+
+		@Override
+		public void setTransportMode(String transportMode) {
+			travelTime.setTransportMode(transportMode);
+		}	
 	}
 }

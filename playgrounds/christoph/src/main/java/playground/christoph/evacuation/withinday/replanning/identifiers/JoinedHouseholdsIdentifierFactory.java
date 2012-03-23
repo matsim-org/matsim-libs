@@ -34,26 +34,26 @@ public class JoinedHouseholdsIdentifierFactory implements DuringActivityIdentifi
 
 	private final Scenario scenario;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
-	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
 	private final HouseholdsTracker householdsTracker;
+	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	
-	public JoinedHouseholdsIdentifierFactory(Scenario scenario,
-			SelectHouseholdMeetingPoint selectHouseholdMeetingPoint, ModeAvailabilityChecker modeAvailabilityChecker, 
-			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker) {
+	public JoinedHouseholdsIdentifierFactory(Scenario scenario,SelectHouseholdMeetingPoint selectHouseholdMeetingPoint, 
+			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
+			ModeAvailabilityChecker modeAvailabilityChecker) {
 		this.scenario = scenario;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
-		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.householdsTracker = householdsTracker;
+		this.modeAvailabilityChecker = modeAvailabilityChecker;
 	}
 	
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(scenario, selectHouseholdMeetingPoint, 
-				modeAvailabilityChecker, coordAnalyzer.createInstance(), vehiclesTracker, householdsTracker);
+				coordAnalyzer.createInstance(), vehiclesTracker, householdsTracker, modeAvailabilityChecker.createInstance());
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}

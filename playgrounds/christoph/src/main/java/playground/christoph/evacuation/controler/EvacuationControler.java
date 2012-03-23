@@ -293,11 +293,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
-		this.initHouseholdMeetingPointSelector();
-				
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
-		
-		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, vehiclesTracker);
 		
 		/*
 		 * Read household-vehicles-assignment files.
@@ -316,6 +312,18 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.config.scenario().setUseVehicles(true);
 		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.scenarioData, this.householdVehicleAssignmentReader.getAssignedVehicles());
 		createVehiclesForHouseholds.run();
+		
+		/*
+		 * ModeAvailabilityChecker to check which vehicles are available for
+		 * a household at a given facility.
+		 */
+		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, vehiclesTracker);
+		
+		/*
+		 * Select a households meeting point respecting its members positions
+		 * and their expected evacuation times.
+		 */
+		this.initHouseholdMeetingPointSelector();
 		
 		/*
 		 * Write vehicles to file.
@@ -388,9 +396,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	 * has started based on their experience from "normal" days.
 	 */
 	private void initHouseholdMeetingPointSelector() {
-		
-		// get route factory
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
 				
 		// create a copy of the MultiModalTravelTimeWrapperFactory...
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
@@ -399,13 +404,9 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		}
 		// ... and set the TravelTimeCollector for car mode
 		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.travelTimeCollectorWrapperFactory);
-
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		
-		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-		ReplanningModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
-
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, router, this.householdsTracker, this.vehiclesTracker, coordAnalyzer.createInstance());
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, timeFactory, 
+				this.householdsTracker, this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.modeAvailabilityChecker.createInstance());
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 	
@@ -471,7 +472,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.activityPerformingIdentifier = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap()).createIdentifier();
 		
 		this.joinedHouseholdsIdentifier = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
-				this.modeAvailabilityChecker, this.coordAnalyzer.createInstance(), this.vehiclesTracker, this.householdsTracker).createIdentifier();
+				this.coordAnalyzer.createInstance(), this.vehiclesTracker, this.householdsTracker, this.modeAvailabilityChecker.createInstance()).createIdentifier();
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		
 		/*
@@ -519,7 +520,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		/*
 		 * During Activity Replanners
 		 */
-		this.currentActivityToMeetingPointReplanner = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsTracker, modeAvailabilityChecker).createReplanner();
+		this.currentActivityToMeetingPointReplanner = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, this.householdsTracker, this.modeAvailabilityChecker).createReplanner();
 		this.currentActivityToMeetingPointReplanner.addAgentsToReplanIdentifier(this.activityPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplanner(this.currentActivityToMeetingPointReplanner, EvacuationConfig.evacuationTime, EvacuationConfig.evacuationTime + 1);
 		

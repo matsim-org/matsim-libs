@@ -20,16 +20,10 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,44 +31,28 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
-import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
+import playground.christoph.evacuation.withinday.replanning.utils.HouseholdModeAssignment;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
@@ -92,7 +70,6 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsIdentifier.class);
 	
-	private final Vehicles vehicles;
 	private final Households households;
 	private final ActivityFacilities facilities;
 	private final CoordAnalyzer coordAnalyzer;
@@ -113,32 +90,22 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final Map<Id, String> transportModeMapping;
 	private final Map<Id, Id> driverVehicleMapping;
 	
-	private final WalkSpeedComparator walkSpeedComparator;
-	
-	public JoinedHouseholdsIdentifier(Scenario scenario,
-			SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
-			ModeAvailabilityChecker modeAvailabilityChecker, CoordAnalyzer coordAnalyzer, 
-			VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker) {
-		this.vehicles = ((ScenarioImpl) scenario).getVehicles();
+	public JoinedHouseholdsIdentifier(Scenario scenario, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
+			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
+			ModeAvailabilityChecker modeAvailabilityChecker) {
 		this.households = ((ScenarioImpl) scenario).getHouseholds();
 		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
-		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.householdsTracker = householdsTracker;
+		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		
 		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.householdMeetingPointMapping = new ConcurrentHashMap<Id, Id>();
 		this.transportModeMapping = new ConcurrentHashMap<Id, String>();
 		this.driverVehicleMapping = new ConcurrentHashMap<Id, Id>();
 		this.householdDepartures = new HashMap<Id, HouseholdDeparture>();
-		
-		/*
-		 * Create WalkSpeedComparator and calculate travel times for each person.
-		 */
-		this.walkSpeedComparator = new WalkSpeedComparator();
-		this.walkSpeedComparator.calcTravelTimes(scenario.getPopulation());
 	}
 
 	@Override
@@ -165,66 +132,18 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				Id meetingPointId = selectHouseholdMeetingPoint.selectNextMeetingPoint(householdId);
 				householdMeetingPointMapping.put(householdId, meetingPointId);
 				Household household = households.getHouseholds().get(householdId);
-				
-				Queue<Vehicle> availableVehicles = getAvailableVehicles(household, facilityId);
-				Queue<Id> possibleDrivers = new PriorityQueue<Id>(4, walkSpeedComparator);
-				Queue<Id> possiblePassengers = new PriorityQueue<Id>(4, walkSpeedComparator);
-				
-				// identify potential drivers and passengers
-				for (Id personId : household.getMemberIds()) {
-					if (modeAvailabilityChecker.hasDrivingLicense(personId)) possibleDrivers.add(personId);
-					else possiblePassengers.add(personId);					
-				}
-				
-				/*
-				 * Fill people into vehicles. Start with largest cars.
-				 * Will end if all people are assigned to a vehicle
-				 * or no further vehicles or drivers a available.
-				 * Remaining agents will walk.
-				 */
-				while (availableVehicles.peek() != null) {
-					Vehicle vehicle = availableVehicles.poll();
-					int seats = vehicle.getType().getCapacity().getSeats();
-					
-					// if no more drivers are available
-					if (possibleDrivers.peek() == null) break;
-					
-					// set transport mode for driver
-					Id driverId = possibleDrivers.poll();
-					transportModeMapping.put(driverId, TransportMode.car);
-					driverVehicleMapping.put(driverId, vehicle.getId());
-					seats--;
-					
-					List<Id> passengers = new ArrayList<Id>();
-					while (seats > 0) {
-						Id passengerId = null;
-						if (possiblePassengers.peek() != null) {
-							passengerId = possiblePassengers.poll();
-						} else if (possibleDrivers.peek() != null) {
-							passengerId = possibleDrivers.poll();
-						} else {
-							break;
-						}
-						
-						passengers.add(passengerId);
-						transportModeMapping.put(passengerId, PassengerDepartureHandler.passengerTransportMode);
-						seats--;
-					}
-					
-					// register person as passenger in the vehicle
-					for (Id passengerId : passengers) {
-						vehiclesTracker.addPassengerToVehicle(passengerId, vehicle.getId());
-					}
-				}
-				
-				// if vehicle capacity is exceeded, remaining agents have to walk
-				while (possibleDrivers.peek() != null) {
-					transportModeMapping.put(possibleDrivers.poll(), TransportMode.walk);					
-				}
-				while (possiblePassengers.peek() != null) {
-					transportModeMapping.put(possiblePassengers.poll(), TransportMode.walk);					
-				}
 
+				/*
+				 * 
+				 */
+				HouseholdModeAssignment assignment = modeAvailabilityChecker.getHouseholdModeAssignment(household, facilityId);	
+				driverVehicleMapping.putAll(assignment.getDriverVehicleMap());
+				transportModeMapping.putAll(assignment.getTransportModeMap());
+				
+				for (Entry<Id, Id> e : assignment.getPassengerVehicleMap().entrySet()) {
+					vehiclesTracker.addPassengerToVehicle(e.getKey(), e.getValue());
+				}
+				
 				// finally add agents to replanning set
 				for (Id agentId : household.getMemberIds()) {
 					set.add(agentMapping.get(agentId));
@@ -254,23 +173,6 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	 */
 	public Map<Id, Id> getDriverVehicleMapping() {
 		return this.driverVehicleMapping;
-	}
-		
-	/*
-	 * Return a queue containing a households vehicles ordered by the number
-	 * of seats, starting with the car with the highest number.
-	 */
-	private Queue<Vehicle> getAvailableVehicles(Household household, Id facilityId) {
-		List<Id> availableVehicles = modeAvailabilityChecker.getAvailableCars(household, facilityId);
-		
-		Queue<Vehicle> queue = new PriorityQueue<Vehicle>(2, new VehicleSeatsComparator());
-		
-		for (Id id : availableVehicles) {
-			Vehicle vehicle = vehicles.getVehicles().get(id);
-			queue.add(vehicle);
-		}
-		
-		return queue;
 	}
 	
 	/*
@@ -496,68 +398,5 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		}
 	}
 	
-	/*
-	 * Compares walk speeds of people respecting their age, gender, etc.
-	 */
-	private static class WalkSpeedComparator implements Comparator<Id>, Serializable, MatsimComparator {
-
-		private static final long serialVersionUID = 1L;
-		
-		private final PersonalizableTravelTime travelTime;
-		private final Link link; 
-		private final Map<Id, Double> travelTimesMap;
-		
-		public WalkSpeedComparator() {
-			travelTime = new WalkTravelTimeFactory(new PlansCalcRouteConfigGroup()).createTravelTime();
-			
-			NetworkFactory factory = new NetworkFactoryImpl(NetworkImpl.createNetwork());
-			Node startNode = factory.createNode(new IdImpl("startNode"), new Coord3dImpl(0, 0, 0));
-			Node endNode = factory.createNode(new IdImpl("endNode"), new Coord3dImpl(1, 0, 0));
-			link = factory.createLink(new IdImpl("link"), startNode, endNode);
-			link.setLength(1.0);
-			
-			travelTimesMap = new HashMap<Id, Double>();
-		}
-		
-		public void calcTravelTimes(Population population) {
-			travelTimesMap.clear();
-			
-			for (Person person : population.getPersons().values()) {
-				travelTime.setPerson(person);
-				double tt = travelTime.getLinkTravelTime(link, 0.0);
-				travelTimesMap.put(person.getId(), tt);
-			}
-		}
-		
-		@Override
-		public int compare(Id id1, Id id2) {
-			double tt1 = travelTimesMap.get(id1);
-			double tt2 = travelTimesMap.get(id2);
-			
-			/*
-			 * Invert the return value since people with long travel times should be
-			 * at the front end of the queue.
-			 */
-			return -Double.compare(tt1, tt2);
-		}
-		
-	}
-	
-	private static class VehicleSeatsComparator implements Comparator<Vehicle>, Serializable, MatsimComparator {
-
-		private static final long serialVersionUID = 1L;
-		
-		@Override
-		public int compare(Vehicle v1, Vehicle v2) {
-			
-			int seats1 = v1.getType().getCapacity().getSeats();
-			int seats2 = v2.getType().getCapacity().getSeats();
-			
-			if (seats1 > seats2) return 1;
-			else if (seats1 < seats2) return -1;
-			// both have the same number of seats: order them based on their Id
-			else return v1.getId().compareTo(v2.getId());
-		}
-	}
 
 }

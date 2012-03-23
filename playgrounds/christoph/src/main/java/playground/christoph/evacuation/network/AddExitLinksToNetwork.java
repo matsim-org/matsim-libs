@@ -161,7 +161,13 @@ public class AddExitLinksToNetwork {
 	}
 	
 	public void createExitLinks() {
-		Node rescueNode = network.getFactory().createNode(scenario.createId("rescueNode"), scenario.createCoord(0.0, 0.0));
+		/*
+		 * Use a coordinate which should be outside the evacuation area but still is feasible.
+		 * Otherwise the AStarLandmarks algorithm could be confused and loose some performance.
+		 */
+//		Coord rescueCoord = scenario.createCoord(0.0, 0.0);
+		Coord rescueCoord = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0);
+		Node rescueNode = network.getFactory().createNode(scenario.createId("rescueNode"), rescueCoord);
 		network.addNode(rescueNode);
 		
 		int counter = 0;
@@ -191,7 +197,9 @@ public class AddExitLinksToNetwork {
 		 * first rescue node. The link between them gets equipped with the
 		 * rescue facility that is the destination of the evacuated persons.
 		 */
-		Node rescueNode2 = network.getFactory().createNode(scenario.createId("rescueNode2"), scenario.createCoord(1.0, 1.0));
+//		Coord rescueCoord2 = scenario.createCoord(1.0, 1.0);
+		Coord rescueCoord2 = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
+		Node rescueNode2 = network.getFactory().createNode(scenario.createId("rescueNode2"), rescueCoord2);
 		network.addNode(rescueNode2);
 		
 		Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink"), rescueNode, rescueNode2);
