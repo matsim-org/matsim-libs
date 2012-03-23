@@ -225,7 +225,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 	// }
 	public void calcAvgTUOonActLoc(String filenameBase) {
 		SimpleWriter writer = new SimpleWriter(filenameBase + "destActLoc.log");
-		writer.writeln("x\ty\tavg.TUO\tvolumes");
+		writer.writeln("x\ty\tavg.TUO\tvolumes\tln_vol");
 		for (Coord crd : actLocStat.keySet()) {
 			BasicStatistics bs = actLocStat.get(crd);
 			double avgTUO = bs.getAvg();
@@ -236,7 +236,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 										 * in a day
 										 */) {
 				writer.writeln(crd.getX() + "\t" + crd.getY() + "\t" + avgTUO
-						+ "\t" + bs.size());
+						+ "\t" + size + "\t" + Math.log(size));
 				writer.flush();
 			}
 		}

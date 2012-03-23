@@ -78,5 +78,12 @@
 			<artifactId>Jama</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>ejml</groupId>
+			<artifactId>ejml</artifactId>
+			<version>0.18</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/ejml-0.18.jar</systemPath>
+		</dependency>
 	</dependencies>
 </project>

@@ -46,6 +46,7 @@ import org.matsim.counts.MatsimCountsReader;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.DestinationTripUtilOffsetDistributionWithoutGrids;
+import playground.yu.utils.io.SimpleWriter;
 import utilities.math.BasicStatistics;
 import utilities.misc.DynamicData;
 
@@ -69,7 +70,7 @@ public class HomelocUtilOffsetDistribution implements ActivityEndEventHandler,
 		, networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
 		, countsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml"//
 		, eventsFilename = "test/input/bln2pct/1536.2500.events.xml.gz"//
-		, outputFilenameBase = "test/output/bln2pct/UOD.allday."// UOD.9.
+		, outputFilenameBase = "test/output/bln2pct/"// UOD.9.
 
 		;
 
@@ -100,7 +101,7 @@ public class HomelocUtilOffsetDistribution implements ActivityEndEventHandler,
 
 		// aluoe.write(outputFilenameBase, interval);
 
-		hluod.output(outputFilenameBase);
+		hluod.output(outputFilenameBase + "home_dayPlan_UO.log");
 	}
 
 	private final Map<Id/* personId */, Coord/* home Location */> recordedPopHomeLocs;
@@ -126,10 +127,17 @@ public class HomelocUtilOffsetDistribution implements ActivityEndEventHandler,
 	private void calcDayUtilOffsetDistributionOfHome() {
 		for (Id personId : dayUtilOffsets.keySet()) {
 			Double duo = dayUtilOffsets.get(personId);
-			if (duo != 0d) {
-				// TODO
+			if (duo > 1d) {
+				Coord homeLoc = recordedPopHomeLocs.get(personId);
+				BasicStatistics bs = homeStats.get(homeLoc);
+				if (bs == null) {
+					bs = new BasicStatistics();
+					homeStats.put(homeLoc, bs);
+				}
+				bs.add(duo);
 			}
 		}
+
 	}
 
 	private double getLinkUtilOffset(Id linkId, int timeStep) {
@@ -173,11 +181,33 @@ public class HomelocUtilOffsetDistribution implements ActivityEndEventHandler,
 
 	private void output(String outputFilenameBase) {
 		calcDayUtilOffsetDistributionOfHome();
+		write(outputFilenameBase);
+	}
+
+	private void prepareResult(SimpleWriter writer) {
+		for (Coord crd : homeStats.keySet()) {
+			BasicStatistics bs = homeStats.get(crd);
+			int volume = bs.size();
+			if (volume > 0)/* at least 50 residents */{
+				double avgDayUO = bs.getAvg();
+				writer.writeln(crd.getX() + "\t" + crd.getY() + "\t" + avgDayUO
+						+ "\t" + volume + "\t" + Math.sqrt(volume));
+				writer.flush();
+			}
+		}
 	}
 
 	@Override
 	public void reset(int iteration) {
 
+	}
+
+	private void write(String filename) {
+		SimpleWriter writer = new SimpleWriter(filename);
+		writer.writeln("x\ty\tavg.DayUO\tvolume\tsqrt_vol");
+		writer.flush();
+		prepareResult(writer);
+		writer.close();
 	}
 
 }
