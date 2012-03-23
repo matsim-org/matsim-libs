@@ -81,7 +81,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private static Set<Id> linkIds = new HashSet<Id>();
 	private XYLineChart chart;// paramChart
 
-	private int paramDim;
+	static int paramDim;
 
 	static final String PARAM_NAME_INDEX = "parameterName_",
 			PARAM_STDDEV_INDEX = "paramStddev_";

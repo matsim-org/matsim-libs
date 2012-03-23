@@ -20,6 +20,11 @@
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLls;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.ejml.data.DenseMatrix64F;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,6 +38,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
@@ -53,6 +59,10 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 
 	private BasicStatistics betaTravelingPtStats = null;
 	private final ParameterEstimator pe;
+	private DenseMatrix64F attrM = null, utilCorrV = null;
+
+	private Map<String/* paramName */, List<Double>> attrs = null;
+	List<Double> utilCorrs = null;
 
 	public PCStrMn(Network net, int firstIteration, Config config
 	// ,int paramDimension
@@ -133,14 +143,25 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		}
 	}
 
-	private void calculateDeltaParameter(int planNb, int paramDimension) {
-		// TODO
-		DenseMatrix64F attrM = new DenseMatrix64F(planNb, paramDimension)//
-		, utilCorrV = new DenseMatrix64F(planNb, 1);
+	private DenseMatrix64F calculateDeltaParameter(int planNb) {
+		pe.clear();
+		String paramDimensionStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "parameterDimension");
+		int paramDim;
+		if (paramDimensionStr != null) {
+			paramDim = Integer.parseInt(paramDimensionStr);
+		} else {
+			throw new RuntimeException(
+					"The information about parameter dimension can NOT be found in config!");
+		}
+
+		attrM = new DenseMatrix64F(planNb, paramDim);
+		utilCorrV = new DenseMatrix64F(planNb, 1);
 
 		pe.setAttrM(attrM);
 		pe.setUtilCorrV(utilCorrV);
 
+		return pe.getDeltaParameters();
 	}
 
 	@Override
@@ -152,13 +173,15 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 
 		((Events2Score4PC) chooser).createWriter();
 
-		int planNb = 0;
+		int correctedPlanNb = 0;
+		attrs = new TreeMap<String, List<Double>>();
+		utilCorrs = new ArrayList<Double>();
+
 		for (Person person : population.getPersons().values()) {
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
 			// ***before removePlans and plan choice, correct utility***
-			generateScoreCorrections(person);
-			planNb += person.getPlans().size();
+			generateScoreCorrections(person, correctedPlanNb);
 		}
 
 		// TODO get delta parameter from ParameterEstimator and set new
@@ -217,7 +240,11 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		}
 	}
 
-	private void generateScoreCorrection(Plan plan) {
+	/**
+	 * @param plan
+	 * @return whether the score is corrected
+	 */
+	private boolean generateScoreCorrection(Plan plan) {
 		planConverter.convert((PlanImpl) plan);
 		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
 		double scoreCorrection = calibrator.getUtilityCorrection(planSteps)
@@ -233,11 +260,16 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		// plan.setScore(oldScore + scoreCorrection);// this line is NOT
 		// necessary
 		// // any more
+		return scoreCorrection != 0d;
 	}
 
-	private void generateScoreCorrections(Person person) {
+	private void generateScoreCorrections(Person person, int correctedPlanNb) {
 		for (Plan plan : person.getPlans()) {
-			generateScoreCorrection(plan);
+			if (generateScoreCorrection(plan)) {
+				correctedPlanNb++;
+				utilCorrs.add((Double) plan.getCustomAttributes().get(
+						UTILITY_CORRECTION));
+			}
 		}
 	}
 
