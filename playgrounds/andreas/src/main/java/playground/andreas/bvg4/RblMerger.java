@@ -310,7 +310,6 @@ public class RblMerger {
 	 */
 	private Map<Id, Map<Id, Map<Id, StopStatsContainer>>> accumulateData(List<FahrzeitEvent> fahrzeitEvents) {
 		Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap = new HashMap<Id, Map<Id,Map<Id,StopStatsContainer>>>();
-		int notSameDay = 0;
 		int fahrzeitEventsDropped = 0;
 		
 		for (FahrzeitEvent event : fahrzeitEvents) {
@@ -338,20 +337,22 @@ public class RblMerger {
 			double arrivalOffset = event.getArrivalTimeIstAtStop() - event.getDepartureTimeIst();
 			double departureOffset = event.getDepartureTimeIstAtStop() - event.getDepartureTimeIst();
 			
-			if(event.getArrivalDateIstAtStop().equalsIgnoreCase(event.getDepartureDateIst())){
-				// same day - proceed
-				line2route2stop2StatsMap.get(lineId).get(routeId).get(event.getStopId()).addArrival(arrivalOffset);
-				line2route2stop2StatsMap.get(lineId).get(routeId).get(event.getStopId()).addDeparture(departureOffset);
-			} else {
-				notSameDay++;
-				// TODO Should consider +/- 86400 seconds
-			}		
+			if (arrivalOffset < 0) {
+				// departure at terminus was yesterday
+				arrivalOffset += 86400.0;
+			}
 			
+			if (departureOffset < 0) {
+				// departure at terminus was yesterday
+				departureOffset += 86400.0;
+			}
+			
+			line2route2stop2StatsMap.get(lineId).get(routeId).get(event.getStopId()).addArrival(arrivalOffset);
+			line2route2stop2StatsMap.get(lineId).get(routeId).get(event.getStopId()).addDeparture(departureOffset);
 		}
 		
 		log.info("Finished accumulating arrival and departure times...");
 		log.info("Dropped " + fahrzeitEventsDropped + " entries, since they are not linked to a fahrt");
-		log.info("Dropped another " + notSameDay + " entries, since their departure at terminus and arrival/departure at stop are on different days");
 		return line2route2stop2StatsMap;	
 	}
 	
