@@ -21,6 +21,7 @@
 package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,10 +59,20 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 	private Map<Id, int[]> occupancies;  //Map< stopFacilityId,value[]>
 	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();  //Map< vehId,stopFacilityId> 
 	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>();  //Map<vehId,passengersNo. in Veh> 
-	private static String HEADER = "time\tvehId\tStopId\tno.ofPassengersInVeh\n";
-	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
-	private final static String STR_M44 = "M44";
+	private final static String HEADER = "time\tvehId\tStopId\tno.ofPassengersInVeh\n";
+	private StringBuffer occupancyRecord = new StringBuffer(HEADER);
 	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
+	private HashSet <Id> trDriversSet = new HashSet <Id>();   //a set to contain all transit drivers id's
+
+	//String constants
+	private final static String STR_M44 = "M44";
+	private final static String STR_TIME = "time: \t";
+	private final static String STR_VEH =	" veh: \t";
+	private final static String STR_PASSENGER =	" has Passenger \t";
+	private final static String STR_STOP =	" \tat stop: \t";
+	private final static String STR_ENTERING =	" ENTERING PERSON :\t";
+	private final static String STR_NL =	"\n";
+	private final static String STR_TB =	"\t";
 	
 	public PtBseOccupancyAnalyzer() {
 		this.timeBinSize = 3600;
@@ -74,21 +85,27 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 	public void reset(int iteration) {
 		this.occupancies.clear();
 		this.veh_stops.clear();
-		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
+		this.occupancyRecord = new StringBuffer(HEADER);
 		this.vehToRouteId.clear();
 	}
 	
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		trDriversSet.add(event.getDriverId());   //fill transit drivers set
 		this.vehToRouteId.put(event.getVehicleId(), event.getTransitRouteId());
 	}
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		//ignore transit drivers in this occupancy analysis 
+		if (trDriversSet.contains(event.getPersonId())){ 
+			return ;
+		}
+		
 		//only specific transit line
 		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
 		if ( !transitLineId.toString().contains(STR_M44)) {
-			return ;
+			
 		}
 		
 		// ------------------veh_passenger- (for occupancy)-----------------
@@ -96,11 +113,16 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 		double time = event.getTime();
 		Integer nPassengers = this.veh_passengers.get(vehId);
 		this.veh_passengers.put(vehId, (nPassengers != null) ? (nPassengers + 1) : 1);
-		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId 	+ " has Passenger\t" + this.veh_passengers.get(vehId) + " \tat stop :\t" + stopId + " ENTERING PERSON :\t" 	+ event.getPersonId() + "\n");
+		this.occupancyRecord.append(STR_TIME + time + STR_VEH + vehId 	+ STR_PASSENGER + this.veh_passengers.get(vehId) + STR_STOP + stopId + STR_ENTERING	+ event.getPersonId() + STR_NL);
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
+		//ignore transit drivers in this occupancy analysis
+		if (trDriversSet.contains(event.getPersonId())){
+			return ;
+		}
+		
 		//only specific transit line
 		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
 		if ( !transitLineId.toString().contains(STR_M44)) {
@@ -118,7 +140,7 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 			this.veh_passengers.remove(vehId);
 		}
 		Integer passengers = this.veh_passengers.get(vehId);
-		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId 	+ " has Passenger\t" + ((passengers != null) ? passengers : 0) + "\n");
+		this.occupancyRecord.append(STR_TIME + time + STR_VEH + vehId 	+ STR_PASSENGER + ((passengers != null) ? passengers : 0) + STR_NL);
 	}
 
 	@Override
@@ -139,13 +161,13 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 		if (noPassengersInVeh != null) {
 			occupancyAtStop[this.getTimeSlotIndex(event.getTime())] += noPassengersInVeh;
 			this.occupancyRecord.append(event.getTime());
-			this.occupancyRecord.append("\t");
+			this.occupancyRecord.append(STR_TB);
 			this.occupancyRecord.append(vehId);
-			this.occupancyRecord.append("\t");
+			this.occupancyRecord.append(STR_TB);
 			this.occupancyRecord.append(facId);
-			this.occupancyRecord.append("\t");
+			this.occupancyRecord.append(STR_TB);
 			this.occupancyRecord.append(noPassengersInVeh);
-			this.occupancyRecord.append("\n");
+			this.occupancyRecord.append(STR_NL);
 		}
 	}
 
