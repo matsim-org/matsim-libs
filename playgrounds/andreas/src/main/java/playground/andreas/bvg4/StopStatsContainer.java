@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.Id;
 public class StopStatsContainer {
 	
 	private static final Logger log = Logger.getLogger(StopStatsContainer.class);
+	static final String toStringHeader = "# StopId; n Arr; mean Arr; std dev Arr; n Dep; mean Dep; std dev Dep"; 
 
 	private Id stopId;
 
@@ -118,13 +119,13 @@ public class StopStatsContainer {
 	@Override
 	public String toString() {
 		StringBuffer strBuffer = new StringBuffer();
-		strBuffer.append("StopId: "); strBuffer.append(this.stopId); strBuffer.append(", ");
-		strBuffer.append("n Arr: "); strBuffer.append(this.getNumberOfEntriesArrival()); strBuffer.append(", ");
-		strBuffer.append("mean Arr: "); strBuffer.append(this.getArithmeticMeanArrival()); strBuffer.append(", ");
-		strBuffer.append("std dev Arr: "); strBuffer.append(this.getStandardDeviationArrival()); strBuffer.append(", ");
-		strBuffer.append("n Dep: "); strBuffer.append(this.getNumberOfEntriesDeparture()); strBuffer.append(", ");
-		strBuffer.append("mean Dep: "); strBuffer.append(this.getArithmeticMeanDeparture()); strBuffer.append(", ");
-		strBuffer.append("std dev Dep: "); strBuffer.append(this.getStandardDeviationDeparture()); strBuffer.append(", ");
+		strBuffer.append(this.stopId); strBuffer.append("; ");
+		strBuffer.append(this.getNumberOfEntriesArrival()); strBuffer.append("; ");
+		strBuffer.append(this.getArithmeticMeanArrival()); strBuffer.append("; ");
+		strBuffer.append(this.getStandardDeviationArrival()); strBuffer.append("; ");
+		strBuffer.append(this.getNumberOfEntriesDeparture()); strBuffer.append("; ");
+		strBuffer.append(this.getArithmeticMeanDeparture()); strBuffer.append("; ");
+		strBuffer.append(this.getStandardDeviationDeparture());
 		return strBuffer.toString();
 	}	
 }

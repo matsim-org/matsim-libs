@@ -45,6 +45,12 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
 import playground.andreas.utils.pt.TransitScheduleCleaner;
 
@@ -59,9 +65,12 @@ public class RblMerger {
 		String transitScheduleInFilename = "D:/berlin_bvg3/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
 		
 		String stopNamesMapFilename = "F:/bvg4/input/stopNameMap.csv";
+		String newStopsFilename = "F:/bvg4/input/newStops.csv";
 		
-		String transitScheduleOutFilename = "F:/bvg4/output/transitSchedule.xml";
-		String eventsFromTransitScheduleOutFilename = "F:/bvg4/output/eventsFromTransitScheduleOutFile.xml";
+		String statsOutFilename = "F:/bvg4/output/statsOut.txt";
+		String transitScheduleOutFilename = "F:/bvg4/output/transitScheduleOut.xml";
+		String vehiclesOutFilename = "F:/bvg4/output/vehiclesOut.xml";
+		String eventsFromTransitScheduleOutFilename = "F:/bvg4/output/eventsFromTransitScheduleOut.xml";
 		
 		Set<String> onlyTakeDeparturesFromTheseRblDates = new TreeSet<String>();
 		onlyTakeDeparturesFromTheseRblDates.add("4811");		
@@ -93,6 +102,7 @@ public class RblMerger {
 		
 		RblMerger rblMerger = new RblMerger();	
 		rblMerger.init(networkFilename, transitScheduleInFilename);
+		rblMerger.addNewStops(newStopsFilename);
 		
 		List<FahrtEvent> fahrtEvents = rblMerger.readFahrtData(fahrtDataFilenames);
 		List<FahrzeitEvent> fahrzeitEvents = rblMerger.readFahrzeitData(fahrzeitDataFilenames);
@@ -105,6 +115,7 @@ public class RblMerger {
 		
 		fahrzeitEvents = rblMerger.substituteStopNames(stopNamesMapFilename, fahrzeitEvents, false);
 		Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap = rblMerger.accumulateData(fahrzeitEvents);
+		rblMerger.writeStats(line2route2stop2StatsMap, statsOutFilename);
 		
 		TransitSchedule newTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		rblMerger.addStopsToSchedule(newTransitSchedule, line2route2stop2StatsMap);
@@ -115,7 +126,7 @@ public class RblMerger {
 		rblMerger.addDepartures(newTransitSchedule, fahrtEvents, onlyTakeDeparturesFromTheseRblDates);
 		
 		newTransitSchedule = rblMerger.cleanUpSchedule(newTransitSchedule);
-		rblMerger.writeTransitSchedule(newTransitSchedule, transitScheduleOutFilename);		
+		rblMerger.writeTransitSchedule(newTransitSchedule, transitScheduleOutFilename, vehiclesOutFilename);		
 		rblMerger.createEventsFromTransitSchedule(newTransitSchedule, eventsFromTransitScheduleOutFilename);		
 	}
 
@@ -131,6 +142,14 @@ public class RblMerger {
 		config.network().setInputFile(networkFile);
 		config.transit().setTransitScheduleFile(transitScheduleInFile);
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);;
+	}
+
+	private void addNewStops(String newStopsFilename) {
+		List<TransitStopFacility> newStops = ReadNewStops.readNewStopsList(newStopsFilename);
+		for (TransitStopFacility transitStopFacility : newStops) {
+			scenario.getTransitSchedule().addStopFacility(transitStopFacility);
+		}
+		log.info("Added " + newStops.size() + " new stops to the original transit schedule");
 	}
 
 	/**
@@ -475,12 +494,20 @@ public class RblMerger {
 						for (Link link : path.links) {
 							links.add(link.getId());
 						}
+						if(path.links.size() != 0){
+							if (stop.getStopFacility().getLinkId() != path.links.get(path.links.size() - 1).getId()) {
+								path = routeAlgo.calcLeastCostPath(path.links.get(path.links.size() - 1).getToNode(), scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getFromNode(), 0.0);
+								for (Link link : path.links) {
+									links.add(link.getId());
+								}
+								links.add(stop.getStopFacility().getLinkId());
+							}
+						}
 					}
 					
 					lastLinkId = stop.getStopFacility().getLinkId();
 				}
-				
-				links.remove(links.size() - 1);				
+
 				LinkNetworkRouteImpl networkRoute = new LinkNetworkRouteImpl(startLinkId, lastLinkId);
 				networkRoute.setLinkIds(startLinkId, links, lastLinkId);
 	
@@ -570,10 +597,40 @@ public class RblMerger {
 	 * 
 	 * @param newTransitSchedule
 	 * @param newTransitScheduleOutFilename
+	 * @param vehiclesOutFilename 
 	 */
-	private void writeTransitSchedule(TransitSchedule newTransitSchedule, String newTransitScheduleOutFilename) {
+	private void writeTransitSchedule(TransitSchedule newTransitSchedule, String newTransitScheduleOutFilename, String vehiclesOutFilename) {
 		new TransitScheduleWriterV1(newTransitSchedule).write(newTransitScheduleOutFilename);
-		log.info("Transit schedule written to " + newTransitScheduleOutFilename);		
+		log.info("Transit schedule written to " + newTransitScheduleOutFilename);
+		
+		Set<Id> vehIds = new TreeSet<Id>();
+		
+		for (TransitLine line : newTransitSchedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					vehIds.add(departure.getVehicleId());
+				}
+			}
+		}
+		
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		Id vehTypeId = new IdImpl("rbl");
+		VehicleType vehType = vehicles.getFactory().createVehicleType(vehTypeId);
+		VehicleCapacity vehCap = vehicles.getFactory().createVehicleCapacity();
+		vehCap.setSeats(1);
+		vehCap.setStandingRoom(1);
+		vehType.setCapacity(vehCap);
+		vehicles.getVehicleTypes().put(vehTypeId, vehType);
+		
+		Map<Id, Vehicle> vehMap = vehicles.getVehicles();
+		for (Id vehId : vehIds) {
+			Vehicle veh = vehicles.getFactory().createVehicle(vehId, vehType);
+			vehMap.put(vehId, veh);
+		}
+		
+		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
+		writer.writeFile(vehiclesOutFilename);
+		log.info("Vehicles written to " + vehiclesOutFilename);		
 	}
 
 	/**
@@ -614,6 +671,32 @@ public class RblMerger {
 		}
 		eventWriter.closeFile();
 		log.info(events.size() + " events written to " + eventsFromTransitScheduleOutFile);
+	}
+
+	private void writeStats(Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap,	String statsOutFilename) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(statsOutFilename)));
+			writer.write("# line id; route id; stop id; " + StopStatsContainer.toStringHeader); writer.newLine();
+			
+			for (Entry<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMapEntry : line2route2stop2StatsMap.entrySet()) {
+				Id lineId = line2route2stop2StatsMapEntry.getKey();
+				for (Entry<Id, Map<Id, StopStatsContainer>> route2stop2StatsMapEntry : line2route2stop2StatsMapEntry.getValue().entrySet()) {
+					Id routeId = route2stop2StatsMapEntry.getKey();
+					for (Entry<Id, StopStatsContainer> stop2StatsMapEntry : route2stop2StatsMapEntry.getValue().entrySet()) {
+						Id stopId = stop2StatsMapEntry.getKey();
+						writer.write(lineId + "; " + routeId + "; " + stopId + "; " + stop2StatsMapEntry.getValue().toString());
+						writer.newLine();
+					}
+				}
+			}			
+			
+			writer.flush();
+			writer.close();			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	/**
