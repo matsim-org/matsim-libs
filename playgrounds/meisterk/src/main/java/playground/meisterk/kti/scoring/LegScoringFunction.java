@@ -132,7 +132,17 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			Route route = leg.getRoute();
 			if (!(route instanceof KtiPtRoute)) {
 				if (route == null) log.error("Route in pt leg is not from type KtiPtRoute. It is null!");
-				else log.error("Route in pt leg is not from type KtiPtRoute. It is from type : " + route.getClass().toString());
+				else {
+				      log.error("Route in pt leg is not from type KtiPtRoute. It is from type : " + route.getClass().toString());
+				      log.error("Person Id: " + plan.getPerson().getId());
+				      log.error("LegIndex: " + legIndex);
+				      log.error("");
+				      int i = 0;
+				      for (Leg l : legs) {
+				    	  log.error("Leg #" + i + ", RouteType: " + l.getRoute().getClass().toString());
+				    	  i++;
+				      }
+				}
 				throw new RuntimeException("Cannot calculate score for PT leg since it does not contain a KtiPtRoute!");
 			}
 			KtiPtRoute ktiPtRoute = (KtiPtRoute) route;
