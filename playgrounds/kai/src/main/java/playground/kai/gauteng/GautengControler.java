@@ -21,6 +21,13 @@ import playground.kai.gauteng.routing.GautengTravelDisutilityInclTollFactory;
 import playground.kai.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.kai.run.KaiAnalysisListener;
 
+/**
+ * Design comments:<ul>
+ * <li> The money (toll) is converted into utils both for the router and for the scoring.
+ * <li> However, setting up the toll scheme in terms of disutilities does not seem right.
+ * </ul>
+ *
+ */
 class GautengControler {
 	static Logger log = Logger.getLogger(GautengControler.class) ;
 	
@@ -42,11 +49,15 @@ class GautengControler {
 		// CONSTRUCT ROAD PRICING SCHEME:
 		RoadPricingSchemeI vehDepScheme = constructRoadPricingScheme(controler);		
 
-		// INSERT INTO SCORING:
-		insertRoadPricingIntoScoring(controler, vehDepScheme);
+		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing class):
+		// insert into scoring:
+		installGenerationOfMoneyEvents(controler, vehDepScheme);
 
-		// INSERT INTO ROUTING:
+		// insert into routing:
 		controler.setTravelDisutilityFactory( new GautengTravelDisutilityInclTollFactory( vehDepScheme ) );
+		
+		// INSTALL AGENT-SPECIFIC UTILITY OF MONEY (quite separate from toll):
+		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory(controler.getConfig(), controler.getNetwork()));
 		
 		// ADDITIONAL ANALYSIS:
 		controler.addControlerListener(new KaiAnalysisListener()) ;
@@ -56,7 +67,7 @@ class GautengControler {
 	
 	}
 
-	private static void insertRoadPricingIntoScoring(final Controler controler, RoadPricingSchemeI vehDepScheme) {
+	private static void installGenerationOfMoneyEvents(final Controler controler, RoadPricingSchemeI vehDepScheme) {
 		final CalcPaidToll calcPaidToll = new CalcPaidToll(controler.getNetwork(), vehDepScheme, controler.getPopulation() ) ;
 		final CalcAverageTolledTripLength cattl = new CalcAverageTolledTripLength(controler.getNetwork(), vehDepScheme );
 
@@ -78,7 +89,7 @@ class GautengControler {
 			@Override
 			public void notifyAfterMobsim(final AfterMobsimEvent event) {
 				// evaluate the final tolls paid by the agents and add them to their scores
-				calcPaidToll.sendUtilityEvents(Time.MIDNIGHT, event.getControler().getEvents());
+				calcPaidToll.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
 				// yyyyyy I would, in fact, prefer if agents did this at their arrival!!!!
 			}
 		} ) ;
@@ -92,8 +103,6 @@ class GautengControler {
 			}
 		} ) ;
 		
-		// catch money event with special scoring function:
-		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory(controler.getConfig(), controler.getNetwork()));
 	}
 
 	private static RoadPricingSchemeI constructRoadPricingScheme(final Controler controler) {

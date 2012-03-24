@@ -50,6 +50,8 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 		if ( FACTOR != 1. ) { 
 			Logger.getLogger(this.getClass()).error("artificially inflating toll by: " + FACTOR ) ;
 		}			
+		Logger.getLogger(this.getClass()).warn("for me, using this as cordon toll did not work; using it as new scheme `link' " +
+				"toll for the time being.  needs to be debugged?!?!  kai, mar'12") ;
 	}
 
 	public String getDescription() {
@@ -84,7 +86,8 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 	}
 
 	public String getType() {
-		return delegate.getType();
+//		return delegate.getType();
+		return "link" ;
 	}
 
 

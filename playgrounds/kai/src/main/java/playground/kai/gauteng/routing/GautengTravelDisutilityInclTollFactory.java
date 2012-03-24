@@ -63,7 +63,7 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, this.person.getId() ) ;
 				if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
 					toll = link.getLength() * cost.amount ;
-				} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_CORDON ) ) {
+				} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
 						toll = cost.amount ;
 				} else {
 					throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
