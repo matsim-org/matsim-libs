@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 /**
@@ -64,6 +63,6 @@ public interface RoadPricingSchemeI {
 	 * <code>null</code> if the link is either not part of the tolling scheme
 	 * or there is no toll at the specified time for the link.
 	 */
-	public Cost getLinkCostInfo(final Id linkId, final double time, Person person);
+	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId);
 
 }

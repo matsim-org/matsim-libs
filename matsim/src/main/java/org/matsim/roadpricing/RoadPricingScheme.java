@@ -152,7 +152,7 @@ public class RoadPricingScheme implements RoadPricingSchemeI {
 	/* (non-Javadoc)
 	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getLinkCostInfo(org.matsim.api.core.v01.Id, double)
 	 */
-	public Cost getLinkCostInfo(final Id linkId, final double time, Person person) {
+	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId) {
 		// this is the default road pricing scheme, which ignores the person.  kai, mar'12
 		// (I have decided to put the person into the method call rather than the setPerson construction in TravelDisutility etc.
 		// Reason: A big advantage of agent-based simulation over traditional methods is heterogeneity of agent population.
