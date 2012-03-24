@@ -17,25 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- *
- */
+ 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLls;
 
 import org.ejml.alg.dense.linsol.SolvePseudoInverse;
 import org.ejml.data.DenseMatrix64F;
 
 /**
- * [Attr]<sub>m x n</sub> x [&Delta;&beta;]<sub>n x 1</sub> = [utility
- * correction (from cadyts)]<sub>m x 1</sub>. In order to realize min||[utility
- * correction]<sub>m x 1</sub>- [Attr]<sub>m x n</sub> x [&Delta;&beta;]<sub>n x
- * 1</sub>||<sup>2</sup>, [&Delta;&beta;]<sub>n x 1</sub> (vector) is estimated
- * in this class with Moore-Penrose pseudoinverse (
- * (Attr<sup>T</sup>Attr)&Delta;&beta; = Attr<sup>T</sup>UC &rarr; &Delta;&beta;
- * = Attr<sup>+</sup>UC )
- * (http://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_pseudoinverse) and the
- * code from EJML (http://code.google.com/p/efficient-java-matrix-library)
  *
  * @author yu
  *
