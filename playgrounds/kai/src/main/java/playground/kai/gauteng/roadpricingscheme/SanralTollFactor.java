@@ -21,7 +21,6 @@ package playground.kai.gauteng.roadpricingscheme;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
 public abstract class SanralTollFactor {
 	private final static int carStartId = 0;
@@ -35,9 +34,10 @@ public abstract class SanralTollFactor {
 	private final static int extStartId = 4000000;
 	private final static int extEndId = 4020181;
 	
-	enum Type { carWithTag, carWithoutTag, commercialClassCWithTag, commercialClassBWithTag, commercialClassCWithoutTag, 
-		commercialClassBWithoutTag, busWithTag, busWithoutTag, taxiWithTag, taxiWithoutTag, extWithTag, extWithoutTag } ;
-	public static Type typeOf ( Id idObj ) {
+	public enum Type { carWithTag, carWithoutTag,  commercialClassCWithTag,  commercialClassBWithTag,  commercialClassCWithoutTag, 
+		 commercialClassBWithoutTag,  busWithTag,  busWithoutTag,  taxiWithTag,  taxiWithoutTag,  extWithTag,  extWithoutTag } ;
+
+    public static Type typeOf ( Id idObj ) {
 		long id = Long.parseLong(idObj.toString());
 
 		if (id < carStartId + (carEndId - carStartId)*TagPenetration.CAR) { 
@@ -85,53 +85,6 @@ public abstract class SanralTollFactor {
 	 * and `Medium' and `Long' combined represent Class C vehicles. */
 	private final static double fractionClassB = 0.50;
 	
-	public static double getUtilityOfMoney(final Id vehicleId, final PlanCalcScoreConfigGroup cnScoringGroup) {
-		double valueOfTime_hr = 100 ;
-		switch( typeOf(vehicleId) ) {
-		case carWithTag:
-			break ;
-		case carWithoutTag:
-			break ;
-		case commercialClassBWithTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case commercialClassCWithTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case commercialClassBWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case commercialClassCWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case busWithTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case busWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case taxiWithTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case taxiWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case extWithTag:
-			valueOfTime_hr = 200.;
-			break ;
-		case extWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
-		}
-		final double utilityOfTime_hr = - cnScoringGroup.getPerforming_utils_hr() + cnScoringGroup.getTraveling_utils_hr() ;
-		// "performing" is normally positive, but needs to be counted negative
-		// "traveling" is normally negative, and needs to be counted negative
-
-		double utilityOfMoney = utilityOfTime_hr / valueOfTime_hr ;
-		
-		return utilityOfMoney ;
-	}
-
 	public static double getTollFactor(final Person person, final Id linkId, final double time) {
 		Id vehicleId = person.getId() ;
 		// yyyyyy aaarrrrgh ... (assuming vehId = personId).  kai, mar'12

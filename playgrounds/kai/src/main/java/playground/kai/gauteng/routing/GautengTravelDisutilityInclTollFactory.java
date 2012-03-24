@@ -30,7 +30,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeI;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
-import playground.kai.gauteng.roadpricingscheme.SanralTollFactor;
+import playground.kai.gauteng.utilityofmoney.GautengUtilityOfMoney;
 
 /**
  * @author kn after bkick after dgrether
@@ -69,7 +69,7 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 					throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
 				}
 
-				double utilityOfMoney = SanralTollFactor.getUtilityOfMoney(this.person.getId(),localCnScoringGroup) ; 
+				double utilityOfMoney = GautengUtilityOfMoney.getUtilityOfMoney(this.person.getId(),localCnScoringGroup) ; 
 				
 				linkTravelDisutility += - utilityOfMoney * toll ;
 				return linkTravelDisutility ;

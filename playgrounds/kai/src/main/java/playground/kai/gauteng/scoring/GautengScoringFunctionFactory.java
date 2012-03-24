@@ -30,11 +30,10 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
-import playground.kai.gauteng.roadpricingscheme.SanralTollFactor;
+import playground.kai.gauteng.utilityofmoney.GautengUtilityOfMoney;
 
 /**
  * @author nagel after
@@ -66,7 +65,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.ActivityScoringFunction(params));
 
 		//utility spend for traveling (in this case: travel time and distance costs)
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.LegScoringFunction(params, network));
 		// yy careful: The standard leg scoring function assumes uniform utilities of time.  If this does not hold, the leg
 		// scoring function needs to be replaced.  (But then, presumably, also the activity scoring function
 		// needs to be replaced.)  kai, mar'12
@@ -116,7 +115,7 @@ class ScoringFromToll implements MoneyScoring, BasicScoring {
 	@Override
 	public void addMoney(final double amount) {
 		
-		this.score += - SanralTollFactor.getUtilityOfMoney(vehicleId, cnScoringGroup) * amount;
+		this.score += - GautengUtilityOfMoney.getUtilityOfMoney(vehicleId, cnScoringGroup) * amount;
 		if ( cnt < 10 ) {
 			cnt++ ;
 			log.info("toll paid: " + amount + "; resulting accumulated toll utility: " + this.score );
