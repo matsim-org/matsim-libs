@@ -348,6 +348,7 @@ public class LinkImpl implements Link {
 	@Override
 	public String toString() {
 		return super.toString() +
+		"[id=" + this.getId() + "]" +
 		"[from_id=" + this.from.getId() + "]" +
 		"[to_id=" + this.to.getId() + "]" +
 		"[length=" + this.length + "]" +
