@@ -26,6 +26,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.knowledges.Knowledges;
 
 /**
  * {@link org.matsim.core.controler.listener.ControlerListener} that dumps the
@@ -47,7 +49,15 @@ public class PlansDumping implements BeforeMobsimListener {
 				|| (event.getIteration() == (controler.getFirstIteration() + 1)))) {
 			controler.stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
-			new PopulationWriter(controler.getPopulation(), controler.getNetwork(), controler.getScenario().getKnowledges())
+			Knowledges k = null ;
+			if ( controler.getConfig().scenario().isUseKnowledges() ) {
+				k = ((ScenarioImpl) controler.getScenario()).getKnowledges();
+			} else {
+				k = ((ScenarioImpl) controler.getScenario()).retrieveNotEnabledKnowledges();
+				// seems that this call is there for some backwards compatibility ... reading knowledges into the 
+				// population even when knowledges is not enabled.  kai, mar'12
+			}
+			new PopulationWriter(controler.getPopulation(), controler.getNetwork(), k)
 				.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "plans.xml.gz"));
 			log.info("finished plans dump.");
 			controler.stopwatch.endOperation("dump all plans");
