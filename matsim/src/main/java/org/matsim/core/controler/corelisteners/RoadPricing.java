@@ -104,7 +104,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		// evaluate the final tolls paid by the agents and add them to their scores
-		this.tollCalc.sendUtilityEvents(Time.MIDNIGHT, event.getControler().getEvents());
+		this.tollCalc.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
 	}
 
 	@Override

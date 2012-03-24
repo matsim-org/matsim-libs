@@ -214,7 +214,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Simulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 
-		paidToll.sendUtilityEvents(Time.MIDNIGHT, events);
+		paidToll.sendMoneyEvents(Time.MIDNIGHT, events);
 
 		scoring.finish();
 	}

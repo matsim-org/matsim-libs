@@ -47,7 +47,7 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  * fully function, add an instance of this class as EventHandler to your Events
  * object.
  * <br/>
- * This will class and its methods will pass the person to the toll calculation ...
+ * This class and its methods will pass the person to the toll calculation ...
  * ... but the toll calculation must in fact use the person.  Standard RoadPricingScheme objects
  * which are read from xml will not and in the current design cannot do this.  kai, mar'12
  *
@@ -67,6 +67,12 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 
 	private TollBehaviourI handler = null;
 
+	/**
+     * Design comments:<ul>
+     * <li> yy I don't think that we really need Population.  kai, mar'12
+     * <li> yyyy However, would need EventsManager if toll is sent to agent at arrival. kai, mar'12
+     * </ul>
+	 */
 	public CalcPaidToll(final Network network, final RoadPricingSchemeI scheme, Population population) {
 		super();
 		this.network = network;
@@ -76,10 +82,14 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 			this.handler = new DistanceTollBehaviour();
 		} else if (RoadPricingScheme.TOLL_TYPE_AREA.equals(scheme.getType())) {
 			this.handler = new AreaTollBehaviour();
+			Logger.getLogger(this.getClass()).warn("area toll does not work if you have different toll amounts on different " +
+					"links.  Make sure you get what you want.  kai, mar'12");
 		} else if (RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType())) {
 			this.handler = new CordonTollBehaviour();
-//			Logger.getLogger(this.getClass()).warn("using LinkTollBehaviour for cordon toll behavior.  the CordonTollBehaviour is weird.  kai, mar'12") ;
-//			this.handler = new LinkTollBehaviour();
+			Logger.getLogger(this.getClass()).warn("cordon toll only charges at transition from untolled to tolled. " +
+					"Make sure this is what you want. kai, mar'12") ;
+		} else if (RoadPricingScheme.TOLL_TYPE_LINK.equals(scheme.getType())) {
+			this.handler = new LinkTollBehaviour();
 		} else {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
 		}
@@ -118,7 +128,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * @param time the current time the generated events are associated with
 	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
 	 */
-	public void sendUtilityEvents(final double time, final EventsManager events) {
+	public void sendMoneyEvents(final double time, final EventsManager events) {
 		for (Map.Entry<Id, AgentTollInfo> entries : this.agents.entrySet()) {
 			events.processEvent(new AgentMoneyEventImpl(time, entries.getKey(), -entries.getValue().toll));
 			if ( cnt < 10 ) {
@@ -217,26 +227,30 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		public void handleEvent(final PersonEvent event, final Link link, Person person) {
 			if (event instanceof AgentWait2LinkEventImpl) {
 				/* we do not handle wait2link-events for link toll, because the agent
-				 * must not pay twice for this link, and he (likely) paid already when
+				 * should not pay twice for this link, and he (likely) paid already when
 				 * arriving at this link.  */
 				return;
 			}
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(),
-					event.getTime(), person.getId());
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), person.getId());
 			if (cost != null) {
-				double newToll = cost.amount;
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
 					info = new AgentTollInfo();
 					CalcPaidToll.this.agents.put(event.getPersonId(), info);
 				}
-				info.toll += newToll;
+				info.toll += cost.amount;
 			}
 		}
 	}
 
 	/** Handles the calculation of the area toll. Whenever the agent is seen on
-	 * one of the tolled link, the constant toll amount has to be paid once. */
+	 * one of the tolled link, the constant toll amount has to be paid once.
+	 * <br/>
+	 * Design comments:<ul>
+	 * <li> This implementation becomes a problem if someone tries to implement more than one area which do
+	 * not share the same flat fee.  kai, mar'12
+	 * </ul> 
+	 */
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final PersonEvent event, final Link link, Person person) {
@@ -268,7 +282,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
 					// no information about this agent, so it did not yet pay the toll
-					// [[yyyy this would refer to any toll, so if we have two cordons, it is over.  kai, mar'12]]
+					// [[yyyy this would refer to any toll, so if we have two cordons, it does not work.  kai, mar'12]]
 					info = new AgentTollInfo();
 					CalcPaidToll.this.agents.put(event.getPersonId(), info);
 					info.toll = 0.0; // we start in the area, do not toll
@@ -278,8 +292,9 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 					info.insideCordonArea = true;
 					info.toll += cost.amount;
 				}
+				// else: agent was already in toll area, does not have to pay again (this implementation is a bit unusual!)
 			} else {
-				// this is a link outside the toll area.
+				// this is a link outside the toll area; just need to memorize that the agent is outside the toll area.
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
 					info = new AgentTollInfo();

@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class RoadPricingScheme implements RoadPricingSchemeI {
 
-	/** The type to be used for distance tolls. */
+	/** The type to be used for distance tolls (the toll scheme gives a toll per km for each link). */
 	public static final String TOLL_TYPE_DISTANCE = "distance";
 
 	/** The type to be used for cordon tolls. */
@@ -45,6 +45,9 @@ public class RoadPricingScheme implements RoadPricingSchemeI {
 
 	/** The type to be used for area tolls. */
 	public static final String TOLL_TYPE_AREA = "area";
+
+	/** The type to be used for link toll (the toll scheme gives a toll per link). */
+	public static final String TOLL_TYPE_LINK = "link";
 
 	private Map<Id, List<Cost>> linkIds = null;
 
