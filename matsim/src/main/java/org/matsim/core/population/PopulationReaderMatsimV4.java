@@ -105,7 +105,14 @@ import org.xml.sax.Attributes;
 		this.network = scenario.getNetwork();
 		if (scenario instanceof ScenarioImpl) {
 			this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
-			Knowledges k = ((ScenarioImpl) scenario).getKnowledges();
+			Knowledges k = null ;
+			if ( scenario.getConfig().scenario().isUseKnowledges() ) {
+				k = ((ScenarioImpl) scenario).getKnowledges();
+			} else {
+				k = ((ScenarioImpl) scenario).retrieveNotEnabledKnowledges();
+				// seems that this call is there for some backwards compatibility ... reading knowledges into the 
+				// population even when knowledges is not enabled.  kai, mar'12
+			}
 			if (k == null) {
 				this.knowledges = new KnowledgesImpl(); // we need knowledges to read in a file
 			} else {
