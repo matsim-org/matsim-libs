@@ -114,7 +114,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				/*
 				 * Vector p = new Vector(1/* (single-)choiceSetSize /); p.set(0,
 				 * 1d/* 100% /);
-				 * 
+				 *
 				 * Matrix d = new Matrix(1/* n-choiceSetSize /, paramDimension
 				 * // m-size of parameters that has to be calibrated ); for (int
 				 * i = 0; i < paramDimension; i++) { d.setColumn(i, new
@@ -184,12 +184,14 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			generateScoreCorrections(person, correctedPlanNb);
 		}
 
-		// TODO get delta parameter from ParameterEstimator and set new
-		// parameters in MNL
+		// TODO get name of parameters to be estimated,
+		// set attr and uc values and put them in matrix or vectors (attrs and
+		// utilCorrs)
+		// get delta parameter from ParameterEstimator and set new parameters in
+		// MNL
 		MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
 				.getMultinomialLogit();
-		// TODO
-		// mnl.setParameter(paramNameIndex, value);
+		// TODO mnl.setParameter(paramNameIndex, value);
 
 		for (Person person : population.getPersons().values()) {
 			/* ***********************************************************
