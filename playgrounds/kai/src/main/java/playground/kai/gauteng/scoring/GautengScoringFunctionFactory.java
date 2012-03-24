@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -111,12 +112,18 @@ class ScoringFromToll implements MoneyScoring, BasicScoring {
 		
 	}
 
+	private static int cnt = 0 ;
 	@Override
 	public void addMoney(final double amount) {
 		
 		this.score += - SanralTollFactor.getUtilityOfMoney(vehicleId, cnScoringGroup) * amount;
-		log.info("toll paid: " + amount + "; resulting accumulated toll utility: " + this.score );
-		log.error("utility of money == one for everybody; needs to be fixed ...") ;
+		if ( cnt < 10 ) {
+			cnt++ ;
+			log.info("toll paid: " + amount + "; resulting accumulated toll utility: " + this.score );
+			if (cnt==10 ) {
+				log.info(Gbl.FUTURE_SUPPRESSED) ;
+			}
+		}
 
 	}
 

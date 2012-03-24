@@ -20,6 +20,7 @@
 package playground.kai.gauteng.roadpricingscheme;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
 public abstract class SanralTollFactor {
@@ -131,7 +132,10 @@ public abstract class SanralTollFactor {
 		return utilityOfMoney ;
 	}
 
-	public static double getTollFactor(final Id vehicleId, final Id linkId, final double time) {
+	public static double getTollFactor(final Person person, final Id linkId, final double time) {
+		Id vehicleId = person.getId() ;
+		// yyyyyy aaarrrrgh ... (assuming vehId = personId).  kai, mar'12
+		
 		double timeDiscount = getTimeDiscount(time);
 		double tagDiscount = 0.00;
 		double ptDiscount = 0.00;

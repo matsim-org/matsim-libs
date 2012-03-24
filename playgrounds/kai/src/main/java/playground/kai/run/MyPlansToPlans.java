@@ -64,7 +64,8 @@ public class MyPlansToPlans {
 //		plans.printPlansCount();
 //		plansWriter.closeStreaming();
 
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("otfvis-config.xml") ;
+		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
+		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFileName) ;
 		Scenario sc = sl.loadScenario() ;
 		Population pop = sc.getPopulation();
 

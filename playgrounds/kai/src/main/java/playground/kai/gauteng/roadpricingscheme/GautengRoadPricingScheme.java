@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.roadpricing.RoadPricingSchemeI;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
@@ -38,25 +40,35 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
 public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 	private RoadPricingSchemeI delegate = null ;
 	private Network network;
+	private Population population ;
+	private final double FACTOR = 100. ;
 	
-	public GautengRoadPricingScheme( RoadPricingSchemeI inputRoadPricingScheme, Network network ) {
+	public GautengRoadPricingScheme( RoadPricingSchemeI inputRoadPricingScheme, Network network, Population population ) {
 		this.delegate = inputRoadPricingScheme ;
 		this.network = network ;
+		this.population = population ; 
+		if ( FACTOR != 1. ) { 
+			Logger.getLogger(this.getClass()).error("artificially inflating toll by: " + FACTOR ) ;
+		}			
 	}
 
 	public String getDescription() {
 		return delegate.getDescription();
 	}
 
-	public Cost getLinkCostInfo(Id linkId, double time, Person person) {
-		Cost baseToll = delegate.getLinkCostInfo(linkId, time, null);
+	@Override
+	public Cost getLinkCostInfo(Id linkId, double time, Id personId) {
+		Cost baseToll = delegate.getLinkCostInfo(linkId, time, personId );
 		if (baseToll == null) {
 			return new Cost(0.,24*3600.,0.0) ;
 		}
 		Link link = network.getLinks().get(linkId) ;
-		return new Cost( baseToll.startTime, baseToll.endTime, 
-				baseToll.amount * SanralTollFactor.getTollFactor(person.getId(), link.getId(), time)
-						);
+//		System.err.println( " link: " + link ) ;
+		Person person = population.getPersons().get(personId) ;
+//		System.err.println( " person: " + person ) ;
+		final double tollFactor = SanralTollFactor.getTollFactor(person, link.getId(), time);
+//		System.err.println( " toll factor: " + tollFactor ) ;
+		return new Cost( baseToll.startTime, baseToll.endTime, FACTOR * baseToll.amount * tollFactor );
 	}
 
 	public Map<Id, List<Cost>> getLinkIds() {

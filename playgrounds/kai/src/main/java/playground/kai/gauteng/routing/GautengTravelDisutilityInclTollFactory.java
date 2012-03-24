@@ -60,7 +60,7 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 			public double getLinkTravelDisutility(Link link, double time) {
 				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time);
 				double toll = 0. ;
-				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, this.person) ;
+				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, this.person.getId() ) ;
 				if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
 					toll = link.getLength() * cost.amount ;
 				} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_CORDON ) ) {

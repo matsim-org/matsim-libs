@@ -26,7 +26,9 @@ class GautengControler {
 	
 	public static void main ( String[] args ) {
 
-		final Controler controler = new Controler( args ) ;
+		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
+
+		final Controler controler = new Controler( configFileName ) ;
 
 		controler.setOverwriteFiles(true) ;
 		
@@ -84,9 +86,9 @@ class GautengControler {
 		controler.addControlerListener( new IterationEndsListener() {
 			@Override
 			public void notifyIterationEnds(final IterationEndsEvent event) {
-				log.info("The sum of all paid tolls : " + calcPaidToll.getAllAgentsToll() + " Euro.");
-				log.info("The number of people, who paid toll : " + calcPaidToll.getDraweesNr());
-				log.info("The average paid trip length : " + cattl.getAverageTripLength() + " m.");
+				log.info("The sum of all paid tolls          : " + calcPaidToll.getAllAgentsToll() + " monetary units.");
+				log.info("The number of people who paid toll : " + calcPaidToll.getDraweesNr());
+				log.info("The average paid trip length       : " + cattl.getAverageTripLength() + " m.");
 			}
 		} ) ;
 		
@@ -106,7 +108,8 @@ class GautengControler {
 		}
 
 		// wrapper that provides vehicle dependent scheme:
-		RoadPricingSchemeI vehDepScheme = new GautengRoadPricingScheme( scheme, controler.getScenario().getNetwork() );
+		RoadPricingSchemeI vehDepScheme = new GautengRoadPricingScheme( scheme, controler.getScenario().getNetwork() 
+				, controler.getScenario().getPopulation() );
 
 		return vehDepScheme;
 	}
