@@ -51,7 +51,10 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -80,6 +83,7 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 	private final HouseholdsTracker householdsTracker;
 	private final VehiclesTracker vehiclesTracker;
 	private final CoordAnalyzer coordAnalyzer;
+	private final Geometry affectedArea;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final int numOfThreads;
 
@@ -91,12 +95,13 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 	
 	public SelectHouseholdMeetingPoint(Scenario scenario, MultiModalTravelTimeFactory timeFactory,
 			HouseholdsTracker householdsTracker, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer,
-			ModeAvailabilityChecker modeAvailabilityChecker) {
+			Geometry affectedArea, ModeAvailabilityChecker modeAvailabilityChecker) {
 		this.scenario = scenario;
 		this.timeFactory = timeFactory;
 		this.householdsTracker = householdsTracker;
 		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
+		this.affectedArea = affectedArea;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
@@ -124,6 +129,14 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 		Scenario subScenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(subScenario).readFile(config.network().getInputFile());
 		Network subNetwork = subScenario.getNetwork();
+
+		/*
+		 * If enabled in config file, convert subNetwork to a multi-modal network.
+		 */
+		if (this.scenario.getConfig().multiModal().isCreateMultiModalNetwork()) {
+			log.info("Creating multi modal network.");
+			new MultiModalNetworkCreator(this.scenario.getConfig().multiModal()).run(subNetwork);
+		}
 		
 		/*
 		 * Adding z-coordinates to the network
@@ -136,15 +149,27 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 		 */
 		Set<Id> affectedNodes = new HashSet<Id>();
 		for (Node node : subNetwork.getNodes().values()) {
-			if (this.coordAnalyzer.isNodeAffected(node)) affectedNodes.add(node.getId());
+			if (coordAnalyzer.isNodeAffected(node)) affectedNodes.add(node.getId());
 		}
 		log.info("Found " + affectedNodes.size() + " nodes inside affected area.");
+
+		/*
+		 * Identify buffered affected nodes.
+		 */
+		CoordAnalyzer bufferedCoordAnalyzer = this.defineBufferedArea();
+		Set<Id> bufferedAffectedNodes = new HashSet<Id>();
+		for (Node node : subNetwork.getNodes().values()) {
+			if (bufferedCoordAnalyzer.isNodeAffected(node) && !affectedNodes.contains(node.getId())) {
+				bufferedAffectedNodes.add(node.getId());
+			}
+		}
+		log.info("Found " + bufferedAffectedNodes.size() + " additional nodes inside buffered affected area.");
 		
 		/*
 		 * Identify link that cross the evacuation line and their start and
 		 * end nodes which are located right after the evacuation line.
 		 */
-		Set<Id> crossEvacuationLineNodes = new HashSet<Id>();
+		Set<Id> crossEvacuationLineNodes = new HashSet<Id>(bufferedAffectedNodes);
 		Set<Id> crossEvacuationLineLinks = new HashSet<Id>();
 		for (Link link : subNetwork.getLinks().values()) {
 			boolean fromNodeInside = affectedNodes.contains(link.getFromNode().getId());
@@ -170,11 +195,10 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 				nodesToRemove.add(node.getId());
 			}
 		}
-		for (Id id : nodesToRemove) subNetwork.removeNode(id);
-		
+		for (Id id : nodesToRemove) subNetwork.removeNode(id);	
 		log.info("Remaining nodes " + subNetwork.getNodes().size());
 		log.info("Remaining links " + subNetwork.getLinks().size());
-		
+	
 		Set<String> transportModes = new HashSet<String>();
 		transportModes.add(TransportMode.bike);
 		transportModes.add(TransportMode.car);
@@ -193,6 +217,9 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 		subNetwork.addNode(exitNode2);
 		subNetwork.addLink(exitLink);
 		
+		/*
+		 * Create exit links for links that cross the evacuation line.
+		 */
 		int i = 0;
 		for (Id id : crossEvacuationLineNodes) {
 			Node node = subNetwork.getNodes().get(id);
@@ -209,6 +236,67 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 		 */
 		TravelTimeWrapperFactory wrapperTimeFactory = new TravelTimeWrapperFactory(timeFactory);
 		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, wrapperTimeFactory, factory, routeFactory);
+	}
+	
+	/*
+	 * Identify facilities that are located inside the affected area. They
+	 * might be attached to links which are NOT affected. However, those links
+	 * still have to be included in the sub network.
+	 * The links themselves are secure, therefore we can directly connect them
+	 * to the exit node.
+	 */
+	private CoordAnalyzer defineBufferedArea() {
+	
+		double buffer = 0.0;
+		double dBuffer = 50.0;	// buffer increase per iteration
+		
+		/*
+		 * Identify not affected links where affected facilities are attached.
+		 */
+		Set<Link> links = new HashSet<Link>();
+		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
+			if (this.coordAnalyzer.isFacilityAffected(facility)) {
+				Id linkId = facility.getLinkId();
+				Link link = scenario.getNetwork().getLinks().get(linkId);
+				
+				if (!this.coordAnalyzer.isLinkAffected(link)) {
+					links.add(link);
+				}
+			}
+		}
+		
+		/*
+		 * Increase the buffer until all links are included in the geometry.
+		 */
+		if (links.size() == 0) return this.coordAnalyzer;
+		else {
+			while (true) {
+				buffer += dBuffer;
+				Geometry geometry = this.affectedArea.buffer(buffer);
+				
+				CoordAnalyzer bufferedCoordAnalyzer = new CoordAnalyzer(geometry);
+				
+				boolean increaseBuffer = false;
+				for (Link link : links) {
+					/*
+					 * If the link and/or its from/to nodes is not affected, 
+					 * the buffer has to be increased.
+					 */
+					if (!bufferedCoordAnalyzer.isLinkAffected(link) ||
+							!bufferedCoordAnalyzer.isNodeAffected(link.getFromNode()) ||
+							!bufferedCoordAnalyzer.isNodeAffected(link.getToNode())) {
+						increaseBuffer = true;
+						break;
+					}
+				}
+				
+				if (!increaseBuffer) {
+					log.info("A buffer of  " + buffer + " was required to catch all links where affected" +
+							"facilities are attached to.");
+					return bufferedCoordAnalyzer;
+				}
+			}
+		}		
 	}
 	
 	/*

@@ -68,7 +68,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final CoordAnalyzer coordAnalyzer;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final PlanAlgorithm toHomeFacilityPlanAlgo;
-	private final PlanAlgorithm fromHomeFacilityPlanAlgo;
+	private final PlanAlgorithm evacuationPlanAlgo;
 	
 	private final List<Household> householdsToCheck;
 	private double time;
@@ -83,7 +83,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		
 		this.toHomeFacilityPlanAlgo = toHomeFacilityRouter.getPlanAlgoInstance();
-		this.fromHomeFacilityPlanAlgo = fromHomeFacilityRouter.getPlanAlgoInstance();
+		this.evacuationPlanAlgo = fromHomeFacilityRouter.getPlanAlgoInstance();
 		
 		this.householdsToCheck = new ArrayList<Household>();
 	}
@@ -223,6 +223,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		 */
 		Id fromLinkId = null;
 		String mode = null;
+		boolean needsHomeRouting = true;
 		if (positionType == Position.LINK) {
 			mode = agentPosition.getTransportMode();
 			fromLinkId = agentPosition.getPositionId();
@@ -234,42 +235,39 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			Id facilityId = agentPosition.getPositionId();
 			ActivityFacility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId);
 			pdd.isAffected = this.coordAnalyzer.isFacilityAffected(facility);
-
+			
 			/*
 			 * If the current Activity is performed ad the homeFacilityId, the return
 			 * home time is 0.0.
 			 */
 			if (facilityId.equals(homeFacilityId)) {
-				pdd.agentReturnHomeTime = 0.0;
-			} 
+				needsHomeRouting = false;
+			}
 			
 			/*
 			 * Otherwise the activity is performed at another facility. Get the link where
 			 * the facility is attached to the network.
 			 */
-			else {
-				// get the index of the currently performed activity in the selected plan
-				MobsimAgent mobsimAgent = agentPosition.getAgent();
-				PlanAgent planAgent = (PlanAgent) mobsimAgent;
-				
-				PlanImpl executedPlan = (PlanImpl) planAgent.getSelectedPlan();
-				
-				Activity currentActivity = (Activity) planAgent.getCurrentPlanElement();
-				int currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
-				
-				Id possibleVehicleId = getVehicleId(executedPlan);
-				mode = this.modeAvailabilityChecker.identifyTransportMode(currentActivityIndex, executedPlan, possibleVehicleId);
-				fromLinkId = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
-				
-				/*
-				 * If the agent has a vehicle available, the car will be available at the
-				 * home location for the evacuation. 
-				 */
-				if (mode.equals(TransportMode.car)) {
-					pdd.agentReturnHomeVehicleId = possibleVehicleId;
-				}				
-			}
+			// get the index of the currently performed activity in the selected plan
+			MobsimAgent mobsimAgent = agentPosition.getAgent();
+			PlanAgent planAgent = (PlanAgent) mobsimAgent;
 			
+			PlanImpl executedPlan = (PlanImpl) planAgent.getSelectedPlan();
+			
+			Activity currentActivity = (Activity) planAgent.getCurrentPlanElement();
+			int currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
+			
+			Id possibleVehicleId = getVehicleId(executedPlan);
+			mode = this.modeAvailabilityChecker.identifyTransportMode(currentActivityIndex, executedPlan, possibleVehicleId);
+			fromLinkId = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
+			
+			/*
+			 * If the agent has a vehicle available, the car will be available at the
+			 * home location for the evacuation. 
+			 */
+			if (mode.equals(TransportMode.car)) {
+				pdd.agentReturnHomeVehicleId = possibleVehicleId;
+			}	
 		} else if (positionType == Position.VEHICLE) {
 			mode = agentPosition.getTransportMode();
 			
@@ -291,8 +289,10 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		/*
 		 * Calculate the travel time from the agents current position to its home facility.
 		 */
-		double t = calculateTravelTime(toHomeFacilityPlanAlgo, personId, fromLinkId, homeLinkId, mode, time);
-		pdd.agentReturnHomeTime = t;
+		if (needsHomeRouting) {
+			double t = calculateTravelTime(toHomeFacilityPlanAlgo, personId, fromLinkId, homeLinkId, mode, time);
+			pdd.agentReturnHomeTime = t;
+		} else pdd.agentReturnHomeTime = time;
 		pdd.agentTransportMode = mode;
 		
 		/*
@@ -301,7 +301,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		if (!pdd.isAffected) pdd.agentDirectEvacuationTime = 0.0;
 		else {
 			Id toLinkId = this.scenario.createId("exitLink");
-			t = calculateTravelTime(toHomeFacilityPlanAlgo, personId, fromLinkId, toLinkId, mode, time);
+			double t = calculateTravelTime(evacuationPlanAlgo, personId, fromLinkId, toLinkId, mode, time);
 			pdd.agentDirectEvacuationTime = t;
 		}
 	}
@@ -338,13 +338,13 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			if (mode.equals(TransportMode.car)) {
 				// Calculate a car travel time only once since it should not be person dependent.
 				if (vehicularTravelTime == Double.MIN_VALUE) {
-					vehicularTravelTime = calculateTravelTime(fromHomeFacilityPlanAlgo, entry.getKey(), hdd.homeLinkId, toLinkId, mode, time);
+					vehicularTravelTime = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.homeLinkId, toLinkId, mode, time);
 				} else continue;
 			}
 			else if (mode.equals(TransportMode.ride)) continue;
 			else if (mode.equals(PassengerDepartureHandler.passengerTransportMode)) continue;
 			else {
-				double tt = calculateTravelTime(fromHomeFacilityPlanAlgo, entry.getKey(), hdd.homeLinkId, toLinkId, mode, time);
+				double tt = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.homeLinkId, toLinkId, mode, time);
 				if (tt > nonVehicularTravelTime) nonVehicularTravelTime = tt;
 			}
 		}

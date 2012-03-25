@@ -406,7 +406,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.travelTimeCollectorWrapperFactory);
 		
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, timeFactory, 
-				this.householdsTracker, this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.modeAvailabilityChecker.createInstance());
+				this.householdsTracker, this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.affectedArea, this.modeAvailabilityChecker.createInstance());
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 	
