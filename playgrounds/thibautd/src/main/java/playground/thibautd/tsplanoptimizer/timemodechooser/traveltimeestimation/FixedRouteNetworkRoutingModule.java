@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -123,29 +122,16 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	private static Map<Tuple<Id, Id>, NetworkRoute> extractRoutes(final Plan plan) {
 		Map<Tuple<Id, Id>, NetworkRoute> routes = new HashMap<Tuple<Id, Id>, NetworkRoute>();
 
-		// assume strict act/leg alternance.
-		// if not, abort and only keep found routes.
-		try {
-			Iterator<PlanElement> elementIterator = plan.getPlanElements().iterator();
-			Activity origin = (Activity) elementIterator.next();
+		OdIterator iterator = new OdIterator( plan.getPlanElements() );
 
-			while ( elementIterator.hasNext() ) {
-				Leg leg = (Leg) elementIterator.next();
-				Activity destination = (Activity) elementIterator.next();
+		for (Od od = iterator.next(); od != null; od = iterator.next()) {
+			Route route = od.leg.getRoute();
 
-				Route route = leg.getRoute();
-
-				if (route instanceof NetworkRoute) {
-					routes.put(
-							extractOD( origin , destination ),
-							(NetworkRoute) route.clone());
-				}
-
-				origin = destination;
+			if (route instanceof NetworkRoute) {
+				routes.put(
+						extractOD( od.origin , od.destination ),
+						(NetworkRoute) route.clone());
 			}
-		}
-		catch (ClassCastException e) {
-			return routes;
 		}
 
 		return routes;
@@ -392,6 +378,61 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 		@Override
 		public Id getFacilityId() {
 			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+	}
+
+	/**
+	 * "iterator" over patterns of type Act-Leg-Act in a plan.
+	 */
+	private static class OdIterator {
+		private final Iterator<PlanElement> pes;
+		private PlanElement o = null;
+		private PlanElement leg = null;
+		private PlanElement d = null;
+
+		public OdIterator(final List<PlanElement> pes) {
+			this.pes = pes.iterator();
+		}
+
+		public Od next() {
+			boolean wasTranslated = translate();
+			if ( !wasTranslated ) {
+				return null;
+			}
+
+			// search for Act-Leg-Act patterns
+			while ( !(o instanceof Activity) ||
+					!(leg instanceof Leg) ||
+					!(d instanceof Activity) ) {
+				wasTranslated = translate();
+				if ( !wasTranslated ) {
+					return null;
+				}
+			}
+
+			return new Od( (Activity) o , (Leg) leg , (Activity) d );
+		}
+
+		private boolean translate() {
+				if (!pes.hasNext()) {
+					return false;
+				}
+				o = leg;
+				leg = d;
+				d = pes.next();
+				return true;
+		}
+	}
+
+	private static class Od {
+		public static Activity origin;
+		public static Leg leg;
+		public static Activity destination;
+
+		public Od(final Activity o, final Leg l, final Activity d) {
+			origin = o;
+			leg = l;
+			destination = d;
 		}
 	}
 }
