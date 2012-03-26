@@ -251,7 +251,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		VehiclesFactory vehFactory = vehicles.getFactory();
 		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("p"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(11)); // july 2011 the driver takes one seat
+		capacity.setSeats(Integer.valueOf(this.pConfig.getPaxPerVehicle() + 1)); // july 2011 the driver takes one seat
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehType.setCapacity(capacity);
 		vehType.setAccessTime(2.0);
