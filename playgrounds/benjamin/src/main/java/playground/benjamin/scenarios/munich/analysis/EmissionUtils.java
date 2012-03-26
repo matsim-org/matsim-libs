@@ -51,6 +51,7 @@ public class EmissionUtils {
 
 	public EmissionUtils(){
 		personFilter = new PersonFilter();
+		
 		listOfPollutants = new TreeSet<String>();
 		for(WarmPollutant wp : WarmPollutant.values()){
 			listOfPollutants.add(wp.toString());
