@@ -574,6 +574,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		public double getWeight() {
 			return 1.0;
 		}
+
+		@Override
+		public Id getDesiredAccessStopId() {
+			return null;
+		}
 	}
 
 }

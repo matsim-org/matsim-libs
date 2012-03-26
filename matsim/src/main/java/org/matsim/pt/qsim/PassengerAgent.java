@@ -22,6 +22,7 @@ package org.matsim.pt.qsim;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.mobsim.framework.MobsimAgentMarkerInterface;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -56,6 +57,13 @@ public interface PassengerAgent extends MobsimAgentMarkerInterface, Identifiable
 	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
 	 */
 	public boolean getExitAtStop(final TransitStopFacility stop);
+	
+	/**
+	 * Asks a passenger which is departing on a transit leg about the stop it wants to use for accessing the transit line.
+	 * 
+	 * @return The transit stop id.
+	 */
+	public Id getDesiredAccessStopId();
 	
 	/**
 	 * @return a statistical weight, how many "real" agents this agent represents, e.g. "5.0" if you simulate a 20%-sample.

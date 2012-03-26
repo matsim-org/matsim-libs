@@ -43,7 +43,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.InternalInterface;
-import org.matsim.ptproject.qsim.agents.TransitAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -188,7 +187,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id linkId) {
 		// this puts the agent into the transit stop.
-		Id accessStopId = ((TransitAgent) planAgent).getDesiredAccessStopId();
+		Id accessStopId = ((PassengerAgent) planAgent).getDesiredAccessStopId();
 		if (accessStopId == null) {
 			// looks like this agent has a bad transit route, likely no
 			// route could be calculated for it

@@ -187,6 +187,11 @@ public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 		return MobsimAgent.State.ABORT ;
 	}
 
+	@Override
+	public Id getDesiredAccessStopId() {
+		return null;
+	}
+
 //	@Override
 //	public Plan getSelectedPlan() {
 //		return PopulationUtils.unmodifiablePlan(this.dummyPerson.getSelectedPlan());

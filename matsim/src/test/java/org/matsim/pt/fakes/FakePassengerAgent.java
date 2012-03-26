@@ -68,4 +68,9 @@ public class FakePassengerAgent implements PassengerAgent {
 		return 1.0;
 	}
 
+	@Override
+	public Id getDesiredAccessStopId() {
+		return null;
+	}
+
 }
