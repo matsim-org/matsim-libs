@@ -140,6 +140,7 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 			// (means nobody has entered the vehicle yet)
 			return;
 		}
+		TransitStopFacility fac = this.schedule.getFacilities().get(facId);
 
 		for (Id personId : this.personsFromVehId.get(vehId)) {
 			// get the "Person" behind the id:
@@ -149,14 +150,10 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 			Plan selectedPlan = person.getSelectedPlan();
 
 			// get the planStepFactory for the plan (or create one):
-
 			PlanBuilder<TransitStopFacility> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
 
 			if (tmpPlanStepFactory != null) {
-
 				// add the "turn" to the planStepfactory
-				TransitStopFacility fac = this.schedule.getFacilities().get(facId);
-
 				tmpPlanStepFactory.addTurn(fac, (int) time);
 			}
 		}
@@ -195,11 +192,7 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 
 		planStepFactory = (PlanBuilder<TransitStopFacility>) selectedPlan.getCustomAttributes().get(this.STR_PLANSTEPFACTORY);
 		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(this.STR_ITERATION);
-		if (planStepFactory == null
-		// (means there is not yet a plansStepFactory for this plan
-				|| factoryIteration == null || factoryIteration != this.iteration
-		// (means the iteration for which the plansStepFactory was build is over)
-		) {
+		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
 			// attach the iteration number to the plan:
 			selectedPlan.getCustomAttributes().put(this.STR_ITERATION, this.iteration);
 

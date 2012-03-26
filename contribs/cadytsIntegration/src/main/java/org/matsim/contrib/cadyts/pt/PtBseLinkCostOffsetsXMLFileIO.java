@@ -25,6 +25,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import utilities.misc.DynamicDataXMLFileIO;
 
+/**
+ * Enables cadyts to persist the cost offsets to file.
+ */
 public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitStopFacility> {
 
 	private static final long serialVersionUID = 1L;
