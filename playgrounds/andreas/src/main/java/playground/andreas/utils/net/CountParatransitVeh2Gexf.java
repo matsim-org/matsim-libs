@@ -69,17 +69,17 @@ public class CountParatransitVeh2Gexf extends MatsimJaxbXmlWriter {
 		
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("F:/p_run/network_real.xml");
+		new MatsimNetworkReader(scenario).readFile("F:/p/network_real.xml");
 //		new MatsimNetworkReader(scenario).readFile("D:/berlin_bvg3/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz");
 		
 		net2Gexf.addNetworkAsLayer(network, 0);
 		net2Gexf.createAttValues();
 		
-		for (int i = 0; i <= 10000; i++) {
-			net2Gexf.handleEvents("all2all", "F:/p_run/", i, "p_");
+		for (int i = 0; i <= 100; i++) {
+			net2Gexf.handleEvents("abbacddct", "F:/p/", i, "p_");
 		}
 		
-		net2Gexf.write("F:/p_run/gexf_out_all2all.gexf");
+		net2Gexf.write("F:/p/gexf_out_abbacddct.gexf");
 
 	}
 
@@ -100,7 +100,7 @@ public class CountParatransitVeh2Gexf extends MatsimJaxbXmlWriter {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			eventsManager.addHandler(handler);
 			EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
-			eventsReader.parse(path + runName + "/it." + iteration + "/" + runName +"." + iteration + ".events.xml.gz");
+			eventsReader.parse(path + runName + "/ITERS/it." + iteration + "/" + runName +"." + iteration + ".events.xml.gz");
 			
 			addValuesToGexf(iteration, handler);
 			
