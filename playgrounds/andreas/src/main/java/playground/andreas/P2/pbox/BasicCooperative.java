@@ -62,6 +62,8 @@ public class BasicCooperative implements Cooperative{
 	private double budgetLastIteration;
 	private double scorePerVehicle;
 	private double scorePerVehicleLastIteration;
+	private double score;
+	private double scoreLastIteration;
 	
 	private PRouteProvider routeProvider;
 	private int currentIteration;
@@ -90,6 +92,7 @@ public class BasicCooperative implements Cooperative{
 	}
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
+		this.scoreLastIteration = this.score;
 		this.budgetLastIteration = this.budget;
 		this.scorePerVehicleLastIteration = scorePerVehicle;
 		int nVehicles = 0;
@@ -101,7 +104,8 @@ public class BasicCooperative implements Cooperative{
 			}
 			nVehicles += plan.getNVehciles();
 		}
-		this.scorePerVehicle = (this.budget - this.budgetLastIteration) / nVehicles;
+		this.score = this.budget - this.budgetLastIteration;
+		this.scorePerVehicle = this.score / nVehicles;
 	}
 
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
@@ -110,7 +114,7 @@ public class BasicCooperative implements Cooperative{
 		if(this.testPlan != null){
 			// compare score per vehicles
 //			if(this.scorePerVehicle > this.scorePerVehicleLastIteration){
-			if (this.budget > this.budgetLastIteration){
+			if (this.score > this.scoreLastIteration){
 				// testPlan improves the plan, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
 				this.bestPlan.setStartStop(this.testPlan.getStartStop());
 				this.bestPlan.setEndStop(this.testPlan.getEndStop());
