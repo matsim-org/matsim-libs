@@ -75,7 +75,7 @@ public class ParkAndRideIncluder {
 			return false;
 		}
 
-		ParkAndRideFacility choosenFacility = identifyPnrFacility( pnrAccess );
+		ParkAndRideFacility choosenFacility = identifyPnrFacility( pnrAccess , facilities );
 
 		TripRouter.insertTrip(
 				planElements,
@@ -151,8 +151,9 @@ public class ParkAndRideIncluder {
 		}
 	}
 
-	private ParkAndRideFacility identifyPnrFacility(
-			final List<? extends PlanElement> pnrAccess) {
+	public static ParkAndRideFacility identifyPnrFacility(
+			final List<? extends PlanElement> pnrAccess,
+			final ParkAndRideFacilities facilities) {
 		if (pnrAccess.size() < 2) {
 			return null;
 		}

@@ -48,6 +48,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -90,7 +91,6 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 	private final TransitRouterConfig transitRouterConfig;
 	private final ModeRouteFactory routeFactory;
 	private final PopulationFactory populationFactory;
-	private final TransitRouterNetworkTravelTimeAndDisutility ttCalculator;
 	private final TransitSchedule transitSchedule;
 	private final DepartureTimeCache departureTimeCache = new DepartureTimeCache();
 
@@ -109,7 +109,6 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final PersonalizableTravelDisutility pnrCost,
 			final PersonalizableTravelTime pnrTime) {
 		this.transitSchedule = schedule;
-		this.ttCalculator = ptTimeCost;
 		this.facilities = parkAndRideFacilities;
 		this.routeFactory = routeFactory;
 		this.populationFactory = populationFactory;
@@ -200,8 +199,11 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			if (directWalkCost < pathCost) {
 				List<Leg> legs = new ArrayList<Leg>();
 				Leg leg = new LegImpl(TransportMode.transit_walk);
-				double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / transitRouterConfig.getBeelineWalkSpeed();
-				Route walkRoute = new GenericRouteImpl(null, null);
+				double walkDistance = CoordUtils.calcDistance(fromCoord, toCoord);
+				double walkTime = walkDistance / transitRouterConfig.getBeelineWalkSpeed();
+				Route walkRoute = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+				walkRoute.setTravelTime( walkTime );
+				walkRoute.setDistance( walkDistance );
 				leg.setRoute(walkRoute);
 				leg.setTravelTime(walkTime);
 				legs.add(leg);
@@ -342,7 +344,8 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final Facility fromFacility,
 			final Facility toFacility,
 			final LinkIterator links) {
-		List< Leg > baseTrip = parsePtSubTripLegs( fromFacility , toFacility , links );
+		Tuple< List<Leg> , Double > tripAndCost = parsePtSubTripLegs( fromFacility , toFacility , links );
+		List< Leg > baseTrip = tripAndCost.getFirst();
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
 		// the following was executed in PlansCalcTransitRoute at plan insertion.
@@ -351,7 +354,8 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		Id toLinkId = null;
 		if (baseTrip.size() > 1) { // at least one pt leg available
 			toLinkId = (baseTrip.get(1).getRoute()).getStartLinkId();
-		} else {
+		}
+		else {
 			toLinkId = toFacility.getLinkId();
 		}
 
@@ -403,16 +407,40 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 				trip.add( leg2 );
 			}
 		}
+
+		// check if walk would actually be better
+		double directWalkCost =
+			CoordUtils.calcDistance(
+					fromFacility.getCoord(),
+					toFacility.getCoord()) /
+			transitRouterConfig.getBeelineWalkSpeed() * ( 0 - transitRouterConfig.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		if (directWalkCost < tripAndCost.getSecond()) {
+			List<PlanElement> legs = new ArrayList<PlanElement>();
+			Leg leg = new LegImpl(TransportMode.transit_walk);
+			double walkTime =
+				CoordUtils.calcDistance(
+						fromFacility.getCoord(),
+						toFacility.getCoord()) /
+				transitRouterConfig.getBeelineWalkSpeed();
+			Route walkRoute = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+			walkRoute.setTravelTime( walkTime );
+			leg.setRoute(walkRoute);
+			leg.setTravelTime(walkTime);
+			legs.add(leg);
+			return legs;
+		}
+
 		return trip;
 	}
 
 	// adapted from TransitRouterImpl.convert(...)
 	// returns a list of tuples leg/arrival coord of the leg
-	private List<Leg> parsePtSubTripLegs(
+	private Tuple<List<Leg>, Double> parsePtSubTripLegs(
 			final Facility fromFacility,
 			final Facility toFacility,
 			final LinkIterator links) {
 		double time = links.now();
+		double cost = 0;
 		List<Leg> legs = new ArrayList<Leg>();
 		Leg leg = null;
 
@@ -421,7 +449,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			legs.clear();
 			leg = createFullWalk( fromFacility , toFacility );
 			legs.add( leg );
-			return legs;
+			return new Tuple<List<Leg>, Double>( legs , cost );
 		}
 
 		TransitLine line = null;
@@ -432,6 +460,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 
 		int transitLegCount = 0;
 		for (Link link = links.next(); links.hasNext(); link = links.next()) {
+			cost += timeCost.getLinkTravelDisutility( link , time );
 			TransitRouterNetworkLink l = (TransitRouterNetworkLink) link;
 
 			if (l.getLine() == null) {
@@ -544,7 +573,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			legs.add( leg );
 		}
 
-		return legs;
+		return new Tuple<List<Leg>, Double>( legs , cost );
 	}
 
 	private Leg createFullWalk(
