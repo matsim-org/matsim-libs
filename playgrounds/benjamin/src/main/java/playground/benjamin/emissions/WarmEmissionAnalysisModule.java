@@ -21,11 +21,8 @@
  * *********************************************************************** */
 package playground.benjamin.emissions;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -60,8 +57,8 @@ public class WarmEmissionAnalysisModule {
 
 	int vehAttributesNotSpecifiedCnt = 0;
 	final int maxWarnCnt = 3;
-	Set<Id> vehAttributesNotSpecified = Collections.synchronizedSet(new HashSet<Id>());
-	Set<Id> vehicleIdSet = Collections.synchronizedSet(new HashSet<Id>());
+//	Set<Id> vehAttributesNotSpecified = Collections.synchronizedSet(new HashSet<Id>());
+//	Set<Id> vehicleIdSet = Collections.synchronizedSet(new HashSet<Id>());
 
 	int freeFlowCounter = 0;
 	int stopGoCounter = 0;
@@ -101,8 +98,8 @@ public class WarmEmissionAnalysisModule {
 	public void reset() {
 		logger.info("resetting counters...");
 		vehAttributesNotSpecifiedCnt = 0;
-		vehAttributesNotSpecified.clear();
-		vehicleIdSet.clear();
+//		vehAttributesNotSpecified.clear();
+//		vehicleIdSet.clear();
 	
 		freeFlowCounter = 0;
 		stopGoCounter = 0;
@@ -212,14 +209,14 @@ public class WarmEmissionAnalysisModule {
 								"`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
 						if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 					}
-					vehAttributesNotSpecified.add(personId);
+//					vehAttributesNotSpecified.add(personId);
 				}
 			} else {
 				stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 				efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 				efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 
-				vehAttributesNotSpecified.add(personId);
+//				vehAttributesNotSpecified.add(personId);
 			}
 			
 			if (averageSpeed_kmh > freeFlowSpeed_kmh){
@@ -249,7 +246,7 @@ public class WarmEmissionAnalysisModule {
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
 		emissionEventCounter++;
-		vehicleIdSet.add(personId);
+//		vehicleIdSet.add(personId);
 		return warmEmissionsOfEvent;
 	}
 
@@ -278,13 +275,13 @@ public class WarmEmissionAnalysisModule {
 		return vehicleInformationTuple;
 	}
 
-	public Set<Id> getVehAttributesNotSpecified() {
-		return vehAttributesNotSpecified;
-	}
-
-	public Set<Id> getVehicleIdSet() {
-		return vehicleIdSet;
-	}
+//	public Set<Id> getVehAttributesNotSpecified() {
+//		return vehAttributesNotSpecified;
+//	}
+//
+//	public Set<Id> getVehicleIdSet() {
+//		return vehicleIdSet;
+//	}
 
 	public int getFreeFlowOccurences() {
 		return freeFlowCounter / WarmPollutant.values().length;

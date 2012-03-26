@@ -22,9 +22,7 @@
 package playground.benjamin.emissions;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -79,8 +77,8 @@ public class ColdEmissionAnalysisModule {
 	int vehInfoWarnHDVCnt = 0;
 	int vehAttributesNotSpecifiedCnt = 0;
 	final int maxWarnCnt = 3;
-	Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
-	Set<Id> vehicleIdSet = new HashSet<Id>();
+//	Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
+//	Set<Id> vehicleIdSet = new HashSet<Id>();
 
 	public static class ColdEmissionAnalysisModuleParameter {
 		public Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
@@ -107,8 +105,8 @@ public class ColdEmissionAnalysisModule {
 		logger.info("resetting counters...");
 		vehInfoWarnHDVCnt = 0;
 		vehAttributesNotSpecifiedCnt = 0;
-		vehAttributesNotSpecified.clear();
-		vehicleIdSet.clear();
+//		vehAttributesNotSpecified.clear();
+//		vehicleIdSet.clear();
 	}
 
 	public void calculateColdEmissionsAndThrowEvent(
@@ -194,15 +192,15 @@ public class ColdEmissionAnalysisModule {
 							    "`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
 						if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 					}
-					vehAttributesNotSpecified.add(personId);
+//					vehAttributesNotSpecified.add(personId);
 				}
 			} else {
 				generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
-				vehAttributesNotSpecified.add(personId);
+//				vehAttributesNotSpecified.add(personId);
 			}
 			coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
 		}
-		vehicleIdSet.add(personId);
+//		vehicleIdSet.add(personId);
 		return coldEmissionsOfEvent;
 	}
 
@@ -231,11 +229,11 @@ public class ColdEmissionAnalysisModule {
 		return vehicleInformationTuple;
 	}
 
-	public Set<Id> getVehAttributesNotSpecified() {
-		return vehAttributesNotSpecified;
-	}
-
-	public Set<Id> getVehicleIdSet() {
-		return vehicleIdSet;
-	}
+//	public Set<Id> getVehAttributesNotSpecified() {
+//		return vehAttributesNotSpecified;
+//	}
+//
+//	public Set<Id> getVehicleIdSet() {
+//		return vehicleIdSet;
+//	}
 }

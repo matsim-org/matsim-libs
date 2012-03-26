@@ -419,7 +419,7 @@ public class EmissionModule {
 				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
 		
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
-		ColdEmissionAnalysisModule cam = coldEmissionHandler.getColdEmissionAnalysisModule();
+//		ColdEmissionAnalysisModule cam = coldEmissionHandler.getColdEmissionAnalysisModule();
 		
 		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
@@ -433,12 +433,12 @@ public class EmissionModule {
 		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
 		
-		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
-				+ wam.getVehAttributesNotSpecified().size() + " of "
-				+ wam.getVehicleIdSet().size() + " vehicles.");
-		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
-				+ cam.getVehAttributesNotSpecified().size() + " of "
-				+ cam.getVehicleIdSet().size() + " vehicles.");
+//		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
+//				+ wam.getVehAttributesNotSpecified().size() + " of "
+//				+ wam.getVehicleIdSet().size() + " vehicles.");
+//		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
+//				+ cam.getVehAttributesNotSpecified().size() + " of "
+//				+ cam.getVehicleIdSet().size() + " vehicles.");
 		
 		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}

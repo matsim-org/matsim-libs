@@ -168,7 +168,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		vehicleInformation = vehicleType.getId().toString();
 
 //// ===
-//// TODO: remove this after debuging
+//// TODO: remove this after debugging
 //		double linkLength_km = linkLength / 1000;
 //		double travelTime_h = travelTime / 3600;
 //		double freeFlowSpeed_kmh_double = (freeVelocity * 3.6);
