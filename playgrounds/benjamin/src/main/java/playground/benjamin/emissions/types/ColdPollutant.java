@@ -25,10 +25,9 @@ package playground.benjamin.emissions.types;
  */
 public enum ColdPollutant {
 	
-	/*TODO: CO2 not directly available for cold emissions; thus it could be calculated through FC as follows:
+	/*TODO: CO2 not directly available for cold emissions; thus it could be calculated through FC, CO, and HC as follows:
 	get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866) / 0.273;*/
-	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
-	CO("CO"), HC("HC");
+	CO("CO"), FC("FC"), HC("HC"), NMHC("NMHC"), NOX("NOx"), NO2("NO2"), PM("PM");
 	
 	private String key;
 

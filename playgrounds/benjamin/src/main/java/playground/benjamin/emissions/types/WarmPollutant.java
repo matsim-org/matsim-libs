@@ -25,9 +25,7 @@ package playground.benjamin.emissions.types;
  */
 public enum WarmPollutant {
 	
-	/*TODO: WarmPollutant should also have "HC" and "CO"*/
-	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
-	CO2_TOTAL("CO2(total)");
+	CO("CO"), CO2_TOTAL("CO2(total)"), FC("FC"), HC("HC"), NMHC("NMHC"), NOX("NOx"), NO2("NO2"), PM("PM"),	SO2("SO2");
 	
 	private String key;
 

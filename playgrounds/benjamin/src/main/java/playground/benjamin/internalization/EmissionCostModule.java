@@ -36,11 +36,11 @@ public class EmissionCostModule {
 	private final double emissionCostFactor;
 	
 	/*Values taken from IMPACT (Maibach et al.(2008))*/
-	private final double EURO_PER_GRAMM_NOX = 9600. / (1000 * 1000);
-	private final double EURO_PER_GRAMM_PM = 384500. / (1000 * 1000);
-	private final double EURO_PER_GRAMM_VOC = 1700. / (1000 * 1000);
-	private final double CONVERSION_FACTOR_HC_TO_VOC = 1.0;
-	private final double EURO_PER_GRAMM_CO2 = 70. / (1000 * 1000);
+	private final double EURO_PER_GRAMM_NOX = 9600. / (1000. * 1000.);
+	private final double EURO_PER_GRAMM_NMVOC = 1700. / (1000. * 1000.);
+	private final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
+	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
+	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 	
 	public EmissionCostModule(double emissionCostFactor) {
 		this.emissionCostFactor = emissionCostFactor;
@@ -50,11 +50,13 @@ public class EmissionCostModule {
 		double warmEmissionCosts = 0.0;
 		
 		for(WarmPollutant wp : warmEmissions.keySet()){
-			if(wp.equals(WarmPollutant.FC)); //do nothing
-			else if(wp.equals(WarmPollutant.NOX)) warmEmissionCosts = warmEmissionCosts + warmEmissions.get(wp) * EURO_PER_GRAMM_NOX;
+			if(wp.equals(WarmPollutant.NOX)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_NOX;
+			else if(wp.equals(WarmPollutant.NMHC)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_NMVOC;
+			else if(wp.equals(WarmPollutant.SO2)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_SO2;
+			else if(wp.equals(WarmPollutant.PM)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_PM2_5_EXHAUST;
+			else if(wp.equals(WarmPollutant.CO2_TOTAL)); // warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_CO2;
+			else if(wp.equals(WarmPollutant.FC)); //do nothing
 			else if(wp.equals(WarmPollutant.NO2)); //do nothing
-			else if(wp.equals(WarmPollutant.PM)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_PM;
-			else if(wp.equals(WarmPollutant.CO2_TOTAL)); //do nothing
 		}
 		return this.emissionCostFactor * warmEmissionCosts;
 	}
@@ -63,10 +65,11 @@ public class EmissionCostModule {
 		double coldEmissionCosts = 0.0;
 		
 		for(ColdPollutant cp : coldEmissions.keySet()){
-			if(cp.equals(ColdPollutant.FC)); //do nothing
-			else if(cp.equals(ColdPollutant.NOX)) coldEmissionCosts += coldEmissions.get(cp) * EURO_PER_GRAMM_NOX;
+			if(cp.equals(ColdPollutant.NOX)) coldEmissionCosts += coldEmissions.get(cp) * EURO_PER_GRAMM_NOX;
+			else if(cp.equals(ColdPollutant.NMHC)) coldEmissionCosts += coldEmissions.get(cp) * EURO_PER_GRAMM_NMVOC;
+			else if(cp.equals(ColdPollutant.PM)) coldEmissionCosts += coldEmissions.get(cp) * EURO_PER_GRAMM_PM2_5_EXHAUST;
+			else if(cp.equals(ColdPollutant.FC)); //do nothing
 			else if(cp.equals(ColdPollutant.NO2)); //do nothing
-			else if(cp.equals(ColdPollutant.PM)) coldEmissionCosts += coldEmissions.get(cp) * EURO_PER_GRAMM_PM;
 			else if(cp.equals(ColdPollutant.CO)); //do nothing
 			else if(cp.equals(ColdPollutant.HC)); //do nothing
 		}
