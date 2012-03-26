@@ -74,9 +74,7 @@ import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
@@ -105,8 +103,8 @@ import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.InvertedNetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -278,7 +276,7 @@ public class Controler {
 	private TransitRouterFactory transitRouterFactory = null;
 
 	/* package */volatile Throwable uncaughtException = null; // package-private
-																// for tests
+	// for tests
 
 	/** initializes Log4J */
 	static {
@@ -416,7 +414,7 @@ public class Controler {
 		// Use a TravelTimeCalculator that buffers TravelTimes from the previous Iteration.
 		TravelTimeCalculatorWithBufferFactory timeFactory = new TravelTimeCalculatorWithBufferFactory();
 		setTravelTimeCalculatorFactory(timeFactory);
-		
+
 		// set Route Factories
 		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 		for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
@@ -470,11 +468,11 @@ public class Controler {
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-					@Override
-					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
-					}
-				});
+			@Override
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
+			}
+		});
 
 		int firstIteration = this.config.controler().getFirstIteration();
 		int lastIteration = this.config.controler().getLastIteration();
@@ -492,7 +490,7 @@ public class Controler {
 			resetRandomNumbers();
 
 			this.controlerListenerManager
-					.fireControlerIterationStartsEvent(this.iteration);
+			.fireControlerIterationStartsEvent(this.iteration);
 			if (this.iteration > firstIteration) {
 				this.stopwatch.beginOperation("replanning");
 				this.controlerListenerManager.fireControlerReplanningEvent(this.iteration);
@@ -531,7 +529,7 @@ public class Controler {
 						"Shutdown probably caused by the following Exception.", this.uncaughtException);
 			}
 			this.controlerListenerManager
-					.fireControlerShutdownEvent(unexpected);
+			.fireControlerShutdownEvent(unexpected);
 			if (this.dumpDataAtEnd) {
 				// dump plans
 				new PopulationWriter(this.population, this.network, 
@@ -544,7 +542,7 @@ public class Controler {
 				ActivityFacilities facilities = this.getFacilities();
 				if (facilities != null) {
 					new FacilitiesWriter((ActivityFacilitiesImpl) facilities)
-						.write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
+					.write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
 				}
 				if (((NetworkFactoryImpl) this.network.getFactory()).isTimeVariant()) {
 					new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"),
@@ -552,7 +550,7 @@ public class Controler {
 				}
 				if (this.config.scenario().isUseHouseholds()) {
 					new HouseholdsWriterV10(this.scenarioData.getHouseholds())
-							.writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
+					.writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
 				}
 				if (this.config.scenario().isUseLanes()) {
 					new LaneDefinitionsWriter20(
@@ -575,7 +573,7 @@ public class Controler {
 				log.info("Cannot remove shutdown hook. " + e.getMessage());
 			}
 			this.shutdownHook = null; // important for test cases to free the
-										// memory
+			// memory
 			this.collectLogMessagesAppender = null;
 			IOUtils.closeOutputDirLogging();
 		}
@@ -649,7 +647,7 @@ public class Controler {
 			log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
 			new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
 		}
-		
+
 		// pre-initialize the travel time calculator to be able to use it in the wrapper
 		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.getTravelTimeCalculator());
@@ -713,7 +711,7 @@ public class Controler {
 					.getWritePlansInterval();
 		}
 	}
-	
+
 	/**
 	 * Design decisions:
 	 * <ul>
@@ -770,14 +768,14 @@ public class Controler {
 					// files!
 					throw new RuntimeException(
 							"The output directory " + this.outputPath
-									+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
+							+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
 				}
 			}
 		} else {
 			if (!outputDir.mkdirs()) {
 				throw new RuntimeException(
 						"The output directory path " + this.outputPath
-								+ " could not be created. Check pathname and permissions!");
+						+ " could not be created. Check pathname and permissions!");
 			}
 		}
 
@@ -956,21 +954,26 @@ public class Controler {
 			Simulation simulation = this.mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
-		}
-		String mobsim = this.config.controler().getMobsim();
-		if (mobsim != null) {
+		} else if (this.config.simulation() != null && this.config.simulation().getExternalExe() != null ) {
+			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData, this.events);
+			simulation.setControlerIO(this.controlerIO);
+			simulation.setIterationNumber(this.getIterationNumber());
+			return simulation;
+		} else if (this.config.controler().getMobsim() != null) {
+			String mobsim = this.config.controler().getMobsim();
 			MobsimFactory f = this.mobsimFactories.get(mobsim);
 			if (f == null) {
 				throw new IllegalArgumentException(
 						"There is no MobsimFactory registered for the name " + mobsim);
 			}
-			Simulation simulation = f.createMobsim(this.getScenario(),
-					this.getEvents());
+			Simulation simulation = f.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		} else {
+			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
+			MobsimFactory mobsimFactory;
 			if (config.getModule(QSimConfigGroup.GROUP_NAME) != null) {
-				setMobsimFactory(new QSimFactory());
+				mobsimFactory = new QSimFactory();
 				/*
 				 * cdobler: If a multi modal simulation should be run,
 				 * we use a MultiModalMobsimFactory which is only a
@@ -980,32 +983,22 @@ public class Controler {
 				 */
 				if (config.multiModal().isMultiModalSimulationEnabled()) {
 					MultiModalTravelTimeWrapperFactory timeFactory = getMultiModalTravelTimeWrapperFactory();
-					MobsimFactory multiModalFactory = new MultiModalMobsimFactory(getMobsimFactory(), timeFactory);
-					setMobsimFactory(multiModalFactory);
+					mobsimFactory = new MultiModalMobsimFactory(mobsimFactory, timeFactory);
 				}
 			} else if (config.getModule("JDEQSim") != null) {
-				setMobsimFactory(new JDEQSimulationFactory());
+				mobsimFactory = new JDEQSimulationFactory();
 			} else if (config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
-				setMobsimFactory(new QueueSimulationFactory());
+				mobsimFactory = new QueueSimulationFactory();
 			} else {
 				log.warn("There is no configuration for a mobility simulation in the config. The Controler "
 						+ "uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file "
 						+ "to avoid this warning");
 				config.addSimulationConfigGroup(new SimulationConfigGroup());
-				setMobsimFactory(new QueueSimulationFactory());
+				mobsimFactory = new QueueSimulationFactory();
 			}
-			
-			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
-			if (this.config.simulation() == null || this.config.simulation().getExternalExe() == null) {
-				Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
-				enrichSimulation(simulation);
-				return simulation;
-			} else {
-				ExternalMobsim sim = new ExternalMobsim(this.scenarioData, this.events);
-				sim.setControlerIO(this.controlerIO);
-				sim.setIterationNumber(this.getIterationNumber());
-				return sim;
-			}
+			Simulation simulation = mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
+			enrichSimulation(simulation);
+			return simulation;
 		}
 	}
 
@@ -1013,7 +1006,7 @@ public class Controler {
 		if (simulation instanceof ObservableSimulation) {
 			for (SimulationListener l : this.getQueueSimulationListener()) {
 				((ObservableSimulation) simulation)
-						.addQueueSimulationListeners(l);
+				.addQueueSimulationListeners(l);
 			}
 		}
 		if (simulation instanceof VisMobsim) {
@@ -1275,7 +1268,7 @@ public class Controler {
 			 * we have to use a multiModalLegHandler.
 			 */
 			plansCalcRoute.addLegHandler(TransportMode.car, multiModalLegHandler);
-			
+
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
 				plansCalcRoute.addLegHandler(mode, multiModalLegHandler);
 			}
