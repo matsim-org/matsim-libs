@@ -74,4 +74,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		return this.weight;
 	}
 
+	@Override
+	public Id getDesiredAccessStopId() {
+		// Probably not used in your simulation because you ask this before you pass the route in. //mz
+		return route.getAccessStopId();
+	}
+
 }

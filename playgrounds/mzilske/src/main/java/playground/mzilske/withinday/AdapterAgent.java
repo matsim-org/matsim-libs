@@ -429,4 +429,10 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 		return 0;
 	}
 
+	@Override
+	public Id getDesiredAccessStopId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
