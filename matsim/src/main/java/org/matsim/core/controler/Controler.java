@@ -138,8 +138,11 @@ import org.matsim.pt.TransitControlerListener;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
-import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
+import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegRouter;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
@@ -372,7 +375,7 @@ public class Controler {
 		this.addMobsimFactory("qsim", new QSimFactory());
 		this.addMobsimFactory("queueSimulation", new QueueSimulationFactory());
 		this.addMobsimFactory("jdeqsim", new JDEQSimulationFactory());
-		this.addMobsimFactory("multimodalQSim", new MultiModalMobsimFactory(new QSimFactory(), this.multiModalTravelTimeFactory));
+		this.addMobsimFactory("multimodalQSim", new QSimFactory());
 	}
 
 	/**
@@ -974,17 +977,6 @@ public class Controler {
 			MobsimFactory mobsimFactory;
 			if (config.getModule(QSimConfigGroup.GROUP_NAME) != null) {
 				mobsimFactory = new QSimFactory();
-				/*
-				 * cdobler: If a multi modal simulation should be run,
-				 * we use a MultiModalMobsimFactory which is only a
-				 * wrapper. It hands over the TravelTimeCalculator to
-				 * the MultiModalSimEngine. I do not like this - but at
-				 * the moment I see no better way to do so...
-				 */
-				if (config.multiModal().isMultiModalSimulationEnabled()) {
-					MultiModalTravelTimeWrapperFactory timeFactory = getMultiModalTravelTimeWrapperFactory();
-					mobsimFactory = new MultiModalMobsimFactory(mobsimFactory, timeFactory);
-				}
 			} else if (config.getModule("JDEQSim") != null) {
 				mobsimFactory = new JDEQSimulationFactory();
 			} else if (config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
@@ -1005,8 +997,7 @@ public class Controler {
 	private void enrichSimulation(final Simulation simulation) {
 		if (simulation instanceof ObservableSimulation) {
 			for (SimulationListener l : this.getQueueSimulationListener()) {
-				((ObservableSimulation) simulation)
-				.addQueueSimulationListeners(l);
+				((ObservableSimulation) simulation).addQueueSimulationListeners(l);
 			}
 		}
 		if (simulation instanceof VisMobsim) {
@@ -1023,6 +1014,18 @@ public class Controler {
 					manager.addSnapshotWriter(snapshotWriter);
 				}
 				((ObservableSimulation) simulation).addQueueSimulationListeners(manager);
+			}
+		}
+		if (simulation instanceof QSim) {
+			// The QSim may need a multiModalSimEngine, which needs travel times, which are kept from iteration to iteration by the Controler.
+			// One day, we may create a dynamic equivalent to the Scenario, which things like Mobsims have access to (and which would then also contain the Plan database).
+			// But until then, this is too special for my taste to put into the MobsimFactory interface, so we add it here in passing.  mz 2012-03
+			if (config.multiModal().isMultiModalSimulationEnabled()) {
+				log.info("Using MultiModalMobsim...");
+				QSim qSim = (QSim) simulation;
+	        	MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimeFactory);
+	        	qSim.addMobsimEngine(multiModalEngine);
+	        	qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalEngine, config.multiModal()));
 			}
 		}
 	}
