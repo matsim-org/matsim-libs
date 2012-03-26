@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.RoutingModuleFactory;
-import playground.thibautd.router.TransitRouterWrapper;
 import playground.thibautd.router.TransitRoutingModuleFactory;
 import playground.thibautd.router.TripRouterFactory;
+import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
@@ -108,7 +107,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 					TransportMode.pt,
 					FixedTransitRouteRoutingModule.createFactory(
 						plan,
-						controler.getTransitRouterFactory().createTransitRouter().getSchedule(),
+						controler.getScenario().getTransitSchedule(),
 						(TransitRoutingModuleFactory) ptFactory ));
 		}
 

@@ -108,7 +108,7 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 					TransportMode.pt,
 					FixedTransitRouteRoutingModule.createFactory(
 						plan,
-						controler.getTransitRouterFactory().createTransitRouter().getSchedule(),
+						controler.getScenario().getTransitSchedule(),
 						(TransitRoutingModuleFactory) ptFactory ));
 		}
 

@@ -122,7 +122,7 @@ public class MultiLegRoutingControler extends Controler {
 		if (getConfig().scenario().isUseTransit()) {
 			factory.setRoutingModuleFactory(
 					TransportMode.pt,
-					new TransitRoutingModuleFactory(getTransitRouterFactory()));
+					new TransitRoutingModuleFactory(getTransitRouterFactory(), getScenario().getTransitSchedule()));
 		}
 
 		// if the user defined something, erase defaults

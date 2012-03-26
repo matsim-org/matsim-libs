@@ -160,7 +160,7 @@ public class DataPrepare {
 				this.scenario.getConfig().vspExperimental());
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, routeFactory,
-				transitConfig, new TransitRouterImpl(this.scenario.getTransitSchedule(), tRConfig ));
+				transitConfig, new TransitRouterImpl(tRConfig, this.scenario.getTransitSchedule() ), this.scenario.getTransitSchedule());
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
@@ -172,7 +172,7 @@ public class DataPrepare {
 				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
 
-		TransitRouterImpl router = new TransitRouterImpl(this.scenario.getTransitSchedule(), tRConfig );
+		TransitRouterImpl router = new TransitRouterImpl(tRConfig, this.scenario.getTransitSchedule() );
 		Network routerNet = router.getTransitRouterNetwork();
 
 		log.info("create vis network");

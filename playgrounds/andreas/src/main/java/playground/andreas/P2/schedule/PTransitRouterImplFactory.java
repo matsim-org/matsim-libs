@@ -82,7 +82,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		if(this.routerNetwork == null){
 			this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
 		}		
-		return new TransitRouterImpl(this.schedule, this.config, new TransitRouterNetworkTravelTimeAndDisutility(this.config), this.routerNetwork);
+		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
+		return new TransitRouterImpl(this.config, this.routerNetwork, ttCalculator, ttCalculator);
 	}
 
 	@Override

@@ -149,7 +149,7 @@ public class TransitControler extends Controler {
 				this.config.vspExperimental());
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory(), this.transitConfig,
-				new TransitRouterImpl(this.scenarioData.getTransitSchedule(), trConfig) );
+				new TransitRouterImpl(trConfig, this.scenarioData.getTransitSchedule()), this.scenarioData.getTransitSchedule() );
 	}
 
 	public static class TransitControlerListener implements StartupListener {

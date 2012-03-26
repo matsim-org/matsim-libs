@@ -51,7 +51,7 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 			final LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
 		//super(config, network, costCalculator, timeCalculator, factory);
-		super(config, network, costCalculator, timeCalculator, factory, routeFactory, transitConfig, new AdaptedTransitRouter(myTransitRouterConfig, schedule));
+		super(config, network, costCalculator, timeCalculator, factory, routeFactory, transitConfig, new AdaptedTransitRouter(myTransitRouterConfig, schedule), schedule);
 
 		//this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
 

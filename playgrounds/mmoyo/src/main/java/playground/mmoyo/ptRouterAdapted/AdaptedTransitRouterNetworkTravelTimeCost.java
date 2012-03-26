@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.DepartureTimeCache;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
@@ -33,6 +34,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetworkTravelTimeAndDisutility {
 
 	private static final Logger log = Logger.getLogger(AdaptedTransitRouterNetworkTravelTimeCost.class);
+	
+	private final DepartureTimeCache data = new DepartureTimeCache();
 
 	private MyTransitRouterConfig myConfig;	
 	public AdaptedTransitRouterNetworkTravelTimeCost(MyTransitRouterConfig config ) {
@@ -103,7 +106,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		}
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
 		
-		double nextDepartureTime = getNextDepartureTime(wrapped.getRoute(), fromStop, now);
+		double nextDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
 		
 		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
 		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station

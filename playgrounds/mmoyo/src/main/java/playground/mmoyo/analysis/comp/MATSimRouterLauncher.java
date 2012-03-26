@@ -49,7 +49,7 @@ public class MATSimRouterLauncher {
 
 		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
 				timeCostCalculator, timeCostCalculator, dijkstraFactory, new ModeRouteFactory(), transitConfig, 
-				new TransitRouterImpl(scenario.getTransitSchedule(), tRConfig));
+				new TransitRouterImpl(tRConfig, scenario.getTransitSchedule()), scenario.getTransitSchedule());
 	
 		Population population = scenario.getPopulation();
 		

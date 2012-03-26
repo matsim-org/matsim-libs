@@ -80,7 +80,7 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
 					controler.getPopulation().getFactory(),
 					controler.getNetwork(),
-					controler.getTransitRouterFactory().createTransitRouter().getSchedule(),
+					controler.getScenario().getTransitSchedule(),
 					transitConfig.beelineWalkConnectionDistance,
 					transitConfig.searchRadius,
 					ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() ),

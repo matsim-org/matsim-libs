@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -38,7 +39,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -48,7 +48,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -58,6 +57,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.DepartureTimeCache;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -92,6 +92,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 	private final TransitRouterNetworkTravelTimeAndDisutility ttCalculator;
 	private final TransitSchedule transitSchedule;
+	private final DepartureTimeCache departureTimeCache = new DepartureTimeCache();
 
 	public ParkAndRideRoutingModule(
 			final ModeRouteFactory routeFactory,
@@ -445,7 +446,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 						(((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 						((TransitRouterNetworkLink) link).fromNode.stop.getArrivalOffset() :
 						((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
-					double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+					double arrivalTime = this.departureTimeCache.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
 					legs.add( leg );
@@ -507,7 +508,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 					(prevLink).toNode.stop.getArrivalOffset()
 					: (prevLink).toNode.stop.getDepartureOffset();
-			double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+			double arrivalTime = this.departureTimeCache.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
 			legs.add( leg );

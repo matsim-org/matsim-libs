@@ -79,7 +79,7 @@ public class RouterTester {
 				s.getConfig().plansCalcRoute(), s.getConfig().transitRouter(),
 				s.getConfig().vspExperimental());
 
-		TransitRouterImpl router = new TransitRouterImpl(ts, tRConfig);
+		TransitRouterImpl router = new TransitRouterImpl(tRConfig, ts);
 
 		PtRouter ptR = new PtRouter(router);
 

@@ -53,12 +53,22 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * -uses myTransitRouterConfig Manuel apr10
  */
 public class AdaptedTransitRouter extends TransitRouterImpl {
+	
+	
 
 	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {
 		
 		//super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
-		super (schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig), buildNetwork(schedule, myTRConfig.beelineWalkConnectionDistance ));
+		this (schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig), buildNetwork(schedule, myTRConfig.beelineWalkConnectionDistance ));
 		//attention : the transit network is created first in the upper class   with "this.adaptedTransitNetwork = buildNetwork()";
+	}
+
+	public AdaptedTransitRouter(
+			TransitSchedule schedule,
+			MyTransitRouterConfig myTRConfig,
+			AdaptedTransitRouterNetworkTravelTimeCost adaptedTransitRouterNetworkTravelTimeCost,
+			TransitRouterNetwork buildNetwork) {
+		super(myTRConfig, buildNetwork, adaptedTransitRouterNetworkTravelTimeCost, adaptedTransitRouterNetworkTravelTimeCost);
 	}
 
 	@Override

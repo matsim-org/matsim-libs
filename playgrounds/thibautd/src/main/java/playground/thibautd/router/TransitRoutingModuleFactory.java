@@ -21,6 +21,7 @@ package playground.thibautd.router;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * Sets the handler for PT so has to use detailed transit simulation.
@@ -30,14 +31,17 @@ import org.matsim.pt.router.TransitRouterFactory;
  */
 public class TransitRoutingModuleFactory implements RoutingModuleFactory {
 	private final TransitRouterFactory transitRouterFactory;
+	private final TransitSchedule transitSchedule;
 
 	/**
 	 * Initialises a builder.
 	 * @param transitRouterFactory the factory to use to initialise hanlders
+	 * @param transitSchedule 
 	 */
 	public TransitRoutingModuleFactory(
-			final TransitRouterFactory transitRouterFactory) {
+			final TransitRouterFactory transitRouterFactory, TransitSchedule transitSchedule) {
 		this.transitRouterFactory = transitRouterFactory;
+		this.transitSchedule = transitSchedule;
 	}
 
 	@Override
@@ -46,6 +50,7 @@ public class TransitRoutingModuleFactory implements RoutingModuleFactory {
 			final TripRouterFactory factory) {
 		return new TransitRouterWrapper(
 				transitRouterFactory.createTransitRouter(),
+				transitSchedule,
 				// use a walk router in case no PT path is found
 				factory.getRoutingModuleFactories().get(
 					TransportMode.transit_walk ).createModule(
