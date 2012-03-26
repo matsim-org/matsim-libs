@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.IdentifiableArrayMap;
 
 public class NodeImpl implements Node {
 
@@ -42,8 +43,10 @@ public class NodeImpl implements Node {
 	private String type = null;
 	private String origid = null;
 
-	protected transient  Map<Id, Link> inlinks  = new LinkedHashMap<Id, Link>(4, 0.95f);
-	protected transient  Map<Id, Link> outlinks = new LinkedHashMap<Id, Link>(4, 0.95f);
+//	protected transient  Map<Id, Link> inlinks  = new LinkedHashMap<Id, Link>(4, 0.95f);
+//	protected transient  Map<Id, Link> outlinks = new LinkedHashMap<Id, Link>(4, 0.95f);
+	protected transient  Map<Id, Link> inlinks  = new IdentifiableArrayMap<Link>();
+	protected transient  Map<Id, Link> outlinks = new IdentifiableArrayMap<Link>();
 
 	protected Coord coord;
 	protected final Id id;
