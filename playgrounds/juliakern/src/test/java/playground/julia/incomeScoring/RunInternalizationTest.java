@@ -25,7 +25,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -36,17 +35,16 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -58,18 +56,12 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import playground.benjamin.emissions.ColdEmissionHandler;
 import playground.benjamin.emissions.EmissionModule;
-import playground.benjamin.emissions.WarmEmissionHandler;
-import playground.benjamin.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import playground.benjamin.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
+import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionScoringFunctionFactory;
-import playground.benjamin.internalization.EmissionTravelCostCalculatorFactory;
+import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
-//import tutorial.programming.example06EventsHandling.MyEventHandler1;
-import playground.julia.incomeScoring.RoadUsedHandler;
-import tutorial.programming.example06EventsHandling.MyEventHandler1;
 
 /**
  * @author benjamin
@@ -93,6 +85,7 @@ public class RunInternalizationTest extends MatsimTestCase{
 	private Controler controler;
 	private Vehicles emissionVehicles;
 	private EmissionModule emissionModule;
+	private EmissionCostModule emissionCostModule;
 	
 	private boolean roadUsed;
 	
@@ -119,12 +112,14 @@ public class RunInternalizationTest extends MatsimTestCase{
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 		
+		emissionCostModule = new EmissionCostModule(1.0);
+		
 		EventsManager controleventsManager = EventsUtils.createEventsManager();
 
 		
 //		installScoringFunctionFactory();
 		installTravelCostCalculatorFactory();
-		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule));
+		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 
 		
 		//linkleaveEventhandler hinzufuegen, der ueberprueft, ob die richtige Strecke gewaehlt wurde,
@@ -133,7 +128,7 @@ public class RunInternalizationTest extends MatsimTestCase{
 		
 		//create the handler and add it
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		
 		//events=	this.controler.getEvents();//.addHandler(handler);
 		RoadUsedHandler handler = new RoadUsedHandler();
@@ -151,7 +146,7 @@ public class RunInternalizationTest extends MatsimTestCase{
 
 
 	private void installTravelCostCalculatorFactory() {
-		EmissionTravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory(emissionModule);
+		EmissionTravelDisutilityCalculatorFactory emissionTccf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissionTccf);
 	}
 

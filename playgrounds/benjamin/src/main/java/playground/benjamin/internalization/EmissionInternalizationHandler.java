@@ -40,10 +40,11 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 	private static final Logger logger = Logger.getLogger(EmissionInternalizationHandler.class);
 
 	EventsManager eventsManager;
-	EmissionCostModule costModule = new EmissionCostModule();
+	EmissionCostModule emissionCostModule;
 
-	public EmissionInternalizationHandler(Controler controler) {
+	public EmissionInternalizationHandler(Controler controler, EmissionCostModule emissionCostModule) {
 		this.eventsManager = controler.getEvents();
+		this.emissionCostModule = emissionCostModule;
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 	public void handleEvent(WarmEmissionEvent event) {
 		Id personId = event.getVehicleId();
 		double time = event.getTime();
-		double warmEmissionCosts = costModule.calculateWarmEmissionCosts(event.getWarmEmissions());
+		double warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
 		double amount2Pay = - warmEmissionCosts;
 		
 		Event moneyEvent = new AgentMoneyEventImpl(time, personId, amount2Pay);
@@ -67,7 +68,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 	public void handleEvent(ColdEmissionEvent event) {
 		Id personId = event.getVehicleId();
 		double time = event.getTime();
-		double coldEmissionCosts = costModule.calculateColdEmissionCosts(event.getColdEmissions());
+		double coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
 		double amount2Pay = - coldEmissionCosts;
 		
 		Event moneyEvent = new AgentMoneyEventImpl(time, personId, amount2Pay);

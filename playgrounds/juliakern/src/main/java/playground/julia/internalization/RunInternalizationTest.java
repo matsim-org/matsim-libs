@@ -34,14 +34,14 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -55,8 +55,9 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.EmissionModule;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
+import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionScoringFunctionFactory;
-import playground.benjamin.internalization.EmissionTravelCostCalculatorFactory;
+import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 
 /**
@@ -78,6 +79,7 @@ public class RunInternalizationTest {
 	private Controler controler;
 	private Vehicles emissionVehicles;
 	private EmissionModule emissionModule;
+	private EmissionCostModule emissionCostModule;
 	
 	private void run() {
 		
@@ -99,14 +101,16 @@ public class RunInternalizationTest {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 		
+		emissionCostModule = new EmissionCostModule(1.0);
+		
 //		installScoringFunctionFactory();
 		installTravelCostCalculatorFactory();
-		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule));
+		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 		this.controler.run();
 	}
 
 	private void installTravelCostCalculatorFactory() {
-		EmissionTravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory(emissionModule);
+		EmissionTravelDisutilityCalculatorFactory emissionTccf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissionTccf);
 	}
 

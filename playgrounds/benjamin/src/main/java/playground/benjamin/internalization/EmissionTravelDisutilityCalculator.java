@@ -40,8 +40,8 @@ import playground.benjamin.emissions.types.WarmPollutant;
  * @author benjamin
  *
  */
-public class EmissionTravelCostCalculator implements PersonalizableTravelDisutility{
-	private static final Logger logger = Logger.getLogger(EmissionTravelCostCalculator.class);
+public class EmissionTravelDisutilityCalculator implements PersonalizableTravelDisutility{
+	private static final Logger logger = Logger.getLogger(EmissionTravelDisutilityCalculator.class);
 	
 	TravelTime timeCalculator;
 	double marginalUtlOfMoney;
@@ -49,16 +49,16 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelDisutil
 	double marginalUtlOfTravelTime;
 	Person person;
 	EmissionModule emissionModule;
-	// TODO: get this from somewhere else?
-	EmissionCostModule costModule = new EmissionCostModule();
+	EmissionCostModule emissionCostModule;
 
 
-	public EmissionTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule) {
+	public EmissionTravelDisutilityCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceCostRateCar();
 		this.marginalUtlOfTravelTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 		this.emissionModule = emissionModule;
+		this.emissionCostModule = emissionCostModule;
 	}
 
 	@Override
@@ -68,14 +68,14 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelDisutil
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time) {
-		double generalizedTravelCost;
+		double linkTravelDisutility;
 		
 		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time);
-		double generalizedTravelTimeCost = this.marginalUtlOfTravelTime * linkTravelTime ;
+		double linkTravelTimeDisutility = this.marginalUtlOfTravelTime * linkTravelTime ;
 		
 		double distance = link.getLength();
 		double distanceCost = - this.distanceCostRateCar * distance;
-		double generalizedDistanceCost = this.marginalUtlOfMoney * distanceCost;
+		double linkDistanceDisutility = this.marginalUtlOfMoney * distanceCost;
 
 		/* The following is an estimate of the warm emission costs that an agent (depending on her vehicle type and
 		the average travel time on that link in the last iteration) would have to pay if chosing that link in the next
@@ -94,16 +94,15 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelDisutil
 					vehicleInformation
 			);
 			
-			double expectedEmissionCosts = this.costModule.calculateWarmEmissionCosts(expectedWarmEmissions);
-			double generalizedExpectedEmissionCost = this.marginalUtlOfMoney * expectedEmissionCosts ;
-//			logger.warn("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
+			double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
+			double linkExpectedEmissionDisutility = this.marginalUtlOfMoney * expectedEmissionCosts ;
+			//			logger.info("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
 			
-////		// Test the routing:
-////		if(!link.getId().equals(new IdImpl("11"))) 
-////			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost;
-////		else 
-			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost + generalizedExpectedEmissionCost;
+			/* // Test the routing:
+			if(!link.getId().equals(new IdImpl("11"))) 
+			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost;
+			else */	linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedEmissionDisutility;
 
-			return generalizedTravelCost;
+			return linkTravelDisutility;
 	}
 }

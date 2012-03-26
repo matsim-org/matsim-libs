@@ -52,7 +52,7 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelDisutil
 	Person person;
 	EmissionModule emissionModule;
 	// TODO: get this from somewhere else?
-	EmissionCostModule costModule = new EmissionCostModule();
+	EmissionCostModule costModule = new EmissionCostModule(1.0);
 
 
 	public EmissionTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule) {

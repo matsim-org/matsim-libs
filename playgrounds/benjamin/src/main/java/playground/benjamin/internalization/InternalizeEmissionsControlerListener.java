@@ -43,6 +43,7 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 
 	Controler controler;
 	EmissionModule emissionModule;
+	EmissionCostModule emissionCostModule;
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
@@ -51,8 +52,10 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	int firstIt;
 	int lastIt;
 
-	public InternalizeEmissionsControlerListener(EmissionModule emissionModule) {
+
+	public InternalizeEmissionsControlerListener(EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
 		this.emissionModule = emissionModule;
+		this.emissionCostModule = emissionCostModule;
 	}
 
 	@Override
@@ -72,7 +75,7 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		iteration = event.getIteration();
 
 		logger.info("creating new emission internalization handler...");
-		emissionInternalizationHandler = new EmissionInternalizationHandler(controler);
+		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule);
 		logger.info("adding emission internalization module to emission events stream...");
 		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
 

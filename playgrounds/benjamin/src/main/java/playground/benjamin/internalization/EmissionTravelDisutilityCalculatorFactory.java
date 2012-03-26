@@ -32,29 +32,31 @@ import playground.benjamin.emissions.EmissionModule;
  * @author benjamin
  *
  */
-public class EmissionTravelCostCalculatorFactory implements	TravelDisutilityFactory {
+public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
 	private final EmissionModule emissionModule;
+	private final EmissionCostModule emissionCostModule;
 
-	public EmissionTravelCostCalculatorFactory(EmissionModule emissionModule) {
+	public EmissionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
 		this.emissionModule = emissionModule;
+		this.emissionCostModule = emissionCostModule;
 	}
 
 	@Override
 	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
-		final EmissionTravelCostCalculator etcc = new EmissionTravelCostCalculator(timeCalculator, cnScoringGroup, emissionModule);
+		final EmissionTravelDisutilityCalculator etdc = new EmissionTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule);
 
 		return new PersonalizableTravelDisutility(){
 
 			@Override
 			public void setPerson(Person person) {
-				etcc.setPerson(person);
+				etdc.setPerson(person);
 			}
 
 			@Override
 			public double getLinkTravelDisutility(Link link, double time) {
-				double generalizedTravelCost = etcc.getLinkTravelDisutility(link, time);
-				return generalizedTravelCost;
+				double linkTravelDisutility = etdc.getLinkTravelDisutility(link, time);
+				return linkTravelDisutility;
 			}
 		};
 	}

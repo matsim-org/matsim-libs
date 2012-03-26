@@ -33,15 +33,19 @@ import playground.benjamin.emissions.types.WarmPollutant;
 public class EmissionCostModule {
 	private static final Logger logger = Logger.getLogger(EmissionCostModule.class);
 	
+	private final double emissionCostFactor;
+	
 	/*Values taken from IMPACT (Maibach et al.(2008))*/
 	private final double EURO_PER_GRAMM_NOX = 9600. / (1000 * 1000);
 	private final double EURO_PER_GRAMM_PM = 384500. / (1000 * 1000);
-	
 	private final double EURO_PER_GRAMM_VOC = 1700. / (1000 * 1000);
 	private final double CONVERSION_FACTOR_HC_TO_VOC = 1.0;
-	
 	private final double EURO_PER_GRAMM_CO2 = 70. / (1000 * 1000);
 	
+	public EmissionCostModule(double emissionCostFactor) {
+		this.emissionCostFactor = emissionCostFactor;
+	}
+
 	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions) {
 		double warmEmissionCosts = 0.0;
 		
@@ -52,7 +56,7 @@ public class EmissionCostModule {
 			else if(wp.equals(WarmPollutant.PM)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_PM;
 			else if(wp.equals(WarmPollutant.CO2_TOTAL)); //do nothing
 		}
-		return warmEmissionCosts;
+		return this.emissionCostFactor * warmEmissionCosts;
 	}
 	
 	public double calculateColdEmissionCosts(Map<ColdPollutant, Double> coldEmissions) {
@@ -66,7 +70,7 @@ public class EmissionCostModule {
 			else if(cp.equals(ColdPollutant.CO)); //do nothing
 			else if(cp.equals(ColdPollutant.HC)); //do nothing
 		}
-		return coldEmissionCosts;
+		return this.emissionCostFactor * coldEmissionCosts;
 	}
 
 }

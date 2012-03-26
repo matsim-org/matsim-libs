@@ -25,52 +25,38 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.*;
+import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import playground.benjamin.emissions.ColdEmissionHandler;
 import playground.benjamin.emissions.EmissionModule;
-import playground.benjamin.emissions.WarmEmissionHandler;
-import playground.benjamin.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import playground.benjamin.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
-import playground.benjamin.internalization.EmissionScoringFunctionFactory;
-import playground.benjamin.internalization.EmissionTravelCostCalculatorFactory;
-import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
-import playground.julia.incomeScoring.RoadUsedHandler;
+import playground.benjamin.internalization.EmissionCostModule;
+import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 
 /**
  * @author benjamin
@@ -96,6 +82,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 	private Controler controler;
 	private Vehicles emissionVehicles;
 	private EmissionModule emissionModule;
+	private EmissionCostModule emissionCostModule;
 	private String outputDirectory;
 
 	public void testEmissionRouting() {
@@ -220,7 +207,8 @@ public class EmissionRoutingTest extends MatsimTestCase{
 	
 
 	private void installTravelCostCalculatorFactory() {
-		EmissionTravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory(emissionModule);
+		emissionCostModule = new EmissionCostModule(1.0);
+		EmissionTravelDisutilityCalculatorFactory emissionTccf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissionTccf);
 	}
 	
