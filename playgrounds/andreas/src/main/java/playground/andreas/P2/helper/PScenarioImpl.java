@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * Hook providing the ability to register a new TransitSchedule
@@ -34,6 +35,8 @@ public class PScenarioImpl extends ScenarioImpl{
 	private static final Logger log = Logger.getLogger(PScenarioImpl.class);
 
 	private TransitSchedule pTransitSchedule = null;
+	
+	private Vehicles pVehicles = null;
 
 	public PScenarioImpl(Config config) {
 		super(config);
@@ -50,8 +53,23 @@ public class PScenarioImpl extends ScenarioImpl{
 		}
 	}
 	
+	@Override
+	public Vehicles getVehicles() {
+		if(pVehicles == null){
+			log.info("returning old vehicles");
+			return super.getVehicles();
+		} else {
+			log.info("returning new vehicles");
+			return this.pVehicles;
+		}
+	}
+	
 	public void setTransitSchedule(TransitSchedule schedule) {
-		this.pTransitSchedule  = schedule;
+		this.pTransitSchedule = schedule;
+	}
+	
+	public void setVehicles(Vehicles vehicles) {
+		this.pVehicles = vehicles;
 	}
 
 }

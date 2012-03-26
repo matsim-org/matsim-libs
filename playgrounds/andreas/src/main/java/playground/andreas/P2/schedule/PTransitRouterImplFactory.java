@@ -38,6 +38,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
@@ -59,7 +60,11 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	private final static Logger log = Logger.getLogger(PTransitRouterImplFactory.class);
 
 	private TransitSchedule baseSchedule;
+	private Vehicles baseVehicles;
+	
 	private TransitSchedule schedule;
+	private Vehicles vehicles;
+	
 	private TransitRouterConfig config;
 	private TransitRouterNetwork routerNetwork;
 	
@@ -91,9 +96,11 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		this.pBox.notifyStartup(event);
 		this.routerNetwork = null;
 		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
+		this.baseVehicles = event.getControler().getScenario().getVehicles();
 		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
 		((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
-		this.addPVehiclesToOriginalOnes(event.getControler());
+		this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pBox.getVehicles());
+		((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
 		this.config = new TransitRouterConfig(event.getControler().getScenario().getConfig().planCalcScore()
 				, event.getControler().getScenario().getConfig().plansCalcRoute(), event.getControler().getScenario().getConfig().transitRouter(),
 				event.getControler().getScenario().getConfig().vspExperimental());
@@ -112,7 +119,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 			this.routerNetwork = null;
 			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
 			((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
-			this.addPVehiclesToOriginalOnes(event.getControler());
+			this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pBox.getVehicles());
+			((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
 			
 			if(this.agentsStuckHandler != null){
 				ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
@@ -158,10 +166,17 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		return schedule;
 	}
 	
-	private void addPVehiclesToOriginalOnes(Controler controler){
-		Vehicles pVeh = pBox.getVehicles();
-		controler.getScenario().getVehicles().getVehicleTypes().putAll(pVeh.getVehicleTypes());
-		controler.getScenario().getVehicles().getVehicles().putAll(pVeh.getVehicles());
+	private Vehicles addPVehiclesToOriginalOnes(Vehicles baseVehicles, Vehicles pVehicles){
+		
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		
+		vehicles.getVehicleTypes().putAll(baseVehicles.getVehicleTypes());
+		vehicles.getVehicles().putAll(baseVehicles.getVehicles());
+		
+		vehicles.getVehicleTypes().putAll(pVehicles.getVehicleTypes());
+		vehicles.getVehicles().putAll(pVehicles.getVehicles());
+		
+		return vehicles;
 	}
 	
 	private void dumpTransitScheduleAndVehicles(IterationStartsEvent event){
