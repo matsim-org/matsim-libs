@@ -38,9 +38,11 @@ import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -54,14 +56,11 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLi
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.Events2ScoreWithLeftTurnPenalty4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.PCCtlwithLeftTurnPenalty;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
 import playground.yu.utils.io.SimpleWriter;
-import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
 import utilities.misc.DynamicData;
 import cadyts.calibrators.Calibrator;
@@ -70,7 +69,8 @@ import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 public class PCCtlListener extends BseParamCalibrationControlerListener
-		implements StartupListener, ShutdownListener, IterationEndsListener {
+		implements StartupListener, ShutdownListener, IterationEndsListener,
+		BeforeMobsimListener {
 	private int caliStartTime, caliEndTime;
 	private int avgLlhOverIters = 0, writeLlhInterval = 0;
 	// private Config config;
@@ -247,13 +247,13 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		PCCtlwithLeftTurnPenalty ctl = (PCCtlwithLeftTurnPenalty) event
+		CtlWithLeftTurnPenaltyLs ctl = (CtlWithLeftTurnPenaltyLs) event
 				.getControler();
 		Config config = ctl.getConfig();
 		int iter = event.getIteration();
 		int firstIter = ctl.getFirstIteration();
 		// this.chooser.finish();-->called in notifyScoring()
-		PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
+		// PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
 
 		// if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
 		ControlerIO io = ctl.getControlerIO();
@@ -275,25 +275,25 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			}
 		}
 		// ************************************************
-		if (calibrator.getParameterCovarianceExpOfVarComponent()
-		// getParameterCovariance()
-		!= null) {
-			writerCV.writeln(iter
-					// + "\t"
-					// + calibrator.getParameterCovariance()
-					// .toSingleLineString()
-					+ "\t"
-					+ calibrator.getParameterCovarianceExpOfVarComponent()
-							.toSingleLineString()
-			// + "\t"
-			// + calibrator.getParameterCovarianceVarOfExpComponent()
-			// .toSingleLineString()
-			);
-		}
-		writerCV.flush();
+		// if (calibrator.getParameterCovarianceExpOfVarComponent()
+		// // getParameterCovariance()
+		// != null) {
+		// writerCV.writeln(iter
+		// // + "\t"
+		// // + calibrator.getParameterCovariance()
+		// // .toSingleLineString()
+		// + "\t"
+		// + calibrator.getParameterCovarianceExpOfVarComponent()
+		// .toSingleLineString()
+		// // + "\t"
+		// // + calibrator.getParameterCovarianceVarOfExpComponent()
+		// // .toSingleLineString()
+		// );
+		// }
+		// writerCV.flush();
 
 		// ###################################################
-		Vector avgParams = calibrator.getAvgParameters();
+		// Vector avgParams = calibrator.getAvgParameters();
 		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 		// ScoringConfigGetSetValues.setConfig(config);
@@ -302,8 +302,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		// if (
 		// // !watching &&
 		// cycleIdx == 0) {
-		MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
-				.getMultinomialLogit();
+		// MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
+		// .getMultinomialLogit();
 
 		// *******should after Scoring Listener!!!*******
 
@@ -312,34 +312,32 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			StringBuffer sb = new StringBuffer(Integer.toString(iter));
 
 			for (int i = 0; i < paramNames.length; i++) {
-				int paramNameIndex = Events2Score4AttrRecorder.attrNameList
-						.indexOf(paramNames[i]/*
-											 * pos. of param in Parameters in
-											 * Cadyts
-											 */);
+				// int paramNameIndex = Events2Score4AttrRecorder.attrNameList
+				// .indexOf(paramNames[i]/*
+				// * pos. of param in Parameters in
+				// * Cadyts
+				// */);
 
 				// double paramScaleFactor =
 				// Events2Score4PC_mnl_mnl.paramScaleFactorList
 				// .get(paramNameIndex);
 
-				double value = avgParams.get(i);
+				double value;
 				// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
 				// AGAIN!!!***
-				if (scoringCfg.getParams().containsKey(paramNames[i])) {
-					scoringCfg.addParam(paramNames[i], Double.toString(value
-					// / paramScaleFactor
-							));
-					// ScoringConfigGetSetValues
-					// .setValue(paramNames[i], value);
-				} else/* bse */{
-					config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
-							Double.toString(value
-							// / paramScaleFactor
-							));
+				String valStr = scoringCfg.getParams().get(paramNames[i]);
+				if (valStr == null) {
+					valStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+							paramNames[i]);
+					if (valStr == null) {
+						throw new RuntimeException(
+								"The calibrated parameter can NOT be found");
+					}
 				}
+				value = Double.parseDouble(valStr);
 				// *****************************************************
 				// ****SET CALIBRATED PARAMETERS IN MNL*****************
-				mnl.setParameter(paramNameIndex, value);
+				// mnl.setParameter(paramNameIndex, value);
 
 				// text output
 				paramArrays[i][iter - firstIter] = value;
@@ -349,25 +347,28 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 			// ********calibrator.getParameters() JUST FOR
 			// ANALYSIS********
-			Vector params = calibrator.getParameters();
-			for (int i1 = 0; i1 < paramNames.length; i1++) {
-				sb.append("\t");
-				sb.append(params.get(i1));
-			}
+			// Vector params = calibrator.getParameters();
+			// for (int i1 = 0; i1 < paramNames.length; i1++) {
+			// sb.append("\t");
+			// sb.append(params.get(i1));
+			// }
 
 			writer.writeln(sb);
 			writer.flush();
 		}
 		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
-		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setMultinomialLogit(mnl);
+		// ((Events2ScoreWithLeftTurnPenalty4PC)
+		// chooser).setMultinomialLogit(mnl);
 
-		CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory = new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				config, ctl.getNetwork());
-		ctl.setScoringFunctionFactory(sfFactory);
-		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setSfFactory(sfFactory);
-
-		strategyManager.setChooser(chooser);
+		// CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory =
+		// new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
+		// config, ctl.getNetwork());
+		// ctl.setScoringFunctionFactory(sfFactory);
+		// ((Events2ScoreWithLeftTurnPenalty4PC)
+		// chooser).setSfFactory(sfFactory);
+		//
+		// strategyManager.setChooser(chooser);
 
 		// }
 		// cycleIdx++;
@@ -473,7 +474,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		final PCCtlwithLeftTurnPenalty ctl = (PCCtlwithLeftTurnPenalty) event
+		final CtlWithLeftTurnPenaltyLs ctl = (CtlWithLeftTurnPenaltyLs) event
 				.getControler();
 		Config config = ctl.getConfig();
 
@@ -819,6 +820,18 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		 * volumes = new VolumesAnalyzer(3600, 30 * 3600,
 		 * network);ctl.getEvents().addHandler(volumes);
 		 */
+	}
+
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		Controler ctl = event.getControler();
+
+		CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory = new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
+				ctl.getConfig(), ctl.getNetwork());
+		ctl.setScoringFunctionFactory(sfFactory);
+		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setSfFactory(sfFactory);
+
+		((PCStrMn) ctl.getStrategyManager()).setChooser(chooser);
 	}
 
 	// public void setWriteQGISFile(boolean writeQGISFile) {

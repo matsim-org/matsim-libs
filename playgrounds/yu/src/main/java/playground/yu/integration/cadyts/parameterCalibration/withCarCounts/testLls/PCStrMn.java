@@ -23,6 +23,7 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.test
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.ejml.data.DenseMatrix64F;
@@ -32,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -45,6 +47,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.MultinomialLogitCreator;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
+import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import utilities.math.BasicStatistics;
 import utilities.math.MultinomialLogit;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
@@ -57,20 +60,19 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	private Plan oldSelected = null;
 	private MultinomialLogit singleMnl = null;
 
-	private BasicStatistics betaTravelingPtStats = null;
+	private BasicStatistics betaTravelingStats = null,
+			constantLeftTurnStats = null;
 	private final ParameterEstimator pe;
 	private DenseMatrix64F attrM = null, utilCorrV = null;
 
 	private Map<String/* paramName */, List<Double>> attrs = null;
 	List<Double> utilCorrs = null;
+	private int correctedPlanNb = 0;
 
-	public PCStrMn(Network net, int firstIteration, Config config
-	// ,int paramDimension
-	) {
+	public PCStrMn(Network net, int firstIteration, Config config) {
 		super(firstIteration);
 		this.net = net;
 		this.config = config;
-		// this.paramDimension = paramDimension;
 		pe = new ParameterEstimator();
 	}
 
@@ -84,13 +86,15 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	protected void afterRunHook(Population population) {
 		super.afterRunHook(population);
 		// output stats and variabilities
-		statistics = new double[] { betaTravelingPtStats.getAvg(),
-				betaTravelingPtStats.getVar() };
+		statistics = new double[] { betaTravelingStats.getAvg(),
+				betaTravelingStats.getVar(), constantLeftTurnStats.getAvg(),
+				constantLeftTurnStats.getVar() };
 		System.out.println("BSE_Statistics\tavg.\t" + statistics[0]/*
 																	 * betaTravelingPtAttr
 																	 * .
 																	 */
-				+ "\tvar.\t" + statistics[1]/* betaTravelingPtAttr. */);
+				+ "\tvar.\t" + statistics[1]/* betaTravelingPtAttr. */
+				+ "\tavg.\t" + statistics[2] + "\tvar.\t" + statistics[3]);
 	}
 
 	@Override
@@ -144,21 +148,22 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	}
 
 	private DenseMatrix64F calculateDeltaParameter(int planNb) {
-		pe.clear();
-		String paramDimensionStr = config.findParam(
-				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "parameterDimension");
-		int paramDim;
-		if (paramDimensionStr != null) {
-			paramDim = Integer.parseInt(paramDimensionStr);
-		} else {
-			throw new RuntimeException(
-					"The information about parameter dimension can NOT be found in config!");
-		}
-
-		attrM = new DenseMatrix64F(planNb, paramDim);
+		attrM = new DenseMatrix64F(planNb, PCCtlListener.paramDim);
 		utilCorrV = new DenseMatrix64F(planNb, 1);
-
+		// converts from Map to Matrix or Vector
+		for (int i = 0; i < PCCtlListener.paramNames.length; i++) {
+			List<Double> attrList = attrs.get(PCCtlListener.paramNames[i]);
+			for (int j = 0; j < attrList.size(); j++) {
+				attrM.set(j, i,/* CAUTION, the order of j and i */
+						attrList.get(j));
+			}
+		}
+		// attrs.clear();
 		pe.setAttrM(attrM);
+
+		for (int i = 0; i < utilCorrs.size(); i++) {
+			utilCorrV.set(i, 0, utilCorrs.get(i));
+		}
 		pe.setUtilCorrV(utilCorrV);
 
 		return pe.getDeltaParameters();
@@ -169,29 +174,62 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		// the most things before "removePlans"
 		super.beforePopulationRunHook(population);// iter++
 		// cadyts class - create new BasicStatistics Objects
-		betaTravelingPtStats = new BasicStatistics();
+		betaTravelingStats = new BasicStatistics();
+		constantLeftTurnStats = new BasicStatistics();
 
 		((Events2Score4PC) chooser).createWriter();
 
-		int correctedPlanNb = 0;
+		correctedPlanNb = 0;
+		// (re)initializes attrs and utilCorrs
 		attrs = new TreeMap<String, List<Double>>();
+		for (String paramName : PCCtlListener.paramNames) {
+			attrs.put(paramName, new ArrayList<Double>());
+		}
 		utilCorrs = new ArrayList<Double>();
 
 		for (Person person : population.getPersons().values()) {
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
 			// ***before removePlans and plan choice, correct utility***
-			generateScoreCorrections(person, correctedPlanNb);
+			generateScoreCorrections(person);
 		}
+		if (correctedPlanNb > 0) {
+			// calculate least squares and get delta parameter from
+			// ParameterEstimator and set new parameters in MNL
+			DenseMatrix64F estimatedParams = calculateDeltaParameter(correctedPlanNb);
 
-		// TODO get name of parameters to be estimated,
-		// set attr and uc values and put them in matrix or vectors (attrs and
-		// utilCorrs)
-		// get delta parameter from ParameterEstimator and set new parameters in
-		// MNL
-		MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
-				.getMultinomialLogit();
-		// TODO mnl.setParameter(paramNameIndex, value);
+			//
+			MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
+					.getMultinomialLogit();
+			for (int i = 0; i < PCCtlListener.paramNames.length; i++) {
+				double deltaParam = estimatedParams.get(i, 0/* CAUTION! */);
+				int paramIdx = Events2Score4AttrRecorder.attrNameList
+						.indexOf(PCCtlListener.paramNames[i]);
+				double oldParamVal = mnl.getParameter(paramIdx);
+				double newParamVal = oldParamVal + deltaParam;
+				mnl.setParameter(paramIdx, newParamVal);
+				if (i == 0) {
+					betaTravelingStats.add(newParamVal);
+				} else if (i == 1) {
+					constantLeftTurnStats.add(newParamVal);
+				}
+
+				// set new parameters in config
+				PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
+				if (scoringCfg.getParams().containsKey(
+						PCCtlListener.paramNames[i])) {
+					scoringCfg.addParam(PCCtlListener.paramNames[i],
+							Double.toString(newParamVal));
+				} else {
+					config.setParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME,
+							PCCtlListener.paramNames[i],
+							Double.toString(newParamVal));
+				}
+
+				// ?((Events2ScoreWithLeftTurnPenalty4PC)
+				// chooser).setMultinomialLogit(mnl);
+			}
+		}
 
 		for (Person person : population.getPersons().values()) {
 			/* ***********************************************************
@@ -222,8 +260,8 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				// only with planSelector/-Changer, without Plan innovation,
 				// i.e. no new plan will be created
 				// **************WRITE ATTR.S INTO MNL******************
-				chooser.setPersonAttrs(person,
-						new BasicStatistics[] { betaTravelingPtStats });
+				chooser.setPersonAttrs(person, new BasicStatistics[] {
+						betaTravelingStats, constantLeftTurnStats });
 				// now there are only #maxPlansPerAgent# Plans in choice set
 
 				/* ***********************************************************
@@ -265,12 +303,45 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		return scoreCorrection != 0d;
 	}
 
-	private void generateScoreCorrections(Person person, int correctedPlanNb) {
+	/**
+	 * generates score corrections, and also prepares the Attr-Matrix and
+	 * UC-Vector
+	 *
+	 * @param person
+	 * @param correctedPlanNb
+	 */
+	private void generateScoreCorrections(Person person) {
 		for (Plan plan : person.getPlans()) {
-			if (generateScoreCorrection(plan)) {
-				correctedPlanNb++;
-				utilCorrs.add((Double) plan.getCustomAttributes().get(
-						UTILITY_CORRECTION));
+			if (generateScoreCorrection(plan)// TODO sth. as
+												// "variance != minStdDev^2"
+			) {
+
+				Map<String, Object> customAttrs = plan.getCustomAttributes();
+				/*
+				 * set attr and uc values and put them in matrix or vector
+				 * (attrs and utilCorrs)
+				 */
+				Map<String, Double> tmpNameVals = new TreeMap<String, Double>();
+				for (String paramName : PCCtlListener.paramNames) {
+					Object ob = customAttrs.get(paramName);
+					tmpNameVals.put(paramName,
+							ob == null ? 0d : ((Number) ob).doubleValue());
+				}
+
+				boolean allZero = true;
+				for (Double value : tmpNameVals.values()) {
+					if (value != 0d) {
+						allZero = false;
+						break;
+					}
+				}
+				if (!allZero) {
+					correctedPlanNb++;
+					utilCorrs.add((Double) customAttrs.get(UTILITY_CORRECTION));
+					for (Entry<String, Double> entry : tmpNameVals.entrySet()) {
+						attrs.get(entry.getKey()).add(entry.getValue());
+					}
+				}
 			}
 		}
 	}

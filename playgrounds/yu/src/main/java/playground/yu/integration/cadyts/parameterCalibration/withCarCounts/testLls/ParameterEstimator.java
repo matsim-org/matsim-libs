@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
- 
+
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLls;
 
 import org.ejml.alg.dense.linsol.SolvePseudoInverse;
@@ -48,7 +48,7 @@ public class ParameterEstimator {
 			throw new RuntimeException(
 					"Attributes Matrix or the uility correction vector is null yet!");
 		}
-		DenseMatrix64F deltaBeta = new DenseMatrix64F(attrM.getNumCols());
+		DenseMatrix64F deltaBeta = new DenseMatrix64F(attrM.getNumCols(), 1);
 		SolvePseudoInverse spi = new SolvePseudoInverse(attrM.getNumRows(),
 				attrM.getNumCols());
 		spi.setA(attrM);
@@ -68,7 +68,11 @@ public class ParameterEstimator {
 	 * reinitialize the attrM and utilCorrV (A and b, or X and y)
 	 */
 	public void clear() {
-		attrM.zero();
-		utilCorrV.zero();
+		if (attrM != null) {
+			attrM.zero();
+		}
+		if (utilCorrV != null) {
+			utilCorrV.zero();
+		}
 	}
 }
