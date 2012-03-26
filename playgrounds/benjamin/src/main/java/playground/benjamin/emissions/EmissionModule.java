@@ -141,7 +141,7 @@ public class EmissionModule {
 	private Map<Integer, String> createRoadTypeMapping(String filename){
 		logger.info("entering createRoadTypeMapping ...") ;
 		
-		Map<Integer, String> roadTypeMapping = new HashMap<Integer, String>();
+		Map<Integer, String> mapping = new HashMap<Integer, String>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
@@ -154,7 +154,7 @@ public class EmissionModule {
 				Integer visumRtNr = Integer.parseInt(inputArray[indexFromKey.get("VISUM_RT_NR")]);
 				String hbefaRtName = (inputArray[indexFromKey.get("HBEFA_RT_NAME")]);
 				
-				roadTypeMapping.put(visumRtNr, hbefaRtName);
+				mapping.put(visumRtNr, hbefaRtName);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -162,14 +162,14 @@ public class EmissionModule {
 			e.printStackTrace();
 		}
 		logger.info("leaving createRoadTypeMapping ...") ;
-		return roadTypeMapping;
+		return mapping;
 	}
 	
-	private Vehicles createEmissionVehicles(String emissionVehicleFile) {
+	private Vehicles createEmissionVehicles(String emissionVehicleFilename) {
 		logger.info("entering createEmissionVehicles ...") ;
 		emissionVehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(emissionVehicles);
-		vehicleReader.readFile(emissionVehicleFile);
+		vehicleReader.readFile(emissionVehicleFilename);
 		logger.info("leaving createEmissionVehicles ...") ;
 		return emissionVehicles;
 	}
@@ -177,7 +177,7 @@ public class EmissionModule {
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
 		
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
@@ -198,7 +198,7 @@ public class EmissionModule {
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
 				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
 				
-				avgHbefaWarmTable.put(key, value);
+				avgWarmTable.put(key, value);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -207,13 +207,13 @@ public class EmissionModule {
 		}
 
 		logger.info("leaving createAvgHbefaWarmTable ...");
-		return avgHbefaWarmTable;
+		return avgWarmTable;
 	}
 	
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createAvgHbefaColdTable(String filename){
 		logger.info("entering createAvgHbefaColdTable ...");
 		
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
+		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
@@ -232,7 +232,7 @@ public class EmissionModule {
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
 				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
 				
-				avgHbefaColdTable.put(key, value);
+				avgColdTable.put(key, value);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -240,7 +240,7 @@ public class EmissionModule {
 			e.printStackTrace();
 		}
 		logger.info("leaving createAvgHbefaColdTable ...");
-		return avgHbefaColdTable;
+		return avgColdTable;
 	}
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
@@ -285,7 +285,7 @@ public class EmissionModule {
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createDetailedHbefaColdTable(String filename) {
 		logger.info("entering createDetailedHbefaColdTable ...");
 		
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
+		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaColdTableDetailed = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
@@ -308,7 +308,7 @@ public class EmissionModule {
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
 				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
 				
-				detailedHbefaColdTable.put(key, value);
+				hbefaColdTableDetailed.put(key, value);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -316,7 +316,7 @@ public class EmissionModule {
 			e.printStackTrace();
 		}
 		logger.info("leaving createDetailedHbefaColdTable ...");
-		return detailedHbefaColdTable;
+		return hbefaColdTableDetailed;
 	}
 
 	private Map<String, Integer> createIndexFromKey(String strLine, String fieldSeparator) {

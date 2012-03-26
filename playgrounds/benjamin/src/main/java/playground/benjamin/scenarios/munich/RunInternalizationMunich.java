@@ -36,6 +36,7 @@ import playground.benjamin.internalization.InternalizeEmissionsControlerListener
 public class RunInternalizationMunich {
 	
 //	private static String configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
+	private static double emissionCostFactor;
 	
 	public static void main(String[] args) {
 		
@@ -43,9 +44,9 @@ public class RunInternalizationMunich {
 		config.addCoreModules();
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
 //		confReader.readFile(configFile);
-//		double emissionCostFactor = 1.0;
+//		emissionCostFactor = 1.0;
 		confReader.readFile(args[0]);
-		double emissionCostFactor = Double.parseDouble(args[1]);
+		emissionCostFactor = Double.parseDouble(args[1]);
 		
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
