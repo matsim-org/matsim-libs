@@ -849,8 +849,6 @@ public class Controler {
 		 * are added to the list.
 		 */
 
-		this.addCoreControlerListener(new CoreControlerListener());
-
 		// the default handling of plans
 		this.plansScoring = new PlansScoring();
 		this.addCoreControlerListener(this.plansScoring);
@@ -971,6 +969,32 @@ public class Controler {
 			enrichSimulation(simulation);
 			return simulation;
 		} else {
+			if (config.getModule(QSimConfigGroup.GROUP_NAME) != null) {
+				setMobsimFactory(new QSimFactory());
+				/*
+				 * cdobler: If a multi modal simulation should be run,
+				 * we use a MultiModalMobsimFactory which is only a
+				 * wrapper. It hands over the TravelTimeCalculator to
+				 * the MultiModalSimEngine. I do not like this - but at
+				 * the moment I see no better way to do so...
+				 */
+				if (config.multiModal().isMultiModalSimulationEnabled()) {
+					MultiModalTravelTimeWrapperFactory timeFactory = getMultiModalTravelTimeWrapperFactory();
+					MobsimFactory multiModalFactory = new MultiModalMobsimFactory(getMobsimFactory(), timeFactory);
+					setMobsimFactory(multiModalFactory);
+				}
+			} else if (config.getModule("JDEQSim") != null) {
+				setMobsimFactory(new JDEQSimulationFactory());
+			} else if (config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
+				setMobsimFactory(new QueueSimulationFactory());
+			} else {
+				log.warn("There is no configuration for a mobility simulation in the config. The Controler "
+						+ "uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file "
+						+ "to avoid this warning");
+				config.addSimulationConfigGroup(new SimulationConfigGroup());
+				setMobsimFactory(new QueueSimulationFactory());
+			}
+			
 			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
 			if (this.config.simulation() == null || this.config.simulation().getExternalExe() == null) {
 				Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
@@ -1352,73 +1376,6 @@ public class Controler {
 
 	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
 		return this.facilityPenalties;
-	}
-
-	/**
-	 * A ControlerListener that controls the most critical parts of the
-	 * simulation process. This code could be integrated into the Controler
-	 * class directly, but would make it more cumbersome to read. So it is
-	 * implemented as a ControlerListener, to keep the structure of the
-	 * Controler as simple as possible.
-	 */
-	protected static class CoreControlerListener implements StartupListener {
-
-		// private final List<EventWriter> eventWriters = new
-		// LinkedList<EventWriter>();
-
-		public CoreControlerListener() {
-			// empty public constructor for protected class
-		}
-
-		@Override
-		public void notifyStartup(final StartupEvent event) {
-			if (event.getControler().getMobsimFactory() == null) {
-
-				String mobsim = event.getControler().config.controler().getMobsim();
-				if (mobsim != null) {
-					MobsimFactory f = event.getControler().mobsimFactories.get(mobsim);
-					if (f == null) {
-						log.warn("There is no MobsimFactory registered for the name " + mobsim);
-					}
-				} else {
-					log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
-
-					Config c = event.getControler().getScenario().getConfig();
-					QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
-					if (conf != null) {
-						event.getControler().setMobsimFactory(new QSimFactory());
-
-						/*
-						 * cdobler: If a multi modal simulation should be run,
-						 * we use a MultiModalMobsimFactory which is only a
-						 * wrapper. It hands over the TravelTimeCalculator to
-						 * the MultiModalSimEngine. I do not like this - but at
-						 * the moment I see no better way to do so...
-						 */
-						if (c.multiModal().isMultiModalSimulationEnabled()) {
-							MobsimFactory factory = event.getControler().getMobsimFactory();
-							
-							MultiModalTravelTimeWrapperFactory timeFactory = event.getControler().getMultiModalTravelTimeWrapperFactory();
-
-							MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, timeFactory);
-							event.getControler().setMobsimFactory(multiModalFactory);
-						}
-					} else if (c.getModule("JDEQSim") != null) {
-						event.getControler().setMobsimFactory(
-								new JDEQSimulationFactory());
-					} else if (c.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
-						event.getControler().setMobsimFactory(
-								new QueueSimulationFactory());
-					} else {
-						log.warn("There is no configuration for a mobility simulation in the config. The Controler "
-								+ "uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file "
-								+ "to avoid this warning");
-						c.addSimulationConfigGroup(new SimulationConfigGroup());
-						event.getControler().setMobsimFactory(new QueueSimulationFactory());
-					}
-				}
-			}
-		}
 	}
 
 	public static void main(final String[] args) {
