@@ -38,6 +38,8 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
@@ -52,38 +54,38 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class TransitRouterImpl implements TransitRouter {
 
-	private final TransitSchedule schedule;
 	private final TransitRouterNetwork transitNetwork;
 
 	private final MultiNodeDijkstra dijkstra;
 	private final TransitRouterConfig config;
-	private final TransitRouterNetworkTravelTimeAndDisutility ttCalculator;
+	private final TravelDisutility travelDisutility;
+	private final TravelTime travelTime;
+	
+	private final DepartureTimeCache data = new DepartureTimeCache();
 
-	public TransitRouterImpl(final TransitSchedule schedule, final TransitRouterConfig config) {
-		this(schedule, config, new TransitRouterNetworkTravelTimeAndDisutility(config));
-	}
+	public TransitRouterImpl(final TransitRouterConfig config, final TransitSchedule schedule) {
+		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);
+		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
+		this.config = config;
+		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
+		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
+		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);}
 
-	public TransitRouterImpl(final TransitSchedule schedule, final TransitRouterConfig config,
-			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator ) {
-		this(schedule, config, ttCalculator, TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance));
-	}
-
-	public TransitRouterImpl(final TransitSchedule schedule, final TransitRouterConfig config,
-			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator, final TransitRouterNetwork routerNetwork) {
-		this.schedule = schedule;
+	public TransitRouterImpl(final TransitRouterConfig config, final TransitRouterNetwork routerNetwork, final TravelTime travelTime, TravelDisutility travelDisutility) {
 		this.config = config;
 		this.transitNetwork = routerNetwork;
-		this.ttCalculator = ttCalculator;
-		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.ttCalculator, this.ttCalculator);
+		this.travelTime = travelTime;
+		this.travelDisutility = travelDisutility;
+		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
 	}
 
 	@Override
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
-		if (this.ttCalculator instanceof PersonalizableTravelDisutility) {
-			((PersonalizableTravelDisutility) this.ttCalculator).setPerson(person);
+		if (this.travelDisutility instanceof PersonalizableTravelDisutility) {
+			((PersonalizableTravelDisutility) this.travelDisutility).setPerson(person);
 		}
-		if (this.ttCalculator instanceof PersonalizableTravelTime) {
-			((PersonalizableTravelTime) this.ttCalculator).setPerson(person);
+		if (this.travelTime instanceof PersonalizableTravelTime) {
+			((PersonalizableTravelTime) this.travelTime).setPerson(person);
 		}
 		// find possible start stops
 		Collection<TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromCoord, this.config.searchRadius);
@@ -164,7 +166,7 @@ public class TransitRouterImpl implements TransitRouter {
 					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 					leg.setRoute(ptRoute);
 					double arrivalOffset = (((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) link).fromNode.stop.getArrivalOffset() : ((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
-					double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+					double arrivalTime = this.data.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
 					legs.add(leg);
@@ -215,7 +217,7 @@ public class TransitRouterImpl implements TransitRouter {
 			double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 					(prevLink).toNode.stop.getArrivalOffset()
 					: (prevLink).toNode.stop.getDepartureOffset();
-			double arrivalTime = this.ttCalculator.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+			double arrivalTime = this.data.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
 			legs.add(leg);
@@ -248,11 +250,6 @@ public class TransitRouterImpl implements TransitRouter {
 		return this.transitNetwork;
 	}
 
-	@Override
-	public TransitSchedule getSchedule() {
-		return schedule;
-	}
-
 	protected TransitRouterNetwork getTransitNetwork() {
 		return transitNetwork;
 	}
@@ -263,10 +260,6 @@ public class TransitRouterImpl implements TransitRouter {
 
 	protected TransitRouterConfig getConfig() {
 		return config;
-	}
-
-	protected TransitRouterNetworkTravelTimeAndDisutility getTtCalculator() {
-		return ttCalculator;
 	}
 
 }

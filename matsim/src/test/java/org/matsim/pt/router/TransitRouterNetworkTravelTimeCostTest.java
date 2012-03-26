@@ -37,7 +37,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and G on the red line
 		TransitRouterNetworkLink testLink = null;
@@ -58,7 +58,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -82,7 +82,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -108,7 +108,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -137,7 +137,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;

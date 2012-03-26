@@ -20,19 +20,12 @@
 
 package org.matsim.pt.router;
 
-import java.util.Arrays;
-import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 /**
@@ -44,12 +37,14 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
  */
 public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, TravelDisutility {
 
-	private final static double MIDNIGHT = 24.0*3600;
+	final static double MIDNIGHT = 24.0*3600;
 
 	protected final TransitRouterConfig config;
 	private Link previousLink = null;
 	private double previousTime = Double.NaN;
 	private double cachedTravelTime = Double.NaN;
+
+	private DepartureTimeCache data = new DepartureTimeCache();
 
 	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
 		this.config = config;
@@ -100,7 +95,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			// (agent stays on the same route, so use transit line travel time)
 			
 			// get the next departure time:
-			double bestDepartureTime = getNextDepartureTime(wrapped.route, fromStop, time);
+			double bestDepartureTime = data.getNextDepartureTime(wrapped.route, fromStop, time);
 
 			// the travel time on the link is 
 			//   the time until the departure (``dpTime - now'')
@@ -122,57 +117,6 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		return time2;
 	}
 
-	private final HashMap<TransitRoute, double[]> sortedDepartureCache = new HashMap<TransitRoute, double[]>();
-
 	static int wrnCnt = 0 ;
-	
-	public final double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {
-
-		double earliestDepartureTimeAtTerminus = depTime - stop.getDepartureOffset();
-		// This shifts my time back to the terminus.
-
-		if (earliestDepartureTimeAtTerminus >= MIDNIGHT) {
-			earliestDepartureTimeAtTerminus = earliestDepartureTimeAtTerminus % MIDNIGHT;
-		}
-
-		if ( earliestDepartureTimeAtTerminus < 0. && wrnCnt < 1 ) {
-			wrnCnt++ ;
-			Logger.getLogger(this.getClass()).warn("if departure at terminus is before midnight, this router may not work correctly" +
-					" (will take the first departure at terminus AFTER midnight).\n" + Gbl.ONLYONCE ) ;
-		}
-
-		// this will search for the terminus departure that corresponds to my departure at the stop:
-		double[] cache = this.sortedDepartureCache.get(route);
-		if (cache == null) {
-			cache = new double[route.getDepartures().size()];
-			int i = 0;
-			for (Departure dep : route.getDepartures().values()) {
-				cache[i++] = dep.getDepartureTime();
-			}
-			Arrays.sort(cache);
-			this.sortedDepartureCache.put(route, cache);
-		}
-		int pos = Arrays.binarySearch(cache, earliestDepartureTimeAtTerminus);
-		if (pos < 0) {
-			// (if the departure time is not found _exactly_, binarySearch returns (-(insertion point) - 1).  That is
-			// retval = -(insertion point) - 1  or insertion point = -(retval+1) .
-			// This will, in fact, be the normal situation, so it is important to understand this.)
-			pos = -(pos + 1);
-		}
-		if (pos >= cache.length) {
-			pos = 0; // there is no later departure time, take the first in the morning
-		}
-		double bestDepartureTime = cache[pos];
-		// (departure time at terminus)
-
-		bestDepartureTime += stop.getDepartureOffset();
-		// (resulting departure time at stop)
-		
-		while (bestDepartureTime < depTime) {
-			bestDepartureTime += MIDNIGHT;
-			// (add enough "MIDNIGHT"s until we are _after_ the desired departure time)
-		}
-		return bestDepartureTime;
-	}
 
 }

@@ -1231,7 +1231,7 @@ public class Controler {
 		} else if (this.config.scenario().isUseTransit()) {
 			plansCalcRoute = new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory(),routeFactory, this.config.transit(),
-					this.transitRouterFactory.createTransitRouter());
+					this.transitRouterFactory.createTransitRouter(), this.scenarioData.getTransitSchedule());
 			log.warn("As simulation of public transit is enabled a leg router for area tolls is used. Other features, " +
 					"e.g. multimodal simulation, may not work as expected.");
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {

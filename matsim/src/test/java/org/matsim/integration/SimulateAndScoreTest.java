@@ -151,7 +151,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
         TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, config.travelTimeCalculator());
         PersonalizableTravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, config.planCalcScore());
         PlansCalcTransitRoute plansCalcRoute = new PlansCalcTransitRoute(config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator,
-					new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(), config.transit(), router.createTransitRouter());
+					new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(), config.transit(), router.createTransitRouter(), transitSchedule);
 
 
 

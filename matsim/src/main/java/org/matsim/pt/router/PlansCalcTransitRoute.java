@@ -82,16 +82,17 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	 * <li> It restricts the usable part of the network for the above to "car". </li>
 	 * <li> It remembers <tt>transitConfig</tt>.
 	 * </ul>
+	 * @param transitSchedule TODO
 	 */
 	public PlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory,
-			final TransitConfigGroup transitConfig, final TransitRouter transitRouter) {
+			final TransitConfigGroup transitConfig, final TransitRouter transitRouter, TransitSchedule transitSchedule) {
 		super(config, network, costCalculator, timeCalculator, factory, routeFactory);
 
 		this.transitConfig = transitConfig;
 		this.transitRouter = transitRouter;
-		this.schedule = this.transitRouter.getSchedule();
+		this.schedule = transitSchedule;
 
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {

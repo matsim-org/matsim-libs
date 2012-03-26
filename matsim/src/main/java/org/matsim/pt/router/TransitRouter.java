@@ -24,7 +24,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * @author mrieser
@@ -33,8 +32,4 @@ public interface TransitRouter {
 
 	public abstract List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person);
 
-	/**
-	 * @return The transit schedule for which routes are calculated
-	 */
-	public TransitSchedule getSchedule();
 }

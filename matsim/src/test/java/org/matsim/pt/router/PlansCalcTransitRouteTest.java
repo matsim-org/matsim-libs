@@ -58,7 +58,7 @@ public class PlansCalcTransitRouteTest extends TestCase {
 				vspConfigGroup);
 		
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(routerConfig, f.network, ttc, ttc, new DijkstraFactory(), 
-				((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).getModeRouteFactory(), transitConfig, new TransitRouterImpl(f.schedule, transitRouterConfig ));
+				((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).getModeRouteFactory(), transitConfig, new TransitRouterImpl(transitRouterConfig, f.schedule ), f.schedule);
 
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(16100, 10050);
