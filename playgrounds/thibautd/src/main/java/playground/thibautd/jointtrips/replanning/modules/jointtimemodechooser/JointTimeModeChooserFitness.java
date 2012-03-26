@@ -49,16 +49,52 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 	// to use with one thread only.
 	private final static boolean DEBUG = false;
 	private final ScoringFunctionFactory factory;
-	private final double NEGATIVE_DURATION_PENALTY = 100;
-	private final double UNSYNCHRONIZED_PENALTY = 1E-5;
+	private final double negativeDurationPenalty;
+	private final double unsynchronizedPenalty;
+
+	//private final Map<String, Double> cache = new HashMap<String, Double>();
+	//private int n = 0;
+	//private int nc = 0;
+
+	//public void finalize() {
+	//	System.out.println( nc +" / "+n );
+	//}
 
 	public JointTimeModeChooserFitness(
+			final double negativeDurationPenalty,
+			final double unsynchronizedPenalty,
 			final ScoringFunctionFactory scoringFunctionFactory) {
+		this.negativeDurationPenalty = negativeDurationPenalty;
+		this.unsynchronizedPenalty = unsynchronizedPenalty;
 		this.factory = scoringFunctionFactory;
 	}
 
 	@Override
 	public double computeFitnessValue(final Solution solution) {
+	//	String key = toKey( solution );
+	//	Double cachedScore = cache.get( key );
+
+	//	n++;
+	//	if (cachedScore == null) {
+	//		nc++;
+	//		cachedScore = reallyComputeFitness( solution );
+	//		cache.put( key , cachedScore );
+	//	}
+
+	//	return cachedScore;
+	//}
+
+	//private static String toKey(final Solution solution) {
+	//	StringBuffer buffer = new StringBuffer();
+
+	//	for (Value val : solution.getRepresentation()) {
+	//		buffer.append( "-&-"+val.getValue() );
+	//	}
+
+	//	return buffer.toString();
+	//}
+
+	//private double reallyComputeFitness(final Solution solution) {
 		JointPlan plan = (JointPlan) solution.getRepresentedPlan();
 
 		if (DEBUG) log.debug( "start scoring" );
@@ -139,7 +175,7 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 		}
 
 		return plan.getScore() +
-			(accumulatedNegativeDuration * NEGATIVE_DURATION_PENALTY) -
-			(accumulatedUnsynchronizedTime * UNSYNCHRONIZED_PENALTY);
+			(accumulatedNegativeDuration * negativeDurationPenalty) -
+			(accumulatedUnsynchronizedTime * unsynchronizedPenalty);
 	}
 }

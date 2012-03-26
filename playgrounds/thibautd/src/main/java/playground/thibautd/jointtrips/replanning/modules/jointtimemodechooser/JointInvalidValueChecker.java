@@ -23,7 +23,6 @@ import playground.thibautd.tsplanoptimizer.framework.Move;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
 import playground.thibautd.tsplanoptimizer.framework.Value;
-import playground.thibautd.tsplanoptimizer.timemodechooser.IntegerValueChanger;
 
 /**
  * @author thibautd
@@ -42,21 +41,19 @@ public class JointInvalidValueChecker implements TabuChecker {
 	public boolean isTabu(
 			final Solution solution,
 			final Move move) {
-		if (move instanceof IntegerValueChanger) {
-			Solution result = move.apply( solution );
+		JointTimeModeChooserSolution result =
+			(JointTimeModeChooserSolution) move.apply( solution );
+		for (Value val : result.getRepresentation()) {
+			Object value = val.getValue();
 
-			for (Value val : result.getRepresentation()) {
-				Object value = val.getValue();
-
-				if (value instanceof Integer) {
-					if (((Integer) value) < 0) {
-						return true;
-					}
+			if (value instanceof Integer) {
+				if (((Integer) value) < 0) {
+					return true;
 				}
 			}
 		}
 
-		return false;
+		return !result.respectsModeConstraints() || !result.fitsInScenarioDuration();
 	}
 }
 

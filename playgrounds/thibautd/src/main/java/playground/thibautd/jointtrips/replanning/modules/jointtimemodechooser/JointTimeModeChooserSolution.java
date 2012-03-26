@@ -29,7 +29,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -51,6 +53,7 @@ import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
  * @author thibautd
  */
 public class JointTimeModeChooserSolution implements Solution {
+	private final static double SCENARIO_DUR = 24 * 3600;
 	private final JointPlan plan;
 	private final JointPlanRouter planRouter;
 
@@ -101,6 +104,49 @@ public class JointTimeModeChooserSolution implements Solution {
 		}
 
 		return indices;
+	}
+
+	public boolean respectsModeConstraints() {
+		Iterator<List<PlanElement>> peListsIter = values.associatedPlanElements.iterator();
+		Iterator<List<Value>> valueListsIter = values.values.iterator();
+
+		while (valueListsIter.hasNext()) {
+			Iterator<PlanElement> pes = peListsIter.next().iterator();
+			Iterator<Value> values = valueListsIter.next().iterator();
+
+			while (values.hasNext()) {
+				Value val = values.next();
+				PlanElement pe = pes.next();
+
+				if (pe instanceof Subtour &&
+						!((Subtour) pe).isCarAllowed() &&
+						TransportMode.car.equals( val.getValue() )) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean fitsInScenarioDuration() {
+		Iterator<List<Value>> valueListsIter = values.values.iterator();
+
+		while (valueListsIter.hasNext()) {
+			Iterator<Value> values = valueListsIter.next().iterator();
+
+			double dur = 0;
+			while (values.hasNext()) {
+				Object val = values.next().getValue();
+
+				if (val instanceof Integer) {
+					dur += (Integer) val;
+					if (dur > SCENARIO_DUR) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -174,14 +220,9 @@ public class JointTimeModeChooserSolution implements Solution {
 		List<List<PlanElement>> groupCodedPlanElements = new ArrayList<List<PlanElement>>();
 		List<Tuple<Plan , List<PlanElement>>> planStructures = new ArrayList<Tuple<Plan , List<PlanElement>>>();
 		
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg && ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
-				Route route = ((Leg) pe).getRoute();
-				((Leg) pe).setTravelTime( route.getTravelTime() );
-			}
-		}
-
 		for (Plan individualPlan : plan.getIndividualPlans().values()) {
+			boolean isCarAvailable = !"never".equals( ((PersonImpl) individualPlan.getPerson()).getCarAvail() );
+
 			List<Value> values = new ArrayList<Value>();
 			List<PlanElement> codedPlanElements = new ArrayList<PlanElement>();
 			List<PlanElement> planStructure = tripRouter.tripsToLegs( individualPlan.getPlanElements() );
@@ -217,7 +258,7 @@ public class JointTimeModeChooserSolution implements Solution {
 
 			for (List<PlanElement> subtour : analyseSubtours( planStructure )) {
 				if (!isSharedSubtour( subtour )) {
-					Subtour subtourElement = new Subtour( subtour );
+					Subtour subtourElement = new Subtour( isCarAvailable , subtour );
 					codedPlanElements.add( subtourElement );
 					values.add( new ValueImpl<String>( subtourElement.getMode() ) );
 				}
@@ -365,8 +406,10 @@ public class JointTimeModeChooserSolution implements Solution {
 	// allows to set mode for a whole subtour in the plan structure
 	private static class Subtour implements PlanElement {
 		private final List<Leg> legs = new ArrayList<Leg>();
+		private final boolean isCarAvailable;
 
-		public Subtour(final List<PlanElement> elements) {
+		public Subtour(final boolean isCarAvailable, final List<PlanElement> elements) {
+			this.isCarAvailable = isCarAvailable;
 			for (PlanElement pe : elements) {
 				if (pe instanceof Leg) {
 					legs.add( (Leg) pe );
@@ -382,6 +425,10 @@ public class JointTimeModeChooserSolution implements Solution {
 
 		public String getMode() {
 			return legs.get(0).getMode();
+		}
+
+		public boolean isCarAllowed() {
+			return isCarAvailable;
 		}
 	}
 

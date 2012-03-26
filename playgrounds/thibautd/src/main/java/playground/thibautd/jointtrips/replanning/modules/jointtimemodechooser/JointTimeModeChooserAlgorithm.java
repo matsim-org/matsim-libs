@@ -26,6 +26,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.RoutingModuleFactory;
@@ -41,11 +42,6 @@ import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.
  * @author thibautd
  */
 public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
-	// if true, graphs of score evolution across TS iterations will
-	// be created. This takes a LOT of ressources and creates a lot
-	// of files. Use with care!
-	private static final boolean DEBUG = true;
-
 	private final MultiLegRoutingControler controler;
 	private final DepartureDelayAverageCalculator delay;
 
@@ -67,12 +63,15 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 					controler );
 
 		ScoringFunctionFactory scoringFunctionFactory = controler.getScoringFunctionFactory();
+		JointTimeModeChooserConfigGroup config = (JointTimeModeChooserConfigGroup)
+			controler.getConfig().getModule( JointTimeModeChooserConfigGroup.GROUP_NAME );
 		ConfigurationBuilder builder =
 			new JointTimeModeChooserConfigBuilder(
 					jointPlan,
+					config,
 					scoringFunctionFactory,
 					tripRouterFactory,
-					DEBUG ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
+					config.isDebugMode() ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
 
 		Solution bestSolution = TabuSearchRunner.runTabuSearch( builder );
 
