@@ -34,11 +34,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -59,9 +57,9 @@ import org.matsim.vehicles.Vehicles;
 public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, AgentSource {
 
 
-    private Collection<MobsimAgent> ptDrivers;
+	private Collection<MobsimAgent> ptDrivers;
 
-    public static class TransitAgentTriesToTeleportException extends RuntimeException {
+	public static class TransitAgentTriesToTeleportException extends RuntimeException {
 
 		public TransitAgentTriesToTeleportException(String message) {
 			super(message);
@@ -109,7 +107,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	}
 
 
-    @Override
+	@Override
 	public void afterSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
 		for (Entry<Id, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
@@ -190,37 +188,20 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id linkId) {
 		// this puts the agent into the transit stop.
-		Leg leg = ((TransitAgent)planAgent).getCurrentLeg() ;
-		
-		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
-			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + planAgent.getId().toString());
-			log.info("route: "
-							+ leg.getRoute().getClass().getCanonicalName()
-							+ " "
-							+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+		Id accessStopId = ((TransitAgent) planAgent).getDesiredAccessStopId();
+		if (accessStopId == null) {
+			// looks like this agent has a bad transit route, likely no
+			// route could be calculated for it
+			log.error("pt-agent doesn't know to what transit stop to go. Removing agent from simulation. Agent " + planAgent.getId().toString());
 			this.qSim.getAgentCounter().decLiving();
 			this.qSim.getAgentCounter().incLost();
+		}
+		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
+		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
+			this.agentTracker.addAgentToStop((PassengerAgent) planAgent, stop.getId());
+			this.internalInterface.registerAdditionalAgentOnLink(planAgent) ;
 		} else {
-			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-			if (route.getAccessStopId() == null) {
-				// looks like this agent has a bad transit route, likely no
-				// route could be calculated for it
-				this.qSim.getAgentCounter().decLiving();
-				this.qSim.getAgentCounter().incLost();
-				log.error("Agent has bad transit route! agentId="
-						+ planAgent.getId() + " route="
-						+ route.getRouteDescription()
-						+ ". The agent is removed from the simulation.");
-			} else {
-				TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
-				if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-					this.agentTracker.addAgentToStop((PassengerAgent) planAgent, stop.getId());
-//					this.getMobsim().registerAdditionalAgentOnLink(planAgent) ;
-					this.internalInterface.registerAdditionalAgentOnLink(planAgent) ;
-				} else {
-					throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");
-				}
-			}
+			throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");
 		}
 	}
 
@@ -255,18 +236,18 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		// Nothing to do here.
 	}
 
-    @Override
-    public void insertAgentsIntoMobsim() {
-        if (useUmlaeufe ) {
-            ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
-        } else {
-            ptDrivers = createVehiclesAndDriversWithoutUmlaeufe(this.schedule, this.agentTracker);
-        }
-    }
+	@Override
+	public void insertAgentsIntoMobsim() {
+		if (useUmlaeufe ) {
+			ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
+		} else {
+			ptDrivers = createVehiclesAndDriversWithoutUmlaeufe(this.schedule, this.agentTracker);
+		}
+	}
 
-    public Collection<MobsimAgent> getPtDrivers() {
-        return Collections.unmodifiableCollection(ptDrivers);
-    }
+	public Collection<MobsimAgent> getPtDrivers() {
+		return Collections.unmodifiableCollection(ptDrivers);
+	}
 
 
 }

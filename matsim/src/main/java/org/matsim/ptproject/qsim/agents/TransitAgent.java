@@ -22,12 +22,16 @@ package org.matsim.ptproject.qsim.agents;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
+import org.matsim.pt.qsim.PassengerAgent;
+import org.matsim.pt.qsim.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -40,6 +44,8 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  * @author mrieser
  */
 public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
+
+	private final static Logger log = Logger.getLogger(TransitAgent.class);
 
 	public static TransitAgent createTransitAgent(Person p, Netsim simulation) {
 		TransitAgent agent = new TransitAgent(p, simulation);
@@ -66,7 +72,7 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 		}
 	}
 
-	public Leg getCurrentLeg() {
+	private Leg getCurrentLeg() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		return (Leg) currentPlanElement;
 	}
@@ -84,6 +90,22 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	@Override
 	public double getWeight() {
 		return 1.0;
+	}
+
+	public Id getDesiredAccessStopId() {
+		Leg leg = getCurrentLeg();
+		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
+			log.info("route: "
+					+ leg.getRoute().getClass().getCanonicalName()
+					+ " "
+					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+			return null;
+		} else {
+			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			Id accessStopId = route.getAccessStopId();
+			return accessStopId;
+		}
 	}
 
 }
