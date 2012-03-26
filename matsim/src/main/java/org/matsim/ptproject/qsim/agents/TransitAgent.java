@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
-import org.matsim.pt.qsim.PassengerAgent;
-import org.matsim.pt.qsim.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
