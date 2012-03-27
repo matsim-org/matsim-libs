@@ -21,20 +21,20 @@
 package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.contrib.freight.controler.RunMobSimWithCarrier;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
 
 public class EquilWithCarrierTest extends MatsimTestCase {
-	
-    public void testMobsimWithCarrier()  {
-    	String NETWORK_FILENAME = getInputDirectory() + "network.xml";
-//    	String NETWORK_FILENAME = "../contrib/freight/" + getInputDirectory() + "network.xml";
-    	String PLANS_FILENAME = getInputDirectory() + "plans100.xml";
-//    	String PLANS_FILENAME = "../contrib/freight/" + getInputDirectory() + "plans100.xml";
+
+	public void testMobsimWithCarrier()  {
+		String NETWORK_FILENAME = getInputDirectory() + "network.xml";
+		String PLANS_FILENAME = getInputDirectory() + "plans100.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		ActivityParams workParams = new ActivityParams("w");
@@ -46,17 +46,26 @@ public class EquilWithCarrierTest extends MatsimTestCase {
 		config.global().setCoordinateSystem("EPSG:32632");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(2);
-        config.network().setInputFile(NETWORK_FILENAME);
-        config.plans().setInputFile(PLANS_FILENAME);
+		config.network().setInputFile(NETWORK_FILENAME);
+		config.plans().setInputFile(PLANS_FILENAME);
 		config.addQSimConfigGroup(new QSimConfigGroup());
+		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
+		bestScore.setModuleName("BestScore");
+		bestScore.setProbability(0.9);
+		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
+		reRoute.setModuleName("ReRoute");
+		reRoute.setProbability(0.1);
+		reRoute.setDisableAfter(300);
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		config.strategy().addStrategySettings(bestScore);
+		config.strategy().addStrategySettings(reRoute);
 		Controler controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);
 		String CARRIER_PLANS = getInputDirectory() + "carrierPlans.xml";
-//		String CARRIER_PLANS = "../contrib/freight/" + getInputDirectory() + "carrierPlans.xml";
 		controler.addControlerListener(new RunMobSimWithCarrier(CARRIER_PLANS));
 		controler.setOverwriteFiles(true);
 		controler.run();
-    }
+	}
 
 }
