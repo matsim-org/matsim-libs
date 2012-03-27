@@ -48,6 +48,7 @@ import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.referencing.FactoryException;
@@ -71,6 +72,7 @@ public class ShapeToStreetSnapper {
 	GeometryFactory geofac = new GeometryFactory();
 	
 	
+	private static final double DETOUR_COEF = 3;
 	private static final double epsilon = 0.00001;
 	private final Scenario sc;
 
@@ -92,7 +94,11 @@ public class ShapeToStreetSnapper {
 			Node n0 = nodes.get(i-1);
 			Node n1 = nodes.get(i);
 			Path path = dijkstra.calcLeastCostPath(n0, n1, 0);
-			finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
+			if (path.travelCost < 500 || path.travelCost < DETOUR_COEF * ((CoordImpl)n0.getCoord()).calcDistance(n1.getCoord()) ){
+				finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
+			}else {
+				finalNodes.add(n0);
+			}
 			
 		}
 
@@ -140,6 +146,7 @@ public class ShapeToStreetSnapper {
 		coords[coords.length-1] = coords[0];
 		LinearRing shell = this.geofac.createLinearRing(coords);
 		Polygon ep = this.geofac.createPolygon(shell, null);
+		ep = (Polygon) ep.union(p);
 		GisDebugger.addGeometry(ep);
 		GisDebugger.dump("/Users/laemmel/tmp/!!snapperEvacArea.shp");
 		// TODO Auto-generated method stub
@@ -463,7 +470,7 @@ public class ShapeToStreetSnapper {
 			Coordinate c1 = MGC.coord2Coordinate(link.getToNode().getCoord());
 			LineString ls = this.geofac.createLineString(new Coordinate[]{c0,c1});
 			if (ls.intersects(this.p) || this.p.covers(ls)) {
-				return link.getLength()+10000;
+				return Double.POSITIVE_INFINITY;
 			}
 			
 			return link.getLength();
