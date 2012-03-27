@@ -1,0 +1,77 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FeatureCoordinateTransformer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.gregor.grips.geospatial;
+
+import java.util.Collection;
+
+import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+public class FeatureCoordinateTransformer {
+	
+	
+
+
+	private final MathTransform transform;
+
+	public FeatureCoordinateTransformer(CoordinateReferenceSystem src, CoordinateReferenceSystem target) {
+		FactoryException ex;
+		try {
+			this.transform = CRS.findMathTransform(src, target,true);
+			return;
+		} catch (FactoryException e) {
+			ex = e;
+		}
+		throw new RuntimeException(ex);
+	}
+	
+	public void transform(Feature f) {
+		Exception ex;
+		try {
+			Geometry trr = JTS.transform(f.getDefaultGeometry(), this.transform);
+			f.setDefaultGeometry(trr);
+			return;
+		} catch (MismatchedDimensionException e) {
+			ex = e;
+		} catch (TransformException e) {
+			ex = e; 
+		} catch (IllegalAttributeException e) {
+			ex = e; 
+		}
+		throw new RuntimeException(ex);
+	}
+	
+	public void transform(Collection<Feature> fts) {
+		for (Feature ft : fts) {
+			transform(ft);
+		}
+	}
+
+}
