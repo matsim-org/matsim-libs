@@ -192,11 +192,15 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private void handleBankruptCopperatives(int iteration) {
 		
 		LinkedList<Cooperative> nonBankruptCooperatives = new LinkedList<Cooperative>();
+		int numberOfCooperativesWithZeroBudget = 0;
 		
 		// Get cooperatives with positive budget
 		for (Cooperative cooperative : this.cooperatives) {
 			if(cooperative.getBudget() >= 0){
 				nonBankruptCooperatives.add(cooperative);
+			}
+			if(cooperative.getBudget() == 0){
+				numberOfCooperativesWithZeroBudget++;
 			}
 		}
 		
@@ -214,7 +218,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 //			}
 			
 			// calculate the exact number necessary
-			numberOfNewCoopertives = (int) (nonBankruptCooperatives.size() * (1.0/this.pConfig.getShareOfCooperativesWithProfit() - 1.0) + 0.0000000000001);
+			numberOfNewCoopertives = (int) ((nonBankruptCooperatives.size() - numberOfCooperativesWithZeroBudget) * (1.0/this.pConfig.getShareOfCooperativesWithProfit() - 1.0) + 0.0000000000001);
 		}
 		
 		// delete bankrupt ones

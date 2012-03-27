@@ -58,6 +58,7 @@ public class BasicCooperative implements Cooperative{
 	private PPlan testPlan;
 
 	private TransitLine currentTransitLine;
+	private int numberOfIterationsWithoutScoring;
 	private double budget;
 	private double budgetLastIteration;
 	private double scorePerVehicle;
@@ -70,6 +71,7 @@ public class BasicCooperative implements Cooperative{
 
 	public BasicCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
+		this.numberOfIterationsWithoutScoring = pConfig.getNumberOfIterationsWithoutScoring();
 		this.costPerVehicleBuy = pConfig.getPricePerVehicleBought();
 		this.costPerVehicleSell = pConfig.getPricePerVehicleSold();
 		this.minOperationTime = pConfig.getMinOperationTime();
@@ -103,6 +105,10 @@ public class BasicCooperative implements Cooperative{
 				route.setDescription(plan.toString(this.budget));
 			}
 			nVehicles += plan.getNVehicles();
+		}
+		if(this.numberOfIterationsWithoutScoring > 0){
+			this.budget = Math.max(this.budget, 0.0);
+			this.numberOfIterationsWithoutScoring--;
 		}
 		this.score = this.budget - this.budgetLastIteration;
 		this.scorePerVehicle = this.score / nVehicles;
