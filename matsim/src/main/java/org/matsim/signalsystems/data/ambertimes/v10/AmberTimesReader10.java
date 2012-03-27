@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +36,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
+import org.xml.sax.SAXException;
 
 /**
  * @author jbischoff
@@ -61,15 +64,21 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 		XMLAmberTimes xmlatdefs = null;
 		InputStream stream = null;
 		try {
-		jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
-		Unmarshaller u = jc.createUnmarshaller();
-		// validate XML file
-		log.info("starting to validate " + filename);
-		super.validateFile(filename, u);
-		log.info("starting unmarshalling " + filename);
+			jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
+			Unmarshaller u = jc.createUnmarshaller();
+			// validate XML file
+			log.info("starting to validate " + filename);
+			super.validateFile(filename, u);
+			log.info("starting unmarshalling " + filename);
 			stream = IOUtils.getInputstream(filename);
 			xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
-		} catch (Exception e) {
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		} catch (JAXBException e) {
+			throw new UncheckedIOException(e);
+		} catch (SAXException e) {
+			throw new UncheckedIOException(e);
+		} catch (ParserConfigurationException e) {
 			throw new UncheckedIOException(e);
 		} finally {
 			try {

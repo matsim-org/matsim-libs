@@ -25,7 +25,6 @@ package org.matsim.vis.otfvis.opengl.layer;
 import java.awt.Color;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;

@@ -60,11 +60,11 @@ public class ReleaseInfo {
 		}
 
 		System.out.println();
-		System.out.println("Copyright (C) 2011 by");
-		System.out.println("    Kay W. Axhausen, Michael Balmer, Christoph Dobler, Dominik Grether,");
-		System.out.println("    Andreas Horni, Gregor Laemmel, Nicolas Lefebvre, Fabrice Marchal,");
-		System.out.println("    Konrad Meister, Kai Nagel, Andreas Neumann, Marcel Rieser,");
-		System.out.println("    David Strippgen, Rashid Waraich, Michael Zilske,");
+		System.out.println("Copyright (C) 2012 by");
+		System.out.println("    Kay W. Axhausen, Michael Balmer, Christoph Dobler, Thibaut Dubernet,");
+		System.out.println("    Dominik Grether, Andreas Horni, Gregor Laemmel, Nicolas Lefebvre,");
+		System.out.println("    Fabrice Marchal, Konrad Meister, Kai Nagel, Andreas Neumann,");
+		System.out.println("    Marcel Rieser, David Strippgen, Rashid Waraich, Michael Zilske,");
 		System.out.println("    Technische Universitaet Berlin (TU-Berlin) and");
 		System.out.println("    Swiss Federal Institute of Technology Zurich (ETHZ)");
 		System.out.println();

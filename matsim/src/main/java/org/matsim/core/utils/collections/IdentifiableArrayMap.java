@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -303,7 +304,7 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 				this.pos++;
 				return t;
 			}
-			return null;
+			throw new NoSuchElementException();
 		}
 
 		@Override

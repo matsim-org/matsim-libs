@@ -32,8 +32,8 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
 import org.xml.sax.SAXException;
 
 /**
@@ -68,7 +68,6 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 			if (sid != null) {
 				log.debug("creating parser for system id: " + sid);
 				if (sid.compareTo(SCHEMALOCATIONV11) == 0) {
-					reader = new LaneDefinitionsReader11(this.laneDefinitionsV1, sid);
 					log.info("Using LaneDefinitionReader11...");
 					log.warn("The laneDefinitions_v1.1.xsd file format is used. For the use within the mobility simulation it is strongly recommended to" +
 							"convert the read data to the v2.0.xsd format using the LaneDefinitionsV11ToV20Conversion class. " +

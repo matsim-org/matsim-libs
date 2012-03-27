@@ -231,8 +231,8 @@ public final class QSim implements VisMobsim, Netsim {
 	// "run" method:
 
 
-    @Override
-	public final void run() {
+  @Override
+	public void run() {
         prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		// do iterations
@@ -256,7 +256,7 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
-	 final void prepareSim() {
+	 /*package*/ void prepareSim() {
 		if (events == null) {
 			throw new RuntimeException(
 					"No valid Events Object (events == null)");
@@ -304,7 +304,7 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Close any files, etc.
 	 */
-	 final void cleanupSim(@SuppressWarnings("unused") final double seconds) {
+	/*package*/ void cleanupSim(@SuppressWarnings("unused") final double seconds) {
 
 
 		if (this.netEngine != null) {
@@ -361,7 +361,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 *            the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	 final boolean doSimStep(final double time) {
+	/*package*/ boolean doSimStep(final double time) {
 			
 		// teleportation "engine":
 		this.handleTeleportationArrivals();
@@ -383,7 +383,7 @@ public final class QSim implements VisMobsim, Netsim {
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
-	private final void handleTeleportationArrivals() {
+	private void handleTeleportationArrivals() {
 		double now = this.getSimTimer().getTimeOfDay();
 		while (this.teleportationList.peek() != null) {
 			Tuple<Double, MobsimAgent> entry = this.teleportationList.peek();
@@ -401,7 +401,7 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 	
 	@Override
-	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
+	public void insertAgentIntoMobsim( MobsimAgent agent ) {
 		if ( this.agents.contains(agent) ) {
 			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
 		}
@@ -440,8 +440,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 * 
 	 * @see MobsimDriverAgent#getActivityEndTime()
 	 */
-//	@Override
-	private final void arrangeActivityStart(final MobsimAgent agent) {
+	private void arrangeActivityStart(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
 		if (!(agent instanceof AbstractTransitDriver)) {
 			// yy why?  kai, mar'12
@@ -454,7 +453,7 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public final void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
+	public void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
 		// yyyy possibly, this should be "notifyChangedPlan".  kai, oct'10
 		// yy the "newTime" is strictly speaking not necessary.  It is there so people do not put in the 
 		// new time instead of the old time, since then it will not work.  kai, oct'10
@@ -530,7 +529,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 * 
 	 * @param agent
 	 */
-	private final void arrangeAgentDeparture(final MobsimAgent agent) {
+	private void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay();
 		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId();
@@ -673,67 +672,67 @@ public final class QSim implements VisMobsim, Netsim {
 	// ############################################################################################################################
 
 	@Override
-	public final EventsManager getEventsManager() {
+	public EventsManager getEventsManager() {
 		return events;
 	}
 
 	@Override
-	public final NetsimNetwork getNetsimNetwork() {
+	public NetsimNetwork getNetsimNetwork() {
 		return this.netEngine.getNetsimNetwork();
 	}
 
 	@Override
-	public final VisNetwork getVisNetwork() {
+	public VisNetwork getVisNetwork() {
 		return this.netEngine.getNetsimNetwork();
 	}
 
 	@Override
-	public final Scenario getScenario() {
+	public Scenario getScenario() {
 		return this.scenario;
 	}
 
 	@Override
-	public final MobsimTimer getSimTimer() {
+	public MobsimTimer getSimTimer() {
 		return this.simTimer;
 	}
 
-	/*package*/ final MobsimEngine getNetsimEngine() {
+	/*package*/ MobsimEngine getNetsimEngine() {
 		 // For a test
 		return this.netEngine;
 	}
 
 	// For a test 
 	// the corresponding test could be moved into this package. kai
-	public final MultiModalSimEngine getMultiModalSimEngine() {
+	public MultiModalSimEngine getMultiModalSimEngine() {
 		return this.multiModalEngine;
 	}
 
-	public final void addMobsimEngine(MobsimEngine mobsimEngine) {
-        if (mobsimEngine instanceof TransitQSimEngine) {
-        	if ( this.transitEngine != null ) {
-        		log.warn("pre-existing transitEngine != null; will be overwritten; with the current design, " +
-        				"there can only be one TransitQSimEngine") ;
-        	}
-            this.transitEngine = (TransitQSimEngine) mobsimEngine;
-        } 
-        if (mobsimEngine instanceof MultiModalSimEngine) {
-        	if ( this.multiModalEngine != null ) {
-        		log.warn("pre-existing multiModalEngine != null; will be overwritten; with the current design, " +
-        				"there can only be one MultiModalSimEngine") ;
-        	}
-        	this.multiModalEngine = (MultiModalSimEngine) mobsimEngine;
-        }
-        
-        mobsimEngine.setInternalInterface(this.internalInterface);
+	public void addMobsimEngine(MobsimEngine mobsimEngine) {
+		if (mobsimEngine instanceof TransitQSimEngine) {
+			if ( this.transitEngine != null ) {
+				log.warn("pre-existing transitEngine != null; will be overwritten; with the current design, " +
+						"there can only be one TransitQSimEngine") ;
+			}
+			this.transitEngine = (TransitQSimEngine) mobsimEngine;
+		} 
+		if (mobsimEngine instanceof MultiModalSimEngine) {
+			if ( this.multiModalEngine != null ) {
+				log.warn("pre-existing multiModalEngine != null; will be overwritten; with the current design, " +
+						"there can only be one MultiModalSimEngine") ;
+			}
+			this.multiModalEngine = (MultiModalSimEngine) mobsimEngine;
+		}
+
+		mobsimEngine.setInternalInterface(this.internalInterface);
 		this.mobsimEngines.add(mobsimEngine);
 	}
 
 	@Override
-	public final AgentCounterI getAgentCounter() {
+	public AgentCounterI getAgentCounter() {
 		return this.agentCounter;
 	}
 
-	public final void addDepartureHandler(DepartureHandler departureHandler) {
+	public void addDepartureHandler(DepartureHandler departureHandler) {
 		this.departureHandlers.add(departureHandler);
 	}
 
@@ -744,31 +743,31 @@ public final class QSim implements VisMobsim, Netsim {
 	 * @param listeners
 	 */
 	@Override
-	public final void addQueueSimulationListeners(SimulationListener listener) {
+	public void addQueueSimulationListeners(SimulationListener listener) {
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
-    /**
-     * Only OTFVis is allowed to use this. If you want access to the TransitQSimEngine,
-     * just "inline" the factory method of this class to plug together your own QSim, and you've got it!
-     * This getter will disappear very soon. michaz 11/11
-     */
-    @Deprecated
-	public final TransitQSimEngine getTransitEngine() {
+	/**
+	 * Only OTFVis is allowed to use this. If you want access to the TransitQSimEngine,
+	 * just "inline" the factory method of this class to plug together your own QSim, and you've got it!
+	 * This getter will disappear very soon. michaz 11/11
+	 */
+	@Deprecated
+	public TransitQSimEngine getTransitEngine() {
 		return transitEngine;
 	}
 
 	@Override
-	public final Collection<MobsimAgent> getAgents() {
+	public Collection<MobsimAgent> getAgents() {
 		return Collections.unmodifiableCollection(this.agents);
 	}
 
 	@Override
-	public final Collection<MobsimAgent> getActivityEndsList() {
+	public Collection<MobsimAgent> getActivityEndsList() {
 		return Collections.unmodifiableCollection(activityEndsList);
 	}
 
-    public final void addAgentSource(AgentSource agentSource) {
+  public void addAgentSource(AgentSource agentSource) {
 		agentSources.add(agentSource);
 	}
 

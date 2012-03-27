@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
@@ -35,6 +37,7 @@ import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
@@ -72,7 +75,13 @@ public class SignalGroupsReader20 extends MatsimJaxbXmlParser {
 			log.info("starting unmarshalling " + filename);
 			stream = IOUtils.getInputstream(filename);
 			xmlsgdefs = (XMLSignalGroups) u.unmarshal(stream);
-		} catch (Exception e) {
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		} catch (JAXBException e) {
+			throw new UncheckedIOException(e);
+		} catch (SAXException e) {
+			throw new UncheckedIOException(e);
+		} catch (ParserConfigurationException e) {
 			throw new UncheckedIOException(e);
 		} finally {
 			try {

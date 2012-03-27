@@ -51,7 +51,6 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
@@ -153,7 +152,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 
 	@Override
-	public final void run() {
+	public void run() {
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		//do iterations
@@ -173,7 +172,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		this.listenerManager = null;
 	}
 
-	final void createAgents() {
+	/*package*/ void createAgents() {
 		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
@@ -194,7 +193,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
-	final void prepareSim() {
+	/*package*/ void prepareSim() {
 		if (events == null) {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
@@ -233,7 +232,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	/**
 	 * Close any files, etc.
 	 */
-	final void cleanupSim() {
+	/*package*/ void cleanupSim() {
 
 		this.netSimEngine.afterSim();
 
@@ -268,7 +267,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	 * @param time the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	final boolean doSimStep(final double time) {
+	/*package*/ boolean doSimStep(final double time) {
 		this.moveVehiclesWithUnknownLegMode(time);
 		this.handleActivityEnds(time);
 		Collection<QueueVehicle> arrivingVehicles = this.netSimEngine.simStep(time);
@@ -296,7 +295,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		}
 	}
 
-	/* package */ static final EventsManager getEvents() {
+	/* package */ static EventsManager getEvents() {
 		return events;
 	}
 
@@ -305,13 +304,13 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		return events;
 	}
 
-	final void handleUnknownLegMode(double now, final MobsimAgent planAgent) {
+	/*package*/ void handleUnknownLegMode(double now, final MobsimAgent planAgent) {
 		double arrivalTime = this.simTimer.getTimeOfDay() + planAgent.getExpectedTravelTime();
 
 		this.teleportationList.add(new Tuple<Double, MobsimAgent>(arrivalTime, planAgent));
 	}
 
-	final void moveVehiclesWithUnknownLegMode(final double now) {
+	/*package*/ void moveVehiclesWithUnknownLegMode(final double now) {
 		while (this.teleportationList.peek() != null ) {
 			Tuple<Double, MobsimAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
@@ -325,7 +324,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
+	public /*package*/ void insertAgentIntoMobsim( MobsimAgent agent ) {
 		this.agentCounter.incLiving();
 		this.arrangeNextAgentAction(agent) ;
 	}

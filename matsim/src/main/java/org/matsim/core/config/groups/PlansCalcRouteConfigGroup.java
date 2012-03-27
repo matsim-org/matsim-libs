@@ -125,7 +125,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
 		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
-		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray(new String[]{})));
+		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray(new String[this.networkModes.size()])));
 		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
 			map.put( TELEPORTED_MODE_SPEEDS + entry.getKey(), String.valueOf(entry.getValue()));
 		}

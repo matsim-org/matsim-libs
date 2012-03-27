@@ -20,29 +20,15 @@
 package org.matsim.ptproject.qsim.qnetsimengine;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.pt.qsim.TransitDriverAgent;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 
 /**
  * 
- * Please read the docu  AbstractQLane and QLinkImpl jointly. kai, nov'11
+ * Please read the docu AbstractQLane and QLinkImpl jointly. kai, nov'11
  * 
  * 
  * @author nagel

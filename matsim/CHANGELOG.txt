@@ -2,12 +2,42 @@ MATSim - Multi Agent Transport Simulation
 ===============================================================================
 
 
+Release "not yet released" (version 0.5.0)
+-------------------------------------------------------------------------------
 
-Release version 0.x.x
+Changes:
+
+- Configuration Changes:
+  -
+  
+- New Features:
+  - 
+
+- Feature Improvements:
+  - Loading Plans is now faster thanks to multithreading (r18639)
+  - Preprocessing for AStarLandmarks router is now faster thanks to multithreading (r18734)
+
+- BugFix:
+  - 
+
+- Chagnes for developers:
+  -  
+
+
+
+Release Spring 2012b (version 0.4.1)
+-------------------------------------------------------------------------------
+
+Changes:
+- BugFix:
+  - Agents did not generate any AgentStuckEvents anymore, even when they got stuck
+    on a link and qsim was configured to remove stuck agents. 
+
+Release Spring 2012 (version 0.4.0)
 -------------------------------------------------------------------------------
 
 Main focus of this release:
->>tbd<<
+Maintenance Release
 
 
 Changes:
@@ -22,6 +52,7 @@ Changes:
 
 - Feature improvements:
   - Major memory improvements in OsmNetworkReader by using Long instead of String for osm-ids (r14944)
+  - CompressedRoutes can now be enabled using config file (plans.networkRouteType = CompressedNetworkRoute) (r17328)
   - dump of configuration to logfile now uses os-specific line endings, making the dump reabable on Windows (r14945, #168)
   - transit router now exposes additional attributes for configuration to config-file (r14860)
   - improved OTFVis visualization of traffic signals and lanes (r18143, r18129, r18387, r18390)
@@ -38,10 +69,10 @@ Changes:
 	- package org.matsim.signalsystems
 		- provided some additional factories for better extensibility of the packages
 		- provided convenience method in SignalUtils
+	- all persons now generate PersonEntersVehicleEvent/PersonLeavesVehicleEvent. Before, only pt passengers did that. Some event handlers may need to adapt. (r17776)
 
-  API-Changes:
-  - 
-  
+	
+
   Non-API Changes:
 	- org.matsim.lanes.* was split into two subpackages, one for each model: 
 		1. org.matsim.lanes.data.v11.*: A model written to simplify creation and modelling of lanes
@@ -49,6 +80,7 @@ Changes:
 	- dtd/laneDefinitions_v2.0.xsd: added additional element to laneType in order to allow the user to calibrate the lanes model via the capacity of the lane. The capacity must be set explicitly in the xml otherwise the model will use some defaults with probably too high capacities. In order to avoid the usage of the defaults use LanesCapacityCalculator to preprocess the data using the same semantics that have been used on the fly in previous releases. The capacity calculation is done automaticall if the lane layout is modelled via the org.matsim.lanes.data.v11 package classes and then converted to with the LaneDefinitionsV11ToV20Conversion class into the 2.0 model. 
 	- config module signalsystems: added to parameters to switch on and off ambertimes and intergreen usage
 	- org.matsim.lanes & signalsystems can deal with not available turning moves
+
 
 
 Release Spring 2011 (version 0.3.0)

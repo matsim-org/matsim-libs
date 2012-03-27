@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -90,7 +90,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * RESTRICTED ... available replanning operations are restricted (time > replanning time)
 	 * UNRESTRICTED ... replanning operations are not restricted (time <= replanning time)
 	 */
-	private enum timeFilterMode {
+	private enum TimeFilterMode {
 		EXACT, RESTRICTED, UNRESTRICTED
 	}
 	
@@ -147,13 +147,15 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 		double now = event.getTime();
 		Link link = network.getLinks().get(event.getLinkId());
 		
-		double departureTime = event.getTime();
+		double departureTime;
 		if (this.multiModalTravelTime != null) {
 			Person person = this.personAgentMapping.get(event.getPersonId()).getSelectedPlan().getPerson();
 			multiModalTravelTime.setPerson(person);
 			double travelTime = multiModalTravelTime.getModalLinkTravelTime(link, now, mode);
 			departureTime = Math.floor(now + travelTime);				
-		} else departureTime = Math.floor((now + ((LinkImpl) link).getFreespeedTravelTime(now)));
+		} else {
+			departureTime = Math.floor((now + ((LinkImpl) link).getFreespeedTravelTime(now)));
+		}
 		
 		replanningMap.put(event.getPersonId(), departureTime);
 	}
@@ -244,7 +246,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @return a list of agents who might need a replanning and use one of the given transport modes
 	 */
 	public Set<PlanBasedWithinDayAgent> getReplanningAgents(final double time, final Set<String> transportModes) {
-		return this.filterAgents(time, transportModes, timeFilterMode.EXACT);
+		return this.filterAgents(time, transportModes, TimeFilterMode.EXACT);
 	}
 
 	/**
@@ -273,7 +275,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @return a list of agents who might need an unrestricted replanning and use one of the given transport modes
 	 */
 	public Set<PlanBasedWithinDayAgent> getUnrestrictedReplanningAgents(final double time, final Set<String> transportModes) {
-		return this.filterAgents(time, transportModes, timeFilterMode.UNRESTRICTED);
+		return this.filterAgents(time, transportModes, TimeFilterMode.UNRESTRICTED);
 	}
 	
 	/**
@@ -302,10 +304,10 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @return a list of agents who might need a restricted replanning and use one of the given transport modes
 	 */
 	public Set<PlanBasedWithinDayAgent> getRestrictedReplanningAgents(final double time, final Set<String> transportModes) {
-		return this.filterAgents(time, transportModes, timeFilterMode.RESTRICTED);
+		return this.filterAgents(time, transportModes, TimeFilterMode.RESTRICTED);
 	}
 	
-	private Set<PlanBasedWithinDayAgent> filterAgents(final double time, final Set<String> transportModes, final timeFilterMode timeMode) {
+	private Set<PlanBasedWithinDayAgent> filterAgents(final double time, final Set<String> transportModes, final TimeFilterMode timeMode) {
 		Set<PlanBasedWithinDayAgent> set = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
 		Iterator<Entry<Id, Double>> entries = replanningMap.entrySet().iterator();
@@ -316,11 +318,11 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 			double replanningTime = entry.getValue();
 
 			// check time
-			if (timeMode == timeFilterMode.EXACT) {
+			if (timeMode == TimeFilterMode.EXACT) {
 				if (time != replanningTime) continue;				
-			} else if (timeMode == timeFilterMode.RESTRICTED) {
+			} else if (timeMode == TimeFilterMode.RESTRICTED) {
 				if (time <= replanningTime) continue;
-			} else if (timeMode == timeFilterMode.UNRESTRICTED) {
+			} else if (timeMode == TimeFilterMode.UNRESTRICTED) {
 				if (time > replanningTime) continue;
 			}
 

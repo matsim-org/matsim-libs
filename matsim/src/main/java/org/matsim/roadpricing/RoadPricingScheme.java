@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
@@ -72,9 +71,7 @@ public class RoadPricingScheme implements RoadPricingSchemeI {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getName()
-	 */
+	@Override
 	public String getName() {
 		return this.name;
 	}
@@ -83,9 +80,7 @@ public class RoadPricingScheme implements RoadPricingSchemeI {
 		this.type = type.intern();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getType()
-	 */
+	@Override
 	public String getType() {
 		return this.type;
 	}
@@ -94,9 +89,7 @@ public class RoadPricingScheme implements RoadPricingSchemeI {
 		this.description = description;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getDescription()
-	 */
+	@Override
 	public String getDescription() {
 		return this.description;
 	}
@@ -128,16 +121,12 @@ public class RoadPricingScheme implements RoadPricingSchemeI {
 	  return (c != null) ? c.remove(cost) : false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getLinkIdSet()
-	 */
+	@Override
 	public Set<Id> getLinkIdSet() {
 		return this.linkIds.keySet();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getLinkIds()
-	 */
+	@Override
 	public Map<Id, List<Cost>> getLinkIds(){
 	  return this.linkIds;
 	}
@@ -152,9 +141,7 @@ public class RoadPricingScheme implements RoadPricingSchemeI {
 		return this.costCache.clone();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.roadpricing.RoadPricingSchemeI#getLinkCostInfo(org.matsim.api.core.v01.Id, double)
-	 */
+	@Override
 	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId) {
 		// this is the default road pricing scheme, which ignores the person.  kai, mar'12
 		// (I have decided to put the person into the method call rather than the setPerson construction in TravelDisutility etc.
