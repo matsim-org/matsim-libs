@@ -117,6 +117,12 @@ public class BasicCooperative implements Cooperative{
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
 		this.currentIteration = iteration;
 		
+		if(this.numberOfIterationsWithoutScoring > 0){
+			PPlanStrategy strategy = pStrategyManager.chooseStrategy();
+			this.bestPlan = strategy.run(this);
+			this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStartStop(), this.bestPlan.getEndStop(), this.bestPlan.getId()));
+		}
+		
 		if(this.testPlan != null){
 			// compare score per vehicles
 //			if(this.scorePerVehicle > this.scorePerVehicleLastIteration){

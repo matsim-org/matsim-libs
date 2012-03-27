@@ -46,6 +46,11 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Person
 		double startTime = 0.0;
 		double endTime = 24 * 3600.0;
 		
+		if(demandTimeBins == null){
+			// there is no demand return old plan
+			return cooperative.getBestPlan();
+		}
+		
 		for (int i = 0; i < demandTimeBins.length; i++) {
 			if(demandTimeBins[i] == 0){
 				startTime = this.timeBinSize * i;
