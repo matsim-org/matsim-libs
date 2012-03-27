@@ -32,6 +32,8 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
+import playground.andreas.P2.helper.PConfigGroup;
+
 /**
  * Scores paratransit vehicles
  * 
@@ -43,19 +45,21 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
 	
-	private String pIdentifier;
-	private double earningsPerMeterAndPassenger = 0.05;
-	private double expensesPerMeter = 0.03;
+	private final String pIdentifier;
+	private final double earningsPerMeterAndPassenger;
+	private final double expensesPerMeter;
+	private final double costPerVehicleAndDay;
 	
 	private Network net;
 	
 	TreeMap<Id, Id> driverId2VehIdMap = new TreeMap<Id, Id>();
 	TreeMap<Id, ScoreContainer> vehicleId2ScoreMap = new TreeMap<Id, ScoreContainer>();
 
-	public ScorePlansHandler(String pIdentifier, double earningsPerMeterAndPassenger, double expensesPerMeter){
-		this.pIdentifier = pIdentifier;
-		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
-		this.expensesPerMeter = expensesPerMeter;
+	public ScorePlansHandler(PConfigGroup pConfig){
+		this.pIdentifier = pConfig.getPIdentifier();
+		this.earningsPerMeterAndPassenger = pConfig.getEarningsPerKilometerAndPassenger() / 1000.0;
+		this.expensesPerMeter = pConfig.getCostPerKilometer() / 1000.0;
+		this.costPerVehicleAndDay = pConfig.getCostPerVehicleAndDay();
 	}
 
 	public void init(Network net) {
@@ -72,7 +76,7 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 			this.driverId2VehIdMap.put(event.getDriverId(), event.getVehicleId());
 		}
 		if(this.vehicleId2ScoreMap.get(event.getVehicleId()) == null){
-			this.vehicleId2ScoreMap.put(event.getVehicleId(), new ScoreContainer(event.getVehicleId(), this.earningsPerMeterAndPassenger, this.expensesPerMeter));
+			this.vehicleId2ScoreMap.put(event.getVehicleId(), new ScoreContainer(event.getVehicleId(), this.earningsPerMeterAndPassenger, this.expensesPerMeter, this.costPerVehicleAndDay));
 		}		
 	}
 

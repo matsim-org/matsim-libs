@@ -43,10 +43,11 @@ public class ScoreContainer {
 		
 	int passengersCurrentlyInVeh = 0;
 	
-	public ScoreContainer(Id vehicleId, double earningsPerMeterAndPassenger, double expensesPerMeter){
+	public ScoreContainer(Id vehicleId, double earningsPerMeterAndPassenger, double expensesPerMeter, double costPerVehicleAndDay){
 		this.vehicleId = vehicleId;
 		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
 		this.expensesPerMeter = expensesPerMeter;
+		this.costs += costPerVehicleAndDay;
 	}
 	
 	public void addPassenger(){
