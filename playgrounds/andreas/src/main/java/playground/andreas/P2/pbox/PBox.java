@@ -218,7 +218,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 //			}
 			
 			// calculate the exact number necessary
-			numberOfNewCoopertives = (int) ((nonBankruptCooperatives.size() - numberOfCooperativesWithZeroBudget) * (1.0/this.pConfig.getShareOfCooperativesWithProfit() - 1.0) + 0.0000000000001);
+			numberOfNewCoopertives = (int) ((nonBankruptCooperatives.size() - numberOfCooperativesWithZeroBudget) * (1.0/this.pConfig.getShareOfCooperativesWithProfit() - 1.0) + 0.0000000000001) - numberOfCooperativesWithZeroBudget;
 		}
 		
 		// delete bankrupt ones
