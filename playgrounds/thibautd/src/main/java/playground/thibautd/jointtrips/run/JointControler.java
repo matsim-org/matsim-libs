@@ -106,7 +106,6 @@ public class JointControler extends MultiLegRoutingControler {
 		 * order is contrary to the order the listeners are added to the list.
 		 */
 
-		this.addCoreControlerListener(new CoreControlerListener());
 
 		// the default handling of plans
 		// this.plansScoring = new JointPlansScoring();

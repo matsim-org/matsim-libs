@@ -34,7 +34,6 @@ public class CtlWithLeftTurnPenaltyLs extends BseParamCalibrationControler {
 	 */
 	@Override
 	protected void loadCoreListeners() {
-		addCoreControlerListener(new CoreControlerListener());
 
 		// ******DEACTIVATE SCORING & ROADPRICING IN MATSIM******
 		// the default handling of plans

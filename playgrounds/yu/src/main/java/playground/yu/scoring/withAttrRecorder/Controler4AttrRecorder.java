@@ -49,7 +49,6 @@ public class Controler4AttrRecorder extends Controler implements
 
 	@Override
 	protected void loadCoreListeners() {
-		addCoreControlerListener(new CoreControlerListener());
 
 		// ------DEACTIVATE SCORING & ROADPRICING IN MATSIM------
 		planScoring4AttrRecorder = new PlansScoring4AttrRecorder();

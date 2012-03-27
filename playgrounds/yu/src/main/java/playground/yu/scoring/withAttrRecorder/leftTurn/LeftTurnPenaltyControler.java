@@ -53,8 +53,7 @@ public class LeftTurnPenaltyControler extends Controler4AttrRecorder {
 
 	@Override
 	protected void loadCoreListeners() {
-		addCoreControlerListener(new CoreControlerListener());
-
+	
 		// ------DEACTIVATE SCORING & ROADPRICING IN MATSIM------
 		plansScoringLTP = new PlansScoringWithLeftTurnPenalty();
 		addCoreControlerListener(plansScoringLTP);
