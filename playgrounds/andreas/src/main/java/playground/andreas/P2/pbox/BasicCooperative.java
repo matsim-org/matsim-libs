@@ -102,7 +102,7 @@ public class BasicCooperative implements Cooperative{
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
 				route.setDescription(plan.toString(this.budget));
 			}
-			nVehicles += plan.getNVehciles();
+			nVehicles += plan.getNVehicles();
 		}
 		this.score = this.budget - this.budgetLastIteration;
 		this.scorePerVehicle = this.score / nVehicles;
@@ -121,7 +121,7 @@ public class BasicCooperative implements Cooperative{
 				this.bestPlan.setStartTime(this.testPlan.getStartTime());
 				this.bestPlan.setEndTime(this.testPlan.getEndTime());
 			}
-			this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() + 1);
+			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
 			this.testPlan = null;
 		}
 
@@ -130,13 +130,13 @@ public class BasicCooperative implements Cooperative{
 			// insufficient, sell vehicles
 			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) Math.floor(this.budget / this.costPerVehicleSell));
 			
-			if(this.bestPlan.getNVehciles() - numberOfVehiclesToSell < 1){
+			if(this.bestPlan.getNVehicles() - numberOfVehiclesToSell < 1){
 				// can not balance the budget by selling vehicles, bankrupt
 				return;
 			}
 
 			// can balance the budget, so sell vehicles
-			this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() - numberOfVehiclesToSell);
+			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - numberOfVehiclesToSell);
 			this.budget += this.costPerVehicleSell * numberOfVehiclesToSell;
 			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
 		}
@@ -149,31 +149,31 @@ public class BasicCooperative implements Cooperative{
 			// adapt fleet size
 			// plan scored negative sell one vehicle, plan scored positive try to buy one
 			if(this.budget < this.budgetLastIteration){
-				if(this.bestPlan.getNVehciles() > 1){
+				if(this.bestPlan.getNVehicles() > 1){
 					// can sell one vehicle
 					this.budget += this.costPerVehicleSell * 1;
-					this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() - 1);
+					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 				}
 			} else {
 				// plan scored positive
 				if(this.budget > this.costPerVehicleBuy){
 					// budget ok, buy one
 					this.budget -= this.costPerVehicleBuy * 1;
-					this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() + 1);
+					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
 				}
 			}
 		} else {
 			// replan
-			if(this.bestPlan.getNVehciles() > 1){
+			if(this.bestPlan.getNVehicles() > 1){
 				// can afford to use one vehicle for testing, get a new testPlan
 				PPlanStrategy strategy = pStrategyManager.chooseStrategy();
 				this.testPlan = strategy.run(this);
-				this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() - 1);
+				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 			}
 		}
 		
 		// reinitialize the plan
-		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehciles(), this.bestPlan.getStartStop(), this.bestPlan.getEndStop(), this.bestPlan.getId()));
+		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStartStop(), this.bestPlan.getEndStop(), this.bestPlan.getId()));
 		
 		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
 		for (PPlan plan : this.getAllPlans()) {

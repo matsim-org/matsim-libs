@@ -105,7 +105,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 
 				for (PPlan plan : plans) {
 					coopPax += plan.getTripsServed();
-					coopVeh += plan.getNVehciles();
+					coopVeh += plan.getNVehicles();
 					coopScore += plan.getScore();
 				}
 				

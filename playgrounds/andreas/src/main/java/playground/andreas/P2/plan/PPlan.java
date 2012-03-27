@@ -126,7 +126,7 @@ public class PPlan {
 		this.endTime = endTime;
 	}
 	
-	public int getNVehciles(){
+	public int getNVehicles(){
 		return this.nVehicles;
 	}
 	
@@ -203,7 +203,7 @@ public class PPlan {
 			return false;
 		}
 		
-		if(this.nVehicles != testPlan.getNVehciles()){
+		if(this.nVehicles != testPlan.getNVehicles()){
 			return false;
 		}
 		
