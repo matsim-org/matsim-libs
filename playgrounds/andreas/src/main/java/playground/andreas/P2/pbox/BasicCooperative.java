@@ -59,10 +59,9 @@ public class BasicCooperative implements Cooperative{
 
 	private TransitLine currentTransitLine;
 	private int numberOfIterationsWithoutScoring;
+	
 	private double budget;
 	private double budgetLastIteration;
-	private double scorePerVehicle;
-	private double scorePerVehicleLastIteration;
 	private double score;
 	private double scoreLastIteration;
 	
@@ -96,36 +95,30 @@ public class BasicCooperative implements Cooperative{
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
 		this.scoreLastIteration = this.score;
 		this.budgetLastIteration = this.budget;
-		this.scorePerVehicleLastIteration = scorePerVehicle;
-		int nVehicles = 0;
+		
+		this.score = 0;
+		
 		for (PPlan plan : this.getAllPlans()) {
 			scorePlan(driverId2ScoreMap, plan);
-			this.budget += plan.getScore();
+			this.score += plan.getScore();
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
-				route.setDescription(plan.toString(this.budget));
+				route.setDescription(plan.toString(this.budget + this.score));
 			}
-			nVehicles += plan.getNVehicles();
 		}
+
+		this.budget += this.score;
+		
 		if(this.numberOfIterationsWithoutScoring > 0){
 			this.budget = Math.max(this.budget, 0.0);
 			this.numberOfIterationsWithoutScoring--;
-		}
-		this.score = this.budget - this.budgetLastIteration;
-		this.scorePerVehicle = this.score / nVehicles;
+		}		
 	}
 
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
 		this.currentIteration = iteration;
 		
-		if(this.numberOfIterationsWithoutScoring > 0){
-			PPlanStrategy strategy = pStrategyManager.chooseStrategy();
-			this.bestPlan = strategy.run(this);
-			this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStartStop(), this.bestPlan.getEndStop(), this.bestPlan.getId()));
-		}
-		
 		if(this.testPlan != null){
-			// compare score per vehicles
-//			if(this.scorePerVehicle > this.scorePerVehicleLastIteration){
+			// compare scores
 			if (this.score > this.scoreLastIteration){
 				// testPlan improves the plan, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
 				this.bestPlan.setStartStop(this.testPlan.getStartStop());
@@ -135,6 +128,11 @@ public class BasicCooperative implements Cooperative{
 			}
 			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
 			this.testPlan = null;
+		}
+		
+		if(this.numberOfIterationsWithoutScoring > 0){
+			PPlanStrategy strategy = pStrategyManager.getTimeReduceDemand();
+			this.bestPlan = strategy.run(this);
 		}
 
 		// balance the budget
@@ -157,24 +155,24 @@ public class BasicCooperative implements Cooperative{
 			log.error("There should be no inbalanced budget at this time.");
 		}		
 
-		if(MatsimRandom.getRandom().nextDouble() < 0.7){
+//		if(MatsimRandom.getRandom().nextDouble() < 0.7){
 			// adapt fleet size
 			// plan scored negative sell one vehicle, plan scored positive try to buy one
-			if(this.budget < this.budgetLastIteration){
+			if(this.score < this.scoreLastIteration){
 				if(this.bestPlan.getNVehicles() > 1){
 					// can sell one vehicle
 					this.budget += this.costPerVehicleSell * 1;
 					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 				}
 			} else {
-				// plan scored positive
+				// plan scored (even more) positive
 				if(this.budget > this.costPerVehicleBuy){
 					// budget ok, buy one
 					this.budget -= this.costPerVehicleBuy * 1;
 					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
 				}
 			}
-		} else {
+//		} else {
 			// replan
 			if(this.bestPlan.getNVehicles() > 1){
 				// can afford to use one vehicle for testing, get a new testPlan
@@ -182,7 +180,7 @@ public class BasicCooperative implements Cooperative{
 				this.testPlan = strategy.run(this);
 				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 			}
-		}
+//		}
 		
 		// reinitialize the plan
 		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStartStop(), this.bestPlan.getEndStop(), this.bestPlan.getId()));

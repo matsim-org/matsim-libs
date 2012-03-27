@@ -23,12 +23,13 @@ public class PStrategyManager {
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	
-	private String pIdentifier;	
+	private String pIdentifier;
+	private TimeReduceDemand timeReduceDemand = null;	
 	
 	public PStrategyManager(PConfigGroup pConfig){
 		this.pIdentifier = pConfig.getPIdentifier();
 	}
-	
+	// TODO[an] always initialize TimeReduceDemand
 	public void init(PConfigGroup pConfig, EventsManager eventsManager) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			double rate = settings.getProbability();
@@ -63,6 +64,7 @@ public class PStrategyManager {
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
+			this.timeReduceDemand = strat;
 		}
 		
 		if (strategy == null) {
@@ -103,4 +105,7 @@ public class PStrategyManager {
 		return strBuffer.toString();
 	}
 
+	public TimeReduceDemand getTimeReduceDemand() {
+		return this.timeReduceDemand;
+	}	
 }
