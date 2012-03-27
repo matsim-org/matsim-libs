@@ -49,26 +49,23 @@ import org.matsim.core.events.TravelEventHandler;
  * final score are written to the selected plans of each person in the
  * scenario.
  * 
- * Note: As of now, this is only a convenience class which is used from many playgrounds.
- * The MATSim Controler (more specifically, PlansScoring) plugs together the same
- * elements which are used in this class by itself.
+ * If you want your own way to reproduce plan elements from Events to get scored,
+ * build your own class like this.
  *
  * @author mrieser, michaz
  */
-public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
-		AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkLeaveEventHandler,
-        LinkEnterEventHandler, TravelEventHandler {
+public final class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
+AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkLeaveEventHandler,
+LinkEnterEventHandler, TravelEventHandler {
 
-
-
-    private EventsToActivities eventsToActivities;
-    private EventsToLegs eventsToLegs;
-    private PlanElementsToScore handler;
+	private EventsToActivities eventsToActivities;
+	private EventsToLegs eventsToLegs;
+	private PlanElementsToScore handler;
 	private Scenario scenario;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private double learningRate;
 
-    /**
+	/**
 	 * Initializes EventsToScore with a learningRate of 1.0.
 	 *
 	 * @param scenario
@@ -82,16 +79,16 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		this.scenario = scenario;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
-        initHandlers(scenario, scoringFunctionFactory, learningRate);
+		initHandlers(scenario, scoringFunctionFactory, learningRate);
 	}
 
 	private void initHandlers(final Scenario scenario,
 			final ScoringFunctionFactory factory, final double learningRate) {
 		this.eventsToActivities = new EventsToActivities();
-        this.handler = new PlanElementsToScore(scenario, factory, learningRate);
-        this.eventsToActivities.setActivityHandler(this.handler);
-        this.eventsToLegs = new EventsToLegs();
-        this.eventsToLegs.setLegHandler(this.handler);
+		this.handler = new PlanElementsToScore(scenario, factory, learningRate);
+		this.eventsToActivities.setActivityHandler(this.handler);
+		this.eventsToLegs = new EventsToLegs();
+		this.eventsToLegs.setLegHandler(this.handler);
 	}
 
 	@Override
@@ -99,23 +96,21 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		eventsToLegs.handleEvent(event);
 	}
 
-    @Override
-    public void handleEvent(LinkEnterEvent event) {
-        eventsToLegs.handleEvent(event);
-    }
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		eventsToLegs.handleEvent(event);
+	}
 
-    @Override
-    public void handleEvent(LinkLeaveEvent event) {
-        eventsToLegs.handleEvent(event);
-    }
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		eventsToLegs.handleEvent(event);
+	}
 
-    @Override
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		eventsToLegs.handleEvent(event);
 	}
 
-    
-    
 	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
@@ -137,24 +132,24 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		eventsToActivities.handleEvent(event);
 	}
 
-    @Override
+	@Override
 	public void handleEvent(final ActivityEndEvent event) {
 		eventsToActivities.handleEvent(event);
 	}
 
-    @Override
-    public void handleEvent(TravelEvent travelEvent) {
-        eventsToLegs.handleEvent(travelEvent);
-    }
+	@Override
+	public void handleEvent(TravelEvent travelEvent) {
+		eventsToLegs.handleEvent(travelEvent);
+	}
 
 
-    /**
+	/**
 	 * Finishes the calculation of the plans' scores and assigns the new scores
 	 * to the plans.
 	 */
 	public void finish() {
-        eventsToActivities.finish();
-        handler.finish();
+		eventsToActivities.finish();
+		handler.finish();
 	}
 
 	/**
@@ -185,9 +180,9 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 
 	@Override
 	public void reset(final int iteration) {
-        this.eventsToActivities.reset(iteration);
-        this.eventsToLegs.reset(iteration);
-        initHandlers(scenario, scoringFunctionFactory, learningRate);
+		this.eventsToActivities.reset(iteration);
+		this.eventsToLegs.reset(iteration);
+		initHandlers(scenario, scoringFunctionFactory, learningRate);
 	}
 
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
