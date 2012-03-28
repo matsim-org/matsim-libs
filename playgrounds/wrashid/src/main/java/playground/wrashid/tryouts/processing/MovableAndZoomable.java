@@ -39,7 +39,9 @@ public class MovableAndZoomable extends PApplet {
 
 		resetCenterCoordinateAndScaling();
 
-		smooth();
+		
+		
+		//smooth();
 
 		addMouseWheelListener(new MouseWheelListener() {
 

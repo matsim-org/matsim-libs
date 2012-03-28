@@ -42,7 +42,29 @@ public class EmbeddedProcessingFrame extends Frame {
 		});
         add(btn1);
         
+        Button btn2 = new Button("High Quality");
         
+        btn2.addActionListener(new ActionListener() {
+        	
+        	boolean isHighQualityRenderingOn=false;
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!isHighQualityRenderingOn){
+					isHighQualityRenderingOn=true;
+					networkWithHeatMap.smooth();
+					((Button) e.getSource()).setLabel("Low Quality");
+				} else {
+					isHighQualityRenderingOn=false;
+					networkWithHeatMap.noSmooth();
+					((Button) e.getSource()).setLabel("High Quality");
+				}
+				
+				
+				
+			}
+		});
+        add(btn2);
         
         
         sb=new  Scrollbar(Scrollbar.HORIZONTAL, 1, 100, 1, 1000);
