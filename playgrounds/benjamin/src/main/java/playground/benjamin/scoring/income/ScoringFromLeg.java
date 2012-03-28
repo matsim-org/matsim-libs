@@ -25,8 +25,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.benjamin.scoring.income.ScoringFromLeg;
 
@@ -96,6 +98,11 @@ public class ScoringFromLeg extends LegScoringFunction {
 		Route route = leg.getRoute();
 		double dist = route.getDistance();
 		if (TransportMode.car.equals(leg.getMode())) {
+			if (route instanceof NetworkRoute) {	
+				dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
+			}
+			// (I just put in the last three lines.  This is not optimal, but better than nothing.  kai, mar'12)
+			
 			dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
 		}
 		
