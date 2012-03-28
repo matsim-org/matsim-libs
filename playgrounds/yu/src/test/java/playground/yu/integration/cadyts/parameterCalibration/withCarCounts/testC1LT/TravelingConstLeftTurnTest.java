@@ -38,9 +38,13 @@ import playground.yu.integration.cadyts.CalibrationConfig;
 
 /**
  * @author yu
- * 
+ *
  */
 public class TravelingConstLeftTurnTest extends MatsimTestCase {
+	@Rule
+	MatsimTestUtils utils = new MatsimTestUtils(); // maybe not necessary in
+													// this class
+
 	private class GetCalibratedParameters implements IterationStartsListener {
 
 		@Override
@@ -77,28 +81,28 @@ public class TravelingConstLeftTurnTest extends MatsimTestCase {
 					expectedTraveling = -6;
 					break;
 				case 3:
-					expectedTraveling = -5.999990694514531;
+					expectedTraveling = -6.224864010329179;
 					break;
 				case 4:
-					expectedTraveling = -5.999985161438379;
+					expectedTraveling = -4.910974516956966;
 					break;
 				case 5:
-					expectedTraveling = -5.999981079200879;
+					expectedTraveling = -3.7406282014957446;
 					break;
 				case 6:
-					expectedTraveling = -5.999977789213263;
+					expectedTraveling = -2.4271613971127577;
 					break;
 				case 7:
-					expectedTraveling = -5.999975006222327;
+					expectedTraveling = -1.712279517913751;
 					break;
 				case 8:
-					expectedTraveling = -5.999972578908722;
+					expectedTraveling = -1.220208954146627;
 					break;
 				case 9:
-					expectedTraveling = -5.99997041660933;
+					expectedTraveling = -0.931647757513297;
 					break;
 				case 10:
-					expectedTraveling = -5.999968460370428;
+					expectedTraveling = -0.9158018072990199;
 					break;
 				}
 
@@ -117,28 +121,28 @@ public class TravelingConstLeftTurnTest extends MatsimTestCase {
 					expectedConstantLeftTurn = 0;
 					break;
 				case 3:
-					expectedConstantLeftTurn = -2.1989080664082048E-5;
+					expectedConstantLeftTurn = -1.7154468311127662;
 					break;
 				case 4:
-					expectedConstantLeftTurn = -3.5063874183051054E-5;
+					expectedConstantLeftTurn =-3.287301770649159;
 					break;
 				case 5:
-					expectedConstantLeftTurn = -4.471030272299403E-5;
+					expectedConstantLeftTurn = -4.5138497659059835;
 					break;
 				case 6:
-					expectedConstantLeftTurn = -5.248462633471199E-5;
+					expectedConstantLeftTurn = -5.467464963420053;
 					break;
 				case 7:
-					expectedConstantLeftTurn = -5.9060904848814176E-5;
+					expectedConstantLeftTurn = -6.069118477846682;
 					break;
 				case 8:
-					expectedConstantLeftTurn = -6.479670937220244E-5;
+					expectedConstantLeftTurn = -6.519746879845867;
 					break;
 				case 9:
-					expectedConstantLeftTurn = -6.990627896440479E-5;
+					expectedConstantLeftTurn = -6.772647538223071;
 					break;
 				case 10:
-					expectedConstantLeftTurn = -7.452892265376252E-5;
+					expectedConstantLeftTurn = -6.821687128260576;
 					break;
 				}
 
@@ -149,10 +153,6 @@ public class TravelingConstLeftTurnTest extends MatsimTestCase {
 			}
 		}
 	}
-
-	@Rule
-	MatsimTestUtils utils = new MatsimTestUtils(); // maybe not necessary in
-													// this class
 
 	/**
 	 * tests the parameter calibration with pop [-6, 0] counts [-5, -0.5]
