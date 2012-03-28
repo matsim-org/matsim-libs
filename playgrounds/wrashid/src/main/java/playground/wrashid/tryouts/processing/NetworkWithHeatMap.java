@@ -1,5 +1,12 @@
 package playground.wrashid.tryouts.processing;
 
+import java.awt.Event;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -22,10 +29,20 @@ public class NetworkWithHeatMap extends PApplet {
 	float biggestX = Float.MIN_VALUE;
 	float biggestY = Float.MIN_VALUE;
 	private double maxDistanceInMeters = 500000;
-
+	private float moveTranslateX=0;
+	private float moveTranslateY=0;
+	
+	
 	public void setup() {
-		
-		
+
+		addMouseWheelListener(new MouseWheelListener() {
+
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				adjustScaleFactor(e);
+			}
+		});
+
 		size(1000, 1000);
 		smooth();
 		noStroke();
@@ -56,28 +73,89 @@ public class NetworkWithHeatMap extends PApplet {
 
 		}
 
+	addMouseMotionListener(new MouseMotionListener() {
+			
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				mouseX = e.getX();
+				mouseY = e.getY();
+			}
+			
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				//System.out.println(moveTranslateX);
+				//System.out.println(moveTranslateY);
+				moveTranslateX+=e.getX()-mouseX;
+				moveTranslateY+=e.getY()-mouseY;
+				mouseX = e.getX();
+				mouseY = e.getY();
+			
+			}
+		});
+	
+	addMouseListener(new MouseListener() {
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (mouseEvent.getClickCount()==2) println("<double click>");
+			
+		}
+	});
+		
+	}
+
+	public void adjustScaleFactor(MouseWheelEvent e) {
+
+		if (e.getWheelRotation() < 0) {
+			setScaler(getScaler() + 0.1f);
+		}
+
+		if (e.getWheelRotation() > 0) {
+			setScaler(getScaler() - 0.1f);
+		}
+		
 	}
 
 	public void draw() {
 
+		
 		strokeWeight((float) 0.01);
-		//translate(width / 2, height / 2); // use translate around scale
-		scale(getScaler());
-		//translate(-width / 6, (float) (-height / 1.05)); // to scale from the
-															// center
+		
+
+		translate(moveTranslateX,moveTranslateY);
+		translate(-scaler*width/2,-scaler*height/2);
+		scale(scaler);
+	
 
 		background(255);
-		// fill(0);
-		// stroke(255);
-		// stroke(0);
+	
 		drawNetwork();
 
-		/*
-		 * ellipse(140,140,140,140); ellipse(250,200,200,200);
-		 * ellipse(400,200,70,70); ellipse(230,320,20,20);
-		 * ellipse(400,400,50,50); fill(255); ellipse(width/2,height/2,30,30);
-		 * fill(255,0,0); ellipse(width/2,height/2,1,1);
-		 */
+	
 	}
 
 	private void drawNetwork() {
@@ -85,7 +163,6 @@ public class NetworkWithHeatMap extends PApplet {
 		// function.
 
 		CoordImpl zuerichCoord = new CoordImpl(683248, 248161);
-		
 
 		float scalingFactor = width / (biggestX - smallestX);
 		// System.out.println(scalingFactor);
@@ -98,8 +175,7 @@ public class NetworkWithHeatMap extends PApplet {
 
 			if (GeneralLib.getDistance(zuerichCoord, link.getFromNode().getCoord()) < getMaxDistanceInMeters() / 2) {
 
-				float distanceScaled = (float) ((GeneralLib.getDistance(zuerichCoord, link.getFromNode().getCoord()))
-						/ (getMaxDistanceInMeters() / 2));
+				float distanceScaled = (float) ((GeneralLib.getDistance(zuerichCoord, link.getFromNode().getCoord())) / (getMaxDistanceInMeters() / 2));
 
 				float r = 255 * (1 - distanceScaled);
 				float g = 255 * distanceScaled;
@@ -107,8 +183,7 @@ public class NetworkWithHeatMap extends PApplet {
 				stroke(r, g, 0);
 			} else if (GeneralLib.getDistance(zuerichCoord, link.getFromNode().getCoord()) < getMaxDistanceInMeters()) {
 
-				float distanceScaled = (float) ((GeneralLib.getDistance(zuerichCoord, link.getFromNode().getCoord()) - (getMaxDistanceInMeters() / 2))
-						/ (getMaxDistanceInMeters() / 2));
+				float distanceScaled = (float) ((GeneralLib.getDistance(zuerichCoord, link.getFromNode().getCoord()) - (getMaxDistanceInMeters() / 2)) / (getMaxDistanceInMeters() / 2));
 
 				float g = 255 * (1 - distanceScaled);
 				float b = 255 * distanceScaled;
