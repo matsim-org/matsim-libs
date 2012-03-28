@@ -26,12 +26,13 @@ import org.matsim.core.events.AgentMoneyEventImpl;
 
 /**
  * A Scoring Function that only respects the travel time.
+ * 
  * @author cdobler
  */
 public class OnlyTimeDependentScoringFunction extends ScoringFunctionAdapter {
 	
-	private double score;
-	private double startTime;
+	protected double score;
+	protected double startTime;
 	
 	public OnlyTimeDependentScoringFunction() {
 	}
