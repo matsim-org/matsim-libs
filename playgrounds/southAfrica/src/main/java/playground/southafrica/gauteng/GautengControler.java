@@ -25,7 +25,8 @@ class GautengControler {
 	
 	public static void main ( String[] args ) {
 
-		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
+//		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
+		String configFileName = "../../sanral2010/config/kaiconfig.xml" ;
 
 		final Controler controler = new Controler( configFileName ) ;
 
