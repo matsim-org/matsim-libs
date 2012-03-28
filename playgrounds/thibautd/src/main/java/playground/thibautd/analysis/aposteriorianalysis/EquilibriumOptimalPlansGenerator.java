@@ -24,7 +24,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -34,6 +37,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.scoring.ScoringFunction;
 
 import playground.thibautd.jointtrips.config.CliquesConfigGroup;
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
@@ -41,8 +45,7 @@ import playground.thibautd.jointtrips.population.Clique;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilitiesUtils;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
-import playground.thibautd.jointtrips.replanning.selectors.PlanWithLongestTypeSelector;
+import playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser.JointTimeModeChooserModule;
 import playground.thibautd.jointtrips.run.JointControler;
 import playground.thibautd.utils.RemoveJointTrips;
 
@@ -63,7 +66,7 @@ public class EquilibriumOptimalPlansGenerator {
 		Logger.getLogger(EquilibriumOptimalPlansGenerator.class);
 
 	private final JointControler controler;
-	private final JointReplanningConfigGroup configGroup;
+	// private final JointReplanningConfigGroup configGroup;
 	private final Config config;
 
 	/**
@@ -74,8 +77,8 @@ public class EquilibriumOptimalPlansGenerator {
 			final JointControler controler) {
 		this.controler = controler;
 		this.config = controler.getConfig();
-		this.configGroup = (JointReplanningConfigGroup)
-			controler.getConfig().getModule( JointReplanningConfigGroup.GROUP_NAME );
+		//this.configGroup = (JointReplanningConfigGroup)
+		//	controler.getConfig().getModule( JointReplanningConfigGroup.GROUP_NAME );
 	}
 
 	/**
@@ -186,7 +189,7 @@ public class EquilibriumOptimalPlansGenerator {
 			}
 		}
 
-		configGroup.setOptimizeToggle( "false" );
+		//configGroup.setOptimizeToggle( "false" );
 		optimiseSelectedPlans();
 		writePopulation( file );
 	}
@@ -205,7 +208,7 @@ public class EquilibriumOptimalPlansGenerator {
 			JointTripPossibilitiesUtils.includeAllJointTrips( plan );
 		}
 
-		configGroup.setOptimizeToggle( "false" );
+		//configGroup.setOptimizeToggle( "false" );
 		optimiseSelectedPlans();
 		writePopulation( file );
 		return true;
@@ -232,16 +235,30 @@ public class EquilibriumOptimalPlansGenerator {
 
 		optimiseSelectedPlans();
 		writePopulation( file );
-
 	}
 
 	private void optimiseSelectedPlans() {
-		JointPlanOptimizerModule module = new JointPlanOptimizerModule( controler );
+		// JointPlanOptimizerModule module = new JointPlanOptimizerModule( controler );
+		JointTimeModeChooserModule module = new JointTimeModeChooserModule( controler );
 		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
 
 		module.prepareReplanning();
 		for (Clique clique : scenario.getCliques().getCliques().values()) {
 			module.handlePlan( clique.getSelectedPlan() );
+
+			for (Plan plan : ((JointPlan) clique.getSelectedPlan()).getIndividualPlans().values()) {
+				ScoringFunction scoringFunction = controler.getScoringFunctionFactory().createNewScoringFunction( plan );
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						scoringFunction.handleActivity( (Activity) pe );
+					}
+					if (pe instanceof Leg) {
+						scoringFunction.handleLeg( (Leg) pe );
+					}
+				}
+				scoringFunction.finish();
+				plan.setScore( scoringFunction.getScore() );
+			}
 		}
 		module.finishReplanning();
 	}
