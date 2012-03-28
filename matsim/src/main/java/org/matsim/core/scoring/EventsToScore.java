@@ -54,7 +54,7 @@ import org.matsim.core.events.TravelEventHandler;
  *
  * @author mrieser, michaz
  */
-public final class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
+public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
 AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkLeaveEventHandler,
 LinkEnterEventHandler, TravelEventHandler {
 
