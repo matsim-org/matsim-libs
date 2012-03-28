@@ -20,6 +20,7 @@
 package playground.thibautd.jointtrips.population.jointtrippossibilities;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -192,6 +193,38 @@ public class JointTripPossibilitiesUtilsTest {
 					}
 				}
 			}
+		}
+	}
+
+	@Test
+	public void testRemoveOnePassenger() {
+		JointPlan plan = getPlanWithJointTrips();
+		JointTripPossibilities possibilities =
+			JointTripPossibilitiesUtils.extractJointTripPossibilities( plan );
+
+		plan.setJointTripPossibilities( possibilities );
+
+		Map<JointTripPossibility, Boolean> trips =
+			JointTripPossibilitiesUtils.getPerformedJointTrips( plan );
+		trips.entrySet().iterator().next().setValue( false );
+
+		JointTripPossibilitiesUtils.includeJointTrips( trips , plan );
+
+		List<PlanElement> pes = plan.getPlanElements();
+
+		int c = 0;
+		for (PlanElement pe : pes) {
+			if (pe instanceof JointLeg) {
+				c++;
+				Collection<? extends PlanElement> linked = ((JointLeg) pe).getLinkedElements().values();
+				Assert.assertTrue(
+						"wrong joint legs links in plan "+plan.getIndividualPlanElements()+": does not contains all of "+linked,
+						pes.containsAll( linked ));
+			}
+		}
+
+		if (c==0) {
+			throw new RuntimeException( "nothing was tested for plan "+plan.getIndividualPlanElements() );
 		}
 	}
 

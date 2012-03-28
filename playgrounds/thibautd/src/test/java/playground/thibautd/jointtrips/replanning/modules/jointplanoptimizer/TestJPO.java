@@ -100,6 +100,7 @@ import playground.thibautd.jointtrips.utils.JointControlerUtils;
  * @author thibautd
  */
 @RunWith(Parameterized.class)
+@Ignore
 public class TestJPO {
 //TODO: refactor (one abstract fixtures initializing class, and individual class tests)
 	@Rule

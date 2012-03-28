@@ -153,6 +153,7 @@ public class RoutesTest {
 	@Test
 	public void testPtTrip() throws Exception {
 		int testCount = 0;
+		int longCount = 0;
 		for (Tuple<Facility, Facility> od : ods) {
 			List<? extends PlanElement> pnrTrip =
 				pnrRouter.calcRoute(
@@ -185,13 +186,15 @@ public class RoutesTest {
 						PERSON);
 
 			compareTrips( pnrPtPortion , ptTrip );
+
 			testCount++;
+			if (pnrTrip.size() > 1) longCount++;
 		}
 
 		// this is the observed number of valid trips
-		// used to test that the test actually performs something
-		if (testCount < 2304) {
-			throw new RuntimeException( "only "+testCount+" trips were compared" );
+		// used to test that the test actually performs something useful
+		if (testCount != 2304 || longCount != 1748) {
+			throw new RuntimeException( "only "+testCount+" trips were compared, "+longCount+" trips of more than one leg" );
 		}
 	}
 
