@@ -86,9 +86,9 @@ public class Covariance2DfromParameters {
 		int width;
 		if (args.length != 3) {
 			// paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
-			paramFilename = "test/input/bln2pct/msd20pureParams.log";
-			outputFilename = "test/output/bln2pct/msd20varOfExp1kWindows.log";
-			width = 1000;
+			paramFilename = "test/input/bln2pct/pui100pureParams.log";
+			outputFilename = "test/output/bln2pct/pui100varOfExp400Windows.log";
+			width = 400;
 		} else {
 			paramFilename = args[0];
 			outputFilename = args[1];
