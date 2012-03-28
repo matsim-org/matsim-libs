@@ -119,6 +119,7 @@
 			<xs:element name="cellSizeCellBasedAccessibility" type="xs:nonNegativeInteger"/>
 			<xs:element name="shapeFileCellBasedAccessibility" type="fileType" minOccurs="1" 
 				maxOccurs="1"/>
+			<xs:element name="useCustomBoundingBox" type="xs:boolean"/>
 			<xs:element name="boundingBoxTop" type="xs:double"/>
 			<xs:element name="boundingBoxLeft" type="xs:double"/>
 			<xs:element name="boundingBoxRight" type="xs:double"/>
