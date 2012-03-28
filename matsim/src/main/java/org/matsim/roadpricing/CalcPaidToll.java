@@ -116,7 +116,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 
 
 
-	private static int cnt = 0 ;
+//	private static int cnt = 0 ;
 	/**
 	 * Sends {@link AgentMoneyEventImpl}s for all agents that must pay a toll.
 	 * This method should usually be called at the end before of an iteration.
@@ -131,13 +131,13 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	public void sendMoneyEvents(final double time, final EventsManager events) {
 		for (Map.Entry<Id, AgentTollInfo> entries : this.agents.entrySet()) {
 			events.processEvent(new AgentMoneyEventImpl(time, entries.getKey(), -entries.getValue().toll));
-			if ( cnt < 10 ) {
-				cnt++ ;
-				Logger.getLogger(this.getClass()).info("toll paid: " + entries.getValue().toll ) ;
-				if (cnt==10 ) {
-					Logger.getLogger(this.getClass()).info(Gbl.FUTURE_SUPPRESSED) ;
-				}
-			}
+//			if ( cnt < 10 ) {
+//				cnt++ ;
+//				Logger.getLogger(this.getClass()).info("toll paid: " + entries.getValue().toll ) ;
+//				if (cnt==10 ) {
+//					Logger.getLogger(this.getClass()).info(Gbl.FUTURE_SUPPRESSED) ;
+//				}
+//			}
 
 		}
 	}
