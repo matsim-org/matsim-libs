@@ -158,20 +158,20 @@ public class BasicCooperative implements Cooperative{
 //		if(MatsimRandom.getRandom().nextDouble() < 0.7){
 			// adapt fleet size
 			// plan scored negative sell one vehicle, plan scored positive try to buy one
-			if(this.score < this.scoreLastIteration){
-				if(this.bestPlan.getNVehicles() > 1){
-					// can sell one vehicle
-					this.budget += this.costPerVehicleSell * 1;
-					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
-				}
-			} else {
+//			if(this.score < this.scoreLastIteration){
+//				if(this.bestPlan.getNVehicles() > 1){
+//					// can sell one vehicle
+//					this.budget += this.costPerVehicleSell * 1;
+//					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+//				}
+//			} else {
 				// plan scored (even more) positive
 				if(this.budget > this.costPerVehicleBuy){
 					// budget ok, buy one
 					this.budget -= this.costPerVehicleBuy * 1;
 					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
 				}
-			}
+//			}
 //		} else {
 			// replan
 			if(this.bestPlan.getNVehicles() > 1){
