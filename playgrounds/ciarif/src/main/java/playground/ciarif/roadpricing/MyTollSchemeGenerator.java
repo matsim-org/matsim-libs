@@ -335,7 +335,8 @@ public class MyTollSchemeGenerator {
 	}
 
 	private NetworkImpl filterNetwork(final Network net, boolean full) {
-		MyNetwork n = new MyNetwork();
+//		MyNetwork n = new MyNetwork();
+		NetworkImpl n = NetworkImpl.createNetwork() ;
 		
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[this.usedCoords.length];

@@ -40,13 +40,26 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 /**
+ * Design thoughts:<ul>
+ * <li> This class is final, since it is sitting behind an interface, and thus delegation can be used for 
+ * implementation modifications.  Access to the quad tree might be justified in some cases, but should then be realized
+ * by specific methods and not via inheritance of the field (I would think
+
+ </ul>
+ * 
  * @author nagel
  * @author mrieser
  */
-public class NetworkImpl implements Network, BasicLocations {
+public final class NetworkImpl implements Network, BasicLocations {
 
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
 
+	/**
+	 * Design thoughts:<ul>
+	 * <li> This should, in my view, return the interface, not the implementation. (But how to deal with the BasicLocation
+	 * aspect?)  kai, mar'12
+	 * </ul>
+	 */
 	public static NetworkImpl createNetwork() {
 		return new NetworkImpl();
 	}
