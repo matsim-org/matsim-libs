@@ -9,4 +9,11 @@
   <artifactId>southAfrica</artifactId>
   <name>southAfrica</name>
   <version>0.4.0-SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>kai</artifactId>
+  		<version>0.4.0-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
