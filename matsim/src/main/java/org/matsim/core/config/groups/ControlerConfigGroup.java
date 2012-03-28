@@ -51,7 +51,10 @@ public class ControlerConfigGroup extends Module {
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
+
 	/*package*/ static final String MOBSIM = "mobsim";
+	public enum MobsimType {queueSimulation, qsim, JDEQSim, multimodalQSim } ;
+	
 	public static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
 
@@ -216,7 +219,13 @@ public class ControlerConfigGroup extends Module {
 				"to a file. `0' disables events writing completely.");
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
 				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
-		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: queueSimulation, qsim, jdeqsim, multimodalQSim");
+		
+		String mobsimTypes = "" ;
+		for ( MobsimType mtype : MobsimType.values() ) {
+			mobsimTypes += (mtype.toString() + " ") ;
+		}
+		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes );
+		
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.") ;
 		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
 				"to a file. `0' disables snapshots writing completely");
