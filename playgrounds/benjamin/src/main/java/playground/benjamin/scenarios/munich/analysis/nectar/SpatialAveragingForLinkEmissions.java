@@ -196,7 +196,7 @@ public class SpatialAveragingForLinkEmissions {
 						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 							double value = emissionMapToAnalyze.get(linkId).get(pollutant2analyze);
-							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+							double weightOfLinkForCell = calculateWeightOfLinkForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
 							sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
 							sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
 						}
@@ -264,7 +264,7 @@ public class SpatialAveragingForLinkEmissions {
 		return dateTimeString;
 	}
 
-	private double calculateWeightOfPersonForCell(double x1, double y1, double x2, double y2) {
+	private double calculateWeightOfLinkForCell(double x1, double y1, double x2, double y2) {
 		double distance = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 		return Math.exp((-distance * distance) / (smoothingRadius_m * smoothingRadius_m));
 	}
