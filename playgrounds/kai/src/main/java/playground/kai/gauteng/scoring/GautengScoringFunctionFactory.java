@@ -60,43 +60,21 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		// Design comment: This is the only place where the person is available (via plan.getPerson()).  Thus, all 
 		// person-specific scoring actions need to be injected from here. kai, mar'12
 
-		//summing up all relevant ulitlites
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		
-		//utility earned from activities
+
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.ActivityScoringFunction(params));
-
-		//utility spend for traveling (in this case: travel time and distance costs)
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.LegScoringFunction(params, network));
-		// yy careful: The standard leg scoring function assumes uniform utilities of time.  If this does not hold, the leg
-		// scoring function needs to be replaced.  (But then, presumably, also the activity scoring function
-		// needs to be replaced.)  kai, mar'12
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(params));
 
-		//utility spend for traveling (toll costs) if there is a toll
+		// person-dependent money scoring function (standard implementation contains person-indep scoring function):
 		double utilityOfMoney_normally_positive = this.utlOfMon.getUtilityOfMoney_normally_positive(plan.getPerson().getId());
 		scoringFunctionAccumulator.addScoringFunction( new MoneyScoringImpl(utilityOfMoney_normally_positive) ) ;
 		
-		//utility spend for being stuck
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(params));
-
 		return scoringFunctionAccumulator;
-
 	}
 
 }
 
-/**
- * Notes:<ul>
- * <li> This class is only supposed to work as expected if there are NO OTHER money events than those from road pricing!
- * [[I don't see why that should be so.  Only problem: The logging statement would be wrong. kai, mar'12]]
- * <li> One may be tempted to include this into the standard Charypar Nagel scoring function.  However, it is currently 
- * not possible/not useful to have person-specific values of money in that scoring function.  So it is better to leave it here.
- * kai, mar'12
- * </ul>
- * 
- * @see http://www.matsim.org/node/263
- * @author bkick and michaz after rashid_waraich
- */
 class MoneyScoringImpl implements MoneyScoring, BasicScoring {
 	final static private Logger log = Logger.getLogger(MoneyScoringImpl.class);
 
