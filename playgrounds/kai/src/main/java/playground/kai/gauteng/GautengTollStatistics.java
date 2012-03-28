@@ -60,7 +60,7 @@ public class GautengTollStatistics implements EventHandler, AgentMoneyEventHandl
 	}
 		
 	static int moneyToBin( double amount ) {
-		return (int)(amount/500.) ;
+		return (int)(amount/5.) ;
 	}
 
 	enum SimplifiedType {priv, comm} ;  

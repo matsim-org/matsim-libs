@@ -31,6 +31,7 @@ import org.matsim.roadpricing.RoadPricingSchemeI;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 import playground.kai.gauteng.utilityofmoney.GautengUtilityOfMoney;
+import playground.kai.gauteng.utilityofmoney.UtilityOfMoneyI;
 
 /**
  * @author kn after bkick after dgrether
@@ -39,15 +40,18 @@ import playground.kai.gauteng.utilityofmoney.GautengUtilityOfMoney;
 public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityFactory {
 
 	final private RoadPricingSchemeI scheme;
+	private final UtilityOfMoneyI utlOfMon ;
 
-	public GautengTravelDisutilityInclTollFactory( RoadPricingSchemeI scheme ) {
+	public GautengTravelDisutilityInclTollFactory( RoadPricingSchemeI scheme, UtilityOfMoneyI utlOfMon ) {
 		this.scheme = scheme ;
+		this.utlOfMon = utlOfMon ;
 	}
 
-	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, 
+			PlanCalcScoreConfigGroup cnScoringGroup) {
 		final PersonalizableTravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
 		final RoadPricingSchemeI localScheme = this.scheme ;
-		final PlanCalcScoreConfigGroup localCnScoringGroup = cnScoringGroup ;
+		final UtilityOfMoneyI localUtlOfMon = this.utlOfMon ;
 		
 		return new PersonalizableTravelDisutility() {
 			private Person person = null ;
@@ -59,19 +63,21 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 			@Override
 			public double getLinkTravelDisutility(Link link, double time) {
 				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time);
-				double toll = 0. ;
+				double toll_usually_positive = 0. ;
 				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, this.person.getId() ) ;
 				if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
-					toll = link.getLength() * cost.amount ;
+					toll_usually_positive = link.getLength() * cost.amount ;
 				} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
-						toll = cost.amount ;
+						toll_usually_positive = cost.amount ;
 				} else {
 					throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
 				}
 
-				double utilityOfMoney = GautengUtilityOfMoney.getUtilityOfMoney(this.person.getId(),localCnScoringGroup) ; 
+				double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(this.person.getId() ) ; 
 				
-				linkTravelDisutility += - utilityOfMoney * toll ;
+				linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
+				// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
+				
 				return linkTravelDisutility ;
 			}
 		};

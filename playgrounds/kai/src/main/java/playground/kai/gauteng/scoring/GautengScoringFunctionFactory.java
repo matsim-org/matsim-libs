@@ -33,7 +33,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
-import playground.kai.gauteng.utilityofmoney.GautengUtilityOfMoney;
+import playground.kai.gauteng.utilityofmoney.UtilityOfMoneyI;
 
 /**
  * @author nagel after
@@ -46,12 +46,14 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 	private PlanCalcScoreConfigGroup configGroup;
 	private CharyparNagelScoringParameters params;
 	private final Network network;
+	private final UtilityOfMoneyI utlOfMon ;
 
-	public GautengScoringFunctionFactory(Config config, Network network) {
+	public GautengScoringFunctionFactory(Config config, Network network, UtilityOfMoneyI utlOfMon) {
 		this.config = config;
 		this.configGroup = config.planCalcScore();
 		this.params = new CharyparNagelScoringParameters(configGroup);
 		this.network = network;
+		this.utlOfMon = utlOfMon ;
 	}
 
 	public ScoringFunction createNewScoringFunction(Plan plan) {
@@ -71,7 +73,8 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		// needs to be replaced.)  kai, mar'12
 
 		//utility spend for traveling (toll costs) if there is a toll
-		scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll( plan.getPerson().getId(), this.configGroup ) ) ;
+		double utilityOfMoney_normally_positive = this.utlOfMon.getUtilityOfMoney_normally_positive(plan.getPerson().getId());
+		scoringFunctionAccumulator.addScoringFunction( new MoneyScoringImpl(utilityOfMoney_normally_positive) ) ;
 		
 		//utility spend for being stuck
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(params));
@@ -94,16 +97,14 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
  * @see http://www.matsim.org/node/263
  * @author bkick and michaz after rashid_waraich
  */
-class ScoringFromToll implements MoneyScoring, BasicScoring {
-	final static private Logger log = Logger.getLogger(ScoringFromToll.class);
+class MoneyScoringImpl implements MoneyScoring, BasicScoring {
+	final static private Logger log = Logger.getLogger(MoneyScoringImpl.class);
 
 	private double score = 0.0;
-	private Id vehicleId ;
-	private PlanCalcScoreConfigGroup cnScoringGroup ;
+	private double utilityOfMoney_normally_positive ;
 	
-	ScoringFromToll( Id vehicleId, PlanCalcScoreConfigGroup cnScoringGroup ) {
-		this.vehicleId = vehicleId ;
-		this.cnScoringGroup = cnScoringGroup ;
+	MoneyScoringImpl( double utilityOfMoney_normally_positive ) {
+		this.utilityOfMoney_normally_positive = utilityOfMoney_normally_positive ;
 	}
 	
 	@Override
@@ -113,12 +114,14 @@ class ScoringFromToll implements MoneyScoring, BasicScoring {
 
 	private static int cnt = 0 ;
 	@Override
-	public void addMoney(final double amount) {
+	public void addMoney(final double amount_usually_negative) {
 		
-		this.score += - GautengUtilityOfMoney.getUtilityOfMoney(vehicleId, cnScoringGroup) * amount;
+		this.score += this.utilityOfMoney_normally_positive * amount_usually_negative;
+		// positive * negative = negative contribution to score, which is correct.
+		
 		if ( cnt < 10 ) {
 			cnt++ ;
-			log.info("toll paid: " + amount + "; resulting accumulated toll utility: " + this.score );
+			log.info("toll paid: " + amount_usually_negative + "; resulting accumulated toll utility: " + this.score );
 			if (cnt==10 ) {
 				log.info(Gbl.FUTURE_SUPPRESSED) ;
 			}

@@ -12,11 +12,17 @@ import playground.kai.gauteng.roadpricingscheme.SanralTollFactor;
  * @author nagel
  *
  */
-public class GautengUtilityOfMoney {
+public class GautengUtilityOfMoney implements UtilityOfMoneyI {
+	
+	private PlanCalcScoreConfigGroup planCalcScore;
 
-	public static double getUtilityOfMoney(final Id vehicleId, final PlanCalcScoreConfigGroup cnScoringGroup) {
+	public GautengUtilityOfMoney( final PlanCalcScoreConfigGroup cnScoringGroup ) {
+		this.planCalcScore = cnScoringGroup ;
+	}
+
+	public double getUtilityOfMoney_normally_positive(final Id personId ) {
 		double valueOfTime_hr = 100 ;
-		switch( SanralTollFactor.typeOf(vehicleId) ) {
+		switch( SanralTollFactor.typeOf(personId) ) {
 		case carWithTag:
 		case carWithoutTag:
 			break ;
@@ -30,14 +36,15 @@ public class GautengUtilityOfMoney {
 		case taxiWithoutTag:
 		case extWithTag:
 		case extWithoutTag:
-			valueOfTime_hr = 100.;
+			valueOfTime_hr = 1000.;
 			break ;
 		}
-		final double utilityOfTime_hr = - cnScoringGroup.getPerforming_utils_hr() + cnScoringGroup.getTraveling_utils_hr() ;
-		// "performing" is normally positive, but needs to be counted negative
-		// "traveling" is normally negative, and needs to be counted negative
+		final double utilityOfTravelTime_hr = 
+			this.planCalcScore.getPerforming_utils_hr() - this.planCalcScore.getTraveling_utils_hr() ;
+		// "performing" is normally positive
+		// "traveling" is normally negative
 	
-		double utilityOfMoney = utilityOfTime_hr / valueOfTime_hr ;
+		double utilityOfMoney = utilityOfTravelTime_hr / valueOfTime_hr ;
 		
 		return utilityOfMoney ;
 	}

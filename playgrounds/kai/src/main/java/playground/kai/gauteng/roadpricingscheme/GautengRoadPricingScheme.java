@@ -30,6 +30,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeI;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
@@ -41,10 +44,9 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 	private RoadPricingSchemeI delegate = null ;
 	private Network network;
 	private Population population ;
-	private final double FACTOR = 1. ;
+	private  double FACTOR = 1. ;
 	
-	public GautengRoadPricingScheme( RoadPricingSchemeI inputRoadPricingScheme, Network network, Population population ) {
-		this.delegate = inputRoadPricingScheme ;
+	public GautengRoadPricingScheme( Config config, Network network, Population population ) {
 		this.network = network ;
 		this.population = population ; 
 		if ( FACTOR != 1. ) { 
@@ -52,6 +54,16 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 		}			
 		Logger.getLogger(this.getClass()).warn("for me, using this as cordon toll did not work; using it as new scheme `link' " +
 				"toll for the time being.  needs to be debugged?!?!  kai, mar'12") ;
+		
+		// read the road pricing scheme from file
+		RoadPricingScheme scheme = new RoadPricingScheme();
+		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
+		try {
+			rpReader.parse( config.roadpricing().getTollLinksFile());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		this.delegate = scheme ;
 	}
 
 	public String getDescription() {
