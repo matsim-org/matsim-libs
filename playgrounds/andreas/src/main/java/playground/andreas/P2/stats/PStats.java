@@ -145,7 +145,8 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 				budget += cooperative.getBudget();
 				score += coopScore;				
 				
-				if(cooperative.getBudget() > 0){
+				// statistics for each coop with cash
+				if(cooperative.getBudget() + (coopVeh - 1) * pConfig.getPricePerVehicleSold() > 0){
 					coopPos++;
 					paxPos += coopPax;
 					vehPos += coopVeh;

@@ -166,7 +166,7 @@ public class BasicCooperative implements Cooperative{
 //				}
 //			} else {
 				// plan scored (even more) positive
-				if(this.budget > this.costPerVehicleBuy){
+				if(this.budget > this.costPerVehicleBuy * 1.5){
 					// budget ok, buy one
 					this.budget -= this.costPerVehicleBuy * 1;
 					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
