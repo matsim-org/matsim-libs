@@ -52,8 +52,10 @@ public class TravelTimeAndDistanceBasedTravelDisutility implements TravelMinDisu
 		this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceCostRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
 		if ( wrnCnt < 1 ) {
 			wrnCnt++ ;
-			Logger.getLogger(this.getClass()).warn("Assuming that monetary distance cost rate care is NEGATIVE!!  This may " +
-					"be changed.") ;
+			if ( cnScoringGroup.getMonetaryDistanceCostRateCar() > 0. ) {
+				Logger.getLogger(this.getClass()).warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal" +
+				"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
+			}
 		}
 		
 	}
