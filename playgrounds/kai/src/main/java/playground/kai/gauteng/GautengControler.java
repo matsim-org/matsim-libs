@@ -54,6 +54,7 @@ class GautengControler {
 				new GenerationOfMoneyEvents( sc.getNetwork(), sc.getPopulation(), vehDepScheme) 
 		) ;
 		
+		
 		controler.setScoringFunctionFactory(
 				new GautengScoringFunctionFactory(sc.getConfig(), sc.getNetwork(), personSpecificUtilityOfMoney )
 		);
