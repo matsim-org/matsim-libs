@@ -104,7 +104,8 @@ class GautengControler {
 				log.info("The number of people who paid toll : " + calcPaidToll.getDraweesNr());
 				log.info("The average paid trip length       : " + cattl.getAverageTripLength() + " m.");
 				
-				gautengTollStatistics.printTollInfo() ;
+				int iteration = event.getIteration() ;
+				gautengTollStatistics.printTollInfo(event.getControler().getControlerIO().getIterationFilename(iteration, "")) ;
 			}
 		} ) ;
 		

@@ -41,7 +41,7 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 	private RoadPricingSchemeI delegate = null ;
 	private Network network;
 	private Population population ;
-	private final double FACTOR = 100. ;
+	private final double FACTOR = 1. ;
 	
 	public GautengRoadPricingScheme( RoadPricingSchemeI inputRoadPricingScheme, Network network, Population population ) {
 		this.delegate = inputRoadPricingScheme ;
@@ -65,11 +65,8 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 			return new Cost(0.,24*3600.,0.0) ;
 		}
 		Link link = network.getLinks().get(linkId) ;
-//		System.err.println( " link: " + link ) ;
 		Person person = population.getPersons().get(personId) ;
-//		System.err.println( " person: " + person ) ;
 		final double tollFactor = SanralTollFactor.getTollFactor(person, link.getId(), time);
-//		System.err.println( " toll factor: " + tollFactor ) ;
 		return new Cost( baseToll.startTime, baseToll.endTime, FACTOR * baseToll.amount * tollFactor );
 	}
 

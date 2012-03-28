@@ -3,6 +3,8 @@
  */
 package playground.kai.gauteng;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.kai.gauteng.roadpricingscheme.SanralTollFactor;
 import playground.kai.gauteng.roadpricingscheme.SanralTollFactor.Type;
@@ -21,41 +24,131 @@ import playground.kai.gauteng.roadpricingscheme.SanralTollFactor.Type;
  */
 public class GautengTollStatistics implements EventHandler, AgentMoneyEventHandler {
 
+	private Map<Id,Double> personMoneyMap = new HashMap<Id,Double>() ;
+	private Map<Id,Double> personCountMap = new HashMap<Id,Double>() ;
+	
 	private Map<Type,Double> typeMoneyMap = new HashMap<Type,Double>() ;
 	private Map<Type,Double> typeCountMap = new HashMap<Type,Double>() ;
 
 	@Override
 	public void reset(int iteration) {
+		Logger.getLogger(this.getClass()).warn("calling reset ...") ;
+		personMoneyMap.clear() ;
+		personCountMap.clear() ;
 		typeMoneyMap.clear() ;
 		typeCountMap.clear() ;
 	}
 
 	@Override
 	public void handleEvent(AgentMoneyEvent event) {
-		Id personId = event.getPersonId() ;
-		Type agentType = SanralTollFactor.typeOf(personId) ;
-		if ( typeMoneyMap .get(agentType)==null ) {
-			typeMoneyMap.put(agentType,0.) ;
-			typeCountMap.put(agentType,0.) ;
+		if ( event.getAmount()==0. ) {
+			return ;
 		}
-		double currentMoney = typeMoneyMap.get(agentType) ;
-		double currentCount = typeCountMap.get(agentType) ;
+		Id personId = event.getPersonId() ;
+		if ( personMoneyMap.get(personId) == null ) {
+			personMoneyMap.put(personId,0.) ;
+			personCountMap.put(personId,0.) ;
+		}
+		double currentMoney = personMoneyMap.get(personId) ;
+		double currentCount = personCountMap.get(personId) ;
 		
-//		Logger.getLogger(this.getClass()).warn( " currentMoneyBefore: " + currentMoney ) ;
 		currentMoney += event.getAmount() ;
-//		Logger.getLogger(this.getClass()).warn( " amount: " + event.getAmount() + " currentMoney: " + currentMoney ) ;
-		currentCount ++ ;
+		currentCount++ ;
 		
-		typeMoneyMap.put( agentType, currentMoney ) ;
-		typeCountMap.put( agentType, currentCount ) ;
-		
+		personMoneyMap.put(personId,currentMoney) ;
+		personCountMap.put(personId,currentCount) ;
 	}
+		
+	static int moneyToBin( double amount ) {
+		return (int)(amount/500.) ;
+	}
+
+	enum SimplifiedType {priv, comm} ;  
+
+	class TwoWayTable<K,L,V> {
+		Map<String,Double> values = new HashMap<String,Double>() ;
+		String createKey( K kk, L ll ) {
+			return kk.toString() + ":" + ll.toString() ;
+		}
+		Double getEntry( String key ) {
+			if ( values.get(key) == null ) {
+				values.put( key, 0. ) ;
+			}
+			return values.get(key) ;
+		}
+		Double putEntry( String key, Double value ) {
+			return values.put( key, value ) ;
+		}
+	}
+
+	static int maxIdx = 0 ;
+	public void printTollInfo(String directoryname) {
+		TwoWayTable<SimplifiedType,Integer,Double> countsTable = new TwoWayTable<SimplifiedType,Integer,Double>() ;
+		TwoWayTable<SimplifiedType,Integer,Double> moneyTable = new TwoWayTable<SimplifiedType,Integer,Double>() ;
+		Map<SimplifiedType,Integer> maxIdx = new HashMap<SimplifiedType,Integer>() ;
+		for ( Id personId : personMoneyMap.keySet() ) {
+			double amount = -personMoneyMap.get(personId) ; 
+			if ( amount==0. ) {
+				continue ;
+			}
+			Integer idx = moneyToBin( amount ) ;
+//			System.err.println( " person: " + personId + " money: " + amount ) ;
+			Type agentType = SanralTollFactor.typeOf(personId) ;
+			SimplifiedType sType = null ;
+			switch ( agentType ) {
+			case carWithoutTag:
+			case carWithTag:
+				sType = SimplifiedType.priv ; break ;
+			case commercialClassBWithoutTag:
+			case commercialClassBWithTag:
+			case commercialClassCWithoutTag:
+			case commercialClassCWithTag:
+				sType = SimplifiedType.comm ; break ;
+			}
+
+			if ( sType != null ) { 
+				String key = countsTable.createKey( sType, idx ) ;
+				{
+					double currentCount = countsTable.getEntry( key ) ;
+					currentCount++ ;
+					countsTable.putEntry( key, currentCount ) ;
+				}{
+					double currentMoney = moneyTable.getEntry(key) ;
+					currentMoney += amount ;
+					moneyTable.putEntry( key, currentMoney ) ;
+				}{
+					Integer currentMax = maxIdx.get(sType) ;
+					if ( currentMax==null || currentMax < idx ) {
+						maxIdx.put(sType,idx) ;
+					}
+				}
+			}
+			
+		}
+
 	
-	public void printTollInfo() {
-		for ( Type type : typeMoneyMap.keySet() ) {
-			Logger.getLogger(this.getClass()).warn( "type: " + type.toString() 
-					+ " av toll per money event: " + (typeMoneyMap.get(type)/typeCountMap.get(type)) ) ;
-			// will have to change when money event is no longer just at end of day.
+		for ( SimplifiedType sType : SimplifiedType.values() ) {
+			String filename = directoryname + sType.toString() + ".txt" ;
+			BufferedWriter out = IOUtils.getBufferedWriter( filename );
+
+			for ( int idx=0 ; idx<=maxIdx.get(sType) ; idx++ ) {
+				String key = countsTable.createKey( sType, idx ) ;
+				if ( countsTable.getEntry(key) != 0. ) {
+					String str =  (moneyTable.getEntry(key)/countsTable.getEntry(key)) + "\t" + countsTable.getEntry(key) + "\n" ;
+					try {
+						out.write( str ) ;
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			try {
+				out.close() ;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 	}
 

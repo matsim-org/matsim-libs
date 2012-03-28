@@ -18,38 +18,19 @@ public class GautengUtilityOfMoney {
 		double valueOfTime_hr = 100 ;
 		switch( SanralTollFactor.typeOf(vehicleId) ) {
 		case carWithTag:
-			break ;
 		case carWithoutTag:
 			break ;
 		case commercialClassBWithTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case commercialClassCWithTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case commercialClassBWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case commercialClassCWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case busWithTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case busWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case taxiWithTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case taxiWithoutTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case extWithTag:
-			valueOfTime_hr = 200.;
-			break ;
 		case extWithoutTag:
-			valueOfTime_hr = 200.;
+			valueOfTime_hr = 100.;
 			break ;
 		}
 		final double utilityOfTime_hr = - cnScoringGroup.getPerforming_utils_hr() + cnScoringGroup.getTraveling_utils_hr() ;
