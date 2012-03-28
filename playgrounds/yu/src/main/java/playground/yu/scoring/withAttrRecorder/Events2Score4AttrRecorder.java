@@ -40,12 +40,12 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.yu.scoring.Events2Score;
 import playground.yu.scoring.Events2ScoreI;
 import playground.yu.utils.io.SimpleWriter;
 
@@ -56,7 +56,7 @@ import playground.yu.utils.io.SimpleWriter;
  * @author yu
  * 
  */
-public class Events2Score4AttrRecorder extends EventsToScore implements
+public class Events2Score4AttrRecorder extends Events2Score implements
 		Events2ScoreI {
 	public final static List<String> attrNameList = new ArrayList<String>();
 
