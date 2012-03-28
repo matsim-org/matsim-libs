@@ -22,76 +22,89 @@ package playground.christoph.socialcosts;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
-import java.io.File;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.charts.ChartUtil;
+import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
- * Writes social costs to a graph.
+ * Writes social costs to a graph and a table.
  * 
  * @author cdobler
  */
 public class SocialCostWriter {
+	
+	private static final String separator = "\t"; 
+	private static final String lineEnd = "\n"; 
 	
 	protected int iteration;
 	
 	SocialCostWriter(int iteration) {
 		this.iteration = iteration;
 	}
+
+	public void writeTable(final String filename, double[] meanData, double[] medianData, double[] quantil25Data, double[] quantil75Data) {
 	
-	public void writeGraphic(final String filename, double[] meanData, double[] medianData, double[] quantil25Data, double[] quantil75Data) {
 		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(meanData, medianData, quantil25Data, quantil75Data), 1024, 768);
+			BufferedWriter out = IOUtils.getBufferedWriter(filename);
+			
+			StringBuffer sb = new StringBuffer();
+			
+			// create and write header
+			sb.append("mean");
+			sb.append(separator);
+			sb.append("median");
+			sb.append(separator);
+			sb.append("25% quantil");
+			sb.append(separator);
+			sb.append("75% quantil");
+			sb.append(lineEnd);
+			out.write(sb.toString());
+
+			// write data
+			for (int i = 0; i < meanData.length; i++) {
+				sb = new StringBuffer();
+				sb.append(meanData[i]);
+				sb.append(separator);
+				sb.append(medianData[i]);
+				sb.append(separator);
+				sb.append(quantil25Data[i]);
+				sb.append(separator);
+				sb.append(quantil75Data[i]);
+				sb.append(lineEnd);
+				out.write(sb.toString());
+			}
+			
+			out.flush();
+			out.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Gbl.errorMsg(e);
 		}
 	}
 	
-	/**
-	 * @return a graphic showing the number of agents in the evacuated area
-	 */
-	private JFreeChart getGraphic(double[] meanData, double[] medianData, double[] quantil25Data, double[] quantil75Data) {
-		
-		final XYSeriesCollection xyData = new XYSeriesCollection();
-		
-		final XYSeries meanSerie = new XYSeries("mean", false, true);
-		final XYSeries medianSerie = new XYSeries("median", false, true);
-		final XYSeries quantil25SigmaSerie = new XYSeries("25% quantil", false, true);
-		final XYSeries quantil75SigmaSerie = new XYSeries("75% qunatil", false, true);
-		
-		for (int i = 0; i < meanData.length; i++) {
-			meanSerie.add(i, meanData[i]);
-			medianSerie.add(i, medianData[i]);
-			quantil25SigmaSerie.add(i, quantil25Data[i]);
-			quantil75SigmaSerie.add(i, quantil75Data[i]);
+	public void writeGraphic(final String filename, String yAxisTitle, double[] meanData, double[] medianData, double[] quantil25Data, double[] quantil75Data) {
+			ChartUtil chartUtil = getGraphic(yAxisTitle, meanData, medianData, quantil25Data, quantil75Data);
+			chartUtil.saveAsPng(filename, 1024, 768);
+	}
+
+	private ChartUtil getGraphic(String yAxisTitle, double[] meanData, double[] medianData, double[] quantil25Data, double[] quantil75Data) {
+
+		double[] iterations = new double[iteration + 1];
+		for (int i = 0; i <= iteration; i++) {
+			iterations[i] = i;
 		}
 		
-		xyData.addSeries(meanSerie);
-		xyData.addSeries(medianSerie);
-		xyData.addSeries(quantil25SigmaSerie);
-		xyData.addSeries(quantil75SigmaSerie);
-
-		final JFreeChart chart = ChartFactory.createXYLineChart(
-	        "social costs (per leg)",
-	        "iteration", "social costs (per leg)",
-	        xyData,
-	        PlotOrientation.VERTICAL,
-	        true,   // legend
-	        false,   // tooltips
-	        false   // urls
-	    );
-
-		XYPlot plot = chart.getXYPlot();
+		XYLineChart chart = new XYLineChart("Social Costs", "iteration", yAxisTitle);
+		chart.addSeries("mean", iterations, meanData);
+		chart.addSeries("median", iterations, medianData);
+		chart.addSeries("25% quantil", iterations, quantil25Data);
+		chart.addSeries("75% qunatil", iterations, quantil75Data);
+		
+		XYPlot plot = chart.getChart().getXYPlot();
 		plot.getRenderer().setSeriesPaint(0, Color.red);
 		plot.getRenderer().setSeriesPaint(1, Color.blue);
 		plot.getRenderer().setSeriesPaint(2, Color.blue);
@@ -101,10 +114,8 @@ public class SocialCostWriter {
 		plot.getRenderer().setSeriesStroke(3, new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
 				BasicStroke.JOIN_ROUND, 1.0f, new float[] {2.0f, 4.0f}, 0.0f));
 		
-		final CategoryAxis axis1 = new CategoryAxis("hour");
-		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
-		plot.setDomainAxis(new NumberAxis("time"));
+		chart.addMatsimLogo();
+		
 		return chart;
 	}
-	
 }

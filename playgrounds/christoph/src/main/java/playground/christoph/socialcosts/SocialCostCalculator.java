@@ -106,6 +106,11 @@ public class SocialCostCalculator implements TravelDisutility,
 	private List<Double> medianSocialCosts = new ArrayList<Double>();
 	private List<Double> quantil25PctSocialCosts = new ArrayList<Double>();
 	private List<Double> quantil75PctSocialCosts = new ArrayList<Double>();
+
+	private List<Double> meanNormalizedSocialCosts = new ArrayList<Double>();
+	private List<Double> medianNormalizedSocialCosts = new ArrayList<Double>();
+	private List<Double> quantil25PctNormalizedSocialCosts = new ArrayList<Double>();
+	private List<Double> quantil75PctNormalizedSocialCosts = new ArrayList<Double>();
 	
 	public SocialCostCalculator(final Network network, EventsManager events, TravelTime travelTime) {
 		this(network, 15 * 60, 30 * 3600, events, travelTime); // default timeslot-duration: 15 minutes
@@ -363,6 +368,7 @@ public class SocialCostCalculator implements TravelDisutility,
 
 		// Get a DescriptiveStatistics instance
 		DescriptiveStatistics stats = new DescriptiveStatistics();		
+		DescriptiveStatistics statsNormalized = new DescriptiveStatistics();
 		
 		// Add the data from the array
 		for (LegTrip legTrip : performedLegs) {
@@ -372,6 +378,14 @@ public class SocialCostCalculator implements TravelDisutility,
 				if (socialCosts > 0.0) costs = costs + socialCosts;
 			}
 			stats.addValue(costs);
+			
+			/*
+			 * Normalize a legs social cost by dividing them by the leg travel time.
+			 * As a result we get something like social costs per traveled second.
+			 * Another option would be doing this on link level instead of leg level.
+			 */
+			double legTravelTime = legTrip.arrivalTime - legTrip.departureTime;
+			if (costs > 0.0 && legTravelTime > 0.0) statsNormalized.addValue(costs / legTravelTime);
 		}
 
 		// Compute some statistics
@@ -382,6 +396,13 @@ public class SocialCostCalculator implements TravelDisutility,
 		double quantile25 = stats.getPercentile(25);
 		double quantile75 = stats.getPercentile(75);
 		
+		double sumNormalized = statsNormalized.getSum();
+		double meanNormalized = statsNormalized.getMean();
+		double stdNormalized = statsNormalized.getStandardDeviation();
+		double medianNormalized = statsNormalized.getPercentile(50);
+		double quantile25Normalized = statsNormalized.getPercentile(25);
+		double quantile75Normalized = statsNormalized.getPercentile(75);
+		
 		log.info("Sum of all leg costs: " + sum);
 		log.info("Mean leg costs: " + mean);
 		log.info("Standard deviation: " + std);
@@ -389,10 +410,22 @@ public class SocialCostCalculator implements TravelDisutility,
 		log.info("25% quantile leg costs: " + quantile25);
 		log.info("75% quantile leg costs: " + quantile75);
 		
+		log.info("Normalized sum of all leg costs: " + sumNormalized);
+		log.info("Normalized mean leg costs: " + meanNormalized);
+		log.info("Normalized standard deviation: " + stdNormalized);
+		log.info("Normalized median leg costs: " + medianNormalized);
+		log.info("Normalized 25% quantile leg costs: " + quantile25Normalized);
+		log.info("Normalized 75% quantile leg costs: " + quantile75Normalized);
+		
 		meanSocialCosts.add(mean);
 		medianSocialCosts.add(median);
 		quantil25PctSocialCosts.add(quantile25);
 		quantil75PctSocialCosts.add(quantile75);
+		
+		meanNormalizedSocialCosts.add(meanNormalized);
+		medianNormalizedSocialCosts.add(medianNormalized);
+		quantil25PctNormalizedSocialCosts.add(quantile25Normalized);
+		quantil75PctNormalizedSocialCosts.add(quantile75Normalized);
 	}
 
 	private void calcLegStatistics() {
@@ -432,8 +465,20 @@ public class SocialCostCalculator implements TravelDisutility,
 			quantil75Data[i] = quantil75PctSocialCosts.get(i);
 		}
 		
-		fileName = event.getControler().getControlerIO().getOutputFilename("socialCosts.png");
-		writer.writeGraphic(fileName, meanData, medianData, quantil25Data, quantil75Data);
+		fileName = event.getControler().getControlerIO().getOutputFilename("socialCosts");
+		writer.writeGraphic(fileName + ".png", "social costs (per leg)", meanData, medianData, quantil25Data, quantil75Data);
+		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
+		
+		for (int i = 0; i < dataLength; i++) {
+			meanData[i] = meanNormalizedSocialCosts.get(i);
+			medianData[i] = medianNormalizedSocialCosts.get(i);
+			quantil25Data[i] = quantil25PctNormalizedSocialCosts.get(i);
+			quantil75Data[i] = quantil75PctNormalizedSocialCosts.get(i);
+		}
+		
+		fileName = event.getControler().getControlerIO().getOutputFilename("normalizedSocialCosts");
+		writer.writeGraphic(fileName + ".png", "social costs (per leg, normalized)", meanData, medianData, quantil25Data, quantil75Data);
+		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
 	}
 
 	private void updateSocCosts(int iteration) {
