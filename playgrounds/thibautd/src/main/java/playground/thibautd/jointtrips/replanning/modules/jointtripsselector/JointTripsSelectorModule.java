@@ -23,7 +23,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
+import playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser.JointTimeModeChooserModule;
 
 /**
  * @author thibautd
@@ -34,7 +34,7 @@ public class JointTripsSelectorModule extends AbstractMultithreadedModule {
 
 	public JointTripsSelectorModule(final Controler controler) {
 		super(controler.getConfig().global());
-		optDelegate = new JointPlanOptimizerModule( controler );
+		optDelegate = new JointTimeModeChooserModule( controler );
 		this.controler = controler;
 	}
 

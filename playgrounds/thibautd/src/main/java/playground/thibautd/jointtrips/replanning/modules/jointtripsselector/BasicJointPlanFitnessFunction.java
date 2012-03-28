@@ -41,7 +41,6 @@ import playground.thibautd.tsplanoptimizer.framework.Solution;
  */
 public class BasicJointPlanFitnessFunction implements FitnessFunction {
 	private final ScoringFunctionFactory factory;
-	private final Map<Solution, Double> knownScores = new HashMap<Solution, Double>();
 
 	public BasicJointPlanFitnessFunction(
 			final ScoringFunctionFactory scoringFunctionFactory) {
@@ -50,35 +49,30 @@ public class BasicJointPlanFitnessFunction implements FitnessFunction {
 
 	@Override
 	public double computeFitnessValue(final Solution solution) {
-		Double score = knownScores.get( solution );
+		JointPlan jointPlan = (JointPlan) solution.getRepresentedPlan();
 
-		if (score == null) {
-			JointPlan jointPlan = (JointPlan) solution.getRepresentedPlan();
+		for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
+			ScoringFunction scoringFunction = factory.createNewScoringFunction( indivPlan );
 
-			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
-				ScoringFunction scoringFunction = factory.createNewScoringFunction( indivPlan );
-
-				for (PlanElement pe : indivPlan.getPlanElements()) {
-					if (pe instanceof Activity) {
-						scoringFunction.handleActivity( (Activity) pe );
-					}
-					else if (pe instanceof Leg) {
-						scoringFunction.handleLeg( (Leg) pe );
-					}
-					else {
-						throw new RuntimeException( "unknown PlanElement type "+pe.getClass() );
-					}
+			for (PlanElement pe : indivPlan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					scoringFunction.handleActivity( (Activity) pe );
 				}
-
-				scoringFunction.finish();
-				indivPlan.setScore( scoringFunction.getScore() );
+				else if (pe instanceof Leg) {
+					scoringFunction.handleLeg( (Leg) pe );
+				}
+				else {
+					throw new RuntimeException( "unknown PlanElement type "+pe.getClass() );
+				}
 			}
 
-			score = jointPlan.getScore();
-			if (Double.isNaN( score )) {
-				throw new RuntimeException( "got a NaN score for plan "+jointPlan.getIndividualPlanElements() );
-			}
-			knownScores.put( solution , score );
+			scoringFunction.finish();
+			indivPlan.setScore( scoringFunction.getScore() );
+		}
+
+		double score = jointPlan.getScore();
+		if (Double.isNaN( score )) {
+			throw new RuntimeException( "got a NaN score for plan "+jointPlan.getIndividualPlanElements() );
 		}
 
 		return score;

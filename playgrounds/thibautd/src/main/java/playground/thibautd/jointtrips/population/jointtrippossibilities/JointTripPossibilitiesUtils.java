@@ -367,19 +367,23 @@ class PuDoFactory {
 	}
 
 	public JointActivity createPickUp(final Person person) {
-		return new JointActivity(
+		JointActivity pu = new JointActivity(
 				puName,
 				puCoord,
 				puLink,
 				person);
+		pu.setMaximumDuration( 0 );
+		return pu;
 	}
 
 	public JointActivity createDropOff(final Person person) {
-		return new JointActivity(
+		JointActivity dro = new JointActivity(
 				JointActingTypes.DROP_OFF,
 				doCoord,
 				doLink,
 				person);
+		dro.setMaximumDuration( 0 );
+		return dro;
 	}
 }
 

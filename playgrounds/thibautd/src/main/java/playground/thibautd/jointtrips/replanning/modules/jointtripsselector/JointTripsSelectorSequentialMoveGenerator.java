@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTripsSelector.java
+ * JointTripsSelectorSequentialMoveGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,52 +19,58 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointtripsselector;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
+import playground.thibautd.tsplanoptimizer.framework.AppliedMoveListener;
+import playground.thibautd.tsplanoptimizer.framework.Move;
+import playground.thibautd.tsplanoptimizer.framework.MoveGenerator;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
-import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;
 
 /**
+ * Generates one move per iteration.
  * @author thibautd
  */
-public class JointTripsSelector implements PlanAlgorithm {
-	private static final Logger log =
-		Logger.getLogger(JointTripsSelector.class);
+public class JointTripsSelectorSequentialMoveGenerator implements MoveGenerator, AppliedMoveListener {
+	private static final List<Move> EMPTY = Collections.emptyList();
+	private final Iterator<Move> moves;
+	private Move currentMove;
 
-	private static final boolean DEBUG = false;
-	private final PlanAlgorithm optimisationSubroutine;
-	private final ScoringFunctionFactory scoringFunctionFactory;
+	public JointTripsSelectorSequentialMoveGenerator(
+			final Random random,
+			final int size) {
+		List<Move> moves = new ArrayList<Move>();
 
-	public JointTripsSelector(
-			final PlanAlgorithm optimisationRoutine,
-			final ScoringFunctionFactory scoringFunctionFactory) {
-		this.optimisationSubroutine = optimisationRoutine;
-		this.scoringFunctionFactory = scoringFunctionFactory;
+		for (int i=0; i < size; i++) {
+			moves.add( new MutateOneBoolean( i ) );
+		}
+
+		Collections.shuffle( moves , random );
+		this.moves = moves.iterator();
+		currentMove = this.moves.hasNext() ? this.moves.next() : null;
 	}
 
 	@Override
-	public void run(final Plan plan) {
-		ConfigurationBuilder builder =
-			new JointTripsSelectorConfigBuilder(
-					(JointPlan) plan,
-					scoringFunctionFactory,
-					optimisationSubroutine);
-
-		Solution bestSolution = runTabuSearch( builder );
-
-		// problem: it re-optimises the plan (and it needs to)!
-		((JointPlan) plan).resetFromPlan( (JointPlan) bestSolution.getRepresentedPlan() );
-		((JointPlan) plan).resetScores();
-
-		if (DEBUG) {
-			log.debug( "resulting plan: "+plan );
+	public void notifyMove(
+			final Solution currentSolution,
+			final Move toApply,
+			final double resultingFitness) {
+		if (toApply == currentMove) {
+			currentMove = moves.hasNext() ? moves.next() : null;
 		}
+		else {
+			throw new RuntimeException( "expected "+currentMove+", got "+toApply );
+		}
+	}
+
+	@Override
+	public Collection<Move> generateMoves() {
+		return currentMove != null ? Arrays.asList( currentMove ) : EMPTY;
 	}
 }
 
