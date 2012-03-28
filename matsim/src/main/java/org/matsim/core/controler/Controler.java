@@ -705,7 +705,8 @@ public class Controler {
 			// config file was already read in the constructor.  Isn't this here overriding
 			// config settings that were entered between construction and run()?  kai, mar'12
 		}
-		checkConfigConsistencyAndWriteToLog("Complete config dump after reading the config file:");
+		checkConfigConsistencyAndWriteToLog("Complete config dump directly after reading the config file.  " +
+				"See later for config dump after setup.");
 
 		/*
 		 * use writeEventsInterval from config file, only if not already
