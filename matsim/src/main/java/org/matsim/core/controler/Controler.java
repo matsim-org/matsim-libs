@@ -125,6 +125,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
@@ -535,8 +536,13 @@ public class Controler {
 			.fireControlerShutdownEvent(unexpected);
 			if (this.dumpDataAtEnd) {
 				// dump plans
-				new PopulationWriter(this.population, this.network, 
-						(this.getScenario()).getKnowledges()).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
+				Knowledges kk ;
+				if ( this.config.scenario().isUseKnowledges()) {
+					kk = (this.getScenario()).getKnowledges();
+				} else {
+					kk = this.getScenario().retrieveNotEnabledKnowledges() ;
+				}
+				new PopulationWriter(this.population, this.network, kk).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
 				// dump network
 				new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
 				// dump config
