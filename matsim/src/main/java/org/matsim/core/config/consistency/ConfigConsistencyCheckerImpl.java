@@ -22,6 +22,9 @@ package org.matsim.core.config.consistency;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
@@ -54,17 +57,96 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		this.checkMultimodalMobsim(config);
 	}
 
+	/**
+	 * Design comments:<ul>
+	 * <li> This is so complicated since currently it is possible to define some mobsim in the controler config module
+	 * but still run the jdeqsim.  The logical behavior would be to run the defined mobsim and to ignore the jdeqsim.
+	 * But this would silently change the behavior for people who have used it in that way.  If anybody finds this 
+	 * after, say, a year from now, it could/should be simplified (and made more restrictive).  kai, mar'12
+	 * </ul>
+	 */
 	private void checkMobsimSelection(final Config config) {
+		if ( config.getModule("JDEQSim")!=null && config.controler().getMobsim() != null ) {
+			if ( !config.controler().getMobsim().equalsIgnoreCase(MobsimType.JDEQSim.toString()) ) {
+				throw new RuntimeException( "config module for JDEQSim defined but other mobsim selected in controler config" +
+						" module; aborting since there is no way to fix this AND remain backwards compatible.\n" +
+						" Either select jdeqsim in the controler config OR remove the jdeqsim config module.") ;
+			}
+		}
+			
 		if (config.controler().getMobsim() == null) {
 			log.warn("You should specify which mobsim is to used in the configuration (controler.mobsim).");
+		} else if ( config.controler().getMobsim().equals( MobsimType.queueSimulation.toString() ) ) {
+			if ( config.simulation() == null ) {
+				config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
+				for ( MobsimType mType : MobsimType.values() ) {
+					if ( mType != MobsimType.queueSimulation ) {
+						checkForConfigModulesOfUnselectedMobsims(config, mType);
+					}
+				}
+			}
+			for ( MobsimType mType : MobsimType.values() ) {
+				if ( mType != MobsimType.queueSimulation ) {
+					config.removeModule(mType.toString());
+				}
+			}
+		} else if ( config.controler().getMobsim().equals( MobsimType.qsim.toString() ) ) {
+			if ( config.getQSimConfigGroup() == null ) {
+				config.addQSimConfigGroup(new QSimConfigGroup()) ;
+				for ( MobsimType mType : MobsimType.values() ) {
+					if ( mType != MobsimType.qsim ) {
+						checkForConfigModulesOfUnselectedMobsims(config, mType);
+					}
+				}
+			}
+			for ( MobsimType mType : MobsimType.values() ) {
+				if ( mType != MobsimType.qsim ) {
+					config.removeModule(mType.toString());
+				}
+			}
+		} else if ( config.controler().getMobsim().equals( MobsimType.JDEQSim.toString() ) ) {
+			if ( config.getModule(MobsimType.JDEQSim.toString()) == null ) {
+				log.warn("JDEQSim does not seem to have a typed (= preconfigured) config group; " +
+				"thus cannot load it; thus cannot print configuration options into logfile.  kai, mar'12") ;
+				for ( MobsimType mType : MobsimType.values() ) {
+					if ( mType != MobsimType.JDEQSim ) {
+						checkForConfigModulesOfUnselectedMobsims(config, mType);
+					}
+				}
+			}
+			for ( MobsimType mType : MobsimType.values() ) {
+				if ( mType != MobsimType.JDEQSim ) {
+					config.removeModule(mType.toString());
+				}
+			}
+		} else if ( config.controler().getMobsim().equals( MobsimType.multimodalQSim.toString() ) ) {
+			if ( config.getModule(MobsimType.multimodalQSim.toString()) == null ) {
+				config.addModule(MultiModalConfigGroup.GROUP_NAME, new MultiModalConfigGroup() ) ;
+				for ( MobsimType mType : MobsimType.values() ) {
+					if ( mType != MobsimType.multimodalQSim ) {
+						checkForConfigModulesOfUnselectedMobsims(config, mType);
+					}
+				}
+			}
+			for ( MobsimType mType : MobsimType.values() ) {
+				if ( mType != MobsimType.multimodalQSim ) {
+					config.removeModule(mType.toString());
+				}
+			}
+		} else {
+			log.warn("mobsim type not known to this config consistency checker.  Assuming you are using your own mobsim, " +
+					"and you know what you are doing.") ;
 		}
+
+		// older checks, valid for the implicit mobsim selection by putting in the corresponding config group.
 		if ( config.simulation()!=null ) {
 			if ( config.getQSimConfigGroup()!=null ) {
 				log.warn("have both `simulation' and `qsim' config groups; presumably both are defined in" +
 						" the config file; removing the `simulation' config group; in future versions, this" +
 						" may become a fatal error") ;
 				config.removeModule( SimulationConfigGroup.GROUP_NAME ) ;
-			} else if ( config.getModule("JDEQSim")!=null ) {
+			}
+			if ( config.getModule("JDEQSim")!=null ) {
 				log.warn("have both `simulation' and `JDEQSim' config groups; presumably both are defined in" +
 						" the config file; removing the `simulation' config group; in future versions, this" +
 						" may become a fatal error") ;
@@ -76,6 +158,17 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 					" the config file; removing the `qsim' config group; in future versions, this" +
 					" may become a fatal error") ;
 			config.removeModule( QSimConfigGroup.GROUP_NAME ) ;
+		}
+	}
+
+	private void checkForConfigModulesOfUnselectedMobsims(final Config config,
+			MobsimType mType) {
+		if ( config.getModule( mType.toString()) != null ) {
+			throw new RuntimeException("you have NO config module defined for the mobsim that you have selected " +
+					"BUT you have a config module defined for a mobsim that you have NOT selected; aborting ...") ;
+//			log.warn("you have a config module defined for a mobsim that you have not selected;" +
+//		" removing the config module; this may eventually become a fatal error.") ;
+//		config.removeModule( mType.toString() ) ;
 		}
 	}
 
