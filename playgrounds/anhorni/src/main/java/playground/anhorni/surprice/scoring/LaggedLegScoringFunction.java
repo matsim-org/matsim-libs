@@ -66,13 +66,13 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
         
         this.memory = memory;
         this.day = day;
-        
         this.votFactor = votFactor;
-        
         this.config = config;
-        
 		this.reset();		
-		this.adaptCoefficients();
+				
+		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
+			this.adaptCoefficients();
+		}
 	}
     
     private void adaptCoefficients() {
@@ -100,12 +100,8 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
 				// do nothing
 			}
 		}
-		this.adaptCoefficientsAccordingToIncome();
 	}
 	
-	private void adaptCoefficientsAccordingToIncome() {		
-	}
-
 	@Override
 	public void reset() {
 		this.lastTime = INITIAL_LAST_TIME;
