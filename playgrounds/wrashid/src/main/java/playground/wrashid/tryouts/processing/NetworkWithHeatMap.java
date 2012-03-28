@@ -24,6 +24,7 @@ import processing.core.*;
 
 public class NetworkWithHeatMap extends MovableAndZoomable {
 
+	public boolean animateHeatWave=false; 
 	private Network network;
 	float smallestX = Float.MAX_VALUE;
 	float smallestY = Float.MAX_VALUE;
@@ -74,6 +75,9 @@ public class NetworkWithHeatMap extends MovableAndZoomable {
 		// the old locations.
 		background(255);
 		
+		if (animateHeatWave==true){
+			maxDistanceInMeters+=maxDistanceInMeters/20;
+		}
 
 		drawNetwork();
 

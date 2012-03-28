@@ -9,7 +9,7 @@ public class AnimationCharging extends PApplet {
 	public void setup() {
 
 		size(1000, 1000);
-		 frameRate(60);
+		 frameRate(24);
 	}
 	
 	public void draw(){

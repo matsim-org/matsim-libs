@@ -66,6 +66,21 @@ public class EmbeddedProcessingFrame extends Frame {
 		});
         add(btn2);
         
+        Button btn3 = new Button("Animate Heat Wave");
+        
+        btn3.addActionListener(new ActionListener() {
+        	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				networkWithHeatMap.frameRate(24);
+				networkWithHeatMap.animateHeatWave=true;
+				
+				
+				
+			}
+		});
+        add(btn3);
+        
         
         sb=new  Scrollbar(Scrollbar.HORIZONTAL, 1, 100, 1, 1000);
         //sb.setSize(500, 40);
