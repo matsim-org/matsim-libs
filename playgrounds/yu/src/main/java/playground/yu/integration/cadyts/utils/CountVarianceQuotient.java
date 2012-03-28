@@ -27,9 +27,9 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * Calculates CountVarianceQuetient and outputs scatter plot with counts on the
  * x-axis and variance on the y-axis
- * 
+ *
  * @author C
- * 
+ *
  */
 public class CountVarianceQuotient {
 
@@ -39,7 +39,7 @@ public class CountVarianceQuotient {
 	public static void main(String[] args) {
 		String countsFilename = "test/input/bln2pct/SB.2000.counts.xml"//
 		, varianceFilename = "test/input/bln2pct/SB.simpleVariance.log"//
-		, networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
+		, networkFilename = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
 		, outputFilenameBase = "test/output/bln2pct/SBcountsVSvariance.";
 
 		// reads network

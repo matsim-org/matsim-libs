@@ -237,6 +237,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		((PCStrMn) ctl.getStrategyManager())
 				.init(calibrator, ctl.getTravelTimeCalculator(),
 						(MultinomialLogitChoice) chooser);
+		// TODO add argument to init method, e.g. ctl.getCounts()
 	}
 
 	private void loadScoringAttributes(String scorAttrFilename,

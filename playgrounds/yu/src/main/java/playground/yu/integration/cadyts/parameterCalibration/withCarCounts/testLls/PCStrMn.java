@@ -21,12 +21,14 @@
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLls;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.ejml.data.DenseMatrix64F;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -50,6 +52,8 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.param
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import utilities.math.BasicStatistics;
 import utilities.math.MultinomialLogit;
+import cadyts.calibrators.Calibrator;
+import cadyts.demand.PlanStep;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 
 public class PCStrMn extends BseParamCalibrationStrategyManager implements
@@ -69,10 +73,24 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	List<Double> utilCorrs = null;
 	private int correctedPlanNb = 0;
 
+	final double minStdDev, varianceScale;
+
 	public PCStrMn(Network net, int firstIteration, Config config) {
 		super(firstIteration);
 		this.net = net;
 		this.config = config;
+
+		final String minStdDevStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "minFlowStddevVehH");
+		minStdDev = minStdDevStr != null ? Double.parseDouble(minStdDevStr)
+				: Calibrator.DEFAULT_MIN_FLOW_STDDEV_VEH_H;
+
+		final String varianceScaleStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "varianceScale");
+		varianceScale = varianceScaleStr != null ? Double
+				.parseDouble(varianceScaleStr)
+				: Calibrator.DEFAULT_VARIANCE_SCALE;
+
 		pe = new ParameterEstimator();
 	}
 
@@ -308,19 +326,18 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	 * UC-Vector
 	 *
 	 * @param person
-	 * @param correctedPlanNb
+	 *            *
 	 */
 	private void generateScoreCorrections(Person person) {
 		for (Plan plan : person.getPlans()) {
-			if (generateScoreCorrection(plan)// TODO sth. as
-												// "variance != minStdDev^2"
-			) {
+			if (generateScoreCorrection(plan) && !hasTooLowCount(plan)
+			/*
+			 * variance * count >= minStdDev ^ 2, too low count will NOT be
+			 * considered for the least squares calculation
+			 */) {
 
 				Map<String, Object> customAttrs = plan.getCustomAttributes();
-				/*
-				 * set attr and uc values and put them in matrix or vector
-				 * (attrs and utilCorrs)
-				 */
+				/* set attr and uc values */
 				Map<String, Double> tmpNameVals = new TreeMap<String, Double>();
 				for (String paramName : PCCtlListener.paramNames) {
 					Object ob = customAttrs.get(paramName);
@@ -335,15 +352,36 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 						break;
 					}
 				}
-				if (!allZero) {
-					correctedPlanNb++;
-					utilCorrs.add((Double) customAttrs.get(UTILITY_CORRECTION));
-					for (Entry<String, Double> entry : tmpNameVals.entrySet()) {
-						attrs.get(entry.getKey()).add(entry.getValue());
-					}
+				if (allZero) {
+					return;
 				}
+
+				correctedPlanNb++;
+				utilCorrs.add((Double) customAttrs.get(UTILITY_CORRECTION));
+				for (Entry<String, Double> entry : tmpNameVals.entrySet()) {
+					attrs.get(entry.getKey()).add(entry.getValue());
+				}
+
 			}
 		}
+	}
+
+	private boolean hasTooLowCount(Plan plan) {
+		planConverter.convert((PlanImpl) plan);
+		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
+
+		for (Iterator<PlanStep<Link>> planStepIt = planSteps.iterator(); planStepIt
+				.hasNext();) {
+			PlanStep<Link> planStep = planStepIt.next();
+			Id linkId = planStep.getLink().getId();
+			/*
+			 * TODO if counts contains this linkId. Yes, look at the time, TODO
+			 * judge if count * varianceScale < minStdDev^2: yes -> break,
+			 * directly return true;
+			 */
+		}
+
+		return false;
 	}
 
 	public void init(MATSimChoiceParameterCalibrator<Link> calibrator,
