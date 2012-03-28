@@ -8,7 +8,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
 import playground.kai.gauteng.roadpricingscheme.SanralTollFactor;
 
-/**
+/**This is a comment.
  * @author nagel
  *
  */

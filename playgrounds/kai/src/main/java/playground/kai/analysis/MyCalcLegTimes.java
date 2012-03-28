@@ -167,7 +167,9 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 			}
 			
 			// register the leg for the overall average:
-			legTypes.add("zzz_all") ;
+			legTypes.add("zzzzzzz_all") ;
+			// (reason for so many "zzz": make entry long enough for the following tab)
+			// (This works because now ALL legs will be of legType="zzzzzzz_all".)
 			
 			// go through all types of statistics that are generated ...
 			for ( StatType statType : StatType.values() ) {

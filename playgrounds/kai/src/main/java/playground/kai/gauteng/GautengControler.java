@@ -10,6 +10,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -70,6 +71,7 @@ class GautengControler {
 	private static void installGenerationOfMoneyEvents(final Controler controler, RoadPricingSchemeI vehDepScheme) {
 		final CalcPaidToll calcPaidToll = new CalcPaidToll(controler.getNetwork(), vehDepScheme, controler.getPopulation() ) ;
 		final CalcAverageTolledTripLength cattl = new CalcAverageTolledTripLength(controler.getNetwork(), vehDepScheme );
+		final GautengTollStatistics gautengTollStatistics = new GautengTollStatistics() ;
 
 		// accumulate toll for agent:
 		controler.addControlerListener( new StartupListener() {
@@ -81,6 +83,7 @@ class GautengControler {
 				localControler.getEvents().addHandler(calcPaidToll);
 				// analysis:
 				localControler.getEvents().addHandler(cattl);
+				localControler.getEvents().addHandler(gautengTollStatistics) ;
 
 			}
 		} ) ;
@@ -100,6 +103,8 @@ class GautengControler {
 				log.info("The sum of all paid tolls          : " + calcPaidToll.getAllAgentsToll() + " monetary units.");
 				log.info("The number of people who paid toll : " + calcPaidToll.getDraweesNr());
 				log.info("The average paid trip length       : " + cattl.getAverageTripLength() + " m.");
+				
+				gautengTollStatistics.printTollInfo() ;
 			}
 		} ) ;
 		
