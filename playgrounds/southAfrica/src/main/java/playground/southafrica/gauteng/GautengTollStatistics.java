@@ -131,6 +131,10 @@ public class GautengTollStatistics implements EventHandler, AgentMoneyEventHandl
 			String filename = directoryname + sType.toString() + ".txt" ;
 			BufferedWriter out = IOUtils.getBufferedWriter( filename );
 
+			if ( maxIdx.get(sType)==null ) {
+				// this may happen if nobody of the type paid toll.
+				continue ;
+			}
 			for ( int idx=0 ; idx<=maxIdx.get(sType) ; idx++ ) {
 				String key = countsTable.createKey( sType, idx ) ;
 				if ( countsTable.getEntry(key) != 0. ) {
