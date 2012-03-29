@@ -35,15 +35,13 @@ public class MultiDayControler {
 			System.exit(-1);
 		}		
 		String configFile = args[0];
+		Config config = ConfigUtils.loadConfig(configFile);
+		String path = config.plans().getInputFile();
+		String outPath = config.controler().getOutputDirectory();
 		
 		AgentMemories memories = new AgentMemories();
 				
-		for (String day : Surprice.days) {
-			Config config = ConfigUtils.loadConfig(configFile);
-			
-			String outPath = config.controler().getOutputDirectory();
-			String path = config.plans().getInputFile();
-			
+		for (String day : Surprice.days) {			
 			config.setParam("controler", "outputDirectory", outPath + "/" + day);
 			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
@@ -55,7 +53,12 @@ public class MultiDayControler {
 			
 			DayControler controler = new DayControler(config, memories, day, votFactors);
 			controler.run();
-		}
+		}		
+		UtilityAnalyzer analyzer = new UtilityAnalyzer();
+		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreate.xml");
+		double sideLength = Double.parseDouble(configCreate.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
+		analyzer.analyze(config, outPath, sideLength);
+		
 		log.info("Week simulated, yep, .................................................................");
     }
 }

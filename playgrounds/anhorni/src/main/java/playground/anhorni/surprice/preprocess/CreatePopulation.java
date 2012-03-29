@@ -112,7 +112,7 @@ public class CreatePopulation {
 		
 		this.tollZone = centerZone;
 		
-		Zone topLeftZone =  new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, sideLength), 1000.0, 1000.0); 
+		Zone topLeftZone =  new Zone("topLeftZone", (Coord) new CoordImpl(0.0, sideLength), 1000.0, 1000.0); 
 		this.initZone(topLeftZone);
 		Zone bottomLeftZone =  new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, 1000.0), 1000.0, 1000.0); 
 		this.initZone(bottomLeftZone);

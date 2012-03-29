@@ -63,7 +63,7 @@ public class CreateScenario {
 				
 		CreatePopulation populationCreator = new CreatePopulation();
 		populationCreator.createPopulation(this.scenario, config);	
-		
+				
 		CreateToll tollCreator = new CreateToll();
 		tollCreator.create(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"), populationCreator.getTollZone()); // TODO: different schemes for different days
 	}
