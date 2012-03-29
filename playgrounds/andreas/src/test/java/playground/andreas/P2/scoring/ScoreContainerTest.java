@@ -1,0 +1,55 @@
+package playground.andreas.P2.scoring;
+
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.testcases.MatsimTestUtils;
+
+import playground.andreas.P2.PScenarioHelper;
+import playground.andreas.P2.helper.PConfigGroup;
+
+
+public class ScoreContainerTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	
+	@Test
+    public final void testScoreContainer() {
+		
+		PConfigGroup pC = new PConfigGroup();
+		pC.addParam("costPerVehicleAndDay", "40.0");
+		pC.addParam("earningsPerKilometerAndPassenger", "0.20");
+		pC.addParam("costPerKilometer", "0.30");
+		
+		Network net = PScenarioHelper.createTestNetwork().getNetwork();
+		Link link1 = net.getLinks().get(new IdImpl("1112"));
+		Link link2 = net.getLinks().get(new IdImpl("A"));
+		
+		ScoreContainer sC = new ScoreContainer(new IdImpl("veh_1"), pC.getEarningsPerKilometerAndPassenger() / 1000.0, pC.getCostPerKilometer() / 1000.0, pC.getCostPerVehicleAndDay());
+		
+		Assert.assertEquals("revenue with zero trips served", -40.0, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue per pax with zero trips served", Double.NaN, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
+		
+		sC.addPassenger();
+		sC.handleLinkTravelled(link1);
+		
+		Assert.assertEquals("revenue with one incomplete trip served", -40.12, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue per pax with zero trips served", Double.NaN, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
+		
+		sC.addPassenger();
+		sC.handleLinkTravelled(link2);
+		Assert.assertEquals("revenue with two incomplete trips served", -40.11, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue per pax with zero trips served", Double.NaN, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
+		
+		sC.removePassenger();
+		sC.removePassenger();
+		Assert.assertEquals("revenue with two trips served", -40.11, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue per pax with two trips served", -20.055, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("trips served", 2, sC.getTripsServed(), MatsimTestUtils.EPSILON);		
+	}
+}
