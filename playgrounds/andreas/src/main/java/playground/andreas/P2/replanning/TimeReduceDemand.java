@@ -48,7 +48,7 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Person
 		
 		if(demandTimeBins == null){
 			// there is no demand return old plan
-			return cooperative.getBestPlan();
+			return null;
 		}
 		
 		for (int i = 0; i < demandTimeBins.length; i++) {

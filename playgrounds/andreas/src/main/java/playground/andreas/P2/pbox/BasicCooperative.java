@@ -132,7 +132,11 @@ public class BasicCooperative implements Cooperative{
 		
 		if(this.numberOfIterationsWithoutScoring > 0){
 			PPlanStrategy strategy = pStrategyManager.getTimeReduceDemand();
-			this.bestPlan = strategy.run(this);
+			this.testPlan = strategy.run(this);
+			if (this.testPlan != null) {
+				this.bestPlan = this.testPlan;
+				this.testPlan = null;
+			}			
 		}
 
 		// balance the budget
@@ -178,7 +182,9 @@ public class BasicCooperative implements Cooperative{
 				// can afford to use one vehicle for testing, get a new testPlan
 				PPlanStrategy strategy = pStrategyManager.chooseStrategy();
 				this.testPlan = strategy.run(this);
-				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+				if(this.testPlan != null){
+					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+				}
 			}
 //		}
 		
