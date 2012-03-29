@@ -43,8 +43,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
-import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;

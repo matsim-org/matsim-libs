@@ -28,9 +28,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -274,12 +272,13 @@ public class Controler {
 	private ControlerIO controlerIO;
 
 	private MobsimFactory mobsimFactory = null;
-	private final Map<String, MobsimFactory> mobsimFactories = new HashMap<String, MobsimFactory>();
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
 
 	/* package */volatile Throwable uncaughtException = null; // package-private
+	private MobsimFactoryRegister mobsimFactoryRegister;
+	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 	// for tests
 
 	/** initializes Log4J */
@@ -370,13 +369,12 @@ public class Controler {
 		}
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
+		MobsimRegistrar mobsimRegistrar = new MobsimRegistrar();
+		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
+		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
+		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
+		
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
-
-		// register default mobsim factories
-		this.addMobsimFactory("qsim", new QSimFactory());
-		this.addMobsimFactory("queueSimulation", new QueueSimulationFactory());
-		this.addMobsimFactory("jdeqsim", new JDEQSimulationFactory());
-		this.addMobsimFactory("multimodalQSim", new QSimFactory());
 	}
 
 	/**
@@ -971,11 +969,7 @@ public class Controler {
 			return simulation;
 		} else if (this.config.controler().getMobsim() != null) {
 			String mobsim = this.config.controler().getMobsim();
-			MobsimFactory f = this.mobsimFactories.get(mobsim);
-			if (f == null) {
-				throw new IllegalArgumentException(
-						"There is no MobsimFactory registered for the name " + mobsim);
-			}
+			MobsimFactory f = this.mobsimFactoryRegister.getInstance(mobsim);
 			Simulation simulation = f.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
@@ -1011,10 +1005,8 @@ public class Controler {
 			int itNumber = this.getIterationNumber();
 			if (config.controler().getWriteSnapshotsInterval() != 0 && itNumber % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);
-				SnapshotWriterRegistrar registrar = new SnapshotWriterRegistrar();
-				SnapshotWriterFactoryRegister register = registrar.getFactoryRegister();
 				for (String snapshotFormat : this.config.controler().getSnapshotFormat()) {
-					SnapshotWriterFactory snapshotWriterFactory = register.getInstance(snapshotFormat);
+					SnapshotWriterFactory snapshotWriterFactory = this.snapshotWriterRegister.getInstance(snapshotFormat);
 					String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
 					String fileName = this.controlerIO.getIterationFilename(itNumber, baseFileName);
 					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
@@ -1449,14 +1441,15 @@ public class Controler {
 	 * 
 	 * @param mobsimName
 	 * @param mobsimFactory
-	 * @return the mobsim factory previously registered with that name, or
-	 *         <code>null</code> if none was registered before with that name
 	 * 
 	 * @see ControlerConfigGroup#getMobsim()
 	 */
-	public MobsimFactory addMobsimFactory(final String mobsimName,
-			final MobsimFactory mobsimFactory) {
-		return this.mobsimFactories.put(mobsimName, mobsimFactory);
+	public void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
+		this.mobsimFactoryRegister.register(mobsimName, mobsimFactory);
+	}
+	
+	public void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {
+		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
 	}
 
 	public SignalsControllerListenerFactory getSignalsControllerListenerFactory() {

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnapshotWriterRegistrar
+ * OTFSignalPosition
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.ptproject.qsim.qnetsimengine;
 
-package org.matsim.core.controler;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.vis.snapshotwriters.KMLSnapshotWriterFactory;
-import org.matsim.vis.snapshotwriters.TransimsSnapshotWriterFactory;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
-public class SnapshotWriterRegistrar {
+/**
+ * @author dgrether
+ *
+ */
+public class OTFSignal implements Serializable {
+
+	private String id;
+	private SignalGroupState state;
+	private List<OTFLinkWLanes> turningMoveRestrictions = null;
+	private String systemId;
 	
-	private SnapshotWriterFactoryRegister register = new SnapshotWriterFactoryRegister();
+	public OTFSignal(String systemId, String signalId) {
+		this.systemId = systemId;
+		this.id = signalId;
+	}
 
-	public SnapshotWriterRegistrar() {
-		register.register("googleearth", new KMLSnapshotWriterFactory());
-		register.register("transims", new TransimsSnapshotWriterFactory());
+	public String getId(){
+		return this.id;
+	}
+
+	public String getSignalSystemId(){
+		return this.systemId;
 	}
 	
-	public SnapshotWriterFactoryRegister getFactoryRegister() {
-		return register;
+	public void setState(SignalGroupState state){
+		this.state = state;
+	}
+	
+	public SignalGroupState getSignalGroupState(){
+		return this.state;
+	}
+	
+	public List<OTFLinkWLanes> getTurningMoveRestrictions(){
+		return this.turningMoveRestrictions;
+	}
+
+	public void addTurningMoveRestriction(OTFLinkWLanes toLink) {
+		if (this.turningMoveRestrictions == null){
+			this.turningMoveRestrictions = new ArrayList<OTFLinkWLanes>();
+		}
+		this.turningMoveRestrictions.add(toLink);
 	}
 
 }

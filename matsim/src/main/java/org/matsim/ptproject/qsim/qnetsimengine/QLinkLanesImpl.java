@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
@@ -36,9 +35,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
-import org.matsim.lanes.otfvis.io.OTFLane;
-import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -107,8 +103,6 @@ import org.matsim.vis.snapshotwriters.VisData;
  * </ul>
  */
 public class QLinkLanesImpl extends AbstractQLink {
-
-	final private static Logger log = Logger.getLogger(QLinkLanesImpl.class);
 
 	final private static QLane.FromLinkEndComparator fromLinkEndComparator = new QLane.FromLinkEndComparator();
 

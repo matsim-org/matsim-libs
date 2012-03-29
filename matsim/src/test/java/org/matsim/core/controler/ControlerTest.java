@@ -685,49 +685,6 @@ public class ControlerTest {
 	}
 	
 	@Test
-	public void testOTFVisSnapshotWriterOnQueueSimulation() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(2);
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-		config.simulation().setSnapshotPeriod(600);
-		config.simulation().setSnapshotStyle("equiDist");
-		
-		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
-		controler.run();
-
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
-	}
-	
-	@Test
-	public void testOTFVisSnapshotWriterOnQSim() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(2);
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-		qSimConfigGroup.setSnapshotPeriod(600);
-		qSimConfigGroup.setSnapshotStyle("equiDist");
-		config.addQSimConfigGroup(qSimConfigGroup);
-		
-		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
-		controler.run();
-
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
-	}
-	
-	@Test
 	public void testKMLSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);

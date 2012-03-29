@@ -48,7 +48,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneData20;
-import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;

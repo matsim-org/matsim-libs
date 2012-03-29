@@ -10,16 +10,6 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 
 public class SnapshotWriterRegistrarTest extends MatsimTestCase {
 
-	public void testGivesInstanceForOtfvisSnapshotWriter() {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		SnapshotWriterRegistrar registrar = new SnapshotWriterRegistrar();
-		SnapshotWriterFactoryRegister register = registrar.getFactoryRegister();
-		SnapshotWriterFactory factory = register.getInstance("otfvis");
-		SnapshotWriter snapshotWriter = factory.createSnapshotWriter(getOutputDirectory() + factory.getPreferredBaseFilename(), scenario);
-		snapshotWriter.finish();
-	}
-
 	public void testGivesInstanceForKMLSnapshotWriter() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);

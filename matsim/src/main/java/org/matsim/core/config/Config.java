@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -51,7 +52,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
-import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 /**
  * Stores all configuration settings specified in a configuration file and

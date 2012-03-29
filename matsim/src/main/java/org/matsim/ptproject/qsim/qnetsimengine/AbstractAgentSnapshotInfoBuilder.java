@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -45,8 +44,6 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  *
  */
 abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuilder{
-
-	private static final Logger log = Logger.getLogger(AbstractAgentSnapshotInfoBuilder.class);
 
 	protected final double storageCapacityFactor;
 

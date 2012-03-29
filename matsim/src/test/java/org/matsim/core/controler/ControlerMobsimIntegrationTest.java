@@ -106,7 +106,7 @@ public class ControlerMobsimIntegrationTest {
 	public void testRunMobsim_multimodalQSim() {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
-		cfg.controler().setMobsim("multimodalQSim");
+		cfg.controler().setMobsim("qsim");
 		cfg.controler().setWritePlansInterval(0);
 		cfg.addQSimConfigGroup(new QSimConfigGroup());
 		cfg.multiModal().setMultiModalSimulationEnabled(true);
