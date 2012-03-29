@@ -21,13 +21,13 @@ package playground.dgrether.satellic;
 
 import java.util.Arrays;
 
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.run.OTFVis;
 
 import playground.dgrether.DgOTFVisConfigWriter;
 import playground.dgrether.DgPaths;

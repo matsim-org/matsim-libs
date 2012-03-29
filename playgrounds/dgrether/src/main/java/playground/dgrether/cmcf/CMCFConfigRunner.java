@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package playground.dgrether.cmcf;
 
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.controler.Controler;
-import org.matsim.run.OTFVis;
 
 import playground.dgrether.DgPaths;
 

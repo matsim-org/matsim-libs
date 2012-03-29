@@ -1,5 +1,6 @@
 package playground.andreas.bln;
 
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -16,7 +17,6 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
 import org.matsim.ptproject.qsim.agents.TransitAgentFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.run.OTFVis;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;

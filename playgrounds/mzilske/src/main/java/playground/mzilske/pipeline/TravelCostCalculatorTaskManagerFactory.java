@@ -1,8 +1,8 @@
 package playground.mzilske.pipeline;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 public class TravelCostCalculatorTaskManagerFactory extends TaskManagerFactory {
 

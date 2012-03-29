@@ -21,18 +21,18 @@
 package playground.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
-import org.matsim.run.OTFVis;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 public class TransitControler {
 

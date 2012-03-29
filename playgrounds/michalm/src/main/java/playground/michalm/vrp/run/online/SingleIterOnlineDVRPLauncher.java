@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -21,7 +22,6 @@ import org.matsim.population.algorithms.*;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.*;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.run.OTFVis;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 

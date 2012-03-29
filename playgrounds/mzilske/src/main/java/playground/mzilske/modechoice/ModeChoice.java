@@ -2,6 +2,7 @@ package playground.mzilske.modechoice;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -9,7 +10,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 public class ModeChoice {
 	

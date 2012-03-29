@@ -20,6 +20,7 @@
 package playground.dgrether.signalsystems.sylvia.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -27,7 +28,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;

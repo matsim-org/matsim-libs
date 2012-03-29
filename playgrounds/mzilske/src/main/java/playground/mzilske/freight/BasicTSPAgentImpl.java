@@ -8,9 +8,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Contract;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Shipment;
+
 import playground.mzilske.freight.TransportChain.ChainLeg;
 
 public abstract class BasicTSPAgentImpl implements TSPAgent{

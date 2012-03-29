@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.otfvis;
 
-import org.matsim.run.OTFVis;
+import org.matsim.contrib.otfvis.OTFVis;
 
 import playground.benjamin.BkPaths;
 

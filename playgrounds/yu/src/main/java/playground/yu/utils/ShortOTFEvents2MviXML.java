@@ -5,12 +5,12 @@ package playground.yu.utils;
 
 import java.io.File;
 
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.run.OTFVis;
 
 /**
  * quote from org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI of David

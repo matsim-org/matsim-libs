@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.daganzo2012;
 
-import org.matsim.run.OTFVis;
+import org.matsim.contrib.otfvis.OTFVis;
 
 
 /**

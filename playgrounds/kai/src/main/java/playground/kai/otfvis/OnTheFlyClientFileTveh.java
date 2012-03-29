@@ -1,6 +1,6 @@
 package playground.kai.otfvis;
 
-import org.matsim.run.OTFVis;
+import org.matsim.contrib.otfvis.OTFVis;
 
 public class OnTheFlyClientFileTveh {
 

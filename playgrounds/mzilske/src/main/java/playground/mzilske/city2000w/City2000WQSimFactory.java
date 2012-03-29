@@ -28,6 +28,8 @@
 
 package playground.mzilske.city2000w;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
@@ -35,13 +37,11 @@ import org.matsim.contrib.freight.mobsim.FreightAgentSource;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
-import org.matsim.core.mobsim.framework.*;
-import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-
-import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.

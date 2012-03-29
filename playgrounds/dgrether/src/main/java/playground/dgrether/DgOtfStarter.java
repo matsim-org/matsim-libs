@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether;
 
-import org.matsim.run.OTFVis;
+import org.matsim.contrib.otfvis.OTFVis;
 
 
 /**

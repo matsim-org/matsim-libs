@@ -20,6 +20,7 @@
 package playground.jbischoff.BAsignals;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
@@ -32,7 +33,6 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;

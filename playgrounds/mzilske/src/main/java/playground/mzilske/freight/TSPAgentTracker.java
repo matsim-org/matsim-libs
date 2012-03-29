@@ -9,13 +9,20 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.events.*;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.Shipment;
+import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
+import org.matsim.contrib.freight.events.ShipmentDeliveredEventHandler;
+import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
+import org.matsim.contrib.freight.events.ShipmentPickedUpEventHandler;
+import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEvent;
+import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEventHandler;
+import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEvent;
+import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEventHandler;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
-import org.matsim.contrib.freight.carrier.CarrierContract;
-import org.matsim.contrib.freight.carrier.Shipment;
 import playground.mzilske.freight.api.TSPAgentFactory;
 import playground.mzilske.freight.events.QueryTSPOffersEvent;
 import playground.mzilske.freight.events.QueryTSPOffersEventHandler;
@@ -23,13 +30,6 @@ import playground.mzilske.freight.events.ShipperTSPContractAcceptEvent;
 import playground.mzilske.freight.events.ShipperTSPContractAcceptEventHandler;
 import playground.mzilske.freight.events.ShipperTSPContractCanceledEvent;
 import playground.mzilske.freight.events.ShipperTSPContractCanceledEventHandler;
-
-import org.matsim.contrib.freight.events.ShipmentDeliveredEventHandler;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEventHandler;
-import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEvent;
-import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEventHandler;
-import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEvent;
-import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEventHandler;
 import playground.mzilske.freight.events.TransportChainAddedEvent;
 import playground.mzilske.freight.events.TransportChainAddedEventHandler;
 import playground.mzilske.freight.events.TransportChainRemovedEvent;

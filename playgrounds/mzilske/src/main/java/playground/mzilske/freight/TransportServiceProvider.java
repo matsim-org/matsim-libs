@@ -3,7 +3,6 @@ package playground.mzilske.freight;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.contrib.freight.carrier.Actor;
 
 public interface TransportServiceProvider extends Actor {

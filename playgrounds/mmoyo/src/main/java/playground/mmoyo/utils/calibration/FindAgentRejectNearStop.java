@@ -33,12 +33,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.run.OTFVis;
 
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.NonSelectedPlansRemover;

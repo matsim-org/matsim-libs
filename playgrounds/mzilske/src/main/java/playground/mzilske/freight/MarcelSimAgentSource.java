@@ -28,15 +28,16 @@
 
 package playground.mzilske.freight;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
-import playground.mrieser.core.mobsim.api.AgentSource;
-import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
+
+import playground.mrieser.core.mobsim.api.AgentSource;
+import playground.mrieser.core.mobsim.api.PlanAgent;
+import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
 
 public class MarcelSimAgentSource implements AgentSource {
 

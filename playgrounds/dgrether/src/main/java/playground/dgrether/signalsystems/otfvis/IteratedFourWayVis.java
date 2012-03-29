@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
-import org.matsim.run.OTFVis;
+import org.matsim.contrib.otfvis.OTFVis;
 
 
 /**

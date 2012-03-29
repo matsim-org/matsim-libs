@@ -2,6 +2,7 @@ package playground.michalm.util.otfvis;
 
 import java.util.*;
 
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.run.*;
 
 

@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.roedergershenson;
 
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;

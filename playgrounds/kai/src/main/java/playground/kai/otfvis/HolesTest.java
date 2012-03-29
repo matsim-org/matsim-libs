@@ -36,7 +36,7 @@ public class HolesTest {
 		controler.setOverwriteFiles( true ) ;
 		controler.run() ;
 		
-		org.matsim.run.OTFVis.main( new String[] {"output/holes/ITERS/it.0/0.otfvis.mvi"} ) ;
+		org.matsim.contrib.otfvis.OTFVis.main( new String[] {"output/holes/ITERS/it.0/0.otfvis.mvi"} ) ;
 	}
 
 }

@@ -19,7 +19,6 @@
 
 package playground.mzilske.city2000w;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;

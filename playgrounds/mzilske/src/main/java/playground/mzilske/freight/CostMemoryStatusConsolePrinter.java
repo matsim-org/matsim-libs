@@ -2,8 +2,8 @@ package playground.mzilske.freight;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.contrib.freight.trade.CostMemory;
+
 import playground.mzilske.freight.CostMemoryImpl.CostTableKey;
 import playground.mzilske.freight.api.CarrierCostMemoryStatusHandler;
 import playground.mzilske.freight.events.CostMemoryStatusEvent;

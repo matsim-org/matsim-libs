@@ -5,7 +5,7 @@ package playground.yu.utils;
 
 import java.io.File;
 
-import org.matsim.run.OTFVis;
+import org.matsim.contrib.otfvis.OTFVis;
 
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;

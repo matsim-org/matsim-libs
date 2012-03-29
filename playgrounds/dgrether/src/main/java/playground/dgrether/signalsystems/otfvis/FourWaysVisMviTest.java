@@ -21,6 +21,7 @@ package playground.dgrether.signalsystems.otfvis;
 
 import java.util.Arrays;
 
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -28,7 +29,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.run.OTFVis;
 
 import playground.dgrether.DgPaths;
 

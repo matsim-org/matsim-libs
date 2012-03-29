@@ -3,6 +3,7 @@ package playground.mzilske.freight.api;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.trade.CostMemory;
 import org.matsim.core.events.handler.EventHandler;
+
 import playground.mzilske.freight.events.CostMemoryStatusEvent;
 
 
