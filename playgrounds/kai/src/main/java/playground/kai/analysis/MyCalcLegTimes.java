@@ -241,7 +241,7 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 
 	@Deprecated // this is probably averageLegDuration.  kai, jul'11
 	public double getAverageTripDuration() {
-		log.warn("not implemented; returning fake zero") ;
+		log.warn("getAverageTripDuration() is not implemented; returning fake zero") ;
 		return 0. ;
 //		throw new RuntimeException("not implemented") ;
 //		return ( this.sumsContainer.get(StatType.duration) / this.legCount.get(StatType.duration) ) ;
@@ -249,10 +249,10 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 
 	public void writeStats(final String filenameTmp) {
 		for ( StatType type : StatType.values() ) {
-			String filename = filenameTmp ;
-			if ( type!=StatType.duration ) {
-				filename += type.toString() ;
-			}
+			String filename = filenameTmp + type.toString() + ".txt" ;
+//			if ( type!=StatType.duration ) {
+//				filename += type.toString() ;
+//			}
 			BufferedWriter legStatsFile = null;
 			legStatsFile = IOUtils.getBufferedWriter(filename);
 			writeStats(type, legStatsFile );
@@ -283,9 +283,9 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 						out.write("\t" + this.dataBoundaries.get(statType)[i] + "+" ) ;
 					}
 					out.write("\t| average\n");
-					Logger.getLogger(this.getClass()).warn("Writing a file that is often called `tripXXX.txt', " +
-							"and which explicitly talks about `trips'.  It uses, however, _legs_ as unit of analysis. " +
-					"This makes a difference with intermodal trips.  kai, jul'11");
+//					Logger.getLogger(this.getClass()).warn("Writing a file that is often called `tripXXX.txt', " +
+//							"and which explicitly talks about `trips'.  It uses, however, _legs_ as unit of analysis. " +
+//					"This makes a difference with intermodal trips.  kai, jul'11");
 				}
 				
 				// data:

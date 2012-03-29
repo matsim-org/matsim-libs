@@ -48,11 +48,11 @@ public class KaiAnalysisListener implements StartupListener, AfterMobsimListener
 
 		int iteration = event.getIteration() ;
 
-		this.calcLegTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "mytripdurations.txt"));
+		this.calcLegTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "stats_"));
 
-		Logger.getLogger(this.getClass()).info("[" + iteration + "] average trip (probably: leg) duration is: " 
-				+ (int) this.calcLegTimes.getAverageTripDuration()
-				+ " seconds = " + Time.writeTime(this.calcLegTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
+//		Logger.getLogger(this.getClass()).info("[" + iteration + "] average trip leg duration is: " 
+//				+ (int) this.calcLegTimes.getAverageTripDuration()
+//				+ " seconds = " + Time.writeTime(this.calcLegTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
 
 		// trips are from "true" activity to "true" activity.  legs may also go
 		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
