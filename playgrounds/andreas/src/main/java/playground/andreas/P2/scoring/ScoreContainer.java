@@ -69,7 +69,11 @@ public class ScoreContainer {
 	}
 	
 	public double getTotalRevenuePerPassenger(){
-		return (this.earnings - this.costs) / this.servedTrips;
+		if(this.servedTrips == 0){
+			return Double.NaN;
+		} else {
+			return (this.earnings - this.costs) / this.servedTrips;
+		}
 	}
 	
 	public int getTripsServed(){
