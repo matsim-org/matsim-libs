@@ -10,7 +10,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.Zone;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 
 public class CellBasedAccessibilityCSVWriter {
 	
@@ -51,7 +51,7 @@ public class CellBasedAccessibilityCSVWriter {
 	 * @param freespeedTravelTimesCarLogSum
 	 * @param travelTimesWalkLogSum
 	 */
-	public void write(Zone<ZoneAccessibilityObject> startZone, 
+	public void write(Zone<CounterObject> startZone, 
 							 Coord coordFromZone,
 							 Node node, 
 							 double congestedTravelTimesCarLogSum, 
@@ -60,7 +60,7 @@ public class CellBasedAccessibilityCSVWriter {
 		
 		try{
 			assert(CellBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
-			accessibilityDataWriter.write( startZone.getAttribute().getZoneID() + "," +
+			accessibilityDataWriter.write( startZone.getAttribute().getCounter() + "," +
 										   coordFromZone.getX() + "," +
 										   coordFromZone.getY() + "," +
 										   node.getId() + "," + 

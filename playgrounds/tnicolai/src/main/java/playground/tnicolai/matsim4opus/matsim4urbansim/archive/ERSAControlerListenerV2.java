@@ -43,7 +43,7 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGrid2KMZWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriterERSA_V2;
@@ -59,7 +59,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 
 	private static final Logger log = Logger.getLogger(ERSAControlerListenerV2.class);
 
-	private final ClusterObject[] aggregatedJobArray;
+	private final AggregateObject2NearestNode[] aggregatedJobArray;
 	private final int resolutionFeet;
 	private final int resolutionMeter;
 
@@ -77,7 +77,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 	 * constructor
 	 * @param aggregatedJobArray
 	 */
-	public ERSAControlerListenerV2(final ClusterObject[] aggregatedJobArray, final int resolutionFeet, final int resolutionMeter, final Benchmark benchmark){
+	public ERSAControlerListenerV2(final AggregateObject2NearestNode[] aggregatedJobArray, final int resolutionFeet, final int resolutionMeter, final Benchmark benchmark){
 
 		log.info("Initializing ERSAControlerListenerV2 ...");
 

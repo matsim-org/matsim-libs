@@ -42,9 +42,9 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.CreateHomeWorkHomePlan;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
 import playground.tnicolai.matsim4opus.utils.io.writer.PopulationCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
@@ -479,13 +479,13 @@ public class ReadFromUrbansimParcelModel {
 	 * 
 	 * @return HashMap
 	 */
-	public Map<Id,WorkplaceObject> readZoneBasedWorkplaces(){
+	public Map<Id,CounterObject> readZoneBasedWorkplaces(){
 		
 		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read jobs table from " + filename );
 
-		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = new HashMap<Id,WorkplaceObject>();
+		Map<Id,CounterObject> numberOfWorkplacesPerZone = new HashMap<Id,CounterObject>();
 		
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -497,7 +497,7 @@ public class ReadFromUrbansimParcelModel {
 			final int indexZoneID_WORK	   = idxFromKey.get( Constants.ZONE_ID_WORK );
 			
 			ZoneId zone_ID;
-			WorkplaceObject workObj;
+			CounterObject workObj;
 			
 			while ( (line=reader.readLine()) != null ) {
 				String[] parts = line.split( Constants.TAB );
@@ -509,7 +509,7 @@ public class ReadFromUrbansimParcelModel {
 				// each zone ID indicates a job
 				workObj = numberOfWorkplacesPerZone.get(zone_ID);
 				if( workObj == null){
-					workObj = new WorkplaceObject();
+					workObj = new CounterObject();
 					numberOfWorkplacesPerZone.put(zone_ID, workObj);
 				}
 				workObj.counter++;
@@ -539,14 +539,14 @@ public class ReadFromUrbansimParcelModel {
 	 * @return HashMap
 	 */
 	@Deprecated
-	public ClusterObject[] readAndBuildJobsObject(final ActivityFacilitiesImpl parcels, double jobSample){
+	public AggregateObject2NearestNode[] readAndBuildJobsObject(final ActivityFacilitiesImpl parcels, double jobSample){
 		
 		// readJobs creates a hash map of job with key = job id
 		// this hash map includes jobs according to job sample size
 		List<PersonAndJobsObject> jobSampleList = readJobs(parcels, jobSample);
 		assert( jobSampleList != null );
 		// this hash map aggregates jobs belonging to the same parcel (key = parcel id)
-		ClusterObject[] jobClusterArray = aggregateJobsWithSameParcelID(jobSampleList);
+		AggregateObject2NearestNode[] jobClusterArray = aggregateJobsWithSameParcelID(jobSampleList);
 				
 		return jobClusterArray;		
 	}
@@ -557,10 +557,10 @@ public class ReadFromUrbansimParcelModel {
 	 * @param jobObjectMap
 	 */
 	@Deprecated
-	public ClusterObject[] aggregateJobsWithSameParcelID(List<PersonAndJobsObject> jobSampleList) {
+	public AggregateObject2NearestNode[] aggregateJobsWithSameParcelID(List<PersonAndJobsObject> jobSampleList) {
 		
 		log.info("Aggregating Job with identical parcel ID ...");
-		Map<Id, ClusterObject> jobClusterMap = new HashMap<Id, ClusterObject>();
+		Map<Id, AggregateObject2NearestNode> jobClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
 		
 		ProgressBar bar = new ProgressBar( jobSampleList.size() );
 		
@@ -569,18 +569,18 @@ public class ReadFromUrbansimParcelModel {
 			PersonAndJobsObject jo = jobSampleList.get( i );
 			
 			if( jobClusterMap.containsKey( jo.getParcelID() ) ){
-				ClusterObject jco = jobClusterMap.get( jo.getParcelID() );
+				AggregateObject2NearestNode jco = jobClusterMap.get( jo.getParcelID() );
 				jco.addObject( jo.getObjectID() );
 			}
 			else
-				jobClusterMap.put( jo.getParcelID(), new ClusterObject(jo.getObjectID(),
+				jobClusterMap.put( jo.getParcelID(), new AggregateObject2NearestNode(jo.getObjectID(),
 																		  jo.getParcelID(),
 																		  jo.getZoneID(),
 																		  jo.getCoord() ) );
 		}
 		
-		ClusterObject jobClusterArray []  = new ClusterObject[ jobClusterMap.size() ];
-		Iterator<ClusterObject> jobClusterIterator = jobClusterMap.values().iterator();
+		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ jobClusterMap.size() ];
+		Iterator<AggregateObject2NearestNode> jobClusterIterator = jobClusterMap.values().iterator();
 
 		for(int i = 0; jobClusterIterator.hasNext(); i++)
 			jobClusterArray[i] = jobClusterIterator.next();
@@ -597,7 +597,7 @@ public class ReadFromUrbansimParcelModel {
 	 * @param network
 	 * @return
 	 */
-	public ClusterObject[] getAggregatedWorkplaces(final ActivityFacilitiesImpl parcels, final double jobSample, final NetworkImpl network){
+	public AggregateObject2NearestNode[] getAggregatedWorkplaces(final ActivityFacilitiesImpl parcels, final double jobSample, final NetworkImpl network){
 		
 		// readJobs creates a hash map of job with key = job id
 		// this hash map includes jobs according to job sample size
@@ -609,7 +609,7 @@ public class ReadFromUrbansimParcelModel {
 		WorkplaceCSVWriter.writeWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
 		
 		log.info("Aggregating workplaces with identical nearest node ...");
-		Map<Id, ClusterObject> jobClusterMap = new HashMap<Id, ClusterObject>();
+		Map<Id, AggregateObject2NearestNode> jobClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
 		
 		ProgressBar bar = new ProgressBar( jobSampleList.size() );
 		
@@ -623,19 +623,19 @@ public class ReadFromUrbansimParcelModel {
 			
 			
 			if( jobClusterMap.containsKey( nearestNode.getId() ) ){
-				ClusterObject jco = jobClusterMap.get( nearestNode.getId() );
+				AggregateObject2NearestNode jco = jobClusterMap.get( nearestNode.getId() );
 				jco.addObject( jo.getObjectID() );
 			}
 			else
-				jobClusterMap.put( nearestNode.getId(), new ClusterObject(jo.getObjectID(),
+				jobClusterMap.put( nearestNode.getId(), new AggregateObject2NearestNode(jo.getObjectID(),
 																		  jo.getParcelID(),
 																		  jo.getZoneID(),
 																		  nearestNode.getCoord(),
 																		  nearestNode) );
 		}
 		
-		ClusterObject jobClusterArray []  = new ClusterObject[ jobClusterMap.size() ];
-		Iterator<ClusterObject> jobClusterIterator = jobClusterMap.values().iterator();
+		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ jobClusterMap.size() ];
+		Iterator<AggregateObject2NearestNode> jobClusterIterator = jobClusterMap.values().iterator();
 
 		for(int i = 0; jobClusterIterator.hasNext(); i++)
 			jobClusterArray[i] = jobClusterIterator.next();
@@ -841,7 +841,7 @@ public class ReadFromUrbansimParcelModel {
 		log.info( "Starting to read persons table from " + filename );
 		
 		Map<Id, PersonAndJobsObject> personLocations = new HashMap<Id, PersonAndJobsObject>();
-		Map<Id, ClusterObject> personClusterMap = new HashMap<Id, ClusterObject>();
+		Map<Id, AggregateObject2NearestNode> personClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
 		
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -874,11 +874,11 @@ public class ReadFromUrbansimParcelModel {
 							assert( nearestNode != null );
 	
 							if( personClusterMap.containsKey( nearestNode.getId() ) ){
-								ClusterObject co = personClusterMap.get( nearestNode.getId() );
+								AggregateObject2NearestNode co = personClusterMap.get( nearestNode.getId() );
 								co.addObject( personId );
 							}
 							else
-								personClusterMap.put( nearestNode.getId(), new ClusterObject(personId,
+								personClusterMap.put( nearestNode.getId(), new AggregateObject2NearestNode(personId,
 																							 homeParcelId,
 																						  	 null,
 																						  	 nearestNode.getCoord(),

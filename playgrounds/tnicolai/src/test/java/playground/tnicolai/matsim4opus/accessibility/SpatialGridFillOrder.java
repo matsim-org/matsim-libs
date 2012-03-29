@@ -41,7 +41,7 @@ import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
@@ -56,7 +56,7 @@ public class SpatialGridFillOrder {
 	 */
 	public static void main(final String[] args) {
 		NetworkImpl network = createNetwork();
-		ClusterObject[] dummyJobClusterArray = createWorkplaces(network);
+		AggregateObject2NearestNode[] dummyJobClusterArray = createWorkplaces(network);
 		SpatialGrid<Interpolation> grid = network2SpatialGrid(network);
 		Map<Id, Double> resultMap = travelTimeAccessibility(network, dummyJobClusterArray);
 
@@ -174,7 +174,7 @@ public class SpatialGridFillOrder {
 	/**
 	 * creating workplaces ...
 	 */
-	static ClusterObject[] createWorkplaces(final NetworkImpl network){
+	static AggregateObject2NearestNode[] createWorkplaces(final NetworkImpl network){
 
 		System.out.println("Creating workplaces ...");
 
@@ -208,7 +208,7 @@ public class SpatialGridFillOrder {
 		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(6), parcelID2, zoneID, new CoordImpl(200, 110)));
 
 		// aggregate jobs
-		ClusterObject[] dummyJobClusterArray = dummyUrbanSimPracelModel.aggregateJobsWithSameParcelID(dummyJobSampleList);
+		AggregateObject2NearestNode[] dummyJobClusterArray = dummyUrbanSimPracelModel.aggregateJobsWithSameParcelID(dummyJobSampleList);
 
 		// add nearest network node
 		for(int i = 0; i < dummyJobClusterArray.length; i++){
@@ -232,7 +232,7 @@ public class SpatialGridFillOrder {
 	 * @return
 	 */
 	static Map<Id, Double> travelTimeAccessibility(final NetworkImpl network,
-													final ClusterObject[] dummyJobClusterArray){
+													final AggregateObject2NearestNode[] dummyJobClusterArray){
 
 		System.out.println("Computing travel time accessibility ...");
 

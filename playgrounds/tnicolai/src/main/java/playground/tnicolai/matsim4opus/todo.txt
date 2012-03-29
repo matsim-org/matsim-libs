@@ -1,12 +1,16 @@
 Todos:
 
-- implement normal MATSim config as input
-- orthogonal mapping of workplaces (consider walk distance to link rather than to node (as approximation))
-- output of travel time/distances for each person ?
+- orthogonal mapping of measuring points, i.e. othog. walk time from point2Link + walk or car travel time from link intersection 2 nearest node
+	- test why plots of this implementation looks wired
+- MATSimZone: test or implement controllers
 - test different beta values
 - test accessibility measure paired with workers or 1-person hh or income in UrbanSim
-- implement controler for agent-based performance feedback (time spent travelling, money spent travelling, etc.)
-- Schnittstelle SpatialGrid für Interpolation
+- implement controller for agent-based performance feedback (time spent traveling, money spent traveling, etc.)
+- implement interface for SpatialGrid Interpolation (for returning accessibility values for each parcel)
+- re-implement SpatialGrid: use 2d array of doubles instead of Object
 
 Tasks Done:
+- MATSimZone: implement "get_matsim_data_into_urbansim" -> using a common module for UrbanSim parcel and zone since one zone data is return by now from MATSim (works for both cases)
+- implement normal MATSim config as input
 - Brussel scenario: matching coordinates of zone centroids and network -> created new network with right projection
+- re-implement: determine measuring point to process via cell centroid and not the left bottom corner (shapefiles)

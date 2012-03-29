@@ -150,12 +150,6 @@ public class Constants {
 	
 	/** MATSim properties */
 	public static final String MATSIM_PROPERTIES_FILE = "matsim.properties";
-	public static final String FIRST_ITERATION = "firstIteration";
-	public static final String LAST_ITERATION = "lastIteration";
-	public static final String NUMBER_OF_ITERATIONS_PER_RUN = "numberOfIterationPerRun";
-	public static final String PLANS_FILE_PATH = "inputPlansFile";
-	public static final String RUN_NUMBER = "run";
-	public static final String PATH_TO_GENERATED_MATSIM_CONFIG_FILE = "generatedMATSimConfigPath";
 	
 	/** MATSim config modules */
 	public static final String MATSIM_CONFIG_MODULE_CONTROLLER = "matsimControler";
@@ -165,16 +159,11 @@ public class Constants {
 	public static final String MATSIM_CONFIG_PARAMETER_YEAR = "year";
 	public static final String MATSIM_CONFIG_PARAMETER_TEMP_DIRECTORY = "tempDirectory";
 	
-	/** test run */
-	public static final int TEST_RUN_SUCCESSFUL = 0;
-	public static final int TEST_RUN_FAILD 		= -1;
-	
 	/** exit codes */
 	public static final int NOT_VALID_PATH		= 0;
 	public static final int MATSIM_PROPERTIES_FILE_NOT_FOUND = 1;
-	public static final int CONFIG_OBJECT_NOT_INITIALIZED = 2;
-	public static final int EXCEPTION_OCCURED	= 3;
-	public static final int UNMARSCHALLING_FAILED = 4;
+	public static final int EXCEPTION_OCCURED	= 2;
+	public static final int UNMARSCHALLING_FAILED = 3;
 	
 	/** MATSim 4 UrbanSim (urbansimParameter) parameter names **/
 	public static final String URBANSIM_PARAMETER = "urbansimParameter";
@@ -193,24 +182,6 @@ public class Constants {
 	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
 	public static final String MATSIM_MODE = "matsim_mode";
 	public static final String TARGET_LOCATION_HOT_START_PLANS_FILE = "target_location_for_hotstart_plans_file";
-	
-	/** MATSim 4 UrbanSim (matsim4urbansimContoler) parameter names **/
-	public static final String MATSIM_4_URBANSIM_CONTROLER = "matsim4urbansimContoler";
-	public static final String COMPUTE_AGENT_PERFORMANCE = "compute_agent_performance";
-	public static final String COMPUTE_ZONE_2_ZONE_IMPEDANCE = "compute_zone2zone_impedance";
-	public static final String COMPUTE_ZONE_BASED_ACCESSIBILITY = "compute_zonebased_accessibility";
-	public static final String COMPUTE_CELL_BASED_ACCESSIBILITY_SHAPEFILE = "compute_cellbased_accessibility_with_shapefile";
-	public static final String COMPUTE_CELL_BASED_ACCESSIBILITY_NETWORK = "compute_cellbased_accessibility_with_networkboundary";
-	public static final String CELL_SIZE = "cell_size";
-	public static final String BOUNDING_BOX_TOP = "bb_top";
-	public static final String BOUNDING_BOX_LEFT= "bb_left";
-	public static final String BOUNDING_BOX_RIGHT = "bb_right";
-	public static final String BOUNDING_BOX_BOTTOM = "bb_bottom";
-	public static final String CELL_BASED_ACCESSIBILITY_SHAPEFILE = "cell_based_accessibility_shapefile";
-	public static final String COMPUTE_RAW_SUM = "compute_raw_sum";
-	public static final String USE_MATSIM_CAR_PARAMETER = "use_matsim_car_parameter";
-	public static final String USE_MATSIM_WALK_PARAMETER = "use_matsim_walk_parameter";
-	public static final String USE_MATSIM_LOGIT_SCALE_PARAMETER = "use_matsim_logit_scale_parameter";
 	
 	/** MATSim 4 UrbanSim (accessibilityParameter) parameter names **/
 	public static final String ACCESSIBILITY_PARAMETER = "accessibility_parameter";

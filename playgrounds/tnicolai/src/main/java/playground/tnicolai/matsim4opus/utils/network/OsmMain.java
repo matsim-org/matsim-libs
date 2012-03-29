@@ -29,8 +29,8 @@ public class OsmMain {
 	 * 
 	 * If needed use this to convert osm into matsim format, in addition you can set the right projection ...
 	 */
-	private static String inputOSMNetwork = "/Users/thomas/Downloads/belgiumResidential.osm";// "/Users/thomas/Downloads/belgium.osm";
-	private static String outputMATSimNetwork = "/Users/thomas/Downloads/belgiumResidential.xml.gz";
+	private static String inputOSMNetwork = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/archive/belgium_incl_borderArea.osm";// "/Users/thomas/Downloads/belgium.osm";
+	private static String outputMATSimNetwork = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/archive/belgium_incl_borderAreaV2.xml.gz";
 	
 	public static void main(String[] args) {
 		Scenario scenario = createScenario();

@@ -6,14 +6,14 @@ import org.matsim.api.core.v01.Id;
 
 public class AccessibilityHelperObject{
 	
-	private Map<Id,WorkplaceObject> numberOfWorkplacesPerZone;
+	private Map<Id,CounterObject> numberOfWorkplacesPerZone;
 	private double accessibilityTravelTimes;
 	private double minTravelTime;
 	
 	/**
 	 * constructor
 	 */
-	public AccessibilityHelperObject(Map<Id,WorkplaceObject> numberOfWorkplacesPerZone) {
+	public AccessibilityHelperObject(Map<Id,CounterObject> numberOfWorkplacesPerZone) {
 		this.numberOfWorkplacesPerZone = numberOfWorkplacesPerZone;
 		this.accessibilityTravelTimes = 0.;
 		this.minTravelTime = Double.MAX_VALUE;

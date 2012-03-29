@@ -35,10 +35,10 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverter;
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConverter;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimZoneModel;
@@ -70,6 +70,10 @@ import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
  * 	For a better readability some functionality is outsourced into helper classes
  */
 public class MATSim4UrbanSimZone {
+	
+	// tnicolai TODO:
+	// 1) Check Population Sampling --> seems to be ok! 
+	// 2) Distribution of Population (Verteilung ungleichmaessig!!!
 
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZone.class);
@@ -85,7 +89,7 @@ public class MATSim4UrbanSimZone {
 	// indicates if MATSim run was successful
 	static boolean isSuccessfulMATSimRun = Boolean.FALSE;
 	// needed for controler listerners
-	ClusterObject[] aggregatedOpportunities = null;
+	AggregateObject2NearestNode[] aggregatedOpportunities = null;
 	
 	
 	/**
@@ -175,7 +179,7 @@ public class MATSim4UrbanSimZone {
 	 * 
 	 * @return JobClusterObject[] 
 	 */
-	ClusterObject[] readUrbansimJobs(ActivityFacilitiesImpl zones, double jobSample){
+	AggregateObject2NearestNode[] readUrbansimJobs(ActivityFacilitiesImpl zones, double jobSample){
 		return readFromUrbansim.getAggregatedWorkplaces(zones, jobSample, (NetworkImpl) scenario.getNetwork());
 	}
 	

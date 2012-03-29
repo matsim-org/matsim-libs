@@ -55,7 +55,7 @@ import org.matsim.utils.LeastCostPathTree;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityHelperObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 
 /**
@@ -69,7 +69,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 
 	private ActivityFacilitiesImpl zones;
 	private ActivityFacilitiesImpl facilities;
-	private Map<Id,WorkplaceObject> numberOfWorkplacesPerZone;
+	private Map<Id,CounterObject> numberOfWorkplacesPerZone;
 	private String travelDataPath;
 	private String zonesPath;
 	private double beta_per_minute;
@@ -79,7 +79,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 	 * constructor
 	 * @param zones 
 	 */
-	MATSim4UrbanSimControlerListenerV2( final ActivityFacilitiesImpl zones, final Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities, ScenarioImpl scenario ) {
+	MATSim4UrbanSimControlerListenerV2( final ActivityFacilitiesImpl zones, final Map<Id,CounterObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities, ScenarioImpl scenario ) {
 		this.zones = zones;
 		this.facilities = facilities;
 		this.numberOfWorkplacesPerZone = numberOfWorkplacesPerZone;

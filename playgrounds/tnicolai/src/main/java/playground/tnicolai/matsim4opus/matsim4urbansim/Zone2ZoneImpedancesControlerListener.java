@@ -55,6 +55,8 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 /**
  * This controller version is designed for the sustaincity mile stone (Month 18).
  * 
+ * This works for UrbanSim Zone and Parcel Applications !!! (march'12)
+ * 
  * @author nagel
  * @author thomas
  *
@@ -71,7 +73,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	 * @param zones 
 	 * @param parcels
 	 */
-	Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels) {
+	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels) {
 		this.zones = zones;
 		this.parcels = parcels;
 		this.travelDataPath = Constants.MATSIM_4_OPUS_TEMP + Constants.TRAVEL_DATA_FILE_CSV;

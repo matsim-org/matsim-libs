@@ -26,7 +26,7 @@ import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
@@ -50,7 +50,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		this.dummyCostFactor = 1.;
 		
 		NetworkImpl network = createNetwork();
-		ClusterObject[] dummyJobClusterArray= createWorkplaces(network);
+		AggregateObject2NearestNode[] dummyJobClusterArray= createWorkplaces(network);
 		
 		Map<Id, Double> resultMap = travelTimeAccessibility(network, dummyJobClusterArray);
 		
@@ -71,7 +71,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		this.dummyTolerance = 0.01;
 		
 		NetworkImpl network = createNetwork();
-		ClusterObject[] dummyJobClusterArray= createWorkplaces(network);
+		AggregateObject2NearestNode[] dummyJobClusterArray= createWorkplaces(network);
 		
 		SpatialGrid<InterpolationObjectV2> derivationGrid300 = constructDerivationGrid(network, dummyJobClusterArray, 300);
 		SpatialGrid<InterpolationObjectV2> derivationGrid700 = constructDerivationGrid(network, dummyJobClusterArray, 700);
@@ -86,7 +86,7 @@ public class AccessibilityTest extends MatsimTestCase{
 	 * @param dummyJobClusterArray
 	 */
 	private SpatialGrid<InterpolationObjectV2> constructDerivationGrid(NetworkImpl network,
-			ClusterObject[] dummyJobClusterArray, double resolution) {
+			AggregateObject2NearestNode[] dummyJobClusterArray, double resolution) {
 		Map<Id, Double> resultMap = travelTimeAccessibility(network, dummyJobClusterArray);
 		
 		NetworkBoundary nb = new NetworkBoundary(network);
@@ -203,7 +203,7 @@ public class AccessibilityTest extends MatsimTestCase{
 	/**
 	 * creating workplaces ...
 	 */
-	private ClusterObject[] createWorkplaces(NetworkImpl network){
+	private AggregateObject2NearestNode[] createWorkplaces(NetworkImpl network){
 		
 		log.info("Creating workplaces ...");
 		
@@ -229,7 +229,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(8), new IdImpl(5), zoneID, new CoordImpl(1000, -110)));
 		
 		// aggregate jobs
-		ClusterObject[] dummyJobClusterArray = dummyUrbanSimPracelModel.aggregateJobsWithSameParcelID(dummyJobSampleList);
+		AggregateObject2NearestNode[] dummyJobClusterArray = dummyUrbanSimPracelModel.aggregateJobsWithSameParcelID(dummyJobSampleList);
 		
 		// add nearest network node
 		for(int i = 0; i < dummyJobClusterArray.length; i++){
@@ -252,7 +252,7 @@ public class AccessibilityTest extends MatsimTestCase{
 	 * @return
 	 */
 	private Map<Id, Double> travelTimeAccessibility(final NetworkImpl network, 
-													final ClusterObject[] dummyJobClusterArray){
+													final AggregateObject2NearestNode[] dummyJobClusterArray){
 		
 		log.info("Computing travel time accessibility ...");
 		
@@ -310,7 +310,7 @@ public class AccessibilityTest extends MatsimTestCase{
 	 */
 	private void computeDerivation(final SpatialGrid<InterpolationObjectV2> grid,
 									final NetworkImpl network, 
-									final ClusterObject[] dummyJobClusterArray){
+									final AggregateObject2NearestNode[] dummyJobClusterArray){
 		log.info("Computing travel time accessibility for each square ...");
 		
 		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator());

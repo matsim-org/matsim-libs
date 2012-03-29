@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
-public class ClusterObject {
+public class AggregateObject2NearestNode {
 	
 	private List<Id> objectIdList = null; // either job or person id
 	private Id zoneID;
@@ -15,7 +15,7 @@ public class ClusterObject {
 	private Coord coordinate;
 	private Node nearestNode;
 	
-	public ClusterObject(Id objectID, Id parcelId, Id zoneId, Coord coordinate){
+	public AggregateObject2NearestNode(Id objectID, Id parcelId, Id zoneId, Coord coordinate){
 		if(this.objectIdList == null)
 			this.objectIdList = new ArrayList<Id>();
 		this.objectIdList.add( objectID );
@@ -25,7 +25,7 @@ public class ClusterObject {
 		this.nearestNode = null;
 	}
 	
-	public ClusterObject(Id objectID, Id parcelId, Id zoneId, Coord coordinate, Node nearestNode){
+	public AggregateObject2NearestNode(Id objectID, Id parcelId, Id zoneId, Coord coordinate, Node nearestNode){
 		if(this.objectIdList == null)
 			this.objectIdList = new ArrayList<Id>();
 		this.objectIdList.add( objectID );

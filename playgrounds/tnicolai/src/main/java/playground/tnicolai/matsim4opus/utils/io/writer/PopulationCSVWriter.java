@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 
 public class PopulationCSVWriter {
@@ -61,7 +61,7 @@ public class PopulationCSVWriter {
 	 * @param file
 	 * @param personClusterMap
 	 */
-	public static void writeAggregatedPopulationData2CSV(final String file, final Map<Id, ClusterObject> personClusterMap){
+	public static void writeAggregatedPopulationData2CSV(final String file, final Map<Id, AggregateObject2NearestNode> personClusterMap){
 		
 		try{
 			log.info("Dumping aggregated person information as csv to " + file + " ...");
@@ -75,11 +75,11 @@ public class PopulationCSVWriter {
 					 		   Constants.ERSA_PERSONS_COUNT);
 			bwAggregatedPopulation.newLine();
 			
-			Iterator<ClusterObject> personIterator = personClusterMap.values().iterator();
+			Iterator<AggregateObject2NearestNode> personIterator = personClusterMap.values().iterator();
 
 			while(personIterator.hasNext()){
 				
-				ClusterObject person = personIterator.next();
+				AggregateObject2NearestNode person = personIterator.next();
 				
 				bwAggregatedPopulation.write(person.getParcelID() + "," +
 								   person.getNearestNode().getId() + "," +

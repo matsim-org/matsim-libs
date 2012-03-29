@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+Ø * project: org.matsim.*
  * ERSAControlerListener.java
  *                                                                         *
  * *********************************************************************** *
@@ -35,24 +35,23 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.LeastCostPathTree;
 
+import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
-import playground.tnicolai.matsim4opus.interfaces.controlerinterface.AccessibilityControlerInterface;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.CellBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
@@ -96,6 +95,7 @@ import com.vividsolutions.jts.geom.Point;
  *  improvements march'12
  *  - revised distance measure from centroid to network:
  *  	using orthogonal distance from centroid to nearest network link!
+ *  - merged CellBasedAccessibilityNetworkControlerListener and CellBasedAccessibilityShapefileControlerListener
  *  
  * TODO: implement configurable betas for different accessibility measures based on different costs
  * beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts,
@@ -104,12 +104,14 @@ import com.vividsolutions.jts.geom.Point;
  * @author thomas
  * 
  */
-public class CellBasedAccessibilityShapeControlerListener implements ShutdownListener, AccessibilityControlerInterface{
+public class CellBasedAccessibilityControlerListener implements ShutdownListener{
 
-	private static final Logger log = Logger.getLogger(CellBasedAccessibilityShapeControlerListener.class);
+	private static final Logger log = Logger.getLogger(CellBasedAccessibilityControlerListener.class);
+	public static final String SHAPE_FILE = "SF";
+	public static final String NETWORK = "NW";
 	
-	private ClusterObject[] aggregatedOpportunities;
-	private ZoneLayer<ZoneAccessibilityObject> startZones;
+	private AggregateObject2NearestNode[] aggregatedOpportunities;
+	private ZoneLayer<CounterObject> measuringPoints;
 	
 	private SpatialGrid<Double> congestedTravelTimeAccessibilityGrid;
 	private SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
@@ -119,34 +121,37 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 	
 	private Benchmark benchmark;
 	
-	private String fileExtension = "shapeFileBoundary";
+	private String fileExtension;
 	
 	/**
 	 * constructor
 	 * 
-	 * @param startZones
+	 * @param measuringPoints
 	 * @param aggregatedOpportunities
 	 * @param travelTimeAccessibilityGrid
 	 * @param travelCostAccessibilityGrid
 	 * @param travelDistanceAccessibilityGrid
 	 * @param benchmark
 	 */
-	CellBasedAccessibilityShapeControlerListener(ZoneLayer<ZoneAccessibilityObject> startZones, 			// needed for google earth plots (not supported by now tnicolai feb'12)
-			   									 ClusterObject[] aggregatedOpportunities, 					// destinations
+	public CellBasedAccessibilityControlerListener(ZoneLayer<CounterObject> measuringPoints, 				// needed for google earth plots (not supported by now tnicolai feb'12)
+			   									 AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations
 			   									 SpatialGrid<Double> congestedTravelTimeAccessibilityGrid, 	// table for congested car travel times in accessibility computation
-			   									 SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid,	// table for freespeed car travel times in accessibility computation
+			   									 SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid,	// table for free-speed car travel times in accessibility computation
 			   									 SpatialGrid<Double> walkTravelTimeAccessibilityGrid, 		// table for walk travel times in accessibility computation
+			   									 String extention,											// this string indicates if the study area (boundary) is given by shape-file or network
 			   									 Benchmark benchmark){										// Benchmark tool
-		assert ( startZones != null );
-		this.startZones	= startZones;	
+		assert ( measuringPoints != null );
+		this.measuringPoints = measuringPoints;	
 		assert ( aggregatedOpportunities != null );
-		this.aggregatedOpportunities 	= aggregatedOpportunities;
+		this.aggregatedOpportunities = aggregatedOpportunities;
 		assert ( congestedTravelTimeAccessibilityGrid != null );
 		this.congestedTravelTimeAccessibilityGrid = congestedTravelTimeAccessibilityGrid;
 		assert ( freespeedTravelTimeAccessibilityGrid != null );
 		this.freespeedTravelTimeAccessibilityGrid = freespeedTravelTimeAccessibilityGrid;
 		assert ( walkTravelTimeAccessibilityGrid != null );
 		this.walkTravelTimeAccessibilityGrid = walkTravelTimeAccessibilityGrid;
+		assert( extention != null);
+		this.fileExtension = extention;
 		assert( benchmark != null );
 		this.benchmark = benchmark;
 	}
@@ -191,7 +196,7 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 			CellBasedAccessibilityCSVWriter accCsvWriter = new CellBasedAccessibilityCSVWriter(fileExtension);
 			
 			log.info("Computing and writing grid based accessibility measures with following settings:" );
-			log.info("Depature time (in seconds): " + depatureTime);
+			log.info("Departure time (in seconds): " + depatureTime);
 			log.info("Beta car traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
 			log.info("Beta walk traveling utils/h: " + sc.getConfig().planCalcScore().getTravelingWalk_utils_hr());
 			log.info("Beta performing utils/h: " + sc.getConfig().planCalcScore().getPerforming_utils_hr());
@@ -202,19 +207,19 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 			log.info("Beta walk traveling per min: " + betaWalkMin);
 			log.info("Walk speed (meter/min): " + this.walkSpeedMeterPerMin);
 			
-			Iterator<Zone<ZoneAccessibilityObject>> startZoneIterator = startZones.getZones().iterator();
-			log.info(startZones.getZones().size() + " measurement points are now processing ...");
+			Iterator<Zone<CounterObject>> measuringPointIterator = measuringPoints.getZones().iterator();
+			log.info(measuringPoints.getZones().size() + " measuring points are now processing ...");
 			
-			ProgressBar bar = new ProgressBar( startZones.getZones().size() );
+			ProgressBar bar = new ProgressBar( measuringPoints.getZones().size() );
 		
-			// iterates through all starting points (fromZone) and calculates their workplace accessibility
-			while( startZoneIterator.hasNext() ){
+			// iterates through all starting points (fromZone) and calculates their accessibility, e.g. to jobs
+			while( measuringPointIterator.hasNext() ){
 				
 				bar.update();
 				
-				Zone<ZoneAccessibilityObject> startZone = startZoneIterator.next();
+				Zone<CounterObject> measurePoint = measuringPointIterator.next();
 				
-				Point point = startZone.getGeometry().getCentroid();
+				Point point = measurePoint.getGeometry().getCentroid();
 				// get coordinate from origin (start point)
 				Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
 				assert( coordFromZone!=null );
@@ -234,7 +239,7 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 //				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
 				double walkTimeOffset_min = NetworkUtil.getDistance2Node(network.getNearestLink(coordFromZone), 
 																		 point, 
-																		 fromNode)  / this.walkSpeedMeterPerMin ;
+																		 fromNode)  / this.walkSpeedMeterPerMin;
 //				double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;
@@ -272,14 +277,14 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 				double freespeedTravelTimesCarLogSum = betaScalePreFactor * Math.log( freespeedTravelTimesCarSum );
 				double travelTimesWalkLogSum 		 = betaScalePreFactor * Math.log( travelTimesWalkSum );
 				
-				// assign log sums to current starZone object and spatial grid
-				setAccessibilityValues2StartZoneAndSpatialGrid(startZone,
+				// assign log sums to current measuring point and spatial grid
+				setAccessibilityValues2MeasurePointAndSpatialGrid(measurePoint,
 															   congestedTravelTimesCarLogSum, 
 															   freespeedTravelTimesCarLogSum,
 															   travelTimesWalkLogSum);
 				
-				// writing accessibility values (stored in starZone object) in csv format ...
-				accCsvWriter.write(startZone, 
+				// writing accessibility values (stored in starZone object) in csv format (for qgis) ...
+				accCsvWriter.write(measurePoint, 
 								   coordFromZone, 
 								   fromNode, 
 								   congestedTravelTimesCarLogSum, 
@@ -290,7 +295,7 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 			
 			if( this.benchmark != null && benchmarkID > 0 ){
 				this.benchmark.stoppMeasurement(benchmarkID);
-				log.info("Accessibility computation with " + startZones.getZones().size() + " starting points (origins) and " + this.aggregatedOpportunities.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
+				log.info("Accessibility computation with " + measuringPoints.getZones().size() + " starting points (origins) and " + this.aggregatedOpportunities.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
 			}
 			accCsvWriter.close();
 			dumpResults();
@@ -305,8 +310,52 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 	private void dumpResults() throws IOException{
 		log.info("Writing files ...");
 		// finish and close writing
-		GridUtils.writeSpatialGridTables(this, "UsingShapeFileBoundary");
-		GridUtils.writeKMZFiles(this, "UsingShapeFileBoundary");
+		GridUtils.writeSpatialGridTable(
+				congestedTravelTimeAccessibilityGrid,
+				Constants.MATSIM_4_OPUS_TEMP
+						+ Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY
+						+ "_cellsize_"
+						+ congestedTravelTimeAccessibilityGrid.getResolution()
+						+ fileExtension + Constants.FILE_TYPE_TXT);
+		GridUtils.writeSpatialGridTable(
+				freespeedTravelTimeAccessibilityGrid,
+				Constants.MATSIM_4_OPUS_TEMP
+						+ Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY
+						+ "_cellsize_"
+						+ freespeedTravelTimeAccessibilityGrid.getResolution()
+						+ fileExtension + Constants.FILE_TYPE_TXT);
+		GridUtils.writeSpatialGridTable(
+				walkTravelTimeAccessibilityGrid,
+				Constants.MATSIM_4_OPUS_TEMP
+						+ Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY
+						+ "_cellsize_"
+						+ walkTravelTimeAccessibilityGrid.getResolution()
+						+ fileExtension + Constants.FILE_TYPE_TXT);
+
+		GridUtils.writeKMZFiles(
+				measuringPoints, 
+				congestedTravelTimeAccessibilityGrid, 
+				Constants.MATSIM_4_OPUS_TEMP
+				+ Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY
+				+ "_cellsize_"
+				+ congestedTravelTimeAccessibilityGrid.getResolution()
+				+ fileExtension + Constants.FILE_TYPE_KMZ);
+		GridUtils.writeKMZFiles(
+				measuringPoints, 
+				freespeedTravelTimeAccessibilityGrid, 
+				Constants.MATSIM_4_OPUS_TEMP
+				+ Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY
+				+ "_cellsize_"
+				+ freespeedTravelTimeAccessibilityGrid.getResolution()
+				+ fileExtension + Constants.FILE_TYPE_KMZ);
+		GridUtils.writeKMZFiles(
+				measuringPoints, 
+				walkTravelTimeAccessibilityGrid, 
+				Constants.MATSIM_4_OPUS_TEMP
+				+ Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY
+				+ "_cellsize_"
+				+ walkTravelTimeAccessibilityGrid.getResolution()
+				+ fileExtension + Constants.FILE_TYPE_KMZ);
 		log.info("Writing files done!");
 	}
 	
@@ -316,35 +365,13 @@ public class CellBasedAccessibilityShapeControlerListener implements ShutdownLis
 	 * @param freespeedTravelTimesCarLogSum
 	 * @param accessibilityTravelDistance
 	 */
-	private void setAccessibilityValues2StartZoneAndSpatialGrid(Zone<ZoneAccessibilityObject> startZone,
+	private void setAccessibilityValues2MeasurePointAndSpatialGrid(Zone<CounterObject> startZone,
 												 				double congestedTravelTimesCarLogSum, 
 												 				double freespeedTravelTimesCarLogSum,
 												 				double travelTimesWalkLogSum) {
 
-		startZone.getAttribute().setCongestedTravelTimeAccessibility( congestedTravelTimesCarLogSum );
-		startZone.getAttribute().setFreespeedTravelTimeAccessibility( freespeedTravelTimesCarLogSum );
-		startZone.getAttribute().setWalkTravelTimeAccessibility(travelTimesWalkLogSum );
-		
 		congestedTravelTimeAccessibilityGrid.setValue(congestedTravelTimesCarLogSum , startZone.getGeometry().getCentroid());
 		freespeedTravelTimeAccessibilityGrid.setValue(freespeedTravelTimesCarLogSum , startZone.getGeometry().getCentroid());
 		walkTravelTimeAccessibilityGrid.setValue(travelTimesWalkLogSum , startZone.getGeometry().getCentroid());
-	}
-	
-	// getter methods (this implements AccessibilityControlerInterface)
-	
-	public ZoneLayer<ZoneAccessibilityObject> getStartZones(){
-		return startZones;
-	}
-	public ClusterObject[] getJobObjectMap(){
-		return aggregatedOpportunities;
-	}
-	public SpatialGrid<Double> getCongestedTravelTimeAccessibilityGrid(){
-		return congestedTravelTimeAccessibilityGrid;
-	}
-	public SpatialGrid<Double> getFreespeedTravelTimeAccessibilityGrid(){
-		return freespeedTravelTimeAccessibilityGrid;
-	}
-	public SpatialGrid<Double> getWalkTravelTimeAccessibilityGrid(){
-		return walkTravelTimeAccessibilityGrid;
 	}
 }

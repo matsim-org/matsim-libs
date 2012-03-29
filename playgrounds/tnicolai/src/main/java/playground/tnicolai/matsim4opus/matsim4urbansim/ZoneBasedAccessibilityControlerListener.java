@@ -19,12 +19,11 @@ import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.ZoneBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.ZoneCSVWriter;
-import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**
  *  improvements feb'12
@@ -34,6 +33,8 @@ import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
  *  - using walk travel times instead of travel distances. This is because of the betas that are utils/time unit. The walk time
  *  corresponds to distances since this is also linear.
  * 
+ * This works for UrbanSim Zone and Parcel Applications !!! (march'12)
+ * 
  * @author thomas
  *
  */
@@ -42,7 +43,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListener.class);
 	
 	private ActivityFacilitiesImpl zones; 
-	private ClusterObject[] aggregatedOpportunities;
+	private AggregateObject2NearestNode[] aggregatedOpportunities;
 	
 	private double walkSpeedMeterPerMin = -1;
 	
@@ -51,19 +52,19 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 	/**
 	 * constructor
 	 * @param zones (origin)
-	 * @param aggregatedpportunities (destination)
+	 * @param aggregatedOpportunities (destination)
 	 * @param benchmark
 	 */
 	public ZoneBasedAccessibilityControlerListener(ActivityFacilitiesImpl zones, 
-												   ClusterObject[] aggregatedpportunities, 
+												   AggregateObject2NearestNode[] aggregatedOpportunities, 
 												   Benchmark benchmark){
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListener ...");
 		
 		assert(zones != null);
 		this.zones = zones;
-		assert(aggregatedpportunities != null);
-		this.aggregatedOpportunities = aggregatedpportunities;
+		assert(aggregatedOpportunities != null);
+		this.aggregatedOpportunities = aggregatedOpportunities;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
 		
@@ -116,7 +117,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			log.info("Computing and writing zone based accessibility measures ..." );
 			
 			log.info("Computing and writing grid based accessibility measures with following settings:" );
-			log.info("Depature time (in seconds): " + depatureTime);
+			log.info("Departure time (in seconds): " + depatureTime);
 			log.info("Beta car traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
 			log.info("Beta walk traveling utils/h: " + sc.getConfig().planCalcScore().getTravelingWalk_utils_hr());
 			log.info("Beta performing utils/h: " + sc.getConfig().planCalcScore().getPerforming_utils_hr());
@@ -150,12 +151,12 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				// from here: accessibility computation for current starting point ("fromNode")
 				
 				// captures the euclidean distance between a zone centroid and its nearest node
-//				LinkImpl nearestLink = network.getNearestLink( zones[fromIndex].getZoneCoordinate() );
-//				double distCentroid2Link = nearestLink.calcDistance( zones[fromIndex].getZoneCoordinate() );
-//				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
-				double walkTimeOffset_min = NetworkUtil.getDistance2Node(network.getNearestLink( zones[fromIndex].getZoneCoordinate()), 
-																		 zones[fromIndex].getZoneCoordinate(), 
-																		 fromNode)  / this.walkSpeedMeterPerMin ;
+				LinkImpl nearestLink = network.getNearestLink( zones[fromIndex].getZoneCoordinate() );
+				double distCentroid2Link = nearestLink.calcDistance( zones[fromIndex].getZoneCoordinate() );
+				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
+//				double walkTimeOffset_min = NetworkUtil.getDistance2Node(network.getNearestLink( zones[fromIndex].getZoneCoordinate()), 
+//																		 zones[fromIndex].getZoneCoordinate(), 
+//																		 fromNode)  / this.walkSpeedMeterPerMin;
 //				double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(zones[fromIndex].getZoneCoordinate(), fromNode.getCoord()) / 60.;
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;

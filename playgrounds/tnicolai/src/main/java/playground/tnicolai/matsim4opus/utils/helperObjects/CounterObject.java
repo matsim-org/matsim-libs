@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Zone.java
+ * WorkplaceObject.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.tnicolai.matsim4opus.gis;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * Representation of a spatial zone. This class is just a wrapper for feature of
- * type "Zone" providing some convenience methods.
- * 
- * @author illenberger
  * 
  */
-public class Zone<T> {
+package playground.tnicolai.matsim4opus.utils.helperObjects;
 
-	private final Geometry geometry;
-	
-	private T attribute;
-	
-	/**
-	 * Creates a new zone wrapping <tt>feature</tt>.
-	 * 
-	 * @param feature a feature of type {@link Zone#FEATURE_TYPE_NAME}
-	 */
-	public Zone(Geometry geometry) {
-		this.geometry = geometry;
-	}
-	
-	/**
-	 * Returns the default geometry of the wrapped feature.
-	 * 
-	 * @return the default geometry of the wrapped feature.
-	 */
-	public Geometry getGeometry() {
-		return geometry;
-	}
+/**
+ * @author thomas
+ *
+ */
+public class CounterObject {
 
-	public T getAttribute() {
-		return attribute;
+	public long counter = 0;
+	
+	public CounterObject(){
+		this.counter = 0;
 	}
 	
-	public void setAttribute(T attribute) {
-		this.attribute = attribute;
+	public CounterObject(long counter){
+		this.counter = counter;
 	}
+	
+	public long getCounter(){
+		return this.counter;
+	}
+	
 }
+

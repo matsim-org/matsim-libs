@@ -52,9 +52,9 @@ import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.KMZCellObject;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -78,8 +78,8 @@ public class ERSAControlerListener implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ERSAControlerListener.class);
 	
-	private ClusterObject[] jobClusterArray;
-	private ZoneLayer<ZoneAccessibilityObject> startZones;
+	private AggregateObject2NearestNode[] jobClusterArray;
+	private ZoneLayer<KMZCellObject> startZones;
 	
 	private SpatialGrid<Double> travelTimeAccessibilityGrid;
 	private SpatialGrid<Double> travelCostAccessibilityGrid;
@@ -93,7 +93,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * constructor
 	 * @param jobClusterMap
 	 */
-	ERSAControlerListener(ZoneLayer<ZoneAccessibilityObject> startZones, ClusterObject[] jobClusterArray, 
+	ERSAControlerListener(ZoneLayer<KMZCellObject> startZones, AggregateObject2NearestNode[] jobClusterArray, 
 			SpatialGrid<Double> travelTimeAccessibilityGrid, SpatialGrid<Double> travelCostAccessibilityGrid, 
 			SpatialGrid<Double> travelDistanceAccessibilityGrid, Benchmark benchmark){
 		
@@ -141,7 +141,7 @@ public class ERSAControlerListener implements ShutdownListener{
 			BufferedWriter accessibilityIndicatorWriter = initCSVWriter( sc );
 			
 			log.info("Computing and writing accessibility measures ..." );
-			Iterator<Zone<ZoneAccessibilityObject>> startZoneIterator = startZones.getZones().iterator();
+			Iterator<Zone<KMZCellObject>> startZoneIterator = startZones.getZones().iterator();
 			log.info(startZones.getZones().size() + " measurement points are now processing ...");
 			
 			// addNearestNodeToJobClusterArray( network ); // tnicolai: unnecessary step, since this is now done while gathering workplaces
@@ -153,7 +153,7 @@ public class ERSAControlerListener implements ShutdownListener{
 				
 				bar.update();
 				
-				Zone<ZoneAccessibilityObject> startZone = startZoneIterator.next();
+				Zone<KMZCellObject> startZone = startZoneIterator.next();
 				
 				Point point = startZone.getGeometry().getCentroid();
 				// get coordinate from origin (start point)
@@ -257,16 +257,16 @@ public class ERSAControlerListener implements ShutdownListener{
 		log.info("Aggregating workplaces to their nearest network node and dumping results as csv: " + Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv");
 		
 		// aggregate number of workplaces to their nearest network node and dump out the results
-		Map<Id,WorkplaceObject> aggregatedWorkplaces = new HashMap<Id,WorkplaceObject>();
+		Map<Id,CounterObject> aggregatedWorkplaces = new HashMap<Id,CounterObject>();
 		Map<Id,Node> nearestNode = new HashMap<Id, Node>();
 		for(int i = 0; i < jobClusterArray.length; i++){
 			Id nodeID = jobClusterArray[i].getNearestNode().getId();
 			if(aggregatedWorkplaces.containsKey( nodeID )){
-				WorkplaceObject numWorkplaces = aggregatedWorkplaces.get( nodeID );
+				CounterObject numWorkplaces = aggregatedWorkplaces.get( nodeID );
 				numWorkplaces.counter += jobClusterArray[i].getNumberOfObjects();
 			}
 			else{
-				WorkplaceObject numWorkplaces = new WorkplaceObject();
+				CounterObject numWorkplaces = new CounterObject();
 				numWorkplaces.counter = jobClusterArray[i].getNumberOfObjects();
 				aggregatedWorkplaces.put(nodeID, numWorkplaces);
 				nearestNode.put( nodeID, jobClusterArray[i].getNearestNode());
@@ -320,7 +320,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @param accessibilityTravelCosts
 	 * @param accessibilityTravelDistance
 	 */
-	private void setAccessibilityValue2StartZone(Zone<ZoneAccessibilityObject> startZone,
+	private void setAccessibilityValue2StartZone(Zone<KMZCellObject> startZone,
 			double accessibilityTravelTimes, double accessibilityTravelCosts,
 			double accessibilityTravelDistance) {
 		
@@ -328,9 +328,9 @@ public class ERSAControlerListener implements ShutdownListener{
 		double tc = Math.log( accessibilityTravelCosts );
 		double td =  Math.log( accessibilityTravelDistance);
 		
-		startZone.getAttribute().setCongestedTravelTimeAccessibility( tt < 0.0 ? 0.0 : tt );
-		startZone.getAttribute().setFreespeedTravelTimeAccessibility( tc < 0.0 ? 0.0 : tc );
-		startZone.getAttribute().setWalkTravelTimeAccessibility(td < 0.0 ? 0.0 : td );
+		startZone.getAttribute().setCarAccessibility( tt < 0.0 ? 0.0 : tt );
+		startZone.getAttribute().setCustomAccessibility( tc < 0.0 ? 0.0 : tc );
+		startZone.getAttribute().setWalkAccessibility(td < 0.0 ? 0.0 : td );
 	}
 
 	/**
@@ -338,11 +338,11 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * 
 	 * @param startZone
 	 */
-	private void setAccessiblityValue2SpatialGrid(Zone<ZoneAccessibilityObject> startZone) {
+	private void setAccessiblityValue2SpatialGrid(Zone<KMZCellObject> startZone) {
 		
-		travelTimeAccessibilityGrid.setValue(startZone.getAttribute().getCongestedTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
-		travelCostAccessibilityGrid.setValue(startZone.getAttribute().getFreespeedTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
-		travelDistanceAccessibilityGrid.setValue(startZone.getAttribute().getWalkTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
+		travelTimeAccessibilityGrid.setValue(startZone.getAttribute().getCarAccessibility() , startZone.getGeometry().getCentroid());
+		travelCostAccessibilityGrid.setValue(startZone.getAttribute().getCustomAccessibility() , startZone.getGeometry().getCentroid());
+		travelDistanceAccessibilityGrid.setValue(startZone.getAttribute().getWalkAccessibility() , startZone.getGeometry().getCentroid());
 	}
 
 	/**
@@ -352,15 +352,15 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @throws IOException
 	 */
 	private void dumpCSVData(BufferedWriter accessibilityIndicatorWriter,
-			Zone<ZoneAccessibilityObject> startZone, Coord coordFromZone) throws IOException {
+			Zone<KMZCellObject> startZone, Coord coordFromZone) throws IOException {
 		
 		// dumping results into output file
-		accessibilityIndicatorWriter.write( startZone.getAttribute().getZoneID() + "," +
+		accessibilityIndicatorWriter.write( startZone.getAttribute().getID() + "," +
 											coordFromZone.getX() + "," +
 											coordFromZone.getY() + "," +
-											startZone.getAttribute().getCongestedTravelTimeAccessibility() + "," +
-											startZone.getAttribute().getFreespeedTravelTimeAccessibility() + "," +
-											startZone.getAttribute().getWalkTravelTimeAccessibility() );
+											startZone.getAttribute().getCarAccessibility() + "," +
+											startZone.getAttribute().getCustomAccessibility() + "," +
+											startZone.getAttribute().getWalkAccessibility() );
 		accessibilityIndicatorWriter.newLine();
 	}
 
@@ -407,10 +407,10 @@ public class ERSAControlerListener implements ShutdownListener{
 	
 	// getter methods
 	
-	ZoneLayer<ZoneAccessibilityObject> getStartZones(){
+	ZoneLayer<KMZCellObject> getStartZones(){
 		return startZones;
 	}
-	ClusterObject[] getJobObjectMap(){
+	AggregateObject2NearestNode[] getJobObjectMap(){
 		return jobClusterArray;
 	}
 	SpatialGrid<Double> getTravelTimeAccessibilityGrid(){

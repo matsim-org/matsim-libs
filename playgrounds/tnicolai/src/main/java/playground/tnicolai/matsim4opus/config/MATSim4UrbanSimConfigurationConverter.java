@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.utils;
+package playground.tnicolai.matsim4opus.config;
 
 import java.io.File;
 import java.util.Collections;

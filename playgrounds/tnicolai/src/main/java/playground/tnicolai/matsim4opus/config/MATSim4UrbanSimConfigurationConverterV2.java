@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.utils;
+package playground.tnicolai.matsim4opus.config;
 
 import java.io.File;
 import java.util.Collections;
@@ -29,6 +29,7 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -214,32 +215,34 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		boolean backupRunData 	= matsim4UrbanSimParameter.getUrbansimParameter().isBackupRunData();
 		String testParameter 	= matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
 		
-		// setting opus paths internally
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN, isTestRun ? "TRUE" : "FALSE");
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE, String.valueOf(samplingRate) );
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.OPUS_HOME_PARAM, opusHome );
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.OPUS_DATA_PATH_PARAM, opusDataPath );
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_PARAM, matsim4Opus );
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_CONFIG_PARAM, matsim4OpusConfig );
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_OUTPUT_PARAM, matsim4OpusOutput );
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_TEMP_PARAM, matsim4OpusTemp );
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_BACKUP_PARAM, matsim4OpusBackup );
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.YEAR, String.valueOf(year));
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM, backupRunData ? "TRUE" : "FALSE");
-		scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.TEST_PARAMETER_PARAM, testParameter);
-		// setting paths into constants structure
-		Constants.OPUS_HOME = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.OPUS_HOME_PARAM);
-		Constants.OPUS_DATA_PATH = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.OPUS_DATA_PATH_PARAM);
-		Constants.MATSIM_4_OPUS = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_PARAM);
-		Constants.MATSIM_4_OPUS_CONFIG = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_CONFIG_PARAM);
-		Constants.MATSIM_4_OPUS_OUTPUT = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_OUTPUT_PARAM);
-		Constants.MATSIM_4_OPUS_TEMP = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_TEMP_PARAM);
-		Constants.MATSIM_4_OPUS_BACKUP = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_BACKUP_PARAM);
+		UrbanSimParameterConfigModule module = this.getUrbanSimParameterConfig();
+		module.setPopulationSampleRate(samplingRate);
+		module.setOpportunitySampleRate(1.); // tnicolai, make configurable
+		module.setYear(year);
+		module.setOpusHome(opusHome);
+		module.setOpusDataPath(opusDataPath);
+		module.setMATSim4Opus(matsim4Opus);
+		module.setMATSim4OpusConfig(matsim4OpusConfig);
+		module.setMATSim4OpusOutput(matsim4OpusOutput);
+		module.setMATSim4OpusTemp(matsim4OpusTemp);
+		module.setMATSim4OpusBackup(matsim4OpusBackup);
+		module.setTestParameter(testParameter);
+		module.setBackup(backupRunData);
+		module.setTestRun(isTestRun);	
 		
-		// view results
+		// setting paths into constants structure
+		Constants.OPUS_HOME = module.getOpusHome();
+		Constants.OPUS_DATA_PATH = module.getOpusDataPath();
+		Constants.MATSIM_4_OPUS = module.getMATSim4Opus();
+		Constants.MATSIM_4_OPUS_CONFIG = module.getMATSim4OpusConfig();
+		Constants.MATSIM_4_OPUS_OUTPUT = module.getMATSim4OpusOutput();
+		Constants.MATSIM_4_OPUS_TEMP = module.getMATSim4OpusTemp();
+		Constants.MATSIM_4_OPUS_BACKUP = module.getMATSim4OpusBackup();
+		
 		log.info("UrbanSimParameter settings:");
-		log.info("SamplingRate: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE) );
-		log.info("Year: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ); 
+		log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
+		log.info("OpportunitySamplingRate: " + module.getOpportunitySampleRate() );
+		log.info("Year: " + module.getYear() ); 
 		log.info("OPUS_HOME: " + Constants.OPUS_HOME );
 		log.info("OPUS_DATA_PATH: " + Constants.OPUS_DATA_PATH );
 		log.info("MATSIM_4_OPUS: " + Constants.MATSIM_4_OPUS );
@@ -247,9 +250,9 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		log.info("MATSIM_4_OPUS_OUTPUT: " + Constants.MATSIM_4_OPUS_OUTPUT );
 		log.info("MATSIM_4_OPUS_TEMP: " + Constants.MATSIM_4_OPUS_TEMP ); 
 		log.info("MATSIM_4_OPUS_BACKUP: " + Constants.MATSIM_4_OPUS_BACKUP );
-		log.info("Is Test Run: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN) );
-		log.info("Backing Up Run Data: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM) );
-		log.info("(Custom) Test Parameter: " + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TEST_PARAMETER_PARAM) );
+		log.info("(Custom) Test Parameter: " + module.getTestParameter() );
+		log.info("Backing Up Run Data: " + module.isBackup() );
+		log.info("Is Test Run: " + module.isTestRun() );
 	}
 	
 	/**
@@ -261,6 +264,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		// get every single matsim4urbansim/matsim4urbansimContoler parameter
 		int cellSize 							= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getCellSizeCellBasedAccessibility().intValue();
+		boolean useCustomBoundingBox			= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox();
 		double boundingBoxLeft					= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft();
 		double boundingBoxBottom				= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxBottom();
 		double boundingBoxRight					= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxRight();
@@ -285,32 +289,35 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 				computeCellbasedAccessibilityShapeFile = true;
 		}
 
-		// setting matsim4urbansim controller settings internally
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.CELL_SIZE, String.valueOf(cellSize) );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.BOUNDING_BOX_TOP, String.valueOf(boundingBoxTop) );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.BOUNDING_BOX_LEFT, String.valueOf(boundingBoxLeft) );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.BOUNDING_BOX_RIGHT, String.valueOf(boundingBoxRight) );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.BOUNDING_BOX_BOTTOM, String.valueOf(boundingBoxBottom) );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.CELL_BASED_ACCESSIBILITY_SHAPEFILE, shapeFile );
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_AGENT_PERFORMANCE, computeAgentPerformanceFeedback ? "TRUE" : "FALSE");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_ZONE_2_ZONE_IMPEDANCE, computeZone2ZoneImpedance ? "TRUE" : "FALSE");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_ZONE_BASED_ACCESSIBILITY, computeZoneBasedAccessibility ? "TRUE" : "FALSE");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_CELL_BASED_ACCESSIBILITY_SHAPEFILE, computeCellbasedAccessibilityShapeFile ? "TRUE" : "FALSE");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_CELL_BASED_ACCESSIBILITY_NETWORK, computeCellBasedAccessibilityNetwork ? "TRUE" : "FALSE");
+		MATSim4UrbaSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
+		module.setAgentPerformance(computeAgentPerformanceFeedback);
+		module.setZone2ZoneImpedance(computeZone2ZoneImpedance);
+		module.setZoneBasedAccessibility(computeZoneBasedAccessibility);
+		module.setCellBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility());
+		module.setCellSizeCellBasedAccessibility(cellSize);
+		module.setCellBasedAccessibilityShapeFile(computeCellbasedAccessibilityShapeFile);
+		module.setCellBasedAccessibilityNetwork(computeCellBasedAccessibilityNetwork);
+		module.setShapeFileCellBasedAccessibility(shapeFile);
+		module.setUseCustomBoundingBox(useCustomBoundingBox);
+		module.setBoundingBoxLeft(boundingBoxLeft);
+		module.setBoundingBoxBottom(boundingBoxBottom);
+		module.setBoundingBoxRight(boundingBoxRight);
+		module.setBoundingBoxTop(boundingBoxTop);
 		
 		// view results
 		log.info("MATSim4UrbanSimControler settings:");
-		log.info("Compute Agent-performance: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_AGENT_PERFORMANCE) );
-		log.info("Compute Zone2Zone Impedance Matrix: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_ZONE_2_ZONE_IMPEDANCE) ); 
-		log.info("Compute Zone-Based Accessibilities: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_ZONE_BASED_ACCESSIBILITY) );
-		log.info("Compute Cell-Based Accessibilities (using ShapeFile): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_CELL_BASED_ACCESSIBILITY_SHAPEFILE) ); 
-		log.info("Compute Cell-Based Accessibilities (using Network Boundaries): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.COMPUTE_CELL_BASED_ACCESSIBILITY_NETWORK) );
-		log.info("Cell Size: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.CELL_SIZE) );
-		log.info("Network Boundary (Top): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.BOUNDING_BOX_TOP) ); 
-		log.info("Network Boundary (Left): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.BOUNDING_BOX_LEFT) ); 
-		log.info("Network Boundary (Right): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.BOUNDING_BOX_RIGHT) ); 
-		log.info("Network Boundary (Bottom): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.BOUNDING_BOX_BOTTOM) ); 
-		log.info("Shape File: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_CONTROLER, Constants.CELL_BASED_ACCESSIBILITY_SHAPEFILE) ); 
+		log.info("Compute Agent-performance: " + module.isAgentPerformance() );
+		log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
+		log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
+		log.info("Compute Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
+		log.info("Compute Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
+		log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
+		log.info("Use (Custom) Network Boundaries: " + module.isUseCustomBoundingBox() );
+		log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
+		log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
+		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
+		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
+		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
 	}
 	
 	private void initAccessibilityParameter(Matsim4UrbansimType matsim4UrbanSimParameter){
@@ -339,13 +346,13 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		if(useMATSimCarParameter){
 			// usually travelling_utils are negative
-			betaCarTT 	   	= cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // "marginalCostOfTime"
+			betaCarTT 	   	= cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // "marginalCostOfTime" [utils]
 			betaCarTTPower	= 0.;
 			betaCarLnTT		= 0.;
-			betaCarTD		= 0.; // tnicolai: was ist die utility von Distanz??? Es geht um die Überwinding von Distanz und die dabei entstehenden Kosten s.u. betaCarTC
-			betaCarTDPower	= 0.; // alle TravelDistance betas löschen ???
+			betaCarTD		= cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar(); // this is [1/money * money/meter] = [1/meter]
+			betaCarTDPower	= 0.;
 			betaCarLnTD		= 0.;
-			betaCarTC		= cnScoringGroup.getMarginalUtilityOfMoney();
+			betaCarTC		= cnScoringGroup.getMarginalUtilityOfMoney(); // [1/money]
 			betaCarTCPower	= 0.;
 			betaCarLnTC		= 0.;
 		}
@@ -363,13 +370,13 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		if(useMATSimWalkParameter){
 			// usually travelling_utils are negative
-			betaWalkTT		= cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // "marginalCostOfTime"
+			betaWalkTT		= cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // "marginalCostOfTime"  [utils]
 			betaWalkTTPower	= 0.;
 			betaWalkLnTT	= 0.;
-			betaWalkTD		= 0.; // tnicolai: was ist die utility von Distanz??? Es geht um die Überwinding von Distanz und die dabei entstehenden Kosten s.u. betaWalkTC
-			betaWalkTDPower	= 0.; // alle TravelDistance betas löschen ???
+			betaWalkTD		= cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMarginalUtlOfDistanceWalk(); // no distanceCostRateWalk available, is marginalUtlOfDistanceWalk right? [1/money * money/meter] = [1/meter]
+			betaWalkTDPower	= 0.;																						  // make sure getMarginalUtlOfDistanceWalk is set in (standard) config 
 			betaWalkLnTD	= 0.;
-			betaWalkTC		= cnScoringGroup.getMarginalUtlOfDistanceWalk();
+			betaWalkTC		= cnScoringGroup.getMarginalUtilityOfMoney(); // [1/money]
 			betaWalkTCPower	= 0.;
 			betaWalkLnTC	= 0.;
 		}
@@ -384,55 +391,57 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 			betaWalkTCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelCostPower2();
 			betaWalkLnTC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelCost();
 		}
-
-		// setting values internally
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.COMPUTE_RAW_SUM, String.valueOf(useRawSum) );
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.LOGIT_SCALE_PARAMETER, String.valueOf(logitScaleParameter) );
-		// CAR values
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES, String.valueOf(betaCarTT) );
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES_POWER, String.valueOf(betaCarTTPower));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_TIMES, String.valueOf(betaCarLnTT));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE, String.valueOf(betaCarTD));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE_POWER, String.valueOf(betaCarTDPower));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_DISTANCE, String.valueOf(betaCarLnTD));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS, String.valueOf(betaCarTC));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS_POWER, String.valueOf(betaCarTCPower));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_COSTS, String.valueOf(betaCarLnTC));
-		// WALK values TODO:
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_TIMES, String.valueOf(betaWalkTT));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_TIMES_POWER, String.valueOf(betaWalkTTPower));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_LN_TRAVEL_TIMES, String.valueOf(betaWalkLnTT));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_DISTANCE, String.valueOf(betaWalkTD));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_DISTANCE_POWER, String.valueOf(betaWalkTDPower));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_LN_TRAVEL_DISTANCE, String.valueOf(betaWalkLnTD));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_COSTS, String.valueOf(betaWalkTC));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_COSTS_POWER, String.valueOf(betaWalkTCPower));
-		scenario.getConfig().setParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_LN_TRAVEL_COSTS, String.valueOf(betaWalkLnTC));
+		
+		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
+		module.setUseLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
+		module.setUseRawSumsWithoutLn(useRawSum);
+		module.setUseCarParameterFromMATSim(useMATSimCarParameter);
+		module.setUseWalkParameterFromMATSim(useMATSimWalkParameter);
+		module.setLogitScaleParameter(logitScaleParameter);
+		module.setBetaCarTravelTime(betaCarTT);
+		module.setBetaCarTravelTimePower2(betaCarTTPower);
+		module.setBetaCarLnTravelTime(betaCarLnTT);
+		module.setBetaCarTravelDistance(betaCarTD);
+		module.setBetaCarTravelDistancePower2(betaCarTDPower);
+		module.setBetaCarLnTravelDistance(betaCarLnTD);
+		module.setBetaCarTravelCost(betaCarTC);
+		module.setBetaCarTravelCostPower2(betaCarTCPower);
+		module.setBetaCarLnTravelCost(betaCarLnTC);
+		module.setBetaWalkTravelTime(betaWalkTT);
+		module.setBetaWalkTravelTimePower2(betaWalkTTPower);
+		module.setBetaWalkLnTravelTime(betaWalkLnTT);
+		module.setBetaWalkTravelDistance(betaWalkTD);
+		module.setBetaWalkTravelDistancePower2(betaWalkTDPower);
+		module.setBetaWalkLnTravelDistance(betaWalkLnTD);
+		module.setBetaWalkTravelCost(betaWalkTC);
+		module.setBetaWalkTravelCostPower2(betaWalkTCPower);
+		module.setBetaWalkLnTravelCost(betaWalkLnTC);
+		
 		
 		// view results
 		log.info("AccessibilityParameter settings:");
-		log.info("Compute raw sum (not logsum): " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.COMPUTE_RAW_SUM) );
-		log.info("Logit Scale Parameter: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.LOGIT_SCALE_PARAMETER) ); 
+		log.info("Compute raw sum (not logsum): " + module.isUseRawSumsWithoutLn() );
+		log.info("Logit Scale Parameter: " + module.isUseLogitScaleParameterFromMATSim() ); 
 		
-		log.info("BETA_CAR_TRAVEL_TIMES: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES) );
-		log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES_POWER) );
-		log.info("BETA_CAR_LN_TRAVEL_TIMES: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_TIMES) );
-		log.info("BETA_CAR_TRAVEL_DISTANCE: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE) );
-		log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE_POWER) );
-		log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_DISTANCE) );
-		log.info("BETA_CAR_TRAVEL_COSTS: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS) );
-		log.info("BETA_CAR_TRAVEL_COSTS_POWER: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS_POWER) );
-		log.info("BETA_CAR_LN_TRAVEL_COSTS: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_COSTS) );
+		log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
+		log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
+		log.info("BETA_CAR_LN_TRAVEL_TIMES: " + module.getBetaCarLnTravelTime());
+		log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
+		log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + module.getBetaCarTravelDistancePower2() );
+		log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + module.getBetaCarLnTravelDistance() );
+		log.info("BETA_CAR_TRAVEL_COSTS: " + module.getBetaCarTravelCost() );
+		log.info("BETA_CAR_TRAVEL_COSTS_POWER: " + module.getBetaCarTravelCostPower2() );
+		log.info("BETA_CAR_LN_TRAVEL_COSTS: " + module.getBetaCarLnTravelCost());
 		
-		log.info("BETA_WALK_TRAVEL_TIMES: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_TIMES) );
-		log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_TIMES_POWER) );
-		log.info("BETA_WALK_LN_TRAVEL_TIMES: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_LN_TRAVEL_TIMES) );
-		log.info("BETA_WALK_TRAVEL_DISTANCE: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_DISTANCE) );
-		log.info("BETA_WALK_TRAVEL_DISTANCE_POWER: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_DISTANCE_POWER) );
-		log.info("BETA_WALK_LN_TRAVEL_DISTANCE: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_LN_TRAVEL_DISTANCE) );
-		log.info("BETA_WALK_TRAVEL_COSTS: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_COSTS) );
-		log.info("BETA_WALK_TRAVEL_COSTS_POWER: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_TRAVEL_COSTS_POWER) );
-		log.info("BETA_WALK_LN_TRAVEL_COSTS: " + scenario.getConfig().getParam(Constants.ACCESSIBILITY_PARAMETER, Constants.BETA_WALK_LN_TRAVEL_COSTS) );
+		log.info("BETA_WALK_TRAVEL_TIMES: " + module.getBetaWalkTravelTime()  );
+		log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + module.getBetaWalkTravelTimePower2() );
+		log.info("BETA_WALK_LN_TRAVEL_TIMES: " + module.getBetaWalkLnTravelTime() );
+		log.info("BETA_WALK_TRAVEL_DISTANCE: " + module.getBetaWalkTravelDistance() );
+		log.info("BETA_WALK_TRAVEL_DISTANCE_POWER: " + module.getBetaWalkTravelDistancePower2() );
+		log.info("BETA_WALK_LN_TRAVEL_DISTANCE: " + module.getBetaWalkLnTravelDistance() );
+		log.info("BETA_WALK_TRAVEL_COSTS: " + module.getBetaWalkTravelCost() );
+		log.info("BETA_WALK_TRAVEL_COSTS_POWER: " + module.getBetaWalkTravelCostPower2() );
+		log.info("BETA_WALK_LN_TRAVEL_COSTS: " + module.getBetaWalkLnTravelCost() );
 	}
 	/**
 	 * setting MATSim network
@@ -463,30 +472,32 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		// get plans file for warm start 
 		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
 		
+		MATSim4UrbaSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
+		
 		// setting plans file as input
 		if( !hotStart.equals("") &&
 		  (new File(hotStart)).exists() ){
 			log.info("Hot Start detcted!");
 			setPlansFile( hotStart );
-			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE, Constants.HOT_START);
+			module.setHotStart(true);
 		}
 		else if( !warmStart.equals("") ){
 			log.info("Warm Start detcted!");
 			setPlansFile( warmStart );
-			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE, Constants.WARM_START);
+			module.setWarmStart(true);
 		}
 		else{
 			log.info("Cold Start (no plans file) detected!");
-			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE, Constants.COLD_START);
+			module.setColdStart(true);
 		}
 		
 		// setting target location for hot start plans file
 		if(!hotStart.equals("")){
 			log.info("Storing plans file from current run. This enables hot start for next MATSim run.");
-			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE, hotStart);
+			module.setHotStartTargetLocation(hotStart);
 		}
 		else
-			scenario.getConfig().setParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE, "");
+			module.setHotStartTargetLocation("");
 	}
 
 	/**
@@ -619,7 +630,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		// last iteration for them determined here tnicolai feb'12
 		int disableStrategyAfterIteration = (int) Math.ceil(scenario.getConfig().controler().getLastIteration() * 0.8);
 		
-		// configure strategies for re-planning (shoulbe something like 5)
+		// configure strategies for re-planning (should be something like 5)
 		scenario.getConfig().strategy().setMaxAgentPlanMemorySize( matsimParameter.getStrategy().getMaxAgentPlanMemorySize().intValue() );
 		
 		// clear if any strategy is defined
@@ -657,7 +668,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 	 */
 	private void initPlanCalcRoute(){
 		log.info("Setting PlanCalcRouteGroup to config...");
-		scenario.getConfig().plansCalcRoute().setWalkSpeed(0.833333333333333); // 1.38888889m/s corresponds to 5km/h -- and -- 0.833333333333333m/s corresponds to 3km/h
+		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- and -- 0.833333333333333m/s corresponds to 3km/h
 		log.info("PlanCalcRouteGroup settings:");
 		log.info("WalkSpeed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
 		log.info("...done!");
@@ -665,6 +676,36 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 	
 	public ScenarioImpl getScenario(){
 			return scenario;
+	}
+	
+	public AccessibilityParameterConfigModule getAccessibilityParameterConfig() {
+		Module m = this.scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		if (m instanceof AccessibilityParameterConfigModule) {
+			return (AccessibilityParameterConfigModule) m;
+		}
+		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		this.scenario.getConfig().getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
+		return apcm;
+	}
+	
+	public MATSim4UrbaSimControlerConfigModule getMATSim4UrbaSimControlerConfig() {
+		Module m = this.scenario.getConfig().getModule(MATSim4UrbaSimControlerConfigModule.GROUP_NAME);
+		if (m instanceof MATSim4UrbaSimControlerConfigModule) {
+			return (MATSim4UrbaSimControlerConfigModule) m;
+		}
+		MATSim4UrbaSimControlerConfigModule mccm = new MATSim4UrbaSimControlerConfigModule(MATSim4UrbaSimControlerConfigModule.GROUP_NAME);
+		this.scenario.getConfig().getModules().put(MATSim4UrbaSimControlerConfigModule.GROUP_NAME, mccm);
+		return mccm;
+	}
+	
+	public UrbanSimParameterConfigModule getUrbanSimParameterConfig() {
+		Module m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModule.GROUP_NAME);
+		if (m instanceof UrbanSimParameterConfigModule) {
+			return (UrbanSimParameterConfigModule) m;
+		}
+		UrbanSimParameterConfigModule upcm = new UrbanSimParameterConfigModule(UrbanSimParameterConfigModule.GROUP_NAME);
+		this.scenario.getConfig().getModules().put(UrbanSimParameterConfigModule.GROUP_NAME, upcm);
+		return upcm;
 	}
 	
 	// Testing fetch  factor calculation for storageCap 

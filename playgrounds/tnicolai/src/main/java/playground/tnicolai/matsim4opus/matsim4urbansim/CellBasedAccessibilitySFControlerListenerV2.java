@@ -21,34 +21,31 @@ import org.matsim.utils.LeastCostPathTree;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
-import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.CellBasedAccessibilityCSVWriter;
 
 import com.vividsolutions.jts.geom.Point;
 
-public class CellBasedAccessibilitySFControlerListenerV2 extends CellBasedAcessibilityControlerListener{
+public class CellBasedAccessibilitySFControlerListenerV2 extends CellBasedAccessibilityControlerListenerV2{
 	
 	private static final Logger log = Logger.getLogger(CellBasedAccessibilitySFControlerListenerV2.class);
 	
-	public CellBasedAccessibilitySFControlerListenerV2(ZoneLayer<ZoneAccessibilityObject> startZones, 			// needed for google earth plots (not supported by now tnicolai feb'12)
-													 ClusterObject[] aggregatedOpportunities, 					// destinations (like workplaces)
-													 SpatialGrid<Double> congestedTravelTimeAccessibilityGrid, 	// table for congested car travel times in accessibility computation
-													 SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid,	// table for freespeed car travel times in accessibility computation
-													 SpatialGrid<Double> walkTravelTimeAccessibilityGrid, 		// table for walk travel times in accessibility computation
+	public CellBasedAccessibilitySFControlerListenerV2(ZoneLayer<CounterObject> startZones, 					// needed for google earth plots (not supported by now tnicolai feb'12)
+													 AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
+													 SpatialGrid<Double> carGrid, 								// table for congested car travel times in accessibility computation
+													 SpatialGrid<Double> walkGrid, 								// table for walk travel times in accessibility computation
 													 Benchmark benchmark, 										// Benchmark tool
 													 ScenarioImpl scenario){
 		super(startZones, 
 				aggregatedOpportunities,
-				congestedTravelTimeAccessibilityGrid,
-				freespeedTravelTimeAccessibilityGrid,
-				walkTravelTimeAccessibilityGrid, 
+				carGrid,
+				walkGrid, 
 				benchmark,
 				scenario);
 	}
@@ -56,7 +53,7 @@ public class CellBasedAccessibilitySFControlerListenerV2 extends CellBasedAcessi
 	@Override
 	public void notifyShutdown(ShutdownEvent event){
 		
-log.info("Entering notifyShutdown ..." );
+		log.info("Entering notifyShutdown ..." );
 		
 		int benchmarkID = this.benchmark.addMeasure("1-Point accessibility computation");
 		
@@ -77,21 +74,21 @@ log.info("Entering notifyShutdown ..." );
 		double logitScaleParameterPreFactor = 1/(logitScaleParameter);
 
 		try{
-			CellBasedAccessibilityCSVWriter accCsvWriter = new CellBasedAccessibilityCSVWriter(this.sfSuffix);
+			CellBasedAccessibilityCSVWriter accCsvWriter = new CellBasedAccessibilityCSVWriter("");
 			
 			printSettings();
 			
-			Iterator<Zone<ZoneAccessibilityObject>> startZoneIterator = startZones.getZones().iterator();
-			log.info(startZones.getZones().size() + " measurement points are now processing ...");
+			Iterator<Zone<CounterObject>> startZoneIterator = measuringPoints.getZones().iterator();
+			log.info(measuringPoints.getZones().size() + " measurement points are now processing ...");
 			
-			ProgressBar bar = new ProgressBar( startZones.getZones().size() );
+			ProgressBar bar = new ProgressBar( measuringPoints.getZones().size() );
 		
 			// iterates through all starting points (fromZone) and calculates their workplace accessibility
 			while( startZoneIterator.hasNext() ){
 				
 				bar.update();
 				
-				Zone<ZoneAccessibilityObject> startZone = startZoneIterator.next();
+				Zone<CounterObject> startZone = startZoneIterator.next();
 				
 				Point point = startZone.getGeometry().getCentroid();
 				// get coordinate from origin (start point)
@@ -116,14 +113,14 @@ log.info("Entering notifyShutdown ..." );
 				double sumWALK= 0.;	
 
 				// go through all jobs (nearest network node) and calculate workplace accessibility
-				for ( int i = 0; i < this.aggregatedWorkplaces.length; i++ ) {
+				for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
 					
 					// get stored network node (this is the nearest node next to an aggregated workplace)
-					Node destinationNode = this.aggregatedWorkplaces[i].getNearestNode();
+					Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 
 					// using number of aggregated workplaces as weight for log sum measure
-					int opportunityWeight = this.aggregatedWorkplaces[i].getNumberOfObjects();
+					int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
 
 					// congested car travel times in hours
 					double arrivalTime = lcptCongestedCarTravelTime.getTree().get( nodeID ).getTime();
@@ -176,7 +173,6 @@ log.info("Entering notifyShutdown ..." );
 				// assign log sums to current starZone object and spatial grid
 				setAccessibilityValues2StartZoneAndSpatialGrid(startZone,
 															   carAccessibility, 
-															   -1,
 															   walkAccessibility);
 				
 				// writing accessibility values (stored in starZone object) in csv format ...
@@ -191,7 +187,7 @@ log.info("Entering notifyShutdown ..." );
 			
 			if( this.benchmark != null && benchmarkID > 0 ){
 				this.benchmark.stoppMeasurement(benchmarkID);
-				log.info("Accessibility computation with " + startZones.getZones().size() + " starting points (origins) and " + this.aggregatedWorkplaces.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
+				log.info("Accessibility computation with " + measuringPoints.getZones().size() + " starting points (origins) and " + this.aggregatedOpportunities.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
 			}
 			accCsvWriter.close();
 			dumpResults();

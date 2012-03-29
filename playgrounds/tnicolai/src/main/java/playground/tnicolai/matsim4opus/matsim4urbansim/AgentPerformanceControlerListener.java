@@ -23,13 +23,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 
-public class PersonsControlerListener implements ShutdownListener{
+public class AgentPerformanceControlerListener implements ShutdownListener{
 
-	private static final Logger log = Logger.getLogger(PersonsControlerListener.class);
+	private static final Logger log = Logger.getLogger(AgentPerformanceControlerListener.class);
 	
 	private Benchmark benchmark;
 	
-	public PersonsControlerListener(Benchmark benchmark){
+	public AgentPerformanceControlerListener(Benchmark benchmark){
 		this.benchmark = benchmark;
 	}
 	

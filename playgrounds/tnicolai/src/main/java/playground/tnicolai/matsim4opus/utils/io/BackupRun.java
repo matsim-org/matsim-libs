@@ -8,6 +8,9 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.tnicolai.matsim4opus.config.ConfigurationModule;
+import playground.tnicolai.matsim4opus.config.MATSim4UrbaSimControlerConfigModule;
+import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.DateUtil;
 
@@ -18,9 +21,10 @@ public class BackupRun {
 	
 	public static void runBackup(ScenarioImpl scenario){
 		
-		String value = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM);
+//		String value = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM);
+		UrbanSimParameterConfigModule module = ConfigurationModule.getUrbanSimParameterConfigModule(scenario);
 		
-		if( value.equalsIgnoreCase("TRUE") ){
+		if( module.isBackup() ){
 			// saving results from current run
 			saveRunOutputs(scenario);
 			prepareHotStart(scenario);
@@ -34,7 +38,9 @@ public class BackupRun {
 	private static void saveRunOutputs(ScenarioImpl scenario) {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 		
-		String currentYear = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR);
+//		String currentYear = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR);
+		UrbanSimParameterConfigModule module = ConfigurationModule.getUrbanSimParameterConfigModule(scenario);
+		int currentYear = module.getYear();
 		int lastIteration = scenario.getConfig().controler().getLastIteration();
 		
 		String saveDirectory = "run" + currentYear + "-" + DateUtil.now();
@@ -72,14 +78,15 @@ public class BackupRun {
 	 */
 	private static void prepareHotStart(ScenarioImpl scenario){
 		
-		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
+//		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
+		MATSim4UrbaSimControlerConfigModule module = ConfigurationModule.getMATSim4UrbaSimControlerConfigModule(scenario);
 		
-		if(!targetLocationHotStartFile.equals("")){
+		if(!module.getHotStartTargetLocation().equals("")){
 			
 			String plansFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME;
 			
 			log.info("Preparing hot start for next MATSim run ...");
-			boolean success = FileCopy.moveFileOrDirectory(plansFile, targetLocationHotStartFile);
+			boolean success = FileCopy.moveFileOrDirectory(plansFile, module.getHotStartTargetLocation());
 			if(success)
 				log.info("Hot start preparation successful!");
 			else

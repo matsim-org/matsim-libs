@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 
 public class WorkplaceCSVWriter {
@@ -20,7 +20,7 @@ public class WorkplaceCSVWriter {
 	 * @param file
 	 * @param jobClusterArray
 	 */
-	public static void writeAggregatedWorkplaceData2CSV(final String file, final ClusterObject[] jobClusterArray){
+	public static void writeAggregatedWorkplaceData2CSV(final String file, final AggregateObject2NearestNode[] jobClusterArray){
 		
 		try{
 			log.info("Dumping aggregated workplace information as csv to " + file + " ...");

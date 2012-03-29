@@ -21,7 +21,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class OSM2MATSimNetwork {
 
 	public static void main(String[] args) {
-		String osm = "/Users/thomas/Downloads/merged-network.osm";
+		String osm = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/archive/belgium_incl_borderArea.osm";
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network net = sc.getNetwork();

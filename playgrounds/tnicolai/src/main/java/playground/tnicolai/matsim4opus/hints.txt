@@ -1,0 +1,6 @@
+Enable OSM Background in OTFVis:
+- use "standard MATSim config and enter 2 parameter:
+- in module "global" enter the coordinate system of the study area like (Brussels): <param name="coordinateSystem" value="EPSG:31300" />
+- in module "otfvis" enable mapOverlyMode : <param name="mapOverlayMode" value="true" />
+
+---

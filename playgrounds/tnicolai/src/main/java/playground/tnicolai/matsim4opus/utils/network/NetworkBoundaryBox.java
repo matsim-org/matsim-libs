@@ -7,10 +7,10 @@ import org.matsim.core.utils.misc.NetworkUtils;
 public class NetworkBoundaryBox {
 	
 	// Logger
-	private static final Logger log = Logger.getLogger(NetworkBoundaryBox.class);
-	private static double boundingBox [] = null;
+	private final Logger log = Logger.getLogger(NetworkBoundaryBox.class);
+	private double boundingBox [] = null;
 	
-	public static void setCustomBoundaryBox(double xmin, double ymin, double xmax, double ymax){
+	public void setCustomBoundaryBox(double xmin, double ymin, double xmax, double ymax){
 		
 		log.info("Setting custom bounding box ...");
 		
@@ -23,7 +23,7 @@ public class NetworkBoundaryBox {
 		log.info("...done!");
 	}
 	
-	public static void setDefaultBoundaryBox(Network network){
+	public void setDefaultBoundaryBox(Network network){
 		
 		if(boundingBox != null)
 			log.warn("Bounding box is already initialized and will not be overwritten!");
@@ -35,7 +35,7 @@ public class NetworkBoundaryBox {
 		}
 	}
 	
-	public static double[] getBoundingBox(){
-		return NetworkBoundaryBox.boundingBox;
+	public double[] getBoundingBox(){
+		return this.boundingBox;
 	}
 }

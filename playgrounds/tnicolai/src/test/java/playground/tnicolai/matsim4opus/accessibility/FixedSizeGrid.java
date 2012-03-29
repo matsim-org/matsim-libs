@@ -14,7 +14,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
 public class FixedSizeGrid {
@@ -25,7 +25,7 @@ public class FixedSizeGrid {
 	public static void main(String[] args) {
 
 		NetworkImpl network = SpatialGridFillOrder.createNetwork();
-		ClusterObject[] dummyJobClusterArray = SpatialGridFillOrder.createWorkplaces(network);
+		AggregateObject2NearestNode[] dummyJobClusterArray = SpatialGridFillOrder.createWorkplaces(network);
 		Map<Id, Double> resultMap = SpatialGridFillOrder.travelTimeAccessibility(network, dummyJobClusterArray);
 		
 		Bin[] binArray = createBins( network, resultMap );

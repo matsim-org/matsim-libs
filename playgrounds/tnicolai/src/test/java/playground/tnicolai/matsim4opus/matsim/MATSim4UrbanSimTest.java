@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.tnicolai.matsim4opus.matsim4urbansim.MATSim4UrbanSim;
+import playground.tnicolai.matsim4opus.matsim4urbansim.archive.MATSim4UrbanSim;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
 
 

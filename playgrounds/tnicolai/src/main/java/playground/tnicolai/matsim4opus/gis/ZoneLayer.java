@@ -82,7 +82,6 @@ public class ZoneLayer<T> {
 		this.crs = crs;
 		this.srid = CRSUtils.getSRID(crs);
 		for(Zone<?> zone : zones) {
-//			zone.getFeature().getDefaultGeometry().setSRID(srid);
 			zone.getGeometry().setSRID(srid);
 		}
 	}

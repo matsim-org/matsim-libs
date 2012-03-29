@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.matsim4urbansim;
+package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
@@ -6,8 +6,8 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.matsim4urbansim.archive.GridBasedAccessibilityControlerListener;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
+import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
 public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
@@ -75,7 +75,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		log.info("### DONE with demand generation from UrbanSim ###");
 		
 		// gather all workplaces, workplaces are aggregated with respect to their nearest Node
-		ClusterObject[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network);
+		AggregateObject2NearestNode[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network);
 		
 		// Running the controler
 		Controler controler = new Controler(scenario);
@@ -83,7 +83,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		//controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionFeet, resolutionMeter, this.benchmark) );
-		controler.addControlerListener( new GridBasedAccessibilityControlerListener(aggregatedWorkplaces, resolutionMeter, benchmark));
+//		controler.addControlerListener( new GridBasedAccessibilityControlerListener(aggregatedWorkplaces, resolutionMeter, benchmark));
 		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener(zones, parcels));
 		
 		controler.run();

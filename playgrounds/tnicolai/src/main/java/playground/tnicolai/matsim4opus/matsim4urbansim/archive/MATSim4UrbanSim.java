@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.tnicolai.matsim4opus.matsim4urbansim;
+package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
 
 
 import java.io.File;
@@ -42,17 +42,18 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.tnicolai.matsim4opus.config.JAXBUnmaschal;
+import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverter;
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
+import playground.tnicolai.matsim4opus.matsim4urbansim.ZoneBasedAccessibilityControlerListener;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
 import playground.tnicolai.matsim4opus.utils.DateUtil;
-import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConverter;
-import playground.tnicolai.matsim4opus.utils.JAXBUnmaschal;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.FileCopy;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
-import playground.tnicolai.matsim4opus.utils.network.NetworkRemoveUnusedNodes;
 
 
 /**
@@ -127,7 +128,7 @@ public class MATSim4UrbanSim {
 		modifyPopulation(newPopulation);
 		benchmark.stoppMeasurement(pc);
 		System.out.println("Population construction took: " + benchmark.getDurationInSeconds( pc ) + " seconds.");
-		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
+		Map<Id,CounterObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
 
 		log.info("### DONE with demand generation from urbansim ###");
 
@@ -209,7 +210,7 @@ public class MATSim4UrbanSim {
 	 * 
 	 * @return HashMap
 	 */
-	Map<Id,WorkplaceObject> ReadUrbansimJobs(ReadFromUrbansimParcelModel readFromUrbansim){
+	Map<Id,CounterObject> ReadUrbansimJobs(ReadFromUrbansimParcelModel readFromUrbansim){
 		return readFromUrbansim.readZoneBasedWorkplaces();
 	}
 	
@@ -217,7 +218,7 @@ public class MATSim4UrbanSim {
 	 * run simulation
 	 * @param zones
 	 */
-	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, 
+	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Map<Id,CounterObject> numberOfWorkplacesPerZone, 
 			ReadFromUrbansimParcelModel readFromUrbansim){
 		
 		Controler controler = new Controler(scenario);
@@ -225,7 +226,7 @@ public class MATSim4UrbanSim {
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, parcels) ); 	// creates zone2zone impedance matrix
+//		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, parcels) ); 	// creates zone2zone impedance matrix
 		controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				// creates zone based table of log sums (workplce accessibility)
 																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., (NetworkImpl) scenario.getNetwork()), 
 																					benchmark));

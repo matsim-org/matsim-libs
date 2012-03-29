@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.matsim4urbansim;
+package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -35,7 +35,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
 
@@ -88,7 +88,7 @@ class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 		
 		readUrbansimParcelModel(readFromUrbansim, facilities, zones);
 		Population newPopulation = readUrbansimPersons(readFromUrbansim, facilities, network);
-		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
+		Map<Id,CounterObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
 		
 		log.info("### DONE with demand generation from urbansim ###") ;
 

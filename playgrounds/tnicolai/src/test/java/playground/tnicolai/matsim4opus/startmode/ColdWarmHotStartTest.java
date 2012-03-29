@@ -34,11 +34,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.tnicolai.matsim4opus.config.JAXBUnmaschal;
+import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverter;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
 import playground.tnicolai.matsim4opus.matsimTestData.MATSimRunMode;
-import playground.tnicolai.matsim4opus.utils.MATSim4UrbanSimConfigurationConverter;
-import playground.tnicolai.matsim4opus.utils.JAXBUnmaschal;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel.PopulationCounter;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;

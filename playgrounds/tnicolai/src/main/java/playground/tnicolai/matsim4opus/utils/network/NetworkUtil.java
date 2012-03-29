@@ -24,14 +24,21 @@ public class NetworkUtil {
 	 */
 	public static double getOrthogonalDistance(Link link, Coord point){
 		
+		return getOrthogonalDistance(link, point.getX(), point.getY());
+	}
+	
+	public static double getOrthogonalDistance(Link link, Point point){
+		
+		return getOrthogonalDistance(link, point.getX(), point.getY());
+	}
+	
+	private static double getOrthogonalDistance(Link link, double pointx, double pointy){
+		
 		double ax = link.getFromNode().getCoord().getX();
 		double ay = link.getFromNode().getCoord().getY();
 		double bx = link.getToNode().getCoord().getX();
 		double by = link.getToNode().getCoord().getY();
-		
-		double pointx = point.getX();
-		double pointy = point.getY();
-		
+
 		double normalzation = Math.sqrt( Math.pow( bx - ax , 2) + Math.pow( by - ay, 2));
 		double distance = Math.abs( ((pointx - ax) * (by - ay)) - ((pointy -ay) * (bx - ax)) );
 		
@@ -53,62 +60,114 @@ public class NetworkUtil {
 	 */
 	public static double getDistance2Node(LinkImpl link, Coord point, Node destinationNode){
 		
+		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
+	}
+	
+	/**
+	 * in accessibility computation travel costs are calculated between a start and an end node.
+	 * the distance to a start node is calculated as follows:
+	 * 1) the orthogonal distance between a start point and the nearest network link is calculated than ...
+	 * 2) the distance between the intersection (of the projection of the start point) on the network link to the "start" node is taken.
+	 * than it returns the distances of (1) + (2)
+	 * 
+	 * @param link
+	 * @param point
+	 * @param destinationNode
+	 * @return
+	 */
+	public static double getDistance2Node(LinkImpl link, Point point, Node destinationNode){
+		
+		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
+	}
+	
+	private static double getDistance2Node(LinkImpl link, double pointx, double pointy, Node destinationNode){
+		
 		double ax = link.getFromNode().getCoord().getX();
 		double ay = link.getFromNode().getCoord().getY();
 		double bx = link.getToNode().getCoord().getX();
 		double by = link.getToNode().getCoord().getY();
 		
-		double pointx = point.getX();
-		double pointy = point.getY();
-		
-		double normalzation = Math.sqrt( Math.pow( bx - ax , 2) + Math.pow( by - ay, 2));
+		double normalzation = Math.sqrt( (bx - ax)*(bx - ax) + (by - ay)*(by - ay));
 		double distance = Math.abs( ((pointx - ax) * (by - ay)) - ((pointy -ay) * (bx - ax)) );
 		
-		double linkVectorX = bx - ax;
-		double linkVectorY = by - ay;
+		double bax = bx - ax;
+		double bay = by - ay;
 		
-		double projectionVectorX = pointx - ax;
-		double projectionVectorY = pointy - ay;
+		double pax = pointx - ax;
+		double pay = pointy - ay;
 		
-		double numerator = projectionVectorX * linkVectorX + projectionVectorY * linkVectorY;
-		double denominator = Math.pow(linkVectorX, 2) + Math.pow(linkVectorY, 2);
+		double numerator = pax * bax + pay * bay;
+		double denominator = bax*bax + bay*bay;
+		double fraction = numerator/denominator; 
+		double vectorx = bax * fraction;
+		double vectory = bay * fraction;
 		
-		double interscetionx = (linkVectorX * numerator) / denominator;
-		double interscetiony = (linkVectorY * numerator) / denominator;
+		double intersectionx = ax + vectorx;
+		double intersectiony = ay + vectory;
 		
-		double distance2DestinationNode = Math.abs( (interscetionx - linkVectorX) + (interscetiony - linkVectorY));
+		double distance2DestinationNode = Math.sqrt( (intersectionx - destinationNode.getCoord().getX())*(intersectionx - destinationNode.getCoord().getX()) + (intersectiony - destinationNode.getCoord().getY())*(intersectiony - destinationNode.getCoord().getY()));
 		
 		return (distance/normalzation) + distance2DestinationNode;
 	}
 	
-	public static double getDistance2Node(LinkImpl link, Point point, Node destinationNode){
+	/**
+	 * this is just another implementation of getDistance2Node, its implemented to test whether a faster implementation
+	 * is possible. However, getDistance2Node is faster. Don't use this method
+	 * 
+	 * @param link
+	 * @param point
+	 * @param destinationNode
+	 * @return
+	 */
+	@Deprecated
+	public static double  getDistance2NodeV2(LinkImpl link, Coord point, Node destinationNode){
+		return getDistance2NodeV2(link, point.getX(), point.getY(), destinationNode);
+	}
+	
+	/**
+	 * this is just another implementation of getDistance2Node, its implemented to test whether a faster implementation
+	 * is possible. However, getDistance2Node is faster. Don't use this method
+	 * 
+	 * @param link
+	 * @param point
+	 * @param destinationNode
+	 * @return
+	 */
+	@Deprecated
+	public static double  getDistance2NodeV2(LinkImpl link, Point point, Node destinationNode){
+		return getDistance2NodeV2(link, point.getX(), point.getY(), destinationNode);
+	}
+	
+	@Deprecated
+	private static double getDistance2NodeV2(LinkImpl link, double pointx, double pointy, Node destinationNode){
 		
+		// line A B
 		double ax = link.getFromNode().getCoord().getX();
 		double ay = link.getFromNode().getCoord().getY();
 		double bx = link.getToNode().getCoord().getX();
 		double by = link.getToNode().getCoord().getY();
 		
-		double pointx = point.getX();
-		double pointy = point.getY();
+		// vector ba
+		double bax = bx - ax;
+		double bay = by - ay;
+		// vector pa
+		double pax = pointx - ax;
+		double pay = pointy - ay;
 		
-		double normalzation = Math.sqrt( Math.pow( bx - ax , 2) + Math.pow( by - ay, 2));
-		double distance = Math.abs( ((pointx - ax) * (by - ay)) - ((pointy -ay) * (bx - ax)) );
+		// calculation the vector p (projection of point P on line A B)
+		double numerator = pax * bax + pay * bay;
+		double denominator = bax*bax + bay*bay;
+		double fraction = numerator/denominator;
+		double vectorx = bax * fraction;
+		double vectory = bay * fraction;
 		
-		double linkVectorX = bx - ax;
-		double linkVectorY = by - ay;
+		double intersectionx = ax + vectorx;
+		double intersectiony = ay + vectory;
 		
-		double projectionVectorX = pointx - ax;
-		double projectionVectorY = pointy - ay;
+		double distancePoint2Link = Math.sqrt( (pointx-intersectionx)*(pointx-intersectionx) + (pointy-intersectiony)*(pointy-intersectiony));//Math.sqrt( Math.pow(intersectionx, 2) + Math.pow(intersectiony, 2) );
+		double distanceIntersection2Node = Math.sqrt( (intersectionx - destinationNode.getCoord().getX())*(intersectionx - destinationNode.getCoord().getX()) + (intersectiony - destinationNode.getCoord().getY())*(intersectiony - destinationNode.getCoord().getY()) );
 		
-		double numerator = projectionVectorX * linkVectorX + projectionVectorY * linkVectorY;
-		double denominator = Math.pow(linkVectorX, 2) + Math.pow(linkVectorY, 2);
-		
-		double interscetionx = (linkVectorX * numerator) / denominator;
-		double interscetiony = (linkVectorY * numerator) / denominator;
-		
-		double distance2DestinationNode = Math.abs( (interscetionx - linkVectorX) + (interscetiony - linkVectorY));
-		
-		return (distance/normalzation) + distance2DestinationNode;
+		return distancePoint2Link + distanceIntersection2Node;
 	}
 
 	/**

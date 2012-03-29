@@ -348,5 +348,23 @@ public class SpatialGrid<T> {
 		}
 
 	}
+	
+	/**
+	 * for testing
+	 * @param args
+	 */
+	public static void main(String args[]){
+		
+		SpatialGrid<Double> sg = new SpatialGrid<Double>(0, 0, 100, 100, 1);
+		
+		double counter = 0.;
+		for(int row = 0; row <= sg.maxY; row += sg.resolution){
+			for(int col = 0; col <= sg.maxX; col += sg.resolution){
+				sg.setValue(row, col, counter);
+				counter += 1.;
+			}
+		}
+		sg.toFile("/Users/thomas/Development/opus_home/matsim4opus/tmp/out.txt");
+	}
 
 }

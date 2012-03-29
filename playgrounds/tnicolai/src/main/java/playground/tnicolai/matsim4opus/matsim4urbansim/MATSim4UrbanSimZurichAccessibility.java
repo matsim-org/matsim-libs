@@ -33,9 +33,10 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
-import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesIVTCHNetwork;
-import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
+import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesZurichBigRoads;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -63,75 +64,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 	 */
 	public MATSim4UrbanSimZurichAccessibility(String args[]){
 		super(args);
-		// set the resolution, this is used for setting 
-		// the starting points for accessibility measures
-//		checkAndSetShapeFile(args);
-//		checkAndSetGridSize(args);
-//		checkAndSetJobSample(args);
-//		checkAndSetBoundingBox(args);
 	}
-
-//	/**
-//	 * Set the shape file path in order to determine 
-//	 * the starting points for accessibility computation
-//	 * 
-//	 * @param args
-//	 */
-//	private void checkAndSetShapeFile(String[] args) {
-//
-//		if( args.length >= 2 ){
-//			shapeFile = args[1].trim();
-//			log.info("The shape file path was set to " + shapeFile);
-//			if(!Paths.pathExsits(shapeFile))
-//				throw new RuntimeException("Given path to shape file does not exist: " + shapeFile);
-//		} else{
-//			log.error("Missing shape file!!!");
-//			System.exit(-1);
-//		}
-//	}
-//	
-//	/**
-//	 * Set the grid size for the starting points
-//	 * 
-//	 * @param args
-//	 */
-//	private void checkAndSetGridSize(String[] args) {
-//		
-//		if(args.length >= 3){
-//			gridSizeInMeter = Double.parseDouble( args[2].trim() );
-//			log.info("The resolution was set to " + String.valueOf(gridSizeInMeter) );
-//		} else{
-//			log.error("Missing resolution!!!");
-//			System.exit(-1);
-//		}
-//	}
-	
-//	/**
-//	 * Set the jobSample for the starting points
-//	 * 
-//	 * @param args
-//	 */
-//	private void checkAndSetJobSample(String[] args) {
-//
-//		if (args.length >= 4) {
-//			jobSample = Double.parseDouble(args[3].trim());
-//			log.info("The jobSample was set to " + String.valueOf(jobSample));
-//		} else {
-//			log.error("Missing jobSample!!!");
-//			System.exit(-1);
-//		}
-//	}
-	
-//	/**
-//	 * Set custom bounding box to determine the area to process
-//	 * 
-//	 * @param args
-//	 */
-//	private void checkAndSetBoundingBox(String args[]){
-//		// tnicolai: get bounding box via config
-//		// minX, minY, maxX, maxY
-//		NetworkBoundaryBox.setCustomBoundaryBox(676223.42, 241583.83, 689664.05, 254305.72); // this is for the Zurich application
-//	}
 	
 	/**
 	 * This modifies the MATSim network according to the given
@@ -142,7 +75,8 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		log.info("");
 		log.info("Checking for network modifications ...");
 		// check given test parameter for desired modifications
-		String testParameter = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TEST_PARAMETER_PARAM);
+//		String testParameter = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TEST_PARAMETER_PARAM);
+		String testParameter = getUrbanSimParameterConfig().getTestParameter();
 		if(testParameter.equals("")){
 			log.info("No modifications to perform.");
 			log.info("");
@@ -150,8 +84,8 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		}
 		else{
 			String scenarioArray[] = testParameter.split(",");
-			ZurichUtilitiesIVTCHNetwork.modifyNetwork(network, scenarioArray);
-//			ZurichUtilitiesZurichBigRoads.modifyNetwork(network, scenarioArray);
+//			ZurichUtilitiesIVTCHNetwork.modifyNetwork(network, scenarioArray);
+			ZurichUtilitiesZurichBigRoads.modifyNetwork(network, scenarioArray);
 			log.info("Done modifying network.");
 			log.info("");
 		}
@@ -182,47 +116,53 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 			log.warn("Computation of AgentPerformance under development !!! No output yet.");
 		}
 		
-		if(computeGridBasedAccessibilitiesShapeFile){
-			
-			// init aggregatedWorkplaces
-			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
-
-			
-			Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
-			
-			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-			
-			controler.addControlerListener( new CellBasedAccessibilityShapeControlerListener(GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, boundary, srid), 
-																	  						 aggregatedOpportunities,
-																	  						 congestedTravelTimeAccessibilityGrid, 
-																	  						 freespeedTravelTimeAccessibilityGrid, 
-																	  						 walkTravelTimeAccessibilityGrid, 
-																	  						 benchmark) );
-		}
 		
-		if(computeGridBasedAccessibilitiesNetwork){
+		if(computeCellBasedAccessibilitiesNetwork || computeCellBasedAccessibilitiesShapeFile){
 			
-			// init aggregatedWorkplaces
+//			SpatialGrid<Double> carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
+//			SpatialGrid<Double> walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid;
+			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
+			SpatialGrid<Double> walkTravelTimeAccessibilityGrid;
+			ZoneLayer<CounterObject>  measuringPoints;
+			String extension;
+			
+			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
 			if(aggregatedOpportunities == null)
 				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
 			
-			// set default boundary box for accessibility computation
-			// if a bounding box is already set it won't be overwritten!
-			NetworkBoundaryBox.setDefaultBoundaryBox(controler.getNetwork());
+			if (computeCellBasedAccessibilitiesNetwork) {
+				extension = CellBasedAccessibilityControlerListener.NETWORK;
+				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
+																			   nwBoundaryBox.getBoundingBox(),
+																			   srid);
+//				carGrid = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), cellSizeInMeter);
+//				walkGrid= new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				congestedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				freespeedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkTravelTimeAccessibilityGrid		 = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+			}
+			else{
+				extension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
+				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
+				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
+																				   boundary, 
+																				   srid);
+//				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+//				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				walkTravelTimeAccessibilityGrid      = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+			} 
 			
-			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), cellSizeInMeter);
-			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), cellSizeInMeter);
-			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), cellSizeInMeter);
+			controler.addControlerListener( new CellBasedAccessibilityControlerListener(measuringPoints, 
+																							 aggregatedOpportunities,
+																							 congestedTravelTimeAccessibilityGrid, 
+																							 freespeedTravelTimeAccessibilityGrid, 
+																							 walkTravelTimeAccessibilityGrid,
+																							 extension,
+																							 benchmark) );
 			
-			controler.addControlerListener( new CellBasedAccessibilityNetworkControlerListener(GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, NetworkBoundaryBox.getBoundingBox(), srid), 
-																							   aggregatedOpportunities, 
-																							   congestedTravelTimeAccessibilityGrid, 
-																							   freespeedTravelTimeAccessibilityGrid, 
-																							   walkTravelTimeAccessibilityGrid, 
-																							   benchmark));
 		}
 	}
 	
@@ -241,7 +181,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		
 		MATSim4UrbanSimZurichAccessibility m4uZurich = new MATSim4UrbanSimZurichAccessibility(args);
 		m4uZurich.runMATSim();
-		
+		m4uZurich.matim4UrbanSimShutdown();
 		endTime = System.currentTimeMillis();
 		time = (endTime - startTime) / 60000;
 		
