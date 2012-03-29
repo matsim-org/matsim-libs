@@ -76,7 +76,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	// private Config config;
 	// private int cycleIdx = 0, cycle;
 
-	private SimpleWriter writer = null, writerCV = null;
+	private SimpleWriter writer = null;
+	private final SimpleWriter writerCV = null;
 	private static List<Link> links = new ArrayList<Link>();
 	private static Set<Id> linkIds = new HashSet<Id>();
 	private XYLineChart chart;// paramChart
@@ -156,34 +157,11 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			writer = new SimpleWriter(ctlIO.getOutputFilename("parameters.log"));
 			StringBuffer sb = new StringBuffer("iter");
 			for (int i = 0; i < paramNames.length; i++) {
-				sb.append("\tavg. ");
-				sb.append(paramNames[i]);
-
-			}
-			for (int i = 0; i < paramNames.length; i++) {
 				sb.append("\t");
 				sb.append(paramNames[i]);
 
 			}
 			writer.writeln(sb);
-		}
-
-		{
-			writerCV = new SimpleWriter(
-					ctlIO.getOutputFilename("parameterCovariance.log"));
-			StringBuffer sb = new StringBuffer("iter\t" + "VAR{"
-					+ paramNames[0]
-			// "covariance ["
-			);
-			for (int i = 1; i < paramNames.length; i++) {
-				sb.append(", ");
-				sb.append(paramNames[i]);
-			}
-			sb.append("|eps}"
-			// "]\texpectation of variance\tvariance of expectation"
-			);
-
-			writerCV.writeln(sb);
 		}
 
 		{
@@ -234,10 +212,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			delta = Double.parseDouble(deltaStr);
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
-		((PCStrMn) ctl.getStrategyManager())
-				.init(calibrator, ctl.getTravelTimeCalculator(),
-						(MultinomialLogitChoice) chooser);
-		// TODO add argument to init method, e.g. ctl.getCounts()
+		((PCStrMn) ctl.getStrategyManager()).init(calibrator,
+				ctl.getTravelTimeCalculator(),
+				(MultinomialLogitChoice) chooser, ctl.getCounts());
 	}
 
 	private void loadScoringAttributes(String scorAttrFilename,
@@ -253,10 +230,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		Config config = ctl.getConfig();
 		int iter = event.getIteration();
 		int firstIter = ctl.getFirstIteration();
-		// this.chooser.finish();-->called in notifyScoring()
-		// PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
 
-		// if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
 		ControlerIO io = ctl.getControlerIO();
 		// ***************************************************
 		calibrator.setFlowAnalysisFile(io.getIterationFilename(iter,
@@ -275,53 +249,14 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				e.printStackTrace();
 			}
 		}
-		// ************************************************
-		// if (calibrator.getParameterCovarianceExpOfVarComponent()
-		// // getParameterCovariance()
-		// != null) {
-		// writerCV.writeln(iter
-		// // + "\t"
-		// // + calibrator.getParameterCovariance()
-		// // .toSingleLineString()
-		// + "\t"
-		// + calibrator.getParameterCovarianceExpOfVarComponent()
-		// .toSingleLineString()
-		// // + "\t"
-		// // + calibrator.getParameterCovarianceVarOfExpComponent()
-		// // .toSingleLineString()
-		// );
-		// }
-		// writerCV.flush();
 
-		// ###################################################
-		// Vector avgParams = calibrator.getAvgParameters();
 		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
-
-		// ScoringConfigGetSetValues.setConfig(config);
-		// VERY IMPORTANT #########################################
-
-		// if (
-		// // !watching &&
-		// cycleIdx == 0) {
-		// MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
-		// .getMultinomialLogit();
-
-		// *******should after Scoring Listener!!!*******
 
 		if (calibrator.getInitialStepSize() != 0d) {
 
 			StringBuffer sb = new StringBuffer(Integer.toString(iter));
 
 			for (int i = 0; i < paramNames.length; i++) {
-				// int paramNameIndex = Events2Score4AttrRecorder.attrNameList
-				// .indexOf(paramNames[i]/*
-				// * pos. of param in Parameters in
-				// * Cadyts
-				// */);
-
-				// double paramScaleFactor =
-				// Events2Score4PC_mnl_mnl.paramScaleFactorList
-				// .get(paramNameIndex);
 
 				double value;
 				// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
@@ -336,9 +271,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 					}
 				}
 				value = Double.parseDouble(valStr);
-				// *****************************************************
-				// ****SET CALIBRATED PARAMETERS IN MNL*****************
-				// mnl.setParameter(paramNameIndex, value);
 
 				// text output
 				paramArrays[i][iter - firstIter] = value;
@@ -346,38 +278,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				sb.append(value);
 			}
 
-			// ********calibrator.getParameters() JUST FOR
-			// ANALYSIS********
-			// Vector params = calibrator.getParameters();
-			// for (int i1 = 0; i1 < paramNames.length; i1++) {
-			// sb.append("\t");
-			// sb.append(params.get(i1));
-			// }
-
 			writer.writeln(sb);
 			writer.flush();
 		}
 		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
-
-		// ((Events2ScoreWithLeftTurnPenalty4PC)
-		// chooser).setMultinomialLogit(mnl);
-
-		// CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory =
-		// new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-		// config, ctl.getNetwork());
-		// ctl.setScoringFunctionFactory(sfFactory);
-		// ((Events2ScoreWithLeftTurnPenalty4PC)
-		// chooser).setSfFactory(sfFactory);
-		//
-		// strategyManager.setChooser(chooser);
-
-		// }
-		// cycleIdx++;
-		// if (cycleIdx == cycle) {
-		// cycleIdx = 0;
-		// }
-		// }
-
 		// TESTS: calculate log-likelihood -(q-y)^2/(2sigma^2)
 		if (writeLlhInterval > 0 && avgLlhOverIters > 0) {
 			int nextWriteLlhInterval = writeLlhInterval
@@ -448,7 +352,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		writer.close();
-		writerCV.close();
 
 		Controler ctl = event.getControler();
 		ControlerIO ctlIO = ctl.getControlerIO();

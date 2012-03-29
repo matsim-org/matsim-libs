@@ -37,16 +37,16 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
 
 import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.MultinomialLogitCreator;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
@@ -62,7 +62,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	// private double delta;
 	private final Config config;
 	private Plan oldSelected = null;
-	private MultinomialLogit singleMnl = null;
+	private final MultinomialLogit singleMnl = null;
 
 	private BasicStatistics betaTravelingStats = null,
 			constantLeftTurnStats = null;
@@ -74,6 +74,9 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	private int correctedPlanNb = 0;
 
 	final double minStdDev, varianceScale;
+	private Counts counts = null;
+
+	private static int countTimeBin = 3600;
 
 	public PCStrMn(Network net, int firstIteration, Config config) {
 		super(firstIteration);
@@ -92,13 +95,18 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				: Calibrator.DEFAULT_VARIANCE_SCALE;
 
 		pe = new ParameterEstimator();
+
+		final String timeBinStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "timeBinSize_s");
+		if (timeBinStr != null) {
+			countTimeBin = Integer.parseInt(timeBinStr);
+		}
 	}
 
-	@Override
-	protected void afterRemovePlanHook(Plan plan) {
-		super.afterRemovePlanHook(plan);
-		// something could be done here.
-	}
+	// @Override
+	// protected void afterRemovePlanHook(Plan plan) {
+	// super.afterRemovePlanHook(plan);
+	// }
 
 	@Override
 	protected void afterRunHook(Population population) {
@@ -115,55 +123,56 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				+ "\tavg.\t" + statistics[2] + "\tvar.\t" + statistics[3]);
 	}
 
-	@Override
-	protected void afterStrategyRunHook(Person person, PlanStrategy strategy) {
-		super.afterStrategyRunHook(person, strategy);
-		if (strategy != null) {
-			// if (iter - firstIter > getMaxPlansPerAgent()) {//
-			// //////////////////////////
-			// // ENSURE THAT EVERY PLAN IN CHOICE SET HAS BEEN SIMULATED
-			// // ATLEAST ONE TIME
-			if (strategy.getNumberOfStrategyModules() > 0) {
-				/*
-				 * New plan has been created by e.g. ReRoute,
-				 * TimeAllocationMutator etc. Only the old score of last
-				 * selected Plan will set to the new created Plan.
-				 */
-				Plan selectedPlan = person.getSelectedPlan();
-				selectedPlan.setScore(oldSelected.getScore());
-				oldSelected = null;
-
-				/*
-				 * Vector p = new Vector(1/* (single-)choiceSetSize /); p.set(0,
-				 * 1d/* 100% /);
-				 *
-				 * Matrix d = new Matrix(1/* n-choiceSetSize /, paramDimension
-				 * // m-size of parameters that has to be calibrated ); for (int
-				 * i = 0; i < paramDimension; i++) { d.setColumn(i, new
-				 * Vector(0d)); }
-				 */
-				// ******************************************************
-
-				calibrator.selectPlan(0, getSinglePlanChoiceSet(selectedPlan),
-						singleMnl);
-				singleMnl = null;
-
-				// **********************************************************
-			} else {// Change-/SelectExpBeta
-				// ********************************************************
-				/* UPDATE PARAMETERS (OBSERVE THE PLAN CHOOSING IN MATSIM) */
-				/* int selectedIdx= */calibrator.selectPlan(person.getPlans()
-						.indexOf(person.getSelectedPlan())/* selectedIdx */,
-						getPlanChoiceSet((PersonImpl) person),
-						((MultinomialLogitChoice) chooser)
-								.getMultinomialLogit()/* MNL */);
-				// ***************************************************
-			}
-			// }
-		} else {// strategy==null
-			Gbl.errorMsg("No strategy found!");
-		}
-	}
+	// @Override
+	// protected void afterStrategyRunHook(Person person, PlanStrategy strategy)
+	// {
+	// super.afterStrategyRunHook(person, strategy);
+	// if (strategy != null) {
+	// // if (iter - firstIter > getMaxPlansPerAgent()) {//
+	// // //////////////////////////
+	// // // ENSURE THAT EVERY PLAN IN CHOICE SET HAS BEEN SIMULATED
+	// // // ATLEAST ONE TIME
+	// if (strategy.getNumberOfStrategyModules() > 0) {
+	// /*
+	// * New plan has been created by e.g. ReRoute,
+	// * TimeAllocationMutator etc. Only the old score of last
+	// * selected Plan will set to the new created Plan.
+	// */
+	// Plan selectedPlan = person.getSelectedPlan();
+	// selectedPlan.setScore(oldSelected.getScore());
+	// oldSelected = null;
+	//
+	// /*
+	// * Vector p = new Vector(1/* (single-)choiceSetSize /); p.set(0,
+	// * 1d/* 100% /);
+	// *
+	// * Matrix d = new Matrix(1/* n-choiceSetSize /, paramDimension
+	// * // m-size of parameters that has to be calibrated ); for (int
+	// * i = 0; i < paramDimension; i++) { d.setColumn(i, new
+	// * Vector(0d)); }
+	// */
+	// // ******************************************************
+	//
+	// calibrator.selectPlan(0, getSinglePlanChoiceSet(selectedPlan),
+	// singleMnl);
+	// singleMnl = null;
+	//
+	// // **********************************************************
+	// } else {// Change-/SelectExpBeta
+	// // ********************************************************
+	// /* UPDATE PARAMETERS (OBSERVE THE PLAN CHOOSING IN MATSIM) */
+	// /* int selectedIdx= */calibrator.selectPlan(person.getPlans()
+	// .indexOf(person.getSelectedPlan())/* selectedIdx */,
+	// getPlanChoiceSet((PersonImpl) person),
+	// ((MultinomialLogitChoice) chooser)
+	// .getMultinomialLogit()/* MNL */);
+	// // ***************************************************
+	// }
+	// // }
+	// } else {// strategy==null
+	// Gbl.errorMsg("No strategy found!");
+	// }
+	// }
 
 	private DenseMatrix64F calculateDeltaParameter(int planNb) {
 		attrM = new DenseMatrix64F(planNb, PCCtlListener.paramDim);
@@ -173,7 +182,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			List<Double> attrList = attrs.get(PCCtlListener.paramNames[i]);
 			for (int j = 0; j < attrList.size(); j++) {
 				attrM.set(j, i,/* CAUTION, the order of j and i */
-						attrList.get(j));
+				attrList.get(j));
 			}
 		}
 		// attrs.clear();
@@ -195,7 +204,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		betaTravelingStats = new BasicStatistics();
 		constantLeftTurnStats = new BasicStatistics();
 
-		((Events2Score4PC) chooser).createWriter();
+		// ((Events2Score4PC) chooser).createWriter();
 
 		correctedPlanNb = 0;
 		// (re)initializes attrs and utilCorrs
@@ -281,18 +290,12 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				chooser.setPersonAttrs(person, new BasicStatistics[] {
 						betaTravelingStats, constantLeftTurnStats });
 				// now there are only #maxPlansPerAgent# Plans in choice set
-
-				/* ***********************************************************
-				 * set the last chosen plan to cadyts, only works with {@code
-				 * cadyts.interfaces.matsim.ExpBetaPlanChanger},it's not to be
-				 * done with MNL, but "ChangeExpBeta" as well as "SelectExpBeta"
-				 * can still be written in configfile
-				 */
-			} else {// with planInnovation
-				singleMnl = new MultinomialLogitCreator().createSingle(config);
-				((Events2Score4PC) chooser).setSinglePlanAttrs(oldSelected,
-						singleMnl);
 			}
+			// else {// with planInnovation
+			// singleMnl = new MultinomialLogitCreator().createSingle(config);
+			// ((Events2Score4PC) chooser).setSinglePlanAttrs(oldSelected,
+			// singleMnl);
+			// }
 		} else { // strategy==null
 			Gbl.errorMsg("No strategy found!");
 		}
@@ -324,7 +327,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	/**
 	 * generates score corrections, and also prepares the Attr-Matrix and
 	 * UC-Vector
-	 *
+	 * 
 	 * @param person
 	 *            *
 	 */
@@ -366,6 +369,12 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		}
 	}
 
+	/**
+	 * judge if there is too low count during the plan
+	 * 
+	 * @param plan
+	 * @return
+	 */
 	private boolean hasTooLowCount(Plan plan) {
 		planConverter.convert((PlanImpl) plan);
 		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
@@ -375,26 +384,35 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			PlanStep<Link> planStep = planStepIt.next();
 			Id linkId = planStep.getLink().getId();
 			/*
-			 * TODO if counts contains this linkId. Yes, look at the time, TODO
-			 * judge if count * varianceScale < minStdDev^2: yes -> break,
-			 * directly return true;
+			 * if counts contains this linkId. Yes, look at the time, judge if
+			 * count * varianceScale < minStdDev^2: yes -> break, directly
+			 * return true;
 			 */
-		}
+			Count count = counts.getCount(linkId);
+			if (count != null) {
+				if (varianceScale
+						* count.getVolume(
+								planStep.getEntryTime_s() / countTimeBin + 1)
+								.getValue()/* volume (count-y) */< minStdDev
+						* minStdDev) {
+					return true;
+				}
+			}
 
+		}
 		return false;
 	}
 
 	public void init(MATSimChoiceParameterCalibrator<Link> calibrator,
-			TravelTime travelTimeCalculator, MultinomialLogitChoice chooser
-	// ,double delta
-	) {
+			TravelTime travelTimeCalculator, MultinomialLogitChoice chooser,
+			Counts counts) {
 		// init(calibrator, travelTimeCalculator);
 		this.calibrator = calibrator;
 		planConverter = new PlanToPlanStep(travelTimeCalculator, net);
 		tt = travelTimeCalculator;
-		// this.worstPlanSelector = new RemoveWorstPlanSelector();
 		// /////////////////////////////////////////////////////////////////////
 		this.chooser = chooser;
 		// this.delta = delta;
+		this.counts = counts;
 	}
 }
