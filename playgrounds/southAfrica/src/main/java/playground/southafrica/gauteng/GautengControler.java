@@ -1,8 +1,15 @@
 package playground.southafrica.gauteng;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
 import org.matsim.roadpricing.RoadPricingSchemeI;
 
 import playground.kai.run.KaiAnalysisListener;
@@ -12,6 +19,20 @@ import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
+
+class PersonHouseholdMapping {
+	Map<Id,Id> delegate = new HashMap<Id,Id>() ;
+	// key = personId; value = householdId
+	// Id hhId = personHouseholdMapping.get( personId ) ;
+
+	Id getHhIdFromPersonId( Id personId ) {
+		return delegate.get(personId) ;
+	}
+	Id insertPersonidHhidPair( Id personId, Id hhId ) {
+		// maybe check if that key (= personId) is already taken.  Shoudl not happen.
+		return delegate.put( personId, hhId) ;
+	}
+}
 
 /**
  * Design comments:<ul>
@@ -33,6 +54,8 @@ class GautengControler {
 		controler.setOverwriteFiles(true) ;
 		
 		Scenario sc = controler.getScenario();
+		
+//		constructPersonHhMappingAndInsertIntoScenario(sc);
 
 		
 		
@@ -77,6 +100,23 @@ class GautengControler {
 		// RUN:
 		controler.run();
 	
+	}
+
+	private static void constructPersonHhMappingAndInsertIntoScenario(
+			Scenario sc) {
+		Households hhs = ((ScenarioImpl) sc).getHouseholds() ;
+		
+		PersonHouseholdMapping phm = new PersonHouseholdMapping() ;
+		
+		for ( Household hh : hhs.getHouseholds().values() ) {
+			for ( Id personId : hh.getMemberIds() ) {
+				phm.insertPersonidHhidPair( personId, hh.getId() ) ;
+			}
+		}
+		sc.addScenarioElement( phm ) ;
+		
+		// retreive as follows:
+		PersonHouseholdMapping retreivedPhm = sc.getScenarioElement( PersonHouseholdMapping.class ) ;
 	}
 
 
