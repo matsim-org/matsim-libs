@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -16,7 +17,7 @@ import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 
 public class StopId2LineId2PulkTest {
 
-	@Test
+	@Test @Ignore
 	public void testStopId2LineId2Pulk() {
 
 
