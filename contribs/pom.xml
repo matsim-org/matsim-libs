@@ -88,6 +88,7 @@
 		<module>grips</module>
 		<module>matsim4urbansim</module>
 		<module>networkEditor</module>
+		<module>otfvis</module>
 	</modules>
 	<repositories>
 		<repository>

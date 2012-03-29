@@ -1,0 +1,4 @@
+Iteration	BEGIN iteration	BEGIN replanning	END replanning	BEGIN mobsim	END mobsim	END iteration		replanning	mobsim	iteration
+0	20:03:39			20:03:39	20:03:39	20:03:39			00:00:00	00:00:00
+1	20:03:39	20:03:39	20:03:39	20:03:39	20:03:39	20:03:39		00:00:00	00:00:00	00:00:00
+2	20:03:39	20:03:39	20:03:39	20:03:39	20:03:39	20:03:39		00:00:00	00:00:00	00:00:00
