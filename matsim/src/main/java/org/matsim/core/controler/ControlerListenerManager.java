@@ -125,7 +125,7 @@ public final class ControlerListenerManager implements MatsimManager {
     	log.info("calling notifyStartup on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyStartup(event);
     }
-    log.info("all ControlerStartupListeners called.");
+    log.info("[it." + this.controler.getIterationNumber() + "] all ControlerStartupListeners called." );
 	}
 
 	/**
@@ -144,7 +144,7 @@ public final class ControlerListenerManager implements MatsimManager {
     	log.info("calling notifyShutdown on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyShutdown(event);
     }
-    log.info("all ControlerShutdownListeners called.");
+    log.info("[it." + this.controler.getIterationNumber() + "] all ControlerShutdownListeners called.");
 	}
 
 	/**
@@ -163,7 +163,7 @@ public final class ControlerListenerManager implements MatsimManager {
 			log.info("calling notifyIterationStarts on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyIterationStarts(event);
     }
-		log.info("all ControlerIterationStartsListeners called.");
+		log.info("[it." + this.controler.getIterationNumber() + "] all ControlerIterationStartsListeners called.");
 	}
 
 	/**
@@ -183,7 +183,7 @@ public final class ControlerListenerManager implements MatsimManager {
 			log.info("calling notifyIterationEnds on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyIterationEnds(event);
 		}
-		log.info("all ControlerIterationEndsListeners called.");
+		log.info("[it." + this.controler.getIterationNumber() + "] all ControlerIterationEndsListeners called.");
 	}
 
 	/**
@@ -203,7 +203,7 @@ public final class ControlerListenerManager implements MatsimManager {
 			log.info("calling notifyScoring on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyScoring(event);
 		}
-		log.info("all ControlerScoringListeners called.");
+		log.info("[it." + this.controler.getIterationNumber() + "] all ControlerScoringListeners called.");
 	}
 
 	/**
@@ -223,7 +223,7 @@ public final class ControlerListenerManager implements MatsimManager {
 			log.info("calling notifyReplanning on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyReplanning(event);
 		}
-		log.info("all ControlerReplanningListeners called.");
+		log.info("[it." + this.controler.getIterationNumber() + "] all ControlerReplanningListeners called.");
 	}
 
 	/**
@@ -243,7 +243,7 @@ public final class ControlerListenerManager implements MatsimManager {
 			log.info("calling notifyBeforeMobsim on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyBeforeMobsim(event);
 		}
-		log.info("all ControlerBeforeMobsimListeners called.");
+		log.info("[it." + this.controler.getIterationNumber() + "] all ControlerBeforeMobsimListeners called.");
 	}
 
 	/**
@@ -264,7 +264,7 @@ public final class ControlerListenerManager implements MatsimManager {
 			log.info("calling notifyAfterMobsim on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyAfterMobsim(event);
 		}
-		log.info("all ControlerAfterMobsimListeners called.");
+		log.info("[it." + this.controler.getIterationNumber() + "] all ControlerAfterMobsimListeners called.");
 	}
 
 }
