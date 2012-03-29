@@ -32,6 +32,7 @@ import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
@@ -200,6 +201,34 @@ public class MyRaster{
 		}
 	}
 
+	
+	/**
+	 * The method checks if the given <i>Point</i> falls within the envelope of
+	 * the polygon, and only processes points within the envelope. At 
+	 * instantiation of the <i>MyRaster</i> object the <i>KdeType</i> had to be
+	 * specified - indicating how the point is to be processed. Each point is
+	 * considered to have a weight of 1. If a different weight is to be considered
+	 * for each point, use the method {@link MyRaster#processPoint(Coord, double)}.
+	 * The following Kernel Density Estimate functions are currently implemented:
+	 * <ul>
+	 * 		<b>0</b> - Only increase the value of the pixel within which the 
+	 * 				   point falls. <br>
+	 * 		<b>1</b> - Uniform. Increases all pixels within the radius by the
+	 * 				   same amount, 1 / radius.<br>
+	 * 		<b>2</b> - Triangular. Increases the pixel within which the activity
+	 * 				   takes place, by 1, and all other pixels within the radius
+	 * 				   by an inverse linear function between 0 (at a distance 
+	 * 				   equal to the radius) and 1 (at the activity, i.e. distance
+	 * 				   equal to zero).<br>
+	 * 		<b>3</b> - Triweight.
+	 * </ul>
+	 * @param coord of the point that is to be processed.
+	 * @return
+	 */
+	public boolean processPoint(Coord coord){
+		return this.processPoint(coord, 1.0);		
+	}
+
 	/**
 	 * The method checks if the given <i>Point</i> falls within the envelope of
 	 * the polygon, and only processes points within the envelope. At 
@@ -218,10 +247,13 @@ public class MyRaster{
 	 * 				   equal to zero).<br>
 	 * 		<b>3</b> - Triweight.
 	 * </ul>
-	 * @param point that is to be processed.
+	 * @param coord of the point that is to be processed.
+	 * @param weight of the point if it is not unity. The surface below the function
+	 * 		  would then add up to the weight, and not 1. This is arguably better than
+	 * 		  repeating the unity function multiple times at the same area.
 	 * @return
 	 */
-	public boolean processPoint(Coord coord) {
+	public boolean processPoint(Coord coord, double weight) {
 		GeometryFactory gf = new GeometryFactory();
 		Point point = gf.createPoint(new Coordinate(coord.getX(), coord.getY()));
 		boolean result = false;
@@ -246,7 +278,7 @@ public class MyRaster{
 			
 			switch (this.KdeType) {
 			case 0:
-				height = 1.0;
+				height = weight;
 				imageMatrix.setQuick(x, y, imageMatrix.getQuick(x, y) + 1);	
 				maxValue = Math.max(maxValue,imageMatrix.getQuick(x, y));
 				result = true;
@@ -257,7 +289,7 @@ public class MyRaster{
 				int maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
 				int minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
 				int maxY = (int) Math.min(imageMatrix.columns()-1, Math.floor((originY - (point.getY() - radius))/resolution));
-				height = 1 / (2.0*radius);
+				height = weight / (2.0*radius);
 				for(int i = minX; i <= maxX; i++){
 					for(int j = minY; j <= maxY; j++){
 						p = gf.createPoint(new Coordinate((i + 0.5)*resolution + originX, originY - (j + 0.5)*resolution));
@@ -284,7 +316,7 @@ public class MyRaster{
 				break;
 				
 			case 2: // Triangular
-				height = 1 / radius;
+				height = weight / radius;
 				minX = (int) Math.max(0, Math.floor((point.getX() - radius - originX)/resolution));
 				maxX = (int) Math.min(imageMatrix.rows()-1, Math.floor((point.getX() + radius - originX)/resolution));
 				minY = (int) Math.max(0, Math.floor((originY - (point.getY() + radius))/resolution));
@@ -347,9 +379,9 @@ public class MyRaster{
 						double d = point.distance(p);
 						double u = d / radius;
 						if(pixel.contains(point)){
-							height = 35.0 / 32.0;
+							height = (35.0 / 32.0) * weight;
 						} else if( d <= radius){
-							height = (35.0 / 32.0)*Math.pow(1 - Math.pow(u, 2), 3);
+							height = (35.0 / 32.0)*weight*Math.pow(1 - Math.pow(u, 2), 3);
 						}
 						imageMatrix.setQuick(i, j, imageMatrix.getQuick(i, j) + height);
 						maxValue = Math.max(maxValue,imageMatrix.getQuick(i, j));
@@ -424,6 +456,8 @@ public class MyRaster{
 		log.info("resolution: " + resolution);
 		log.info("# rows: " + imageMatrix.rows());
 		log.info("# columns: " + imageMatrix.columns());
+		log.info("Number of pixels to process: " + (imageMatrix.rows()*imageMatrix.columns()));
+		Counter counter = new Counter("  # pixels: ");
 		try{
 			bw.write("xMin,xMax,yMin,yMax,Value");
 			bw.newLine();
@@ -441,7 +475,7 @@ public class MyRaster{
 					} else{
 						/* Don't write it out, otherwise R will duplicate all pixels from different envelopes' entries. */ 
 					}
-					
+					counter.incCounter();
 				}
 			}
 			
@@ -454,6 +488,7 @@ public class MyRaster{
 				throw new RuntimeException("Could not close BufferedWriter " + filename);
 			}
 		}
+		counter.printCounter();
 	}
 	
 	public int rows(){
