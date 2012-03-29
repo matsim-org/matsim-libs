@@ -112,7 +112,8 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 
 	public double getAverageTripLength() {
 		if (this.cntTrips == 0) return 0;
-		log.warn("NOTE: The result of this calculation has been changed from 'av over all trips' to 'av over tolled trips'.  kai/benjamin, apr'10") ;
+//		log.warn("NOTE: The result of this calculation has been changed from 'av over all trips' to 'av over tolled trips'.  kai/benjamin, apr'10") ;
+		// commenting this out.  kai, mar'12
 		return (this.sumLength / this.cntTrips);
 	}
 }
