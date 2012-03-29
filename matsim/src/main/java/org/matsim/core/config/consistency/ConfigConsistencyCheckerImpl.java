@@ -76,7 +76,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 			
 		if (config.controler().getMobsim() == null) {
 			log.warn("You should specify which mobsim is to used in the configuration (controler.mobsim).");
-		} else if ( config.controler().getMobsim().equals( MobsimType.queueSimulation.toString() ) ) {
+		} else if ( config.controler().getMobsim().equalsIgnoreCase( MobsimType.queueSimulation.toString() ) ) {
 			if ( config.simulation() == null ) {
 				config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 				for ( MobsimType mType : MobsimType.values() ) {
@@ -90,7 +90,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 					config.removeModule(mType.toString());
 				}
 			}
-		} else if ( config.controler().getMobsim().equals( MobsimType.qsim.toString() ) ) {
+		} else if ( config.controler().getMobsim().equalsIgnoreCase( MobsimType.qsim.toString() ) ) {
 			if ( config.getQSimConfigGroup() == null ) {
 				config.addQSimConfigGroup(new QSimConfigGroup()) ;
 				for ( MobsimType mType : MobsimType.values() ) {
@@ -104,7 +104,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 					config.removeModule(mType.toString());
 				}
 			}
-		} else if ( config.controler().getMobsim().equals( MobsimType.JDEQSim.toString() ) ) {
+		} else if ( config.controler().getMobsim().equalsIgnoreCase( MobsimType.JDEQSim.toString() ) ) {
 			if ( config.getModule(MobsimType.JDEQSim.toString()) == null ) {
 				log.warn("JDEQSim does not seem to have a typed (= preconfigured) config group; " +
 				"thus cannot load it; thus cannot print configuration options into logfile.  kai, mar'12") ;
@@ -119,7 +119,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 					config.removeModule(mType.toString());
 				}
 			}
-		} else if ( config.controler().getMobsim().equals( MobsimType.multimodalQSim.toString() ) ) {
+		} else if ( config.controler().getMobsim().equalsIgnoreCase( MobsimType.multimodalQSim.toString() ) ) {
 			if ( config.getModule(MobsimType.multimodalQSim.toString()) == null ) {
 				config.addModule(MultiModalConfigGroup.GROUP_NAME, new MultiModalConfigGroup() ) ;
 				for ( MobsimType mType : MobsimType.values() ) {
