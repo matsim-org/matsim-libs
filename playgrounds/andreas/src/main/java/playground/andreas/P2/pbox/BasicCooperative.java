@@ -130,15 +130,6 @@ public class BasicCooperative implements Cooperative{
 			this.testPlan = null;
 		}
 		
-		if(this.numberOfIterationsWithoutScoring > 0){
-			PPlanStrategy strategy = pStrategyManager.getTimeReduceDemand();
-			this.testPlan = strategy.run(this);
-			if (this.testPlan != null) {
-				this.bestPlan = this.testPlan;
-				this.testPlan = null;
-			}			
-		}
-
 		// balance the budget
 		if(this.budget < 0){
 			// insufficient, sell vehicles
@@ -174,18 +165,28 @@ public class BasicCooperative implements Cooperative{
 					// budget ok, buy one
 					this.budget -= this.costPerVehicleBuy * 1;
 					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
-				}
+				} else {
 //			}
 //		} else {
 			// replan
-			if(this.bestPlan.getNVehicles() > 1){
-				// can afford to use one vehicle for testing, get a new testPlan
-				PPlanStrategy strategy = pStrategyManager.chooseStrategy();
-				this.testPlan = strategy.run(this);
-				if(this.testPlan != null){
-					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+					if(this.numberOfIterationsWithoutScoring > 0){
+						PPlanStrategy strategy = pStrategyManager.getTimeReduceDemand();
+						this.testPlan = strategy.run(this);
+						if (this.testPlan != null) {
+							this.bestPlan = this.testPlan;
+							this.testPlan = null;
+						}			
+					} else {
+						if(this.bestPlan.getNVehicles() > 1){
+							// can afford to use one vehicle for testing, get a new testPlan
+							PPlanStrategy strategy = pStrategyManager.chooseStrategy();
+							this.testPlan = strategy.run(this);
+							if(this.testPlan != null){
+								this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+							}
+						}
+					}
 				}
-			}
 //		}
 		
 		// reinitialize the plan
