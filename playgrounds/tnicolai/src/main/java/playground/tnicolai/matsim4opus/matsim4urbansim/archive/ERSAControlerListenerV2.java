@@ -47,7 +47,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2Neare
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGrid2KMZWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriterERSA_V2;
-import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -209,7 +209,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 //		writeSpatialGridTables();
 		SpatialGridTableWriterERSA_V2.writeTableAndCSV(this.travelTimeAccessibilityGrid, this.travelCostAccessibilityGrid, this.travelDistanceAccessibilityGrid, this.travelTimeAccessibilityMap, this.travelCostAccessibilityMap, this.travelDistanceAccessibilityMap, this.resolutionMeter);
 		SpatialGrid2KMZWriter.writeKMZFiles(this.travelTimeAccessibilityGrid, this.travelCostAccessibilityGrid, this.travelDistanceAccessibilityGrid);
-		WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedJobArray );
+		AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedJobArray );
 		// accessibility measure were written while computing, just closing file now .
 //		CellBasedAccessibilityCSVWriter.close();
 	}

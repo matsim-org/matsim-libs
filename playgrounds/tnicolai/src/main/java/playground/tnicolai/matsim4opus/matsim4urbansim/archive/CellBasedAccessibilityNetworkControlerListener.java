@@ -53,7 +53,7 @@ import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.CellBasedAccessibilityCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriter;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -187,7 +187,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		double betaWalkMin = betaWalkHour / 60.; // get utility per minute.
 
 		try{
-			CellBasedAccessibilityCSVWriter accCsvWriter = new CellBasedAccessibilityCSVWriter(fileExtension);
+			AnalysisCellBasedAccessibilityCSVWriter accCsvWriter = new AnalysisCellBasedAccessibilityCSVWriter(fileExtension);
 			
 			log.info("Computing and writing grid based accessibility measures with following settings:" );
 			log.info("Departure time (in seconds): " + depatureTime);

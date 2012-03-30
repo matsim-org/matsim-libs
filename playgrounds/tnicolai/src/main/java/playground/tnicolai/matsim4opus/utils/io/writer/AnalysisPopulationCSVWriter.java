@@ -12,9 +12,9 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 
-public class PopulationCSVWriter {
+public class AnalysisPopulationCSVWriter {
 	
-	private static final Logger log = Logger.getLogger(PopulationCSVWriter.class);
+	private static final Logger log = Logger.getLogger(AnalysisPopulationCSVWriter.class);
 	
 	/**
 	 * writing raw population data to disc

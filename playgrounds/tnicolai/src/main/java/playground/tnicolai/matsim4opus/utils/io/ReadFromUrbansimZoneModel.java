@@ -45,8 +45,8 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2Neare
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
-import playground.tnicolai.matsim4opus.utils.io.writer.PopulationCSVWriter;
-import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisPopulationCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 
 /**
  * @author nagel
@@ -466,7 +466,7 @@ public class ReadFromUrbansimZoneModel {
 		
 		// Since the aggregated workplaces in jobClusterArray does contain coordinates of their nearest node 
 		// this result is dumped out here    tnicolai dec'12
-		WorkplaceCSVWriter.writeWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
+		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
 		
 		log.info("Aggregating workplaces with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> jobClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
@@ -744,9 +744,9 @@ public class ReadFromUrbansimZoneModel {
 				}
 			}
 			// dump population data
-			PopulationCSVWriter.writePopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "population.csv", personLocations);
+			AnalysisPopulationCSVWriter.writePopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "population.csv", personLocations);
 			// dump aggregated population data
-			PopulationCSVWriter.writeAggregatedPopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
+			AnalysisPopulationCSVWriter.writeAggregatedPopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
 			
 			
 		} catch (Exception e) {e.printStackTrace();}

@@ -52,7 +52,7 @@ import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.CellBasedAccessibilityCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 import com.vividsolutions.jts.geom.Point;
@@ -176,7 +176,7 @@ public class CellBasedAccessibilityControlerListener implements ShutdownListener
 		// calculates the workplace accessibility based on congested travel times:
 		// (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
 		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree( ttc, new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()) );
-		// calculates the workplace accessibility based on freespeed travel times:
+		// calculates the workplace accessibility based on free-speed travel times:
 		// link.getLength() * link.getFreespeed()
 		LeastCostPathTree lcptFreespeedTravelTime = new LeastCostPathTree(ttc, new FreeSpeedTravelTimeCostCalculator());
 		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
@@ -193,7 +193,7 @@ public class CellBasedAccessibilityControlerListener implements ShutdownListener
 		double betaWalkMin = betaWalkHour / 60.; // get utility per minute.
 
 		try{
-			CellBasedAccessibilityCSVWriter accCsvWriter = new CellBasedAccessibilityCSVWriter(fileExtension);
+			AnalysisCellBasedAccessibilityCSVWriter accCsvWriter = new AnalysisCellBasedAccessibilityCSVWriter(fileExtension);
 			
 			log.info("Computing and writing grid based accessibility measures with following settings:" );
 			log.info("Departure time (in seconds): " + depatureTime);
@@ -233,14 +233,17 @@ public class CellBasedAccessibilityControlerListener implements ShutdownListener
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				// captures the euclidean distance between a square centroid and its nearest node
-//				LinkImpl nearestLink = network.getNearestLink( coordFromZone );
-//				double distCentroid2Link = nearestLink.calcDistance(coordFromZone);
-//				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
+				// captures the distance (as walk time) between a zone centroid and its nearest node
 				double walkTimeOffset_min = NetworkUtil.getDistance2Node(network.getNearestLink(coordFromZone), 
 																		 point, 
 																		 fromNode)  / this.walkSpeedMeterPerMin;
-//				double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
+				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
+				// Euclidean Distance (measuring point 2 nearest node):
+				// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
+				// Orthogonal Distance (measuring point 2 nearest link, does not include remaining distance between link intersection and nearest node)
+				// LinkImpl nearestLink = network.getNearestLink( coordFromZone );
+				// double walkTimeOffset_min = (nearestLink.calcDistance( coordFromZone ) / this.walkSpeedMeterPerMin); 
+				// or use NetworkUtil.getOrthogonalDistance(link, point) instead!
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;
 				double travelTimesWalkSum  	   	  = 0.; // substitute for travel distance

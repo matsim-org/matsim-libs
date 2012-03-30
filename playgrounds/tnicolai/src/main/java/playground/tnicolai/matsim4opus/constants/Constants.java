@@ -110,9 +110,8 @@ public class Constants {
 	public static final String OUTPUT_ZONES_FILE_XML	= "zones.xml";
 	public static final String TRAVEL_DATA_FILE_CSV		= "travel_data.csv";
 	public static final String GRID_DATA_FILE_CSV 		= "grid_data.csv";
-	public static final String ZONES_FILE_CSV 			= "zones.csv";
 	public static final String ZONES_COMPLETE_FILE_CSV 	= "zones_complete.csv";
-	
+
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";
 	public static final String TAB = "\t";
@@ -142,10 +141,10 @@ public class Constants {
 	public static final String V1_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v1.xsd";
 	public static final String V1_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v1.xsd";
 	public static final String V1_XSD_FILE_NAME = "matsim4urbansim_v1.xsd";
-	public static final String V11_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v1.1.xsd";
-	public static final String V11_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v1.1.xsd";
-	public static final String V11_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v1.1.xsd";
-	public static final String V11_XSD_FILE_NAME = "matsim4urbansim_v1.1.xsd";
+	public static final String V2_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v2.xsd";
+	public static final String V2_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v2.xsd";
+	public static final String V2_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v2.xsd";
+	public static final String V2_XSD_FILE_NAME = "matsim4urbansim_v2.xsd";
 	public static final String JAXB_PARSER_PACKAGE_NAME = "matsim4urbansim.jaxbconfig";
 	
 	/** MATSim properties */

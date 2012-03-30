@@ -110,12 +110,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		// set spatial reference id (not necessary but needed to match the outcomes with google maps)
 		int srid = Constants.SRID_SWITZERLAND; // Constants.SRID_WASHINGTON_NORTH
 		
-		// The following lines register what should be executed _after_ the iterations are done:
-		
-		if(computeAgentPerformance){ // tnicolai: todo
-			log.warn("Computation of AgentPerformance under development !!! No output yet.");
-		}
-		
+		// The following lines register what should be executed _after_ the iterations are done:		
 		
 		if(computeCellBasedAccessibilitiesNetwork || computeCellBasedAccessibilitiesShapeFile){
 			
@@ -173,19 +168,13 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 	 */
 	public static void main(String[] args) {
 		
-		long startTime;
-		long endTime;
-		long time;
-		
-		startTime = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 		
 		MATSim4UrbanSimZurichAccessibility m4uZurich = new MATSim4UrbanSimZurichAccessibility(args);
 		m4uZurich.runMATSim();
 		m4uZurich.matim4UrbanSimShutdown();
-		endTime = System.currentTimeMillis();
-		time = (endTime - startTime) / 60000;
 		
-		log.info("Computation took " + time + " minutes. Computation done!");
+		log.info("Computation took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 
 }

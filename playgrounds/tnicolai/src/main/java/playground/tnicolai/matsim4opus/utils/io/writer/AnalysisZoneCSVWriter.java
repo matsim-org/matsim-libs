@@ -10,9 +10,9 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 
-public class ZoneCSVWriter {
+public class AnalysisZoneCSVWriter {
 
-	private static final Logger log = Logger.getLogger(ZoneCSVWriter.class);
+	private static final Logger log = Logger.getLogger(AnalysisZoneCSVWriter.class);
 	private static BufferedWriter zoneCSVWriter = null;
 	
 	/**
@@ -56,7 +56,7 @@ public class ZoneCSVWriter {
 							 double travelTimesWalkLogSum){
 		
 		try{
-			assert(ZoneCSVWriter.zoneCSVWriter != null);
+			assert(AnalysisZoneCSVWriter.zoneCSVWriter != null);
 			zoneCSVWriter.write( zoneID + "," + 
 								 zoneCentroid.getX() + "," + 
 								 zoneCentroid.getY() + "," + 
@@ -78,7 +78,7 @@ public class ZoneCSVWriter {
 	public static void close(){
 		try {
 			log.info("Closing ZoneCSVWriter ...");
-			assert(ZoneCSVWriter.zoneCSVWriter != null);
+			assert(AnalysisZoneCSVWriter.zoneCSVWriter != null);
 			zoneCSVWriter.flush();
 			zoneCSVWriter.close();
 			log.info("... done!");

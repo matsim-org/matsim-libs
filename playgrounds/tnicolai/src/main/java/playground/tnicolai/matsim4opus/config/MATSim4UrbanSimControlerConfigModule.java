@@ -2,7 +2,7 @@ package playground.tnicolai.matsim4opus.config;
 
 import org.matsim.core.config.Module;
 
-public class MATSim4UrbaSimControlerConfigModule extends Module{
+public class MATSim4UrbanSimControlerConfigModule extends Module{
 	
 	private static final long serialVersionUID = 2L;
 	
@@ -42,7 +42,7 @@ public class MATSim4UrbaSimControlerConfigModule extends Module{
     
     private String hotStartTargetLocation;
 
-	public MATSim4UrbaSimControlerConfigModule(String name) {
+	public MATSim4UrbanSimControlerConfigModule(String name) {
 		super(name);
 		this.isColdStart = false;
 		this.isWarmStart = false;

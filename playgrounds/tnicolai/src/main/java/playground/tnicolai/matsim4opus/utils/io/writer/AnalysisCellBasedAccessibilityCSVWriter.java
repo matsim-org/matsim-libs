@@ -12,15 +12,15 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 
-public class CellBasedAccessibilityCSVWriter {
+public class AnalysisCellBasedAccessibilityCSVWriter {
 	
-	private static final Logger log = Logger.getLogger(CellBasedAccessibilityCSVWriter.class);
+	private static final Logger log = Logger.getLogger(AnalysisCellBasedAccessibilityCSVWriter.class);
 	private static BufferedWriter accessibilityDataWriter = null;
 	
 	/**
 	 * writes the header of accessibility data csv file
 	 */
-	public CellBasedAccessibilityCSVWriter(String fileExtension){
+	public AnalysisCellBasedAccessibilityCSVWriter(String fileExtension){
 		try{
 			log.info("Initializing GridBasedAccessibilityCSVWriter ...");
 			accessibilityDataWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + fileExtension +"_accessibility_indicators_ersa.csv" );
@@ -59,7 +59,7 @@ public class CellBasedAccessibilityCSVWriter {
 							 double travelTimesWalkLogSum){
 		
 		try{
-			assert(CellBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
+			assert(AnalysisCellBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
 			accessibilityDataWriter.write( startZone.getAttribute().getCounter() + "," +
 										   coordFromZone.getX() + "," +
 										   coordFromZone.getY() + "," +
@@ -82,7 +82,7 @@ public class CellBasedAccessibilityCSVWriter {
 	public void close(){
 		try {
 			log.info("Closing GridBasedAccessibilityCSVWriter ...");
-			assert(CellBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
+			assert(AnalysisCellBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
 			accessibilityDataWriter.flush();
 			accessibilityDataWriter.close();
 			log.info("... done!");

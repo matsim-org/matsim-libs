@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -17,17 +16,18 @@ import playground.tnicolai.matsim4opus.constants.Constants;
  * @author thomas
  *
  */
-public class ZoneBasedAccessibilityCSVWriter {
+public class UrbanSimZoneCSVWriter {
 	
-	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityCSVWriter.class);
+	private static final Logger log 	= Logger.getLogger(UrbanSimZoneCSVWriter.class);
 	private static BufferedWriter accessibilityDataWriter = null;
+	public static final String FILE_NAME= "zones.csv";
 	
 	/**
-	 * writes the header of accessibility data csv file
+	 * writes the header for zones csv file
 	 */
-	public static void initAccessiblityWriter(String file){
+	public static void initUrbanSimZoneWriter(String file){
 		try{
-			log.info("Initializing ZoneBasedAccessibilityCSVWriter ...");
+			log.info("Initializing UrbanSimZoneCSVWriter ...");
 			accessibilityDataWriter = IOUtils.getBufferedWriter( file );
 			
 			// create header
@@ -45,7 +45,7 @@ public class ZoneBasedAccessibilityCSVWriter {
 	}
 	
 	/**
-	 * writing the accessibility measures into csv file
+	 * writing the zone data (accessibilities) to csv file
 	 * @param node
 	 * @param congestedTravelTimesCarLogSum
 	 * @param freespeedTravelTimesCarLogSum
@@ -57,7 +57,7 @@ public class ZoneBasedAccessibilityCSVWriter {
 							 double travelTimesWalkLogSum){
 		
 		try{
-			assert(ZoneBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
+			assert(UrbanSimZoneCSVWriter.accessibilityDataWriter != null);
 			accessibilityDataWriter.write( zoneID + "," + 
 										   congestedTravelTimesCarLogSum + "," + 
 										   freespeedTravelTimesCarLogSum + "," + 
@@ -74,8 +74,8 @@ public class ZoneBasedAccessibilityCSVWriter {
 	 */
 	public static void close(){
 		try {
-			log.info("Closing ZoneBasedAccessibilityCSVWriter ...");
-			assert(ZoneBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
+			log.info("Closing UrbanSimZoneCSVWriter ...");
+			assert(UrbanSimZoneCSVWriter.accessibilityDataWriter != null);
 			accessibilityDataWriter.flush();
 			accessibilityDataWriter.close();
 			log.info("... done!");

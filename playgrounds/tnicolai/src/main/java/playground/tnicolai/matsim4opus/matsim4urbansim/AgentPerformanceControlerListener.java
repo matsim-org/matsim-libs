@@ -3,26 +3,30 @@ package playground.tnicolai.matsim4opus.matsim4urbansim;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
+import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimPersonCSVWriter;
 
+/**
+ * implements agent-based performance feedback for UrbanSim population (time spent traveling, money spent traveling, etc.)
+ * 
+ * @author thomas
+ *
+ */
 public class AgentPerformanceControlerListener implements ShutdownListener{
 
 	private static final Logger log = Logger.getLogger(AgentPerformanceControlerListener.class);
@@ -31,6 +35,11 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 	
 	public AgentPerformanceControlerListener(Benchmark benchmark){
 		this.benchmark = benchmark;
+		// writing agent performances continuously into "persons.csv"-file. Naming of this 
+		// files is given by the UrbanSim convention importing a csv file into a identically named 
+		// data set table. THIS PRODUCES URBANSIM INPUT
+		UrbanSimPersonCSVWriter.initUrbanSimPersonWriter(Constants.MATSIM_4_OPUS_TEMP + 
+														 UrbanSimPersonCSVWriter.FILE_NAME);
 	}
 	
 	/**
@@ -39,73 +48,86 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		
-		int benchmarkID = this.benchmark.addMeasure("Person Contoler");
+		int benchmarkID = this.benchmark.addMeasure("Agent performance controler");
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
+		// get network
+		Network network = controler.getNetwork();
 		// get persons
 		Population population = controler.getPopulation();
 		Iterator<? extends Person> persons = population.getPersons().values().iterator();
 		
-//		while(persons.hasNext()){
-//			
-//			Person p = persons.next();
-//			
-//			Plan plan = p.getSelectedPlan();
-//			
-//			boolean isFirstPlanActivity = true;
-//			String lastZoneId = null;
-//			
-//			if(plan.getPlanElements().size() <= 1) // check if activities available (then size of plan elements > 1)
-//				continue;
-//			
-//			for ( PlanElement pe : plan.getPlanElements() ) {
-//				if ( pe instanceof Activity ) {
-//					Activity act = (Activity) pe;
-//					Id id = act.getFacilityId();
-//					if( id == null) // that person plan doesn't contain any activity, continue with next person
-//						continue;
-//					
-//					ActivityFacility fac = allFacilities.get(id);
-//					if(fac == null)
-//						continue;
-//					String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString() ;
-//
-//					if (isFirstPlanActivity)
-//						isFirstPlanActivity = false; 
-//					else {
-//						matrixEntry = originDestinationMatrix.getEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID));
-//						if(matrixEntry != null){
-//							double value = matrixEntry.getValue();
-//							originDestinationMatrix.setEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), value+1.);
-//						}
-//						else	
-//							originDestinationMatrix.createEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), 1.);
-//							// see PtPlanToPlanStepBasedOnEvents.addPersonToVehicleContainer (or zone coordinate addition)
-//					}
-//					lastZoneId = zone_ID; // stores the first activity (e. g. "home")
-//				}
-//			}
-//		}
-	}
+		while(persons.hasNext()){
 
-	/**
-	 * for testing only
-	 * @param args
-	 */
-	public static void main(String[] args){
-		
-		String plansFileName = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/plans/zurich2000_10pct_100it_plans_withstoragecap_merged_zurich_bigRoads_network.xml.gz";
-		String networkFileName = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/network/merged_zurich_network_bigRoads.xml";
-		
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
-		new MatsimPopulationReader(scenario).readFile(networkFileName);
-		new MatsimPopulationReader(scenario).readFile(plansFileName);
-		
-		Population population = scenario.getPopulation();
-		
-		log.info("... done!");
-		
+			double duration_home_work_min 	= -1.;
+			double distance_home_work_meter	= -1.;
+			double duration_work_home_min	= -1.;
+			double distance_work_home_meter	= -1.;
+			
+			Person p = persons.next();
+			// dumping out travel times/distances from selected plan
+			Plan plan = p.getSelectedPlan();
+			
+			boolean isHomeActivity = true;
+			
+			// check if activities available (then size of plan elements > 1)
+			// what happens with persons which no activities???
+			if(plan.getPlanElements().size() <= 1) 
+				continue;
+			
+			for ( PlanElement pe : plan.getPlanElements() ) {
+				if ( pe instanceof Activity ) {
+					Activity activity = (Activity) pe;
+					
+					if(activity.getType().endsWith(Constants.ACT_HOME))
+						isHomeActivity = true;
+					else
+						isHomeActivity = false;
+				}
+				else if(pe instanceof Leg){
+					Leg leg = (Leg) pe;
+					// if pe is a leg
+					Route route = leg.getRoute();
+					// tnicolai: or should we use route.getDistance ???
+					double distance = RouteUtils.calcDistance( (NetworkRoute)route ,network); 
+					if(isHomeActivity){
+						distance_home_work_meter = distance;
+						// to get minutes in time format mm:ss use TimeUtil.convertSeconds2Minutes(leg.getTravelTime()); 
+						// or see org.matsim.core.utils.misc.Time
+						duration_home_work_min   = leg.getTravelTime() / 60.;
+					}
+					else{
+						distance_work_home_meter = distance;
+						// to get minutes in time format mm:ss use TimeUtil.convertSeconds2Minutes(leg.getTravelTime()); 
+						// or see org.matsim.core.utils.misc.Time
+						duration_work_home_min	 = leg.getTravelTime() / 60.;
+					}
+				}
+			}
+			UrbanSimPersonCSVWriter.write(p.getId().toString(), 
+										  duration_home_work_min,
+										  distance_home_work_meter, 
+										  duration_work_home_min,
+										  distance_work_home_meter);
+			// for debugging
+			// String personID = p.getId().toString();
+			// log.info("Person[" + personID + "],Home2WorkTravelTime[" + duration_home_work_min
+			//		+ "],Home2WorkDistance[" + distance_home_work_meter
+			//		+ "],Work2HomeTravelTime[" + duration_work_home_min
+			//		+ "],Work2HomeDistance[" + distance_work_home_meter + "]");
+		}
+		// close writer
+		UrbanSimPersonCSVWriter.close();
+		// print computation time 
+		if (this.benchmark != null && benchmarkID > 0) {
+			this.benchmark.stoppMeasurement(benchmarkID);
+			log.info("Agent Performance Feedback with population size:"
+					+ population.getPersons().size() + " took "
+					+ this.benchmark.getDurationInSeconds(benchmarkID)
+					+ " seconds ("
+					+ this.benchmark.getDurationInSeconds(benchmarkID) / 60.
+					+ " minutes).");
+		}
 	}
 }

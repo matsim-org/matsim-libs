@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.tnicolai.matsim4opus.config.ConfigurationModule;
-import playground.tnicolai.matsim4opus.config.MATSim4UrbaSimControlerConfigModule;
+import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
 import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.DateUtil;
@@ -79,7 +79,7 @@ public class BackupRun {
 	private static void prepareHotStart(ScenarioImpl scenario){
 		
 //		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
-		MATSim4UrbaSimControlerConfigModule module = ConfigurationModule.getMATSim4UrbaSimControlerConfigModule(scenario);
+		MATSim4UrbanSimControlerConfigModule module = ConfigurationModule.getMATSim4UrbaSimControlerConfigModule(scenario);
 		
 		if(!module.getHotStartTargetLocation().equals("")){
 			

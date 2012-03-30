@@ -24,6 +24,7 @@
 package playground.tnicolai.matsim4opus.config;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
@@ -289,7 +290,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 				computeCellbasedAccessibilityShapeFile = true;
 		}
 
-		MATSim4UrbaSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
+		MATSim4UrbanSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
 		module.setAgentPerformance(computeAgentPerformanceFeedback);
 		module.setZone2ZoneImpedance(computeZone2ZoneImpedance);
 		module.setZoneBasedAccessibility(computeZoneBasedAccessibility);
@@ -472,7 +473,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		// get plans file for warm start 
 		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
 		
-		MATSim4UrbaSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
+		MATSim4UrbanSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
 		
 		// setting plans file as input
 		if( !hotStart.equals("") &&
@@ -529,9 +530,11 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		controlerCG.setLastIteration( lastIteration);
 		controlerCG.setOutputDirectory( Constants.MATSIM_4_OPUS_OUTPUT );
 		
-		HashSet<String> hs = new HashSet<String>();
-		hs.add("otfvis");
-		controlerCG.setSnapshotFormat(Collections.unmodifiableSet(hs));
+//		HashSet<String> hs = new HashSet<String>();
+//		hs.add("otfvis");
+//		controlerCG.setSnapshotFormat(Collections.unmodifiableSet(hs));
+		controlerCG.setSnapshotFormat(Arrays.asList("otfvis")); // otfvis dosn't work ???
+		controlerCG.setWriteSnapshotsInterval( 0 ); // disabling snapshots
 		
 		log.info("ControlerConfigGroup settings:");
 		log.info("FirstIteration: " + controlerCG.getFirstIteration());
@@ -688,13 +691,13 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		return apcm;
 	}
 	
-	public MATSim4UrbaSimControlerConfigModule getMATSim4UrbaSimControlerConfig() {
-		Module m = this.scenario.getConfig().getModule(MATSim4UrbaSimControlerConfigModule.GROUP_NAME);
-		if (m instanceof MATSim4UrbaSimControlerConfigModule) {
-			return (MATSim4UrbaSimControlerConfigModule) m;
+	public MATSim4UrbanSimControlerConfigModule getMATSim4UrbaSimControlerConfig() {
+		Module m = this.scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
+		if (m instanceof MATSim4UrbanSimControlerConfigModule) {
+			return (MATSim4UrbanSimControlerConfigModule) m;
 		}
-		MATSim4UrbaSimControlerConfigModule mccm = new MATSim4UrbaSimControlerConfigModule(MATSim4UrbaSimControlerConfigModule.GROUP_NAME);
-		this.scenario.getConfig().getModules().put(MATSim4UrbaSimControlerConfigModule.GROUP_NAME, mccm);
+		MATSim4UrbanSimControlerConfigModule mccm = new MATSim4UrbanSimControlerConfigModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
+		this.scenario.getConfig().getModules().put(MATSim4UrbanSimControlerConfigModule.GROUP_NAME, mccm);
 		return mccm;
 	}
 	

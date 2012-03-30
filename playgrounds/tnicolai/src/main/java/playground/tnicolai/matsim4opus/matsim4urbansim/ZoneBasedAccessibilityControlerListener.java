@@ -1,6 +1,7 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -8,7 +9,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -22,8 +22,9 @@ import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.ZoneBasedAccessibilityCSVWriter;
-import playground.tnicolai.matsim4opus.utils.io.writer.ZoneCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisZoneCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriter;
+import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**
  *  improvements feb'12
@@ -71,11 +72,12 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
-		ZoneBasedAccessibilityCSVWriter.initAccessiblityWriter(Constants.MATSIM_4_OPUS_TEMP +
-															   Constants.ZONES_FILE_CSV);
-		// in contrast to the file above this contains all information about zones but is not dedicated for URBASIM
-		ZoneCSVWriter.initAccessiblityWriter(Constants.MATSIM_4_OPUS_TEMP + 
-											 Constants.ZONES_COMPLETE_FILE_CSV);
+		UrbanSimZoneCSVWriter.initUrbanSimZoneWriter(Constants.MATSIM_4_OPUS_TEMP +
+													 UrbanSimZoneCSVWriter.FILE_NAME);
+		// in contrast to the file above this contains all information about
+		// zones but is not dedicated as input for UrbanSim, use for analysis
+		AnalysisZoneCSVWriter.initAccessiblityWriter(Constants.MATSIM_4_OPUS_TEMP + 
+											 		 Constants.ZONES_COMPLETE_FILE_CSV);
 		
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListener!");
 	}
@@ -84,24 +86,25 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
 		
+		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
+		
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		
-		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
+		double walkSpeedMeterPerSec = sc.getConfig().plansCalcRoute().getWalkSpeed();
+		this.walkSpeedMeterPerMin = walkSpeedMeterPerSec * 60.;
 		
 		// init LeastCostPathTree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		// calculates the workplace accessibility based on congested travel times:
 		// (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
 		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree( ttc, new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()) );
-		// calculates the workplace accessibility based on freespeed travel times:
+		// calculates the workplace accessibility based on free-speed travel times:
 		// link.getLength() * link.getFreespeed()
 		LeastCostPathTree lcptFreespeedTravelTime = new LeastCostPathTree(ttc, new FreeSpeedTravelTimeCostCalculator());
-		// this calculates a least cost path tree only based on link.getLength() (without marginalCostOfDistance since it's zero)
-		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator(sc.getConfig().plansCalcRoute().getWalkSpeed()) );
-		
-		this.walkSpeedMeterPerMin = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator( walkSpeedMeterPerSec ) );
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
@@ -139,9 +142,11 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			for(int fromIndex= 0; fromIndex < zones.length; fromIndex++){
 				
 				bar.update();
-				
+				// get coordinate from origin (start point)
+				Coord coordFromZone = zones[fromIndex].getZoneCoordinate();
 				// get nearest network node and zone id for origin zone
 				Node fromNode = zones[fromIndex].getNearestNode();
+				assert( fromNode != null );
 				Id originZoneID = zones[fromIndex].getZoneID();
 				// run dijkstra on network
 				lcptCongestedTravelTime.calculate(network, fromNode, depatureTime);
@@ -150,14 +155,17 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				// captures the euclidean distance between a zone centroid and its nearest node
-				LinkImpl nearestLink = network.getNearestLink( zones[fromIndex].getZoneCoordinate() );
-				double distCentroid2Link = nearestLink.calcDistance( zones[fromIndex].getZoneCoordinate() );
-				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
-//				double walkTimeOffset_min = NetworkUtil.getDistance2Node(network.getNearestLink( zones[fromIndex].getZoneCoordinate()), 
-//																		 zones[fromIndex].getZoneCoordinate(), 
-//																		 fromNode)  / this.walkSpeedMeterPerMin;
-//				double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(zones[fromIndex].getZoneCoordinate(), fromNode.getCoord()) / 60.;
+				// captures the distance (as walk time) between a zone centroid and its nearest node
+				double walkTimeOffset_min = NetworkUtil.getDistance2Node(network.getNearestLink(coordFromZone), 
+																		 coordFromZone, 
+						 												 fromNode)  / this.walkSpeedMeterPerMin;
+				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
+				// Euclidean Distance (measuring point 2 nearest node):
+				// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(zones[fromIndex].getZoneCoordinate(), fromNode.getCoord()) / 60.;
+				// Orthogonal Distance (measuring point 2 nearest link, does not include remaining distance between link intersection and nearest node)
+				// LinkImpl nearestLink = network.getNearestLink( zones[fromIndex].getZoneCoordinate() );
+				// double walkTimeOffset_min = (nearestLink.calcDistance( zones[fromIndex].getZoneCoordinate() ) / this.walkSpeedMeterPerMin); 
+				// or use NetworkUtil.getOrthogonalDistance(link, point) instead!
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;
 				double travelTimesWalkSum 		  = 0.; // substitute for travel distance
@@ -195,17 +203,17 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				double travelTimesWalkLogSum 		 = betaScalePreFactor * Math.log( travelTimesWalkSum );
 
 				// writing accessibility measures of current node in csv format (UrbanSim input)
-				ZoneBasedAccessibilityCSVWriter.write(originZoneID,
-													  congestedTravelTimesCarLogSum, 
-													  freespeedTravelTimesCarLogSum, 
-													  travelTimesWalkLogSum);
+				UrbanSimZoneCSVWriter.write(originZoneID,
+											congestedTravelTimesCarLogSum, 
+											freespeedTravelTimesCarLogSum, 
+											travelTimesWalkLogSum);
 				// writing complete zones information for further analysis
-				ZoneCSVWriter.write(originZoneID, 
-									zones[fromIndex].getZoneCoordinate(), 
-									fromNode.getCoord(), 
-									congestedTravelTimesCarLogSum, 
-									freespeedTravelTimesCarLogSum, 
-									travelTimesWalkLogSum);
+				AnalysisZoneCSVWriter.write(originZoneID, 
+											zones[fromIndex].getZoneCoordinate(), 
+											fromNode.getCoord(), 
+											congestedTravelTimesCarLogSum, 
+											freespeedTravelTimesCarLogSum, 
+											travelTimesWalkLogSum);
 			}
 			
 			this.benchmark.stoppMeasurement(benchmarkID);
@@ -221,8 +229,8 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		catch(Exception e){ e.printStackTrace(); }
 		finally{
 			// finalizing/closing csv file containing accessibility measures
-			ZoneBasedAccessibilityCSVWriter.close();
-			ZoneCSVWriter.close();
+			UrbanSimZoneCSVWriter.close();
+			AnalysisZoneCSVWriter.close();
 		}
 	}
 }

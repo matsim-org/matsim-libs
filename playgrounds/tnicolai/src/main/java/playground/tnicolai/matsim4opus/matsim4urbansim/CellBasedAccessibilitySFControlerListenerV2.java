@@ -28,7 +28,7 @@ import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.CellBasedAccessibilityCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriter;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -74,7 +74,7 @@ public class CellBasedAccessibilitySFControlerListenerV2 extends CellBasedAccess
 		double logitScaleParameterPreFactor = 1/(logitScaleParameter);
 
 		try{
-			CellBasedAccessibilityCSVWriter accCsvWriter = new CellBasedAccessibilityCSVWriter("");
+			AnalysisCellBasedAccessibilityCSVWriter accCsvWriter = new AnalysisCellBasedAccessibilityCSVWriter("");
 			
 			printSettings();
 			

@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.tnicolai.matsim4opus.config.AccessibilityParameterConfigModule;
-import playground.tnicolai.matsim4opus.config.MATSim4UrbaSimControlerConfigModule;
+import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV2;
 import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
 import playground.tnicolai.matsim4opus.constants.Constants;
@@ -45,7 +45,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
-import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
 
 
@@ -82,7 +82,7 @@ public class MATSim4UrbanSimParcelV2 {
 	ScenarioImpl scenario = null;
 	// MATSim4UrbanSim configuration converter
 	MATSim4UrbanSimConfigurationConverterV2 connector = null;
-	// Reads UrbanSim output files
+	// Reads UrbanSim Parcel output files
 	ReadFromUrbansimParcelModel readFromUrbansim = null;
 	// Benchmarking computation times and hard disc space ... 
 	Benchmark benchmark = null;
@@ -145,7 +145,6 @@ public class MATSim4UrbanSimParcelV2 {
 		cleanNetwork(network);
 		
 		// get the data from UrbanSim (parcels and persons)
-		// readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
 		readFromUrbansim = new ReadFromUrbansimParcelModel( getUrbanSimParameterConfig().getYear() );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
@@ -191,6 +190,18 @@ public class MATSim4UrbanSimParcelV2 {
 	}
 	
 	/**
+	 * reads UrbanSim persons table and creates a MATSim population
+	 * @param oldPopulation
+	 * @param parcels
+	 * @param network
+	 * @param samplingRate
+	 * @return
+	 */
+	Population readUrbanSimPopulation(Population oldPopulation, ActivityFacilitiesImpl parcels, Network network, double samplingRate){
+		return readFromUrbansim.readPersons( oldPopulation, parcels, network, samplingRate );
+	}
+	
+	/**
 	 * Reads the UrbanSim job table and aggregates jobs with same nearest node 
 	 * 
 	 * @return JobClusterObject[] 
@@ -211,7 +222,7 @@ public class MATSim4UrbanSimParcelV2 {
 		// read UrbanSim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		
-		MATSim4UrbaSimControlerConfigModule m4uModule = getMATSim4UrbaSimControlerConfig();
+		MATSim4UrbanSimControlerConfigModule m4uModule= getMATSim4UrbaSimControlerConfig();
 		UrbanSimParameterConfigModule uspModule		  = getUrbanSimParameterConfig();
 		
 		
@@ -225,15 +236,7 @@ public class MATSim4UrbanSimParcelV2 {
 		
 			log.info("MATSim will remove persons from plans-file, which are no longer part of the UrbanSim population!");
 			log.info("New UrbanSim persons will be added.");
-			
-//			String mode = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE);
-//			if(mode.equals(Constants.HOT_START))
-//				log.info("MATSim is running in HOT start mode, i.e. MATSim starts with pop file from previous run: " + scenario.getConfig().plans().getInputFile());
-//			else if(mode.equals(Constants.WARM_START))
-//				log.info("MATSim is running in WARM start mode, i.e. MATSim starts with pre-existing pop file:" + scenario.getConfig().plans().getInputFile());
-//			
-//			log.info("Persons not found in pop file are added; persons no longer in UrbanSim persons file are removed." ) ;
-			
+
 			oldPopulation = scenario.getPopulation() ;
 		}
 		else {
@@ -243,8 +246,7 @@ public class MATSim4UrbanSimParcelV2 {
 		}
 
 		// read UrbanSim persons.  Generates hwh acts as side effect
-//		double populationSampleRate = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE));
-		Population newPopulation = readFromUrbansim.readPersons( oldPopulation, parcels, network, uspModule.getPopulationSampleRate() ) ;
+		Population newPopulation = readUrbanSimPopulation(oldPopulation,parcels, network, uspModule.getPopulationSampleRate());//readFromUrbansim.readPersons( oldPopulation, parcels, network, uspModule.getPopulationSampleRate() ) ;
 		
 		// clean
 		oldPopulation=null;
@@ -290,7 +292,10 @@ public class MATSim4UrbanSimParcelV2 {
 		if(computeZone2ZoneImpedance)
 			// creates zone2zone impedance matrix
 			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
-																					  parcels) ); 
+																					  parcels) );
+		if(computeAgentPerformance)
+			// creates a persons.csv output for UrbanSim
+			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark));
 		
 		if(computeZoneBasedAccessibilities){
 			
@@ -312,8 +317,8 @@ public class MATSim4UrbanSimParcelV2 {
 			// init aggregatedWorkplaces
 			if(aggregatedOpportunities == null)
 				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
-			WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
-																aggregatedOpportunities);
+			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
+																		aggregatedOpportunities);
 		}
 	}
 	
@@ -330,7 +335,7 @@ public class MATSim4UrbanSimParcelV2 {
 		// setting workplace/job sample rate
 		checkAndSetJobSample(args); // tnicolai make configurable, use opportunitySamplingRate in MATSim4UrbaSimControlerConfigModule
 
-		MATSim4UrbaSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
+		MATSim4UrbanSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
 
 		this.computeAgentPerformance	= module.isAgentPerformance();
 		this.computeZone2ZoneImpedance	= module.isZone2ZoneImpedance();
@@ -421,13 +426,13 @@ public class MATSim4UrbanSimParcelV2 {
 		return apcm;
 	}
 	
-	MATSim4UrbaSimControlerConfigModule getMATSim4UrbaSimControlerConfig() {
-		Module m = this.scenario.getConfig().getModule(MATSim4UrbaSimControlerConfigModule.GROUP_NAME);
-		if (m instanceof MATSim4UrbaSimControlerConfigModule) {
-			return (MATSim4UrbaSimControlerConfigModule) m;
+	MATSim4UrbanSimControlerConfigModule getMATSim4UrbaSimControlerConfig() {
+		Module m = this.scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
+		if (m instanceof MATSim4UrbanSimControlerConfigModule) {
+			return (MATSim4UrbanSimControlerConfigModule) m;
 		}
-		MATSim4UrbaSimControlerConfigModule mccm = new MATSim4UrbaSimControlerConfigModule(MATSim4UrbaSimControlerConfigModule.GROUP_NAME);
-		this.scenario.getConfig().getModules().put(MATSim4UrbaSimControlerConfigModule.GROUP_NAME, mccm);
+		MATSim4UrbanSimControlerConfigModule mccm = new MATSim4UrbanSimControlerConfigModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
+		this.scenario.getConfig().getModules().put(MATSim4UrbanSimControlerConfigModule.GROUP_NAME, mccm);
 		return mccm;
 	}
 	
