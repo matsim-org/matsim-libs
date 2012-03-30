@@ -28,7 +28,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.thibautd.jointtrips.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
+import playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser.JointTimeModeChooserModule;
 import playground.thibautd.jointtrips.replanning.modules.jointtripsmutator.JointTripsMutatorModule;
 import playground.thibautd.jointtrips.replanning.selectors.RandomPlanSelectorWithoutCasts;
 
@@ -52,7 +52,7 @@ public class MutateAndOptimiseStrategy extends JointPlanStrategy {
 		super( extractSelector( controler.getConfig() ) );
 
 		addStrategyModule( new JointTripsMutatorModule( controler ) );
-		addStrategyModule( new JointPlanOptimizerModule( controler ) );
+		addStrategyModule( new JointTimeModeChooserModule( controler ) );
 	}
 
 	private static PlanSelector extractSelector(
