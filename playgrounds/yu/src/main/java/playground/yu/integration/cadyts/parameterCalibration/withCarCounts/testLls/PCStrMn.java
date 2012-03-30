@@ -21,15 +21,12 @@
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLls;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.ejml.data.DenseMatrix64F;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,15 +34,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
 
 import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
@@ -53,16 +45,14 @@ import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import utilities.math.BasicStatistics;
 import utilities.math.MultinomialLogit;
 import cadyts.calibrators.Calibrator;
-import cadyts.demand.PlanStep;
-import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 
 public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		BseStrategyManager {
 	// private final static Logger log = Logger.getLogger(PCStrMn.class);
 	// private double delta;
 	private final Config config;
-	private Plan oldSelected = null;
-	private final MultinomialLogit singleMnl = null;
+	// private Plan oldSelected = null;
+	// private final MultinomialLogit singleMnl = null;
 
 	private BasicStatistics betaTravelingStats = null,
 			constantLeftTurnStats = null;
@@ -74,9 +64,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	private int correctedPlanNb = 0;
 
 	final double minStdDev, varianceScale;
-	private Counts counts = null;
-
-	private static int countTimeBin = 3600;
+	private PCCtlListener cltListener = null;
 
 	public PCStrMn(Network net, int firstIteration, Config config) {
 		super(firstIteration);
@@ -95,12 +83,6 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				: Calibrator.DEFAULT_VARIANCE_SCALE;
 
 		pe = new ParameterEstimator();
-
-		final String timeBinStr = config.findParam(
-				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "timeBinSize_s");
-		if (timeBinStr != null) {
-			countTimeBin = Integer.parseInt(timeBinStr);
-		}
 	}
 
 	// @Override
@@ -281,7 +263,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		if (strategy != null) {
 			// ENSURE THAT EVERY PLAN IN CHOICE SET HAS BEEN SIMULATED ATLEAST
 			// ONE TIME
-			oldSelected = person.getSelectedPlan();
+			// oldSelected = person.getSelectedPlan();
 
 			if (strategy.getNumberOfStrategyModules() <= 0) {
 				// only with planSelector/-Changer, without Plan innovation,
@@ -306,21 +288,12 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	 * @return whether the score is corrected
 	 */
 	private boolean generateScoreCorrection(Plan plan) {
-		planConverter.convert((PlanImpl) plan);
-		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
-		double scoreCorrection = calibrator.getUtilityCorrection(planSteps)
+
+		double scoreCorrection = cltListener.getUtilityCorrection(plan)
 				/ config.planCalcScore().getBrainExpBeta();
 		// #######SAVE "utilityCorrection" 4 MNL.ASC#########
 		plan.getCustomAttributes().put(UTILITY_CORRECTION, scoreCorrection);
-		// ##################################################
-		// Double oldScore = plan.getScore();
-		// if (oldScore == null) {
-		// oldScore = 0d;// dummy setting, the score of plans will be
-		// // calculated between firstIter+1 and firstIter+
-		// }
-		// plan.setScore(oldScore + scoreCorrection);// this line is NOT
-		// necessary
-		// // any more
+
 		return scoreCorrection != 0d;
 	}
 
@@ -333,10 +306,11 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	 */
 	private void generateScoreCorrections(Person person) {
 		for (Plan plan : person.getPlans()) {
-			if (generateScoreCorrection(plan) && !hasTooLowCount(plan)
+			if (generateScoreCorrection(plan)
 			/*
-			 * variance * count >= minStdDev ^ 2, too low count will NOT be
-			 * considered for the least squares calculation
+			 * &&!hasTooLowCount(plan) variance * count >= minStdDev ^ 2, too
+			 * low count will NOT be considered for the least squares
+			 * calculation
 			 */) {
 
 				Map<String, Object> customAttrs = plan.getCustomAttributes();
@@ -372,47 +346,43 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	/**
 	 * judge if there is too low count during the plan
 	 * 
+	 * @param pcCtlListener
+	 * 
 	 * @param plan
 	 * @return
 	 */
-	private boolean hasTooLowCount(Plan plan) {
-		planConverter.convert((PlanImpl) plan);
-		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
 
-		for (Iterator<PlanStep<Link>> planStepIt = planSteps.iterator(); planStepIt
-				.hasNext();) {
-			PlanStep<Link> planStep = planStepIt.next();
-			Id linkId = planStep.getLink().getId();
-			/*
-			 * if counts contains this linkId. Yes, look at the time, judge if
-			 * count * varianceScale < minStdDev^2: yes -> break, directly
-			 * return true;
-			 */
-			Count count = counts.getCount(linkId);
-			if (count != null) {
-				if (varianceScale
-						* count.getVolume(
-								planStep.getEntryTime_s() / countTimeBin + 1)
-								.getValue()/* volume (count-y) */< minStdDev
-						* minStdDev) {
-					return true;
-				}
-			}
+	// private boolean hasTooLowCount(Plan plan) {
+	// planConverter.convert((PlanImpl) plan);
+	// cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
+	//
+	// for (Iterator<PlanStep<Link>> planStepIt = planSteps.iterator();
+	// planStepIt
+	// .hasNext();) {
+	// PlanStep<Link> planStep = planStepIt.next();
+	// Id linkId = planStep.getLink().getId();
+	// /*
+	// * if counts contains this linkId. Yes, look at the time, judge if
+	// * count * varianceScale < minStdDev^2: yes -> break, directly
+	// * return true;
+	// */
+	// Count count = counts.getCount(linkId);
+	// if (count != null) {
+	// if (varianceScale
+	// * count.getVolume(
+	// planStep.getEntryTime_s() / countTimeBin + 1)
+	// .getValue()/* volume (count-y) */< minStdDev
+	// * minStdDev) {
+	// return true;
+	// }
+	// }
+	//
+	// }
+	// return false;
+	// }
 
-		}
-		return false;
-	}
-
-	public void init(MATSimChoiceParameterCalibrator<Link> calibrator,
-			TravelTime travelTimeCalculator, MultinomialLogitChoice chooser,
-			Counts counts) {
-		// init(calibrator, travelTimeCalculator);
-		this.calibrator = calibrator;
-		planConverter = new PlanToPlanStep(travelTimeCalculator, net);
-		tt = travelTimeCalculator;
-		// /////////////////////////////////////////////////////////////////////
+	public void init(PCCtlListener pcCtlListener, MultinomialLogitChoice chooser) {
+		cltListener = pcCtlListener;
 		this.chooser = chooser;
-		// this.delta = delta;
-		this.counts = counts;
 	}
 }

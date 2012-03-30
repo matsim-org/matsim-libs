@@ -20,17 +20,16 @@
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLls;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -47,12 +46,13 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
@@ -62,9 +62,9 @@ import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.Vector;
-import utilities.misc.DynamicData;
 import cadyts.calibrators.Calibrator;
 import cadyts.calibrators.analytical.ChoiceParameterCalibrator4;
+import cadyts.demand.PlanStep;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
@@ -78,8 +78,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private SimpleWriter writer = null;
 	private final SimpleWriter writerCV = null;
-	private static List<Link> links = new ArrayList<Link>();
-	private static Set<Id> linkIds = new HashSet<Id>();
+	// private static List<Link> links = new ArrayList<Link>();
+	// private static Set<Id> linkIds = new HashSet<Id>();
 	private XYLineChart chart;// paramChart
 
 	static int paramDim;
@@ -91,6 +91,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private double[][] paramArrays/* performing, traveling and so on */;
 
 	private double llhSum = 0d;
+	private PlanToPlanStep planConverter = null;
+	private Counts counts = null;
+	private static int countTimeBin = 3600;
+	private Network network = null;
 
 	// private final boolean writeQGISFile = true;
 
@@ -115,8 +119,11 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 					PARAM_NAME_INDEX + i);
 		}
 
-		// int timeBinSize_s = Integer.parseInt(config.findParam(
-		// BSE_CONFIG_MODULE_NAME, "timeBinSize_s"));
+		final String timeBinStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+				"timeBinSize_s");
+		if (timeBinStr != null) {
+			countTimeBin = Integer.parseInt(timeBinStr);
+		}
 
 		// SETTING REGRESSIONINERTIA
 		String regressionInertiaValue = config.findParam(
@@ -212,9 +219,35 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			delta = Double.parseDouble(deltaStr);
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
-		((PCStrMn) ctl.getStrategyManager()).init(calibrator,
-				ctl.getTravelTimeCalculator(),
-				(MultinomialLogitChoice) chooser, ctl.getCounts());
+
+		((PCStrMn) ctl.getStrategyManager()).init(this,
+				(MultinomialLogitChoice) chooser);
+	}
+
+	double getUtilityCorrection(Plan plan) {
+		double uc = 0d;
+		planConverter.convert((PlanImpl) plan);
+
+		for (Iterator<PlanStep<Link>> planStepIt = planConverter.getPlanSteps()
+				.iterator(); planStepIt.hasNext();) {
+			PlanStep<Link> planStep = planStepIt.next();
+			Id linkId = planStep.getLink().getId();
+			Count count = counts.getCount(linkId);
+			if (count != null) {
+				int entryTime_s = planStep.getEntryTime_s();
+				double countVal = count.getVolume(
+						entryTime_s / countTimeBin + 1/* hour */).getValue();
+				if (countVal != 0d/* zeroCount */) {
+					double simVal = resultsContainer.getSimValue(network
+							.getLinks().get(linkId), entryTime_s,
+							entryTime_s + 3599, TYPE.FLOW_VEH_H);
+					uc += 1d - simVal/* simVal */
+							/ countVal;
+				}
+			}
+		}
+
+		return uc;
 	}
 
 	private void loadScoringAttributes(String scorAttrFilename,
@@ -230,25 +263,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		Config config = ctl.getConfig();
 		int iter = event.getIteration();
 		int firstIter = ctl.getFirstIteration();
-
 		ControlerIO io = ctl.getControlerIO();
 		// ***************************************************
 		calibrator.setFlowAnalysisFile(io.getIterationFilename(iter,
 				"flowAnalysis.log"));
-		calibrator.afterNetworkLoading(resultsContainer);
-		// ************************************************
-		if (iter % writeLinkUtilOffsetsInterval == 0) {
-			try {
-				DynamicData<Link> linkCostOffsets = calibrator
-						.getLinkCostOffsets();
-				new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(
-						io.getIterationFilename(iter, "linkUtilOffsets.xml"),
-						linkCostOffsets);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 
 		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
@@ -289,7 +307,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			if (iter <= nextWriteLlhInterval
 					&& iter > nextWriteLlhInterval - avgLlhOverIters
 					|| iter % writeLlhInterval == 0) {
-				Network network = ctl.getNetwork();
 
 				for (Map.Entry<Id, Count> entry : ctl.getCounts().getCounts()
 						.entrySet()) {
@@ -381,6 +398,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		final CtlWithLeftTurnPenaltyLs ctl = (CtlWithLeftTurnPenaltyLs) event
 				.getControler();
 		Config config = ctl.getConfig();
+		network = ctl.getNetwork();
 
 		setMatsimParameters(ctl);
 
@@ -420,6 +438,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		// INITIALIZING StrategyManager
 		initializeStrategyManager(ctl);
+
+		planConverter = new PlanToPlanStep(ctl.getTravelTimeCalculator(),
+				network);
 		// ******************************************************************
 
 		// INITIALIZING resultContainer
@@ -470,7 +491,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void readCounts(Controler ctl) {
 		final Counts counts = ctl.getCounts();
-		final Network network = ctl.getNetwork();
 		final Config config = ctl.getConfig();
 
 		if (counts == null) {
@@ -492,9 +512,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			if (link == null) {
 				System.err.println("could not find link " + countId.toString());
 			} else if (isInRange(countId, network)) {
-				// for ...2QGIS
-				links.add(network.getLinks().get(countId));
-				linkIds.add(countId);
+				// // for ...2QGIS
+				// links.add(network.getLinks().get(countId));
+				// linkIds.add(countId);
 				// ---------GUNNAR'S CODES---------------------
 				for (Volume volume : countsMap.get(countId).getVolumes()
 						.values()) {
@@ -509,6 +529,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				}
 			}
 		}
+		this.counts = counts;
 	}
 
 	private void setCalibratorParameters(Config config) {
@@ -714,7 +735,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		String distFilterCenterNodeStr = ccg.getDistanceFilterCenterNode();
 		if (distFilterCenterNodeStr != null) {
 			// set up center and radius of counts stations locations
-			distanceFilterCenterNodeCoord = ctl.getNetwork().getNodes()
+			distanceFilterCenterNodeCoord = network.getNodes()
 					.get(new IdImpl(distFilterCenterNodeStr)).getCoord();
 			distanceFilter = ccg.getDistanceFilter();
 		}
@@ -731,7 +752,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		Controler ctl = event.getControler();
 
 		CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory = new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				ctl.getConfig(), ctl.getNetwork());
+				ctl.getConfig(), network);
 		ctl.setScoringFunctionFactory(sfFactory);
 		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setSfFactory(sfFactory);
 
