@@ -45,9 +45,15 @@ class GautengControler {
 	static Logger log = Logger.getLogger(GautengControler.class) ;
 	
 	public static void main ( String[] args ) {
-
+		if(args.length != 3){
+			throw new RuntimeException("Must provide three arguments: config file path, base value of time (for cars) and multiplier for commercial vehicles.") ;
+		}
+		// Get arguments
+		// Read the base Value-of-Time (VoT) for private cars, and the VoT multiplier from the arguments, johan Mar'12
+		String configFileName = args[0] ;
 //		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
-		String configFileName = "../../sanral2010/config/kaiconfig.xml" ;
+		double baseValueOfTime = Double.parseDouble(args[1]);
+		double valueOfTimeMultiplier = Double.parseDouble(args[2]);
 
 		final Controler controler = new Controler( configFileName ) ;
 
@@ -56,7 +62,6 @@ class GautengControler {
 		Scenario sc = controler.getScenario();
 		
 //		constructPersonHhMappingAndInsertIntoScenario(sc);
-
 		
 		
 		if (sc.getConfig().scenario().isUseRoadpricing()) {
@@ -70,7 +75,8 @@ class GautengControler {
 			new GautengRoadPricingScheme( sc.getConfig(), sc.getNetwork() , sc.getPopulation() );
 
 		// CONSTRUCT UTILITY OF MONEY:
-		UtilityOfMoneyI personSpecificUtilityOfMoney = new GautengUtilityOfMoney( sc.getConfig().planCalcScore() ) ;
+		
+		UtilityOfMoneyI personSpecificUtilityOfMoney = new GautengUtilityOfMoney( sc.getConfig().planCalcScore() , baseValueOfTime, valueOfTimeMultiplier) ;
 
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing class):
 		// insert into scoring:

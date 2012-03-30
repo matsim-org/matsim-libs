@@ -10,15 +10,28 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor.Type;
 
-/**This is a comment.
+/**
+ * Calculates the utility of money from a given Value of Time (VoT). 
  * @author nagel
- *
+ * @author jwjoubert
  */
 public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	
 	private PlanCalcScoreConfigGroup planCalcScore;
+	private final double baseValueOfTime;
+	private final double commercialMultiplier;
 
-	public GautengUtilityOfMoney( final PlanCalcScoreConfigGroup cnScoringGroup ) {
+	/**
+	 * Class to calculate the marginal utility of money (beta_money) for 
+	 * different vehicle types given the value of time (VoT).  
+	 * @param cnScoringGroup
+	 * @param baseValueOfTime expressed in Currency/hr that is currently (March 
+	 * 2012) used for private cars, taxis and external traffic. 
+	 * @param valueOfTimeMultiplier to inflate the base VoT for heavy commercial 
+	 * vehicles. A multiplier of <i>half</i> this value is used for busses and
+	 * smaller commercial vehicles.
+	 */
+	public GautengUtilityOfMoney( final PlanCalcScoreConfigGroup cnScoringGroup, double baseValueOfTime, double valueOfTimeMultiplier ) {
 		this.planCalcScore = cnScoringGroup ;
 		for ( Type vehType : Type.values() ) {
 			Logger.getLogger(this.getClass()).info( " vehType: " + vehType.toString() 
@@ -26,6 +39,8 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 					+ "; value of travel time savings per hr: " + getValueOfTime_hr(vehType)
 					+ "; => utility of money: " + getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr(vehType)) ) ;
 		}
+		this.baseValueOfTime = baseValueOfTime ;
+		this.commercialMultiplier = valueOfTimeMultiplier ;
 	}
 
 	public double getUtilityOfMoney_normally_positive(final Id personId ) {
@@ -52,7 +67,7 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	}
 
 	private double getValueOfTime_hr(Type vehicleType) {
-		double valueOfTime_hr = 100 ;
+		double valueOfTime_hr = baseValueOfTime ;
 		switch( vehicleType ) {
 		case carWithTag:
 		case carWithoutTag:
@@ -61,17 +76,17 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		case commercialClassBWithoutTag:
 		case busWithTag:
 		case busWithoutTag:
-			valueOfTime_hr = 300. ; 
+			valueOfTime_hr = baseValueOfTime*0.5*commercialMultiplier ; 
 			break;
 		case commercialClassCWithTag:
 		case commercialClassCWithoutTag:
-			valueOfTime_hr = 600. ; 
+			valueOfTime_hr = baseValueOfTime*commercialMultiplier ; 
 			break ;
 		case taxiWithTag:
 		case taxiWithoutTag:
 		case extWithTag:
 		case extWithoutTag:
-			valueOfTime_hr = 100.;
+			valueOfTime_hr = baseValueOfTime;
 			break ;
 		}
 		return valueOfTime_hr;

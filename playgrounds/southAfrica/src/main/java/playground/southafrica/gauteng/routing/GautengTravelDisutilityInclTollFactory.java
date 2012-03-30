@@ -27,10 +27,9 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeI;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeI;
 
-import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
 /**

@@ -22,7 +22,7 @@ package playground.southafrica.gauteng.roadpricingscheme;
 
 public abstract class TagPenetration {
 	public final static double CAR = 0.40;
-	public final static double COMMERCIAL = 0.60;
+	public final static double COMMERCIAL = 0.40;
 	public final static double BUS = 0.50;
 	public final static double TAXI = 0.40;
 	public final static double EXTERNAL = 0.25;
