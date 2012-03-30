@@ -60,10 +60,9 @@ public class CreatePopulation {
 	private DecisionModelCreator decisionModelCreator = new DecisionModelCreator();
 	private Random random = new Random(37835409);
 	
-	private Zone tollZone;
-	
+	private Zone tollZone;	
 	private ObjectAttributes votFactors = new ObjectAttributes();
-			
+				
 	public void createPopulation(ScenarioImpl scenario, Config config) {		
 		this.scenario = scenario;
 		this.config = config;		
@@ -186,7 +185,7 @@ public class CreatePopulation {
 	}
 	
 	private double addOtherActs(PlanImpl plan, PersonImpl person, String day, double endTime) {
-		DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
+		//DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
 		boolean checkShopping = false;
 		boolean checkLeisure = false;
 		

@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -25,6 +26,18 @@ public class UtilityAnalyzer {
 	
 	private List<Zone> zones = new Vector<Zone>();
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private UtilitiesBoxPlot boxPlot = new UtilitiesBoxPlot("Utilities");
+	
+	public static void main (final String[] args) {
+		UtilityAnalyzer analyzer = new UtilityAnalyzer();
+		Config config = ConfigUtils.loadConfig(args[0]);
+		String outPath = args[1];
+		
+		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreate.xml");
+		double sideLength = Double.parseDouble(configCreate.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
+		
+		analyzer.analyze(config, outPath, sideLength);
+	}
 		
 	public void analyze(Config config, String outPath, double sideLength) {
 		this.initZones(sideLength);
@@ -33,20 +46,39 @@ public class UtilityAnalyzer {
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.facilities().getInputFile());
 		
 		TreeMap<String, Utilities> utilitiesPerZone = new TreeMap<String, Utilities>();
+		ArrayList<Double> utilities = new ArrayList<Double>();
 		
 		for (String day : Surprice.days) {
 			String plansFilePath = outPath + "/" + day + "/" + day + ".output_plans.xml.gz";
 			MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 			populationReader.readFile(plansFilePath);
 
-			this.computeUtilities(utilitiesPerZone, day);
+			this.computeZoneUtilities(utilitiesPerZone, day);
+			this.computeUtilities(utilities, day);
+			this.boxPlot.addUtilities(utilities, day);
 			
 			this.scenario.getPopulation().getPersons().clear();
 		}	
 		this.write(outPath, utilitiesPerZone);
+		this.boxPlot.createChart();
+		this.boxPlot.saveAsPng(outPath + "/utilities.png", 400, 300);
 	}
 	
-	private void computeUtilities(TreeMap<String, Utilities> utilitiesPerZone, String day) {		
+	private void computeUtilities(ArrayList<Double> utilities, String day) {		
+		double avgUtility = 0.0;
+		int n = 0;
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			avgUtility += person.getSelectedPlan().getScore();
+			n++;
+		}
+		avgUtility /= n;
+		
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			utilities.add(person.getSelectedPlan().getScore() / avgUtility);
+		}		
+	}
+		
+	private void computeZoneUtilities(TreeMap<String, Utilities> utilitiesPerZone, String day) {		
 		for (Zone zone : this.zones) {
 			if (utilitiesPerZone.get(zone.getName()) == null) {
 				Utilities utilitiesPerDay = new Utilities();
