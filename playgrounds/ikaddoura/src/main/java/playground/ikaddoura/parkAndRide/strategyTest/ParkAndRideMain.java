@@ -39,7 +39,7 @@ public class ParkAndRideMain {
 		controler.setOverwriteFiles(true);
 			
 		controler.addControlerListener(new ParkAndRideControlerListener(controler));
-			
+		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
 		ParkAndRideScoringFunctionFactory scoringfactory = new ParkAndRideScoringFunctionFactory(planCalcScoreConfigGroup, controler.getNetwork());
 		controler.setScoringFunctionFactory(scoringfactory);

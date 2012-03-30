@@ -24,11 +24,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
@@ -42,15 +40,15 @@ import org.matsim.core.scenario.ScenarioImpl;
  * @author Ihab
  *
  */
-public class ParkAndRidePlanStrategy implements PlanStrategyModule {
-	private static final Logger log = Logger.getLogger(ParkAndRidePlanStrategy.class);
+public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
+	private static final Logger log = Logger.getLogger(ParkAndRideChangeLocationStrategy.class);
 
 	ScenarioImpl sc;
 	Network net;
 	Population pop;
 	private List<Id> parkAndRideLinkIDs = new ArrayList<Id>();
 
-	public ParkAndRidePlanStrategy(Controler controler) {
+	public ParkAndRideChangeLocationStrategy(Controler controler) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
@@ -71,8 +69,6 @@ public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 
 	@Override
 	public void handlePlan(Plan plan) {
-		if (plan.getPerson().getId().toString().contains("car")) { // checks if car is available
-			log.info("Car is available. Park and Ride is possible.");
 			
 			List<PlanElement> planElements = plan.getPlanElements();
 			boolean hasParkAndRide = false;
@@ -88,58 +84,10 @@ public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 			}
 			
 			if (hasParkAndRide == false){
-				log.info("Plan doesn't contain Park and Ride. Adding Park and Ride...");
-
-				// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus der Liste möglicher P+R Links)
-				Activity parkAndRide = createParkAndRideActivity(Math.random());
-
-				// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
-				for (int i = 0; i < planElements.size(); i++) {
-					PlanElement pe = planElements.get(i);
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (act.getType().equals("home") && i==0){
-							planElements.remove(1);
-							planElements.add(1, pop.getFactory().createLeg(TransportMode.car));
-							planElements.add(2, parkAndRide);
-							planElements.add(3, pop.getFactory().createLeg(TransportMode.pt));
-						}
-					}
-				}
-				
-				// splits first Leg before homeActivity into ptLeg - parkAndRideActivity - carLeg
-				int size = planElements.size();
-				for (int i = 0; i < size; i++) {
-					PlanElement pe = planElements.get(i);
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (act.getType().equals("home") && i==planElements.size()-1) {
-							planElements.remove(size-2);
-							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.car));
-							planElements.add(size-2, parkAndRide);
-							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.pt));	
-						}
-					} 
-				}
-				
-				// change all carLegs between parkAndRideActivities to ptLegs
-				List <Integer> parkAndRidePlanElementIndex = getPlanElementIndex(planElements);
-				if (parkAndRidePlanElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
-				for (int i = 0; i < planElements.size(); i++) {
-					PlanElement pe = planElements.get(i);
-					if (i>parkAndRidePlanElementIndex.get(0) && i < parkAndRidePlanElementIndex.get(1)){
-						if (pe instanceof Leg){
-							Leg leg = (Leg) pe;
-							if (TransportMode.car.equals(leg.getMode())){
-								leg.setMode(TransportMode.pt);
-							}
-						}
-					}
-				}
-				
+				log.info("Plan doesn't contain Park and Ride.");
 			}
 			else {
-				log.info("Plan contains already Park and Ride. Changing the Park and Ride Location...");
+				log.info("Plan contains Park and Ride. Changing the Park and Ride Location...");
 							
 				List<Integer> planElementIndex = getPlanElementIndex(planElements);
 				if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
@@ -155,11 +103,6 @@ public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 					}
 				}
 			}
-		}
-		else {
-			log.info("Person has no car. Park and Ride is not possible.");
-			// do nothing!
-		}
 	}
 	
 	private Activity createParkAndRideActivity(double random) {
@@ -170,7 +113,7 @@ public class ParkAndRidePlanStrategy implements PlanStrategyModule {
 		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
 		
 		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getCoord(), rndLinkId); 
-		parkAndRide.setMaximumDuration(0.0);
+		parkAndRide.setMaximumDuration(120.0);
 		
 		return parkAndRide;
 	}

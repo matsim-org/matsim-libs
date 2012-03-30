@@ -26,10 +26,8 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
-import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 /**
  * @author Ihab
@@ -45,42 +43,32 @@ public class ParkAndRideControlerListener implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		
+		PlanStrategy strategyAddRemove = new PlanStrategyImpl(new RandomPlanSelector());
+		strategyAddRemove.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+		strategyAddRemove.addStrategyModule(new ParkAndRideAddRemoveStrategy(controler)); // only if car is available: P+R added (if plan doesn't contain P+R) or P+R removed (if plan contains P+R)
+		strategyAddRemove.addStrategyModule(new ReRoute(controler));
+		
+		PlanStrategy strategyChangeLocation = new PlanStrategyImpl(new RandomPlanSelector());
+		strategyChangeLocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler)); // if plan contains P+R: change to other P+R location
+		strategyChangeLocation.addStrategyModule(new ReRoute(controler));
+		
+		PlanStrategy strategyTimeAllocation = new PlanStrategyImpl(new RandomPlanSelector());
+		strategyTimeAllocation.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig())); // TimeAllocation, not changing "parkAndRide" and "pt interaction"
+		strategyTimeAllocation.addStrategyModule(new ReRoute(controler));
 
-//// führt die Standard SubtourModeChoice für Pläne mit oder ohne ParkAndRide aus.
-//		PlanStrategy strategy1 = new PlanStrategyImpl(new RandomPlanSelector());
-//		strategy1.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-//		strategy1.addStrategyModule(new SubtourModeChoice(controler.getConfig()));
-//		strategy1.addStrategyModule(new ReRoute(controler));
-		
-// Verändert einen Plan nur wenn ein Pkw verfügbar ist ("car" in personId). Wenn Plan noch kein P+R enthält --> P+R wird eingebaut. Wenn Plan bereits P+R enthält --> zufällige Auswahl einer anderen P+R Location
-		PlanStrategy strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy2.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategy2.addStrategyModule(new ParkAndRidePlanStrategy(controler));
-		strategy2.addStrategyModule(new ReRoute(controler));
-		
-// Wenn der Plan P+R enthält --> P+R mitsamt des zugehörigen ptLegs entfernt.
-		PlanStrategy strategy3 = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy3.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategy3.addStrategyModule(new ParkAndRideRemoverStrategy(controler));
-		strategy3.addStrategyModule(new ReRoute(controler));
-		
-// TimeAllocation, welche die parkAndRide und pt interaction Aktivitäten berücksichtigt
-		PlanStrategy strategy4 = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy4.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig()));
 		
 		StrategyManager manager = this.controler.getStrategyManager() ;
+	
+		manager.addStrategy(strategyAddRemove, 0.1);
+		manager.addChangeRequest(45, strategyAddRemove, 0);
+				
+		manager.addStrategy(strategyChangeLocation, 0.1);
+		manager.addChangeRequest(45, strategyChangeLocation, 0);
 		
-//		manager.addStrategy(strategy1, 0.3);
-		
-		manager.addStrategy(strategy2, 0.15);
-		manager.addChangeRequest(45, strategy2, 0);
-		
-		manager.addStrategy(strategy3, 0.15);
-		manager.addChangeRequest(45, strategy3, 0);
-		
-		manager.addStrategy(strategy4, 0.15);
-		manager.addChangeRequest(45, strategy4, 0);
-
+		manager.addStrategy(strategyTimeAllocation, 0.1);
+		manager.addChangeRequest(45, strategyTimeAllocation, 0);
 
 	}
 
