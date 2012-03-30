@@ -17,6 +17,7 @@ import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor.Type;
  */
 public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	
+	private final Logger log = Logger.getLogger(GautengUtilityOfMoney.class);
 	private PlanCalcScoreConfigGroup planCalcScore;
 	private final double baseValueOfTime;
 	private final double commercialMultiplier;
@@ -33,8 +34,11 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	 */
 	public GautengUtilityOfMoney( final PlanCalcScoreConfigGroup cnScoringGroup, double baseValueOfTime, double valueOfTimeMultiplier ) {
 		this.planCalcScore = cnScoringGroup ;
+		log.warn("Value of Time (VoT) used as base: " + baseValueOfTime) ;
+		log.warn("Value of Time multiplier: " + valueOfTimeMultiplier) ;
+		
 		for ( Type vehType : Type.values() ) {
-			Logger.getLogger(this.getClass()).info( " vehType: " + vehType.toString() 
+			log.info( " vehType: " + vehType.toString() 
 					+ "; utility of travel time savings per hr: " + getUtilityOfTravelTime_hr()
 					+ "; value of travel time savings per hr: " + getValueOfTime_hr(vehType)
 					+ "; => utility of money: " + getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr(vehType)) ) ;
