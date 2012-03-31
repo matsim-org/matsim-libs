@@ -47,6 +47,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
 import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
 import playground.andreas.P2.plan.deprecated.SimpleBackAndForthScheduleProvider;
@@ -174,6 +175,8 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, 0);
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
 			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, 0);
+		} else if(pConfig.getRouteProvider().equalsIgnoreCase(ComplexCircleScheduleProvider.NAME)){
+			return new ComplexCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, 0);
 		} else {
 			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
 			return null;

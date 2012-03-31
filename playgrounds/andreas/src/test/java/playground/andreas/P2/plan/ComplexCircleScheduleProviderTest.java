@@ -1,0 +1,177 @@
+package playground.andreas.P2.plan;
+
+import java.util.ArrayList;
+
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.testcases.MatsimTestUtils;
+
+import playground.andreas.P2.PScenarioHelper;
+import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
+
+public class ComplexCircleScheduleProviderTest {
+	
+@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	
+	@Test
+    public final void testCreateTransitLineLikeSimpleCircleScheduleProvider() {
+		
+		Scenario scenario = PScenarioHelper.createTestNetwork();
+		PConfigGroup pC = new PConfigGroup();
+		
+		
+		TransitSchedule tS = CreateStopsForAllCarLinks.createStopsForAllCarLinks(scenario.getNetwork(), pC);
+		
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(pC.getPIdentifier(), tS, scenario.getNetwork(), 10);
+		
+		Id lineId = new IdImpl("line1");
+		double startTime = 7.0 * 3600.0;
+		double endTime = 9.0 * 3600.0;
+		int numberOfVehicles = 2;
+		TransitStopFacility startStop = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "1424"));
+		TransitStopFacility endStop = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "4434"));
+		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
+		stopsToBeServed.add(startStop);
+		stopsToBeServed.add(endStop);
+		
+		Id routeId = new IdImpl("route1");
+		
+		ArrayList<Id> refIds = new ArrayList<Id>();
+		refIds.add(new IdImpl("1424")); refIds.add(new IdImpl("2434"));
+		refIds.add(new IdImpl("3444")); refIds.add(new IdImpl("4434"));
+		refIds.add(new IdImpl("3424")); refIds.add(new IdImpl("2414"));
+		refIds.add(new IdImpl("1424"));
+		
+		TransitLine line = prov.createTransitLine(lineId, startTime, endTime, numberOfVehicles, stopsToBeServed, routeId);
+		
+		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
+		
+		for (TransitRoute route : line.getRoutes().values()) {
+			Assert.assertEquals("Route id have to be the same", new IdImpl(lineId + "-" + routeId), route.getId());
+			Assert.assertEquals("Number of departures", 14.0, route.getDepartures().size(), MatsimTestUtils.EPSILON);
+			
+			// check links			
+			Assert.assertEquals("Start link id has to be the same", refIds.get(0), route.getRoute().getStartLinkId());
+			
+			int i = 1;
+			for (Id linkId : route.getRoute().getLinkIds()) {
+				Assert.assertEquals("Route link ids have to be the same", refIds.get(i), linkId);
+				i++;
+			}
+			
+			Assert.assertEquals("End link id has to be the same", refIds.get(refIds.size() - 1), route.getRoute().getEndLinkId());
+			
+			// check stops
+			i = 0;
+			for (TransitRouteStop stop : route.getStops()) {
+				Assert.assertEquals("Route stop ids have to be the same", new IdImpl(pC.getPIdentifier() + refIds.get(i)), stop.getStopFacility().getId());
+				i++;
+			}			
+		}	
+	}
+	
+	@Test
+    public final void testCreateTransitLineWithMoreStops() {
+		
+		Scenario scenario = PScenarioHelper.createTestNetwork();
+		PConfigGroup pC = new PConfigGroup();
+		
+		
+		TransitSchedule tS = CreateStopsForAllCarLinks.createStopsForAllCarLinks(scenario.getNetwork(), pC);
+		
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(pC.getPIdentifier(), tS, scenario.getNetwork(), 10);
+		
+		Id lineId = new IdImpl("line1");
+		double startTime = 7.0 * 3600.0;
+		double endTime = 9.0 * 3600.0;
+		int numberOfVehicles = 2;
+		TransitStopFacility stop1 = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "1424"));
+		TransitStopFacility stop2 = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "2423"));
+		TransitStopFacility stop3 = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "2333"));
+		TransitStopFacility stop4 = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "3433"));
+		TransitStopFacility stop5 = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "3334"));
+		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
+		stopsToBeServed.add(stop1);
+		stopsToBeServed.add(stop2);
+		stopsToBeServed.add(stop3);
+		stopsToBeServed.add(stop4);
+		stopsToBeServed.add(stop5);
+		
+		Id routeId = new IdImpl("route1");
+		
+		ArrayList<Id> refIds = new ArrayList<Id>();
+		refIds.add(new IdImpl("1424")); refIds.add(new IdImpl("2423"));
+		refIds.add(new IdImpl("2333")); refIds.add(new IdImpl("3334"));
+		refIds.add(new IdImpl("3433")); refIds.add(new IdImpl("3334"));
+		refIds.add(new IdImpl("3424")); refIds.add(new IdImpl("2414"));
+		refIds.add(new IdImpl("1424"));
+		
+		TransitLine line = prov.createTransitLine(lineId, startTime, endTime, numberOfVehicles, stopsToBeServed, routeId);
+		
+		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
+		
+		for (TransitRoute route : line.getRoutes().values()) {
+			Assert.assertEquals("Route id have to be the same", new IdImpl(lineId + "-" + routeId), route.getId());
+			
+			// check links			
+			Assert.assertEquals("Start link id has to be the same", refIds.get(0), route.getRoute().getStartLinkId());
+			
+			int i = 1;
+			for (Id linkId : route.getRoute().getLinkIds()) {
+				Assert.assertEquals("Route link ids have to be the same", refIds.get(i), linkId);
+				i++;
+			}
+			
+			Assert.assertEquals("End link id has to be the same", refIds.get(refIds.size() - 1), route.getRoute().getEndLinkId());
+			
+			// check stops
+			i = 0;
+			for (TransitRouteStop stop : route.getStops()) {
+				Assert.assertEquals("Route stop ids have to be the same", new IdImpl(pC.getPIdentifier() + refIds.get(i)), stop.getStopFacility().getId());
+				i++;
+			}
+			
+			Assert.assertEquals("Number of departures", 11.0, route.getDepartures().size(), MatsimTestUtils.EPSILON);			
+		}	
+	}
+	
+	@Test
+    public final void testGetRandomTransitStop() {
+		
+		ScenarioImpl scenario = (ScenarioImpl) PScenarioHelper.createTestNetwork();
+		PConfigGroup pC = new PConfigGroup();
+		
+		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), 10);
+		
+		for (int i = 0; i < 5; i++) {
+			TransitStopFacility stop1 = prov.getRandomTransitStop();
+			TransitStopFacility stop2 = prov.getRandomTransitStop();
+			Assert.assertNotSame("Stop should not be the same", stop1.getId(), stop2.getId());			
+		}
+	}	
+	
+	@Test
+    public final void testCreateEmptyLine() {
+		
+		ScenarioImpl scenario = (ScenarioImpl) PScenarioHelper.createTestNetwork();
+		PConfigGroup pC = new PConfigGroup();
+		
+		Id lineId = new IdImpl("1");
+		
+		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), 10);
+		TransitLine line = prov.createEmptyLine(lineId);
+		
+		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
+	}
+}
