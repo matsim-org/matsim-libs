@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.andreas.P2.plan;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -65,11 +66,16 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 	}
 
 	@Override
-	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, TransitStopFacility startStop, TransitStopFacility endStop, Id routeId){
+	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId){
+		if (stopsToBeServed.size() != 2) {
+			log.warn("This route provider can only handle as much as to stops. Please use a different route provider.");
+			return null;
+		}
+		
 		// initialize
 		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(pLineId);			
 		routeId = new IdImpl(pLineId + "-" + routeId);
-		TransitRoute transitRoute = createRoute(routeId, startStop, endStop, startTime);
+		TransitRoute transitRoute = createRoute(routeId, stopsToBeServed.get(0), stopsToBeServed.get(1), startTime);
 		
 		// register route
 		line.addRoute(transitRoute);

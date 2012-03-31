@@ -69,12 +69,11 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Person
 				
 		// profitable route, change startTime
 		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
-		newPlan.setStartStop(cooperative.getBestPlan().getStartStop());
-		newPlan.setEndStop(cooperative.getBestPlan().getEndStop());
+		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		newPlan.setStartTime(startTime);
 		newPlan.setEndTime(endTime);
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 		
 		return newPlan;
 	}

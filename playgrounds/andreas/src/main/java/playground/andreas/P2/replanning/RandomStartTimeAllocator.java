@@ -35,8 +35,7 @@ public class RandomStartTimeAllocator extends PStrategy implements PPlanStrategy
 	public PPlan run(Cooperative cooperative) {
 		// profitable route, change startTime
 		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
-		newPlan.setStartStop(cooperative.getBestPlan().getStartStop());
-		newPlan.setEndStop(cooperative.getBestPlan().getEndStop());
+		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
 		// get a valid new start time
 		double newStartTime = Math.max(0.0, cooperative.getBestPlan().getStartTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * this.mutationRange);
@@ -44,7 +43,7 @@ public class RandomStartTimeAllocator extends PStrategy implements PPlanStrategy
 		newPlan.setStartTime(newStartTime);
 		
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 
 		return newPlan;
 	}

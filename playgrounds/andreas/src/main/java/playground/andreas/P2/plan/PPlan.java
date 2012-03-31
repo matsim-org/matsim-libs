@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.andreas.P2.plan;
 
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -50,8 +51,7 @@ public class PPlan {
 	private double endTime;
 	private int nVehicles;
 	
-	private TransitStopFacility startStop;
-	private TransitStopFacility endStop;
+	private ArrayList<TransitStopFacility> stopsToBeServed;
 
 	private Set<Id> vehicleIds;
 	
@@ -59,18 +59,16 @@ public class PPlan {
 		this.id = id;
 	}
 	
-	public PPlan(Id id, TransitStopFacility startStop, TransitStopFacility endStop, double startTime, double endTime){
+	public PPlan(Id id, ArrayList<TransitStopFacility> stopsToBeServed, double startTime, double endTime){
 		this.id = id;
-		this.startStop = startStop;
-		this.endStop = endStop;
+		this.stopsToBeServed = stopsToBeServed;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
 	
 	public PPlan(Id id, PPlan oldPlan){
 		this.id = id;
-		this.startStop = oldPlan.getStartStop();
-		this.endStop = oldPlan.getEndStop();
+		this.stopsToBeServed = oldPlan.getStopsToBeServed();
 		this.startTime = oldPlan.getStartTime();
 		this.endTime = oldPlan.getEndTime();
 		this.line = oldPlan.getLine();
@@ -78,17 +76,33 @@ public class PPlan {
 
 	@Override
 	public String toString() {
-		return "Plan " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
-		+ ", trips: " + this.tripsServed + ", vehicles: " + this.vehicleIds.size()
-		+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
-		+ ", corridor from " + this.startStop.getId() + " to " + this.endStop.getId();
+		StringBuffer sB = new StringBuffer();
+		sB.append("Plan " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
+				+ ", trips: " + this.tripsServed + ", vehicles: " + this.vehicleIds.size()
+				+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
+				+ ", Stops: ");
+		
+		for (TransitStopFacility stop : this.stopsToBeServed) {
+			sB.append(stop.getId()); sB.append(", ");
+		}
+		
+		return  sB.toString();
 	}
 	
-	public String toString(double budget) {
-		return "Plan " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
-		+ ", trips: " + this.tripsServed + ", vehicles: " + this.vehicleIds.size()
-		+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
-		+ ", corridor from " + this.startStop.getId() + " to " + this.endStop.getId() + ", line budget " + budget;
+	public String toString(double budget) {		
+		StringBuffer sB = new StringBuffer();
+		sB.append("Plan " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
+				+ ", trips: " + this.tripsServed + ", vehicles: " + this.vehicleIds.size()
+				+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
+				+ ", Stops: ");
+		
+		for (TransitStopFacility stop : this.stopsToBeServed) {
+			sB.append(stop.getId()); sB.append(", ");
+		}
+		
+		sB.append("line budget " + budget);
+		
+		return  sB.toString();
 	}
 
 	public Id getId() {
@@ -134,20 +148,12 @@ public class PPlan {
 		this.nVehicles = nVehicles;
 	}
 
-	public TransitStopFacility getStartStop() {
-		return startStop;
+	public ArrayList<TransitStopFacility> getStopsToBeServed() {
+		return stopsToBeServed;
 	}
-
-	public void setStartStop(TransitStopFacility startStop) {
-		this.startStop = startStop;
-	}
-
-	public TransitStopFacility getEndStop() {
-		return endStop;
-	}
-
-	public void setEndStop(TransitStopFacility endStop) {
-		this.endStop = endStop;
+	
+	public void setStopsToBeServed(ArrayList<TransitStopFacility> stopsToBeServed) {
+		this.stopsToBeServed = stopsToBeServed;
 	}
 
 	public double getScore() {
@@ -175,12 +181,11 @@ public class PPlan {
 	}
 
 	public boolean isSameButVehSize(PPlan testPlan) {
-		if(!this.startStop.getId().toString().equalsIgnoreCase(testPlan.getStartStop().getId().toString())){
-			return false;
-		}
 		
-		if(!this.endStop.getId().toString().equalsIgnoreCase(testPlan.getEndStop().getId().toString())){
-			return false;
+		for (int i = 0; i < this.stopsToBeServed.size(); i++) {
+			if(!this.stopsToBeServed.get(i).getId().toString().equalsIgnoreCase(testPlan.getStopsToBeServed().get(i).getId().toString())){
+				return false;
+			}			
 		}
 		
 		if(this.startTime != testPlan.getStartTime()){
@@ -195,12 +200,10 @@ public class PPlan {
 	}
 	
 	public boolean isSameButOperationTime(PPlan testPlan) {
-		if(!this.startStop.getId().toString().equalsIgnoreCase(testPlan.getStartStop().getId().toString())){
-			return false;
-		}
-		
-		if(!this.endStop.getId().toString().equalsIgnoreCase(testPlan.getEndStop().getId().toString())){
-			return false;
+		for (int i = 0; i < this.stopsToBeServed.size(); i++) {
+			if(!this.stopsToBeServed.get(i).getId().toString().equalsIgnoreCase(testPlan.getStopsToBeServed().get(i).getId().toString())){
+				return false;
+			}
 		}
 		
 		if(this.nVehicles != testPlan.getNVehicles()){

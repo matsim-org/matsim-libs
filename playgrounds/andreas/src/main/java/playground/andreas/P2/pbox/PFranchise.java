@@ -1,13 +1,11 @@
 package playground.andreas.P2.pbox;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.plan.PPlan;
 
@@ -22,10 +20,8 @@ public class PFranchise {
 	private final static Logger log = Logger.getLogger(PFranchise.class);
 	
 	private final boolean activated;
+	private TreeSet<String> routeHashes = new TreeSet<String>();
 	
-	
-	private Map<Id, Set<Id>> startToEndStopIdMap = new HashMap<Id, Set<Id>>();
-
 	public PFranchise(boolean useFranchise) {
 		this.activated = useFranchise;
 		if(this.activated){
@@ -41,43 +37,41 @@ public class PFranchise {
 			return false;
 		}
 		
-		Id startStopId = plan.getStartStop().getId();
-		Id endStopId = plan.getEndStop().getId();
+		String routeHash = generateRouteHash(plan.getStopsToBeServed());
 		
-		// no record for start stop - allow
-		if(this.startToEndStopIdMap.get(startStopId) == null){
-			this.startToEndStopIdMap.put(startStopId, new TreeSet<Id>());
-			this.startToEndStopIdMap.get(startStopId).add(endStopId);
-			return false;
-		}
-		
-		// record available for start stop but wrong end stop - allow
-		if(!this.startToEndStopIdMap.get(startStopId).contains(endStopId)){
-			this.startToEndStopIdMap.get(startStopId).add(endStopId);
-			return false;
-		}
-		
-		return true;
+		return this.routeHashes.contains(routeHash);
 	}
 
 	/**
-	 * Reset all start and end stops to the stops currently in use
+	 * Reset all route hashes to the routes currently in use
 	 * 
 	 * @param cooperatives
 	 */
 	public void reset(LinkedList<Cooperative> cooperatives) {
-		this.startToEndStopIdMap = new HashMap<Id, Set<Id>>();
+		this.routeHashes = new TreeSet<String>();
 		
 		for (Cooperative cooperative : cooperatives) {
 			for (PPlan plan : cooperative.getAllPlans()) {
-				Id startStopId = plan.getStartStop().getId();
-				Id endStopId = plan.getEndStop().getId();
-				if(this.startToEndStopIdMap.get(startStopId) == null){
-					this.startToEndStopIdMap.put(startStopId, new TreeSet<Id>());
+				String routeHash = generateRouteHash(plan.getStopsToBeServed());
+				if (this.routeHashes.contains(routeHash)) {
+					log.warn("Cooperative " + cooperative.getId() + " with plan " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
 				}
-				this.startToEndStopIdMap.get(startStopId).add(endStopId);
+				this.routeHashes.add(routeHash);
 			}
+		}		
+	}
+	
+	/**
+	 * Generates a unique String from the stops given
+	 * 
+	 * @param stopsToBeServed
+	 * @return
+	 */
+	private String generateRouteHash(ArrayList<TransitStopFacility> stopsToBeServed){
+		StringBuffer sB = new StringBuffer();
+		for (TransitStopFacility transitStopFacility : stopsToBeServed) {
+			sB.append(transitStopFacility.getId().toString()); sB.append("-");
 		}
-		
+		return sB.toString();
 	}
 }

@@ -38,6 +38,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.pbox.Cooperative;
@@ -111,8 +112,11 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				
 				String startTime = Time.writeTime(cooperative.getBestPlan().getStartTime());
 				String endTime = Time.writeTime(cooperative.getBestPlan().getEndTime());
-				String startLink = cooperative.getBestPlan().getStartStop().getLinkId().toString();
-				String endLink = cooperative.getBestPlan().getEndStop().getLinkId().toString();
+				
+				ArrayList<Id> stopsServed = new ArrayList<Id>();
+				for (TransitStopFacility stop : cooperative.getBestPlan().getStopsToBeServed()) {
+					stopsServed.add(stop.getId());
+				}
 				
 				ArrayList<Id> linksServed = new ArrayList<Id>();
 				for (TransitRoute route : cooperative.getBestPlan().getLine().getRoutes().values()) {
@@ -127,7 +131,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				
 				try {
 					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + (int) coopVeh + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" + startTime + "\t" + endTime 
-							+ "\t" + startLink + "\t" + endLink + "\t" + linksServed + "\n");
+							+ "\t" + stopsServed + "\t" + linksServed + "\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

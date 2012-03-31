@@ -36,8 +36,7 @@ public class RandomEndTimeAllocator extends PStrategy implements PPlanStrategy{
 	public PPlan run(Cooperative cooperative) {
 		// profitable route, change startTime
 		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
-		newPlan.setStartStop(cooperative.getBestPlan().getStartStop());
-		newPlan.setEndStop(cooperative.getBestPlan().getEndStop());
+		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
 		
 		// get a valid new end time
@@ -45,7 +44,7 @@ public class RandomEndTimeAllocator extends PStrategy implements PPlanStrategy{
 		newEndTime = Math.max(newEndTime, cooperative.getBestPlan().getStartTime() + cooperative.getMinOperationTime());
 		newPlan.setEndTime(newEndTime);
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 		
 		return newPlan;
 	}

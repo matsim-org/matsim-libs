@@ -41,6 +41,10 @@ public class SimpleCircleScheduleProviderTest {
 		int numberOfVehicles = 2;
 		TransitStopFacility startStop = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "1424"));
 		TransitStopFacility endStop = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "4434"));
+		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
+		stopsToBeServed.add(startStop);
+		stopsToBeServed.add(endStop);
+		
 		Id routeId = new IdImpl("route1");
 		
 		ArrayList<Id> refIds = new ArrayList<Id>();
@@ -49,7 +53,7 @@ public class SimpleCircleScheduleProviderTest {
 		refIds.add(new IdImpl("3424")); refIds.add(new IdImpl("2414"));
 		refIds.add(new IdImpl("1424"));
 		
-		TransitLine line = prov.createTransitLine(lineId, startTime, endTime, numberOfVehicles, startStop, endStop, routeId);
+		TransitLine line = prov.createTransitLine(lineId, startTime, endTime, numberOfVehicles, stopsToBeServed, routeId);
 		
 		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
 		

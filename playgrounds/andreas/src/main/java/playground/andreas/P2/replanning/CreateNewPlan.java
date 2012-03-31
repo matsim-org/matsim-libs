@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
@@ -35,11 +36,20 @@ public class CreateNewPlan extends PStrategy implements PPlanStrategy{
 		do {
 			double startTime = MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime());
 			double endTime = startTime + cooperative.getMinOperationTime() + MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime() - startTime);
-			newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), cooperative.getRouteProvider().getRandomTransitStop(), cooperative.getRouteProvider().getRandomTransitStop(), startTime, endTime); 
-			while(newPlan.getStartStop() == newPlan.getEndStop()){
-				newPlan.setEndStop(cooperative.getRouteProvider().getRandomTransitStop());
+			
+			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop();
+			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop();
+			while(stop1.getId() == stop2.getId()){
+				stop2 = cooperative.getRouteProvider().getRandomTransitStop();
 			}
-			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));
+			
+			ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
+			stopsToBeServed.add(stop1);
+			stopsToBeServed.add(stop2);
+			
+			newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), stopsToBeServed, startTime, endTime); 
+			
+			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stopsToBeServed, new IdImpl(cooperative.getCurrentIteration())));
 		} while (cooperative.getFranchise().planRejected(newPlan));		
 
 		return newPlan;

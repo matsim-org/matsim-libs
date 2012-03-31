@@ -121,8 +121,7 @@ public class BasicCooperative implements Cooperative{
 			// compare scores
 			if (this.score > this.scoreLastIteration){
 				// testPlan improves the plan, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
-				this.bestPlan.setStartStop(this.testPlan.getStartStop());
-				this.bestPlan.setEndStop(this.testPlan.getEndStop());
+				this.bestPlan.setStopsToBeServed(this.testPlan.getStopsToBeServed());
 				this.bestPlan.setStartTime(this.testPlan.getStartTime());
 				this.bestPlan.setEndTime(this.testPlan.getEndTime());
 			}
@@ -192,7 +191,7 @@ public class BasicCooperative implements Cooperative{
 //		}
 		
 		// reinitialize the plan
-		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStartStop(), this.bestPlan.getEndStop(), this.bestPlan.getId()));
+		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStopsToBeServed(), this.bestPlan.getId()));
 		
 		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
 		for (PPlan plan : this.getAllPlans()) {
