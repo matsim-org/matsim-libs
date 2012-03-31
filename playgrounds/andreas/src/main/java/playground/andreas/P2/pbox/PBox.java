@@ -48,8 +48,8 @@ import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.plan.PRouteProvider;
-import playground.andreas.P2.plan.SimpleBackAndForthScheduleProvider;
 import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
+import playground.andreas.P2.plan.deprecated.SimpleBackAndForthScheduleProvider;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
 import playground.andreas.P2.scoring.ScoreContainer;

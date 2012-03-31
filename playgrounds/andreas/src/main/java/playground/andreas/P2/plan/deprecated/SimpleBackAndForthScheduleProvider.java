@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.P2.plan;
+package playground.andreas.P2.plan.deprecated;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +41,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.andreas.P2.plan.PRouteProvider;
 
 
 /**
