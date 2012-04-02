@@ -22,7 +22,6 @@ package org.matsim.core.trafficmonitoring;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -56,6 +55,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.xml.sax.SAXException;
@@ -201,7 +201,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// read comparison data
-		BufferedReader infile = new BufferedReader(new FileReader(compareFile));
+		BufferedReader infile = IOUtils.getBufferedReader(compareFile);
 		String line;
 		String[] compareData = new String[4*24];
 		try {

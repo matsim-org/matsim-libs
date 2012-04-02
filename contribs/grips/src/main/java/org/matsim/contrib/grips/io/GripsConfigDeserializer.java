@@ -66,7 +66,7 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 			log.info("starting to validate " + filename);
 			super.validateFile(filename, u);
 			log.info("starting unmarshalling " + filename);
-			stream = IOUtils.getInputstream(filename);
+			stream = IOUtils.getInputStream(filename);
 			JAXBElement<GripsConfigType> el = (JAXBElement<GripsConfigType>)u.unmarshal(stream);
 			gct =  el.getValue(); 
 		} catch (IOException e) {

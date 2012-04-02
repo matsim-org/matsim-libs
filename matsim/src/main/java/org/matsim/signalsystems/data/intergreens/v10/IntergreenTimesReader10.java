@@ -71,7 +71,7 @@ public class IntergreenTimesReader10 extends MatsimJaxbXmlParser {
 		log.info("starting to validate " + filename);
 		super.validateFile(filename, u);
 		log.info("starting unmarshalling " + filename);
-			stream = IOUtils.getInputstream(filename);
+			stream = IOUtils.getInputStream(filename);
 			xmlIntergreenTimes = (XMLIntergreenTimes) u.unmarshal(stream);
 			IntergreenTimesDataFactory factory = this.intergreensData.getFactory();
 			for (XMLSignalSystem xmlSignalSystem : xmlIntergreenTimes.getSignalSystem()){

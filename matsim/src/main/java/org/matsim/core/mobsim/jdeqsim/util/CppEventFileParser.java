@@ -1,7 +1,6 @@
 package org.matsim.core.mobsim.jdeqsim.util;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -13,6 +12,7 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * This parser can read the event output files of the C++ DEQSim.
@@ -41,8 +41,7 @@ public class CppEventFileParser {
 		ArrayList<EventLog> rows = new ArrayList<EventLog>();
 		BufferedReader br = null;
 		try {
-			FileReader fr = new FileReader(filePath);
-			br = new BufferedReader(fr);
+			br = IOUtils.getBufferedReader(filePath);
 			String line = null;
 			StringTokenizer tokenizer = null;
 			line = br.readLine();

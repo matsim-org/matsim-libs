@@ -76,7 +76,7 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 			log.info("starting to validate " + filename);
 			super.validateFile(filename, u);
 			log.info("starting unmarshalling " + filename);
-			stream = IOUtils.getInputstream(filename);
+			stream = IOUtils.getInputStream(filename);
 			xmlssdefs = (XMLSignalSystems) u.unmarshal(stream);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

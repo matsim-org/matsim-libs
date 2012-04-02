@@ -27,13 +27,6 @@
 		<defaultGoal>compiler:compile</defaultGoal>
 		<resources>
 			<resource>
-				<directory>./</directory>
-				<includes>
-					<include>res/**/*.*</include>
-					<include>dtd/**/*.*</include>
-				</includes>
-			</resource>
-			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
 					<exclude>revision.txt</exclude>
@@ -47,18 +40,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-			</testResource>
-			<testResource>
-				<directory>./</directory>
-				<includes>
-					<include>test/input/**/*</include>
-					<include>test/scenarios/**/*</include>
-				</includes>
-			</testResource>
-		</testResources>
 		<plugins>
 			<plugin>
         <groupId>org.codehaus.mojo</groupId>

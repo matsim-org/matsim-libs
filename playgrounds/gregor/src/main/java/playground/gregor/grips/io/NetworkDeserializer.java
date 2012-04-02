@@ -291,7 +291,7 @@ public class NetworkDeserializer {
 		}
 		InputStream stream = null;
 		try {
-			stream = IOUtils.getInputstream(file);
+			stream = IOUtils.getInputStream(file);
 			//			URL url = new URL("http://schemas.opengis.net/gml/3.2.1/gml.xsd");
 			//			XMLSchemaFactory schemaFac = new XMLSchemaFactory();
 			//			Schema s = schemaFac.newSchema(url);

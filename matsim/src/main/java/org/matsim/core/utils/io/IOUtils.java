@@ -566,45 +566,48 @@ public class IOUtils {
    *
    * @author dgrether
    */
-  public static InputStream getInputstream(final String filename) throws UncheckedIOException {
-    InputStream inputStream = null;
-    if (filename == null) {
-      throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
-    }
-    try {
-	    if (new File(filename).exists()) {
-	      if (filename.endsWith(GZ)) {
-	        inputStream = new GZIPInputStream(new FileInputStream(filename));
-	      } else {
-	        inputStream = new FileInputStream(filename);
-	      }
-	    } else if (new File(filename + GZ).exists()) {
-	        inputStream = new GZIPInputStream(new FileInputStream(filename));
-	    }
-	    else {
-	      InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
-	      if (stream != null) {
-	        if (filename.endsWith(GZ)) {
-	          inputStream = new GZIPInputStream(new FileInputStream(filename));
-	        }
-	        else {
-	          inputStream = new FileInputStream(filename);
-	        }
-	      }
-	      else {
-	        inputStream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
-	      }
-	      if (inputStream != null) {
-	        log.info("streaming file from classpath: " + filename);
-	      }
-	    }
-	    if (inputStream == null) {
-	      throw new FileNotFoundException(filename);
-	    }
-	    return inputStream;
-    } catch (IOException e) {
-    	throw new UncheckedIOException(e);
-    }
-  }
+	public static InputStream getInputStream(final String filename) throws UncheckedIOException {
+		InputStream inputStream = null;
+		if (filename == null) {
+			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
+		}
+		try {
+			// search in file system
+			if (new File(filename).exists()) {
+				if (filename.endsWith(GZ)) {
+					inputStream = new GZIPInputStream(new FileInputStream(filename));
+				} else {
+					inputStream = new FileInputStream(filename);
+				}
+			} else if (new File(filename + GZ).exists()) {
+				inputStream = new GZIPInputStream(new FileInputStream(filename));
+			} else {
+				// search in classpath
+				InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
+				if (stream != null) {
+					if (filename.endsWith(GZ)) {
+						inputStream = new GZIPInputStream(stream);
+					}
+					else {
+						inputStream = stream;
+					}
+				} else {
+					stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
+					if (stream != null) {
+						inputStream = new GZIPInputStream(stream);
+					}
+				}
+				if (inputStream != null) {
+					log.info("streaming file from classpath: " + filename);
+				}
+			}
+			if (inputStream == null) {
+				throw new FileNotFoundException(filename);
+			}
+			return inputStream;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 
 }

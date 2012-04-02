@@ -58,7 +58,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 		InputStream stream = null;
 		try {
 //			stream = new FileInputStream(filename);
-		  stream = IOUtils.getInputstream(filename);
+		  stream = IOUtils.getInputStream(filename);
 			xmlLssDefinition = (XMLSignalSystems) u.unmarshal(stream);
 			log.info("unmarshalling complete");
 		}

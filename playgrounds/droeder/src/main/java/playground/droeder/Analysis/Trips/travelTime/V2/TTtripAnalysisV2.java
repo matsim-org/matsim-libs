@@ -115,7 +115,7 @@ public class TTtripAnalysisV2 {
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
 		TTPlan2TripsFilterV2 planFilter = new TTPlan2TripsFilterV2(); 
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(planFilter);
-		new MatsimPopulationReader(sc).parse(IOUtils.getInputstream(plans));
+		new MatsimPopulationReader(sc).parse(IOUtils.getInputStream(plans));
 		
 		this.unProcessedAgents = planFilter.getUnprocessedAgents();
 		this.eventsHandler.addTrips( planFilter.getTrips());
@@ -124,6 +124,6 @@ public class TTtripAnalysisV2 {
 	private void readEvents(String eventsFile){
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(this.eventsHandler);
-		new EventsReaderXMLv1(manager).parse(IOUtils.getInputstream(eventsFile));
+		new EventsReaderXMLv1(manager).parse(IOUtils.getInputStream(eventsFile));
 	}
 }

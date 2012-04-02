@@ -55,7 +55,7 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 		super.validateFile(filename, u);
 		InputStream stream = null;
 		try {
-			stream = IOUtils.getInputstream(filename);
+			stream = IOUtils.getInputStream(filename);
 			xmlLssConfig = (XMLSignalSystemConfig)u.unmarshal(stream);
 		}
 		finally {

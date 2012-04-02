@@ -76,7 +76,7 @@ public class SignalControlReader20 extends MatsimJaxbXmlParser {
 			super.validateFile(filename, u);
 			log.info("starting unmarshalling " + filename);
 			//			stream = new FileInputStream(filename);
-			stream = IOUtils.getInputstream(filename);
+			stream = IOUtils.getInputStream(filename);
 			xmlSignalControl = (XMLSignalControl) u.unmarshal(stream);
 			log.info("unmarshalling complete");
 		} catch (IOException e) {

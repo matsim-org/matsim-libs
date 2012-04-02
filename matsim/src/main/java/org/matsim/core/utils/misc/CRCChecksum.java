@@ -21,6 +21,7 @@
 package org.matsim.core.utils.misc;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,10 +63,19 @@ public class CRCChecksum {
 	public static long getCRCFromFile(final String filename) {
 		InputStream in = null;
 		try {
-			if (filename.endsWith(".gz")) {
-				in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(filename)));
+			if (new File(filename).exists()) {
+				if (filename.endsWith(".gz")) {
+					in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(filename)));
+				} else {
+				   in = new BufferedInputStream(new FileInputStream(filename));
+				}
 			} else {
-			   in = new BufferedInputStream(new FileInputStream( filename ));
+				InputStream stream = CRCChecksum.class.getClassLoader().getResourceAsStream(filename);
+				if (filename.endsWith(".gz")) {
+					in = new GZIPInputStream(new BufferedInputStream(stream));
+				} else {
+					in = new BufferedInputStream(stream);
+				}
 			}
 			return getCRCFromStream(in);
 		} catch (IOException e) {

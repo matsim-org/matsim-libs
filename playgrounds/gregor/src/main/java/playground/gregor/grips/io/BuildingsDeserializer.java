@@ -150,7 +150,7 @@ public class BuildingsDeserializer {
 			if (schema != null && schema.equals("http")) {
 				stream = new URL(uri).openStream();
 			} else {
-				stream = IOUtils.getInputstream(uri);
+				stream = IOUtils.getInputStream(uri);
 			}
 
 

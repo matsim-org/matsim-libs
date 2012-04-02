@@ -81,7 +81,7 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 			log.info("starting unmarshalling " + filename);
 			InputStream stream = null;
 			try {
-			  stream = IOUtils.getInputstream(filename);
+			  stream = IOUtils.getInputStream(filename);
 				xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
 			}
 			finally {

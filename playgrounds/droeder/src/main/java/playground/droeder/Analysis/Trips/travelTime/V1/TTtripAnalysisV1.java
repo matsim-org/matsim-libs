@@ -91,7 +91,7 @@ public class TTtripAnalysisV1 {
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
 		PlanElementFilterV1 filter = new PlanElementFilterV1();
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(filter);
-		new MatsimPopulationReader(sc).parse(IOUtils.getInputstream(plans));
+		new MatsimPopulationReader(sc).parse(IOUtils.getInputStream(plans));
 		
 		this.planElements = filter.getElements();
 	}
@@ -100,7 +100,7 @@ public class TTtripAnalysisV1 {
 		TTtripEventsHandlerV1 handler = new TTtripEventsHandlerV1(this.planElements.keySet());
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(handler);
-		new EventsReaderXMLv1(manager).parse(IOUtils.getInputstream(eventsFile));
+		new EventsReaderXMLv1(manager).parse(IOUtils.getInputStream(eventsFile));
 		this.events = handler.getEvents();
 	}
 }
