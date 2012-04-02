@@ -26,10 +26,10 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.matsim.ptproject.qsim.qnetsimengine.OTFLane;
-import org.matsim.ptproject.qsim.qnetsimengine.OTFLaneModelBuilder;
-import org.matsim.ptproject.qsim.qnetsimengine.OTFLinkWLanes;
-import org.matsim.ptproject.qsim.qnetsimengine.OTFSignal;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLane;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLaneModelBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLinkWLanes;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFSignal;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.otfvis.io.OTFSignalSystem;
 import org.matsim.vis.otfvis.OTFClientControl;

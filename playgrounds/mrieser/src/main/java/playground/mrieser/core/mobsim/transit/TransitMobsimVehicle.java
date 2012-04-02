@@ -21,8 +21,8 @@ package playground.mrieser.core.mobsim.transit;
 
 import java.util.Collection;
 
-import org.matsim.pt.qsim.PassengerAgent;
-import org.matsim.pt.qsim.TransitStopHandler;
+import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 

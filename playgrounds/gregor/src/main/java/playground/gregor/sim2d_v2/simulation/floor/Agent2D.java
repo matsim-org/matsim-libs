@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;

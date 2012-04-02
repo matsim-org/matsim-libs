@@ -23,12 +23,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
-import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 
 /**
  * @author nagel

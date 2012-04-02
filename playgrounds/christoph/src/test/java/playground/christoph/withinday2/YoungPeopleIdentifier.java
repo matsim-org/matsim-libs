@@ -5,11 +5,11 @@ import java.util.Set;
 
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 public class YoungPeopleIdentifier extends DuringLegIdentifier {

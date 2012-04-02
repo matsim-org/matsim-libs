@@ -42,8 +42,8 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.ptproject.qsim.InternalInterface;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.PedestrianSignal;

@@ -22,7 +22,7 @@ package org.matsim.signalsystems.otfvis.io;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.ptproject.qsim.qnetsimengine.OTFSignal;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFSignal;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 

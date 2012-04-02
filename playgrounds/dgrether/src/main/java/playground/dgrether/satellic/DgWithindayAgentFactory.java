@@ -22,10 +22,10 @@ package playground.dgrether.satellic;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 
 /**

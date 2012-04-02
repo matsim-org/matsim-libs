@@ -1,8 +1,8 @@
 package org.matsim.core.controler;
 
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.ptproject.qsim.QSimFactory;
 
 public class MobsimRegistrar {
 

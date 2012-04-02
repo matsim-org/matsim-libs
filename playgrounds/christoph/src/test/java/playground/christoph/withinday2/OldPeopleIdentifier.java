@@ -6,9 +6,9 @@ import java.util.Set;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 public class OldPeopleIdentifier extends DuringActivityIdentifier {

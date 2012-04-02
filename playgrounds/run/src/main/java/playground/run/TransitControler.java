@@ -29,8 +29,8 @@ import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 

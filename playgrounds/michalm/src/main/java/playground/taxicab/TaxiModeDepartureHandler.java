@@ -23,7 +23,7 @@ package playground.taxicab;
 import org.apache.log4j.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.core.mobsim.framework.*;
-import org.matsim.ptproject.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 
 /**
  * @author nagel

@@ -20,7 +20,7 @@
 
 package playground.christoph.withinday;
 
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 

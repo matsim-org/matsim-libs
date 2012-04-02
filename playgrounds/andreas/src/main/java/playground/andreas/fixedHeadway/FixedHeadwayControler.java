@@ -8,11 +8,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.ptproject.qsim.QSim;
 
 public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandler{
 	

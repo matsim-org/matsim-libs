@@ -21,8 +21,8 @@ package playground.mrieser.core.mobsim.transit;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.pt.qsim.PassengerAgent;
-import org.matsim.pt.qsim.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;

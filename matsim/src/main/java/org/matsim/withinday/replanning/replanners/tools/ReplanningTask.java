@@ -21,7 +21,7 @@
 package org.matsim.withinday.replanning.replanners.tools;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 
 public class ReplanningTask {
 

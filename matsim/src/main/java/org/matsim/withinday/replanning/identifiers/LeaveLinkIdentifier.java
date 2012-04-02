@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 

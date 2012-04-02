@@ -40,10 +40,10 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 /*
  * This Module is used by a NextLegReplanner. It calculates the time

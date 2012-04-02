@@ -21,7 +21,7 @@ package playground.gregor.sim2d_v2.simulation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 

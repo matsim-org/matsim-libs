@@ -28,10 +28,10 @@ import java.util.Queue;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.ptproject.qsim.InternalInterface;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.PedestrianSignal;

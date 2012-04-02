@@ -3,7 +3,7 @@ package playground.gregor.prorityqueuesimtest;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 public class PrioQDepartureHandler implements DepartureHandler {
 

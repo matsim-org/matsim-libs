@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 /**
  * @author nagel

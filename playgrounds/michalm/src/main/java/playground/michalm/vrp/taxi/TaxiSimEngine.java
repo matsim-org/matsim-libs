@@ -4,8 +4,8 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.matsim.ptproject.qsim.*;
-import org.matsim.ptproject.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.vis.otfvis.opengl.queries.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;

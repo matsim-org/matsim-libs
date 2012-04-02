@@ -28,9 +28,9 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 

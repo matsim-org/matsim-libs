@@ -30,8 +30,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**

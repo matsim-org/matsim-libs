@@ -31,11 +31,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 

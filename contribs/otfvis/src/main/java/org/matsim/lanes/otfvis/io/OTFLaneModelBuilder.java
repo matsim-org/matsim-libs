@@ -24,13 +24,13 @@ import java.awt.geom.Point2D.Double;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLane;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLinkWLanes;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLane;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.ptproject.qsim.qnetsimengine.OTFLane;
-import org.matsim.ptproject.qsim.qnetsimengine.OTFLinkWLanes;
-import org.matsim.ptproject.qsim.qnetsimengine.QLane;
-import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;

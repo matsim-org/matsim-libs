@@ -26,10 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.qsim.SimpleTransitStopHandlerFactory;
-import org.matsim.pt.qsim.TransitStopHandlerFactory;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 

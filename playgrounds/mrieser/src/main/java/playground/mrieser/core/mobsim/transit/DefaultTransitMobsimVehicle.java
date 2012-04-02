@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.pt.qsim.PassengerAgent;
-import org.matsim.pt.qsim.TransitStopHandler;
+import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 

@@ -21,9 +21,9 @@
 package playground.mrieser.pt;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.fakes.FakePassengerAgent;
-import org.matsim.pt.qsim.TransitQVehicle;
-import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;

@@ -23,7 +23,7 @@ package org.matsim.withinday.mobsim;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.parallel.ParallelReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;

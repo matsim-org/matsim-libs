@@ -33,8 +33,8 @@ import java.util.Collection;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.vehicles.VehicleUtils;
 
 /**

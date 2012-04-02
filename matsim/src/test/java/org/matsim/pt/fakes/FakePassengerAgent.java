@@ -23,7 +23,7 @@ package org.matsim.pt.fakes;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.pt.qsim.PassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;

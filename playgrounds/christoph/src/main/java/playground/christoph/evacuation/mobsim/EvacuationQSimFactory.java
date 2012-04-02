@@ -28,17 +28,17 @@ import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
-import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
-import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalDepartureHandler;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
 /**
  * @author cdobler

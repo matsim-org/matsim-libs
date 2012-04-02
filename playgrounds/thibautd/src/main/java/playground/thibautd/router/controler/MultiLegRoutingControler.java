@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
@@ -33,7 +34,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 
 import playground.thibautd.router.DefaultRoutingModuleFactory;
 import playground.thibautd.router.PlanRouterWrapper;

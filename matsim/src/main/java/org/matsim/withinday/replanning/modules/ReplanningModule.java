@@ -25,6 +25,8 @@ import java.util.Locale;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
@@ -35,8 +37,6 @@ import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegRouter;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 
 public class ReplanningModule extends AbstractMultithreadedModule {
 

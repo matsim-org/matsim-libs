@@ -27,10 +27,10 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.testcases.MatsimTestCase;
 
 public class WithinDayQSimFactoryTest extends MatsimTestCase {

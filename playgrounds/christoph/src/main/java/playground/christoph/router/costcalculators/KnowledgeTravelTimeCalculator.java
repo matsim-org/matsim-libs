@@ -23,8 +23,8 @@ package playground.christoph.router.costcalculators;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 
 import playground.christoph.network.MyLinkImpl;
 import playground.christoph.network.SubLink;

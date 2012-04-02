@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
-import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.vehicles.Vehicle;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;

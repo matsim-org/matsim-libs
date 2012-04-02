@@ -21,7 +21,7 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 
 import playground.gregor.microcalibratedqsim.LinkVelocityClassifier;
 import playground.gregor.microcalibratedqsim.WekaEstimator;

@@ -41,10 +41,10 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;

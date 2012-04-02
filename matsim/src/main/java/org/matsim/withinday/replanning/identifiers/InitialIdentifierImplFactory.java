@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifierFactory;
 

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 
 /**

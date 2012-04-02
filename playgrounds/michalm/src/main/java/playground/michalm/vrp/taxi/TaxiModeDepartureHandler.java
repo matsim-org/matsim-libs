@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.core.mobsim.framework.*;
-import org.matsim.ptproject.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import playground.michalm.vrp.data.*;

@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 
 
 /**

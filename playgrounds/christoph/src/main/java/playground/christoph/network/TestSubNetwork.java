@@ -30,6 +30,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -39,8 +41,6 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityC
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.container.NodeKnowledge;

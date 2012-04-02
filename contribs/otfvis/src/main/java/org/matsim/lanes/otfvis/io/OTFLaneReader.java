@@ -22,10 +22,10 @@ package org.matsim.lanes.otfvis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLaneModelBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLinkWLanes;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
-import org.matsim.ptproject.qsim.qnetsimengine.OTFLaneModelBuilder;
-import org.matsim.ptproject.qsim.qnetsimengine.OTFLinkWLanes;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 

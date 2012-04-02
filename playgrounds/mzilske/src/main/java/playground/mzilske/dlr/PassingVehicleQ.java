@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.VehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
 
 final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 

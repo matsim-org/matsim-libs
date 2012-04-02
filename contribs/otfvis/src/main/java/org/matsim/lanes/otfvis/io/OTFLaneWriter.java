@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLinkWLanes;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.ptproject.qsim.qnetsimengine.OTFLinkWLanes;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;

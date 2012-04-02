@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 
 
 public class DynAgent implements MobsimDriverAgent {

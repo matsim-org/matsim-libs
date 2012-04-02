@@ -24,8 +24,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 /**
  * @author nagel

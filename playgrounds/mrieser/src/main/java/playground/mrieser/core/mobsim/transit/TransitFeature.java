@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import org.matsim.pt.qsim.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;

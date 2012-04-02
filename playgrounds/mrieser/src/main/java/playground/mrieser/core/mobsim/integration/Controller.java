@@ -22,8 +22,8 @@ package playground.mrieser.core.mobsim.integration;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.ptproject.qsim.QSimFactory;
 
 import playground.mrieser.core.mobsim.usecases.OptimizedCarSimFactory;
 import playground.mrieser.core.mobsim.usecases.RefMobsimFactory;

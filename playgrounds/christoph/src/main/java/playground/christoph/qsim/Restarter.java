@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSim;
 
 public class Restarter implements MobsimInitializedListener {
 

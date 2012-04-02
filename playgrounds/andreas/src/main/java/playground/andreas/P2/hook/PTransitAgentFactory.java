@@ -21,9 +21,9 @@
 package playground.andreas.P2.hook;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 
 
 /**

@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 
 /*
  * Identify Agents that need a replanning of their scheduled plan.

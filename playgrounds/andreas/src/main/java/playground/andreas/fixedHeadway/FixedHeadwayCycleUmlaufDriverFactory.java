@@ -1,10 +1,10 @@
 package playground.andreas.fixedHeadway;
 
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
+import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.pt.Umlauf;
-import org.matsim.pt.qsim.AbstractTransitDriver;
-import org.matsim.pt.qsim.AbstractTransitDriverFactory;
-import org.matsim.pt.qsim.TransitStopAgentTracker;
-import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 /**
  * @author aneumann
