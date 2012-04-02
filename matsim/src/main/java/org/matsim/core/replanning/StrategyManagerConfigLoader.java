@@ -249,7 +249,7 @@ public final class StrategyManagerConfigLoader {
 	private static PlanStrategy tryToLoadPlanStrategyByName(final Controler controler, final String name) {
 		PlanStrategy strategy = null;
 		//classes loaded by name must not be part of the matsim core
-		if (name.startsWith("org.matsim")) {
+		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
 			log.error("Strategies in the org.matsim package must not be loaded by name!");
 		}
 		else {
