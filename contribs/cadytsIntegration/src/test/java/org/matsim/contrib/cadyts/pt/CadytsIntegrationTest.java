@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Count;
@@ -54,15 +53,12 @@ public class CadytsIntegrationTest {
 		System.out.println(" Output Dir " + this.utils.getOutputDirectory() );
 
 		String configFile = inputDir + "equil_config.xml";
-		//configFile = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
-		Config config = ConfigUtils.loadConfig(configFile);
-
+		Config config = this.utils.loadConfig(configFile);
 
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
-		controler.setOverwriteFiles(true);
 		controler.run();
 
 		//scenario data  test
