@@ -353,16 +353,6 @@
 			<version>3.4.1</version>
 		</dependency>
 		<dependency>
-			<groupId>jogl</groupId>
-			<artifactId>jogl</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>jogl</groupId>
-			<artifactId>gluegen-rt</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<dependency>
 			<groupId>kml</groupId>
 			<artifactId>kml</artifactId>
 			<version>2.2.0</version>
@@ -394,11 +384,6 @@
 			<version>2.1.7</version>
 		</dependency>
 		<!--End of jaxb 2.1.7 dependencies -->
-		<dependency>
-			<groupId>edu.ucar</groupId>
-			<artifactId>netcdf</artifactId>
-			<version>4.2.20</version>
-		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt2-main</artifactId>
@@ -436,11 +421,6 @@
 			<version>2.7.1</version>
 		</dependency>
 		<dependency>
-			<groupId>net.java.dev.timingframework</groupId>
-			<artifactId>timingframework</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt2-referencing</artifactId>
 			<version>2.3.5</version>
@@ -465,11 +445,6 @@
 			<version>2.3.5</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.swinglabs</groupId>
-			<artifactId>swingx</artifactId>
-			<version>1.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.swinglabs</groupId>
