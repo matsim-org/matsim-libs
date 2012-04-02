@@ -2,20 +2,19 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
    
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
   <artifactId>sschroeder</artifactId>
   <name>sschroeder</name>
-  <version>0.4.0-SNAPSHOT</version>
-    <dependencyManagement>
+  <dependencyManagement>
   	<dependencies>
   		<dependency>
   			<groupId>org.matsim</groupId>
   			<artifactId>matsim</artifactId>
-  			<version>0.4.0-SNAPSHOT</version>
+  			<version>0.5.0-SNAPSHOT</version>
   			<type>jar</type>
   			<scope>compile</scope>
   			<exclusions>
@@ -98,13 +97,13 @@
     <dependency>
 			<groupId>org.matsim.contrib</groupId>
   		<artifactId>freight</artifactId>
-  		<version>0.4.0-SNAPSHOT</version>
+  		<version>0.5.0-SNAPSHOT</version>
 			<scope>compile</scope>
 	</dependency>
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>mzilske</artifactId>
-  		<version>0.4.0-SNAPSHOT</version>
+  		<version>0.5.0-SNAPSHOT</version>
   		<type>jar</type>
   		<scope>compile</scope>
   		<exclusions>
@@ -153,7 +152,7 @@
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>mrieser</artifactId>
-  		<version>0.4.0-SNAPSHOT</version>
+  		<version>0.5.0-SNAPSHOT</version>
   		<type>jar</type>
   		<scope>compile</scope>
   		<exclusions>

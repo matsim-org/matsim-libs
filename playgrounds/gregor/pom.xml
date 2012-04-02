@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.4.0-SNAPSHOT</version>
+		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>playground</groupId>
 	<artifactId>gregor</artifactId>
 	<name>gregor</name>
-	<version>0.4.0-SNAPSHOT</version>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.jmatio</groupId>
@@ -29,11 +29,6 @@
 			<version>1.11</version>
 		</dependency>
 		<dependency>
-		<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.7.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.jvnet.ogc</groupId>
 			<artifactId>iso-19139-d_2007_04_17-schema</artifactId>
 			<version>1.0.3</version>
@@ -46,21 +41,16 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>evacuation</artifactId>
-			<version>0.4.0-SNAPSHOT</version>
+			<version>0.5.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>grips</artifactId>
-			<version>0.4.0-SNAPSHOT</version>
+			<version>0.5.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>tw.edu.ntu.csie</groupId>
-			<artifactId>libsvm</artifactId>
-			<version>3.1</version>
-		</dependency>
-			<dependency>
 			<groupId>net.sf.javaml</groupId>
 			<artifactId>javaml</artifactId>
 			<version>0.1.6</version>
@@ -77,7 +67,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>0.4.0-SNAPSHOT</version>
+			<version>0.5.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

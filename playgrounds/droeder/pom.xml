@@ -2,14 +2,14 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
   <artifactId>droeder</artifactId>
   <name>droeder</name>
-  <version>0.4.0-SNAPSHOT</version>
-    <dependencies>
+
+  <dependencies>
   	<dependency>
   		<groupId>org.apache.commons</groupId>
   		<artifactId>commons-math</artifactId>
@@ -17,22 +17,22 @@
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>andreas</artifactId>
-  		<version>0.4.0-SNAPSHOT</version>
+  		<version>0.5.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>mzilske</artifactId>
-  		<version>0.4.0-SNAPSHOT</version>
+  		<version>0.5.0-SNAPSHOT</version>
   	</dependency>
   	  	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>gregor</artifactId>
-  		<version>0.4.0-SNAPSHOT</version>
+  		<version>0.5.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>kai</artifactId>
-  		<version>0.4.0-SNAPSHOT</version>
+  		<version>0.5.0-SNAPSHOT</version>
   	</dependency>
-    </dependencies>
+  </dependencies>
 </project>
