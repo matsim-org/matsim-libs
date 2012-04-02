@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -26,17 +27,31 @@ public class UtilityAnalyzer {
 	
 	private List<Zone> zones = new Vector<Zone>();
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private UtilitiesBoxPlot boxPlot = new UtilitiesBoxPlot("Utilities");
+	private UtilitiesBoxPlot boxPlotRelative = new UtilitiesBoxPlot("Utilities");
+	private UtilitiesBoxPlot boxPlotAbsolute = new UtilitiesBoxPlot("Utilities");
 	
-	public static void main (final String[] args) {
-		UtilityAnalyzer analyzer = new UtilityAnalyzer();
-		Config config = ConfigUtils.loadConfig(args[0]);
-		String outPath = args[1];
+	private final static Logger log = Logger.getLogger(UtilityAnalyzer.class);
+	
+	public static void main (final String[] args) {		
+		if (args.length != 2) {
+			log.error("Provide correct number of arguments ...");
+			System.exit(-1);
+		}
 		
-		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreate.xml");
+		UtilityAnalyzer analyzer = new UtilityAnalyzer();
+		
+		String configFile = args[0];
+		String configCreateFile = args[1];
+		
+		Config config = ConfigUtils.loadConfig(configFile);
+		String outPath = config.controler().getOutputDirectory();
+		
+		Config configCreate = ConfigUtils.loadConfig(configCreateFile);
 		double sideLength = Double.parseDouble(configCreate.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
 		
 		analyzer.analyze(config, outPath, sideLength);
+		
+		log.info("=================== Finished analyses ====================");
 	}
 		
 	public void analyze(Config config, String outPath, double sideLength) {
@@ -46,7 +61,8 @@ public class UtilityAnalyzer {
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.facilities().getInputFile());
 		
 		TreeMap<String, Utilities> utilitiesPerZone = new TreeMap<String, Utilities>();
-		ArrayList<Double> utilities = new ArrayList<Double>();
+		ArrayList<Double> utilitiesRelative = new ArrayList<Double>();
+		ArrayList<Double> utilitiesAbsolute = new ArrayList<Double>();
 		
 		for (String day : Surprice.days) {
 			String plansFilePath = outPath + "/" + day + "/" + day + ".output_plans.xml.gz";
@@ -54,17 +70,23 @@ public class UtilityAnalyzer {
 			populationReader.readFile(plansFilePath);
 
 			this.computeZoneUtilities(utilitiesPerZone, day);
-			this.computeUtilities(utilities, day);
-			this.boxPlot.addUtilities(utilities, day);
+			this.computeUtilities(utilitiesRelative, day, "rel");
+			this.boxPlotRelative.addUtilities(utilitiesRelative, day);
 			
+			this.computeUtilities(utilitiesAbsolute, day, "abs");
+			this.boxPlotAbsolute.addUtilities(utilitiesAbsolute, day);
+						
 			this.scenario.getPopulation().getPersons().clear();
 		}	
 		this.write(outPath, utilitiesPerZone);
-		this.boxPlot.createChart();
-		this.boxPlot.saveAsPng(outPath + "/utilities.png", 400, 300);
+		this.boxPlotRelative.createChart();
+		this.boxPlotRelative.saveAsPng(outPath + "/utilitiesRelative.png", 400, 300);
+		
+		this.boxPlotAbsolute.createChart();
+		this.boxPlotAbsolute.saveAsPng(outPath + "/utilitiesAbsolute.png", 400, 300);
 	}
 	
-	private void computeUtilities(ArrayList<Double> utilities, String day) {		
+	private void computeUtilities(ArrayList<Double> utilities, String day, String type) {		
 		double avgUtility = 0.0;
 		int n = 0;
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
@@ -74,7 +96,11 @@ public class UtilityAnalyzer {
 		avgUtility /= n;
 		
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			utilities.add(person.getSelectedPlan().getScore() / avgUtility);
+			if (type.equals("rel")) {
+				utilities.add(person.getSelectedPlan().getScore() / avgUtility);
+			} else {
+				utilities.add(person.getSelectedPlan().getScore());
+			}
 		}		
 	}
 		
