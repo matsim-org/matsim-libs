@@ -167,11 +167,11 @@ public final class NetworkImpl implements Network, BasicLocations {
 	/**
 	 * @param capPeriod the capacity-period in seconds
 	 */
-	public final void setCapacityPeriod(final double capPeriod) {
+	public void setCapacityPeriod(final double capPeriod) {
 		this.capperiod = (int) capPeriod;
 	}
 
-	public final void setEffectiveCellSize(final double effectiveCellSize) {
+	public void setEffectiveCellSize(final double effectiveCellSize) {
 		if (this.effectiveCellSize != effectiveCellSize) {
 			if (effectiveCellSize != DEFAULT_EFFECTIVE_CELL_SIZE) {
 				log.warn("Setting effectiveCellSize to a non-default value of " + effectiveCellSize);
@@ -182,7 +182,7 @@ public final class NetworkImpl implements Network, BasicLocations {
 		}
 	}
 
-	public final void setEffectiveLaneWidth(final double effectiveLaneWidth) {
+	public void setEffectiveLaneWidth(final double effectiveLaneWidth) {
 		if (!Double.isNaN(this.effectiveLaneWidth)) {
 			log.warn(this + "[effectiveLaneWidth=" + this.effectiveLaneWidth + " already set. Will be overwritten with " + effectiveLaneWidth + "]");
 		}
@@ -196,7 +196,7 @@ public final class NetworkImpl implements Network, BasicLocations {
 	 *
 	 * @param events a list of events.
 	 */
-	public final void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
+	public void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
 		if (!this.factory.isTimeVariant()) {
 			throw new RuntimeException(
 					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
@@ -221,7 +221,7 @@ public final class NetworkImpl implements Network, BasicLocations {
 	 * @param event
 	 *            a network change event.
 	 */
-	public final void addNetworkChangeEvent(final NetworkChangeEvent event) {
+	public void addNetworkChangeEvent(final NetworkChangeEvent event) {
 		if (!this.factory.isTimeVariant()) {
 			throw new RuntimeException(
 					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
@@ -238,16 +238,16 @@ public final class NetworkImpl implements Network, BasicLocations {
 	}
 
 	@Override
-	public final double getCapacityPeriod() {
+	public double getCapacityPeriod() {
 		return this.capperiod;
 	}
 
-	public final double getEffectiveCellSize() {
+	public double getEffectiveCellSize() {
 		return this.effectiveCellSize;
 	}
 
 	@Override
-	public final double getEffectiveLaneWidth() {
+	public double getEffectiveLaneWidth() {
 		return this.effectiveLaneWidth;
 	}
 
@@ -503,7 +503,7 @@ public final class NetworkImpl implements Network, BasicLocations {
 		return getLinks().get(locationId);
 	}
 
-	public final Node createAndAddNode(final Id id, final Coord coord) {
+	public Node createAndAddNode(final Id id, final Coord coord) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
@@ -512,18 +512,18 @@ public final class NetworkImpl implements Network, BasicLocations {
 		return n;
 	}
 
-	public final Node createAndAddNode(final Id id, final Coord coord, final String nodeType) {
+	public Node createAndAddNode(final Id id, final Coord coord, final String nodeType) {
 		NodeImpl n = (NodeImpl) createAndAddNode(id, coord);
 		n.setType(nodeType);
 		return n;
 	}
 
-	public final Link createAndAddLink(final Id id, final Node fromNode,
+	public Link createAndAddLink(final Id id, final Node fromNode,
 			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
 				return createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 			}
 
-	public final LinkImpl createAndAddLink(final Id id, final Node fromNode,
+	public LinkImpl createAndAddLink(final Id id, final Node fromNode,
 			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes,
 			final String origId, final String type) {
 

@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
 /**
