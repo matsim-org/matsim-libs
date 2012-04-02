@@ -23,20 +23,19 @@ package playground.gregor.grips.geospatial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.grips.config.GripsConfigModule;
+import org.matsim.contrib.grips.helper.Algorithms;
+import org.matsim.contrib.grips.helper.shapetostreetsnapper.LinkSorter;
+import org.matsim.contrib.grips.helper.shapetostreetsnapper.TravelCost;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -73,6 +72,7 @@ public class ShapeToStreetSnapper {
 	
 	
 	private static final double DETOUR_COEF = 3;
+	private static final double TRAVEL_COST_CUTOFF = 500;
 	private static final double epsilon = 0.00001;
 	private final Scenario sc;
 
@@ -94,12 +94,18 @@ public class ShapeToStreetSnapper {
 			Node n0 = nodes.get(i-1);
 			Node n1 = nodes.get(i);
 			Path path = dijkstra.calcLeastCostPath(n0, n1, 0);
-			if (path.travelCost < 500 || path.travelCost < DETOUR_COEF * ((CoordImpl)n0.getCoord()).calcDistance(n1.getCoord()) ){
+			if (path != null && (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * ((CoordImpl)n0.getCoord()).calcDistance(n1.getCoord())) ){
 				finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 			}else {
 				finalNodes.add(n0);
 			}
 			
+		}
+		Node nn0 = nodes.get(nodes.size()-1);
+		Node nn1 = nodes.get(0);
+		Path path = dijkstra.calcLeastCostPath(nn0, nn1, 0);
+		if (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * ((CoordImpl)nn0.getCoord()).calcDistance(nn1.getCoord()) ){
+			finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 		}
 
 		Set<Integer> rmIdxs = new HashSet<Integer>();
@@ -128,7 +134,7 @@ public class ShapeToStreetSnapper {
 			idx++;
 		}
 		
-		
+		GisDebugger.setCRSString("EPSG: 3395");
 		
 		GisDebugger.addGeometry(p);
 		GisDebugger.dump("/Users/laemmel/tmp/!!snapperP.shp");
@@ -204,53 +210,95 @@ public class ShapeToStreetSnapper {
 		for (int i = 1; i < p.getExteriorRing().getNumPoints(); i++) {
 			Coordinate c0 = p.getExteriorRing().getCoordinateN(i-1);
 			Coordinate c1 = p.getExteriorRing().getCoordinateN(i);
-			
-			LineString ls = this.geofac.createLineString(new Coordinate[]{c0,c1});
-			
-			Coordinate center = new Coordinate((c0.x+c1.x)/2,(c0.y+c1.y)/2);
-			double searchRange = Math.max(maxL, c0.distance(c1));
-			Collection<Node> coll = qTree.get(center.x, center.y,searchRange);
-			
-			List<Link> iLs = new ArrayList<Link>();
-			for (Node n : coll) {
-				for (Link l : n.getOutLinks().values()) {
-					Coordinate tmpC0 = MGC.coord2Coordinate(l.getFromNode().getCoord());
-					Coordinate tmpC1 = MGC.coord2Coordinate(l.getToNode().getCoord());
-					LineString tmpLs = this.geofac.createLineString(new Coordinate[]{tmpC0,tmpC1});
-					
-					if (ls.intersects(tmpLs)) {
-						iLs.add(l);
-					}
-				}
-				for (Link l : n.getInLinks().values()) {
-					Coordinate tmpC0 = MGC.coord2Coordinate(l.getFromNode().getCoord());
-					Coordinate tmpC1 = MGC.coord2Coordinate(l.getToNode().getCoord());
-					LineString tmpLs = this.geofac.createLineString(new Coordinate[]{tmpC0,tmpC1});
-					
-					if (ls.intersects(tmpLs)) {
-						iLs.add(l);
-					}
-				}
-			}
-			
-			LinkSorter sorter = new LinkSorter(c0, c1);//kaputt
-			Collections.sort(iLs, sorter);
-			for (Link link : iLs) {
-				Node tmp = link.getFromNode();
-				if (contains(MGC.coord2Coordinate(tmp.getCoord()),p.getExteriorRing().getCoordinates())) {
-					tmp = link.getToNode();
-				}
-				if (contains(MGC.coord2Coordinate(tmp.getCoord()),p.getExteriorRing().getCoordinates())) {
-					throw new RuntimeException("should not happen!!");
-				}
-				if (nodes.size() == 0 || nodes.get(nodes.size()-1) != tmp) {
-					nodes.add(tmp);
-				}
-			}
-			
-			
+			handle(c0,c1,nodes,maxL,qTree,p);
 		}
+		Coordinate c0 = p.getExteriorRing().getCoordinateN(p.getExteriorRing().getCoordinates().length-1);
+		Coordinate c1 = p.getExteriorRing().getCoordinateN(0);
+		handle(c0,c1,nodes,maxL,qTree,p);
 		return nodes;
+	}
+
+	private void handle(Coordinate c0, Coordinate c1, List<Node> nodes, double maxL, QuadTree<Node> qTree, Polygon p) {
+		LineString ls = this.geofac.createLineString(new Coordinate[]{c0,c1});
+		
+		Coordinate center = new Coordinate((c0.x+c1.x)/2,(c0.y+c1.y)/2);
+		double searchRange = Math.max(maxL, c0.distance(c1));
+		Collection<Node> coll = qTree.get(center.x, center.y,searchRange);
+		
+		List<Link> iLs = new ArrayList<Link>();
+		for (Node n : coll) {
+			for (Link l : n.getOutLinks().values()) {
+				Coordinate tmpC0 = MGC.coord2Coordinate(l.getFromNode().getCoord());
+				Coordinate tmpC1 = MGC.coord2Coordinate(l.getToNode().getCoord());
+				LineString tmpLs = this.geofac.createLineString(new Coordinate[]{tmpC0,tmpC1});
+				
+				if (ls.intersects(tmpLs)) {
+					iLs.add(l);
+				}
+			}
+			for (Link l : n.getInLinks().values()) {
+				Coordinate tmpC0 = MGC.coord2Coordinate(l.getFromNode().getCoord());
+				Coordinate tmpC1 = MGC.coord2Coordinate(l.getToNode().getCoord());
+				LineString tmpLs = this.geofac.createLineString(new Coordinate[]{tmpC0,tmpC1});
+				
+				if (ls.intersects(tmpLs)) {
+					iLs.add(l);
+				}
+			}
+		}
+		
+		LinkSorter sorter = new LinkSorter(c0, c1);
+		Collections.sort(iLs, sorter);
+		for (Link link : iLs) {
+			Node tmp = link.getFromNode();
+			if (Algorithms.contains(MGC.coord2Coordinate(tmp.getCoord()),p.getExteriorRing().getCoordinates())) {
+				tmp = link.getToNode();
+			} 
+			
+			if (Algorithms.contains(MGC.coord2Coordinate(tmp.getCoord()),p.getExteriorRing().getCoordinates())) {
+				//link intersects polygon boundary but orig and dest node are inside polygon
+				continue;
+			}
+			
+			if (tmp.getInLinks().size() <= 2) {
+				//polygon cuts network on a non-intersection node, so we walk downstream and try to find the next inetsection
+				tmp = getBndNode(tmp,link);	
+				if (Algorithms.contains(MGC.coord2Coordinate(tmp.getCoord()),p.getExteriorRing().getCoordinates())) {
+					continue;
+				}
+			}
+			
+			if (nodes.size() == 0 || nodes.get(nodes.size()-1) != tmp) {
+				nodes.add(tmp);
+			}
+		}		
+	}
+
+	private Node getBndNode(Node tmp, Link link) {
+		
+
+		Node origTmp = tmp;
+		
+		Node oldTmp = null; 
+		if (link.getToNode() == tmp) {
+			oldTmp = link.getFromNode();
+		} else {
+			oldTmp = link.getToNode();
+		}
+		while (tmp.getInLinks().size() <= 2) {
+			for (Link l : tmp.getOutLinks().values()) {
+				if (l.getToNode() != oldTmp) {
+					oldTmp = tmp;
+					tmp = l.getToNode();
+					break;
+				}
+			}
+			if (tmp == origTmp || oldTmp == origTmp) {
+				return origTmp;
+			}
+		}
+		
+		return tmp;
 	}
 
 	public static void main(String [] args) {
@@ -302,185 +350,5 @@ public class ShapeToStreetSnapper {
 		Polygon snapped = snapper.run(p);
 		
 	}
-
 	
-	//helper
-	
-	private static class LinkSorter implements Comparator<Link> {
-
-		Map<Link,Double> distCache = new HashMap<Link,Double>();
-		private final Coordinate c0;
-		private final Coordinate c1;
-		
-		public LinkSorter(Coordinate c0, Coordinate c1) {
-			this.c0 = c0;
-			this.c1 = c1;
-			
-		}
-		
-		
-		@Override
-		public int compare(Link o1, Link o2) {
-			double dist1 = getDistToC0(o1);
-			double dist2 = getDistToC0(o2);
-			
-			if (dist1 < dist2) {
-				return -1;
-			}
-			
-			if (dist1 > dist2) {
-				return 1;
-			}
-			return 0;
-		}
-		
-		private double getDistToC0(Link o1) {
-			Double dist1 = this.distCache.get(o1);
-			if (dist1 == null) {
-				Coordinate intersection = new Coordinate(Double.NaN,Double.NaN);
-				computeLineIntersection(this.c0,this.c1,MGC.coord2Coordinate(o1.getFromNode().getCoord()),MGC.coord2Coordinate(o1.getToNode().getCoord()),intersection);
-				dist1 = this.c0.distance(intersection);
-				this.distCache.put(o1, dist1);
-			}
-			return dist1;
-		}
-
-
-		private boolean computeLineIntersection(Coordinate a0, Coordinate a1, Coordinate b0, Coordinate b1, Coordinate intersectionCoordinate) {
-			
-			
-			
-			double a = (b1.x - b0.x) * (a0.y - b0.y) - (b1.y - b0.y) * (a0.x - b0.x);
-			double b = (a1.x - a0.x) * (a0.y - b0.y) - (a1.y - a0.y) * (a0.x - b0.x);
-			double denom = (b1.y - b0.y) * (a1.x - a0.x) - (b1.x - b0.x) * (a1.y - a0.y);
-			
-			//conincident
-			if (Math.abs(a) < epsilon && Math.abs(b) < epsilon && Math.abs(denom) < epsilon) {
-				intersectionCoordinate.x = (a0.x+a1.x) /2;
-				intersectionCoordinate.y = (a0.y+a1.y) /2;
-				return true;
-			}
-			
-			//parallel
-			if (Math.abs(denom) < epsilon) {
-				return false;
-			}
-			
-			double ua = a / denom;
-			double ub = b / denom;
-			
-			if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
-				return false;
-			}
-			
-			double x = a0.x + ua * (a1.x - a0.x);
-			double y = a0.y + ua * (a1.y - a0.y);
-			intersectionCoordinate.x = x;
-			intersectionCoordinate.y = y;
-			
-			return true;
-		}
-	}
-	
-	
-	/**
-	 * Tests whether a polygon (defined by an array of Coordinate) contains a Coordinate
-	 * @param coord
-	 * @param p
-	 * @return true if coord lays within p
-	 */
-	private boolean contains(Coordinate coord, Coordinate[] p) {
-		int wn = getWindingNumber(coord,p);
-		return wn != 0;
-	}
-
-	//winding number algorithm
-	//see softSurfer (www.softsurfer.com) for more details
-	private int getWindingNumber(Coordinate c, Coordinate[] p) {
-
-
-		int wn = 0;
-
-		for (int i=0; i<p.length-1; i++) {
-			if (p[i].y <= c.y) {
-				if (p[i+1].y > c.y)
-					if (isLeftOfLine( c,p[i], p[i+1]) > 0)
-						++wn;
-			}
-			else {
-				if (p[i+1].y <= c.y)
-					if (isLeftOfLine( c,p[i], p[i+1]) < 0)
-						--wn;
-			}
-
-			//test for early return here
-		}
-		return wn;
-	}
-	
-	
-	/**
-	 * tests if line segment a0a1 intersects b0b1
-	 * @param a0
-	 * @param a1
-	 * @param b0
-	 * @param b1
-	 * @return true if segment a0a1 intersects b0b1
-	 */
-	private boolean intersects(Coordinate a0,
-			Coordinate a1, Coordinate b0, Coordinate b1) {
-		double b0Side = isLeftOfLine(b0,a0,a1);
-		if (b0Side == 0) {
-			return true;
-		}
-		double b1Side = isLeftOfLine(b1,a0,a1);
-		if (b1Side == 0) {
-			return true;
-		}
-		return b0Side*b1Side < 0;
-	}
-	
-	/**
-	 * tests whether coordinate c0 is located left of the infinite vector that runs through c1 and c2
-	 * @param c0 the coordinate to test
-	 * @param c1 one coordinate of the vector
-	 * @param c2 another coordinate of the same vector
-	 * @return >0 if c0 is left of the vector
-	 * 		  ==0 if c0 is on the vector
-	 * 		   <0 if c0 is right of the vector
-	 */
-	private double isLeftOfLine(Coordinate c0, Coordinate c1, Coordinate c2) {
-		return (c2.x - c1.x)*(c0.y - c1.y) - (c0.x - c1.x) * (c2.y - c1.y);
-	}
-
-	
-	private static final class TravelCost implements PersonalizableTravelDisutility {
-		
-		private final Polygon p;
-
-		private final GeometryFactory geofac = new GeometryFactory();
-		
-		public TravelCost(Polygon p) {
-			this.p = p;
-		}
-		
-		@Override
-		public double getLinkTravelDisutility(Link link, double time) {
-			Coordinate c0 = MGC.coord2Coordinate(link.getFromNode().getCoord());
-			Coordinate c1 = MGC.coord2Coordinate(link.getToNode().getCoord());
-			LineString ls = this.geofac.createLineString(new Coordinate[]{c0,c1});
-			if (ls.intersects(this.p) || this.p.covers(ls)) {
-				return Double.POSITIVE_INFINITY;
-			}
-			
-			return link.getLength();
-		}
-		
-		@Override
-		public void setPerson(Person person) {
-			// TODO Auto-generated method stub
-			
-		}
-	};
-
 }

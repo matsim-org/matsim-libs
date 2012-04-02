@@ -61,8 +61,14 @@ public class GisDebugger {
 
 	private static boolean init = false;
 
+	private static String CRS = "EPSG: 32632";
+
 	public static final GeometryFactory geofac = new GeometryFactory();
 
+	public static void setCRSString(String crs) {
+		CRS = crs;
+	}
+	
 	public static void addGeometry(Geometry geo) {
 		geos.add(geo);
 	}
@@ -129,7 +135,7 @@ public class GisDebugger {
 
 
 	private static void initFeatures() {
-		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 32632");
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(CRS);
 		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
 				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
 		AttributeType l = DefaultAttributeTypeFactory.newAttributeType(
