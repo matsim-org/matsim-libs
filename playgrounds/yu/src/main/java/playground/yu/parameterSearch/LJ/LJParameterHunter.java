@@ -20,8 +20,6 @@
 
 package playground.yu.parameterSearch.LJ;
 
-import java.util.Collection;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -36,28 +34,26 @@ public class LJParameterHunter {
 		ctl = new Controler(cfg);
 		llhListener = new SimCntLogLikelihoodCtlListener();
 		ctl.addControlerListener(llhListener);
-	}
-
-	public double getLogLikelihood() {
-		// TODO getter in SimCntLogLikelihoodCtlListener TODO a class or sth.
-		// else? or in another class?
-		return 0;
-	}
-
-	public Collection<Double> getParameters(Collection<String> names) {
-		// TODO a class or sth. else? or in another class?
-		return null;
-	}
-
-	// TODO setParameters? TODO a class or sth. else? or in another class?
-
-	public void run() {
+		// TODO add ... listener
 		ctl.setOverwriteFiles(true);
 		ctl.run();
 	}
 
+	// public double getLogLikelihood() {
+	// // TODO getter in SimCntLogLikelihoodCtlListener TODO a class or sth.
+	// // else? or in another class?
+	// return 0;
+	// }
+
+	// public Collection<Double> getParameters(Collection<String> names) {
+	// // TODO a class or sth. else? or in another class?
+	// return null;
+	// }
+
+	// TODO setParameters? TODO a class or sth. else? or in another class?
+
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0]/* configfilename */);
-		new LJParameterHunter(config).run();
+		new LJParameterHunter(
+				ConfigUtils.loadConfig(args[0]/* configfilename */));
 	}
 }

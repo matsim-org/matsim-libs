@@ -32,7 +32,7 @@ import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
 
 /**
- * sets parameters of scoringfunction into config and also into
+ * sets parameters of scoringfunction into {@code Config} and also into
  * {@code Controler}
  * 
  * @author yu
@@ -42,8 +42,8 @@ public class ParametersSetter {
 	public static void setParameters(Controler ctl,
 			Tuple<String, Double>... parameters) {
 		// set new parameters in config
-		Config config = ctl.getConfig();
-		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
+		Config cfg = ctl.getConfig();
+		PlanCalcScoreConfigGroup scoringCfg = cfg.planCalcScore();
 		for (Tuple<String, Double> parameter : parameters) {
 			String name = parameter.getFirst();
 			String value = Double.toString(parameter.getSecond());
@@ -51,12 +51,12 @@ public class ParametersSetter {
 			if (scoringCfg.getParams().containsKey(name)) {
 				scoringCfg.addParam(name, value);
 			} else {
-				config.setParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME, name,
+				cfg.setParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME, name,
 						value);
 			}
 		}
 		// set new parameters in Controler
 		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				config, ctl.getNetwork()));
+				cfg, ctl.getNetwork()));
 	}
 }
