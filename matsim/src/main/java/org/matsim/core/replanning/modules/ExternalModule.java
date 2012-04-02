@@ -53,6 +53,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * Basic wrapper for any call to external "plans-to-plans" modules. As basic handling of
@@ -262,6 +263,11 @@ public class ExternalModule implements PlanStrategyModule {
 		@Override
 		public Population getPopulation() {
 			return this.myPopulation;
+		}
+		
+		@Override
+		public TransitSchedule getTransitSchedule() {
+			return null;
 		}
 
 		@Override

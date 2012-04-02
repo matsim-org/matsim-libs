@@ -35,10 +35,10 @@ public class ScenarioLoaderImplTest {
 	@Test
 	public void testLoadScenario_loadTransitData() {
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(util.getClassInputDirectory() + "transitConfig.xml");
-		Assert.assertEquals(0, ((ScenarioImpl) sl.getScenario()).getTransitSchedule().getTransitLines().size());
-		Assert.assertEquals(0, ((ScenarioImpl) sl.getScenario()).getTransitSchedule().getFacilities().size());
+		Assert.assertEquals(0, sl.getScenario().getTransitSchedule().getTransitLines().size());
+		Assert.assertEquals(0, sl.getScenario().getTransitSchedule().getFacilities().size());
 		sl.loadScenario();
-		Assert.assertEquals(1, ((ScenarioImpl) sl.getScenario()).getTransitSchedule().getTransitLines().size());
-		Assert.assertEquals(2, ((ScenarioImpl) sl.getScenario()).getTransitSchedule().getFacilities().size());
+		Assert.assertEquals(1, sl.getScenario().getTransitSchedule().getTransitLines().size());
+		Assert.assertEquals(2, sl.getScenario().getTransitSchedule().getFacilities().size());
 	}
 }

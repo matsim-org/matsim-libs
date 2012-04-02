@@ -20,12 +20,18 @@
 
 package org.matsim.integration;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -51,7 +57,12 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.testcases.MatsimTestCase;
@@ -60,8 +71,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.Arrays;
 
 public class SimulateAndScoreTest extends MatsimTestCase {
 
@@ -127,7 +136,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
         Vehicle vehicle = vehicles.getFactory().createVehicle(new IdImpl("V1"), vehicleType);
         vehicles.getVehicles().put(vehicle.getId(), vehicle);
 
-        TransitSchedule transitSchedule = ((ScenarioImpl) scenario).getTransitSchedule();
+        TransitSchedule transitSchedule = scenario.getTransitSchedule();
         transitSchedule.addStopFacility(stop1);
         transitSchedule.addStopFacility(stop2);
         transitSchedule.addStopFacility(stop3);

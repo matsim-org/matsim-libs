@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * Provides a real scenario, but exchanges the population.
@@ -27,6 +28,11 @@ public class SharedNetScenario implements Scenario {
 	@Override
 	public Population getPopulation() {
 		return this.myPopulation;
+	}
+	
+	@Override
+	public TransitSchedule getTransitSchedule() {
+		return this.scenario.getTransitSchedule();
 	}
 
 	@Override

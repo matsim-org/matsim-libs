@@ -90,7 +90,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	public TransitQSimEngine(Netsim queueSimulation) {
 		this.qSim = queueSimulation;
-		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
+		this.schedule = queueSimulation.getScenario().getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker();
 	}
 
@@ -121,7 +121,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
 		Scenario scenario = this.qSim.getScenario();
-		TransitSchedule transitSchedule = ((ScenarioImpl) scenario).getTransitSchedule();
+		TransitSchedule transitSchedule = scenario.getTransitSchedule();
 		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<MobsimAgent>();
 		UmlaufCache umlaufCache = scenario.getScenarioElement(UmlaufCache.class) ;

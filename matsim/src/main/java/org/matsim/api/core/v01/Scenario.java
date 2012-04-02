@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.config.Config;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 
 /**
@@ -40,8 +41,10 @@ public interface Scenario extends IdFactory {
 
 	public Network getNetwork();
 
-	public Population getPopulation() ;
+	public Population getPopulation();
 
+	public TransitSchedule getTransitSchedule();
+	
 	public Config getConfig();
 
 	public Coord createCoord(double x, double y);

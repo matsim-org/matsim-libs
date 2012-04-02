@@ -252,6 +252,7 @@ public class ScenarioImpl implements Scenario {
 		return this.knowledges ;
 	}
 
+	@Override
 	public TransitSchedule getTransitSchedule() {
 		if ((this.transitSchedule == null) && this.config.scenario().isUseTransit()){
 			this.createTransit();
