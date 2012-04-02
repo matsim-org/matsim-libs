@@ -40,7 +40,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Volume;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
+import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.utils.io.SimpleWriter;
 import cadyts.calibrators.Calibrator;
 
@@ -138,8 +138,7 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 		// SETTING MINSTDDEV
 		String minStdDevStr = config.findParam(
-				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"minFlowStddevVehH");
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "minFlowStddevVehH");
 		if (minStdDevStr != null) {
 			minStdDev = Double.parseDouble(minStdDevStr);
 			System.out.println("BSE:\tminStdDev\t= " + minStdDev);
@@ -151,7 +150,7 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 		// SETTING AVG_LLH_OVER_ITERS
 		String avgLlhOverItersStr = config.findParam(
-				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
 				"averageLogLikelihoodOverIterations");
 		if (avgLlhOverItersStr != null) {
 			avgLlhOverIters = Integer.parseInt(avgLlhOverItersStr);
@@ -159,7 +158,7 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 		// SETTING WRITE_LOG-LIKELIHOOD_ITERVAL
 		String writeLlhItervalStr = config.findParam(
-				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
 				"writeLogLikelihoodInterval");
 		if (writeLlhItervalStr != null) {
 			writeLlhInterval = Integer.parseInt(writeLlhItervalStr);
@@ -167,24 +166,21 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 		// SETTING CALIBRATION_START_TIME
 		String caliStartTimeStr = config.findParam(
-				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"startTime");
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "startTime");
 		if (caliStartTimeStr != null) {
 			caliStartTime = Integer.parseInt(caliStartTimeStr);
 		}
 
 		// SETTING CALIBRATION_END_TIME
 		String caliEndTimeStr = config.findParam(
-				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"endTime");
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "endTime");
 		if (caliEndTimeStr != null) {
 			caliEndTime = Integer.parseInt(caliEndTimeStr);
 		}
 
 		// SETTING VARIANCE_SCALE
 		final String varianceScaleStr = config.findParam(
-				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"varianceScale");
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "varianceScale");
 		if (varianceScaleStr != null) {
 			varianceScale = Double.parseDouble(varianceScaleStr);
 			System.out.println("BSE:\tvarianceScale\t= " + varianceScale);
@@ -198,7 +194,7 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 		// INITIALIZING WRITER
 		writer = new SimpleWriter(ctl.getControlerIO().getOutputFilename(
-				"log-likelihood.log"));
+				"log-likelihood.log.gz"));
 	}
 
 	private boolean isInRange(final Id linkid, final Network net) {
