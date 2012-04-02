@@ -64,8 +64,8 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -89,7 +89,7 @@ import playground.christoph.evacuation.mobsim.VehiclesTracker;
 public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentArrivalEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler, 
 		PersonLeavesVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
-		SimulationAfterSimStepListener, IterationEndsListener {
+		MobsimAfterSimStepListener, IterationEndsListener {
 	
 	private static final Logger log = Logger.getLogger(EvacuationTimePicture.class);
 	private static final String separator = "\t";
@@ -304,7 +304,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 	}
 	
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		
 		/*
 		 * If the evacuation starts in the next time step, we check each agents current position.

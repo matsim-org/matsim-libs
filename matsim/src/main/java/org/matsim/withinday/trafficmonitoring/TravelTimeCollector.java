@@ -49,12 +49,12 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkImpl;
@@ -75,7 +75,7 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
 public class TravelTimeCollector implements PersonalizableTravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler,
 		AgentArrivalEventHandler, AgentDepartureEventHandler,
-		SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterSimStepListener {
+		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(TravelTimeCollector.class);
 
@@ -250,7 +250,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	 * Initially set free speed travel time.
 	 */
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 
 		if (e.getQueueSimulation() instanceof Mobsim) {
 			double simStartTime = ((Mobsim) e.getQueueSimulation()).getSimTimer().getSimStartTime();
@@ -277,7 +277,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 	// Update Link TravelTimeInfos if link attributes have changed
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		Collection<Link> links = changedLinks.remove(e.getSimulationTime());
 		
 		if (links != null) {
@@ -292,7 +292,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 	// Update Link TravelTimes
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		// parallel Execution
 		this.run(e.getSimulationTime());
 

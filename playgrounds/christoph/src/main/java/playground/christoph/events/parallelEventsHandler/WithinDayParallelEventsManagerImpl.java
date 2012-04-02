@@ -27,8 +27,8 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 /**
  * 
@@ -49,7 +49,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
  * @author rashid_waraich
  * 
  */
-public class WithinDayParallelEventsManagerImpl extends EventsManagerImpl implements SimulationAfterSimStepListener{
+public class WithinDayParallelEventsManagerImpl extends EventsManagerImpl implements MobsimAfterSimStepListener{
 
 	private int numberOfThreads;
 	private EventsManagerImpl[] events = null;
@@ -205,7 +205,7 @@ public class WithinDayParallelEventsManagerImpl extends EventsManagerImpl implem
 	}
 
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent event)
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event)
 	{
 		for (int i = 0; i < eventsProcessThread.length; i++)
 		{

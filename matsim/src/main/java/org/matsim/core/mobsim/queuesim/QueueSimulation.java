@@ -43,8 +43,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimListenerManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
@@ -101,7 +101,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 	private AgentFactory agentFactory;
 
-	private SimulationListenerManager listenerManager;
+	private MobsimListenerManager listenerManager;
 
 	private final PriorityBlockingQueue<MobsimAgent> activityEndsList =
 			new PriorityBlockingQueue<MobsimAgent>(500, new PlanAgentDepartureTimeComparator());
@@ -122,7 +122,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 		}
 
-		this.listenerManager = new SimulationListenerManager(this);
+		this.listenerManager = new MobsimListenerManager(this);
 
 		this.agentCounter.reset();
 
@@ -146,7 +146,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	 * @param listeners
 	 */
 	@Override
-	public void addQueueSimulationListeners(final SimulationListener listener){
+	public void addQueueSimulationListeners(final MobsimListener listener){
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 

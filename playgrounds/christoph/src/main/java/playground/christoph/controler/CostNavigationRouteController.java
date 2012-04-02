@@ -33,9 +33,9 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEventImpl;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -66,7 +66,7 @@ import playground.christoph.router.traveltime.LookupNetwork;
 import playground.christoph.router.traveltime.LookupNetworkFactory;
 import playground.christoph.router.traveltime.LookupTravelTime;
 
-public class CostNavigationRouteController extends WithinDayController implements SimulationInitializedListener, StartupListener  {
+public class CostNavigationRouteController extends WithinDayController implements MobsimInitializedListener, StartupListener  {
 	/*
 	 * Define the Probability that an Agent uses the
 	 * Replanning Strategy. It is possible to assign
@@ -185,10 +185,10 @@ public class CostNavigationRouteController extends WithinDayController implement
 	}
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		initReplanners((QSim)e.getQueueSimulation());
 		
-		this.selector.notifySimulationInitialized(e);
+		this.selector.notifyMobsimInitialized(e);
 		
 		Set<Id> replannedAgents = new HashSet<Id>();
 		for (PlanBasedWithinDayAgent agent : this.duringLegIdentifier.getHandledAgents()) replannedAgents.add(agent.getId());
@@ -227,7 +227,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 			
 			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
 						
-			this.notifySimulationInitialized(new SimulationInitializedEventImpl(qSim));
+			this.notifyMobsimInitialized(new MobsimInitializedEventImpl(qSim));
 			log.info("Agents to be handled: " + this.duringLegIdentifier.getHandledAgents().size());
 			new EventsReaderXMLv1(getEvents()).parse(eventsFile);
 		}		

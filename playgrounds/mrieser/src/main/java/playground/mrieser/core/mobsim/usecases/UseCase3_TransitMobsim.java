@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -57,7 +57,7 @@ public class UseCase3_TransitMobsim {
 
 		TransitMobsimFactory factory = new TransitMobsimFactory();
 		factory.setMobsimStopTime(60.0*3600);
-		Simulation sim = factory.createMobsim(scenario, events);
+		Mobsim sim = factory.createMobsim(scenario, events);
 
 		sim.run(); // replace with PlanSimulation.runMobsim();
 

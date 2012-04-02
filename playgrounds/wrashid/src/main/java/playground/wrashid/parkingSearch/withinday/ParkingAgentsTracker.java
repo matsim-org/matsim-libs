@@ -41,17 +41,17 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 
 public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler,
-		SimulationInitializedListener, SimulationAfterSimStepListener {
+		MobsimInitializedListener, MobsimAfterSimStepListener {
 
 	private final Scenario scenario;
 	private final double distance;
@@ -93,14 +93,14 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
 			this.agents.put(agent.getId(), (ExperimentalBasicWithindayAgent) agent);
 		}
 	}
 
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		lastTimeStepsLinkEnteredAgents.clear();
 		lastTimeStepsLinkEnteredAgents.addAll(linkEnteredAgents);
 		linkEnteredAgents.clear();

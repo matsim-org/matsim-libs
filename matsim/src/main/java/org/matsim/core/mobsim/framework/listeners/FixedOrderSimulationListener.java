@@ -23,10 +23,10 @@ package org.matsim.core.mobsim.framework.listeners;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 
 /**
  * To avoid problems with the order of some SimulationListeners, this
@@ -36,115 +36,115 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
  * 
  * @author cdobler
  */
-public class FixedOrderSimulationListener implements SimulationInitializedListener,
-	SimulationBeforeSimStepListener, SimulationAfterSimStepListener,
-	SimulationBeforeCleanupListener {
+public class FixedOrderSimulationListener implements MobsimInitializedListener,
+	MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
+	MobsimBeforeCleanupListener {
 
-	List<SimulationInitializedListener> simulationInitializedListener;
-	List<SimulationBeforeSimStepListener> simulationBeforeSimStepListener;
-	List<SimulationAfterSimStepListener> simulationAfterSimStepListener;
-	List<SimulationBeforeCleanupListener> simulationBeforeCleanupListener;
+	List<MobsimInitializedListener> simulationInitializedListener;
+	List<MobsimBeforeSimStepListener> simulationBeforeSimStepListener;
+	List<MobsimAfterSimStepListener> simulationAfterSimStepListener;
+	List<MobsimBeforeCleanupListener> simulationBeforeCleanupListener;
 
 	public FixedOrderSimulationListener() {
-		simulationInitializedListener = new ArrayList<SimulationInitializedListener>();
-		simulationBeforeSimStepListener = new ArrayList<SimulationBeforeSimStepListener>();
-		simulationAfterSimStepListener = new ArrayList<SimulationAfterSimStepListener>();
-		simulationBeforeCleanupListener = new ArrayList<SimulationBeforeCleanupListener>();
+		simulationInitializedListener = new ArrayList<MobsimInitializedListener>();
+		simulationBeforeSimStepListener = new ArrayList<MobsimBeforeSimStepListener>();
+		simulationAfterSimStepListener = new ArrayList<MobsimAfterSimStepListener>();
+		simulationBeforeCleanupListener = new ArrayList<MobsimBeforeCleanupListener>();
 	}
 
 	/**
 	 * Adds the SimulationListener to all ListenerLists that it supports.
 	 */
-	public void addSimulationListener(SimulationListener listener) {
-		if (listener instanceof SimulationInitializedListener) {
-			addSimulationInitializedListener((SimulationInitializedListener) listener);
+	public void addSimulationListener(MobsimListener listener) {
+		if (listener instanceof MobsimInitializedListener) {
+			addSimulationInitializedListener((MobsimInitializedListener) listener);
 		}
-		if (listener instanceof SimulationBeforeSimStepListener) {
-			addSimulationBeforeSimStepListener((SimulationBeforeSimStepListener) listener);
+		if (listener instanceof MobsimBeforeSimStepListener) {
+			addSimulationBeforeSimStepListener((MobsimBeforeSimStepListener) listener);
 		}
-		if (listener instanceof SimulationAfterSimStepListener) {
-			addSimulationAfterSimStepListener((SimulationAfterSimStepListener) listener);
+		if (listener instanceof MobsimAfterSimStepListener) {
+			addSimulationAfterSimStepListener((MobsimAfterSimStepListener) listener);
 		}
-		if (listener instanceof SimulationBeforeCleanupListener) {
-			addSimulationBeforeCleanupListener((SimulationBeforeCleanupListener) listener);
+		if (listener instanceof MobsimBeforeCleanupListener) {
+			addSimulationBeforeCleanupListener((MobsimBeforeCleanupListener) listener);
 		}
 	}
 	
 	/**
 	 * Removes the SimulationListener from all ListenerLists that it supports.
 	 */
-	public void removeSimulationListener(SimulationListener listener) {
-		if (listener instanceof SimulationInitializedListener) {
-			removeSimulationInitializedListener((SimulationInitializedListener) listener);
+	public void removeSimulationListener(MobsimListener listener) {
+		if (listener instanceof MobsimInitializedListener) {
+			removeSimulationInitializedListener((MobsimInitializedListener) listener);
 		}
-		if (listener instanceof SimulationBeforeSimStepListener) {
-			removeSimulationBeforeSimStepListener((SimulationBeforeSimStepListener) listener);
+		if (listener instanceof MobsimBeforeSimStepListener) {
+			removeSimulationBeforeSimStepListener((MobsimBeforeSimStepListener) listener);
 		}
-		if (listener instanceof SimulationAfterSimStepListener) {
-			removeSimulationAfterSimStepListener((SimulationAfterSimStepListener) listener);
+		if (listener instanceof MobsimAfterSimStepListener) {
+			removeSimulationAfterSimStepListener((MobsimAfterSimStepListener) listener);
 		}
-		if (listener instanceof SimulationBeforeCleanupListener) {
-			removeSimulationBeforeCleanupListener((SimulationBeforeCleanupListener) listener);
+		if (listener instanceof MobsimBeforeCleanupListener) {
+			removeSimulationBeforeCleanupListener((MobsimBeforeCleanupListener) listener);
 		}
 	}
 	
-	public void addSimulationInitializedListener(SimulationInitializedListener listener) {
+	public void addSimulationInitializedListener(MobsimInitializedListener listener) {
 		simulationInitializedListener.add(listener);
 	}
 
-	public void removeSimulationInitializedListener(SimulationInitializedListener listener) {
+	public void removeSimulationInitializedListener(MobsimInitializedListener listener) {
 		simulationInitializedListener.remove(listener);
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		for(SimulationInitializedListener listener : simulationInitializedListener) {
-			listener.notifySimulationInitialized(e);
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+		for(MobsimInitializedListener listener : simulationInitializedListener) {
+			listener.notifyMobsimInitialized(e);
 		}
 	}
 
-	public void addSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener) {
+	public void addSimulationBeforeSimStepListener(MobsimBeforeSimStepListener listener) {
 		simulationBeforeSimStepListener.add(listener);
 	}
 
-	public void removeSimulationBeforeSimStepListener(SimulationBeforeSimStepListener listener) {
+	public void removeSimulationBeforeSimStepListener(MobsimBeforeSimStepListener listener) {
 		simulationBeforeSimStepListener.remove(listener);
 	}
 
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-		for(SimulationBeforeSimStepListener listener : simulationBeforeSimStepListener) {
-			listener.notifySimulationBeforeSimStep(e);
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+		for(MobsimBeforeSimStepListener listener : simulationBeforeSimStepListener) {
+			listener.notifyMobsimBeforeSimStep(e);
 		}
 	}
 
-	public void addSimulationAfterSimStepListener(SimulationAfterSimStepListener listener) {
+	public void addSimulationAfterSimStepListener(MobsimAfterSimStepListener listener) {
 		simulationAfterSimStepListener.add(listener);
 	}
 
-	public void removeSimulationAfterSimStepListener(SimulationAfterSimStepListener listener) {
+	public void removeSimulationAfterSimStepListener(MobsimAfterSimStepListener listener) {
 		simulationAfterSimStepListener.remove(listener);
 	}
 
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
-		for(SimulationAfterSimStepListener listener : simulationAfterSimStepListener) {
-			listener.notifySimulationAfterSimStep(e);
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+		for(MobsimAfterSimStepListener listener : simulationAfterSimStepListener) {
+			listener.notifyMobsimAfterSimStep(e);
 		}
 	}
 
-	public void addSimulationBeforeCleanupListener(SimulationBeforeCleanupListener listener) {
+	public void addSimulationBeforeCleanupListener(MobsimBeforeCleanupListener listener) {
 		simulationBeforeCleanupListener.add(listener);
 	}
 
-	public void removeSimulationBeforeCleanupListener(SimulationBeforeCleanupListener listener) {
+	public void removeSimulationBeforeCleanupListener(MobsimBeforeCleanupListener listener) {
 		simulationBeforeCleanupListener.remove(listener);
 	}
 
 	@Override
-	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent e) {
-		for(SimulationBeforeCleanupListener listener : simulationBeforeCleanupListener) {
-			listener.notifySimulationBeforeCleanup(e);
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+		for(MobsimBeforeCleanupListener listener : simulationBeforeCleanupListener) {
+			listener.notifyMobsimBeforeCleanup(e);
 		}
 	}
 

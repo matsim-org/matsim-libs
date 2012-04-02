@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeCleanupListener
+ * QueueSimulationListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.core.mobsim.framework.listeners;
 
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
+import java.util.EventListener;
 
 /**
- * This interface can be implemented when a notification is needed after the
- * QueueSimulation has performed a simulation step.
+ * A marker interface that all QueueSimulationListeners must extend.
  *
- * @author mrieser
+ * @author dgrether
  */
-public interface SimulationAfterSimStepListener extends
-		SimulationListener {
-
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e);
+public interface MobsimListener extends EventListener {
 
 }

@@ -55,8 +55,8 @@ import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
@@ -72,7 +72,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler,
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		AgentStuckEventHandler, IterationEndsListener,
-		SimulationInitializedListener {
+		MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(AgentsInEvacuationAreaCounter.class);
 
@@ -122,7 +122,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
 			if (person.getSelectedPlan().getPlanElements().size() == 0) continue;

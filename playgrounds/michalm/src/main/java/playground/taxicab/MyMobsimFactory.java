@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
@@ -35,7 +35,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	//private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
 
 	@Override
-	public Simulation createMobsim(final Scenario sc, EventsManager events) {
+	public Mobsim createMobsim(final Scenario sc, EventsManager events) {
 
 		final QSim mobsim = QSim.createQSimAndAddAgentSource(sc, events);
 		

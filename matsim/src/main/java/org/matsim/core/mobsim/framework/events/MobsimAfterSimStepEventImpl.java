@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationEvent
+ * QueueSimulationBeforeCleanupEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,21 +19,26 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Simulation;
-
+import org.matsim.core.mobsim.framework.Mobsim;
 
 /**
- * A common type definition for all QueueSimulationEvents that
- * provides a backpointer to the QueueSimulation object.
- * @author dgrether
- *
+ * Default implementation of {@link MobsimAfterSimStepEvent}.
+ * 
+ * @author mrieser
  */
-public interface SimulationEvent<T extends Simulation> {
-	/**
-	 * 
-	 * @return the QueueSimulaiton instance by which the event
-	 * is fired.
-	 */
-	public T getQueueSimulation();
+public class MobsimAfterSimStepEventImpl<T extends Mobsim> 
+		extends AbstractMobsimEvent<T> implements MobsimAfterSimStepEvent<T> {
+
+	private final double simTime;
 	
+	public MobsimAfterSimStepEventImpl(final T queuesim, final double simTime) {
+		super(queuesim);
+		this.simTime = simTime;
+	}
+
+	@Override
+	public double getSimulationTime() {
+		return this.simTime;
+	}
+
 }

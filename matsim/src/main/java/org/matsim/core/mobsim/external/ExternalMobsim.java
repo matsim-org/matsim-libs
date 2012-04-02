@@ -38,7 +38,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.AbstractPopulationWriterHandler;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -49,7 +49,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 
-public class ExternalMobsim implements Simulation {
+public class ExternalMobsim implements Mobsim {
 
 	private static final String CONFIG_MODULE = "simulation";
 

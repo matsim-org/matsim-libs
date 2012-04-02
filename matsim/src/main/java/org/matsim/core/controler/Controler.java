@@ -82,9 +82,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEventsWriter;
@@ -256,7 +256,7 @@ public class Controler {
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
-	private final List<SimulationListener> simulationListener = new ArrayList<SimulationListener>();
+	private final List<MobsimListener> simulationListener = new ArrayList<MobsimListener>();
 
 	private Thread shutdownHook = new Thread() {
 		@Override
@@ -957,9 +957,9 @@ public class Controler {
 	 * ===================================================================
 	 */
 
-	/* package */Simulation getNewMobsim() {
+	/* package */Mobsim getNewMobsim() {
 		if (this.mobsimFactory != null) {
-			Simulation simulation = this.mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
+			Mobsim simulation = this.mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		} else if (this.config.simulation() != null && this.config.simulation().getExternalExe() != null ) {
@@ -970,7 +970,7 @@ public class Controler {
 		} else if (this.config.controler().getMobsim() != null) {
 			String mobsim = this.config.controler().getMobsim();
 			MobsimFactory f = this.mobsimFactoryRegister.getInstance(mobsim);
-			Simulation simulation = f.createMobsim(this.getScenario(), this.getEvents());
+			Mobsim simulation = f.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		} else {
@@ -989,16 +989,16 @@ public class Controler {
 				config.addSimulationConfigGroup(new SimulationConfigGroup());
 				mobsimFactory = new QueueSimulationFactory();
 			}
-			Simulation simulation = mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
+			Mobsim simulation = mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		}
 	}
 
-	private void enrichSimulation(final Simulation simulation) {
-		if (simulation instanceof ObservableSimulation) {
-			for (SimulationListener l : this.getQueueSimulationListener()) {
-				((ObservableSimulation) simulation).addQueueSimulationListeners(l);
+	private void enrichSimulation(final Mobsim simulation) {
+		if (simulation instanceof ObservableMobsim) {
+			for (MobsimListener l : this.getQueueSimulationListener()) {
+				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
 			}
 		}
 		if (simulation instanceof VisMobsim) {
@@ -1012,7 +1012,7 @@ public class Controler {
 					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
 					manager.addSnapshotWriter(snapshotWriter);
 				}
-				((ObservableSimulation) simulation).addQueueSimulationListeners(manager);
+				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
 			}
 		}
 		if (simulation instanceof QSim) {
@@ -1030,7 +1030,7 @@ public class Controler {
 	}
 
 	protected void runMobSim() {
-		Simulation sim = getNewMobsim();
+		Mobsim sim = getNewMobsim();
 		sim.run();
 	}
 
@@ -1385,7 +1385,7 @@ public class Controler {
 		System.exit(0);
 	}
 
-	public List<SimulationListener> getQueueSimulationListener() {
+	public List<MobsimListener> getQueueSimulationListener() {
 		return this.simulationListener;
 	}
 

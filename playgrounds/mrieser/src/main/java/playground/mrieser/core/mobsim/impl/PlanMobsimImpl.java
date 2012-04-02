@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 import playground.mrieser.core.mobsim.api.AgentSource;
 import playground.mrieser.core.mobsim.api.NewMobsimEngine;
@@ -39,7 +39,7 @@ import playground.mrieser.core.mobsim.utils.ClassBasedMap;
 /**
  * @author mrieser
  */
-public class PlanMobsimImpl implements PlanMobsim, Simulation { // TODO [MR] remove Simulation, only for backwards compability
+public class PlanMobsimImpl implements PlanMobsim, Mobsim { // TODO [MR] remove Simulation, only for backwards compability
 
 	private final static Logger log = Logger.getLogger(PlanMobsimImpl.class);
 

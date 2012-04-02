@@ -3,7 +3,7 @@ package playground.mzilske.pipeline;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 public class MobsimTask implements ScenarioSinkSourceEventSource {
 
@@ -29,7 +29,7 @@ public class MobsimTask implements ScenarioSinkSourceEventSource {
 
 	@Override
 	public void process(Scenario scenario) {
-		Simulation mobsim = mobsimFactory.createMobsim(scenario, eventsManager);
+		Mobsim mobsim = mobsimFactory.createMobsim(scenario, eventsManager);
 		mobsim.run();
 		sink.process(scenario);
 	}

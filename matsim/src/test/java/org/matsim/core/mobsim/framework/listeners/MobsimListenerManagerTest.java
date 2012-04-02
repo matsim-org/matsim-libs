@@ -21,16 +21,16 @@ package org.matsim.core.mobsim.framework.listeners;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 
 /**
  * @author mrieser
  */
-public class SimulationListenerManagerTest {
+public class MobsimListenerManagerTest {
 
 	@Test
 	public void testAddQueueSimulationListener() {
-		SimulationListenerManager manager = new SimulationListenerManager(null);
+		MobsimListenerManager manager = new MobsimListenerManager(null);
 		TestSimListener simpleListener = new TestSimListener();
 		TestSubSimListener subListener = new TestSubSimListener();
 		TestExtendedSimListener extendedListener = new TestExtendedSimListener();
@@ -48,7 +48,7 @@ public class SimulationListenerManagerTest {
 
 	@Test
 	public void testRemoveQueueSimulationListener() {
-		SimulationListenerManager manager = new SimulationListenerManager(null);
+		MobsimListenerManager manager = new MobsimListenerManager(null);
 		TestSimListener simpleListener = new TestSimListener();
 		TestSubSimListener subListener = new TestSubSimListener();
 		TestExtendedSimListener extendedListener = new TestExtendedSimListener();
@@ -74,10 +74,10 @@ public class SimulationListenerManagerTest {
 		Assert.assertEquals(1, doubleListener.count);
 	}
 
-	/*package*/ static class TestSimListener implements SimulationInitializedListener {
+	/*package*/ static class TestSimListener implements MobsimInitializedListener {
 		public int count = 0;
 		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 			this.count++;
 		}
 	}
@@ -86,19 +86,19 @@ public class SimulationListenerManagerTest {
 		// interface implemented by super class
 	}
 
-	/*package*/ interface ExtendedSimListener extends SimulationInitializedListener {
+	/*package*/ interface ExtendedSimListener extends MobsimInitializedListener {
 		// interface inherited
 	}
 
 	/*package*/ static class TestExtendedSimListener implements ExtendedSimListener {
 		public int count = 0;
 		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 			this.count++;
 		}
 	}
 
-	/*package*/ static class TestDoubleSimListener extends TestExtendedSimListener implements SimulationInitializedListener {
+	/*package*/ static class TestDoubleSimListener extends TestExtendedSimListener implements MobsimInitializedListener {
 		// class implements an already implemented interface, should only be called once!
 	}
 }

@@ -30,7 +30,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.ptproject.qsim.QSim;
@@ -70,7 +70,7 @@ public class TransitControler {
 		private boolean useOTFVis = true ;
 
 		@Override
-		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 			EventsManager eventsManager1 = eventsManager;
 
 			QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();

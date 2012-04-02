@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
@@ -40,7 +40,7 @@ public class DgWithindayMobsimFactory implements MobsimFactory {
 	 * @see org.matsim.core.mobsim.framework.MobsimFactory#createMobsim(org.matsim.api.core.v01.Scenario, org.matsim.core.api.experimental.events.EventsManager)
 	 */
 	@Override
-	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSim qSim = new QSim(sc, eventsManager, new DefaultQSimEngineFactory());
 		AgentFactory agentFactory = new DgWithindayAgentFactory(qSim, MatsimRandom.getLocalInstance());
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);

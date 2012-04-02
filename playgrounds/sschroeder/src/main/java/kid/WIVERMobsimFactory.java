@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import playground.mrieser.core.mobsim.api.PlanAgent;
@@ -65,7 +65,7 @@ public class WIVERMobsimFactory implements MobsimFactory {
 		this.teleportedModes = teleportedModes.clone();
 	}
 
-	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
+	public Mobsim createMobsim(final Scenario scenario, final EventsManager eventsManager) {
 
 		PlanMobsimImpl planSim = new PlanMobsimImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);

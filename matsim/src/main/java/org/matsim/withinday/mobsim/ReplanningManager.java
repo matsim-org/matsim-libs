@@ -25,10 +25,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
@@ -47,7 +47,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
  * 
  * @author: cdobler
  */
-public class ReplanningManager implements SimulationBeforeSimStepListener, SimulationInitializedListener {
+public class ReplanningManager implements MobsimBeforeSimStepListener, MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(ReplanningManager.class);
 	
@@ -177,7 +177,7 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 	}
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		if (isInitialReplanning()) {
 			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
 		}
@@ -195,7 +195,7 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 	}
 
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		
 		for (Entry<WithinDayDuringActivityReplanner, Double> entry : activateDuringActivityReplanner.entrySet()) {
 			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringActivityReplanner.addWithinDayReplanner(entry.getKey());

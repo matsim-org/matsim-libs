@@ -38,10 +38,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -69,7 +69,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  * @author cdobler
  */
 public class PaperController extends WithinDayController implements StartupListener,
-		SimulationInitializedListener, SimulationBeforeSimStepListener {
+		MobsimInitializedListener, MobsimBeforeSimStepListener {
 
 	private static final Logger log = Logger.getLogger(ExampleWithinDayController.class);
 
@@ -208,7 +208,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	}
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		initReplanners((QSim)e.getQueueSimulation());
 		
 		// Module to analyze the travel times
@@ -218,7 +218,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	}
 	
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		boolean currentState = this.enabled;
 		int time = (int) e.getSimulationTime();
 		if (time >= this.tWithinDayEnabled && time <= this.tWithinDayDisabled) {

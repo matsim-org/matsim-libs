@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
@@ -66,7 +66,7 @@ public class DetailedEvaluationMobsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
+	public Mobsim createMobsim(final Scenario scenario, final EventsManager eventsManager) {
 
 		PlanMobsimImpl planSim = new PlanMobsimImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);

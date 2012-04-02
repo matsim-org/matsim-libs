@@ -9,8 +9,8 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.ptproject.qsim.QSim;
@@ -84,7 +84,7 @@ public class TransitControler extends Controler {
 			this.events.addHandler(new FixedHeadwayControler(qSim, transitEngine));
 		}
 
-        for (SimulationListener l : this.getQueueSimulationListener()) {
+        for (MobsimListener l : this.getQueueSimulationListener()) {
             qSim.addQueueSimulationListeners(l);
         }
         if (this.useOTFVis) {

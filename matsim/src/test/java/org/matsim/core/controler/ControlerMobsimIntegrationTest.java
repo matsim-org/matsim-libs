@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.ptproject.qsim.QSim;
@@ -155,12 +155,12 @@ public class ControlerMobsimIntegrationTest {
 	}
 
 	private static class FakeControler extends Controler {
-		/*package*/ Simulation sim = null;
+		/*package*/ Mobsim sim = null;
 		public FakeControler(final Config cfg) {
 			super(cfg);
 		}
 		@Override
-		Simulation getNewMobsim() {
+		Mobsim getNewMobsim() {
 			// remember the created sim, but return a dummy
 			this.sim = super.getNewMobsim();
 			return new FakeSimulation();
@@ -172,13 +172,13 @@ public class ControlerMobsimIntegrationTest {
 		/*package*/ int callCount = 0;
 
 		@Override
-		public Simulation createMobsim(final Scenario sc, final EventsManager eventsManager) {
+		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			this.callCount++;
 			return new FakeSimulation();
 		}
 	}
 
-	private static class FakeSimulation implements Simulation {
+	private static class FakeSimulation implements Mobsim {
 		@Override
 		public void run() {
 		}

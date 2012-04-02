@@ -11,8 +11,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
@@ -86,9 +86,9 @@ public class PControler extends Controler {
 //		this.events.addHandler(new LogOutputEventHandler());
 
 
-		if (simulation instanceof ObservableSimulation){
-			for (SimulationListener l : this.getQueueSimulationListener()) {
-				((ObservableSimulation)simulation).addQueueSimulationListeners(l);
+		if (simulation instanceof ObservableMobsim){
+			for (MobsimListener l : this.getQueueSimulationListener()) {
+				((ObservableMobsim)simulation).addQueueSimulationListeners(l);
 			}
 		}
 		if (this.useOTFVis) {

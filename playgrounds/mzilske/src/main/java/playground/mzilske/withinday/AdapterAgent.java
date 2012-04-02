@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -18,7 +18,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 
-public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBeforeSimStepListener {
+public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSimStepListener {
 	
 	Id id;
 	
@@ -229,7 +229,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 	private boolean living = true;
 
 	@Override
-	public void notifySimulationBeforeSimStep(@SuppressWarnings("rawtypes") SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 	    if (!living) {
 	        return;//or maybe should be unregistered from listeners in World.done() method
 	    }

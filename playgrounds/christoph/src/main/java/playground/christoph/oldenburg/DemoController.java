@@ -28,10 +28,10 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -63,8 +63,8 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
-public class DemoController extends WithinDayController implements SimulationInitializedListener, StartupListener, 
-	SimulationBeforeSimStepListener, IterationEndsListener {
+public class DemoController extends WithinDayController implements MobsimInitializedListener, StartupListener, 
+	MobsimBeforeSimStepListener, IterationEndsListener {
 
 	private static final Logger log = Logger.getLogger(DemoController.class);
 	
@@ -145,12 +145,12 @@ public class DemoController extends WithinDayController implements SimulationIni
 	}
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {		
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {		
 		initReplanners((QSim)e.getQueueSimulation());
 	}
 	
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		
 		/*
 		 * This is just a workaround:

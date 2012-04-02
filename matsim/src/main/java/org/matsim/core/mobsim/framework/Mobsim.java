@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractQueueSimulationEvent
+ * Simulation
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.framework.events;
-
-import org.matsim.core.mobsim.framework.Simulation;
-
+package org.matsim.core.mobsim.framework;
 
 /**
- * An abstract superclass for all classes implementing the
- * QueueSimulationEvent interface.
- * @author dgrether
+ * Interface to make a simulation work together with
+ * simulation events and a Control(l)er
  *
+ * @author dgrether
  */
-public abstract class AbstractSimulationEvent<T extends Simulation> implements
-		SimulationEvent<T> {
-	
-	private T queuesim;
+public interface Mobsim {
 
-	public AbstractSimulationEvent(T queuesim){
-		this.queuesim = queuesim;
-	}
-	
-	/**
-	 * @see org.matsim.core.mobsim.framework.events.SimulationEvent#getQueueSimulation()
-	 */
-	@Override
-	public T getQueueSimulation() {
-		return this.queuesim;
-	}
+  /**
+   * Start the mobility simulation
+   */
+  public void run();
 
 }

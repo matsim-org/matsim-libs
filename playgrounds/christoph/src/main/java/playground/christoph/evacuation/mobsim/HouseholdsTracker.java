@@ -36,11 +36,11 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -50,7 +50,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
 public class HouseholdsTracker extends AgentsTracker implements 
-		SimulationBeforeSimStepListener, SimulationAfterSimStepListener {
+		MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
 	static final Logger log = Logger.getLogger(HouseholdsTracker.class);
 	
@@ -147,8 +147,8 @@ public class HouseholdsTracker extends AgentsTracker implements
 		this.householdPositions.clear();
 	}
 	
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		super.notifySimulationInitialized(e);
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+		super.notifyMobsimInitialized(e);
 		
 		QSim sim = (QSim) e.getQueueSimulation();
 		Households households = ((ScenarioImpl) sim.getScenario()).getHouseholds();
@@ -173,13 +173,13 @@ public class HouseholdsTracker extends AgentsTracker implements
 	}
 	
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		// clear list for the upcoming time-step
 		householdsToUpdate.clear();
 	}
 	
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		for (Id id : this.householdsToUpdate) {
 			householdPositions.get(id).update();
 		}

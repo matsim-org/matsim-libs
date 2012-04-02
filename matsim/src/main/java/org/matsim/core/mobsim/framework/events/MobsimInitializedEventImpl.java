@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationInitializedEvent
+ * QueueSimulationInitializedEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,15 +19,17 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Simulation;
-
+import org.matsim.core.mobsim.framework.Mobsim;
 
 /**
- * Just a tagging interface for QueueSimulationEvents that are fired
- * when the simulation is initialized.
  * @author dgrether
- *
+ * @see MobsimInitializedEvent
  */
-public interface SimulationInitializedEvent<T extends Simulation> 
-extends SimulationEvent<T>{
+public class MobsimInitializedEventImpl<T extends Mobsim> extends
+		AbstractMobsimEvent<T> implements MobsimInitializedEvent<T> {
+
+	public MobsimInitializedEventImpl(T queuesim) {
+		super(queuesim);
+	}
+
 }

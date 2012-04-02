@@ -46,8 +46,8 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
@@ -78,7 +78,7 @@ import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTrave
  */
 public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 		AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
-		AgentStuckEventHandler, SimulationInitializedListener {
+		AgentStuckEventHandler, MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
 
@@ -125,7 +125,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	}
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		Mobsim sim = (Mobsim) e.getQueueSimulation();
 		
 		personAgentMapping.clear();

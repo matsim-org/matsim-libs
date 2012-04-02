@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
 
 /**The logic is as follows:<ul>
  * <li>When the agent starts something (an activity, a leg), the agent requests this from the central simulation.</li>
@@ -88,7 +88,7 @@ import org.matsim.core.mobsim.framework.ObservableSimulation;
  * 
  *
  */
-public interface Mobsim extends ObservableSimulation {
+public interface Mobsim extends ObservableMobsim {
 	/**
 	 * If you are not inserting (i.e. instantiating) an Agent, please try to use the 
 	 * InternalInterface .  kai, nov'11

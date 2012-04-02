@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -72,7 +72,7 @@ public class AnotherCity2000WMobsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
+	public Mobsim createMobsim(final Scenario scenario, final EventsManager eventsManager) {
 
 		PlanMobsimImpl planSim = new PlanMobsimImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);

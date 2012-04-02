@@ -30,6 +30,6 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface MobsimFactory extends MatsimFactory {
   
-  public Simulation createMobsim(Scenario sc, EventsManager eventsManager);
+  public Mobsim createMobsim(Scenario sc, EventsManager eventsManager);
 
 }

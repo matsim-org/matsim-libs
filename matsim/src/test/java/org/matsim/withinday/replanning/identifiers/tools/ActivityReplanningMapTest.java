@@ -25,13 +25,13 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 
@@ -82,8 +82,8 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 	 *
 	 * @author cdobler
 	 */
-	private static class MobsimListenerForTests implements SimulationInitializedListener, SimulationBeforeSimStepListener,
-		SimulationAfterSimStepListener {
+	private static class MobsimListenerForTests implements MobsimInitializedListener, MobsimBeforeSimStepListener,
+		MobsimAfterSimStepListener {
 
 		private final ActivityReplanningMap arp;
 		private static final int t1 = 5*3600 + 58*60 + 30;
@@ -96,13 +96,13 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void notifySimulationInitialized(final SimulationInitializedEvent e) {
+		public void notifyMobsimInitialized(final MobsimInitializedEvent e) {
 			assertEquals(100, this.arp.getActivityPerformingAgents().size());	// all agents perform an activity
 			assertEquals(0, this.arp.getReplanningDriverAgents(0.0).size());		// no agent ends an activity
 		}
 
 		@Override
-		public void notifySimulationBeforeSimStep(final SimulationBeforeSimStepEvent e) {
+		public void notifyMobsimBeforeSimStep(final MobsimBeforeSimStepEvent e) {
 			if (e.getSimulationTime() == t1) {
 				assertEquals(100, this.arp.getActivityPerformingAgents().size());	// all agents perform an activity before the time step
 				assertEquals(1, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());	// one agent ends an activity
@@ -125,7 +125,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void notifySimulationAfterSimStep(final SimulationAfterSimStepEvent e) {
+		public void notifyMobsimAfterSimStep(final MobsimAfterSimStepEvent e) {
 			if (e.getSimulationTime() == t1) {
 				assertEquals(99, this.arp.getActivityPerformingAgents().size());	// 99 agents perform an activity after the time step
 				assertEquals(0, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());		// no agent ends an activity

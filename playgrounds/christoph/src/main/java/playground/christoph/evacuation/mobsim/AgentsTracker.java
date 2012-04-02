@@ -44,8 +44,8 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;
@@ -53,7 +53,7 @@ import playground.christoph.evacuation.mobsim.Tracker.Position;
 public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, 
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, 
-		LinkEnterEventHandler, LinkLeaveEventHandler, SimulationInitializedListener {
+		LinkEnterEventHandler, LinkLeaveEventHandler, MobsimInitializedListener {
 
 	private final Map<Id, AgentPosition> agentPositions;
 	
@@ -120,7 +120,7 @@ public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEv
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		this.agentPositions.clear();
 		
 		QSim sim = (QSim) e.getQueueSimulation();

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.impl.ActivityHandler;
@@ -51,7 +51,7 @@ public class TeleportOnlyMobsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
 		PlanMobsimImpl planSim = new PlanMobsimImpl(sc);
 

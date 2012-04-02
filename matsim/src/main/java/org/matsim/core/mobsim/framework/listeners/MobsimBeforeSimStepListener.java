@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeCleanupEvent
+ * QueueSimulationBeforeSimStepListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.framework.events;
+package org.matsim.core.mobsim.framework.listeners;
 
-import org.matsim.core.mobsim.framework.Simulation;
-
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 /**
- * A simple tagging interface to mark all QueueSimulationEvents that are fired
- * before the QueueSimulation instance starts to shut down.
- * 
- * @author dgrether
+ *  Listeners of QueueSimulation should implement this if they want to be
+ *  notified after QueueSimulation.beforeSimStep() was invoked.
  *
+ * @author dgrether
  */
-public interface SimulationBeforeCleanupEvent
-<T extends Simulation> extends SimulationEvent<T>
-{
+public interface MobsimBeforeSimStepListener extends MobsimListener {
+
+	public void notifyMobsimBeforeSimStep(final MobsimBeforeSimStepEvent e);
 
 }

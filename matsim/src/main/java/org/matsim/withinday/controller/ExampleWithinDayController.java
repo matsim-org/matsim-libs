@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -62,7 +62,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
  *
  * @author Christoph Dobler
  */
-public class ExampleWithinDayController extends WithinDayController implements SimulationInitializedListener, StartupListener {
+public class ExampleWithinDayController extends WithinDayController implements MobsimInitializedListener, StartupListener {
 
 	/*
 	 * Define the Probability that an Agent uses the
@@ -157,7 +157,7 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	}
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		initReplanners((QSim)e.getQueueSimulation());
 	}
 	

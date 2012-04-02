@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationListener
+ * QueueSimulationInitializedListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,14 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.listeners;
 
-import java.util.EventListener;
-
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 
 /**
- * A tagging interface that all QueueSimulationListeners must extend.
- * @author dgrether
+ * Implement this listener interface if you want to be notified when the QueueSimulation's
+ * setup process is completed.
  *
+ * @author dgrether
  */
-public interface SimulationListener extends EventListener {
+public interface MobsimInitializedListener extends MobsimListener {
+
+	public void notifyMobsimInitialized(final MobsimInitializedEvent e);
 
 }

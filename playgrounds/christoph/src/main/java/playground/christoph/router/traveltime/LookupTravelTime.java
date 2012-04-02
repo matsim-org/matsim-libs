@@ -30,13 +30,13 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.TravelTime;
 
-public class LookupTravelTime implements PersonalizableTravelTime, SimulationBeforeSimStepListener {
+public class LookupTravelTime implements PersonalizableTravelTime, MobsimBeforeSimStepListener {
 	
 	private LookupNetwork lookupNetwork;
 	private TravelTime travelTime;
@@ -74,7 +74,7 @@ public class LookupTravelTime implements PersonalizableTravelTime, SimulationBef
 	 * Update link travel times
 	 */
 	@Override
-	public void notifySimulationBeforeSimStep(final SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(final MobsimBeforeSimStepEvent e) {
 		
 		if (e.getSimulationTime() % updateInterval == 0) {
 			// parallel Execution

@@ -36,20 +36,20 @@ import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
-public class OTFVisMobsimFeature implements VisMobsimFeature, SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener,
+public class OTFVisMobsimFeature implements VisMobsimFeature, MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener,
 AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 
 	private static final Logger log = Logger.getLogger(OTFVisMobsimFeature.class);
@@ -75,7 +75,7 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent ev) {
 		log.info("receiving simulationInitializedEvent");
 		for (MobsimAgent mag : this.queueSimulation.getAgents()) {
 			agents.put(mag.getId(), mag);
@@ -83,7 +83,7 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 	}
 
 	@Override
-	public void notifySimulationBeforeCleanup( SimulationBeforeCleanupEvent ev ) {
+	public void notifyMobsimBeforeCleanup( MobsimBeforeCleanupEvent ev ) {
 		this.server.getSnapshotReceiver().finish();
 	}
 
@@ -93,12 +93,12 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 	}
 
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		this.server.blockUpdates();
 	}
 	
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent event) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
 		this.server.unblockUpdates();
 		double time = event.getSimulationTime() ;
 		this.updateTeleportedAgents(time);

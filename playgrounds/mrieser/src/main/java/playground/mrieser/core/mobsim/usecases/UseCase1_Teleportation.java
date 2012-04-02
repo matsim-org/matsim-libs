@@ -24,7 +24,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.config.ConfigUtils;
 
@@ -49,7 +49,7 @@ public class UseCase1_Teleportation {
 
 		/* **************************************************************** */
 
-		Simulation sim = new TeleportOnlyMobsimFactory().createMobsim(scenario, events);
+		Mobsim sim = new TeleportOnlyMobsimFactory().createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runMobsim();
 
 		/* **************************************************************** */

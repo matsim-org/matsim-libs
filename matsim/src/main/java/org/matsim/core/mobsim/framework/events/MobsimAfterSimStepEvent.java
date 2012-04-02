@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationInitializedListener
+ * QueueSimulationBeforeCleanupEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.framework.listeners;
+package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 
 /**
- * Implement this listener interface if you want to be notified when the QueueSimulation's
- * setup process is completed.
- * @author dgrether
- *
+ * A simple interface for QueueSimulationEvents that are fired for every time step.
+ * 
+ * @author mrieser
  */
-public interface SimulationInitializedListener extends SimulationListener {
+public interface MobsimAfterSimStepEvent<T extends Mobsim> 
+	extends MobsimEvent<T>{
 
-	public void notifySimulationInitialized(SimulationInitializedEvent e);
+	public double getSimulationTime();
 
 }

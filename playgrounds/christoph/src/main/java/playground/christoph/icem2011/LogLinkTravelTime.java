@@ -50,12 +50,12 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 
-public class LogLinkTravelTime implements SimulationBeforeSimStepListener, BeforeMobsimListener, AfterMobsimListener {
+public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMobsimListener, AfterMobsimListener {
 
 	private static final Logger log = Logger.getLogger(LogLinkTravelTime.class);
 	
@@ -96,7 +96,7 @@ public class LogLinkTravelTime implements SimulationBeforeSimStepListener, Befor
 	}
 	
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 	
 		double time = e.getSimulationTime();
 		if (time >= nextWrite) {

@@ -22,7 +22,7 @@ package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
@@ -48,7 +48,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public Simulation createMobsim(Scenario sc, EventsManager events) {
+	public Mobsim createMobsim(Scenario sc, EventsManager events) {
 		QSim qSim = new QSim(sc, events, new DefaultQSimEngineFactory());
 		if ( replanningType.equals( ReplanningType.general ) ) {
 			qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;

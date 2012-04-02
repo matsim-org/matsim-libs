@@ -50,8 +50,8 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -78,7 +78,7 @@ import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHou
  * @author cdobler
  */
 public class AgentsToPickupIdentifier extends DuringLegIdentifier implements LinkEnterEventHandler, LinkLeaveEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler, SimulationInitializedListener {
+		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler, MobsimInitializedListener {
 
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
@@ -281,7 +281,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		QSim sim = (QSim) e.getQueueSimulation();
 
 		agents.clear();

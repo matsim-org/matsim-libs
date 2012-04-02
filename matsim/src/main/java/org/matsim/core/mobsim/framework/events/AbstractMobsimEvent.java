@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepEvent
+ * AbstractQueueSimulationEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,15 +19,28 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Simulation;
-
+import org.matsim.core.mobsim.framework.Mobsim;
 
 /**
- * Is thrown by QueueSimulation after QueueSimulation.beforeSimStep() was invoked.
+ * An abstract superclass for all classes implementing the
+ * QueueSimulationEvent interface.
+ *
  * @author dgrether
  */
-public interface SimulationBeforeSimStepEvent<T extends Simulation> extends SimulationEvent<T> {
+public abstract class AbstractMobsimEvent<T extends Mobsim> implements MobsimEvent<T> {
+	
+	private T queuesim;
 
-	public double getSimulationTime();
+	public AbstractMobsimEvent(T queuesim){
+		this.queuesim = queuesim;
+	}
+	
+	/**
+	 * @see org.matsim.core.mobsim.framework.events.MobsimEvent#getQueueSimulation()
+	 */
+	@Override
+	public T getQueueSimulation() {
+		return this.queuesim;
+	}
 
 }

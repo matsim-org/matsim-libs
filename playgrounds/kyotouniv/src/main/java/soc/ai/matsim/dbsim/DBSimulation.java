@@ -49,9 +49,9 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimListenerManager;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -74,7 +74,7 @@ import org.matsim.vis.snapshotwriters.TransimsSnapshotWriter;
  * @author mrieser
  * @author dgrether
  */
-public class DBSimulation implements ObservableSimulation {
+public class DBSimulation implements ObservableMobsim {
 
 	private int snapshotPeriod = 0;
 
@@ -113,7 +113,7 @@ public class DBSimulation implements ObservableSimulation {
 
 	private AgentFactory agentFactory;
 
-	private SimulationListenerManager listenerManager;
+	private MobsimListenerManager listenerManager;
 
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
@@ -137,7 +137,7 @@ public class DBSimulation implements ObservableSimulation {
 	 */
 	public DBSimulation(final Scenario scenario, final EventsManager events) {
 		this.scenario = scenario;
-		this.listenerManager = new SimulationListenerManager(this);
+		this.listenerManager = new MobsimListenerManager(this);
 		AbstractSimulation.reset(scenario.getConfig().simulation().getStuckTime());
 		this.config = scenario.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
@@ -161,7 +161,7 @@ public class DBSimulation implements ObservableSimulation {
 	 * @param listeners
 	 */
 	@Override
-	public void addQueueSimulationListeners(final SimulationListener listener){
+	public void addQueueSimulationListeners(final MobsimListener listener){
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 

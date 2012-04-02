@@ -34,10 +34,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -66,7 +66,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.SelectHousehol
  *  @author cdobler
  */
 public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier implements 
-		SimulationInitializedListener, SimulationAfterSimStepListener {
+		MobsimInitializedListener, MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsIdentifier.class);
 	
@@ -183,7 +183,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	 * all households are joined at their home facility.
 	 */
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		QSim sim = (QSim) e.getQueueSimulation();
 
 		this.agentMapping.clear();
@@ -194,7 +194,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	}
 	
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		
 		if (e.getSimulationTime() == EvacuationConfig.evacuationTime) {
 			this.initiallyCollectHouseholds(e.getSimulationTime());

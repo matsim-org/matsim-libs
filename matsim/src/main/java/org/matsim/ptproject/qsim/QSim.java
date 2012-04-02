@@ -44,8 +44,8 @@ import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimListenerManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.AbstractTransitDriver;
@@ -142,7 +142,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100 * 3600;
-	private final SimulationListenerManager listenerManager;
+	private final MobsimListenerManager listenerManager;
 	private final Scenario scenario;
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 	private AgentCounter agentCounter;
@@ -214,7 +214,7 @@ public final class QSim implements VisMobsim, Netsim {
 		this.scenario = sc;
 		this.events = events;
 		log.info("Using QSim...");
-		this.listenerManager = new SimulationListenerManager(this);
+		this.listenerManager = new MobsimListenerManager(this);
 		this.agentCounter = new AgentCounter();
 		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup()
 				.getTimeStepSize());
@@ -743,7 +743,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 * @param listeners
 	 */
 	@Override
-	public void addQueueSimulationListeners(SimulationListener listener) {
+	public void addQueueSimulationListeners(MobsimListener listener) {
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 

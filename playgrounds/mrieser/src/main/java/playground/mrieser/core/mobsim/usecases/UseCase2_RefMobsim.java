@@ -24,7 +24,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
@@ -51,7 +51,7 @@ public class UseCase2_RefMobsim {
 
 //		ew = new EventWriterXML("testEventsNewBln.xml");
 //		events.addHandler(ew);
-		Simulation sim = new RefMobsimFactory().createMobsim(scenario, events);
+		Mobsim sim = new RefMobsimFactory().createMobsim(scenario, events);
 		sim.run(); // replace with PlanSimulation.runMobsim();
 
 		/* **************************************************************** */

@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -60,7 +60,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		int numReplanningThreads = 1;
 
 		QSim mobsim = new WithinDayQSimFactory().createMobsim(sc, eventsManager);

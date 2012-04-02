@@ -36,10 +36,10 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
@@ -54,7 +54,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  */
 public class ActivityReplanningMap implements AgentStuckEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler,
-		SimulationInitializedListener, SimulationAfterSimStepListener {
+		MobsimInitializedListener, MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(ActivityReplanningMap.class);
 
@@ -94,7 +94,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * PersonDriverAgents.
 	 */
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		
 		Netsim sim = (Netsim) e.getQueueSimulation();
 
@@ -118,7 +118,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * the Activity DepatureTimes then.
 	 */
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 
 		for (Id id : startingAgents) {
 			MobsimAgent personAgent = personAgentMapping.get(id);

@@ -26,8 +26,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
@@ -35,7 +35,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIden
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
-public class SelectAllAgentsToBeHandled implements SimulationInitializedListener {
+public class SelectAllAgentsToBeHandled implements MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(SelectAllAgentsToBeHandled.class);
 	
@@ -48,7 +48,7 @@ public class SelectAllAgentsToBeHandled implements SimulationInitializedListener
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		collectAgents((QSim) e.getQueueSimulation());
 		selectHandledAgents();
 	}

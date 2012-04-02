@@ -26,14 +26,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.events.GenericEventImpl;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 /**
  * @author droeder
  *
  */
-public class EmobFleet implements SimulationAfterSimStepListener{
+public class EmobFleet implements MobsimAfterSimStepListener{
 	
 	private Map<Id, EmobVehicle> fleet;
 	private EventsManager manager;
@@ -56,7 +56,7 @@ public class EmobFleet implements SimulationAfterSimStepListener{
 	}
 
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		for(EmobVehicle veh : this.fleet.values()){
 			GenericEvent ge;
 			if(veh.changedSoC()){

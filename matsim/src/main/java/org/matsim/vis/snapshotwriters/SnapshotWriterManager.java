@@ -25,15 +25,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
-public class SnapshotWriterManager implements SimulationBeforeCleanupListener, SimulationAfterSimStepListener, SimulationInitializedListener {
+public class SnapshotWriterManager implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener, MobsimInitializedListener {
 	
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	
@@ -58,7 +58,7 @@ public class SnapshotWriterManager implements SimulationBeforeCleanupListener, S
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		Mobsim mobsim = (Mobsim) e.getQueueSimulation();
 		this.snapshotTime = Math.floor(mobsim.getSimTimer().getSimStartTime()
 				/ this.snapshotPeriod)
@@ -69,7 +69,7 @@ public class SnapshotWriterManager implements SimulationBeforeCleanupListener, S
 	}
 
 	@Override
-	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent e) {
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		closeSnapshotWriters();
 	}
 
@@ -80,7 +80,7 @@ public class SnapshotWriterManager implements SimulationBeforeCleanupListener, S
 	}
 
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		double time = e.getSimulationTime();
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;

@@ -22,7 +22,7 @@ package playground.mrieser.svi.controller2;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 /**
  * @author mrieser
@@ -36,7 +36,7 @@ public class DynusTMobsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public Simulation createMobsim(final Scenario sc, final EventsManager eventsManager) {
+	public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
 		return new DynusTMobsim(this.dc, sc, eventsManager);
 	}
 

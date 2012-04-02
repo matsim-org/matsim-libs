@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationInitializedEventImpl
+ * QueueSimulationBeforeSimStepEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,17 +19,15 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
+
 
 /**
+ * Is thrown by QueueSimulation after QueueSimulation.beforeSimStep() was invoked.
  * @author dgrether
- * @see SimulationInitializedEvent
  */
-public class SimulationInitializedEventImpl<T extends Simulation> extends
-		AbstractSimulationEvent<T> implements SimulationInitializedEvent<T> {
+public interface MobsimBeforeSimStepEvent<T extends Mobsim> extends MobsimEvent<T> {
 
-	public SimulationInitializedEventImpl(T queuesim) {
-		super(queuesim);
-	}
+	public double getSimulationTime();
 
 }

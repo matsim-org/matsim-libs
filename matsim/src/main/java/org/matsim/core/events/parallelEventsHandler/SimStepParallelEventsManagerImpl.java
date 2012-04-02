@@ -34,8 +34,8 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 /**
  * An EventsHandler that handles all occurring Events in separate Threads.
@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
  * 
  * @author cdobler
  */
-public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implements SimulationAfterSimStepListener {
+public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implements MobsimAfterSimStepListener {
 	
 	private final int numOfThreads;
 	private CyclicBarrier simStepEndBarrier;
@@ -187,7 +187,7 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 	}
 
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		try {
 			this.processedEventsChecker.setTime(e.getSimulationTime());
 			this.processEvent(new LastEventOfSimStep(e.getSimulationTime()));

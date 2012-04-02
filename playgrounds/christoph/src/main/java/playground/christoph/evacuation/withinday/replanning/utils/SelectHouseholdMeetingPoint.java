@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -74,7 +74,7 @@ import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
  * 
  * @author cdobler
  */
-public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListener {
+public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener {
 
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPoint.class);
 	
@@ -324,7 +324,7 @@ public class SelectHouseholdMeetingPoint implements SimulationBeforeSimStepListe
 	 * household meeting points.
 	 */
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		double time = e.getSimulationTime();
 		if (time == EvacuationConfig.evacuationTime) initThreads(time);
 	}

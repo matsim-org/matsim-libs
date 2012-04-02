@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -77,7 +77,7 @@ import playground.christoph.router.util.SimpleRouterFactory;
 
 //mysimulations/kt-zurich/configIterative.xml
 
-public class SimpleRouterControler extends WithinDayController implements SimulationInitializedListener {
+public class SimpleRouterControler extends WithinDayController implements MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(SimpleRouterControler.class);
 
@@ -224,7 +224,7 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter((QSim)e.getQueueSimulation());
 	}
@@ -271,7 +271,7 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 		}
 	}
 
-	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
+	public static class ReplanningFlagInitializer implements MobsimInitializedListener {
 
 		protected SimpleRouterControler simpleRouterControler;
 		protected Collection<PlanBasedWithinDayAgent> withinDayAgents;
@@ -286,7 +286,7 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 		}
 
 		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 			collectAgents((QSim)e.getQueueSimulation());
 			setReplanningFlags();
 		}

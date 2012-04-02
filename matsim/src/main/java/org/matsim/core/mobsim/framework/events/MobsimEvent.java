@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
+ * QueueSimulationEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.framework.listeners;
+package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be
- *  notified after QueueSimulation.beforeSimStep() was invoked.
+ * A common type definition for all QueueSimulationEvents that
+ * provides a backpointer to the QueueSimulation object.
  * @author dgrether
  *
  */
-public interface SimulationBeforeSimStepListener extends SimulationListener {
-
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e);
-
+public interface MobsimEvent<T extends Mobsim> {
+	/**
+	 * 
+	 * @return the QueueSimulaiton instance by which the event
+	 * is fired.
+	 */
+	public T getQueueSimulation();
+	
 }

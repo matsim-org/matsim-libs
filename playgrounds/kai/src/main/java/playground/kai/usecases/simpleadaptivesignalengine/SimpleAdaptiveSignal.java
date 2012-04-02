@@ -34,8 +34,8 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
@@ -47,7 +47,7 @@ import org.matsim.signalsystems.model.SignalGroupState;
  * @author nagel
  *
  */
-class SimpleAdaptiveSignal implements SimulationBeforeSimStepListener, LinkEnterEventHandler, LinkLeaveEventHandler {
+class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private Queue<Double> vehicleExitTimesOnLink5 = new LinkedList<Double>() ;
 	private long cnt4 = 0 ;
@@ -68,7 +68,7 @@ class SimpleAdaptiveSignal implements SimulationBeforeSimStepListener, LinkEnter
 	}
 
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		Netsim mobsim = (Netsim) e.getQueueSimulation() ;
 		double now = mobsim.getSimTimer().getTimeOfDay() ;
 

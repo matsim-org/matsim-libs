@@ -31,11 +31,11 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
 
-public class Restarter implements SimulationInitializedListener {
+public class Restarter implements MobsimInitializedListener {
 
 	private static Logger log = Logger.getLogger(Restarter.class);
 	
@@ -47,7 +47,7 @@ public class Restarter implements SimulationInitializedListener {
 	private Map<Id, Integer> legPerforming;
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		if (!(e.getQueueSimulation() instanceof QSim)) {
 			log.error("Simulation is not from type QSim - cannot restart it!");
 			return;

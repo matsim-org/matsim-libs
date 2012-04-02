@@ -29,13 +29,13 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -101,8 +101,8 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	 * 
 	 * @author cdobler
 	 */
-	private static class MobsimListenerForTests implements SimulationInitializedListener, SimulationBeforeSimStepListener, 
-		SimulationAfterSimStepListener {
+	private static class MobsimListenerForTests implements MobsimInitializedListener, MobsimBeforeSimStepListener, 
+		MobsimAfterSimStepListener {
 		
 		private TravelTime travelTime;
 		private Link link = null;
@@ -123,7 +123,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		}
 		
 		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 			// check free speed travel times - they should be initialized now
 			assertEquals(link.getLength()/link.getFreespeed(t1), travelTime.getLinkTravelTime(link, t1));
 			assertEquals(link.getLength()/link.getFreespeed(t2), travelTime.getLinkTravelTime(link, t2));
@@ -136,7 +136,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 //			System.out.println(travelTime.getLinkTravelTime(link, e.getSimulationTime()));
 			if (e.getSimulationTime() == t1) {
 				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1));
@@ -162,7 +162,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 			if (e.getSimulationTime() == t1) {
 				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1));
 			} else if (e.getSimulationTime() == t2) {

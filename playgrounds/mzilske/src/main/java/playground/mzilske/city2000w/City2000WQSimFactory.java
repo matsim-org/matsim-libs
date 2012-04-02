@@ -38,7 +38,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
@@ -59,7 +59,7 @@ public class City2000WQSimFactory implements MobsimFactory {
     }
 
     @Override
-    public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+    public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
         QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");

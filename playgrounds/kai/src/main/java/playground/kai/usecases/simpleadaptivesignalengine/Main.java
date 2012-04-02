@@ -26,7 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
@@ -42,7 +42,7 @@ public class Main {
 
 		final MobsimFactory mobsimFactory = new MobsimFactory() {
 			@Override
-			public Simulation createMobsim(Scenario sc, EventsManager events) {
+			public Mobsim createMobsim(Scenario sc, EventsManager events) {
 				QSim qsim = QSim.createQSimAndAddAgentSource(sc, events ) ;
 				qsim.addQueueSimulationListeners(simpleAdaptiveSignalEngine) ;
 				events.addHandler(simpleAdaptiveSignalEngine) ;

@@ -29,8 +29,8 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
@@ -39,7 +39,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIden
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
-public class SelectHandledAgentsByProbability implements SimulationInitializedListener {
+public class SelectHandledAgentsByProbability implements MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(SelectHandledAgentsByProbability.class);
 	
@@ -52,7 +52,7 @@ public class SelectHandledAgentsByProbability implements SimulationInitializedLi
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		collectAgents((QSim) e.getQueueSimulation());
 		selectHandledAgents();
 	}

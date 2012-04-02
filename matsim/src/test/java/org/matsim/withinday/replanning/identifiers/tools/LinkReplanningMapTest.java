@@ -25,13 +25,13 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 
@@ -84,8 +84,8 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 	 *
 	 * @author cdobler
 	 */
-	private static class MobsimListenerForTests implements SimulationInitializedListener, SimulationBeforeSimStepListener,
-		SimulationAfterSimStepListener {
+	private static class MobsimListenerForTests implements MobsimInitializedListener, MobsimBeforeSimStepListener,
+		MobsimAfterSimStepListener {
 
 		private final LinkReplanningMap lrp;
 		private static final int t1 = 5*3600 + 58*60 + 30;
@@ -99,13 +99,13 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void notifySimulationInitialized(final SimulationInitializedEvent e) {
+		public void notifyMobsimInitialized(final MobsimInitializedEvent e) {
 			assertEquals(0, this.lrp.getLegPerformingAgents().size());	// no agent performs a Leg
 			assertEquals(0, this.lrp.getReplanningAgents(0.0).size());	// no agent needs a replanning
 		}
 
 		@Override
-		public void notifySimulationBeforeSimStep(final SimulationBeforeSimStepEvent e) {
+		public void notifyMobsimBeforeSimStep(final MobsimBeforeSimStepEvent e) {
 
 			if (e.getSimulationTime() == t1) {
 				assertEquals(0, this.lrp.getLegPerformingAgents().size());	// no agent performs a Leg
@@ -129,7 +129,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void notifySimulationAfterSimStep(final SimulationAfterSimStepEvent e) {
+		public void notifyMobsimAfterSimStep(final MobsimAfterSimStepEvent e) {
 			if (e.getSimulationTime() == t1) {
 				assertEquals(1, this.lrp.getLegPerformingAgents().size());	// one agent performs a Leg
 				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent has just departed but cannot do a replanning

@@ -6,7 +6,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
@@ -22,7 +22,7 @@ public class PrioQMobsimFactory implements MobsimFactory {
 	PrioQEngine sim2DEngine = null;
 
 	@Override
-	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
 		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
 		if (conf == null) {

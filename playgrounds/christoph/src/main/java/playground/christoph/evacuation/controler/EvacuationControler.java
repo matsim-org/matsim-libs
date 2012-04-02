@@ -43,8 +43,8 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
@@ -118,7 +118,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.SelectHousehol
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class EvacuationControler extends WithinDayController implements SimulationInitializedListener, 
+public class EvacuationControler extends WithinDayController implements MobsimInitializedListener, 
 		IterationStartsListener, StartupListener, AfterMobsimListener {
 
 	public static final String FILENAME_VEHICLES = "output_vehicles.xml.gz";
@@ -423,7 +423,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	}
 	
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		
 		/*
 		 * Need to do this since this does not only create events, but also behaves 

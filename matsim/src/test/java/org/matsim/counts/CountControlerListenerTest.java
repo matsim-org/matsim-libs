@@ -35,7 +35,7 @@ import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -313,7 +313,7 @@ public class CountControlerListenerTest {
 		return Double.parseDouble(parts[1]);
 	}
 	
-	private static class DummyMobsim implements Simulation {
+	private static class DummyMobsim implements Mobsim {
 		private final EventsManager eventsManager;
 		private final int nOfEvents;
 		public DummyMobsim(EventsManager eventsManager, final int nOfEvents) {
@@ -332,7 +332,7 @@ public class CountControlerListenerTest {
 	private static class DummyMobsimFactory implements MobsimFactory {
 		private int count = 1;
 		@Override
-		public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 			return new DummyMobsim(eventsManager, count++);
 		}
 		

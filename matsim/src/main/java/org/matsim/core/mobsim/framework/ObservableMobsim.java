@@ -19,16 +19,15 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework;
 
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
-
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
 /**
  * 
- * Must be implemented by simulations using SimulationListeners
- * @author dgrether
+ * Must be implemented by simulations using {@link MobsimListener}s
  *
+ * @author dgrether
  */
-public interface ObservableSimulation extends Simulation {
+public interface ObservableMobsim extends Mobsim {
 
-  public void addQueueSimulationListeners(final SimulationListener listener);
+  public void addQueueSimulationListeners(final MobsimListener listener);
 }

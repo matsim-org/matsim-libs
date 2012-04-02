@@ -17,20 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.mobsim.framework.listeners;
 
-import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
-
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 
 /**
- * This interface can be implemented when a notification is needed before the
- * QueueSimulation instance starts it's shutdown process.
- * @author dgrether
+ * This interface can be implemented when a notification is needed after the
+ * QueueSimulation has performed a simulation step.
  *
+ * @author mrieser
  */
-public interface SimulationBeforeCleanupListener extends
-		SimulationListener {
+public interface MobsimAfterSimStepListener extends MobsimListener {
 
-	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent e);
+	public void notifyMobsimAfterSimStep(final MobsimAfterSimStepEvent e);
 
 }

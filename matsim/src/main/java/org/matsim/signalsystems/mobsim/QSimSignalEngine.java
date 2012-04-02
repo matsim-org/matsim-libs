@@ -21,8 +21,8 @@ package org.matsim.signalsystems.mobsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
@@ -49,13 +49,13 @@ public class QSimSignalEngine implements SignalEngine {
 	}
 
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		this.initializeSignalizedItems(((Netsim)e.getQueueSimulation()));
 	}
 
 
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		this.signalManager.requestControlUpdate(e.getSimulationTime());
 	}
 	

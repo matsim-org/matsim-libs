@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
@@ -86,7 +86,7 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public Simulation createMobsim(final Scenario scenario, final EventsManager eventsManager) {
+	public Mobsim createMobsim(final Scenario scenario, final EventsManager eventsManager) {
 
 		PlanMobsimImpl planSim = new PlanMobsimImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);

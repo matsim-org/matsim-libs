@@ -51,8 +51,8 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.ptproject.qsim.InternalInterface;
@@ -70,7 +70,7 @@ import org.matsim.vehicles.Vehicles;
  * 
  * @author cdobler
  */
-public class VehiclesTracker implements SimulationInitializedListener, MobsimEngine,
+public class VehiclesTracker implements MobsimInitializedListener, MobsimEngine,
 	PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentArrivalEventHandler,
 	LinkEnterEventHandler, LinkLeaveEventHandler {
 	
@@ -212,7 +212,7 @@ public class VehiclesTracker implements SimulationInitializedListener, MobsimEng
 	}
 		
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		QSim sim = (QSim) e.getQueueSimulation();
 		
 		agents.clear();

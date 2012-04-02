@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.KaiHybridEngine;
@@ -51,7 +51,7 @@ public class Main {
 		// make sure that the mobsim indeed uses that reconfigured netsimEngineFactory:
 		final MobsimFactory mobsimFactory = new MobsimFactory() {
 			@Override
-			public Simulation createMobsim(Scenario sc, EventsManager events) {
+			public Mobsim createMobsim(Scenario sc, EventsManager events) {
 				QSim qsim = QSim.createQSimAndAddAgentSource(sc, events, netsimEngineFactory) ;
 				qsim.addMobsimEngine(hybridEngine) ;
 				return qsim ;

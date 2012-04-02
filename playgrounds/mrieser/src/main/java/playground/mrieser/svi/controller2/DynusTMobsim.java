@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 import playground.mrieser.svi.data.DynamicODMatrix;
 import playground.mrieser.svi.data.DynusTDynamicODDemandWriter;
@@ -35,7 +35,7 @@ import playground.mrieser.svi.replanning.DynamicODDemandCollector;
 /**
  * @author mrieser
  */
-public class DynusTMobsim implements Simulation {
+public class DynusTMobsim implements Mobsim {
 
 	private final DynusTConfig dc;
 	private final Scenario scenario;

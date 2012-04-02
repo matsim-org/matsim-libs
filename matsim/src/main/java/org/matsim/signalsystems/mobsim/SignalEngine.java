@@ -19,15 +19,15 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.mobsim;
 
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 
 /**
  * @author dgrether
  *
  */
-public interface SignalEngine extends SimulationInitializedListener, SimulationBeforeSimStepListener{
+public interface SignalEngine extends MobsimInitializedListener, MobsimBeforeSimStepListener{
 
 	
 }

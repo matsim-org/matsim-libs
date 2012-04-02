@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -79,7 +79,7 @@ public class TransitMobsimFactory implements MobsimFactory {
 
 
 	@Override
-	public Simulation createMobsim(Scenario scenario, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
 		// setup transit related stuff
 		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
 		Vehicles transitVehicles = ((ScenarioImpl) scenario).getVehicles();

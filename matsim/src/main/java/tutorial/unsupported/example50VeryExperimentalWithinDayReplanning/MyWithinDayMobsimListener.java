@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -49,7 +49,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
  *
  * @author nagel
  */
-public class MyWithinDayMobsimListener implements SimulationListener, SimulationBeforeSimStepListener {
+public class MyWithinDayMobsimListener implements MobsimListener, MobsimBeforeSimStepListener {
     private static final Logger log = Logger.getLogger(MyWithinDayMobsimListener.class);
 
 
@@ -64,7 +64,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 	}
 
 	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent event) {
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
 
 		Netsim mobsim = (Netsim) event.getQueueSimulation();
 		this.scenario = mobsim.getScenario();

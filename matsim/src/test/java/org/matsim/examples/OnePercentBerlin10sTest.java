@@ -28,7 +28,7 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -66,7 +66,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
 		events.addHandler(writer);
 
-		Simulation sim = new QueueSimulation(scenario, events);
+		Mobsim sim = new QueueSimulation(scenario, events);
 		log.info("START testOnePercent10s SIM");
 		sim.run();
 		log.info("STOP testOnePercent10s SIM");

@@ -35,8 +35,8 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 
@@ -54,7 +54,7 @@ import playground.christoph.evacuation.events.HouseholdSeparatedEventImpl;
  * 
  * @author cdobler
  */
-public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEventHandler, SimulationAfterSimStepListener {
+public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEventHandler, MobsimAfterSimStepListener {
 
 	static final Logger log = Logger.getLogger(HouseholdsUtils.class);
 	
@@ -101,7 +101,7 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 	}
 	
 	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		
 		if (e.getSimulationTime() >= this.infoTime) {
 			this.infoTime += INFO_PERIOD;
