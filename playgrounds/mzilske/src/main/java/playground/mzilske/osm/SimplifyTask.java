@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mzilske.osm;
 
 import java.util.List;
@@ -58,6 +77,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void process(EntityContainer entityContainer) {
 		// Ask the entity container to invoke the appropriate processing method
 		// for the entity type.
@@ -67,6 +87,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void process(BoundContainer boundContainer) {
 		// pass on the bounds information unchanged
 		sink.process(boundContainer);
@@ -75,6 +96,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void process(NodeContainer container) {
 
 		// stuff all nodes into a file
@@ -90,6 +112,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void process(WayContainer container) {
 		Way way = container.getEntity();
 		List<WayNode> wayNodes = way.getWayNodes();
@@ -142,6 +165,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void process(RelationContainer container) {
 		// Do nothing (Drop all relations)
 	}
@@ -149,6 +173,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void complete() {
 		ReleasableIterator<NodeContainer> nodeIterator;
 		ReleasableIterator<WayContainer> wayIterator;
@@ -188,6 +213,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void release() {
 		allNodes.release();
 		allWays.release();
@@ -197,6 +223,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void setSink(Sink sink) {
 		this.sink = sink;
 	}
