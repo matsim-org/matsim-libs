@@ -96,7 +96,6 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 	public static void main(String [] args) {
 		log.warn("this main method exist for debugging only, meaning it will (hopefully) removed soon[gl 03/2012]");
 		String input = "/Users/laemmel/tmp/gripsConfig.xml";
-		String schema = "http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas/grips_config_v0.1.xsd";
 		GripsConfigModule gcm = new GripsConfigModule("grips");
 		new GripsConfigDeserializer(gcm).readFile(input);
 		
