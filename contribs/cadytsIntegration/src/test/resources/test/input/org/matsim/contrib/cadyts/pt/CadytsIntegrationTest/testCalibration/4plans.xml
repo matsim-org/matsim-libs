@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans>
+
+<!-- ====================================================================== -->
+	<person id="1_1" employed="no">
+		<plan selected="yes">
+			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:18:00">
+				<route>
+					PT1===stop1===B-M44===B-M44_Route2===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
+			<leg mode="transit_walk" trav_time="11:40:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" />
+		</plan>
+
+		<plan selected="no">
+			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:18:00">
+				<route>
+					PT1===stop1===B-M44===B-M44_Route10===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
+			<leg mode="transit_walk" trav_time="11:40:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" />
+		</plan>
+
+
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="1_2" employed="no">
+		<plan selected="yes">
+			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:18:00">
+				<route>
+					PT1===stop1===B-M44===B-M44_Route2===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
+			<leg mode="transit_walk" trav_time="11:40:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" />
+		</plan>
+
+		<plan selected="no">
+			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:18:00">
+				<route>
+					PT1===stop1===B-M44===B-M44_Route10===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
+			<leg mode="transit_walk" trav_time="11:40:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" />
+		</plan>
+
+	
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="1_3" employed="no">
+		<plan selected="yes">
+			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:18:00">
+				<route>
+					PT1===stop1===B-M44===B-M44_Route2===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
+			<leg mode="transit_walk" trav_time="11:40:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" />
+		</plan>
+
+		<plan selected="no">
+			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:18:00">
+				<route>
+					PT1===stop1===B-M44===B-M44_Route10===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
+			<leg mode="transit_walk" trav_time="11:40:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" />
+		</plan>
+
+	
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="1_4" employed="no">
+		<plan selected="yes">
+			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:18:00">
+				<route>
+					PT1===stop1===B-M44===B-M44_Route2===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
+			<leg mode="transit_walk" trav_time="11:40:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" />
+		</plan>
+
+		<plan selected="no">
+			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:18:00">
+				<route>
+					PT1===stop1===B-M44===B-M44_Route10===stop12 
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
+			<leg mode="transit_walk" trav_time="00:02:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
+			<leg mode="transit_walk" trav_time="11:40:00">
+				<route>
+					 
+				</route>
+			</leg>
+			<act type="h" link="1" x="-25000.0" y="0.0" />
+		</plan>
+
+
+	</person>
+
+<!-- ====================================================================== -->
+
+
+</plans>
