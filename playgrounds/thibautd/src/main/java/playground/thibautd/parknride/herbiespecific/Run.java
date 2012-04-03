@@ -59,7 +59,7 @@ public class Run {
 			new CenteredTimeProportionalPenaltyFactory(
 					center,
 					CoordUtils.calcDistance( center , boundaryPoint ),
-					costPerSecondAtCenter);
+					costPerSecondAtCenter * config.planCalcScore().getMarginalUtilityOfMoney());
 
 		MultiLegRoutingControler controler = new UglyHerbieMultilegControler( scenario );
 		controler.addControlerListener( ParkAndRideScoringFunctionFactory.createFactoryListener( penalty ) );

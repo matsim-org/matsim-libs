@@ -30,6 +30,7 @@ import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.router.TransitRouterConfig;
 
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
@@ -37,8 +38,10 @@ import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
+import herbie.running.scoring.TravelScoringFunction;
 
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
+import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
@@ -93,6 +96,19 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 		this.setTravelDisutilityFactory(costCalculatorFactory);
 		
 		super.setUp();
+
+		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
+		// if some parts of the code use this method, everything should be consistent.
+		setTransitRouterFactory(
+				new HerbieTransitRouterFactory( 
+					getScenario().getTransitSchedule(),
+					new TransitRouterConfig(
+						config.planCalcScore(),
+						config.plansCalcRoute(),
+						config.transitRouter(),
+						config.vspExperimental()),
+					herbieConfigGroup,
+					new TravelScoringFunction( params, herbieConfigGroup ) ) );
 	}
 	
 	

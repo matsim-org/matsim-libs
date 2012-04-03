@@ -53,12 +53,12 @@ public class TravelScoringFunction {
 	 * @param travelTime
 	 * @return
 	 */
-	protected double getAlternativeModeScore(double distance, double travelTime) {
+	public double getAlternativeModeScore(double distance, double travelTime) {
 		
 		return this.getCarScore(distance, travelTime);
 	}
 
-	protected double getBikeScore(double distance, double travelTime) {
+	public double getBikeScore(double distance, double travelTime) {
 		
 		double bikeScore = 0.0;
 		
@@ -79,7 +79,7 @@ public class TravelScoringFunction {
 		return bikeScore;
 	}
 
-	protected double getCarScore(double distance, double travelTime) {
+	public double getCarScore(double distance, double travelTime) {
 		
 		double carScore = 0.0;
 		
@@ -94,7 +94,7 @@ public class TravelScoringFunction {
 		return carScore;
 	}
 	
-	protected double getWalkScore(double distance, double travelTime) {
+	public double getWalkScore(double distance, double travelTime) {
 		
 		double walkScore = 0.0;
 		
@@ -136,7 +136,7 @@ public class TravelScoringFunction {
 	 * @param distanceCost is a factor for transit travel cards
 	 * @return
 	 */
-	protected double getInVehiclePtScore(double distance, double travelTime, double distanceCost) {
+	public double getInVehiclePtScore(double distance, double travelTime, double distanceCost) {
 		
 		double ptScore = 0.0;
 		

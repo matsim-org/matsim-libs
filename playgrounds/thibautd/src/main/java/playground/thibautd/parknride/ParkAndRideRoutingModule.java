@@ -70,6 +70,7 @@ import playground.thibautd.parknride.ParkAndRideRouterNetwork.ParkAndRideLink;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.StageActivityTypesImpl;
+import playground.thibautd.router.TransitRouterWrapper;
 
 /**
  * A routing module for park and ride access trips. It is not meant
@@ -348,6 +349,19 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		List< Leg > baseTrip = tripAndCost.getFirst();
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
+		// set the distance in the route. this would be faster to do it during
+		// leg reconstruction.
+		for (Leg leg : baseTrip) {
+			Route route = leg.getRoute();
+
+			if (route instanceof ExperimentalTransitRoute) {
+				route.setDistance(
+						TransitRouterWrapper.calcDistance(
+							(ExperimentalTransitRoute) route,
+							transitSchedule) );
+			}
+		}
+
 		// the following was executed in PlansCalcTransitRoute at plan insertion.
 		Leg firstLeg = baseTrip.get(0);
 		Id fromLinkId = fromFacility.getLinkId();
@@ -434,7 +448,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 	}
 
 	// adapted from TransitRouterImpl.convert(...)
-	// returns a list of tuples leg/arrival coord of the leg
+	// returns a list of tuples leg/arrival cost of the leg
 	private Tuple<List<Leg>, Double> parsePtSubTripLegs(
 			final Facility fromFacility,
 			final Facility toFacility,
