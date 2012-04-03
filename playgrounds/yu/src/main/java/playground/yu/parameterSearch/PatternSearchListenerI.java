@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParametersSetter.java
+ * PatternSearchListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,45 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.parameterSearch;
 
 import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.listener.ControlerListener;
 
-import playground.yu.integration.cadyts.CalibrationConfig;
-import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
+public interface PatternSearchListenerI extends ControlerListener {
+	static final String LOWER_BOUNDARY_OF_PARAMETER_ = "lowerBoundaryOfParameter_"//
+	,
+			UPPER_BOUNDARY_OF_PARAMETER_ = "upperBoundaryOfParameter_";
+	static final Map<String, Double> nameParametersMap = new TreeMap<String, Double>();
 
-/**
- * sets parameters of scoringfunction into {@code Config} and also into
- * {@code Controler}
- * 
- * @author yu
- * 
- */
-public class ParametersSetter {
-	public static void setParameters(Controler ctl,
-			Map<String, Double> nameParameters) {
-		// set new parameters in config
-		Config cfg = ctl.getConfig();
-		PlanCalcScoreConfigGroup scoringCfg = cfg.planCalcScore();
-		for (String name : nameParameters.keySet()) {
-			String value = Double.toString(nameParameters.get(name));
+	static final String PERFORMING = "performing", TRAVELING = "traveling",
+			TRAVELING_PT = "travelingPt", TRAVELING_WALK = "travelingWalk";
 
-			if (scoringCfg.getParams().containsKey(name)) {
-				scoringCfg.addParam(name, value);
-			} else {
-				cfg.setParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME, name,
-						value);
-			}
-		}
-		// set new parameters in Controler
-		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				cfg, ctl.getNetwork()));
-	}
+	static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk",
+			MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar",
+			MONETARY_DISTANCE_COST_RATE_PT = "monetaryDistanceCostRatePt";
+
+	static final String CONSTANT_CAR = "constantCar",
+			CONSTANT_WALK = "constantWalk", CONSTANT_PT = "constantPt";
+
+	static final String STUCK = "stuck",
+			CONSTANT_LEFT_TURN = "constantLeftTurn";
 }

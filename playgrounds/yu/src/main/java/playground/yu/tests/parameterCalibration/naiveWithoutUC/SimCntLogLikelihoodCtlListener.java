@@ -47,12 +47,26 @@ import cadyts.calibrators.Calibrator;
 public class SimCntLogLikelihoodCtlListener implements StartupListener,
 		AfterMobsimListener, ShutdownListener {
 	private double minStdDev, llhSum = 0d, distanceFilter,
-			countsScaleFactor = 1d, varianceScale = 1d;
+			countsScaleFactor = 1d, varianceScale = 1d, avgLlh;
+
 	private int avgLlhOverIters = 0, writeLlhInterval = 0, caliStartTime = 1,
 			caliEndTime = 24;
+
 	private Coord distanceFilterCenterNodeCoord = null;
 
 	private SimpleWriter writer = null;
+
+	public int getAvgLlhOverIters() {
+		return avgLlhOverIters;
+	}
+
+	public int getWriteLlhInterval() {
+		return writeLlhInterval;
+	}
+
+	public double getAverageLoglikelihood() {
+		return avgLlh;
+	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
@@ -112,7 +126,7 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 			}
 			if (iter % writeLlhInterval == 0) {
 				// calculate avg. value of llh
-				double avgLlh = llhSum / avgLlhOverIters;
+				avgLlh = llhSum / avgLlhOverIters;
 				writer.writeln("ITER\t" + iter + "\tavgLlh over "
 						+ avgLlhOverIters + " iterations =\t" + avgLlh
 						+ "\tsum of Llh =\t" + llhSum);

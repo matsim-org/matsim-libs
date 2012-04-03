@@ -22,35 +22,25 @@ package playground.yu.parameterSearch.LJ;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 
+import playground.yu.scoring.withAttrRecorder.leftTurn.LeftTurnPenaltyControler;
 import playground.yu.tests.parameterCalibration.naiveWithoutUC.SimCntLogLikelihoodCtlListener;
 
-public class LJParameterHunter {
-	private final Controler ctl;
+public class LJParameterHunter extends LeftTurnPenaltyControler {
 	private final SimCntLogLikelihoodCtlListener llhListener;
 
 	public LJParameterHunter(Config cfg) {
-		ctl = new Controler(cfg);
+		super(cfg);
 		llhListener = new SimCntLogLikelihoodCtlListener();
-		ctl.addControlerListener(llhListener);
-		// TODO add ... listener
-		ctl.setOverwriteFiles(true);
-		ctl.run();
+		addControlerListener(llhListener);
+		addControlerListener(new LJParaemterSearchListener());
+		setOverwriteFiles(true);
+		run();
 	}
 
-	// public double getLogLikelihood() {
-	// // TODO getter in SimCntLogLikelihoodCtlListener TODO a class or sth.
-	// // else? or in another class?
-	// return 0;
-	// }
-
-	// public Collection<Double> getParameters(Collection<String> names) {
-	// // TODO a class or sth. else? or in another class?
-	// return null;
-	// }
-
-	// TODO setParameters? TODO a class or sth. else? or in another class?
+	public SimCntLogLikelihoodCtlListener getLlhListener() {
+		return llhListener;
+	}
 
 	public static void main(String[] args) {
 		new LJParameterHunter(

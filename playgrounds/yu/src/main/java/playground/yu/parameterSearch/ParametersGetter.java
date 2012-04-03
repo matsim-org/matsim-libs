@@ -24,6 +24,7 @@
 package playground.yu.parameterSearch;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
 import playground.yu.integration.cadyts.CalibrationConfig;
 
@@ -40,8 +41,15 @@ public class ParametersGetter {
 	 * @return
 	 */
 	public static double getValueOfParameter(Config cfg, String name) {
-		String value = cfg.planCalcScore().getParams().get(name);
-		if (value == null) {
+		PlanCalcScoreConfigGroup scoring = cfg.planCalcScore();
+		String value = scoring.getParams().get(name);
+		if (name.equals(PatternSearchListenerI.STUCK)) {
+			return Math.min(
+					Math.min(scoring.getLateArrival_utils_hr(),
+							scoring.getEarlyDeparture_utils_hr()),
+					Math.min(scoring.getTraveling_utils_hr(),
+							scoring.getWaiting_utils_hr()));
+		} else if (value == null) {
 			value = cfg.findParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME,
 					name);
 			if (value == null) {

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParametersSetter.java
+ * PatternSearchAlgoI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,45 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.parameterSearch;
 
-import java.util.Map;
+public interface PatternSearchAlgoI {
+	/** @return the new suggestion of parameter set */
+	double[] getTrial();
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+	/**
+	 * should be called by or "after" {@code AfterMobsimListener}
+	 * 
+	 * @param objective
+	 *            the value of objective function by the newest suggestion of
+	 *            parameter set
+	 */
+	void setObjective(double objective);
 
-import playground.yu.integration.cadyts.CalibrationConfig;
-import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
-
-/**
- * sets parameters of scoringfunction into {@code Config} and also into
- * {@code Controler}
- * 
- * @author yu
- * 
- */
-public class ParametersSetter {
-	public static void setParameters(Controler ctl,
-			Map<String, Double> nameParameters) {
-		// set new parameters in config
-		Config cfg = ctl.getConfig();
-		PlanCalcScoreConfigGroup scoringCfg = cfg.planCalcScore();
-		for (String name : nameParameters.keySet()) {
-			String value = Double.toString(nameParameters.get(name));
-
-			if (scoringCfg.getParams().containsKey(name)) {
-				scoringCfg.addParam(name, value);
-			} else {
-				cfg.setParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME, name,
-						value);
-			}
-		}
-		// set new parameters in Controler
-		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				cfg, ctl.getNetwork()));
-	}
+	/** should be called inside setObjective(double) */
+	void createTrial();
 }

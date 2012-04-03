@@ -9,6 +9,6 @@ import playground.yu.scoring.PlansScoringI;
  * @author yu
  * 
  */
-public interface ControlerWithAttrRecorder {
+public interface ControlerWithAttrRecorderI {
 	PlansScoringI getPlansScoring4AttrRecorder();
 }

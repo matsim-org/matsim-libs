@@ -18,7 +18,7 @@ import playground.yu.scoring.PlansScoringI;
  * 
  */
 public class Controler4AttrRecorder extends Controler implements
-		ControlerWithAttrRecorder {
+		ControlerWithAttrRecorderI {
 	public static void main(String[] args) {
 		Config config;
 		if (args.length < 1) {

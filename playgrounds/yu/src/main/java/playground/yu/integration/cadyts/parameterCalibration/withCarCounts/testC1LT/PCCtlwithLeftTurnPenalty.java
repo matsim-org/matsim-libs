@@ -14,7 +14,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.PlansScoringWithLeftTurnPenalty4PC;
 import playground.yu.scoring.PlansScoringI;
-import playground.yu.scoring.withAttrRecorder.ControlerWithAttrRecorder;
+import playground.yu.scoring.withAttrRecorder.ControlerWithAttrRecorderI;
 import playground.yu.scoring.withAttrRecorder.ScorAttrWriteTrigger;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
 
@@ -23,7 +23,7 @@ import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunct
  * 
  */
 public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler
-		implements ControlerWithAttrRecorder {
+		implements ControlerWithAttrRecorderI {
 
 	public PCCtlwithLeftTurnPenalty(Config config) {
 		super(config);

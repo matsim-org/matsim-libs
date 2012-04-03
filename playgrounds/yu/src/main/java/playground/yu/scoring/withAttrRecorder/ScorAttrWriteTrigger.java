@@ -29,7 +29,7 @@ public class ScorAttrWriteTrigger implements IterationEndsListener {
 					.parseInt(writeScorAttrIntervalStr);
 			if (writeScorAttrInterval > 0
 					&& iteration % writeScorAttrInterval == 0) {
-				((Events2Score4AttrRecorder) ((ControlerWithAttrRecorder) controler)
+				((Events2Score4AttrRecorder) ((ControlerWithAttrRecorderI) controler)
 						.getPlansScoring4AttrRecorder().getPlanScorer())
 						.writeScoreAttrs(controler
 								.getControlerIO()

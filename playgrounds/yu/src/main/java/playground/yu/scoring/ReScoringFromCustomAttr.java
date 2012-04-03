@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParametersSetter.java
+ * ReScoringFromCustomAttr.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,42 +21,47 @@
 /**
  * 
  */
-package playground.yu.parameterSearch;
+package playground.yu.scoring;
 
 import java.util.Map;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.yu.integration.cadyts.CalibrationConfig;
-import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
+import playground.yu.parameterSearch.PatternSearchListenerI;
 
 /**
- * sets parameters of scoringfunction into {@code Config} and also into
- * {@code Controler}
+ * It is assumed that each plan has customized attributes corresponding to the
+ * parameters in scoring function
  * 
  * @author yu
  * 
  */
-public class ParametersSetter {
-	public static void setParameters(Controler ctl,
-			Map<String, Double> nameParameters) {
-		// set new parameters in config
-		Config cfg = ctl.getConfig();
-		PlanCalcScoreConfigGroup scoringCfg = cfg.planCalcScore();
-		for (String name : nameParameters.keySet()) {
-			String value = Double.toString(nameParameters.get(name));
+public class ReScoringFromCustomAttr extends AbstractPersonAlgorithm implements
+		PlanAlgorithm {
 
-			if (scoringCfg.getParams().containsKey(name)) {
-				scoringCfg.addParam(name, value);
-			} else {
-				cfg.setParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME, name,
-						value);
+	@Override
+	public void run(Plan plan) {
+		Map<String, Object> customAttrs = plan.getCustomAttributes();
+		double score = 0;
+		for (String paramName : customAttrs.keySet()) {
+			Object oj = customAttrs.get(paramName);
+			if (oj != null) {
+				Number attr = (Number) oj;
+				score += PatternSearchListenerI.nameParametersMap
+						.get(paramName) * attr.doubleValue();
 			}
 		}
-		// set new parameters in Controler
-		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				cfg, ctl.getNetwork()));
+		plan.setScore(score);
 	}
+
+	@Override
+	public void run(Person person) {
+		for (Plan plan : person.getPlans()) {
+			run(plan);
+		}
+	}
+
 }

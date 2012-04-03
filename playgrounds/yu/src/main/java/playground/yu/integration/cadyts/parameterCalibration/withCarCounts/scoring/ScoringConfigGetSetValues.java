@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
  */
 public class ScoringConfigGetSetValues {
 	private final static Logger log = Logger
-	.getLogger(ScoringConfigGetSetValues.class);
+			.getLogger(ScoringConfigGetSetValues.class);
 	private static PlanCalcScoreConfigGroup scoringCfgGroup;
 	private static Config config;
 
@@ -68,7 +68,7 @@ public class ScoringConfigGetSetValues {
 	 * name="parameterName_5" value="constantPt" /> <param
 	 * name="parameterName_6" value="constantWalk" />
 	 * 
-	 * <param name="parameterName_0" value="monetaryDistanceCostRateCar" />
+	 * <param name="parameterName_7" value="monetaryDistanceCostRateCar" />
 	 * <param name="parameterName_8" value="monetaryDistanceCostRatePt" />
 	 * 
 	 * <param name="parameterName_9" value="marginalUtlOfDistanceWalk" />
