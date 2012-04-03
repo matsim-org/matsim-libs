@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParkAndRideTravelTimeCost.java
+ * HerbieParkAndRideCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride;
+package playground.thibautd.parknride.herbiespecific;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.pt.router.TransitRouterConfig;
 
+import herbie.running.scoring.TravelScoringFunction;
+
 /**
  * @author thibautd
  */
-public class ParkAndRideTravelTimeCost implements PersonalizableTravelDisutility, PersonalizableTravelTime {
+public class HerbieParkAndRideCost implements PersonalizableTravelTime, PersonalizableTravelDisutility {
+	private final TravelScoringFunction distanceScoring;
 	private final TransitRouterConfig config;
-	private final PlanCalcScoreConfigGroup scoreConfig;
 
-	public ParkAndRideTravelTimeCost(
+	public HerbieParkAndRideCost(
 			final TransitRouterConfig config,
-			final PlanCalcScoreConfigGroup scoreConfig) {
+			final TravelScoringFunction distanceScoring) {
+		this.distanceScoring = distanceScoring;
 		this.config = config;
-		this.scoreConfig = scoreConfig;
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) {
+	public double getLinkTravelTime(
+			final Link link,
+			final double time) {
+		return link.getLength() / config.getBeelineWalkSpeed() + config.additionalTransferTime;
+	}
+
+	@Override
+	public double getLinkTravelDisutility(
+			final Link link,
+			final double time) {
 		double transfertime = getLinkTravelTime(link, time);
-		double waittime = this.config.additionalTransferTime;
+		double waittime = config.additionalTransferTime;
 		
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
@@ -52,20 +62,13 @@ public class ParkAndRideTravelTimeCost implements PersonalizableTravelDisutility
 		// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
 		// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
 		// be the same as the marginal opprotunity cost of time).  kai, nov'11
-		return -walktime * config.getMarginalUtilityOfTravelTimeWalk_utl_s()
+		return -distanceScoring.getWalkScore(link.getLength(), walktime)
 			   -waittime * config.getMarginalUtiltityOfWaiting_utl_s()
-			   -link.getLength() * scoreConfig.getMarginalUtlOfDistanceWalk();
+			   - config.getUtilityOfLineSwitch_utl();
 	}
 
 	@Override
-	public double getLinkTravelTime(final Link link, final double time) {
-		double distance = link.getLength();
-		return distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
-	}
-
-	@Override
-	public void setPerson(final Person person) {
-		// nothing to do here
+	public void setPerson(
+			final Person person) {
 	}
 }
-

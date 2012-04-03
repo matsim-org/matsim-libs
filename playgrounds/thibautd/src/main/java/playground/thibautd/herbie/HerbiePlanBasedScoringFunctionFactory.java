@@ -78,7 +78,7 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 		scoringFunctionAccumulator.addScoringFunction(
 				new PlanBasedLegScoringFunction(
 					plan,
-					new LegScoringFunction(
+					new HerbieLegWithNetworkPtDistanceScoringFunction(
 						plan, 
 						params,
 						config,

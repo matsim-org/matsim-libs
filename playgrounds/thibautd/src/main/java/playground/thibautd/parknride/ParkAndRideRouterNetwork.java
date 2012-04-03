@@ -74,6 +74,9 @@ public class ParkAndRideRouterNetwork implements Network {
 
 	/**
 	 * @param carNetwork the regular network, to use for car routing
+	 * @param schedule 
+	 * @param maxBeelineWalkConnectionDistance 
+	 * @param pnrConnectionSearchRadius 
 	 * @param transitNetwork the "network" used for transit routing. The ids of the
 	 * links and nodes must be different of the ones from the car net!
 	 * @param parkAndRideFacilities
@@ -156,7 +159,7 @@ public class ParkAndRideRouterNetwork implements Network {
 		Map<Id, ParkAndRideFacility> pnrFacilities = parkAndRideFacilities.getFacilities();
 		int pnrLinksCount = 0;
 		for (ParkAndRideFacility facility : pnrFacilities.values()) {
-			List<Id> stops = facility.getStopsFacilitiesIds();
+			//List<Id> stops = facility.getStopsFacilitiesIds();
 			//Node carNode = carQuadTree.get( facility.getCoord().getX() , facility.getCoord().getY() );
 			// facility should reference a car link, as re-routing would not work
 			// otherwise.
