@@ -50,8 +50,8 @@ public class GenerateTabSeparatedNetwork {
 	}
 
 	private static boolean isInStudyArea(Coord coord) {
-		if (coord.getX() > 676225 && coord.getX() < 689675) {
-			if (coord.getY() > 241580 && coord.getY() < 254310) {
+		if (coord.getX() > 671225 && coord.getX() < 694675) {
+			if (coord.getY() > 236580 && coord.getY() < 259310) {
 				return true;
 			}
 		}
