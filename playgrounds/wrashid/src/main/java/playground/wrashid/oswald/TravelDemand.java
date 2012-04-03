@@ -67,13 +67,14 @@ public class TravelDemand {
 
 		for (Id personId : startPositions.keySet()) {
 			Coord startCoord = network.getLinks().get(startPositions.get(personId)).getCoord();
-			Coord endCoord = network.getLinks().get(endPositions.get(personId)).getCoord();
-			if (endCoord != null) {
+			
+			if (endPositions.get(personId) != null) {
 				/*
 				 * endCoord could be null in the case, when agent just arrives
 				 * after 'simulationStartTimeInSeconds' and does not go furtehr
 				 * anymore
 				 */
+				Coord endCoord = network.getLinks().get(endPositions.get(personId)).getCoord();
 				System.out.println(startCoord.getX() + "\t" + startCoord.getY() + "\t" + endCoord.getX() + "\t" + endCoord.getY()
 						+ "\t" + (lastEventWasArrivalEvent.get(personId) ? "1" : "0"));
 			}
