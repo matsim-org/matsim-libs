@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.parameterSearch.LJ;
 
@@ -33,13 +33,13 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * Implementation of the algorithm under
  * http://en.wikipedia.org/wiki/Luus%E2%80%93Jaakola
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class LJAlgorithm implements PatternSearchAlgoI {
 	private final double[] lowerBoundaries, upperBoundaries;
-	private final int dimension;
+	private final int dimension, maxIter;
 	private double[] parameters;
 	private final double[] trial;
 	private final double[] samplingRange;
@@ -52,7 +52,7 @@ public class LJAlgorithm implements PatternSearchAlgoI {
 
 	public LJAlgorithm(final double[] lowerBoundaries,
 			final double[] upperBoundaries) {
-		this(lowerBoundaries, upperBoundaries, 1);
+		this(lowerBoundaries, upperBoundaries, 1, 300);
 	}
 
 	/**
@@ -62,7 +62,8 @@ public class LJAlgorithm implements PatternSearchAlgoI {
 	 *            a positive value
 	 */
 	public LJAlgorithm(final double[] lowerBoundaries,
-			final double[] upperBoundaries, final double criterion) {
+			final double[] upperBoundaries, final double criterion,
+			final int maxIter) {
 		this.lowerBoundaries = lowerBoundaries;
 		this.upperBoundaries = upperBoundaries;
 		dimension = lowerBoundaries.length;
@@ -77,6 +78,7 @@ public class LJAlgorithm implements PatternSearchAlgoI {
 					- this.lowerBoundaries[i];
 		}
 		this.criterion = criterion;
+		this.maxIter = maxIter;
 	}
 
 	public void setOutputFilename(String filename) {
@@ -110,7 +112,7 @@ public class LJAlgorithm implements PatternSearchAlgoI {
 	 * should be called "after" {@code ScoringListener} and "before"
 	 * {@code ReplanningListener}, which means it is possible only by
 	 * {@code IterationStartsListener} or {@code IterationEndsListener}
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -127,38 +129,45 @@ public class LJAlgorithm implements PatternSearchAlgoI {
 
 	/**
 	 * should be called by or "after" {@code AfterMobsimListener}
-	 * 
+	 *
 	 * @param objective
 	 */
 	@Override
 	public void setObjective(double objective) {
 		double difference = objective - this.objective;
-
-		if (n < 100 && (difference < -criterion || difference > criterion)) {
+		writer.writeln(">>>>>Difference\t(tried objective - objective):\t"
+				+ difference + "\t(" + objective + "\t- " + this.objective
+				+ ")");
+		if (n < maxIter && (difference < -criterion || difference > criterion)) {
 			if (difference < 0) {/* move to the new position */
-				parameters = trial;
+				for (int i = 0; i < dimension; i++) {
+					parameters[i] = trial[i];
+				}
 				this.objective = objective;
 			} else/* >criterion */{/* decrease the sampling-range */
 				for (int i = 0; i < dimension; i++) {
 					samplingRange[i] *= samplingRangeDecreaseRatio;
 				}
 			}
-			createTrial();
+
 			if (writer != null) {
-				writer.write(">>>>>\tN =\t" + n + ", parameters ="
-				// + parameters
-				);
+				writer.write(">>>>>N =\t" + n + "\tsearchRange =");
+				for (int i = 0; i < dimension; i++) {
+					writer.write("\t" + samplingRange[i]);
+				}
+				writer.write(", parameters =");
 				for (int i = 0; i < dimension; i++) {
 					writer.write("\t" + parameters[i]);
 				}
 				writer.writeln("\tobjective =\t" + this.objective);
 				writer.flush();
 			}
+			createTrial();
+
 			n++;
 		} else if (difference >= -criterion && difference < criterion) {
 			if (writer != null) {
-				writer.writeln("Bingo! We reached the best soluations:\t"
-						+ parameters);
+				writer.writeln("Bingo! We reached the best soluations:\t");
 				writer.write(">>>>>\tN =\t" + n + ", parameters ="
 				// + parameters
 				);
@@ -170,10 +179,17 @@ public class LJAlgorithm implements PatternSearchAlgoI {
 				writer.close();
 				System.exit(0);
 			}
-		} else if (n >= 100) {
+		} else if (n >= maxIter) {
 			if (writer != null) {
-				writer.writeln("Bummer! We haven't reach the best soluation:\t"
-						+ parameters);
+				writer.writeln("Bummer! We haven't reach the best soluation.");
+				writer.write(">>>>>\tN =\t" + n + ", parameters ="
+				// + parameters
+				);
+				for (int i = 0; i < dimension; i++) {
+					writer.write("\t" + parameters[i]);
+				}
+				writer.writeln();
+				writer.flush();
 				writer.close();
 				System.exit(0);
 			}
@@ -188,5 +204,12 @@ public class LJAlgorithm implements PatternSearchAlgoI {
 					upperBoundaries[i], parameters[i] + (randomD * 2d - 1d)
 							* samplingRange[i]/* increment */));
 		}
+		writer.write(">>>>>in creating:\ttried parameters:\tN =\t" + n
+				+ ", trial =");
+		for (int i = 0; i < dimension; i++) {
+			writer.write("\t" + trial[i]);
+		}
+		writer.writeln();
+		writer.flush();
 	}
 }

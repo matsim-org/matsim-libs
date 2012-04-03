@@ -56,6 +56,8 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 	private SimpleWriter writer = null;
 
+	private int n = 0;
+
 	public int getAvgLlhOverIters() {
 		return avgLlhOverIters;
 	}
@@ -73,36 +75,36 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 		int iter = event.getIteration();
 		Controler ctl = event.getControler();
 		// TESTS: calculate log-likelihood -(q-y)^2/(2sigma^2)
-		if (writeLlhInterval > 0 && avgLlhOverIters > 0) {
+		if (writeLlhInterval > 0 && avgLlhOverIters > 0
+				&& iter > ctl.getFirstIteration()) {
 			int nextWriteLlhInterval = writeLlhInterval
 					* (iter / writeLlhInterval + 1);
 			if (iter <= nextWriteLlhInterval
 					&& iter > nextWriteLlhInterval - avgLlhOverIters
-					|| iter % writeLlhInterval == 0) {
+			// || iter % writeLlhInterval == 0
+			) {
 				VolumesAnalyzer volumes = ctl.getVolumes();
 				Network network = ctl.getNetwork();
 
 				for (Map.Entry<Id, Count> entry : ctl.getCounts().getCounts()
 						.entrySet()) {
-					Link link = network.getLinks().get(entry.getKey());
+					Id countId = entry.getKey();
+					Link link = network.getLinks().get(countId);
 					if (link == null) {
 						System.err.println("could not find link "
-								+ entry.getKey().toString());
-					} else if (isInRange(entry.getKey(), network)) {
+								+ countId.toString());
+					} else if (isInRange(countId, network)) {
 						// for ...2QGIS
 						// links.add(network.getLinks().get(entry.getKey()));
 						// linkIds.add(entry.getKey());
+
+						int[] linkVols = volumes.getVolumesForLink(countId);
 						// ---------GUNNAR'S CODES---------------------
 						for (Volume volume : entry.getValue().getVolumes()
 								.values()) {
 							int hour = volume.getHour();
 							if (hour >= caliStartTime && hour <= caliEndTime) {
-								// int start_s = (hour - 1) * 3600;
-								// int end_s = hour * 3600 - 1;
 								double cntVal = volume.getValue();
-
-								int[] linkVols = volumes.getVolumesForLink(link
-										.getId());
 								double simVal = 0d;
 								if (linkVols != null) {
 									simVal = linkVols[hour - 1]
@@ -114,11 +116,13 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 								double absLlh = (simVal - cntVal)
 										* (simVal - cntVal) / 2d / var;
 								llhSum -= absLlh;
+								n++;
 								writer.writeln("ITER\t" + iter
-										+ "\tAccumulated Llh over "
-										+ avgLlhOverIters + " iterations =\t"
-										+ llhSum + "\tadded llh =\t-" + absLlh);
+										+ "\tAccumulated Llh over " + n
+										+ " iterations =\t" + llhSum
+										+ "\tadded llh =\t-" + absLlh);
 								writer.flush();
+
 							}
 						}
 					}
@@ -126,12 +130,13 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 			}
 			if (iter % writeLlhInterval == 0) {
 				// calculate avg. value of llh
-				avgLlh = llhSum / avgLlhOverIters;
-				writer.writeln("ITER\t" + iter + "\tavgLlh over "
-						+ avgLlhOverIters + " iterations =\t" + avgLlh
-						+ "\tsum of Llh =\t" + llhSum);
+				avgLlh = llhSum / n;
+				writer.writeln("ITER\t" + iter + "\tavgLlh over " + n
+						+ " iterations =\t" + avgLlh + "\tsum of Llh =\t"
+						+ llhSum);
 				writer.flush();
 				llhSum = 0d;// refresh
+				n = 0;
 			}
 		}
 	}

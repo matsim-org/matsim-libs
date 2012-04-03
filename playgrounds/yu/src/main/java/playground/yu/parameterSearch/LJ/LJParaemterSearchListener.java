@@ -88,7 +88,22 @@ public class LJParaemterSearchListener extends PatternSearchListener implements
 			}
 		}
 
-		patternSearch = new LJAlgorithm(lowerBoundaries, upperBoundaries);
+		double criterion = 0.1;
+		String criterionStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, CRITERION);
+		if (criterionStr != null) {
+			criterion = Double.parseDouble(criterionStr);
+		}
+
+		int maxIter = 300;
+		String maxIterStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, MAX_ITER);
+		if (maxIterStr != null) {
+			maxIter = Integer.parseInt(maxIterStr);
+		}
+
+		patternSearch = new LJAlgorithm(lowerBoundaries, upperBoundaries,
+				criterion, maxIter);
 		((LJAlgorithm) patternSearch).setOutputFilename(ctl.getControlerIO()
 				.getOutputFilename("LJ.log"));
 		double[] parameters = new double[paramDim];

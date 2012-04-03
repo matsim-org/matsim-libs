@@ -64,6 +64,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	private int correctedPlanNb = 0;
 
 	final double minStdDev, varianceScale;
+	final int parameterUpdateInterval;
 	private PCCtlListener cltListener = null;
 
 	public PCStrMn(Network net, int firstIteration, Config config) {
@@ -81,6 +82,12 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		varianceScale = varianceScaleStr != null ? Double
 				.parseDouble(varianceScaleStr)
 				: Calibrator.DEFAULT_VARIANCE_SCALE;
+
+		final String parameterUpdateIntervalStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
+				"parameterUpdateInterval");
+		parameterUpdateInterval = parameterUpdateIntervalStr != null ? Integer
+				.parseInt(parameterUpdateIntervalStr) : 1;
 
 		pe = new ParameterEstimator();
 	}
@@ -101,7 +108,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 																	 * betaTravelingPtAttr
 																	 * .
 																	 */
-				+ "\tvar.\t" + statistics[1]/* betaTravelingPtAttr. */
+				+ "\tvar.\t" + statistics[1]/* constantLeftTurn */
 				+ "\tavg.\t" + statistics[2] + "\tvar.\t" + statistics[3]);
 	}
 
@@ -164,7 +171,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			List<Double> attrList = attrs.get(PCCtlListener.paramNames[i]);
 			for (int j = 0; j < attrList.size(); j++) {
 				attrM.set(j, i,/* CAUTION, the order of j and i */
-				attrList.get(j));
+						attrList.get(j));
 			}
 		}
 		// attrs.clear();
@@ -186,60 +193,61 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		betaTravelingStats = new BasicStatistics();
 		constantLeftTurnStats = new BasicStatistics();
 
-		// ((Events2Score4PC) chooser).createWriter();
+		if (iter % parameterUpdateInterval == 0) {
+			correctedPlanNb = 0;
+			// (re)initializes attrs and utilCorrs
+			attrs = new TreeMap<String, List<Double>>();
+			for (String paramName : PCCtlListener.paramNames) {
+				attrs.put(paramName, new ArrayList<Double>());
+			}
+			utilCorrs = new ArrayList<Double>();
 
-		correctedPlanNb = 0;
-		// (re)initializes attrs and utilCorrs
-		attrs = new TreeMap<String, List<Double>>();
-		for (String paramName : PCCtlListener.paramNames) {
-			attrs.put(paramName, new ArrayList<Double>());
-		}
-		utilCorrs = new ArrayList<Double>();
+			for (Person person : population.getPersons().values()) {
+				// now there could be #maxPlansPerAgent+?# Plans in choice set
+				// *********************UTILITY CORRECTION********************
+				// ***before removePlans and plan choice, correct utility***
+				generateScoreCorrections(person);
+			}
+			if (correctedPlanNb > 0) {
+				// calculate least squares and get delta parameter from
+				// ParameterEstimator and set new parameters in MNL
+				DenseMatrix64F estimatedParams = calculateDeltaParameter(correctedPlanNb);
 
-		for (Person person : population.getPersons().values()) {
-			// now there could be #maxPlansPerAgent+?# Plans in choice set
-			// *********************UTILITY CORRECTION********************
-			// ***before removePlans and plan choice, correct utility***
-			generateScoreCorrections(person);
-		}
-		if (correctedPlanNb > 0) {
-			// calculate least squares and get delta parameter from
-			// ParameterEstimator and set new parameters in MNL
-			DenseMatrix64F estimatedParams = calculateDeltaParameter(correctedPlanNb);
+				//
+				MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
+						.getMultinomialLogit();
+				for (int i = 0; i < PCCtlListener.paramNames.length; i++) {
+					double deltaParam = estimatedParams.get(i, 0/* CAUTION! */);
+					int paramIdx = Events2Score4AttrRecorder.attrNameList
+							.indexOf(PCCtlListener.paramNames[i]);
+					double oldParamVal = mnl.getParameter(paramIdx);
+					double newParamVal = oldParamVal + deltaParam;
+					mnl.setParameter(paramIdx, newParamVal);
+					if (i == 0) {
+						betaTravelingStats.add(newParamVal);
+					} else if (i == 1) {
+						constantLeftTurnStats.add(newParamVal);
+					}
 
-			//
-			MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
-					.getMultinomialLogit();
-			for (int i = 0; i < PCCtlListener.paramNames.length; i++) {
-				double deltaParam = estimatedParams.get(i, 0/* CAUTION! */);
-				int paramIdx = Events2Score4AttrRecorder.attrNameList
-						.indexOf(PCCtlListener.paramNames[i]);
-				double oldParamVal = mnl.getParameter(paramIdx);
-				double newParamVal = oldParamVal + deltaParam;
-				mnl.setParameter(paramIdx, newParamVal);
-				if (i == 0) {
-					betaTravelingStats.add(newParamVal);
-				} else if (i == 1) {
-					constantLeftTurnStats.add(newParamVal);
+					// set new parameters in config
+					PlanCalcScoreConfigGroup scoringCfg = config
+							.planCalcScore();
+					if (scoringCfg.getParams().containsKey(
+							PCCtlListener.paramNames[i])) {
+						scoringCfg.addParam(PCCtlListener.paramNames[i],
+								Double.toString(newParamVal));
+					} else {
+						config.setParam(
+								CalibrationConfig.BSE_CONFIG_MODULE_NAME,
+								PCCtlListener.paramNames[i],
+								Double.toString(newParamVal));
+					}
+
+					// ?((Events2ScoreWithLeftTurnPenalty4PC)
+					// chooser).setMultinomialLogit(mnl);
 				}
-
-				// set new parameters in config
-				PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
-				if (scoringCfg.getParams().containsKey(
-						PCCtlListener.paramNames[i])) {
-					scoringCfg.addParam(PCCtlListener.paramNames[i],
-							Double.toString(newParamVal));
-				} else {
-					config.setParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME,
-							PCCtlListener.paramNames[i],
-							Double.toString(newParamVal));
-				}
-
-				// ?((Events2ScoreWithLeftTurnPenalty4PC)
-				// chooser).setMultinomialLogit(mnl);
 			}
 		}
-
 		for (Person person : population.getPersons().values()) {
 			/* ***********************************************************
 			 * scoringCfg has been done, but they should be newly defined
@@ -300,7 +308,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	/**
 	 * generates score corrections, and also prepares the Attr-Matrix and
 	 * UC-Vector
-	 * 
+	 *
 	 * @param person
 	 *            *
 	 */
@@ -345,9 +353,9 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 
 	/**
 	 * judge if there is too low count during the plan
-	 * 
+	 *
 	 * @param pcCtlListener
-	 * 
+	 *
 	 * @param plan
 	 * @return
 	 */

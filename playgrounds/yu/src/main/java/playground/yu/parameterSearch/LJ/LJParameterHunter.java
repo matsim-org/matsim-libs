@@ -35,6 +35,7 @@ public class LJParameterHunter extends LeftTurnPenaltyControler {
 		addControlerListener(llhListener);
 		addControlerListener(new LJParaemterSearchListener());
 		setOverwriteFiles(true);
+		setCreateGraphs(false);
 		run();
 	}
 

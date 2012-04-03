@@ -241,8 +241,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 					double simVal = resultsContainer.getSimValue(network
 							.getLinks().get(linkId), entryTime_s,
 							entryTime_s + 3599, TYPE.FLOW_VEH_H);
-					uc += 1d - simVal/* simVal */
-							/ countVal;
+					uc += (countVal - simVal)/* simVal */
+							/ Math.max(countVal, 2500/* TODO */);
 				}
 			}
 		}

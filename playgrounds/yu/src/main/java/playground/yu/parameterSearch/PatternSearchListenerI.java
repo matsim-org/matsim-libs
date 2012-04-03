@@ -26,9 +26,10 @@ import java.util.TreeMap;
 import org.matsim.core.controler.listener.ControlerListener;
 
 public interface PatternSearchListenerI extends ControlerListener {
-	static final String LOWER_BOUNDARY_OF_PARAMETER_ = "lowerBoundaryOfParameter_"//
-	,
-			UPPER_BOUNDARY_OF_PARAMETER_ = "upperBoundaryOfParameter_";
+	static final String LOWER_BOUNDARY_OF_PARAMETER_ = "lowerBoundaryOfParameter_",
+			UPPER_BOUNDARY_OF_PARAMETER_ = "upperBoundaryOfParameter_",
+			CRITERION = "criterion", MAX_ITER = "maxIter";
+
 	static final Map<String, Double> nameParametersMap = new TreeMap<String, Double>();
 
 	static final String PERFORMING = "performing", TRAVELING = "traveling",
