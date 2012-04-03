@@ -61,6 +61,8 @@ public class PStrategyManager {
 			strategy = new IncreaseNumberOfVehicles(settings.getParametersAsArrayList());
 		} else if (name.equals(AddRandomStop.STRATEGY_NAME)) {
 			strategy = new AddRandomStop(settings.getParametersAsArrayList());
+		} else if (name.equals(AggressiveIncreaseNumberOfVehicles.STRATEGY_NAME)) {
+			strategy = new AggressiveIncreaseNumberOfVehicles(settings.getParametersAsArrayList());
 		} else if (name.equals(TimeReduceDemand.STRATEGY_NAME)) {
 			TimeReduceDemand strat = new TimeReduceDemand(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);

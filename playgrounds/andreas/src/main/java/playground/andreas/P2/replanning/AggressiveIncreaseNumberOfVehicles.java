@@ -35,7 +35,7 @@ public class AggressiveIncreaseNumberOfVehicles extends PStrategy implements PPl
 		
 		int vehicleBought = 0;
 		
-		while (cooperative.getBudget() > cooperative.getCostPerVehicleBuy() * 1.5) {
+		while (cooperative.getBudget() > cooperative.getCostPerVehicleBuy()) {
 			// budget ok, buy one
 			cooperative.setBudget(cooperative.getBudget() - cooperative.getCostPerVehicleBuy());
 			vehicleBought++;
