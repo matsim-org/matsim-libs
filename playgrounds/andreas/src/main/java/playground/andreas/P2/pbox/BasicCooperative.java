@@ -169,6 +169,14 @@ public class BasicCooperative implements Cooperative{
 					// can afford to use one vehicle for testing, get a new testPlan
 					PPlanStrategy strategy = pStrategyManager.chooseStrategy();
 					this.testPlan = strategy.run(this);
+					if (this.testPlan == null) {
+						strategy = pStrategyManager.chooseStrategy();
+						this.testPlan = strategy.run(this);
+					}
+					if (this.testPlan == null) {
+						strategy = pStrategyManager.chooseStrategy();
+						this.testPlan = strategy.run(this);
+					}
 //					if(this.testPlan != null){
 //						this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 //					}
