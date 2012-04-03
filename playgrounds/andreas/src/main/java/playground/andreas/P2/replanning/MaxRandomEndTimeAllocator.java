@@ -18,8 +18,7 @@ import playground.andreas.P2.plan.PPlan;
  */
 public class MaxRandomEndTimeAllocator extends PStrategy implements PPlanStrategy{
 	
-	private final static Logger log = Logger.getLogger(MaxRandomEndTimeAllocator.class);
-	
+	private final static Logger log = Logger.getLogger(MaxRandomEndTimeAllocator.class);	
 	public static final String STRATEGY_NAME = "MaxRandomEndTimeAllocator";
 	
 	public MaxRandomEndTimeAllocator(ArrayList<String> parameter) {
@@ -31,7 +30,11 @@ public class MaxRandomEndTimeAllocator extends PStrategy implements PPlanStrateg
 	
 	@Override
 	public PPlan run(Cooperative cooperative) {
-		// profitable route, change startTime
+		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			return null;
+		}
+		
+		// enough vehicles to test, change endTime
 		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
@@ -41,6 +44,8 @@ public class MaxRandomEndTimeAllocator extends PStrategy implements PPlanStrateg
 		newPlan.setEndTime(newEndTime);
 		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
+		
+		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
 		
 		return newPlan;
 	}

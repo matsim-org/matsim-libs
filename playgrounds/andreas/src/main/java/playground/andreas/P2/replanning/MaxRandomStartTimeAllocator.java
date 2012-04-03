@@ -30,7 +30,11 @@ public class MaxRandomStartTimeAllocator extends PStrategy implements PPlanStrat
 
 	@Override
 	public PPlan run(Cooperative cooperative) {
-		// profitable route, change startTime
+		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			return null;
+		}
+		
+		// enough vehicles to test, change startTime
 		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
@@ -41,6 +45,8 @@ public class MaxRandomStartTimeAllocator extends PStrategy implements PPlanStrat
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 
+		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
+		
 		return newPlan;
 	}
 	

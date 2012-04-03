@@ -27,6 +27,13 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.pbox.BasicCooperative;
+import playground.andreas.P2.pbox.Cooperative;
+import playground.andreas.P2.pbox.PFranchise;
+import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
+import playground.andreas.P2.plan.PRouteProvider;
+
 /**
  * Creates an car grid network with one pt line.
  *  
@@ -34,6 +41,19 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  */
 public class PScenarioHelper {
+	
+	public static Cooperative createTestCooperative(){
+		Scenario sC = PScenarioHelper.createTestNetwork();
+		
+		PConfigGroup pC = new PConfigGroup();
+		Cooperative coop = new BasicCooperative(new IdImpl(pC.getPIdentifier() + 1), pC, new PFranchise(pC.getUseFranchise()));
+		
+		PRouteProvider rP = new ComplexCircleScheduleProvider(pC.getPIdentifier(), sC.getTransitSchedule(), sC.getNetwork(), 0);
+		
+		coop.init(rP, 0);
+		
+		return coop;
+	}
 	
 	public static Scenario createTestNetwork() {
 		
