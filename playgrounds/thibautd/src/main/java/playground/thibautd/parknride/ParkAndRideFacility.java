@@ -79,7 +79,10 @@ public class ParkAndRideFacility implements Facility {
 	 * "transfer" links of the routing network.
 	 *
 	 * @return the list of associated stops Ids, as they are referenced in the schedule
+	 * @deprecated this is not actually used to determine the pt stops asociated
+	 * with a PNR facility! The PT router walk distance is used instead!
 	 */
+	@Deprecated 
 	public List<Id> getStopsFacilitiesIds() {
 		return stopsIds;
 	}
