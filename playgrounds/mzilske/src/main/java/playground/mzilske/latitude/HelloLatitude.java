@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -22,7 +23,9 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -49,7 +52,7 @@ public class HelloLatitude {
 
 		Config config = ConfigUtils.createConfig();
 		config.global().setCoordinateSystem(COORDINATE_SYSTEM);
-		config.otfVis().setMapOverlayMode(true);
+		// config.otfVis().setMapOverlayMode(true);
 		MatsimRandom.reset(config.global().getRandomSeed());
 		if (config.getQSimConfigGroup() == null) {
 			config.addQSimConfigGroup(new QSimConfigGroup());
@@ -131,7 +134,8 @@ public class HelloLatitude {
 		Person p = scenario.getPopulation().getFactory().createPerson(new IdImpl("p"));
 		Plan pl = scenario.getPopulation().getFactory().createPlan();
 		for (Location location : locations) {
-			System.out.println(location + " " + new Date(Long.parseLong((String) location.getTimestampMs())));
+			long miliseconds = Long.parseLong((String) location.getTimestampMs());
+			System.out.println(location + " " + new Date(miliseconds));
 			Coord coord = getCoord(location);
 			Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("unknown", coord);
 			pl.addActivity(activity);
@@ -153,7 +157,13 @@ public class HelloLatitude {
 
 	private static void play(Scenario scenario) {
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
+		QSim qSim = new QSim(scenario, events);
+		MyActivityEngine activityEngine = new MyActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine qNetsimEngine = new QNetsimEngine( qSim, new Random());
+		qSim.addMobsimEngine(qNetsimEngine);
+		qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(), new DefaultAgentFactory(qSim), qSim));
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 		JXMapOTFVisClient.run(scenario.getConfig(), server);
 		qSim.run();
