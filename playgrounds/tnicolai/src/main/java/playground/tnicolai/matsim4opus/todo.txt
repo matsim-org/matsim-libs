@@ -1,6 +1,6 @@
 Todos:
 
-- Error while importing travel_data into UrbanSim ???
+
 - MATSimZone: test or implement controllers
 - test different beta values
 - test accessibility measure paired with workers or 1-person hh or income in UrbanSim
@@ -15,3 +15,6 @@ Tasks Done:
 - implement normal MATSim config as input
 - Brussel scenario: matching coordinates of zone centroids and network -> created new network with right projection
 - re-implement: determine measuring point to process via cell centroid and not the left bottom corner (shapefiles)
+
+Fixed errors:
+- Error while importing Brussels travel_data into UrbanSim -> Problem solved, the "travel_data" dataset was empty. Just imported the travel_data.csv output from MATSim
