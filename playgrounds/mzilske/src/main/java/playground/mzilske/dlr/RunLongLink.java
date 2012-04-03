@@ -175,7 +175,7 @@ public class RunLongLink {
 		});
 		events.addHandler(eventsToLegs);
 
-		QSim qSim = new QSim(scenario, events, new QNetsimEngineFactory() {
+		QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, new QNetsimEngineFactory() {
 
 			@Override
 			public QNetsimEngine createQSimEngine(Netsim sim, Random random) {

@@ -62,7 +62,7 @@ public class TransitControler extends Controler {
         } else {
             netsimEngFactory = new DefaultQSimEngineFactory();
         }
-        QSim qSim = new QSim(sc, eventsManager, netsimEngFactory);
+        QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
         AgentFactory agentFactory = new TransitAgentFactory(qSim);
         TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
         transitEngine.setUseUmlaeufe(true);

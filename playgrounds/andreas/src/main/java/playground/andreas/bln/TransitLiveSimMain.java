@@ -47,7 +47,7 @@ public class TransitLiveSimMain {
 		reconstructingUmlaufBuilder.build();
 
 		EventsManager events = EventsUtils.createEventsManager();
-        QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+        QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
         AgentFactory agentFactory;
             agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);

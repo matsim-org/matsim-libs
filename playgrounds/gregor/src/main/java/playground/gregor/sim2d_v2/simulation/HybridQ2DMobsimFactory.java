@@ -38,7 +38,7 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		} else {
 			netsimEngFactory = new DefaultQSimEngineFactory();
 		}
-		QSim qSim = new QSim(sc, eventsManager, netsimEngFactory);
+		QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
 		AgentFactory agentFactory;
 
 		if (!sc.getConfig().controler().getMobsim().equals("hybridQ2D")) {

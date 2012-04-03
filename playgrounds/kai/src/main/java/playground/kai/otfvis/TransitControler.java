@@ -87,7 +87,7 @@ public class TransitControler {
 			} else {
 				netsimEngFactory = new DefaultQSimEngineFactory();
 			}
-			QSim qSim = new QSim(sc, eventsManager1, netsimEngFactory);
+			QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager1, netsimEngFactory);
 			AgentFactory agentFactory= new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setUseUmlaeufe(true);

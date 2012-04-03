@@ -64,7 +64,7 @@ public class Run {
 		
 		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new LogOutputEventHandler());
-		final QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+		final QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
 
 		
 		AgentFactory fac = new AgentFactory() {

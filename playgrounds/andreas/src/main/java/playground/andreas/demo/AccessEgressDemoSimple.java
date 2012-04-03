@@ -283,7 +283,8 @@ public class AccessEgressDemoSimple {
 		RouteTimeDiagram diagram = new RouteTimeDiagram();
 		events.addHandler(diagram);
 
-        QSim qSim = new QSim(this.scenario, events, new DefaultQSimEngineFactory());
+        QSim qSim = QSim.createQSimWithDefaultEngines(this.scenario, events,
+				new DefaultQSimEngineFactory());
         AgentFactory agentFactory;
             agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);

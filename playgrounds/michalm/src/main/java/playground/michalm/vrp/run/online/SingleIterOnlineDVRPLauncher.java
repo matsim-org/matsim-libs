@@ -179,7 +179,7 @@ public class SingleIterOnlineDVRPLauncher
 
         EventsManager events = EventsUtils.createEventsManager();
 
-        QSim sim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+        QSim sim = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
 
         TaxiSimEngine taxiSimEngine = new TaxiSimEngine(sim, data.getVrpData(), optimizerFactory);
         sim.addMobsimEngine(taxiSimEngine);

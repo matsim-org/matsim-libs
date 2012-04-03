@@ -77,7 +77,7 @@ public class ParkingQSimFactory implements MobsimFactory {
         } else {
             netsimEngFactory = new DefaultQSimEngineFactory();
         }
-        QSim qSim = new QSim(sc, eventsManager, netsimEngFactory);
+        QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
         		insertParkingActivities, parkingInfrastructure);

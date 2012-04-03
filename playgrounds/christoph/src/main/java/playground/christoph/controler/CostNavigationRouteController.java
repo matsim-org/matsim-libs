@@ -212,7 +212,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 		 * ... otherwise the events file is parsed and analyzed.
 		 */
 		else {
-			QSim qSim = new QSim(scenarioData, events, new DefaultQSimEngineFactory());
+			QSim qSim = QSim.createQSimWithDefaultEngines(scenarioData, events, new DefaultQSimEngineFactory());
 			ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
 			PopulationAgentSource agentSource = new PopulationAgentSource(scenarioData.getPopulation(), agentFactory, qSim);
 			qSim.addAgentSource(agentSource);

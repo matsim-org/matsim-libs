@@ -41,7 +41,7 @@ public class DgWithindayMobsimFactory implements MobsimFactory {
 	 */
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSim qSim = new QSim(sc, eventsManager, new DefaultQSimEngineFactory());
+		QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, new DefaultQSimEngineFactory());
 		AgentFactory agentFactory = new DgWithindayAgentFactory(qSim, MatsimRandom.getLocalInstance());
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);

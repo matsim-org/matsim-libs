@@ -76,7 +76,7 @@ public class EvacuationQSimFactory implements MobsimFactory {
         } else {
             netsimEngFactory = new DefaultQSimEngineFactory();
         }
-        QSim qSim = new QSim(sc, eventsManager, netsimEngFactory);
+        QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim);
         qSim.addAgentSource(agentSource);
