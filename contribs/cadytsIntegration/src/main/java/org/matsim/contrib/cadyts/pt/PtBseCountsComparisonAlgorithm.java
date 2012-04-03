@@ -95,9 +95,7 @@ class PtBseCountsComparisonAlgorithm {
 				System.out.println("InRange?\t" + isInRange(count.getCoord()));
 				continue;
 			}
-			// -------------------------------------------------------------------
 			int[] volumes = this.getVolumesForStop(stopId);
-			// ------------------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 			if (volumes == null) {
 				log.warn(this.STR_NOVOLUMES + stopId);
 				continue;

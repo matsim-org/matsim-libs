@@ -82,24 +82,16 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 	NewPtBsePlanChanger ptBsePlanChanger;
 
 	public NewPtBsePlanStrategy(final Controler controler) {
-		// IMPORTANT: Do not change this constructor. It needs to be like this in order to be callable
-		// as a "Module"
+		// IMPORTANT: Do not change this constructor. It needs to be like this in order to be callable as a "Module"
 		// from the config file. kai/manuel, dec'10
 
-		// remember the controler: (yyyy I don't think this is necessary. kai, jul'11) done manuel.
-		// this.controler = controler ;
-
-		// add "this" to the events channel so that reset is called between iterations
-		// (yyyy I think this should now be better done by the controler listener mechanics. kai,
-		// jul'11)
-		/* this.controler.getEvents().addHandler( this ) ; no more */
-		/* this. */controler.addControlerListener(this);
+		controler.addControlerListener(this);
 
 		// set up the bus occupancy analyzer ...
 		this.ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
-		/* this. */controler.getEvents().addHandler(this.ptBseOccupAnalyzer); // only here, and removed from
-																																			// notifyBeforeMobsim and
-																																			// notifyAfterMobsim.
+		controler.getEvents().addHandler(this.ptBseOccupAnalyzer);
+		// only here, and removed from notifyBeforeMobsim and notifyAfterMobsim.
+
 		// ... and connect it to the simResults container:
 		this.simResults = new SimResultsContainerImpl(this.ptBseOccupAnalyzer);
 
@@ -108,16 +100,14 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		// yyyyyy passing ptBseOccupAnalyzer into PtPlanToPlanStepBasedOnEvents is, I think, unnecessary
 		// and should be avoided.
 		// See there. kai, jul'11
-		/* this. */controler.getEvents().addHandler(ptStep);
+		controler.getEvents().addHandler(ptStep);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator( /* this. */controler.getScenario());
+		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario());
 
 		// finally, we create the PlanStrategy, with the bse-based plan selector:
-		// Original this.delegate = new PlanStrategyImpl( new NewPtBsePlanChanger( ptStep,
-		// this.calibrator ) ) ;
-		this.ptBsePlanChanger = new NewPtBsePlanChanger(ptStep, this.calibrator); // 8 sep
-		this.delegate = new PlanStrategyImpl(this.ptBsePlanChanger); // 8 sep
+		this.ptBsePlanChanger = new NewPtBsePlanChanger(ptStep, this.calibrator);
+		this.delegate = new PlanStrategyImpl(this.ptBsePlanChanger);
 
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
 
@@ -147,30 +137,6 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 
 		controler.getScenario().addScenarioElement(this.occupCounts);
 	}
-
-	/*
-	 * @Override public void reset(int iteration) { // yyyy since this is now also a controler
-	 * listener, material in here should be moved to "notifyIterationEnds". kai, jul'11
-	 *
-	 * String filename = this.controler.getControlerIO().getIterationFilename(iteration,
-	 * STR_LINKOFFSETFILE) ;
-	 *
-	 * //show in log the results of sim volumes //System.out.println( "resultsContainer.toString() " +
-	 * simResults.toString() ) ;
-	 *
-	 * // mobsim results are in resultsContainer, which is (implicitly) an events listener.
-	 * Communicate them to the calibrator: this.calibrator.afterNetworkLoading(this.simResults);
-	 *
-	 * // the remaining material is, in my view, "just" output: try { PtBseLinkCostOffsetsXMLFileIO
-	 * ptBseLinkCostOffsetsXMLFileIO = new PtBseLinkCostOffsetsXMLFileIO(
-	 * this.controler.getScenario().getTransitSchedule() ); ptBseLinkCostOffsetsXMLFileIO.write(
-	 * filename , this.calibrator.getLinkCostOffsets()); ptBseLinkCostOffsetsXMLFileIO = null;
-	 * }catch(IOException e) { e.printStackTrace(); }
-	 *
-	 * }
-	 *
-	 * @Override public void handleEvent(AdditionalTeleportationDepartureEvent eve) { // dummy }
-	 */
 
 	// Analysis methods
 	// /////////////////////////////////////////////////////
@@ -205,7 +171,6 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		}
 	}
 
-	// Determines the pt counts interval (currently each 10 iterations)
 	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
 		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0) && (iter >= controler.getFirstIteration());
 	}
@@ -220,8 +185,8 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
 
-		// /////originally this was in reset method//////////////
 		this.calibrator.afterNetworkLoading(this.simResults);
+
 		// the remaining material is, in my view, "just" output:
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), STR_LINKOFFSETFILE);
 		try {
@@ -229,8 +194,8 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 			ptBseLinkCostOffsetsXMLFileIO.write(filename, this.calibrator.getLinkCostOffsets());
 			ptBseLinkCostOffsetsXMLFileIO = null;
 		} catch (IOException e) {
-			e.printStackTrace();
-		}// /////////////////////////////////////////////////////
+			log.error(e);
+		}
 
 		generateAndWriteCountsComparisons(event);
 	}

@@ -63,8 +63,8 @@ public class CadytsIntegrationTest {
 
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
-		Assert.assertEquals("Diferent number of links in network.", controler.getNetwork().getLinks().size() , 23 );
-		Assert.assertEquals("Diferent number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
+		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
+		Assert.assertEquals("Different number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
 		Assert.assertNotNull("Transit schedule is null.", controler.getScenario().getTransitSchedule());
 		Assert.assertEquals("Num. of trLines is wrong.", controler.getScenario().getTransitSchedule().getTransitLines().size() , 1);
 		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 5);
@@ -110,18 +110,18 @@ public class CadytsIntegrationTest {
 			e.printStackTrace();
 		}
 		CalibrationStatReader.StatisticsData statData6= calibrationStatReader.getCalStatMap().get(Integer.valueOf(6));
-		Assert.assertEquals("diferrent Count_ll", statData6.getCount_ll() , "-1.546875" );
-		Assert.assertEquals("diferrent Count_ll_pred_err", statData6.getCount_ll_pred_err() , "9.917082938182276E-8" );
-		Assert.assertEquals("diferrent Link_lambda_avg", statData6.getLink_lambda_avg() , "0.0013507168476099964" );
-		Assert.assertEquals("diferrent Link_lambda_max", statData6.getLink_lambda_max() , "0.031434867572002166" );
-		Assert.assertEquals("diferrent Link_lambda_min", statData6.getLink_lambda_min() , "0.0" );
-		Assert.assertEquals("diferrent Link_lambda_stddev", statData6.getLink_lambda_stddev() , "0.0058320747961925256" );
-		Assert.assertEquals("diferrent P2p_ll", statData6.getP2p_ll() , "--" );
-		Assert.assertEquals("diferrent Plan_lambda_avg", statData6.getPlan_lambda_avg() , "0.04322293912351989" );
-		Assert.assertEquals("diferrent Plan_lambda_max", statData6.getPlan_lambda_max() , "0.04715229919344063" );
-		Assert.assertEquals("diferrent Plan_lambda_min", statData6.getPlan_lambda_min() , "0.03929357905359915" );
-		Assert.assertEquals("diferrent Plan_lambda_stddev", statData6.getPlan_lambda_stddev() , "0.004200662608832472" );
-		Assert.assertEquals("diferrent Total_ll", statData6.getTotal_ll() , "-1.546875" );
+		Assert.assertEquals("differrent Count_ll", statData6.getCount_ll() , "-1.546875" );
+		Assert.assertEquals("differrent Count_ll_pred_err", statData6.getCount_ll_pred_err() , "9.917082938182276E-8" );
+		Assert.assertEquals("differrent Link_lambda_avg", statData6.getLink_lambda_avg() , "0.0013507168476099964" );
+		Assert.assertEquals("differrent Link_lambda_max", statData6.getLink_lambda_max() , "0.031434867572002166" );
+		Assert.assertEquals("differrent Link_lambda_min", statData6.getLink_lambda_min() , "0.0" );
+		Assert.assertEquals("differrent Link_lambda_stddev", statData6.getLink_lambda_stddev() , "0.0058320747961925256" );
+		Assert.assertEquals("differrent P2p_ll", statData6.getP2p_ll() , "--" );
+		Assert.assertEquals("differrent Plan_lambda_avg", statData6.getPlan_lambda_avg() , "0.04322293912351989" );
+		Assert.assertEquals("differrent Plan_lambda_max", statData6.getPlan_lambda_max() , "0.04715229919344063" );
+		Assert.assertEquals("differrent Plan_lambda_min", statData6.getPlan_lambda_min() , "0.03929357905359915" );
+		Assert.assertEquals("differrent Plan_lambda_stddev", statData6.getPlan_lambda_stddev() , "0.004200662608832472" );
+		Assert.assertEquals("differrent Total_ll", statData6.getTotal_ll() , "-1.546875" );
 
 		//now test calibration-stats.txt from calibration
 		String testCalibStatPath = outputDir + "calibration-stats.txt";
@@ -133,18 +133,18 @@ public class CadytsIntegrationTest {
 		}
 
 		CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(Integer.valueOf(6));
-		Assert.assertEquals("diferrent Count_ll", "-1.546875", outStatData.getCount_ll() );
-		Assert.assertEquals("diferrent Count_ll_pred_err",  "9.917082938182276E-8" , outStatData.getCount_ll_pred_err() );
-		Assert.assertEquals("diferrent Link_lambda_avg", "0.0013507168476099964", outStatData.getLink_lambda_avg() );
-		Assert.assertEquals("diferrent Link_lambda_max", "0.031434867572002166" , outStatData.getLink_lambda_max() );
-		Assert.assertEquals("diferrent Link_lambda_min", "0.0", outStatData.getLink_lambda_min() );
-		Assert.assertEquals("diferrent Link_lambda_stddev", "0.0058320747961925256" , outStatData.getLink_lambda_stddev());
-		Assert.assertEquals("diferrent P2p_ll", "--" , outStatData.getP2p_ll());
-		Assert.assertEquals("diferrent Plan_lambda_avg", "0.04322293912351989", outStatData.getPlan_lambda_avg() );
-		Assert.assertEquals("diferrent Plan_lambda_max", "0.04715229919344063" , outStatData.getPlan_lambda_max() );
-		Assert.assertEquals("diferrent Plan_lambda_min", "0.03929357905359915" , outStatData.getPlan_lambda_min() );
-		Assert.assertEquals("diferrent Plan_lambda_stddev", "0.004200662608832472" , outStatData.getPlan_lambda_stddev());
-		Assert.assertEquals("diferrent Total_ll", "-1.546875", outStatData.getTotal_ll() );
+		Assert.assertEquals("differrent Count_ll", "-1.546875", outStatData.getCount_ll() );
+		Assert.assertEquals("differrent Count_ll_pred_err",  "9.917082938182276E-8" , outStatData.getCount_ll_pred_err() );
+		Assert.assertEquals("differrent Link_lambda_avg", "0.0013507168476099964", outStatData.getLink_lambda_avg() );
+		Assert.assertEquals("differrent Link_lambda_max", "0.031434867572002166" , outStatData.getLink_lambda_max() );
+		Assert.assertEquals("differrent Link_lambda_min", "0.0", outStatData.getLink_lambda_min() );
+		Assert.assertEquals("differrent Link_lambda_stddev", "0.0058320747961925256" , outStatData.getLink_lambda_stddev());
+		Assert.assertEquals("differrent P2p_ll", "--" , outStatData.getP2p_ll());
+		Assert.assertEquals("differrent Plan_lambda_avg", "0.04322293912351989", outStatData.getPlan_lambda_avg() );
+		Assert.assertEquals("differrent Plan_lambda_max", "0.04715229919344063" , outStatData.getPlan_lambda_max() );
+		Assert.assertEquals("differrent Plan_lambda_min", "0.03929357905359915" , outStatData.getPlan_lambda_min() );
+		Assert.assertEquals("differrent Plan_lambda_stddev", "0.004200662608832472" , outStatData.getPlan_lambda_stddev());
+		Assert.assertEquals("differrent Total_ll", "-1.546875", outStatData.getTotal_ll() );
 
 		//test resulting simulation volumes
 		String outCounts = outputDir + "ITERS/it.10/10.simCountCompareOccupancy.txt";
@@ -176,9 +176,6 @@ public class CadytsIntegrationTest {
 		realValues= reader.getRealValues(stopId);
 		Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
-
 	}
-
-
 
 }

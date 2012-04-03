@@ -33,10 +33,9 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 /**
  * @author nagel
  */
-class NewPtBsePlanChanger implements PlanSelector {
-	private static final Logger log = Logger.getLogger(NewPtBsePlanChanger.class);
+/*package*/ class NewPtBsePlanChanger implements PlanSelector {
 
-	private static boolean scoreWrnFlag = true;
+	private static final Logger log = Logger.getLogger(NewPtBsePlanChanger.class);
 
 	private final double beta = 1.0;
 
@@ -45,10 +44,8 @@ class NewPtBsePlanChanger implements PlanSelector {
 	private final MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator;
 
 	private boolean cadCorrMessGiven = false;
-	private final String STR_CURRCORR = "currPlanCadytsCorr: ";
-	private final String STR_OTHERCORR = " otherPlanCadytsCorr: ";
 
-	NewPtBsePlanChanger(final PtPlanToPlanStepBasedOnEvents ptStep, final MATSimUtilityModificationCalibrator<TransitStopFacility> calib) {
+	/*package*/ NewPtBsePlanChanger(final PtPlanToPlanStepBasedOnEvents ptStep, final MATSimUtilityModificationCalibrator<TransitStopFacility> calib) {
 		log.error("value for beta currently ignored (set to one)");
 		this.ptPlanToPlanStep = ptStep;
 		this.matsimCalibrator = calib;
@@ -82,8 +79,8 @@ class NewPtBsePlanChanger implements PlanSelector {
 		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection;
 
 		if (currentPlanCadytsCorrection != otherPlanCadytsCorrection && !this.cadCorrMessGiven) {
-			log.info(this.STR_CURRCORR + currentPlanCadytsCorrection + this.STR_OTHERCORR + otherPlanCadytsCorrection + Gbl.ONLYONCE);
-			this.cadCorrMessGiven = true; // should be true to give the log info only once
+			log.info("currPlanCadytsCorr: " + currentPlanCadytsCorrection + " otherPlanCadytsCorr: " + otherPlanCadytsCorrection + Gbl.ONLYONCE);
+			this.cadCorrMessGiven = true;
 		}
 
 		double weight = Math.exp(0.5 * this.beta * (otherScore - currentScore));

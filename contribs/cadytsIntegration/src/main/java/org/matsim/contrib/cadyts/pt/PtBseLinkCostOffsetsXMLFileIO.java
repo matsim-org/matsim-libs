@@ -38,14 +38,11 @@ public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitS
 		this.schedule = schedule;
 	}
 
-	String strAttrValue2key = "-----attrValue2key------:\t";
-	String strStop = "stop :\t";
-
 	@Override
 	protected TransitStopFacility attrValue2key(final String stopId) {
-		System.out.println(this.strAttrValue2key + stopId);
+//		System.out.println("-----attrValue2key------:\t" + stopId);
 		TransitStopFacility stop = this.schedule.getFacilities().get(new IdImpl(stopId));
-		System.out.println(this.strStop + stop);
+//		System.out.println("stop:\t" + stop);
 		return stop;
 	}
 

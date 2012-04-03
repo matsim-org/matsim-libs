@@ -122,7 +122,6 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 	@Override
 	public void handleEvent(final PersonLeavesVehicleEvent event) {
 		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
-		;
 		if (!transitLineId.toString().contains(STR_M44)) {
 			return;
 		}
