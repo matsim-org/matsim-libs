@@ -12,7 +12,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
 import org.matsim.core.mobsim.qsim.pt.TransitDriver;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.utils.misc.Time;
 
 public class ActivityEngine {
@@ -21,12 +20,6 @@ public class ActivityEngine {
 	 * thread-safety in the parallel qsim. cdobler, oct'10
 	 */
 	private Queue<MobsimAgent> activityEndsList = new PriorityBlockingQueue<MobsimAgent>(500, new PlanAgentDepartureTimeComparator());
-	private QNetsimEngine netEngine;
-	
-	public ActivityEngine(QNetsimEngine netEngine) {
-		super();
-		this.netEngine = netEngine;
-	}
 
 	private InternalInterface internalInterface;
 
@@ -42,7 +35,7 @@ public class ActivityEngine {
 		if (!(agent instanceof AbstractTransitDriver)) {
 			// yy why?  kai, mar'12
 			
-			netEngine.registerAdditionalAgentOnLink(agent);
+			internalInterface.registerAdditionalAgentOnLink(agent);
 		}
 		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
 			internalInterface.getMobsim().getAgentCounter().decLiving() ;
@@ -71,7 +64,7 @@ public class ActivityEngine {
 			} else {
 				// newTime != Double.POSITIVE_INFINITY - re-activate the agent
 				activityEndsList.add(agent);
-				netEngine.registerAdditionalAgentOnLink(agent);
+				internalInterface.registerAdditionalAgentOnLink(agent);
 				((AgentCounter) internalInterface.getMobsim().getAgentCounter()).incLiving();				
 			}
 		} 
@@ -95,7 +88,7 @@ public class ActivityEngine {
 		if (!(agent instanceof TransitDriver)) {
 			Id agentId = agent.getId();
 			Id linkId = agent.getCurrentLinkId();
-			netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+			internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
 	}
 

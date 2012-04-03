@@ -206,7 +206,7 @@ public final class QSim implements VisMobsim, Netsim {
 		
 		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
 		this.netEngine.setInternalInterface(this.internalInterface) ;
-		this.activityEngine = new ActivityEngine(this.netEngine);
+		this.activityEngine = new ActivityEngine();
 		this.activityEngine.setInternalInterface(this.internalInterface);
 		// (the netEngine is never ``added'', thus this needs to be done manually. kai, dec'11)
 
