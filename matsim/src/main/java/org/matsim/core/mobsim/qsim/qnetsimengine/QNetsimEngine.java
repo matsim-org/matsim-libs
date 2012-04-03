@@ -67,6 +67,8 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
+	private static final int INFO_PERIOD = 3600;
+	
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
 	 * car is in one of the many queues).
@@ -112,13 +114,15 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	private final double stucktimeCache;
 	private final DepartureHandler dpHandler ;
+
+	private double infoTime = 0;
 	
 	/*package*/ InternalInterface internalInterface = null ;
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
 	}
-	
+
 	public QNetsimEngine(final QSim sim, final Random random ) {
 		this( sim, random, null ) ;
 	}
@@ -152,7 +156,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
 		}
-		
+
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
 		// first in ctors calling each other.  kai, feb'12
 		if (sim.getScenario().getConfig().scenario().isUseLanes()) {
@@ -170,10 +174,10 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
-		
+
 		network.getLinkWidthCalculator().setLinkWidth(sim.getScenario().getConfig().otfVis().getLinkWidth());
 		network.initialize(this);
-		
+
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
 	}
 
@@ -217,6 +221,11 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		if (simulateAllLinks) {
 			this.simLinksList.addAll(this.allLinks);
 		}
+		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime()
+				/ INFO_PERIOD)
+				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
+		// to print out the info at the very first
+		// timestep already
 	}
 
 	@Override
@@ -285,11 +294,14 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	}
 
 	private void printSimLog(double time) {
-		int nofActiveLinks = this.getNumberOfSimulatedLinks();
-		int nofActiveNodes = this.getNumberOfSimulatedNodes();
-		log.info("SIMULATION (QNetsimEngine) AT " + Time.writeTime(time)
-				+ " : #links=" + nofActiveLinks
-				+ " #nodes=" + nofActiveNodes);
+		if (time >= this.infoTime) {
+			this.infoTime += INFO_PERIOD;
+			int nofActiveLinks = this.getNumberOfSimulatedLinks();
+			int nofActiveNodes = this.getNumberOfSimulatedNodes();
+			log.info("SIMULATION (QNetsimEngine) AT " + Time.writeTime(time)
+					+ " : #links=" + nofActiveLinks
+					+ " #nodes=" + nofActiveNodes);
+		}
 	}
 
 	@Override

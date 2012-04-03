@@ -36,9 +36,13 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
 import org.matsim.core.utils.misc.Time;
 
 public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
-	
+
 	private static Logger log = Logger.getLogger(MultiModalSimEngine.class);
 
+	private double infoTime = 0;
+
+	private static final int INFO_PERIOD = 3600;
+	
 	/*package*/ Netsim qSim;
 	/*package*/ MultiModalTravelTime multiModalTravelTime;
 	/*package*/ List<MultiModalQLinkExtension> allLinks = null;
@@ -48,7 +52,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	/*package*/ Queue<MultiModalQNodeExtension> nodesToActivate;
 
 	/*package*/ InternalInterface internalInterface = null;
-	
+
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
@@ -56,15 +60,15 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 
 	/*package*/ MultiModalSimEngine(Netsim qSim, MultiModalTravelTime multiModalTravelTime) {
 		this.qSim = qSim;
-		
+
 		activeLinks = new ArrayList<MultiModalQLinkExtension>();
 		activeNodes = new ArrayList<MultiModalQNodeExtension>();
 		linksToActivate = new ConcurrentLinkedQueue<MultiModalQLinkExtension>();	// thread-safe Queue!
 		nodesToActivate = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();	// thread-safe Queue!
-		
+
 		this.multiModalTravelTime = multiModalTravelTime; 
 	}
-	
+
 	@Override
 	public Netsim getMobsim() {
 		return qSim;
@@ -76,6 +80,11 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		for (NetsimLink qLink : this.qSim.getNetsimNetwork().getNetsimLinks().values()) {
 			allLinks.add(this.getMultiModalQLinkExtension(qLink));
 		}
+		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime()
+				/ INFO_PERIOD)
+				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
+		// to print out the info at the very first
+		// timestep already
 	}
 
 	@Override
@@ -87,7 +96,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 
 	/*package*/ void moveNodes(final double time) {
 		reactivateNodes();
-		
+
 		ListIterator<MultiModalQNodeExtension> simNodes = this.activeNodes.listIterator();
 		MultiModalQNodeExtension node;
 		boolean isActive;
@@ -103,7 +112,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 
 	/*package*/ void moveLinks(final double time) {
 		reactivateLinks();
-		
+
 		ListIterator<MultiModalQLinkExtension> simLinks = this.activeLinks.listIterator();
 		MultiModalQLinkExtension link;
 		boolean isActive;
@@ -116,12 +125,15 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 			}
 		}
 	}
-	
+
 	private void printSimLog(double time) {
-		int nofActiveLinks = this.getNumberOfSimulatedLinks();
-		int nofActiveNodes = this.getNumberOfSimulatedNodes();
-		log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) 
-				+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
+		if (time >= this.infoTime) {
+			this.infoTime += INFO_PERIOD;
+			int nofActiveLinks = this.getNumberOfSimulatedLinks();
+			int nofActiveNodes = this.getNumberOfSimulatedNodes();
+			log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) 
+					+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
+		}
 	}
 
 	@Override
@@ -135,7 +147,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 			link.clearVehicles();
 		}
 	}
-	
+
 	@Override
 	public void activateLink(MultiModalQLinkExtension link) {
 		linksToActivate.add(link);
@@ -162,7 +174,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 			linksToActivate.clear();
 		}
 	}
-	
+
 	/*package*/ void reactivateNodes() {
 		if (!nodesToActivate.isEmpty()) {
 			activeNodes.addAll(nodesToActivate);
@@ -173,7 +185,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	/*package*/ MultiModalTravelTime getMultiModalTravelTime() {
 		return this.multiModalTravelTime;
 	}
-	
+
 	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(NetsimNode qNode) {
 		return (MultiModalQNodeExtension) qNode.getCustomAttributes().get(MultiModalQNodeExtension.class.getName());
 	}

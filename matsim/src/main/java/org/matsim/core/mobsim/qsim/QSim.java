@@ -247,10 +247,6 @@ public final class QSim implements VisMobsim, Netsim {
 					"No valid Events Object (events == null)");
 		}
 
-		for (MobsimEngine mobsimEngine : mobsimEngines) {
-			mobsimEngine.onPrepareSim();
-		}
-
 		createAgents();
 		this.initSimTimer();
 		this.infoTime = Math.floor(this.simTimer.getSimStartTime()
@@ -258,6 +254,10 @@ public final class QSim implements VisMobsim, Netsim {
 				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
 		// to print out the info at the very first
 		// timestep already
+		
+		for (MobsimEngine mobsimEngine : mobsimEngines) {
+			mobsimEngine.onPrepareSim();
+		}
 	}
 
 	private void createAgents() {
