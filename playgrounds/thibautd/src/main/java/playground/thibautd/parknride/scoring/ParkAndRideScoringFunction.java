@@ -156,5 +156,16 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 
 		return coord;
 	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// for tests
+	// /////////////////////////////////////////////////////////////////////////
+	boolean isParked() {
+		return isParked;
+	}
+
+	boolean lastLegWasCar()  {
+		return lastLegWasCar;
+	}
 }
 

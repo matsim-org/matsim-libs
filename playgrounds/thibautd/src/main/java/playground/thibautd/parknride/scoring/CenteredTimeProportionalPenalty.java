@@ -116,5 +116,16 @@ public class CenteredTimeProportionalPenalty implements ParkingPenalty {
 	public double getPenalty() {
 		return -accumulatedParkingCost;
 	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// getters for tests
+	// /////////////////////////////////////////////////////////////////////////
+	double getCostPerSecond() {
+		return costPerSecond;
+	}
+
+	double getParkingTime() {
+		return parkingTime;
+	}
 }
 

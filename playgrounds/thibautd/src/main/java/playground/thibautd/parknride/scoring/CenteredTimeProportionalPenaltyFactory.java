@@ -30,6 +30,12 @@ public class CenteredTimeProportionalPenaltyFactory implements ParkingPenaltyFac
 	private final double zoneRadius;
 	private final double maxCostPerSecond;
 
+	/**
+	 * Initialises a factory
+	 * @param zoneCenter the coordinate of the point at which the penalty is higher
+	 * @param zoneRadius the radius in which the penalty is non-zero
+	 * @param maxCostPerSecond the penalty per second, in utility units.
+	 */
 	public CenteredTimeProportionalPenaltyFactory(
 			final Coord zoneCenter,
 			final double zoneRadius,
