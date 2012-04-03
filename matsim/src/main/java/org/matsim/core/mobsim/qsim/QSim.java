@@ -28,7 +28,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -51,7 +50,6 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -59,9 +57,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitDriver;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.UmlaufDriver;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
@@ -129,16 +125,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<Tuple<Double, MobsimAgent>>(
 			30, new TeleportationArrivalTimeComparator());
 
-	/**
-	 * This list needs to be a "blocking" queue since this is needed for
-	 * thread-safety in the parallel qsim. cdobler, oct'10
-	 */
-	private final Queue<MobsimAgent> activityEndsList = new PriorityBlockingQueue<MobsimAgent>(
-			500, new PlanAgentDepartureTimeComparator());
-	// can't use the "Tuple" trick from teleportation list, since we need to be
-	// able to "find" agents for replanning. kai, oct'10
-	// yy On second thought, this does also not work for the teleportationList
-	// since we have the same problem there ... kai, oct'10
+	private ActivityEngine activityEngine;
 
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100 * 3600;
@@ -148,80 +135,79 @@ public final class QSim implements VisMobsim, Netsim {
 	private AgentCounter agentCounter;
 	private Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
-    private TransitQSimEngine transitEngine;
-    
+	private TransitQSimEngine transitEngine;
+
 
 	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
 		@Override
 		public final void arrangeNextAgentState(MobsimAgent agent) {
-				QSim.this.arrangeNextAgentAction(agent) ;
+			QSim.this.arrangeNextAgentAction(agent) ;
 		}
 
 		@Override
 		public final Netsim getMobsim() {
 			return QSim.this ;
 		}
-		
+
 		@Override
 		public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-				QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
+			QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
 		}
-		
+
 		@Override
 		public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-				return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+			return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
-		
+
 
 	};
 
-    // everything above this line is private and should remain private. pls
+	// everything above this line is private and should remain private. pls
 	// contact me if this is in your way. kai, oct'10
 	// ============================================================================================================================
 	// initialization:
 
 
-    public static QSim createQSimAndAddAgentSource(final Scenario sc, final EventsManager events, final QNetsimEngineFactory netsimEngFactory) {
-        QSim qSim = new QSim(sc, events, netsimEngFactory);
-        AgentFactory agentFactory;
-        if (sc.getConfig().scenario().isUseTransit()) {
-            agentFactory = new TransitAgentFactory(qSim);
-            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setUseUmlaeufe(true);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim.addDepartureHandler(transitEngine);
-            qSim.addAgentSource(transitEngine);
-            qSim.addMobsimEngine(transitEngine);
-        } else {
-            agentFactory = new DefaultAgentFactory(qSim);
-        }
-        if (sc.getConfig().network().isTimeVariantNetwork()) {
-    		qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
-        }
-        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-        return qSim;
-     }
+	public static QSim createQSimAndAddAgentSource(final Scenario sc, final EventsManager events, final QNetsimEngineFactory netsimEngFactory) {
+		QSim qSim = new QSim(sc, events, netsimEngFactory);
+		AgentFactory agentFactory;
+		if (sc.getConfig().scenario().isUseTransit()) {
+			agentFactory = new TransitAgentFactory(qSim);
+			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+			transitEngine.setUseUmlaeufe(true);
+			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			qSim.addDepartureHandler(transitEngine);
+			qSim.addAgentSource(transitEngine);
+			qSim.addMobsimEngine(transitEngine);
+		} else {
+			agentFactory = new DefaultAgentFactory(qSim);
+		}
+		if (sc.getConfig().network().isTimeVariantNetwork()) {
+			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+		}
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		qSim.addAgentSource(agentSource);
+		return qSim;
+	}
 
-     public static QSim createQSimAndAddAgentSource(final Scenario scenario, final EventsManager events) {
-         return createQSimAndAddAgentSource(scenario, events, new DefaultQSimEngineFactory());
-     }
+	public static QSim createQSimAndAddAgentSource(final Scenario scenario, final EventsManager events) {
+		return createQSimAndAddAgentSource(scenario, events, new DefaultQSimEngineFactory());
+	}
 
 
-    public QSim(final Scenario sc, final EventsManager events,
-                final QNetsimEngineFactory netsimEngFactory) {
-
+	public QSim(final Scenario sc, final EventsManager events, final QNetsimEngineFactory netsimEngFactory) {
 		this.scenario = sc;
 		this.events = events;
 		log.info("Using QSim...");
 		this.listenerManager = new MobsimListenerManager(this);
 		this.agentCounter = new AgentCounter();
-		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup()
-				.getTimeStepSize());
+		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
 
-		// create the NetworkEngine ...
+		
 		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
 		this.netEngine.setInternalInterface(this.internalInterface) ;
+		this.activityEngine = new ActivityEngine(this.netEngine);
+		this.activityEngine.setInternalInterface(this.internalInterface);
 		// (the netEngine is never ``added'', thus this needs to be done manually. kai, dec'11)
 
 		this.addDepartureHandler(this.netEngine.getDepartureHandler());
@@ -231,9 +217,9 @@ public final class QSim implements VisMobsim, Netsim {
 	// "run" method:
 
 
-  @Override
+	@Override
 	public void run() {
-        prepareSim();
+		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		// do iterations
 		boolean doContinue = true;
@@ -247,7 +233,7 @@ public final class QSim implements VisMobsim, Netsim {
 			}
 		}
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
-		cleanupSim(time);
+		cleanupSim();
 	}
 
 	// ============================================================================================================================
@@ -256,7 +242,7 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
-	 /*package*/ void prepareSim() {
+	/*package*/ void prepareSim() {
 		if (events == null) {
 			throw new RuntimeException(
 					"No valid Events Object (events == null)");
@@ -295,18 +281,7 @@ public final class QSim implements VisMobsim, Netsim {
 		netEngine.addParkedVehicle(veh, startLinkId);
 	}
 
-
-
-
-	// ============================================================================================================================
-	// "cleanupSim":
-
-	/**
-	 * Close any files, etc.
-	 */
-	/*package*/ void cleanupSim(@SuppressWarnings("unused") final double seconds) {
-
-
+	private void cleanupSim() {
 		if (this.netEngine != null) {
 			this.netEngine.afterSim();
 		}
@@ -316,7 +291,6 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		double now = this.simTimer.getTimeOfDay();
-
 		for (Tuple<Double, MobsimAgent> entry : this.teleportationList) {
 			MobsimAgent agent = entry.getSecond();
 			events.processEvent(events.getFactory().createAgentStuckEvent(now,
@@ -325,33 +299,7 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 		this.teleportationList.clear();
 
-		for (MobsimAgent agent : this.activityEndsList) {
-
-			//			if (agent instanceof UmlaufDriver) {
-//				log.error("this does not terminate correctly for UmlaufDrivers; needs to be "
-//						+ "fixed but for the time being we skip the next couple of lines.  kai, dec'10");
-//			} else {
-			
-				if ( agent.getActivityEndTime()!=Double.POSITIVE_INFINITY 
-						&& agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
-					
-					// since we are at an activity, it is not plausible to assume that the agents know mode or destination 
-					// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
-					events.processEvent(events.getFactory().createAgentStuckEvent(now, agent.getId(),null, null));
-					
-
-//					if (agent.getDestinationLinkId() != null) {
-//						// (yy what is the meaning of this condition?  kai, mar'12)
-//						
-//						events.processEvent(events.getFactory()
-//								.createAgentStuckEvent(now, agent.getId(),
-//										agent.getDestinationLinkId(), null));
-//					}
-
-				}
-//			}
-		}
-		this.activityEndsList.clear();
+		activityEngine.afterSim(now);
 	}
 
 	/**
@@ -362,18 +310,18 @@ public final class QSim implements VisMobsim, Netsim {
 	 * @return true if the simulation needs to continue
 	 */
 	/*package*/ boolean doSimStep(final double time) {
-			
+
 		// teleportation "engine":
 		this.handleTeleportationArrivals();
 
 		// "facilities" "engine":
-		this.handleActivityEnds(time);
+		this.activityEngine.handleActivityEnds(this, time);
 
 		// network engine:
 		if (this.netEngine != null) {
 			this.netEngine.doSimStep(time);
 		}
-		
+
 		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.doSimStep(time);
@@ -399,7 +347,7 @@ public final class QSim implements VisMobsim, Netsim {
 			}
 		}
 	}
-	
+
 	@Override
 	public void insertAgentIntoMobsim( MobsimAgent agent ) {
 		if ( this.agents.contains(agent) ) {
@@ -409,7 +357,7 @@ public final class QSim implements VisMobsim, Netsim {
 		this.agentCounter.incLiving();
 		arrangeNextAgentAction(agent);
 	}
-	
+
 	private void arrangeNextAgentAction(MobsimAgent agent) {
 		switch( agent.getState() ) {
 		case ACTIVITY: 
@@ -421,8 +369,8 @@ public final class QSim implements VisMobsim, Netsim {
 		case ABORT:
 			this.events.processEvent( this.events.getFactory().createAgentStuckEvent(
 					this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()
-			)) ;
-			
+					)) ;
+
 			this.agents.remove(agent) ;
 			this.agentCounter.decLiving();
 			this.agentCounter.incLost();
@@ -441,86 +389,14 @@ public final class QSim implements VisMobsim, Netsim {
 	 * @see MobsimDriverAgent#getActivityEndTime()
 	 */
 	private void arrangeActivityStart(final MobsimAgent agent) {
-		this.activityEndsList.add(agent);
-		if (!(agent instanceof AbstractTransitDriver)) {
-			// yy why?  kai, mar'12
-			
-			netEngine.registerAdditionalAgentOnLink(agent);
-		}
-		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
-			this.agentCounter.decLiving() ;
-		}
+		activityEngine.arrangeActivityStart(agent);
 	}
 
 	@Override
 	public void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
-		// yyyy possibly, this should be "notifyChangedPlan".  kai, oct'10
-		// yy the "newTime" is strictly speaking not necessary.  It is there so people do not put in the 
-		// new time instead of the old time, since then it will not work.  kai, oct'10
-
-		internalRescheduleActivityEnd(agent, oldTime, newTime);
+		activityEngine.rescheduleActivityEnd(agent, oldTime, newTime);
 	}
 
-
-	private void internalRescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime) {
-		// remove agent from queue
-		this.activityEndsList.remove(agent);
-
-		// The intention in the following is that an agent that is no longer alive has an activity end time of infinity.  The number of
-		// alive agents is only modified when an activity end time is changed between a finite time and infinite.  kai, jun'11
-		/*
-		 * If an agent performs only a single iteration, the old departure time is Time.UNDEFINED which
-		 * is Double.NEGATIVE_INFINITY. If an agent performs the last of several activities, the old
-		 * departure time is Double.POSITIVE_INFINITY.
-		 * If an agent is (re)activated, it is also (un)registered at an activity location. cdobler, oct'11
-		 */
-		if (oldTime == Double.POSITIVE_INFINITY || oldTime == Time.UNDEFINED_TIME) {
-			if (newTime == Double.POSITIVE_INFINITY) {
-				// agent was de-activated and still should be de-activated - nothing to do here
-			} else {
-				// newTime != Double.POSITIVE_INFINITY - re-activate the agent
-				this.activityEndsList.add(agent);
-				this.netEngine.registerAdditionalAgentOnLink(agent);
-				this.agentCounter.incLiving();				
-			}
-		} 
-		/*
-		 * After the re-planning the agent's current activity has changed to its last activity.
-		 * Therefore the agent is de-activated. cdobler, oct'11
-		 */
-		else if (newTime == Double.POSITIVE_INFINITY) {
-			this.unregisterAgentAtActivityLocation(agent);
-			this.getAgentCounter().decLiving();
-		} 
-		/*
-		 *  The activity is just rescheduled during the day, so we keep the agent active. cdobler, oct'11
-		 */
-		else {
-			this.activityEndsList.add(agent);
-		}
-	}
-	
-	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
-		if (!(agent instanceof TransitDriver)) {
-			Id agentId = agent.getId();
-			Id linkId = agent.getCurrentLinkId();
-			netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
-		}
-	}
-
-	private void handleActivityEnds(final double time) {
-		while (this.activityEndsList.peek() != null) {
-			MobsimAgent agent = this.activityEndsList.peek();
-			if (agent.getActivityEndTime() <= time) {
-				this.activityEndsList.poll();
-				unregisterAgentAtActivityLocation(agent);
-				agent.endActivityAndComputeNextState(time);
-				this.internalInterface.arrangeNextAgentState(agent) ;
-			} else {
-				return;
-			}
-		}
-	}
 
 	/**
 	 * Informs the simulation that the specified agent wants to depart from its
@@ -600,8 +476,7 @@ public final class QSim implements VisMobsim, Netsim {
 	// ############################################################################################################################
 
 	private void initSimTimer() {
-		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig()
-				.getQSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().getQSimConfigGroup();
 		Double startTime = qSimConfigGroup.getStartTime();
 		this.stopTime = qSimConfigGroup.getEndTime();
 		if (startTime == Time.UNDEFINED_TIME) {
@@ -612,21 +487,15 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		double simStartTime = 0;
-		if (QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END
-				.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
-			MobsimAgent firstAgent = this.activityEndsList.peek();
-			if (firstAgent != null) {
-				// set sim start time to config-value ONLY if this is LATER than
-				// the first plans starttime
-				simStartTime = Math.floor(Math.max(startTime,
-						firstAgent.getActivityEndTime()));
+		if (QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
+			Double nextActivityEndTime = activityEngine.getNextActivityEndTime();
+			if (nextActivityEndTime != null) {
+				simStartTime = Math.floor(Math.max(startTime, nextActivityEndTime));
 			}
-		} else if (QSimConfigGroup.ONLY_USE_STARTTIME.equals(qSimConfigGroup
-				.getSimStarttimeInterpretation())) {
+		} else if (QSimConfigGroup.ONLY_USE_STARTTIME.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
 			simStartTime = startTime;
 		} else {
-			throw new RuntimeException(
-					"unkonwn starttimeInterpretation; aborting ...");
+			throw new RuntimeException("unkonwn starttimeInterpretation; aborting ...");
 		}
 
 		this.simTimer.setSimStartTime(simStartTime);
@@ -634,13 +503,15 @@ public final class QSim implements VisMobsim, Netsim {
 
 	}
 
+	
+
 	// ############################################################################################################################
 	// utility methods (presumably no state change)
 	// ############################################################################################################################
 
 	private void printSimLog(final double time) {
 		if (time >= this.infoTime) {
-//		if(true){
+			//		if(true){
 			this.infoTime += INFO_PERIOD;
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.realWorldStarttime
@@ -697,7 +568,7 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	/*package*/ MobsimEngine getNetsimEngine() {
-		 // For a test
+		// For a test
 		return this.netEngine;
 	}
 
@@ -764,10 +635,10 @@ public final class QSim implements VisMobsim, Netsim {
 
 	@Override
 	public Collection<MobsimAgent> getActivityEndsList() {
-		return Collections.unmodifiableCollection(activityEndsList);
+		return activityEngine.getActivityEndsList();
 	}
 
-  public void addAgentSource(AgentSource agentSource) {
+	public void addAgentSource(AgentSource agentSource) {
 		agentSources.add(agentSource);
 	}
 
