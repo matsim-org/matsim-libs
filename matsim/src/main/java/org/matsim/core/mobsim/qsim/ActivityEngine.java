@@ -8,15 +8,15 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.PlanAgentDepartureTimeComparator;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
 import org.matsim.core.mobsim.qsim.pt.TransitDriver;
 import org.matsim.core.utils.misc.Time;
 
-public class ActivityEngine implements MobsimEngine {
+public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
@@ -24,25 +24,6 @@ public class ActivityEngine implements MobsimEngine {
 	private Queue<MobsimAgent> activityEndsList = new PriorityBlockingQueue<MobsimAgent>(500, new PlanAgentDepartureTimeComparator());
 
 	private InternalInterface internalInterface;
-
-	/**
-	 * Registers this agent as performing an activity and makes sure that the
-	 * agent will be informed once his departure time has come.
-	 * @param agent
-	 * 
-	 * @see MobsimDriverAgent#getActivityEndTime()
-	 */
-	void arrangeActivityStart(final MobsimAgent agent) {
-		activityEndsList.add(agent);
-		if (!(agent instanceof AbstractTransitDriver)) {
-			// yy why?  kai, mar'12
-			
-			internalInterface.registerAdditionalAgentOnLink(agent);
-		}
-		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
-			internalInterface.getMobsim().getAgentCounter().decLiving() ;
-		}
-	}
 
 	void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
 		// yyyy possibly, this should be "notifyChangedPlan".  kai, oct'10
@@ -153,6 +134,20 @@ public class ActivityEngine implements MobsimEngine {
 			}
 		}
 		activityEndsList.clear();
+	}
+
+	@Override
+	public boolean handleActivity(MobsimAgent agent) {
+		activityEndsList.add(agent);
+		if (!(agent instanceof AbstractTransitDriver)) {
+			// yy why?  kai, mar'12
+			
+			internalInterface.registerAdditionalAgentOnLink(agent);
+		}
+		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
+			internalInterface.getMobsim().getAgentCounter().decLiving() ;
+		}
+		return true;
 	}
 	
 }

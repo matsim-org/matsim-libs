@@ -43,6 +43,7 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.VehicularDepartureHandler.VehicleBehavior;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 
 /**
@@ -238,6 +239,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	public void doSimStep(final double time) {
 		moveNodes(time);
 		moveLinks(time);
+		printSimLog(time);
 	}
 
 	private void moveNodes(final double time) {
@@ -280,6 +282,14 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 				simLinks.remove();
 			}
 		}
+	}
+
+	private void printSimLog(double time) {
+		int nofActiveLinks = this.getNumberOfSimulatedLinks();
+		int nofActiveNodes = this.getNumberOfSimulatedNodes();
+		log.info("SIMULATION (QNetsimEngine) AT " + Time.writeTime(time)
+				+ " : #links=" + nofActiveLinks
+				+ " #nodes=" + nofActiveNodes);
 	}
 
 	@Override

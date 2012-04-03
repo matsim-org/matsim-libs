@@ -46,6 +46,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -121,6 +122,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private double stopTime = 100 * 3600;
 	private final MobsimListenerManager listenerManager;
 	private final Scenario scenario;
+	private final List<ActivityHandler> activityHandlers = new ArrayList<ActivityHandler>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 	private AgentCounter agentCounter;
 	private Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
@@ -187,7 +189,9 @@ public final class QSim implements VisMobsim, Netsim {
 
 	public static QSim createQSimWithDefaultEngines(Scenario sc, EventsManager events, QNetsimEngineFactory netsimEngFactory) {
 		QSim qSim = new QSim(sc, events);
-		qSim.addMobsimEngine(new ActivityEngine());
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
@@ -196,7 +200,7 @@ public final class QSim implements VisMobsim, Netsim {
 		return qSim;
 	}
 
-	private QSim(final Scenario sc, final EventsManager events) {
+	public QSim(final Scenario sc, final EventsManager events) {
 		this.scenario = sc;
 		this.events = events;
 		log.info("Using QSim...");
@@ -310,7 +314,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private void arrangeNextAgentAction(MobsimAgent agent) {
 		switch( agent.getState() ) {
 		case ACTIVITY: 
-			this.activityEngine.arrangeActivityStart(agent); 
+			arrangeAgentActivity(agent); 
 			break ;
 		case LEG: 
 			this.arrangeAgentDeparture(agent) ; 
@@ -334,6 +338,14 @@ public final class QSim implements VisMobsim, Netsim {
 		activityEngine.rescheduleActivityEnd(agent, oldTime, newTime);
 	}
 
+
+	private void arrangeAgentActivity(MobsimAgent agent) {
+		for (ActivityHandler activityHandler : this.activityHandlers) {
+			if (activityHandler.handleActivity(agent)) {
+				return;
+			}
+		}
+	}
 
 	/**
 	 * Informs the simulation that the specified agent wants to depart from its
@@ -400,9 +412,11 @@ public final class QSim implements VisMobsim, Netsim {
 
 		double simStartTime = 0;
 		if (QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
-			Double nextActivityEndTime = activityEngine.getNextActivityEndTime();
-			if (nextActivityEndTime != null) {
-				simStartTime = Math.floor(Math.max(startTime, nextActivityEndTime));
+			if (activityEngine != null) {
+				Double nextActivityEndTime = activityEngine.getNextActivityEndTime();
+				if (nextActivityEndTime != null) {
+					simStartTime = Math.floor(Math.max(startTime, nextActivityEndTime));
+				}
 			}
 		} else if (QSimConfigGroup.ONLY_USE_STARTTIME.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
 			simStartTime = startTime;
@@ -415,7 +429,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	}
 
-	
+
 
 	// ############################################################################################################################
 	// utility methods (presumably no state change)
@@ -429,21 +443,11 @@ public final class QSim implements VisMobsim, Netsim {
 			long diffreal = (endtime.getTime() - this.realWorldStarttime
 					.getTime()) / 1000;
 			double diffsim = time - this.simTimer.getSimStartTime();
-			int nofActiveLinks = this.netEngine.getNumberOfSimulatedLinks();
-			int nofActiveNodes = this.netEngine.getNumberOfSimulatedNodes();
 			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time)
 					+ " : #Veh=" + this.agentCounter.getLiving() + " lost="
-					+ this.agentCounter.getLost() + " #links=" + nofActiveLinks
-					+ " #nodes=" + nofActiveNodes + " simT=" + diffsim
+					+ this.agentCounter.getLost() + " simT=" + diffsim
 					+ "s realT=" + (diffreal) + "s; (s/r): "
 					+ (diffsim / (diffreal + Double.MIN_VALUE)));
-
-			if (this.multiModalEngine != null) {
-				nofActiveLinks = this.multiModalEngine.getNumberOfSimulatedLinks();
-				nofActiveNodes = this.multiModalEngine.getNumberOfSimulatedNodes();
-				log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) 
-						+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
-			}
 
 			Gbl.printMemoryUsage();
 		}
@@ -525,6 +529,10 @@ public final class QSim implements VisMobsim, Netsim {
 
 	public void addDepartureHandler(DepartureHandler departureHandler) {
 		this.departureHandlers.add(departureHandler);
+	}
+
+	public void addActivityHandler(ActivityHandler activityHandler) {
+		this.activityHandlers.add(activityHandler);
 	}
 
 	/**

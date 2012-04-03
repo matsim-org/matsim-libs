@@ -26,14 +26,18 @@ import java.util.ListIterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
+import org.matsim.core.utils.misc.Time;
 
 public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
+	
+	private static Logger log = Logger.getLogger(MultiModalSimEngine.class);
 
 	/*package*/ Netsim qSim;
 	/*package*/ MultiModalTravelTime multiModalTravelTime;
@@ -78,6 +82,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	public void doSimStep(double time) {
 		moveNodes(time);
 		moveLinks(time);
+		printSimLog(time);
 	}
 
 	/*package*/ void moveNodes(final double time) {
@@ -112,6 +117,13 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		}
 	}
 	
+	private void printSimLog(double time) {
+		int nofActiveLinks = this.getNumberOfSimulatedLinks();
+		int nofActiveNodes = this.getNumberOfSimulatedNodes();
+		log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) 
+				+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
+	}
+
 	@Override
 	public void afterSim() {
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
