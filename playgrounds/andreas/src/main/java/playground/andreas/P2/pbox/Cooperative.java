@@ -59,5 +59,11 @@ public interface Cooperative {
 	public PPlan getBestPlan();
 	
 	public double getMinOperationTime();
+	
+	public double getCostPerVehicleBuy();
+
+	public double getCostPerVehicleSell();
+
+	public void setBudget(double budget);
 
 }
