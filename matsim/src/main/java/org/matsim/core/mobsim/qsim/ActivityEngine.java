@@ -86,7 +86,7 @@ public class ActivityEngine implements MobsimEngine {
 		}
 	}
 
-	void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
+	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
 		if (!(agent instanceof TransitDriver)) {
 			Id agentId = agent.getId();
 			Id linkId = agent.getCurrentLinkId();
@@ -105,7 +105,7 @@ public class ActivityEngine implements MobsimEngine {
 		
 	}
 
-	public Collection<MobsimAgent> getActivityEndsList() {
+	Collection<MobsimAgent> getActivityEndsList() {
 		return Collections.unmodifiableCollection(activityEndsList);
 	}
 
@@ -135,8 +135,7 @@ public class ActivityEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		// TODO Auto-generated method stub
-		
+		// Nothing to do here
 	}
 
 	@Override

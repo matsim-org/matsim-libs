@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -49,7 +47,6 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -64,7 +61,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisMobsim;
@@ -117,12 +113,8 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private MobsimTimer simTimer;
 
-	/**
-	 * Includes all agents that have transportation modes unknown to the
-	 * QueueSimulation (i.e. != "car") or have two activities on the same link
-	 */
-	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<Tuple<Double, MobsimAgent>>(
-			30, new TeleportationArrivalTimeComparator());
+	private TeleportationEngine teleportationEngine;
+
 
 	private ActivityEngine activityEngine;
 
@@ -199,6 +191,7 @@ public final class QSim implements VisMobsim, Netsim {
 		qSim.addMobsimEngine(new ActivityEngine());
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
 		qSim.addMobsimEngine(netsimEngine);
+		qSim.addMobsimEngine(new TeleportationEngine());
 		return qSim;
 	}
 
@@ -279,14 +272,7 @@ public final class QSim implements VisMobsim, Netsim {
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.afterSim();
 		}
-		double now = this.simTimer.getTimeOfDay();
-		for (Tuple<Double, MobsimAgent> entry : this.teleportationList) {
-			MobsimAgent agent = entry.getSecond();
-			events.processEvent(events.getFactory().createAgentStuckEvent(now,
-					agent.getId(), agent.getDestinationLinkId(),
-					agent.getMode()));
-		}
-		this.teleportationList.clear();
+		teleportationEngine.cleanupTeleportation(this);
 	}
 
 	/**
@@ -299,7 +285,7 @@ public final class QSim implements VisMobsim, Netsim {
 	/*package*/ boolean doSimStep(final double time) {
 
 		// teleportation "engine":
-		this.handleTeleportationArrivals();
+		this.teleportationEngine.handleTeleportationArrivals(this);
 
 		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
@@ -308,23 +294,6 @@ public final class QSim implements VisMobsim, Netsim {
 		// console printout:
 		this.printSimLog(time);
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
-	}
-
-	private void handleTeleportationArrivals() {
-		double now = this.getSimTimer().getTimeOfDay();
-		while (this.teleportationList.peek() != null) {
-			Tuple<Double, MobsimAgent> entry = this.teleportationList.peek();
-			if (entry.getFirst().doubleValue() <= now) {
-				this.teleportationList.poll();
-				MobsimAgent personAgent = entry.getSecond();
-				personAgent.notifyTeleportToLink(personAgent
-						.getDestinationLinkId());
-				personAgent.endLegAndComputeNextState(now);
-				this.internalInterface.arrangeNextAgentState(personAgent) ;
-			} else {
-				break;
-			}
-		}
 	}
 
 	@Override
@@ -408,18 +377,11 @@ public final class QSim implements VisMobsim, Netsim {
 		if (handleKnownLegModeDeparture(now, agent, linkId)) {
 			return;
 		} else {
-			handleUnknownLegMode(now, agent);
+			teleportationEngine.handleDeparture(now, agent, linkId);
 			events.processEvent(new AdditionalTeleportationDepartureEvent(now,
 					agent.getId(), linkId, mode, agent.getDestinationLinkId(),
 					agent.getExpectedTravelTime()));
 		}
-	}
-
-	private void handleUnknownLegMode(final double now,
-			final MobsimAgent planAgent) {
-		double arrivalTime = now + planAgent.getExpectedTravelTime();
-		this.teleportationList.add(new Tuple<Double, MobsimAgent>(arrivalTime,
-				planAgent));
 	}
 
 	private boolean handleKnownLegModeDeparture(final double now,
@@ -568,7 +530,9 @@ public final class QSim implements VisMobsim, Netsim {
 			this.addDepartureHandler(this.netEngine.getDepartureHandler());
 
 		}
-
+		if (mobsimEngine instanceof TeleportationEngine) {
+			this.teleportationEngine = (TeleportationEngine) mobsimEngine;
+		}
 		mobsimEngine.setInternalInterface(this.internalInterface);
 		this.mobsimEngines.add(mobsimEngine);
 	}
