@@ -115,7 +115,7 @@ public class RoutesTest {
 						null));
 
 		FreespeedTravelTimeAndDisutility timeCost = new FreespeedTravelTimeAndDisutility( -1 , 1 , -1 );
-		ParkAndRideTravelTimeCost pnrTimeCost = new ParkAndRideTravelTimeCost( transitConfig );
+		ParkAndRideTravelTimeCost pnrTimeCost = new ParkAndRideTravelTimeCost( transitConfig , config.planCalcScore() );
 		pnrRouter =
 			new ParkAndRideRoutingModule(
 					routeFactory,
