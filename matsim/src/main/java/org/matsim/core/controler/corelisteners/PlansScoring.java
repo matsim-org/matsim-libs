@@ -22,9 +22,11 @@ package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -39,7 +41,7 @@ import org.matsim.core.scoring.ScoringFunction;
  *
  * @author mrieser, michaz
  */
-public class PlansScoring implements StartupListener, ScoringListener, IterationStartsListener {
+public class PlansScoring implements StartupListener, ScoringListener, IterationStartsListener, IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(PlansScoring.class);
 
@@ -47,14 +49,18 @@ public class PlansScoring implements StartupListener, ScoringListener, Iteration
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		this.eventsToScore = new EventsToScore(event.getControler().getScenario(), event.getControler().getScoringFunctionFactory(), event.getControler().getConfig().planCalcScore().getLearningRate());
-		event.getControler().getEvents().addHandler(this.eventsToScore);
 		log.debug("PlanScoring startup.");
 	}
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
+		this.eventsToScore = new EventsToScore(event.getControler().getScenario(), event.getControler().getScoringFunctionFactory(), event.getControler().getConfig().planCalcScore().getLearningRate());
+		event.getControler().getEvents().addHandler(this.eventsToScore);
+	}
 
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		event.getControler().getEvents().removeHandler(this.eventsToScore);
 	}
 
 	@Override
