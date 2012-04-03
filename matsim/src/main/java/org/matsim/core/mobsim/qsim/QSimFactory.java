@@ -66,7 +66,7 @@ public class QSimFactory implements MobsimFactory {
         } else {
             netsimEngFactory = new DefaultQSimEngineFactory();
         }
-        QSim qSim = new QSim(sc, eventsManager, netsimEngFactory);
+        QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
         AgentFactory agentFactory;
         
         if (sc.getConfig().scenario().isUseTransit()) {

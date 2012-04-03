@@ -10,11 +10,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.PlanAgentDepartureTimeComparator;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
 import org.matsim.core.mobsim.qsim.pt.TransitDriver;
 import org.matsim.core.utils.misc.Time;
 
-public class ActivityEngine {
+public class ActivityEngine implements MobsimEngine {
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
@@ -92,35 +94,6 @@ public class ActivityEngine {
 		}
 	}
 
-	void handleActivityEnds(QSim qSim, final double time) {
-		while (activityEndsList.peek() != null) {
-			MobsimAgent agent = activityEndsList.peek();
-			if (agent.getActivityEndTime() <= time) {
-				activityEndsList.poll();
-				unregisterAgentAtActivityLocation(agent);
-				agent.endActivityAndComputeNextState(time);
-				qSim.internalInterface.arrangeNextAgentState(agent) ;
-			} else {
-				return;
-			}
-		}
-	}
-
-	void afterSim(double now) {
-		for (MobsimAgent agent : activityEndsList) {
-			if ( agent.getActivityEndTime()!=Double.POSITIVE_INFINITY 
-					&& agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
-	
-				// since we are at an activity, it is not plausible to assume that the agents know mode or destination 
-				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
-				EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
-				eventsManager.processEvent(eventsManager.getFactory().createAgentStuckEvent(now, agent.getId(),null, null));
-	
-			}
-		}
-		activityEndsList.clear();
-	}
-
 	Double getNextActivityEndTime() {
 		MobsimAgent firstAgent = activityEndsList.peek();
 		if (firstAgent != null) {
@@ -139,4 +112,48 @@ public class ActivityEngine {
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 	}
+
+	@Override
+	public void doSimStep(double time) {
+		while (activityEndsList.peek() != null) {
+			MobsimAgent agent = activityEndsList.peek();
+			if (agent.getActivityEndTime() <= time) {
+				activityEndsList.poll();
+				unregisterAgentAtActivityLocation(agent);
+				agent.endActivityAndComputeNextState(time);
+				internalInterface.arrangeNextAgentState(agent) ;
+			} else {
+				return;
+			}
+		}
+	}
+
+	@Override
+	public Netsim getMobsim() {
+		return internalInterface.getMobsim();
+	}
+
+	@Override
+	public void onPrepareSim() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void afterSim() {
+		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		for (MobsimAgent agent : activityEndsList) {
+			if ( agent.getActivityEndTime()!=Double.POSITIVE_INFINITY 
+					&& agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
+		
+				// since we are at an activity, it is not plausible to assume that the agents know mode or destination 
+				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
+				EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
+				eventsManager.processEvent(eventsManager.getFactory().createAgentStuckEvent(now, agent.getId(),null, null));
+		
+			}
+		}
+		activityEndsList.clear();
+	}
+	
 }

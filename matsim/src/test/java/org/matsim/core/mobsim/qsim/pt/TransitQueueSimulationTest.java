@@ -298,7 +298,7 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-        QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+        QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
         AgentFactory agentFactory = new TransitAgentFactory(qSim);
         TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
         transitEngine.setUseUmlaeufe(true);
@@ -556,7 +556,7 @@ public class TransitQueueSimulationTest {
             this.line = line;
             this.route = route;
             this.departure = departure;
-            QSim qSim1 = new QSim(scenario, events, new DefaultQSimEngineFactory());
+            QSim qSim1 = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
             AgentFactory agentFactory = new TransitAgentFactory(qSim1);
             final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim1);
             transitEngine.setUseUmlaeufe(true);

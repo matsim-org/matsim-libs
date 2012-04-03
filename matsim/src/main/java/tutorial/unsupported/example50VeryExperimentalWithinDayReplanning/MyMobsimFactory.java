@@ -49,7 +49,7 @@ public class MyMobsimFactory implements MobsimFactory {
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager events) {
-		QSim qSim = new QSim(sc, events, new DefaultQSimEngineFactory());
+		QSim qSim = QSim.createQSimWithDefaultEngines(sc, events, new DefaultQSimEngineFactory());
 		if ( replanningType.equals( ReplanningType.general ) ) {
 			qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
 		} else if ( replanningType.equals( ReplanningType.carPlans ) ) {

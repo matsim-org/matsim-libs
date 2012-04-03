@@ -1046,7 +1046,8 @@ public class TransitQueueNetworkTest extends TestCase {
             Departure dep = builder.createDeparture(id1, 100);
 
             // setup: simulation
-            QSim qSim = new QSim(scenario, EventsUtils.createEventsManager(), new DefaultQSimEngineFactory());
+            QSim qSim = QSim.createQSimWithDefaultEngines(scenario, EventsUtils.createEventsManager(),
+					new DefaultQSimEngineFactory());
             AgentFactory agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setUseUmlaeufe(true);

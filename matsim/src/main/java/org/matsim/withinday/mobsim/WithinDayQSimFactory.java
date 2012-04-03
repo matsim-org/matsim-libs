@@ -45,7 +45,7 @@ public class WithinDayQSimFactory implements MobsimFactory {
     }
 
     public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events, QNetsimEngineFactory factory) {
-        QSim qSim = new QSim(scenario, events, factory);
+        QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, factory);
         ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
         qSim.addAgentSource(agentSource);
