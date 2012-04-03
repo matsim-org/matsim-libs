@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -191,7 +190,9 @@ public final class QSim implements VisMobsim, Netsim {
 		qSim.addMobsimEngine(new ActivityEngine());
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
 		qSim.addMobsimEngine(netsimEngine);
-		qSim.addMobsimEngine(new TeleportationEngine());
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine(teleportationEngine);
 		return qSim;
 	}
 
@@ -210,6 +211,9 @@ public final class QSim implements VisMobsim, Netsim {
 
 	@Override
 	public void run() {
+		// Teleportation must be last (default) departure handler, so add it
+		// only before running.
+		addDepartureHandler(this.teleportationEngine); 
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		// do iterations
@@ -272,7 +276,6 @@ public final class QSim implements VisMobsim, Netsim {
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.afterSim();
 		}
-		teleportationEngine.cleanupTeleportation(this);
 	}
 
 	/**
@@ -284,13 +287,11 @@ public final class QSim implements VisMobsim, Netsim {
 	 */
 	/*package*/ boolean doSimStep(final double time) {
 
-		// teleportation "engine":
-		this.teleportationEngine.handleTeleportationArrivals(this);
-
 		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.doSimStep(time);
 		}
+
 		// console printout:
 		this.printSimLog(time);
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
@@ -368,36 +369,18 @@ public final class QSim implements VisMobsim, Netsim {
 
 						agent.endLegAndComputeNextState(now) ;
 						this.internalInterface.arrangeNextAgentState(agent) ;
-						return ;
+						return;
 					}
 				} 
 			}
 		}
 
-		if (handleKnownLegModeDeparture(now, agent, linkId)) {
-			return;
-		} else {
-			teleportationEngine.handleDeparture(now, agent, linkId);
-			events.processEvent(new AdditionalTeleportationDepartureEvent(now,
-					agent.getId(), linkId, mode, agent.getDestinationLinkId(),
-					agent.getExpectedTravelTime()));
-		}
-	}
-
-	private boolean handleKnownLegModeDeparture(final double now,
-			final MobsimAgent planAgent, final Id linkId) {
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if (departureHandler.handleDeparture(now, planAgent, linkId)) {
-				return true;
+			if (departureHandler.handleDeparture(now, agent, linkId)) {
+				return;
 			}
-			// The code is not (yet?) very beautiful. But structurally, this
-			// goes through all departure handlers and tries to
-			// find one that feels responsible. If it feels responsible, it
-			// returns true, and so this method returns true.
-			// Otherwise, this method will return false, and then teleportation
-			// will be called. kai, jun'10
 		}
-		return false;
+
 	}
 
 	// ############################################################################################################################
@@ -527,8 +510,6 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 		if (mobsimEngine instanceof QNetsimEngine) {
 			this.netEngine = (QNetsimEngine) mobsimEngine;
-			this.addDepartureHandler(this.netEngine.getDepartureHandler());
-
 		}
 		if (mobsimEngine instanceof TeleportationEngine) {
 			this.teleportationEngine = (TeleportationEngine) mobsimEngine;
