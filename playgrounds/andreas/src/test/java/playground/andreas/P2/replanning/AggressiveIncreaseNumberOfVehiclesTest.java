@@ -33,12 +33,12 @@ public class AggressiveIncreaseNumberOfVehiclesTest {
 		Assert.assertEquals("Compare budget", 0.0, coop.getBudget(), MatsimTestUtils.EPSILON);
 		Assert.assertNull("Test plan should be null", testPlan);
 		
-		coop.setBudget(1500.0);
+		coop.setBudget(1000.0);
 		// nothing should change, due to insufficient funds
 		testPlan = strat.run(coop);
 		
 		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare budget", 1500.0, coop.getBudget(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare budget", 1000.0, coop.getBudget(), MatsimTestUtils.EPSILON);
 		Assert.assertNull("Test plan should be null", testPlan);
 		
 		coop.setBudget(1501.0);
