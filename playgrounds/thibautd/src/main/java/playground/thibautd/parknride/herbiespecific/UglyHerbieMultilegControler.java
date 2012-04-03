@@ -42,6 +42,8 @@ import herbie.running.scoring.TravelScoringFunction;
 
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
+import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
+import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
@@ -58,6 +60,7 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
 	private final HerbieConfigGroup herbieConfigGroup;
+	private ParkingPenaltyFactory penaltyFactory;
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 	
@@ -74,6 +77,10 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 		this.scenarioLoaded = true;
 	}
 
+	public void setParkingPenaltyFactory(final ParkingPenaltyFactory factory) {
+		penaltyFactory = factory;
+	}
+
 	@Override
 	protected void setUp() {
 		HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
@@ -84,7 +91,12 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 				this.getFacilities(),
 				this.getNetwork());
 
-		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
+		this.setScoringFunctionFactory(
+					new ParkAndRideScoringFunctionFactory(
+						herbieScoringFunctionFactory,
+						penaltyFactory,
+						getScenario().getActivityFacilities(),
+						getNetwork()));
 				
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		

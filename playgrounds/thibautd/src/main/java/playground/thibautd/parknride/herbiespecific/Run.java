@@ -61,8 +61,9 @@ public class Run {
 					CoordUtils.calcDistance( center , boundaryPoint ),
 					costPerSecondAtCenter * config.planCalcScore().getMarginalUtilityOfMoney());
 
-		MultiLegRoutingControler controler = new UglyHerbieMultilegControler( scenario );
-		controler.addControlerListener( ParkAndRideScoringFunctionFactory.createFactoryListener( penalty ) );
+		UglyHerbieMultilegControler controler = new UglyHerbieMultilegControler( scenario );
+		controler.setParkingPenaltyFactory( penalty );
+		//controler.addControlerListener( ParkAndRideScoringFunctionFactory.createFactoryListener( penalty ) );
 		controler.addControlerListener(new ModeAnalysis( true ));
 		controler.addControlerListener(new ActivityTypesAnalysis( true ));
 		controler.run();
