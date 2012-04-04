@@ -79,8 +79,9 @@ public class Solomon {
 	
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(Level.INFO);
-		Solomon solomon = new Solomon("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/cvrptw_solomon/nOfCust100/R108.txt", "100_R108");
+		Solomon solomon = new Solomon("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/cvrptw_solomon/nOfCust100/C103.txt", "100_C103");
 		solomon.run();
+
 	}
 
 	public void run(){
@@ -91,7 +92,7 @@ public class Solomon {
 		for(Job j : jobs){
 			vrpBuilder.addJob(j);
 		}
-		for(int i=0;i<20;i++){
+		for(int i=0;i<40;i++){
 			vrpBuilder.addVehicle(VrpUtils.createVehicle("" + (i+1), depotId, vehicleCapacity));
 		}
 		RuinAndRecreate algo = createAlgo(vrpBuilder.build());
@@ -101,8 +102,8 @@ public class Solomon {
 
 	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
 		RuinAndRecreateFactory factory = new DistributionTourWithTimeWindowsAlgoFactory();
-		factory.setIterations(500);
-		factory.setWarmUp(50);
+		factory.setIterations(1000);
+		factory.setWarmUp(100);
 		ChartListener chartListener = new ChartListener();
 		chartListener.setFilename("output/"+instanceName+".png");
 		RuinAndRecreateReport report = new RuinAndRecreateReport();

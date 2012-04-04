@@ -1,9 +1,9 @@
 package vrp.vrpInstances;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -14,9 +14,11 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.DistributionTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
@@ -59,6 +61,12 @@ public class TDSolomon {
 		}
 	}
 	
+	static class Result {
+		public double vehicles;
+		public double distance;
+		public double travelTime;
+	}
+	
 	private static Logger logger = Logger.getLogger(Christophides.class);
 
 	private VrpBuilder vrpBuilder;
@@ -80,6 +88,10 @@ public class TDSolomon {
 	private double depotStart;
 
 	private double depotEnd;
+	
+	private String output;
+	
+	private Result result;
 
 	public TDSolomon(List<Double> timeBins, List<Double> speedValues, String fileNameOfInstance, String instanceName) {
 		super();
@@ -105,11 +117,53 @@ public class TDSolomon {
 		speedValues.add(2.5);
 		speedValues.add(1.0);
 		
-//		for(int i=0;i<9;i++){
+		String inputFolder = "/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/cvrptw_solomon/nOfCust100/"; 
+		String outputFile = "/Users/stefan/Documents/workspace/playgrounds/sschroeder/output/tdSolomon/td3_r1_v2.txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
+		for(int i=0;i<12;i++){
+			String problem = "100_R1" + getName(i+1) + "_TD";
+			String problemFile = "R1" + getName(i+1) + ".txt";
 			TDSolomon solomon = new TDSolomon(timeBins,speedValues,
-					"/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/cvrptw_solomon/nOfCust100/R104.txt", "100_R104_TD");
+					inputFolder + problemFile, problem);
 			solomon.run();
-//		}
+			Result res = solomon.getResults();
+			write(writer, problem, res);
+		}
+		close(writer);
+		
+	}
+
+	private static String getName(int i) {
+		if(i<10){
+			return "0" + i;
+		}
+		else{
+			return "" + i;
+		}
+	}
+
+	private static void close(BufferedWriter writer) {
+		try {
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	private static void write(BufferedWriter writer, String problem, Result res) {
+		try {
+			writer.write(problem + ";" + res.vehicles + ";" + res.distance + ";" + res.travelTime + "\n");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private Result getResults() {
+		return result;
+		
 	}
 
 	public void run(){
@@ -125,7 +179,7 @@ public class TDSolomon {
 		for(Job j : jobs){
 			vrpBuilder.addJob(j);
 		}
-		for(int i=0;i<20;i++){
+		for(int i=0;i<30;i++){
 			Vehicle vehicle = VrpUtils.createVehicle("" + (i+1), depotId, vehicleCapacity);
 			vehicle.setEarliestDeparture(depotStart);
 			vehicle.setLatestArrival(depotEnd);
@@ -133,9 +187,28 @@ public class TDSolomon {
 		}
 		RuinAndRecreate algo = createAlgo(vrpBuilder.build());
 		algo.run();
+		RRSolution sol = algo.getSolution();
+		analyseAndMemorizeResults(sol);
 //		validate(algo.getSolution(),tdCosts);
 	}
 	
+
+	private void analyseAndMemorizeResults(RRSolution sol) {
+		double time = 0.0;
+		double dist = 0.0;
+		int vehicles = 0;
+		for(RRTourAgent a : sol.getTourAgents()){
+			if(a.isActive()){
+				time += a.getTour().costs.transportTime;
+				dist += a.getTour().costs.transportCosts;
+				vehicles++;
+			}
+		}
+		result = new Result();
+		result.distance = dist;
+		result.travelTime = time;
+		result.vehicles = vehicles;
+	}
 
 	private void validate(Collection<Tour> solution, TDCosts tdCosts) {
 		for(Tour t : solution){
@@ -181,8 +254,8 @@ public class TDSolomon {
 
 	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
 		RuinAndRecreateFactory factory = new DistributionTourWithTimeWindowsAlgoFactory();
-		factory.setIterations(1000);
-		factory.setWarmUp(50);
+		factory.setIterations(5000);
+		factory.setWarmUp(100);
 		ChartListener chartListener = new ChartListener();
 		chartListener.setFilename("output/"+instanceName+".png");
 		RuinAndRecreateReport report = new RuinAndRecreateReport();

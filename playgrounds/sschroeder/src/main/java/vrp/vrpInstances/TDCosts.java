@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.basics.CostParams;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Locations;
@@ -100,14 +101,16 @@ class TDCosts implements Costs {
 			
 		@Override
 		public Double getTransportCost(String fromId, String toId, double departureTime) {
-			return crowFly.getTransportCost(fromId, toId, departureTime) + getTransportTime(fromId,toId,departureTime);
+//			return crowFly.getTransportCost(fromId, toId, departureTime) + getTransportTime(fromId,toId,departureTime);
 //			return getTransportTime(fromId,toId,departureTime);
+			return crowFly.getTransportCost(fromId, toId, departureTime);
 		}
 		
 		@Override
 		public Double getBackwardTransportCost(String fromId, String toId,double arrivalTime) {
-			return crowFly.getTransportCost(fromId, toId, arrivalTime) + getBackwardTransportTime(fromId, toId, arrivalTime);
+//			return crowFly.getTransportCost(fromId, toId, arrivalTime) + getBackwardTransportTime(fromId, toId, arrivalTime);
 //			return getBackwardTransportTime(fromId, toId, arrivalTime);
+			return crowFly.getTransportCost(fromId, toId, arrivalTime);
 		}
 
 		
@@ -186,6 +189,11 @@ class TDCosts implements Costs {
 			}
 			travelTimes.put(key, totalTravelTime);
 			return totalTravelTime;
+		}
+
+		@Override
+		public CostParams getCostParams() {
+			return crowFly.getCostParams();
 		}
 
 	}
