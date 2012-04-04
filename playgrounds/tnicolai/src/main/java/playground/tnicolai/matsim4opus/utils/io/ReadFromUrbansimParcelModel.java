@@ -145,6 +145,8 @@ public class ReadFromUrbansimParcelModel {
 				pseudoZone.sumXCoordinate += coord.getX();
 				pseudoZone.sumYCoordinate += coord.getY() ;
 				pseudoZone.count ++ ;
+				
+				reader.close();
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

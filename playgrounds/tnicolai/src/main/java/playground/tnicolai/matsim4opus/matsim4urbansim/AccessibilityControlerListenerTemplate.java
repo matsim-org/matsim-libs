@@ -18,6 +18,7 @@ public class AccessibilityControlerListenerTemplate{
 	public static final String SHAPE_FILE = "SF";
 	public static final String NETWORK = "NW";
 	protected static String fileExtension;
+	protected boolean isParcelMode = false;
 	
 	// start points, measuring accessibility (cell based approach)
 	protected ZoneLayer<CounterObject> measuringPoints;

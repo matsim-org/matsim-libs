@@ -204,7 +204,7 @@ public class Constants {
 	public static final String BETA_WALK_LN_TRAVEL_COSTS = "betaWalkTravelCostPower2";
 	public static final String BETA_WALK_TRAVEL_COSTS_POWER = "betaWalkLnTravelCost";
 	
-	/** ERSA output file header items */
+	/** UrbanSim and/or MATSim output file header items */
 	public static final String ERSA_ZONE_ID = "zone_id";
 	public static final String ERSA_ZONE_X_COORD = "x_coord_zonecentroid";
 	public static final String ERSA_ZONE_Y_COORD = "y_coord_zonecentroid";
@@ -214,8 +214,6 @@ public class Constants {
 	public static final String ERSA_NEARESTNODE_ID = "nearest_node_id";
 	public static final String ERSA_NEARESTNODE_X_COORD = "x_coord_nn";
 	public static final String ERSA_NEARESTNODE_Y_COORD = "y_coord_nn";
-	public static final String ERSA_SQUARE_X_COORD = "x_coord_square";
-	public static final String ERSA_SQUARE_Y_COORD = "y_coord_square";
 	public static final String ERSA_X_COORDNIATE = "x_coordinate";
 	public static final String ERSA_Y_COORDINATE = "y_coordinate";
 	public static final String ERSA_TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
@@ -224,24 +222,18 @@ public class Constants {
 	public static final String ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY = "congested_travel_time_accessibility";
 	public static final String ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY = "freespeed_travel_time_accessibility";
 	public static final String ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY = "walk_travel_time_accessibility";
-	public static final String ERSA_CENTROID_ACCESSIBILITY = "centroid_accessibility";
-	public static final String ERSA_MEAN_ACCESSIBILITY = "mean_accessibility";
-	public static final String ERSA_DERIVATION_ACCESSIBILITY = "derivation_accessibility";
-	public static final String ERSA_CENTROID = "centroid";
-	public static final String ERSA_MEAN = "mean";
-	public static final String ERSA_DERIVATION = "derivation";
 	public static final String ERSA_PERSONS_COUNT = "persons";
 	public static final String ERSA_WORKPLACES_COUNT = "workplaces";
 	
 	/** Spatial IDs and spatial conversion factors */
-	public static final int SRID_WASHINGTON_NORTH = 2926;// srid 2285 also worked, but was last updated in 2001 instead of 2007
-	public static final int SRID_SWITZERLAND = 21781;
+	public static final int SRID_WASHINGTON_NORTH = 2926;	// srid 2285 also worked, but was last updated in 2001 instead of 2007
+	public static final int SRID_SWITZERLAND = 21781;		// 
+	public static final int SRID_BELGIUM = 31300;			// this is the EPSG id of Belgium (
 	public static final double FEET_IN_METER_CONVERSION_FACTOR = 0.3048; 			// this means 1ft corresponds to 0.348m
 	public static final double METER_IN_FEET_CONVERSION_FACTOR = 3.280839895013124;	// here 1 meter corresponds to 3.28084ft
 	
 	/** MATSim 4 UrbanSim parameter values as strings **/
 	public static final String TRUE = "true";
-	public static final String FALSE = "false";
 	
 	/** MATSim Modes **/
 	public static final String COLD_START = "cold_start";

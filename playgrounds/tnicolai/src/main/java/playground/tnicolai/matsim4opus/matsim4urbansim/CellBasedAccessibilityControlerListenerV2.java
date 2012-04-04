@@ -83,47 +83,6 @@ import com.vividsolutions.jts.geom.Point;
 public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityControlerListenerTemplate implements ShutdownListener{ // implements ShutdownListener
 	
 	private static final Logger log = Logger.getLogger(CellBasedAccessibilityControlerListener.class);
-//	public static final String SHAPE_FILE = "SF";
-//	public static final String NETWORK = "NW";
-//	private static String fileExtension;
-//	
-//	// start points, measuring accessibility
-//	ZoneLayer<CounterObject> measuringPoints;
-//	// destinations, opportunities like jobs etc ...
-//	AggregateObject2NearestNode[] aggregatedOpportunities;
-//	
-//	// storing the accessibility results
-//	private SpatialGrid<Double> carGrid;
-//	private SpatialGrid<Double> walkGrid;
-//	
-//	// accessibility parameter
-//	private boolean useRawSum	= false;
-//	private double logitScaleParameter;
-//	private double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
-//	private double betaCarTTPower;
-//	private double betaCarLnTT;
-//	private double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
-//	private double betaCarTDPower;
-//	private double betaCarLnTD;
-//	private double betaCarTC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-//	private double betaCarTCPower;
-//	private double betaCarLnTC;
-//	private double betaWalkTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-//	private double betaWalkTTPower;
-//	private double betaWalkLnTT;
-//	private double betaWalkTD;		// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
-//	private double betaWalkTDPower;
-//	private double betaWalkLnTD;
-//	private double betaWalkTC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-//	private double betaWalkTCPower;
-//	private double betaWalkLnTC;
-//	
-//	private double carTT, carTTPower, carLnTT, carTD, carTDPower, carLnTD, carTC, carTCPower, carLnTC,
-//		   walkTT, walkTTPower, walkLnTT, walkTD, walkTDPower, walkLnTD, walkTC, walkTCPower, walkLnTC;
-//	
-//	private double depatureTime;
-//	private double walkSpeedMeterPerHour = -1;
-//	Benchmark benchmark;
 	
 	/**
 	 * constructor
@@ -339,100 +298,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 			e.printStackTrace();
 		}
 	}
-	
-//	/**
-//	 * returns an util value for given betas and travel costs/offset
-//	 * 
-//	 * @param betaCarX
-//	 * @param CarTravelCostX
-//	 * @param betaWalkX
-//	 * @param walkOffsetX
-//	 * @return
-//	 */
-//	private double getAsUtilCar(final double betaCarX, final double CarTravelCostX, final double betaWalkX, final double walkOffsetX){
-//		if(betaCarX != 0.)
-//			return (betaCarX * CarTravelCostX + betaWalkX * walkOffsetX);
-//		return 0.;
-//	}
-//	
-//	/**
-//	 * returns an util value for given beta and travel costs+offset
-//	 * 
-//	 * @param betaWalkX
-//	 * @param walkTravelCostWithOffest
-//	 * @return
-//	 */
-//	private double getAsUtilWalk(final double betaWalkX, final double walkTravelCostWithOffest){
-//		if(betaWalkX != 0.)
-//			return (betaWalkX * walkTravelCostWithOffest);
-//		return 0.;
-//	}
-//	
-//	/**
-//	 * setting parameter for accessibility calculation
-//	 * @param scenario
-//	 */
-//	private void initAccessibilityParameter(ScenarioImpl scenario){
-//		
-//		AccessibilityParameterConfigModule module = ConfigurationModule.getAccessibilityParameterConfigModule(scenario);
-//		
-//		useRawSum		= module.isUseRawSumsWithoutLn();
-//		logitScaleParameter = module.getLogitScaleParameter();
-//		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
-//		
-//		betaCarTT 	   	= module.getBetaCarTravelTime();
-//		betaCarTTPower	= module.getBetaCarTravelTimePower2();
-//		betaCarLnTT		= module.getBetaCarLnTravelTime();
-//		betaCarTD		= module.getBetaCarTravelDistance();
-//		betaCarTDPower	= module.getBetaCarTravelDistancePower2();
-//		betaCarLnTD		= module.getBetaCarLnTravelDistance();
-//		betaCarTC		= module.getBetaCarTravelCost();
-//		betaCarTCPower	= module.getBetaCarTravelCostPower2();
-//		betaCarLnTC		= module.getBetaCarLnTravelCost();
-//		
-//		betaWalkTT		= module.getBetaWalkTravelTime();
-//		betaWalkTTPower	= module.getBetaWalkTravelTimePower2();
-//		betaWalkLnTT	= module.getBetaWalkLnTravelTime();
-//		betaWalkTD		= module.getBetaWalkTravelDistance();
-//		betaWalkTDPower	= module.getBetaWalkTravelDistancePower2();
-//		betaWalkLnTD	= module.getBetaWalkLnTravelDistance();
-//		betaWalkTC		= module.getBetaWalkTravelCost();
-//		betaWalkTCPower	= module.getBetaWalkTravelCostPower2();
-//		betaWalkLnTC	= module.getBetaWalkLnTravelCost();
-//		
-//		depatureTime 	= 8.*3600;	// tnicolai: make configurable		
-//		printParameterSettings();
-//	}
-//	
-//	/**
-//	 * displays settings
-//	 */
-//	public void printParameterSettings(){
-//		log.info("Computing and writing grid based accessibility measures with following settings:" );
-//		log.info("Returning raw sum (not logsum): " + useRawSum);
-//		log.info("Logit Scale Parameter: " + logitScaleParameter);
-//		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour);
-//		log.info("Depature time (in seconds): " + depatureTime);
-//		log.info("Beta Car Travel Time: " + betaCarTT );
-//		log.info("Beta Car Travel Time Power2: " + betaCarTTPower );
-//		log.info("Beta Car Ln Travel Time: " + betaCarLnTT );
-//		log.info("Beta Car Travel Distance: " + betaCarTD );
-//		log.info("Beta Car Travel Distance Power2: " + betaCarTDPower );
-//		log.info("Beta Car Ln Travel Distance: " + betaCarLnTD );
-//		log.info("Beta Car Travel Cost: " + betaCarTC );
-//		log.info("Beta Car Travel Cost Power2: " + betaCarTCPower );
-//		log.info("Beta Car Ln Travel Cost: " + betaCarLnTC );
-//		log.info("Beta Walk Travel Time: " + betaWalkTT );
-//		log.info("Beta Walk Travel Time Power2: " + betaWalkTTPower );
-//		log.info("Beta Walk Ln Travel Time: " + betaWalkLnTT );
-//		log.info("Beta Walk Travel Distance: " + betaWalkTD );
-//		log.info("Beta Walk Travel Distance Power2: " + betaWalkTDPower );
-//		log.info("Beta Walk Ln Travel Distance: " + betaWalkLnTD );
-//		log.info("Beta Walk Travel Cost: " + betaWalkTC );
-//		log.info("Beta Walk Travel Cost Power2: " + betaWalkTCPower );
-//		log.info("Beta Walk Ln Travel Cost: " + betaWalkLnTC );
-//	}
-	
+
 	// This needs to be executed only once at the end of the accessibility computation
 	// A synchronization is may be not needed
 	private void dumpResults() throws IOException{

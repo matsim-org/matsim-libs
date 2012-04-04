@@ -152,8 +152,13 @@ public class GridUtils {
 						
 			for(double y = ymin; y < ymax; y += gridSize) {
 				
+				// check first if cell centroid is within study area
+				double center_X = x + (gridSize/2);
+				double center_Y = y + (gridSize/2);
+				
 				// check if x, y is within network boundary
-				if(x <= xmax && x >= xmin && y <= ymax && y >= ymin){
+				if (center_X <= xmax && center_X >= xmin && 
+					center_Y <= ymax && center_Y >= ymin) {
 				
 					Point point = factory.createPoint(new Coordinate(x, y));
 					

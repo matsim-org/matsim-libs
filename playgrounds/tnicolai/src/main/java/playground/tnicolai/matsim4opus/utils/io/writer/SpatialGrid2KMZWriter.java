@@ -37,6 +37,9 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SpatialGrid2KMZWriter {
 
 	private static final Logger log = Logger.getLogger(SpatialGrid2KMZWriter.class);
+	private static final String CENTROID = "centroid";
+	private static final String MEAN = "mean";
+	private static final String DERIVATION = "derivation";
 
 	public static void writeKMZFiles(final SpatialGrid<SquareLayer> travelTimeAccessibilityGrid,
 									 final SpatialGrid<SquareLayer> travelCostAccessibilityGrid,
@@ -97,15 +100,15 @@ public class SpatialGrid2KMZWriter {
 		// writing centroid values
 		log.info("Writing centroid values ...");
 		writerCentroid.setColorizable(new MyColorizer( centroidValues ));
-		writerCentroid.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_CENTROID + type + Constants.FILE_TYPE_CSV);
+		writerCentroid.write(geometries, Constants.MATSIM_4_OPUS_TEMP + CENTROID + type + Constants.FILE_TYPE_CSV);
 		// writing mean values
 		log.info("writing mean values ...");
 		writerMean.setColorizable(new MyColorizer( meanValues ));
-		writerMean.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_MEAN + type + Constants.FILE_TYPE_CSV);
+		writerMean.write(geometries, Constants.MATSIM_4_OPUS_TEMP + MEAN + type + Constants.FILE_TYPE_CSV);
 		// writing derivation values
 		log.info("writing derivation values ...");
 		writerDerivation.setColorizable(new MyColorizer( derivationValues ));
-		writerDerivation.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_DERIVATION + type + Constants.FILE_TYPE_CSV);
+		writerDerivation.write(geometries, Constants.MATSIM_4_OPUS_TEMP + DERIVATION + type + Constants.FILE_TYPE_CSV);
 
 		log.info("... done!");
 	}

@@ -32,9 +32,15 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.gis.GridUtils;
+import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimZoneModel;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -59,11 +65,11 @@ import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWrite
  *  in the MATSim output folder. If the backup is activated the most imported files (see BackupRun class) are saved in a new folder. In order 
  *  to match the saved data with the corresponding run or year the folder names contain the "simulation year" and a time stamp.
  * - Other improvements:
- * 	For a better readability some functionality is outsourced into helper classes
+ * 	For a better readability some functionality is out-sourced into helper classes
  */
-public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcelV2{
+public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	
-	// tnicolai TODO:
+	// TODO:
 	// 1) Check Population Sampling --> seems to be ok! 
 	// 2) Distribution of Population (Verteilung ungleichmaessig)!!!
 
@@ -188,6 +194,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcelV2{
 	 * @param controler
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, Controler controler) {
+		
+		int srid = Constants.SRID_BELGIUM;
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
@@ -208,6 +216,44 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcelV2{
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
 																						aggregatedOpportunities, 
 																						benchmark));
+		}
+		
+		// new method
+		if(computeCellBasedAccessibility){
+			SpatialGrid<Double> carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid<Double> walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
+			ZoneLayer<CounterObject>  measuringPoints;
+			String fileExtension;
+			
+			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
+			if(aggregatedOpportunities == null)
+				aggregatedOpportunities = readUrbansimJobs(zones, jobSampleRate);
+			
+			if(computeCellBasedAccessibilitiesNetwork){
+				fileExtension = CellBasedAccessibilityControlerListenerV2.NETWORK;
+				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
+																			   nwBoundaryBox.getBoundingBox(),
+																			   srid);
+				carGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkGrid= new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+			}
+			else{
+				fileExtension = CellBasedAccessibilityControlerListenerV2.SHAPE_FILE;
+				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
+				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
+																				   boundary, 
+																				   srid);
+				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+			}
+			
+			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV2(measuringPoints, 
+																						 aggregatedOpportunities, 
+																						 carGrid,
+																						 walkGrid, 
+																						 fileExtension, 
+																						 benchmark, 
+																						 this.scenario));
 		}
 		
 		if(dumpPopulationData)

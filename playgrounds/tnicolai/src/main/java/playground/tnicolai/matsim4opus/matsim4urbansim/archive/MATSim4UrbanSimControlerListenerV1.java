@@ -65,7 +65,6 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 	private Map<Id,CounterObject> numberOfWorkplacesPerZone;
 	private String travelDataPath;
 	private String zonesPath;
-	private double beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts, betaPowerTravelCosts, betaTravelDistance, betaLnTravelDistance, betaPowerTravelDistance;
 
 	/**
 	 * constructor
@@ -91,8 +90,6 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
-		
-		initCostfunctionParameter(sc);
 
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		LeastCostPathTree lcpt = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()));
@@ -389,31 +386,4 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 		
 		log.info("DONE with computing zone2zone trip numbers ...") ;
 	}
-	
-	/**
-	 * initialize betas for logsum cost function 
-	 * 
-	 * @param scenario
-	 */
-	private void initCostfunctionParameter(Scenario scenario){
-		
-		try{
-			beta = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.LOGIT_SCALE_PARAMETER) );
-			betaTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES) );
-			betaLnTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_TIMES) );
-			betaPowerTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_TIMES_POWER) );
-			betaTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS) );
-			betaLnTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_COSTS) );
-			betaPowerTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_COSTS_POWER) );
-			betaTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE) );
-			betaLnTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_LN_TRAVEL_DISTANCE) );
-			betaPowerTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BETA_CAR_TRAVEL_DISTANCE_POWER) );
-		}
-		catch(NumberFormatException e){
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-	}
-
 }

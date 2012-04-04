@@ -112,8 +112,12 @@ public class SpatialGrid<T> {
 	public T getValue(Point point) {
 		if(isInBounds(point))
 			return (T)matrix[getRow(point.getY())][getColumn(point.getX())];
-		else
+		else{
+			System.out.println("This point lies outside the boundary!!!");
+			System.out.println("Boundary: xmin:"+this.minX+", ymin:"+ this.minY+", xmax:"+this.maxX+", maxy:"+this.maxY);
+			System.out.println("Point: x:"+point.getX()+ ", y:"+point.getY());
 			return null;
+		}
 	}
 	
 	public boolean setValue(T value, Point point) {

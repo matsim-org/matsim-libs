@@ -53,16 +53,16 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author thomas
  *
  */
-class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcel{
+class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 	
 	// Logger
-	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZurichAccessibility.class);
+	private static final Logger log = Logger.getLogger(MATSim4UrbanSimParcelZurichCaseStudy.class);
 	
 	/**
 	 * constructor
 	 * @param args
 	 */
-	public MATSim4UrbanSimZurichAccessibility(String args[]){
+	public MATSim4UrbanSimParcelZurichCaseStudy(String args[]){
 		super(args);
 	}
 	
@@ -124,7 +124,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcel{
 				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
 			
 			if(computeCellBasedAccessibilitiesNetwork){
-				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;
+				fileExtension = CellBasedAccessibilityControlerListenerV2.NETWORK;
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
 																			   nwBoundaryBox.getBoundingBox(),
 																			   srid);
@@ -132,7 +132,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcel{
 				walkGrid= new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
-				fileExtension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
+				fileExtension = CellBasedAccessibilityControlerListenerV2.SHAPE_FILE;
 				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
 				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
 																				   boundary, 
@@ -202,7 +202,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcel{
 		
 		long start = System.currentTimeMillis();
 		
-		MATSim4UrbanSimZurichAccessibility m4uZurich = new MATSim4UrbanSimZurichAccessibility(args);
+		MATSim4UrbanSimParcelZurichCaseStudy m4uZurich = new MATSim4UrbanSimParcelZurichCaseStudy(args);
 		m4uZurich.runMATSim();
 		m4uZurich.matim4UrbanSimShutdown();
 		

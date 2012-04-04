@@ -16,6 +16,12 @@ public class SpatialGridTableWriterERSA_V2 {
 
 	private static final Logger log = Logger.getLogger(SpatialGridTableWriterERSA_V2.class);
 
+	private static final String SQUARE_X_COORD = "x_coord_square";
+	private static final String SQUARE_Y_COORD = "y_coord_square";
+	private static final String CENTROID_ACCESSIBILITY = "centroid_accessibility";
+	private static final String MEAN_ACCESSIBILITY = "mean_accessibility";
+	private static final String DERIVATION_ACCESSIBILITY = "derivation_accessibility";
+	
 	public static void writeTableAndCSV(final SpatialGrid<SquareLayer> travelTimeAccessibilityGrid,
 										final SpatialGrid<SquareLayer> travelCostAccessibilityGrid,
 										final SpatialGrid<SquareLayer> travelDistanceAccessibilityGrid,
@@ -86,11 +92,11 @@ public class SpatialGridTableWriterERSA_V2 {
 							+ "_square_accessibility_indicators_v2"
 							+ Constants.FILE_TYPE_CSV);
 			// create header
-			csvWriter.write(Constants.ERSA_CENTROID_ACCESSIBILITY + ","
-					+ Constants.ERSA_MEAN_ACCESSIBILITY + ","
-					+ Constants.ERSA_DERIVATION_ACCESSIBILITY + ","
-					+ Constants.ERSA_SQUARE_X_COORD + ","
-					+ Constants.ERSA_SQUARE_Y_COORD);
+			csvWriter.write(CENTROID_ACCESSIBILITY + ","
+							+ MEAN_ACCESSIBILITY + ","
+							+ DERIVATION_ACCESSIBILITY + ","
+							+ SQUARE_X_COORD + ","
+							+ SQUARE_Y_COORD);
 			csvWriter.newLine();
 
 			int rows = grid.getNumRows();
