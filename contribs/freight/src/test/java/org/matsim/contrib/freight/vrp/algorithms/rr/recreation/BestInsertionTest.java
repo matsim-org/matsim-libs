@@ -59,7 +59,7 @@ public class BestInsertionTest extends VRPTestCase{
 		tourBuilder.schedulePickup(s1);
 		tourBuilder.scheduleDelivery(s1);
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		tourAgent1 = new RRTourAgentFactory(tourStatusProcessor, tourFactory).createTourAgent(tourBuilder.build(), vrp.getVehicles().iterator().next());
+		tourAgent1 = new RRTourAgentFactory(tourStatusProcessor, tourFactory, vrp.getCosts().getCostParams()).createTourAgent(tourBuilder.build(), vrp.getVehicles().iterator().next());
 		
 		VrpTourBuilder anotherTourBuilder = new VrpTourBuilder();
 		Shipment s2 = createShipment("2", makeId(10,0), makeId(0,0));
@@ -67,7 +67,7 @@ public class BestInsertionTest extends VRPTestCase{
 		anotherTourBuilder.schedulePickup(s2);
 		anotherTourBuilder.scheduleDelivery(s2);
 		anotherTourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		tourAgent2 = new RRTourAgentFactory(tourStatusProcessor, tourFactory).createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
+		tourAgent2 = new RRTourAgentFactory(tourStatusProcessor, tourFactory, vrp.getCosts().getCostParams()).createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
 		
 		Collection<RRTourAgent> agents = new ArrayList<RRTourAgent>();
 		agents.add(tourAgent1);
@@ -83,23 +83,23 @@ public class BestInsertionTest extends VRPTestCase{
 	
 
 	public void testSizeOfNewSolution(){
-		bestInsertion.run(solution, unassignedJobs);
+		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
 		assertEquals(2, solution.getTourAgents().size());
 	}
 	
 	public void testNuOfActivitiesOfAgent1(){
-		bestInsertion.run(solution, unassignedJobs);
+		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
 		assertEquals(6, tourAgent1.getTour().getActivities().size());
 	}
 	
 	public void testNuOfActivitiesOfAgent2(){
-		bestInsertion.run(solution, unassignedJobs);
+		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
 		assertEquals(4, tourAgent2.getTour().getActivities().size());
 	}
 	
 	public void testMarginalCostOfInsertion(){
 		double oldCost = solution.getResult();
-		bestInsertion.run(solution, unassignedJobs);
+		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
 		double newCost = solution.getResult();
 		assertEquals(newCost-oldCost, 4.0);
 	}
@@ -107,7 +107,7 @@ public class BestInsertionTest extends VRPTestCase{
 	public void testTotalCost(){
 		double oldCost = solution.getResult();
 		assertEquals(240.0,oldCost);
-		bestInsertion.run(solution, unassignedJobs);
+		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
 		double newCost = solution.getResult();
 		assertEquals(244.0,newCost);
 	}

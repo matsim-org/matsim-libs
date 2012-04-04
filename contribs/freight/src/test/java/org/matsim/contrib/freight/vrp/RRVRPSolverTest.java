@@ -34,12 +34,10 @@ public class RRVRPSolverTest extends TestCase{
 
 		@Override
 		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
-			ShipmentBasedVRPSolver solver = new ShipmentBasedVRPSolver(shipments, carrierVehicles, network);
+			ShipmentBasedVRPSolver solver = new ShipmentBasedVRPSolver(shipments, carrierVehicles,costs, network, new InitialSolution());
 			PickupAndDeliveryTourAlgoFactory ruinAndRecreateFactory = new PickupAndDeliveryTourAlgoFactory();
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
-			solver.setCosts(costs);
 			solver.setGlobalConstraints(new PickAndDeliveryCapacityAndTWConstraint());
-			solver.setIniSolutionFactory(new InitialSolution());
 			solver.setnOfWarmupIterations(20);
 			solver.setnOfIterations(50);
 			return solver;

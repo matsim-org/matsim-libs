@@ -28,6 +28,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.basics.CostParams;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.Tour;
@@ -106,6 +107,42 @@ public class RuinAndRecreateTest extends TestCase{
 				return getTransportTime(fromId, toId, arrivalTime);
 			}
 
+			@Override
+			public CostParams getCostParams() {
+				return new CostParams() {
+					
+					@Override
+					public double getCostPerVehicle() {
+						return 0;
+					}
+					
+					@Override
+					public double getCostPerSecondWaiting() {
+						return 0;
+					}
+					
+					@Override
+					public double getCostPerSecondTransport() {
+						return 1;
+					}
+					
+					@Override
+					public double getCostPerSecondTooLate() {
+						return 0;
+					}
+					
+					@Override
+					public double getCostPerSecondService() {
+						return 0;
+					}
+					
+					@Override
+					public double getCostPerMeter() {
+						return 1;
+					}
+				};
+			}
+
 		};
 		vrpBuilder = new VrpBuilder(costs, new PickORDeliveryCapacityAndTWConstraint());
 //		vrpBuilder.setDepot("0", 0.0, 0.0);
@@ -151,7 +188,7 @@ public class RuinAndRecreateTest extends TestCase{
 		Collection<Tour> solution = getTours(algo.getSolution());
 		int solVal = 0;
 		for(Tour t : solution){
-			solVal += t.costs.generalizedCosts;
+			solVal += t.costs.transportCosts;
 		}
 		assertEquals(397,solVal);
  	}
@@ -178,7 +215,7 @@ public class RuinAndRecreateTest extends TestCase{
 		Collection<Tour> solution = getTours(algo.getSolution());
 		int solVal = 0;
 		for(Tour t : solution){
-			solVal += t.costs.generalizedCosts;
+			solVal += t.costs.transportCosts;
 		}
 		assertEquals(solVal,445);
 	}

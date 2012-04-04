@@ -136,7 +136,7 @@ public class VRPTestCase extends TestCase{
 	
 	protected RRTourAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
 		
-		return new RRTourAgentFactory(tourStatusProcessor, tourFactory).createTourAgent(tour1, vehicle);
+		return new RRTourAgentFactory(tourStatusProcessor, tourFactory, vrp.getCosts().getCostParams()).createTourAgent(tour1, vehicle);
 	}
 	
 	private Coordinate makeCoord(int i, int j) {
