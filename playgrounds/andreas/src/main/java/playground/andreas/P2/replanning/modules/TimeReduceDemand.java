@@ -1,4 +1,4 @@
-package playground.andreas.P2.replanning;
+package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +15,8 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
+import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 
 /**
  * 

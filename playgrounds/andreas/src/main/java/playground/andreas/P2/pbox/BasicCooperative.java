@@ -32,10 +32,10 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
-import playground.andreas.P2.replanning.AggressiveIncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
+import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
 import playground.andreas.P2.scoring.ScoreContainer;
 
 /**

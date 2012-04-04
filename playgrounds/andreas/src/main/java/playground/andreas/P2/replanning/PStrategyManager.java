@@ -8,6 +8,12 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConfigGroup.PStrategySettings;
+import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
+import playground.andreas.P2.replanning.modules.MaxRandomEndTimeAllocator;
+import playground.andreas.P2.replanning.modules.MaxRandomStartTimeAllocator;
+import playground.andreas.P2.replanning.modules.TimeReduceDemand;
+import playground.andreas.P2.replanning.modules.deprecated.IncreaseNumberOfVehicles;
+import playground.andreas.P2.replanning.modules.deprecated.RemoveAllVehiclesButOne;
 
 /**
  * Loads strategies from config and chooses strategies according to their weights.
