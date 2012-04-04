@@ -92,7 +92,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcelV2{
 
 		// checking if this is a test run
 		// a test run only validates the xml config file by initializing the xml config via the xsd.
-		isTestTun();
+		isTestRun();
 
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.

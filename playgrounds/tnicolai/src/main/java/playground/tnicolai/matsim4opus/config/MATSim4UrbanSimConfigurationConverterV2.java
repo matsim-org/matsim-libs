@@ -138,7 +138,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 			initStandradMATSimConfig(matsimParameter);
 			
 			// MATSim4UrbanSim config initiation
-			initGlobalSettings(); // tnicolai: experimental
+			initGlobalSettings();
 			initMATSim4UrbanSimParameter(matsim4UrbanSimParameter);
 			initNetwork(matsimParameter);
 			initInputPlansFile(matsimParameter);
@@ -279,11 +279,12 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		boolean computeZone2ZoneImpedance 		= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance();
 		boolean computeAgentPerformanceFeedback	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance();
 		boolean computeZoneBasedAccessibility 	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility();
+		boolean computeCellBasedAccessibility	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility();
 		boolean computeCellBasedAccessibilityNetwork = false;
 		boolean computeCellbasedAccessibilityShapeFile = false;
 		// if cell-based accessibility is enabled, check whether a shapefile is given 
 		// (cell-based shape file computation enabled) or not (cell-based network computation enabled) 
-		if(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility()){ 
+		if(computeCellBasedAccessibility){ 
 			if(shapeFile.equalsIgnoreCase(""))
 				computeCellBasedAccessibilityNetwork = true;
 			else
@@ -294,7 +295,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		module.setAgentPerformance(computeAgentPerformanceFeedback);
 		module.setZone2ZoneImpedance(computeZone2ZoneImpedance);
 		module.setZoneBasedAccessibility(computeZoneBasedAccessibility);
-		module.setCellBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility());
+		module.setCellBasedAccessibility(computeCellBasedAccessibility);
 		module.setCellSizeCellBasedAccessibility(cellSize);
 		module.setCellBasedAccessibilityShapeFile(computeCellbasedAccessibilityShapeFile);
 		module.setCellBasedAccessibilityNetwork(computeCellBasedAccessibilityNetwork);
@@ -347,13 +348,13 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		if(useMATSimCarParameter){
 			// usually travelling_utils are negative
-			betaCarTT 	   	= cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // "marginalCostOfTime" [utils]
+			betaCarTT 	   	= cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // [utils/h]
 			betaCarTTPower	= 0.;
 			betaCarLnTT		= 0.;
-			betaCarTD		= cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar(); // this is [1/money * money/meter] = [1/meter]
-			betaCarTDPower	= 0.;
-			betaCarLnTD		= 0.;
-			betaCarTC		= cnScoringGroup.getMarginalUtilityOfMoney(); // [1/money]
+			betaCarTD		= cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar(); // this is [utils/money * money/meter] = [utils/meter]
+			betaCarTDPower	= 0.;																							// useful setting for MonetaryDistanceCostRateCar: 10cent/km (only fuel) or 
+			betaCarLnTD		= 0.;																							// 80cent/km (including taxes, insurance ...)
+			betaCarTC		= cnScoringGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaCarTCPower	= 0.;
 			betaCarLnTC		= 0.;
 		}
@@ -371,13 +372,13 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		if(useMATSimWalkParameter){
 			// usually travelling_utils are negative
-			betaWalkTT		= cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // "marginalCostOfTime"  [utils]
+			betaWalkTT		= cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // [utils/h]
 			betaWalkTTPower	= 0.;
 			betaWalkLnTT	= 0.;
-			betaWalkTD		= cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMarginalUtlOfDistanceWalk(); // no distanceCostRateWalk available, is marginalUtlOfDistanceWalk right? [1/money * money/meter] = [1/meter]
-			betaWalkTDPower	= 0.;																						  // make sure getMarginalUtlOfDistanceWalk is set in (standard) config 
+			betaWalkTD		= cnScoringGroup.getMarginalUtilityOfMoney() * 0.0; // getMonetaryDistanceCostRateWalk doesn't exist thus set to 0.0: [utils/money * money/meter] = [utils/meter]
+			betaWalkTDPower	= 0.;												
 			betaWalkLnTD	= 0.;
-			betaWalkTC		= cnScoringGroup.getMarginalUtilityOfMoney(); // [1/money]
+			betaWalkTC		= cnScoringGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaWalkTCPower	= 0.;
 			betaWalkLnTC	= 0.;
 		}

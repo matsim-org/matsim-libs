@@ -10,17 +10,18 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 
-public class AnalysisZoneCSVWriter {
+public class AnalysisZoneCSVWriterV2 {
 
-	private static final Logger log = Logger.getLogger(AnalysisZoneCSVWriter.class);
+	private static final Logger log = Logger.getLogger(AnalysisZoneCSVWriterV2.class);
 	private static BufferedWriter zoneCSVWriter = null;
+	public static final String FILE_NAME= "zones_complete.csv";
 	
 	/**
 	 * writes the header of accessibility data csv file
 	 */
 	public static void initAccessiblityWriter(String file){
 		try{
-			log.info("Initializing AnalysisZoneCSVWriter ...");
+			log.info("Initializing AnalysisZoneCSVWriterV2 ...");
 			zoneCSVWriter = IOUtils.getBufferedWriter( file );
 			
 			// create header
@@ -29,9 +30,8 @@ public class AnalysisZoneCSVWriter {
 										   Constants.ERSA_ZONE_Y_COORD + "," +
 										   Constants.ERSA_NEARESTNODE_X_COORD + "," +
 										   Constants.ERSA_NEARESTNODE_Y_COORD + "," +
-										   Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
-										   Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
-										   Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY);
+										   "car_accessibility," +
+										   "walk_accessibility");
 			zoneCSVWriter.newLine();
 			
 			log.info("... done!");
@@ -43,28 +43,28 @@ public class AnalysisZoneCSVWriter {
 	
 	/**
 	 * writing the accessibility measures into csv file
-	 * @param node
-	 * @param congestedTravelTimesCarLogSum
-	 * @param freespeedTravelTimesCarLogSum
-	 * @param travelTimesWalkLogSum
+	 * 
+	 * @param zoneID
+	 * @param zoneCentroid
+	 * @param nearestNode
+	 * @param carAccessibility
+	 * @param walkAccessibility
 	 */
 	public static void write(Id zoneID,
 							 Coord zoneCentroid,
 							 Coord nearestNode,
-							 double congestedTravelTimesCarLogSum, 
-							 double freespeedTravelTimesCarLogSum, 
-							 double travelTimesWalkLogSum){
+							 double carAccessibility, 
+							 double walkAccessibility){
 		
 		try{
-			assert(AnalysisZoneCSVWriter.zoneCSVWriter != null);
+			assert(AnalysisZoneCSVWriterV2.zoneCSVWriter != null);
 			zoneCSVWriter.write( zoneID + "," + 
 								 zoneCentroid.getX() + "," + 
 								 zoneCentroid.getY() + "," + 
 								 nearestNode.getX() + "," + 
 								 nearestNode.getY() + "," + 
-								 congestedTravelTimesCarLogSum + "," + 
-								 freespeedTravelTimesCarLogSum + "," + 
-								 travelTimesWalkLogSum );
+								 carAccessibility + "," + 
+								 walkAccessibility );
 			zoneCSVWriter.newLine();
 		}
 		catch(Exception e){
@@ -77,8 +77,8 @@ public class AnalysisZoneCSVWriter {
 	 */
 	public static void close(){
 		try {
-			log.info("Closing AnalysisZoneCSVWriter ...");
-			assert(AnalysisZoneCSVWriter.zoneCSVWriter != null);
+			log.info("Closing AnalysisZoneCSVWriterV2 ...");
+			assert(AnalysisZoneCSVWriterV2.zoneCSVWriter != null);
 			zoneCSVWriter.flush();
 			zoneCSVWriter.close();
 			log.info("... done!");

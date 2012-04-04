@@ -198,22 +198,31 @@ public class GridUtils {
 		return new SpatialGrid<Double>(xMin, yMin, xMax, yMax, gridSize);
 	}
 
+	/**
+	 * 
+	 * @param grid
+	 * @param fileName
+	 */
 	public static void writeSpatialGridTable(SpatialGrid<Double> grid, String fileName){
 		
-		log.info("Writing spatial grid tables ...");
+		log.info("Writing spatial grid table " + fileName + " ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 		try{
 			sgTableWriter.write(grid, fileName);
+			log.info("... done!");
 		}catch(IOException e){
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * @param myListener
+	 * 
+	 * @param measuringPoints
+	 * @param grid
+	 * @param fileName
 	 */
 	public static void writeKMZFiles(ZoneLayer<CounterObject> measuringPoints, SpatialGrid<Double> grid, String fileName) {
-		log.info("Writing Google Erath files ...");
+		log.info("Writing Google Erath file " + fileName + " ...");
 		
 		FeatureKMLWriter writer = new FeatureKMLWriter();
 		Set<Geometry> geometries = new HashSet<Geometry>();
@@ -229,6 +238,6 @@ public class GridUtils {
 		// writing travel time accessibility kmz file
 		writer.setColorizable(new MyColorizer(kmzData));
 		writer.write(geometries, fileName);
-		log.info("Done with writing Google Erath files ...");
+		log.info("... done!");
 	}
 }

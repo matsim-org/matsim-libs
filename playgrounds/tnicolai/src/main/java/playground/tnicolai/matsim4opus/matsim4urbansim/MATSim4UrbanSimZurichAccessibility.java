@@ -112,53 +112,85 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
 		
 		// The following lines register what should be executed _after_ the iterations are done:		
 		
-		if(computeCellBasedAccessibilitiesNetwork || computeCellBasedAccessibilitiesShapeFile){
-			
-//			SpatialGrid<Double> carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
-//			SpatialGrid<Double> walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid;
-			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
-			SpatialGrid<Double> walkTravelTimeAccessibilityGrid;
+		// new method
+		if(computeCellBasedAccessibility){
+			SpatialGrid<Double> carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid<Double> walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
 			ZoneLayer<CounterObject>  measuringPoints;
-			String extension;
+			String fileExtension;
 			
 			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
 			if(aggregatedOpportunities == null)
 				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
 			
-			if (computeCellBasedAccessibilitiesNetwork) {
-				extension = CellBasedAccessibilityControlerListener.NETWORK;
+			if(computeCellBasedAccessibilitiesNetwork){
+				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
 																			   nwBoundaryBox.getBoundingBox(),
 																			   srid);
-//				carGrid = new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//				walkGrid= new SpatialGrid<Double>(NetworkBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				congestedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				freespeedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkTravelTimeAccessibilityGrid		 = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				carGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkGrid= new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
-				extension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
+				fileExtension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
 				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
 				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
 																				   boundary, 
 																				   srid);
-//				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				walkTravelTimeAccessibilityGrid      = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-			} 
+				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+			}
 			
-			controler.addControlerListener( new CellBasedAccessibilityControlerListener(measuringPoints, 
-																							 aggregatedOpportunities,
-																							 congestedTravelTimeAccessibilityGrid, 
-																							 freespeedTravelTimeAccessibilityGrid, 
-																							 walkTravelTimeAccessibilityGrid,
-																							 extension,
-																							 benchmark) );
-			
+			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV2(measuringPoints, 
+																						 aggregatedOpportunities, 
+																						 carGrid,
+																						 walkGrid, 
+																						 fileExtension, 
+																						 benchmark, 
+																						 this.scenario));
 		}
+		
+//		// old method
+//		if(computeCellBasedAccessibility){
+//
+//			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid;
+//			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
+//			SpatialGrid<Double> walkTravelTimeAccessibilityGrid;
+//			ZoneLayer<CounterObject>  measuringPoints;
+//			String fileExtension;
+//			
+//			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
+//			if(aggregatedOpportunities == null)
+//				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
+//			
+//			if (computeCellBasedAccessibilitiesNetwork) {
+//				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;
+//				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
+//																			   nwBoundaryBox.getBoundingBox(),
+//																			   srid);
+//				congestedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+//				freespeedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+//				walkTravelTimeAccessibilityGrid		 = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+//			}
+//			else{
+//				fileExtension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
+//				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
+//				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
+//																				   boundary, 
+//																				   srid);
+//				congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+//				freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+//				walkTravelTimeAccessibilityGrid      = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+//			} 
+//			
+//			controler.addControlerListener( new CellBasedAccessibilityControlerListener(measuringPoints, 
+//																							 aggregatedOpportunities,
+//																							 congestedTravelTimeAccessibilityGrid, 
+//																							 freespeedTravelTimeAccessibilityGrid, 
+//																							 walkTravelTimeAccessibilityGrid,
+//																							 fileExtension,
+//																							 benchmark) );
+//		}
 	}
 	
 	/**

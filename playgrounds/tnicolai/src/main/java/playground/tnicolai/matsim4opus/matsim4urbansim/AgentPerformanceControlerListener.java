@@ -59,7 +59,8 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 		Iterator<? extends Person> persons = population.getPersons().values().iterator();
 		
 		while(persons.hasNext()){
-
+			
+			// tnicolai: add monetary costs !!!
 			double duration_home_work_min 	= -1.;
 			double distance_home_work_meter	= -1.;
 			double duration_work_home_min	= -1.;

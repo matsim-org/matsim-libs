@@ -248,15 +248,15 @@ public class CellBasedAccessibilityControlerListener implements ShutdownListener
 				double freespeedTravelTimesCarSum = 0.;
 				double travelTimesWalkSum  	   	  = 0.; // substitute for travel distance
 
-				// go through all jobs (nearest network node) and calculate workplace accessibility
+				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
 				for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
 					
 					// get stored network node (this is the nearest node next to an aggregated workplace)
 					Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 
-					// using number of aggregated workplaces as weight for log sum measure
-					int jobWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
+					// using number of aggregated opportunities as weight for log sum measure
+					int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
 
 					double arrivalTime = lcptCongestedTravelTime.getTree().get( nodeID ).getTime();
 					
@@ -268,11 +268,11 @@ public class CellBasedAccessibilityControlerListener implements ShutdownListener
 					double walkTravelTime_min = lcptWalkTime.getTree().get( nodeID ).getCost() / 60.;
 					
 					// sum congested travel times
-					congestedTravelTimesCarSum += Math.exp( betaScale * ((betaCarMin * congestedTravelTime_min) + (betaWalkMin * walkTimeOffset_min)) ) * jobWeight;
+					congestedTravelTimesCarSum += Math.exp( betaScale * ((betaCarMin * congestedTravelTime_min) + (betaWalkMin * walkTimeOffset_min)) ) * opportunityWeight;
 					// sum freespeed travel times
-					freespeedTravelTimesCarSum += Math.exp( betaScale * ((betaCarMin * freespeedTravelTime_min) + (betaWalkMin * walkTimeOffset_min)) ) * jobWeight;
+					freespeedTravelTimesCarSum += Math.exp( betaScale * ((betaCarMin * freespeedTravelTime_min) + (betaWalkMin * walkTimeOffset_min)) ) * opportunityWeight;
 					// sum walk travel times (substitute for distances)
-					travelTimesWalkSum 		   += Math.exp( betaScale * (betaWalkMin * (walkTravelTime_min + walkTimeOffset_min)) ) * jobWeight;
+					travelTimesWalkSum 		   += Math.exp( betaScale * (betaWalkMin * (walkTravelTime_min + walkTimeOffset_min)) ) * opportunityWeight;
 				}
 				
 				// get log sum 

@@ -92,10 +92,11 @@ public class MATSim4UrbanSimParcelV2 {
 	AggregateObject2NearestNode[] aggregatedOpportunities = null;
 	
 	// run selected controler
+	boolean computeCellBasedAccessibility			 = false;
 	boolean computeCellBasedAccessibilitiesShapeFile = false;
-	boolean computeZone2ZoneImpedance		   		 = false;
 	boolean computeCellBasedAccessibilitiesNetwork 	 = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
 	boolean computeZoneBasedAccessibilities			 = false;
+	boolean computeZone2ZoneImpedance		   		 = false;
 	boolean computeAgentPerformance					 = false;
 	boolean dumpPopulationData 						 = false;
 	boolean dumpAggegatedWorkplaceData 			  	 = false;
@@ -136,7 +137,7 @@ public class MATSim4UrbanSimParcelV2 {
 
 		// checking if this is a test run
 		// a test run only validates the xml config file by initializing the xml config via the xsd.
-		isTestTun();
+		isTestRun();
 
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
@@ -166,17 +167,6 @@ public class MATSim4UrbanSimParcelV2 {
 
 		// running mobsim and assigned controller listener
 		runControler(zones, parcels);
-	}
-	
-	void isTestTun(){
-//		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
-//			log.info("TestRun was successful...");
-//			return;
-//		}
-		if(getUrbanSimParameterConfig().isTestRun()){
-			log.info("TestRun was successful...");
-			return;
-		}
 	}
 	
 	/**
@@ -269,12 +259,7 @@ public class MATSim4UrbanSimParcelV2 {
 		addControlerListener(zones, parcels, controler);
 		addFurtherControlerListener(controler, parcels);
 		log.info("Adding controler listener done!");
-		
-		// tnicolai todo?: count number of cars per h on a link
-		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
-		// get VolumeLinkAnalyzer by "event.getControler.getVolume... and run getVolumesForLink. that returns an int array with the number of cars per hour on an specific link 
-		// see also http://matsim.org/docs/controler
-		
+	
 		// run the iterations, including post-processing:
 		controler.run() ;
 	}
@@ -304,9 +289,10 @@ public class MATSim4UrbanSimParcelV2 {
 				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
 			// creates zone based table of log sums (workplace accessibility)
 			// uses always a 100% jobSample size (see readUrbansimJobs below)
-			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
+			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV2(zones, 				
 																						aggregatedOpportunities, 
-																						benchmark));
+																						benchmark,
+																						this.scenario));
 		}
 		
 		if(dumpPopulationData)
@@ -320,6 +306,11 @@ public class MATSim4UrbanSimParcelV2 {
 			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
 																		aggregatedOpportunities);
 		}
+		
+		// to count number of cars per h on a link
+		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
+		// get VolumeLinkAnalyzer by "event.getControler.getVolume... and run getVolumesForLink. that returns an int array with the number of cars per hour on an specific link 
+		// see also http://matsim.org/docs/controler
 	}
 	
 	/**
@@ -340,6 +331,7 @@ public class MATSim4UrbanSimParcelV2 {
 		this.computeAgentPerformance	= module.isAgentPerformance();
 		this.computeZone2ZoneImpedance	= module.isZone2ZoneImpedance();
 		this.computeZoneBasedAccessibilities = module.isZoneBasedAccessibility();
+		this.computeCellBasedAccessibility	= module.isCellBasedAccessibility();
 		this.computeCellBasedAccessibilitiesShapeFile = module.isCellBasedAccessibilityShapeFile();
 		this.computeCellBasedAccessibilitiesNetwork = module.isCellBasedAccessibilityNetwork();
 		this.dumpPopulationData = false;
@@ -414,6 +406,17 @@ public class MATSim4UrbanSimParcelV2 {
 	 */
 	void matim4UrbanSimShutdown(){
 		BackupRun.runBackup(scenario);
+	}
+	
+	/**
+	 * 
+	 */
+	void isTestRun(){
+		if(getUrbanSimParameterConfig().isTestRun()){
+			log.info("TestRun was successful...");
+			MATSim4UrbanSimParcelV2.isSuccessfulMATSimRun = true;
+			return;
+		}
 	}
 	
 	AccessibilityParameterConfigModule getAccessibilityParameterConfig() {

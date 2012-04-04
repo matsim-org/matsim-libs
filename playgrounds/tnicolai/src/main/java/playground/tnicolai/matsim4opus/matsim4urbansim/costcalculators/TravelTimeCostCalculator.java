@@ -26,7 +26,7 @@ public class TravelTimeCostCalculator implements TravelMinDisutility, TravelDisu
 	public double getLinkTravelDisutility(Link link, double time) {
 		if(link != null){
 			double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
-			return travelTime;
+			return travelTime; 	// travel time in seconds
 		}
 		log.warn("Link is null. Returned 0 as car time.");
 		return 0.;
@@ -34,7 +34,7 @@ public class TravelTimeCostCalculator implements TravelMinDisutility, TravelDisu
 	
 	@Override
 	public double getLinkMinimumTravelDisutility(final Link link) {
-		if(link != null)
+		if(link != null) 		// travel time in seconds
 			return (link.getLength() / link.getFreespeed());
 		log.warn("Link is null. Returned 0 as walk time.");
 		return 0.;
