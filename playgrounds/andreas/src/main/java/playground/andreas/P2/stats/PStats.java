@@ -75,13 +75,14 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 	final private static int INDEX_SHAREPOSPAX = 11;
 	final private static int INDEX_SHAREPOSVEH = 12;
 
-
 	private BufferedWriter pStatsWriter;
 
 	private double[][] history = null;
 	private int minIteration = 0;
 	private PBox pBox;
 	private PConfigGroup pConfig;
+
+	private RecursiveStatsContainer statsContainer;
 
 	public PStats(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
 		this.pBox = pBox;
@@ -96,7 +97,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 			log.info("enabled");
 			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pStats.txt"));
 			try {
-				this.pStatsWriter.write("iter\tcoops\t+coops\tpax\t+pax\tveh\t+veh\tbudget\t+budget\tscore\t+score\tsharePosCoop\tsharePosPax\tsharePosVeh\t\n");
+				this.pStatsWriter.write("iter\tcoops\t+coops\tpax\t+pax\tveh\t+veh\tbudget\t+budget\tscore\t+score\tsharePosCoop\tsharePosPax\tsharePosVeh\tmeanCoop+\tstdDevCoop+\tmeanPax+\tstdDevPax+\tmeanVeh+\tstdDevVeh+\t\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -109,6 +110,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 10000) iterations = 10000; // limit the history size
 		this.history = new double[14][iterations+1];
+		this.statsContainer = new RecursiveStatsContainer();
 	}
 
 	@Override
@@ -159,9 +161,13 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 			double sharePosPax = paxPos / pax * 100.0;
 			double sharePosVeh = vehPos / veh * 100.0;
 			
+			this.statsContainer.handleNewEntry(coopPos, paxPos, vehPos);
+			
 			try {
 				this.pStatsWriter.write(event.getIteration() + "\t" + (int) coop + "\t" + (int) coopPos + "\t" + (int) pax + "\t" + (int) paxPos + "\t" + (int) veh + "\t" + (int) vehPos + "\t" +
-						budget + "\t" + budgetPos + "\t" + score + "\t" + scorePos + "\t" + sharePosCoop + "\t" + sharePosPax + "\t" + sharePosVeh + "\n");
+						budget + "\t" + budgetPos + "\t" + score + "\t" + scorePos + "\t" + sharePosCoop + "\t" + sharePosPax + "\t" + sharePosVeh + "\t" +
+						statsContainer.getArithmeticMeanCoops() + "\t" + statsContainer.getStdDevCoop() + "\t" + statsContainer.getArithmeticMeanPax() + "\t" + statsContainer.getStdDevPax() + "\t" + 
+						statsContainer.getArithmeticMeanVeh() + "\t" + statsContainer.getStdDevVeh() + "\n");
 				this.pStatsWriter.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
