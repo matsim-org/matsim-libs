@@ -42,7 +42,7 @@ public class NoiseTool {
 	
 	String outputfile = runDirectory + "noiseEvents.xml";
 
-	/* constructor */
+	
 	public NoiseTool() {
 		Config config = ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.createScenario(config);
@@ -56,7 +56,7 @@ public class NoiseTool {
 		noise.run(args);
 	}
 
-	/*method without return value*/
+	
 	private void run(String[] args) {
 
 		loadScenario();
@@ -71,8 +71,8 @@ public class NoiseTool {
 		matsimEventsReader.readFile(eventsFile);
 
 		/* get information from class NoiseHandler  and save it in the following maps: linkId, time, traffic info*/
-		Map<Id, Map<String, double[]>> linkInfos = handler.getlinkToTrafficInfo();
-		Map <Id,double [][]> linkInfosProStunde = handler.getInfosProStunde();
+		Map<Id, Map<String, double[]>> linkInfos = handler.getlinkId2timePeriod2TrafficInfo();
+		Map <Id,double [][]> linkInfosProStunde = handler.getlinkId2hour2vehicles();
 	
 		/* new instance of the class Calculation*/
 		Calculation calculation = new Calculation();

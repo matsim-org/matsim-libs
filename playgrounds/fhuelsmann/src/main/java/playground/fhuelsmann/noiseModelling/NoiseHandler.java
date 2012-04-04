@@ -40,9 +40,9 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 	private final Network network;
 	// private final EventsManager NoiseEventsManager;
 
-	private Map<Id, Map<String, double[]>> linkToTrafficInfo = new TreeMap<Id, Map<String, double[]>>();
+	private Map<Id, Map<String, double[]>> linkId2timePeriod2trafficInfo = new TreeMap<Id, Map<String, double[]>>();
 	private Map<Id, List<Double>> linkTimes = new TreeMap<Id, List<Double>>();
-	private Map <Id,double[][]> linkToInfosProStunde = new TreeMap <Id, double[][]> ();
+	private Map <Id,double[][]> linkId2hour2vehicles = new TreeMap <Id, double[][]> ();
 
 	// Constructor
 	public NoiseHandler(Network network) {
@@ -70,23 +70,23 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 		double freeSpeedInKmh = freeSpeedInMs * 3.6;
 		
 		/*********calculation of vehicles per hour**********/
-		if(!linkToInfosProStunde.containsKey(linkId)){
-			double[][] infosProStunde = new double[24][2];
+		if(!linkId2hour2vehicles.containsKey(linkId)){
+			double[][] hour2vehicles = new double[24][2];
 			for(int i=0;i<24;++i){
-				infosProStunde[i][0] = 0.0 ; //first element includes the total number of vehicles
-				infosProStunde[i][1] = 0.0 ; // the second element includes the number of heavyduty vehicles 
+				hour2vehicles[i][0] = 0.0 ; //first element includes the total number of vehicles
+				hour2vehicles[i][1] = 0.0 ; // the second element includes the number of heavyduty vehicles 
 			}
-			linkToInfosProStunde.put(linkId, infosProStunde);
+			linkId2hour2vehicles.put(linkId, hour2vehicles);
 		}
 		
 		int index = timeClass - 1 ;
 		if(index<24){
 			if(personId.toString().contains("gv_")){ // check if it is a heavy duty vehicle
-				++ linkToInfosProStunde.get(linkId)[index][0] ;
-				++ linkToInfosProStunde.get(linkId)[index][1] ;
+				++ linkId2hour2vehicles.get(linkId)[index][0] ;
+				++ linkId2hour2vehicles.get(linkId)[index][1] ;
 			}
 			else{
-				++ linkToInfosProStunde.get(linkId)[index][0] ;
+				++ linkId2hour2vehicles.get(linkId)[index][0] ;
 			}
 		}
 		/********calculation of vehicles per hour***********/
@@ -96,7 +96,7 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 		// number of total vehicles [1]
 		// and heavy duty vehicles [2] 
 		// if the linkId doesn't exist in the map
-		if (!linkToTrafficInfo.containsKey(linkId)) {
+		if (!linkId2timePeriod2trafficInfo.containsKey(linkId)) {
 			double[] trafficInfo = new double[3];
 			// initialize the array
 			trafficInfo[0] = freeSpeedInKmh; // the first element of the array
@@ -112,9 +112,9 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 			}
 			Map<String, double[]> timeToTrafficInfo = new TreeMap<String, double[]>();
 			timeToTrafficInfo.put(timePeriod, trafficInfo);
-			linkToTrafficInfo.put(linkId, timeToTrafficInfo);
+			linkId2timePeriod2trafficInfo.put(linkId, timeToTrafficInfo);
 		} else {
-			if (!linkToTrafficInfo.get(linkId).containsKey(timePeriod)) {
+			if (!linkId2timePeriod2trafficInfo.get(linkId).containsKey(timePeriod)) {
 				double[] trafficInfo = new double[3];
 				trafficInfo[0] = freeSpeedInKmh; // the first element of the
 													// array contains freespeed
@@ -127,12 +127,12 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 				} else {
 					trafficInfo[2] = 0.0;
 				}
-				linkToTrafficInfo.get(linkId).put(timePeriod, trafficInfo);
+				linkId2timePeriod2trafficInfo.get(linkId).put(timePeriod, trafficInfo);
 			} else {
 				if (personId.toString().contains("gv_")) {
-					++linkToTrafficInfo.get(linkId).get(timePeriod)[2];
+					++linkId2timePeriod2trafficInfo.get(linkId).get(timePeriod)[2];
 				}
-				++linkToTrafficInfo.get(linkId).get(timePeriod)[1];
+				++linkId2timePeriod2trafficInfo.get(linkId).get(timePeriod)[1];
 			}
 		}
 	}
@@ -157,15 +157,15 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 
 	}
 	
-	public Map<Id, Map<String, double[]>> getlinkToTrafficInfo() {
-		return linkToTrafficInfo;
+	public Map<Id, Map<String, double[]>> getlinkId2timePeriod2TrafficInfo() {
+		return linkId2timePeriod2trafficInfo;
 	}
 
 	public Map<Id, List<Double>> getlinkTimes() {
 		return linkTimes;
 	}
-	public Map <Id,double [][]> getInfosProStunde(){
-		return linkToInfosProStunde;
+	public Map <Id,double [][]> getlinkId2hour2vehicles(){
+		return linkId2hour2vehicles;
 	}
 
 }
