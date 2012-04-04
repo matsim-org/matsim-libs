@@ -450,6 +450,13 @@ public class RblMerger {
 			double arrivalDelay = stopStats.getArithmeticMeanArrival();
 			double departureDelay = stopStats.getArithmeticMeanDeparture();
 			lastTransitRouteStops.add(newTransitSchedule.getFactory().createTransitRouteStop(stopFacility, arrivalDelay, departureDelay));
+
+			if (lastTransitRouteStops.size() > 1) {
+				// last and second last are the same - remove last stop
+				if (lastTransitRouteStops.get(lastTransitRouteStops.size() - 1).getStopFacility().getId() == lastTransitRouteStops.get(lastTransitRouteStops.size() - 2).getStopFacility().getId()){
+					lastTransitRouteStops.remove(lastTransitRouteStops.size() - 1);
+				}
+			}
 		}
 				
 		log.info("Finished creating transit route stops...");
@@ -491,24 +498,20 @@ public class RblMerger {
 					}
 					
 					if(lastLinkId != null){
-						Path path = routeAlgo.calcLeastCostPath(scenario.getNetwork().getLinks().get(lastLinkId).getToNode(), scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getToNode(), 0.0);
+						links.add(lastLinkId);
+						Path path = routeAlgo.calcLeastCostPath(scenario.getNetwork().getLinks().get(lastLinkId).getToNode(), scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getFromNode(), 0.0);
 						for (Link link : path.links) {
 							links.add(link.getId());
-						}
-						if(path.links.size() != 0){
-							if (stop.getStopFacility().getLinkId() != path.links.get(path.links.size() - 1).getId()) {
-								path = routeAlgo.calcLeastCostPath(path.links.get(path.links.size() - 1).getToNode(), scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getFromNode(), 0.0);
-								for (Link link : path.links) {
-									links.add(link.getId());
-								}
-								links.add(stop.getStopFacility().getLinkId());
-							}
 						}
 					}
 					
 					lastLinkId = stop.getStopFacility().getLinkId();
 				}
 
+				if(links.size() != 0){
+					links.remove(0);
+				}
+				
 				LinkNetworkRouteImpl networkRoute = new LinkNetworkRouteImpl(startLinkId, lastLinkId);
 				networkRoute.setLinkIds(startLinkId, links, lastLinkId);
 	
