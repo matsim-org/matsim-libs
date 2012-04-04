@@ -128,10 +128,6 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
     @Override
 	public void notifyScoring(ScoringEvent event) {
 		carrierAgentTracker.scoreSelectedPlans();
-		double score = 0.0;
-		for(Carrier carrier : carriers.getCarriers().values()){
-			score += carrier.getSelectedPlan().getScore();
-		}
 	}
 
 	@Override
@@ -180,7 +176,11 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 		stratManager.addStrategy(planStrat_reRoutePlan, 0.05);
 		
 		for(Carrier carrier : carriers.getCarriers().values()){
-				stratManager.nextStrategy().run(carrier);
+			if(carrier.getSelectedPlan() == null){
+				logger.warn("carrier cannot replan since no selected plan is available");
+				continue;
+			}
+			stratManager.nextStrategy().run(carrier);
 		}
 		
 	}

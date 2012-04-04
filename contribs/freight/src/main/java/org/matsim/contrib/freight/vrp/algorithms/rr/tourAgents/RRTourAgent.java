@@ -179,12 +179,12 @@ public class RRTourAgent {
 		if(newTour != null){
 			double marginalCosts = cost(newTour) - cost(tour);
 			double price;
-			if(noFixedCosts){
+//			if(noFixedCosts){
 				price = marginalCosts;
-			}
-			else{
-				price = marginalCosts + shareOfFixedCosts(job,newTour);
-			}
+//			}
+//			else{
+//				price = marginalCosts + shareOfFixedCosts(job,newTour);
+//			}
 			 
 //			if(scale || !active || keepScaling){
 //				price = scale(marginalCosts);
