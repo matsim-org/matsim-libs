@@ -13,7 +13,7 @@ import playground.andreas.P2.replanning.PStrategy;
 
 /**
  * 
- * Changes the end time of operation randomly within a certain range, leaving a minimal operating time.
+ * Sets a new endTime between the old endTime and midnight.
  * 
  * @author aneumann
  *

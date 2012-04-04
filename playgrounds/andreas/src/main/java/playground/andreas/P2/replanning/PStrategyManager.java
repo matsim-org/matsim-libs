@@ -11,6 +11,8 @@ import playground.andreas.P2.helper.PConfigGroup.PStrategySettings;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.MaxRandomEndTimeAllocator;
 import playground.andreas.P2.replanning.modules.MaxRandomStartTimeAllocator;
+import playground.andreas.P2.replanning.modules.RandomEndTimeAllocator;
+import playground.andreas.P2.replanning.modules.RandomStartTimeAllocator;
 import playground.andreas.P2.replanning.modules.TimeReduceDemand;
 import playground.andreas.P2.replanning.modules.deprecated.IncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.deprecated.RemoveAllVehiclesButOne;

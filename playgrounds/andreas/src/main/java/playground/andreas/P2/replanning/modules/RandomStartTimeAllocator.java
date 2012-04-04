@@ -1,4 +1,4 @@
-package playground.andreas.P2.replanning;
+package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
 
@@ -8,6 +8,8 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
+import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 
 /**
  * 
@@ -33,6 +35,10 @@ public class RandomStartTimeAllocator extends PStrategy implements PPlanStrategy
 
 	@Override
 	public PPlan run(Cooperative cooperative) {
+		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			return null;
+		}
+		
 		// profitable route, change startTime
 		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
@@ -45,6 +51,8 @@ public class RandomStartTimeAllocator extends PStrategy implements PPlanStrategy
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 
+		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
+		
 		return newPlan;
 	}
 	
