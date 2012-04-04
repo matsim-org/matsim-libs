@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess;
+package playground.anhorni.surprice.preprocess.miniscenario;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;

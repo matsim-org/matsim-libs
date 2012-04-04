@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess;
+package playground.anhorni.surprice.preprocess.miniscenario;
 
 import org.matsim.core.population.PersonImpl;
 

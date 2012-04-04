@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess;
+package playground.anhorni.surprice.preprocess.miniscenario;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -21,7 +21,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import playground.anhorni.surprice.preprocess.Zone;
+
+import playground.anhorni.surprice.preprocess.miniscenario.Zone;
 
 public class UtilityAnalyzer {
 	
