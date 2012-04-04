@@ -22,6 +22,7 @@ package playground.thibautd.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -78,6 +79,7 @@ public class RemoveJointTrips {
 		// step through plan, and retain only plan elements not in a shared ride.
 		// the first access leg is retained.
 		boolean inJointTrip = false;
+		Leg lastLeg = null;
 		for (PlanElement element : inPlanElements) {
 			if (inJointTrip) {
 				if (element instanceof Activity) {
@@ -97,7 +99,11 @@ public class RemoveJointTrips {
 
 					if ( type.matches( JointActingTypes.PICK_UP_REGEXP ) ||
 							type.equals( JointActingTypes.PICK_UP ) ) {
+						// we enter a joint trip: remember it...
 						inJointTrip = true;
+						// ... and invalidate the route of the previous leg
+						// (which was the "access" to the PU)
+						lastLeg.setRoute( null );
 					}
 					else {
 						constructedPlanElements.add( element );
@@ -105,6 +111,7 @@ public class RemoveJointTrips {
 				}
 				else {
 					constructedPlanElements.add( element );
+					lastLeg = (Leg) element;
 				}
 			}
 		}
