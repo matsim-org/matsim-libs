@@ -29,8 +29,11 @@ public class Tour {
 	
 	public static class Costs {
 		public double transportTime;
-		public double generalizedCosts;
+		public double transportCosts;
 		public double serviceTime;
+		public double waitingTime;
+		public double totalDutyTime;
+		public int totalLoad;
 		
 	}
 	
@@ -48,8 +51,8 @@ public class Tour {
 		for(TourActivity c : tourActivities){
 			tour += "[" + c.getType() + "@" + c.getLocationId() + "@" + c.getEarliestArrTime() + "-" + c.getLatestArrTime() + "]";
 		}
-		tour += "[transportTime=" + costs.transportTime + "][serviceTime=" + costs.serviceTime + 
-			"][generalizedCosts=" + costs.generalizedCosts + "]"; 
+		tour += "[totalDutyTime=" + costs.totalDutyTime + "][transportTime=" + costs.transportTime + "][waitingTime="+costs.waitingTime+"][serviceTime=" + costs.serviceTime + 
+			"][generalizedCosts=" + costs.transportCosts + "]"; 
 		return tour;
 	}
 

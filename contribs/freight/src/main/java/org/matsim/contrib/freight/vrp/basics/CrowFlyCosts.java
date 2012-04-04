@@ -38,6 +38,39 @@ public class CrowFlyCosts implements Costs{
 	
 	private Locations locations;
 	
+	private CostParams costParams = new CostParams() {
+		
+		@Override
+		public double getCostPerVehicle() {
+			return 1000;
+		}
+		
+		@Override
+		public double getCostPerSecondTooLate() {
+			return 0;
+		}
+		
+		@Override
+		public double getCostPerSecondTransport() {
+			return 1;
+		}
+		
+		@Override
+		public double getCostPerMeter() {
+			return 1;
+		}
+
+		@Override
+		public double getCostPerSecondWaiting() {
+			return 0;
+		}
+
+		@Override
+		public double getCostPerSecondService() {
+			return 1;
+		}
+	};
+	
 	public CrowFlyCosts(Locations locations) {
 		super();
 		this.locations = locations;
@@ -53,7 +86,7 @@ public class CrowFlyCosts implements Costs{
 			logger.debug(fromId + " " + toId + " no dist found");
 			throw new NullPointerException();
 		}
-		return dist; 
+		return costParams.getCostPerMeter()*dist; 
 	}
 
 	@Override
@@ -69,6 +102,11 @@ public class CrowFlyCosts implements Costs{
 	@Override
 	public Double getBackwardTransportTime(String fromId, String toId, double arrivalTime) {
 		return getTransportTime(fromId, toId, arrivalTime);
+	}
+
+	@Override
+	public CostParams getCostParams() {
+		return costParams;
 	}
 
 }

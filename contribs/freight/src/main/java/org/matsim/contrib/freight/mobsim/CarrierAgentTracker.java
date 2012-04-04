@@ -113,7 +113,13 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
             CarrierAgentImpl agent = findCarrierAgent(carrier.getId());
             agent.calculateCosts();
         }
-
+    }
+    
+    public void scoreSelectedPlans() {
+        for(Carrier carrier : carriers.getCarriers().values()){
+            CarrierAgentImpl agent = findCarrierAgent(carrier.getId());
+            agent.scoreSelectedPlan();
+        }
     }
 
     public Collection<Plan> createPlans() {

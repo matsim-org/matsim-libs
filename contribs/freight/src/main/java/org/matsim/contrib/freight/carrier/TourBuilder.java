@@ -10,6 +10,8 @@ import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 
 
 public class TourBuilder {
@@ -97,6 +99,19 @@ public class TourBuilder {
 
 	private Delivery createDelivery(CarrierShipment shipment) {
 		return new Delivery(shipment);
+	}
+
+	public Leg createLeg() {
+		return new Leg();
+	}
+
+	public NetworkRoute createRoute(Id startLinkId, List<Id> linkIds, Id endLinkId) {
+		LinkNetworkRouteImpl linkNetworkRouteImpl = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+		if(linkIds != null && !linkIds.isEmpty()){
+			linkNetworkRouteImpl.setLinkIds(startLinkId, linkIds, endLinkId);
+		}
+		return linkNetworkRouteImpl;
+		
 	}
 
 

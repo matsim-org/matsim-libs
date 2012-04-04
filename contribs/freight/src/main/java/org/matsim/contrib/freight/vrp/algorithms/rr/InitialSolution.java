@@ -47,7 +47,7 @@ public class InitialSolution implements InitialSolutionFactory {
 		logger.info("create initial solution.");
 		RRSolution solution = createEmptySolution(vrp);
 		BestInsertion bestInsertion = new BestInsertion();
-		bestInsertion.run(solution, getUnassignedJobs(vrp));
+		bestInsertion.run(solution, getUnassignedJobs(vrp), Double.MAX_VALUE);
 		return solution;
 	}
 
@@ -60,9 +60,10 @@ public class InitialSolution implements InitialSolutionFactory {
 		Collection<RRTourAgent> emptyTours = new ArrayList<RRTourAgent>();
 		TourStatusProcessor statusProcessor = new TourCostAndTWProcessor(vrp.getCosts());
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(statusProcessor, new PickupAndDeliveryTourFactory(vrp.getCosts(), 
-				vrp.getGlobalConstraints(), statusProcessor));
+				vrp.getGlobalConstraints(), statusProcessor), vrp.getCosts().getCostParams());
 		for (Vehicle vehicle : vrp.getVehicles()) { 
 			RRTourAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory);
+			tourAgent.noFixedCosts = true;
 			emptyTours.add(tourAgent);
 		}
 		return new RRSolution(emptyTours);

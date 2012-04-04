@@ -19,6 +19,7 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
+import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.core.utils.misc.Counter;
@@ -65,7 +66,6 @@ public class TourCostAndTWProcessor implements TourStatusProcessor{
 		int nOfActivities = tour.getActivities().size();
 		TourActivity prevAct = tour.getActivities().getFirst();
 		TourActivity nextAct = tour.getActivities().getLast();
-		boolean first = true;
 		
 		for(int i=1,j=nOfActivities-2;i<nOfActivities;i++,j--){
 			
@@ -80,29 +80,44 @@ public class TourCostAndTWProcessor implements TourStatusProcessor{
 			
 			if(currActFromFront instanceof JobActivity){
 				currActFromFront.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currActFromFront).getCapacityDemand());
+				if(currActFromFront instanceof Pickup){
+					tour.costs.totalLoad += ((Pickup) currActFromFront).getCapacityDemand();
+				}
 			}
 			else{
 				currActFromFront.setCurrentLoad(prevAct.getCurrentLoad());
 			}
 			
 			double earliestStartTimeAtLastActivity = prevAct.getEarliestArrTime() + prevAct.getServiceTime();
-			double earliestArrivalTimeAtCurrentActivity = earliestStartTimeAtLastActivity + getTransportTime(prevAct, tour.getActivities().get(i), earliestStartTimeAtLastActivity); 
-			double early = Math.max(tour.getActivities().get(i).getEarliestArrTime(), earliestArrivalTimeAtCurrentActivity);
-			tour.getActivities().get(i).setEarliestArrTime(early);
+			double earliestArrivalTimeAtCurrentActivity = earliestStartTimeAtLastActivity + getTransportTime(prevAct, currActFromFront, earliestStartTimeAtLastActivity); 
+			double early = Math.max(currActFromFront.getEarliestArrTime(), earliestArrivalTimeAtCurrentActivity);
+			currActFromFront.setEarliestArrTime(early);
+			double waitingTime = 0.0;
+			if(earliestArrivalTimeAtCurrentActivity < currActFromFront.getEarliestArrTime()){
+				waitingTime = currActFromFront.getEarliestArrTime() - earliestArrivalTimeAtCurrentActivity;
+			}
 			
-			tour.costs.generalizedCosts += this.costs.getTransportCost(prevAct.getLocationId(), tour.getActivities().get(i).getLocationId(), earliestStartTimeAtLastActivity);
-			tour.costs.transportTime  += this.costs.getTransportTime(prevAct.getLocationId(), tour.getActivities().get(i).getLocationId(), earliestStartTimeAtLastActivity);
-			tour.costs.serviceTime += currActFromFront.getServiceTime();
+			double serviceTime = currActFromFront.getServiceTime();
+			double transportTime = this.costs.getTransportTime(prevAct.getLocationId(), currActFromFront.getLocationId(), earliestStartTimeAtLastActivity);
+		
+			tour.costs.transportCosts += this.costs.getTransportCost(prevAct.getLocationId(), currActFromFront.getLocationId(), earliestStartTimeAtLastActivity);
+			tour.costs.transportTime  += transportTime;
+			tour.costs.serviceTime += serviceTime;
+			tour.costs.waitingTime += waitingTime; 	
+			tour.costs.totalDutyTime += waitingTime + serviceTime + transportTime;
 			
 			nextAct = tour.getActivities().get(j);
-			prevAct = tour.getActivities().get(i);
+			prevAct = currActFromFront;
 		}
 	}
 	
 	private void reset(Tour tour) {
-		tour.costs.generalizedCosts = 0.0;
+		tour.costs.transportCosts = 0.0;
 		tour.costs.transportTime = 0.0;
 		tour.costs.serviceTime = 0.0;
+		tour.costs.waitingTime = 0.0;
+		tour.costs.totalDutyTime = 0.0;
+		tour.costs.totalLoad = 0;
 	}
 
 	private double getTransportTime(TourActivity act1, TourActivity act2, double departureTime) {

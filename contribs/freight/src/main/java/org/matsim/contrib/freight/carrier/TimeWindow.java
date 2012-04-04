@@ -19,4 +19,8 @@ public class TimeWindow {
 		return end;
 	}
 	
+	public String toString(){
+		return "[start="+start+", end="+end+"]";
+	}
+	
 }

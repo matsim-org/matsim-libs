@@ -24,6 +24,7 @@ public class CarrierPlanStrategy implements PlanStrategy<Carrier>{
 	public void run(Carrier carrier){
 		for(CarrierPlanStrategyModule module : strategyModules){
 			logger.info("run " + module.getClass().toString());
+			
 			module.handleActor(carrier);
 		}
 		assertSelectedCarrierPlanIsConsistenWithContracts(carrier);

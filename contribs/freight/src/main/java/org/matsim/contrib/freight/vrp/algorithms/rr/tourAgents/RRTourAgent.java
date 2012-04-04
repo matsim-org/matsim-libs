@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.basics.CostParams;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
+import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -37,16 +39,24 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 public class RRTourAgent {
 	
+
 	public static class Offer {
 		
 		private RRTourAgent agent;
 		
-		private double cost;
+		private double price;
+		
+		private double marginalCosts;
 
-		public Offer(RRTourAgent agent, double cost) {
+		public Offer(RRTourAgent agent, double price, double mc) {
 			super();
 			this.agent = agent;
-			this.cost = cost;
+			this.price = price;
+			this.marginalCosts = mc;
+		}
+
+		public double getMarginalCosts() {
+			return marginalCosts;
 		}
 
 		public RRTourAgent getTourAgent() {
@@ -54,12 +64,12 @@ public class RRTourAgent {
 		}
 
 		public double getPrice() {
-			return cost;
+			return price;
 		}
 		
 		@Override
 		public String toString() {
-			return "currentTour=" + agent + "; marginalInsertionCosts=" + cost;
+			return "currentTour=" + agent + "; marginalInsertionCosts=" + price;
 		}
 		
 	}
@@ -86,17 +96,24 @@ public class RRTourAgent {
 	
 	private boolean keepScaling = false;
 	
+	public boolean scale = false;
+	
+	public boolean noFixedCosts = false;
+	
 	public double marginalCostScalingFactorForNewService = 1.0;
 	
 	public double fixCostsForService = 0.0;
 	
-	public RRTourAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder) {
+	public CostParams costParams;
+	
+	public RRTourAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder, CostParams costParams) {
 		super();
 		this.tour = tour;
 		this.tourFactory=tourBuilder;
 		this.activityStatusUpdater=tourStatusProcessor;
 		this.vehicle = vehicle;
 		id = vehicle.getId();
+		this.costParams = costParams;
 		iniJobs();
 		syncTour();
 	}
@@ -128,13 +145,21 @@ public class RRTourAgent {
 
 	public double getTourCost(){
 		syncTour();
-		double fix =0.0;
-		if(isActive()){
-			fix = fixCostsForService;
-		}
-		return tour.getCosts().generalizedCosts + fix;
+		return cost(tour);
 	}
 	
+	private double cost(Tour tour){
+		if(isActive(tour)){
+			double fix = costParams.getCostPerVehicle();
+			double waiting = tour.getCosts().waitingTime*costParams.getCostPerSecondWaiting();
+			double service = tour.getCosts().serviceTime*costParams.getCostPerSecondService();
+			double transportCosts = tour.getCosts().transportCosts;
+			return fix + waiting + service + transportCosts;
+		}
+		else{
+			return 0.0;
+		}
+	}
 
 	public Tour getTour() {
 		syncTour();
@@ -152,18 +177,30 @@ public class RRTourAgent {
 		syncTour();
 		Tour newTour = tourFactory.createTour(vehicle, tour, job, bestKnownPrice);
 		if(newTour != null){
-			double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
-			if(!active || keepScaling){
-				marginalCosts = scale(marginalCosts);
-				keepScaling = true;
+			double marginalCosts = cost(newTour) - cost(tour);
+			double price;
+			if(noFixedCosts){
+				price = marginalCosts;
 			}
-			Offer offer = new Offer(this, marginalCosts);
+			else{
+				price = marginalCosts + shareOfFixedCosts(job,newTour);
+			}
+			 
+//			if(scale || !active || keepScaling){
+//				price = scale(marginalCosts);
+//				keepScaling = true;
+//			}
+			Offer offer = new Offer(this, price, marginalCosts);
 			tourOfLastOffer = newTour;
 			return offer;
 		}
 		else{
 			return null;
 		}
+	}
+
+	private double shareOfFixedCosts(Job job, Tour newTour) {
+		return (((Shipment)job).getSize()/newTour.costs.totalLoad)*costParams.getCostPerVehicle();
 	}
 
 	private double scale(double marginalCosts) {
@@ -221,8 +258,12 @@ public class RRTourAgent {
 		return vehicle;
 	}
 	
-	public boolean isActive(){
+	private boolean isActive(Tour tour){
 //		syncTour();
 		return tour.getActivities().size()>2;
+	}
+	
+	public boolean isActive(){
+		return isActive(tour);
 	}
 }

@@ -26,6 +26,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.RecreationStrateg
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinStrategy;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.ThresholdFunction;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
@@ -70,9 +71,17 @@ public class RuinAndRecreate {
 	
 	private int lastPrint = 1;
 	
+	private TourPlan iniTourPlan;
+	
 	public RuinAndRecreate(VehicleRoutingProblem vrp, RRSolution iniSolution, int nOfMutations) {
 		this.vrp = vrp;
 		this.currentSolution = iniSolution;
+		this.nOfMutations = nOfMutations;
+	}
+	
+	public RuinAndRecreate(VehicleRoutingProblem vrp, TourPlan iniTourPlan, int nOfMutations) {
+		this.vrp = vrp;
+		this.iniTourPlan = iniTourPlan;
 		this.nOfMutations = nOfMutations;
 	}
 
@@ -103,6 +112,7 @@ public class RuinAndRecreate {
 	public void run(){
 		logger.info("run ruin-and-recreate");
 		logger.info("#warmupIterations="+warmUpIterations+ "; #iterations="+nOfMutations);
+		makeIniSolution();
 		verify();
 		init();
 		logger.info("#jobs: " + vrp.getJobs().values().size());
@@ -111,7 +121,8 @@ public class RuinAndRecreate {
 		resetIterations();
 		while(currentMutation < nOfMutations){
 			RRSolution tentativeSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
-			ruinAndRecreate(tentativeSolution);
+			double result2beat = currentSolution.getResult() + thresholdFunction.getThreshold(currentMutation);
+			ruinAndRecreate(tentativeSolution, result2beat);
 			double tentativeResult = tentativeSolution.getResult();
 			double currentResult = currentSolution.getResult();
 			boolean isAccepted = false;
@@ -126,6 +137,13 @@ public class RuinAndRecreate {
 		informFinish();
 	}
 	
+	private void makeIniSolution() {
+		if(currentSolution == null){
+			currentSolution = RRUtils.createSolution(vrp, iniTourPlan, tourAgentFactory);
+		}
+		
+	}
+
 	private void verify() {
 		if(currentSolution.getTourAgents().isEmpty() || currentSolution.getTourAgents().size() < 1){
 			throw new IllegalStateException("initial solution is empty. this cannot be. check vehicle-routing-problem setup (VRP)");
@@ -136,12 +154,13 @@ public class RuinAndRecreate {
 	private void init() {
 		thresholdFunction.setNofIterations(nOfMutations);
 		thresholdFunction.setInitialThreshold(initialThreshold);
+		
 	}
 
-	private void ruinAndRecreate(RRSolution solution) {
+	private void ruinAndRecreate(RRSolution solution, double upperBound) {
 		RuinStrategy ruinStrategy = ruinStrategyManager.getRandomStrategy();
 		ruinStrategy.run(solution);
-		recreationStrategy.run(solution,ruinStrategy.getUnassignedJobs());
+		recreationStrategy.run(solution,ruinStrategy.getUnassignedJobs(), upperBound);
 	}
 
 	private void randomWalk(int nOfIterations) {
@@ -154,7 +173,7 @@ public class RuinAndRecreate {
 		double[] results = new double[nOfIterations];
 		for(int i=0;i<nOfIterations;i++){
 			printNoIteration(i);
-			ruinAndRecreate(initialSolution);
+			ruinAndRecreate(initialSolution, Double.MAX_VALUE);
 			double result = initialSolution.getResult();
 			results[i]=result;
 		}
@@ -199,5 +218,9 @@ public class RuinAndRecreate {
 	
 	public RRSolution getSolution(){
 		return currentSolution;
+	}
+	
+	public TourPlan getTourPlan(){
+		return RRUtils.createTourPlan(currentSolution);
 	}
 }

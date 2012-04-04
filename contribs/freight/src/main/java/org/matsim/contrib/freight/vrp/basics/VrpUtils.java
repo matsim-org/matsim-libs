@@ -21,6 +21,7 @@ package org.matsim.contrib.freight.vrp.basics;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
@@ -78,5 +79,7 @@ public class VrpUtils {
 	public static Shipment createShipment(String id, String fromId, String toId, int size){
 		return new Shipment(id, fromId, toId, size);
 	}
+
+	
 	
 }

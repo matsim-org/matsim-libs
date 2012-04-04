@@ -53,9 +53,14 @@ public class BestInsertion implements RecreationStrategy{
 	}
 
 	@Override
-	public void run(RRSolution tentativeSolution, List<Job> unassignedJobs) {
+	public void run(RRSolution tentativeSolution, List<Job> unassignedJobs, double upperBound) {
 		Collections.shuffle(unassignedJobs,random);
+		double currentResult = tentativeSolution.getResult();
+		setScaling(tentativeSolution);
 		for(Job unassignedJob : unassignedJobs){
+			if(currentResult >= upperBound){
+				return;
+			}
 			Offer bestOffer = null;
 			boolean firstAgent = true;
 			double bestKnownPrice = Double.MAX_VALUE;
@@ -86,6 +91,7 @@ public class BestInsertion implements RecreationStrategy{
 				}
 			}
 			if(bestOffer != null){
+				currentResult += bestOffer.getMarginalCosts();
 				bestOffer.getTourAgent().offerGranted(unassignedJob);
 				cheapestAgents.put(unassignedJob.getId(), bestOffer.getTourAgent().getId());
 			}
@@ -93,6 +99,24 @@ public class BestInsertion implements RecreationStrategy{
 				throw new IllegalStateException("given the vehicles, could not create a valid solution");
 			}
 		}
+	}
+
+	private void setScaling(RRSolution tentativeSolution) {
+//		RRTourAgent withFewestActivities = null;
+//		for(RRTourAgent a : tentativeSolution.getTourAgents()){
+//			if(!a.isActive()){
+//				continue;
+//			}
+//			if(withFewestActivities == null){
+//				withFewestActivities = a;
+//			}
+//			if(a.getTour().getActivities().size() < withFewestActivities.getTour().getActivities().size()){
+//				withFewestActivities = a;
+//			}
+//		}
+//		if(withFewestActivities != null){
+//			withFewestActivities.scale = true;
+//		}
 	}
 
 	private RRTourAgent getCheapestAgent(RRSolution tentativeSolution, Job unassignedJob) {

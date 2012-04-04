@@ -52,7 +52,7 @@ public class TourCostProcessor implements TourStatusProcessor{
 	@Override
 	public void process(Tour tour){
 		if(tour.getActivities().size() <= 2){
-			tour.getCosts().generalizedCosts = 0.0;
+			tour.getCosts().transportCosts = 0.0;
 			tour.getCosts().transportTime = 0.0;
 			return;
 		}
@@ -68,14 +68,14 @@ public class TourCostProcessor implements TourStatusProcessor{
 			else{
 				toAct.setCurrentLoad(prevAct.getCurrentLoad());
 			}
-			tour.costs.generalizedCosts += costs.getTransportCost(prevAct.getLocationId(),toAct.getLocationId(), 0.0);
+			tour.costs.transportCosts += costs.getTransportCost(prevAct.getLocationId(),toAct.getLocationId(), 0.0);
 			tour.costs.transportTime  += costs.getTransportTime(prevAct.getLocationId(),toAct.getLocationId(), 0.0);
 			prevAct = toAct;
 		}
 	}
 	
 	private void reset(Tour tour) {
-		tour.costs.generalizedCosts = 0.0;
+		tour.costs.transportCosts = 0.0;
 		tour.costs.transportTime = 0.0;
 	}
 

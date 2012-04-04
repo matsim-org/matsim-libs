@@ -30,6 +30,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDelivery
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
+import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 
@@ -68,7 +69,7 @@ public class PickupAndDeliveryTourAlgoFactory implements RuinAndRecreateFactory 
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution){
 		TourCostProcessor tourCostProcessor = new TourCostProcessor(vrp.getCosts());
 		TourFactory tourFactory = new PickupAndDeliveryTourFactory(vrp.getCosts(),vrp.getGlobalConstraints(), tourCostProcessor);
-		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,tourFactory);
+		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,tourFactory, vrp.getCosts().getCostParams());
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);
@@ -106,6 +107,13 @@ public class PickupAndDeliveryTourAlgoFactory implements RuinAndRecreateFactory 
 
 	public void addRuinAndRecreateListener(RuinAndRecreateListener l){
 		ruinAndRecreationListeners.add(l);
+	}
+
+	@Override
+	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp,
+			TourPlan initialSolution) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

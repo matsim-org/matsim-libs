@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.vrp.basics.CostParams;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -93,13 +94,16 @@ public class NetworkTransportCosts implements Costs{
 	
 	private int timeSliceWidth;
 	
+	private CostParams costParams;
+	
 	private Counter ttMemorizedCounter;
 	
 	private Counter ttRequestedCounter;
 
-	public NetworkTransportCosts(LeastCostPathCalculator pathCalculator, Network network, int timeSliceWidth) {
+	public NetworkTransportCosts(LeastCostPathCalculator pathCalculator, CostParams costParams, Network network, int timeSliceWidth) {
 		super();
 		this.router = pathCalculator;
+		this.costParams = costParams;
 		this.network = network;
 		this.timeSliceWidth = timeSliceWidth;
 		this.ttMemorizedCounter = new Counter("numTravelTimes memorized ");
@@ -163,6 +167,11 @@ public class NetworkTransportCosts implements Costs{
 
 	private CostKey makeKey(String fromId, String toId, long time) {
 		return new CostKey(fromId,toId,time);
+	}
+
+	@Override
+	public CostParams getCostParams() {
+		return costParams;
 	}
 
 }

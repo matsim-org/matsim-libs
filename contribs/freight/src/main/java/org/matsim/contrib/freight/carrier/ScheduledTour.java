@@ -8,9 +8,9 @@ public class ScheduledTour {
 	private CarrierVehicle vehicle;
 	private double departure;
 
-	public ScheduledTour(Tour tour, CarrierVehicle firstVehicle, double departure) {
+	public ScheduledTour(Tour tour, CarrierVehicle vehicle, double departure) {
 		this.tour = tour;
-		this.vehicle = firstVehicle;
+		this.vehicle = vehicle;
 		this.departure = departure;
 	}
 

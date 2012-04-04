@@ -23,18 +23,12 @@ public class VRPCarrierPlanBuilder {
 	private Network network;
 	private VRPSolverFactory vrpSolverFactory;
 	private Costs costs;
-	private LeastCostPathCalculator router;
-
 	public VRPCarrierPlanBuilder(CarrierCapabilities caps, Collection<CarrierContract> contracts, Network network, Costs costs) {
 		super();
 		this.costs = costs;
 		this.caps=caps;
 		this.contracts=contracts;
 		this.network=network;
-	}
-	
-	public void setRouter(LeastCostPathCalculator router) {
-		this.router = router;
 	}
 
 	public void setVrpSolverFactory(VRPSolverFactory vrpSolverFactory) {

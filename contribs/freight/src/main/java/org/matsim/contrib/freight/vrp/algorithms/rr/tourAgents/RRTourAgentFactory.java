@@ -17,6 +17,7 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
+import org.matsim.contrib.freight.vrp.basics.CostParams;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
@@ -34,15 +35,18 @@ public class RRTourAgentFactory {
 	
 	private TourFactory tourBuilder;
 	
-	public RRTourAgentFactory(TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder) {
+	private CostParams costParams;
+	
+	public RRTourAgentFactory(TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder, CostParams costParams) {
 		super();
 		this.tourStatusProcessor = tourStatusProcessor;
 		this.tourBuilder = tourBuilder;
+		this.costParams = costParams;
 	}
 
 	public RRTourAgent createTourAgent(Tour tour, Vehicle vehicle) {
-		RRTourAgent tourAgent = new RRTourAgent(vehicle, tour, tourStatusProcessor, tourBuilder);
-		tourAgent.marginalCostScalingFactorForNewService = 10.0;
+		RRTourAgent tourAgent = new RRTourAgent(vehicle, tour, tourStatusProcessor, tourBuilder, costParams);
+		tourAgent.marginalCostScalingFactorForNewService = 5.0;
 		tourAgent.fixCostsForService = 100.0;
 		return tourAgent;
 	}

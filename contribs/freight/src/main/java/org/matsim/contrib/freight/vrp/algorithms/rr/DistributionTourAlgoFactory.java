@@ -13,6 +13,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionTourF
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
+import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 public class DistributionTourAlgoFactory implements RuinAndRecreateFactory {
@@ -44,7 +45,7 @@ public class DistributionTourAlgoFactory implements RuinAndRecreateFactory {
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution) {
 		TourCostProcessor tourCostProcessor = new TourCostProcessor(vrp.getCosts());
 		TourFactory tourFactory = new DistributionTourFactory(vrp.getCosts(), vrp.getGlobalConstraints(), tourCostProcessor);
-		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,tourFactory);
+		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,tourFactory, vrp.getCosts().getCostParams());
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);
@@ -74,6 +75,13 @@ public class DistributionTourAlgoFactory implements RuinAndRecreateFactory {
 	public void setWarmUp(int nOfWarmUpIterations) {
 		this.warmUp = nOfWarmUpIterations;
 		
+	}
+
+	@Override
+	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp,
+			TourPlan initialSolution) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

@@ -35,14 +35,12 @@ public class DTWSolverFactory implements VRPSolverFactory{
 
 	@Override
 	public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
-		ShipmentBasedVRPSolver rrSolver = new ShipmentBasedVRPSolver(shipments, carrierVehicles, network);
+		ShipmentBasedVRPSolver rrSolver = new ShipmentBasedVRPSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
 		DistributionTourWithTimeWindowsAlgoFactory ruinAndRecreateFactory = new DistributionTourWithTimeWindowsAlgoFactory();
 		addListeners(ruinAndRecreateFactory);
 		rrSolver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
-		rrSolver.setIniSolutionFactory(new InitialSolution());
-		rrSolver.setnOfWarmupIterations(100);
-		rrSolver.setnOfIterations(1000);
-		rrSolver.setCosts(costs);
+		rrSolver.setnOfWarmupIterations(20);
+		rrSolver.setnOfIterations(200);
 		PickORDeliveryCapacityAndTWConstraint constraints = new PickORDeliveryCapacityAndTWConstraint();
 		rrSolver.setGlobalConstraints(constraints);
 		

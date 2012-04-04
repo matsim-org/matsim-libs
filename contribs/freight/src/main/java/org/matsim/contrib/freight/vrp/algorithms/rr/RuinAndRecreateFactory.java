@@ -1,5 +1,6 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
+import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 
@@ -12,6 +13,8 @@ public interface RuinAndRecreateFactory {
 	 * @return
 	 */
 	public abstract RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution);
+	
+	public abstract RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, TourPlan initialSolution);
 
 	public abstract void addRuinAndRecreateListener(RuinAndRecreateListener l);
 	

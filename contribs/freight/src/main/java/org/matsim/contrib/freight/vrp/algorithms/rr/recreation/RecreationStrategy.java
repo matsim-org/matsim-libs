@@ -32,6 +32,6 @@ import org.matsim.contrib.freight.vrp.basics.Job;
 
 public interface RecreationStrategy {
 	
-	public void run(RRSolution tentativeSolution, List<Job> unassignedJobs);
+	public void run(RRSolution tentativeSolution, List<Job> unassignedJobs, double upperBound);
 
 }

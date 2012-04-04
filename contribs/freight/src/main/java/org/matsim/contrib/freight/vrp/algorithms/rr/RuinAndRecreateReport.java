@@ -39,7 +39,7 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 		double dist = 0.0;
 		for(RRTourAgent t : bestSolution.getTourAgents()){
 			if(t.getTour().getActivities().size()>2){
-				dist+=t.getTour().costs.generalizedCosts;
+				dist+=t.getTour().costs.transportCosts;
 			}
 		}
 		return dist;

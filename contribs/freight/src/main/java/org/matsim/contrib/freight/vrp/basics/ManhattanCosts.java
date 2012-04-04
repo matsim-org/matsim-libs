@@ -29,15 +29,52 @@ public class ManhattanCosts implements Costs {
 	public double speed = 1;
 	
 	private Locations locations;
+	
+	private CostParams costParams = new CostParams() {
+		
+		@Override
+		public double getCostPerVehicle() {
+			return 100;
+		}
+		
+		@Override
+		public double getCostPerSecondTooLate() {
+			return 0;
+		}
+		
+		@Override
+		public double getCostPerSecondTransport() {
+			return 1;
+		}
+		
+		@Override
+		public double getCostPerMeter() {
+			return 1;
+		}
+
+		@Override
+		public double getCostPerSecondWaiting() {
+			return 0;
+		}
+
+		@Override
+		public double getCostPerSecondService() {
+			return 0;
+		}
+	};
 
 	public ManhattanCosts(Locations locations) {
 		super();
 		this.locations = locations;
 	}
 
+	public void setCostParams(CostParams costParams) {
+		this.costParams = costParams;
+	}
+
 	@Override
 	public Double getTransportCost(String fromId, String toId, double time) {
-		return calculateDistance(fromId, toId);
+		return costParams.getCostPerMeter()*calculateDistance(fromId, toId);
 	}
 
 	@Override
@@ -60,5 +97,10 @@ public class ManhattanCosts implements Costs {
 	@Override
 	public Double getBackwardTransportTime(String fromId, String toId,double arrivalTime) {
 		return getTransportTime(fromId, toId, arrivalTime);
+	}
+
+	@Override
+	public CostParams getCostParams() {
+		return costParams;
 	}
 }

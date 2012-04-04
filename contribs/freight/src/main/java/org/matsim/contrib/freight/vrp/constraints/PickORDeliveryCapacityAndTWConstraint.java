@@ -27,6 +27,7 @@ import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * @author stefan schroeder
@@ -38,14 +39,28 @@ public class PickORDeliveryCapacityAndTWConstraint implements Constraints {
 	
 	public double maxTimeInOperation = Double.MAX_VALUE;
 	
+	public Counter counter;
+	
+	public Counter counterRejected;
+	
+	public PickORDeliveryCapacityAndTWConstraint() {
+		super();
+		counter = new Counter("#constraints calls ");
+		counterRejected = new Counter("#constraints rejected: ");
+	}
+
 	@Override
 	public boolean judge(Tour tour, Vehicle vehicle) {
+//		counter.incCounter();
+//		c
 		int currentLoad = 0;
 		boolean deliveryOccured = false;
 		for(TourActivity tourAct : tour.getActivities()){
 			if(tourAct instanceof JobActivity){
 				if(deliveryOccured){
 					if(tourAct instanceof Pickup){
+//						counterRejected.incCounter();
+//						counterRejected.printCounter();
 						return false;
 					}
 				}
@@ -56,10 +71,14 @@ public class PickORDeliveryCapacityAndTWConstraint implements Constraints {
 			}
 			if(currentLoad > vehicle.getCapacity()){
 //				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentLoad=" + currentLoad + " on tour " + tour);
+//				counterRejected.incCounter();
+//				counterRejected.printCounter();
 				return false;
 			}
 			if(tourAct.getLatestArrTime() < tourAct.getEarliestArrTime()){
 //				logger.debug("timeWindow-conflic on tour " + tour);
+//				counterRejected.incCounter();
+//				counterRejected.printCounter();
 				return false;
 			}
 		}

@@ -32,5 +32,7 @@ public interface Costs {
 	public Double getBackwardTransportCost(String fromId, String toId, double arrivalTime);
 
 	public Double getBackwardTransportTime(String fromId, String toId, double arrivalTime);
+
+	public CostParams getCostParams();
 	
 }

@@ -26,8 +26,6 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 	
 	private Network network;
 	
-	private double mTravelled;
-	
 	public ReRouteVehicles(LeastCostPathCalculator router, Network network) {
 		super();
 		this.router = router;

@@ -26,6 +26,8 @@ import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostParams;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -42,24 +44,30 @@ class CarrierAgentImpl {
 		
 		private double distance = 0.0;
 		
-		private double time = 0.0;
+		private double totalDutyTime = 0.0;
+		
+		private double travelTime = 0.0;
 		
 		private double startTime = 0.0;
 		
-		private int currentLoad = 0;
+		private double tooLate = 0.0;
 		
-		private double performance = 0.0;
+		private double waitingTime = 0.0;
+		
+		private double serviceTime = 0.0;
+		
+		private double lastActivityEnd = 0.0;
+		
+//		private double lastServiceStart = 0.0;
 		
 		private double volumes = 0.0;
 		
-		private double distanceRecordOfLastActivity = 0.0;
-
 		private double additionalCosts = 0.0;
 		
 		private ScheduledTour scheduledTour;
 		
 		private CarrierAgentImpl carrierAgent;
-
+		
 		CarrierDriverAgentImpl(CarrierAgentImpl carrierAgent, Id driverId, ScheduledTour tour) {
 			this.driverId = driverId;
 			this.scheduledTour = tour;
@@ -68,85 +76,104 @@ class CarrierAgentImpl {
 
 		public void activityEndOccurs(String activityType, double time) {
 			Tour tour = this.scheduledTour.getTour();
+			lastActivityEnd = time;
 			if (FreightConstants.START.equals(activityType)){
 				startTime = time;
+//				logger.info("driver="+driverId+" start ends, time=" + time);
 			}
 			if (FreightConstants.PICKUP.equals(activityType)) {
-				Pickup tourElement = (Pickup) tour.getTourElements().get(activityCounter);
-				calculateLoadFactorComponent(tourElement);
-				volumes += tourElement.getShipment().getSize();
-				carrierAgent.notifyPickup(driverId, tourElement.getShipment(), time);
-				activityCounter+=2;
+//				serviceTime += time-lastServiceStart;
+//				logger.info("driver="+driverId+" picksUp ends, time=" + time);
 			} else if (FreightConstants.DELIVERY.equals(activityType)) {
-				Delivery tourElement = (Delivery) tour.getTourElements().get(activityCounter);
-				calculateLoadFactorComponent(tourElement);
-				carrierAgent.notifyDelivery(driverId, tourElement.getShipment(), time);
-				activityCounter+=2;
+//				serviceTime += time-lastServiceStart;
+//				logger.info("driver="+driverId+" delivery ends, time=" + time);
 			}
 		}
-		
-
-		public double getCapacityUsage(){
-			return performance / (distance*scheduledTour.getVehicle().getCapacity());
-		}
-
-		private void calculateLoadFactorComponent(TourElement tourElement) {
-			if(!(tourElement instanceof ShipmentBasedActivity)){
-				return;
-			}
-			ShipmentBasedActivity act = (ShipmentBasedActivity) tourElement;
-			performance += currentLoad*(distance-distanceRecordOfLastActivity);
-			if(tourElement instanceof Pickup){
-				currentLoad += act.getShipment().getSize();
-			}
-			else{
-				currentLoad -= act.getShipment().getSize();
-			}
-			distanceRecordOfLastActivity = distance;
-		}
-
 
 		public void activityStartOccurs(String activityType, double time) {
+			Tour tour = this.scheduledTour.getTour();
+			travelTime += time - lastActivityEnd;
 			if(FreightConstants.END.equals(activityType)){
-				time += time - startTime;
+				totalDutyTime = time - startTime;
+//				logger.info("driver="+driverId+" end starts, time=" + time);
 			}
-			
+			if (FreightConstants.PICKUP.equals(activityType)) {
+//				lastServiceStart = time;
+				Pickup tourElement = (Pickup) tour.getTourElements().get(activityCounter);
+//				logger.info("driver="+driverId+" pickUp starts, time=" + time + ", tw=" + tourElement.getTimeWindow());
+				if(time > tourElement.getTimeWindow().getEnd()){
+					tooLate += time - tourElement.getTimeWindow().getEnd();
+				}
+				if(time < tourElement.getTimeWindow().getStart()){
+					waitingTime += tourElement.getTimeWindow().getStart() - time;
+//					lastServiceStart = tourElement.getTimeWindow().getStart();
+				}
+				carrierAgent.notifyPickup(driverId, tourElement.getShipment(), time);
+//				lastActivity = tourElement;
+				activityCounter+=2;
+			} else if (FreightConstants.DELIVERY.equals(activityType)) {
+//				lastServiceStart = time;
+				Delivery tourElement = (Delivery) tour.getTourElements().get(activityCounter);
+//				logger.info("driver="+driverId+" delivery starts, time=" + time + ", tw=" + tourElement.getTimeWindow());
+				if(time > tourElement.getTimeWindow().getEnd()){
+					tooLate += time - tourElement.getTimeWindow().getEnd();
+				}
+				if(time < tourElement.getTimeWindow().getStart()){
+					waitingTime += tourElement.getTimeWindow().getStart() - time;
+//					lastServiceStart = tourElement.getTimeWindow().getStart();
+				}
+				carrierAgent.notifyDelivery(driverId, tourElement.getShipment(), time);
+//				lastActivity = tourElement;
+				activityCounter+=2;
+			}
 		}
 
-		public void tellDistance(double distance) {
+		void tellDistance(double distance) {
 			this.distance += distance;
 		}
 		
-		public double getDistance(){
+		double getDistance(){
 			return distance;
 		}
 
-		public void tellTraveltime(double time) {
-			this.time += time;
+//		public void tellTraveltime(double time) {
+//			this.travelTime += time;
+//		}
+
+		double getTooLate() {
+			return tooLate;
 		}
 
-		public void tellToll(double toll) {
+		void tellToll(double toll) {
 			this.additionalCosts  += toll;
 		}
 
-		public double getAdditionalCosts(){
+		double getAdditionalCosts(){
 			return this.additionalCosts;
 		}
 
-		public double getVolumes() {
+		double getVolumes() {
 			return volumes;
 		}
 
-		public double getPerformace() {
-			return performance;
-		}
-
-		public CarrierVehicle getVehicle() {
+		CarrierVehicle getVehicle() {
 			return scheduledTour.getVehicle();
 		}
+		
+		double getTransportTime(){
+			return travelTime;
+		}
+		
+		double getWaitingTime(){
+			return waitingTime;
+		}
+		
+		double getServiceTime(){
+			return serviceTime;
+		}
 
-		public double getTime() {
-			return time;
+		double getDutyTime() {
+			return totalDutyTime;
 		}
 	}
 
@@ -188,21 +215,25 @@ class CarrierAgentImpl {
 			Activity startActivity = new ActivityImpl(FreightConstants.START, scheduledTour.getVehicle().getLocation());
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
+			LegImpl lastLeg = null;
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
 				if(tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg){
-					Route route = ((org.matsim.contrib.freight.carrier.Tour.Leg)tourElement).getRoute();
+					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
+					Route route = tourLeg.getRoute();
 					assertRouteIsNotNull(route);
-					Leg leg = new LegImpl(TransportMode.car);
+					LegImpl leg = new LegImpl(TransportMode.car);
 					leg.setRoute(route);
+					leg.setDepartureTime(tourLeg.getDepartureTime());
+					leg.setTravelTime(tourLeg.getExpectedTransportTime());
+					leg.setArrivalTime(tourLeg.getDepartureTime() + tourLeg.getExpectedTransportTime());
 					plan.addLeg(leg);
+					lastLeg = leg;
 				}
 				else if(tourElement instanceof TourActivity){
 					TourActivity act = (TourActivity) tourElement;
 					Activity tourElementActivity = new ActivityImpl(act.getActivityType(), act.getLocation());
-//					tourElementActivity.setEndTime(tourElement.getTimeWindow().getStart());
-					tourElementActivity.setMaximumDuration(act.getDuration());
-					tourElementActivity.setStartTime(act.getTimeWindow().getStart());
-					tourElementActivity.setEndTime(act.getTimeWindow().getEnd() + act.getDuration());
+					double endTime = Math.max(lastLeg.getArrivalTime() + act.getDuration(), act.getTimeWindow().getStart() + act.getDuration());
+					tourElementActivity.setEndTime(endTime);
 					plan.addActivity(tourElementActivity);
 				}
 			}
@@ -249,9 +280,9 @@ class CarrierAgentImpl {
 		carrierDriverAgents.get(personId).tellDistance(distance);
 	}
 	
-	public void tellTraveltime(Id personId, double time){
-		carrierDriverAgents.get(personId).tellTraveltime(time);
-	}
+//	public void tellTraveltime(Id personId, double time){
+//		carrierDriverAgents.get(personId).tellTraveltime(time);
+//	}
 
 	private Person createDriverPerson(Id driverId) {
 		Person person = new PersonImpl(driverId);
@@ -284,8 +315,28 @@ class CarrierAgentImpl {
 	}
 
 	public void scoreSelectedPlan() {
-		// TODO Auto-generated method stub
-		
+		if(carrier.getSelectedPlan() == null){
+			return;
+		}
+		double score = 0.0;
+		double tooLate = 0.0;
+		double waiting = 0.0;
+		double transport = 0.0;
+		double duty = 0.0;
+		double dist = 0.0;
+		int vehicles = 0;
+		for(CarrierDriverAgentImpl driver : carrierDriverAgents.values()){
+			vehicles++;
+			tooLate += driver.tooLate;
+			waiting += driver.waitingTime;
+			transport += driver.travelTime;
+			duty += driver.totalDutyTime;
+			dist += driver.distance;
+			score += (-1)*new CarrierCostFunction(new CarrierCostParams()).getCosts(driver.getTransportTime(), 
+					driver.getDistance(), driver.getWaitingTime(), driver.getServiceTime(), driver.getTooLate());
+			score += (-1)*new CarrierCostParams().getCostPerVehicle();
+		}
+		carrier.getSelectedPlan().setScore(score);
 	}
 
 }

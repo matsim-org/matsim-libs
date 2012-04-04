@@ -1,39 +1,48 @@
 package org.matsim.contrib.freight.replanning;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
-import org.matsim.contrib.freight.vrp.VRPSolverFactory;
+import org.matsim.contrib.freight.carrier.CarrierFactory;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.vrp.DTWSolverFactory;
+import org.matsim.contrib.freight.vrp.ShipmentBasedVRPSolver;
+import org.matsim.contrib.freight.vrp.algorithms.rr.DistributionTourWithTimeWindowsAlgoFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.basics.Costs;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.contrib.freight.vrp.constraints.PickORDeliveryCapacityAndTWConstraint;
 
 public class ReScheduleVehicles implements CarrierPlanStrategyModule{
 
 	private Network network;
-	
-	private VRPSolverFactory vrpSolverFactory;
 
 	private Costs costs;
 	
-	private LeastCostPathCalculator router;
+	public Collection<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
 	
-	public ReScheduleVehicles(Network network, Costs costs, VRPSolverFactory vrpSolverFactory) {
+	public ReScheduleVehicles(Network network, Costs costs) {
 		super();
 		this.network = network;
 		this.costs = costs;
-		this.vrpSolverFactory = vrpSolverFactory;
-	}
-
-	public void setRouter(LeastCostPathCalculator router) {
-		this.router = router;
 	}
 
 	@Override
-	public void handleActor(Carrier carrier) {
-		VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), network, costs);
-		planBuilder.setRouter(router);
-		planBuilder.setVrpSolverFactory(vrpSolverFactory);
-		carrier.setSelectedPlan(planBuilder.buildPlan());
+	public void handleActor(Carrier carrier) {	
+//		ShipmentBasedVRPSolver vrpSolver = new ShipmentBasedVRPSolver(new CarrierFactory().getShipments(carrier.getContracts()), 
+//				new CarrierFactory().getVehicles(carrier.getCarrierCapabilities()), costs, network, new InitialSolution());
+		ShipmentBasedVRPSolver vrpSolver = new ShipmentBasedVRPSolver(new CarrierFactory().getShipments(carrier.getContracts()), 
+				new CarrierFactory().getVehicles(carrier.getCarrierCapabilities()), costs, network, carrier.getSelectedPlan());
+		vrpSolver.setRuinAndRecreateFactory(new DistributionTourWithTimeWindowsAlgoFactory());
+		vrpSolver.setGlobalConstraints(new PickORDeliveryCapacityAndTWConstraint());
+		vrpSolver.setnOfWarmupIterations(20);
+		vrpSolver.setnOfIterations(500);
+		vrpSolver.listeners.addAll(listeners);
+		Collection<ScheduledTour> scheduledTours = vrpSolver.solve();
+		carrier.setSelectedPlan(new CarrierPlan(scheduledTours));
 	}
 
 }
