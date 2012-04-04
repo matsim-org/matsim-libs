@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.scenario;
+package playground.tnicolai.matsim4opus.scenario.zurich;
 
 import java.util.ArrayList;
 
@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+
 
 public class ZurichUtilitiesZurichBigRoads extends ZurichUtilities{
 

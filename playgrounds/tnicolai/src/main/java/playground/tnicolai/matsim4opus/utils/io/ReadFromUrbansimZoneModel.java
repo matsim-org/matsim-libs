@@ -40,13 +40,13 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.CreateHomeWorkHomePlan;
-import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisPopulationCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
 /**
  * @author nagel

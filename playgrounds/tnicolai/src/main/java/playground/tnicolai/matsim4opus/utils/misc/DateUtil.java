@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.utils;
+package playground.tnicolai.matsim4opus.utils.misc;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

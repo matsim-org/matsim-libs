@@ -34,8 +34,8 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
-import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
-import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesZurichBigRoads;
+import playground.tnicolai.matsim4opus.scenario.zurich.ZurichUtilities;
+import playground.tnicolai.matsim4opus.scenario.zurich.ZurichUtilitiesZurichBigRoads;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author thomas
  *
  */
-class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcelV2{
+class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimParcel{
 	
 	// Logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZurichAccessibility.class);

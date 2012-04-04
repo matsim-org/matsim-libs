@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.utils;
+package playground.tnicolai.matsim4opus.utils.misc;
 
 /**
  * 

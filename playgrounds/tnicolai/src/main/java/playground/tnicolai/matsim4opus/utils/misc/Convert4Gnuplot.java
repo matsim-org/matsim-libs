@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.utils;
+package playground.tnicolai.matsim4opus.utils.misc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

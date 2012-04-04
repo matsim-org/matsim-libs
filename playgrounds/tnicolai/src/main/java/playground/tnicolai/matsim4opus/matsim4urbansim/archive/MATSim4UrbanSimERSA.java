@@ -43,10 +43,10 @@ import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
 import playground.tnicolai.matsim4opus.matsim4urbansim.CellBasedAccessibilityControlerListener;
-import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

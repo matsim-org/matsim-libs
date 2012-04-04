@@ -53,10 +53,10 @@ import org.matsim.matrices.Matrix;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityHelperObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
+import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
 /**
  *

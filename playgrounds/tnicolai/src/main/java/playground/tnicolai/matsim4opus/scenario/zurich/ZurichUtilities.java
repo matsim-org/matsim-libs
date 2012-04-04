@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.scenario;
+package playground.tnicolai.matsim4opus.scenario.zurich;
 
 import java.util.ArrayList;
 import java.util.Iterator;

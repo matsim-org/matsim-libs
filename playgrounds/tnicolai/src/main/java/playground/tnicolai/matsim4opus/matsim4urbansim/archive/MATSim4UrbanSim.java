@@ -48,12 +48,12 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
 import playground.tnicolai.matsim4opus.matsim4urbansim.ZoneBasedAccessibilityControlerListener;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
-import playground.tnicolai.matsim4opus.utils.DateUtil;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.FileCopy;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.misc.DateUtil;
 
 
 /**

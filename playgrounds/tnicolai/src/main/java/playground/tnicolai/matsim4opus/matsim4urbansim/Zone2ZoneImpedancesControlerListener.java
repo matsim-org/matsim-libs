@@ -49,8 +49,8 @@ import org.matsim.utils.LeastCostPathTree;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
-import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
+import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
 /**
  * This controller version is designed for the sustaincity mile stone (Month 18).

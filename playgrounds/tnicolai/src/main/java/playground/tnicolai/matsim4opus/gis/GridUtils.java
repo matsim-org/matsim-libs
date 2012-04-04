@@ -11,9 +11,9 @@ import org.geotools.feature.Feature;
 
 import playground.tnicolai.matsim4opus.gis.io.FeatureKMLWriter;
 import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
-import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriter;
+import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

@@ -12,7 +12,7 @@ import playground.tnicolai.matsim4opus.config.ConfigurationModule;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
 import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.DateUtil;
+import playground.tnicolai.matsim4opus.utils.misc.DateUtil;
 
 public class BackupRun {
 	

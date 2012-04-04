@@ -18,12 +18,12 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
-import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisZoneCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriter;
+import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**

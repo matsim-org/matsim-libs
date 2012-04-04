@@ -1,21 +1,12 @@
-package playground.tnicolai.matsim4opus.scenario;
+package playground.tnicolai.matsim4opus.scenario.zurich;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.PopulationUtils;
+
 
 public class ZurichUtilitiesOSMNetwork extends ZurichUtilities{
 

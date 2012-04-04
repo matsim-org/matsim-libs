@@ -1,6 +1,6 @@
 Todos:
 
-- implement ZoneBasedAccessibilityControlerListenerV2 (see Cell-Based approach ...)
+
 - MATSimZone: test or implement controllers
 - test different beta values
 - test accessibility measure paired with workers or 1-person hh or income in UrbanSim
@@ -9,6 +9,7 @@ Todos:
 - make "opportunity" sampling rate configurable 
 
 Tasks Done:
+- implement ZoneBasedAccessibilityControlerListenerV2 (see Cell-Based approach ...)
 - implement controller for agent-based performance feedback (time spent traveling, money spent traveling, etc.)
 - orthogonal mapping of measuring points, i.e. othog. walk time from point2Link + walk or car travel time from link intersection 2 nearest node
 	- test why plots of this implementation looks wired -> solved :-) prevoius implementation wasn't correct

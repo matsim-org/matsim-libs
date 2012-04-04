@@ -25,8 +25,6 @@ package playground.tnicolai.matsim4opus.config;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;

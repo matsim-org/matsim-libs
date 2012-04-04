@@ -16,13 +16,29 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.run.NetworkCleaner;
 
-public class OSM2MATSimNetwork2 {
+public class OSM2MATSimNetworkV2 {
 	
 	private static final String PATH = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/archive/";//"../";
 	private static final String INFILE = PATH + "belgium_incl_borderArea.osm";//"belgium_filtered.osm";
 	private static final String OUTFILE = PATH + "belgium_incl_borderAreaV2.xml.gz";
 	
 	public static void main(final String[] args) {
+		
+		// this is a simple version of the code below
+//		String osm = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/archive/belgium_incl_borderArea.osm";
+//		Config config = ConfigUtils.createConfig();
+//		Scenario sc = ScenarioUtils.createScenario(config);
+//		Network net = sc.getNetwork();
+//		// tnicolai: get name from projection identifiyer (EPSG)
+//		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:31300");
+//		String transformation = crs.getName().toString();
+//		
+//		//CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
+//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, transformation);
+//		OsmNetworkReader onr = new OsmNetworkReader(net, ct);
+//		onr.parse(osm);
+//		new NetworkCleaner().run(net);
+//		new NetworkWriter(net).write("/Users/thomas/Downloads/merged-network.xml");
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
 		Network network = sc.getNetwork();

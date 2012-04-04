@@ -41,13 +41,13 @@ import org.matsim.utils.LeastCostPathTree;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
-import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGrid2KMZWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriterERSA_V2;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
