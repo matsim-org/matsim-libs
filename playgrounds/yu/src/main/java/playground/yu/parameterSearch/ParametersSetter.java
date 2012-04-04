@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.parameterSearch;
 
@@ -35,15 +35,23 @@ import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunct
 /**
  * sets parameters of scoringfunction into {@code Config} and also into
  * {@code Controler}
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class ParametersSetter {
 	public static void setParameters(Controler ctl,
 			Map<String, Double> nameParameters) {
 		// set new parameters in config
 		Config cfg = ctl.getConfig();
+		setParametersInConfig(cfg, nameParameters);
+		// set new parameters in Controler
+		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
+				cfg, ctl.getNetwork()));
+	}
+
+	public static void setParametersInConfig(Config cfg,
+			Map<String, Double> nameParameters) {
 		PlanCalcScoreConfigGroup scoringCfg = cfg.planCalcScore();
 		for (String name : nameParameters.keySet()) {
 			String value = Double.toString(nameParameters.get(name));
@@ -55,8 +63,5 @@ public class ParametersSetter {
 						value);
 			}
 		}
-		// set new parameters in Controler
-		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				cfg, ctl.getNetwork()));
 	}
 }

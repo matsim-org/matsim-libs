@@ -28,23 +28,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
 /**
+ * Calculate the best parameter set based on the utility correction
+ *
  * @author yu
  *
  */
 public class LsPC_Run {
-	/** @param args */
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		Controler ctl = new CtlWithLeftTurnPenaltyLs(config);
-		// if (args.length > 1 && Boolean.parseBoolean(args[1])) {
-		// ctl.addControlerListener(new CntSimCap4Chart());
-		// ctl.addControlerListener(new RouteTravelTimeSummary());
-		// }
-		// TODO set in config
-		// ctl.addControlerListener(new QVProfilControlerListener());
 
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
