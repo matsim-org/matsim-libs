@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.core.mobsim.qsim.pt;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +36,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -29,7 +49,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.testcases.utils.SelectiveEventsCollector;
@@ -71,7 +90,7 @@ public class QSimIntegrationTest {
 				"		</transitRoute>" +
 				"	</transitLine>" +
 				"</transitSchedule>";
-		new TransitScheduleReaderV1(f.scenario.getTransitSchedule(), f.scenario.getNetwork(), f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
+		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
@@ -130,7 +149,7 @@ public class QSimIntegrationTest {
 		"		</transitRoute>" +
 		"	</transitLine>" +
 		"</transitSchedule>";
-		new TransitScheduleReaderV1(f.scenario.getTransitSchedule(), f.scenario.getNetwork(), f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
+		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
@@ -190,7 +209,7 @@ public class QSimIntegrationTest {
 				"		</transitRoute>" +
 				"	</transitLine>" +
 				"</transitSchedule>";
-		new TransitScheduleReaderV1(f.scenario.getTransitSchedule(), f.scenario.getNetwork(), f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
+		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		String plansXml = "<?xml version=\"1.0\" ?>" +
 				"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">" +
@@ -272,7 +291,7 @@ public class QSimIntegrationTest {
 		"		</transitRoute>" +
 		"	</transitLine>" +
 		"</transitSchedule>";
-		new TransitScheduleReaderV1(f.scenario.getTransitSchedule(), f.scenario.getNetwork(), f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
+		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		String plansXml = "<?xml version=\"1.0\" ?>" +
 		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">" +
