@@ -42,6 +42,7 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * @author yChen
+ * @author mrieser / senozon
  */
 public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler {
@@ -57,7 +58,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	private final Map<Id, Id> vehStops = new HashMap<Id, Id>();
 	/** Map<vehId,passengersNo. in Veh> */
 	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>();
-	private StringBuffer occupancyRecord;
+	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final Set<Id> transitDrivers = new HashSet<Id>();
 	private final Set<Id> transitVehicles = new HashSet<Id>();
 
@@ -206,7 +207,11 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 *         seconds to (timeBinSize-1)seconds.
 	 */
 	public int[] getBoardVolumesForStop(final Id stopId) {
-		return this.boards.get(stopId);
+		int[] values = this.boards.get(stopId);
+		if (values == null) {
+			return new int[this.maxSlotIndex + 1];
+		}
+		return values;
 	}
 
 	/**
@@ -216,7 +221,11 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 *         seconds to (timeBinSize-1)seconds.
 	 */
 	public int[] getAlightVolumesForStop(final Id stopId) {
-		return this.alights.get(stopId);
+		int[] values = this.alights.get(stopId);
+		if (values == null) {
+			return new int[this.maxSlotIndex + 1];
+		}
+		return values;
 	}
 
 	/**
@@ -226,7 +235,11 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 *         time bin 0 from 0 seconds to (timeBinSize-1)seconds.
 	 */
 	public int[] getOccupancyVolumesForStop(final Id stopId) {
-		return this.occupancies.get(stopId);
+		int[] values = this.occupancies.get(stopId);
+		if (values == null) {
+			return new int[this.maxSlotIndex + 1];
+		}
+		return values;
 	}
 
 	/**
