@@ -143,8 +143,7 @@
 		<param name="inputBoardCountsFile" value="&INPUTBASE;counts/counts_boarding.xml" /> 
   		<param name="inputOccupancyCountsFile" value="&INPUTBASE;counts/counts_occupancy.xml" />
   		<param name="inputAlightCountsFile" value="&INPUTBASE;counts/counts_alighting.xml"/> 
-		
-		<param name="outputformat" value="kml" /> 
+			<param name="outputformat" value="" /> 
   		<param name="distanceFilter" value="30000.0" /> 
   		<param name="countsScaleFactor" value="1.0" />
   		<param name="distanceFilterCenterNode" value="7" />  

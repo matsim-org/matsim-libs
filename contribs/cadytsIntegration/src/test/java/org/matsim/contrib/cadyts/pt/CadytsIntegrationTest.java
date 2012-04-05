@@ -21,6 +21,7 @@
 package org.matsim.contrib.cadyts.pt;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import org.junit.Assert;
@@ -87,12 +88,12 @@ public class CadytsIntegrationTest {
 		List <PlanStrategy> strategyList = controler.getStrategyManager().getStrategies();
 		NewPtBsePlanStrategy ptBsestrategy = null;
 		int i=0;
-		do{
+		do {
 			if (strategyList.get(i).getClass().equals(NewPtBsePlanStrategy.class)){
 				ptBsestrategy = (NewPtBsePlanStrategy)strategyList.get(i);
 			}
 			i++;
-		}while (ptBsestrategy==null && i< strategyList.size());
+		} while (ptBsestrategy==null && i< strategyList.size());
 		Assert.assertNotNull(ptBsestrategy);
 
 		//test calibration settings
@@ -102,7 +103,8 @@ public class CadytsIntegrationTest {
 		//  results
 		// Test first that the calibrationStatReader works properly
 		TabularFileParser tabularFileParser = new TabularFileParser();
-		String calibStatFile = inputDir + "input_calibration-stats.txt";
+		URL url = CadytsIntegrationTest.class.getClassLoader().getResource(inputDir + "input_calibration-stats.txt");
+		String calibStatFile = url.getFile(); // hack to get the file loaded from classpath, which is not directly supported by Cadyts
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
 		try {
 			tabularFileParser.parse(calibStatFile, calibrationStatReader);
