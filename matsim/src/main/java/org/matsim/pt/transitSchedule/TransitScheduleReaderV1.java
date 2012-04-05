@@ -27,11 +27,13 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -79,6 +81,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	/**
 	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, ModeRouteFactory, IdFactory)}
 	 */
+	@Deprecated
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network, final IdFactory idf) {
 		this.schedule = schedule;
 		this.routeFactory = new ModeRouteFactory();
@@ -89,6 +92,12 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 		this.schedule = schedule;
 		this.routeFactory = routeFactory;
 		this.idf = idf;
+	}
+
+	public TransitScheduleReaderV1(final Scenario scenario) {
+		this.schedule = scenario.getTransitSchedule();
+		this.routeFactory = ((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getModeRouteFactory();
+		this.idf = scenario;
 	}
 
 	public void readFile(final String fileName) throws UncheckedIOException {
