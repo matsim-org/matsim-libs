@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
 public class OccupancyAnalyzerTest {
 
 	@Test
-	public void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtSecondStop() throws SAXException, ParserConfigurationException, IOException {
+	public void test_SinglePersonOccupancy() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
 		"<?xml version='1.0' encoding='UTF-8'?>" +
