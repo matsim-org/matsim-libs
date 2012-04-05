@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
@@ -50,8 +51,9 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class ExportParkingTimesAndEnergyConsumptions {
 
 	public static void main(String[] args) {
-		String eventsFile="H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/50.events.txt.gz";
-		String networkFile="H:/data/experiments/ARTEMIS/output/run10/output_network.xml.gz";
+		
+		String eventsFile="E:/pikelot/swiss run dobler/output_census2000V2_10pct_kti_run5/ITERS/it.100/kti.2.100.events.xml.gz";
+		String networkFile="E:/svn/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
 		EventsManager events = EventsUtils.createEventsManager();
 
 		
@@ -66,9 +68,12 @@ public class ExportParkingTimesAndEnergyConsumptions {
 		
 		events.addHandler(energyConsumptionPlugin);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		//EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
 		
-		reader.readFile(eventsFile);
+		//reader.readFile(eventsFile);
+		
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
+		reader.parse(eventsFile);
 		
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
 		
