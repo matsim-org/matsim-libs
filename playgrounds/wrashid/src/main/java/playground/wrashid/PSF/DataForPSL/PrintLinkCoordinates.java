@@ -27,7 +27,7 @@ import playground.wrashid.lib.GeneralLib;
 public class PrintLinkCoordinates {
 
 	public static void main(String[] args) throws Exception {
-		Network network = GeneralLib.readNetwork("C:/data/workspace/playgrounds/mzilske/inputs/schweiz/zurich-switzerland.xml.gz");
+		Network network = GeneralLib.readNetwork("E:/svn/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz");
 
 		System.out.println("linkId\tx\ty");
 		for (Link link : network.getLinks().values()){
