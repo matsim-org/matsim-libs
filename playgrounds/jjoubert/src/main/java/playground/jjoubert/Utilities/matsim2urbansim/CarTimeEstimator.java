@@ -165,6 +165,8 @@ public class CarTimeEstimator {
 			String hours, 
 			String outputFilename,
 			boolean write){
+		
+		log.info("Phase 1: Calculating actual travel times.");
 		/*
 		 * Phase 1: calculate actual travel times from MATSim output.
 		 */
@@ -185,6 +187,7 @@ public class CarTimeEstimator {
 		mpp.processPlans();
 		DenseDoubleMatrix2D partialMatrix = mpp.getOdMatrix();
 
+		log.info("Phase 2: Calculating missing intra- and inter-zonal travel times.");
 		/*
 		 * Phase 2: calculate missing intra- and inter-zonal travel times.
 		 */
