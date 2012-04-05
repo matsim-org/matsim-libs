@@ -5,22 +5,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
-import pl.poznan.put.vrp.dynamic.data.model.Request;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
+import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.ServeTask;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
-import pl.poznan.put.vrp.dynamic.data.schedule.WaitTask;
-import playground.michalm.dynamic.DynActivity;
-import playground.michalm.dynamic.DynActivityImpl;
-import playground.michalm.dynamic.DynAgent;
-import playground.michalm.dynamic.DynAgentLogic;
-import playground.michalm.dynamic.DynLeg;
+import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.model.TaxiCustomer;
 import playground.michalm.vrp.data.network.MATSimVertex;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
+import playground.michalm.vrp.data.network.shortestpath.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
 
@@ -51,6 +42,13 @@ public class TaxiAgentLogic
     {
         this.agent = adapterAgent;
         return createBeforeScheduleActivity();
+    }
+
+
+    @Override
+    public DynAgent getDynAgent()
+    {
+        return agent;
     }
 
 
@@ -194,8 +192,11 @@ public class TaxiAgentLogic
             throw new IllegalStateException("Passanger and taxi on different links!");
         }
 
-//        if (taxiSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),currentLinkId) == null) {
-        if (taxiSimEngine.internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(),currentLinkId) == null) {
+        // if
+        // (taxiSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),currentLinkId)
+        // == null) {
+        if (taxiSimEngine.internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(),
+                currentLinkId) == null) {
             throw new RuntimeException("Passenger id=" + passenger.getId()
                     + "is not waiting for taxi");
         }
@@ -203,7 +204,8 @@ public class TaxiAgentLogic
         // event handling
         EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
         EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
-        events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(), agent.getId()));
+        events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
+                agent.getId()));
 
         return TaxiTaskActivity.createServeActivity(task);
     }
@@ -233,7 +235,8 @@ public class TaxiAgentLogic
 
                 passenger.notifyTeleportToLink(passenger.getDestinationLinkId());
                 passenger.endLegAndComputeNextState(now);
-                TaxiAgentLogic.this.taxiSimEngine.internalInterface.arrangeNextAgentState(passenger) ;
+                TaxiAgentLogic.this.taxiSimEngine.internalInterface
+                        .arrangeNextAgentState(passenger);
             }
         };
     }

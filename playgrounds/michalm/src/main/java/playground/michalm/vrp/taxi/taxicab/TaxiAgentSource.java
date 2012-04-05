@@ -8,9 +8,9 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.VehicleUtils;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import playground.michalm.dynamic.DynAgent;
-import playground.michalm.dynamic.DynAgentWithPlan;
+import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.model.DynVehicle;
 import playground.michalm.vrp.data.network.MATSimVertex;
 import playground.michalm.vrp.driver.VRPSchedulePlanFactory;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
@@ -48,6 +48,7 @@ public class TaxiAgentSource
             TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, data.getVrpGraph()
                     .getShortestPaths(), taxiSimEngine);
             taxiSimEngine.addAgentLogic(taxiAgentLogic);
+            ((DynVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);
 
             Id id = data.getScenario().createId(vrpVeh.getName());
             Id startLinkId = ((MATSimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
@@ -56,8 +57,8 @@ public class TaxiAgentSource
                     taxiAgentLogic);
 
             if (isAgentWithPlan) {
-                qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent, new VRPSchedulePlanFactory(vrpVeh,
-                        data)));
+                qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent,
+                        new VRPSchedulePlanFactory(vrpVeh, data)));
             }
             else {
                 qSim.insertAgentIntoMobsim(taxiAgent);

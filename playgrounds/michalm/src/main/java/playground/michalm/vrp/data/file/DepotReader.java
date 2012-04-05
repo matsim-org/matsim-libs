@@ -10,6 +10,7 @@ import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.model.DynVehicle;
 import playground.michalm.vrp.data.network.*;
 
 
@@ -99,7 +100,7 @@ public class DepotReader
         int t1 = getInt(atts, "t1", 86400); // default: 24 * 3600
         int tLimit = getInt(atts, "tLimit", t1 - t0); // default: t1-t0
 
-        vehicles.add(new VehicleImpl(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
+        vehicles.add(new DynVehicle(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
     }
 
 

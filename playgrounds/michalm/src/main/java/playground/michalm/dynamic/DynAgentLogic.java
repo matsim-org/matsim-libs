@@ -5,6 +5,9 @@ public interface DynAgentLogic
     DynActivity init(DynAgent agent);
 
 
+    DynAgent getDynAgent();
+
+
     void endActivityAndAssumeControl(DynActivity oldActivity, double now);
 
 

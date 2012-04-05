@@ -44,7 +44,7 @@ public class DynAgent implements MobsimDriverAgent {
 
     // =====
 
-    private DynLeg vrpLeg;// DRIVE task
+    private DynLeg dynLeg;
 
     private Id currentLinkId;
 
@@ -52,7 +52,7 @@ public class DynAgent implements MobsimDriverAgent {
 
     // =====
 
-    private DynActivity vrpActivity;// WAIT or SERVE task
+    private DynActivity dynActivity;
 
     private double activityEndTime = Time.UNDEFINED_TIME;
 
@@ -68,8 +68,8 @@ public class DynAgent implements MobsimDriverAgent {
         this.eventsManager = simulation.getEventsManager();
 
         // initial activity
-        vrpActivity = this.agentLogic.init(this);
-        activityEndTime = vrpActivity.getEndTime();
+        dynActivity = this.agentLogic.init(this);
+        activityEndTime = dynActivity.getEndTime();
 
         if (activityEndTime != Time.UNDEFINED_TIME) {
             state = MobsimAgent.State.ACTIVITY;
@@ -92,9 +92,9 @@ public class DynAgent implements MobsimDriverAgent {
 
         switch (state) {
             case ACTIVITY: // WAIT (will it be also SERVE???)
-                if (activityEndTime != vrpActivity.getEndTime()) {
+                if (activityEndTime != dynActivity.getEndTime()) {
                     double oldTime = activityEndTime;
-                    activityEndTime = vrpActivity.getEndTime();
+                    activityEndTime = dynActivity.getEndTime();
 
                     simulation.rescheduleActivityEnd(DynAgent.this, oldTime, activityEndTime);
                 }
@@ -115,18 +115,18 @@ public class DynAgent implements MobsimDriverAgent {
 
     public void startActivity(DynActivity activity, double now)
     {
-        vrpActivity = activity;
-        activityEndTime = vrpActivity.getEndTime();
+        dynActivity = activity;
+        activityEndTime = dynActivity.getEndTime();
         state = MobsimAgent.State.ACTIVITY;
 
         eventsManager.processEvent(eventsManager.getFactory().createActivityStartEvent(now, id,
-                currentLinkId, null, vrpActivity.getActivityType()));
+                currentLinkId, null, dynActivity.getActivityType()));
     }
 
 
     public void startLeg(DynLeg leg, double now)
     {
-        vrpLeg = leg;
+        dynLeg = leg;
         nextLinkId = leg.getNextLinkId();
         state = MobsimAgent.State.LEG;
     }
@@ -136,10 +136,10 @@ public class DynAgent implements MobsimDriverAgent {
     public void endActivityAndComputeNextState(double now)
     {
         eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id,
-                currentLinkId, null, vrpActivity.getActivityType()));
+                currentLinkId, null, dynActivity.getActivityType()));
 
-        DynActivity oldActivity = vrpActivity;
-        vrpActivity = null;// !!! this is important
+        DynActivity oldActivity = dynActivity;
+        dynActivity = null;
         state = null;// !!! this is important
 
         agentLogic.endActivityAndAssumeControl(oldActivity, now);
@@ -152,8 +152,8 @@ public class DynAgent implements MobsimDriverAgent {
         eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id,
                 currentLinkId, TransportMode.car));
 
-        DynLeg oldLeg = vrpLeg;
-        vrpLeg = null;// !!! this is important
+        DynLeg oldLeg = dynLeg;
+        dynLeg = null;
         state = null;// !!! this is important
 
         agentLogic.endLegAndAssumeControl(oldLeg, now);
@@ -223,7 +223,7 @@ public class DynAgent implements MobsimDriverAgent {
     @Override
     public Id getDestinationLinkId()
     {
-        return vrpLeg.getDestinationLinkId();
+        return dynLeg.getDestinationLinkId();
     }
 
 
@@ -237,7 +237,7 @@ public class DynAgent implements MobsimDriverAgent {
     @Override
     public void notifyMoveOverNode(Id newLinkId)
     {
-        nextLinkId = vrpLeg.getNextLinkId();
+        nextLinkId = dynLeg.getNextLinkId();
         currentLinkId = newLinkId;
     }
 

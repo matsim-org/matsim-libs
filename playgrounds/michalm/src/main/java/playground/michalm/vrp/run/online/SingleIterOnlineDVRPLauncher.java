@@ -71,18 +71,22 @@ public class SingleIterOnlineDVRPLauncher
 
     private void processArgs()
     {
-        dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
+        // dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
+        dirName = "D:\\PP-rad\\taxi\\poznan\\";
+
         netFileName = dirName + "network.xml";
         plansFileName = dirName + "plans.xml";
         depotsFileName = dirName + "depots.xml";
         reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
         travelTimesFromEvents = true;
-        eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
+        // eventsFileName =
+        // "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
+        eventsFileName = "d:\\PP-rad\\taxi\\poznan\\output\\ITERS\\it.20\\20.events.xml.gz";
 
-        algorithmType = AlgorithmType.PRE_ASSIGNMENT;
+        algorithmType = AlgorithmType.RE_ASSIGNMENT;
 
-        otfVis = !true;
+        otfVis = true;
 
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "\\vrp_output";
@@ -157,7 +161,7 @@ public class SingleIterOnlineDVRPLauncher
 
                 List<Vehicle> vehicles = data.getVrpData().getVehicles();
                 Vehicle[] reqIdToVehMapping = new Vehicle[scanner.nextInt()];
-                
+
                 for (int i = 0; i < reqIdToVehMapping.length; i++) {
                     reqIdToVehMapping[i] = vehicles.get(scanner.nextInt());
                 }
@@ -181,7 +185,7 @@ public class SingleIterOnlineDVRPLauncher
 
         QSim sim = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
 
-        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(sim, data.getVrpData(), optimizerFactory);
+        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(sim, data, optimizerFactory);
         sim.addMobsimEngine(taxiSimEngine);
         sim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
                 new DefaultAgentFactory(sim), sim));

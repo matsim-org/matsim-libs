@@ -1,44 +1,28 @@
 package playground.michalm.vrp.data.network.shortestpath.sparse;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.router.util.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.MATSimVertex;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
 
 public class SparseShortestPath
     implements ShortestPath
 {
-    private int timeInterval;
-    private int intervalCoutn;
-    private boolean cyclic;
+    private final SparseShortestPathFinder sspFinder;
 
-    private SPEntry entries[];
+    private final Link fromLink;
+    private final Link toLink;
 
-    private TravelTime travelTime;
-    private TravelDisutility travelCost;
-    private LeastCostPathCalculator router;
-    private Link fromLink;
-    private Link toLink;
+    private SPEntry entries[] = null;// lazy initialization
 
 
-    public SparseShortestPath(int numIntervals, int timeInterval, boolean cyclic,
-            LeastCostPathCalculator router, TravelTime travelTime, TravelDisutility travelCost,
-            MATSimVertex fromVertex, MATSimVertex toVertex)
+    public SparseShortestPath(SparseShortestPathFinder sspFinder, MATSimVertex fromVertex,
+            MATSimVertex toVertex)
     {
-        this.timeInterval = timeInterval;
-        this.intervalCoutn = numIntervals;
-        this.cyclic = cyclic;
-
-        entries = new SPEntry[numIntervals];
-
-        this.router = router;
-        this.travelTime = travelTime;
-        this.travelCost = travelCost;
-
+        this.sspFinder = sspFinder;
         fromLink = fromVertex.getLink();
         toLink = toVertex.getLink();
     }
@@ -46,14 +30,19 @@ public class SparseShortestPath
 
     private int getIdx(int departTime)
     {
-        int idx = (departTime / timeInterval);
-        return cyclic ? (idx % intervalCoutn) : idx;
+        int idx = (departTime / sspFinder.TIME_BIN_SIZE);
+        return sspFinder.CYCLIC ? (idx % sspFinder.NUM_SLOTS) : idx;
     }
 
 
     @Override
     public SPEntry getSPEntry(int departTime)
     {
+        // lazy initialization of the SP entries
+        if (entries == null) {
+            entries = new SPEntry[sspFinder.NUM_SLOTS];
+        }
+
         int idx = getIdx(departTime);
         SPEntry entry = entries[idx];
 
@@ -69,8 +58,8 @@ public class SparseShortestPath
     private SPEntry calculateSPEntry(int departTime)
     {
         if (fromLink != toLink) {
-            Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
-                    departTime);
+            Path path = sspFinder.router.calcLeastCostPath(fromLink.getToNode(),
+                    toLink.getFromNode(), departTime);
 
             double time = path.travelTime;
             double cost = path.travelCost;
@@ -79,14 +68,14 @@ public class SparseShortestPath
             int idxShift;
 
             if (ShortestPath.INCLUDE_TO_LINK) {
-                time += travelTime.getLinkTravelTime(toLink, departTime);
-                cost += travelCost.getLinkTravelDisutility(toLink, time);
+                time += sspFinder.travelTime.getLinkTravelTime(toLink, departTime);
+                cost += sspFinder.travelCost.getLinkTravelDisutility(toLink, time);
                 ids[idCount - 1] = toLink.getId();
                 idxShift = 0;
             }
             else {
-                time += travelTime.getLinkTravelTime(fromLink, departTime);
-                cost += travelCost.getLinkTravelDisutility(fromLink, time);
+                time += sspFinder.travelTime.getLinkTravelTime(fromLink, departTime);
+                cost += sspFinder.travelCost.getLinkTravelDisutility(fromLink, time);
                 ids[0] = fromLink.getId();
                 idxShift = 1;
             }

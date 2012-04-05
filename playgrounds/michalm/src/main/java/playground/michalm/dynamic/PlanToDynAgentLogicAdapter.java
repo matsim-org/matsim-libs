@@ -1,20 +1,17 @@
 package playground.michalm.dynamic;
 
-import java.util.*;
+import java.util.Iterator;
 
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.routes.*;
+import org.matsim.core.population.routes.NetworkRoute;
 
 
 /**
- * 
- * This class could be useful for jUnit testing of compatibility of DynAgent
- * with PersonDriverAgentImpl (i.e. comparing events thrown during 2 different QSims,
- * one with {@code PlanBasedDynAgentLogic} while the other with
- * {@codePersonDriverAgentImpl}).
+ * This class could be useful for jUnit testing of compatibility of DynAgent with
+ * PersonDriverAgentImpl (i.e. comparing events thrown during 2 different QSims, one with
+ * {@code PlanBasedDynAgentLogic} while the other with {@codePersonDriverAgentImpl}).
  * 
  * @author michalm
- *
  */
 public class PlanToDynAgentLogicAdapter
     implements DynAgentLogic
@@ -39,6 +36,13 @@ public class PlanToDynAgentLogicAdapter
 
         Activity act = (Activity)planElemIter.next();
         return new DynActivityImpl(act.getType(), act.getEndTime());
+    }
+
+
+    @Override
+    public DynAgent getDynAgent()
+    {
+        return agent;
     }
 
 

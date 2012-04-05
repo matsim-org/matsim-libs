@@ -2,25 +2,27 @@ package playground.michalm.vrp.taxi;
 
 import java.util.*;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.vis.otfvis.opengl.queries.*;
+import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
-import pl.poznan.put.vrp.dynamic.data.*;
+import pl.poznan.put.vrp.dynamic.data.VRPData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.optimizer.*;
+import pl.poznan.put.vrp.dynamic.optimizer.VRPOptimizerFactory;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import playground.michalm.vrp.data.MATSimVRPData;
 import playground.michalm.vrp.data.jdbc.JDBCWriter;
-import playground.michalm.vrp.otfvis.*;
-import playground.michalm.vrp.taxi.taxicab.*;
+import playground.michalm.vrp.otfvis.VRPOTFClientLive;
+import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 
 
 public class TaxiSimEngine
     implements MobsimEngine
 {
+    private MATSimVRPData matsimVrpData;
     private VRPData vrpData;
 
     private Netsim netsim;
@@ -33,9 +35,9 @@ public class TaxiSimEngine
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
     /**
-     * yyyyyy This should not be public.  An easy fix would be to put vrp.taxi.taxicab and vrp.taxi into the same package
-     * and reduce visibility to package level.  Alternatively, the internal interface can be passed to the taxicabs somehow
-     * (during initialization?).  kai, dec'11
+     * yyyyyy This should not be public. An easy fix would be to put vrp.taxi.taxicab and vrp.taxi
+     * into the same package and reduce visibility to package level. Alternatively, the internal
+     * interface can be passed to the taxicabs somehow (during initialization?). kai, dec'11
      */
     public InternalInterface internalInterface = null;
 
@@ -47,12 +49,13 @@ public class TaxiSimEngine
     }
 
 
-    public TaxiSimEngine(Netsim netsim, VRPData data, VRPOptimizerFactory optimizerFactory)
+    public TaxiSimEngine(Netsim netsim, MATSimVRPData data, VRPOptimizerFactory optimizerFactory)
     {
         this.netsim = netsim;
         this.optimizerFactory = optimizerFactory;
 
-        vrpData = data;
+        matsimVrpData = data;
+        vrpData = data.getVrpData();
     }
 
 
@@ -127,10 +130,10 @@ public class TaxiSimEngine
         // this happens at the end of QSim.doSimStep() therefore "time+1"
         // this value will be used throughout the next QSim.doSimStep()
         vrpData.setTime((int)time + 1); // this can be moved to Before/AfterSimStepListener
-        
-        if (time == 3600) {
+
+        if (time == -3600) {
             System.err.println("************************ SQL &&&&&&&&&&&&&&&&&&&&&");
-            JDBCWriter writer = new JDBCWriter(vrpData);
+            JDBCWriter writer = new JDBCWriter(matsimVrpData);
             writer.simulationInitialized();
             writer.fillWithTaskForTesting();
             writer.close();

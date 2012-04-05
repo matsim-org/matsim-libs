@@ -13,24 +13,30 @@ import playground.michalm.vrp.data.network.shortestpath.*;
 
 public class SparseShortestPathFinder
 {
-    public final int travelTimeBinSize;// in seconds
-    public final int numSlots;
-    private MATSimVRPData data;
+    final int TIME_BIN_SIZE;// in seconds
+    final int NUM_SLOTS;
+    final boolean CYCLIC = true;
+    
+    final private MATSimVRPData data;
+    
+    TravelTime travelTime;
+    TravelDisutility travelCost;
+    LeastCostPathCalculator router;
 
 
     public SparseShortestPathFinder(MATSimVRPData data)
     {
         this.data = data;
-        travelTimeBinSize = 15 * 60;// 15 minutes
-        numSlots = 24 * 4;// 24 hours split into quarters
+        TIME_BIN_SIZE = 15 * 60;// 15 minutes
+        NUM_SLOTS = 24 * 4;// 24 hours split into quarters
     }
 
 
     public SparseShortestPathFinder(MATSimVRPData data, int travelTimeBinSize, int numSlots)
     {
         this.data = data;
-        this.travelTimeBinSize = travelTimeBinSize;
-        this.numSlots = numSlots;
+        this.TIME_BIN_SIZE = travelTimeBinSize;
+        this.NUM_SLOTS = numSlots;
     }
 
 
@@ -38,6 +44,10 @@ public class SparseShortestPathFinder
     public ShortestPathToArcTimeArcCostAdapter[][] findShortestPaths(TravelTime travelTime,
             TravelDisutility travelCost, LeastCostPathCalculator router)
     {
+        this.travelTime = travelTime;
+        this.travelCost = travelCost;
+        this.router = router;
+        
         MATSimVRPGraph graph = data.getVrpGraph();
         int n = graph.getVertexCount();
 
@@ -57,8 +67,7 @@ public class SparseShortestPathFinder
                 MATSimVertex vB = (MATSimVertex)b;
 
                 ShortestPathToArcTimeArcCostAdapter sPath_AB = new ShortestPathToArcTimeArcCostAdapter(
-                        new SparseShortestPath(numSlots, travelTimeBinSize, true, router,
-                                travelTime, travelCost, vA, vB));
+                        new SparseShortestPath(this, vA, vB));
 
                 sPath_A[vB.getId()] = sPath_AB;
             }

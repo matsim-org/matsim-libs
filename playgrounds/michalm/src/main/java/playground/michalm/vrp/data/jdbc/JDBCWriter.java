@@ -11,15 +11,22 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
+import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.model.DynVehicle;
 import playground.michalm.vrp.data.network.MATSimVertex;
+import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
+import cern.colt.Arrays;
 
 
 public class JDBCWriter
 {
     private static final String dbUrl = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};"
-            + "DBQ=d:\\PP-rad\\taxi\\baza danych\\baza_vrp.mdb;DriverID=22;READONLY=false";
+            + "DBQ=d:\\PP-rad\\taxi\\poznan\\baza_vrp.mdb;DriverID=22;READONLY=false";
 
     private VRPData data;
+    private ShortestPath[][] shortestPaths;
+
     private Connection con;
 
     private PreparedStatement vertexInsert;
@@ -41,9 +48,10 @@ public class JDBCWriter
     private PreparedStatement taskStatusUpdate;
 
 
-    public JDBCWriter(VRPData data)
+    public JDBCWriter(MATSimVRPData matsimData)
     {
-        this.data = data;
+        this.data = matsimData.getVrpData();
+        shortestPaths = matsimData.getVrpGraph().getShortestPaths();
 
         try {
             con = DriverManager.getConnection(dbUrl, "", "");
@@ -66,8 +74,8 @@ public class JDBCWriter
                             + "values (?, ?, ?, ?, ?, ?, ?, ?, 'V')");
 
             scheduleInsert = con.prepareStatement(//
-                    "insert into Schedules (Schedule_Id, Vehicle_Id, Status, CurrentTask_Id) "
-                            + "values (?, ?, ?, null)");
+                    "insert into Schedules (Schedule_Id, Vehicle_Id, Status, CurrentTask_Id, CurrentLink_Id) "
+                            + "values (?, ?, ?, null, ?)");
 
             customerInsert = con.prepareStatement(//
                     "insert into Customers (Customer_Id, Name, Vertex_Id) values (?, ?, ?)");
@@ -83,8 +91,8 @@ public class JDBCWriter
 
             driveTaskInsert = con.prepareStatement(//
                     "insert into Tasks (Task_Id, Task_Idx, Schedule_Id, TaskType, TaskStatus, "
-                            + "BeginTime, EndTime, FromVertex_Id, ToVertex_Id) "
-                            + "values (?, ?, ?, '" + TaskType.DRIVE.name() + "', ?, ?, ?, ?, ?)");
+                            + "BeginTime, EndTime, FromVertex_Id, ToVertex_Id, Link_Ids) "
+                            + "values (?, ?, ?, '" + TaskType.DRIVE.name() + "', ?, ?, ?, ?, ?, ?)");
 
             serveTaskInsert = con.prepareStatement(//
                     "insert into Tasks (Task_Id, Task_Idx, Schedule_Id, TaskType, TaskStatus, "
@@ -150,6 +158,8 @@ public class JDBCWriter
                 scheduleInsert.setInt(1, v.getId());
                 scheduleInsert.setInt(2, v.getId());
                 scheduleInsert.setString(3, v.getSchedule().getStatus().name());
+                scheduleInsert.setString(4, ((DynVehicle)v).getAgentLogic().getDynAgent()
+                        .getCurrentLinkId().toString());
                 scheduleInsert.executeUpdate();
             }
 
@@ -204,6 +214,11 @@ public class JDBCWriter
                             DriveTask dt = (DriveTask)t;
                             driveTaskInsert.setInt(7, dt.getFromVertex().getId());
                             driveTaskInsert.setInt(8, dt.getToVertex().getId());
+
+                            SPEntry path = shortestPaths[dt.getFromVertex().getId()][dt
+                                    .getToVertex().getId()].getSPEntry(dt.getBeginTime());
+                            driveTaskInsert.setString(9, Arrays.toString(path.linkIds));
+
                             break;
 
                         case SERVE:
@@ -331,6 +346,11 @@ public class JDBCWriter
                             DriveTask dt = (DriveTask)t;
                             driveTaskInsert.setInt(7, dt.getFromVertex().getId());
                             driveTaskInsert.setInt(8, dt.getToVertex().getId());
+
+                            SPEntry path = shortestPaths[dt.getFromVertex().getId()][dt
+                                    .getToVertex().getId()].getSPEntry(dt.getBeginTime());
+                            driveTaskInsert.setString(9, Arrays.toString(path.linkIds));
+
                             break;
 
                         case SERVE:
