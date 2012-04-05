@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -44,6 +45,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ConvertThurgau2Plans {
@@ -54,130 +57,131 @@ public class ConvertThurgau2Plans {
 	private static final String SHOP = "s";	
 	private static final String EDUC = "e";
 	private static final String OTHR = "o";
-
 	private static final String MALE = "m";
 	private static final String FEMALE = "f";
-
-	private static final String YES = "yes";
-	private static final String NO = "no";
+	
+	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	private final String inputfile;
-	private final String outputfile;
-
-	private final int dow_min;
-	private final int dow_max;
+	//private final String outputfile;
 	
 	private final static Logger log = Logger.getLogger(ConvertThurgau2Plans.class);
-
-	public ConvertThurgau2Plans(final String inputfile, final String outputfile, final int dow_min, final int dow_max) {
-		super();
-		this.inputfile = inputfile;
-		this.outputfile = outputfile;
-		this.dow_min = dow_min;
-		this.dow_max = dow_max;
+	
+	public static void main(final String[] args) {		
+		if (args.length != 1) {
+			log.error("Provide correct number of arguments ...");
+			System.exit(-1);
+		}
+		
+		ConvertThurgau2Plans scenarioCreator = new ConvertThurgau2Plans(args[0]);	
+		
+		try {
+			scenarioCreator.run();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		log.info("Scenario creation finished \n ----------------------------------------------------");
 	}
+	
+	// ------------------------------------------------------------------------------------------------
 
-	private final Set<Id> createPlans(final Population plans, final Map<Id,String> person_strings) throws Exception {
-		Set<Id> coord_err_pids = new HashSet<Id>();
+	public ConvertThurgau2Plans(final String inputfile) {
+		this.inputfile = inputfile;
+	}
+	
+	// ------------------------------------------------------------------------------------------------
 
-		Set<Id> pids_dow = new HashSet<Id>();
-
+	private void createPopulationAndPlans(final Population population, final Map<Id, String> person_strings) throws Exception {
 		for (Id pid : person_strings.keySet()) {
 			String person_string = person_strings.get(pid);
 			String person_string_new = "";
 
 			String[] lines = person_string.split("\n", -1); // last line is always an empty line
-			for (int l=0; l<lines.length-1; l++) {
-				String[] entries = lines[l].split("\t", -1);
+			for (int l = 0; l < lines.length-1; l++) {
+				
+				String[] entrs = lines[l].split(",", -1);
 
 				// pid check
-				if (!pid.toString().equals(entries[0].trim())) { Gbl.errorMsg("That must not happen!"); }
+				if (!pid.toString().equals(entrs[2].trim())) {
+					Gbl.errorMsg("That must not happen!");
+				}
 
 				// departure time (min => sec.)
-				int departure = Integer.parseInt(entries[3].trim()) * 60;
-				entries[3] = Integer.toString(departure);
-
-				// start coordinate (round to hectare)
-				Coord from = new CoordImpl(entries[4].trim(),entries[5].trim());
-				from.setX(Math.round(from.getX()/100.0)*100);
-				from.setY(Math.round(from.getY()/100.0)*100);
-				entries[4] = Double.toString(from.getX());
-				entries[5] = Double.toString(from.getY());
-
-				// start coordinate (round to hectare)
-				Coord to = new CoordImpl(entries[6].trim(),entries[7].trim());
-				to.setX(Math.round(to.getX()/100.0)*100);
-				to.setY(Math.round(to.getY()/100.0)*100);
-				entries[6] = Double.toString(to.getX());
-				entries[7] = Double.toString(to.getY());
-
-				// departure time (min => sec.). A few arrival times are not given, setting to departure time (trav_time=0)
-				int arrival = departure;
-				if (!entries[8].trim().equals("")) { arrival = Integer.parseInt(entries[8].trim())*60; }
-				entries[8] = Integer.toString(arrival);
+				String dp[] = (entrs[6].trim()).split(",", -1);
+				int departure = Integer.parseInt(dp[0].trim()) * 3600 + Integer.parseInt(dp[1].trim()) * 60;
+				
+				// arrival time (min => sec.)
+				String ar[] = (entrs[7].trim()).split(",", -1);
+				int arrival = Integer.parseInt(ar[0].trim()) * 3600 + Integer.parseInt(ar[1].trim()) * 60;
+				
 
 				// destination activity type ---------------------
-				int purpose = Integer.parseInt(entries[11].trim());
+				int purpose = Integer.parseInt(entrs[24].trim());
 				String acttype = null;
-				if (purpose == 1) { acttype = WORK; }
-				else if (purpose == 2) { acttype = EDUC; }
-				else if (purpose == 3) { acttype = SHOP; }
-				else if (purpose == 4) { acttype = LEIS; }
-				else if (purpose == 5) { acttype = LEIS; }
-				else if (purpose == 3) { acttype = SHOP; }
+				if 		(purpose == 1) { acttype = OTHR; }	// Pick up/Drop off
+				else if (purpose == 2) { acttype = OTHR; }	// Private business
+				else if (purpose == 3) { acttype = WORK; }	// Work related
+				else if (purpose == 4) { acttype = EDUC; }	// School
+				else if (purpose == 5) { acttype = WORK; }	// Work
+				else if (purpose == 6) { acttype = SHOP; }	// Shopping daily
+				else if (purpose == 7) { acttype = SHOP; }	// Shopping long-term
+				else if (purpose == 8) { acttype = LEIS; }	// Leisure
+				else if (purpose == 9) { acttype = OTHR; }	// Other
+				else if (purpose == 10) { acttype = HOME; }	// Home
 				else { Gbl.errorMsg("pid=" + pid + ": purpose=" + purpose + " not known!"); }
-
-				// trip mode type ---------------------------------
-				int m = Integer.parseInt(entries[12].trim());
-				String mode = null;
-				if (m == 1) { mode = TransportMode.walk; }
-				else if (m == 2) { mode = TransportMode.bike; }
-				else if (m == 3) { mode = TransportMode.car; }
-				else if (m == 4) { mode = TransportMode.pt; }
-				else if (m == 5) { mode = TransportMode.ride;}
-				else if (m == 6) { mode = "undefined"; }
-				else { Gbl.errorMsg("pid=" + pid + ": m=" + m + " not known!"); }
-
-				// micro census person weight
-				double weight = Double.parseDouble(entries[16].trim());
-
-				// person age
-				int age = Integer.parseInt(entries[17].trim());
-
-				// person gender
-				int g = Integer.parseInt(entries[18].trim());
-				String gender = null;
-				if (g == 0) {
-					gender = FEMALE;
-				}
-				else if (g == 1) {
-					gender = MALE;
-				}
-				else { 
-					Gbl.errorMsg("pid=" + pid + ": g=" + g + " not known!");
-				}
-				// day of week
-				int dow = Integer.parseInt(entries[20].trim());
-				if ((dow < 1) || (dow > 7)) { Gbl.errorMsg("pid=" + pid + ": dow=" + dow + " not known!"); }
-				if (!((this.dow_min<=dow) && (dow<=this.dow_max))) { pids_dow.add(pid); }
-
-				// distance (km => m)
-				double distance = Double.parseDouble(entries[21].trim())*1000.0;
-				entries[21] = Double.toString(distance);
 				
-				// creating the line with the changed data ------------------------
-				String str = entries[0];
-				for (int i=1; i<entries.length; i++) { str = str + "\t" + entries[i];  }
-				str = str + "\n";
-				person_string_new = person_string_new + str;
+				// trip mode type ---------------------------------
+				int m = Integer.parseInt(entrs[29].trim());
+				String mode = null;
+				if (m == 0) 	 { mode = "undefined"; }	// Unkown
+				else if (m == 1) { mode = TransportMode.pt; }	// Rail
+				else if (m == 2) { mode = TransportMode.pt; }	// Bus
+				else if (m == 3) { mode = TransportMode.car; }	// Car driver
+				else if (m == 4) { mode = TransportMode.ride; }	// Car passenger
+				else if (m == 5) { mode = TransportMode.car; }	// Motorcycle
+				else if (m == 6) { mode = TransportMode.bike; }	// Cycle
+				else if (m == 6) { mode = TransportMode.walk; }	// Walking
+				else if (m == 6) { mode = "undefined"; }		// Other
+				else { Gbl.errorMsg("pid=" + pid + ": m=" + m + " not known!");
+				}
 
+				// micro census 2000 person weight
+				double pweight = Double.parseDouble(entrs[89].trim());
+				
+				// micro census 2000 trip weight
+				double tweight = Double.parseDouble(entrs[90].trim());
+
+// get this info from 2nd file
+//				// person age
+//				int age = Integer.parseInt(entries[17].trim());
+//
+//				// person gender
+//				int g = Integer.parseInt(entries[18].trim());
+//				String gender = null;
+//				if (g == 0) {
+//					gender = FEMALE;
+//				}
+//				else if (g == 1) {
+//					gender = MALE;
+//				}
+//				else { 
+//					Gbl.errorMsg("pid=" + pid + ": g=" + g + " not known!");
+//				}
+				
+				// day of week
+				int dow = Integer.parseInt(entrs[22].trim());
+				if ((dow < 1) || (dow > 7)) {
+					Gbl.errorMsg("pid=" + pid + ": dow=" + dow + " not known!"); 
+				}
+				
 				// creating/getting the MATSim person
-				PersonImpl person = (PersonImpl) plans.getPersons().get(pid);
+				PersonImpl person = (PersonImpl) population.getPersons().get(pid);
 				if (person == null) {
 					person = new PersonImpl(pid);
-					plans.addPerson(person);
-					person.setAge(age);
-					person.setSex(gender);
+					population.addPerson(person);
+// get this info from 2nd file
+//					person.setAge(age);
+//					person.setSex(gender);
 				}
 
 				// creating/getting plan
@@ -185,88 +189,52 @@ public class ConvertThurgau2Plans {
 				if (plan == null) {
 					person.createAndAddPlan(true);
 					plan = person.getSelectedPlan();
-					plan.setScore(weight); // used plans score as a storage for the person weight of the MZ2000
+					plan.setScore(pweight); // used plans score as a storage for the person weight of the MZ2000
 				}
 
 				// adding acts/legs
 				if (plan.getPlanElements().size() != 0) { // already lines parsed and added
 					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
-					//from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
 					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-					leg.setRoute(route);
-					route.setDistance(distance);
-					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 					act.setStartTime(arrival);
-
-					// coordinate consistency check
-					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {
-						coord_err_pids.add(pid);
-					}
 				}
 				else {
-					ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME,from);
+					ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME);
 					homeAct.setEndTime(departure);
 					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-					leg.setRoute(route);
-					route.setDistance(distance);
-					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 					act.setStartTime(arrival);
 				}
 			}
 			// replacing the person string with the new data
-			if (person_strings.put(pid,person_string_new) == null) { Gbl.errorMsg("That must not happen!"); }
-		}
-
-		log.info("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
-		this.removePlans(plans,person_strings,pids_dow);
-		log.info("        done.");
-		coord_err_pids.removeAll(pids_dow);
-
-		return coord_err_pids;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	private final void removePlans(final Population plans, final Map<Id,String> person_strings, final Set<Id> ids) {
-		for (Id id : ids) {
-			Person p = plans.getPersons().remove(id);
-			if (p == null) { Gbl.errorMsg("pid="+id+": id not found in the plans DB!"); }
-			String p_str = person_strings.remove(id);
-			if (p_str == null) { Gbl.errorMsg("pid="+id+": id not found in the person_strings DB!"); }
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	private final void setHomeLocations(final Population plans, final Map<Id,String> person_strings) {
-		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			Activity home = ((PlanImpl) plan).getFirstActivity();
-			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
-				Activity act = (ActivityImpl)plan.getPlanElements().get(i);
-				if ((act.getCoord().getX() == home.getCoord().getX()) && (act.getCoord().getY() == home.getCoord().getY())) {
-					if (!act.getType().equals(HOME)) {
-						act.setType(HOME);
-					}
-				}
+			if (person_strings.put(pid, person_string_new) == null) {
+				Gbl.errorMsg("That must not happen!");
 			}
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyNonHomeBasedPlans(final Population plans, final Map<Id,String> person_strings) {
+	private final void removePersons(final Population population, final Set<Id> ids) {
+		for (Id id : ids) {
+			Person p = population.getPersons().remove(id);
+			if (p == null) {
+				Gbl.errorMsg("pid="+id+": id not found in the plans DB!");
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////
+
+	private final Set<Id> identifyNonHomeBasedPlans(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -278,7 +246,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansWithTypeOther(final Population plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansWithTypeOther(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -294,7 +262,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansModeTypeUndef(final Population plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansModeTypeUndef(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -310,7 +278,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansWithRoundTrips(final Population plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansWithRoundTrips(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -332,7 +300,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void removingRoundTrips(final Population plans, final Map<Id,String> person_strings) {
+	private final void removingRoundTrips(final Population plans) {
 		int cnt_sametypes = 0;
 		int cnt_difftypes = 0;
 		int cnt_p = 0;
@@ -404,7 +372,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansNegDistance(final Population plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansNegDistance(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -420,7 +388,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansWithNegCoords(final Population plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansWithNegCoords(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -436,7 +404,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansWithTooLongWalkTrips(final Population plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansWithTooLongWalkTrips(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -452,7 +420,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansInconsistentTimes(final Population plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansInconsistentTimes(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -466,7 +434,7 @@ public class ConvertThurgau2Plans {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifySingleActPlans(final Population plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifySingleActPlans(final Population plans) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -492,13 +460,18 @@ public class ConvertThurgau2Plans {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Population plans) throws Exception {
-		log.info("    running " + this.getClass().getName() + " module...");
+	public void run() throws Exception {
+		
+		Population population = this.scenario.getPopulation();
+		
+		if (population.getName() == null) {
+			population.setName("created by '" + this.getClass().getName() + "'");
+		}
+		if (!population.getPersons().isEmpty()) {
+			Gbl.errorMsg("[population=" + population + " is not empty]");
+		}
 
-		if (plans.getName() == null) { plans.setName("created by '" + this.getClass().getName() + "'"); }
-		if (!plans.getPersons().isEmpty()) { Gbl.errorMsg("[plans=" + plans + " is not empty]"); }
-
-		Map<Id,String> person_strings = new TreeMap<Id,String>();
+		Map<Id,String> person_strings = new TreeMap<Id, String>();
 		int id = Integer.MIN_VALUE;
 		int prev_id = Integer.MIN_VALUE;
 		Id prev_pid = new IdImpl(prev_id);
@@ -509,10 +482,9 @@ public class ConvertThurgau2Plans {
 		BufferedReader br = new BufferedReader(fr);
 		String curr_line = br.readLine(); // Skip header
 		while ((curr_line = br.readLine()) != null) {
+			String[] entrs = curr_line.split("\t", -1);
 
-			String[] entries = curr_line.split("\t", -1);
-
-			id = Integer.parseInt(entries[0].trim());
+			id = Integer.parseInt(entrs[2].trim());
 			if (id == prev_id) { person_string = person_string + curr_line + "\n"; }
 			else {
 				if (prev_id != Integer.MIN_VALUE) {
@@ -531,156 +503,147 @@ public class ConvertThurgau2Plans {
 		log.info("      done.");
 		log.info("      # persons parsed = " + person_strings.size());
 
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("      creating plans...");
-		Set<Id> pids = this.createPlans(plans,person_strings);
-		log.info("      done.");
-		log.info("      # persons created = " + plans.getPersons().size());
-		log.info("      # person_strings  = " + person_strings.size());
-		log.info("      # persons with coord inconsistency = \t" + pids.size());
-		log.info("      removing persons with coord inconsistency...");
-		this.removePlans(plans,person_strings,pids);
-		log.info("      done.");
-		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
-
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("      setting home locations...");
-		this.setHomeLocations(plans,person_strings);
-		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		this.clean(population, person_strings);
+	}
+	
+	private void clean(Population population, Map<Id,String> person_strings) {
+		log.info("      creating population...");
+		Set<Id> pids = null;
+		try {
+			this.createPopulationAndPlans(population, person_strings);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify plans with inconsistent times...");
-		pids = this.identifyPlansInconsistentTimes(plans,person_strings);
+		pids = this.identifyPlansInconsistentTimes(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
-		log.info("      # persons with plans with inconsistent times = \t" + pids.size());
+		log.info("      # persons with planspopulation inconsistent times = \t" + pids.size());
 		log.info("      removing persons with plans with inconsistent times...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePersons(population, pids);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify non home based day plans...");
-		pids = this.identifyNonHomeBasedPlans(plans,person_strings);
+		pids = this.identifyNonHomeBasedPlans(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
 		log.info("      # persons with non home based plans = \t" + pids.size());
 		log.info("      removing persons with non home based plans...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePersons(population, pids);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify plans with act type '"+ OTHR +"'...");
-		pids = this.identifyPlansWithTypeOther(plans,person_strings);
+		pids = this.identifyPlansWithTypeOther(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
 		log.info("      # persons with plans with act type '"+ OTHR +"' = \t" + pids.size());
 		log.info("      removing persons with plans with act type '"+ OTHR +"'...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePersons(population, pids);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify plans with mode undefined ...");
-		pids = this.identifyPlansModeTypeUndef(plans,person_strings);
+		pids = this.identifyPlansModeTypeUndef(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
 		log.info("      # persons with plans with mode undefined = \t" + pids.size());
 		log.info("      removing persons with plans with mode undefined ...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePersons(population, pids);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify plans round trips...");
-		pids = this.identifyPlansWithRoundTrips(plans,person_strings);
+		pids = this.identifyPlansWithRoundTrips(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
 		log.info("      # persons with plans with round trips = \t" + pids.size());
 		log.info("      removing round trips...");
-		this.removingRoundTrips(plans,person_strings);
+		this.removingRoundTrips(population);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify plans neg. route distances...");
-		pids = this.identifyPlansNegDistance(plans,person_strings);
+		pids = this.identifyPlansNegDistance(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
 		log.info("      # persons with plans neg. route distances = \t" + pids.size());
 		log.info("      removing persons with plans neg. route distances...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePersons(population, pids);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify plans neg. act coords...");
-		pids = this.identifyPlansWithNegCoords(plans,person_strings);
+		pids = this.identifyPlansWithNegCoords(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
 		log.info("      # persons with plans neg. act coords = \t" + pids.size());
 		log.info("      removing persons with plans neg. act coords...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePersons(population, pids);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify plans with too long walk trips...");
-		pids = this.identifyPlansWithTooLongWalkTrips(plans,person_strings);
+		pids = this.identifyPlansWithTooLongWalkTrips(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
 		log.info("      # persons with plans with too long walk trips = \t" + pids.size());
 		log.info("      removing persons with plans with too long walk trips...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePersons(population, pids);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify single activity plans...");
-		pids = this.identifySingleActPlans(plans,person_strings);
+		pids = this.identifySingleActPlans(population);
 		log.info("      done.");
-		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # persons        = " + population.getPersons().size());
 		log.info("      # person_strings = " + person_strings.size());
 		log.info("      # persons with single activity plans = \t" + pids.size());
 		log.info("      removing persons with single activity plans...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePersons(population, pids);
 		log.info("      done.");
 		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+		log.info("      # persons left        = " + population.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////		
 		log.info("removing routes");
-		this.removeRoutes(plans);
+		this.removeRoutes(population);
 		log.info("    done.");
 	}
 }
