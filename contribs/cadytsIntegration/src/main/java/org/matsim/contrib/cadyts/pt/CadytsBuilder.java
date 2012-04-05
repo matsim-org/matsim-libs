@@ -127,8 +127,8 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		matsimCalibrator.setStatisticsFile(config.controler().getOutputDirectory() + "calibration-stats.txt");
 
 		// SET countsScale
-		NewPtBsePlanStrategy.countsScaleFactor = Double.parseDouble(config.findParam(NewPtBsePlanStrategy.MODULE_NAME, "countsScaleFactor"));
-		log.info("BSE:\tusing the countsScaleFactor of " + NewPtBsePlanStrategy.countsScaleFactor + " as packetSize from config.");
+//		NewPtBsePlanStrategy.countsScaleFactor = Double.parseDouble(config.findParam(NewPtBsePlanStrategy.MODULE_NAME, "countsScaleFactor"));
+//		log.info("BSE:\tusing the countsScaleFactor of " + NewPtBsePlanStrategy.countsScaleFactor + " as packetSize from config.");
 		//will be used in inner class SimResultsContainerImpl.getSimValue with "return values[hour] * countsScaleFactor;"
 
 		// pt counts data were already read by ptContolerListener of controler. Can that information get achieved from here?

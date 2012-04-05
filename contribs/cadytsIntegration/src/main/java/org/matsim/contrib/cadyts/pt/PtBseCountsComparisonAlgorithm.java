@@ -92,7 +92,6 @@ class PtBseCountsComparisonAlgorithm {
 		for (Count count : this.counts.getCounts().values()) {
 			Id stopId = count.getLocId();
 			if (!isInRange(count.getCoord())) {
-				System.out.println("InRange?\t" + isInRange(count.getCoord()));
 				continue;
 			}
 			int[] volumes = this.getVolumesForStop(stopId);

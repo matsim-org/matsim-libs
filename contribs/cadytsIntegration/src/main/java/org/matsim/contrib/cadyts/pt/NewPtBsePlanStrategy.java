@@ -53,7 +53,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
-import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
@@ -71,7 +70,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 	final static String BSE_MOD_NAME = "bse";
 	final static String STR_LINKOFFSETFILE = "linkCostOffsets.xml";
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = null;
-	static double countsScaleFactor /* =1 */; // not so great
+	private final double countsScaleFactor;
 	private final Counts occupCounts = new Counts();
 	private final Counts boardCounts = new Counts();
 	private final Counts alightCounts = new Counts();
@@ -124,10 +123,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		// yyyyyy the counts data is read in "buildCalibrator", and here again. This is not necessary,
 		// and confuses the reader of the program. kai, jul'11
 
-		// countsScaleFactor =
-		// Double.parseDouble(this.controler.getConfig().ptCounts().getCountsScaleFactor() //better read
-		// it from config object like below
-		countsScaleFactor = /* this. */controler.getConfig().ptCounts().getCountsScaleFactor();
+		this.countsScaleFactor = controler.getConfig().ptCounts().getCountsScaleFactor();
 
 		// set flowAnalysisFile
 		String strWriteAnalysisFile = controler.getConfig().findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "writeAnalysisFile");
@@ -200,6 +196,11 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		generateAndWriteCountsComparisons(event);
 	}
 
+	/*package*/ MATSimUtilityModificationCalibrator<TransitStopFacility> getCalibrator() {
+		// for testing purposes only
+		return this.calibrator;
+	}
+
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
 	// yyyyyy this statement is no longer correct since someone added other public methods below. kai,
@@ -223,11 +224,11 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 
 				Network network = controler.getNetwork();
 				PtBseCountsComparisonAlgorithm ccaBoard = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.boardCounts,
-						network, countsScaleFactor);
+						network, this.countsScaleFactor);
 				PtBseCountsComparisonAlgorithm ccaAlight = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.alightCounts,
-						network, countsScaleFactor);
+						network, this.countsScaleFactor);
 				PtBseCountsComparisonAlgorithm ccaOccupancy = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.occupCounts,
-						network, countsScaleFactor);
+						network, this.countsScaleFactor);
 
 				String distanceFilterStr = config.findParam("ptCounts", "distanceFilter");
 				String distanceFilterCenterNodeId = config.findParam("ptCounts", "distanceFilterCenterNode");
@@ -238,9 +239,9 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
 				}
 
-				ccaBoard.setCountsScaleFactor(countsScaleFactor);
-				ccaAlight.setCountsScaleFactor(countsScaleFactor);
-				ccaOccupancy.setCountsScaleFactor(countsScaleFactor);
+				ccaBoard.setCountsScaleFactor(this.countsScaleFactor);
+				ccaAlight.setCountsScaleFactor(this.countsScaleFactor);
+				ccaOccupancy.setCountsScaleFactor(this.countsScaleFactor);
 
 				// filter stations here??
 
@@ -363,18 +364,6 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 			return stringBuffer2.toString();
 		}
 
-	}
-
-	final String getCalibratorSettings() {
-		StringBuffer sBuff = new StringBuffer();
-		sBuff.append("[BruteForce=" + this.calibrator.getBruteForce() + "]");
-		sBuff.append("[CenterRegression=" + this.calibrator.getCenterRegression() + "]");
-		sBuff.append("[FreezeIteration=" + this.calibrator.getFreezeIteration() + "]");
-		sBuff.append("[MinStddev=" + this.calibrator.getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H) + "]");
-		sBuff.append("[PreparatoryIterations=" + this.calibrator.getPreparatoryIterations() + "]");
-		sBuff.append("[RegressionInertia=" + this.calibrator.getRegressionInertia() + "]");
-		sBuff.append("[VarianceScale=" + this.calibrator.getVarianceScale() + "]");
-		return sBuff.toString();
 	}
 
 }
