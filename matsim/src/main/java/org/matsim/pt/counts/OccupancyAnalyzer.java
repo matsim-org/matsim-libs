@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,12 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.pt.counts;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,19 +31,20 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * @author yChen
  */
-public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
-		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler,
-		VehicleDepartsAtFacilityEventHandler {
+public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
+		VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler {
 
 	private static final Logger log = Logger.getLogger(OccupancyAnalyzer.class);
 
@@ -55,10 +54,12 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	private Map<Id, int[]> boards, alights, occupancies;
 
 	/** Map< vehId,stopFacilityId> */
-	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();
+	private final Map<Id, Id> vehStops = new HashMap<Id, Id>();
 	/** Map<vehId,passengersNo. in Veh> */
 	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>();
 	private StringBuffer occupancyRecord;
+	private final Set<Id> transitDrivers = new HashSet<Id>();
+	private final Set<Id> transitVehicles = new HashSet<Id>();
 
 	public OccupancyAnalyzer(final int timeBinSize, final double maxTime) {
 		log.setLevel( Level.INFO ) ;
@@ -95,13 +96,23 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		this.boards.clear();
 		this.alights.clear();
 		this.occupancies.clear();
-		this.veh_stops.clear();
+		this.vehStops.clear();
 		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	}
 
 	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.transitDrivers.add(event.getDriverId());
+		this.transitVehicles.add(event.getVehicleId());
+	}
+	
+	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id vehId = event.getVehicleId(), stopId = this.veh_stops.get(vehId);
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-transit vehicles
+		}
+		
+		Id vehId = event.getVehicleId(), stopId = this.vehStops.get(vehId);
 		double time = event.getTime();
 		// --------------------------getOns---------------------------
 		int[] getOn = this.boards.get(stopId);
@@ -121,8 +132,12 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-transit vehicles
+		}
+		
 		Id vehId = event.getVehicleId();
-		Id stopId = this.veh_stops.get(vehId);
+		Id stopId = this.vehStops.get(vehId);
 		double time = event.getTime();
 		// --------------------------getDowns---------------------------
 		int[] getDown = this.alights.get(stopId);
@@ -151,18 +166,14 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		Id stopId = event.getFacilityId();
-
-		this.veh_stops.put(event.getVehicleId(), stopId);
-		// (constructing a table with vehId as key, and stopId as value; constructed when veh arrives at stop; necessary
-		// since personEnters/LeavesVehicle does not carry stop id)
-
+		this.vehStops.put(event.getVehicleId(), stopId);
 	}
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		Id stopId = event.getFacilityId();
 		Id vehId = event.getVehicleId();
-		this.veh_stops.remove(vehId);
+		this.vehStops.remove(vehId);
 		// -----------------------occupancy--------------------------------
 		int[] occupancyAtStop = this.occupancies.get(stopId);
 
