@@ -1,7 +1,7 @@
 /**
  *
  */
-package playground.yu.parameterSearch.NelderMead;
+package playground.yu.parameterSearch;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -12,7 +12,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 import playground.yu.integration.cadyts.CalibrationConfig;
-import playground.yu.parameterSearch.ParametersSetter;
 import playground.yu.scoring.withAttrRecorder.leftTurn.LeftTurnPenaltyControler;
 import playground.yu.tests.parameterCalibration.naiveWithoutUC.SimCntLogLikelihoodCtlListener;
 import playground.yu.utils.io.SimpleWriter;

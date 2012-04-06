@@ -1,13 +1,14 @@
 /**
  *
  */
-package playground.yu.parameterSearch.NelderMead;
+package playground.yu.parameterSearch;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.optimization.GoalType;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.apache.commons.math.optimization.SimpleScalarValueChecker;
 import org.apache.commons.math.optimization.direct.NelderMead;
+
 
 /**
  * An attempt to use Nelder-Mead Method to search the best parameters in scoring

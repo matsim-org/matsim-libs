@@ -74,12 +74,12 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 			defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
 			defaultFeatureTypeFactory.setName("link");
 			defaultFeatureTypeFactory
-			.addTypes(new AttributeType[] { geom, id });
+					.addTypes(new AttributeType[] { geom, id });
 		}
 
 		@Override
 		public Collection<Feature> getFeatures() throws SchemaException,
-		NumberFormatException, IllegalAttributeException {
+				NumberFormatException, IllegalAttributeException {
 			for (int i = 0; i < attrTypes.size(); i++) {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			}
@@ -146,12 +146,12 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		int startTime, endTime;
 
 		if (args.length <= 3) {
-			networkFilename = "../../matsim/examples/equil/network.xml";
+			networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz";
 			coordinateReferenceSystem = gk4;
-			flowCapacityFactor = 0.1;
+			flowCapacityFactor = 0.02;
 			startTime = 7;
 			endTime = 20;
-			eventsFilename = "../../matsim/output/example1/ITERS/it.0/0.events.xml.gz";
+			eventsFilename = "D:/workspace2/playgrounds/yu/test/input/bln2pct/SC.2000.events.xml.gz";
 		} else {
 			networkFilename = args[0];
 			coordinateReferenceSystem = args[1];
@@ -176,7 +176,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 
 		mn2q.readEvents(eventsFilename
-				// "../../runs-svn/run1535/ITERS/it.1900/1535.1900.events.xml.gz"
+		// "../../runs-svn/run1535/ITERS/it.1900/1535.1900.events.xml.gz"
 				, new EventHandler[] { clas, va });
 
 		/*
