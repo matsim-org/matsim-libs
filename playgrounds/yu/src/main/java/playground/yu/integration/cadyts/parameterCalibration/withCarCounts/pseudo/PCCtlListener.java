@@ -235,15 +235,26 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			Count count = counts.getCount(linkId);
 			if (count != null) {
 				int entryTime_s = planStep.getEntryTime_s();
-				double countVal = count.getVolume(
-						entryTime_s / countTimeBin + 1/* hour */).getValue();
-				if (countVal != 0d/* zeroCount */) {
-					double simVal = resultsContainer.getSimValue(network
-							.getLinks().get(linkId), entryTime_s,
-							entryTime_s + 3599, TYPE.FLOW_VEH_H);
-					uc += (countVal - simVal)/* simVal */
-							/ Math.max(countVal, 2500/* TODO */);
+
+				int hour = entryTime_s / countTimeBin + 1;
+				if (hour >= caliStartTime && hour <= caliEndTime) {
+
+					Volume vol = count.getVolume(hour);
+
+					if (vol != null) {
+						double countVal = vol.getValue();
+						if (countVal != 0d/* zeroCount */) {
+							double simVal = resultsContainer.getSimValue(
+									network.getLinks().get(linkId),
+									entryTime_s, entryTime_s + 3599,
+									TYPE.FLOW_VEH_H);
+							uc += (countVal - simVal)/* simVal */
+									/ Math.max(countVal, 2500/* TODO */);
+						}
+					}
+
 				}
+
 			}
 		}
 
