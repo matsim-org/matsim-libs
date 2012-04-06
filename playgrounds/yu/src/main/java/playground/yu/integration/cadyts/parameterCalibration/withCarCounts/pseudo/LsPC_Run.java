@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MultidirectionalSearcher.java
+ * Run.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,33 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.parameterSearch;
+/**
+ *
+ */
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.pseudo;
 
-import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.optimization.GoalType;
-import org.apache.commons.math.optimization.OptimizationException;
-import org.apache.commons.math.optimization.SimpleScalarValueChecker;
-import org.apache.commons.math.optimization.direct.MultiDirectional;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 
 /**
- * An attempt to use multi-directional direct search method to search the best
- * parameters in scoring function
- * 
+ * Calculate the best parameter set based on the utility correction
+ *
  * @author yu
- * 
+ *
  */
-public class MultidirectionalSearcher {
+public class LsPC_Run {
+	public static void main(final String[] args) {
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Controler ctl = new CtlWithLeftTurnPenaltyLs(config);
 
-	public static void main(String[] args) throws OptimizationException,
-			FunctionEvaluationException, IllegalArgumentException {
-		MultiDirectional optimizer = new MultiDirectional();
-		optimizer.setMaxIterations(1000);
-		optimizer.setMaxEvaluations(1000);
-
-		optimizer.setConvergenceChecker(new SimpleScalarValueChecker(0.001,
-				0.001));
-		optimizer.optimize(new LLhParamFct(args[0]), GoalType.MAXIMIZE,
-				new double[] { -4.5, -1d });
+		ctl.setCreateGraphs(false);
+		ctl.setOverwriteFiles(true);
+		ctl.run();
 	}
 
 }

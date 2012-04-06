@@ -17,26 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- *
- */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLls;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurnWithUnitiveStdDev;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
+import playground.yu.analysis.RouteTravelTimeSummary;
+import playground.yu.counts.CntSimCap4Chart;
+
 /**
- * Calculate the best parameter set based on the utility correction
- *
  * @author yu
- *
+ * 
  */
-public class LsPC_Run {
+public class PC_Run {
+	/** @param args */
+	/**
+	 * @param args
+	 */
 	public static void main(final String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
-		Controler ctl = new CtlWithLeftTurnPenaltyLs(config);
+		Controler ctl = new PCCtlwithLeftTurnPenalty(config);
+		if (args.length > 1 && Boolean.parseBoolean(args[1])) {
+			ctl.addControlerListener(new CntSimCap4Chart());
+			ctl.addControlerListener(new RouteTravelTimeSummary());
+		}
+		// TODO set in config
+		// ctl.addControlerListener(new QVProfilControlerListener());
 
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);

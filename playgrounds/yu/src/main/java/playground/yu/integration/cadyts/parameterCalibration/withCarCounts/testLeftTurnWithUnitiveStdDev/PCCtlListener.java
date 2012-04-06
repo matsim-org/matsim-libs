@@ -18,18 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLls;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurnWithUnitiveStdDev;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -37,52 +38,56 @@ import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.Events2ScoreWithLeftTurnPenalty4PC;
+import playground.yu.integration.cadyts.utils.SampleVarianceReader;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
 import playground.yu.utils.io.SimpleWriter;
+import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
+import utilities.misc.DynamicData;
 import cadyts.calibrators.Calibrator;
 import cadyts.calibrators.analytical.ChoiceParameterCalibrator4;
-import cadyts.demand.PlanStep;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
+/**
+ * sets the standard deviation of all the counts with a unitive minStddev.
+ * 
+ * @author yu
+ * 
+ */
 public class PCCtlListener extends BseParamCalibrationControlerListener
-		implements StartupListener, ShutdownListener, IterationEndsListener,
-		BeforeMobsimListener {
+		implements StartupListener, ShutdownListener, IterationEndsListener {
 	private int caliStartTime, caliEndTime;
 	private int avgLlhOverIters = 0, writeLlhInterval = 0;
 	// private Config config;
 	// private int cycleIdx = 0, cycle;
 
-	private SimpleWriter writer = null;
-	private final SimpleWriter writerCV = null;
-	// private static List<Link> links = new ArrayList<Link>();
-	// private static Set<Id> linkIds = new HashSet<Id>();
+	private SimpleWriter writer = null, writerCV = null;
+	private static List<Link> links = new ArrayList<Link>();
+	private static Set<Id> linkIds = new HashSet<Id>();
 	private XYLineChart chart;// paramChart
 
-	static int paramDim;
+	private int paramDim;
 
 	static final String PARAM_NAME_INDEX = "parameterName_",
 			PARAM_STDDEV_INDEX = "paramStddev_";
@@ -91,18 +96,16 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private double[][] paramArrays/* performing, traveling and so on */;
 
 	private double llhSum = 0d;
-	private PlanToPlanStep planConverter = null;
-	private Counts counts = null;
-	private static int countTimeBin = 3600;
-	private Network network = null;
-
-	// private final boolean writeQGISFile = true;
+	private boolean writeQGISFile = true;
 
 	private void initializeCalibrator(Controler ctl) {
-		Config config = ctl.getConfig();
+		org.matsim.core.config.Config config = ctl.getConfig();
 		ControlerIO ctlIO = ctl.getControlerIO();
 
 		// SETTING "parameter calibration" parameters
+		// watching = Boolean.parseBoolean(config.findParam(
+		// BSE_CONFIG_MODULE_NAME, "watching"));
+
 		String parameterDimensionStr = config.findParam(BSE_CONFIG_MODULE_NAME,
 				"parameterDimension");
 		if (parameterDimensionStr != null) {
@@ -119,11 +122,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 					PARAM_NAME_INDEX + i);
 		}
 
-		final String timeBinStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-				"timeBinSize_s");
-		if (timeBinStr != null) {
-			countTimeBin = Integer.parseInt(timeBinStr);
-		}
+		// int timeBinSize_s = Integer.parseInt(config.findParam(
+		// BSE_CONFIG_MODULE_NAME, "timeBinSize_s"));
 
 		// SETTING REGRESSIONINERTIA
 		String regressionInertiaValue = config.findParam(
@@ -164,11 +164,34 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			writer = new SimpleWriter(ctlIO.getOutputFilename("parameters.log"));
 			StringBuffer sb = new StringBuffer("iter");
 			for (int i = 0; i < paramNames.length; i++) {
+				sb.append("\tavg. ");
+				sb.append(paramNames[i]);
+
+			}
+			for (int i = 0; i < paramNames.length; i++) {
 				sb.append("\t");
 				sb.append(paramNames[i]);
 
 			}
 			writer.writeln(sb);
+		}
+
+		{
+			writerCV = new SimpleWriter(
+					ctlIO.getOutputFilename("parameterCovariance.log"));
+			StringBuffer sb = new StringBuffer("iter\t" + "VAR{"
+					+ paramNames[0]
+			// "covariance ["
+			);
+			for (int i = 1; i < paramNames.length; i++) {
+				sb.append(", ");
+				sb.append(paramNames[i]);
+			}
+			sb.append("|eps}"
+			// "]\texpectation of variance\tvariance of expectation"
+			);
+
+			writerCV.writeln(sb);
 		}
 
 		{
@@ -219,35 +242,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			delta = Double.parseDouble(deltaStr);
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
-
-		((PCStrMn) ctl.getStrategyManager()).init(this,
-				(MultinomialLogitChoice) chooser);
-	}
-
-	double getUtilityCorrection(Plan plan) {
-		double uc = 0d;
-		planConverter.convert((PlanImpl) plan);
-
-		for (Iterator<PlanStep<Link>> planStepIt = planConverter.getPlanSteps()
-				.iterator(); planStepIt.hasNext();) {
-			PlanStep<Link> planStep = planStepIt.next();
-			Id linkId = planStep.getLink().getId();
-			Count count = counts.getCount(linkId);
-			if (count != null) {
-				int entryTime_s = planStep.getEntryTime_s();
-				double countVal = count.getVolume(
-						entryTime_s / countTimeBin + 1/* hour */).getValue();
-				if (countVal != 0d/* zeroCount */) {
-					double simVal = resultsContainer.getSimValue(network
-							.getLinks().get(linkId), entryTime_s,
-							entryTime_s + 3599, TYPE.FLOW_VEH_H);
-					uc += (countVal - simVal)/* simVal */
-							/ Math.max(countVal, 2500/* TODO */);
-				}
-			}
-		}
-
-		return uc;
+		((PCStrMn) ctl.getStrategyManager())
+				.init(calibrator, ctl.getTravelTimeCalculator(),
+						(MultinomialLogitChoice) chooser);
 	}
 
 	private void loadScoringAttributes(String scorAttrFilename,
@@ -258,37 +255,99 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		CtlWithLeftTurnPenaltyLs ctl = (CtlWithLeftTurnPenaltyLs) event
+		PCCtlwithLeftTurnPenalty ctl = (PCCtlwithLeftTurnPenalty) event
 				.getControler();
 		Config config = ctl.getConfig();
 		int iter = event.getIteration();
 		int firstIter = ctl.getFirstIteration();
+		// this.chooser.finish();-->called in notifyScoring()
+		PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
+
+		// if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
 		ControlerIO io = ctl.getControlerIO();
 		// ***************************************************
 		calibrator.setFlowAnalysisFile(io.getIterationFilename(iter,
 				"flowAnalysis.log"));
+		calibrator.afterNetworkLoading(resultsContainer);
+		// ************************************************
+		if (iter % writeLinkUtilOffsetsInterval == 0) {
+			try {
+				DynamicData<Link> linkCostOffsets = calibrator
+						.getLinkCostOffsets();
+				new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(
+						io.getIterationFilename(iter, "linkUtilOffsets.xml"),
+						linkCostOffsets);
 
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		// ************************************************
+		if (calibrator.getParameterCovarianceExpOfVarComponent()
+		// getParameterCovariance()
+		!= null) {
+			writerCV.writeln(iter
+					// + "\t"
+					// + calibrator.getParameterCovariance()
+					// .toSingleLineString()
+					+ "\t"
+					+ calibrator.getParameterCovarianceExpOfVarComponent()
+							.toSingleLineString()
+			// + "\t"
+			// + calibrator.getParameterCovarianceVarOfExpComponent()
+			// .toSingleLineString()
+			);
+		}
+		writerCV.flush();
+
+		// ###################################################
+		utilities.math.Vector avgParams = calibrator.getAvgParameters();
 		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
+
+		// ScoringConfigGetSetValues.setConfig(config);
+		// VERY IMPORTANT #########################################
+
+		// if (
+		// // !watching &&
+		// cycleIdx == 0) {
+		MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
+				.getMultinomialLogit();
+
+		// *******should after Scoring Listener!!!*******
 
 		if (calibrator.getInitialStepSize() != 0d) {
 
 			StringBuffer sb = new StringBuffer(Integer.toString(iter));
 
 			for (int i = 0; i < paramNames.length; i++) {
+				int paramNameIndex = Events2Score4AttrRecorder.attrNameList
+						.indexOf(paramNames[i]/*
+											 * pos. of param in Parameters in
+											 * Cadyts
+											 */);
 
-				double value;
+				// double paramScaleFactor =
+				// Events2Score4PC_mnl_mnl.paramScaleFactorList
+				// .get(paramNameIndex);
+
+				double value = avgParams.get(i);
 				// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
 				// AGAIN!!!***
-				String valStr = scoringCfg.getParams().get(paramNames[i]);
-				if (valStr == null) {
-					valStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-							paramNames[i]);
-					if (valStr == null) {
-						throw new RuntimeException(
-								"The calibrated parameter can NOT be found");
-					}
+				if (scoringCfg.getParams().containsKey(paramNames[i])) {
+					scoringCfg.addParam(paramNames[i], Double.toString(value
+					// / paramScaleFactor
+							));
+					// ScoringConfigGetSetValues
+					// .setValue(paramNames[i], value);
+				} else/* bse */{
+					config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
+							Double.toString(value
+							// / paramScaleFactor
+							));
 				}
-				value = Double.parseDouble(valStr);
+				// *****************************************************
+				// ****SET CALIBRATED PARAMETERS IN MNL*****************
+				mnl.setParameter(paramNameIndex, value);
 
 				// text output
 				paramArrays[i][iter - firstIter] = value;
@@ -296,10 +355,35 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				sb.append(value);
 			}
 
+			// ********calibrator.getParameters() JUST FOR
+			// ANALYSIS********
+			utilities.math.Vector params = calibrator.getParameters();
+			for (int i1 = 0; i1 < paramNames.length; i1++) {
+				sb.append("\t");
+				sb.append(params.get(i1));
+			}
+
 			writer.writeln(sb);
 			writer.flush();
 		}
 		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
+
+		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setMultinomialLogit(mnl);
+
+		CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory = new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
+				config, ctl.getNetwork());
+		ctl.setScoringFunctionFactory(sfFactory);
+		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setSfFactory(sfFactory);
+
+		strategyManager.setChooser(chooser);
+
+		// }
+		// cycleIdx++;
+		// if (cycleIdx == cycle) {
+		// cycleIdx = 0;
+		// }
+		// }
+
 		// TESTS: calculate log-likelihood -(q-y)^2/(2sigma^2)
 		if (writeLlhInterval > 0 && avgLlhOverIters > 0) {
 			int nextWriteLlhInterval = writeLlhInterval
@@ -307,6 +391,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			if (iter <= nextWriteLlhInterval
 					&& iter > nextWriteLlhInterval - avgLlhOverIters
 					|| iter % writeLlhInterval == 0) {
+				Network network = ctl.getNetwork();
 
 				for (Map.Entry<Id, Count> entry : ctl.getCounts().getCounts()
 						.entrySet()) {
@@ -369,6 +454,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		writer.close();
+		writerCV.close();
 
 		Controler ctl = event.getControler();
 		ControlerIO ctlIO = ctl.getControlerIO();
@@ -395,10 +481,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		final CtlWithLeftTurnPenaltyLs ctl = (CtlWithLeftTurnPenaltyLs) event
+		final PCCtlwithLeftTurnPenalty ctl = (PCCtlwithLeftTurnPenalty) event
 				.getControler();
 		Config config = ctl.getConfig();
-		network = ctl.getNetwork();
 
 		setMatsimParameters(ctl);
 
@@ -438,9 +523,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		// INITIALIZING StrategyManager
 		initializeStrategyManager(ctl);
-
-		planConverter = new PlanToPlanStep(ctl.getTravelTimeCalculator(),
-				network);
 		// ******************************************************************
 
 		// INITIALIZING resultContainer
@@ -491,6 +573,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void readCounts(Controler ctl) {
 		final Counts counts = ctl.getCounts();
+		final Network network = ctl.getNetwork();
 		final Config config = ctl.getConfig();
 
 		if (counts == null) {
@@ -506,15 +589,29 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
 				"endTime"));
 
+		Map<String/* countId */, Map<Integer/* timeStep */, Double/* sample variance */>> countsSampleVariances = null;
+		String countsSampleVarianceFilename = config.findParam(
+				BSE_CONFIG_MODULE_NAME, "countsSampleVarianceFile");
+		if (countsSampleVarianceFilename != null) {
+			SampleVarianceReader svReader = new SampleVarianceReader(
+					countsSampleVarianceFilename);
+			svReader.read();
+			countsSampleVariances = svReader.getCountsSampleVariances();
+		} else {
+			Logger.getLogger(this.getClass().getName())
+					.warning(
+							"BSE:\tThere is not countsSampleVarianceFilename set in configfile, this means, the variance for each count will be replaced with the count value by using poisson distribution in substitution for gauss distribution.");
+		}
 		Map<Id, Count> countsMap = counts.getCounts();
 		for (Id countId : countsMap.keySet()) {
 			Link link = network.getLinks().get(countId);
 			if (link == null) {
 				System.err.println("could not find link " + countId.toString());
 			} else if (isInRange(countId, network)) {
-				// // for ...2QGIS
-				// links.add(network.getLinks().get(countId));
-				// linkIds.add(countId);
+
+				// for ...2QGIS
+				links.add(network.getLinks().get(countId));
+				linkIds.add(countId);
 				// ---------GUNNAR'S CODES---------------------
 				for (Volume volume : countsMap.get(countId).getVolumes()
 						.values()) {
@@ -523,13 +620,18 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						int start_s = (hour - 1) * 3600;
 						int end_s = hour * 3600 - 1;
 						double val_veh_h = volume.getValue();
+						// -------------------------------------------------
+						// calibrator.addMeasurement(link, start_s, end_s,
+						// val_veh_h, TYPE.FLOW_VEH_H);
+						final double stddev = calibrator
+								.getMinStddev(TYPE.FLOW_VEH_H);
 						calibrator.addMeasurement(link, start_s, end_s,
-								val_veh_h, TYPE.FLOW_VEH_H);
+								val_veh_h, stddev, TYPE.FLOW_VEH_H);
+						// -------------------------------------------------
 					}
 				}
 			}
 		}
-		this.counts = counts;
 	}
 
 	private void setCalibratorParameters(Config config) {
@@ -735,7 +837,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		String distFilterCenterNodeStr = ccg.getDistanceFilterCenterNode();
 		if (distFilterCenterNodeStr != null) {
 			// set up center and radius of counts stations locations
-			distanceFilterCenterNodeCoord = network.getNodes()
+			distanceFilterCenterNodeCoord = ctl.getNetwork().getNodes()
 					.get(new IdImpl(distFilterCenterNodeStr)).getCoord();
 			distanceFilter = ccg.getDistanceFilter();
 		}
@@ -747,19 +849,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		 */
 	}
 
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		Controler ctl = event.getControler();
-
-		CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory = new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				ctl.getConfig(), network);
-		ctl.setScoringFunctionFactory(sfFactory);
-		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setSfFactory(sfFactory);
-
-		((PCStrMn) ctl.getStrategyManager()).setChooser(chooser);
+	public void setWriteQGISFile(boolean writeQGISFile) {
+		this.writeQGISFile = writeQGISFile;
 	}
-
-	// public void setWriteQGISFile(boolean writeQGISFile) {
-	// // this.writeQGISFile = writeQGISFile;
-	// }
 }
