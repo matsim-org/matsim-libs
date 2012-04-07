@@ -46,18 +46,25 @@ class GautengControler {
 	
 	public static void main ( String[] args ) {
 		if(args.length != 3){
-			throw new RuntimeException("Must provide three arguments: config file path, base value of time (for cars) and multiplier for commercial vehicles.") ;
+			throw new RuntimeException("Must provide three arguments: config file path; " +
+					"input plans file; base value of time (for cars) and multiplier for commercial vehicles.") ;
 		}
 		// Get arguments
 		// Read the base Value-of-Time (VoT) for private cars, and the VoT multiplier from the arguments, johan Mar'12
 		String configFileName = args[0] ;
 //		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
+		
+		String plansFilename = args[1] ;
+		
 		double baseValueOfTime = Double.parseDouble(args[1]);
 		double valueOfTimeMultiplier = Double.parseDouble(args[2]);
 
 		final Controler controler = new Controler( configFileName ) ;
 
 		controler.setOverwriteFiles(true) ;
+		
+		/* Allow for the plans file to be passed as argument. */
+		controler.getConfig().plans().setInputFile(plansFilename) ;
 		
 		Scenario sc = controler.getScenario();
 		
