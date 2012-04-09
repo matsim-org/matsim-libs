@@ -52,7 +52,7 @@ public class MultiAnalyzer {
 	private static final Logger logger = Logger.getLogger(MultiAnalyzer.class);
 	
 //	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/short/";
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing_x10/short/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing/short/";
 //	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing_x100/short/";
 	private static String netFile = runDirectory + "output_network.xml.gz";
 	private static String configFile = runDirectory + "output_config.xml.gz";
@@ -103,7 +103,7 @@ public class MultiAnalyzer {
 			userWelfareCalculator.reset();
 			
 			double userWelfareDiff = finalUserWelfare - initialUserWelfare;
-			double userWelfareDiffPct = 100 * (userWelfareDiff / initialUserWelfare);
+			double userWelfareDiffPct = 100. * (userWelfareDiff / initialUserWelfare);
 
 			System.out.println("\n*******************************************************************");
 			System.out.println("VALUES FOR " + userGroup);
@@ -114,8 +114,8 @@ public class MultiAnalyzer {
 			System.out.println("Change in user welfare is calculated to\t\t" + BkNumberUtils.roundDouble(userWelfareDiff, decimalPlace) 
 						+ " or " + BkNumberUtils.roundDouble(userWelfareDiffPct, decimalPlace) + "%");
 			System.out.println("*******************************************************************");
-			System.out.println("Final users with invalid score (none or negative):\t" + initialInvalidPlanCnt);
-			System.out.println("Initial users with invalid score (none or negative):\t" + finalInvalidPlanCnt);
+			System.out.println("Final users with invalid score (null or <= 0.0):\t" + initialInvalidPlanCnt);
+			System.out.println("Initial users with invalid score (null or <= 0.0):\t" + finalInvalidPlanCnt);
 			System.out.println("*******************************************************************\n");
 		}
 		
@@ -139,8 +139,8 @@ public class MultiAnalyzer {
 		System.out.println("Change in user welfare is calculated to\t\t" + BkNumberUtils.roundDouble(userWelfareDiff, decimalPlace) 
 					+ " or " + BkNumberUtils.roundDouble(userWelfareDiffPct, decimalPlace) + "%");
 		System.out.println("*******************************************************************");
-		System.out.println("Final users with invalid score (none or negative):\t" + initialInvalidPlanCnt);
-		System.out.println("Initial users with invalid score (none or negative):\t" + finalInvalidPlanCnt);
+		System.out.println("Final users with invalid score (null or <= 0.0):\t" + initialInvalidPlanCnt);
+		System.out.println("Initial users with invalid score (null or <= 0.0):\t" + finalInvalidPlanCnt);
 		System.out.println("*******************************************************************\n");
 	}
 
