@@ -34,34 +34,37 @@ import playground.benjamin.internalization.InternalizeEmissionsControlerListener
  *
  */
 public class RunInternalizationMunich {
-	
-//	private static String configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
-	private static double emissionCostFactor;
-	
+
+	static String configFile;
+	static String emissionCostFactor;
+
+
 	public static void main(String[] args) {
-		
+		//		configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
+		//		emissionCostFactor = "1.0";
+
+		configFile = args[0];
+		emissionCostFactor = args[1];
+
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
-//		confReader.readFile(configFile);
-//		emissionCostFactor = 1.0;
-		confReader.readFile(args[0]);
-		emissionCostFactor = Double.parseDouble(args[1]);
-		
+		confReader.readFile(configFile);
+
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
-		
-		EmissionCostModule emissionCostModule = new EmissionCostModule(emissionCostFactor);
-		
+
+		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor));
+
 		EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissionTducf);
-		
+
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
-		
+
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
