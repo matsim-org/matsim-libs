@@ -94,7 +94,6 @@ public class ConvertThurgau2Plans {
 	private void createPopulationAndPlans(final Population population, final Map<Id, String> person_strings) throws Exception {
 		for (Id pid : person_strings.keySet()) {
 			String person_string = person_strings.get(pid);
-			String person_string_new = "";
 
 			String[] lines = person_string.split("\n", -1); // last line is always an empty line
 			for (int l = 0; l < lines.length-1; l++) {
@@ -213,10 +212,6 @@ public class ConvertThurgau2Plans {
 					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 					act.setStartTime(arrival);
 				}
-			}
-			// replacing the person string with the new data
-			if (person_strings.put(pid, person_string_new) == null) {
-				Gbl.errorMsg("That must not happen!");
 			}
 		}
 	}
