@@ -19,6 +19,7 @@
 package playground.andreas.P2.plan.deprecated;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -168,6 +169,11 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	@Override
 	public TransitLine createEmptyLine(Id id) {
 		return this.scheduleWithStopsOnly.getFactory().createTransitLine(id);
+	}
+	
+	@Override
+	public Collection<TransitStopFacility> getAllPStops() {
+		return this.scheduleWithStopsOnly.getFacilities().values();
 	}
 
 }
