@@ -169,7 +169,9 @@ public class PlanRouter implements PlanAlgorithm {
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
 	private Facility toFacility(final Activity act) {
-		if (facilities != null) {
+		if ((act.getLinkId() == null || act.getCoord() == null)
+				&& facilities != null) {
+			// use facilities only if the activity does not provides the required fields.
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
 		else {
@@ -213,8 +215,6 @@ public class PlanRouter implements PlanAlgorithm {
 			return now + ((Leg) pe).getTravelTime();
 		}
 	}	
-
-
 
 	private static class ActivityWrapperFacility implements Facility {
 		private final Activity act;
