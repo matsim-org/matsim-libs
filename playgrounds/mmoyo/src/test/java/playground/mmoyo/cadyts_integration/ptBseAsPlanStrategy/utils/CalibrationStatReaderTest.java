@@ -38,8 +38,9 @@ public class CalibrationStatReaderTest {
 	@Test
 	public void testReader() throws IOException {
 		TabularFileParser tabularFileParser = new TabularFileParser();
-		URL url = CadytsIntegrationTest.class.getClassLoader().getResource(this.utils.getInputDirectory() + "calibration-stats.txt");
-		String calibStatFile = url.getFile(); // hack to get the file loaded from classpath, which is not directly supported by Cadyts
+		//URL url = CadytsIntegrationTest.class.getClassLoader().getResource(this.utils.getInputDirectory() + "calibration-stats.txt");
+		//String calibStatFile = url.getFile(); // hack to get the file loaded from classpath, which is not directly supported by Cadyts
+		String calibStatFile = this.utils.getInputDirectory() + "calibration-stats.txt"; 
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
 		tabularFileParser.parse(calibStatFile, calibrationStatReader);
 		CalibrationStatReader.StatisticsData statData6= calibrationStatReader.getCalStatMap().get(Integer.valueOf(6));

@@ -1,8 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
   [
-   <!ENTITY INPUTBASE   "test/input/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/testCalibration/">
+   <!ENTITY INPUTBASE   "test/input/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/">
   ]
 >
   <!-- 
@@ -33,7 +32,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="&OUTPUTBASE;" />
+		<param name="outputDirectory" value="output" />
 		<param name="firstIteration" value="1" />  
 		<param name="lastIteration" value="10" />
 		<param name="writeEventsInterval" value="1" />

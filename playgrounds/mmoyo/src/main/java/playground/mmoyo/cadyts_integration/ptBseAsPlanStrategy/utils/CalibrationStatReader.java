@@ -17,47 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.utils;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
 import utilities.io.tabularfileparser.TabularFileHandler;
-import utilities.io.tabularfileparser.TabularFileParser;
 
 /**Reader for the calibration-stat files produced after calibration.**/
 public class CalibrationStatReader implements TabularFileHandler {
+
 	private static final Logger log = Logger.getLogger(CalibrationStatReader.class);
 
 	private static final String[] HEADER = {"count-ll", "count-ll-pred-err", "p2p-ll", "total-ll", "link-lambda-avg", "link-lambda-stddev", "link-lambda-min", "link-lambda-max", "plan-lambda-avg", "plan-lambda-stddev", "plan-lambda-min", "plan-lambda-max", "replan-count"};
 	private int rowNum =0;
-	final String EMPTY = "--";
-	//final String POINT = ".";
-	final String TAB = "\t";
-	final String CRL = "\n";
-	private Map <Integer, StatisticsData> statDataMap = new TreeMap <Integer, StatisticsData>();
-	private StringBuffer sBuff;
+	private final Map <Integer, StatisticsData> statDataMap = new TreeMap <Integer, StatisticsData>();
 
-	protected CalibrationStatReader(){
+	public CalibrationStatReader(){
 	}
 
 	@Override
 	public void startDocument() {
 		log.info("reading calibration-stats file...");
-		sBuff = new StringBuffer();
 	}
 
 	@Override
 	public void startRow(final String[] row)  {
-		String colArray[] = row[0].split(TAB);
+		String colArray[] = row[0].split("\t");
 		int col= 0;
-		if (rowNum>0) {
+		if (this.rowNum > 0) {
 			StatisticsData sData = new StatisticsData();
 			for (String s : colArray) {
-				sBuff.append(s + TAB);
 				switch (col) {
 		        	case 0:  sData.setCount_ll(s); break;
 		            case 1:  sData.setCount_ll_pred_err(s); break;
@@ -75,11 +67,10 @@ public class CalibrationStatReader implements TabularFileHandler {
 				}//switch
 				col++;
 			}
-			statDataMap.put(rowNum, sData);
+			this.statDataMap.put(this.rowNum, sData);
 		}else{
 			boolean equalsHeader = true;
 			for (String s : colArray) {
-				sBuff.append(s + TAB);
 				if (!s.equalsIgnoreCase(HEADER[col])){
 					equalsHeader = false;
 					break;
@@ -89,21 +80,19 @@ public class CalibrationStatReader implements TabularFileHandler {
 			if (!equalsHeader) {
 				log.warn("the structure does not match. The header should be:  ");
 				for (String g : HEADER) {
-					System.out.print(g + TAB);
+					log.warn(g + "\t");
 				}
 			}
 		}
-		sBuff.append(CRL);
-		rowNum++;
+		this.rowNum++;
 	}
 
 	@Override
 	public void endDocument() {
-		System.out.println (sBuff.toString());
 		log.info("done.");
 	}
 
-	protected class StatisticsData{
+	public class StatisticsData {
 		private String count_ll;
 		private String count_ll_pred_err;
 		private String p2p_ll;
@@ -119,123 +108,116 @@ public class CalibrationStatReader implements TabularFileHandler {
 		private String replan_count;
 
 		protected void setCount_ll(final String countLl) {
-			count_ll = countLl;
+			this.count_ll = countLl;
 		}
 
 		protected void setCount_ll_pred_err(final String countLlPredErr) {
-			count_ll_pred_err = countLlPredErr;
+			this.count_ll_pred_err = countLlPredErr;
 		}
 
 		protected void setP2p_ll(final String p2pLl) {
-			p2p_ll = p2pLl;
+			this.p2p_ll = p2pLl;
 		}
 
 		protected void setTotal_ll(final String totalLl) {
-			total_ll = totalLl;
+			this.total_ll = totalLl;
 		}
 
 		protected void setLink_lambda_avg(final String linkLambdaAvg) {
-			link_lambda_avg = linkLambdaAvg;
+			this.link_lambda_avg = linkLambdaAvg;
 		}
 
 		protected void setLink_lambda_stddev(final String linkLambdaStddev) {
-			link_lambda_stddev = linkLambdaStddev;
+			this.link_lambda_stddev = linkLambdaStddev;
 		}
 
 		protected void setLink_lambda_min(final String linkLambdaMin) {
-			link_lambda_min = linkLambdaMin;
+			this.link_lambda_min = linkLambdaMin;
 		}
 
 		protected void setLink_lambda_max(final String linkLambdaMax) {
-			link_lambda_max = linkLambdaMax;
+			this.link_lambda_max = linkLambdaMax;
 		}
 
 		protected void setPlan_lambda_avg(final String planLambdaAvg) {
-			plan_lambda_avg = planLambdaAvg;
+			this.plan_lambda_avg = planLambdaAvg;
 		}
 
 		protected void setPlan_lambda_stddev(final String planLambdaStddev) {
-			plan_lambda_stddev = planLambdaStddev;
+			this.plan_lambda_stddev = planLambdaStddev;
 		}
 
 		protected void setPlan_lambda_min(final String planLambdaMin) {
-			plan_lambda_min = planLambdaMin;
+			this.plan_lambda_min = planLambdaMin;
 		}
 
 		protected void setPlan_lambda_max(final String planLambdaMax) {
-			plan_lambda_max = planLambdaMax;
+			this.plan_lambda_max = planLambdaMax;
 		}
 
 		protected void setReplan_count(final String replanCount) {
-			replan_count = replanCount;
+			this.replan_count = replanCount;
 		}
 
-		protected String getCount_ll() {
-			return count_ll;
+		public String getCount_ll() {
+			return this.count_ll;
 		}
 
-		protected String getCount_ll_pred_err() {
-			return count_ll_pred_err;
+		public String getCount_ll_pred_err() {
+			return this.count_ll_pred_err;
 		}
 
-		protected String getP2p_ll() {
-			return p2p_ll;
+		public String getP2p_ll() {
+			return this.p2p_ll;
 		}
 
-		protected String getTotal_ll() {
-			return total_ll;
+		public String getTotal_ll() {
+			return this.total_ll;
 		}
 
-		protected String getLink_lambda_avg() {
-			return link_lambda_avg;
+		public String getLink_lambda_avg() {
+			return this.link_lambda_avg;
 		}
 
-		protected String getLink_lambda_stddev() {
-			return link_lambda_stddev;
+		public String getLink_lambda_stddev() {
+			return this.link_lambda_stddev;
 		}
 
-		protected String getLink_lambda_min() {
-			return link_lambda_min;
+		public String getLink_lambda_min() {
+			return this.link_lambda_min;
 		}
 
-		protected String getLink_lambda_max() {
-			return link_lambda_max;
+		public String getLink_lambda_max() {
+			return this.link_lambda_max;
 		}
 
-		protected String getPlan_lambda_avg() {
-			return plan_lambda_avg;
+		public String getPlan_lambda_avg() {
+			return this.plan_lambda_avg;
 		}
 
-		protected String getPlan_lambda_stddev() {
-			return plan_lambda_stddev;
+		public String getPlan_lambda_stddev() {
+			return this.plan_lambda_stddev;
 		}
 
-		protected String getPlan_lambda_min() {
-			return plan_lambda_min;
+		public String getPlan_lambda_min() {
+			return this.plan_lambda_min;
 		}
 
-		protected String getPlan_lambda_max() {
-			return plan_lambda_max;
+		public String getPlan_lambda_max() {
+			return this.plan_lambda_max;
 		}
 
-		protected String getReplan_count() {
-			return replan_count;
+		public String getReplan_count() {
+			return this.replan_count;
 		}
 	}
 
-	protected Map <Integer, StatisticsData> getCalStatMap (){
-		return statDataMap;
-	}
-
-	public static void main(String[] args) throws IOException {
-		String calibStatFile = "../mmoyo/test/input/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/testCalibration/input_calibration-stats.txt";
-		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
-		new TabularFileParser().parse(calibStatFile, calibrationStatReader);
-		System.out.println(calibrationStatReader.getCalStatMap().get(Integer.valueOf(2)).count_ll);
+	public Map <Integer, StatisticsData> getCalStatMap (){
+		return this.statDataMap;
 	}
 
 	@Override
-	public String preprocess(String arg0) {
+	public String preprocess(final String arg0) {
 		return arg0;
 	}
 
