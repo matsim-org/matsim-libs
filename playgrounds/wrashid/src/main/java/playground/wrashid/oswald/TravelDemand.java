@@ -63,7 +63,7 @@ public class TravelDemand {
 
 		Network network = GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz");
 
-		System.out.println("startPos-x\tstartPos-y\tendPos-x\tendPos-y\tdidArrive");
+		System.out.println("personId\tstartPos-x\tstartPos-y\tendPos-x\tendPos-y\tdidArrive");
 
 		for (Id personId : startPositions.keySet()) {
 			Coord startCoord = network.getLinks().get(startPositions.get(personId)).getCoord();
@@ -75,7 +75,7 @@ public class TravelDemand {
 				 * anymore
 				 */
 				Coord endCoord = network.getLinks().get(endPositions.get(personId)).getCoord();
-				System.out.println(startCoord.getX() + "\t" + startCoord.getY() + "\t" + endCoord.getX() + "\t" + endCoord.getY()
+				System.out.println(personId + "\t" + startCoord.getX() + "\t" + startCoord.getY() + "\t" + endCoord.getX() + "\t" + endCoord.getY()
 						+ "\t" + (lastEventWasArrivalEvent.get(personId) ? "1" : "0"));
 			}
 		}

@@ -57,11 +57,11 @@ public class ParkingDemandInitialization {
 
 		Network network = GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz");
 
-		System.out.println("x\ty");
+		System.out.println("agentId\tx\ty");
 		
-		for (Id linkId : arrivals.values()) {
-			Coord linkCoord = network.getLinks().get(linkId).getCoord();
-			System.out.println(linkCoord.getX() + "\t" + linkCoord.getY());
+		for (Id agentId : arrivals.keySet()) {
+			Coord linkCoord = network.getLinks().get(arrivals.get(agentId)).getCoord();
+			System.out.println(agentId + "\t" + linkCoord.getX() + "\t" + linkCoord.getY());
 		}
 
 	}
