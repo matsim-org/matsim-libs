@@ -4,13 +4,7 @@
    <!ENTITY INPUTBASE   "test/input/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/">
   ]
 >
-  <!-- 
-   <!ENTITY INPUTBASE   "test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-  
-   <!ENTITY INPUTBASE   "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY OUTPUTBASE	"../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   -->
+
    
 <config>
 	<module name="global">
