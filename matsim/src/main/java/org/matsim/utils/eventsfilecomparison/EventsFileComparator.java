@@ -42,6 +42,18 @@ public abstract class EventsFileComparator {
 	public static final int CODE_MISSING_EVENT = -3;
 	public static final int CODE_WRONG_EVENT_COUNT = -4;
 
+	public static void main(String[] args) {
+		if (args.length != 2) {
+			System.out.println("Error: expected 2 events files as input arguments but found " + args.length);
+			System.out.println("Syntax: EventsFileComparator eventsFile1 eventsFile2");
+		} else {
+			String filename1 = args[0];
+			String filename2 = args[1];
+			
+			EventsFileComparator.compare(filename1, filename2);			
+		}
+	}
+	
 	/**
 	 * Compares two Events files. This method is thread-safe.
 	 *
