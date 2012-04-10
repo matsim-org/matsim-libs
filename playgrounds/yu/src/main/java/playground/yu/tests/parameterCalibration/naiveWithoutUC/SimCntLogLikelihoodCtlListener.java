@@ -83,6 +83,7 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 					&& iter > nextWriteLlhInterval - avgLlhOverIters
 			// || iter % writeLlhInterval == 0
 			) {
+				n++;
 				VolumesAnalyzer volumes = ctl.getVolumes();
 				Network network = ctl.getNetwork();
 
@@ -116,7 +117,6 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 								double absLlh = (simVal - cntVal)
 										* (simVal - cntVal) / 2d / var;
 								llhSum -= absLlh;
-								n++;
 								writer.writeln("ITER\t" + iter
 										+ "\tAccumulated Llh over " + n
 										+ " iterations =\t" + llhSum

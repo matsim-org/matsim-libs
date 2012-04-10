@@ -30,9 +30,9 @@ public class NelderMeadSearcher {
 		optimizer.setMaxIterations(1000);
 		optimizer.setMaxEvaluations(1000);
 
-		optimizer.setConvergenceChecker(new SimpleScalarValueChecker(0.001,
-				0.001));
+		optimizer
+				.setConvergenceChecker(new SimpleScalarValueChecker(0.01, 0.01));
 		optimizer.optimize(new LLhParamFct(args[0]), GoalType.MAXIMIZE,
-				new double[] { -4.5, -1d });
+				new double[] { -6d, 0d });
 	}
 }

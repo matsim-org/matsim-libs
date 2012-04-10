@@ -35,7 +35,10 @@ import org.apache.commons.math.optimization.direct.MultiDirectional;
  */
 public class MultidirectionalSearcher {
 
-	public static void main(String[] args) throws OptimizationException,
+	public static void main(String[] args/*
+										 * TODO args for criterion and start
+										 * point
+										 */) throws OptimizationException,
 			FunctionEvaluationException, IllegalArgumentException {
 		MultiDirectional optimizer = new MultiDirectional();
 		optimizer.setMaxIterations(1000);
