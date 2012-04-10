@@ -40,8 +40,13 @@ public class WrapperChartUtil extends ChartUtil {
 	public WrapperChartUtil(final JFreeChart chart) {
 		super(TITLE, XLABEL, YLABEL);
 		this.chart = chart;
-		//this.addMatsimLogo();
-		this.addDefaultFormatting();
+		try {
+			this.addDefaultFormatting();
+			//this.addMatsimLogo();
+		}
+		catch (Exception e) {
+			// no default formating: not a big deal.
+		}
 	}
 
 	@Override
