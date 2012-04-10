@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtBseOccupancyAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -45,25 +44,21 @@ import org.matsim.counts.Counts;
 import org.matsim.pt.counts.SimpleWriter;
 
 /**
- *   Collects occupancy data of transit-line stations 
- *
+ * Collects occupancy data of transit-line stations
  */
-public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
-										PersonEntersVehicleEventHandler, 
-										PersonLeavesVehicleEventHandler, 
-										VehicleArrivesAtFacilityEventHandler,
-										VehicleDepartsAtFacilityEventHandler{ 
+public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
+		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
-	private Map<Id, int[]> occupancies;  //Map< stopFacilityId,value[]>
-	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();  //Map< vehId,stopFacilityId> 
-	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>();  //Map<vehId,passengersNo. in Veh> 
-	private final static String HEADER = "time\tvehId\tStopId\tno.ofPassengersInVeh\n";
-	private StringBuffer occupancyRecord = new StringBuffer(HEADER);
+	private Map<Id, int[]> occupancies; // Map< stopFacilityId,value[]>
+	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>(); // Map< vehId,stopFacilityId>
+	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>(); // Map<vehId,passengersNo.in Veh>
+	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
-	private HashSet <Id> trDriversSet = new HashSet <Id>();   //a set to contain all transit drivers id's
-
+	private final Set<Id> transitDrivers = new HashSet<Id>();
+	private final Set<Id> transitVehicles = new HashSet<Id>();
+	
 	//String constants
 	private final static String STR_M44 = "M44";
 	private final static String STR_TIME = "time: \t";
@@ -82,32 +77,34 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 	}
 
 	@Override
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 		this.occupancies.clear();
 		this.veh_stops.clear();
-		this.occupancyRecord = new StringBuffer(HEADER);
-		this.vehToRouteId.clear();
+		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
+		this.vehToRouteId.clear();    
+		this.transitDrivers.clear();   //clear stored data Manuel apr2012
+		this.transitVehicles.clear();   //clear stored data Manuel apr2012
 	}
-	
+
 	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		trDriversSet.add(event.getDriverId());   //fill transit drivers set
+	public void handleEvent(final TransitDriverStartsEvent event) {
 		this.vehToRouteId.put(event.getVehicleId(), event.getTransitRouteId());
+		this.transitDrivers.add(event.getDriverId()); //store transit drivers as in org.matsim.pt.counts.OccupancyAnalyzer Manuel apr2012
+		this.transitVehicles.add(event.getVehicleId()); //store transit vehicles as in org.matsim.pt.counts.OccupancyAnalyzer Manuel apr2012
 	}
-	
+
 	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		//ignore transit drivers in this occupancy analysis 
-		if (trDriversSet.contains(event.getPersonId())){ 
-			return ;
+	public void handleEvent(final PersonEntersVehicleEvent event) {
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-transit vehicles, as in org.matsim.pt.counts.OccupancyAnalyzer Manuel apr2012
 		}
 		
-		//only specific transit line
+		// only specific transit line
 		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
-		if ( !transitLineId.toString().contains(STR_M44)) {
-			
+		if (!transitLineId.toString().contains(STR_M44)) {
+			return;
 		}
-		
+
 		// ------------------veh_passenger- (for occupancy)-----------------
 		Id vehId = event.getVehicleId(), stopId = this.veh_stops.get(vehId);
 		double time = event.getTime();
@@ -117,16 +114,15 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 	}
 
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		//ignore transit drivers in this occupancy analysis
-		if (trDriversSet.contains(event.getPersonId())){
-			return ;
+	public void handleEvent(final PersonLeavesVehicleEvent event) {
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-transit vehicles, as in org.matsim.pt.counts.OccupancyAnalyzer Manuel apr2012
 		}
 		
-		//only specific transit line
+		// only specific transit line
 		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
-		if ( !transitLineId.toString().contains(STR_M44)) {
-			return ;
+		if (!transitLineId.toString().contains(STR_M44)) {
+			return;
 		}
 		// ----------------veh_passenger-(for occupancy)--------------------------
 		Id vehId = event.getVehicleId();
@@ -144,14 +140,15 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 	}
 
 	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
 		Id vehId = event.getVehicleId();
-		Id facId = event.getFacilityId() ;
+		Id facId = event.getFacilityId();
 
 		// -----------------------occupancy--------------------------------
 		this.veh_stops.remove(vehId);
 		int[] occupancyAtStop = this.occupancies.get(facId);
-		if (occupancyAtStop == null) {  // no previous departure from this stop, therefore no occupancy record yet.  Create this:
+		if (occupancyAtStop == null) { // no previous departure from this stop, therefore no occupancy
+																		// record yet. Create this:
 			occupancyAtStop = new int[this.maxSlotIndex + 1];
 			this.occupancies.put(facId, occupancyAtStop);
 		}
@@ -172,16 +169,17 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 	}
 
 	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+	public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
 		Id stopId = event.getFacilityId();
 
 		this.veh_stops.put(event.getVehicleId(), stopId);
-		// (constructing a table with vehId as key, and stopId as value; constructed when veh arrives at stop; necessary
+		// (constructing a table with vehId as key, and stopId as value; constructed when veh arrives at
+		// stop; necessary
 		// since personEnters/LeavesVehicle does not carry stop id)
 	}
 
-	//occupancy methods
-	public void setOccupancies(Map<Id, int[]> occupancies) {
+	// occupancy methods
+	public void setOccupancies(final Map<Id, int[]> occupancies) {
 		this.occupancies = occupancies;
 	}
 
@@ -194,9 +192,9 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 
 	/**
 	 * @param stopId
-	 * @return Array containing the number of passengers in bus after the
-	 *         transfer at the stop {@code stopId} per time bin, starting with
-	 *         time bin 0 from 0 seconds to (timeBinSize-1)seconds.
+	 * @return Array containing the number of passengers in bus after the transfer at the stop
+	 *         {@code stopId} per time bin, starting with time bin 0 from 0 seconds to
+	 *         (timeBinSize-1)seconds.
 	 */
 	public int[] getOccupancyVolumesForStop(final Id stopId) {
 		return this.occupancies.get(stopId);
@@ -208,7 +206,7 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 
 	public void writeResultsForSelectedStopIds(final String filename, final Counts occupCounts, final List<Id> m44StopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
-		
+
 		// write header
 		final String oc = "oc";
 		final String sim = "scalSim";
@@ -221,55 +219,55 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler,
 			countValBuff.append(oc + i + sep + (i + 1) + CHR_HT);
 			simValBuff.append(sim + i + sep + (i + 1) + CHR_HT);
 		}
-		countValBuff.append(simValBuff.toString()  + "coordinate\tcsId\n");
+		countValBuff.append(simValBuff.toString() + "coordinate\tcsId\n");
 		writer.write(countValBuff.toString());
 
 		// write content
-		//for (Id stopId : getOccupancyStopIds()) {  this is for all stations
-		for (Id stopId : m44StopIds) { 
-			//get count data
+		// for (Id stopId : getOccupancyStopIds()) { this is for all stations
+		for (Id stopId : m44StopIds) {
+			// get count data
 			Count count = occupCounts.getCounts().get(stopId);
-			if (!occupCounts.getCounts().containsKey(stopId)){
+			if (!occupCounts.getCounts().containsKey(stopId)) {
 				continue;
 			}
-			
-			//get sim-Values
+
+			// get sim-Values
 			int[] ocuppancy = this.occupancies.get(stopId);
-			if (ocuppancy == null) {
-				//log.debug("stopId:\t" + stopId + "\tthere aren't passengers in Bus after the transfer!");
-			}
+//			if (ocuppancy == null) {
+//				 log.debug("stopId:\t" + stopId + "\tthere aren't passengers in Bus after the transfer!");
+//			}
 			countValBuff = new StringBuffer(stopId.toString() + CHR_HT);
-			simValBuff = new StringBuffer();	
+			simValBuff = new StringBuffer();
 			for (int i = 0; i < 24; i++) {
-				countValBuff.append(count.getVolume(i+1).getValue() + CHR_HT); //all volumes from 1 to 24 must be given in counts file, even with 0 as value.
-				simValBuff.append((ocuppancy != null ? ocuppancy[i]: 0) + CHR_HT);
+				countValBuff.append(count.getVolume(i + 1).getValue() + CHR_HT); // all volumes from 1 to 24 must be given in counts file, even with 0 as value.
+				simValBuff.append((ocuppancy != null ? ocuppancy[i] : 0) + CHR_HT);
 			}
 			countValBuff.append(simValBuff.toString() + count.getCoord().toString() + CHR_HT + count.getCsId() + CHR_NL);
 			writer.write(countValBuff.toString());
-			
-			countValBuff= null;	
-			simValBuff= null;
+
+			countValBuff = null;
+			simValBuff = null;
 		}
 		writer.write(this.occupancyRecord.toString());
 		writer.close();
 	}
-	
-	private void readEvents(String eventFileName){
+
+	private void readEvents(final String eventFileName) {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventFileName); 
+		reader.parse(eventFileName);
 	}
-	
-	public void run(String eventFileName){
+
+	public void run(final String eventFileName) {
 		this.readEvents(eventFileName);
 	}
-	
-	public static void main(String[] args) {
+
+	public static void main(final String[] args) {
 		String eventFile = null;
-		if (args.length==1){
+		if (args.length == 1) {
 			eventFile = args[0];
-		}else{
+		} else {
 			eventFile = "../playgrounds/mmoyo/output/routeAnalysis/scoreOff/afterBugRepair/it500/500.events.xml.gz";
 		}
 		new PtBseOccupancyAnalyzer().run(eventFile);

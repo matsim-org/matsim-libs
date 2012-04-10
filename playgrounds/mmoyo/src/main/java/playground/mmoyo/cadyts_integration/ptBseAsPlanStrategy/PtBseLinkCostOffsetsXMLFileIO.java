@@ -1,12 +1,9 @@
-package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtBseLinkCostOffsetsXMLFileIO.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,18 +17,17 @@ package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
-//LINK import org.matsim.api.core.v01.network.Link;
-//LINK import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import utilities.misc.DynamicDataXMLFileIO;
 
+/**
+ * Enables cadyts to persist the cost offsets to file.
+ */
 public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitStopFacility> {
 
 	private static final long serialVersionUID = 1L;
@@ -42,13 +38,11 @@ public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitS
 		this.schedule = schedule;
 	}
 
-	String strAttrValue2key = "-----attrValue2key------:\t";
-	String strStop = "stop :\t";
 	@Override
 	protected TransitStopFacility attrValue2key(final String stopId) {
-		System.out.println(strAttrValue2key + stopId);
-		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl(stopId));
-		System.out.println(strStop + stop);
+//		System.out.println("-----attrValue2key------:\t" + stopId);
+		TransitStopFacility stop = this.schedule.getFacilities().get(new IdImpl(stopId));
+//		System.out.println("stop:\t" + stop);
 		return stop;
 	}
 
@@ -56,17 +50,5 @@ public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitS
 	protected String key2attrValue(final TransitStopFacility key) {
 		return key.getId().toString();
 	}
-
-//	@Override
-//	public void startElement(String uri, String localName, String name, Attributes attributes) {
-//
-//		// StringBuilder sb = new StringBuilder();
-//		// for (int i = 0; i < attributes.getLength(); i++) {
-//		// sb.append("\t" + attributes.getQName(i) + "\t"
-//		// + attributes.getValue(i));
-//		// }
-//		// System.out.println("element :\t" + name + "\t" + sb);
-//		super.startElement(uri, localName, name, attributes);
-//	}
 
 }

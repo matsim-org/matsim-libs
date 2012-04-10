@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtPlanToPlanStepBasedOnEvents.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -30,22 +29,17 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -53,253 +47,215 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.utils.ExpTransRouteUtils;
 import cadyts.demand.PlanBuilder;
 
-class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
-{
+class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
+		PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler {
 	private static final Logger log = Logger.getLogger(PtPlanToPlanStepBasedOnEvents.class);
 
-	private final Network net;
-	private final Scenario sc ;
+	private final Scenario sc;
 	private final TransitSchedule schedule;
 
-	private final Map< Id, Collection<Id> > personsFromVehId = new HashMap< Id, Collection<Id> >() ;
+	private final Map<Id, Collection<Id>> personsFromVehId = new HashMap<Id, Collection<Id>>();
 
-	private int iteration = -1 ;
+	private int iteration = -1;
 
 	// this is _only_ there for output:
-	Set<Plan> plansEverSeen = new HashSet<Plan>() ;
-
-	// these are there so that print functions can be called from the outside (for debugging):
-	private static Network NET ;
-	private static TransitSchedule SCHEDULE ;
-
-	//private PtBseOccupancyAnalyzer delegOcupAnalizer;  //it is not needed 18.jul.2011
+	Set<Plan> plansEverSeen = new HashSet<Plan>();
 
 	private final static String STR_M44 = "M44";
 	private final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private final String STR_ITERATION = "iteration";
 	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
-	private final Set<Id> popIdSet;
+	private final Set<Id> transitDrivers = new HashSet<Id>();
+	private final Set<Id> transitVehicles = new HashSet<Id>();
 	
-	PtPlanToPlanStepBasedOnEvents(Scenario sc/*, PtBseOccupancyAnalyzer delOcupAnalizer 18.jul.2011*/) {
-		this.sc = sc ;
-		this.net = sc.getNetwork();
-		popIdSet = sc.getPopulation().getPersons().keySet();
-		this.schedule = ((ScenarioImpl) sc).getTransitSchedule() ;
-		
-		NET = this.net ;
-		SCHEDULE = this.schedule ;
-		//this.delegOcupAnalizer = delOcupAnalizer;   //it is not needed 18.jul.2011
+	PtPlanToPlanStepBasedOnEvents(final Scenario sc) {
+		this.sc = sc;
+		this.schedule = ((ScenarioImpl) sc).getTransitSchedule();
 	}
 
-	private long plansFound = 0 ;
-	private long plansNotFound = 0 ;
-	@SuppressWarnings("unchecked")
-	final cadyts.demand.Plan<TransitStopFacility> getPlanSteps(Plan plan) {
-		PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY) ;
-		if ( planStepFactory == null ) {
-			this.plansNotFound ++ ;
-			return null ;
+	private long plansFound = 0;
+	private long plansNotFound = 0;
+
+	final cadyts.demand.Plan<TransitStopFacility> getPlanSteps(final Plan plan) {
+		PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) plan.getCustomAttributes().get(
+				this.STR_PLANSTEPFACTORY);
+		if (planStepFactory == null) {
+			this.plansNotFound++;
+			return null;
 		}
-		this.plansFound ++ ;
+		this.plansFound++;
 		final cadyts.demand.Plan<TransitStopFacility> planSteps = planStepFactory.getResult();
 		return planSteps;
 	}
 
 	@Override
-	public void reset(int iteration) {
-		this.iteration = iteration ;
+	public void reset(final int iteration) {
+		this.iteration = iteration;
 
-		log.warn("found " + this.plansFound + " out of " + (this.plansFound+this.plansNotFound)
-				+ " (" + (100.*this.plansFound/(this.plansFound+this.plansNotFound)) + "%)" ) ;
-		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)") ;
+		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
+				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
+		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
 
-		personsFromVehId.clear();
+		this.personsFromVehId.clear();
 		this.vehToRouteId.clear();
-		//this.delegOcupAnalizer.reset(iteration);    //it is not needed 18.jul.2011
+		
+		plansEverSeen.clear(); //clear stored data Manuel apr2012
+		this.transitDrivers.clear();   //clear stored data Manuel apr2012
+		this.transitVehicles.clear();   //clear stored data Manuel apr2012
 	}
 
 	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
+	public void handleEvent(final TransitDriverStartsEvent event) {
 		this.vehToRouteId.put(event.getVehicleId(), event.getTransitRouteId());
+		this.transitDrivers.add(event.getDriverId()); //store transit drivers as in org.matsim.pt.counts.OccupancyAnalyzer Manuel apr2012
+		this.transitVehicles.add(event.getVehicleId()); //store transit vehicles as in org.matsim.pt.counts.OccupancyAnalyzer Manuel apr2012
 	}
 
 	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
+	public void handleEvent(final PersonEntersVehicleEvent event) {
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-transit vehicles, as in org.matsim.pt.counts.OccupancyAnalyzer Manuel apr2012
+		}
+		
 		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
-		if ( !transitLineId.toString().contains(STR_M44)) {
-			return ;
+		if (!transitLineId.toString().contains(STR_M44)) {
+			return;
+		}
+
+		addPersonToVehicleContainer(event.getPersonId(), event.getVehicleId());
+	}
+
+	@Override
+	public void handleEvent(final PersonLeavesVehicleEvent event) {
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-transit vehicles, as in org.matsim.pt.counts.OccupancyAnalyzer Manuel apr2012
 		}
 		
-		if(popIdSet.contains(event.getPersonId())){  //exclude driver agents that don't belong to population file
-			addPersonToVehicleContainer(event.getPersonId(), event.getVehicleId());			
+		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
+		if (!transitLineId.toString().contains(STR_M44)) {
+			return;
 		}
-		//this.delegOcupAnalizer.handleEvent(event);     //it is not needed 18.jul.2011
+		removePersonFromVehicleContainer(event.getPersonId(), event.getVehicleId());
 	}
 
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());;
-		if ( !transitLineId.toString().contains(STR_M44)) {
-			return ;
-		}
-		if(popIdSet.contains(event.getPersonId())){ //ignore pt vchicle driver
-			removePersonFromVehicleContainer(event.getPersonId(), event.getVehicleId());
-		}
-		
-		//this.delegOcupAnalizer.handleEvent(event);      //it is not needed 18.jul.2011
-	}
-
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		//this.delegOcupAnalizer.handleEvent(event);      //it is not needed 18.jul.2011
-	}
-
-	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		double time = event.getTime() ;
+	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
+		double time = event.getTime();
 		Id vehId = event.getVehicleId();
-		Id facId = event.getFacilityId() ;
-		if ( this.personsFromVehId.get(vehId)==null ) {
+		Id facId = event.getFacilityId();
+		if (this.personsFromVehId.get(vehId) == null) {
 			// (means nobody has entered the vehicle yet)
-			return ;
+			return;
 		}
+		TransitStopFacility fac = this.schedule.getFacilities().get(facId);
 
-		for ( Id personId : this.personsFromVehId.get(vehId) ) {
+		for (Id personId : this.personsFromVehId.get(vehId)) {
 			// get the "Person" behind the id:
-			Person person = this.sc.getPopulation().getPersons().get( personId ) ;
-			
+			Person person = this.sc.getPopulation().getPersons().get(personId);
+
 			// get the selected plan:
-			Plan selectedPlan = person.getSelectedPlan() ;
+			Plan selectedPlan = person.getSelectedPlan();
 
 			// get the planStepFactory for the plan (or create one):
+			PlanBuilder<TransitStopFacility> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
 
-			PlanBuilder<TransitStopFacility> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan); 
-
-			if ( tmpPlanStepFactory != null ) {
-
+			if (tmpPlanStepFactory != null) {
 				// add the "turn" to the planStepfactory
-				TransitStopFacility fac = this.schedule.getFacilities().get( facId ) ;
-
-				tmpPlanStepFactory.addTurn( fac, (int) time ) ;
+				tmpPlanStepFactory.addTurn(fac, (int) time);
 			}
 		}
-		//this.delegOcupAnalizer.handleEvent(event);       //it is not needed 18.jul.2011
 	}
-
 
 	// ###################################################################################
 	// only private functions below here (low level functionality)
 
-	private void addPersonToVehicleContainer(Id personId, Id vehId) {
+	private void addPersonToVehicleContainer(final Id personId, final Id vehId) {
 		// get the personsContainer that belongs to the vehicle:
-		Collection<Id> personsInVehicle = this.personsFromVehId.get( vehId ) ;
+		Collection<Id> personsInVehicle = this.personsFromVehId.get(vehId);
 
-		if ( personsInVehicle == null ) {
+		if (personsInVehicle == null) {
 			// means does not exist yet
 			personsInVehicle = new ArrayList<Id>();
-			this.personsFromVehId.put( vehId, personsInVehicle ) ;
+			this.personsFromVehId.put(vehId, personsInVehicle);
 		}
 
-		personsInVehicle.add( personId ) ;
+		personsInVehicle.add(personId);
 	}
 
-	private void removePersonFromVehicleContainer(Id personId, Id vehId) {
+	private void removePersonFromVehicleContainer(final Id personId, final Id vehId) {
 		// get the personsContainer that belongs to the vehicle:
-		Collection<Id> personsInVehicle = this.personsFromVehId.get( vehId ) ;
+		Collection<Id> personsInVehicle = this.personsFromVehId.get(vehId);
 
-		if ( personsInVehicle == null ) {
-			Gbl.errorMsg( "should not be possible: person should enter before leaving, and then construct the container" ) ;
+		if (personsInVehicle == null) {
+			Gbl.errorMsg("should not be possible: person should enter before leaving, and then construct the container");
 		}
 
 		// remove the person from the personsContainer:
-		personsInVehicle.remove( personId ) ; // linear time operation; a HashMap might be better.
+		personsInVehicle.remove(personId); // linear time operation; a HashMap might be better.
 	}
 
-	@SuppressWarnings("unchecked")
-	private PlanBuilder<TransitStopFacility> getPlanStepFactoryForPlan(Plan selectedPlan) {
-		PlanBuilder<TransitStopFacility> planStepFactory = null ;
+	private PlanBuilder<TransitStopFacility> getPlanStepFactoryForPlan(final Plan selectedPlan) {
+		PlanBuilder<TransitStopFacility> planStepFactory = null;
 
-		planStepFactory = (PlanBuilder<TransitStopFacility>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY) ;
-		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION) ;
-		if ( planStepFactory == null
-				// (means there is not yet a plansStepFactory for this plan
-				|| factoryIteration==null || factoryIteration != iteration
-				// (means the iteration for which the plansStepFactory was build is over)
-				) {
+		planStepFactory = (PlanBuilder<TransitStopFacility>) selectedPlan.getCustomAttributes().get(this.STR_PLANSTEPFACTORY);
+		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(this.STR_ITERATION);
+		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
 			// attach the iteration number to the plan:
-			selectedPlan.getCustomAttributes().put( STR_ITERATION, iteration ) ;
+			selectedPlan.getCustomAttributes().put(this.STR_ITERATION, this.iteration);
 
 			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder<TransitStopFacility>() ;
-			selectedPlan.getCustomAttributes().put( STR_PLANSTEPFACTORY, planStepFactory ) ;
+			planStepFactory = new PlanBuilder<TransitStopFacility>();
+			selectedPlan.getCustomAttributes().put(this.STR_PLANSTEPFACTORY, planStepFactory);
 
 			// memorize the plan as being seen:
-			plansEverSeen.add( selectedPlan ) ;
+			this.plansEverSeen.add(selectedPlan);
 		}
 
 		return planStepFactory;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void printCadytsAndMatsimPlans() {
-		String separator = 	"\n==============================";
-		System.err.println("results:") ;
-
-		for ( Plan matsimPlan : this.plansEverSeen ) {
-			PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) matsimPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY) ;
-			cadyts.demand.Plan<TransitStopFacility> cadytsPlan = planStepFactory.getResult() ;
-
-			System.err.println(separator);
-
-			if ( printMatsimPlanPtLinks(matsimPlan) ) {
-				printCadytsPlan(cadytsPlan);
-			}
-
-		}
-	}
-	static void printCadytsPlan(cadyts.demand.Plan<TransitStopFacility> cadytsPlan) {
-		//prints Cadyts plan
-		String sepCadStr = 	"==printing Cadyts Plan==";
+	static void printCadytsPlan(final cadyts.demand.Plan<TransitStopFacility> cadytsPlan) {
+		// prints Cadyts plan
+		String sepCadStr = "==printing Cadyts Plan==";
 		System.err.println(sepCadStr);
-		if ( cadytsPlan!= null ) {
-			for( int ii=0 ; ii<cadytsPlan.size(); ii++ ) {
-				cadyts.demand.PlanStep<TransitStopFacility> cadytsPlanStep = cadytsPlan.getStep(ii) ;
-				System.err.println("stopId" + cadytsPlanStep.getLink().getId() + " time: " + cadytsPlanStep.getEntryTime_s() ) ;
+		if (cadytsPlan != null) {
+			for (int ii = 0; ii < cadytsPlan.size(); ii++) {
+				cadyts.demand.PlanStep<TransitStopFacility> cadytsPlanStep = cadytsPlan.getStep(ii);
+				System.err.println("stopId" + cadytsPlanStep.getLink().getId() + " time: " + cadytsPlanStep.getEntryTime_s());
 			}
 		} else {
-			System.err.println( " cadyts plan is null ") ;
+			System.err.println(" cadyts plan is null ");
 		}
 	}
-	static boolean printMatsimPlanPtLinks(Plan matsimPlan) {
-		//prints MATSim plan
-		final String sepMatStr = 	"==printing MATSim plan exp transit routes==";
+
+	static boolean printMatsimPlanPtLinks(final Plan matsimPlan) {
+		// prints MATSim plan
+		final String sepMatStr = "==printing MATSim plan exp transit routes==";
 		final String personIdStr = "person Id: ";
-		boolean containsM44 = false ;
+		boolean containsM44 = false;
 		System.err.println(sepMatStr);
 		System.err.println(personIdStr + matsimPlan.getPerson().getId());
-		for (PlanElement planElement : matsimPlan.getPerson().getSelectedPlan().getPlanElements()){
+		for (PlanElement planElement : matsimPlan.getPerson().getSelectedPlan().getPlanElements()) {
 			if ((planElement instanceof Leg)) {
-				Leg leg= (Leg)planElement;
-				if (leg.getRoute()!= null && (leg.getMode().equals("pt")) ){
-					ExperimentalTransitRoute exptr = (ExperimentalTransitRoute)leg.getRoute();
-					if ( exptr.getRouteDescription().contains(STR_M44) ) {
-						containsM44 = true ;
-						System.err.print( exptr.getRouteDescription() + ": " ) ;
+				Leg leg = (Leg) planElement;
+				if (leg.getRoute() != null && (leg.getMode().equals("pt"))) {
+					ExperimentalTransitRoute exptr = (ExperimentalTransitRoute) leg.getRoute();
+					if (exptr.getRouteDescription().contains(STR_M44)) {
+						containsM44 = true;
+						System.err.print(exptr.getRouteDescription() + ": ");
 
-						ExpTransRouteUtils expTransRouteUtils = new ExpTransRouteUtils(NET, SCHEDULE, exptr);
-						for(Link link: expTransRouteUtils.getLinks()){
-							System.err.print("-- " + link.getId() + " --");
-						}
+						// ExpTransRouteUtils expTransRouteUtils = new ExpTransRouteUtils(NET, SCHEDULE, exptr);
+						// for(Link link: expTransRouteUtils.getLinks()){
+						// System.err.print("-- " + link.getId() + " --");
+						// }
 						System.err.println();
 					}
 				}
 			}
 		}
-		return containsM44 ;
+		return containsM44;
 	}
 
 }

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NewPtBsePlanChanger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,8 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -33,81 +32,75 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 
 /**
  * @author nagel
- *
  */
-class NewPtBsePlanChanger implements PlanSelector
-{
+/*package*/ class NewPtBsePlanChanger implements PlanSelector {
+
 	private static final Logger log = Logger.getLogger(NewPtBsePlanChanger.class);
 
-	private static boolean scoreWrnFlag = true;
+	private final double beta = 1.0;
 
-	private double beta = 1.0 ;
+	private final PtPlanToPlanStepBasedOnEvents ptPlanToPlanStep;
 
-	private PtPlanToPlanStepBasedOnEvents ptPlanToPlanStep;
+	private final MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator;
 
-	private MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator;
+	private boolean cadCorrMessGiven = false;
 
-	private boolean cadCorrMessGiven= false ;
-	private final String STR_CURRCORR = "currPlanCadytsCorr: ";
-	private final String STR_OTHERCORR = " otherPlanCadytsCorr: ";
-	
-	NewPtBsePlanChanger(PtPlanToPlanStepBasedOnEvents ptStep, MATSimUtilityModificationCalibrator<TransitStopFacility> calib ) {
-		log.error( "value for beta currently ignored (set to one)") ;
-		this.ptPlanToPlanStep = ptStep ;
-		this.matsimCalibrator = calib ;
+	/*package*/ NewPtBsePlanChanger(final PtPlanToPlanStepBasedOnEvents ptStep, final MATSimUtilityModificationCalibrator<TransitStopFacility> calib) {
+		log.error("value for beta currently ignored (set to one)");
+		this.ptPlanToPlanStep = ptStep;
+		this.matsimCalibrator = calib;
 	}
 
 	@Override
-	public Plan selectPlan(Person person) {
+	public Plan selectPlan(final Person person) {
 		Plan currentPlan = person.getSelectedPlan();
-		if ( person.getPlans().size() <= 1 || currentPlan.getScore()==null ) {
-			return currentPlan ;
+		if (person.getPlans().size() <= 1 || currentPlan.getScore() == null) {
+			return currentPlan;
 		}
-		//ChoiceSampler<TransitStopFacility> sampler = ((SamplingCalibrator<TransitStopFacility>)this.matsimCalibrator).getSampler(person) ;
+		// ChoiceSampler<TransitStopFacility> sampler =
+		// ((SamplingCalibrator<TransitStopFacility>)this.matsimCalibrator).getSampler(person) ;
 
 		// random plan:
-		Plan otherPlan = null ;
+		Plan otherPlan = null;
 		do {
 			otherPlan = ((PersonImpl) person).getRandomPlan();
-		} while ( otherPlan==currentPlan ) ;
+		} while (otherPlan == currentPlan);
 
-		if ( otherPlan.getScore()==null ) {
+		if (otherPlan.getScore() == null) {
 			return otherPlan;
 		}
 
-		cadyts.demand.Plan<TransitStopFacility> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps( currentPlan );
-		double currentPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(currentPlanSteps)/ this.beta;
+		cadyts.demand.Plan<TransitStopFacility> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(currentPlan);
+		double currentPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(currentPlanSteps) / this.beta;
 		double currentScore = currentPlan.getScore().doubleValue() + currentPlanCadytsCorrection;
 
-		cadyts.demand.Plan<TransitStopFacility> otherPlanSteps = this.ptPlanToPlanStep.getPlanSteps( otherPlan );
-		double otherPlanCadytsCorrection  = this.matsimCalibrator.getUtilityCorrection(otherPlanSteps)/ this.beta;
-		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection ;
+		cadyts.demand.Plan<TransitStopFacility> otherPlanSteps = this.ptPlanToPlanStep.getPlanSteps(otherPlan);
+		double otherPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(otherPlanSteps) / this.beta;
+		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection;
 
-		if ( currentPlanCadytsCorrection != otherPlanCadytsCorrection && !cadCorrMessGiven){
-			log.info( STR_CURRCORR + currentPlanCadytsCorrection + STR_OTHERCORR + otherPlanCadytsCorrection + Gbl.ONLYONCE) ;
-			cadCorrMessGiven = true;  //should be true to give the log info only once
+		if (currentPlanCadytsCorrection != otherPlanCadytsCorrection && !this.cadCorrMessGiven) {
+			log.info("currPlanCadytsCorr: " + currentPlanCadytsCorrection + " otherPlanCadytsCorr: " + otherPlanCadytsCorrection + Gbl.ONLYONCE);
+			this.cadCorrMessGiven = true;
 		}
 
-		double weight = Math.exp( 0.5 * this.beta * (otherScore - currentScore) );
+		double weight = Math.exp(0.5 * this.beta * (otherScore - currentScore));
 		// (so far, this is >1 if otherScore>currentScore, and <=1 otherwise)
 		// (beta is the slope (strength) of the operation: large beta means strong reaction)
 
-		Plan selectedPlan = currentPlan ;
-		cadyts.demand.Plan<TransitStopFacility> selectedPlanSteps =currentPlanSteps;
-		if (MatsimRandom.getRandom().nextDouble() < 0.01*weight ) {
+		Plan selectedPlan = currentPlan;
+		cadyts.demand.Plan<TransitStopFacility> selectedPlanSteps = currentPlanSteps;
+		if (MatsimRandom.getRandom().nextDouble() < 0.01 * weight) {
 			// as of now, 0.01 is hardcoded (proba to change when both scores are the same)
 
 			selectedPlan = otherPlan;
 			selectedPlanSteps = otherPlanSteps;
 		}
 
-		//sampler.enforceNextAccept();
-		//sampler.isAccepted(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));
+		// sampler.enforceNextAccept();
+		// sampler.isAccepted(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));
 
 		this.matsimCalibrator.registerChoice(selectedPlanSteps);
 
-		return selectedPlan ;
+		return selectedPlan;
 	}
-
-
 }
