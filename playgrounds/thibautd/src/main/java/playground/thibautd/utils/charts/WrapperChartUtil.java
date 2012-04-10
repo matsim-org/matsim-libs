@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.utils.charts;
 
+import org.apache.log4j.Logger;
+
 import org.jfree.chart.JFreeChart;
 import org.matsim.core.utils.charts.ChartUtil;
 
@@ -32,6 +34,9 @@ import org.matsim.core.utils.charts.ChartUtil;
  * @author thibautd
  */
 public class WrapperChartUtil extends ChartUtil {
+	private static final Logger log =
+		Logger.getLogger(WrapperChartUtil.class);
+
 
 	private static final String TITLE = "";
 	private static final String XLABEL = "";
@@ -46,6 +51,10 @@ public class WrapperChartUtil extends ChartUtil {
 		}
 		catch (Exception e) {
 			// no default formating: not a big deal.
+			log.warn( "Could not set the default formating for chart with title <<"+chart.getTitle().getText()
+					+">>: got a "+e+" with message "+e.getMessage()
+					//+" and stack trace "+e.getStackTrace()
+					+". This is not fatal, but the plot may not look as expected." );
 		}
 	}
 

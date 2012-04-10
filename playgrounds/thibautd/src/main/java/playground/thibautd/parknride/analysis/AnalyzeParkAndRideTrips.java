@@ -47,6 +47,9 @@ public class AnalyzeParkAndRideTrips {
 		
 		ChartUtil chart = analyzer.getPtTimeProportionHistogram();
 		chart.saveAsPng( outputDir+"/ptTimeProportion.png" , WIDTH , HEIGHT );
+
+		chart = analyzer.getNumberOfPtLegsHistogram();
+		chart.saveAsPng( outputDir+"/transitLegsNumber.png" , WIDTH , HEIGHT );
 	}
 }
 

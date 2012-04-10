@@ -116,23 +116,61 @@ public class ParkAndRideTripsAnalyzer {
 		}
 
 		return createProportionHistogram(
-				"Part of the Transit travel time in the total PNR travel time",
+				"Part of the Transit travel time (including walk) in the total PNR travel time",
 				"TimePt / TotalTripTime",
-				"Frequency",
-				proportions);
+				"Number of Trips",
+				proportions,
+				N_BINS,
+				0,
+				1);
 	}
 
 	public ChartUtil getNumberOfPtLegsHistogram() {
-		throw new UnsupportedOperationException( "TODO" );
+		double[] numberOfPtLegs = new double[ trips.size() ];
+
+		int i = 0;
+		int maxCount = -1;
+		for (List<PlanElement> trip : trips) {
+			int count = 0;
+
+			for (PlanElement pe : trip) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					String mode = leg.getMode();
+					double tt = leg.getTravelTime();
+
+					if ( mode.equals( TransportMode.pt ) ) {
+						count++;
+					}
+				}
+			}
+
+			numberOfPtLegs[ i ] = count;
+			maxCount = count > maxCount ? count : maxCount;
+			i++;
+		}
+
+		return createProportionHistogram(
+				"Number of transit legs (walk excluded) per PNR Trip",
+				"Number of Pt Legs",
+				"Number of Trips",
+				numberOfPtLegs,
+				// one bin per count, including 0
+				maxCount + 1,
+				-0.5,
+				maxCount + 0.5);
 	}
 
 	private static ChartUtil createProportionHistogram(
 			final String title,
 			final String xName,
 			final String yName,
-			final double[] values) {
+			final double[] values,
+			final int nBins,
+			final double min,
+			final double max) {
 		HistogramDataset dataset = new HistogramDataset();
-		dataset.addSeries( xName , values , N_BINS , 0 , 1 );
+		dataset.addSeries( xName , values , nBins , min , max );
 
 		JFreeChart chart =
 			ChartFactory.createHistogram(
