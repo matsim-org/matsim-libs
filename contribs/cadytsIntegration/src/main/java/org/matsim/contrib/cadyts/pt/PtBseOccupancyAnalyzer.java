@@ -20,12 +20,14 @@
 package org.matsim.contrib.cadyts.pt;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -54,14 +56,16 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
 	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>(); // Map< vehId,stopFacilityId>
 	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>(); // Map<vehId,passengersNo.in Veh>
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
-	private final static String STR_M44 = "M44";
-	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
+	private final Set<Id> transitDrivers = new HashSet<Id>();
+	private final Set<Id> transitVehicles = new HashSet<Id>();
+	private final Set<Id> analyzedLines = new HashSet<Id>();
 
 	public PtBseOccupancyAnalyzer() {
 		this.timeBinSize = 3600;
 		this.maxTime = 24 * 3600 - 1;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
 		this.occupancies = new HashMap<Id, int[]>();
+		this.analyzedLines.add(new IdImpl("M44")); // TODO make configurable
 	}
 
 	@Override
@@ -69,20 +73,22 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
 		this.occupancies.clear();
 		this.veh_stops.clear();
 		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
-		this.vehToRouteId.clear();
+		this.transitDrivers.clear();
+		this.transitVehicles.clear();
 	}
 
 	@Override
 	public void handleEvent(final TransitDriverStartsEvent event) {
-		this.vehToRouteId.put(event.getVehicleId(), event.getTransitRouteId());
+		if (this.analyzedLines.contains(event.getTransitLineId())) {
+			this.transitDrivers.add(event.getDriverId());
+			this.transitVehicles.add(event.getVehicleId());
+		}
 	}
 
 	@Override
 	public void handleEvent(final PersonEntersVehicleEvent event) {
-		// only specific transit line
-		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
-		if (!transitLineId.toString().contains(STR_M44)) {
-			return;
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-(analyzed-)transit vehicles
 		}
 
 		// ------------------veh_passenger- (for occupancy)-----------------
@@ -96,11 +102,10 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
 
 	@Override
 	public void handleEvent(final PersonLeavesVehicleEvent event) {
-		// only specific transit line
-		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
-		if (!transitLineId.toString().contains(STR_M44)) {
-			return;
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-(analyzed-)transit vehicles
 		}
+
 		// ----------------veh_passenger-(for occupancy)--------------------------
 		Id vehId = event.getVehicleId();
 		double time = event.getTime();
