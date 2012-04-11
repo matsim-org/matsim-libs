@@ -7,7 +7,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.model.TaxiCustomer;
 import playground.michalm.vrp.data.network.*;
 
@@ -17,11 +17,11 @@ public class TaxiModeDepartureHandler
 {
     private static final String TAXI_MODE = "taxi";
 
-    private MATSimVRPData data;
+    private MatsimVrpData data;
     private TaxiSimEngine taxiSimEngine;
 
 
-    public TaxiModeDepartureHandler(TaxiSimEngine taxiSimEngine, MATSimVRPData data)
+    public TaxiModeDepartureHandler(TaxiSimEngine taxiSimEngine, MatsimVrpData data)
     {
         this.taxiSimEngine = taxiSimEngine;
         this.data = data;
@@ -35,12 +35,12 @@ public class TaxiModeDepartureHandler
             // mobsim.getEventsManager().processEvent(
             // new TaxiRequestEventImpl(now, agent.getId(), linkId, agent.getMode()));
 
-            MATSimVRPGraph vrpGraph = data.getVrpGraph();
+            MatsimVrpGraph vrpGraph = data.getVrpGraph();
 
-            MATSimVertex fromVertex = vrpGraph.getVertex(linkId);
+            MatsimVertex fromVertex = vrpGraph.getVertex(linkId);
 
             Id toLinkId = agent.getDestinationLinkId();
-            MATSimVertex toVertex = vrpGraph.getVertex(toLinkId);
+            MatsimVertex toVertex = vrpGraph.getVertex(toLinkId);
 
             List<Customer> customers = data.getVrpData().getCustomers();
             List<Request> requests = data.getVrpData().getRequests();

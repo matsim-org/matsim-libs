@@ -6,10 +6,10 @@ import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
 
-public interface MATSimVRPGraph
-    extends VRPGraph
+public interface MatsimVrpGraph
+    extends VrpGraph
 {
-    MATSimVertex getVertex(Id linkId);
+    MatsimVertex getVertex(Id linkId);
 
 
     ShortestPath getShortestPath(Vertex vertexFrom, Vertex vertexTo);

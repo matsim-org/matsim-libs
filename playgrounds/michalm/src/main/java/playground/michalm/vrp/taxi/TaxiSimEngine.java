@@ -8,26 +8,26 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
-import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.optimizer.VRPOptimizerFactory;
+import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizerFactory;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import playground.michalm.vrp.data.MATSimVRPData;
-import playground.michalm.vrp.data.jdbc.JDBCWriter;
-import playground.michalm.vrp.otfvis.VRPOTFClientLive;
+import playground.michalm.vrp.data.MatsimVrpData;
+import playground.michalm.vrp.data.jdbc.JdbcWriter;
+import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 
 
 public class TaxiSimEngine
     implements MobsimEngine
 {
-    private MATSimVRPData matsimVrpData;
-    private VRPData vrpData;
+    private MatsimVrpData matsimVrpData;
+    private VrpData vrpData;
 
     private Netsim netsim;
 
-    private VRPOptimizerFactory optimizerFactory;
+    private VrpOptimizerFactory optimizerFactory;
     private TaxiOptimizer optimizer;
     private TaxiEvaluator taxiEvaluator = new TaxiEvaluator();
 
@@ -49,7 +49,7 @@ public class TaxiSimEngine
     }
 
 
-    public TaxiSimEngine(Netsim netsim, MATSimVRPData data, VRPOptimizerFactory optimizerFactory)
+    public TaxiSimEngine(Netsim netsim, MatsimVrpData data, VrpOptimizerFactory optimizerFactory)
     {
         this.netsim = netsim;
         this.optimizerFactory = optimizerFactory;
@@ -86,11 +86,11 @@ public class TaxiSimEngine
             @Override
             public void run()
             {
-                if (VRPOTFClientLive.queryControl != null) {
+                if (VrpOTFClientLive.queryControl != null) {
                     for (Vehicle v : vrpData.getVehicles()) {
                         QueryAgentPlan query = new QueryAgentPlan();
                         query.setId(v.getName());
-                        VRPOTFClientLive.queryControl.createQuery(query);
+                        VrpOTFClientLive.queryControl.createQuery(query);
                     }
                 }
             }
@@ -105,7 +105,7 @@ public class TaxiSimEngine
 
         notifyAgents();
         notifyOptimizerListeners(new OptimizerEvent((int)now, vrpData,
-                taxiEvaluator.evaluateVRP(vrpData)));
+                taxiEvaluator.evaluateVrp(vrpData)));
     }
 
 
@@ -133,7 +133,7 @@ public class TaxiSimEngine
 
         if (time == -3600) {
             System.err.println("************************ SQL &&&&&&&&&&&&&&&&&&&&&");
-            JDBCWriter writer = new JDBCWriter(matsimVrpData);
+            JdbcWriter writer = new JdbcWriter(matsimVrpData);
             writer.simulationInitialized();
             writer.fillWithTaskForTesting();
             writer.close();

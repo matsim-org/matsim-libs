@@ -19,7 +19,7 @@ public class TaxiAgentLogic
     implements DynAgentLogic
 {
     private TaxiSimEngine taxiSimEngine;
-    private MATSimVRPGraph vrpGraph;
+    private MatsimVrpGraph vrpGraph;
 
     private Vehicle vrpVehicle;
     private DynAgent agent;
@@ -27,7 +27,7 @@ public class TaxiAgentLogic
     private Request currentRequest;
 
 
-    public TaxiAgentLogic(Vehicle vrpVehicle, MATSimVRPGraph vrpGraph, TaxiSimEngine taxiSimEngine)
+    public TaxiAgentLogic(Vehicle vrpVehicle, MatsimVrpGraph vrpGraph, TaxiSimEngine taxiSimEngine)
     {
         this.vrpVehicle = vrpVehicle;
         this.vrpGraph = vrpGraph;
@@ -217,7 +217,7 @@ public class TaxiAgentLogic
         SPEntry path = vrpGraph.getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
                 .getSPEntry(realDepartTime);
 
-        Id destinationLinkId = ((MATSimVertex)driveTask.getToVertex()).getLink().getId();
+        Id destinationLinkId = ((MatsimVertex)driveTask.getToVertex()).getLink().getId();
 
         return new TaxiLeg(path, destinationLinkId) {
             @Override
@@ -245,7 +245,7 @@ public class TaxiAgentLogic
         SPEntry path = vrpGraph.getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
                 .getSPEntry(realDepartTime);
 
-        Id destinationLinkId = ((MATSimVertex)driveTask.getToVertex()).getLink().getId();
+        Id destinationLinkId = ((MatsimVertex)driveTask.getToVertex()).getLink().getId();
 
         return new TaxiLeg(path, destinationLinkId);
     }

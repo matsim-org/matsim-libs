@@ -9,28 +9,28 @@ import org.matsim.vehicles.VehicleUtils;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import playground.michalm.dynamic.*;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.model.DynVehicle;
-import playground.michalm.vrp.data.network.MATSimVertex;
-import playground.michalm.vrp.driver.VRPSchedulePlanFactory;
+import playground.michalm.vrp.data.network.MatsimVertex;
+import playground.michalm.vrp.driver.VrpSchedulePlanFactory;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
 
 
 public class TaxiAgentSource
     implements AgentSource
 {
-    private MATSimVRPData data;
+    private MatsimVrpData data;
     private TaxiSimEngine taxiSimEngine;
     private boolean isAgentWithPlan;
 
 
-    public TaxiAgentSource(MATSimVRPData data, TaxiSimEngine vrpSimEngine)
+    public TaxiAgentSource(MatsimVrpData data, TaxiSimEngine vrpSimEngine)
     {
         this(data, vrpSimEngine, false);
     }
 
 
-    public TaxiAgentSource(MATSimVRPData data, TaxiSimEngine taxiSimEngine, boolean isAgentWithPlan)
+    public TaxiAgentSource(MatsimVrpData data, TaxiSimEngine taxiSimEngine, boolean isAgentWithPlan)
     {
         this.data = data;
         this.taxiSimEngine = taxiSimEngine;
@@ -51,14 +51,14 @@ public class TaxiAgentSource
             ((DynVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);
 
             Id id = data.getScenario().createId(vrpVeh.getName());
-            Id startLinkId = ((MATSimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
+            Id startLinkId = ((MatsimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
 
             DynAgent taxiAgent = new DynAgent(id, startLinkId, taxiSimEngine.getMobsim(),
                     taxiAgentLogic);
 
             if (isAgentWithPlan) {
                 qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent,
-                        new VRPSchedulePlanFactory(vrpVeh, data)));
+                        new VrpSchedulePlanFactory(vrpVeh, data)));
             }
             else {
                 qSim.insertAgentIntoMobsim(taxiAgent);

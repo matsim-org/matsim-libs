@@ -13,7 +13,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import pl.poznan.put.util.TypedStringTokenizer;
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.TimeAsTravelCost;
 import playground.michalm.vrp.data.network.shortestpath.*;
@@ -24,7 +24,7 @@ public class FullShortestPathsFinder
 {
     private final static Logger log = Logger.getLogger(FullShortestPathsFinder.class);
 
-    private MATSimVRPData data;
+    private MatsimVrpData data;
 
     final int TIME_BIN_SIZE;// in seconds
     final int NUM_SLOTS;
@@ -33,7 +33,7 @@ public class FullShortestPathsFinder
 
     // public
 
-    public FullShortestPathsFinder(MATSimVRPData data)
+    public FullShortestPathsFinder(MatsimVrpData data)
     {
         this.data = data;
         TIME_BIN_SIZE = 15 * 60;// 15 minutes
@@ -41,7 +41,7 @@ public class FullShortestPathsFinder
     }
 
 
-    public FullShortestPathsFinder(MATSimVRPData data, int travelTimeBinSize, int numSlots)
+    public FullShortestPathsFinder(MatsimVrpData data, int travelTimeBinSize, int numSlots)
     {
         this.data = data;
         this.TIME_BIN_SIZE = travelTimeBinSize;
@@ -65,7 +65,7 @@ public class FullShortestPathsFinder
         LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(
                 network, travelCost, travelTime);
 
-        MATSimVRPGraph graph = data.getVrpGraph();
+        MatsimVrpGraph graph = data.getVrpGraph();
         int n = graph.getVertexCount();
 
         FullShortestPath[][] shortestPaths = (FullShortestPath[][])Array.newInstance(
@@ -74,14 +74,14 @@ public class FullShortestPathsFinder
         List<Vertex> vertices = graph.getVertices();
 
         for (Vertex a : vertices) {
-            MATSimVertex vA = (MATSimVertex)a;
+            MatsimVertex vA = (MatsimVertex)a;
 
             log.info("findShortestPaths ==== vertex: " + vA + " ====");
             FullShortestPath[] sPath_A = shortestPaths[vA.getId()];
             Link fromLink = vA.getLink();
 
             for (Vertex b : vertices) {
-                MATSimVertex vB = (MATSimVertex)b;
+                MatsimVertex vB = (MatsimVertex)b;
 
                 FullShortestPath sPath_AB = new FullShortestPath(NUM_SLOTS, TIME_BIN_SIZE, true);
                 sPath_A[vB.getId()] = sPath_AB;
@@ -146,7 +146,7 @@ public class FullShortestPathsFinder
         BufferedWriter costsBW = new BufferedWriter(new FileWriter(costsFileName));
         BufferedWriter pathsBW = new BufferedWriter(new FileWriter(pathsFileName));
 
-        MATSimVRPGraph graph = data.getVrpGraph();
+        MatsimVrpGraph graph = data.getVrpGraph();
         int n = graph.getVertexCount();
 
         for (int i = 0; i < n; i++) {
@@ -211,7 +211,7 @@ public class FullShortestPathsFinder
     {
         log.info("readShortestPaths() ==== STARTED ====");
 
-        MATSimVRPGraph graph = data.getVrpGraph();
+        MatsimVrpGraph graph = data.getVrpGraph();
         int n = graph.getVertexCount();
         boolean readPaths = pathsFileName != null;
 
@@ -284,10 +284,10 @@ public class FullShortestPathsFinder
     /**
      * Updates travel times and costs
      */
-    public void upadateVRPArcs(FullShortestPath[][] shortestPaths)
+    public void upadateVrpArcs(FullShortestPath[][] shortestPaths)
     {
-        log.info("upadateVRPArcs() ==== STARTED ====");
-        FixedSizeVRPGraph graph = (FixedSizeVRPGraph)data.getVrpGraph();
+        log.info("upadateVrpArcs() ==== STARTED ====");
+        FixedSizeVrpGraph graph = (FixedSizeVrpGraph)data.getVrpGraph();
         List<Vertex> vertices = graph.getVertices();
 
         for (Vertex vA : vertices) {
@@ -299,6 +299,6 @@ public class FullShortestPathsFinder
             }
         }
 
-        log.info("upadateVRPArcs() ==== FINISHED ====");
+        log.info("upadateVrpArcs() ==== FINISHED ====");
     }
 }

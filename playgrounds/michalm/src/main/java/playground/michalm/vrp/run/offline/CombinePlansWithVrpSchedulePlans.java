@@ -11,7 +11,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-public class CombinePlansWithVRPSchedulePlans
+public class CombinePlansWithVrpSchedulePlans
 {
     public static void main(String... args)
         throws IOException

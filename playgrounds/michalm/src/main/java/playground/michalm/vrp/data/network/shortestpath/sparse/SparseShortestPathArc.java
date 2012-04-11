@@ -1,7 +1,7 @@
 package playground.michalm.vrp.data.network.shortestpath.sparse;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.network.MATSimVertex;
+import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.data.network.shortestpath.*;
 
 
@@ -73,7 +73,7 @@ public class SparseShortestPathArc
         public Arc build(Vertex vertexFrom, Vertex vertexTo)
         {
             return new SparseShortestPathArc(new SparseShortestPath(sspFinder,
-                    (MATSimVertex)vertexFrom, (MATSimVertex)vertexTo));
+                    (MatsimVertex)vertexFrom, (MatsimVertex)vertexTo));
         }
     }
 }

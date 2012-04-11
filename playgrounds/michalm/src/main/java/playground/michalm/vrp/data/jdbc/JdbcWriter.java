@@ -3,7 +3,7 @@ package playground.michalm.vrp.data.jdbc;
 import java.sql.*;
 import java.util.List;
 
-import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
@@ -11,20 +11,20 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.model.DynVehicle;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 import cern.colt.Arrays;
 
 
-public class JDBCWriter
+public class JdbcWriter
 {
     private static final String dbUrl = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};"
             + "DBQ=d:\\PP-rad\\taxi\\poznan\\baza_vrp.mdb;DriverID=22;READONLY=false";
 
-    private VRPData data;
-    private MATSimVRPGraph vrpGraph;
+    private VrpData data;
+    private MatsimVrpGraph vrpGraph;
 
     private Connection con;
 
@@ -47,7 +47,7 @@ public class JDBCWriter
     private PreparedStatement taskStatusUpdate;
 
 
-    public JDBCWriter(MATSimVRPData matsimData)
+    public JdbcWriter(MatsimVrpData matsimData)
     {
         this.data = matsimData.getVrpData();
         vrpGraph = matsimData.getVrpGraph();
@@ -130,7 +130,7 @@ public class JDBCWriter
                 vertexInsert.setString(2, v.getName());
                 vertexInsert.setDouble(3, v.getX());
                 vertexInsert.setDouble(4, v.getY());
-                vertexInsert.setString(5, ((MATSimVertex)v).getLink().getId().toString());
+                vertexInsert.setString(5, ((MatsimVertex)v).getLink().getId().toString());
                 vertexInsert.executeUpdate();
             }
 
@@ -540,7 +540,7 @@ public class JDBCWriter
     public static void main(String[] args)
         throws SQLException, ClassNotFoundException
     {
-        new JDBCWriter(null).simulationInitialized();
+        new JdbcWriter(null).simulationInitialized();
 
         try {
             Thread.sleep(3000);

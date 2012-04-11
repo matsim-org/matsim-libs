@@ -6,7 +6,7 @@ import java.util.List;
 import org.matsim.core.router.util.*;
 
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
 
 
@@ -16,14 +16,14 @@ public class SparseShortestPathFinder
     final int NUM_SLOTS;
     final boolean CYCLIC = true;
 
-    final private MATSimVRPData data;
+    final private MatsimVrpData data;
 
     TravelTime travelTime;
     TravelDisutility travelCost;
     LeastCostPathCalculator router;
 
 
-    public SparseShortestPathFinder(MATSimVRPData data)
+    public SparseShortestPathFinder(MatsimVrpData data)
     {
         this.data = data;
         TIME_BIN_SIZE = 15 * 60;// 15 minutes
@@ -31,7 +31,7 @@ public class SparseShortestPathFinder
     }
 
 
-    public SparseShortestPathFinder(MATSimVRPData data, int timeBinSize, int numSlots)
+    public SparseShortestPathFinder(MatsimVrpData data, int timeBinSize, int numSlots)
     {
         this.data = data;
         this.TIME_BIN_SIZE = timeBinSize;
@@ -47,7 +47,7 @@ public class SparseShortestPathFinder
         this.travelCost = travelCost;
         this.router = router;
 
-        MATSimVRPGraph graph = data.getVrpGraph();
+        MatsimVrpGraph graph = data.getVrpGraph();
         int n = graph.getVertexCount();
 
         SparseShortestPathArc[][] shortestPaths = (SparseShortestPathArc[][])Array.newInstance(
@@ -56,12 +56,12 @@ public class SparseShortestPathFinder
         List<Vertex> vertices = graph.getVertices();
 
         for (Vertex a : vertices) {
-            MATSimVertex vA = (MATSimVertex)a;
+            MatsimVertex vA = (MatsimVertex)a;
 
             SparseShortestPathArc[] sPath_A = shortestPaths[vA.getId()];
 
             for (Vertex b : vertices) {
-                MATSimVertex vB = (MATSimVertex)b;
+                MatsimVertex vB = (MatsimVertex)b;
 
                 SparseShortestPathArc sPath_AB = new SparseShortestPathArc(new SparseShortestPath(
                         this, vA, vB));

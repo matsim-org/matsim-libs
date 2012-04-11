@@ -10,7 +10,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
@@ -105,7 +105,7 @@ public class Localizables2GIS<T extends Localizable>
                     + Arrays.toString(args));
         }
 
-        VRPData data = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
+        VrpData data = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
                 VertexImpl.getBuilder());
         String coordSystem = TransformationFactory.WGS84_UTM33N;
 

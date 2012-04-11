@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.*;
 
 
-public class VRPOTFClientLive
+public class VrpOTFClientLive
 {
 
     public static OTFQueryControl queryControl;

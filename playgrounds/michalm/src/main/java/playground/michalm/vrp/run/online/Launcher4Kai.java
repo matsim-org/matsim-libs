@@ -18,6 +18,6 @@ public class Launcher4Kai
         // OFTVis on?
         arguments[4] = "true";
 
-        SingleIterOnlineDVRPLauncher.main(arguments);
+        SingleIterOnlineDvrpLauncher.main(arguments);
     }
 }

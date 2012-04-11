@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-import playground.michalm.vrp.data.network.MATSimVertex;
+import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
 
@@ -19,8 +19,8 @@ public class SparseShortestPath
     private SPEntry[] entries = null;// lazy initialization
 
 
-    public SparseShortestPath(SparseShortestPathFinder sspFinder, MATSimVertex fromVertex,
-            MATSimVertex toVertex)
+    public SparseShortestPath(SparseShortestPathFinder sspFinder, MatsimVertex fromVertex,
+            MatsimVertex toVertex)
     {
         this.sspFinder = sspFinder;
         fromLink = fromVertex.getLink();

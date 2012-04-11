@@ -4,17 +4,17 @@ import org.matsim.api.core.v01.population.Plan;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import playground.michalm.dynamic.*;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 
 
-public class VRPSchedulePlanFactory
+public class VrpSchedulePlanFactory
     implements DynPlanFactory
 {
     private Vehicle vehicle;
-    private MATSimVRPData data;
+    private MatsimVrpData data;
 
 
-    public VRPSchedulePlanFactory(Vehicle vehicle, MATSimVRPData data)
+    public VrpSchedulePlanFactory(Vehicle vehicle, MatsimVrpData data)
     {
         this.vehicle = vehicle;
         this.data = data;
@@ -24,6 +24,6 @@ public class VRPSchedulePlanFactory
     @Override
     public Plan create(DynAgent agent)
     {
-        return new VRPSchedulePlan(vehicle, data);
+        return new VrpSchedulePlan(vehicle, data);
     }
 }

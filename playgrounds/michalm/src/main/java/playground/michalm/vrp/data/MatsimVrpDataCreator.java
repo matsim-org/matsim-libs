@@ -6,19 +6,19 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.VRPData.VRPType;
+import pl.poznan.put.vrp.dynamic.data.VrpData.VrpType;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.*;
 
 
-public class MATSimVRPDataCreator
+public class MatsimVrpDataCreator
 {
-    public static MATSimVRPData create(Scenario scenario)
+    public static MatsimVrpData create(Scenario scenario)
         throws IOException
     {
-        VRPData vrpData = new VRPData();
-        vrpData.setType(VRPType.TAXI);
+        VrpData vrpData = new VrpData();
+        vrpData.setType(VrpType.TAXI);
 
         List<Customer> customers = new ArrayList<Customer>();
         List<Request> requests = new ArrayList<Request>();
@@ -28,10 +28,10 @@ public class MATSimVRPDataCreator
 
         int vertexCount = scenario.getNetwork().getLinks().size();
 
-        MATSimVertexBuilder vertexBuilder = MATSimVertexImpl.createFromLinkIdBuilder(scenario
+        MatsimVertexBuilder vertexBuilder = MatsimVertexImpl.createFromLinkIdBuilder(scenario
                 .getNetwork());
 
-        VRPGraph graph = new FixedSizeMatsimVrpGraph(vertexCount);
+        VrpGraph graph = new FixedSizeMatsimVrpGraph(vertexCount);
         vrpData.setVrpGraph(graph);
 
         // build vertices for all links...
@@ -39,6 +39,6 @@ public class MATSimVRPDataCreator
             graph.addVertex(vertexBuilder.setLinkId(id).build());
         }
 
-        return new MATSimVRPData(vrpData, scenario);
+        return new MatsimVrpData(vrpData, scenario);
     }
 }

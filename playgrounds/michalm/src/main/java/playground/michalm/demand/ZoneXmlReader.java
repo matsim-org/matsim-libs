@@ -11,7 +11,7 @@ import playground.michalm.demand.Zone.Group;
 import playground.michalm.demand.Zone.Type;
 
 
-public class ZoneXMLReader
+public class ZoneXmlReader
     extends MatsimXmlParser
 {
     private final static String ZONE = "zone";
@@ -27,7 +27,7 @@ public class ZoneXMLReader
     private List<Zone> fileOrderedZones = new ArrayList<Zone>();
 
 
-    public ZoneXMLReader(Scenario scenario)
+    public ZoneXmlReader(Scenario scenario)
     {
         this.scenario = scenario;
     }

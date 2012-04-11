@@ -3,25 +3,25 @@ package playground.michalm.vrp.data;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import pl.poznan.put.vrp.dynamic.data.VRPData;
-import playground.michalm.vrp.data.network.MATSimVRPGraph;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
 
 
-public class MATSimVRPData
+public class MatsimVrpData
 {
-    private VRPData vrpData;
+    private VrpData vrpData;
     private Scenario scenario;
 
     private String coordSystem;
 
 
-    public MATSimVRPData(VRPData vrpData, Scenario scenario)
+    public MatsimVrpData(VrpData vrpData, Scenario scenario)
     {
         this(vrpData, scenario, TransformationFactory.WGS84_UTM33N);
     }
 
 
-    public MATSimVRPData(VRPData vrpData, Scenario scenario, String coordSystem)
+    public MatsimVrpData(VrpData vrpData, Scenario scenario, String coordSystem)
     {
         this.vrpData = vrpData;
         this.scenario = scenario;
@@ -29,7 +29,7 @@ public class MATSimVRPData
     }
 
 
-    public VRPData getVrpData()
+    public VrpData getVrpData()
     {
         return vrpData;
     }
@@ -47,8 +47,8 @@ public class MATSimVRPData
     }
 
 
-    public MATSimVRPGraph getVrpGraph()
+    public MatsimVrpGraph getVrpGraph()
     {
-        return (MATSimVRPGraph)vrpData.getVrpGraph();
+        return (MatsimVrpGraph)vrpData.getVrpGraph();
     }
 }

@@ -6,12 +6,12 @@ import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.model.DynVehicle;
-import playground.michalm.vrp.data.network.MATSimVRPGraph;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
 
 
 public class DepotReader
@@ -21,8 +21,8 @@ public class DepotReader
     private final static String VEHICLE = "vehicle";
 
     private Scenario scenario;
-    private MATSimVRPData data;
-    private MATSimVRPGraph graph;
+    private MatsimVrpData data;
+    private MatsimVrpGraph graph;
 
     private List<Depot> depots = new ArrayList<Depot>();
     private List<Vehicle> vehicles = new ArrayList<Vehicle>();
@@ -30,7 +30,7 @@ public class DepotReader
     private Depot currentDepot;
 
 
-    public DepotReader(Scenario scenario, MATSimVRPData data)
+    public DepotReader(Scenario scenario, MatsimVrpData data)
     {
         this.scenario = scenario;
         this.data = data;
@@ -43,7 +43,7 @@ public class DepotReader
     {
         parse(filename);
 
-        VRPData vrpData = data.getVrpData();
+        VrpData vrpData = data.getVrpData();
         vrpData.setDepots(depots);
         vrpData.setVehicles(vehicles);
     }

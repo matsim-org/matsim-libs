@@ -39,7 +39,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
  * That AgentPointLayer has its own (Array)Drawer.  The class here cannot be renamed because of the 
  * ConnectionManager/mvi issue.  kai, feb'11
  */
-public class VRPAgentPointDrawer
+public class VrpAgentPointDrawer
 {
 
     private final OGLAgentPointLayer oglAgentPointLayer;
@@ -48,7 +48,7 @@ public class VRPAgentPointDrawer
             new double[] { 0.0, 30., 50. }, new Color[] { Color.RED, Color.YELLOW, Color.GREEN });
 
 
-    VRPAgentPointDrawer(OGLAgentPointLayer oglAgentPointLayer)
+    VrpAgentPointDrawer(OGLAgentPointLayer oglAgentPointLayer)
     {
         this.oglAgentPointLayer = oglAgentPointLayer;
     }

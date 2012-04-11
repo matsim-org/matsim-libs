@@ -15,23 +15,23 @@ import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.cvrp.data.AlgorithmParams;
 import pl.poznan.put.vrp.dynamic.DebugPrint;
 import pl.poznan.put.vrp.dynamic.chart.*;
-import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.optimizer.VRPOptimizer;
+import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizer;
 import pl.poznan.put.vrp.dynamic.optimizer.evaluation.*;
-import pl.poznan.put.vrp.dynamic.optimizer.evolutionary.EvolutionaryVRPOptimizer;
+import pl.poznan.put.vrp.dynamic.optimizer.evolutionary.EvolutionaryVrpOptimizer;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
 import playground.michalm.util.gis.Schedules2GIS;
-import playground.michalm.vrp.data.MATSimVRPData;
-import playground.michalm.vrp.data.network.MATSimVertexImpl;
+import playground.michalm.vrp.data.MatsimVrpData;
+import playground.michalm.vrp.data.network.MatsimVertexImpl;
 import playground.michalm.vrp.data.network.shortestpath.full.*;
-import playground.michalm.vrp.driver.VRPSchedulePlan;
+import playground.michalm.vrp.driver.VrpSchedulePlan;
 
 
-public class OfflineDVRPLauncher
+public class OfflineDvrpLauncher
 {
     // means: ArcTravelTimes and ArcTravelCosts are averaged for optimization
     private static boolean AVG_TRAFFIC_MODE = false;// default: false
@@ -117,14 +117,14 @@ public class OfflineDVRPLauncher
         // to have TravelTimeCalculatorWithBuffer instead of TravelTimeCalculator use:
         // controler.setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
 
-        VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
-                MATSimVertexImpl.createFromXYBuilder(scenario));
+        VrpData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
+                MatsimVertexImpl.createFromXYBuilder(scenario));
 
         if (!STATIC_MODE) {
             LacknerReader.parseDynamicFile(vrpDirName, vrpDynamicFileName, vrpData);
         }
 
-        MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
+        MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
 
         FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
         FullShortestPath[][] shortestPaths = null;
@@ -137,11 +137,11 @@ public class OfflineDVRPLauncher
             shortestPaths = spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, null);
         }
 
-        spf.upadateVRPArcs(shortestPaths);
+        spf.upadateVrpArcs(shortestPaths);
 
         // ================================================== BELOW: only for comparison reasons...
 
-        FixedSizeVRPGraph graph = (FixedSizeVRPGraph)vrpData.getVrpGraph();
+        FixedSizeVrpGraph graph = (FixedSizeVrpGraph)vrpData.getVrpGraph();
 
         InterpolatedArc[][] simulatedArcs = null;
 
@@ -155,7 +155,7 @@ public class OfflineDVRPLauncher
 
         // now can run the optimizer or simulated optimizer...
 
-        VRPOptimizer optimizer = new EvolutionaryVRPOptimizer(new AlgorithmParams(new File(dirName
+        VrpOptimizer optimizer = new EvolutionaryVrpOptimizer(new AlgorithmParams(new File(dirName
                 + "\\" + algParamsFileName)), data.getVrpData());
 
         DeterministicSimulator simulator = new DeterministicSimulator(vrpData, 24 * 60 * 60,
@@ -168,14 +168,14 @@ public class OfflineDVRPLauncher
 
         if (VRP_OUT_FILES) {
             optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VRPData data)
+                public JFreeChart createChart(VrpData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
             optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VRPData data)
+                public JFreeChart createChart(VrpData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);
                 }
@@ -199,7 +199,7 @@ public class OfflineDVRPLauncher
             for (Vehicle v : vehicles) {
                 Person person = pf.createPerson(scenario.createId("vrpDriver_" + v.getId()));
 
-                VRPSchedulePlan plan = new VRPSchedulePlan(v, data);
+                VrpSchedulePlan plan = new VrpSchedulePlan(v, data);
 
                 person.addPlan(plan);
                 scenario.getPopulation().addPerson(person);
@@ -219,7 +219,7 @@ public class OfflineDVRPLauncher
             graph.setArcs(simulatedArcs);
 
             new ScheduleUpdater(vrpData).updateSchedule();
-            VRPEvaluation eval = new VRPEvaluator().evaluateVRP(vrpData);
+            VrpEvaluation eval = new VrpEvaluator().evaluateVrp(vrpData);
 
             // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(vrpData));
             ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(vrpData));

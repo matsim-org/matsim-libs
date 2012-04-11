@@ -12,7 +12,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 import com.vividsolutions.jts.geom.*;
@@ -24,11 +24,11 @@ public class Schedules2GIS
     private String filename;
     private FeatureType featureType;
     private GeometryFactory geofac;
-    private MATSimVRPData data;
+    private MatsimVrpData data;
     private Collection<Feature> features;
 
 
-    public Schedules2GIS(List<Vehicle> vehicles, MATSimVRPData data, String filename)
+    public Schedules2GIS(List<Vehicle> vehicles, MatsimVrpData data, String filename)
     {
         this.vehicles = vehicles;
         this.data = data;

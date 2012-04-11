@@ -6,10 +6,10 @@ import java.util.Arrays;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 
-import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
-import playground.michalm.vrp.data.MATSimVRPData;
-import playground.michalm.vrp.data.network.MATSimVertexImpl;
+import playground.michalm.vrp.data.MatsimVrpData;
+import playground.michalm.vrp.data.network.MatsimVertexImpl;
 import playground.michalm.vrp.data.network.shortestpath.full.*;
 
 
@@ -70,9 +70,9 @@ public class SimLauncherWithArcEstimator
         controler.run();
 
         Scenario scenario = controler.getScenario();
-        VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
-                MATSimVertexImpl.createFromXYBuilder(scenario));
-        MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
+        VrpData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
+                MatsimVertexImpl.createFromXYBuilder(scenario));
+        MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
 
         FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
         FullShortestPath[][] shortestPaths = spf.findShortestPaths(

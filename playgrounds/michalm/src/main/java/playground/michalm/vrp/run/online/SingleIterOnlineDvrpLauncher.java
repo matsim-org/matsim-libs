@@ -28,9 +28,9 @@ import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
-import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVRPGraph;
+import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVrpGraph;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.AlgorithmType;
@@ -39,12 +39,12 @@ import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
 import playground.michalm.vrp.data.network.shortestpath.sparse.*;
-import playground.michalm.vrp.otfvis.VRPOTFClientLive;
+import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
 
 
-public class SingleIterOnlineDVRPLauncher
+public class SingleIterOnlineDvrpLauncher
 {
     private String dirName;
     private String netFileName;
@@ -58,7 +58,7 @@ public class SingleIterOnlineDVRPLauncher
     private String eventsFileName;
 
     private Scenario scenario;
-    private MATSimVRPData data;
+    private MatsimVrpData data;
 
     private AlgorithmType algorithmType;
     private TaxiOptimizerFactory optimizerFactory;
@@ -95,7 +95,7 @@ public class SingleIterOnlineDVRPLauncher
     }
 
 
-    private void prepareMATSimData()
+    private void prepareMatsimData()
     {
         Config config = ConfigUtils.createConfig();
         scenario = ScenarioUtils.createScenario(config);
@@ -130,17 +130,17 @@ public class SingleIterOnlineDVRPLauncher
     }
 
 
-    private void initMATSimVRPData()
+    private void initMatsimVrpData()
         throws IOException
     {
-        data = MATSimVRPDataCreator.create(scenario);
+        data = MatsimVrpDataCreator.create(scenario);
         new DepotReader(scenario, data).readFile(depotsFileName);
 
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
 
         SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
         SparseShortestPathArc[][] arcs = sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
-        ((FixedSizeVRPGraph)data.getVrpGraph()).setArcs(arcs);
+        ((FixedSizeVrpGraph)data.getVrpGraph()).setArcs(arcs);
     }
 
 
@@ -196,14 +196,14 @@ public class SingleIterOnlineDVRPLauncher
 
         if (vrpOutFiles) {
             taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VRPData data)
+                public JFreeChart createChart(VrpData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
             taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VRPData data)
+                public JFreeChart createChart(VrpData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);
                 }
@@ -213,7 +213,7 @@ public class SingleIterOnlineDVRPLauncher
         if (otfVis) { // OFTVis visualization
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, sim.getEventsManager(), sim);
-            VRPOTFClientLive.run(scenario.getConfig(), server);
+            VrpOTFClientLive.run(scenario.getConfig(), server);
         }
 
         sim.run();
@@ -222,7 +222,7 @@ public class SingleIterOnlineDVRPLauncher
 
     private void generateVrpOutput()
     {
-        System.out.println(new TaxiEvaluator().evaluateVRP(data.getVrpData()).toString());
+        System.out.println(new TaxiEvaluator().evaluateVrp(data.getVrpData()).toString());
 
         if (vrpOutFiles) {
             new Schedules2GIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
@@ -238,8 +238,8 @@ public class SingleIterOnlineDVRPLauncher
         throws IOException
     {
         processArgs();
-        prepareMATSimData();
-        initMATSimVRPData();
+        prepareMatsimData();
+        initMatsimVrpData();
         initOptimizerFactory();
         runSim();
         generateVrpOutput();
@@ -249,6 +249,6 @@ public class SingleIterOnlineDVRPLauncher
     public static void main(String... args)
         throws IOException
     {
-        new SingleIterOnlineDVRPLauncher().go();
+        new SingleIterOnlineDvrpLauncher().go();
     }
 }

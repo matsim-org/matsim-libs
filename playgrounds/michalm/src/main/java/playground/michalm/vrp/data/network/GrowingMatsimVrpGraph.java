@@ -15,21 +15,21 @@ import playground.michalm.vrp.data.network.shortestpath.*;
  * @author michalm
  */
 public class GrowingMatsimVrpGraph
-    extends GrowingVRPGraph
-    implements MATSimVRPGraph
+    extends GrowingVrpGraph
+    implements MatsimVrpGraph
 {
-    private final Map<Id, MATSimVertex> linkIdToVertex;
+    private final Map<Id, MatsimVertex> linkIdToVertex;
 
 
     public GrowingMatsimVrpGraph(ArcBuilder arcBuilder)
     {
         super(arcBuilder);
-        linkIdToVertex = new LinkedHashMap<Id, MATSimVertex>();
+        linkIdToVertex = new LinkedHashMap<Id, MatsimVertex>();
     }
 
 
     @Override
-    public MATSimVertex getVertex(Id linkId)
+    public MatsimVertex getVertex(Id linkId)
     {
         return linkIdToVertex.get(linkId);
     }
@@ -38,7 +38,7 @@ public class GrowingMatsimVrpGraph
     @Override
     public void addVertex(Vertex vertex)
     {
-        MATSimVertex mVertex = (MATSimVertex)vertex;
+        MatsimVertex mVertex = (MatsimVertex)vertex;
         Id linkId = mVertex.getLink().getId();
 
         if (linkIdToVertex.put(linkId, mVertex) != null) {

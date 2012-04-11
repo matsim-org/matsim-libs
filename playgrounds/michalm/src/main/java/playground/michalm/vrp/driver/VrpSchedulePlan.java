@@ -11,18 +11,18 @@ import org.matsim.core.utils.misc.RouteUtils;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 
-public class VRPSchedulePlan
+public class VrpSchedulePlan
     implements Plan
 {
     private PopulationFactory populFactory;
     private Network network;
-    private MATSimVRPGraph vrpGraph;
+    private MatsimVrpGraph vrpGraph;
 
     private Vehicle vehicle;
 
@@ -32,7 +32,7 @@ public class VRPSchedulePlan
     private Person person;
 
 
-    public VRPSchedulePlan(Vehicle vehicle, MATSimVRPData data)
+    public VrpSchedulePlan(Vehicle vehicle, MatsimVrpData data)
     {
         this.vehicle = vehicle;
 
@@ -49,7 +49,7 @@ public class VRPSchedulePlan
 
     private void init()
     {
-        MATSimVertex depotVertex = (MATSimVertex)vehicle.getDepot().getVertex();
+        MatsimVertex depotVertex = (MatsimVertex)vehicle.getDepot().getVertex();
 
         Schedule schedule = vehicle.getSchedule();
 
@@ -65,19 +65,19 @@ public class VRPSchedulePlan
             switch (t.getType()) {
                 case DRIVE:
                     DriveTask dt = (DriveTask)t;
-                    addLeg((MATSimVertex)dt.getFromVertex(), (MATSimVertex)dt.getToVertex(),
+                    addLeg((MatsimVertex)dt.getFromVertex(), (MatsimVertex)dt.getToVertex(),
                             dt.getBeginTime(), dt.getEndTime());
                     break;
 
                 case SERVE:
                     ServeTask st = (ServeTask)t;
-                    addActivity((MATSimVertex)st.getAtVertex(), st.getEndTime(), ""
+                    addActivity((MatsimVertex)st.getAtVertex(), st.getEndTime(), ""
                             + st.getRequest().getId());
                     break;
 
                 case WAIT:
                     WaitTask wt = (WaitTask)t;
-                    addActivity((MATSimVertex)wt.getAtVertex(), wt.getEndTime(), "W");
+                    addActivity((MatsimVertex)wt.getAtVertex(), wt.getEndTime(), "W");
                     break;
 
                 default:
@@ -90,7 +90,7 @@ public class VRPSchedulePlan
     }
 
 
-    private void addLeg(MATSimVertex fromVertex, MATSimVertex toVertex, int departTime,
+    private void addLeg(MatsimVertex fromVertex, MatsimVertex toVertex, int departTime,
             int arrivalTime)
     {
         ShortestPath sp = vrpGraph.getShortestPath(fromVertex, toVertex);
@@ -138,7 +138,7 @@ public class VRPSchedulePlan
     }
 
 
-    private void addActivity(MATSimVertex vertex, int endTime, String type)
+    private void addActivity(MatsimVertex vertex, int endTime, String type)
     {
         // Activity act = populFactory.createActivityFromLinkId("service",
         // vertex.getLink().getId());

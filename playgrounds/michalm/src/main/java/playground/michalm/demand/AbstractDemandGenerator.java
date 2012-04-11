@@ -45,7 +45,7 @@ public class AbstractDemandGenerator
         MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
         nr.readFile(networkFileName);
 
-        ZoneXMLReader xmlReader = new ZoneXMLReader(scenario);
+        ZoneXmlReader xmlReader = new ZoneXmlReader(scenario);
         xmlReader.parse(zonesXMLFileName);
         zones = xmlReader.getZones();
         fileOrderedZones = xmlReader.getZoneFileOrder();

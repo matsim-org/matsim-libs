@@ -19,9 +19,9 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
-import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVRPGraph;
+import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVrpGraph;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.AlgorithmType;
@@ -33,10 +33,10 @@ import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
 import playground.michalm.vrp.data.network.shortestpath.sparse.*;
-import playground.michalm.vrp.driver.VRPSchedulePlan;
+import playground.michalm.vrp.driver.VrpSchedulePlan;
 
 
-public class SingleIterOfflineDVRPLauncher
+public class SingleIterOfflineDvrpLauncher
 {
     private String dirName;
     private String netFileName;
@@ -50,7 +50,7 @@ public class SingleIterOfflineDVRPLauncher
     private String eventsFileName;
 
     private Scenario scenario;
-    private MATSimVRPData data;
+    private MatsimVrpData data;
 
     private AlgorithmType algorithmType;
     private TaxiOptimizerFactory optimizerFactory;
@@ -79,7 +79,7 @@ public class SingleIterOfflineDVRPLauncher
     }
 
 
-    private void prepareMATSimData()
+    private void prepareMatsimData()
         throws IOException
     {
         Config config = ConfigUtils.createConfig();
@@ -97,7 +97,7 @@ public class SingleIterOfflineDVRPLauncher
 
     private void handleTaxiModeDepartures()
     {
-        MATSimVRPGraph vrpGraph = data.getVrpGraph();
+        MatsimVrpGraph vrpGraph = data.getVrpGraph();
         List<Customer> customers = data.getVrpData().getCustomers();
         List<Request> requests = data.getVrpData().getRequests();
 
@@ -132,8 +132,8 @@ public class SingleIterOfflineDVRPLauncher
             Activity beginAct = (Activity)planElements.get(0);
             Activity endAct = (Activity)planElements.get(2);
 
-            MATSimVertex fromVertex = vrpGraph.getVertex(beginAct.getLinkId());
-            MATSimVertex toVertex = vrpGraph.getVertex(endAct.getLinkId());
+            MatsimVertex fromVertex = vrpGraph.getVertex(beginAct.getLinkId());
+            MatsimVertex toVertex = vrpGraph.getVertex(endAct.getLinkId());
             double now = beginAct.getEndTime();
 
             int id = requests.size();
@@ -154,10 +154,10 @@ public class SingleIterOfflineDVRPLauncher
     }
 
 
-    private void initMATSimVRPData()
+    private void initMatsimVrpData()
         throws IOException
     {
-        data = MATSimVRPDataCreator.create(scenario);
+        data = MatsimVrpDataCreator.create(scenario);
         new DepotReader(scenario, data).readFile(depotsFileName);
 
         handleTaxiModeDepartures();// creates Requests
@@ -166,7 +166,7 @@ public class SingleIterOfflineDVRPLauncher
 
         SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
         SparseShortestPathArc[][] arcs = sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
-        ((FixedSizeVRPGraph)data.getVrpGraph()).setArcs(arcs);
+        ((FixedSizeVrpGraph)data.getVrpGraph()).setArcs(arcs);
     }
 
 
@@ -209,14 +209,14 @@ public class SingleIterOfflineDVRPLauncher
 
         if (vrpOutFiles) {
             optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VRPData data)
+                public JFreeChart createChart(VrpData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
             optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VRPData data)
+                public JFreeChart createChart(VrpData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);
                 }
@@ -230,7 +230,7 @@ public class SingleIterOfflineDVRPLauncher
     private void generateVrpOutput()
         throws IOException
     {
-        System.out.println(new TaxiEvaluator().evaluateVRP(data.getVrpData()).toString());
+        System.out.println(new TaxiEvaluator().evaluateVrp(data.getVrpData()).toString());
 
         if (vrpOutFiles) {
             List<Vehicle> vehicles = data.getVrpData().getVehicles();
@@ -247,7 +247,7 @@ public class SingleIterOfflineDVRPLauncher
             for (Vehicle v : vehicles) {
                 Person person = pf.createPerson(scenario.createId("vrpDriver_" + v.getId()));
 
-                VRPSchedulePlan plan = new VRPSchedulePlan(v, data);
+                VrpSchedulePlan plan = new VrpSchedulePlan(v, data);
 
                 person.addPlan(plan);
                 scenario.getPopulation().addPerson(person);
@@ -276,7 +276,7 @@ public class SingleIterOfflineDVRPLauncher
     public static void main(String... args)
         throws IOException
     {
-        new SingleIterOfflineDVRPLauncher().go();
+        new SingleIterOfflineDvrpLauncher().go();
     }
 
 
@@ -284,8 +284,8 @@ public class SingleIterOfflineDVRPLauncher
         throws IOException
     {
         processArgs();
-        prepareMATSimData();
-        initMATSimVRPData();
+        prepareMatsimData();
+        initMatsimVrpData();
         initOptimizerFactory();
         runSim();
         generateVrpOutput();
