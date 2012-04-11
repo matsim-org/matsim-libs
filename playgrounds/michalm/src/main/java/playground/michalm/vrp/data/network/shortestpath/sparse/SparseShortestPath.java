@@ -16,7 +16,7 @@ public class SparseShortestPath
     private final Link fromLink;
     private final Link toLink;
 
-    private SPEntry entries[] = null;// lazy initialization
+    private SPEntry[] entries = null;// lazy initialization
 
 
     public SparseShortestPath(SparseShortestPathFinder sspFinder, MATSimVertex fromVertex,

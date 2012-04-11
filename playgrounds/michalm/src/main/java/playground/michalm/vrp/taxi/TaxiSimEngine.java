@@ -4,7 +4,7 @@ import java.util.*;
 
 import javax.swing.SwingUtilities;
 
-import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 

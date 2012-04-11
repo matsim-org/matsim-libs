@@ -1,9 +1,8 @@
 package playground.michalm.util.otfvis;
 
-import java.util.*;
+import java.util.Arrays;
 
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.run.*;
 
 
 public class OTFVisSimLive

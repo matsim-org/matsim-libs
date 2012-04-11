@@ -1,21 +1,21 @@
 package playground.michalm.util.gis;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 
-import org.geotools.factory.*;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.*;
-import org.matsim.core.utils.geometry.geotools.*;
-import org.matsim.core.utils.geometry.transformations.*;
-import org.matsim.core.utils.gis.*;
-import org.opengis.referencing.crs.*;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.file.*;
+import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Point;
 
 
 // taken from org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape

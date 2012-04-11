@@ -1,8 +1,8 @@
 package playground.michalm.util.sim;
 
-import java.util.*;
+import java.util.Arrays;
 
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.Controler;
 
 
 public class SimLauncher
@@ -13,8 +13,10 @@ public class SimLauncher
         String cfgFileName;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\";
-            cfgFileName = "siec-config.xml";
+//            dirName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\";
+//          cfgFileName = "siec-config.xml";
+            dirName = "d:\\PP-rad\\taxi\\poznan\\";
+            cfgFileName = "poznan-config.xml";
         }
         else if (args.length == 2) {
             dirName = args[0];

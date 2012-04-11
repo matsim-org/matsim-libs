@@ -1,12 +1,12 @@
 package playground.michalm.demand;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 
-import org.geotools.data.*;
+import org.geotools.data.FeatureSource;
 import org.geotools.feature.*;
 import org.matsim.api.core.v01.*;
-import org.matsim.core.utils.gis.*;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 
 public class ZoneShpReader

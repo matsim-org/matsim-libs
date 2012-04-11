@@ -6,12 +6,12 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.*;
-import org.matsim.core.population.routes.*;
-import org.matsim.core.utils.misc.*;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.RouteUtils;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.MATSimVRPData;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
@@ -22,13 +22,13 @@ public class VRPSchedulePlan
 {
     private PopulationFactory populFactory;
     private Network network;
-    private ShortestPath[][] shortestPaths;
+    private MATSimVRPGraph vrpGraph;
 
     private Vehicle vehicle;
 
     private List<PlanElement> actsLegs;
     private List<PlanElement> unmodifiableActsLegs;
-    
+
     private Person person;
 
 
@@ -41,7 +41,7 @@ public class VRPSchedulePlan
 
         populFactory = data.getScenario().getPopulation().getFactory();
         network = data.getScenario().getNetwork();
-        shortestPaths = data.getVrpGraph().getShortestPaths();
+        vrpGraph = data.getVrpGraph();
 
         init();
     }
@@ -93,7 +93,7 @@ public class VRPSchedulePlan
     private void addLeg(MATSimVertex fromVertex, MATSimVertex toVertex, int departTime,
             int arrivalTime)
     {
-        ShortestPath sp = shortestPaths[fromVertex.getId()][toVertex.getId()];
+        ShortestPath sp = vrpGraph.getShortestPath(fromVertex, toVertex);
 
         Leg leg = populFactory.createLeg(TransportMode.car);
 

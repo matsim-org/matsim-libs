@@ -1,10 +1,10 @@
 package playground.michalm.vrp.data;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.utils.geometry.transformations.*;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import pl.poznan.put.vrp.dynamic.data.*;
-import playground.michalm.vrp.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.VRPData;
+import playground.michalm.vrp.data.network.MATSimVRPGraph;
 
 
 public class MATSimVRPData

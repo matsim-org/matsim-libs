@@ -1,14 +1,14 @@
 package playground.michalm.vrp.run.offline;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Arrays;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.*;
-import org.matsim.core.network.*;
-import org.matsim.core.population.*;
-import org.matsim.core.scenario.*;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 
 public class CombinePlansWithVRPSchedulePlans

@@ -3,8 +3,8 @@ package playground.michalm.demand;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.core.utils.io.*;
-import org.xml.sax.*;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
 
 import playground.michalm.demand.Zone.Act;
 import playground.michalm.demand.Zone.Group;

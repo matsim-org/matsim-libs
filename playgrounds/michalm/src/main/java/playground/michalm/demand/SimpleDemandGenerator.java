@@ -1,22 +1,22 @@
 package playground.michalm.demand;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 
-import javax.naming.*;
-import javax.xml.parsers.*;
+import javax.naming.ConfigurationException;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.*;
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.*;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
-import org.matsim.core.scenario.*;
-import org.xml.sax.*;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.xml.sax.SAXException;
 
-import cern.jet.random.*;
-import cern.jet.random.engine.*;
+import cern.jet.random.Uniform;
+import cern.jet.random.engine.MersenneTwister;
 
 
 public class SimpleDemandGenerator

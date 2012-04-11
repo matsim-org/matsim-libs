@@ -20,10 +20,10 @@
 
 package playground.taxicab;
 
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.basic.v01.*;
-import org.matsim.core.events.handler.*;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
  * @author nagel

@@ -1,9 +1,9 @@
 package playground.michalm.vrp.data.network;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
 public interface MATSimVertex

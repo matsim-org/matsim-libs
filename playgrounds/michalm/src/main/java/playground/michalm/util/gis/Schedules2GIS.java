@@ -2,17 +2,17 @@ package playground.michalm.util.gis;
 
 import java.util.*;
 
-import org.geotools.factory.*;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.*;
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.utils.geometry.geotools.*;
-import org.matsim.core.utils.gis.*;
-import org.opengis.referencing.crs.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.MATSimVRPData;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 import com.vividsolutions.jts.geom.*;
@@ -72,8 +72,9 @@ public class Schedules2GIS
 
     private LineString createLineString(DriveTask driveTask)
     {
-        SPEntry entry = data.getVrpGraph().getShortestPaths()[driveTask.getFromVertex().getId()][driveTask
-                .getToVertex().getId()].getSPEntry(driveTask.getBeginTime());
+        SPEntry entry = data.getVrpGraph()
+                .getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
+                .getSPEntry(driveTask.getBeginTime());
 
         Id[] ids = entry.linkIds;
 

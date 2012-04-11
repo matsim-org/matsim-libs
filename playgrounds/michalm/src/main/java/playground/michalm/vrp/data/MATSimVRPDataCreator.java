@@ -1,6 +1,6 @@
 package playground.michalm.vrp.data;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.VRPData.VRPType;
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.*;
 
 
@@ -30,7 +31,7 @@ public class MATSimVRPDataCreator
         MATSimVertexBuilder vertexBuilder = MATSimVertexImpl.createFromLinkIdBuilder(scenario
                 .getNetwork());
 
-        MATSimVRPGraph graph = new MATSimVRPGraph(vertexCount);
+        VRPGraph graph = new FixedSizeMatsimVrpGraph(vertexCount);
         vrpData.setVrpGraph(graph);
 
         // build vertices for all links...

@@ -1,6 +1,6 @@
 package playground.michalm.dynamic;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 
 
 public interface DynLeg

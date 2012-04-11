@@ -1,7 +1,7 @@
 package playground.michalm.vrp.taxi.taxicab;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import playground.michalm.dynamic.*;
+import playground.michalm.dynamic.DynActivity;
 
 
 class TaxiTaskActivity

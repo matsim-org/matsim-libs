@@ -2,8 +2,8 @@ package playground.michalm.demand;
 
 import java.util.*;
 
-import cern.jet.random.*;
-import cern.jet.random.engine.*;
+import cern.jet.random.Uniform;
+import cern.jet.random.engine.MersenneTwister;
 
 
 public class Distribution<T>

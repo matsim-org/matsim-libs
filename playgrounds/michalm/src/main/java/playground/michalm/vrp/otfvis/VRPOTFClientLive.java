@@ -27,29 +27,18 @@ import javax.swing.SwingUtilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
-import org.matsim.lanes.otfvis.io.OTFLaneReader;
-import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.lanes.otfvis.io.*;
 import org.matsim.pt.otfvis.FacilityDrawer;
-import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
-import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
-import org.matsim.vis.otfvis.OTFClient;
-import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.signalsystems.otfvis.io.*;
+import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
-import org.matsim.vis.otfvis.data.OTFClientQuadTree;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuadTree;
+import org.matsim.vis.otfvis.data.*;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
-import org.matsim.vis.otfvis.gui.OTFHostControlBar;
-import org.matsim.vis.otfvis.gui.OTFQueryControl;
-import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
+import org.matsim.vis.otfvis.gui.*;
+import org.matsim.vis.otfvis.handler.*;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
+import org.matsim.vis.otfvis.opengl.layer.*;
 
 
 public class VRPOTFClientLive

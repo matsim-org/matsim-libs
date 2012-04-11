@@ -1,7 +1,7 @@
 package playground.michalm.vrp.data.network.router;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.api.experimental.events.*;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
 import org.matsim.core.trafficmonitoring.*;
 

@@ -1,8 +1,8 @@
 package playground.michalm.demand;
 
-import java.util.*;
+import java.util.EnumMap;
 
-import org.geotools.feature.*;
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.*;
 
 

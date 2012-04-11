@@ -1,21 +1,21 @@
 package playground.michalm.vrp.data.network.shortestpath.full;
 
 import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.zip.*;
+import java.lang.reflect.Array;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-import pl.poznan.put.util.*;
+import pl.poznan.put.util.TypedStringTokenizer;
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.MATSimVRPData;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.data.network.router.TimeAsTravelCost;
 import playground.michalm.vrp.data.network.shortestpath.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
@@ -26,8 +26,9 @@ public class FullShortestPathsFinder
 
     private MATSimVRPData data;
 
-    public final int travelTimeBinSize;// in seconds
-    public final int numSlots;
+    final int TIME_BIN_SIZE;// in seconds
+    final int NUM_SLOTS;
+    final boolean CYCLIC = true;
 
 
     // public
@@ -35,20 +36,20 @@ public class FullShortestPathsFinder
     public FullShortestPathsFinder(MATSimVRPData data)
     {
         this.data = data;
-        travelTimeBinSize = 15 * 60;// 15 minutes
-        numSlots = 24 * 4;// 24 hours split into quarters
+        TIME_BIN_SIZE = 15 * 60;// 15 minutes
+        NUM_SLOTS = 24 * 4;// 24 hours split into quarters
     }
 
 
     public FullShortestPathsFinder(MATSimVRPData data, int travelTimeBinSize, int numSlots)
     {
         this.data = data;
-        this.travelTimeBinSize = travelTimeBinSize;
-        this.numSlots = numSlots;
+        this.TIME_BIN_SIZE = travelTimeBinSize;
+        this.NUM_SLOTS = numSlots;
     }
 
 
-    public void findShortestPaths(TravelTime travelTime,
+    public FullShortestPath[][] findShortestPaths(TravelTime travelTime,
             LeastCostPathCalculatorFactory leastCostPathCalculatorFactory)
     {
         log.info("findShortestPaths(Controler) ==== STARTED ====");
@@ -69,7 +70,6 @@ public class FullShortestPathsFinder
 
         FullShortestPath[][] shortestPaths = (FullShortestPath[][])Array.newInstance(
                 FullShortestPath.class, n, n);
-        graph.setShortestPaths(shortestPaths);
 
         List<Vertex> vertices = graph.getVertices();
 
@@ -83,14 +83,14 @@ public class FullShortestPathsFinder
             for (Vertex b : vertices) {
                 MATSimVertex vB = (MATSimVertex)b;
 
-                FullShortestPath sPath_AB = new FullShortestPath(numSlots, travelTimeBinSize, true);
+                FullShortestPath sPath_AB = new FullShortestPath(NUM_SLOTS, TIME_BIN_SIZE, true);
                 sPath_A[vB.getId()] = sPath_AB;
 
                 Link toLink = vB.getLink();
 
                 if (fromLink != toLink) {
-                    for (int k = 0; k < numSlots; k++) {
-                        int departTime = k * travelTimeBinSize;// + travelTimeBinSize/2 TODO
+                    for (int k = 0; k < NUM_SLOTS; k++) {
+                        int departTime = k * TIME_BIN_SIZE;// + travelTimeBinSize/2 TODO
                         Path path = router.calcLeastCostPath(fromLink.getToNode(),
                                 toLink.getFromNode(), departTime);
 
@@ -122,7 +122,7 @@ public class FullShortestPathsFinder
                     }
                 }
                 else {
-                    for (int k = 0; k < numSlots; k++) {
+                    for (int k = 0; k < NUM_SLOTS; k++) {
                         sPath_AB.entries[k] = ShortestPath.ZERO_PATH_ENTRY;
                     }
                 }
@@ -131,10 +131,13 @@ public class FullShortestPathsFinder
 
         log.info("findShortestPaths(Controler) ==== FINISHED ====");
         // Check out "NetworkLegRouter" what one can make with Paths in order to build Routes
+
+        return shortestPaths;
     }
 
 
-    public void writeShortestPaths(String timesFileName, String costsFileName, String pathsFileName)
+    public void writeShortestPaths(FullShortestPath[][] shortestPaths, String timesFileName,
+            String costsFileName, String pathsFileName)
         throws IOException
     {
         log.info("writeShortestPaths() ==== STARTED ====");
@@ -145,8 +148,6 @@ public class FullShortestPathsFinder
 
         MATSimVRPGraph graph = data.getVrpGraph();
         int n = graph.getVertexCount();
-
-        FullShortestPath[][] shortestPaths = (FullShortestPath[][])graph.getShortestPaths();
 
         for (int i = 0; i < n; i++) {
             FullShortestPath[] sPath_i = shortestPaths[i];
@@ -159,7 +160,7 @@ public class FullShortestPathsFinder
 
                 SPEntry[] entries = sPath_ij.entries;
 
-                for (int k = 0; k < numSlots; k++) {
+                for (int k = 0; k < NUM_SLOTS; k++) {
                     SPEntry entry = entries[k];
                     timesBW.write(entry.travelTime + "\t");
                     costsBW.write(entry.travelCost + "\t");
@@ -204,7 +205,8 @@ public class FullShortestPathsFinder
     }
 
 
-    public void readShortestPaths(String timesFileName, String costsFileName, String pathsFileName)
+    public FullShortestPath[][] readShortestPaths(String timesFileName, String costsFileName,
+            String pathsFileName)
         throws IOException
     {
         log.info("readShortestPaths() ==== STARTED ====");
@@ -215,7 +217,6 @@ public class FullShortestPathsFinder
 
         FullShortestPath[][] shortestPaths = (FullShortestPath[][])Array.newInstance(
                 FullShortestPath.class, n, n);
-        graph.setShortestPaths(shortestPaths);
 
         BufferedReader timesBR = getReader(new File(timesFileName));
         BufferedReader costsBR = getReader(new File(costsFileName));
@@ -237,12 +238,12 @@ public class FullShortestPathsFinder
                     pathsTST.nextToken();// line beginning
                 }
 
-                FullShortestPath sPath_ij = new FullShortestPath(numSlots, travelTimeBinSize, true);
+                FullShortestPath sPath_ij = new FullShortestPath(NUM_SLOTS, TIME_BIN_SIZE, true);
                 sPath_i[j] = sPath_ij;
 
                 SPEntry[] entries = sPath_ij.entries;
 
-                for (int k = 0; k < numSlots; k++) {
+                for (int k = 0; k < NUM_SLOTS; k++) {
                     double travelTime = timesTST.nextDouble();
                     double travelCost = costsTST.nextDouble();
                     Id[] linkIds = null;
@@ -276,42 +277,28 @@ public class FullShortestPathsFinder
         }
 
         log.info("readShortestPaths() ==== FINISHED ====");
+        return shortestPaths;
     }
 
 
     /**
      * Updates travel times and costs
      */
-    public void upadateVRPArcTimesAndCosts()
+    public void upadateVRPArcs(FullShortestPath[][] shortestPaths)
     {
-        log.info("upadateVRPArcTimesAndCosts() ==== STARTED ====");
-        MATSimVRPGraph graph = data.getVrpGraph();
+        log.info("upadateVRPArcs() ==== STARTED ====");
+        FixedSizeVRPGraph graph = (FixedSizeVRPGraph)data.getVrpGraph();
         List<Vertex> vertices = graph.getVertices();
 
-        ShortestPath[][] shortestPaths = graph.getShortestPaths();
-
         for (Vertex vA : vertices) {
-            ShortestPath[] sPath_i = shortestPaths[vA.getId()];
+            FullShortestPath[] sPath_i = shortestPaths[vA.getId()];
 
             for (Vertex vB : vertices) {
-                FullShortestPath sPath_ij = (FullShortestPath)sPath_i[vB.getId()];
-                SPEntry[] entries = sPath_ij.entries;
-
-                int[] timesOnDeparture = new int[numSlots];
-                double[] costsOnDeparture = new double[numSlots];
-
-                for (int k = 0; k < numSlots; k++) {
-                    timesOnDeparture[k] = entries[k].travelTime;
-                    costsOnDeparture[k] = entries[k].travelCost;
-                }
-
-                graph.setArcTime(vA, vB, new InterpolatedArcTime(timesOnDeparture,
-                        travelTimeBinSize, true));
-                graph.setArcCost(vA, vB, new InterpolatedArcCost(costsOnDeparture,
-                        travelTimeBinSize, true));
+                graph.setArc(vA, vB,
+                        FullShortestPathArc.createArc(sPath_i[vB.getId()], TIME_BIN_SIZE, true));
             }
         }
 
-        log.info("upadateVRPArcTimesAndCosts() ==== FINISHED ====");
+        log.info("upadateVRPArcs() ==== FINISHED ====");
     }
 }

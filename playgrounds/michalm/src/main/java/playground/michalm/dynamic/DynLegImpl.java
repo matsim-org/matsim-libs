@@ -1,9 +1,9 @@
 package playground.michalm.dynamic;
 
-import java.util.*;
+import java.util.Iterator;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.population.routes.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.population.routes.NetworkRoute;
 
 
 public class DynLegImpl

@@ -22,10 +22,10 @@
  */
 package playground.michalm.vrp.otfvis;
 
-import java.awt.*;
+import java.awt.Color;
 
-import org.matsim.vis.otfvis.opengl.drawer.*;
-import org.matsim.vis.otfvis.opengl.layer.*;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.snapshotwriters.*;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 

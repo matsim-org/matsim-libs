@@ -13,8 +13,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import playground.michalm.vrp.data.MATSimVRPData;
 import playground.michalm.vrp.data.model.DynVehicle;
-import playground.michalm.vrp.data.network.MATSimVertex;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 import cern.colt.Arrays;
 
@@ -25,7 +24,7 @@ public class JDBCWriter
             + "DBQ=d:\\PP-rad\\taxi\\poznan\\baza_vrp.mdb;DriverID=22;READONLY=false";
 
     private VRPData data;
-    private ShortestPath[][] shortestPaths;
+    private MATSimVRPGraph vrpGraph;
 
     private Connection con;
 
@@ -51,7 +50,7 @@ public class JDBCWriter
     public JDBCWriter(MATSimVRPData matsimData)
     {
         this.data = matsimData.getVrpData();
-        shortestPaths = matsimData.getVrpGraph().getShortestPaths();
+        vrpGraph = matsimData.getVrpGraph();
 
         try {
             con = DriverManager.getConnection(dbUrl, "", "");
@@ -215,8 +214,8 @@ public class JDBCWriter
                             driveTaskInsert.setInt(7, dt.getFromVertex().getId());
                             driveTaskInsert.setInt(8, dt.getToVertex().getId());
 
-                            SPEntry path = shortestPaths[dt.getFromVertex().getId()][dt
-                                    .getToVertex().getId()].getSPEntry(dt.getBeginTime());
+                            SPEntry path = vrpGraph.getShortestPath(dt.getFromVertex(),
+                                    dt.getToVertex()).getSPEntry(dt.getBeginTime());
                             driveTaskInsert.setString(9, Arrays.toString(path.linkIds));
 
                             break;
@@ -347,8 +346,8 @@ public class JDBCWriter
                             driveTaskInsert.setInt(7, dt.getFromVertex().getId());
                             driveTaskInsert.setInt(8, dt.getToVertex().getId());
 
-                            SPEntry path = shortestPaths[dt.getFromVertex().getId()][dt
-                                    .getToVertex().getId()].getSPEntry(dt.getBeginTime());
+                            SPEntry path = vrpGraph.getShortestPath(dt.getFromVertex(),
+                                    dt.getToVertex()).getSPEntry(dt.getBeginTime());
                             driveTaskInsert.setString(9, Arrays.toString(path.linkIds));
 
                             break;

@@ -3,32 +3,32 @@ package playground.michalm.vrp.run.offline;
 import java.io.*;
 import java.util.*;
 
-import org.jfree.chart.*;
-import org.matsim.api.core.v01.*;
+import org.jfree.chart.JFreeChart;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.*;
-import org.matsim.core.network.*;
-import org.matsim.core.scenario.*;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
-import pl.poznan.put.vrp.cvrp.data.*;
-import pl.poznan.put.vrp.dynamic.*;
+import pl.poznan.put.vrp.cvrp.data.AlgorithmParams;
+import pl.poznan.put.vrp.dynamic.DebugPrint;
 import pl.poznan.put.vrp.dynamic.chart.*;
-import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.file.*;
+import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.optimizer.*;
+import pl.poznan.put.vrp.dynamic.optimizer.VRPOptimizer;
 import pl.poznan.put.vrp.dynamic.optimizer.evaluation.*;
-import pl.poznan.put.vrp.dynamic.optimizer.evolutionary.*;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
-import pl.poznan.put.vrp.dynamic.simulator.*;
-import playground.michalm.util.gis.*;
-import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
+import pl.poznan.put.vrp.dynamic.optimizer.evolutionary.EvolutionaryVRPOptimizer;
+import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
+import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
+import playground.michalm.util.gis.Schedules2GIS;
+import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.network.MATSimVertexImpl;
 import playground.michalm.vrp.data.network.shortestpath.full.*;
-import playground.michalm.vrp.driver.*;
+import playground.michalm.vrp.driver.VRPSchedulePlan;
 
 
 public class OfflineDVRPLauncher
@@ -127,30 +127,27 @@ public class OfflineDVRPLauncher
         MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
 
         FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
+        FullShortestPath[][] shortestPaths = null;
 
         if (VRP_OUT_FILES) {
-            spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
+            shortestPaths = spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName,
+                    vrpArcPathsFileName);
         }
         else {
-            spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, null);
+            shortestPaths = spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, null);
         }
 
-        spf.upadateVRPArcTimesAndCosts();
+        spf.upadateVRPArcs(shortestPaths);
 
         // ================================================== BELOW: only for comparison reasons...
 
-        VRPGraph graph = vrpData.getVrpGraph();
+        FixedSizeVRPGraph graph = (FixedSizeVRPGraph)vrpData.getVrpGraph();
 
-        InterpolatedArcCost[][] simulatedArcCosts = null;
-        InterpolatedArcTime[][] simulatedArcTimes = null;
+        InterpolatedArc[][] simulatedArcs = null;
 
         if (AVG_TRAFFIC_MODE) {
-            simulatedArcCosts = (InterpolatedArcCost[][])graph.getArcCosts();
-            simulatedArcTimes = (InterpolatedArcTime[][])graph.getArcTimes();
-
-            graph.setArcCosts(ConstantArcCost.averageInterpolatedArcCosts(simulatedArcCosts));
-            graph.setArcTimes(ConstantArcTime.averageInterpolatedArcTimes(simulatedArcTimes));
-
+            simulatedArcs = (InterpolatedArc[][])graph.getArcs();
+            graph.setArcs(ConstantArc.createArcs(simulatedArcs));
             System.err.println("RUNNING WITH AVERAGED ArcTimes/Costs");
         }
 
@@ -219,8 +216,7 @@ public class OfflineDVRPLauncher
         // ================================================== BELOW: only for comparison reasons...
 
         if (AVG_TRAFFIC_MODE) {
-            graph.setArcCosts(simulatedArcCosts);
-            graph.setArcTimes(simulatedArcTimes);
+            graph.setArcs(simulatedArcs);
 
             new ScheduleUpdater(vrpData).updateSchedule();
             VRPEvaluation eval = new VRPEvaluator().evaluateVRP(vrpData);

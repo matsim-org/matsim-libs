@@ -30,6 +30,7 @@ import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VRPData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVRPGraph;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.AlgorithmType;
@@ -37,7 +38,7 @@ import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
-import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathFinder;
+import playground.michalm.vrp.data.network.shortestpath.sparse.*;
 import playground.michalm.vrp.otfvis.VRPOTFClientLive;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
@@ -138,8 +139,8 @@ public class SingleIterOnlineDVRPLauncher
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
 
         SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
-        sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
-        sspf.upadateVRPArcTimesAndCosts();
+        SparseShortestPathArc[][] arcs = sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
+        ((FixedSizeVRPGraph)data.getVrpGraph()).setArcs(arcs);
     }
 
 
@@ -183,7 +184,8 @@ public class SingleIterOnlineDVRPLauncher
 
         EventsManager events = EventsUtils.createEventsManager();
 
-        QSim sim = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
+        QSim sim = QSim.createQSimWithDefaultEngines(scenario, events,
+                new DefaultQSimEngineFactory());
 
         TaxiSimEngine taxiSimEngine = new TaxiSimEngine(sim, data, optimizerFactory);
         sim.addMobsimEngine(taxiSimEngine);

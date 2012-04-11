@@ -22,7 +22,7 @@ package playground.taxicab ;
 import org.matsim.core.config.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.*;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.Controler;
 
 public class EquilTest {
 

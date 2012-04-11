@@ -16,10 +16,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.xml.sax.SAXException;
 
-import com.vividsolutions.jts.geom.*;
-
 import cern.jet.random.Uniform;
 import cern.jet.random.engine.MersenneTwister;
+
+import com.vividsolutions.jts.geom.*;
 
 
 public class AbstractDemandGenerator

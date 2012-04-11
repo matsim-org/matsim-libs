@@ -2,9 +2,9 @@ package playground.michalm.vrp.data.network;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkImpl;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.VertexBuilder;
 
 
 public class MATSimVertexImpl

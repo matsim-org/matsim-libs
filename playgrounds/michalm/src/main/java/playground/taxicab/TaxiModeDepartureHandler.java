@@ -20,9 +20,9 @@
 
 package playground.taxicab;
 
-import org.apache.log4j.*;
-import org.matsim.api.core.v01.*;
-import org.matsim.core.mobsim.framework.*;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 
 /**

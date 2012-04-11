@@ -10,8 +10,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.model.TaxiCustomer;
-import playground.michalm.vrp.data.network.MATSimVertex;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
 
@@ -20,7 +19,7 @@ public class TaxiAgentLogic
     implements DynAgentLogic
 {
     private TaxiSimEngine taxiSimEngine;
-    private ShortestPath[][] shortestPaths;
+    private MATSimVRPGraph vrpGraph;
 
     private Vehicle vrpVehicle;
     private DynAgent agent;
@@ -28,11 +27,10 @@ public class TaxiAgentLogic
     private Request currentRequest;
 
 
-    public TaxiAgentLogic(Vehicle vrpVehicle, ShortestPath[][] shortestPaths,
-            TaxiSimEngine taxiSimEngine)
+    public TaxiAgentLogic(Vehicle vrpVehicle, MATSimVRPGraph vrpGraph, TaxiSimEngine taxiSimEngine)
     {
         this.vrpVehicle = vrpVehicle;
-        this.shortestPaths = shortestPaths;
+        this.vrpGraph = vrpGraph;
         this.taxiSimEngine = taxiSimEngine;
     }
 
@@ -216,8 +214,8 @@ public class TaxiAgentLogic
     private TaxiLeg createLegWithPassenger(DriveTask driveTask, int realDepartTime,
             final Request request)
     {
-        SPEntry path = shortestPaths[driveTask.getFromVertex().getId()][driveTask.getToVertex()
-                .getId()].getSPEntry(realDepartTime);
+        SPEntry path = vrpGraph.getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
+                .getSPEntry(realDepartTime);
 
         Id destinationLinkId = ((MATSimVertex)driveTask.getToVertex()).getLink().getId();
 
@@ -244,8 +242,8 @@ public class TaxiAgentLogic
 
     private TaxiLeg createLeg(DriveTask driveTask, int realDepartTime)
     {
-        SPEntry path = shortestPaths[driveTask.getFromVertex().getId()][driveTask.getToVertex()
-                .getId()].getSPEntry(realDepartTime);
+        SPEntry path = vrpGraph.getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
+                .getSPEntry(realDepartTime);
 
         Id destinationLinkId = ((MATSimVertex)driveTask.getToVertex()).getLink().getId();
 

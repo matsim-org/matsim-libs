@@ -1,15 +1,15 @@
 package playground.michalm.vrp.run.offline;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Arrays;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.controler.*;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.Controler;
 
-import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.file.*;
-import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.VRPData;
+import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
+import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.network.MATSimVertexImpl;
 import playground.michalm.vrp.data.network.shortestpath.full.*;
 
 
@@ -75,8 +75,9 @@ public class SimLauncherWithArcEstimator
         MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
 
         FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
-        spf.findShortestPaths(controler.getTravelTimeCalculator(),
-                controler.getLeastCostPathCalculatorFactory());
-        spf.writeShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
+        FullShortestPath[][] shortestPaths = spf.findShortestPaths(
+                controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+        spf.writeShortestPaths(shortestPaths, vrpArcTimesFileName, vrpArcCostsFileName,
+                vrpArcPathsFileName);
     }
 }

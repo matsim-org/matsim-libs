@@ -1,10 +1,10 @@
 package playground.michalm.vrp.driver;
 
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Plan;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import playground.michalm.dynamic.*;
-import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.MATSimVRPData;
 
 
 public class VRPSchedulePlanFactory

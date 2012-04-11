@@ -3,36 +3,37 @@ package playground.michalm.vrp.run.online;
 import java.io.*;
 import java.util.*;
 
-import org.jfree.chart.*;
-import org.matsim.api.core.v01.*;
+import org.jfree.chart.JFreeChart;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.*;
-import org.matsim.core.network.*;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.*;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.util.*;
-import org.matsim.core.scenario.*;
-import org.matsim.core.trafficmonitoring.*;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
-import pl.poznan.put.vrp.dynamic.data.*;
+import pl.poznan.put.vrp.dynamic.data.VRPData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
+import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVRPGraph;
+import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.*;
-import pl.poznan.put.vrp.dynamic.simulator.*;
-import pl.poznan.put.vrp.dynamic.simulator.customer.*;
-import playground.michalm.util.gis.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.AlgorithmType;
+import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
+import pl.poznan.put.vrp.dynamic.simulator.customer.CustomerAction;
+import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.file.*;
+import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
 import playground.michalm.vrp.data.network.shortestpath.sparse.*;
-import playground.michalm.vrp.driver.*;
+import playground.michalm.vrp.driver.VRPSchedulePlan;
 
 
 public class SingleIterOfflineDVRPLauncher
@@ -65,12 +66,12 @@ public class SingleIterOfflineDVRPLauncher
         plansFileName = dirName + "plans.xml";
         depotsFileName = dirName + "depots.xml";
         reqIdToVehIdFileName = dirName + "reqIdToVehId";
-        
+
         travelTimesFromEvents = true;
         eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
 
         algorithmType = AlgorithmType.NO_RE_ASSIGNMENT;
-        //algorithmType = AlgorithmType.RE_ASSIGNMENT;
+        // algorithmType = AlgorithmType.RE_ASSIGNMENT;
 
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "\\vrp_output";
@@ -164,8 +165,8 @@ public class SingleIterOfflineDVRPLauncher
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
 
         SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
-        sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
-        sspf.upadateVRPArcTimesAndCosts();
+        SparseShortestPathArc[][] arcs = sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
+        ((FixedSizeVRPGraph)data.getVrpGraph()).setArcs(arcs);
     }
 
 

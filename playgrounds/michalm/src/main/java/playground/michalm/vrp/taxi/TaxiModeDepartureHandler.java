@@ -1,14 +1,14 @@
 package playground.michalm.vrp.taxi;
 
-import java.util.*;
+import java.util.List;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.mobsim.framework.*;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.model.*;
+import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.model.TaxiCustomer;
 import playground.michalm.vrp.data.network.*;
 
 

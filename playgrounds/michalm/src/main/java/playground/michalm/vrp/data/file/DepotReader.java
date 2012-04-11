@@ -3,15 +3,15 @@ package playground.michalm.vrp.data.file;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.core.utils.io.*;
-import org.xml.sax.*;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
 
-import pl.poznan.put.vrp.dynamic.data.*;
+import pl.poznan.put.vrp.dynamic.data.VRPData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.*;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import playground.michalm.vrp.data.MATSimVRPData;
 import playground.michalm.vrp.data.model.DynVehicle;
-import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.MATSimVRPGraph;
 
 
 public class DepotReader

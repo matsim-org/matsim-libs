@@ -1,13 +1,13 @@
 package playground.michalm.util.gis;
 
-import java.util.*;
+import java.util.Arrays;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.config.*;
-import org.matsim.core.network.*;
-import org.matsim.core.scenario.*;
-import org.matsim.core.utils.geometry.transformations.*;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.network.*;
 
 
@@ -22,7 +22,7 @@ public class Net2GIS
         String outFileNameN;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "D:\\PP-rad\\taxi\\mielec\\";
+            dirName = "D:\\PP-rad\\taxi\\poznan\\";
             netFileName = dirName + "network.xml";
             outFileNameLs = dirName + "linksLs.shp";
             outFileNameP = dirName + "linksP.shp";
