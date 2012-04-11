@@ -21,18 +21,19 @@ package playground.anhorni.surprice.preprocess.rwscenario;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.ActivityImpl;
 
 public class PersonWeeks {	
 	private Person person;
 	private ArrayList<TreeMap<Integer, Plan>> days = new ArrayList<TreeMap<Integer, Plan>>();
 	private int currentWeek = - 1;
-	
-	private final static Logger log = Logger.getLogger(PersonWeeks.class);
-	
+	private boolean isWorker = false;
+	private double pweight = 1.0;
+		
 	public PersonWeeks() {
 		for (int i = 0; i < 7; i++) {
 			this.days.add(i, new TreeMap<Integer, Plan>());
@@ -52,10 +53,37 @@ public class PersonWeeks {
 	}
 	
 	public void addDay(int dow, Plan plan) {
-		if (this.currentWeek < 7) this.days.get(this.currentWeek).put(dow - 1, plan);
+		if (this.currentWeek < 7) {
+			this.days.get(this.currentWeek).put(dow - 1, plan);
+			if (this.isWorker(plan)) {
+				this.isWorker = true; // do not reset isWorker for plans without 
+			}
+		}
 	}
-
+		
+	private boolean isWorker(Plan plan) {
+		boolean worker = false;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				ActivityImpl act = (ActivityImpl)pe;				
+				if (act.getType().startsWith("w")) {
+					worker = true;
+				}
+			}
+		}
+		return worker;
+	}
+	
 	public Person getPerson() {
 		return this.person;
+	}
+	public boolean isWorker() {
+		return isWorker;
+	}
+	public double getPweight() {
+		return pweight;
+	}
+	public void setPweight(double pweight) {
+		this.pweight = pweight;
 	}
 }

@@ -59,45 +59,39 @@ public class ConvertThurgau2Plans {
 	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	private final String inputfileF3;
-	private final String inputfileF2;
-	private final String outputfile;
+	private String inputfileF3;
+	private String inputfileF2;
+	private String outputfile;
 	
 	private TreeMap<Id, PersonWeeks> personWeeks = new TreeMap<Id, PersonWeeks>();
 	
 	private final static Logger log = Logger.getLogger(ConvertThurgau2Plans.class);
 	
 	public static void main(final String[] args) {		
-		if (args.length != 0) {
+		if (args.length != 3) {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
 		}
 		
+		ConvertThurgau2Plans creator = new ConvertThurgau2Plans();
+		creator.run(args[0], args[1], args[2]);
+	}
+			
+	// ------------------------------------------------------------------------------------------------
+	
+	public void run(String inputfileF2, String inputfileF3, String outputfile) {
 		// hard-coded for the moment
-		String inputF2 = "C:/l/studies/surprice/thurgau_2003_public_F2.dat";
-		String inputF3 = "C:/l/studies/surprice/thurgau_2003_public_F3.dat";
-		String output = "C:/l/studies/surprice/plansThurgau.xml";
-		
-		//ConvertThurgau2Plans scenarioCreator = new ConvertThurgau2Plans(args[0], args[1], args[2]);	
-		ConvertThurgau2Plans scenarioCreator = new ConvertThurgau2Plans(inputF2, inputF3, output);
-		
+		this.inputfileF2 = inputfileF2; // "C:/l/studies/surprice/thurgau_2003_public_F2.dat";
+		this.inputfileF3 = inputfileF3; // "C:/l/studies/surprice/thurgau_2003_public_F3.dat";
+		this.outputfile = outputfile; // "C:/l/studies/surprice/plansThurgau.xml";
+				
 		try {
-			scenarioCreator.run();
+			this.convert();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}		
 		log.info("Scenario creation finished \n ----------------------------------------------------");
 	}
-	
-	// ------------------------------------------------------------------------------------------------
-
-	public ConvertThurgau2Plans(final String inputfileF2, final String inputfileF3, final String outputfile) {
-		this.inputfileF2 = inputfileF2;
-		this.inputfileF3 = inputfileF3;
-		this.outputfile = outputfile;
-	}
-	
-	// ------------------------------------------------------------------------------------------------
 
 	private void addPlans(final Map<Id, String> person_strings) {		
 		for (Id pid : person_strings.keySet()) {
@@ -127,6 +121,12 @@ public class ConvertThurgau2Plans {
 							this.personWeeks.put(pid, new PersonWeeks());
 						}
 						this.personWeeks.get(pid).increaseWeek();
+						
+						// micro census 2000 person weight
+						double pweight = Double.parseDouble(entrs[89].trim());						
+						// micro census 2000 trip weight
+						// double tweight = Double.parseDouble(entrs[90].trim());
+						this.personWeeks.get(pid).setPweight(pweight);
 					}
 					this.personWeeks.get(pid).addDay(dow, plan);
 					week_prev = week;
@@ -214,18 +214,12 @@ public class ConvertThurgau2Plans {
 		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(pid);
 		person.createAndAddPlan(true);
 		Plan plan = person.getSelectedPlan();
-				
-		// micro census 2000 person weight
-		double pweight = Double.parseDouble(entrs[89].trim());
-		
-		// micro census 2000 trip weight
-		// double tweight = Double.parseDouble(entrs[90].trim());
-		
-		plan.setScore(pweight + dow * 100); // used plans score as a storage for the person weight of the MZ2000
+						
+		plan.setScore(dow * 100.0); // used plans score as a storage for the person weight of the MZ2000
 		return plan;
 	}
 
-	public void run() throws Exception {
+	public void convert() throws Exception {
 		
 		Population population = this.scenario.getPopulation();
 		
@@ -499,5 +493,9 @@ public class ConvertThurgau2Plans {
 				}
 			}
 		}
+	}
+
+	public TreeMap<Id, PersonWeeks> getPersonWeeks() {
+		return personWeeks;
 	}
 }
