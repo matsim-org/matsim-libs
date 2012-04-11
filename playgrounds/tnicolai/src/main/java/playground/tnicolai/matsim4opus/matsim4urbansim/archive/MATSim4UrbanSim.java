@@ -52,7 +52,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.FileCopy;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.misc.DateUtil;
 
 
@@ -115,7 +115,7 @@ public class MATSim4UrbanSim {
 		cleanNetwork(network);
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
+		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -159,8 +159,8 @@ public class MATSim4UrbanSim {
 	 * @param parcels
 	 * @param zones
 	 */
-	void readUrbansimParcelModel(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl zones){
-		readFromUrbansim.readFacilities(parcels, zones);
+	void readUrbansimParcelModel(ReadFromUrbanSimModel readFromUrbansim, ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl zones){
+		readFromUrbansim.readFacilitiesParcel(parcels, zones);
 	}
 	
 	/**
@@ -171,7 +171,7 @@ public class MATSim4UrbanSim {
 	 * @param network
 	 * @return
 	 */
-	Population readUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl parcels, Network network){
+	Population readUrbansimPersons(ReadFromUrbanSimModel readFromUrbansim, ActivityFacilitiesImpl parcels, Network network){
 		// read urbansim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
@@ -195,7 +195,7 @@ public class MATSim4UrbanSim {
 		}
 
 		// read urbansim persons.  Generates hwh acts as side effect
-		Population newPopulation = readFromUrbansim.readPersons( oldPopulation, parcels, network, Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE)) ) ;
+		Population newPopulation = readFromUrbansim.readPersonsParcel( oldPopulation, parcels, network, Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE)) ) ;
 		
 		// clean
 		oldPopulation=null;
@@ -206,11 +206,11 @@ public class MATSim4UrbanSim {
 	
 	/**
 	 * Reads in the job table from urbansim that contains for every "job_id" the corresponded "parcel_id_work" and "zone_id_work"
-	 * and returns an HashMap with the number of job for each zone.
+	 * and returns an HashMap with the number of jobs for each zone.
 	 * 
 	 * @return HashMap
 	 */
-	Map<Id,CounterObject> ReadUrbansimJobs(ReadFromUrbansimParcelModel readFromUrbansim){
+	Map<Id,CounterObject> ReadUrbansimJobs(ReadFromUrbanSimModel readFromUrbansim){
 		return readFromUrbansim.readZoneBasedWorkplaces();
 	}
 	
@@ -219,7 +219,7 @@ public class MATSim4UrbanSim {
 	 * @param zones
 	 */
 	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Map<Id,CounterObject> numberOfWorkplacesPerZone, 
-			ReadFromUrbansimParcelModel readFromUrbansim){
+			ReadFromUrbanSimModel readFromUrbansim){
 		
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
@@ -228,7 +228,7 @@ public class MATSim4UrbanSim {
 		// The following lines register what should be done _after_ the iterations were run:
 //		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, parcels) ); 	// creates zone2zone impedance matrix
 		controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				// creates zone based table of log sums (workplce accessibility)
-																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., (NetworkImpl) scenario.getNetwork()), 
+																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., (NetworkImpl) scenario.getNetwork(), true), 
 																					benchmark));
 		
 		// tnicolai todo?: count number of cars per h on a link

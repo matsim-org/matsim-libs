@@ -28,7 +28,7 @@ import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorT
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 
 public class AccessibilityTest extends MatsimTestCase{
 	
@@ -207,7 +207,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		
 		log.info("Creating workplaces ...");
 		
-		ReadFromUrbansimParcelModel dummyUrbanSimPracelModel = new ReadFromUrbansimParcelModel(2000);
+		ReadFromUrbanSimModel dummyUrbanSimPracelModel = new ReadFromUrbanSimModel(2000);
 		
 		// create dummy jobs
 		Id zoneID = new IdImpl(1);

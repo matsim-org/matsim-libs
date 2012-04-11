@@ -29,15 +29,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
-import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimZoneModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -71,13 +69,10 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	
 	// TODO:
 	// 1) Check Population Sampling --> seems to be ok! 
-	// 2) Distribution of Population (Verteilung ungleichmaessig)!!!
+	// 2) Distribution of Population (Verteilung ungleichmaessig)!!! -> verteilen 
 
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZone.class);
-
-	// Reads UrbanSim Zone output files
-	ReadFromUrbansimZoneModel readFromUrbansim = null;
 
 	/**
 	 * constructor
@@ -87,6 +82,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	 */
 	MATSim4UrbanSimZone(String args[]){
 		super(args);
+		// set flag to false (needed for ReadFromUrbanSimModel to choose the right method)
+		isParcel = false;
 	}
 	
 	/**
@@ -107,7 +104,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		cleanNetwork(network);
 		
 		// get the data from UrbanSim (parcels and persons)
-		readFromUrbansim = new ReadFromUrbansimZoneModel( getUrbanSimParameterConfig().getYear() );
+		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear() );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		// initializing parcels and zones from UrbanSim input
@@ -136,7 +133,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	 * @param zones
 	 */
 	void readUrbansimZoneModel(ActivityFacilitiesImpl zones){
-		readFromUrbansim.readFacilities(zones);
+		readFromUrbansim.readFacilitiesZones(zones);
 	}
 	
 	/**
@@ -149,17 +146,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	 */
 	@Override
 	Population readUrbanSimPopulation(Population oldPopulation, ActivityFacilitiesImpl zones, Network network, double samplingRate){
-		return readFromUrbansim.readPersons( oldPopulation, zones, network, samplingRate );
-	}
-	
-	/**
-	 * Reads the UrbanSim job table and aggregates jobs with same nearest node 
-	 * 
-	 * @return JobClusterObject[] 
-	 */
-	@Override
-	AggregateObject2NearestNode[] readUrbansimJobs(ActivityFacilitiesImpl zones, double jobSample){
-		return readFromUrbansim.getAggregatedWorkplaces(zones, jobSample, (NetworkImpl) scenario.getNetwork());
+		return readFromUrbansim.readPersonsZone( oldPopulation, zones, network, samplingRate );
 	}
 	
 	/**

@@ -8,7 +8,7 @@ import org.matsim.core.network.NetworkImpl;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 
 public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 
@@ -64,18 +64,18 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		modifyNetwork(network);
 		cleanNetwork(network);
 		
-		ReadFromUrbansimParcelModel readUrbanSimData = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
+		ReadFromUrbanSimModel readUrbanSimData = new ReadFromUrbanSimModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-		readUrbanSimData.readFacilities(parcels, zones);
+		readUrbanSimData.readFacilitiesParcel(parcels, zones);
 		// set population in scenario
 		scenario.setPopulation( readUrbansimPersons(readUrbanSimData, parcels, network) );
 		
 		log.info("### DONE with demand generation from UrbanSim ###");
 		
 		// gather all workplaces, workplaces are aggregated with respect to their nearest Node
-		AggregateObject2NearestNode[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network);
+		AggregateObject2NearestNode[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network, true);
 		
 		// Running the controler
 		Controler controler = new Controler(scenario);

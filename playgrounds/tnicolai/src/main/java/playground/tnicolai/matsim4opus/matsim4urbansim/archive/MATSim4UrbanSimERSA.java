@@ -45,7 +45,7 @@ import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
 import playground.tnicolai.matsim4opus.matsim4urbansim.CellBasedAccessibilityControlerListener;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -282,7 +282,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 	 */
 	@Override
 	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Map<Id,CounterObject> numberOfWorkplacesPerZone,
-			ReadFromUrbansimParcelModel readFromUrbansim){
+			ReadFromUrbanSimModel readFromUrbansim){
 		
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
@@ -393,7 +393,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 	 * @throws IOException 
 	 */
 	private CellBasedAccessibilityControlerListener initAndAddControlerListener(ActivityFacilitiesImpl parcels,
-			ReadFromUrbansimParcelModel readFromUrbansim, Controler controler) throws IOException {
+			ReadFromUrbanSimModel readFromUrbansim, Controler controler) throws IOException {
 		
 		Geometry boundary = getBoundary(shapeFile);
 		
@@ -410,7 +410,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		// gather all workplaces
 		int jmID = benchmark.addMeasure("Creating Destinations (jobObjectMap)");
 		// JobClusterObject[] jobClusterArray = readFromUrbansim.readAndBuildJobsObject(parcels, jobSample); // tnicolai: old version
-		AggregateObject2NearestNode[] jobClusterArray = readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl)scenario.getNetwork()); // this aggreagtes workplaces directly to their nearest node 
+		AggregateObject2NearestNode[] jobClusterArray = readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl)scenario.getNetwork(), true); // this aggreagtes workplaces directly to their nearest node 
 		benchmark.stoppMeasurement(jmID);
 		logger.info("Creating job destinations (jobObjectMap) took " + benchmark.getDurationInSeconds(jmID) + "seconds.");
 		

@@ -236,7 +236,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					
 					walkTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
 					walkTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
-					walkLnTC 	= 0.;	 // since MATSim doesn't gives monetary costs jet 
+					walkLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 
 					// sum walk travel times (substitute for distances)
 					sumWALK += opportunityWeight

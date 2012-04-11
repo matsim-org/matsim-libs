@@ -43,8 +43,8 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel.PopulationCounter;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel.PopulationCounter;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
 
 
@@ -163,11 +163,11 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	private ActivityFacilitiesImpl testRunPracels(int year){
 		log.info("Running ReadFromUrbansimParcelModel with argument year = " + year);
 		// get the data from test urbansim parcels
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year );
+		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( year );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");
-		readFromUrbansim.readFacilities(facilities, zones);
+		readFromUrbansim.readFacilitiesParcel(facilities, zones);
 		// return constructed zones for validation
 		return zones;
 	}
@@ -186,18 +186,18 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		boolean result = false;
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year );
+		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( year );
 
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("dummy locations");
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("dummy zones");
-		readFromUrbansim.readFacilities(facilities, zones);
+		readFromUrbansim.readFacilitiesParcel(facilities, zones);
 		
 		// read urbansim persons. Generates hwh acts as side effect
-		Population newPop = readFromUrbansim.readPersons( null, facilities, null, sampleRate );
+		Population newPop = readFromUrbansim.readPersonsParcel( null, facilities, null, sampleRate );
 		PopulationCounter pCounter = readFromUrbansim.getPopulationCounter();
 		// determine result
-		result = (pCounter.NUrbansimPersons == this.popSize) && (newPop.getPersons().size() == this.popSize);
+		result = (pCounter.numberOfUrbanSimPersons == this.popSize) && (newPop.getPersons().size() == this.popSize);
 		return result;
 	}
 	

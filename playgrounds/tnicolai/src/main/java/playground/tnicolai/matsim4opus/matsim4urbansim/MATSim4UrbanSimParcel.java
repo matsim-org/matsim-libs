@@ -44,7 +44,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2Neare
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
 
@@ -83,13 +83,15 @@ public class MATSim4UrbanSimParcel {
 	// MATSim4UrbanSim configuration converter
 	MATSim4UrbanSimConfigurationConverterV2 connector = null;
 	// Reads UrbanSim Parcel output files
-	ReadFromUrbansimParcelModel readFromUrbansim = null;
+	ReadFromUrbanSimModel readFromUrbansim = null;
 	// Benchmarking computation times and hard disc space ... 
 	Benchmark benchmark = null;
 	// indicates if MATSim run was successful
 	static boolean isSuccessfulMATSimRun 			 = false;
 	// needed for controler listeners
 	AggregateObject2NearestNode[] aggregatedOpportunities = null;
+	
+	boolean isParcel = true;
 	
 	// run selected controler
 	boolean computeCellBasedAccessibility			 = false;
@@ -99,7 +101,7 @@ public class MATSim4UrbanSimParcel {
 	boolean computeZone2ZoneImpedance		   		 = false;
 	boolean computeAgentPerformance					 = false;
 	boolean dumpPopulationData 						 = false;
-	boolean dumpAggegatedWorkplaceData 			  	 = false;
+	boolean dumpAggegatedWorkplaceData 			  	 = true;
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
 	double jobSampleRate 							 = 1.;
@@ -146,7 +148,7 @@ public class MATSim4UrbanSimParcel {
 		cleanNetwork(network);
 		
 		// get the data from UrbanSim (parcels and persons)
-		readFromUrbansim = new ReadFromUrbansimParcelModel( getUrbanSimParameterConfig().getYear() );
+		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear() );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -176,7 +178,7 @@ public class MATSim4UrbanSimParcel {
 	 * @param zones
 	 */
 	void readUrbansimParcelModel(ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl zones){
-		readFromUrbansim.readFacilities(parcels, zones);
+		readFromUrbansim.readFacilitiesParcel(parcels, zones);
 	}
 	
 	/**
@@ -188,7 +190,7 @@ public class MATSim4UrbanSimParcel {
 	 * @return
 	 */
 	Population readUrbanSimPopulation(Population oldPopulation, ActivityFacilitiesImpl parcels, Network network, double samplingRate){
-		return readFromUrbansim.readPersons( oldPopulation, parcels, network, samplingRate );
+		return readFromUrbansim.readPersonsParcel( oldPopulation, parcels, network, samplingRate );
 	}
 	
 	/**
@@ -197,18 +199,18 @@ public class MATSim4UrbanSimParcel {
 	 * @return JobClusterObject[] 
 	 */
 	AggregateObject2NearestNode[] readUrbansimJobs(ActivityFacilitiesImpl parcels, double jobSample){
-		return readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl) scenario.getNetwork());
+		return readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl) scenario.getNetwork(), isParcel);
 	}
 	
 	/**
 	 * read person table from urbansim and build MATSim population
 	 * 
 	 * @param readFromUrbansim
-	 * @param parcels
+	 * @param parcelsOrZones
 	 * @param network
 	 * @return
 	 */
-	Population readUrbansimPersons(ActivityFacilitiesImpl parcels, Network network){
+	Population readUrbansimPersons(ActivityFacilitiesImpl parcelsOrZones, Network network){
 		// read UrbanSim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		
@@ -235,8 +237,8 @@ public class MATSim4UrbanSimParcel {
 			oldPopulation = null;
 		}
 
-		// read UrbanSim persons.  Generates hwh acts as side effect
-		Population newPopulation = readUrbanSimPopulation(oldPopulation,parcels, network, uspModule.getPopulationSampleRate());//readFromUrbansim.readPersons( oldPopulation, parcels, network, uspModule.getPopulationSampleRate() ) ;
+		// read UrbanSim persons. Generates hwh acts as side effect
+		Population newPopulation = readUrbanSimPopulation(oldPopulation, parcelsOrZones, network, uspModule.getPopulationSampleRate());
 		
 		// clean
 		oldPopulation=null;

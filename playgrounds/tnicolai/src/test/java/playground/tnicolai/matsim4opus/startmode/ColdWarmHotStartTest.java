@@ -39,8 +39,8 @@ import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConver
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
 import playground.tnicolai.matsim4opus.matsimTestData.MATSimRunMode;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel.PopulationCounter;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel.PopulationCounter;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
 
 
@@ -149,12 +149,12 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 		this.currentMode = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE);
 		
 		// init class ReadFromUrbansimParcelModel
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( 2001 );
+		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( 2001 );
 		
 		// create facilities -> needed for Population generation
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-		readFromUrbansim.readFacilities(parcels, zones);
+		readFromUrbansim.readFacilitiesParcel(parcels, zones);
 
 		Population oldPopulation = null;
 
@@ -163,7 +163,7 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 			oldPopulation = scenario.getPopulation();
 		}
 		
-		Population newPopulation = readFromUrbansim.readPersons(oldPopulation, parcels, scenario.getNetwork(), samplingRate);
+		Population newPopulation = readFromUrbansim.readPersonsParcel(oldPopulation, parcels, scenario.getNetwork(), samplingRate);
 		return readFromUrbansim.getPopulationCounter();
 	}
 	
@@ -249,7 +249,7 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 		}
 		else if(runMode == MATSimRunMode.coldStart)
 			assertTrue(result.identifiedCnt == 0 &&
-					result.NUrbansimPersons == 10 &&
+					result.numberOfUrbanSimPersons == 10 &&
 					result.populationMergeTotal == 9 &&
 					this.currentMode.equals(Constants.COLD_START));
 	}

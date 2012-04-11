@@ -43,7 +43,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 	}
 	
 	/**
-	 * agent-based performance feedback (time spent travelling, money spent travelling, etc.)
+	 * agent-based performance feedback (time spent traveling, money spent traveling, etc.)
 	 */
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {

@@ -43,7 +43,7 @@ import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorT
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -191,7 +191,7 @@ public class SpatialGridFillOrder {
 		 * J = Jobs
 		 */
 
-		ReadFromUrbansimParcelModel dummyUrbanSimPracelModel = new ReadFromUrbansimParcelModel(2000);
+		ReadFromUrbanSimModel dummyUrbanSimPracelModel = new ReadFromUrbanSimModel(2000);
 
 		// create dummy jobs
 		Id zoneID = new IdImpl(1);

@@ -10,11 +10,10 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
-import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
 public class BoundariesFromUrbanSimCoordinates {
 	// Logger
-	private static final Logger log = Logger.getLogger(ReadFromUrbansimParcelModel.class);
+	private static final Logger log = Logger.getLogger(BoundariesFromUrbanSimCoordinates.class);
 	
 	private static final String inputFile = "/Users/thomas/Development/opus_home/matsim4opus/tmp/zone__dataset_table__exported_indicators__2001.tab";
 	
