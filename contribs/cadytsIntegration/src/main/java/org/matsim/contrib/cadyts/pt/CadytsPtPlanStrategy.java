@@ -86,7 +86,8 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer();
 		controler.getEvents().addHandler(this.cadytsPtOccupAnalyzer);
 
-		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer);
+		this.countsScaleFactor = controler.getConfig().ptCounts().getCountsScaleFactor();
+		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, this.countsScaleFactor);
 
 		// this collects events and generates cadyts plans from it
 		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(controler.getScenario());
@@ -105,12 +106,10 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		// ===========================
 		// everything beyond this line is, I think, analysis code. kai, jul'11
 
-		this.countsScaleFactor = controler.getConfig().ptCounts().getCountsScaleFactor();
 
 		// set flowAnalysisFile
-		String strWriteAnalysisFile = controler.getConfig().findParam(CadytsPtConfigGroup.GROUP_NAME, "writeAnalysisFile");
+		String strWriteAnalysisFile = controler.getConfig().findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.WRITE_ANALYSIS_FILE);
 		this.writeAnalysisFile = strWriteAnalysisFile != null && Boolean.parseBoolean(strWriteAnalysisFile);
-		strWriteAnalysisFile = null;
 	}
 
 	// Analysis methods
@@ -158,11 +157,9 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		// the remaining material is, in my view, "just" output:
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			CadytsPtLinkCostOffsetsXMLFileIO cadytsPtLinkCostOffsetsXMLFileIO = new CadytsPtLinkCostOffsetsXMLFileIO(trSched);
-			cadytsPtLinkCostOffsetsXMLFileIO.write(filename, this.calibrator.getLinkCostOffsets());
-			cadytsPtLinkCostOffsetsXMLFileIO = null;
+			new CadytsPtLinkCostOffsetsXMLFileIO(trSched).write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
-			log.error(e);
+			log.error("Could not write link cost offsets!", e);
 		}
 
 		generateAndWriteCountsComparisons(event);
@@ -274,12 +271,14 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		return this.delegate.getPlanSelector();
 	}
 
-	/*package*/ class SimResultsContainerImpl implements SimResults<TransitStopFacility> {
+	/*package*/ static class SimResultsContainerImpl implements SimResults<TransitStopFacility> {
 		private static final long serialVersionUID = 1L;
 		private CadytsPtOccupancyAnalyzer occupancyAnalyzer = null;
+		private final double countsScaleFactor;
 
-		SimResultsContainerImpl(final CadytsPtOccupancyAnalyzer oa) {
+		SimResultsContainerImpl(final CadytsPtOccupancyAnalyzer oa, final double countsScaleFactor) {
 			this.occupancyAnalyzer = oa;
+			this.countsScaleFactor = countsScaleFactor;
 		}
 
 		@Override
@@ -292,7 +291,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 				return 0;
 			}
 
-			return values[hour] * CadytsPtPlanStrategy.this.countsScaleFactor;
+			return values[hour] * this.countsScaleFactor;
 		}
 
 		@Override

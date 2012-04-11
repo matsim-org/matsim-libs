@@ -92,7 +92,7 @@ public class CalibrationStatReader implements TabularFileHandler {
 		log.info("done.");
 	}
 
-	public class StatisticsData {
+	public static class StatisticsData {
 		private String count_ll;
 		private String count_ll_pred_err;
 		private String p2p_ll;

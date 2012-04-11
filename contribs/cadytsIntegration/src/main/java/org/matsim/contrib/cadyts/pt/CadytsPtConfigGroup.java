@@ -40,6 +40,7 @@ public class CadytsPtConfigGroup extends Module {
 	public static final String USE_BRUTE_FORCE = "useBruteForce";
 	public static final String START_TIME = "startTime";
 	public static final String END_TIME = "endTime";
+	public static final String WRITE_ANALYSIS_FILE = "writeAnalysisFile";
 
 	public CadytsPtConfigGroup() {
 		super(GROUP_NAME);
