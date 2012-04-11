@@ -31,8 +31,7 @@ public class TableParser {
 		//initiate array
 		//TODO muss das mit null initiert werden? muessen hinterher erkennen, wo wir nicht eingetragen haben, um dort NA eintragen zu koennen
 		Double [][] mainarray = new Double [gridsizex+1][gridsizey+1];
-		System.out.println("test size"+"x"+(gridsizex+1)+"y"+(gridsizey+1)+"sollte sein"+mainarray.length+"und"+mainarray[12].length);
-		
+
 		//Datei einlesen -> header?
 		//mins und maxs finden + merken
 		try {
@@ -56,7 +55,6 @@ public class TableParser {
 					e.printStackTrace();
 				}
 			}
-			System.out.println("minx+maxx+miny+maxy"+minx+" "+maxx+" "+miny+" "+maxy);
 			
 			//erneut zeilenweise lesen, werte ins array schreiben
 			BufferedReader in2 = new BufferedReader(new FileReader(file));
@@ -85,6 +83,8 @@ public class TableParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
 	
 		//TODO an dieser Stelle evtl interpolieren
 		//mainarray=NeighbourInterpolation.getNeighbourMatrix(mainarray);
@@ -95,7 +95,6 @@ public class TableParser {
 		for(int i=0; i<gridsizex+1;i++){
 			mainarray[i][0]=(i+1)*1.0;
 		}
-		System.out.println(mainarray[0][1]);
 		//TODO: in der ersten Zeile den letzten Eintrag loeschen
 		
 		//array in Textdatei schreiben
