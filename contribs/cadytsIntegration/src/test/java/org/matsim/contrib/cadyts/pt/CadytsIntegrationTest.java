@@ -65,25 +65,24 @@ public class CadytsIntegrationTest {
 		controler.setMobsimFactory(new DummyMobsimFactory());
 		controler.run();
 
-		// test that NewPtBsePlanStrategy is present as replanning strategy
 		List <PlanStrategy> strategyList = controler.getStrategyManager().getStrategies();
-		NewPtBsePlanStrategy ptBseStrategy = null;
+		CadytsPtPlanStrategy cadytsStrategy = null;
 		for (PlanStrategy strategy : strategyList) {
-			if (strategy.getClass() == NewPtBsePlanStrategy.class) {
-				ptBseStrategy = (NewPtBsePlanStrategy) strategy;
+			if (strategy.getClass() == CadytsPtPlanStrategy.class) {
+				cadytsStrategy = (CadytsPtPlanStrategy) strategy;
 				break;
 			}
 		}
-		Assert.assertNotNull("PtBsePlanStrategy could not be found.", ptBseStrategy);
+		Assert.assertNotNull("CadytsPtPlanStrategy could not be found.", cadytsStrategy);
 
 		//test calibration settings
-		Assert.assertEquals(true, ptBseStrategy.getCalibrator().getBruteForce());
-		Assert.assertEquals(false, ptBseStrategy.getCalibrator().getCenterRegression());
-		Assert.assertEquals(Integer.MAX_VALUE, ptBseStrategy.getCalibrator().getFreezeIteration());
-		Assert.assertEquals(8.0, ptBseStrategy.getCalibrator().getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, ptBseStrategy.getCalibrator().getPreparatoryIterations());
-		Assert.assertEquals(0.95, ptBseStrategy.getCalibrator().getRegressionInertia(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1.0, ptBseStrategy.getCalibrator().getVarianceScale(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(true, cadytsStrategy.getCalibrator().getBruteForce());
+		Assert.assertEquals(false, cadytsStrategy.getCalibrator().getCenterRegression());
+		Assert.assertEquals(Integer.MAX_VALUE, cadytsStrategy.getCalibrator().getFreezeIteration());
+		Assert.assertEquals(8.0, cadytsStrategy.getCalibrator().getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1, cadytsStrategy.getCalibrator().getPreparatoryIterations());
+		Assert.assertEquals(0.95, cadytsStrategy.getCalibrator().getRegressionInertia(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1.0, cadytsStrategy.getCalibrator().getVarianceScale(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -200,7 +199,6 @@ public class CadytsIntegrationTest {
 	}
 
 	private static class DummyMobsimFactory implements MobsimFactory {
-		private final int count = 1;
 		@Override
 		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			return new DummyMobsim();

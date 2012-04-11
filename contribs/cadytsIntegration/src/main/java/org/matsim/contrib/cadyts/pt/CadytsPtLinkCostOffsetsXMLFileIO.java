@@ -28,12 +28,12 @@ import utilities.misc.DynamicDataXMLFileIO;
 /**
  * Enables cadyts to persist the cost offsets to file.
  */
-public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitStopFacility> {
+public class CadytsPtLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitStopFacility> {
 
 	private static final long serialVersionUID = 1L;
 	private final TransitSchedule schedule;
 
-	public PtBseLinkCostOffsetsXMLFileIO(final TransitSchedule schedule) {
+	public CadytsPtLinkCostOffsetsXMLFileIO(final TransitSchedule schedule) {
 		super();
 		this.schedule = schedule;
 	}

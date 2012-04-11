@@ -40,11 +40,11 @@ import org.matsim.pt.counts.SimpleWriter;
  * This is a modified copy of CountsComparisonAlgorithm, in order to realize the same functionality
  * for pt counts.
  */
-class PtBseCountsComparisonAlgorithm {
+class CadytsPtCountsComparisonAlgorithm {
 	/**
 	 * The StopAttributes of the simulation
 	 */
-	private final PtBseOccupancyAnalyzer oa;
+	private final CadytsPtOccupancyAnalyzer oa;
 	/**
 	 * The counts object
 	 */
@@ -65,11 +65,11 @@ class PtBseCountsComparisonAlgorithm {
 	double countsScaleFactor;
 	// needed in CadytsErrorPlot
 
-	final static Logger log = Logger.getLogger(PtBseCountsComparisonAlgorithm.class);
+	final static Logger log = Logger.getLogger(CadytsPtCountsComparisonAlgorithm.class);
 
 	StringBuffer content = new StringBuffer();
 
-	PtBseCountsComparisonAlgorithm(final PtBseOccupancyAnalyzer oa, final Counts counts, final Network network, final double countsScaleFactor) {
+	CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzer oa, final Counts counts, final Network network, final double countsScaleFactor) {
 		this.oa = oa;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();

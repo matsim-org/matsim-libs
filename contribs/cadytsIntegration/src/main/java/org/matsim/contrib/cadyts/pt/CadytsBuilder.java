@@ -152,11 +152,11 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		int arStartTime = Integer.parseInt(config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.START_TIME));
 		int arEndTime = Integer.parseInt(config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.END_TIME));
 
-		NewPtBsePlanStrategy.trSched = sc.getTransitSchedule();
+		CadytsPtPlanStrategy.trSched = sc.getTransitSchedule();
 
 		//add counts data into calibrator
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
-			TransitStopFacility stop= NewPtBsePlanStrategy.trSched.getFacilities().get(entry.getKey());
+			TransitStopFacility stop= CadytsPtPlanStrategy.trSched.getFacilities().get(entry.getKey());
 			for (Volume volume : entry.getValue().getVolumes().values()){
 				if (volume.getHour() >= arStartTime && volume.getHour() <= arEndTime) {    //add volumes for each hour to calibrator
 					int start_s = (volume.getHour() - 1) * 3600;

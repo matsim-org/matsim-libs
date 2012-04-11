@@ -47,7 +47,7 @@ import org.matsim.pt.counts.SimpleWriter;
 /**
  * Collects occupancy data of transit-line stations
  */
-public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
+public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
 	private final int timeBinSize, maxSlotIndex;
@@ -60,7 +60,7 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
 	private final Set<Id> transitVehicles = new HashSet<Id>();
 	private final Set<Id> analyzedLines = new HashSet<Id>();
 
-	public PtBseOccupancyAnalyzer() {
+	public CadytsPtOccupancyAnalyzer() {
 		this.timeBinSize = 3600;
 		this.maxTime = 24 * 3600 - 1;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
@@ -252,6 +252,6 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
 		} else {
 			eventFile = "../playgrounds/mmoyo/output/routeAnalysis/scoreOff/afterBugRepair/it500/500.events.xml.gz";
 		}
-		new PtBseOccupancyAnalyzer().run(eventFile);
+		new CadytsPtOccupancyAnalyzer().run(eventFile);
 	}
 }

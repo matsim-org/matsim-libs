@@ -56,9 +56,9 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
-public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener {
+public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener {
 
-	private final static Logger log = Logger.getLogger(NewPtBsePlanStrategy.class);
+	private final static Logger log = Logger.getLogger(CadytsPtPlanStrategy.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
@@ -72,18 +72,18 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 	private final Counts occupCounts = new Counts();
 	private final Counts boardCounts = new Counts();
 	private final Counts alightCounts = new Counts();
-	private final PtBseOccupancyAnalyzer ptBseOccupAnalyzer;
+	private final CadytsPtOccupancyAnalyzer ptBseOccupAnalyzer;
 	static TransitSchedule trSched;
 	private final boolean writeAnalysisFile;
-	NewPtBsePlanChanger ptBsePlanChanger;
+	CadytsPtPlanChanger ptBsePlanChanger;
 	final Set<Id> analyzedLines = new HashSet<Id>();
 
-	public NewPtBsePlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTURE, needed for reflection-based instantiation
+	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTURE, needed for reflection-based instantiation
 		this.analyzedLines.add(new IdImpl("M44")); // TODO make configurable
 
 		controler.addControlerListener(this);
 
-		this.ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
+		this.ptBseOccupAnalyzer = new CadytsPtOccupancyAnalyzer();
 		controler.getEvents().addHandler(this.ptBseOccupAnalyzer);
 
 		this.simResults = new SimResultsContainerImpl(this.ptBseOccupAnalyzer);
@@ -96,7 +96,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario());
 
 		// finally, we create the PlanStrategy, with the bse-based plan selector:
-		this.ptBsePlanChanger = new NewPtBsePlanChanger(ptStep, this.calibrator);
+		this.ptBsePlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
 		this.delegate = new PlanStrategyImpl(this.ptBsePlanChanger);
 
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
@@ -167,7 +167,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		// the remaining material is, in my view, "just" output:
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			PtBseLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new PtBseLinkCostOffsetsXMLFileIO(trSched);
+			CadytsPtLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new CadytsPtLinkCostOffsetsXMLFileIO(trSched);
 			ptBseLinkCostOffsetsXMLFileIO.write(filename, this.calibrator.getLinkCostOffsets());
 			ptBseLinkCostOffsetsXMLFileIO = null;
 		} catch (IOException e) {
@@ -201,11 +201,11 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 				controler.stopwatch.beginOperation("compare with pt counts");
 
 				Network network = controler.getNetwork();
-				PtBseCountsComparisonAlgorithm ccaBoard = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.boardCounts,
+				CadytsPtCountsComparisonAlgorithm ccaBoard = new CadytsPtCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.boardCounts,
 						network, this.countsScaleFactor);
-				PtBseCountsComparisonAlgorithm ccaAlight = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.alightCounts,
+				CadytsPtCountsComparisonAlgorithm ccaAlight = new CadytsPtCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.alightCounts,
 						network, this.countsScaleFactor);
-				PtBseCountsComparisonAlgorithm ccaOccupancy = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.occupCounts,
+				CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.occupCounts,
 						network, this.countsScaleFactor);
 
 				String distanceFilterStr = config.findParam("ptCounts", "distanceFilter");
@@ -292,9 +292,9 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 
 	/*package*/ class SimResultsContainerImpl implements SimResults<TransitStopFacility> {
 		private static final long serialVersionUID = 1L;
-		private PtBseOccupancyAnalyzer occupancyAnalyzer = null;
+		private CadytsPtOccupancyAnalyzer occupancyAnalyzer = null;
 
-		SimResultsContainerImpl(final PtBseOccupancyAnalyzer oa) {
+		SimResultsContainerImpl(final CadytsPtOccupancyAnalyzer oa) {
 			this.occupancyAnalyzer = oa;
 		}
 
@@ -308,7 +308,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 				return 0;
 			}
 
-			return values[hour] * NewPtBsePlanStrategy.this.countsScaleFactor;
+			return values[hour] * CadytsPtPlanStrategy.this.countsScaleFactor;
 		}
 
 		@Override

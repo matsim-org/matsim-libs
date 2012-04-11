@@ -33,9 +33,9 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 /**
  * @author nagel
  */
-/*package*/ class NewPtBsePlanChanger implements PlanSelector {
+/*package*/ class CadytsPtPlanChanger implements PlanSelector {
 
-	private static final Logger log = Logger.getLogger(NewPtBsePlanChanger.class);
+	private static final Logger log = Logger.getLogger(CadytsPtPlanChanger.class);
 
 	private final double beta = 1.0;
 
@@ -45,7 +45,7 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 
 	private boolean cadCorrMessGiven = false;
 
-	/*package*/ NewPtBsePlanChanger(final PtPlanToPlanStepBasedOnEvents ptStep, final MATSimUtilityModificationCalibrator<TransitStopFacility> calib) {
+	/*package*/ CadytsPtPlanChanger(final PtPlanToPlanStepBasedOnEvents ptStep, final MATSimUtilityModificationCalibrator<TransitStopFacility> calib) {
 		log.error("value for beta currently ignored (set to one)");
 		this.ptPlanToPlanStep = ptStep;
 		this.matsimCalibrator = calib;

@@ -48,7 +48,7 @@
 		<param name="maxAgentPlanMemorySize" value="4" /> <!-- 0 means unlimited -->
 
 		<param name="ModuleProbability_1" value="1.0" />
-		<param name="Module_1" value="org.matsim.contrib.cadyts.pt.NewPtBsePlanStrategy" />
+		<param name="Module_1" value="org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy" />
 	</module>
 
 	<module name="changeLegMode">
