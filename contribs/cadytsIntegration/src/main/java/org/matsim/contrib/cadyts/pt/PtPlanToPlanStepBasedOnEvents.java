@@ -29,10 +29,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
@@ -43,7 +41,6 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -218,34 +215,6 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 		} else {
 			System.err.println(" cadyts plan is null ");
 		}
-	}
-
-	static boolean printMatsimPlanPtLinks(final Plan matsimPlan) {
-		// prints MATSim plan
-		final String sepMatStr = "==printing MATSim plan exp transit routes==";
-		final String personIdStr = "person Id: ";
-		boolean containsM44 = false;
-		System.err.println(sepMatStr);
-		System.err.println(personIdStr + matsimPlan.getPerson().getId());
-		for (PlanElement planElement : matsimPlan.getPerson().getSelectedPlan().getPlanElements()) {
-			if ((planElement instanceof Leg)) {
-				Leg leg = (Leg) planElement;
-				if (leg.getRoute() != null && (leg.getMode().equals("pt"))) {
-					ExperimentalTransitRoute exptr = (ExperimentalTransitRoute) leg.getRoute();
-					if (exptr.getRouteDescription().contains(STR_M44)) {
-						containsM44 = true;
-						System.err.print(exptr.getRouteDescription() + ": ");
-
-						// ExpTransRouteUtils expTransRouteUtils = new ExpTransRouteUtils(NET, SCHEDULE, exptr);
-						// for(Link link: expTransRouteUtils.getLinks()){
-						// System.err.print("-- " + link.getId() + " --");
-						// }
-						System.err.println();
-					}
-				}
-			}
-		}
-		return containsM44;
 	}
 
 }

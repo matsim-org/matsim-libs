@@ -77,10 +77,13 @@
 		<param name="travelingWalk" value="1e-9" />
 		<param name="waiting" value="1e-9" />
 
-		<!-- <param name="lateArrival" value="-18" /> <param name="earlyDeparture" 
-			value="-0" /> <param name="performing" value="+6" /> <param name="traveling" 
-			value="-6" /> <param name="travelingPt" value="-3" /> <param name="travelingWalk" 
-			value="-18" /> <param name="waiting" value="-0" /> -->
+		<!-- <param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="travelingPt" value="-3" />
+		<param name="travelingWalk" value="-18" />
+		<param name="waiting" value="-0" /> -->
 
 		<param name="activityType_0" value="h" /> <!-- home -->
 		<param name="activityPriority_0" value="1" />
