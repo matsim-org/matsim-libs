@@ -20,8 +20,8 @@
 package org.matsim.contrib.cadyts.pt;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -58,18 +58,16 @@ import cadyts.supply.SimResults;
 
 public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener {
 
-	// yyyyyy something beyond just "reset" is needed in terms of events handling, otherwise it does
-	// not work.
-
 	private final static Logger log = Logger.getLogger(NewPtBsePlanStrategy.class);
 
+	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
+	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
+	private static final String OCCUPANCYANALYSIS_FILENAME = "ptBseOccupancyAnalysis.txt";
+
 	private PlanStrategy delegate = null;
-	// private Controler controler;
-	private final SimResultsContainerImpl simResults;
-	final static String MODULE_NAME = "ptCounts";
-	final static String BSE_MOD_NAME = "bse";
-	final static String STR_LINKOFFSETFILE = "linkCostOffsets.xml";
+
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = null;
+	private final SimResultsContainerImpl simResults;
 	private final double countsScaleFactor;
 	private final Counts occupCounts = new Counts();
 	private final Counts boardCounts = new Counts();
@@ -77,28 +75,21 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 	private final PtBseOccupancyAnalyzer ptBseOccupAnalyzer;
 	static TransitSchedule trSched;
 	private final boolean writeAnalysisFile;
-	final String STR_ANALYSISFILE;
 	NewPtBsePlanChanger ptBsePlanChanger;
+	final Set<Id> analyzedLines = new HashSet<Id>();
 
-	public NewPtBsePlanStrategy(final Controler controler) {
-		// IMPORTANT: Do not change this constructor. It needs to be like this in order to be callable as a "Module"
-		// from the config file. kai/manuel, dec'10
+	public NewPtBsePlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTURE, needed for reflection-based instantiation
+		this.analyzedLines.add(new IdImpl("B-M44")); // TODO make configurable
 
 		controler.addControlerListener(this);
 
-		// set up the bus occupancy analyzer ...
 		this.ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
 		controler.getEvents().addHandler(this.ptBseOccupAnalyzer);
-		// only here, and removed from notifyBeforeMobsim and notifyAfterMobsim.
 
-		// ... and connect it to the simResults container:
 		this.simResults = new SimResultsContainerImpl(this.ptBseOccupAnalyzer);
 
 		// this collects events and generates cadyts plans from it
 		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(controler.getScenario());
-		// yyyyyy passing ptBseOccupAnalyzer into PtPlanToPlanStepBasedOnEvents is, I think, unnecessary
-		// and should be avoided.
-		// See there. kai, jul'11
 		controler.getEvents().addHandler(ptStep);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
@@ -114,9 +105,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		// everything beyond this line is, I think, analysis code. kai, jul'11
 
 		// read occup counts from file
-		// String occupancyCountsFilename = this.controler.getConfig().findParam("ptCounts",
-		// "inputOccupancyCountsFile"); //better read it from config object like below
-		String occupancyCountsFilename = /* this. */controler.getConfig().ptCounts().getOccupancyCountsFileName();
+		String occupancyCountsFilename = controler.getConfig().ptCounts().getOccupancyCountsFileName();
 		if (occupancyCountsFilename != null) {
 			new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 		}
@@ -126,9 +115,8 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		this.countsScaleFactor = controler.getConfig().ptCounts().getCountsScaleFactor();
 
 		// set flowAnalysisFile
-		String strWriteAnalysisFile = controler.getConfig().findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "writeAnalysisFile");
+		String strWriteAnalysisFile = controler.getConfig().findParam(CadytsPtConfigGroup.GROUP_NAME, "writeAnalysisFile");
 		this.writeAnalysisFile = strWriteAnalysisFile != null && Boolean.parseBoolean(strWriteAnalysisFile);
-		this.STR_ANALYSISFILE = this.writeAnalysisFile ? "flowAnalysis.txt" : null;
 		strWriteAnalysisFile = null;
 
 		controler.getScenario().addScenarioElement(this.occupCounts);
@@ -138,31 +126,24 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 	// /////////////////////////////////////////////////////
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		int iter = event.getIteration();
-		// The calibrator need the counts of ptBseOccupAnalyzer in every iteration not only in the
-		// active iterations, so it is only added at the beginning and uses its own reset in every
-		// iteration
-		// if ( isActiveInThisIteration( iter, event.getControler() ) ) {
-		this.ptBseOccupAnalyzer.reset(iter);
-		// event.getControler().getEvents().addHandler(ptBseOccupAnalyzer); //Necessary because it is
-		// removed in notifyAfterMobsim 18.jul.2011
-		// }
+		this.ptBseOccupAnalyzer.reset(event.getIteration());
 	}
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		int it = event.getIteration();
 		if (isActiveInThisIteration(it, event.getControler())) {
-			// Get all M44 stations and invoke the method write to get all information of them
-			TransitLine specificLine = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(new IdImpl("B-M44"));
-			List<Id> stopIds = new ArrayList<Id>();
-			for (TransitRoute route : specificLine.getRoutes().values()) {
-				for (TransitRouteStop stop : route.getStops()) {
-					stopIds.add(stop.getStopFacility().getId());
+			// Get all stations of all analyzed lines and invoke the method write to get all information of them
+			Set<Id> stopIds = new HashSet<Id>();
+			for (Id lineId : this.analyzedLines) {
+				TransitLine line = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(lineId);
+				for (TransitRoute route : line.getRoutes().values()) {
+					for (TransitRouteStop stop : route.getStops()) {
+						stopIds.add(stop.getStopFacility().getId());
+					}
 				}
-
 			}
-			String outFile = event.getControler().getControlerIO().getIterationFilename(it, "ptBseOccupancyAnalysis.txt");
+			String outFile = event.getControler().getControlerIO().getIterationFilename(it, OCCUPANCYANALYSIS_FILENAME);
 			this.ptBseOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts, stopIds);
 		}
 	}
@@ -176,7 +157,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		if (this.writeAnalysisFile) {
 			String analysisFilepath = null;
 			if (isActiveInThisIteration(event.getIteration(), event.getControler())) {
-				analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), this.STR_ANALYSISFILE);
+				analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
 			}
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
@@ -184,7 +165,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		this.calibrator.afterNetworkLoading(this.simResults);
 
 		// the remaining material is, in my view, "just" output:
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), STR_LINKOFFSETFILE);
+		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
 			PtBseLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new PtBseLinkCostOffsetsXMLFileIO(trSched);
 			ptBseLinkCostOffsetsXMLFileIO.write(filename, this.calibrator.getLinkCostOffsets());
@@ -203,15 +184,12 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
-	// yyyyyy this statement is no longer correct since someone added other public methods below. kai,
-	// jul'11
+	// yyyyyy this statement is no longer correct since someone added other public methods below. kai,jul'11
 
 	private void generateAndWriteCountsComparisons(final IterationEndsEvent event) {
 		Config config = event.getControler().getConfig();
 		PtCountsConfigGroup ptCounts = config.ptCounts();
-		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be
-																											// done in isActiveInThisIteration. kai,
-																											// oct'10
+		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration. kai,oct'10
 			Controler controler = event.getControler();
 			int iter = event.getIteration();
 			if (isActiveInThisIteration(iter, controler)) {
@@ -312,7 +290,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 		return this.delegate.getPlanSelector();
 	}
 
-	class SimResultsContainerImpl implements SimResults<TransitStopFacility> {
+	/*package*/ class SimResultsContainerImpl implements SimResults<TransitStopFacility> {
 		private static final long serialVersionUID = 1L;
 		private PtBseOccupancyAnalyzer occupancyAnalyzer = null;
 
