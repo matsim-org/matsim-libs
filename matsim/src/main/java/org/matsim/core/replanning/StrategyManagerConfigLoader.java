@@ -255,7 +255,7 @@ public final class StrategyManagerConfigLoader {
 		else {
 			try {
 				Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(name);
-				Class[] args = new Class[1];
+				Class<?>[] args = new Class[1];
 				args[0] = Scenario.class;
 				Constructor<? extends PlanStrategy> c = null;
 				try{
@@ -275,33 +275,29 @@ public final class StrategyManagerConfigLoader {
 				}
 				log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (InstantiationException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (InvocationTargetException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 		return strategy;
 	}
+
 	private static PlanSelector tryToLoadPlanSelectorByName(final Controler controler, final String name) {
 		PlanSelector strategy = null;
 		//classes loaded by name must not be part of the matsim core
-		if (name.startsWith("org.matsim")) {
+		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
 			log.error("PlanSelectors in the org.matsim package must not be loaded by name!");
-		}
-		else {
+		} else {
 			try {
 				Class<? extends PlanSelector> klas = (Class<? extends PlanSelector>) Class.forName(name);
-				Class[] args = new Class[1];
+				Class<?>[] args = new Class[1];
 				args[0] = Scenario.class;
 				Constructor<? extends PlanSelector> c = null;
 				try{
@@ -327,19 +323,15 @@ public final class StrategyManagerConfigLoader {
 				}
 				log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (InstantiationException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (InvocationTargetException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 		return strategy;
