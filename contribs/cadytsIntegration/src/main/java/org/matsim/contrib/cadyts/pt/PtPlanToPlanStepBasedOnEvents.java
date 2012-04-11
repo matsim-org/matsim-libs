@@ -71,7 +71,7 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 	PtPlanToPlanStepBasedOnEvents(final Scenario sc) {
 		this.sc = sc;
 		this.schedule = ((ScenarioImpl) sc).getTransitSchedule();
-		this.analyzedLines.add(new IdImpl("B-M44")); // TODO make configurable
+		this.analyzedLines.add(new IdImpl("M44")); // TODO make configurable
 	}
 
 	private long plansFound = 0;

@@ -79,7 +79,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 	final Set<Id> analyzedLines = new HashSet<Id>();
 
 	public NewPtBsePlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTURE, needed for reflection-based instantiation
-		this.analyzedLines.add(new IdImpl("B-M44")); // TODO make configurable
+		this.analyzedLines.add(new IdImpl("M44")); // TODO make configurable
 
 		controler.addControlerListener(this);
 

@@ -15,7 +15,7 @@
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
 			<leg mode="pt" trav_time="00:18:00">
 				<route>
-					PT1===stop1===B-M44===B-M44_Route2===stop12 
+					PT1===stop1===M44===M44_Route2===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
@@ -43,7 +43,7 @@
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
 			<leg mode="pt" trav_time="00:18:00">
 				<route>
-					PT1===stop1===B-M44===B-M44_Route10===stop12 
+					PT1===stop1===M44===M44_Route10===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
@@ -78,7 +78,7 @@
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
 			<leg mode="pt" trav_time="00:18:00">
 				<route>
-					PT1===stop1===B-M44===B-M44_Route2===stop12 
+					PT1===stop1===M44===M44_Route2===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
@@ -106,7 +106,7 @@
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
 			<leg mode="pt" trav_time="00:18:00">
 				<route>
-					PT1===stop1===B-M44===B-M44_Route10===stop12 
+					PT1===stop1===M44===M44_Route10===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
@@ -140,7 +140,7 @@
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
 			<leg mode="pt" trav_time="00:18:00">
 				<route>
-					PT1===stop1===B-M44===B-M44_Route2===stop12 
+					PT1===stop1===M44===M44_Route2===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
@@ -168,7 +168,7 @@
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
 			<leg mode="pt" trav_time="00:18:00">
 				<route>
-					PT1===stop1===B-M44===B-M44_Route10===stop12 
+					PT1===stop1===M44===M44_Route10===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
@@ -202,7 +202,7 @@
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
 			<leg mode="pt" trav_time="00:18:00">
 				<route>
-					PT1===stop1===B-M44===B-M44_Route2===stop12 
+					PT1===stop1===M44===M44_Route2===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
@@ -230,7 +230,7 @@
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
 			<leg mode="pt" trav_time="00:18:00">
 				<route>
-					PT1===stop1===B-M44===B-M44_Route10===stop12 
+					PT1===stop1===M44===M44_Route10===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />

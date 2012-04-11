@@ -100,14 +100,6 @@
 		<param name="activityClosingTime_1" value="18:00:00" />
 	</module>
 
-	<module name="vis">
-		<param name="logo" value="(c) 2009 TUB-VSP" />
-		<param name="delay" value="200" />
-		<param name="linkwidthfactor" value="15" />
-		<param name="shownodelabels" value="false" />
-		<param name="showlinklabels" value="true" />
-	</module>
-
 	<module name="bse">
 		<param name="startTime" value="5" />
 		<param name="endTime" value="20" />

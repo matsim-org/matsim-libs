@@ -11,9 +11,9 @@
 		<stopFacility id="stop12" x="9900.0" y="0.0" linkRefId="20" />
 	</transitStops>
 
-	<transitLine id="B-M44">
+	<transitLine id="M44">
 		
-		<transitRoute id="B-M44_Route2">
+		<transitRoute id="M44_Route2">
 			<description></description>
 			<transportMode>pt</transportMode>
 			<routeProfile>
@@ -36,32 +36,8 @@
 				<departure id="R2.4" departureTime="06:20:00" vehicleRefId="tr_3" />
 			</departures>
 		</transitRoute>
-		
-		<transitRoute id="B-M44_Route6">
-			<description></description>
-			<transportMode>pt</transportMode>
-			<routeProfile>
-				<stop refId="stop1" departureOffset="00:00:00" />
-				<stop refId="stop6" arrivalOffset="00:05:00" />
-				<stop refId="stop12" arrivalOffset="00:10:00" />
-			</routeProfile>
-			
-			<route>
-				<link refId="1" />
-				<link refId="6" />
-				<link refId="15" />
-				<link refId="20" />
-			</route>
 
-			<departures>
-				<departure id="R6.1" departureTime="05:50:00" vehicleRefId="tr_4" />
-				<departure id="R6.2" departureTime="06:00:00" vehicleRefId="tr_5" />
-				<departure id="R6.3" departureTime="06:10:00" vehicleRefId="tr_6" />
-				<departure id="R6.4" departureTime="06:20:00" vehicleRefId="tr_7" />
-			</departures>
-		</transitRoute>
-		
-		<transitRoute id="B-M44_Route10">
+		<transitRoute id="M44_Route10">
 			<description></description>
 			<transportMode>pt</transportMode>
 			<routeProfile>
@@ -69,7 +45,7 @@
 				<stop refId="stop10" arrivalOffset="00:05:00" />
 				<stop refId="stop12" arrivalOffset="00:10:00" />
 			</routeProfile>
-			
+
 			<route>
 				<link refId="1" />
 				<link refId="10" />
@@ -84,31 +60,7 @@
 				<departure id="R10.4" departureTime="06:20:00" vehicleRefId="tr_11" />
 			</departures>
 		</transitRoute>
-		
-		<transitRoute id="B-M44_RouteBack">
-			<description></description>
-			<transportMode>bus</transportMode>
-			<routeProfile>
-				<stop refId="stop12" departureOffset="00:00:00" />
-				<stop refId="stop1" arrivalOffset="00:10:00" />
-			</routeProfile>
-			
-			<route>
-				<link refId="20" />
-				<link refId="21" />
-				<link refId="22" />
-				<link refId="23" />
-				<link refId="1" />
-			</route>
-
-			<departures>
-				<departure id="RB.1" departureTime="14:50:00" vehicleRefId="tr_0" />
-				<departure id="RB.2" departureTime="15:00:00" vehicleRefId="tr_1" />
-				<departure id="RB.3" departureTime="15:10:00" vehicleRefId="tr_2" />
-				<departure id="RB.4" departureTime="15:20:00" vehicleRefId="tr_3" />
-			</departures>
-		</transitRoute>
-		
+				
 	</transitLine>
 
 </transitSchedule>
