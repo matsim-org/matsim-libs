@@ -156,6 +156,10 @@ BeforeMobsimListener, AfterMobsimListener  {
 
 					kmlWriter.setIterationNumber(iter);
 					kmlWriter.writeFile(filename);
+				}
+				if (outputFormat.contains("txt") || outputFormat.contains("all")) {
+					ControlerIO ctlIO=controler.getControlerIO();
+					
 					if (ccaBoard != null) {
 						ccaBoard.write(ctlIO.getIterationFilename(iter, "simCountCompareBoarding.txt"));
 					}
