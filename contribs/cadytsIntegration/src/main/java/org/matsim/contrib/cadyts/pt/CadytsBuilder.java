@@ -69,28 +69,16 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 			if (value != null) {
 				double stddev_veh_h = Double.parseDouble(value);
 				matsimCalibrator.setMinStddev(stddev_veh_h, TYPE.FLOW_VEH_H);
-				log.info("BSE:\tminFlowStddevVehH\t=\t" + stddev_veh_h);
+				log.info("CadytsPt:\tminFlowStddevVehH\t=\t" + stddev_veh_h);
 			}
 		}
-
-		// SET MAX DRAWS
-		/*
-			{
-				final String maxDrawStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "maxDraws");
-				if (maxDrawStr != null) {
-					final int maxDraws = Integer.parseInt(maxDrawStr);
-					log.info("BSE:\tmaxDraws=" + maxDraws);
-					calibrator.setMaxDraws(maxDraws);
-				}
-			}
-		 */
 
 		// SET FREEZE ITERATION
 		{
 			final String freezeIterationStr = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.FREEZE_ITERATION);
 			if (freezeIterationStr != null) {
 				final int freezeIteration = Integer.parseInt(freezeIterationStr);
-				log.info("BSE:\tfreezeIteration\t= " + freezeIteration);
+				log.info("CadytsPt:\tfreezeIteration\t= " + freezeIteration);
 				matsimCalibrator.setFreezeIteration(freezeIteration);
 			}
 		}
@@ -100,7 +88,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 			final String preparatoryIterationsStr = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.PREPARATORY_ITERATIONS);
 			if (preparatoryIterationsStr != null) {
 				final int preparatoryIterations = Integer.parseInt(preparatoryIterationsStr);
-				log.info("BSE:\tpreparatoryIterations\t= " + preparatoryIterations);
+				log.info("CadytsPt:\tpreparatoryIterations\t= " + preparatoryIterations);
 				matsimCalibrator.setPreparatoryIterations(preparatoryIterations);
 			}
 		}
@@ -110,7 +98,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 			final String varianceScaleStr = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.VARIANCE_SCALE);
 			if (varianceScaleStr != null) {
 				final double varianceScale = Double.parseDouble(varianceScaleStr);
-				log.info("BSE:\tvarianceScale\t= " + varianceScale);
+				log.info("CadytsPt:\tvarianceScale\t= " + varianceScale);
 				matsimCalibrator.setVarianceScale(varianceScale);
 			}
 		}
@@ -120,7 +108,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 			final String useBruteForceStr = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.USE_BRUTE_FORCE);
 			if (useBruteForceStr != null) {
 				final boolean useBruteForce = Boolean.parseBoolean(useBruteForceStr);
-				log.info("BSE:\tuseBruteForce\t= " + useBruteForce);
+				log.info("CadytsPt:\tuseBruteForce\t= " + useBruteForce);
 				matsimCalibrator.setBruteForce(useBruteForce);
 			}
 		}
@@ -146,7 +134,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		Counts occupCounts = new Counts() ;
 		new MatsimCountsReader(occupCounts).readFile(countsFilename);
 		if (occupCounts.getCounts().size() == 0) {
-			throw new RuntimeException("BSE requires counts-data.");
+			throw new RuntimeException("CadytsPt requires counts-data.");
 		}
 
 		int arStartTime = Integer.parseInt(config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.START_TIME));

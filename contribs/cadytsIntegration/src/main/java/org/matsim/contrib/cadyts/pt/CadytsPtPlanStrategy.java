@@ -62,7 +62,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
-	private static final String OCCUPANCYANALYSIS_FILENAME = "ptBseOccupancyAnalysis.txt";
+	private static final String OCCUPANCYANALYSIS_FILENAME = "cadytsPtOccupancyAnalysis.txt";
 
 	private PlanStrategy delegate = null;
 
@@ -72,10 +72,10 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	private final Counts occupCounts = new Counts();
 	private final Counts boardCounts = new Counts();
 	private final Counts alightCounts = new Counts();
-	private final CadytsPtOccupancyAnalyzer ptBseOccupAnalyzer;
+	private final CadytsPtOccupancyAnalyzer cadytsPtOccupAnalyzer;
 	static TransitSchedule trSched;
 	private final boolean writeAnalysisFile;
-	CadytsPtPlanChanger ptBsePlanChanger;
+	CadytsPtPlanChanger cadytsPtPlanChanger;
 	final Set<Id> analyzedLines = new HashSet<Id>();
 
 	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTURE, needed for reflection-based instantiation
@@ -83,10 +83,10 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 		controler.addControlerListener(this);
 
-		this.ptBseOccupAnalyzer = new CadytsPtOccupancyAnalyzer();
-		controler.getEvents().addHandler(this.ptBseOccupAnalyzer);
+		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer();
+		controler.getEvents().addHandler(this.cadytsPtOccupAnalyzer);
 
-		this.simResults = new SimResultsContainerImpl(this.ptBseOccupAnalyzer);
+		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer);
 
 		// this collects events and generates cadyts plans from it
 		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(controler.getScenario());
@@ -95,9 +95,9 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		// build the calibrator. This is a static method, and in consequence has no side effects
 		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario());
 
-		// finally, we create the PlanStrategy, with the bse-based plan selector:
-		this.ptBsePlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
-		this.delegate = new PlanStrategyImpl(this.ptBsePlanChanger);
+		// finally, we create the PlanStrategy, with the cadyts-based plan selector:
+		this.cadytsPtPlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
+		this.delegate = new PlanStrategyImpl(this.cadytsPtPlanChanger);
 
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
 
@@ -126,7 +126,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	// /////////////////////////////////////////////////////
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		this.ptBseOccupAnalyzer.reset(event.getIteration());
+		this.cadytsPtOccupAnalyzer.reset(event.getIteration());
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 				}
 			}
 			String outFile = event.getControler().getControlerIO().getIterationFilename(it, OCCUPANCYANALYSIS_FILENAME);
-			this.ptBseOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts, stopIds);
+			this.cadytsPtOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts, stopIds);
 		}
 	}
 
@@ -167,9 +167,9 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		// the remaining material is, in my view, "just" output:
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			CadytsPtLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new CadytsPtLinkCostOffsetsXMLFileIO(trSched);
-			ptBseLinkCostOffsetsXMLFileIO.write(filename, this.calibrator.getLinkCostOffsets());
-			ptBseLinkCostOffsetsXMLFileIO = null;
+			CadytsPtLinkCostOffsetsXMLFileIO cadytsPtLinkCostOffsetsXMLFileIO = new CadytsPtLinkCostOffsetsXMLFileIO(trSched);
+			cadytsPtLinkCostOffsetsXMLFileIO.write(filename, this.calibrator.getLinkCostOffsets());
+			cadytsPtLinkCostOffsetsXMLFileIO = null;
 		} catch (IOException e) {
 			log.error(e);
 		}
@@ -201,11 +201,11 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 				controler.stopwatch.beginOperation("compare with pt counts");
 
 				Network network = controler.getNetwork();
-				CadytsPtCountsComparisonAlgorithm ccaBoard = new CadytsPtCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.boardCounts,
+				CadytsPtCountsComparisonAlgorithm ccaBoard = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.boardCounts,
 						network, this.countsScaleFactor);
-				CadytsPtCountsComparisonAlgorithm ccaAlight = new CadytsPtCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.alightCounts,
+				CadytsPtCountsComparisonAlgorithm ccaAlight = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.alightCounts,
 						network, this.countsScaleFactor);
-				CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.occupCounts,
+				CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.occupCounts,
 						network, this.countsScaleFactor);
 
 				String distanceFilterStr = config.findParam("ptCounts", "distanceFilter");
@@ -231,7 +231,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
 					ControlerIO ctlIO = controler.getControlerIO();
 
-					String filename = ctlIO.getIterationFilename(iter, "ptBseCountscompare.kmz");
+					String filename = ctlIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
 					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(),
 							ccaAlight.getComparison(), ccaOccupancy.getComparison(), TransformationFactory.getCoordinateTransformation(config
 									.global().getCoordinateSystem(), TransformationFactory.WGS84), this.boardCounts, this.alightCounts,
@@ -240,13 +240,13 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 					kmlWriter.setIterationNumber(iter);
 					kmlWriter.writeFile(filename);
 					if (ccaBoard != null) {
-						ccaBoard.write(ctlIO.getIterationFilename(iter, "simBseCountCompareBoarding.txt"));
+						ccaBoard.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareBoarding.txt"));
 					}
 					if (ccaAlight != null) {
-						ccaAlight.write(ctlIO.getIterationFilename(iter, "simBseCountCompareAlighting.txt"));
+						ccaAlight.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareAlighting.txt"));
 					}
 					if (ccaOccupancy != null) {
-						ccaOccupancy.write(ctlIO.getIterationFilename(iter, "simBseCountCompareOccupancy.txt"));
+						ccaOccupancy.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
 					}
 				}
 
