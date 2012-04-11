@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.cadyts.pt;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -187,7 +187,7 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
 		return this.occupancies.keySet();
 	}
 
-	public void writeResultsForSelectedStopIds(final String filename, final Counts occupCounts, final List<Id> m44StopIds) {
+	public void writeResultsForSelectedStopIds(final String filename, final Counts occupCounts, final Collection<Id> stopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
 		// write header
@@ -206,8 +206,7 @@ public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
 		writer.write(countValBuff.toString());
 
 		// write content
-		// for (Id stopId : getOccupancyStopIds()) { this is for all stations
-		for (Id stopId : m44StopIds) {
+		for (Id stopId : stopIds) {
 			// get count data
 			Count count = occupCounts.getCounts().get(stopId);
 			if (!occupCounts.getCounts().containsKey(stopId)) {

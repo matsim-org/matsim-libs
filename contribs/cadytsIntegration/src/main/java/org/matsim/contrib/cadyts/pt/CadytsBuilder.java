@@ -30,6 +30,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
+import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
@@ -52,18 +53,19 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		Config config = sc.getConfig();
 
 		// get default regressionInertia, used as parameter in the constructor
-		String regressionInertiaValue = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "regressionInertia");
+		String regressionInertiaValue = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.REGRESSION_INERTIA);
 		double regressionInertia = MATSimUtilityModificationCalibrator.DEFAULT_REGRESSION_INERTIA;
 		if (regressionInertiaValue != null) {
 			regressionInertia = Double.parseDouble(regressionInertiaValue);
 		}
 
+		// if logfile is not specified, it is written to the working directory... so better write it to the output directory.
 		MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator =
-				new MATSimUtilityModificationCalibrator<TransitStopFacility>(MatsimRandom.getLocalInstance(), regressionInertia); // a logfile could optionally be passed
+				new MATSimUtilityModificationCalibrator<TransitStopFacility>(config.controler().getOutputDirectory() + "/cadyts.log", MatsimRandom.getLocalInstance(), regressionInertia);
 
 		// Set default standard deviation
 		{
-			String value = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "minFlowStddevVehH");
+			String value = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.MIN_FLOW_STDDEV);
 			if (value != null) {
 				double stddev_veh_h = Double.parseDouble(value);
 				matsimCalibrator.setMinStddev(stddev_veh_h, TYPE.FLOW_VEH_H);
@@ -85,7 +87,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 		// SET FREEZE ITERATION
 		{
-			final String freezeIterationStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "freezeIteration");
+			final String freezeIterationStr = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.FREEZE_ITERATION);
 			if (freezeIterationStr != null) {
 				final int freezeIteration = Integer.parseInt(freezeIterationStr);
 				log.info("BSE:\tfreezeIteration\t= " + freezeIteration);
@@ -95,7 +97,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 		// SET Preparatory Iterations
 		{
-			final String preparatoryIterationsStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "preparatoryIterations");
+			final String preparatoryIterationsStr = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.PREPARATORY_ITERATIONS);
 			if (preparatoryIterationsStr != null) {
 				final int preparatoryIterations = Integer.parseInt(preparatoryIterationsStr);
 				log.info("BSE:\tpreparatoryIterations\t= " + preparatoryIterations);
@@ -105,7 +107,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 		// SET varianceScale
 		{
-			final String varianceScaleStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "varianceScale");
+			final String varianceScaleStr = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.VARIANCE_SCALE);
 			if (varianceScaleStr != null) {
 				final double varianceScale = Double.parseDouble(varianceScaleStr);
 				log.info("BSE:\tvarianceScale\t= " + varianceScale);
@@ -115,7 +117,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 		//SET useBruteForce
 		{
-			final String useBruteForceStr = config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "useBruteForce");
+			final String useBruteForceStr = config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.USE_BRUTE_FORCE);
 			if (useBruteForceStr != null) {
 				final boolean useBruteForce = Boolean.parseBoolean(useBruteForceStr);
 				log.info("BSE:\tuseBruteForce\t= " + useBruteForce);
@@ -136,7 +138,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 		//add a module in config not in file but "in execution"
 
-		String countsFilename = config.findParam(NewPtBsePlanStrategy.MODULE_NAME, "inputOccupancyCountsFile");
+		String countsFilename = config.findParam(PtCountsConfigGroup.GROUP_NAME, PtCountsConfigGroup.OCCUPANCY_COUNTS_INPUT_FILENAME);
 		if (countsFilename == null) {
 			throw new RuntimeException("could not get counts filename from config; aborting");
 		}
@@ -147,8 +149,8 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 			throw new RuntimeException("BSE requires counts-data.");
 		}
 
-		int arStartTime = Integer.parseInt(config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "startTime"));
-		int arEndTime = Integer.parseInt(config.findParam(NewPtBsePlanStrategy.BSE_MOD_NAME, "endTime"));
+		int arStartTime = Integer.parseInt(config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.START_TIME));
+		int arEndTime = Integer.parseInt(config.findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.END_TIME));
 
 		NewPtBsePlanStrategy.trSched = sc.getTransitSchedule();
 
