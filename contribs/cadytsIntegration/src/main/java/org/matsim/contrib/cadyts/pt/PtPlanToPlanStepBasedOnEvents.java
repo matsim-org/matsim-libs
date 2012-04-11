@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
@@ -60,24 +61,24 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 	// this is _only_ there for output:
 	Set<Plan> plansEverSeen = new HashSet<Plan>();
 
-	private final static String STR_M44 = "M44";
-	private final String STR_PLANSTEPFACTORY = "planStepFactory";
-	private final String STR_ITERATION = "iteration";
-	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
-	private final Set<Id> popIdSet;
+	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
+	private static final String STR_ITERATION = "iteration";
+
+	private final Set<Id> transitDrivers = new HashSet<Id>();
+	private final Set<Id> transitVehicles = new HashSet<Id>();
+	private final Set<Id> analyzedLines = new HashSet<Id>();
 
 	PtPlanToPlanStepBasedOnEvents(final Scenario sc) {
 		this.sc = sc;
-		this.popIdSet = sc.getPopulation().getPersons().keySet();
 		this.schedule = ((ScenarioImpl) sc).getTransitSchedule();
+		this.analyzedLines.add(new IdImpl("B-M44")); // TODO make configurable
 	}
 
 	private long plansFound = 0;
 	private long plansNotFound = 0;
 
 	final cadyts.demand.Plan<TransitStopFacility> getPlanSteps(final Plan plan) {
-		PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) plan.getCustomAttributes().get(
-				this.STR_PLANSTEPFACTORY);
+		PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;
 			return null;
@@ -96,35 +97,32 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
 
 		this.personsFromVehId.clear();
-		this.vehToRouteId.clear();
+		this.transitDrivers.clear();
+		this.transitVehicles.clear();
 	}
 
 	@Override
 	public void handleEvent(final TransitDriverStartsEvent event) {
-		this.vehToRouteId.put(event.getVehicleId(), event.getTransitRouteId());
+		if (this.analyzedLines.contains(event.getTransitLineId())) {
+			this.transitDrivers.add(event.getDriverId());
+			this.transitVehicles.add(event.getVehicleId());
+		}
 	}
 
 	@Override
 	public void handleEvent(final PersonEntersVehicleEvent event) {
-		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
-		if (!transitLineId.toString().contains(STR_M44)) {
-			return;
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-(analyzed-)transit vehicles
 		}
-
-		if (this.popIdSet.contains(event.getPersonId())) { // exclude driver agents that don't belong to population file
-			addPersonToVehicleContainer(event.getPersonId(), event.getVehicleId());
-		}
+		addPersonToVehicleContainer(event.getPersonId(), event.getVehicleId());
 	}
 
 	@Override
 	public void handleEvent(final PersonLeavesVehicleEvent event) {
-		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
-		if (!transitLineId.toString().contains(STR_M44)) {
-			return;
+		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+			return; // ignore transit drivers or persons entering non-(analyzed-)transit vehicles
 		}
-		if (this.popIdSet.contains(event.getPersonId())) { // ignore pt vehicle driver
-			removePersonFromVehicleContainer(event.getPersonId(), event.getVehicleId());
-		}
+		removePersonFromVehicleContainer(event.getPersonId(), event.getVehicleId());
 	}
 
 	@Override
@@ -186,15 +184,15 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 	private PlanBuilder<TransitStopFacility> getPlanStepFactoryForPlan(final Plan selectedPlan) {
 		PlanBuilder<TransitStopFacility> planStepFactory = null;
 
-		planStepFactory = (PlanBuilder<TransitStopFacility>) selectedPlan.getCustomAttributes().get(this.STR_PLANSTEPFACTORY);
-		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(this.STR_ITERATION);
+		planStepFactory = (PlanBuilder<TransitStopFacility>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
 		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
 			// attach the iteration number to the plan:
-			selectedPlan.getCustomAttributes().put(this.STR_ITERATION, this.iteration);
+			selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
 
 			// construct a new PlanBulder and attach it to the plan:
 			planStepFactory = new PlanBuilder<TransitStopFacility>();
-			selectedPlan.getCustomAttributes().put(this.STR_PLANSTEPFACTORY, planStepFactory);
+			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
 
 			// memorize the plan as being seen:
 			this.plansEverSeen.add(selectedPlan);
