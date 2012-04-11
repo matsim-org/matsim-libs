@@ -87,7 +87,7 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 			       - config.getUtilityOfLineSwitch_utl();
 		}
 
-		// this is fine as long as the scores are additives are additive
+		// this is fine as long as the scores are additives
 		return -distanceScoring.getInVehiclePtScore(
 				link.getLength(),
 				getLinkTravelTime( link , time ),

@@ -36,7 +36,6 @@ import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.scoring.ActivityScoringFunction;
-import herbie.running.scoring.LegScoringFunction;
 
 /**
  * @author thibautd
