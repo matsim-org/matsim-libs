@@ -33,6 +33,7 @@ import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
 import playground.andreas.P2.plan.PRouteProvider;
+import playground.andreas.P2.replanning.CreateNewPlan;
 
 /**
  * Creates an car grid network with one pt line.
@@ -50,7 +51,7 @@ public class PScenarioHelper {
 		
 		PRouteProvider rP = new ComplexCircleScheduleProvider(pC.getPIdentifier(), sC.getTransitSchedule(), sC.getNetwork(), 0);
 		
-		coop.init(rP, 0);
+		coop.init(rP, new CreateNewPlan(new ArrayList<String>()), 0);
 		
 		return coop;
 	}

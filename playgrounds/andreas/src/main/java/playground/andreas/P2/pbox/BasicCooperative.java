@@ -78,13 +78,11 @@ public class BasicCooperative implements Cooperative{
 		this.franchise = franchise;
 	}
 
-	public void init(PRouteProvider pRouteProvider, int iteration) {
+	public void init(PRouteProvider pRouteProvider, PPlanStrategy initialStrategy, int iteration) {
 		this.budget = 0.0;
 		this.currentIteration = iteration;
 		this.routeProvider = pRouteProvider;
-	
-		PPlanStrategy strategy = new CreateNewPlan(new ArrayList<String>());
-		this.bestPlan = strategy.run(this);
+		this.bestPlan = initialStrategy.run(this);
 		
 		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
 		for (TransitRoute route : this.bestPlan.getLine().getRoutes().values()) {
