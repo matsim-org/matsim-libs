@@ -76,13 +76,16 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					controler.getConfig().plansCalcRoute(),
 					controler.getConfig().transitRouter(),
 					controler.getConfig().vspExperimental());
+		TravelScoringFunction travelScoring = 
+			new TravelScoringFunction(
+				new CharyparNagelScoringParameters( controler.getConfig().planCalcScore() ),
+				(HerbieConfigGroup) controler.getConfig().getModule( HerbieConfigGroup.GROUP_NAME ) );
+	
 		HerbieParkAndRideCost timeCost =
 			new HerbieParkAndRideCost(
 					transitConfig,
-					new TravelScoringFunction(
-						new CharyparNagelScoringParameters( controler.getConfig().planCalcScore() ),
-						(HerbieConfigGroup) controler.getConfig().getModule( HerbieConfigGroup.GROUP_NAME ) ) );
-
+					travelScoring);
+	
 		PersonalizableTravelTime carTime = tripRouterFactory.getTravelTimeCalculatorFactory().createTravelTime();
 		PersonalizableTravelDisutility carCost =
 			tripRouterFactory.getTravelCostCalculatorFactory().createTravelDisutility(
@@ -91,7 +94,8 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					new TransitRouterNetworkTravelTimeAndDisutility( transitConfig );
 
 		ParkAndRideRoutingModule routingModule =
-			new ParkAndRideRoutingModule(
+			new HerbieParkAndRideRoutingModule(
+					travelScoring,
 					((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
 					controler.getPopulation().getFactory(),
 					controler.getNetwork(),

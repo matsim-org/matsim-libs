@@ -89,7 +89,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 	private final ParkAndRideRouterNetwork routingNetwork;
 	private final ParkAndRideCostAggregator timeCost;
 	private final MultiNodeDijkstra leastCostPathAlgo;
-	private final TransitRouterConfig transitRouterConfig;
+	protected final TransitRouterConfig transitRouterConfig;
 	private final ModeRouteFactory routeFactory;
 	private final PopulationFactory populationFactory;
 	private final TransitSchedule transitSchedule;
@@ -423,11 +423,8 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		}
 
 		// check if walk would actually be better
-		double directWalkCost =
-			CoordUtils.calcDistance(
-					fromFacility.getCoord(),
-					toFacility.getCoord()) /
-			transitRouterConfig.getBeelineWalkSpeed() * ( 0 - transitRouterConfig.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		double directWalkCost = calcDirectWalkCost(fromFacility, toFacility);
+
 		if (directWalkCost < tripAndCost.getSecond()) {
 			List<PlanElement> legs = new ArrayList<PlanElement>();
 			Leg leg = new LegImpl(TransportMode.transit_walk);
@@ -445,6 +442,19 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 		}
 
 		return trip;
+	}
+
+	/**
+	 * Used to compute the cost of walking, for comparison with
+	 * the PT trip.
+	 */ 
+	protected double calcDirectWalkCost(
+			final Facility fromFacility,
+			final Facility toFacility) {
+		return CoordUtils.calcDistance(
+					fromFacility.getCoord(),
+					toFacility.getCoord()) /
+			transitRouterConfig.getBeelineWalkSpeed() * ( 0 - transitRouterConfig.getMarginalUtilityOfTravelTimeWalk_utl_s());
 	}
 
 	// adapted from TransitRouterImpl.convert(...)
