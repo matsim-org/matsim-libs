@@ -138,7 +138,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 		//add a module in config not in file but "in execution"
 
-		String countsFilename = config.findParam(PtCountsConfigGroup.GROUP_NAME, PtCountsConfigGroup.OCCUPANCY_COUNTS_INPUT_FILENAME);
+		String countsFilename = ((PtCountsConfigGroup) config.getModule(PtCountsConfigGroup.GROUP_NAME)).getOccupancyCountsFileName();
 		if (countsFilename == null) {
 			throw new RuntimeException("could not get counts filename from config; aborting");
 		}
