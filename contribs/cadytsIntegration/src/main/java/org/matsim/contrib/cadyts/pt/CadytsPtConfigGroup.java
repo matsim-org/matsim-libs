@@ -19,9 +19,15 @@
 
 package org.matsim.contrib.cadyts.pt;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author mrieser / senozon
@@ -41,21 +47,33 @@ public class CadytsPtConfigGroup extends Module {
 	public static final String START_TIME = "startTime";
 	public static final String END_TIME = "endTime";
 	public static final String WRITE_ANALYSIS_FILE = "writeAnalysisFile";
+	private static final String CALIBRATED_LINES = "calibratedLines";
+
+	private final Set<Id> calibratedLines = new HashSet<Id>();
 
 	public CadytsPtConfigGroup() {
 		super(GROUP_NAME);
 	}
 
 	@Override
-	public void addParam(final String param_name, final String value) {
-		// TODO Auto-generated method stub
-		super.addParam(param_name, value);
+	public void addParam(final String paramName, final String value) {
+		if (CALIBRATED_LINES.equals(paramName)) {
+			this.calibratedLines.clear();
+			for (String lineId : CollectionUtils.stringToArray(value)) {
+				this.calibratedLines.add(new IdImpl(lineId));
+			}
+		} else {
+			super.addParam(paramName, value);
+		}
 	}
 
 	@Override
 	public Map<String, String> getComments() {
-		// TODO Auto-generated method stub
-		return super.getComments();
+		Map<String, String> comments = super.getComments();
+
+		comments.put(CALIBRATED_LINES, "Comma-separated list of transit lines to be calibrated.");
+
+		return comments;
 	}
 
 	@Override
@@ -68,6 +86,15 @@ public class CadytsPtConfigGroup extends Module {
 	public Map<String, String> getParams() {
 		// TODO Auto-generated method stub
 		return super.getParams();
+	}
+
+	public Set<Id> getCalibratedLines() {
+		return Collections.unmodifiableSet(this.calibratedLines);
+	}
+
+	public void setCalibratedLines(final Set<Id> lines) {
+		this.calibratedLines.clear();
+		this.calibratedLines.addAll(lines);
 	}
 
 }

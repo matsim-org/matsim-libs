@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
@@ -76,12 +75,16 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	static TransitSchedule trSched;
 	private final boolean writeAnalysisFile;
 	CadytsPtPlanChanger cadytsPtPlanChanger;
-	final Set<Id> analyzedLines = new HashSet<Id>();
+	final Set<Id> analyzedLines;
 
 	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTURE, needed for reflection-based instantiation
-		this.analyzedLines.add(new IdImpl("M44")); // TODO make configurable
-
 		controler.addControlerListener(this);
+
+		CadytsPtConfigGroup cadytsConfig = new CadytsPtConfigGroup();
+		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, cadytsConfig);
+		// addModule() also initializes the config group with the values read from the config file
+
+		this.analyzedLines = cadytsConfig.getCalibratedLines();
 
 		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer();
 		controler.getEvents().addHandler(this.cadytsPtOccupAnalyzer);

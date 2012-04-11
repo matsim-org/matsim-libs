@@ -112,6 +112,7 @@
 		 <param name="calibrationMethodSwitch" value="101"/>
 		 <param name="proportionalAssignment" value=""/> 
 		??? -->
+		<param name="calibratedLines" value="M44" />
 	</module>
 
 	<module name="ptRouter">
