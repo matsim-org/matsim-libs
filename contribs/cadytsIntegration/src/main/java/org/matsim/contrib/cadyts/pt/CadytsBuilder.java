@@ -28,7 +28,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
 import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -49,7 +48,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		// private Constructor, should not be instantiated
 	}
 
-	/*package*/ static MATSimUtilityModificationCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc) {
+	/*package*/ static MATSimUtilityModificationCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts) {
 		Config config = sc.getConfig();
 
 		// get default regressionInertia, used as parameter in the constructor
@@ -131,8 +130,6 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 			throw new RuntimeException("could not get counts filename from config; aborting");
 		}
 
-		Counts occupCounts = new Counts() ;
-		new MatsimCountsReader(occupCounts).readFile(countsFilename);
 		if (occupCounts.getCounts().size() == 0) {
 			throw new RuntimeException("CadytsPt requires counts-data.");
 		}

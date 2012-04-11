@@ -92,25 +92,18 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(controler.getScenario());
 		controler.getEvents().addHandler(ptStep);
 
+		String occupancyCountsFilename = controler.getConfig().ptCounts().getOccupancyCountsFileName();
+		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
+
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario());
+		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario(), this.occupCounts);
 
 		// finally, we create the PlanStrategy, with the cadyts-based plan selector:
 		this.cadytsPtPlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
 		this.delegate = new PlanStrategyImpl(this.cadytsPtPlanChanger);
 
-		// NOTE: The coupling between calibrator and simResults is done in "reset".
-
 		// ===========================
 		// everything beyond this line is, I think, analysis code. kai, jul'11
-
-		// read occup counts from file
-		String occupancyCountsFilename = controler.getConfig().ptCounts().getOccupancyCountsFileName();
-		if (occupancyCountsFilename != null) {
-			new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
-		}
-		// yyyyyy the counts data is read in "buildCalibrator", and here again. This is not necessary,
-		// and confuses the reader of the program. kai, jul'11
 
 		this.countsScaleFactor = controler.getConfig().ptCounts().getCountsScaleFactor();
 
@@ -118,8 +111,6 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		String strWriteAnalysisFile = controler.getConfig().findParam(CadytsPtConfigGroup.GROUP_NAME, "writeAnalysisFile");
 		this.writeAnalysisFile = strWriteAnalysisFile != null && Boolean.parseBoolean(strWriteAnalysisFile);
 		strWriteAnalysisFile = null;
-
-		controler.getScenario().addScenarioElement(this.occupCounts);
 	}
 
 	// Analysis methods
@@ -217,17 +208,13 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
 				}
 
-				ccaBoard.setCountsScaleFactor(this.countsScaleFactor);
-				ccaAlight.setCountsScaleFactor(this.countsScaleFactor);
-				ccaOccupancy.setCountsScaleFactor(this.countsScaleFactor);
-
 				// filter stations here??
 
 				ccaBoard.run();
 				ccaAlight.run();
 				ccaOccupancy.run();
 
-				String outputFormat = config.findParam("ptCounts", "outputformat");
+				String outputFormat = ((PtCountsConfigGroup) config.getModule(PtCountsConfigGroup.GROUP_NAME)).getOutputFormat();
 				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
 					ControlerIO ctlIO = controler.getControlerIO();
 
@@ -239,15 +226,12 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 					kmlWriter.setIterationNumber(iter);
 					kmlWriter.writeFile(filename);
-					if (ccaBoard != null) {
-						ccaBoard.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareBoarding.txt"));
-					}
-					if (ccaAlight != null) {
-						ccaAlight.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareAlighting.txt"));
-					}
-					if (ccaOccupancy != null) {
-						ccaOccupancy.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
-					}
+				}
+				if (outputFormat.contains("txt") || outputFormat.contains("all")) {
+					ControlerIO ctlIO = controler.getControlerIO();
+					ccaBoard.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareBoarding.txt"));
+					ccaAlight.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareAlighting.txt"));
+					ccaOccupancy.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
 				}
 
 				controler.stopwatch.endOperation("compare with pt counts");
