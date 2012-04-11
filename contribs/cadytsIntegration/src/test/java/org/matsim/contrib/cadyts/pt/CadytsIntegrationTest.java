@@ -133,26 +133,26 @@ public class CadytsIntegrationTest {
 			stopId = new IdImpl("stop1");
 			simValues = reader.getSimulatedValues(stopId);
 			realValues= reader.getRealValues(stopId);
-			Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 4.0 , MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 4.0 , MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 
 			stopId = new IdImpl("stop2");
 			simValues = reader.getSimulatedValues(stopId);
 			realValues= reader.getRealValues(stopId);
-			Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 
 			stopId = new IdImpl("stop6");
 			simValues = reader.getSimulatedValues(stopId);
 			realValues= reader.getRealValues(stopId);
-			Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 2.0 , MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 2.0 , MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 
 			stopId = new IdImpl("stop10");
 			simValues = reader.getSimulatedValues(stopId);
 			realValues= reader.getRealValues(stopId);
-			Assert.assertEquals("Volume of hour 6 is wrong", simValues[6], 1.0 , MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Volume of hour 6 is wrong", realValues[6], 1.0 , MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6], MatsimTestUtils.EPSILON);
 		}
 
 		// test calibration statistics
