@@ -51,17 +51,17 @@ public class Module  implements Serializable{
 		this.params = new TreeMap<String,String>();
 	}
 
-	public void addParam(final String param_name, final String value) {
-		if (this.params.containsKey(param_name)) {
-			log.info(this.toString() + "[param_name=" + param_name + ",old_value=" + this.params.get(param_name) + ",value=" + value + " value replaced]");
+	public void addParam(final String paramName, final String value) {
+		if (this.params.containsKey(paramName)) {
+			log.info(this.toString() + "[paramName=" + paramName + ",oldValue=" + this.params.get(paramName) + ",value=" + value + " value replaced]");
 		}
 
 		// changing windows path backslashes into unix path slashes
-		String new_value = value.replace('\\','/');
-		if (!new_value.equals(value)) {
-			log.info(this.toString() + "[value=" + value + ",new_value=" + new_value + " replaced backslashes with slashes]");
+		String newValue = value.replace('\\','/');
+		if (!newValue.equals(value)) {
+			log.info(this.toString() + "[value=" + value + ",newValue=" + newValue + " replaced backslashes with slashes]");
 		}
-		this.params.put(param_name,new_value);
+		this.params.put(paramName,newValue);
 	}
 
 	/**
@@ -90,12 +90,12 @@ public class Module  implements Serializable{
 		/* nothing to do in default */
 	}
 
-	public String getValue(final String param_name) {
+	public String getValue(final String paramName) {
 		// yyyy my intuition is that this should be made final.  This would leave the prototypical "getParameterFromHashKey"
 		// still intact.  But it would force normal config groups to use direct getters and setters ... allowing later to
 		// find out where the parameters are actually used in the code.  So far, this seems feasible (few actual
 		// occurences in the code).  kai, jun'11
-		return this.params.get(param_name);
+		return this.params.get(paramName);
 	}
 
 	protected final String getName() {
@@ -117,6 +117,6 @@ public class Module  implements Serializable{
 	@Override
 	public final String toString() {
 		return "[name=" + this.name + "]" +
-				"[nof_params=" + this.params.size() + "]";
+				"[nOfParams=" + this.params.size() + "]";
 	}
 }
