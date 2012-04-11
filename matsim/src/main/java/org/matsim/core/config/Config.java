@@ -22,6 +22,7 @@ package org.matsim.core.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -247,8 +248,17 @@ public class Config {
 	 *             if a config-group with the specified name already exists.
 	 */
 	public final void addModule(final String name, final Module module) {
-		if (this.modules.containsKey(name)) {
-			throw new IllegalArgumentException("Module " + name + " exists already.");
+		Module m = this.modules.get(name);
+		if (m != null) {
+			if (m.getClass() == Module.class && module.getClass() != Module.class) {
+				// default module, replace it with custom group implementation
+				for (Map.Entry<String, String> e : m.getParams().entrySet()) {
+					module.addParam(e.getKey(), e.getValue());
+				}
+				this.modules.put(name, module);
+			} else {
+				throw new IllegalArgumentException("Module " + name + " exists already.");
+			}
 		}
 		this.modules.put(name, module);
 	}
