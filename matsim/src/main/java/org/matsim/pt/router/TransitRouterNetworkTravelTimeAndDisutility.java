@@ -117,6 +117,4 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		return time2;
 	}
 
-	static int wrnCnt = 0 ;
-
 }

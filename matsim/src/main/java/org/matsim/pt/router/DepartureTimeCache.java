@@ -22,8 +22,6 @@ package org.matsim.pt.router;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -43,11 +41,9 @@ public class DepartureTimeCache {
 		if (earliestDepartureTimeAtTerminus >= TransitRouterNetworkTravelTimeAndDisutility.MIDNIGHT) {
 			earliestDepartureTimeAtTerminus = earliestDepartureTimeAtTerminus % TransitRouterNetworkTravelTimeAndDisutility.MIDNIGHT;
 		}
-	
-		if ( earliestDepartureTimeAtTerminus < 0. && TransitRouterNetworkTravelTimeAndDisutility.wrnCnt < 1 ) {
-			TransitRouterNetworkTravelTimeAndDisutility.wrnCnt++ ;
-			Logger.getLogger(this.getClass()).warn("if departure at terminus is before midnight, this router may not work correctly" +
-					" (will take the first departure at terminus AFTER midnight).\n" + Gbl.ONLYONCE ) ;
+		if (earliestDepartureTimeAtTerminus < 0) {
+			// this may happen when depTime < departureOffset, e.g. I want to start at 24:03, but the bus departs at 23:55 at terminus
+			earliestDepartureTimeAtTerminus += TransitRouterNetworkTravelTimeAndDisutility.MIDNIGHT;
 		}
 	
 		// this will search for the terminus departure that corresponds to my departure at the stop:
