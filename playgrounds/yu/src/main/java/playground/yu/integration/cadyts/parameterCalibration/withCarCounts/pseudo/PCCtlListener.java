@@ -23,7 +23,6 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.pseu
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -72,12 +71,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		implements StartupListener, ShutdownListener, IterationEndsListener,
 		BeforeMobsimListener {
 	private int caliStartTime, caliEndTime;
-	private int avgLlhOverIters = 0, writeLlhInterval = 0;
-	// private Config config;
-	// private int cycleIdx = 0, cycle;
+	// private int avgLlhOverIters = 0, writeLlhInterval = 0;
 
 	private SimpleWriter writer = null;
-	private final SimpleWriter writerCV = null;
 	// private static List<Link> links = new ArrayList<Link>();
 	// private static Set<Id> linkIds = new HashSet<Id>();
 	private XYLineChart chart;// paramChart
@@ -90,11 +86,11 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private double[][] paramArrays/* performing, traveling and so on */;
 
-	private double llhSum = 0d;
 	private PlanToPlanStep planConverter = null;
-	private Counts counts = null;
+	private Counts counts;
 	private static int countTimeBin = 3600;
 	private Network network = null;
+	private double minStdDev, varianceScale;
 
 	// private final boolean writeQGISFile = true;
 
@@ -156,6 +152,16 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		// SETTING staticsFile
 		calibrator.setStatisticsFile(ctlIO
 				.getOutputFilename("calibration-stats.txt"));
+
+		String caliStartTimeStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+				"startTime");
+		caliStartTime = caliStartTimeStr != null ? Integer
+				.parseInt(caliStartTimeStr) : DEFAULT_CALIBRATION_START_TIME;
+
+		String caliEndTimeStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+				"endTime");
+		caliEndTime = caliEndTimeStr != null ? Integer.parseInt(caliEndTimeStr)
+				: DEFAULT_CALIBRATION_END_TIME;
 	}
 
 	private void initializeOutput(Controler ctl) {
@@ -188,17 +194,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		Config config = ctl.getConfig();
 
-		String avgLlhOverItersStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-				"averageLogLikelihoodOverIterations");
-		if (avgLlhOverItersStr != null) {
-			avgLlhOverIters = Integer.parseInt(avgLlhOverItersStr);
-		}
-
-		String writeLlhItervalStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-				"writeLogLikelihoodInterval");
-		if (writeLlhItervalStr != null) {
-			writeLlhInterval = Integer.parseInt(writeLlhItervalStr);
-		}
 		// writeLinkUtilOffsetsInterval
 		String writeLinkUtilOffsetsIntervalStr = config.findParam(
 				BSE_CONFIG_MODULE_NAME, "writeLinkUtilOffsetsInterval");
@@ -248,8 +243,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 									network.getLinks().get(linkId),
 									entryTime_s, entryTime_s + 3599,
 									TYPE.FLOW_VEH_H);
-							uc += (countVal - simVal)/* simVal */
-									/ Math.max(countVal, 2500/* TODO */);
+							uc += (countVal - simVal)
+									/ Math.max(minStdDev * minStdDev,
+											countsScaleFactor * countVal);
 						}
 					}
 
@@ -310,71 +306,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			writer.writeln(sb);
 			writer.flush();
 		}
-		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
-		// TESTS: calculate log-likelihood -(q-y)^2/(2sigma^2)
-		if (writeLlhInterval > 0 && avgLlhOverIters > 0) {
-			int nextWriteLlhInterval = writeLlhInterval
-					* (iter / writeLlhInterval + 1);
-			if (iter <= nextWriteLlhInterval
-					&& iter > nextWriteLlhInterval - avgLlhOverIters
-					|| iter % writeLlhInterval == 0) {
-
-				for (Map.Entry<Id, Count> entry : ctl.getCounts().getCounts()
-						.entrySet()) {
-					Link link = network.getLinks().get(entry.getKey());
-					if (link == null) {
-						System.err.println("could not find link "
-								+ entry.getKey().toString());
-					} else if (isInRange(entry.getKey(), network)) {
-						// ---------GUNNAR'S CODES---------------------
-						for (Volume volume : entry.getValue().getVolumes()
-								.values()) {
-							int hour = volume.getHour();
-							if (hour >= caliStartTime && hour <= caliEndTime) {
-								// int start_s = (hour - 1) * 3600;
-								// int end_s = hour * 3600 - 1;
-								double cntVal = volume.getValue();
-
-								int[] linkVols = volumes.getVolumesForLink(link
-										.getId());
-								double simVal = 0d;
-								if (linkVols != null) {
-									simVal = linkVols[hour - 1]
-											* countsScaleFactor;
-								}
-
-								double minstddev = calibrator
-										.getMinStddev(TYPE.FLOW_VEH_H);
-								double var = Math.max(minstddev * minstddev,
-										calibrator.getVarianceScale() * cntVal);
-								double absLlh = (simVal - cntVal)
-										* (simVal - cntVal) / 2d / var;
-								llhSum -= absLlh;
-								// System.out.println("Accumulated Llh over "
-								// + avgLlhOverIters
-								// + " iterations at it." + iter + " =\t"
-								// + llhSum + "\tadded llh =\t-" + absLlh);
-							}
-						}
-					}
-				}
-			}
-			if (iter % writeLlhInterval == 0) {
-				// calculate avg. value of llh
-				double avgLlh = llhSum / avgLlhOverIters;
-				System.out.println("avgLlh over " + avgLlhOverIters
-						+ " iterations at it." + iter + " =\t" + avgLlh);
-				llhSum = 0d;// refresh
-			}
-		}
-		// output - chart etc.
-		String halfwayOutputIntervalStr = config.findParam(
-				BSE_CONFIG_MODULE_NAME, "halfwayOutputInterval");
-		int halfwayOutputInterval = 0;
-		if (halfwayOutputIntervalStr != null) {
-			halfwayOutputInterval = Integer.parseInt(halfwayOutputIntervalStr);
-		}
-		outputHalfway(ctl, halfwayOutputInterval);
 	}
 
 	@Override
@@ -410,7 +341,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				.getControler();
 		Config config = ctl.getConfig();
 		network = ctl.getNetwork();
-
+		counts = ctl.getCounts();
 		setMatsimParameters(ctl);
 
 		String scorAttrFilename = config.findParam(BSE_CONFIG_MODULE_NAME,
@@ -433,16 +364,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		// ***************SETTING PARAMETERS FOR INTEGRATION***********
 		// SETTING countsScale
-		{
-			countsScaleFactor = config.counts().getCountsScaleFactor();
-			System.out.println("BSE:\tusing the countsScaleFactor of "
-					+ countsScaleFactor + " as packetSize from config.");
-		}
-		// cycle = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
-		// "cycle"));
-
-		// READING countsdata
-		readCounts(ctl);
+		countsScaleFactor = config.counts().getCountsScaleFactor();
+		System.out.println("BSE:\tusing the countsScaleFactor of "
+				+ countsScaleFactor + " as packetSize from config.");
 
 		// INITIALIZING chooser
 		chooser = ctl.getPlansScoring4PC().getPlanScorer();
@@ -459,88 +383,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		// INITIALIZING OUTPUT
 		initializeOutput(ctl);
-	}
-
-	private void outputHalfway(Controler ctl, int outputIterInterval) {
-		int iter = ctl.getIterationNumber();
-		if (outputIterInterval == 0) {
-			return;
-		}
-		if (iter % outputIterInterval == 0) {
-			ControlerIO ctlIO = ctl.getControlerIO();
-			int firstIter = ctl.getFirstIteration();
-
-			double[] xs = new double[iter - firstIter + 1];
-			for (int i = firstIter; i <= iter; i++) {
-				xs[i - firstIter] = i;
-			}
-
-			String chartTitle = "Calibrated Parameter(s):";
-			for (String paramName : paramNames) {
-				chartTitle += " " + paramName;
-			}
-
-			XYLineChart chart = new XYLineChart(chartTitle, "iter",
-					"value of parameters") // ,travPerf = new
-			// XYLineChart("traveling & performing - avg. and sqrt(var)",
-			// "iteration","[h]")
-			;
-			String chartFilename = "";
-			for (int i = 0; i < paramNames.length; i++) {
-				chart.addSeries(paramNames[i], xs, paramArrays[i]);
-				chartFilename += paramNames[i] + ".";
-			}
-
-			chart.saveAsPng(
-					ctlIO.getIterationFilename(iter, chartFilename + "png"),
-					1024, 768);
-
-			// travPerf.saveAsPng(ctlIO.getIterationFilename(iter,
-			// "travTravPt.png"), 1024, 768);
-		}
-	}
-
-	private void readCounts(Controler ctl) {
-		final Counts counts = ctl.getCounts();
-		final Config config = ctl.getConfig();
-
-		if (counts == null) {
-			throw new RuntimeException("BSE requires counts-data.");
-		}
-
-		String caliStartTimeStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-				"startTime");
-
-		caliStartTime = caliStartTimeStr != null ? Integer
-				.parseInt(caliStartTimeStr) : DEFAULT_CALIBRATION_START_TIME;
-
-		caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
-				"endTime"));
-
-		Map<Id, Count> countsMap = counts.getCounts();
-		for (Id countId : countsMap.keySet()) {
-			Link link = network.getLinks().get(countId);
-			if (link == null) {
-				System.err.println("could not find link " + countId.toString());
-			} else if (isInRange(countId, network)) {
-				// // for ...2QGIS
-				// links.add(network.getLinks().get(countId));
-				// linkIds.add(countId);
-				// ---------GUNNAR'S CODES---------------------
-				for (Volume volume : countsMap.get(countId).getVolumes()
-						.values()) {
-					int hour = volume.getHour();
-					if (hour >= caliStartTime && hour <= caliEndTime) {
-						int start_s = (hour - 1) * 3600;
-						int end_s = hour * 3600 - 1;
-						double val_veh_h = volume.getValue();
-						calibrator.addMeasurement(link, start_s, end_s,
-								val_veh_h, TYPE.FLOW_VEH_H);
-					}
-				}
-			}
-		}
-		this.counts = counts;
 	}
 
 	private void setCalibratorParameters(Config config) {
@@ -599,10 +441,11 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			String minStdDevStr = config.findParam(BSE_CONFIG_MODULE_NAME,
 					"minFlowStddevVehH");
 			if (minStdDevStr != null) {
-				double minStdDev = Double.parseDouble(minStdDevStr);
+				minStdDev = Double.parseDouble(minStdDevStr);
 				calibrator.setMinStddev(minStdDev, TYPE.FLOW_VEH_H);
 				System.out.println("BSE:\tminStdDev\t= " + minStdDev);
 			} else {
+				minStdDev = Calibrator.DEFAULT_MIN_FLOW_STDDEV_VEH_H;
 				System.out.println("BSE:\tminStdDev\t= default value\t"
 						+ Calibrator.DEFAULT_MIN_FLOW_STDDEV_VEH_H);
 			}
@@ -628,11 +471,11 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			final String varianceScaleStr = config.findParam(
 					BSE_CONFIG_MODULE_NAME, "varianceScale");
 			if (varianceScaleStr != null) {
-				final double varianceScale = Double
-						.parseDouble(varianceScaleStr);
+				varianceScale = Double.parseDouble(varianceScaleStr);
 				System.out.println("BSE:\tvarianceScale\t= " + varianceScale);
 				calibrator.setVarianceScale(varianceScale);
 			} else {
+				varianceScale = Calibrator.DEFAULT_VARIANCE_SCALE;
 				System.out.println("BSE:\tvarianceScale\t= default value\t"
 						+ Calibrator.DEFAULT_VARIANCE_SCALE);
 			}
@@ -769,8 +612,4 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		((PCStrMn) ctl.getStrategyManager()).setChooser(chooser);
 	}
-
-	// public void setWriteQGISFile(boolean writeQGISFile) {
-	// // this.writeQGISFile = writeQGISFile;
-	// }
 }

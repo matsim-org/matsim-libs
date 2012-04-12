@@ -242,9 +242,6 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 								PCCtlListener.paramNames[i],
 								Double.toString(newParamVal));
 					}
-
-					// ?((Events2ScoreWithLeftTurnPenalty4PC)
-					// chooser).setMultinomialLogit(mnl);
 				}
 			}
 		}
