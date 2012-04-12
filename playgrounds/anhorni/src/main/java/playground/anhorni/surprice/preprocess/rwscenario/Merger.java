@@ -37,25 +37,27 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.anhorni.surprice.Surprice;
+import playground.balmermi.census2000.modules.PersonSetSecLoc;
 
 public class Merger {	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 	private ConvertThurgau2Plans thurgauConverter = new ConvertThurgau2Plans();
 	private TreeMap<Id, PersonHomeWork> personHWFacilities = new TreeMap<Id, PersonHomeWork>();
 	private Random random = new Random(102830259L);
-	
+	private TreeMap<Id, PersonWeeks> personWeeksMZ = new TreeMap<Id, PersonWeeks>();
+		
 	private final static Logger log = Logger.getLogger(ConvertThurgau2Plans.class);
 		
 	public static void main(final String[] args) {		
-		if (args.length != 0) {
+		if (args.length != 1) {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
-		}
-		
+		}		
 		Merger creator = new Merger();
 		creator.run(args[0]);
 	}
@@ -78,6 +80,28 @@ public class Merger {
 		
 		// merge ................................................................
 		this.merge();
+		
+		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+	}
+	
+	private void writeWeek(String outPath) {
+		for (int dow = 0; dow < 7; dow++) {
+			int counter = 0;
+			int nextMsg = 1;
+			for (Person person : this.scenario.getPopulation().getPersons().values()) {			
+				counter++;
+				if (counter % nextMsg == 0) {
+					nextMsg *= 2;
+					log.info(" person # " + counter);
+				}
+				person.getPlans().clear();
+				Plan plan = this.personWeeksMZ.get(person.getId()).getDay(dow, 0);
+				person.addPlan(plan);
+				((PersonImpl)person).setSelectedPlan(plan);				
+			}
+			log.info("Writing population with plans ...");
+			new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + dow + "plans.xml.gz");
+		}	
 	}
 		
 	private void readMZ(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath) {
@@ -133,27 +157,25 @@ public class Merger {
 				nextMsg *= 2;
 				log.info(" person # " + counter);
 			}			
-			PersonWeeks personWeeks;
+			PersonWeeks personWeeksThurgau;
 			if (this.personHWFacilities.get(p.getId()).getWorkFaciliyId() != null) {
-				personWeeks = this.chooseWeek(workersNormalized);
+				personWeeksThurgau = this.chooseWeek(workersNormalized);
 			}
 			else {
-				personWeeks = this.chooseWeek(nonworkersNormalized);
+				personWeeksThurgau = this.chooseWeek(nonworkersNormalized);
 			}
-			PersonImpl person = (PersonImpl)p;
-			person.getPlans().clear();
-			
-			this.createPlansForPerson(person, personWeeks);
+			PersonImpl person = (PersonImpl)p;			
+			this.createPlansForPerson(person, personWeeksThurgau);
 		}				
 	}
 	
-	private void createPlansForPerson(PersonImpl person, PersonWeeks personWeeks) {
+	private void createPlansForPerson(PersonImpl person, PersonWeeks personWeeksThurgau) {
 		// only one week to begin with
 		int week = 0;
 		for (int dow = 0; dow < 7; dow++) {
-			// copy plan
-			Plan plan = personWeeks.getDay(dow, week);
-			PersonImpl thurgauPerson = (PersonImpl)personWeeks.getPerson();
+			person.getPlans().clear();
+			Plan plan = personWeeksThurgau.getDay(dow, week);
+			PersonImpl thurgauPerson = (PersonImpl)personWeeksThurgau.getPerson();
 			thurgauPerson.addPlan(plan);
 			thurgauPerson.setSelectedPlan(plan);
 			Plan planNew = thurgauPerson.copySelectedPlan();
@@ -177,10 +199,17 @@ public class Merger {
 						act.setFacilityId(phw.getHomeFacilityId());
 						act.setCoord(this.scenario.getActivityFacilities().getFacilities().get(phw.getHomeFacilityId()).getCoord());
 						act.setLinkId(this.scenario.getActivityFacilities().getFacilities().get(phw.getHomeFacilityId()).getLinkId());
-					}
+					}					
 				}
-			}		
-			// TODO: preliminarily assign shop and leisure locations
+			}
+			// assign shop, leisure and education locations according to Balmers neighborhood search
+			PersonSetSecLoc secLocationAssigner = new PersonSetSecLoc(this.scenario.getActivityFacilities(), null);
+			secLocationAssigner.run(person);
+			
+			if (this.personWeeksMZ.get(person.getId()) == null) {
+				this.personWeeksMZ.put(person.getId(), new PersonWeeks());
+			}
+			this.personWeeksMZ.get(person.getId()).addDay(dow, person.getSelectedPlan());
 		}
 	}
 	
@@ -213,9 +242,7 @@ public class Merger {
 		}		
 		// normalize maps:
 		workersNormalized = this.normalizeMap(workers);
-		nonworkersNormalized = this.normalizeMap(nonworkers);
-		
-		
+		nonworkersNormalized = this.normalizeMap(nonworkers);	
 	}
 	
 	private double getTotalScore(TreeMap<Id, PersonWeeks> map) {

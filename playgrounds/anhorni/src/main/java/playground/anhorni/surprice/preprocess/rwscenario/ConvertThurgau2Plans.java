@@ -67,7 +67,7 @@ public class ConvertThurgau2Plans {
 	
 	private final static Logger log = Logger.getLogger(ConvertThurgau2Plans.class);
 	
-	public static void main(final String[] args) {		
+	public static void main(final String[] args) {
 		if (args.length != 3) {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
@@ -79,11 +79,10 @@ public class ConvertThurgau2Plans {
 			
 	// ------------------------------------------------------------------------------------------------
 	
-	public void run(String inputfileF2, String inputfileF3, String outputfile) {
-		// hard-coded for the moment
-		this.inputfileF2 = inputfileF2; // "C:/l/studies/surprice/thurgau_2003_public_F2.dat";
-		this.inputfileF3 = inputfileF3; // "C:/l/studies/surprice/thurgau_2003_public_F3.dat";
-		this.outputfile = outputfile; // "C:/l/studies/surprice/plansThurgau.xml";
+	public void run(String inputfileF2, String inputfileF3, String outPath) {
+		this.inputfileF2 = inputfileF2;
+		this.inputfileF3 = inputfileF3;
+		this.outputfile = outPath + "/plansThurgau.xml";
 				
 		try {
 			this.convert();
