@@ -12,6 +12,7 @@ import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.scoring.PlansScoringI;
+import playground.yu.scoring.withAttrRecorder.ScorAttrReader.ScorAttrReadListener;
 
 /**
  * @author yu
@@ -39,6 +40,7 @@ public class Controler4AttrRecorder extends Controler implements
 		super(config);
 		// ---------------------------------------------------
 		addControlerListener(new ScorAttrWriteTrigger());
+		addControlerListener(new ScorAttrReadListener());
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
 

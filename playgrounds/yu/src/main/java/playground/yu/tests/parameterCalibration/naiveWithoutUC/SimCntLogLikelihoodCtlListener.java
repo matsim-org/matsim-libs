@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -41,6 +42,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.CalibrationConfig;
+import playground.yu.scoring.withAttrRecorder.leftTurn.LeftTurnPenaltyControler;
 import playground.yu.utils.io.SimpleWriter;
 import cadyts.calibrators.Calibrator;
 
@@ -54,7 +56,7 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 	private Coord distanceFilterCenterNodeCoord = null;
 
-	private SimpleWriter writer = null;
+	private SimpleWriter writer = null, writer2 = null;
 
 	private int n = 0;
 
@@ -79,62 +81,72 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 				&& iter > ctl.getFirstIteration()) {
 			int nextWriteLlhInterval = writeLlhInterval
 					* (iter / writeLlhInterval + 1);
+
 			if (iter <= nextWriteLlhInterval
 					&& iter > nextWriteLlhInterval - avgLlhOverIters
-			// || iter % writeLlhInterval == 0
-			) {
+					|| iter % writeLlhInterval == 0) {
 				n++;
-				VolumesAnalyzer volumes = ctl.getVolumes();
-				Network network = ctl.getNetwork();
+			}
 
-				for (Map.Entry<Id, Count> entry : ctl.getCounts().getCounts()
-						.entrySet()) {
-					Id countId = entry.getKey();
-					Link link = network.getLinks().get(countId);
-					if (link == null) {
-						System.err.println("could not find link "
-								+ countId.toString());
-					} else if (isInRange(countId, network)) {
-						// for ...2QGIS
-						// links.add(network.getLinks().get(entry.getKey()));
-						// linkIds.add(entry.getKey());
+			VolumesAnalyzer volumes = ctl.getVolumes();
+			Network network = ctl.getNetwork();
 
-						int[] linkVols = volumes.getVolumesForLink(countId);
-						// ---------GUNNAR'S CODES---------------------
-						for (Volume volume : entry.getValue().getVolumes()
-								.values()) {
-							int hour = volume.getHour();
-							if (hour >= caliStartTime && hour <= caliEndTime) {
-								double cntVal = volume.getValue();
-								double simVal = 0d;
-								if (linkVols != null) {
-									simVal = linkVols[hour - 1]
-											* countsScaleFactor;
-								}
+			double localLlhSum = 0;
+			for (Map.Entry<Id, Count> entry : ctl.getCounts().getCounts()
+					.entrySet()) {
+				Id countId = entry.getKey();
+				Link link = network.getLinks().get(countId);
+				if (link == null) {
+					System.err.println("could not find link "
+							+ countId.toString());
+				} else if (isInRange(countId, network)) {
+					// for ...2QGIS
+					// links.add(network.getLinks().get(entry.getKey()));
+					// linkIds.add(entry.getKey());
 
-								double var = Math.max(minStdDev * minStdDev,
-										varianceScale * cntVal);
-								double absLlh = (simVal - cntVal)
-										* (simVal - cntVal) / 2d / var;
+					int[] linkVols = volumes.getVolumesForLink(countId);
+					// ---------GUNNAR'S CODES---------------------
+					for (Volume volume : entry.getValue().getVolumes().values()) {
+						int hour = volume.getHour();
+						if (hour >= caliStartTime && hour <= caliEndTime) {
+							double cntVal = volume.getValue();
+							double simVal = 0d;
+							if (linkVols != null) {
+								simVal = linkVols[hour - 1] * countsScaleFactor;
+							}
+
+							double var = Math.max(minStdDev * minStdDev,
+									varianceScale * cntVal);
+							double absLlh = (simVal - cntVal)
+									* (simVal - cntVal) / 2d / var;
+
+							localLlhSum -= absLlh;
+							if (iter <= nextWriteLlhInterval
+									&& iter > nextWriteLlhInterval
+											- avgLlhOverIters
+									|| iter % writeLlhInterval == 0) {
 								llhSum -= absLlh;
 								writer.writeln("ITER\t" + iter
 										+ "\tAccumulated Llh over " + n
 										+ " iterations =\t" + llhSum
 										+ "\tadded llh =\t-" + absLlh);
 								writer.flush();
-
 							}
 						}
 					}
 				}
+
 			}
+			writer2.writeln("BSE:\tllh of ITER\t" + iter + "\t=\t"
+					+ localLlhSum);
+			writer2.flush();
+
 			if (iter % writeLlhInterval == 0) {
 				// calculate avg. value of llh
 				avgLlh = llhSum / n;
-				writer.writeln("ITER\t" + iter + "\tavgLlh over " + n
-						+ " iterations =\t" + avgLlh + "\tsum of Llh =\t"
+				System.out.println("ITER\t" + iter + "\tavgLlh over " + n
+						+ " iterations =\t" + avgLlh + "\t;\tsum of Llh =\t"
 						+ llhSum);
-				writer.flush();
 				llhSum = 0d;// refresh
 				n = 0;
 			}
@@ -213,7 +225,9 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 		// INITIALIZING WRITER
 		writer = new SimpleWriter(ctl.getControlerIO().getOutputFilename(
-				"log-likelihood.log"));
+				"log-likelihood.detailed.log.gz"));
+		writer2 = new SimpleWriter(ctl.getControlerIO().getOutputFilename(
+				"log-likelihoodStats.log"));
 	}
 
 	private boolean isInRange(final Id linkid, final Network net) {
@@ -231,7 +245,8 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 	}
 
 	public static void main(String[] args) {
-		Controler ctl = new Controler(args[0]);
+		Config cfg = ConfigUtils.loadConfig(args[0]);
+		LeftTurnPenaltyControler ctl = new LeftTurnPenaltyControler(cfg);
 		ctl.addControlerListener(new SimCntLogLikelihoodCtlListener());
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
@@ -241,5 +256,6 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		writer.close();
+		writer2.close();
 	}
 }

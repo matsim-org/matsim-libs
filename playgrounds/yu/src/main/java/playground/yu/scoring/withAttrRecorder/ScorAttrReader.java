@@ -9,9 +9,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+
+import playground.yu.integration.cadyts.CalibrationConfig;
 
 /**
  * reads scoring function attributes from scorAttr file, and saves them in
@@ -22,14 +27,14 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  */
 public class ScorAttrReader implements TabularFileHandler {
 	private final TabularFileParserConfig parserConfig;
-	private Population population=null;
+	private Population population = null;
 	private String[] attrNames = null;
 
 	public ScorAttrReader(String scorAttrFilename, Population population) {
 		parserConfig = new TabularFileParserConfig();
 		parserConfig.setFileName(scorAttrFilename);
 		parserConfig.setDelimiterRegex("\t");
-		//		parserConfig.setStartTag("PersonId");
+		// parserConfig.setStartTag("PersonId");
 		this.population = population;
 	}
 
@@ -43,7 +48,7 @@ public class ScorAttrReader implements TabularFileHandler {
 		if (!row[0].equals("PersonId")) {
 			if (attrNames == null) {
 				throw new RuntimeException(
-				"There is not yet attributes name collection, was Filehead not read?");
+						"There is not yet attributes name collection, was Filehead not read?");
 			}
 
 			Person person = population.getPersons().get(new IdImpl(row[0]));
@@ -56,5 +61,26 @@ public class ScorAttrReader implements TabularFileHandler {
 			attrNames = row;// first 2 element don't belong to
 			// attrNames
 		}
+	}
+
+	public static class ScorAttrReadListener implements StartupListener {
+
+		@Override
+		public void notifyStartup(StartupEvent event) {
+			Controler ctl = event.getControler();
+
+			String scorAttrFilename = ctl.getConfig().findParam(
+					CalibrationConfig.BSE_CONFIG_MODULE_NAME,
+					"scorAttrFilename");
+			if (scorAttrFilename != null) {
+				System.out
+						.println("BEGINNING of loading scoring function attributes.");
+				new ScorAttrReader(scorAttrFilename, ctl.getPopulation())
+						.parser();
+				System.out
+						.println("ENDING of loading scoring function attributes.");
+			}
+		}
+
 	}
 }

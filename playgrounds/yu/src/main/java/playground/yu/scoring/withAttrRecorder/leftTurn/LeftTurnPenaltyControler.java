@@ -12,7 +12,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.scoring.PlansScoringI;
 import playground.yu.scoring.withAttrRecorder.Controler4AttrRecorder;
-import playground.yu.scoring.withAttrRecorder.ScorAttrWriteTrigger;
 
 /**
  * @author yu
@@ -41,9 +40,6 @@ public class LeftTurnPenaltyControler extends Controler4AttrRecorder {
 
 	public LeftTurnPenaltyControler(Config config) {
 		super(config);
-		// ---------------------------------------------------
-		addControlerListener(new ScorAttrWriteTrigger());
-		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
 
 	@Override
@@ -53,7 +49,7 @@ public class LeftTurnPenaltyControler extends Controler4AttrRecorder {
 
 	@Override
 	protected void loadCoreListeners() {
-	
+
 		// ------DEACTIVATE SCORING & ROADPRICING IN MATSIM------
 		plansScoringLTP = new PlansScoringWithLeftTurnPenalty();
 		addCoreControlerListener(plansScoringLTP);
