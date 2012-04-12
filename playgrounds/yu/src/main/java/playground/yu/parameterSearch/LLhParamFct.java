@@ -18,7 +18,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author C
- *
+ * 
  */
 public class LLhParamFct implements MultivariateRealFunction {
 	private final Config cfg;
@@ -90,4 +90,58 @@ public class LLhParamFct implements MultivariateRealFunction {
 		return avgLlh;
 	}
 
+	/**
+	 * @return the initial parameter values as the first search point
+	 */
+	public double[] getFirstPoint() {
+		double[] point = new double[paramNames.length];
+		int n = 0;
+		for (String parameterName : paramNames) {
+			point[n] = ParametersGetter.getValueOfParameter(cfg, parameterName);
+			n++;
+		}
+		return point;
+	}
+
+	public double getRelativeThreshold() {
+		String relativeThresholdStr = cfg.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "relativeThreshold");
+		if (relativeThresholdStr != null) {
+			return Double.parseDouble(relativeThresholdStr);
+		}
+		return 1e-6;
+	}
+
+	public double getAbsoluteThreshold() {
+		String absoluteThresholdStr = cfg.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "absoluteThreshold");
+		if (absoluteThresholdStr != null) {
+			return Double.parseDouble(absoluteThresholdStr);
+		}
+		return 1e-3;
+	}
+
+	/**
+	 * maxIterations is not the lastIteration in MATSim Config
+	 * ControlerConfigGroup, but the maximal iterations for parameter search.
+	 * 
+	 * @return
+	 */
+	public int getMaxIterations() {
+		String maxIterationsStr = cfg.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "maxIterations");
+		if (maxIterationsStr != null) {
+			return Integer.parseInt(maxIterationsStr);
+		}
+		return 10000;
+	}
+
+	public int getMaxEvaluations() {
+		String maxEvaluationsStr = cfg.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "maxEvaluations");
+		if (maxEvaluationsStr != null) {
+			return Integer.parseInt(maxEvaluationsStr);
+		}
+		return 10000;
+	}
 }

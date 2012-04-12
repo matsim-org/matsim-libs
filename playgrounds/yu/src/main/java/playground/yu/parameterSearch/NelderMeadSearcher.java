@@ -18,6 +18,26 @@ import org.apache.commons.math.optimization.direct.NelderMead;
  */
 public class NelderMeadSearcher {
 
+	private final NelderMead optimizer;
+	private final LLhParamFct objectiveFunction;
+
+	public NelderMeadSearcher(String configFilename) {
+		objectiveFunction = new LLhParamFct(configFilename);
+
+		optimizer = new NelderMead();
+		optimizer.setMaxIterations(objectiveFunction.getMaxIterations());
+		optimizer.setMaxEvaluations(objectiveFunction.getMaxEvaluations());
+		optimizer.setConvergenceChecker(new SimpleScalarValueChecker(
+				objectiveFunction.getRelativeThreshold(), objectiveFunction
+						.getAbsoluteThreshold()));
+	}
+
+	public void run() throws OptimizationException,
+			FunctionEvaluationException, IllegalArgumentException {
+		optimizer.optimize(objectiveFunction, GoalType.MAXIMIZE,
+				objectiveFunction.getFirstPoint());
+	}
+
 	/**
 	 * @param args
 	 * @throws IllegalArgumentException
@@ -26,13 +46,6 @@ public class NelderMeadSearcher {
 	 */
 	public static void main(String[] args) throws OptimizationException,
 			FunctionEvaluationException, IllegalArgumentException {
-		NelderMead optimizer = new NelderMead();
-		optimizer.setMaxIterations(1000);
-		optimizer.setMaxEvaluations(1000);
-
-		optimizer
-				.setConvergenceChecker(new SimpleScalarValueChecker(0.01, 0.01));
-		optimizer.optimize(new LLhParamFct(args[0]), GoalType.MAXIMIZE,
-				new double[] { -6d, 0d });
+		new NelderMeadSearcher(args[0]).run();
 	}
 }

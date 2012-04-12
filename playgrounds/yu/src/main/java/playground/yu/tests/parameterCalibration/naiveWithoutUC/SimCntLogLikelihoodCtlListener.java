@@ -213,7 +213,7 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 
 		// INITIALIZING WRITER
 		writer = new SimpleWriter(ctl.getControlerIO().getOutputFilename(
-				"log-likelihood.log.gz"));
+				"log-likelihood.log"));
 	}
 
 	private boolean isInRange(final Id linkid, final Network net) {
