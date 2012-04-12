@@ -54,8 +54,9 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		} else {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}
-		this.routeFactory.setRouteFactory(TransportMode.car, factory);
-		this.routeFactory.setRouteFactory(TransportMode.ride, factory);
+		for (String transportMode : scenario.getConfig().plansCalcRoute().getNetworkModes()) {
+			this.routeFactory.setRouteFactory(transportMode, factory);
+		}
 	}
 
 	@Override
