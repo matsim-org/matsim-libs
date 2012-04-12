@@ -130,7 +130,11 @@ public class ConvertThurgau2Plans {
 					this.personWeeks.get(pid).addDay(dow, plan);
 					week_prev = week;
 				}
-				this.addTripsAndActs(pid, entrs);
+				boolean isWorker = this.addTripsAndActs(pid, entrs);
+				
+				if (isWorker) {
+					this.personWeeks.get(pid).setIsWorker();
+				}
 				
 				pid_prev = pid;
 				dow_prev = dow;
@@ -138,9 +142,10 @@ public class ConvertThurgau2Plans {
 		}
 	}
 	
-	private void addTripsAndActs(Id pid, String[] entrs) {
+	private boolean addTripsAndActs(Id pid, String[] entrs) {
 		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(pid);
 		Plan plan = person.getSelectedPlan();
+		boolean isWorker = false;
 		
 		// departure time (min => sec.)
 		String dp[] = (entrs[6].trim()).split(":", -1);
@@ -195,6 +200,11 @@ public class ConvertThurgau2Plans {
 			leg.setArrivalTime(arrival);
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);
+			
+			if (act.getType().startsWith("w")) {
+				isWorker = true;
+			}
+			
 		}
 		else {
 			ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME);
@@ -206,6 +216,7 @@ public class ConvertThurgau2Plans {
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);
 		}
+		return isWorker;
 	}
 	
 	private Plan addPlan(Id pid, String[] entrs, int dow) {

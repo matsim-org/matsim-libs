@@ -21,11 +21,8 @@ package playground.anhorni.surprice.preprocess.rwscenario;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 
 public class PersonWeeks {	
 	private Person person;
@@ -55,25 +52,12 @@ public class PersonWeeks {
 	public void addDay(int dow, Plan plan) {
 		if (this.currentWeek < 7) {
 			this.days.get(this.currentWeek).put(dow - 1, plan);
-			if (this.isWorker(plan)) {
-				this.isWorker = true; // do not reset isWorker for plans without 
-			}
 		}
 	}
 		
-	private boolean isWorker(Plan plan) {
-		boolean worker = false;
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				ActivityImpl act = (ActivityImpl)pe;				
-				if (act.getType().startsWith("w")) {
-					worker = true;
-				}
-			}
-		}
-		return worker;
+	public void setIsWorker() {
+		this.isWorker = true;
 	}
-	
 	public Person getPerson() {
 		return this.person;
 	}

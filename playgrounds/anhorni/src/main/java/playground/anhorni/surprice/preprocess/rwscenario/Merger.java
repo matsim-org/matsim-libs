@@ -122,8 +122,7 @@ public class Merger {
 			}
 			PlanImpl plan = (PlanImpl)p.getSelectedPlan();
 			Id homeFacilityId = plan.getFirstActivity().getFacilityId();
-			Id workFacilityId = this.getWorkFacilityId(plan);
-			
+			Id workFacilityId = this.getWorkFacilityId(plan);			
 			this.personHWFacilities.put(p.getId(), new PersonHomeWork(p, homeFacilityId, workFacilityId));
 		}
 	}
@@ -144,10 +143,10 @@ public class Merger {
 	private void merge() {
 		// prepare data structures for probabilistic draw of chains
 		// pweights + workers and non-workers
-		TreeMap<Double, PersonWeeks> workersNormalized = null;
-		TreeMap<Double, PersonWeeks> nonworkersNormalized = null;		
+		TreeMap<Double, PersonWeeks> workersNormalized = new TreeMap<Double, PersonWeeks>(java.util.Collections.reverseOrder());
+		TreeMap<Double, PersonWeeks> nonworkersNormalized = new TreeMap<Double, PersonWeeks>(java.util.Collections.reverseOrder());		
 		this.prepareForDrawing(workersNormalized, nonworkersNormalized);
-				
+						
 		// assign chain (acts + times) ----------------
 		int counter = 0;
 		int nextMsg = 1;
@@ -219,14 +218,14 @@ public class Merger {
 			random.nextDouble();
 		}
 		double randomScore = random.nextDouble();
-		
+				
 		PersonWeeks personWeeks = map.get(map.firstKey());
 		for (Entry<Double, PersonWeeks> entry : map.entrySet()) {
 	        if (entry.getKey() > randomScore + 0.000000000000000001) {
 	        	personWeeks = entry.getValue();
 	        }
 	    }		
-		return personWeeks;		
+		return personWeeks;
 	}
 	
 	private void prepareForDrawing(TreeMap<Double, PersonWeeks> workersNormalized, TreeMap<Double, PersonWeeks> nonworkersNormalized) {
@@ -239,10 +238,10 @@ public class Merger {
 			else {
 				nonworkers.put(pid, thurgauConverter.getPersonWeeks().get(pid));
 			}
-		}		
+		}
 		// normalize maps:
-		workersNormalized = this.normalizeMap(workers);
-		nonworkersNormalized = this.normalizeMap(nonworkers);	
+		this.normalizeMap(workersNormalized, workers);
+		this.normalizeMap(nonworkersNormalized, nonworkers);
 	}
 	
 	private double getTotalScore(TreeMap<Id, PersonWeeks> map) {
@@ -254,14 +253,12 @@ public class Merger {
 		return totalScore;
 	}
 	
-	private TreeMap<Double, PersonWeeks> normalizeMap(TreeMap<Id, PersonWeeks> map) {
-		TreeMap<Double, PersonWeeks> mapNormalized = new TreeMap<Double, PersonWeeks>(java.util.Collections.reverseOrder());
+	private void normalizeMap(TreeMap<Double, PersonWeeks> mapNormalized, TreeMap<Id, PersonWeeks> map) {
 		double sumScore = 0.0;
 		for (PersonWeeks personWeeks : map.values()) {
 			double score = personWeeks.getPweight();
 			sumScore += (score / this.getTotalScore(map));				
 			mapNormalized.put(sumScore , personWeeks);	
 		}
-		return mapNormalized;
 	}	
 }
