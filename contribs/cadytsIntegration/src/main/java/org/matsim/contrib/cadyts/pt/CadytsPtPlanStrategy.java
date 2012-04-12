@@ -106,13 +106,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		this.cadytsPtPlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
 		this.delegate = new PlanStrategyImpl(this.cadytsPtPlanChanger);
 
-		// ===========================
-		// everything beyond this line is, I think, analysis code. kai, jul'11
-
-
-		// set flowAnalysisFile
-		String strWriteAnalysisFile = controler.getConfig().findParam(CadytsPtConfigGroup.GROUP_NAME, CadytsPtConfigGroup.WRITE_ANALYSIS_FILE);
-		this.writeAnalysisFile = strWriteAnalysisFile != null && Boolean.parseBoolean(strWriteAnalysisFile);
+		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 
 	// Analysis methods
@@ -142,7 +136,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	}
 
 	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
-		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0) && (iter >= controler.getFirstIteration());
+		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0);
 	}
 
 	@Override
@@ -157,7 +151,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 		this.calibrator.afterNetworkLoading(this.simResults);
 
-		// the remaining material is, in my view, "just" output:
+		// write some output
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
 			new CadytsPtLinkCostOffsetsXMLFileIO(trSched).write(filename, this.calibrator.getLinkCostOffsets());

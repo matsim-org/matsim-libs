@@ -101,17 +101,12 @@
 	</module>
 
 	<module name="cadytsPt">
-		<param name="startTime" value="5" />
-		<param name="endTime" value="20" />
+		<param name="startHour" value="5" />
+		<param name="endHour" value="20" />
 		<param name="regressionInertia" value="0.95" />
 		<param name="minFlowStddevVehH" value="8.0" />  <!-- 8,9,10 -->
 		<param name="useBruteForce" value="true" />
 		<param name="preparatoryIterations" value="1" />
-		<!-- <param name="preparatoryIterations" value="20"/>
-		 <param name="freezeIteration" value="200" />
-		 <param name="calibrationMethodSwitch" value="101"/>
-		 <param name="proportionalAssignment" value=""/> 
-		??? -->
 		<param name="calibratedLines" value="M44" />
 	</module>
 
