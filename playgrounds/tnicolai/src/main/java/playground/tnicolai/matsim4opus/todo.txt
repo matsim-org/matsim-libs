@@ -1,5 +1,7 @@
 Todos:
 
+- add a "Travel model visualization" section: "There are at least two options to visualize matsim: 1. OTFVis or 2. senozon via" -> to be done by senozone ???
+- for UrbanSim ZONE: spread persons within a zone like in "tutorial.unsupported.example80DemandGenerationFromShapefile.DemandGenerator" or use a radius if no shapefile available
 - test different beta values
 - test accessibility measure paired with workers or 1-person hh or income in UrbanSim
 - implement interface for SpatialGrid Interpolation (for returning accessibility values for each parcel)

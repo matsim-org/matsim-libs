@@ -304,7 +304,7 @@ public class ReadFromUrbanSimModel {
 				Id personId = new IdImpl( parts[ indexPersonID ] );
 
 				if ( !( compensationFlag || MatsimRandom.getRandom().nextDouble() < samplingRate || personExistsInOldPopulation(oldPop, personId)) )
-					continue ;
+					continue;
 				
 				// see reason of this flag below
 				compensationFlag = false;
@@ -314,14 +314,14 @@ public class ReadFromUrbanSimModel {
 				// get home location id
 				Id homeZoneId = new IdImpl( parts[ indexZoneID_HOME ] );
 				ActivityFacility homeLocation = zones.getFacilities().get( homeZoneId ) ;
-				if ( homeLocation==null ) {
-					log.warn( "homeLocation==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this ) ;
-					continue ;
+				if ( homeLocation==null ){
+					log.warn( "homeLocation==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this );
+					continue;
 				}
-				Coord homeCoord = homeLocation.getCoord() ;
-				if ( homeCoord==null ) {
-					log.warn( "homeCoord==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this ) ;
-					continue ;
+				Coord homeCoord = homeLocation.getCoord();
+				if ( homeCoord==null ){
+					log.warn( "homeCoord==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this );
+					continue;
 				}
 
 				// add home location to plan
@@ -342,7 +342,7 @@ public class ReadFromUrbanSimModel {
 							log.warn( "jobLocationId==null, probably out of area. person_id: " + personId
 									+ " work_zone_id: " + workZoneId + Gbl.ONLYONCE ) ;
 						}
-						compensationFlag = true ; // WHY?
+						compensationFlag = true ;
 						// can't remember.  The way this reads to me is that this is set to true if a working person is encountered
 						// that does not have a workplace.  Because it does not have a workplace, we discard it.  If this happens
 						// with too many persons, we end up having much less than our target sample size.  With the seattle_parcel
