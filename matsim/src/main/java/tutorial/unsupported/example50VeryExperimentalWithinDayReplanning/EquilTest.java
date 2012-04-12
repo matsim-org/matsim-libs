@@ -20,13 +20,21 @@
 package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 
 public class EquilTest {
 
 	public static void main(String[] args){		
 		final Controler controler = new Controler("examples/tutorial/programming/example50VeryExperimentalWithindayReplanning/withinday-config.xml");
 		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new MyControlerListener()) ;
+		controler.addControlerListener(new StartupListener() {
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				Controler controler = event.getControler() ;
+				controler.setMobsimFactory(new MyMobsimFactory(controler.createTravelCostCalculator(), controler.getTravelTimeCalculator())) ;
+			}
+		}) ;
 		controler.run();
 	}
 
