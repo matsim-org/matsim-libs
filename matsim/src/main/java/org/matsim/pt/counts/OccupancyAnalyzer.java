@@ -57,7 +57,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	/** Map< vehId,stopFacilityId> */
 	private final Map<Id, Id> vehStops = new HashMap<Id, Id>();
 	/** Map<vehId,passengersNo. in Veh> */
-	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>();
+	private final Map<Id, Integer> vehPassengers = new HashMap<Id, Integer>();
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final Set<Id> transitDrivers = new HashSet<Id>();
 	private final Set<Id> transitVehicles = new HashSet<Id>();
@@ -98,7 +98,10 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		this.alights.clear();
 		this.occupancies.clear();
 		this.vehStops.clear();
+		this.vehPassengers.clear();
 		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
+		this.transitDrivers.clear();
+		this.transitVehicles.clear();
 	}
 
 	@Override
@@ -123,10 +126,10 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		}
 		getOn[getTimeSlotIndex(time)]++;
 		// ------------------------veh_passenger---------------------------
-		Integer nPassengers = this.veh_passengers.get(vehId);
-		this.veh_passengers.put(vehId, (nPassengers != null) ? (nPassengers + 1) : 1);
+		Integer nPassengers = this.vehPassengers.get(vehId);
+		this.vehPassengers.put(vehId, (nPassengers != null) ? (nPassengers + 1) : 1);
 		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId
-				+ " has Passenger\t" + this.veh_passengers.get(vehId)
+				+ " has Passenger\t" + this.vehPassengers.get(vehId)
 				+ " \tat stop :\t" + stopId + " ENTERING PERSON :\t"
 				+ event.getPersonId() + "\n");
 	}
@@ -148,17 +151,17 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		}
 		getDown[getTimeSlotIndex(time)]++;
 		// ------------------------veh_passenger---------------------------
-		Integer nPassengers = this.veh_passengers.get(vehId);
+		Integer nPassengers = this.vehPassengers.get(vehId);
 		if (nPassengers == null) {
 			log.error( "tests for `null' but exception says 'negative'???  kai, oct'10 ") ;
 			throw new RuntimeException("negative passenger-No. in vehicle?");
 		}
-		this.veh_passengers.put(vehId, nPassengers - 1);
-		if (this.veh_passengers.get(vehId).intValue() == 0) {
-			this.veh_passengers.remove(vehId);
+		this.vehPassengers.put(vehId, nPassengers - 1);
+		if (this.vehPassengers.get(vehId).intValue() == 0) {
+			this.vehPassengers.remove(vehId);
 		}
 
-		Integer passengers = this.veh_passengers.get(vehId);
+		Integer passengers = this.vehPassengers.get(vehId);
 		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId
 				+ " has Passenger\t" + ((passengers != null) ? passengers : 0)
 				+ "\n");
@@ -184,7 +187,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 			this.occupancies.put(stopId, occupancyAtStop);
 		}
 
-		Integer noPassengersInVeh = this.veh_passengers.get(vehId);
+		Integer noPassengersInVeh = this.vehPassengers.get(vehId);
 
 		if (noPassengersInVeh != null) {
 			occupancyAtStop[this.getTimeSlotIndex(event.getTime())] += noPassengersInVeh;

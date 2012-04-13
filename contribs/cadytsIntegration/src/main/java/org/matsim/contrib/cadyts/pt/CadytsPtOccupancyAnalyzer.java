@@ -52,8 +52,8 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
 	private Map<Id, int[]> occupancies; // Map< stopFacilityId,value[]>
-	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>(); // Map< vehId,stopFacilityId>
-	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>(); // Map<vehId,passengersNo.in Veh>
+	private final Map<Id, Id> vehStops = new HashMap<Id, Id>(); // Map< vehId,stopFacilityId>
+	private final Map<Id, Integer> vehPassengers = new HashMap<Id, Integer>(); // Map<vehId,passengersNo.in Veh>
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final Set<Id> transitDrivers = new HashSet<Id>();
 	private final Set<Id> transitVehicles = new HashSet<Id>();
@@ -70,7 +70,8 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	@Override
 	public void reset(final int iteration) {
 		this.occupancies.clear();
-		this.veh_stops.clear();
+		this.vehStops.clear();
+		this.vehPassengers.clear();
 		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 		this.transitDrivers.clear();
 		this.transitVehicles.clear();
@@ -91,11 +92,11 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		}
 
 		// ------------------veh_passenger- (for occupancy)-----------------
-		Id vehId = event.getVehicleId(), stopId = this.veh_stops.get(vehId);
+		Id vehId = event.getVehicleId(), stopId = this.vehStops.get(vehId);
 		double time = event.getTime();
-		Integer nPassengers = this.veh_passengers.get(vehId);
-		this.veh_passengers.put(vehId, (nPassengers != null) ? (nPassengers + 1) : 1);
-		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId + " has Passenger\t" + this.veh_passengers.get(vehId)
+		Integer nPassengers = this.vehPassengers.get(vehId);
+		this.vehPassengers.put(vehId, (nPassengers != null) ? (nPassengers + 1) : 1);
+		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId + " has Passenger\t" + this.vehPassengers.get(vehId)
 				+ " \tat stop :\t" + stopId + " ENTERING PERSON :\t" + event.getPersonId() + "\n");
 	}
 
@@ -108,15 +109,15 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		// ----------------veh_passenger-(for occupancy)--------------------------
 		Id vehId = event.getVehicleId();
 		double time = event.getTime();
-		Integer nPassengers = this.veh_passengers.get(vehId);
+		Integer nPassengers = this.vehPassengers.get(vehId);
 		if (nPassengers == null) {
 			throw new RuntimeException("null passenger-No. in vehicle ?");
 		}
-		this.veh_passengers.put(vehId, nPassengers - 1);
-		if (this.veh_passengers.get(vehId).intValue() == 0) {
-			this.veh_passengers.remove(vehId);
+		this.vehPassengers.put(vehId, nPassengers - 1);
+		if (this.vehPassengers.get(vehId).intValue() == 0) {
+			this.vehPassengers.remove(vehId);
 		}
-		Integer passengers = this.veh_passengers.get(vehId);
+		Integer passengers = this.vehPassengers.get(vehId);
 		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId + " has Passenger\t"
 				+ ((passengers != null) ? passengers : 0) + "\n");
 	}
@@ -127,7 +128,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		Id facId = event.getFacilityId();
 
 		// -----------------------occupancy--------------------------------
-		this.veh_stops.remove(vehId);
+		this.vehStops.remove(vehId);
 		int[] occupancyAtStop = this.occupancies.get(facId);
 		if (occupancyAtStop == null) { // no previous departure from this stop, therefore no occupancy
 																		// record yet. Create this:
@@ -135,7 +136,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 			this.occupancies.put(facId, occupancyAtStop);
 		}
 
-		Integer noPassengersInVeh = this.veh_passengers.get(vehId);
+		Integer noPassengersInVeh = this.vehPassengers.get(vehId);
 
 		if (noPassengersInVeh != null) {
 			occupancyAtStop[this.getTimeSlotIndex(event.getTime())] += noPassengersInVeh;
@@ -154,7 +155,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
 		Id stopId = event.getFacilityId();
 
-		this.veh_stops.put(event.getVehicleId(), stopId);
+		this.vehStops.put(event.getVehicleId(), stopId);
 		// (constructing a table with vehId as key, and stopId as value; constructed when veh arrives at
 		// stop; necessary
 		// since personEnters/LeavesVehicle does not carry stop id)
