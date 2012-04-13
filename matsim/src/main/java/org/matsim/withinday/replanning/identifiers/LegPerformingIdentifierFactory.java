@@ -24,7 +24,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
-public class LegPerformingIdentifierFactory implements DuringLegIdentifierFactory {
+public class LegPerformingIdentifierFactory extends DuringLegIdentifierFactory {
 
 	private LinkReplanningMap linkReplanningMap;
 	
@@ -35,6 +35,7 @@ public class LegPerformingIdentifierFactory implements DuringLegIdentifierFactor
 	@Override
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new LegPerformingIdentifier(linkReplanningMap);
+		this.addAgentFiltersToIdentifier(identifier);
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}

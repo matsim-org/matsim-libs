@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityEndIdentifierFactory.java
+ * CollectionAgentFilterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.replanning.identifiers;
+package org.matsim.withinday.replanning.identifiers.filter;
 
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
-public class ActivityEndIdentifierFactory extends DuringActivityIdentifierFactory {
+public class CollectionAgentFilterFactory implements AgentFilterFactory {
 
-	private ActivityReplanningMap activityReplanningMap;
-	
-	public ActivityEndIdentifierFactory(ActivityReplanningMap activityReplanningMap) {
-		this.activityReplanningMap = activityReplanningMap;
-	}
-	
 	@Override
-	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new ActivityEndIdentifier(activityReplanningMap);
-		identifier.setIdentifierFactory(this);
-		this.addAgentFiltersToIdentifier(identifier);
-		return identifier;
+	public CollectionAgentFilter createAgentFilter() {
+		return new CollectionAgentFilter();
 	}
 
 }

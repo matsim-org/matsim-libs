@@ -20,7 +20,31 @@
 
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
-public interface IdentifierFactory {
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-	public AgentsToReplanIdentifier createIdentifier();
+public abstract class IdentifierFactory {
+
+	private final Set<AgentFilterFactory> agentFilterFactories = new LinkedHashSet<AgentFilterFactory>();
+	
+	public abstract AgentsToReplanIdentifier createIdentifier();
+	
+	protected final void addAgentFiltersToIdentifier(AgentsToReplanIdentifier identifier) {
+		for (AgentFilterFactory agentFilterFactory : agentFilterFactories) {
+			identifier.addAgentFilter(agentFilterFactory.createAgentFilter());
+		}
+	}
+	
+	public final void addAgentFilterFactory(AgentFilterFactory agentFilterFactory) {
+		this.agentFilterFactories.add(agentFilterFactory);
+	}
+	
+	public final boolean removeAgentFilterFactory(AgentFilterFactory agentFilterFactory) {
+		return this.agentFilterFactories.remove(agentFilterFactory);
+	}
+
+	public final Set<AgentFilterFactory> getAgentFilterFactories() {
+		return Collections.unmodifiableSet(agentFilterFactories);
+	}
 }

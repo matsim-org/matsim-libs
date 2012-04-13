@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityEndIdentifierFactory.java
+ * CollectionAgentFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.replanning.identifiers;
+package org.matsim.withinday.replanning.identifiers.filter;
 
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-public class ActivityEndIdentifierFactory extends DuringActivityIdentifierFactory {
+import org.matsim.api.core.v01.Id;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
-	private ActivityReplanningMap activityReplanningMap;
+public class CollectionAgentFilter implements AgentFilter {
+
+	private final Set<Id> includedAgents;
 	
-	public ActivityEndIdentifierFactory(ActivityReplanningMap activityReplanningMap) {
-		this.activityReplanningMap = activityReplanningMap;
+	// use the factory
+	/*package*/ CollectionAgentFilter() {
+		this.includedAgents = new HashSet<Id>();
+	}
+
+	public boolean addIncludedAgent(Id id) {
+		return this.includedAgents.add(id);
+	}
+	
+	public boolean addIncludedAgents(Collection<Id> ids) {
+		return this.includedAgents.addAll(ids);
+	}
+	
+	public boolean removeIncludedAgent(Id id) {
+		return this.includedAgents.remove(id);
+	}
+
+	public Collection<Id> getIncludedAgents() {
+		return Collections.unmodifiableSet(this.includedAgents);
 	}
 	
 	@Override
-	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new ActivityEndIdentifier(activityReplanningMap);
-		identifier.setIdentifierFactory(this);
-		this.addAgentFiltersToIdentifier(identifier);
-		return identifier;
+	public void applyAgentFilter(Set<Id> set, double time) {
+		Iterator<Id> iter = set.iterator();
+		
+		while (iter.hasNext()) {
+			Id id = iter.next();
+			if (!includedAgents.contains(id)) iter.remove();
+		}
 	}
 
 }

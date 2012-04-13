@@ -20,8 +20,8 @@
 
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
-public interface InitialIdentifierFactory extends IdentifierFactory {
+public abstract class InitialIdentifierFactory extends IdentifierFactory {
 
 	@Override
-	public InitialIdentifier createIdentifier();
+	public abstract InitialIdentifier createIdentifier();
 }

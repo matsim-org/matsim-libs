@@ -20,13 +20,13 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -50,7 +50,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.network.LinkImpl;
@@ -122,6 +121,10 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 		this.replanningMap = new HashMap<Id, Double>();
 		this.personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.agentTransportModeMap = new HashMap<Id, String>();
+	}
+	
+	public Map<Id, PlanBasedWithinDayAgent> getPersonAgentMapping() {
+		return Collections.unmodifiableMap(this.personAgentMapping);
 	}
 	
 	@Override
@@ -224,7 +227,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param time
 	 * @return a list of agents who might need a replanning
 	 */
-	public Set<PlanBasedWithinDayAgent> getReplanningAgents(final double time) {
+	public Set<Id> getReplanningAgents(final double time) {
 		Set<String> transportModes = null;
 		return this.getReplanningAgents(time, transportModes);
 	}
@@ -234,7 +237,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param transportMode
 	 * @return a list of agents who might need a replanning and use the given transport mode
 	 */
-	public Set<PlanBasedWithinDayAgent> getReplanningAgents(final double time, final String transportMode) {
+	public Set<Id> getReplanningAgents(final double time, final String transportMode) {
 		Set<String> transportModes = new HashSet<String>();
 		transportModes.add(transportMode);
 		return this.getReplanningAgents(time, transportModes);
@@ -245,7 +248,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param transportModes
 	 * @return a list of agents who might need a replanning and use one of the given transport modes
 	 */
-	public Set<PlanBasedWithinDayAgent> getReplanningAgents(final double time, final Set<String> transportModes) {
+	public Set<Id> getReplanningAgents(final double time, final Set<String> transportModes) {
 		return this.filterAgents(time, transportModes, TimeFilterMode.EXACT);
 	}
 
@@ -253,7 +256,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param time
 	 * @return a list of agents who might need an unrestricted replanning and use the given transport mode
 	 */
-	public Set<PlanBasedWithinDayAgent> getUnrestrictedReplanningAgents(final double time) {
+	public Set<Id> getUnrestrictedReplanningAgents(final double time) {
 		Set<String> transportModes = null;
 		return this.getUnrestrictedReplanningAgents(time, transportModes);
 	}
@@ -263,7 +266,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param transportMode
 	 * @return a list of agents who might need an unrestricted replanning and use the given transport mode
 	 */
-	public Set<PlanBasedWithinDayAgent> getUnrestrictedReplanningAgents(final double time, final String transportMode) {
+	public Set<Id> getUnrestrictedReplanningAgents(final double time, final String transportMode) {
 		Set<String> transportModes = new HashSet<String>();
 		transportModes.add(transportMode);
 		return this.getUnrestrictedReplanningAgents(time, transportModes);
@@ -274,7 +277,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param transportModes
 	 * @return a list of agents who might need an unrestricted replanning and use one of the given transport modes
 	 */
-	public Set<PlanBasedWithinDayAgent> getUnrestrictedReplanningAgents(final double time, final Set<String> transportModes) {
+	public Set<Id> getUnrestrictedReplanningAgents(final double time, final Set<String> transportModes) {
 		return this.filterAgents(time, transportModes, TimeFilterMode.UNRESTRICTED);
 	}
 	
@@ -282,7 +285,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param time
 	 * @return a list of agents who might need a restricted replanning and use the given transport mode
 	 */
-	public Set<PlanBasedWithinDayAgent> getRestrictedReplanningAgents(final double time) {
+	public Set<Id> getRestrictedReplanningAgents(final double time) {
 		Set<String> transportModes = null;
 		return this.getRestrictedReplanningAgents(time, transportModes);
 	}
@@ -292,7 +295,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param transportMode
 	 * @return a list of agents who might need a restricted replanning and use the given transport mode
 	 */
-	public Set<PlanBasedWithinDayAgent> getRestrictedReplanningAgents(final double time, final String transportMode) {
+	public Set<Id> getRestrictedReplanningAgents(final double time, final String transportMode) {
 		Set<String> transportModes = new HashSet<String>();
 		transportModes.add(transportMode);
 		return this.getRestrictedReplanningAgents(time, transportModes);
@@ -303,12 +306,12 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @param transportModes
 	 * @return a list of agents who might need a restricted replanning and use one of the given transport modes
 	 */
-	public Set<PlanBasedWithinDayAgent> getRestrictedReplanningAgents(final double time, final Set<String> transportModes) {
+	public Set<Id> getRestrictedReplanningAgents(final double time, final Set<String> transportModes) {
 		return this.filterAgents(time, transportModes, TimeFilterMode.RESTRICTED);
 	}
 	
-	private Set<PlanBasedWithinDayAgent> filterAgents(final double time, final Set<String> transportModes, final TimeFilterMode timeMode) {
-		Set<PlanBasedWithinDayAgent> set = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+	private Set<Id> filterAgents(final double time, final Set<String> transportModes, final TimeFilterMode timeMode) {
+		Set<Id> set = new HashSet<Id>();
 		
 		Iterator<Entry<Id, Double>> entries = replanningMap.entrySet().iterator();
 		while (entries.hasNext()) {
@@ -333,8 +336,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 			}
 			
 			// non of the checks fails therefore add agent to the replanning set
-			PlanBasedWithinDayAgent withinDayAgent = this.personAgentMapping.get(personId);
-			set.add(withinDayAgent);	
+			set.add(personId);	
 		}
 
 		return set;
@@ -344,7 +346,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @return A list of all agents that are currently performing a leg. Note that
 	 * some of them might be limited in the available replanning operations! 
 	 */
-	public Set<PlanBasedWithinDayAgent> getLegPerformingAgents() {
+	public Set<Id> getLegPerformingAgents() {
 		Set<String> transportModes = null;
 		return this.getLegPerformingAgents(transportModes);
 	}
@@ -355,7 +357,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * given transport mode. Note that some of them might be limited in the available 
 	 * replanning operations! 
 	 */
-	public Set<PlanBasedWithinDayAgent> getLegPerformingAgents(final String transportMode) {
+	public Set<Id> getLegPerformingAgents(final String transportMode) {
 		Set<String> transportModes = new HashSet<String>();
 		transportModes.add(transportMode);
 		return this.getLegPerformingAgents(transportModes);
@@ -363,12 +365,12 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 
 	/**
 	 * @param transportModes
-	 * @return A list of all agents that are currently performing a leg with the
+	 * @return A list of Ids of all agents that are currently performing a leg with the
 	 * given transport mode. Note that some of them might be limited in the available 
 	 * replanning operations! 
 	 */
-	public Set<PlanBasedWithinDayAgent> getLegPerformingAgents(final Set<String> transportModes) {
-		Set<PlanBasedWithinDayAgent> legPerformingAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+	public Set<Id> getLegPerformingAgents(final Set<String> transportModes) {
+		Set<Id> legPerformingAgents = new HashSet<Id>();
 		
 		for (Id id : this.enrouteAgents) {
 			
@@ -379,8 +381,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 			}
 			
 			// the check did not fail therefore add agent to the replanning set
-			PlanBasedWithinDayAgent agent = this.personAgentMapping.get(id);
-			legPerformingAgents.add(agent);
+			legPerformingAgents.add(id);
 		}
 
 		return legPerformingAgents;

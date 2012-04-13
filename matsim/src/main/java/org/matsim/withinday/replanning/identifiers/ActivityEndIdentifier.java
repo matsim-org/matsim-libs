@@ -20,11 +20,12 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -45,28 +46,20 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<PlanBasedWithinDayAgent> activityPerformingAgents = activityReplanningMap.getReplanningDriverAgents(time);
-		Collection<PlanBasedWithinDayAgent> handledAgents = this.getHandledAgents();
+		
+		Set<PlanBasedWithinDayAgent> endActivityAgents = activityReplanningMap.getEndActivityAgents(time);
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
-		if (this.handleAllAgents()) {
-			agentsToReplan.addAll(activityPerformingAgents);
-		} else {
-			if (activityPerformingAgents.size() > handledAgents.size()) {
-				for (PlanBasedWithinDayAgent agent : handledAgents) {
-					if (activityPerformingAgents.contains(agent)) {
-						agentsToReplan.add(agent);
-					}
-				}
-			} else {
-				for (PlanBasedWithinDayAgent agent : activityPerformingAgents) {
-					if (handledAgents.contains(agent)) {
-						agentsToReplan.add(agent);
-					}
-				}
-			}			
+		/*
+		 * Apply filter to remove agents that should not be replanned.
+		 * We need a workaround since applyFilters expects Ids and not Agents.
+		 */
+		Set<Id> agentIds = new HashSet<Id>();
+		for (PlanBasedWithinDayAgent agent : endActivityAgents) agentIds.add(agent.getId());
+		this.applyFilters(agentIds, time);
+		for (PlanBasedWithinDayAgent agent : endActivityAgents) {
+			if (agentIds.contains(agent.getId())) agentsToReplan.add(agent);
 		}
-		
 		
 		Iterator<PlanBasedWithinDayAgent> iter = agentsToReplan.iterator();
 		while(iter.hasNext()) {

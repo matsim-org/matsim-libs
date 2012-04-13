@@ -20,12 +20,12 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -42,7 +42,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 /*
@@ -80,9 +79,9 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	}
 	
 	private void init() {
-		this.personAgentMapping = new TreeMap<Id, PlanBasedWithinDayAgent>();
-		this.replanningSet = new TreeSet<Id>();
-		this.startingAgents = new TreeSet<Id>();
+		this.personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
+		this.replanningSet = new HashSet<Id>();
+		this.startingAgents = new HashSet<Id>();
 	}
 
 	/*
@@ -111,6 +110,10 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		}
 	}
 
+	public Map<Id, PlanBasedWithinDayAgent> getPersonAgentMapping() {
+		return Collections.unmodifiableMap(this.personAgentMapping);
+	}
+	
 	/*
 	 * The Activity Start Events are thrown before the Activity Start has been handled
 	 * by the Simulation. As a result the Departure Time is not set at that time.
@@ -174,21 +177,17 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	/*
 	 * Returns a List of all Agents, that are currently performing an Activity.
 	 */
-	public synchronized Set<PlanBasedWithinDayAgent> getActivityPerformingAgents() {
-		Set<PlanBasedWithinDayAgent> activityPerformingAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-
-		for (Id id : replanningSet) activityPerformingAgents.add(personAgentMapping.get(id));
-
-		return activityPerformingAgents;
+	public Set<Id> getActivityPerformingAgents() {
+		return Collections.unmodifiableSet(replanningSet);
 	}
 
 	/*
 	 * TODO: find a better name
 	 * Returns a List of all agents that are going to end their activity right now
 	 */
-	public synchronized Set<PlanBasedWithinDayAgent> getReplanningDriverAgents(double time) {
-		Set<PlanBasedWithinDayAgent> personAgentsToReplanActivityEnd = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-				
+	public Set<PlanBasedWithinDayAgent> getEndActivityAgents(double time) {
+		Set<PlanBasedWithinDayAgent> personAgentsToReplanActivityEnd = new HashSet<PlanBasedWithinDayAgent>();
+		
 		Iterator<Id> ids = replanningSet.iterator();
 		while(ids.hasNext()) {
 			Id id = ids.next();
@@ -201,7 +200,6 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 				ids.remove();
 				personAgentsToReplanActivityEnd.add(withinDayAgent);
 			}
-//			else break;
 		}
 
 		return personAgentsToReplanActivityEnd;

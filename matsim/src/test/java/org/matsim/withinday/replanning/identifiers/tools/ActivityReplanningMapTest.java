@@ -98,29 +98,29 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		@Override
 		public void notifyMobsimInitialized(final MobsimInitializedEvent e) {
 			assertEquals(100, this.arp.getActivityPerformingAgents().size());	// all agents perform an activity
-			assertEquals(0, this.arp.getReplanningDriverAgents(0.0).size());		// no agent ends an activity
+			assertEquals(0, this.arp.getEndActivityAgents(0.0).size());		// no agent ends an activity
 		}
 
 		@Override
 		public void notifyMobsimBeforeSimStep(final MobsimBeforeSimStepEvent e) {
 			if (e.getSimulationTime() == t1) {
 				assertEquals(100, this.arp.getActivityPerformingAgents().size());	// all agents perform an activity before the time step
-				assertEquals(1, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());	// one agent ends an activity
+				assertEquals(1, this.arp.getEndActivityAgents(e.getSimulationTime()).size());	// one agent ends an activity
 			}
 
 			if (e.getSimulationTime() == t2) {
 				assertEquals(99, this.arp.getActivityPerformingAgents().size());	// 99 agents perform an activity before the time step
-				assertEquals(1, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());	// one agent ends an activity
+				assertEquals(1, this.arp.getEndActivityAgents(e.getSimulationTime()).size());	// one agent ends an activity
 			}
 
 			if (e.getSimulationTime() == t3) {
 				assertEquals(98, this.arp.getActivityPerformingAgents().size());	// 98 agents perform an activity before the time step
-				assertEquals(1, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());	// one agent ends an activity
+				assertEquals(1, this.arp.getEndActivityAgents(e.getSimulationTime()).size());	// one agent ends an activity
 			}
 
 			if (e.getSimulationTime() == t4) {
 				assertEquals(97, this.arp.getActivityPerformingAgents().size());	// 97 agents perform an activity before the time step
-				assertEquals(97, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());	// 97 agents end an activity
+				assertEquals(97, this.arp.getEndActivityAgents(e.getSimulationTime()).size());	// 97 agents end an activity
 			}
 		}
 
@@ -128,22 +128,22 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		public void notifyMobsimAfterSimStep(final MobsimAfterSimStepEvent e) {
 			if (e.getSimulationTime() == t1) {
 				assertEquals(99, this.arp.getActivityPerformingAgents().size());	// 99 agents perform an activity after the time step
-				assertEquals(0, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());		// no agent ends an activity
+				assertEquals(0, this.arp.getEndActivityAgents(e.getSimulationTime()).size());		// no agent ends an activity
 			}
 
 			if (e.getSimulationTime() == t2) {
 				assertEquals(98, this.arp.getActivityPerformingAgents().size());	// 98 agents perform an activity after the time step
-				assertEquals(0, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());		// no agent ends an activity
+				assertEquals(0, this.arp.getEndActivityAgents(e.getSimulationTime()).size());		// no agent ends an activity
 			}
 
 			if (e.getSimulationTime() == t3) {
 				assertEquals(97, this.arp.getActivityPerformingAgents().size());	// 97 agents perform an activity after the time step
-				assertEquals(0, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());		// no agent ends an activity
+				assertEquals(0, this.arp.getEndActivityAgents(e.getSimulationTime()).size());		// no agent ends an activity
 			}
 
 			if (e.getSimulationTime() == t4) {
 				assertEquals(0, this.arp.getActivityPerformingAgents().size());	// no agents perform an activity after the time step
-				assertEquals(0, this.arp.getReplanningDriverAgents(e.getSimulationTime()).size());		// no agent ends an activity
+				assertEquals(0, this.arp.getEndActivityAgents(e.getSimulationTime()).size());		// no agent ends an activity
 			}
 		}
 	}

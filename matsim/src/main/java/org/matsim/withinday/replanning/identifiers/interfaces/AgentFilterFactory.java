@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityEndIdentifierFactory.java
+ * AgentFilterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.replanning.identifiers;
+package org.matsim.withinday.replanning.identifiers.interfaces;
 
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+/**
+ * 
+ * @author cdobler
+ */
+public interface AgentFilterFactory {
 
-public class ActivityEndIdentifierFactory extends DuringActivityIdentifierFactory {
-
-	private ActivityReplanningMap activityReplanningMap;
-	
-	public ActivityEndIdentifierFactory(ActivityReplanningMap activityReplanningMap) {
-		this.activityReplanningMap = activityReplanningMap;
-	}
-	
-	@Override
-	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new ActivityEndIdentifier(activityReplanningMap);
-		identifier.setIdentifierFactory(this);
-		this.addAgentFiltersToIdentifier(identifier);
-		return identifier;
-	}
-
+	/**
+	 * Create an instance of an AgentFilter.
+	 */
+	public AgentFilter createAgentFilter();
 }

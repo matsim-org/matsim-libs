@@ -20,48 +20,39 @@
 
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 
-/*
- * Identify Agents that need a replanning of their scheduled plan.
+/**
+ * Identifies agents that need a replanning of their scheduled plan.
+ * 
+ * @author cdobler
  */
 public abstract class AgentsToReplanIdentifier {
 	
-	private static final Logger log = Logger.getLogger(AgentsToReplanIdentifier.class);
-	
-	private boolean handleAllAgents = true;
 	private IdentifierFactory identifierFactory;
-	private Set<PlanBasedWithinDayAgent> handledAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+	private final Set<AgentFilter> agentFilters = new LinkedHashSet<AgentFilter>();
 	
 	public abstract Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time);
+	
+	public final void addAgentFilter(AgentFilter agentFilter) {
+		this.agentFilters.add(agentFilter);
+	}
+	
+	public final boolean removeAgentFilter(AgentFilter agentFilter) {
+		return this.agentFilters.remove(agentFilter);
+	}
 
-	public final void setHandledAgent(Collection<PlanBasedWithinDayAgent> agents) {
-		this.handledAgents.clear();
-		this.handledAgents.addAll(agents);
-
-		if (handleAllAgents) {
-			log.info("Agents to be handled have been set.Therefore, disable \"handle all Agents\"!");
-			this.handleAllAgents = false;
-		}
+	public final Set<AgentFilter> getAgentFilters() {
+		return Collections.unmodifiableSet(agentFilters);
 	}
 	
-	public final void handleAllAgents(boolean value) {
-		this.handleAllAgents = value;
-	}
-	
-	public final boolean handleAllAgents() {
-		return this.handleAllAgents;
-	}
-	
-	public final Set<PlanBasedWithinDayAgent> getHandledAgents() {
-		return Collections.unmodifiableSet(handledAgents);
+	public final void applyFilters(Set<Id> set, double time) {
+		for (AgentFilter agentFilter : agentFilters) agentFilter.applyAgentFilter(set, time);
 	}
 	
 	public final void setIdentifierFactory(IdentifierFactory factory) {

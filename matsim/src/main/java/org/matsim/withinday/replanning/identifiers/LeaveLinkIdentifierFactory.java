@@ -26,7 +26,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
-public class LeaveLinkIdentifierFactory implements DuringLegIdentifierFactory {
+public class LeaveLinkIdentifierFactory extends DuringLegIdentifierFactory {
 
 	private final LinkReplanningMap linkReplanningMap;
 	private final Set<String> transportModes;
@@ -45,6 +45,7 @@ public class LeaveLinkIdentifierFactory implements DuringLegIdentifierFactory {
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new LeaveLinkIdentifier(linkReplanningMap, transportModes);
 		identifier.setIdentifierFactory(this);
+		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}
 

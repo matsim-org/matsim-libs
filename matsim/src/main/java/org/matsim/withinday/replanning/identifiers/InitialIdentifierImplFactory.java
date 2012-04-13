@@ -25,7 +25,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifierFactory;
 
 
-public class InitialIdentifierImplFactory implements InitialIdentifierFactory {
+public class InitialIdentifierImplFactory extends InitialIdentifierFactory {
 
 	private QSim qsim;
 	
@@ -37,6 +37,7 @@ public class InitialIdentifierImplFactory implements InitialIdentifierFactory {
 	public InitialIdentifier createIdentifier() {
 		InitialIdentifier identifier = new InitialIdentifierImpl(qsim);
 		identifier.setIdentifierFactory(this);
+		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}
 

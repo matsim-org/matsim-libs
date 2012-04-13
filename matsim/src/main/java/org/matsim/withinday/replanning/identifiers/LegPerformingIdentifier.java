@@ -20,10 +20,11 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -40,25 +41,15 @@ public class LegPerformingIdentifier extends DuringLegIdentifier {
 	
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<PlanBasedWithinDayAgent> legPerformingAgents =  linkReplanningMap.getLegPerformingAgents();
-		Collection<PlanBasedWithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<Id> legPerformingAgents = linkReplanningMap.getLegPerformingAgents();
+		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
+
+		// apply filter to remove agents that should not be replanned
+		this.applyFilters(legPerformingAgents, time);
+		
+		// create set of PlanBasedWithinDayAgent
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		
-		if (this.handleAllAgents()) return legPerformingAgents;
-		
-		if (legPerformingAgents.size() > handledAgents.size()) {
-			for (PlanBasedWithinDayAgent agent : handledAgents) {
-				if (legPerformingAgents.contains(agent)) {
-					agentsToReplan.add(agent);
-				}
-			}
-		} else {
-			for (PlanBasedWithinDayAgent agent : legPerformingAgents) {
-				if (handledAgents.contains(agent)) {
-					agentsToReplan.add((PlanBasedWithinDayAgent)agent);
-				}
-			}
-		}
+		for (Id id : legPerformingAgents) agentsToReplan.add(mapping.get(id));
 
 		return agentsToReplan;
 	}

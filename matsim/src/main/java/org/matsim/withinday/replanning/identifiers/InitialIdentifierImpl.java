@@ -21,9 +21,12 @@
 package org.matsim.withinday.replanning.identifiers;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -38,34 +41,26 @@ public class InitialIdentifierImpl extends InitialIdentifier {
 	/*package*/ InitialIdentifierImpl(QSim qsim) {
 		this.qsim = qsim;
 	}
-		
+	
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+				
 		Collection<MobsimAgent> mobsimAgents = this.qsim.getAgents();
-		Collection<PlanBasedWithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		
-		if (this.handleAllAgents()) {
-			for (MobsimAgent agent : mobsimAgents) {
-				agentsToReplan.add((PlanBasedWithinDayAgent)agent);
-			}
-			return agentsToReplan;
+
+		/*
+		 * Apply filter to remove agents that should not be replanned.
+		 * We need a workaround since applyFilters expects Ids and not Agents.
+		 */
+		Set<Id> agentIds = new HashSet<Id>();
+		for (MobsimAgent agent : mobsimAgents) agentIds.add(agent.getId());
+		this.applyFilters(agentIds, time);
+		Iterator<MobsimAgent> iter = mobsimAgents.iterator();
+		while (iter.hasNext()) {
+			MobsimAgent agent = iter.next();
+			if (agentIds.contains(agent.getId())) agentsToReplan.add((PlanBasedWithinDayAgent)agent);
 		}
-		
-		if (mobsimAgents.size() > handledAgents.size()) {
-			for (PlanBasedWithinDayAgent agent : handledAgents) {
-				if (mobsimAgents.contains(agent)) {
-					agentsToReplan.add(agent);
-				}
-			}
-		} else {
-			for (MobsimAgent agent : mobsimAgents) {
-				if (handledAgents.contains(agent)) {
-					agentsToReplan.add((PlanBasedWithinDayAgent)agent);
-				}
-			}
-		}
-	
+
 		return agentsToReplan;
 	}
 

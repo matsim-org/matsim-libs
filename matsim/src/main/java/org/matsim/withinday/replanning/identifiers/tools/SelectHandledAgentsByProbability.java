@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -34,6 +35,8 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
+import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -43,14 +46,14 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 
 	private static final Logger log = Logger.getLogger(SelectHandledAgentsByProbability.class);
 	
-	protected Collection<PlanBasedWithinDayAgent> withinDayAgents;
+	protected Collection<Id> withinDayAgents;
 
 	protected List<Tuple<AgentsToReplanIdentifier, Double>> identifierProbabilities;	// <Identifier, probability for handling an agent>
 
 	public SelectHandledAgentsByProbability() {
 		identifierProbabilities = new ArrayList<Tuple<AgentsToReplanIdentifier, Double>>();
 	}
-
+	
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		collectAgents((QSim) e.getQueueSimulation());
@@ -65,15 +68,15 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 
 		Random random = MatsimRandom.getLocalInstance();
 		double probability;
-		List<PlanBasedWithinDayAgent> agentsToHandle;
+		List<Id> agentsToHandle;
 
 		for (Tuple<AgentsToReplanIdentifier, Double> tuple : identifierProbabilities) {
-			agentsToHandle = new ArrayList<PlanBasedWithinDayAgent>();
+			agentsToHandle = new ArrayList<Id>();
 
-			for (PlanBasedWithinDayAgent withinDayAgent : this.withinDayAgents) {
+			for (Id agentId : this.withinDayAgents) {
 				probability = random.nextDouble();
 				if (probability <= tuple.getSecond()) {
-					agentsToHandle.add(withinDayAgent);
+					agentsToHandle.add(agentId);
 					
 					if (tuple.getFirst() instanceof InitialIdentifier) initialIdentificationCounter++;
 					else if (tuple.getFirst() instanceof DuringActivityIdentifier) activityIdentificationCounter++;
@@ -81,7 +84,10 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 					else unknownIdentificationCounter++;
 				}				
 			}
-			tuple.getFirst().setHandledAgent(agentsToHandle);
+			
+			CollectionAgentFilter filter = new CollectionAgentFilterFactory().createAgentFilter();
+			filter.addIncludedAgents(agentsToHandle);
+			tuple.getFirst().addAgentFilter(filter);
 		}
 
 		log.info("Initial Replanning Identifiers have " + initialIdentificationCounter + " registered Agents.");
@@ -91,11 +97,11 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 	}
 
 	private void collectAgents(QSim sim) {
-		this.withinDayAgents = new ArrayList<PlanBasedWithinDayAgent>();
+		this.withinDayAgents = new ArrayList<Id>();
 
 		for (MobsimAgent mobsimAgent : sim.getAgents()) {
 			if (mobsimAgent instanceof PlanBasedWithinDayAgent) {
-				withinDayAgents.add((PlanBasedWithinDayAgent) mobsimAgent);
+				withinDayAgents.add(mobsimAgent.getId());
 			} else {
 				log.warn("MobsimAgent was expected to be from type WithinDayAgent, but was from type " + mobsimAgent.getClass().toString());
 			}
@@ -107,11 +113,12 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 		identifierProbabilities.add(new Tuple<AgentsToReplanIdentifier, Double>(identifier, probability));
 	}
 	
-	public void removelIdentifier(AgentsToReplanIdentifier identifier) {
+	public void removeIdentifier(AgentsToReplanIdentifier identifier) {
 		Iterator<Tuple<AgentsToReplanIdentifier, Double>> iter = identifierProbabilities.iterator();
 		while (iter.hasNext()) {
 			Tuple<AgentsToReplanIdentifier, Double> tuple = iter.next();
 			if (identifier == tuple.getFirst()) iter.remove();
 		}
 	}
+
 }
