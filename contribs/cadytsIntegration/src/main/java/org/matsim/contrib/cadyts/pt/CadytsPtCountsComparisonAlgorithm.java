@@ -62,8 +62,7 @@ class CadytsPtCountsComparisonAlgorithm {
 
 	private final Network network;
 
-	double countsScaleFactor;
-	// needed in CadytsErrorPlot
+	double countsScaleFactor; // needed in CadytsErrorPlot
 
 	final static Logger log = Logger.getLogger(CadytsPtCountsComparisonAlgorithm.class);
 
@@ -87,7 +86,7 @@ class CadytsPtCountsComparisonAlgorithm {
 	final char CHR_HT = '\t';
 	final char CHR_NL = '\n';
 
-	void compare() {
+	void calculateComparison() {
 		double countValue;
 		for (Count count : this.counts.getCounts().values()) {
 			Id stopId = count.getLocId();
@@ -163,10 +162,6 @@ class CadytsPtCountsComparisonAlgorithm {
 	 */
 	List<CountSimComparison> getComparison() {
 		return this.countSimComp;
-	}
-
-	void run() {
-		this.compare();
 	}
 
 	/**

@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -58,14 +57,14 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final Set<Id> transitDrivers = new HashSet<Id>();
 	private final Set<Id> transitVehicles = new HashSet<Id>();
-	private final Set<Id> analyzedLines = new HashSet<Id>();
+	private final Set<Id> calibratedLines;
 
-	public CadytsPtOccupancyAnalyzer() {
+	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines) {
+		this.calibratedLines = calibratedLines;
 		this.timeBinSize = 3600;
 		this.maxTime = 24 * 3600 - 1;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
 		this.occupancies = new HashMap<Id, int[]>();
-		this.analyzedLines.add(new IdImpl("M44")); // TODO make configurable
 	}
 
 	@Override
@@ -79,7 +78,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 
 	@Override
 	public void handleEvent(final TransitDriverStartsEvent event) {
-		if (this.analyzedLines.contains(event.getTransitLineId())) {
+		if (this.calibratedLines.contains(event.getTransitLineId())) {
 			this.transitDrivers.add(event.getDriverId());
 			this.transitVehicles.add(event.getVehicleId());
 		}
@@ -245,13 +244,4 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		this.readEvents(eventFileName);
 	}
 
-	public static void main(final String[] args) {
-		String eventFile = null;
-		if (args.length == 1) {
-			eventFile = args[0];
-		} else {
-			eventFile = "../playgrounds/mmoyo/output/routeAnalysis/scoreOff/afterBugRepair/it500/500.events.xml.gz";
-		}
-		new CadytsPtOccupancyAnalyzer().run(eventFile);
-	}
 }

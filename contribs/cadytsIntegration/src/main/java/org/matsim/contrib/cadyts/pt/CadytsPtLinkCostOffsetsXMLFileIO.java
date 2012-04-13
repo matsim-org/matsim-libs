@@ -40,9 +40,7 @@ public class CadytsPtLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Trans
 
 	@Override
 	protected TransitStopFacility attrValue2key(final String stopId) {
-//		System.out.println("-----attrValue2key------:\t" + stopId);
 		TransitStopFacility stop = this.schedule.getFacilities().get(new IdImpl(stopId));
-//		System.out.println("stop:\t" + stop);
 		return stop;
 	}
 

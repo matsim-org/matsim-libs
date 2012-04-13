@@ -48,13 +48,16 @@ import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
+/**
+ * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
+ * select plans that better match to given occupancy counts.
+ */
 public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener {
 
 	private final static Logger log = Logger.getLogger(CadytsPtPlanStrategy.class);
@@ -72,28 +75,27 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	private final Counts boardCounts = new Counts();
 	private final Counts alightCounts = new Counts();
 	private final CadytsPtOccupancyAnalyzer cadytsPtOccupAnalyzer;
-	static TransitSchedule trSched;
 	private final boolean writeAnalysisFile;
-	CadytsPtPlanChanger cadytsPtPlanChanger;
-	final Set<Id> analyzedLines;
+	private final CadytsPtPlanChanger cadytsPtPlanChanger;
+	private final Set<Id> calibratedLines;
 
-	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTURE, needed for reflection-based instantiation
+	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTOR, needed for reflection-based instantiation
 		controler.addControlerListener(this);
 
 		CadytsPtConfigGroup cadytsConfig = new CadytsPtConfigGroup();
 		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, cadytsConfig);
 		// addModule() also initializes the config group with the values read from the config file
 
-		this.analyzedLines = cadytsConfig.getCalibratedLines();
+		this.calibratedLines = cadytsConfig.getCalibratedLines();
 
-		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer();
+		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedLines());
 		controler.getEvents().addHandler(this.cadytsPtOccupAnalyzer);
 
 		this.countsScaleFactor = controler.getConfig().ptCounts().getCountsScaleFactor();
 		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, this.countsScaleFactor);
 
 		// this collects events and generates cadyts plans from it
-		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(controler.getScenario());
+		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(controler.getScenario(), cadytsConfig.getCalibratedLines());
 		controler.getEvents().addHandler(ptStep);
 
 		String occupancyCountsFilename = controler.getConfig().ptCounts().getOccupancyCountsFileName();
@@ -109,8 +111,6 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 
-	// Analysis methods
-	// /////////////////////////////////////////////////////
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		this.cadytsPtOccupAnalyzer.reset(event.getIteration());
@@ -122,7 +122,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		if (isActiveInThisIteration(it, event.getControler())) {
 			// Get all stations of all analyzed lines and invoke the method write to get all information of them
 			Set<Id> stopIds = new HashSet<Id>();
-			for (Id lineId : this.analyzedLines) {
+			for (Id lineId : this.calibratedLines) {
 				TransitLine line = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(lineId);
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (TransitRouteStop stop : route.getStops()) {
@@ -133,10 +133,6 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 			String outFile = event.getControler().getControlerIO().getIterationFilename(it, OCCUPANCYANALYSIS_FILENAME);
 			this.cadytsPtOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts, stopIds);
 		}
-	}
-
-	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
-		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0);
 	}
 
 	@Override
@@ -154,7 +150,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		// write some output
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsPtLinkCostOffsetsXMLFileIO(trSched).write(filename, this.calibrator.getLinkCostOffsets());
+			new CadytsPtLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getTransitSchedule()).write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
 		}
@@ -162,14 +158,19 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		generateAndWriteCountsComparisons(event);
 	}
 
+	/**
+	 * for testing purposes only
+	 */
 	/*package*/ MATSimUtilityModificationCalibrator<TransitStopFacility> getCalibrator() {
-		// for testing purposes only
 		return this.calibrator;
 	}
 
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
-	// yyyyyy this statement is no longer correct since someone added other public methods below. kai,jul'11
+
+	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
+		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0);
+	}
 
 	private void generateAndWriteCountsComparisons(final IterationEndsEvent event) {
 		Config config = event.getControler().getConfig();
@@ -193,20 +194,18 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 				CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.occupCounts,
 						network, this.countsScaleFactor);
 
-				String distanceFilterStr = config.findParam("ptCounts", "distanceFilter");
-				String distanceFilterCenterNodeId = config.findParam("ptCounts", "distanceFilterCenterNode");
-				if ((distanceFilterStr != null) && (distanceFilterCenterNodeId != null)) {
-					Double distanceFilter = Double.valueOf(distanceFilterStr);
+				PtCountsConfigGroup ptCountsConfig = (PtCountsConfigGroup) config.getModule(PtCountsConfigGroup.GROUP_NAME);
+				Double distanceFilter = ptCountsConfig.getDistanceFilter();
+				String distanceFilterCenterNodeId  = ptCountsConfig.getDistanceFilterCenterNode();
+				if ((distanceFilter != null) && (distanceFilterCenterNodeId != null)) {
 					ccaBoard.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
 					ccaAlight.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
 					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
 				}
 
-				// filter stations here??
-
-				ccaBoard.run();
-				ccaAlight.run();
-				ccaOccupancy.run();
+				ccaBoard.calculateComparison();
+				ccaAlight.calculateComparison();
+				ccaOccupancy.calculateComparison();
 
 				String outputFormat = ((PtCountsConfigGroup) config.getModule(PtCountsConfigGroup.GROUP_NAME)).getOutputFormat();
 				if (outputFormat.contains("kml") || outputFormat.contains("all")) {

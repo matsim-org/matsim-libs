@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
@@ -47,7 +46,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.demand.PlanBuilder;
 
-class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
+/*package*/ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler {
 	private static final Logger log = Logger.getLogger(PtPlanToPlanStepBasedOnEvents.class);
 
@@ -66,12 +65,12 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 
 	private final Set<Id> transitDrivers = new HashSet<Id>();
 	private final Set<Id> transitVehicles = new HashSet<Id>();
-	private final Set<Id> analyzedLines = new HashSet<Id>();
+	private final Set<Id> calibratedLines;
 
-	PtPlanToPlanStepBasedOnEvents(final Scenario sc) {
+	PtPlanToPlanStepBasedOnEvents(final Scenario sc, final Set<Id> calibratedLines) {
 		this.sc = sc;
 		this.schedule = ((ScenarioImpl) sc).getTransitSchedule();
-		this.analyzedLines.add(new IdImpl("M44")); // TODO make configurable
+		this.calibratedLines = calibratedLines;
 	}
 
 	private long plansFound = 0;
@@ -103,7 +102,7 @@ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, 
 
 	@Override
 	public void handleEvent(final TransitDriverStartsEvent event) {
-		if (this.analyzedLines.contains(event.getTransitLineId())) {
+		if (this.calibratedLines.contains(event.getTransitLineId())) {
 			this.transitDrivers.add(event.getDriverId());
 			this.transitVehicles.add(event.getVehicleId());
 		}

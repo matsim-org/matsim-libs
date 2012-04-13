@@ -27,6 +27,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
@@ -46,11 +47,17 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 	/*package*/ static MATSimUtilityModificationCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts) {
 		CadytsPtConfigGroup config = (CadytsPtConfigGroup) sc.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
 
+		if (occupCounts.getCounts().size() == 0) {
+			throw new RuntimeException("CadytsPt requires counts-data.");
+		}
+
 		double regressionInertia = config.getRegressionInertia();
 
-		// if logfile is not specified, it is written to the working directory... so better write it to the output directory.
 		MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator =
-				new MATSimUtilityModificationCalibrator<TransitStopFacility>(sc.getConfig().controler().getOutputDirectory() + "/cadyts.log", MatsimRandom.getLocalInstance(), regressionInertia);
+				new MATSimUtilityModificationCalibrator<TransitStopFacility>(
+						sc.getConfig().controler().getOutputDirectory() + "/cadyts.log",
+						MatsimRandom.getLocalInstance(),
+						regressionInertia);
 
 		matsimCalibrator.setMinStddev(config.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
 		matsimCalibrator.setFreezeIteration(config.getFreezeIteration());
@@ -59,23 +66,15 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		matsimCalibrator.setBruteForce(config.useBruteForce());
 		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "calibration-stats.txt");
 
-		// SET countsScale
-//		NewPtBsePlanStrategy.countsScaleFactor = Double.parseDouble(config.findParam(NewPtBsePlanStrategy.MODULE_NAME, "countsScaleFactor"));
-//		log.info("BSE:\tusing the countsScaleFactor of " + NewPtBsePlanStrategy.countsScaleFactor + " as packetSize from config.");
-		//will be used in inner class SimResultsContainerImpl.getSimValue with "return values[hour] * countsScaleFactor;"
-
-		if (occupCounts.getCounts().size() == 0) {
-			throw new RuntimeException("CadytsPt requires counts-data.");
-		}
 
 		int arStartTime = config.getStartHour();
 		int arEndTime = config.getEndHour();
 
-		CadytsPtPlanStrategy.trSched = sc.getTransitSchedule();
+		TransitSchedule schedule = sc.getTransitSchedule();
 
 		//add counts data into calibrator
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
-			TransitStopFacility stop= CadytsPtPlanStrategy.trSched.getFacilities().get(entry.getKey());
+			TransitStopFacility stop = schedule.getFacilities().get(entry.getKey());
 			for (Volume volume : entry.getValue().getVolumes().values()){
 				if (volume.getHour() >= arStartTime && volume.getHour() <= arEndTime) {    //add volumes for each hour to calibrator
 					int start_s = (volume.getHour() - 1) * 3600;
@@ -88,5 +87,4 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 		return matsimCalibrator;
 	}
-
 }
