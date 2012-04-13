@@ -302,7 +302,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
 		
-		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds());
+		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds(), this.scenarioData.getPopulation().getPersons().keySet());
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
 		this.householdsTracker = new HouseholdsTracker(this.householdObjectAttributes);

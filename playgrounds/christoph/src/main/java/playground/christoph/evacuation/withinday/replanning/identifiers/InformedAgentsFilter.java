@@ -75,10 +75,47 @@ public class InformedAgentsFilter implements AgentFilter {
 	 * @param set of PlanBasedWithinDayAgent
 	 */
 	/*package*/ void removeNotInformedAgents(Set<Id> set) {
-		Iterator<Id> iter = set.iterator();
-		while (iter.hasNext()) {
-			Id agentId = iter.next();
-			if (!informedAgentsTracker.isAgentInformed(agentId)) iter.remove();
+		
+		int informed = this.informedAgentsTracker.getInformedAgentsCount();
+		int notInformed = this.informedAgentsTracker.getNotInformedAgentsCount();
+		int agents = set.size();
+		
+		/*
+		 * If we have more informed agents than not informed agents.
+		 */
+		if (informed > notInformed) {
+			/*
+			 * If we have fewer agents who are not informed, remove them from
+			 * the input set. Otherwise do it the other way round.
+			 */
+			if (notInformed < agents) {
+				set.removeAll(this.informedAgentsTracker.getNotInformedAgents());
+			} else {
+				Iterator<Id> iter = set.iterator();
+				while (iter.hasNext()) {
+					Id agentId = iter.next();
+					if (informedAgentsTracker.isAgentNotInformed(agentId)) iter.remove();
+				}
+			}
+		} 
+		/*
+		 * We have fewer informed agents than not informed agents.
+		 */
+		else {
+			Iterator<Id> iter = set.iterator();
+			while (iter.hasNext()) {
+				Id agentId = iter.next();
+				if (!informedAgentsTracker.isAgentInformed(agentId)) iter.remove();
+			}
+//			/*
+//			 * If we have fewer informed agents than in the input set, check for every
+//			 * agent in the set whether it is informed.
+//			 */
+//			if (informed < agents) {
+//			
+//			} else {
+//				
+//			}
 		}
 	}
 	
@@ -89,11 +126,23 @@ public class InformedAgentsFilter implements AgentFilter {
 	 * @param set of PlanBasedWithinDayAgent
 	 */
 	/*package*/ void removeAgentsToBeReplannedInitially(Set<Id> set) {
-		Iterator<Id> iter = set.iterator();
-		while (iter.hasNext()) {
-			Id agentId = iter.next();
-			if (informedAgentsTracker.agentRequiresInitialReplanning(agentId)) iter.remove();
-		}
+		
+		int agents = set.size();
+		int initialAgents = this.informedAgentsTracker.getAgentsRequiringInitialReplanning().size();
+		
+		/*
+		 * If we have fewer agents who require an initial replanning, remove them from
+		 * the input set. Otherwise do it the other way round.
+		 */
+		if (initialAgents < agents) {
+			set.removeAll(this.informedAgentsTracker.getAgentsRequiringInitialReplanning());
+		} else {			
+			Iterator<Id> iter = set.iterator();
+			while (iter.hasNext()) {
+				Id agentId = iter.next();
+				if (informedAgentsTracker.agentRequiresInitialReplanning(agentId)) iter.remove();
+			}
+		}	
 	}
 	
 	/**

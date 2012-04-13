@@ -51,7 +51,9 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 
 	private boolean allHouseholdsInformed = false;
 	
-	public InformedHouseholdsTracker(Households households) {
+	public InformedHouseholdsTracker(Households households, Set<Id> agentIds) {
+		super(agentIds);
+		
 		this.households = households;
 		this.informedHouseholdsInCurrentTimeStep = new ConcurrentLinkedQueue<Id>();
 
@@ -90,8 +92,6 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 	 */
 	private void selectInformationTimes(Households households) {
 
-		int totalAgents = 0;
-
 		for (Household household : households.getHouseholds().values()) {
 			
 			// skip households without members
@@ -104,10 +104,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 			 * at the end of a time step is executed when the simulation has started.
 			 */
 			this.informationTime.add(new Tuple<Id, Double>(household.getId(), EvacuationConfig.evacuationTime + delay + 1.0));
-			totalAgents += household.getMemberIds().size();
 		}
-
-		this.setTotalAgentCount(totalAgents);
 	}
 
 	/*
@@ -161,8 +158,8 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 				informedHouseholdsInCurrentTimeStep.add(tuple.getFirst());
 				
 				for (Id memberId : household.getMemberIds()) {
-					this.toBeInitiallyReplannedAgents.add(memberId);
-					this.informedAgents.add(memberId);
+					this.addToBeInitiallyReplannedAgent(memberId);
+					this.informAgent(memberId);
 				}
 			} else {
 				break;
