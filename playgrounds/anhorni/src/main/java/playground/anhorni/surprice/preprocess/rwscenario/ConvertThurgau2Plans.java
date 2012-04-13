@@ -22,6 +22,7 @@ package playground.anhorni.surprice.preprocess.rwscenario;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -94,58 +95,29 @@ public class ConvertThurgau2Plans {
 
 	private void addPlans(final Map<Id, String> person_strings) {		
 		for (Id pid : person_strings.keySet()) {
-			String person_string = person_strings.get(pid);
+			String person_string = person_strings.get(pid);	
 			
 			int dow_prev = -1;
-			Id pid_prev = null;
-			int week_prev = -1;
-			
+			Id pid_prev = null;			
 			String[] lines = person_string.split("\n", -1); // last line is always an empty line
-			for (int l = 0; l < lines.length-1; l++) {
-				
+			for (int l = 0; l < lines.length-1; l++) {				
 				String[] entrs = lines[l].split("\t", -1);
-
 				int dow = Integer.parseInt(entrs[22].trim());
-				if ((dow < 1) || (dow > 7)) {
-					Gbl.errorMsg("pid=" + pid + ": dow=" + dow + " not known!"); 
-				}
 				
 				// add new plan if day of week changes or person changes
 				if (dow != dow_prev || !pid.equals(pid_prev)) {
-					Plan plan = this.addPlan(pid, entrs, dow);
-					int week = Integer.parseInt(entrs[21].trim());
-					
-					if (week != week_prev) {
-						if (this.personWeeks.get(pid) == null) {
-							this.personWeeks.put(pid, new PersonWeeks());
-						}
-						this.personWeeks.get(pid).increaseWeek();
-						
-						// micro census 2000 person weight
-						double pweight = Double.parseDouble(entrs[89].trim());						
-						// micro census 2000 trip weight
-						// double tweight = Double.parseDouble(entrs[90].trim());
-						this.personWeeks.get(pid).setPweight(pweight);
-					}
-					this.personWeeks.get(pid).addDay(dow, plan);
-					week_prev = week;
+					this.addPlan(pid, entrs, dow);
 				}
-				boolean isWorker = this.addTripsAndActs(pid, entrs);
-				
-				if (isWorker) {
-					this.personWeeks.get(pid).setIsWorker();
-				}
-				
+				this.addTripsAndActs(pid, entrs);				
 				pid_prev = pid;
 				dow_prev = dow;
 			}
 		}
 	}
 	
-	private boolean addTripsAndActs(Id pid, String[] entrs) {
+	private void addTripsAndActs(Id pid, String[] entrs) {
 		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(pid);
 		Plan plan = person.getSelectedPlan();
-		boolean isWorker = false;
 		
 		// departure time (min => sec.)
 		String dp[] = (entrs[6].trim()).split(":", -1);
@@ -199,12 +171,7 @@ public class ConvertThurgau2Plans {
 			leg.setTravelTime(arrival-departure);
 			leg.setArrivalTime(arrival);
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
-			act.setStartTime(arrival);
-			
-			if (act.getType().startsWith("w")) {
-				isWorker = true;
-			}
-			
+			act.setStartTime(arrival);			
 		}
 		else {
 			ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME);
@@ -216,7 +183,6 @@ public class ConvertThurgau2Plans {
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);
 		}
-		return isWorker;
 	}
 	
 	private Plan addPlan(Id pid, String[] entrs, int dow) {
@@ -225,7 +191,7 @@ public class ConvertThurgau2Plans {
 		person.createAndAddPlan(true);
 		Plan plan = person.getSelectedPlan();
 						
-		plan.setScore(dow * 100.0); // used plans score as a storage for the person weight of the MZ2000
+		plan.setScore(dow * 1.0); // used plans score as a storage for the person weight of the MZ2000
 		return plan;
 	}
 
@@ -248,9 +214,10 @@ public class ConvertThurgau2Plans {
 
 		FileReader fr = new FileReader(this.inputfileF3);
 		BufferedReader br = new BufferedReader(fr);
+		String[] entrs = null;
 		String curr_line = br.readLine(); // Skip header
 		while ((curr_line = br.readLine()) != null) {
-			String[] entrs = curr_line.split("\t", -1);
+			entrs = curr_line.split("\t", -1);
 
 			id = Integer.parseInt(entrs[2].trim());
 			if (id == prev_id) {
@@ -280,8 +247,40 @@ public class ConvertThurgau2Plans {
 		this.addPlans(person_strings);
 		
 		this.clean(person_strings);
+		
+		this.createPersonWeeks(entrs);
 				
 		this.write();
+	}
+	
+	private void createPersonWeeks(String[] entrs) {
+		int counter = 0;
+		int nextMsg = 1;
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			counter++;
+			if (counter % nextMsg == 0) {
+				nextMsg *= 2;
+				log.info(" person # " + counter);
+			}					
+			Id pid = person.getId();
+			this.personWeeks.put(pid, new PersonWeeks(this.scenario.getPopulation().getPersons().get(pid)));
+			
+			// micro census 2000 person weight
+			double pweight = Double.parseDouble(entrs[89].trim());						
+			// micro census 2000 trip weight
+			// double tweight = Double.parseDouble(entrs[90].trim());
+			this.personWeeks.get(pid).setPweight(pweight);
+			
+			double prev_score = 1000.0;
+			for (Plan plan : person.getPlans()) {				
+				if (plan.getScore() <= prev_score) {
+					this.personWeeks.get(pid).increaseWeek();	
+				}
+				prev_score = plan.getScore();
+				this.personWeeks.get(pid).addDay((int) Math.floor(plan.getScore()), plan);
+			}		
+			this.personWeeks.get(pid).setIsWorker();
+		}
 	}
 	
 	private void createPersons() throws Exception {
@@ -321,7 +320,6 @@ public class ConvertThurgau2Plans {
 	private void write() {
 		log.info("Writing population with plans ...");
 		new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(this.outputfile);
-		
 	}
 	
 	private void clean(Map<Id,String> person_strings) {

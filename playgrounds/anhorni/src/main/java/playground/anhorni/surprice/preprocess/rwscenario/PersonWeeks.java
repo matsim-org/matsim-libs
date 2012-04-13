@@ -21,8 +21,12 @@ package playground.anhorni.surprice.preprocess.rwscenario;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
+
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.ActivityImpl;
 
 public class PersonWeeks {	
 	private Person person;
@@ -31,11 +35,6 @@ public class PersonWeeks {
 	private boolean isWorker = false;
 	private double pweight = 1.0;
 		
-	public PersonWeeks() {
-		for (int i = 0; i < 7; i++) {
-			this.days.add(i, new TreeMap<Integer, Plan>());
-		}
-	}
 	
 	public void increaseWeek() {
 		this.currentWeek++;
@@ -43,20 +42,39 @@ public class PersonWeeks {
 	
 	public PersonWeeks(Person person) {
 		this.person = person;
+		
+		for (int i = 0; i < 7; i++) {
+			this.days.add(i, new TreeMap<Integer, Plan>());
+		}
 	}
 	
 	public Plan getDay(int dow, int week) {
-		return this.days.get(week).get(dow - 1);
+		int w = week;
+		while (this.days.get(w).size() < 7 && w < 6) { // week is not complete -> take next week
+			w++;
+		}
+		return this.days.get(w).get(dow);
 	}
 	
 	public void addDay(int dow, Plan plan) {
 		if (this.currentWeek < 7) {
-			this.days.get(this.currentWeek).put(dow - 1, plan);
+			this.days.get(this.currentWeek).put(dow, plan);
 		}
 	}
 		
 	public void setIsWorker() {
-		this.isWorker = true;
+		for (int i = 0; i < days.size(); i++) {
+			for (Plan plan : this.days.get(i).values()) {
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						ActivityImpl act = (ActivityImpl)pe;				
+						if (act.getType().startsWith("w")) {
+							this.isWorker = true;
+						}
+					}
+				}
+			}
+		}
 	}
 	public Person getPerson() {
 		return this.person;
@@ -69,5 +87,11 @@ public class PersonWeeks {
 	}
 	public void setPweight(double pweight) {
 		this.pweight = pweight;
+	}
+	public int getCurrentWeek() {
+		return currentWeek;
+	}
+	public void setCurrentWeek(int currentWeek) {
+		this.currentWeek = currentWeek;
 	}
 }

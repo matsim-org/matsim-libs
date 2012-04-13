@@ -170,11 +170,14 @@ public class Merger {
 	
 	private void createPlansForPerson(PersonImpl person, PersonWeeks personWeeksThurgau) {
 		// only one week to begin with
-		int week = 0;
+		int week = 0;		
 		for (int dow = 0; dow < 7; dow++) {
 			person.getPlans().clear();
 			Plan plan = personWeeksThurgau.getDay(dow, week);
 			PersonImpl thurgauPerson = (PersonImpl)personWeeksThurgau.getPerson();
+			
+			log.info("pid " + thurgauPerson.getId() + " score " + plan.getScore());
+			
 			thurgauPerson.addPlan(plan);
 			thurgauPerson.setSelectedPlan(plan);
 			Plan planNew = thurgauPerson.copySelectedPlan();
@@ -186,7 +189,7 @@ public class Merger {
 			
 			// assign home and work locations
 			PersonHomeWork phw = this.personHWFacilities.get(person.getId());			
-			for (PlanElement pe : plan.getPlanElements()) {
+			for (PlanElement pe : planNew.getPlanElements()) {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;				
 					if (act.getType().startsWith("w")) {
@@ -202,11 +205,12 @@ public class Merger {
 				}
 			}
 			// assign shop, leisure and education locations according to Balmers neighborhood search
-			PersonSetSecLoc secLocationAssigner = new PersonSetSecLoc(this.scenario.getActivityFacilities(), null);
-			secLocationAssigner.run(person);
+//	TODO:		PersonSetSecLoc secLocationAssigner = new PersonSetSecLoc(this.scenario.getActivityFacilities(), null);
+//	TODO:		secLocationAssigner.run(person);
 			
 			if (this.personWeeksMZ.get(person.getId()) == null) {
-				this.personWeeksMZ.put(person.getId(), new PersonWeeks());
+				this.personWeeksMZ.put(person.getId(), new PersonWeeks(person));
+				this.personWeeksMZ.get(person.getId()).setCurrentWeek(week);
 			}
 			this.personWeeksMZ.get(person.getId()).addDay(dow, person.getSelectedPlan());
 		}
