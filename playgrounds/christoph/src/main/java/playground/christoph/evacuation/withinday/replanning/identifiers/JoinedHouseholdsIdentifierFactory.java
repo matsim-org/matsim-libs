@@ -30,30 +30,34 @@ import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
-public class JoinedHouseholdsIdentifierFactory implements DuringActivityIdentifierFactory {
+public class JoinedHouseholdsIdentifierFactory extends DuringActivityIdentifierFactory {
 
 	private final Scenario scenario;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
 	private final HouseholdsTracker householdsTracker;
+	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	
 	public JoinedHouseholdsIdentifierFactory(Scenario scenario,SelectHouseholdMeetingPoint selectHouseholdMeetingPoint, 
 			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
-			ModeAvailabilityChecker modeAvailabilityChecker) {
+			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker) {
 		this.scenario = scenario;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.householdsTracker = householdsTracker;
+		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 	}
 	
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(scenario, selectHouseholdMeetingPoint, 
-				coordAnalyzer.createInstance(), vehiclesTracker, householdsTracker, modeAvailabilityChecker.createInstance());
+				coordAnalyzer.createInstance(), vehiclesTracker, householdsTracker, informedHouseholdsTracker, 
+				modeAvailabilityChecker.createInstance());
+		this.addAgentFiltersToIdentifier(identifier);
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}

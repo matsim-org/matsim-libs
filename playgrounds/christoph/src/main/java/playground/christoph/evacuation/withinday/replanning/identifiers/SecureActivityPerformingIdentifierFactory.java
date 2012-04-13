@@ -25,7 +25,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIden
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
-public class SecureActivityPerformingIdentifierFactory implements DuringActivityIdentifierFactory {
+public class SecureActivityPerformingIdentifierFactory extends DuringActivityIdentifierFactory {
 
 	private ActivityReplanningMap activityReplanningMap;
 	private Coord centerCoord;
@@ -41,6 +41,7 @@ public class SecureActivityPerformingIdentifierFactory implements DuringActivity
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new SecureActivityPerformingIdentifier(activityReplanningMap, centerCoord, secureDistance);
 		identifier.setIdentifierFactory(this);
+		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}
 

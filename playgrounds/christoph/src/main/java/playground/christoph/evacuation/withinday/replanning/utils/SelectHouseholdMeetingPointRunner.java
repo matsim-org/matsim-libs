@@ -26,6 +26,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -40,6 +43,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PlanImpl;
@@ -61,7 +65,7 @@ import playground.christoph.evacuation.mobsim.Tracker.Position;
 public class SelectHouseholdMeetingPointRunner implements Runnable {
 
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPointRunner.class);
-	
+		
 	private final Scenario scenario;
 	private final HouseholdsTracker householdsTracker;
 	private final VehiclesTracker vehiclesTracker;
@@ -73,14 +77,22 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final List<Household> householdsToCheck;
 	private double time;
 	
+	private final CyclicBarrier startBarrier;
+	private final CyclicBarrier endBarrier;
+	private final AtomicBoolean allMeetingsPointsSelected;
+	
 	public SelectHouseholdMeetingPointRunner(Scenario scenario, ReplanningModule toHomeFacilityRouter, 
 			ReplanningModule fromHomeFacilityRouter, HouseholdsTracker householdsTracker, 
-			VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, ModeAvailabilityChecker modeAvailabilityChecker) {
+			VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, ModeAvailabilityChecker modeAvailabilityChecker,
+			CyclicBarrier startBarrier, CyclicBarrier endBarrier, AtomicBoolean allMeetingsPointsSelected) {
 		this.scenario = scenario;
 		this.householdsTracker = householdsTracker;
 		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.startBarrier = startBarrier;
+		this.endBarrier = endBarrier;
+		this.allMeetingsPointsSelected = allMeetingsPointsSelected;
 		
 		this.toHomeFacilityPlanAlgo = toHomeFacilityRouter.getPlanAlgoInstance();
 		this.evacuationPlanAlgo = fromHomeFacilityRouter.getPlanAlgoInstance();
@@ -90,30 +102,68 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	
 	@Override
 	public void run() {
-		for (Household household : householdsToCheck) {
-			
-			HouseholdDecisionData hdd = new HouseholdDecisionData(household, this.scenario, this.householdsTracker, this.vehiclesTracker);
-			Id homeFacilityId = hdd.homeFacilityId;
-			ActivityFacility homeFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(homeFacilityId);
-			hdd.homeFacilityIsAffected = this.coordAnalyzer.isFacilityAffected(homeFacility);
-			
-			/*
-			 * So far we assume that all households outside the affected area follow
-			 * the evacuation order and evacuate to their home directly.
-			 */
-			if (!hdd.homeFacilityIsAffected) {
-				hdd.householdPosition.setMeetingPointFacilityId(hdd.householdPosition.getHomeFacilityId());
-				continue;
-			}
-			
-			calculateHouseholdTimes(hdd, time);
-			calculateLatestAcceptedLeaveTime(hdd, time);
-			
-			calculateHouseholdReturnHomeTime(hdd, time);
-			calculateEvacuationTimeFromHome(hdd, hdd.householdReturnHomeTime);
-			calculateHouseholdDirectEvacuationTime(hdd, time);
-			
-			selectHouseholdMeetingPoint(hdd, time);
+		
+		/*
+		 * The method is ended when the simulationRunning Flag is
+		 * set to false.
+		 */
+		while(true) {
+			try {
+				/*
+				 * The Threads wait at the startBarrier until they are
+				 * triggered in the next TimeStep by the run() method in
+				 * the ParallelQNetsimEngine.
+				 */
+				startBarrier.await();
+
+				/*
+				 * Check if all meeting points have selected. If yes,
+				 * we can end the threads.
+				 */
+				if (allMeetingsPointsSelected.get()) {
+					return;
+				}
+				
+				for (Household household : householdsToCheck) {
+					
+					HouseholdDecisionData hdd = new HouseholdDecisionData(household, this.scenario, this.householdsTracker, this.vehiclesTracker);
+					Id homeFacilityId = hdd.homeFacilityId;
+					ActivityFacility homeFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(homeFacilityId);
+					hdd.homeFacilityIsAffected = this.coordAnalyzer.isFacilityAffected(homeFacility);
+					
+					/*
+					 * So far we assume that all households outside the affected area follow
+					 * the evacuation order and evacuate to their home directly.
+					 */
+					if (!hdd.homeFacilityIsAffected) {
+						hdd.householdPosition.setMeetingPointFacilityId(hdd.householdPosition.getHomeFacilityId());
+						continue;
+					}
+					
+					calculateHouseholdTimes(hdd, time);
+					calculateLatestAcceptedLeaveTime(hdd, time);
+					
+					calculateHouseholdReturnHomeTime(hdd, time);
+					calculateEvacuationTimeFromHome(hdd, hdd.householdReturnHomeTime);
+					calculateHouseholdDirectEvacuationTime(hdd, time);
+					
+					selectHouseholdMeetingPoint(hdd, time);
+				}
+				
+				// clear list for next iteration
+				householdsToCheck.clear();
+				
+				/*
+				 * The End of the Moving is synchronized with
+				 * the endBarrier. If all Threads reach this Barrier
+				 * the main Thread can go on.
+				 */
+				endBarrier.await();
+			} catch (InterruptedException e) {
+				Gbl.errorMsg(e);
+			} catch (BrokenBarrierException e) {
+            	Gbl.errorMsg(e);
+            }
 		}
 	}
 	

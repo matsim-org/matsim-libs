@@ -124,10 +124,6 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			
 			Leg legToMeeting = scenario.getPopulation().getFactory().createLeg(transportMode);
 			
-			/*
-			 * TODO: use a departure time function to determine the end time
-			 * Probably move this to the identifier???
-			 */
 			double newEndTime = this.time;
 			currentActivity.setMaximumDuration(newEndTime - currentActivity.getStartTime());
 			currentActivity.setEndTime(newEndTime);

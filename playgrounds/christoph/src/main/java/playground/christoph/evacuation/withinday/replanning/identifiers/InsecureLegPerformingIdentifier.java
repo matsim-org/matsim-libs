@@ -20,13 +20,14 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -50,17 +51,25 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 	}
 	
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<PlanBasedWithinDayAgent> legPerformingAgents =  linkReplanningMap.getLegPerformingAgents();
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
-		for (MobsimAgent personAgent : legPerformingAgents) {
-			Link currentLink = this.network.getLinks().get(personAgent.getCurrentLinkId());
+		Set<Id> legPerformingAgents = linkReplanningMap.getLegPerformingAgents();
+		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
+		
+		// apply filter to remove agents that should not be replanned
+		this.applyFilters(legPerformingAgents, time);
+		
+		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());		
+		for (Id id : legPerformingAgents) {
+			
+			PlanBasedWithinDayAgent agent = mapping.get(id);
+			
+			Link currentLink = this.network.getLinks().get(agent.getCurrentLinkId());
 			boolean isAffected = this.coordAnalyzer.isLinkAffected(currentLink);
 			
 			/*
 			 * If the agent is affected, add it to the replanning list.
 			 */
-			if (isAffected) agentsToReplan.add((PlanBasedWithinDayAgent) personAgent);
+			if (isAffected) agentsToReplan.add(agent);
 		}
 		if (time == EvacuationConfig.evacuationTime) log.info("Found " + agentsToReplan.size() + " Agents performing a Leg in an insecure area.");
 		

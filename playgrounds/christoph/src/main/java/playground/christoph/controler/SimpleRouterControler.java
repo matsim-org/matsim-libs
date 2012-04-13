@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
@@ -35,8 +36,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -48,20 +47,13 @@ import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
+import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
+import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
-import playground.christoph.router.CompassRoute;
-import playground.christoph.router.RandomCompassRoute;
-import playground.christoph.router.RandomDijkstraRoute;
-import playground.christoph.router.RandomRoute;
-import playground.christoph.router.TabuRoute;
-import playground.christoph.router.util.SimpleRouterFactory;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -274,7 +266,7 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 	public static class ReplanningFlagInitializer implements MobsimInitializedListener {
 
 		protected SimpleRouterControler simpleRouterControler;
-		protected Collection<PlanBasedWithinDayAgent> withinDayAgents;
+		protected Collection<Id> withinDayAgents;
 
 		protected int noReplanningCounter = 0;
 		protected int initialReplanningCounter = 0;
@@ -298,13 +290,13 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 		 * are assigned based on probabilities from config files.
 		 */
 		protected void setReplanningFlags() {
-			Set<PlanBasedWithinDayAgent> randomAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-			Set<PlanBasedWithinDayAgent> tabuAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-			Set<PlanBasedWithinDayAgent> compassAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-			Set<PlanBasedWithinDayAgent> randomCompassAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-			Set<PlanBasedWithinDayAgent> dijkstraAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+			Set<Id> randomAgents = new TreeSet<Id>();
+			Set<Id> tabuAgents = new TreeSet<Id>();
+			Set<Id> compassAgents = new TreeSet<Id>();
+			Set<Id> randomCompassAgents = new TreeSet<Id>();
+			Set<Id> dijkstraAgents = new TreeSet<Id>();
 			
-			for (PlanBasedWithinDayAgent withinDayAgent : this.withinDayAgents) {
+			for (Id agentId : this.withinDayAgents) {
 				double probability;
 				Random random = MatsimRandom.getLocalInstance();
 				probability = random.nextDouble();
@@ -329,31 +321,31 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 
 				// Random Router
 				if (pRandomRouterLow <= probability && probability < pRandomRouterHigh) {
-					randomAgents.add(withinDayAgent);
+					randomAgents.add(agentId);
 					initialReplanningCounter++;
 					simpleRouterControler.randomRouterCounter++;
 				}
 				// Tabu Router
 				else if (pTabuRouterLow <= probability && probability < pTabuRouterHigh) {
-					tabuAgents.add(withinDayAgent);
+					tabuAgents.add(agentId);
 					initialReplanningCounter++;
 					simpleRouterControler.tabuRouterCounter++;
 				}
 				// Compass Router
 				else if (pCompassRouterLow <= probability && probability < pCompassRouterHigh) {
-					compassAgents.add(withinDayAgent);
+					compassAgents.add(agentId);
 					initialReplanningCounter++;
 					simpleRouterControler.compassRouterCounter++;
 				}
 				// Random Compass Router
 				else if (pRandomCompassRouterLow <= probability && probability < pRandomCompassRouterHigh) {
-					randomCompassAgents.add(withinDayAgent);
+					randomCompassAgents.add(agentId);
 					initialReplanningCounter++;
 					simpleRouterControler.randomCompassRouterCounter++;
 				}
 				// Random Dijkstra Router
 				else if (pRandomDijkstraRouterLow <= probability && probability <= pRandomDijkstraRouterHigh) {
-					dijkstraAgents.add(withinDayAgent);
+					dijkstraAgents.add(agentId);
 					initialReplanningCounter++;
 					simpleRouterControler.randomDijkstraRouterCounter++;
 				}
@@ -367,11 +359,29 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 				else simpleRouterControler.getReplanningManager().doInitialReplanning(true);
 			}
 			
-			simpleRouterControler.randomIdentifier.setHandledAgent(randomAgents);
-			simpleRouterControler.tabuIdentifier.setHandledAgent(tabuAgents);
-			simpleRouterControler.compassIdentifier.setHandledAgent(compassAgents);
-			simpleRouterControler.randomCompassIdentifier.setHandledAgent(randomCompassAgents);
-			simpleRouterControler.dijkstraIdentifier.setHandledAgent(dijkstraAgents);
+			CollectionAgentFilterFactory agentFilterFactory = new CollectionAgentFilterFactory();
+			
+			CollectionAgentFilter filter;
+			
+			filter = agentFilterFactory.createAgentFilter();
+			filter.addIncludedAgents(randomAgents);
+			simpleRouterControler.randomIdentifier.addAgentFilter(filter);
+
+			filter = agentFilterFactory.createAgentFilter();
+			filter.addIncludedAgents(tabuAgents);
+			simpleRouterControler.tabuIdentifier.addAgentFilter(filter);
+			
+			filter = agentFilterFactory.createAgentFilter();
+			filter.addIncludedAgents(compassAgents);
+			simpleRouterControler.compassIdentifier.addAgentFilter(filter);
+			
+			filter = agentFilterFactory.createAgentFilter();
+			filter.addIncludedAgents(randomCompassAgents);
+			simpleRouterControler.randomCompassIdentifier.addAgentFilter(filter);
+			
+			filter = agentFilterFactory.createAgentFilter();
+			filter.addIncludedAgents(dijkstraAgents);
+			simpleRouterControler.dijkstraIdentifier.addAgentFilter(filter);
 			
 			log.info("Random Routing Probability: " + simpleRouterControler.pRandomRouter);
 			log.info("Tabu Routing Probability: " + simpleRouterControler.pTabuRouter);
@@ -391,15 +401,10 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 		}
 
 		protected void collectAgents(QSim sim) {
-			this.withinDayAgents = new ArrayList<PlanBasedWithinDayAgent>();
+			this.withinDayAgents = new ArrayList<Id>();
 
 			for (MobsimAgent mobsimAgent : sim.getAgents()) {
-				if (mobsimAgent instanceof MobsimAgent) {
-					MobsimAgent personAgent = mobsimAgent;
-					withinDayAgents.add((PlanBasedWithinDayAgent) personAgent);
-				} else {
-					log.warn("MobsimAgent was expected to be from type PersonAgent, but was from type " + mobsimAgent.getClass().toString());
-				}
+					withinDayAgents.add(mobsimAgent.getId());
 			}
 		}
 

@@ -21,7 +21,11 @@
 package playground.christoph.evacuation.withinday.replanning.utils;
 
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -35,6 +39,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
@@ -62,6 +67,7 @@ import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
+import playground.christoph.evacuation.withinday.replanning.identifiers.InformedHouseholdsTracker;
 
 /**
  * Decides where a household will meet after the evacuation order has been given.
@@ -85,6 +91,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private final CoordAnalyzer coordAnalyzer;
 	private final Geometry affectedArea;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
+	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	private final int numOfThreads;
 
 	private ReplanningModule toHomeFacilityRouter;
@@ -93,9 +100,21 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private Thread[] threads;
 	private Runnable[] runnables;
 	
+	private CyclicBarrier startBarrier;
+	private CyclicBarrier endBarrier;
+	private AtomicBoolean allMeetingsPointsSelected;
+	
+	/*
+	 * Only for some statistics
+	 */
+	private int meetAtHome = 0;
+	private int meetAtRescue = 0;
+	private int meetSecure = 0;
+	private int meetInsecure = 0;
+	
 	public SelectHouseholdMeetingPoint(Scenario scenario, MultiModalTravelTimeFactory timeFactory,
 			HouseholdsTracker householdsTracker, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer,
-			Geometry affectedArea, ModeAvailabilityChecker modeAvailabilityChecker) {
+			Geometry affectedArea, ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker) {
 		this.scenario = scenario;
 		this.timeFactory = timeFactory;
 		this.householdsTracker = householdsTracker;
@@ -103,8 +122,10 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		this.coordAnalyzer = coordAnalyzer;
 		this.affectedArea = affectedArea;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
+		this.allMeetingsPointsSelected = new AtomicBoolean(false);
 		
 		init();
 	}
@@ -325,18 +346,103 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	 */
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+		
+		/*
+		 * If this value is set to true, nothing else is left to do.
+		 */
+		if (this.allMeetingsPointsSelected.get()) return;
+		
 		double time = e.getSimulationTime();
 		if (time == EvacuationConfig.evacuationTime) initThreads(time);
+		
+		if (time >= EvacuationConfig.evacuationTime) {
+			try {
+				if (informedHouseholdsTracker.allHouseholdsInformed()) {
+					/*
+					 * Inform the threads that no further meeting points have to be
+					 * selected. Then reach the start barrier to trigger the threads.
+					 * As as result, the threads will terminate.
+					 */
+					this.allMeetingsPointsSelected.set(true);
+					this.startBarrier.await();
+						
+					/*
+					 * Finally, print some statistics.
+					 */
+					log.info("Households meet at home facility:   " + meetAtHome);
+					log.info("Households meet at rescue facility: " + meetAtRescue);
+					log.info("Households meet at secure place:   " + meetSecure);
+					log.info("Households meet at insecure place: " + meetInsecure);
+					
+				} else {
+					// set current Time
+					for (Runnable runnable : this.runnables) {
+						((SelectHouseholdMeetingPointRunner) runnable).setTime(time);
+					}
+					
+					Queue<Id> informedHouseholds = informedHouseholdsTracker.getInformedHouseholdsInCurrentTimeStep();
+					
+					// assign households to threads
+					int roundRobin = 0;
+					
+					Households households = ((ScenarioImpl) scenario).getHouseholds();
+					for (Id householdId : informedHouseholds) {
+						
+						Household household = households.getHouseholds().get(householdId);
+						
+						// ignore empty households
+						if (household.getMemberIds().size() == 0) continue;
+						
+						((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
+						roundRobin++;
+					}
+					
+					/*
+					 * Reach the start barrier to trigger the threads.
+					 */
+					this.startBarrier.await();
+					
+					/*
+					 * Calculate statistics
+					 */
+					for (Id householdId : informedHouseholds) {
+						
+						Household household = households.getHouseholds().get(householdId);
+						
+						// ignore empty households
+						if (household.getMemberIds().size() == 0) continue;
+						
+						HouseholdPosition householdPosition = this.householdsTracker.getHouseholdPosition(household.getId());
+						if (householdPosition.getHomeFacilityId().equals(householdPosition.getMeetingPointFacilityId())) meetAtHome++;
+						else meetAtRescue++;
+						
+						ActivityFacility meetingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(householdPosition.getMeetingPointFacilityId());
+						if (this.coordAnalyzer.isFacilityAffected(meetingFacility)) meetInsecure++;
+						else meetSecure++;
+					}
+					
+					this.endBarrier.await();
+				}			
+			} catch (InterruptedException ex) {
+				Gbl.errorMsg(ex);
+			} catch (BrokenBarrierException ex) {
+				Gbl.errorMsg(ex);
+			}	
+		}
 	}
 	
 	private void initThreads(double time) {
 		threads = new Thread[this.numOfThreads];
 		runnables = new SelectHouseholdMeetingPointRunner[this.numOfThreads];
 		
+		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
+		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
+		
 		for (int i = 0; i < this.numOfThreads; i++) {
 			
 			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, toHomeFacilityRouter, 
-					fromHomeFacilityRouter, householdsTracker, vehiclesTracker, coordAnalyzer.createInstance(), modeAvailabilityChecker.createInstance());
+					fromHomeFacilityRouter, householdsTracker, vehiclesTracker, coordAnalyzer.createInstance(), 
+					modeAvailabilityChecker.createInstance(), startBarrier, endBarrier, allMeetingsPointsSelected);
 			runner.setTime(time);
 			runnables[i] = runner; 
 					
@@ -346,54 +452,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 			threads[i] = thread;
 		}
 		
-		// assign households to threads
-		int roundRobin = 0;
-		Households households = ((ScenarioImpl) scenario).getHouseholds();
-		for (Household household : households.getHouseholds().values()) {
-			// ignore empty households
-			if (household.getMemberIds().size() == 0) continue;
-			
-			((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
-			roundRobin++;
-		}
-		
 		// start threads
 		for (Thread thread : threads) thread.start();
-		
-		// wait for the threads to finish
-		try {
-			for (Thread thread : threads) {
-				thread.join();
-			}
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-
-		/*
-		 * Print some statistics
-		 */
-		int meetAtHome = 0;
-		int meetAtRescue = 0;
-		int meetSecure = 0;
-		int meetInsecure = 0;
-		
-		for (Household household : households.getHouseholds().values()) {
-			// ignore empty households
-			if (household.getMemberIds().size() == 0) continue;
-			
-			HouseholdPosition householdPosition = this.householdsTracker.getHouseholdPosition(household.getId());
-			if (householdPosition.getHomeFacilityId().equals(householdPosition.getMeetingPointFacilityId())) meetAtHome++;
-			else meetAtRescue++;
-			
-			ActivityFacility meetingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(householdPosition.getMeetingPointFacilityId());
-			if (this.coordAnalyzer.isFacilityAffected(meetingFacility)) meetInsecure++;
-			else meetSecure++;
-		}
-		
-		log.info("Households meet at home facility:   " + meetAtHome);
-		log.info("Households meet at rescue facility: " + meetAtRescue);
-		log.info("Households meet at secure place:   " + meetSecure);
-		log.info("Households meet at insecure place: " + meetInsecure);
 	}
 	
 	private static class TravelTimeWrapperFactory implements MultiModalTravelTimeFactory {

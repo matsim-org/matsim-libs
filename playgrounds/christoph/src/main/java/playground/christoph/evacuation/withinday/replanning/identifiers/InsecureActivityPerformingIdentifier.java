@@ -20,12 +20,13 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -51,21 +52,24 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 	}
 	
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<PlanBasedWithinDayAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
-		Collection<PlanBasedWithinDayAgent> handledAgents = this.getHandledAgents();
+
+		Set<Id> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
+		Map<Id, PlanBasedWithinDayAgent> mapping = activityReplanningMap.getPersonAgentMapping();
+		
+		// apply filter to remove agents that should not be replanned
+		this.applyFilters(activityPerformingAgents, time);
+		
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
-		for (PlanBasedWithinDayAgent personAgent : activityPerformingAgents) {			
-			/*
-			 * Remove the Agent from the list, if the replanning flag is not set.
-			 */
-			if (!handledAgents.contains(personAgent)) continue;
+		for (Id id : activityPerformingAgents) {
+			
+			PlanBasedWithinDayAgent agent = mapping.get(id);
 			
 			/*
 			 *  Get the current PlanElement and check if it is an Activity
 			 */
 			Activity currentActivity;
-			PlanElement currentPlanElement = personAgent.getCurrentPlanElement();
+			PlanElement currentPlanElement = agent.getCurrentPlanElement();
 			if (currentPlanElement instanceof Activity) {
 				currentActivity = (Activity) currentPlanElement;
 			} else continue;
@@ -80,7 +84,7 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 			/*
 			 * Add the Agent to the Replanning List
 			 */
-			agentsToReplan.add((PlanBasedWithinDayAgent)personAgent);
+			agentsToReplan.add(agent);
 		}
 		if (time == EvacuationConfig.evacuationTime) log.info("Found " + activityPerformingAgents.size() + " Agents performing an Activity in an insecure area.");
 		

@@ -40,6 +40,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+		
 		if (agent.getMode().equals(passengerTransportMode)) {
 			if (agent instanceof MobsimDriverAgent) {
 				

@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -76,7 +75,8 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 	private static final Logger log = Logger.getLogger(AgentsInEvacuationAreaCounter.class);
 
-	protected int binSize = 300; // by default 5 minutes
+//	protected int binSize = 300; // by default 5 minutes
+	protected int binSize = 60; // by default 1 minute
 	protected int nofBins = 36 * 3600 / binSize; // by default 36 hours
 	protected int currentBin = 0; // current time bin slot
 
@@ -287,7 +287,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			}
 		}
 		// it is a passenger
-		else {
+		else {			
 			// remove it from the list
 			passengers.remove(event.getPersonId());
 			
@@ -320,9 +320,10 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		// for (Id id : activityAgentsInEvacuationArea) {
-		// log.info(id.toString());
-		// }
+		// debug
+		for (Id id : activityAgentsInEvacuationArea) {
+			 log.info(id.toString());
+		}
 
 		// ensure, that the last bin is written
 		updateBinData(currentBin + 1);

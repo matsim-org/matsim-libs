@@ -24,7 +24,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 
-public class YoungPeopleIdentifierFactory implements DuringLegIdentifierFactory {
+public class YoungPeopleIdentifierFactory extends DuringLegIdentifierFactory {
 
 	private Netsim mobsim;
 	

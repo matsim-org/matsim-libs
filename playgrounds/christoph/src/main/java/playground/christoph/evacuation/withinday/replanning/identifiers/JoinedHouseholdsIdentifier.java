@@ -21,9 +21,11 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,6 +54,7 @@ import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.utils.DeterministicRNG;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdModeAssignment;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
@@ -77,7 +80,9 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final VehiclesTracker vehiclesTracker;
 	private final HouseholdsTracker householdsTracker;
+	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	
+	private final DeterministicRNG rng;
 	private final Map<Id, HouseholdDeparture> householdDepartures;
 	private final Map<Id, PlanBasedWithinDayAgent> agentMapping;
 	
@@ -92,15 +97,17 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	
 	public JoinedHouseholdsIdentifier(Scenario scenario, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
 			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
-			ModeAvailabilityChecker modeAvailabilityChecker) {
+			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker) {
 		this.households = ((ScenarioImpl) scenario).getHouseholds();
 		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.householdsTracker = householdsTracker;
+		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		
+		this.rng = new DeterministicRNG();
 		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.householdMeetingPointMapping = new ConcurrentHashMap<Id, Id>();
 		this.transportModeMapping = new ConcurrentHashMap<Id, String>();
@@ -117,9 +124,9 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		this.householdMeetingPointMapping.clear();
 		this.transportModeMapping.clear();
 		this.driverVehicleMapping.clear();
-		
-		Set<PlanBasedWithinDayAgent> set = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 	
+		Set<Id> agentIds = new HashSet<Id>();
+		
 		Iterator<Entry<Id, HouseholdDeparture>> iter = this.householdDepartures.entrySet().iterator();
 		while(iter.hasNext()) {
 			Entry<Id, HouseholdDeparture> entry = iter.next();
@@ -134,7 +141,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				Household household = households.getHouseholds().get(householdId);
 
 				/*
-				 * 
+				 * Store mapping
 				 */
 				HouseholdModeAssignment assignment = modeAvailabilityChecker.getHouseholdModeAssignment(household, facilityId);	
 				driverVehicleMapping.putAll(assignment.getDriverVehicleMap());
@@ -145,13 +152,17 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				}
 				
 				// finally add agents to replanning set
-				for (Id agentId : household.getMemberIds()) {
-					set.add(agentMapping.get(agentId));
-				}
+				agentIds.addAll(household.getMemberIds());
 			}
 		}
+
+		// apply filter to remove agents that should not be replanned
+		this.applyFilters(agentIds, time);
+
+		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		for (Id agentId : agentIds) agentsToReplan.add(agentMapping.get(agentId));
 		
-		return set;
+		return agentsToReplan;
 	}
 	
 	/**
@@ -197,8 +208,15 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		
 		if (e.getSimulationTime() == EvacuationConfig.evacuationTime) {
-			this.initiallyCollectHouseholds(e.getSimulationTime());
+			this.householdDepartures.clear();
 		} else if (e.getSimulationTime() > EvacuationConfig.evacuationTime) {
+			
+			/*
+			 * Get a Set of Ids of households which have been informed in the current time step.
+			 * Define their departure time, if they are joined.
+			 */
+			this.initiallyCollectHouseholds(e.getSimulationTime());
+			
 			/*
 			 * Get a Set of Ids of households which might have changed their state
 			 * in the current time step.
@@ -215,7 +233,8 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				Id householdId = entry.getKey();
 				HouseholdDeparture householdDeparture = entry.getValue();
 				if (householdDeparture.departureTime < e.getSimulationTime()) {
-					log.warn("Household missed its departure time! Id " + householdId + ". Time: " + e.getSimulationTime());
+					log.warn("Household missed its departure time! Id " + householdId + ". Simulation time: " + e.getSimulationTime() +
+							", expected departure time: " + householdDeparture.departureTime);
 					iter.remove();
 				}
 			}
@@ -223,20 +242,16 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	}
 	
 	/*
-	 * Start collecting households when the evacuation has started.
+	 * Collect households which have just been informed that they should (probably) evacuate.
 	 */
 	private void initiallyCollectHouseholds(double time) {
 		
 		/*
-		 * Get a Set of Ids of all households to initally define their departure time.
-		 */
-		this.householdDepartures.clear();
-		
-		Map<Id, HouseholdPosition> householdPositions = this.householdsTracker.getHouseholdPositions();
-		
-		for (Entry<Id, HouseholdPosition> entry : householdPositions.entrySet()) {
-			Id householdId = entry.getKey();
-			HouseholdPosition householdPosition = entry.getValue();
+		 * Get a Set of Ids of all households which have just been informed.
+		 */	
+		Queue<Id> informedHouseholds = this.informedHouseholdsTracker.getInformedHouseholdsInCurrentTimeStep();
+		for (Id householdId : informedHouseholds) {
+			HouseholdPosition householdPosition = this.householdsTracker.getHouseholdPosition(householdId);
 			
 			// if the household is joined
 			if (householdPosition.isHouseholdJoined()) {
@@ -266,14 +281,18 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 						}
 					}
 				}
-				
 			}
 		}
 	}
 	
 	private void updateHouseholds(Set<Id> householdsToUpdate, double time) {
 		
-		for (Id id : householdsToUpdate) {
+		for (Id id : householdsToUpdate) {			
+			/*
+			 * Ignore households which are not informed so far.
+			 */
+			if (!informedHouseholdsTracker.isHouseholdInformed(id)) continue;
+			
 			HouseholdPosition householdPosition = householdsTracker.getHouseholdPosition(id);
 			HouseholdDeparture householdDeparture = this.householdDepartures.get(id);
 			
@@ -356,10 +375,34 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	
 	private HouseholdDeparture createHouseholdDeparture(double time, Id householdId, Id facilityId) {
 		
-		// TODO: use a function to estimate the departure time
-		HouseholdDeparture householdDeparture = new HouseholdDeparture(householdId, facilityId, time + 600);
+		double departureDelay = calculateDepartureDelay(time, householdId);
+		
+		/*
+		 * We have to add one second here. This ensure that some code which is executed
+		 * at the end of a time step is executed when the simulation has started.
+		 */
+		HouseholdDeparture householdDeparture = new HouseholdDeparture(householdId, facilityId, time + departureDelay + 1);
 		
 		return householdDeparture;
+	}
+	
+	/*
+	 * TODO: use a function to estimate the departure time based on household characteristics and current time
+	 * 
+	 * So far use a Rayleigh Distribution with a sigma of 600. After 706s ~ 50% of all households have reached
+	 * their departure time.
+	 */
+	private final double sigma = 600;
+	private final double upperLimit = 0.999999;
+	
+	private double calculateDepartureDelay(double time, Id householdId) {
+		
+		double rand = this.rng.hashCodeToRandomDouble(householdId);
+		
+		if (rand == 0.0) return 0.0;
+		else if (rand > upperLimit) rand = upperLimit;
+		
+		return Math.floor(Math.sqrt(-2 * Math.pow(sigma, 2) * Math.log(1 - rand)));	
 	}
 	
 	/*

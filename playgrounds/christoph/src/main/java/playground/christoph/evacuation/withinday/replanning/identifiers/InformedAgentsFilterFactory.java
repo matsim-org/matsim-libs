@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InsecureLegPerformingIdentifierFactory.java
+ * InformedAgentsFilterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,31 +20,24 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
+import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilter.FilterType;
 
-public class InsecureLegPerformingIdentifierFactory extends DuringLegIdentifierFactory {
+public class InformedAgentsFilterFactory implements AgentFilterFactory {
 
-	private final LinkReplanningMap linkReplanningMap;
-	private final Network network;
-	private final CoordAnalyzer coordAnalyzer;
+	private final InformedAgentsTracker informedAgentsTracker;
+	private final FilterType filterType;
 	
-	public InsecureLegPerformingIdentifierFactory(LinkReplanningMap linkReplanningMap, Network network, CoordAnalyzer coordAnalyzer) {
-		this.linkReplanningMap = linkReplanningMap;
-		this.network = network;
-		this.coordAnalyzer = coordAnalyzer;
+	public InformedAgentsFilterFactory(InformedAgentsTracker informedAgentsTracker, FilterType filterType) {
+		this.informedAgentsTracker = informedAgentsTracker;
+		this.filterType = filterType;
 	}
 	
 	@Override
-	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new InsecureLegPerformingIdentifier(linkReplanningMap, network, coordAnalyzer);
-		identifier.setIdentifierFactory(this);
-		this.addAgentFiltersToIdentifier(identifier);
-		return identifier;
+	public AgentFilter createAgentFilter() {
+		return new InformedAgentsFilter(informedAgentsTracker, filterType);
 	}
 
 }

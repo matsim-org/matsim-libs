@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -125,6 +126,19 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 			}
 		}
 
+		/*
+		 * Apply filter to remove agents that should not be replanned.
+		 * We need a workaround since applyFilters expects Ids and not Agents.
+		 */
+		Set<Id> agentIds = new HashSet<Id>();
+		for (PlanBasedWithinDayAgent agent : insecureLegPerformingAgents) agentIds.add(agent.getId());
+		this.applyFilters(agentIds, time);
+		Iterator<PlanBasedWithinDayAgent> iter = insecureLegPerformingAgents.iterator();
+		while(iter.hasNext()) {
+			PlanBasedWithinDayAgent agent = iter.next();
+			if (!agentIds.contains(agent.getId())) iter.remove();
+		}
+		
 		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();		
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		Map<Id, AtomicInteger> reservedCapacities = new HashMap<Id, AtomicInteger>();
@@ -195,6 +209,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				}
 			}
 		}
+		
 		return agentsToReplan;
 	}
 

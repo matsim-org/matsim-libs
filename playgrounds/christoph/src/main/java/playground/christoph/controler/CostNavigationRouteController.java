@@ -38,7 +38,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -52,6 +51,8 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
@@ -93,9 +94,11 @@ public class CostNavigationRouteController extends WithinDayController implement
 	/*package*/ int notFollowedAndNotAccepted = 1;
 	/*package*/ String eventsFile = null;
 	
+	protected int handledAgents;
 	protected DuringLegIdentifier duringLegIdentifier;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
+	protected Set<Id> replannedAgents;
 	protected AnalyzeTravelTimes analyzeTravelTimes; 
 	protected SelectHandledAgentsByProbability selector;
 	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
@@ -103,7 +106,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 	protected LookupNetwork lookupNetwork;
 	protected LookupTravelTime lookupTravelTime;
 	protected int updateLookupTravelTimeInterval = 15;
-	
+		
 	private static final Logger log = Logger.getLogger(CostNavigationRouteController.class);
 
 	public CostNavigationRouteController(String[] args) {
@@ -190,8 +193,14 @@ public class CostNavigationRouteController extends WithinDayController implement
 		
 		this.selector.notifyMobsimInitialized(e);
 		
-		Set<Id> replannedAgents = new HashSet<Id>();
-		for (PlanBasedWithinDayAgent agent : this.duringLegIdentifier.getHandledAgents()) replannedAgents.add(agent.getId());
+		replannedAgents = new HashSet<Id>();
+		
+		for (AgentFilter agentFilter : this.duringLegIdentifier.getAgentFilters()) {
+			if (agentFilter instanceof CollectionAgentFilter) {
+				replannedAgents.addAll(((CollectionAgentFilter) agentFilter).getIncludedAgents());
+				handledAgents = replannedAgents.size();
+			}
+		}
 		this.analyzeTravelTimes = new AnalyzeTravelTimes(replannedAgents, scenarioData.getPopulation().getPersons().size());
 		this.getEvents().addHandler(analyzeTravelTimes);
 	}
@@ -228,7 +237,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
 						
 			this.notifyMobsimInitialized(new MobsimInitializedEventImpl(qSim));
-			log.info("Agents to be handled: " + this.duringLegIdentifier.getHandledAgents().size());
+			log.info("Agents to be handled: " + handledAgents);
 			new EventsReaderXMLv1(getEvents()).parse(eventsFile);
 		}		
 		
@@ -237,29 +246,28 @@ public class CostNavigationRouteController extends WithinDayController implement
 	}
 
 	private void printStatistics() {
-		Set<PlanBasedWithinDayAgent> handledAgents = duringLegIdentifier.getHandledAgents();
-		log.info("Persons using CostNavigationRoute: " + handledAgents.size());
+		log.info("Persons using CostNavigationRoute: " + handledAgents);
 		
 		double sumTrust = 0.0;
 		double followedAndAccepted = 0;
 		double followedAndNotAccepted = 0;
 		double notFollowedAndAccepted = 0;
 		double notFollowedAndNotAccepted = 0;
-		for (PlanBasedWithinDayAgent agent : handledAgents) {
-			sumTrust += costNavigationTravelTimeLogger.getTrust(agent.getId());
-			followedAndAccepted += costNavigationTravelTimeLogger.getFollowedAndAccepted(agent.getId());
-			followedAndNotAccepted += costNavigationTravelTimeLogger.getFollowedAndNotAccepted(agent.getId());
-			notFollowedAndAccepted += costNavigationTravelTimeLogger.getNotFollowedAndAccepted(agent.getId());
-			notFollowedAndNotAccepted += costNavigationTravelTimeLogger.getNotFollowedAndNotAccepted(agent.getId());
+		for (Id agentId : replannedAgents) {
+			sumTrust += costNavigationTravelTimeLogger.getTrust(agentId);
+			followedAndAccepted += costNavigationTravelTimeLogger.getFollowedAndAccepted(agentId);
+			followedAndNotAccepted += costNavigationTravelTimeLogger.getFollowedAndNotAccepted(agentId);
+			notFollowedAndAccepted += costNavigationTravelTimeLogger.getNotFollowedAndAccepted(agentId);
+			notFollowedAndNotAccepted += costNavigationTravelTimeLogger.getNotFollowedAndNotAccepted(agentId);
 		}
 		double totalObservations = followedAndAccepted + followedAndNotAccepted + notFollowedAndAccepted + notFollowedAndNotAccepted;
 		double overAllTrust = (followedAndAccepted + notFollowedAndAccepted) / totalObservations;
 		log.info("Mean total trust (over all observations): \t" + overAllTrust);
-		log.info("Mean trust per person (over all persons): \t" + sumTrust / handledAgents.size());
-		log.info("Mean followed and accepted choices per person: \t" + followedAndAccepted / handledAgents.size());
-		log.info("Mean followed and not accepted choices per person: \t" + followedAndNotAccepted / handledAgents.size());
-		log.info("Mean not followed and accepted choices per person: \t" + notFollowedAndAccepted / handledAgents.size());
-		log.info("Mean not followed and not accepted choices per person: \t" + notFollowedAndNotAccepted / handledAgents.size());
+		log.info("Mean trust per person (over all persons): \t" + sumTrust / handledAgents);
+		log.info("Mean followed and accepted choices per person: \t" + followedAndAccepted / handledAgents);
+		log.info("Mean followed and not accepted choices per person: \t" + followedAndNotAccepted / handledAgents);
+		log.info("Mean not followed and accepted choices per person: \t" + notFollowedAndAccepted / handledAgents);
+		log.info("Mean not followed and not accepted choices per person: \t" + notFollowedAndNotAccepted / handledAgents);
 	}
 	
 	/*

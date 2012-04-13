@@ -20,14 +20,15 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -53,14 +54,24 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 	}
 	
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<PlanBasedWithinDayAgent> legPerformingAgents = linkReplanningMap.getLegPerformingAgents();
+		
+		Set<Id> legPerformingAgents = linkReplanningMap.getLegPerformingAgents();
+		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
+		
+		
+		// apply filter to remove agents that should not be replanned
+		this.applyFilters(legPerformingAgents, time);
+		
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
-		for (MobsimAgent personAgent : legPerformingAgents) {
+		for (Id id : legPerformingAgents) {
+			
+			PlanBasedWithinDayAgent agent = mapping.get(id);
+			
 			/*
 			 * Remove the Agent from the list, if the current Link is in a insecure Area.
 			 */
-			Link currentLink = this.network.getLinks().get(personAgent.getCurrentLinkId());
+			Link currentLink = this.network.getLinks().get(agent.getCurrentLinkId());
 			double distanceToStartNode = CoordUtils.calcDistance(currentLink.getFromNode().getCoord(), centerCoord);
 			double distanceToEndNode = CoordUtils.calcDistance(currentLink.getToNode().getCoord(), centerCoord);
 			if (distanceToStartNode <= secureDistance || distanceToEndNode <= secureDistance) {
@@ -70,11 +81,11 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 			/*
 			 * Add the Agent to the Replanning List
 			 */
-			agentsToReplan.add((PlanBasedWithinDayAgent)personAgent);
+			agentsToReplan.add(agent);
 		}
 		
 		if (time == EvacuationConfig.evacuationTime) log.info("Found " + agentsToReplan.size() + " Agents performing a Leg in a secure area.");
-		
+
 		return agentsToReplan;
 	}
 

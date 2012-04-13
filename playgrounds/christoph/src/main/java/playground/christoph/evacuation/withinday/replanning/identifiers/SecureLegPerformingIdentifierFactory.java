@@ -26,7 +26,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
-public class SecureLegPerformingIdentifierFactory implements DuringLegIdentifierFactory {
+public class SecureLegPerformingIdentifierFactory extends DuringLegIdentifierFactory {
 
 	private LinkReplanningMap linkReplanningMap;
 	private Coord centerCoord;
@@ -44,6 +44,7 @@ public class SecureLegPerformingIdentifierFactory implements DuringLegIdentifier
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new SecureLegPerformingIdentifier(linkReplanningMap, network, centerCoord, secureDistance);
 		identifier.setIdentifierFactory(this);
+		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}
 
