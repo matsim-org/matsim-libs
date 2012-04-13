@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateScenario
+ * SfAirScheduleBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package air.scenario;
 
 import java.io.File;
