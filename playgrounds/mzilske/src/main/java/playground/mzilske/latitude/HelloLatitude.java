@@ -1,11 +1,16 @@
 package playground.mzilske.latitude;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -87,10 +92,19 @@ public class HelloLatitude {
 		Latitude latitude = new Latitude(new NetHttpTransport(), accessProtectedResource, jsonFactory);
 		try {
 
-			List<Location> locations = latitude.location.list().setGranularity("best").execute().getItems();
+			String minTime = Long.toString(new DateTime(2012,4,6,0,0).getMillis());
+			String maxTime = Long.toString(new DateTime(2012,4,6,23,59).getMillis());
+			List<Location> locations = latitude.location.list().setGranularity("best").setMinTime(minTime).setMaxTime(maxTime).setMaxResults("1000").execute().getItems();
+			sortLocations(locations);
 			filterLocations(locations);
-			createLinks(scenario, locations);
-			createActivities(scenario, locations);
+			System.out.println("Before segmentation: " + locations.size());
+			List<List<Location>> segmentation = segmentLocations(locations);
+			System.out.println("After segmentation: " + segmentation.size());
+
+			List<Segment> segments = classifySegments(segmentation);
+
+			createLinks(scenario, segmentation);
+			createActivities(scenario, segments);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -98,6 +112,59 @@ public class HelloLatitude {
 
 
 
+	}
+
+	private static List<Segment> classifySegments(List<List<Location>> segmentation) {
+		List<Segment> result = new ArrayList<Segment>();
+		for (List<Location> locations : segmentation) {
+			Segment segment = new Segment();
+			segment.locations = locations;
+			DateTime start = new DateTime(getTime(locations.get(0)));
+			DateTime end = new DateTime(getTime(locations.get(locations.size()-1)));
+			long durationInMinutes = new Duration(start, end).getStandardMinutes();
+			if (durationInMinutes > 5) {
+				segment.isSignificant = true;
+			} else {
+				segment.isSignificant = false;
+			}
+			result.add(segment);
+		}
+		return result;
+	}
+
+	private static List<List<Location>> segmentLocations(List<Location> locations) {
+		List<List<Location>> result = new ArrayList<List<Location>>();
+		Location lastAnchor = null;
+		List<Location> segment = new ArrayList<Location>();
+		result.add(segment);
+		for (Location location : locations) {
+			if (lastAnchor != null) {
+				if (!clusterCriterion(lastAnchor, location)) {
+					segment = new ArrayList<Location>();
+					result.add(segment);
+					lastAnchor = location;
+				}
+			} else {
+				lastAnchor = location;
+			}
+			segment.add(location);
+		}
+		return result;
+	}
+
+	private static boolean clusterCriterion(Location lastAnchor, Location location) {
+		return CoordUtils.calcDistance(getCoord(lastAnchor), getCoord(location)) - ((BigDecimal) lastAnchor.getAccuracy()).longValue() - ((BigDecimal) location.getAccuracy()).longValue() <= 70.0;
+	}
+
+	private static void sortLocations(List<Location> locations) {
+		Collections.sort(locations, new Comparator<Location>() {
+
+			@Override
+			public int compare(Location arg0, Location arg1) {
+				return new Long(getTime(arg0)).compareTo(new Long(getTime(arg1)));
+			}
+
+		});
 	}
 
 	private static void filterLocations(List<Location> locations) {
@@ -110,17 +177,15 @@ public class HelloLatitude {
 		}
 	}
 
-	private static void createLinks(Scenario scenario, List<Location> locations) {
+	private static void createLinks(Scenario scenario, List<List<Location>> segmentation) {
 		Coord prev = null;
 		Node prevNode = null;
-		for (Location location : locations) {
-			System.out.println(location + " " + new Date(Long.parseLong((String) location.getTimestampMs())));
-			Coord coord = getCoord(location);
-			Node node = scenario.getNetwork().getFactory().createNode(new IdImpl((String) location.getTimestampMs()), coord);
+		for (List<Location> location : segmentation) {
+			Location representative = location.get(0);
+			Coord coord = getCoord(representative);
+			Node node = scenario.getNetwork().getFactory().createNode(new IdImpl((String) representative.getTimestampMs()), coord);
 			scenario.getNetwork().addNode(node);
-			System.out.println(coord);
 			if (prev != null) {
-				System.out.println(CoordUtils.calcDistance(prev, coord));
 				Link link = scenario.getNetwork().getFactory().createLink(new IdImpl(prevNode.getId().toString() + node.getId().toString()), prevNode, node);
 				scenario.getNetwork().addLink(link);
 			}
@@ -129,23 +194,47 @@ public class HelloLatitude {
 		}
 	}
 
-	private static void createActivities(Scenario scenario, List<Location> locations) {
-		Coord prev = null;
+	private static long getTime(Location location) {
+		return Long.parseLong((String) location.getTimestampMs());
+	}
+
+	private static void createActivities(Scenario scenario, List<Segment> segments) {
 		Person p = scenario.getPopulation().getFactory().createPerson(new IdImpl("p"));
 		Plan pl = scenario.getPopulation().getFactory().createPlan();
-		for (Location location : locations) {
-			long miliseconds = Long.parseLong((String) location.getTimestampMs());
-			System.out.println(location + " " + new Date(miliseconds));
-			Coord coord = getCoord(location);
-			Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("unknown", coord);
-			pl.addActivity(activity);
-			System.out.println(coord);
-			if (prev != null) {
-				System.out.println(CoordUtils.calcDistance(prev, coord));
-				Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
-				pl.addLeg(leg);
+		int nAct = 0;
+		Activity prev = null;
+		for (Segment segment : segments) {
+			List<Location> locations = segment.locations;
+			Location representative = locations.get(0);
+			long miliseconds = getTime(representative);
+			DateTime start = new DateTime(getTime(locations.get(0)));
+			DateTime end = new DateTime(getTime(locations.get(locations.size()-1)));
+
+			System.out.println(locations + " " + new Date(miliseconds));
+			
+			
+			
+			
+			if(segment.isSignificant) {
+				if (prev != null) {
+					Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
+					pl.addLeg(leg);
+				}
+				Coord coord = getCoord(representative);
+				Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("unknown", coord);
+				activity.setStartTime(start.getMillisOfDay() / 1000);
+				activity.setEndTime(end.getMillisOfDay() / 1000);
+				activity.setType("act" + (++nAct) + "_" + new Duration(start, end).getStandardMinutes());
+				pl.addActivity(activity);
+				System.out.println(coord);
+				System.out.println(activity);
+				prev = activity;
+			} else {
+				// activity.setType("leg");
 			}
-			prev = coord;
+
+
+			
 		}
 		p.addPlan(pl);
 		scenario.getPopulation().addPerson(p);
@@ -169,4 +258,22 @@ public class HelloLatitude {
 		qSim.run();
 	}
 
+	private static double accuracy(List<Location> segment) {
+		double result = 0;
+		for (Location location : segment) {
+			result += ((BigDecimal) location.getAccuracy()).longValue();
+		}
+		return result / segment.size();
+	}
+
+	private static Coord centroid(List<Location> segment) {
+		CoordImpl result = new CoordImpl(0,0);
+		for (Location location : segment) {
+			Coord coord = getCoord(location);
+			result.setXY(result.getX() + coord.getX(), result.getY() + coord.getY());
+		}
+		result.setXY(result.getX() / segment.size(), result.getY() / segment.size());
+		return result;
+	}
+	
 }

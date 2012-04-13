@@ -102,6 +102,11 @@
 			<artifactId>google-api-services-latitude</artifactId>
 			<version>v1-1.2.0-beta</version>
 		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.1</version>
+		</dependency>
 	</dependencies>
 	<modules>
 	</modules>
