@@ -245,8 +245,7 @@ public class SpatialAveragingForLinkEmissions {
 					}
 				}
 			}	
-			//TODO write output for r here use sumOfweightedValuesForCell
-			//coordinates?
+			//TODO set output path
 			//TODO momentan fuer jedes Zeitintervall, passende Ifabfrage o ae
 			String outputPathForR = new String("");
 			writeRoutput(sumOfweightedValuesForCell, outputPathForR);
