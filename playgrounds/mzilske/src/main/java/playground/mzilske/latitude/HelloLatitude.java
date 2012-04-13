@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -65,6 +66,7 @@ public class HelloLatitude {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		getLatitude(scenario);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write("output/population.xml");
 		play(scenario);
 
 
@@ -92,8 +94,8 @@ public class HelloLatitude {
 		Latitude latitude = new Latitude(new NetHttpTransport(), accessProtectedResource, jsonFactory);
 		try {
 
-			String minTime = Long.toString(new DateTime(2012,4,6,0,0).getMillis());
-			String maxTime = Long.toString(new DateTime(2012,4,6,23,59).getMillis());
+			String minTime = Long.toString(new DateTime(2012,3,19,0,0).getMillis());
+			String maxTime = Long.toString(new DateTime(2012,3,19,23,59).getMillis());
 			List<Location> locations = latitude.location.list().setGranularity("best").setMinTime(minTime).setMaxTime(maxTime).setMaxResults("1000").execute().getItems();
 			sortLocations(locations);
 			filterLocations(locations);
@@ -131,29 +133,32 @@ public class HelloLatitude {
 		}
 		return result;
 	}
+	
+	private static List<List<Location>> segmentLocations2(List<Location> locations) {
+		List<List<Location>> result = new ArrayList<List<Location>>();
+		for (Location location : locations) {
+			result.add(Collections.singletonList(location));
+		}
+		return result;
+	}
 
 	private static List<List<Location>> segmentLocations(List<Location> locations) {
 		List<List<Location>> result = new ArrayList<List<Location>>();
-		Location lastAnchor = null;
 		List<Location> segment = new ArrayList<Location>();
 		result.add(segment);
 		for (Location location : locations) {
-			if (lastAnchor != null) {
-				if (!clusterCriterion(lastAnchor, location)) {
+				if (!clusterCriterion(segment, location)) {
 					segment = new ArrayList<Location>();
 					result.add(segment);
-					lastAnchor = location;
 				}
-			} else {
-				lastAnchor = location;
-			}
 			segment.add(location);
 		}
 		return result;
 	}
 
-	private static boolean clusterCriterion(Location lastAnchor, Location location) {
-		return CoordUtils.calcDistance(getCoord(lastAnchor), getCoord(location)) - ((BigDecimal) lastAnchor.getAccuracy()).longValue() - ((BigDecimal) location.getAccuracy()).longValue() <= 70.0;
+	private static boolean clusterCriterion(List<Location> segment, Location location) {
+		if (segment.isEmpty()) return true;
+		return CoordUtils.calcDistance(getCoord(segment.get(0)), getCoord(location)) - ((BigDecimal) segment.get(0).getAccuracy()).longValue() - ((BigDecimal) location.getAccuracy()).longValue() <= 50.0;
 	}
 
 	private static void sortLocations(List<Location> locations) {
@@ -209,12 +214,7 @@ public class HelloLatitude {
 			long miliseconds = getTime(representative);
 			DateTime start = new DateTime(getTime(locations.get(0)));
 			DateTime end = new DateTime(getTime(locations.get(locations.size()-1)));
-
-			System.out.println(locations + " " + new Date(miliseconds));
-			
-			
-			
-			
+			System.out.println(locations + " " + new Date(miliseconds));			
 			if(segment.isSignificant) {
 				if (prev != null) {
 					Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
