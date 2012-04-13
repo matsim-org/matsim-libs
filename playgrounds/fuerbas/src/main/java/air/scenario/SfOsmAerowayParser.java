@@ -23,6 +23,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+// to extract aeroway nodes from planet.osm file use osmosis: http://wiki.openstreetmap.org/wiki/Osmosis/Detailed_Usage_0.39#--node-key_.28--nk.29
 
 public class SfOsmAerowayParser extends MatsimXmlParser {
 	

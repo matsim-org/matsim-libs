@@ -138,7 +138,7 @@ public class SfAirScheduleBuilder {
 					
 
 
-					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {
+					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {	//filter codeshare flights
 
 						String carrier = lineEntries[0];
 						String flightNumber = lineEntries[1].replaceAll(" ", "0");
