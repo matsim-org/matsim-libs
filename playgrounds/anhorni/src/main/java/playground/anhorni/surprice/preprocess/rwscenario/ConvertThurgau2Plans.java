@@ -249,6 +249,11 @@ public class ConvertThurgau2Plans {
 		this.createPersonWeeks(entrs);
 		
 		this.clean(person_strings);
+		
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			this.personWeeks.get(person.getId()).removeIncompleteWeeks();
+		}
+		this.removeIncompletePersons();
 				
 		this.write();
 	}
@@ -280,7 +285,6 @@ public class ConvertThurgau2Plans {
 				this.personWeeks.get(pid).addDay((int) Math.floor(plan.getScore()), plan);
 			}		
 			this.personWeeks.get(pid).setIsWorker();
-			this.personWeeks.get(pid).removeIncompleteWeeks();
 		}
 	}
 	
@@ -364,8 +368,6 @@ public class ConvertThurgau2Plans {
 		log.info("removing routes");
 		this.removeRoutes(population);
 		log.info("    done.");
-		
-		this.removeIncompletePersons();
 	}
 	
 	private void removeIncompletePersons() {
