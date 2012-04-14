@@ -205,8 +205,8 @@ public class Merger {
 				}
 			}
 			// assign shop, leisure and education locations according to Balmers neighborhood search
-			PersonSetSecLoc secLocationAssigner = new PersonSetSecLoc(this.scenario.getActivityFacilities(), null);
-			secLocationAssigner.run(person);
+//			PersonSetSecLoc secLocationAssigner = new PersonSetSecLoc(this.scenario.getActivityFacilities(), null);
+//			secLocationAssigner.run(person);
 			
 			if (this.personWeeksMZ.get(person.getId()) == null) {
 				this.personWeeksMZ.put(person.getId(), new PersonWeeks(person));

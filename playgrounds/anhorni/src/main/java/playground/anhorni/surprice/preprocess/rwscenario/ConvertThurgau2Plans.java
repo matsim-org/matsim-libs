@@ -246,9 +246,9 @@ public class ConvertThurgau2Plans {
 		
 		this.addPlans(person_strings);
 		
-		this.clean(person_strings);
-		
 		this.createPersonWeeks(entrs);
+		
+		this.clean(person_strings);
 				
 		this.write();
 	}
@@ -327,187 +327,132 @@ public class ConvertThurgau2Plans {
 		
 		Population population = this.scenario.getPopulation();
 		
-		this.personWeeks.remove(new IdImpl(217));
-		population.getPersons().remove(new IdImpl(217));
-		
-		this.personWeeks.remove(new IdImpl(15));
-		population.getPersons().remove(new IdImpl(15));
-		
-		this.personWeeks.remove(new IdImpl(22));
-		population.getPersons().remove(new IdImpl(22));
-		
-		this.personWeeks.remove(new IdImpl(155));
-		population.getPersons().remove(new IdImpl(155));
-		
-		this.personWeeks.remove(new IdImpl(216));
-		population.getPersons().remove(new IdImpl(216));
-		
-		this.personWeeks.remove(new IdImpl(223));
-		population.getPersons().remove(new IdImpl(223));
+//		this.personWeeks.remove(new IdImpl(217));
+//		population.getPersons().remove(new IdImpl(217));
+//		
+//		this.personWeeks.remove(new IdImpl(15));
+//		population.getPersons().remove(new IdImpl(15));
+//		
+//		this.personWeeks.remove(new IdImpl(22));
+//		population.getPersons().remove(new IdImpl(22));
+//		
+//		this.personWeeks.remove(new IdImpl(155));
+//		population.getPersons().remove(new IdImpl(155));
+//		
+//		this.personWeeks.remove(new IdImpl(216));
+//		population.getPersons().remove(new IdImpl(216));
+//		
+//		this.personWeeks.remove(new IdImpl(223));
+//		population.getPersons().remove(new IdImpl(223));
 		
 		log.info("      creating population...");
-		Set<Id> pids = null;
 
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("      identify plans with inconsistent times...");
-		pids = this.identifyPlansInconsistentTimes(population);
-		log.info("      done.");
-		log.info("      # persons        = " + population.getPersons().size());
-		log.info("      # person_strings = " + person_strings.size());
-		log.info("      # persons with plans with inconsistent times = \t" + pids.size());
-		log.info("      removing persons with plans with inconsistent times...");
-		this.removePersons(pids);
-		log.info("      done.");
-		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + population.getPersons().size());
+		this.removePlansInconsistentTimes(population);
 
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("      identify non home based day plans...");
-		pids = this.identifyNonHomeBasedPlans(population);
-		log.info("      done.");
-		log.info("      # persons        = " + population.getPersons().size());
-		log.info("      # person_strings = " + person_strings.size());
-		log.info("      # persons with non home based plans = \t" + pids.size());
-		log.info("      removing persons with non home based plans...");
-		this.removePersons(pids);
-		log.info("      done.");
-		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + population.getPersons().size());
-
-		//////////////////////////////////////////////////////////////////////
-
+		log.info("      remove non home based day plans...");
+		this.removeNonHomeBasedPlans(population);
+		
 		log.info("      identify plans with act type '"+ OTHR +"'...");
-		pids = this.identifyPlansWithTypeOther(population);
-		log.info("      done.");
-		log.info("      # persons        = " + population.getPersons().size());
-		log.info("      # person_strings = " + person_strings.size());
-		log.info("      # persons with plans with act type '"+ OTHR +"' = \t" + pids.size());
-		log.info("      removing persons with plans with act type '"+ OTHR +"'...");
-		this.removePersons(pids);
-		log.info("      done.");
-		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + population.getPersons().size());
-
-		//////////////////////////////////////////////////////////////////////
+		this.removePlansWithTypeOther(population);
 
 		log.info("      identify plans with mode undefined ...");
-		pids = this.identifyPlansModeTypeUndef(population);
-		log.info("      done.");
-		log.info("      # persons        = " + population.getPersons().size());
-		log.info("      # person_strings = " + person_strings.size());
-		log.info("      # persons with plans with mode undefined = \t" + pids.size());
-		log.info("      removing persons with plans with mode undefined ...");
-		this.removePersons(pids);
-		log.info("      done.");
-		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + population.getPersons().size());
-
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("      identify single activity plans...");
-		pids = this.identifySingleActPlans(population);
-		log.info("      done.");
-		log.info("      # persons        = " + population.getPersons().size());
-		log.info("      # person_strings = " + person_strings.size());
-		log.info("      # persons with single activity plans = \t" + pids.size());
-		log.info("      removing persons with single activity plans...");
-		this.removePersons(pids);
-		log.info("      done.");
-		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + population.getPersons().size());
-
-		//////////////////////////////////////////////////////////////////////		
+		this.removePlansModeTypeUndef(population);
+	
 		log.info("removing routes");
 		this.removeRoutes(population);
 		log.info("    done.");
+		
+		this.removeIncompletePersons();
+	}
+	
+	private void removeIncompletePersons() {
+		Set<Id> removePersons = new HashSet<Id>();
+		Population population = this.scenario.getPopulation();
+		
+		for (Person p : population.getPersons().values()) {
+			if (!this.personWeeks.get(p.getId()).hasCompleteWeek()) {
+				removePersons.add(p.getId());
+			}
+		}
+		for (Id id : removePersons) {
+			population.getPersons().remove(id);
+			this.personWeeks.remove(id);
+		}	
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void removePersons(final Set<Id> ids) {
-		
-		Population population = this.scenario.getPopulation();
-		
-		for (Id id : ids) {
-			Person p = population.getPersons().remove(id);
-			if (p == null) {
-				Gbl.errorMsg("pid="+id+": id not found in the plans DB!");
-			}
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	private final Set<Id> identifyNonHomeBasedPlans(final Population plans) {
-		Set<Id> ids = new HashSet<Id>();
-		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
-			if (!last.getType().equals(HOME)) { ids.add(p.getId()); }
-		}
-		return ids;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	private final Set<Id> identifyPlansWithTypeOther(final Population plans) {
-		Set<Id> ids = new HashSet<Id>();
-		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity act = (Activity) pe;
-					if (act.getType().equals(OTHR)) { ids.add(p.getId()); }
+	private final void removeNonHomeBasedPlans(final Population population) {
+		Set<Plan> removePlans = new HashSet<Plan>();
+		for (Person p : population.getPersons().values()) {
+			for (Plan plan : p.getPlans()) {
+				ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+				if (!last.getType().equals(HOME)) {
+					removePlans.add(plan);
 				}
 			}
+			p.getPlans().removeAll(removePlans);
 		}
-		return ids;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansModeTypeUndef(final Population plans) {
-		Set<Id> ids = new HashSet<Id>();
+	private final void removePlansWithTypeOther(final Population plans) {
+		Set<Plan> removePlans = new HashSet<Plan>();
 		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
-					if (leg.getMode().equals("undefined")) { ids.add(p.getId()); }
+			for (Plan plan : p.getPlans()) {
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
+						if (act.getType().startsWith(OTHR)) {
+							removePlans.add(plan);
+						}
+					}
 				}
 			}
-		}
-		return ids;
+			p.getPlans().removeAll(removePlans);
+		}	
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansInconsistentTimes(final Population plans) {
-		Set<Id> ids = new HashSet<Id>();
+	private final void removePlansModeTypeUndef(final Population plans) {
+		Set<Plan> removePlans = new HashSet<Plan>();
 		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			for (int i=0; i<plan.getPlanElements().size()-2; i=i+2) {
-				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-				if (act.getEndTime() < act.getStartTime()) {
-					ids.add(p.getId());
+			for (Plan plan : p.getPlans()) {
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
+						if (leg.getMode().equals("undefined")) {
+							removePlans.add(plan);
+						}
+					}
 				}
 			}
+			p.getPlans().removeAll(removePlans);
 		}
-		return ids;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifySingleActPlans(final Population plans) {
-		Set<Id> ids = new HashSet<Id>();
+	private final void removePlansInconsistentTimes(final Population plans) {
+		Set<Plan> removePlans = new HashSet<Plan>();
 		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			if (plan.getPlanElements().size() <= 1) { ids.add(p.getId()); }
+			for (Plan plan : p.getPlans()) {
+				for (int i=0; i<plan.getPlanElements().size()-2; i=i+2) {
+					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
+					if (act.getEndTime() < act.getStartTime()) {
+						removePlans.add(plan);
+					}
+				}
+			}
+			p.getPlans().removeAll(removePlans);
 		}
-		return ids;
 	}
+
 	
 	//////////////////////////////////////////////////////////////////////
 	//remove routes again

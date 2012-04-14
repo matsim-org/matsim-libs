@@ -73,6 +73,15 @@ public class PersonWeeks {
 			this.days.remove(i);
 		}
 	}
+	
+	public boolean hasCompleteWeek() {
+		if (this.days.size() > 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 		
 	public void setIsWorker() {
 		for (int i = 0; i < days.size(); i++) {
