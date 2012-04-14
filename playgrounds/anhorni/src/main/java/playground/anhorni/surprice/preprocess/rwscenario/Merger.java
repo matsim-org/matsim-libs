@@ -19,6 +19,7 @@
 
 package playground.anhorni.surprice.preprocess.rwscenario;
 
+import java.io.File;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -100,7 +101,8 @@ public class Merger {
 				((PersonImpl)person).setSelectedPlan(plan);				
 			}
 			log.info("Writing population with plans ...");
-			new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + dow + "plans.xml.gz");
+			new File(outPath + "/" + dow + "/").mkdirs();
+			new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + dow + "/plans.xml.gz");
 		}	
 	}
 		
@@ -175,9 +177,7 @@ public class Merger {
 			person.getPlans().clear();
 			Plan plan = personWeeksThurgau.getDay(dow, week);
 			PersonImpl thurgauPerson = (PersonImpl)personWeeksThurgau.getPerson();
-			
-			log.info("pid " + thurgauPerson.getId() + " score " + plan.getScore());
-			
+						
 			thurgauPerson.addPlan(plan);
 			thurgauPerson.setSelectedPlan(plan);
 			Plan planNew = thurgauPerson.copySelectedPlan();
@@ -205,8 +205,8 @@ public class Merger {
 				}
 			}
 			// assign shop, leisure and education locations according to Balmers neighborhood search
-//	TODO:		PersonSetSecLoc secLocationAssigner = new PersonSetSecLoc(this.scenario.getActivityFacilities(), null);
-//	TODO:		secLocationAssigner.run(person);
+			PersonSetSecLoc secLocationAssigner = new PersonSetSecLoc(this.scenario.getActivityFacilities(), null);
+			secLocationAssigner.run(person);
 			
 			if (this.personWeeksMZ.get(person.getId()) == null) {
 				this.personWeeksMZ.put(person.getId(), new PersonWeeks(person));

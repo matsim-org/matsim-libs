@@ -22,7 +22,6 @@ package playground.anhorni.surprice.preprocess.rwscenario;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -96,13 +95,13 @@ public class ConvertThurgau2Plans {
 	private void addPlans(final Map<Id, String> person_strings) {		
 		for (Id pid : person_strings.keySet()) {
 			String person_string = person_strings.get(pid);	
-			
+						
 			int dow_prev = -1;
 			Id pid_prev = null;			
 			String[] lines = person_string.split("\n", -1); // last line is always an empty line
 			for (int l = 0; l < lines.length-1; l++) {				
 				String[] entrs = lines[l].split("\t", -1);
-				int dow = Integer.parseInt(entrs[22].trim());
+				int dow = Integer.parseInt(entrs[22].trim()) - 1;
 				
 				// add new plan if day of week changes or person changes
 				if (dow != dow_prev || !pid.equals(pid_prev)) {
@@ -218,8 +217,9 @@ public class ConvertThurgau2Plans {
 		String curr_line = br.readLine(); // Skip header
 		while ((curr_line = br.readLine()) != null) {
 			entrs = curr_line.split("\t", -1);
-
+			
 			id = Integer.parseInt(entrs[2].trim());
+						
 			if (id == prev_id) {
 				person_string = person_string + curr_line + "\n";
 			}
@@ -280,6 +280,7 @@ public class ConvertThurgau2Plans {
 				this.personWeeks.get(pid).addDay((int) Math.floor(plan.getScore()), plan);
 			}		
 			this.personWeeks.get(pid).setIsWorker();
+			this.personWeeks.get(pid).removeIncompleteWeeks();
 		}
 	}
 	
@@ -325,6 +326,24 @@ public class ConvertThurgau2Plans {
 	private void clean(Map<Id,String> person_strings) {
 		
 		Population population = this.scenario.getPopulation();
+		
+		this.personWeeks.remove(new IdImpl(217));
+		population.getPersons().remove(new IdImpl(217));
+		
+		this.personWeeks.remove(new IdImpl(15));
+		population.getPersons().remove(new IdImpl(15));
+		
+		this.personWeeks.remove(new IdImpl(22));
+		population.getPersons().remove(new IdImpl(22));
+		
+		this.personWeeks.remove(new IdImpl(155));
+		population.getPersons().remove(new IdImpl(155));
+		
+		this.personWeeks.remove(new IdImpl(216));
+		population.getPersons().remove(new IdImpl(216));
+		
+		this.personWeeks.remove(new IdImpl(223));
+		population.getPersons().remove(new IdImpl(223));
 		
 		log.info("      creating population...");
 		Set<Id> pids = null;

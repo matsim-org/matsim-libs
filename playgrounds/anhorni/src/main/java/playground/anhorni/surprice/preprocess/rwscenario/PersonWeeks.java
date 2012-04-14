@@ -43,8 +43,8 @@ public class PersonWeeks {
 	public PersonWeeks(Person person) {
 		this.person = person;
 		
-		for (int i = 0; i < 7; i++) {
-			this.days.add(i, new TreeMap<Integer, Plan>());
+		for (int w = 0; w <= 6; w++) {
+			this.days.add(w, new TreeMap<Integer, Plan>());
 		}
 	}
 	
@@ -59,6 +59,18 @@ public class PersonWeeks {
 	public void addDay(int dow, Plan plan) {
 		if (this.currentWeek < 7) {
 			this.days.get(this.currentWeek).put(dow, plan);
+		}
+	}
+	
+	public void removeIncompleteWeeks() {
+		ArrayList<Integer> removeIndices = new ArrayList<Integer>();
+		for (int w = 0; w < days.size(); w++) {
+			if (this.days.get(w).size() < 7) {
+				removeIndices.add(w);
+			}
+		}
+		for (Integer i : removeIndices) {
+			this.days.remove(i);
 		}
 	}
 		
