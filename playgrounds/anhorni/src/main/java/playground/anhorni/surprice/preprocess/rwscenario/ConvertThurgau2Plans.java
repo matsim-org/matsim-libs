@@ -246,10 +246,10 @@ public class ConvertThurgau2Plans {
 		
 		this.addPlans(person_strings);
 		
-		this.createPersonWeeks(entrs);
-		
 		this.clean(person_strings);
 		
+		this.createPersonWeeks(entrs);
+			
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			this.personWeeks.get(person.getId()).removeIncompleteWeeks();
 		}
@@ -330,39 +330,17 @@ public class ConvertThurgau2Plans {
 	private void clean(Map<Id,String> person_strings) {
 		
 		Population population = this.scenario.getPopulation();
-		
-//		this.personWeeks.remove(new IdImpl(217));
-//		population.getPersons().remove(new IdImpl(217));
-//		
-//		this.personWeeks.remove(new IdImpl(15));
-//		population.getPersons().remove(new IdImpl(15));
-//		
-//		this.personWeeks.remove(new IdImpl(22));
-//		population.getPersons().remove(new IdImpl(22));
-//		
-//		this.personWeeks.remove(new IdImpl(155));
-//		population.getPersons().remove(new IdImpl(155));
-//		
-//		this.personWeeks.remove(new IdImpl(216));
-//		population.getPersons().remove(new IdImpl(216));
-//		
-//		this.personWeeks.remove(new IdImpl(223));
-//		population.getPersons().remove(new IdImpl(223));
-		
-		log.info("      creating population...");
 
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("      identify plans with inconsistent times...");
+		log.info("      remove plans with inconsistent times...");
 		this.removePlansInconsistentTimes(population);
 
 		log.info("      remove non home based day plans...");
 		this.removeNonHomeBasedPlans(population);
 		
-		log.info("      identify plans with act type '"+ OTHR +"'...");
+		log.info("      remove plans with act type '"+ OTHR +"'...");
 		this.removePlansWithTypeOther(population);
 
-		log.info("      identify plans with mode undefined ...");
+		log.info("      remove plans with mode undefined ...");
 		this.removePlansModeTypeUndef(population);
 	
 		log.info("removing routes");
@@ -374,6 +352,8 @@ public class ConvertThurgau2Plans {
 		Set<Id> removePersons = new HashSet<Id>();
 		Population population = this.scenario.getPopulation();
 		
+		int originalSize = population.getPersons().size();
+		
 		for (Person p : population.getPersons().values()) {
 			if (!this.personWeeks.get(p.getId()).hasCompleteWeek()) {
 				removePersons.add(p.getId());
@@ -382,27 +362,32 @@ public class ConvertThurgau2Plans {
 		for (Id id : removePersons) {
 			population.getPersons().remove(id);
 			this.personWeeks.remove(id);
-		}	
+		}
+		log.info("removing incomplete persons: " + population.getPersons().size() + " of " + originalSize + " persons left.");
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 
 	private final void removeNonHomeBasedPlans(final Population population) {
+		int removeCnt = 0;
 		Set<Plan> removePlans = new HashSet<Plan>();
 		for (Person p : population.getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
 				ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 				if (!last.getType().equals(HOME)) {
 					removePlans.add(plan);
+					removeCnt++;
 				}
 			}
 			p.getPlans().removeAll(removePlans);
 		}
+		log.info("removed " + removeCnt + " plans");
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
 	private final void removePlansWithTypeOther(final Population plans) {
+		int removeCnt = 0;
 		Set<Plan> removePlans = new HashSet<Plan>();
 		for (Person p : plans.getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
@@ -411,17 +396,20 @@ public class ConvertThurgau2Plans {
 						Activity act = (Activity) pe;
 						if (act.getType().startsWith(OTHR)) {
 							removePlans.add(plan);
+							removeCnt++;
 						}
 					}
 				}
 			}
 			p.getPlans().removeAll(removePlans);
 		}	
+		log.info("removed " + removeCnt + " plans");
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
 	private final void removePlansModeTypeUndef(final Population plans) {
+		int removeCnt = 0;
 		Set<Plan> removePlans = new HashSet<Plan>();
 		for (Person p : plans.getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
@@ -430,17 +418,20 @@ public class ConvertThurgau2Plans {
 						Leg leg = (Leg) pe;
 						if (leg.getMode().equals("undefined")) {
 							removePlans.add(plan);
+							removeCnt++;
 						}
 					}
 				}
 			}
 			p.getPlans().removeAll(removePlans);
 		}
+		log.info("removed " + removeCnt + " plans");
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
 	private final void removePlansInconsistentTimes(final Population plans) {
+		int removeCnt = 0;
 		Set<Plan> removePlans = new HashSet<Plan>();
 		for (Person p : plans.getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
@@ -448,11 +439,13 @@ public class ConvertThurgau2Plans {
 					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 					if (act.getEndTime() < act.getStartTime()) {
 						removePlans.add(plan);
+						removeCnt++;
 					}
 				}
 			}
 			p.getPlans().removeAll(removePlans);
 		}
+		log.info("removed " + removeCnt + " plans");
 	}
 
 	

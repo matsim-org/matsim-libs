@@ -22,6 +22,7 @@ package playground.anhorni.surprice.preprocess.rwscenario;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,7 +35,8 @@ public class PersonWeeks {
 	private int currentWeek = - 1;
 	private boolean isWorker = false;
 	private double pweight = 1.0;
-		
+	
+	private final static Logger log = Logger.getLogger(PersonWeeks.class);		
 	
 	public void increaseWeek() {
 		this.currentWeek++;
@@ -43,35 +45,34 @@ public class PersonWeeks {
 	public PersonWeeks(Person person) {
 		this.person = person;
 		
-		for (int w = 0; w <= 6; w++) {
+		for (int w = 0; w < 6; w++) {
 			this.days.add(w, new TreeMap<Integer, Plan>());
 		}
 	}
 	
 	public Plan getDay(int dow, int week) {
 		int w = week;
-		while (this.days.get(w).size() < 7 && w < 6) { // week is not complete -> take next week
+		while (w < 5 && this.days.get(w).size() < 7) { // week is not complete -> take next week
 			w++;
 		}
 		return this.days.get(w).get(dow);
 	}
 	
 	public void addDay(int dow, Plan plan) {
-		if (this.currentWeek < 7) {
+		if (this.currentWeek < 6) {
 			this.days.get(this.currentWeek).put(dow, plan);
 		}
 	}
 	
 	public void removeIncompleteWeeks() {
-		ArrayList<Integer> removeIndices = new ArrayList<Integer>();
-		for (int w = 0; w < days.size(); w++) {
+		ArrayList<TreeMap<Integer, Plan>> removeWeeks = new ArrayList<TreeMap<Integer, Plan>>();
+		for (int w = 0; w < days.size(); w++) {			
 			if (this.days.get(w).size() < 7) {
-				removeIndices.add(w);
+				removeWeeks.add(this.days.get(w));
 			}
 		}
-		for (Integer i : removeIndices) {
-			this.days.remove(i);
-		}
+		this.days.removeAll(removeWeeks);
+		log.info("removing incomplete weeks: " + this.days.size() + " weeks left for person " + this.person.getId());
 	}
 	
 	public boolean hasCompleteWeek() {
