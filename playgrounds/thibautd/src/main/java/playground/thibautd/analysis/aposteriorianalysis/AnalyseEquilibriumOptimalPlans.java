@@ -98,9 +98,11 @@ public class AnalyseEquilibriumOptimalPlans {
 
 		ChartUtil chart = analyser.getTravelTimeRelativeImprovementsChart();
 		chart.saveAsPng( outputDir+"/travelTimeImprovements.png", WIDTH, HEIGHT );
+		analyser.writeTravelTimeImprovementsDataset( outputDir+"/travelTimeImprovements-relative.dat" );
 
 		chart = analyser.getScoreAbsoluteImprovementsChart();
 		chart.saveAsPng( outputDir+"/scoreImprovements.png", WIDTH, HEIGHT );
+		analyser.writeScoreImprovementsDataset( outputDir+"/scoreImprovements-absolute.dat" );
 
 		if (popUntoggled != null) {
 			chart = analyser.getScoreAbsoluteImprovementsToggleChart();
@@ -109,6 +111,10 @@ public class AnalyseEquilibriumOptimalPlans {
 
 		chart = analyser.getScoreDistributionsChart();
 		chart.saveAsPng( outputDir+"/scoreDistributions.png", WIDTH, HEIGHT );
+		analyser.writeScoreDistributionDatasets(
+				outputDir+"/scoresToggled.dat",
+				outputDir+"/scoresUntoggled.dat",
+				outputDir+"/scoresIndividual.dat");
 	}
 }
 

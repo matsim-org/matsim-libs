@@ -19,11 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.aposteriorianalysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -39,6 +44,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.charts.ChartUtil;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 
@@ -53,8 +59,20 @@ import playground.thibautd.utils.charts.WrapperChartUtil;
  * @author thibautd
  */
 public class EquilibriumOptimalPlansAnalyser {
+	private static final Logger log =
+		Logger.getLogger(EquilibriumOptimalPlansAnalyser.class);
+
+	private static final String FIELD_SEPARATOR = "\t";
+	private static final String NO_VALUE = "NA";
 	private final Map<Id, ComparativePlan> plans = new HashMap<Id, ComparativePlan>();
 	private final ScoringFunctionFactory scoringFunctionFactory;
+
+	// datasets
+	private Map<Integer , List<Double>> travelTimeRelativeImprovements = null;
+	private Map<Integer , List<Double>> toggledScoresDataSet = null;
+	private Map<Integer , List<Double>> untoggledScoresDataSet = null;
+	private Map<Integer , List<Double>> individualScoresDataSet = null;
+	private Map<Integer , List<Double>> scoreImprovements = null;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// construction
@@ -236,8 +254,80 @@ public class EquilibriumOptimalPlansAnalyser {
 		DefaultBoxAndWhiskerCategoryDataset dataset =
 			new DefaultBoxAndWhiskerCategoryDataset();
 
+		if (travelTimeRelativeImprovements == null) {
+			travelTimeRelativeImprovements =
+				calcTravelTimeRelativeImprovements( plans.values() );
+		}
+
+		for (Map.Entry<Integer, List<Double>> improvement : travelTimeRelativeImprovements.entrySet()) {
+			dataset.add(improvement.getValue(), "", improvement.getKey());
+		}
+
+		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
+				"travel time improvements implied by passenger trips",
+				"clique size",
+				"relative improvement (%)",
+				dataset,
+				true);
+		formatCategoryChart( chart );
+		return new WrapperChartUtil( chart );
+	}
+
+	public void writeTravelTimeImprovementsDataset(final String filePath) {
+		if (travelTimeRelativeImprovements == null) {
+			travelTimeRelativeImprovements =
+				calcTravelTimeRelativeImprovements( plans.values() );
+		}
+		writeDataset( filePath , travelTimeRelativeImprovements );
+	}
+
+	private static void writeDataset(
+			final String filePath,
+			final Map<Integer, List<Double>> dataset) {
+		BufferedWriter writer = IOUtils.getBufferedWriter( filePath );
+		Counter counter = new Counter( "Writing "+filePath+": line # " );
+
+		try {
+		// be sure we always order the keys the same way on each line.
+		List<Iterator<Double>> iterators = new ArrayList<Iterator<Double>>();
+		for ( Map.Entry<Integer, List<Double>> e : dataset.entrySet() ) {
+			writer.write(e.getKey() + FIELD_SEPARATOR );
+			iterators.add( e.getValue().iterator() );
+		}
+		writer.newLine();
+
+		int line = 0;
+		while (existsNext( iterators )) {
+			counter.incCounter();
+			line++;
+			writer.write( line + FIELD_SEPARATOR );
+			for ( Iterator<Double> iterator : iterators) {
+				writer.write( iterator.hasNext() ?
+						iterator.next() + FIELD_SEPARATOR :
+						NO_VALUE + FIELD_SEPARATOR );
+			}
+			writer.newLine();
+		}
+		counter.printCounter();
+		writer.close();
+		}
+		catch (IOException e) {
+			// just print an error: do not block the next steps.
+			log.error( "problem while writing "+filePath , e );
+		}
+	}
+
+	private static boolean existsNext(final List<Iterator<Double>> iterators) {
+		for (Iterator i : iterators) {
+			if (i.hasNext()) return true;
+		}
+		return false;
+	}
+
+	private static Map<Integer, List<Double>> calcTravelTimeRelativeImprovements(
+			final Iterable<ComparativePlan> plans) {
 		Map<Integer , List<Double>> improvements = new HashMap<Integer , List<Double>>();
-		for (ComparativePlan plan : plans.values()) {
+		for (ComparativePlan plan : plans) {
 			for (ComparativeLeg leg : plan) {
 				if (leg.isToggledPassenger()) {
 					double jointTravelTime = leg.getToggledTravelTime();
@@ -256,19 +346,7 @@ public class EquilibriumOptimalPlansAnalyser {
 				}
 			}
 		}
-
-		for (Map.Entry<Integer, List<Double>> improvement : improvements.entrySet()) {
-			dataset.add(improvement.getValue(), "", improvement.getKey());
-		}
-
-		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
-				"travel time improvements implied by passenger trips",
-				"clique size",
-				"relative improvement (%)",
-				dataset,
-				true);
-		formatCategoryChart( chart );
-		return new WrapperChartUtil( chart );
+		return improvements;
 	}
 
 	/**
@@ -283,9 +361,29 @@ public class EquilibriumOptimalPlansAnalyser {
 		DefaultBoxAndWhiskerCategoryDataset dataset =
 			new DefaultBoxAndWhiskerCategoryDataset();
 
-		Map<Integer , List<Double>> improvements = new HashMap<Integer , List<Double>>();
+		if (scoreImprovements == null) {
+			scoreImprovements = calcScoreImprovements( plans.values() );
+		}
+
+		for (Map.Entry<Integer, List<Double>> improvement : scoreImprovements.entrySet()) {
+			dataset.add(improvement.getValue(), "", improvement.getKey());
+		}
+
+		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
+				"score improvements implied by passenger trips",
+				"clique size",
+				"improvement",
+				dataset,
+				true);
+		formatCategoryChart( chart );
+		return new WrapperChartUtil( chart );
+	}
+
+	private static Map<Integer, List<Double>> calcScoreImprovements(
+			final Iterable<ComparativePlan> plans) {
+		Map<Integer , List<Double>> scoreImprovements = new HashMap<Integer , List<Double>>();
 		planLoop:
-		for (ComparativePlan plan : plans.values()) {
+		for (ComparativePlan plan : plans) {
 			double improvement = Double.NaN;
 			boolean isPassenger = false;
 			for (ComparativeLeg leg : plan) {
@@ -304,29 +402,26 @@ public class EquilibriumOptimalPlansAnalyser {
 				}
 			}
 			if (isPassenger) {
-				List<Double> improvementsForSize = improvements.get( plan.getCliqueSize() );
+				List<Double> improvementsForSize = scoreImprovements.get( plan.getCliqueSize() );
 
 					if (improvementsForSize == null) {
 						improvementsForSize = new ArrayList<Double>();
-						improvements.put( plan.getCliqueSize() , improvementsForSize );
+						scoreImprovements.put( plan.getCliqueSize() , improvementsForSize );
 					}
 
 					improvementsForSize.add( improvement );
 			}
 		}
+		return scoreImprovements;
+	}
 
-		for (Map.Entry<Integer, List<Double>> improvement : improvements.entrySet()) {
-			dataset.add(improvement.getValue(), "", improvement.getKey());
+
+	public void writeScoreImprovementsDataset(final String filePath) {
+		if (scoreImprovements == null) {
+			scoreImprovements =
+				calcScoreImprovements( plans.values() );
 		}
-
-		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
-				"score improvements implied by passenger trips",
-				"clique size",
-				"improvement",
-				dataset,
-				true);
-		formatCategoryChart( chart );
-		return new WrapperChartUtil( chart );
+		writeDataset( filePath , scoreImprovements );
 	}
 
 	/**
@@ -386,56 +481,27 @@ public class EquilibriumOptimalPlansAnalyser {
 		DefaultBoxAndWhiskerCategoryDataset dataset =
 			new DefaultBoxAndWhiskerCategoryDataset();
 
-		Map<Integer , List<Double>> toggled = new HashMap<Integer , List<Double>>();
-		Map<Integer , List<Double>> untoggled = new HashMap<Integer , List<Double>>();
-		Map<Integer , List<Double>> individual = new HashMap<Integer , List<Double>>();
-
-		planLoop:
-		for (ComparativePlan plan : plans.values()) {
-			double improvement = Double.NaN;
-			for (ComparativeLeg leg : plan) {
-				if (leg.isUntoggledPassenger() || leg.isToggledPassenger()) {
-					double toggledScore = plan.getToggledScore();
-					double untoggledScore = plan.getUntoggledScore();
-					double individualScore = plan.getIndividualScore();
-
-					List<Double> toggledScores = toggled.get( plan.getCliqueSize() );
-					List<Double> untoggledScores = untoggled.get( plan.getCliqueSize() );
-					List<Double> individualScores = individual.get( plan.getCliqueSize() );
-
-					if (toggledScores == null) {
-						toggledScores = new ArrayList<Double>();
-						toggled.put( plan.getCliqueSize() , toggledScores );
-
-						if (!Double.isNaN( untoggledScore )) {
-							untoggledScores = new ArrayList<Double>();
-							untoggled.put( plan.getCliqueSize() , untoggledScores );
-						}
-
-						individualScores = new ArrayList<Double>();
-						individual.put( plan.getCliqueSize() , individualScores );
-					}
-
-					toggledScores.add( toggledScore );
-					if (!Double.isNaN( untoggledScore )) {
-						untoggledScores.add( untoggledScore );
-					}
-					individualScores.add( individualScore );
-					continue planLoop;
-				}
-			}
+		if ( toggledScoresDataSet == null ) {
+			toggledScoresDataSet = new HashMap<Integer , List<Double>>();
+			untoggledScoresDataSet = new HashMap<Integer , List<Double>>();
+			individualScoresDataSet = new HashMap<Integer , List<Double>>();
+			fillScoresDataSets(
+					toggledScoresDataSet,
+					untoggledScoresDataSet,
+					individualScoresDataSet,
+					plans.values());
 		}
 
-		for (Map.Entry<Integer, List<Double>> toggledEntry : toggled.entrySet()) {
+		for (Map.Entry<Integer, List<Double>> toggledEntry : toggledScoresDataSet.entrySet()) {
 			Integer cliqueSize = toggledEntry.getKey();
 
 			dataset.add(
-					individual.get( cliqueSize ),
+					individualScoresDataSet.get( cliqueSize ),
 					"individual",
 					cliqueSize);
-			if (untoggled.size() > 0) {
+			if (untoggledScoresDataSet.size() > 0) {
 				dataset.add(
-						untoggled.get( cliqueSize ),
+						untoggledScoresDataSet.get( cliqueSize ),
 						"all possible joint trips",
 						cliqueSize);
 			}
@@ -455,6 +521,66 @@ public class EquilibriumOptimalPlansAnalyser {
 		return new WrapperChartUtil( chart );
 	}
 
+	private static void fillScoresDataSets(
+			final Map<Integer, List<Double>> toggledScoresDataSet,
+			final Map<Integer, List<Double>> untoggledScoresDataSet,
+			final Map<Integer, List<Double>> individualScoresDataSet,
+			final Iterable<ComparativePlan> plans) {
+		planLoop:
+		for (ComparativePlan plan : plans) {
+			for (ComparativeLeg leg : plan) {
+				if (leg.isUntoggledPassenger() || leg.isToggledPassenger()) {
+					double toggledScore = plan.getToggledScore();
+					double untoggledScore = plan.getUntoggledScore();
+					double individualScore = plan.getIndividualScore();
+
+					List<Double> toggledScores = toggledScoresDataSet.get( plan.getCliqueSize() );
+					List<Double> untoggledScores = untoggledScoresDataSet.get( plan.getCliqueSize() );
+					List<Double> individualScores = individualScoresDataSet.get( plan.getCliqueSize() );
+
+					if (toggledScores == null) {
+						toggledScores = new ArrayList<Double>();
+						toggledScoresDataSet.put( plan.getCliqueSize() , toggledScores );
+
+						if (!Double.isNaN( untoggledScore )) {
+							untoggledScores = new ArrayList<Double>();
+							untoggledScoresDataSet.put( plan.getCliqueSize() , untoggledScores );
+						}
+
+						individualScores = new ArrayList<Double>();
+						individualScoresDataSet.put( plan.getCliqueSize() , individualScores );
+					}
+
+					toggledScores.add( toggledScore );
+					if (!Double.isNaN( untoggledScore )) {
+						untoggledScores.add( untoggledScore );
+					}
+					individualScores.add( individualScore );
+					continue planLoop;
+				}
+			}
+		}
+	}
+
+	public void writeScoreDistributionDatasets(
+			final String filePathToggled,
+			final String filePathUntoggled,
+			final String filePathIndividual) {
+		if ( toggledScoresDataSet == null ) {
+			toggledScoresDataSet = new HashMap<Integer , List<Double>>();
+			untoggledScoresDataSet = new HashMap<Integer , List<Double>>();
+			individualScoresDataSet = new HashMap<Integer , List<Double>>();
+			fillScoresDataSets(
+					toggledScoresDataSet,
+					untoggledScoresDataSet,
+					individualScoresDataSet,
+					plans.values());
+		}
+
+		writeDataset( filePathToggled, toggledScoresDataSet );
+		writeDataset( filePathUntoggled, untoggledScoresDataSet );
+		writeDataset( filePathIndividual, individualScoresDataSet );
+	}
 
 	private static void formatCategoryChart(final JFreeChart chart) {
 		((NumberAxis) chart.getCategoryPlot().getRangeAxis()).setAutoRangeIncludesZero( true );
