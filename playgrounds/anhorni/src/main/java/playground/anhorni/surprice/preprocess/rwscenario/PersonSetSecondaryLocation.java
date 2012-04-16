@@ -255,11 +255,17 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
 				if (H.equals(act.getType())) {
-					if (act.getCoord() == null) { Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!"); }
-					if (act.getCoord().equals(ZERO)) { Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!"); }
+					if (act.getCoord() == null) {
+						Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!");
+					}
+					if (act.getCoord().equals(ZERO)) {
+						Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!");
+					}
 					home_coord = act.getCoord();
 				} else {
-					if ((act.getCoord() != null) && (!act.getCoord().equals(ZERO))) { prim_coord = act.getCoord(); }
+					if ((act.getCoord() != null) && (!act.getCoord().equals(ZERO))) {
+						prim_coord = act.getCoord();
+					}
 				}
 			}
 		}
@@ -272,6 +278,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 						ActivityFacilityImpl f = this.getFacility(home_coord,radius,act.getType());
 						act.setCoord(f.getCoord());
+						act.setFacilityId(f.getId());
 					}
 				}
 			}
@@ -298,6 +305,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 						ActivityFacilityImpl f = this.getFacility(coord1,coord2,radius,act.getType());
 						act.setCoord(f.getCoord());
+						act.setFacilityId(f.getId());
 					}
 				}
 			}
