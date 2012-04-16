@@ -1,0 +1,567 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PED12ScenarioGen.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.gregor.scenariogen;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
+import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+
+import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+
+
+public class PED12ScenarioGen {
+	
+	private static final double EPSILON = 0.0001;
+	private static GeometryFactory geofac = new GeometryFactory();
+	private static int nodeID = 0;
+	private static int linkID = 0;
+	
+	public static void main(String [] args) {
+		String scDir = "/Users/laemmel/devel/ped12_dobLaem/";
+		String inputDir = scDir + "/input/";
+
+		Config c = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(c);
+
+		createAndSaveEnvironment(inputDir);
+		
+		
+		createAnsSavePopulation(sc,inputDir);
+		
+		
+	}
+
+	private static void createAnsSavePopulation(Scenario sc, String inputDir) {
+		
+		NetworkImpl net = (NetworkImpl) sc.getNetwork();
+		//path from subway to mall entry
+		////stairs
+		//up VF,h = 0.610 m/s
+		createPedLink(-2.,1.,-2.,12.,0.61,true,4,net);
+		//down VF,h = 0.694 m/s
+		createPedLink(-2.,12.,-2.,1.,0.694,true,4,net);
+		
+		createPedLink(-2.,12.,-2.,22.,1.34,false,4,net);
+		createPedLink(-2.,22.,-45.5,22.,1.34,false,4,net);
+		
+		//parking lot
+		//1.row
+		createPedLink(-14.,19.,-14.,8.,1.34,false,4,net);
+		createPedLink(-18.,19.,-18.,8.,1.34,false,4,net);
+		createPedLink(-22.,19.,-22.,8.,1.34,false,4,net);
+		createPedLink(-26.,19.,-26.,8.,1.34,false,4,net);
+		createPedLink(-30.,19.,-30.,8.,1.34,false,4,net);
+		createPedLink(-34.,19.,-34.,8.,1.34,false,4,net);
+		createPedLink(-38.,19.,-38.,8.,1.34,false,4,net);
+		createPedLink(-42.,19.,-42.,8.,1.34,false,4,net);
+		//2. row
+		createPedLink(-14.,-4.,-14.,8.,1.34,false,4,net);
+		createPedLink(-18.,-4.,-18.,8.,1.34,false,4,net);
+		createPedLink(-22.,-4.,-22.,8.,1.34,false,4,net);
+		createPedLink(-26.,-4.,-26.,8.,1.34,false,4,net);
+		createPedLink(-30.,-4.,-30.,8.,1.34,false,4,net);
+		createPedLink(-34.,-4.,-34.,8.,1.34,false,4,net);
+		//connections
+		createPedLink(-14.,8.,-18.,8.,1.34,false,4,net);
+		createPedLink(-18.,8.,-22.,8.,1.34,false,4,net);
+		createPedLink(-22.,8.,-26.,8.,1.34,false,4,net);
+		createPedLink(-26.,8.,-30.,8.,1.34,false,4,net);
+		createPedLink(-30.,8.,-34.,8.,1.34,false,4,net);
+		createPedLink(-34.,8.,-38.,8.,1.34,false,4,net);
+		createPedLink(-38.,8.,-42.,8.,1.34,false,4,net);
+		createPedLink(-42.,8.,-45.5,8.,1.34,false,4,net);
+		//3. row
+		createPedLink(-14.,-6.,-14.,-18.,1.34,false,4,net);
+		createPedLink(-18.,-6.,-18.,-18.,1.34,false,4,net);
+		createPedLink(-22.,-6.,-22.,-18.,1.34,false,4,net);
+		createPedLink(-26.,-6.,-26.,-18.,1.34,false,4,net);
+		createPedLink(-30.,-6.,-30.,-18.,1.34,false,4,net);
+		createPedLink(-34.,-6.,-34.,-18.,1.34,false,4,net);
+		//4. row
+		createPedLink(-14.,-29.,-14.,-18.,1.34,false,4,net);
+		createPedLink(-18.,-29.,-18.,-18.,1.34,false,4,net);
+		createPedLink(-22.,-29.,-22.,-18.,1.34,false,4,net);
+		createPedLink(-26.,-29.,-26.,-18.,1.34,false,4,net);
+		createPedLink(-30.,-29.,-30.,-18.,1.34,false,4,net);
+		createPedLink(-34.,-29.,-34.,-18.,1.34,false,4,net);
+		//connections
+		createPedLink(-14.,-18.,-18.,-18.,1.34,false,4,net);
+		createPedLink(-18.,-18.,-22.,-18.,1.34,false,4,net);
+		createPedLink(-22.,-18.,-26.,-18.,1.34,false,4,net);
+		createPedLink(-26.,-18.,-30.,-18.,1.34,false,4,net);
+		createPedLink(-30.,-18.,-34.,-18.,1.34,false,4,net);
+		createPedLink(-34.,-18.,-45.5,-18.,1.34,false,4,net);
+		//5. row
+		createPedLink(-14.,-31.,-14.,-43.,1.34,false,4,net);
+		createPedLink(-18.,-31.,-18.,-43.,1.34,false,4,net);
+		createPedLink(-22.,-31.,-22.,-43.,1.34,false,4,net);
+		createPedLink(-26.,-31.,-26.,-43.,1.34,false,4,net);
+		createPedLink(-30.,-31.,-30.,-43.,1.34,false,4,net);
+		createPedLink(-34.,-31.,-34.,-43.,1.34,false,4,net);
+		//6. row
+		createPedLink(-14.,-54.,-14.,-43.,1.34,false,4,net);
+		createPedLink(-18.,-54.,-18.,-43.,1.34,false,4,net);
+		createPedLink(-22.,-54.,-22.,-43.,1.34,false,4,net);
+		createPedLink(-26.,-54.,-26.,-43.,1.34,false,4,net);
+		createPedLink(-30.,-54.,-30.,-43.,1.34,false,4,net);
+		createPedLink(-34.,-54.,-34.,-43.,1.34,false,4,net);
+		createPedLink(-38.,-54.,-38.,-43.,1.34,false,4,net);
+		createPedLink(-42.,-54.,-42.,-43.,1.34,false,4,net);
+		//connections
+		createPedLink(-14.,-43.,-18.,-43.,1.34,false,4,net);
+		createPedLink(-18.,-43.,-22.,-43.,1.34,false,4,net);
+		createPedLink(-22.,-43.,-26.,-43.,1.34,false,4,net);
+		createPedLink(-26.,-43.,-30.,-43.,1.34,false,4,net);
+		createPedLink(-30.,-43.,-34.,-43.,1.34,false,4,net);
+		createPedLink(-34.,-43.,-38.,-43.,1.34,false,4,net);
+		createPedLink(-38.,-43.,-42.,-43.,1.34,false,4,net);
+		createPedLink(-42.,-43.,-45.5,-43.,1.34,false,4,net);
+		//path parking lot entry mall
+		createPedLink(-45.5,-43.,-45.5,-18.,1.34,false,4,net);
+		createPedLink(-45.5,-18.,-45.5,8.,1.34,false,4,net);
+		createPedLink(-45.5,8.,-45.5,22.,1.34,false,4,net);
+		//into mall
+		createPedLink(-45.5,22.,-47.5,22.,1.34,false,4,net);
+		
+		//inside mall
+		
+		//in front of cash desks
+		createPedLink(-47.5,22.,-50,22.,1.34,false,2,net);
+		createPedLink(-50,22.,-52.5,22.,1.34,false,2,net);
+		createPedLink(-52.5,22.,-55,22.,1.34,false,2,net);
+		createPedLink(-55,22.,-57.5,22.,1.34,false,2,net);
+		createPedLink(-57.5,22.,-60.,22.,1.34,false,2,net);
+		createPedLink(-47.5,22.,-47.5,18.,1.34,false,2,net);
+		createPedLink(-50,22.,-50,18.,1.34,false,2,net);
+		createPedLink(-52.5,22.,-52.5,18.,1.34,false,2,net);
+		createPedLink(-55,22.,-55,18.,1.34,false,2,net);
+		createPedLink(-57.5,22.,-57.5,18.,1.34,false,2,net);
+		createPedLink(-60,22.,-60,18.,1.34,false,2,net);
+		
+		//cash desks
+		createPedCashDeskLink(-47.5,8.,-47.5,18.,1.34,true,.71,net);
+		createPedCashDeskLink(-50,8.,-50,18.,1.34,true,.71,net);
+		createPedCashDeskLink(-52.5,8.,-52.5,18.,1.34,true,.71,net);
+		createPedCashDeskLink(-55,8.,-55,18.,1.34,true,.71,net);
+		createPedCashDeskLink(-57.5,8.,-57.5,18.,1.34,true,.71,net);
+		createPedCashDeskLink(-60,8.,-60,18.,1.34,true,.71,net);
+		
+		//cash desks connectors
+		//1. col
+		createPedLink(-49,-1.,-47.5,8.,1.34,true,4,net);
+		createPedLink(-49,-1.,-50,8.,1.34,true,4,net);
+		createPedLink(-49,-1.,-52.5,8.,1.34,true,4,net);
+		createPedLink(-49,-1.,-55,8.,1.34,true,4,net);
+		createPedLink(-49,-1.,-57.5,8.,1.34,true,4,net);
+		createPedLink(-49,-1.,-60,8.,1.34,true,4,net);
+		//2. col
+		createPedLink(-60,-1.,-47.5,8.,1.34,true,4,net);
+		createPedLink(-60,-1.,-50,8.,1.34,true,4,net);
+		createPedLink(-60,-1.,-52.5,8.,1.34,true,4,net);
+		createPedLink(-60,-1.,-55,8.,1.34,true,4,net);
+		createPedLink(-60,-1.,-57.5,8.,1.34,true,4,net);
+		createPedLink(-60,-1.,-60,8.,1.34,true,4,net);
+		
+		//for debugging only
+		dumpNetworkAsShapeFile(sc,inputDir);
+		
+		new NetworkWriter(net).write(inputDir+"/network.xml");
+		
+	}
+	
+	
+	//pedestrian cash desk link 
+	private static void createPedCashDeskLink(double fromX, double fromY, double toX, double toY,
+			double v,boolean oneWay,double width,NetworkImpl net) {
+		
+		NetworkFactoryImpl nf = net.getFactory();
+		
+		CoordImpl from =  new CoordImpl(fromX, fromY);
+		CoordImpl to =  new CoordImpl(toX, toY);
+		double length = from.calcDistance(to);
+		
+		Node n0 = net.getNearestNode(from);
+		if (n0 == null || from.calcDistance(n0.getCoord()) > EPSILON) {
+			n0 = nf.createNode(new IdImpl(nodeID++), from);
+			net.addNode(n0);
+		}
+		
+		Node n1 = net.getNearestNode(to);
+		if (to.calcDistance(n1.getCoord()) > EPSILON) {
+			n1 = nf.createNode(new IdImpl(nodeID++), to);
+			net.addNode(n1);
+		}		
+		
+		double cap  = 1./20;//every 20 sec one persin
+		double lanes = 5.4*0.26 * width;
+		Link l = nf.createLink(new IdImpl(linkID++), n0, n1, net, length, v,cap , lanes);
+		net.addLink(l);
+		if (!oneWay) {
+			Link lr = nf.createLink(new IdImpl(linkID++), n1, n0, net, length, v,cap , lanes);
+			net.addLink(lr);	
+		}
+		
+	}
+
+	//pedestrian link 
+	private static void createPedLink(double fromX, double fromY, double toX, double toY,
+			double v,boolean oneWay,double width,NetworkImpl net) {
+		
+		NetworkFactoryImpl nf = net.getFactory();
+		
+		CoordImpl from =  new CoordImpl(fromX, fromY);
+		CoordImpl to =  new CoordImpl(toX, toY);
+		double length = from.calcDistance(to);
+		
+		Node n0 = net.getNearestNode(from);
+		if (n0 == null || from.calcDistance(n0.getCoord()) > EPSILON) {
+			n0 = nf.createNode(new IdImpl(nodeID++), from);
+			net.addNode(n0);
+		}
+		
+		Node n1 = net.getNearestNode(to);
+		if (to.calcDistance(n1.getCoord()) > EPSILON) {
+			n1 = nf.createNode(new IdImpl(nodeID++), to);
+			net.addNode(n1);
+		}		
+		
+		double cap  = width * 1.33;
+		double lanes = 5.4*0.26 * width;
+		Link l = nf.createLink(new IdImpl(linkID++), n0, n1, net, length, v,cap , lanes);
+		net.addLink(l);
+		if (!oneWay) {
+			Link lr = nf.createLink(new IdImpl(linkID++), n1, n0, net, length, v,cap , lanes);
+			net.addLink(lr);	
+		}
+		
+	}
+
+	private static void createAndSaveEnvironment(String inputDir) {
+		
+		
+		
+		//stairway boundary from subway station
+		List<Coordinate> stair = new ArrayList<Coordinate>();
+		stair.add(getC(0,12));
+		stair.add(getC(0,0));
+		stair.add(getC(-4,0));
+		stair.add(getC(-4,12));
+		crLs(stair,"stairway");
+		
+		//curbside
+		List<Coordinate> curbs = new ArrayList<Coordinate>();
+		curbs.add(getC(-4,12));
+		curbs.add(getC(-4,20));
+		crLs(curbs,"curbside01");
+		
+		//parking lot
+		List<Coordinate> parking = new ArrayList<Coordinate>();
+		parking.add(getC(-12,20));
+		parking.add(getC(-44,20));
+		crLs(parking,"parking01");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-44,20));
+		parking.add(getC(-44,12));
+		crLs(parking,"parking02");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-40,20));
+		parking.add(getC(-40,12));
+		crLs(parking,"parking03");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-36,20));
+		parking.add(getC(-36,12));
+		crLs(parking,"parking04");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-32,20));
+		parking.add(getC(-32,12));
+		crLs(parking,"parking05");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-28,20));
+		parking.add(getC(-28,12));
+		crLs(parking,"parking06");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-24,20));
+		parking.add(getC(-24,12));
+		crLs(parking,"parking07");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-20,20));
+		parking.add(getC(-20,12));
+		crLs(parking,"parking08");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-16,20));
+		parking.add(getC(-16,12));
+		crLs(parking,"parking09");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-12,20));
+		parking.add(getC(-12,12));
+		crLs(parking,"parking10");
+		
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-12,-5));
+		parking.add(getC(-36,-5));
+		crLs(parking,"parking11");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-12,3));
+		parking.add(getC(-12,-13));
+		crLs(parking,"parking12");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-16,3));
+		parking.add(getC(-16,-13));
+		crLs(parking,"parking13");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-20,3));
+		parking.add(getC(-20,-13));
+		crLs(parking,"parking14");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-24,3));
+		parking.add(getC(-24,-13));
+		crLs(parking,"parking15");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-28,3));
+		parking.add(getC(-28,-13));
+		crLs(parking,"parking16");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-32,3));
+		parking.add(getC(-32,-13));
+		crLs(parking,"parking17");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-36,3));
+		parking.add(getC(-36,-13));
+		crLs(parking,"parking18");
+		
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-12,-30));
+		parking.add(getC(-36,-30));
+		crLs(parking,"parking19");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-12,-22));
+		parking.add(getC(-12,-38));
+		crLs(parking,"parking20");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-16,-22));
+		parking.add(getC(-16,-38));
+		crLs(parking,"parking21");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-20,-22));
+		parking.add(getC(-20,-38));
+		crLs(parking,"parking22");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-24,-22));
+		parking.add(getC(-24,-38));
+		crLs(parking,"parking23");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-28,-22));
+		parking.add(getC(-28,-38));
+		crLs(parking,"parking24");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-32,-22));
+		parking.add(getC(-32,-38));
+		crLs(parking,"parking25");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-36,-22));
+		parking.add(getC(-36,-38));
+		crLs(parking,"parking26");
+		
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-12,-55));
+		parking.add(getC(-44,-55));
+		crLs(parking,"parking27");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-12,-55));
+		parking.add(getC(-12,-47));
+		crLs(parking,"parking28");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-16,-55));
+		parking.add(getC(-16,-47));
+		crLs(parking,"parking29");		
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-20,-55));
+		parking.add(getC(-20,-47));
+		crLs(parking,"parking30");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-24,-55));
+		parking.add(getC(-24,-47));
+		crLs(parking,"parking31");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-28,-55));
+		parking.add(getC(-28,-47));
+		crLs(parking,"parking32");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-32,-55));
+		parking.add(getC(-32,-47));
+		crLs(parking,"parking33");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-36,-55));
+		parking.add(getC(-36,-47));
+		crLs(parking,"parking34");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-40,-55));
+		parking.add(getC(-40,-47));
+		crLs(parking,"parking35");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-44,-55));
+		parking.add(getC(-44,-47));
+		crLs(parking,"parking36");
+		
+		//mall
+		List<Coordinate> mall = new ArrayList<Coordinate>();
+		mall.add(getC(-47,20));
+		mall.add(getC(-47,-44));
+		mall.add(getC(-87,-44));
+		mall.add(getC(-87,36));
+		mall.add(getC(-47,36));
+		mall.add(getC(-47,24));
+		crLs(mall,"mall01");
+		
+		//// cash desks
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-48,18));
+		mall.add(getC(-48,13));
+		mall.add(getC(-49.5,13));
+		mall.add(getC(-49.5,18));
+		mall.add(getC(-48,18));
+		crLs(mall,"counter01");
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-50.5,18));
+		mall.add(getC(-50.5,13));
+		mall.add(getC(-52,13));
+		mall.add(getC(-52,18));
+		mall.add(getC(-50.5,18));
+		crLs(mall,"counter02");		
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-53,18));
+		mall.add(getC(-53,13));
+		mall.add(getC(-54.5,13));
+		mall.add(getC(-54.5,18));
+		mall.add(getC(-53,18));
+		crLs(mall,"counter03");
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-55.5,18));
+		mall.add(getC(-55.5,13));
+		mall.add(getC(-57,13));
+		mall.add(getC(-57,18));
+		mall.add(getC(-55.5,18));
+		crLs(mall,"counter04");		
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-58,18));
+		mall.add(getC(-58,13));
+		mall.add(getC(-59.5,13));
+		mall.add(getC(-59.5,18));
+		mall.add(getC(-58,18));
+		crLs(mall,"counter05");
+		
+		/////walls
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-60.5,13));
+		mall.add(getC(-60.5,18));
+		mall.add(getC(-80,18));
+		crLs(mall,"wall01");
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-83,18));
+		mall.add(getC(-87,18));
+		crLs(mall,"wall02");
+		
+		//// shelfs
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-81,12));
+		mall.add(getC(-75,12));
+		mall.add(getC(-75,-10));
+		mall.add(getC(-81,-10));
+		mall.add(getC(-81,12));
+		crLs(mall,"shelf01");
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-81,-16));
+		mall.add(getC(-75,-16));
+		mall.add(getC(-75,-38));
+		mall.add(getC(-81,-38));
+		mall.add(getC(-81,-16));
+		crLs(mall,"shelf02");
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-69,12));
+		mall.add(getC(-63,12));
+		mall.add(getC(-63,-10));
+		mall.add(getC(-69,-10));
+		mall.add(getC(-69,12));
+		crLs(mall,"shelf03");
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-69,-16));
+		mall.add(getC(-63,-16));
+		mall.add(getC(-63,-38));
+		mall.add(getC(-69,-38));
+		mall.add(getC(-69,-16));
+		crLs(mall,"shelf04");
+		mall = new ArrayList<Coordinate>();
+		mall.add(getC(-57,-4));
+		mall.add(getC(-51,-4));
+		mall.add(getC(-51,-38));
+		mall.add(getC(-57,-38));
+		mall.add(getC(-57,-4));
+		crLs(mall,"shelf05");
+		
+		GisDebugger.dump(inputDir + "/environment.shp");
+		
+	}
+
+	private static void crLs(List<Coordinate> stair, String string) {
+		Coordinate [] coords = new Coordinate[stair.size()];
+		for (int i = 0; i < stair.size(); i++) {
+			coords[i] = stair.get(i);
+		}
+		
+		LineString ls = geofac.createLineString(coords);
+		GisDebugger.addGeometry(ls, string);
+		
+	}
+
+	private static Coordinate getC(double x, double y) {
+		return new Coordinate(x,y);
+	}
+	
+	private static void dumpNetworkAsShapeFile(Scenario sc, String inputDir) {
+		final Network network = sc.getNetwork();
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "EPSG: 32632");
+		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
+		builder.setWidthCoefficient(0.5);
+		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
+		new Links2ESRIShape(network,inputDir+"/links_ls.shp", builder).write();
+	}
+
+}
