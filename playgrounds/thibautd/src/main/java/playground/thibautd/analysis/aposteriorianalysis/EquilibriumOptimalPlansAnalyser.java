@@ -278,50 +278,37 @@ public class EquilibriumOptimalPlansAnalyser {
 			travelTimeRelativeImprovements =
 				calcTravelTimeRelativeImprovements( plans.values() );
 		}
-		writeDataset( filePath , travelTimeRelativeImprovements );
+		writeDataset( filePath , "ttImprovement" , travelTimeRelativeImprovements );
 	}
 
 	private static void writeDataset(
 			final String filePath,
+			final String fieldName,
 			final Map<Integer, List<Double>> dataset) {
 		BufferedWriter writer = IOUtils.getBufferedWriter( filePath );
 		Counter counter = new Counter( "Writing "+filePath+": line # " );
 
 		try {
-		// be sure we always order the keys the same way on each line.
-		List<Iterator<Double>> iterators = new ArrayList<Iterator<Double>>();
-		for ( Map.Entry<Integer, List<Double>> e : dataset.entrySet() ) {
-			writer.write(e.getKey() + FIELD_SEPARATOR );
-			iterators.add( e.getValue().iterator() );
-		}
-		writer.newLine();
+			writer.write( "cliqueSize"+FIELD_SEPARATOR+fieldName );
 
-		int line = 0;
-		while (existsNext( iterators )) {
-			counter.incCounter();
-			line++;
-			writer.write( line + FIELD_SEPARATOR );
-			for ( Iterator<Double> iterator : iterators) {
-				writer.write( iterator.hasNext() ?
-						iterator.next() + FIELD_SEPARATOR :
-						NO_VALUE + FIELD_SEPARATOR );
+			int line = 0;
+			for (Map.Entry<Integer, List<Double>> sizeInfo : dataset.entrySet()) {
+				int cliqueSize = sizeInfo.getKey();
+
+				for ( Double val : sizeInfo.getValue() ) {
+					line++;
+					writer.newLine();
+					counter.incCounter();
+					writer.write( line+FIELD_SEPARATOR+cliqueSize+FIELD_SEPARATOR+val );
+				}
 			}
-			writer.newLine();
-		}
-		counter.printCounter();
-		writer.close();
+			counter.printCounter();
+			writer.close();
 		}
 		catch (IOException e) {
 			// just print an error: do not block the next steps.
 			log.error( "problem while writing "+filePath , e );
 		}
-	}
-
-	private static boolean existsNext(final List<Iterator<Double>> iterators) {
-		for (Iterator i : iterators) {
-			if (i.hasNext()) return true;
-		}
-		return false;
 	}
 
 	private static Map<Integer, List<Double>> calcTravelTimeRelativeImprovements(
@@ -421,7 +408,7 @@ public class EquilibriumOptimalPlansAnalyser {
 			scoreImprovements =
 				calcScoreImprovements( plans.values() );
 		}
-		writeDataset( filePath , scoreImprovements );
+		writeDataset( filePath , "scoreImprovement" , scoreImprovements );
 	}
 
 	/**
@@ -577,9 +564,9 @@ public class EquilibriumOptimalPlansAnalyser {
 					plans.values());
 		}
 
-		writeDataset( filePathToggled, toggledScoresDataSet );
-		writeDataset( filePathUntoggled, untoggledScoresDataSet );
-		writeDataset( filePathIndividual, individualScoresDataSet );
+		writeDataset( filePathToggled, "agentScore" , toggledScoresDataSet );
+		writeDataset( filePathUntoggled, "agentScore" , untoggledScoresDataSet );
+		writeDataset( filePathIndividual, "agentScore" , individualScoresDataSet );
 	}
 
 	private static void formatCategoryChart(final JFreeChart chart) {
