@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.events.InfoEvent;
+import org.matsim.contrib.grips.io.GripsConfigDeserializer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -102,7 +103,24 @@ public class ScenarioGenerator {
 		log.info("loading config file");
 		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "loading config file");
 		this.em.processEvent(e);
-		this.c = ConfigUtils.loadConfig(this.configFile);
+		
+
+		try {
+			this.c = ConfigUtils.createConfig();
+			GripsConfigModule gcm = new GripsConfigModule("grips");
+			this.c.addModule("grips", gcm);
+			
+			this.c.global().setCoordinateSystem("EPSG:32633");
+			
+			GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
+			parser.readFile(this.configFile);
+		} catch(Exception ee) {
+			//TODO for backwards compatibility should be remove soon
+			log.warn("File is not a  grips config file. Guessing it is a common MATSim config file");
+			this.c = ConfigUtils.loadConfig(this.configFile);
+			
+		}
+
 		this.c.addSimulationConfigGroup(new SimulationConfigGroup());
 		this.c.global().setCoordinateSystem("EPSG:3395");
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
@@ -126,7 +144,7 @@ public class ScenarioGenerator {
 		e = new InfoEvent(System.currentTimeMillis(), "simulation config file");
 		this.em.processEvent(e);
 
-		
+
 
 		this.c.controler().setLastIteration(10);
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
@@ -140,7 +158,7 @@ public class ScenarioGenerator {
 		this.c.strategy().addParam("ModuleProbability_2", "0.9");
 
 		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir() + "/config.xml";
-		
+
 		new ConfigWriter(this.c).write(this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(), "scenario generation finished.");
 		this.em.processEvent(e);
@@ -164,7 +182,7 @@ public class ScenarioGenerator {
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,getGripsConfig(this.c).getOutputDir()+"/links_p.shp", builder).write();
-		
+
 	}
 
 	private void generateAndSaveNetworkChangeEvents(Scenario sc) {
@@ -225,21 +243,21 @@ public class ScenarioGenerator {
 		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
 		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", this.c.global().getCoordinateSystem());
 		OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, true);
-//				reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
-//				reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
-//		reader.setHighwayDefaults(2, "trunk",         2,  30.0/3.6, 1., 10000);
-//		reader.setHighwayDefaults(2, "trunk_link",    2,  30.0/3.6, 1.0, 10000);
-//		reader.setHighwayDefaults(3, "primary",       2,  30.0/3.6, 1.0, 10000);
-//		reader.setHighwayDefaults(3, "primary_link",  2,  30.0/3.6, 1.0, 10000);
-//		reader.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 5000);
-//		reader.setHighwayDefaults(5, "tertiary",      1,  30.0/3.6, 1.0,  5000);
-//		reader.setHighwayDefaults(6, "minor",         1,  30.0/3.6, 1.0,  5000);
-//		reader.setHighwayDefaults(6, "unclassified",  1,  30.0/3.6, 1.0,  5000);
-//		reader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  5000);
-//		reader.setHighwayDefaults(6, "living_street", 1,  30.0/3.6, 1.0,  5000);
-//		reader.setHighwayDefaults(6,"path",           1,  5.0/3.6, 1.0,  2500);
-//		reader.setHighwayDefaults(6,"cycleay",        1,  5.0/3.6, 1.0,  2500);
-//		reader.setHighwayDefaults(6,"footway",        1,  5.0/3.6, 1.0,  1000);
+		//				reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
+		//				reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
+		//		reader.setHighwayDefaults(2, "trunk",         2,  30.0/3.6, 1., 10000);
+		//		reader.setHighwayDefaults(2, "trunk_link",    2,  30.0/3.6, 1.0, 10000);
+		//		reader.setHighwayDefaults(3, "primary",       2,  30.0/3.6, 1.0, 10000);
+		//		reader.setHighwayDefaults(3, "primary_link",  2,  30.0/3.6, 1.0, 10000);
+		//		reader.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 5000);
+		//		reader.setHighwayDefaults(5, "tertiary",      1,  30.0/3.6, 1.0,  5000);
+		//		reader.setHighwayDefaults(6, "minor",         1,  30.0/3.6, 1.0,  5000);
+		//		reader.setHighwayDefaults(6, "unclassified",  1,  30.0/3.6, 1.0,  5000);
+		//		reader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  5000);
+		//		reader.setHighwayDefaults(6, "living_street", 1,  30.0/3.6, 1.0,  5000);
+		//		reader.setHighwayDefaults(6,"path",           1,  5.0/3.6, 1.0,  2500);
+		//		reader.setHighwayDefaults(6,"cycleay",        1,  5.0/3.6, 1.0,  2500);
+		//		reader.setHighwayDefaults(6,"footway",        1,  5.0/3.6, 1.0,  1000);
 		reader.setKeepPaths(true);
 		reader.parse(gripsNetworkFile);
 
@@ -291,12 +309,12 @@ public class ScenarioGenerator {
 	private void transform(Feature ft,
 			CoordinateReferenceSystem coordinateSystem) throws FactoryException, MismatchedDimensionException, TransformException, IllegalAttributeException {
 		CoordinateReferenceSystem target = CRS.decode(this.c.global().getCoordinateSystem(),true);
-		
+
 		MathTransform transform = CRS.findMathTransform(coordinateSystem, target,true);
 		Geometry geo = ft.getDefaultGeometry();
-		
+
 		ft.setDefaultGeometry(JTS.transform(geo, transform));
-		
+
 	}
 
 	public GripsConfigModule getGripsConfig() {
@@ -308,8 +326,8 @@ public class ScenarioGenerator {
 		this.c.getModules().put("grips", gcm);
 		return gcm;
 	}
-	
-	
+
+
 	@Deprecated //call this w/o parameter
 	public GripsConfigModule getGripsConfig(Config c) {
 
@@ -321,7 +339,7 @@ public class ScenarioGenerator {
 		c.getModules().put("grips", gcm);
 		return gcm;
 	}
-	
+
 	public String getPathToMatsimConfigXML() {
 		return this.matsimConfigFile;
 	}
