@@ -76,6 +76,7 @@ import com.vividsolutions.jts.geom.Point;
  *  
  *  improvements april'12
  *  - accessibility calculation uses configurable betas (coming from UrbanSim) for car/walk travel times, -distances and -costs
+ *  - replaced "SpatialGrid<Double>" by "SpatialGrid" using double instead of Double-objects
  * 
  * @author thomas
  * 
@@ -89,8 +90,8 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 	 */
 	public CellBasedAccessibilityControlerListenerV2(ZoneLayer<CounterObject> startZones, 						// needed for google earth plots (not supported by now tnicolai feb'12)
 													 AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
-													 SpatialGrid<Double> carGrid, 								// table for congested car travel times in accessibility computation
-													 SpatialGrid<Double> walkGrid, 								// table for walk travel times in accessibility computation
+													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
+													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
 													 String fileExtension,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
 													 Benchmark benchmark,										// Benchmark tool
 													 ScenarioImpl scenario){	

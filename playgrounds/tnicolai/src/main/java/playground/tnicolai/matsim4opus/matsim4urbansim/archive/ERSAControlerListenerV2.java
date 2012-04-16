@@ -39,13 +39,10 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
-import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGrid2KMZWriter;
-import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriterERSA_V2;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
@@ -63,9 +60,9 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 	private final int resolutionFeet;
 	private final int resolutionMeter;
 
-	private SpatialGrid<SquareLayer> travelTimeAccessibilityGrid;
-	private SpatialGrid<SquareLayer> travelCostAccessibilityGrid;
-	private SpatialGrid<SquareLayer> travelDistanceAccessibilityGrid;
+	private SpatialGridOld<SquareLayer> travelTimeAccessibilityGrid;
+	private SpatialGridOld<SquareLayer> travelCostAccessibilityGrid;
+	private SpatialGridOld<SquareLayer> travelDistanceAccessibilityGrid;
 
 	private final Map<Id, Double>travelTimeAccessibilityMap;
 	private final Map<Id, Double>travelCostAccessibilityMap;
@@ -228,9 +225,9 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 		log.info("Detected network size: MinX=" + xmin + " MinY=" + ymin + " MaxX=" + xmax + " MaxY=" + ymax );
 
 		// creating spatial grids, one for each accessibility measure ...
-		this.travelTimeAccessibilityGrid = new SpatialGrid<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
-		this.travelCostAccessibilityGrid = new SpatialGrid<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
-		this.travelDistanceAccessibilityGrid = new SpatialGrid<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
+		this.travelTimeAccessibilityGrid = new SpatialGridOld<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
+		this.travelCostAccessibilityGrid = new SpatialGridOld<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
+		this.travelDistanceAccessibilityGrid = new SpatialGridOld<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
 
 		GeometryFactory factory = new GeometryFactory();
 
@@ -350,7 +347,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 //		log.info("...done filling spatial grids!");
 //	}
 //
-//	private void fill(SpatialGrid<SquareLayer> grid, Map<Id, Double> map) {
+//	private void fill(SpatialGridOld<SquareLayer> grid, Map<Id, Double> map) {
 //		int rows = grid.getNumRows();
 //		int cols = grid.getNumCols(0);
 //		log.info("Grid Rows: " + rows + " Grid Columns: " +cols);

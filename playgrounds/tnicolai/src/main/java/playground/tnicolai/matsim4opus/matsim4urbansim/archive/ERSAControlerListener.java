@@ -46,7 +46,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
@@ -81,9 +80,9 @@ public class ERSAControlerListener implements ShutdownListener{
 	private AggregateObject2NearestNode[] jobClusterArray;
 	private ZoneLayer<KMZCellObject> startZones;
 	
-	private SpatialGrid<Double> travelTimeAccessibilityGrid;
-	private SpatialGrid<Double> travelCostAccessibilityGrid;
-	private SpatialGrid<Double> travelDistanceAccessibilityGrid;
+	private SpatialGridOld<Double> travelTimeAccessibilityGrid;
+	private SpatialGridOld<Double> travelCostAccessibilityGrid;
+	private SpatialGridOld<Double> travelDistanceAccessibilityGrid;
 	
 	private Benchmark benchmark;
 	
@@ -94,8 +93,8 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @param jobClusterMap
 	 */
 	ERSAControlerListener(ZoneLayer<KMZCellObject> startZones, AggregateObject2NearestNode[] jobClusterArray, 
-			SpatialGrid<Double> travelTimeAccessibilityGrid, SpatialGrid<Double> travelCostAccessibilityGrid, 
-			SpatialGrid<Double> travelDistanceAccessibilityGrid, Benchmark benchmark){
+			SpatialGridOld<Double> travelTimeAccessibilityGrid, SpatialGridOld<Double> travelCostAccessibilityGrid, 
+			SpatialGridOld<Double> travelDistanceAccessibilityGrid, Benchmark benchmark){
 		
 		assert ( startZones != null );
 		this.startZones			= startZones;	
@@ -413,13 +412,13 @@ public class ERSAControlerListener implements ShutdownListener{
 	AggregateObject2NearestNode[] getJobObjectMap(){
 		return jobClusterArray;
 	}
-	SpatialGrid<Double> getTravelTimeAccessibilityGrid(){
+	SpatialGridOld<Double> getTravelTimeAccessibilityGrid(){
 		return travelTimeAccessibilityGrid;
 	}
-	SpatialGrid<Double> getTravelCostAccessibilityGrid(){
+	SpatialGridOld<Double> getTravelCostAccessibilityGrid(){
 		return travelCostAccessibilityGrid;
 	}
-	SpatialGrid<Double> getTravelDistanceAccessibilityGrid(){
+	SpatialGridOld<Double> getTravelDistanceAccessibilityGrid(){
 		return travelDistanceAccessibilityGrid;
 	}
 	

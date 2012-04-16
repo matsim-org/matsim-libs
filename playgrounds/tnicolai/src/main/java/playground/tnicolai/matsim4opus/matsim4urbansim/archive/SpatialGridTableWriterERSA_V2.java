@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.utils.io.writer;
+package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
 public class SpatialGridTableWriterERSA_V2 {
@@ -22,9 +21,9 @@ public class SpatialGridTableWriterERSA_V2 {
 	private static final String MEAN_ACCESSIBILITY = "mean_accessibility";
 	private static final String DERIVATION_ACCESSIBILITY = "derivation_accessibility";
 	
-	public static void writeTableAndCSV(final SpatialGrid<SquareLayer> travelTimeAccessibilityGrid,
-										final SpatialGrid<SquareLayer> travelCostAccessibilityGrid,
-										final SpatialGrid<SquareLayer> travelDistanceAccessibilityGrid,
+	public static void writeTableAndCSV(final SpatialGridOld<SquareLayer> travelTimeAccessibilityGrid,
+										final SpatialGridOld<SquareLayer> travelCostAccessibilityGrid,
+										final SpatialGridOld<SquareLayer> travelDistanceAccessibilityGrid,
 										final Map<Id, Double>travelTimeAccessibilityMap,
 										final Map<Id, Double>travelCostAccessibilityMap,
 										final Map<Id, Double>travelDistanceAccessibilityMap,
@@ -67,9 +66,9 @@ public class SpatialGridTableWriterERSA_V2 {
 		log.info("... done writing spatial grid tables!");
 	}
 
-	private static void initSpatialGridsAndDumpCSV(final SpatialGrid<SquareLayer> travelTimeAccessibilityGrid,
-											final SpatialGrid<SquareLayer> travelCostAccessibilityGrid,
-											final SpatialGrid<SquareLayer> travelDistanceAccessibilityGrid,
+	private static void initSpatialGridsAndDumpCSV(final SpatialGridOld<SquareLayer> travelTimeAccessibilityGrid,
+											final SpatialGridOld<SquareLayer> travelCostAccessibilityGrid,
+											final SpatialGridOld<SquareLayer> travelDistanceAccessibilityGrid,
 											final Map<Id, Double>travelTimeAccessibilityMap,
 											final Map<Id, Double>travelCostAccessibilityMap,
 											final Map<Id, Double>travelDistanceAccessibilityMap) {
@@ -84,7 +83,7 @@ public class SpatialGridTableWriterERSA_V2 {
 		log.info("...done filling spatial grids!");
 	}
 
-	private static void initAndDump(final SpatialGrid<SquareLayer> grid, final Map<Id, Double> map, final String type) {
+	private static void initAndDump(final SpatialGridOld<SquareLayer> grid, final Map<Id, Double> map, final String type) {
 
 		try{
 			BufferedWriter csvWriter = IOUtils
@@ -137,7 +136,7 @@ public class SpatialGridTableWriterERSA_V2 {
 		}
 	}
 
-	private static void writeTable(final SpatialGrid<SquareLayer> grid, final String fileName) throws IOException {
+	private static void writeTable(final SpatialGridOld<SquareLayer> grid, final String fileName) throws IOException {
 
 		BufferedWriter layer1 = IOUtils.getBufferedWriter(fileName + "_Centroid" + Constants.FILE_TYPE_TXT);
 		BufferedWriter layer2 = IOUtils.getBufferedWriter(fileName + "_Interpolated" + Constants.FILE_TYPE_TXT);

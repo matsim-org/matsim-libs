@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.tnicolai.matsim4opus.utils.io.writer;
+package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
 
 import gnu.trove.TObjectDoubleHashMap;
 
@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.MyColorizer;
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.io.FeatureKMLWriter;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
@@ -41,9 +40,9 @@ public class SpatialGrid2KMZWriter {
 	private static final String MEAN = "mean";
 	private static final String DERIVATION = "derivation";
 
-	public static void writeKMZFiles(final SpatialGrid<SquareLayer> travelTimeAccessibilityGrid,
-									 final SpatialGrid<SquareLayer> travelCostAccessibilityGrid,
-									 final SpatialGrid<SquareLayer> travelDistanceAccessibilityGrid) {
+	public static void writeKMZFiles(final SpatialGridOld<SquareLayer> travelTimeAccessibilityGrid,
+									 final SpatialGridOld<SquareLayer> travelCostAccessibilityGrid,
+									 final SpatialGridOld<SquareLayer> travelDistanceAccessibilityGrid) {
 
 		log.info("Writing Google Erath files ...");
 
@@ -61,7 +60,7 @@ public class SpatialGrid2KMZWriter {
 		log.info("Done with writing Google Erath files ...");
 	}
 
-	private static void write(final SpatialGrid<SquareLayer> grid, final String type){
+	private static void write(final SpatialGridOld<SquareLayer> grid, final String type){
 
 		FeatureKMLWriter writerCentroid = new FeatureKMLWriter();
 		FeatureKMLWriter writerMean = new FeatureKMLWriter();

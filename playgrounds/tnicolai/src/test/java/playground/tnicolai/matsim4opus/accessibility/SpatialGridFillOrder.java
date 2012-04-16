@@ -40,7 +40,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import playground.tnicolai.matsim4opus.matsim4urbansim.archive.SpatialGridOld;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
@@ -57,7 +57,7 @@ public class SpatialGridFillOrder {
 	public static void main(final String[] args) {
 		NetworkImpl network = createNetwork();
 		AggregateObject2NearestNode[] dummyJobClusterArray = createWorkplaces(network);
-		SpatialGrid<Interpolation> grid = network2SpatialGrid(network);
+		SpatialGridOld<Interpolation> grid = network2SpatialGrid(network);
 		Map<Id, Double> resultMap = travelTimeAccessibility(network, dummyJobClusterArray);
 
 		// compute derivation ...
@@ -76,7 +76,7 @@ public class SpatialGridFillOrder {
 	/**
 	 * @param network
 	 */
-	private static SpatialGrid<Interpolation> network2SpatialGrid(final NetworkImpl network) {
+	private static SpatialGridOld<Interpolation> network2SpatialGrid(final NetworkImpl network) {
 		// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
 		double networkBoundingBox[] = NetworkUtils.getBoundingBox(network.getNodes().values());
 		double xmin = networkBoundingBox[0];
@@ -88,7 +88,7 @@ public class SpatialGridFillOrder {
 		int counter = 0;
 		GeometryFactory factory = new GeometryFactory();
 
-		SpatialGrid<Interpolation> grid = new SpatialGrid<Interpolation>(xmin, ymin, xmax, ymax, res);
+		SpatialGridOld<Interpolation> grid = new SpatialGridOld<Interpolation>(xmin, ymin, xmax, ymax, res);
 
 		Iterator<Node> nodeIterator = network.getNodes().values().iterator();
 

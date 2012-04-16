@@ -96,6 +96,7 @@ import com.vividsolutions.jts.geom.Point;
  *  - revised distance measure from centroid to network:
  *  	using orthogonal distance from centroid to nearest network link!
  *  - merged CellBasedAccessibilityNetworkControlerListener and CellBasedAccessibilityShapefileControlerListener
+ *  - replaced "SpatialGrid<Double>" by "SpatialGrid" using double instead of Double-objects
  *  
  * TODO: implement configurable betas for different accessibility measures based on different costs
  * beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts,
@@ -113,9 +114,9 @@ public class CellBasedAccessibilityControlerListener implements ShutdownListener
 	private AggregateObject2NearestNode[] aggregatedOpportunities;
 	private ZoneLayer<CounterObject> measuringPoints;
 	
-	private SpatialGrid<Double> congestedTravelTimeAccessibilityGrid;
-	private SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
-	private SpatialGrid<Double> walkTravelTimeAccessibilityGrid;
+	private SpatialGrid congestedTravelTimeAccessibilityGrid;
+	private SpatialGrid freespeedTravelTimeAccessibilityGrid;
+	private SpatialGrid walkTravelTimeAccessibilityGrid;
 	
 	private double walkSpeedMeterPerMin = -1;
 	
@@ -135,9 +136,9 @@ public class CellBasedAccessibilityControlerListener implements ShutdownListener
 	 */
 	public CellBasedAccessibilityControlerListener(ZoneLayer<CounterObject> measuringPoints, 				// needed for google earth plots (not supported by now tnicolai feb'12)
 			   									 AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations
-			   									 SpatialGrid<Double> congestedTravelTimeAccessibilityGrid, 	// table for congested car travel times in accessibility computation
-			   									 SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid,	// table for free-speed car travel times in accessibility computation
-			   									 SpatialGrid<Double> walkTravelTimeAccessibilityGrid, 		// table for walk travel times in accessibility computation
+			   									 SpatialGrid congestedTravelTimeAccessibilityGrid, 			// table for congested car travel times in accessibility computation
+			   									 SpatialGrid freespeedTravelTimeAccessibilityGrid,			// table for free-speed car travel times in accessibility computation
+			   									 SpatialGrid walkTravelTimeAccessibilityGrid, 				// table for walk travel times in accessibility computation
 			   									 String extention,											// this string indicates if the study area (boundary) is given by shape-file or network
 			   									 Benchmark benchmark){										// Benchmark tool
 		assert ( measuringPoints != null );

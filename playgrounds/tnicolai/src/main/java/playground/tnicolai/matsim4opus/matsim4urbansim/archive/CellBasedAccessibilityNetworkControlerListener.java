@@ -110,9 +110,9 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 	private AggregateObject2NearestNode[] aggregatedOpportunities;
 	private ZoneLayer<CounterObject> startZones;
 	
-	private SpatialGrid<Double> congestedTravelTimeAccessibilityGrid;
-	private SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
-	private SpatialGrid<Double> walkTravelTimeAccessibilityGrid;
+	private SpatialGrid congestedTravelTimeAccessibilityGrid;
+	private SpatialGrid freespeedTravelTimeAccessibilityGrid;
+	private SpatialGrid walkTravelTimeAccessibilityGrid;
 	
 	private double walkSpeedMeterPerMin = -1;
 	
@@ -132,9 +132,9 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 	 */
 	CellBasedAccessibilityNetworkControlerListener(ZoneLayer<CounterObject> startZones, 						// needed for google earth plots (not supported by now tnicolai feb'12)
 												   AggregateObject2NearestNode[] aggregatedOpportunities, 		// destinations
-												   SpatialGrid<Double> congestedTravelTimeAccessibilityGrid, 	// table for congested car travel times in accessibility computation
-												   SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid,	// table for freespeed car travel times in accessibility computation
-												   SpatialGrid<Double> walkTravelTimeAccessibilityGrid, 		// table for walk travel times in accessibility computation
+												   SpatialGrid congestedTravelTimeAccessibilityGrid, 	// table for congested car travel times in accessibility computation
+												   SpatialGrid freespeedTravelTimeAccessibilityGrid,	// table for freespeed car travel times in accessibility computation
+												   SpatialGrid walkTravelTimeAccessibilityGrid, 		// table for walk travel times in accessibility computation
 												   Benchmark benchmark){										// Benchmark tool
 		assert ( startZones != null );
 		this.startZones	= startZones;	

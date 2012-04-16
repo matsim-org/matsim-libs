@@ -207,8 +207,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		
 		// new method
 		if(computeCellBasedAccessibility){
-			SpatialGrid<Double> carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid<Double> walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
 			ZoneLayer<CounterObject>  measuringPoints;
 			String fileExtension;
 			
@@ -221,8 +221,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
 																			   nwBoundaryBox.getBoundingBox(),
 																			   srid);
-				carGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkGrid= new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
 				fileExtension = CellBasedAccessibilityControlerListenerV2.SHAPE_FILE;

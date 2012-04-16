@@ -114,8 +114,8 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 		
 		// new method
 		if(computeCellBasedAccessibility){
-			SpatialGrid<Double> carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid<Double> walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid carGrid;					// matrix for car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
 			ZoneLayer<CounterObject>  measuringPoints;
 			String fileExtension;
 			
@@ -128,8 +128,8 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
 																			   nwBoundaryBox.getBoundingBox(),
 																			   srid);
-				carGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkGrid= new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
 				fileExtension = CellBasedAccessibilityControlerListenerV2.SHAPE_FILE;
@@ -150,47 +150,48 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 																						 this.scenario));
 		}
 		
-//		// old method
-//		if(computeCellBasedAccessibility){
-//
-//			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid;
-//			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
-//			SpatialGrid<Double> walkTravelTimeAccessibilityGrid;
-//			ZoneLayer<CounterObject>  measuringPoints;
-//			String fileExtension;
-//			
-//			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
-//			if(aggregatedOpportunities == null)
-//				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
-//			
-//			if (computeCellBasedAccessibilitiesNetwork) {
-//				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;
-//				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
-//																			   nwBoundaryBox.getBoundingBox(),
-//																			   srid);
-//				congestedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//				freespeedTravelTimeAccessibilityGrid = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//				walkTravelTimeAccessibilityGrid		 = new SpatialGrid<Double>(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//			}
-//			else{
-//				fileExtension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
-//				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
-//				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
-//																				   boundary, 
-//																				   srid);
-//				congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//				freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//				walkTravelTimeAccessibilityGrid      = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//			} 
-//			
-//			controler.addControlerListener( new CellBasedAccessibilityControlerListener(measuringPoints, 
-//																							 aggregatedOpportunities,
-//																							 congestedTravelTimeAccessibilityGrid, 
-//																							 freespeedTravelTimeAccessibilityGrid, 
-//																							 walkTravelTimeAccessibilityGrid,
-//																							 fileExtension,
-//																							 benchmark) );
-//		}
+		// old method
+		//if(computeCellBasedAccessibility){
+		if(false){
+
+			SpatialGrid congestedTravelTimeAccessibilityGrid;
+			SpatialGrid freespeedTravelTimeAccessibilityGrid;
+			SpatialGrid walkTravelTimeAccessibilityGrid;
+			ZoneLayer<CounterObject>  measuringPoints;
+			String fileExtension;
+			
+			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
+			if(aggregatedOpportunities == null)
+				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
+			
+			if (computeCellBasedAccessibilitiesNetwork) {
+				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;
+				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
+																			   nwBoundaryBox.getBoundingBox(),
+																			   srid);
+				congestedTravelTimeAccessibilityGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				freespeedTravelTimeAccessibilityGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkTravelTimeAccessibilityGrid		 = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+			}
+			else{
+				fileExtension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
+				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
+				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
+																				   boundary, 
+																				   srid);
+				congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				walkTravelTimeAccessibilityGrid      = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+			} 
+			
+			controler.addControlerListener( new CellBasedAccessibilityControlerListener(measuringPoints, 
+																							 aggregatedOpportunities,
+																							 congestedTravelTimeAccessibilityGrid, 
+																							 freespeedTravelTimeAccessibilityGrid, 
+																							 walkTravelTimeAccessibilityGrid,
+																							 fileExtension,
+																							 benchmark) );
+		}
 	}
 	
 	/**

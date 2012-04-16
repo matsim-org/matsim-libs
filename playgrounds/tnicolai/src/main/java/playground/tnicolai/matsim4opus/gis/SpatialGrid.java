@@ -23,13 +23,13 @@
  */
 package playground.tnicolai.matsim4opus.gis;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.xml.sax.Attributes;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriter;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -37,11 +37,11 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  * @author thomas
  */
-public class SpatialGrid<T> {
+public class SpatialGrid{
 	
-	private static final Logger logger = Logger.getLogger(SpatialGrid.class);
+	private static final Logger log = Logger.getLogger(SpatialGrid.class);
 
-	private Object[][] matrix;
+	private double[][] matrix;
 	
 	private final double minX;
 	
@@ -61,7 +61,7 @@ public class SpatialGrid<T> {
 		this.resolution = resolution;
 		int numXBins = (int)Math.ceil((maxX - minX) / resolution) + 1;
 		int numYBins = (int)Math.ceil((maxY - minY) / resolution) + 1;
-		matrix = new Object[numYBins][numXBins];
+		matrix = new double[numYBins][numXBins];
 	}
 	
 	public SpatialGrid(double [] boundingBox, double resolution) {
@@ -73,10 +73,10 @@ public class SpatialGrid<T> {
 		this.resolution = resolution;
 		int numXBins = (int)Math.ceil((maxX - minX) / resolution) + 1;
 		int numYBins = (int)Math.ceil((maxY - minY) / resolution) + 1;
-		matrix = new Object[numYBins][numXBins];
+		matrix = new double[numYBins][numXBins];
 	}
 	
-	public SpatialGrid(SpatialGrid<?> grid) {
+	public SpatialGrid(SpatialGrid grid) {
 		this(grid.getXmin(), grid.getYmin(), grid.getXmax(), grid.getYmax(), grid.getResolution());
 	}
 	
@@ -107,20 +107,18 @@ public class SpatialGrid<T> {
 	public int getNumCols(int row) {
 		return matrix[row].length;
 	}
-	
-	@SuppressWarnings("unchecked")
-	public T getValue(Point point) {
+
+	public double getValue(Point point) {
 		if(isInBounds(point))
-			return (T)matrix[getRow(point.getY())][getColumn(point.getX())];
-		else{
-			System.out.println("This point lies outside the boundary!!!");
-			System.out.println("Boundary: xmin:"+this.minX+", ymin:"+ this.minY+", xmax:"+this.maxX+", maxy:"+this.maxY);
-			System.out.println("Point: x:"+point.getX()+ ", y:"+point.getY());
-			return null;
-		}
+			return matrix[getRow(point.getY())][getColumn(point.getX())];
+		
+		log.warn("This point lies outside the boundary!!!");
+		log.warn("Boundary: xmin:"+this.minX+", ymin:"+ this.minY+", xmax:"+this.maxX+", maxy:"+this.maxY);
+		log.warn("Point: x:"+point.getX()+ ", y:"+point.getY());
+		return Double.NaN;
 	}
 	
-	public boolean setValue(T value, Point point) {
+	public boolean setValue(double value, Point point) {
 		if(isInBounds(point)) {
 			matrix[getRow(point.getY())][getColumn(point.getX())] = value;
 			return true;
@@ -133,12 +131,11 @@ public class SpatialGrid<T> {
 				point.getY() >= minY && point.getY() <= maxY;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public T getValue(int row, int col) {
-		return (T)matrix[row][col];
+	public double getValue(int row, int col) {
+		return matrix[row][col];
 	}
 	
-	public boolean setValue(int row, int col, T value) {
+	public boolean setValue(int row, int col, double value) {
 		if(row < matrix.length) {
 			if(col < matrix[row].length) {
 				matrix[row][col] = value;
@@ -157,200 +154,97 @@ public class SpatialGrid<T> {
 		return (int)Math.floor((xCoord - minX) / resolution);
 	}
 	
-	public Object[][] getMatrix(){
+	public double[][] getMatrix(){
 		return matrix;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void toFile(String filename) {
-		toFile(filename, (ObjectSerializer<T>) new DoubleSerializer());
-	}
-	
-	public void toFile(String filename, ObjectSerializer<T> serializer) {
-		GridXMLWriter<T> writer = new GridXMLWriter<T>(serializer);
-		try {
-			writer.write(this, filename);
-		} catch (IOException e) {
-			logger.fatal("IOException occured!", e);
-		}
-	}
-	
-	public static SpatialGrid<Double> readFromFile(String filename) {
-		return readFromFile(filename, new DoubleSerializer());
-	}
-	
-	public static <V> SpatialGrid<V> readFromFile(String filename, ObjectSerializer<V> serializer) {
-		GridXMLParser<V> parser = new GridXMLParser<V>(serializer);
-		parser.setValidating(false);
-		try {
-			parser.parse(filename);
-			return parser.grid;
-		} catch (Exception e) {
-			logger.fatal("Exception during parsing occured!", e);
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	private static class GridXMLParser<V> extends MatsimXmlParser {
+	/**
+	 * creates a Spatial Grid and initializes it with the values from a given
+	 * file
+	 * 
+	 * @param filename
+	 * @return SpatialGrid
+	 */
+	public static SpatialGrid readFromFile(String filename){
+		
+		BufferedReader reader = IOUtils.getBufferedReader(filename);
+		String line;
+		SpatialGrid sg = null;
+		try{
+			sg = initSpatialGrid(filename);
+			// fill spatial grid
+			String[] header = reader.readLine().split(SpatialGridTableWriter.separator);
+			String[] parts;
+			double yCoord, xCoord, value;
+			
+			while((line = reader.readLine()) != null){
+				parts = line.split(SpatialGridTableWriter.separator);
+				
+				if( parts.length == header.length ){
+				
+					yCoord = Double.parseDouble(parts[0]);
 
-		public static final String GRID_TAG = "grid";
-		
-		public static final String CELL_TAG = "cell";
-		
-		public static final String XMIN_TAG = "xmin";
-		
-		public static final String XMAX_TAG = "xmax";
-		
-		public static final String YMIN_TAG = "ymin";
-		
-		public static final String YMAX_TAG = "ymax";
-		
-		public static final String RES_TAG = "resolution";
-		
-		public static final String ROW_TAG = "row";
-		
-		public static final String COL_TAG = "col";
-		
-		public static final String VALUE_TAG = "value";
-		
-		private SpatialGrid<V> grid;
-		
-		private ObjectSerializer<V> serializer;
-
-		public GridXMLParser(ObjectSerializer<V> serializer) {
-			super();
-			this.serializer = serializer;
-		}
-		
-		@Override
-		public void endTag(String name, String content, Stack<String> context) {
-		}
-
-		@Override
-		public void startTag(String name, Attributes atts, Stack<String> context) {
-			if(CELL_TAG.equalsIgnoreCase(name)) {
-				int row = (int)getDouble(atts, ROW_TAG);
-				int col = (int)getDouble(atts, COL_TAG);
-				String data = atts.getValue(VALUE_TAG);
-				if(data == null)
-					throw new IllegalArgumentException(VALUE_TAG + " must be specified");
-				else {
-					if(!grid.setValue(row, col, serializer.decode(data)))
-						logger.warn(String.format("Out of bounds! (row=%1$s, col=%2$s)",row, col));
-				}
-			} else if(GRID_TAG.equalsIgnoreCase(name)) {
-				if(grid != null) {
-					logger.fatal("Only one grid per file allowed!");
-					throw new UnsupportedOperationException("Only one grid per file allowed!");
-				} else {
-					double xmin = getDouble(atts, XMIN_TAG);
-					double xmax = getDouble(atts, XMAX_TAG);
-					double ymin = getDouble(atts, YMIN_TAG);
-					double ymax = getDouble(atts, YMAX_TAG);
-					double resolution = getDouble(atts, RES_TAG);
-					grid = new SpatialGrid<V>(xmin, ymin, xmax, ymax, resolution);
+					for(int i = 1; i < header.length; i++){
+						
+						xCoord = Double.parseDouble(header[i]);
+						value = Double.parseDouble(parts[i]);
+						
+						sg.setValue(sg.getRow(yCoord), sg.getColumn(xCoord), value);
+					}
 				}
 			}
+		} catch(IOException ioe){
+			ioe.printStackTrace();
 		}
-		
-		private double getDouble(Attributes atts, String qName) {
-			String val = atts.getValue(qName);
-			if(val == null)
-				throw new IllegalArgumentException(qName + " must be specified!");
-			else
-				return Double.parseDouble(val);
-		}
+		return sg;
 	}
 	
-	private static class GridXMLWriter<V> extends MatsimXmlWriter {
-		
-		private ObjectSerializer<V> serializer;
-		
-		public GridXMLWriter(ObjectSerializer<V> serializer) {
-			this.serializer = serializer;
-		}
-		
-		@SuppressWarnings("unchecked")
-		public void write(SpatialGrid<V> grid, String filename) throws IOException {
-			openFile(filename);
-			writeXmlHead();
-			
-			writer.write("<");
-			writer.write(GridXMLParser.GRID_TAG);
-			writer.write(" ");
-			writer.write(makeAttribute(GridXMLParser.XMIN_TAG, String.valueOf(grid.minX)));
-			writer.write(makeAttribute(GridXMLParser.YMIN_TAG, String.valueOf(grid.minY)));
-			writer.write(makeAttribute(GridXMLParser.XMAX_TAG, String.valueOf(grid.maxX)));
-			writer.write(makeAttribute(GridXMLParser.YMAX_TAG, String.valueOf(grid.maxY)));
-			writer.write(makeAttribute(GridXMLParser.RES_TAG, String.valueOf(grid.resolution)));
-			writer.write(">");
-			writer.write(NL);
-			
-			for(int row = 0; row < grid.matrix.length; row++) {
-				for(int col = 0; col < grid.matrix[row].length; col++) {
-					writer.write("\t<");
-					writer.write(GridXMLParser.CELL_TAG);
-					writer.write(" ");
-					writer.write(makeAttribute(GridXMLParser.ROW_TAG, String.valueOf(row)));
-					writer.write(makeAttribute(GridXMLParser.COL_TAG, String.valueOf(col)));
-					writer.write(makeAttribute(GridXMLParser.VALUE_TAG, serializer.encode((V) grid.matrix[row][col])));
-					writer.write("/>");
-					writer.write(NL);
+	/**
+	 * determines the boundary and resolution of the study area 
+	 * than this initializes and returns a Spatial Grid with these settings
+	 * @param filename
+	 * @return SpatialGrid
+	 * @throws IOException
+	 */
+	private static SpatialGrid initSpatialGrid(String filename) throws IOException {
+		BufferedReader reader = IOUtils.getBufferedReader(filename);
+		String line;
+		double xmin= 0.; 
+		double ymin= 0.; 
+		double xmax= 0.; 
+		double ymax= 0.;
+		double ytmp= 0.;
+		double res = 0.;
+
+		line = reader.readLine();
+		String[] header = line.split(SpatialGridTableWriter.separator);
+
+		if (header.length > 1) {
+			xmin = Double.parseDouble(header[1]);
+			xmax = Double.parseDouble(header[header.length - 1]);
+			res = (xmax - xmin) / (header.length - 2);
+
+			boolean firstLine = true;
+			while ((line = reader.readLine()) != null) {
+				ytmp = Double.parseDouble(line
+						.split(SpatialGridTableWriter.separator)[0]);
+				if (firstLine) {
+					ymin = ytmp;
+					firstLine = false;
 				}
 			}
-			
-			writer.write("</");
-			writer.write(GridXMLParser.GRID_TAG);
-			writer.write(">");
-			writer.close();
+			ymax = ytmp;
+
+			System.out.println(xmin + "," + ymin + "," + xmax + "," + ymax
+					+ "," + res);
+			SpatialGrid sg = new SpatialGrid(xmin, ymin, xmax, ymax, res);
+			return sg;
 		}
-		
-		private String makeAttribute(String qName, String value) {
-			StringBuilder builder = new StringBuilder(25);
-			builder.append(qName);
-			builder.append("=\"");
-			builder.append(value);
-			builder.append("\" ");
-			return builder.toString();
-		}
+		return null;
 	}
 	
-	public static interface ObjectSerializer<T> {
-
-		public String encode(T object);
-		
-		public T decode(String data);
-	}
-	
-	public static class DoubleSerializer implements ObjectSerializer<Double> {
-
-		public String encode(Double object) {
-			if(object == null)
-				return "0";
-			else
-				return String.valueOf(object);
-		}
-
-		public Double decode(String data) {
-			return new Double(data);
-		}
-
-	}
-	
-	public static class IntegerSerializer implements ObjectSerializer<Integer> {
-
-		public String encode(Integer object) {
-			if(object == null)
-				return "0";
-			else
-				return String.valueOf(object);
-		}
-
-		public Integer decode(String data) {		
-			return Integer.parseInt(data);
-		}
-
+	public void writeToFile(String filename){
+		GridUtils.writeSpatialGridTable(this, filename);
 	}
 	
 	/**
@@ -359,16 +253,8 @@ public class SpatialGrid<T> {
 	 */
 	public static void main(String args[]){
 		
-		SpatialGrid<Double> sg = new SpatialGrid<Double>(0, 0, 100, 100, 1);
-		
-		double counter = 0.;
-		for(int row = 0; row <= sg.maxY; row += sg.resolution){
-			for(int col = 0; col <= sg.maxX; col += sg.resolution){
-				sg.setValue(row, col, counter);
-				counter += 1.;
-			}
-		}
-		sg.toFile("/Users/thomas/Development/opus_home/matsim4opus/tmp/out.txt");
+		SpatialGrid test = SpatialGrid.readFromFile("/Users/thomas/Development/opus_home/matsim4opus/tmp/carAccessibility_cellsize_100.0SF.txt");
+		test.writeToFile("/Users/thomas/Development/opus_home/matsim4opus/tmp/carAccessibility_cellsize_100.0SF_TEST.txt");
 	}
 
 }

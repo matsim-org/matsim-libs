@@ -25,7 +25,7 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import playground.tnicolai.matsim4opus.matsim4urbansim.archive.SpatialGridOld;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
@@ -73,8 +73,8 @@ public class AccessibilityTest extends MatsimTestCase{
 		NetworkImpl network = createNetwork();
 		AggregateObject2NearestNode[] dummyJobClusterArray= createWorkplaces(network);
 		
-		SpatialGrid<InterpolationObjectV2> derivationGrid300 = constructDerivationGrid(network, dummyJobClusterArray, 300);
-		SpatialGrid<InterpolationObjectV2> derivationGrid700 = constructDerivationGrid(network, dummyJobClusterArray, 700);
+		SpatialGridOld<InterpolationObjectV2> derivationGrid300 = constructDerivationGrid(network, dummyJobClusterArray, 300);
+		SpatialGridOld<InterpolationObjectV2> derivationGrid700 = constructDerivationGrid(network, dummyJobClusterArray, 700);
 		
 		Assert.assertTrue( evaluateSpatialGrid( derivationGrid300 ) && 
 						   evaluateSpatialGrid(derivationGrid700) );
@@ -85,20 +85,20 @@ public class AccessibilityTest extends MatsimTestCase{
 	 * @param network
 	 * @param dummyJobClusterArray
 	 */
-	private SpatialGrid<InterpolationObjectV2> constructDerivationGrid(NetworkImpl network,
+	private SpatialGridOld<InterpolationObjectV2> constructDerivationGrid(NetworkImpl network,
 			AggregateObject2NearestNode[] dummyJobClusterArray, double resolution) {
 		Map<Id, Double> resultMap = travelTimeAccessibility(network, dummyJobClusterArray);
 		
 		NetworkBoundary nb = new NetworkBoundary(network);
 
-		SpatialGrid<InterpolationObjectV2> grid = new SpatialGrid<AccessibilityTest.InterpolationObjectV2>(nb.getXMin(), nb.getYMin(), nb.getXMax(), nb.getYMax(), resolution);
+		SpatialGridOld<InterpolationObjectV2> grid = new SpatialGridOld<AccessibilityTest.InterpolationObjectV2>(nb.getXMin(), nb.getYMin(), nb.getXMax(), nb.getYMax(), resolution);
 		initSpatialGrid(grid, network, resultMap, nb, resolution);
 		computeDerivation(grid, network, dummyJobClusterArray);
 
 		return grid;
 	} 
 	
-	private boolean initSpatialGrid(final SpatialGrid<InterpolationObjectV2> grid, final NetworkImpl network, 
+	private boolean initSpatialGrid(final SpatialGridOld<InterpolationObjectV2> grid, final NetworkImpl network, 
 									final Map<Id, Double> resultMap, final NetworkBoundary nb, final double resolution){
 		
 		List<Node> nodeList = new ArrayList<Node>(network.getNodes().values());
@@ -308,7 +308,7 @@ public class AccessibilityTest extends MatsimTestCase{
 	 * @param network
 	 * @param dummyJobClusterArray
 	 */
-	private void computeDerivation(final SpatialGrid<InterpolationObjectV2> grid,
+	private void computeDerivation(final SpatialGridOld<InterpolationObjectV2> grid,
 									final NetworkImpl network, 
 									final AggregateObject2NearestNode[] dummyJobClusterArray){
 		log.info("Computing travel time accessibility for each square ...");
@@ -412,7 +412,7 @@ public class AccessibilityTest extends MatsimTestCase{
 	 * @param grid
 	 * @return
 	 */
-	private boolean evaluateSpatialGrid(SpatialGrid<InterpolationObjectV2> grid){
+	private boolean evaluateSpatialGrid(SpatialGridOld<InterpolationObjectV2> grid){
 		boolean result = true;
 		
 		if(grid.getResolution() == 300){

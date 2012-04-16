@@ -319,20 +319,20 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 //		logger.info("Writing spatial grid tables ...");
 //		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 //		try {
-//			int ttID = benchmark.addMeasure("Writing TravelTime SpatialGrid-Table" , Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
+//			int ttID = benchmark.addMeasure("Writing TravelTime SpatialGridOld-Table" , Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
 //			sgTableWriter.write(myListener.getCarAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 //			benchmark.stoppMeasurement(ttID);
-//			logger.info("Writing TravelTime SpatialGrid-Table took " + benchmark.getDurationInSeconds(ttID) + " seconds.");
+//			logger.info("Writing TravelTime SpatialGridOld-Table took " + benchmark.getDurationInSeconds(ttID) + " seconds.");
 //			
 //			int tcID = benchmark.addMeasure("Writing TravelCostSpatialGrid-Table", Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
 //			sgTableWriter.write(myListener.getCustomAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 //			benchmark.stoppMeasurement(tcID);
-//			logger.info("Writing TravelCost SpatialGrid-Table took " + benchmark.getDurationInSeconds(tcID) + " seconds.");
+//			logger.info("Writing TravelCost SpatialGridOld-Table took " + benchmark.getDurationInSeconds(tcID) + " seconds.");
 //			
 //			int tdID = benchmark.addMeasure("Writing TravelDistanceSpatialGrid-Table", Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
 //			sgTableWriter.write(myListener.getWalkAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 //			benchmark.stoppMeasurement(tdID);
-//			logger.info("Writing TravelDistance SpatialGrid-Table took " + benchmark.getDurationInSeconds(tdID) + " seconds.");
+//			logger.info("Writing TravelDistance SpatialGridOld-Table took " + benchmark.getDurationInSeconds(tdID) + " seconds.");
 //			
 //		} catch (IOException e) {
 //			e.printStackTrace();
@@ -403,9 +403,9 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		benchmark.stoppMeasurement(szID);
 		logger.info("Creating Grid took " + benchmark.getDurationInSeconds(szID) + "seconds.");
 		
-		SpatialGrid<Double> travelTimeAccessibilityGrid = createSpatialGrid(boundary);
-		SpatialGrid<Double> travelCostAccessibilityGrid = createSpatialGrid(boundary);
-		SpatialGrid<Double> travelDistanceAccessibilityGrid = createSpatialGrid(boundary);
+		SpatialGrid travelTimeAccessibilityGrid = createSpatialGrid(boundary);
+		SpatialGrid travelCostAccessibilityGrid = createSpatialGrid(boundary);
+		SpatialGrid travelDistanceAccessibilityGrid = createSpatialGrid(boundary);
 		
 		// gather all workplaces
 		int jmID = benchmark.addMeasure("Creating Destinations (jobObjectMap)");
@@ -430,14 +430,14 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 	/**
 	 * @param boundary
 	 */
-	private SpatialGrid<Double> createSpatialGrid(Geometry boundary) {
+	private SpatialGrid createSpatialGrid(Geometry boundary) {
 		Envelope env = boundary.getEnvelopeInternal();
 		double xMin = env.getMinX();
 		double xMax = env.getMaxX();
 		double yMin = env.getMinY();
 		double yMax = env.getMaxY();
 		
-		return new SpatialGrid<Double>(xMin, yMin, xMax, yMax, gridSizeInFeet);
+		return new SpatialGrid(xMin, yMin, xMax, yMax, gridSizeInFeet);
 	}
 
 	/**

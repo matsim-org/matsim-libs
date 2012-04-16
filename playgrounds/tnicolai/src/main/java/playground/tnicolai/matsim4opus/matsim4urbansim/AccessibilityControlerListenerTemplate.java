@@ -28,8 +28,8 @@ public class AccessibilityControlerListenerTemplate{
 	protected AggregateObject2NearestNode[] aggregatedOpportunities;
 	
 	// storing the accessibility results
-	protected SpatialGrid<Double> carGrid;
-	protected SpatialGrid<Double> walkGrid;
+	protected SpatialGrid carGrid;
+	protected SpatialGrid walkGrid;
 	
 	// accessibility parameter
 	protected boolean useRawSum	= false;

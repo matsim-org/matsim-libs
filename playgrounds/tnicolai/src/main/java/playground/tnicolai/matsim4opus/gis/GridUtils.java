@@ -193,14 +193,14 @@ public class GridUtils {
 	/**
 	 * @param boundary
 	 */
-	public static SpatialGrid<Double> createSpatialGridByShapeBoundary(double gridSize, Geometry boundary) {
+	public static SpatialGrid createSpatialGridByShapeBoundary(double gridSize, Geometry boundary) {
 		Envelope env = boundary.getEnvelopeInternal();
 		double xMin = env.getMinX();
 		double xMax = env.getMaxX();
 		double yMin = env.getMinY();
 		double yMax = env.getMaxY();
 		
-		return new SpatialGrid<Double>(xMin, yMin, xMax, yMax, gridSize);
+		return new SpatialGrid(xMin, yMin, xMax, yMax, gridSize);
 	}
 
 	/**
@@ -208,7 +208,7 @@ public class GridUtils {
 	 * @param grid
 	 * @param fileName
 	 */
-	public static void writeSpatialGridTable(SpatialGrid<Double> grid, String fileName){
+	public static void writeSpatialGridTable(SpatialGrid grid, String fileName){
 		
 		log.info("Writing spatial grid table " + fileName + " ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
@@ -226,7 +226,7 @@ public class GridUtils {
 	 * @param grid
 	 * @param fileName
 	 */
-	public static void writeKMZFiles(ZoneLayer<CounterObject> measuringPoints, SpatialGrid<Double> grid, String fileName) {
+	public static void writeKMZFiles(ZoneLayer<CounterObject> measuringPoints, SpatialGrid grid, String fileName) {
 		log.info("Writing Google Erath file " + fileName + " ...");
 		
 		FeatureKMLWriter writer = new FeatureKMLWriter();
