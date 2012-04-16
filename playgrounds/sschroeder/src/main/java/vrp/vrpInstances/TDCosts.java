@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.basics.CostParams;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostParams;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Locations;
@@ -192,7 +192,7 @@ class TDCosts implements Costs {
 		}
 
 		@Override
-		public CostParams getCostParams() {
+		public CarrierCostParams getCostParams() {
 			return crowFly.getCostParams();
 		}
 

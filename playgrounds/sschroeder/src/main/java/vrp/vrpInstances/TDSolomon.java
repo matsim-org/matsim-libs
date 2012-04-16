@@ -215,7 +215,7 @@ public class TDSolomon {
 			if(t.getActivities().size() <= 2){
 				continue;
 			}
-			double earliestTourStartTime = t.getActivities().getFirst().getEarliestArrTime();
+			double earliestTourStartTime = t.getActivities().getFirst().getEarliestOperationStartTime();
 			String currentLocation = t.getActivities().getFirst().getLocationId();
 			double currentTime = earliestTourStartTime;
 			System.out.println("tourstart@"+currentLocation+"@"+currentTime);
@@ -230,7 +230,7 @@ public class TDSolomon {
 				System.out.println("on the road: " + transportationTime);
 				currentTime += transportationTime;
 				System.out.println("arrive@"+s.getToId()+"@"+currentTime);
-				System.out.println("planedArrival: " + thisActivity.getEarliestArrTime());
+				System.out.println("planedArrival: " + thisActivity.getEarliestOperationStartTime());
 				if(currentTime > s.getDeliveryTW().getEnd()){
 					System.out.println("WARN: arrived too late" + " currentTime=" + currentTime + " latestDeliverTime=" + s.getDeliveryTW().getEnd());
 				}
@@ -243,8 +243,8 @@ public class TDSolomon {
 				currentLocation = s.getToId();
 			}
 			currentTime += tdCosts.getTransportTime(currentLocation, t.getActivities().getLast().getLocationId(), currentTime);
-			if(currentTime > t.getActivities().getLast().getLatestArrTime()){
-				System.out.println("arrived too late. currentTime=" + currentTime + " latestArrTime=" + t.getActivities().getLast().getLatestArrTime());
+			if(currentTime > t.getActivities().getLast().getLatestOperationStartTime()){
+				System.out.println("arrived too late. currentTime=" + currentTime + " latestArrTime=" + t.getActivities().getLast().getLatestOperationStartTime());
 			}
 			System.out.println("tour finished successfully");
 			System.out.println("");

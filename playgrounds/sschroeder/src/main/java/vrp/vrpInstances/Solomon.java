@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.DistributionTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.PickupAndDeliveryTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
@@ -52,8 +51,6 @@ public class Solomon {
 		public Coordinate getCoord(String id) {
 			return locations.get(id);
 		}
-
-
 	}
 
 	private static Logger logger = Logger.getLogger(Christophides.class);
@@ -79,7 +76,7 @@ public class Solomon {
 	
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(Level.INFO);
-		Solomon solomon = new Solomon("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/cvrptw_solomon/nOfCust100/C103.txt", "100_C103");
+		Solomon solomon = new Solomon("/Users/schroeder/Documents/diss/instances/solomon_100/C101.txt", "100_C103");
 		solomon.run();
 
 	}
@@ -92,7 +89,7 @@ public class Solomon {
 		for(Job j : jobs){
 			vrpBuilder.addJob(j);
 		}
-		for(int i=0;i<40;i++){
+		for(int i=0;i<20;i++){
 			vrpBuilder.addVehicle(VrpUtils.createVehicle("" + (i+1), depotId, vehicleCapacity));
 		}
 		RuinAndRecreate algo = createAlgo(vrpBuilder.build());
@@ -102,12 +99,12 @@ public class Solomon {
 
 	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
 		RuinAndRecreateFactory factory = new DistributionTourWithTimeWindowsAlgoFactory();
-		factory.setIterations(1000);
-		factory.setWarmUp(100);
+		factory.setIterations(5000);
+		factory.setWarmUp(4000);
 		ChartListener chartListener = new ChartListener();
 		chartListener.setFilename("output/"+instanceName+".png");
 		RuinAndRecreateReport report = new RuinAndRecreateReport();
-		factory.addRuinAndRecreateListener(chartListener);
+//		factory.addRuinAndRecreateListener(chartListener);
 		factory.addRuinAndRecreateListener(report);
 		return factory.createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 	}
