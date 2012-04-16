@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Daganzo2012Run
+ * Daganzo2012SimpleAdaptiveRun
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,10 +21,9 @@ package playground.dgrether.daganzo2012;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -33,57 +32,56 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.signalsystems.model.SignalGroupState;
 
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
-import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
-import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
-import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public class Daganzo2012Run {
-
-	private static final String SEPARATOR = "\t";
-
+public class Daganzo2012SimpleAdaptiveRun {
 	private TTInOutflowEventHandler handler3;
 	private TTInOutflowEventHandler handler4;
-	private DgSignalGreenSplitHandler greenSplitHandler;
 	private String outfile;
 	private BufferedWriter writer;
-	private BufferedWriter splitWriter;
-	
-	public static void main(String[] args) {
-		String config = args[0];
-		new Daganzo2012Run().run(config);
-	}
+
 
 	private void run(String config) {
-		Controler controler = new Controler(config);
-		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
-		sylviaConfig.setSignalGroupMaxGreenScale(2.0);
-		sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(true);
-		controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(sylviaConfig));
+		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
-		addControlerListener(controler);
+		final SimpleAdaptiveControl adaptiveControl = new SimpleAdaptiveControl();
+		addControlerListener(controler, adaptiveControl);
+		final MobsimFactory mf = new QSimFactory();
+		
+		controler.setMobsimFactory(new MobsimFactory() {
+			private QSim mobsim;
+
+			@Override
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+				mobsim = (QSim) mf.createMobsim(sc, eventsManager);
+				mobsim.addMobsimEngine(adaptiveControl);
+				return mobsim;
+			}
+			
+		});
+		
 		controler.run();
 	}
 
-	private void addControlerListener(Controler c) {
+	private void addControlerListener(Controler c, final SimpleAdaptiveControl adaptiveControl) {
 		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
-		greenSplitHandler = new DgSignalGreenSplitHandler();
-		greenSplitHandler.addSignalSystem(new IdImpl("1"));
 		
 		c.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent e) {
+				e.getControler().getEvents().addHandler(adaptiveControl);
 				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);
 				outfile = e.getControler().getControlerIO().getOutputFilename("stats.txt");
@@ -95,21 +93,6 @@ public class Daganzo2012Run {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				
-				
-				//green splits
-				e.getControler().getEvents().addHandler(greenSplitHandler);
-				outfile = e.getControler().getControlerIO().getOutputFilename("splits.txt");
-				splitWriter = IOUtils.getBufferedWriter(outfile);
-				String splitHeader = DgGreenSplitWriter.createHeader();
-				splitHeader = "Iteration \t" + splitHeader;
-				try {
-					splitWriter.append(splitHeader);
-					splitWriter.newLine();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				
 			}
 		});
 
@@ -132,35 +115,6 @@ public class Daganzo2012Run {
 					e1.printStackTrace();
 				}
 				
-				
-				for (Id ssid : greenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
-					Map<Id, DgSignalGroupAnalysisData> signalGroupMap = greenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap();
-					for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGroupMap.entrySet()) {
-						// logg.info("for signalgroup: "+entry.getKey());
-						for (Entry<SignalGroupState, Double> ee : entry.getValue().getStateTimeMap().entrySet()) {
-							// logg.info(ee.getKey()+": "+ee.getValue());
-							StringBuilder line = new StringBuilder();
-							line.append(e.getIteration());
-							line.append(SEPARATOR);
-							line.append(ssid);
-							line.append(SEPARATOR);
-							line.append(entry.getKey());
-							line.append(SEPARATOR);
-							line.append(ee.getKey());
-							line.append(SEPARATOR);
-							line.append(ee.getValue());
-							try {
-								splitWriter.append(line.toString());
-								splitWriter.newLine();
-								splitWriter.flush();
-							} catch (IOException e1) {
-								e1.printStackTrace();
-							}
-						}
-					}
-				}
-				
-				
 			}
 		});
 		
@@ -169,13 +123,19 @@ public class Daganzo2012Run {
 				try {
 					writer.flush();
 					writer.close();
-					splitWriter.flush();
-					splitWriter.close();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		});
 	}
+
 	
+	
+	public static void main(String[] args) {
+		String config = args[0];
+		new Daganzo2012SimpleAdaptiveRun().run(config);
+	}
+
+
 }
