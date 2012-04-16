@@ -13,13 +13,13 @@ public class SpatialGrid4Interpolation {
 	// logger 
 	private static final Logger logger = Logger.getLogger(SpatialGrid4Interpolation.class);
 
-	private SpatialGrid<Double> spatialGrid = null;
+	private SpatialGrid spatialGrid = null;
 	private double gridSizeInMeter = 1.;
 	private double[] boundingBox = null;
 	
 	public SpatialGrid4Interpolation() {
 		this.boundingBox = initBoundingBox();
-		this.spatialGrid = new SpatialGrid<Double>(this.boundingBox, gridSizeInMeter);
+		this.spatialGrid = new SpatialGrid(this.boundingBox, gridSizeInMeter);
 		initTestSpatialGrid(this.spatialGrid);
 	}
 	
@@ -34,7 +34,7 @@ public class SpatialGrid4Interpolation {
 		return box;
 	}
 	
-	private void initTestSpatialGrid(final SpatialGrid<Double> spatialGrid){
+	private void initTestSpatialGrid(final SpatialGrid spatialGrid){
 		
 		int rows = spatialGrid.getNumRows();
 		int columns = spatialGrid.getNumCols(0);
@@ -50,7 +50,7 @@ public class SpatialGrid4Interpolation {
 		}
 	}
 	
-	public SpatialGrid<Double> getSpatialGrid(){
+	public SpatialGrid getSpatialGrid(){
 		return this.spatialGrid;
 	}
 
@@ -62,7 +62,7 @@ public class SpatialGrid4Interpolation {
 	public static void main(String args[]){
 		
 		SpatialGrid4Interpolation sg4i = new SpatialGrid4Interpolation();
-		SpatialGrid<Double> sg = sg4i.getSpatialGrid();
+		SpatialGrid sg = sg4i.getSpatialGrid();
 		
 		logger.info("The SpatialGrid looks like :");
 			
@@ -83,7 +83,7 @@ public class SpatialGrid4Interpolation {
 		logger.info("At coordinate x="+ center.getX() + " y="+ center.getY() + " the stored value is ="+ sg.getValue(center));
 		logger.info("At coordinate x="+ corner.getX() + " y="+ corner.getY() + " the stored value is ="+ sg.getValue(corner));
 
-		Object[][] test = sg.getMatrix();
+		double[][] test = sg.getMatrix();
 		logger.info("...done");
 	}
 }
