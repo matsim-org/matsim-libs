@@ -41,9 +41,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.anhorni.surprice.Surprice;
-import playground.balmermi.census2000.modules.PersonSetSecLoc;
+
 
 public class Merger {	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
@@ -100,7 +99,7 @@ public class Merger {
 				person.addPlan(plan);
 				((PersonImpl)person).setSelectedPlan(plan);				
 			}
-			log.info("Writing population with plans ...");
+			log.info("Writing population with plans ..." + outPath + "/" + dow + "/plans.xml.gz");
 			new File(outPath + "/" + dow + "/").mkdirs();
 			new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + dow + "/plans.xml.gz");
 		}	
@@ -148,6 +147,8 @@ public class Merger {
 		TreeMap<Double, PersonWeeks> workersNormalized = new TreeMap<Double, PersonWeeks>(java.util.Collections.reverseOrder());
 		TreeMap<Double, PersonWeeks> nonworkersNormalized = new TreeMap<Double, PersonWeeks>(java.util.Collections.reverseOrder());		
 		this.prepareForDrawing(workersNormalized, nonworkersNormalized);
+		
+		PersonSetSecondaryLocation secLocationAssigner = new PersonSetSecondaryLocation(this.scenario.getActivityFacilities());
 						
 		// assign chain (acts + times) ----------------
 		int counter = 0;
@@ -166,11 +167,12 @@ public class Merger {
 				personWeeksThurgau = this.chooseWeek(nonworkersNormalized);
 			}
 			PersonImpl person = (PersonImpl)p;			
-			this.createPlansForPerson(person, personWeeksThurgau);
+			this.createPlansForPerson(person, personWeeksThurgau, secLocationAssigner);
 		}				
 	}
 	
-	private void createPlansForPerson(PersonImpl person, PersonWeeks personWeeksThurgau) {
+	private void createPlansForPerson(PersonImpl person, PersonWeeks personWeeksThurgau, PersonSetSecondaryLocation secLocationAssigner) {
+				
 		// only one week to begin with
 		int week = 0;		
 		for (int dow = 0; dow < 7; dow++) {
@@ -205,8 +207,7 @@ public class Merger {
 				}
 			}
 			// assign shop, leisure and education locations according to Balmers neighborhood search
-//			PersonSetSecLoc secLocationAssigner = new PersonSetSecLoc(this.scenario.getActivityFacilities(), null);
-//			secLocationAssigner.run(person);
+			secLocationAssigner.run(person);
 			
 			if (this.personWeeksMZ.get(person.getId()) == null) {
 				this.personWeeksMZ.put(person.getId(), new PersonWeeks(person));
