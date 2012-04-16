@@ -2,7 +2,9 @@ package playground.tnicolai.matsim4opus.utils.misc;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -119,11 +121,13 @@ public class Shoot {
 		Random rnd = new Random();
 
 		Iterator<Feature> it = fts.getFeatures().iterator();
+		Map<Id, Feature> featureMap = new HashMap<Id, Feature>();
 		Point p;
 		while (it.hasNext()) {
 			
 			Feature feature = it.next();
 			id = (Long) feature.getAttribute("ZONE_ID");
+			featureMap.put(new IdImpl(id), feature);
 
 			for(int i = 0; i < 10; i++){ // creates 10 test shoots per zone
 				p = getRandomPointInFeature(rnd, feature);
@@ -131,6 +135,22 @@ public class Shoot {
 				writer.write(String.valueOf(id) + "," + String.valueOf(p.getX()) + "," + String.valueOf(p.getY()) + "," + String.valueOf(i));
 				writer.newLine();
 			}
+		}
+		
+		// testing
+		ReadFromUrbanSimModel readFromUrbanSim = new ReadFromUrbanSimModel(year);
+		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
+		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
+		readFromUrbanSim.readFacilitiesParcel(parcels, zones);	
+		
+		Iterator<ActivityFacility> zoneIterator = zones.getFacilities().values().iterator();
+		while(zoneIterator.hasNext()){
+			ActivityFacility zone = zoneIterator.next();
+			Feature f = featureMap.get( zone.getId() );
+			Id test = new IdImpl((Long)f.getAttribute("ZONE_ID"));
+			
+			if(zone.getId().compareTo(test) != 0)
+				System.out.println("Not equal zone:" + zone.getId() + ", feature:" + f.getAttribute("ZONE_ID"));
 		}
 	}
 	
