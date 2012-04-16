@@ -3,42 +3,30 @@ package org.matsim.contrib.freight.vrp.basics;
 public class CarrierCostParams implements CostParams {
 
 
-	private static double COST_PER_SECOND = 50.0/(60.0*60.0);
+	public final double transportCost_per_second;
 	
-	private static double COST_PER_METER = 1.0/1000.0;
+	public final double transportCost_per_meter;
 	
-	private static double COST_PER_SECONDTOOLATE = 1000.0/(60.0*60.0);
+	public final double waitingCost_per_second;
 	
-	private static double COST_PER_VEHICLE = 100.0;
+	public final double serviceCost_per_second;
 	
+	public final double penality_per_secondTooLate;
 	
-	@Override
-	public double getCostPerSecondTransport() {
-		return COST_PER_SECOND;
-	}
+	public final double cost_per_vehicle;
 
-	@Override
-	public double getCostPerMeter() {
-		return COST_PER_METER;
-	}
-
-	@Override
-	public double getCostPerSecondTooLate() {
-		return COST_PER_SECONDTOOLATE;
+	public CarrierCostParams(double transportCostPerSecond,
+			double transportCostPerMeter, double waitingCostPerSecond,
+			double serviceCostPerSecond, double penalityPerSecondTooLate,
+			double costPerVehicle) {
+		super();
+		transportCost_per_second = transportCostPerSecond;
+		transportCost_per_meter = transportCostPerMeter;
+		waitingCost_per_second = waitingCostPerSecond;
+		serviceCost_per_second = serviceCostPerSecond;
+		penality_per_secondTooLate = penalityPerSecondTooLate;
+		cost_per_vehicle = costPerVehicle;
 	}
 	
-	public double getCostPerVehicle(){
-		return COST_PER_VEHICLE;
-	}
-
-	@Override
-	public double getCostPerSecondWaiting() {
-		return COST_PER_SECOND;
-	}
-
-	@Override
-	public double getCostPerSecondService() {
-		return COST_PER_SECOND;
-	}
-
+	
 }

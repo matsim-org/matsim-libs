@@ -33,6 +33,6 @@ public interface Costs {
 
 	public Double getBackwardTransportTime(String fromId, String toId, double arrivalTime);
 
-	public CostParams getCostParams();
+	public CarrierCostParams getCostParams();
 	
 }

@@ -218,7 +218,7 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 					tourBuilder.scheduleDelivery(carrierShipment);
 				}
 				else if(act instanceof Start){
-					tourBuilder.scheduleStart(makeId(act.getLocationId()), act.getEarliestArrTime(), act.getLatestArrTime());
+					tourBuilder.scheduleStart(makeId(act.getLocationId()), act.getEarliestOperationStartTime(), act.getLatestOperationStartTime());
 				}
 				else if(act instanceof End){
 					tourBuilder.addLeg(new Leg());

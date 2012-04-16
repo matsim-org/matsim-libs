@@ -5,17 +5,17 @@ public interface TourActivity {
 	
 	public abstract String getLocationId();
 
-	public abstract void setEarliestArrTime(double early);
+	public abstract void setEarliestOperationStartTime(double early);
 
-	public abstract double getEarliestArrTime();
+	public abstract double getEarliestOperationStartTime();
 
-	public abstract double getLatestArrTime();
+	public abstract double getLatestOperationStartTime();
 
-	public abstract void setLatestArrTime(double late);
+	public abstract void setLatestOperationStartTime(double late);
 
 	public abstract String toString();
 	
-	public double getServiceTime();
+	public double getOperationTime();
 
 	public abstract String getType();
 	

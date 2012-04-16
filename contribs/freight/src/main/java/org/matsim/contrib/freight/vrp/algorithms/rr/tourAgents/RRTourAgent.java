@@ -23,9 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.basics.CostParams;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
+import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
+import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
@@ -82,38 +84,30 @@ public class RRTourAgent {
 	
 	private Vehicle vehicle;
 
-	private Tour tourOfLastOffer = null;
-	
-	private TourStatusProcessor activityStatusUpdater;
+	private TourStatusProcessor tourActivityStatusUpdater;
 
 	private boolean tourStatusOutOfSync = true;
 	
 	private Map<String, Job> jobs = new HashMap<String, Job>();
 	
-	private TourFactory tourFactory;
+	private CarrierCostFunction costFunction;
+
+	private OfferMaker offerMaker;
+
+	private OfferData lastOffer;
 	
-	private boolean active = false;
-	
-	private boolean keepScaling = false;
-	
-	public boolean scale = false;
-	
-	public boolean noFixedCosts = false;
-	
-	public double marginalCostScalingFactorForNewService = 1.0;
-	
-	public double fixCostsForService = 0.0;
-	
-	public CostParams costParams;
-	
-	public RRTourAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder, CostParams costParams) {
+	public void setOfferMaker(OfferMaker offerMaker) {
+		this.offerMaker = offerMaker;
+	}
+
+
+	public RRTourAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, CarrierCostFunction carrierCostFunction) {
 		super();
 		this.tour = tour;
-		this.tourFactory=tourBuilder;
-		this.activityStatusUpdater=tourStatusProcessor;
+		this.tourActivityStatusUpdater=tourStatusProcessor;
+		this.costFunction = carrierCostFunction;
 		this.vehicle = vehicle;
 		id = vehicle.getId();
-		this.costParams = costParams;
 		iniJobs();
 		syncTour();
 	}
@@ -135,14 +129,6 @@ public class RRTourAgent {
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#offerRejected(core.algorithms.ruinAndRecreate.RuinAndRecreate.Offer)
 	 */
 
-	public void offerRejected(Offer offer){
-		tourOfLastOffer = null;
-	}
-
-	/* (non-Javadoc)
-	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#getTotalCost()
-	 */
-
 	public double getTourCost(){
 		syncTour();
 		return cost(tour);
@@ -150,11 +136,10 @@ public class RRTourAgent {
 	
 	private double cost(Tour tour){
 		if(isActive(tour)){
-			double fix = costParams.getCostPerVehicle();
-			double waiting = tour.getCosts().waitingTime*costParams.getCostPerSecondWaiting();
-			double service = tour.getCosts().serviceTime*costParams.getCostPerSecondService();
-			double transportCosts = tour.getCosts().transportCosts;
-			return fix + waiting + service + transportCosts;
+			double cost = 0.0;
+			cost+=costFunction.costParams.cost_per_vehicle;
+			cost+=tour.getTourStats().transportCosts;
+			return cost;
 		}
 		else{
 			return 0.0;
@@ -167,91 +152,75 @@ public class RRTourAgent {
 	}
 
 	
-	@Override
-	public String toString() {
-		return tour.toString();
-	}
-
-
 	public Offer requestService(Job job, double bestKnownPrice) {
 		syncTour();
-		Tour newTour = tourFactory.createTour(vehicle, tour, job, bestKnownPrice);
-		if(newTour != null){
-			double marginalCosts = cost(newTour) - cost(tour);
-			double price;
-//			if(noFixedCosts){
-				price = marginalCosts;
-//			}
-//			else{
-//				price = marginalCosts + shareOfFixedCosts(job,newTour);
-//			}
-			 
-//			if(scale || !active || keepScaling){
-//				price = scale(marginalCosts);
-//				keepScaling = true;
-//			}
-			Offer offer = new Offer(this, price, marginalCosts);
-			tourOfLastOffer = newTour;
-			return offer;
-		}
-		else{
-			return null;
-		}
+		OfferData offerData = offerMaker.makeOffer(vehicle,tour,job,bestKnownPrice);
+		memorize(offerData);
+		return new Offer(this,offerData.offer.price,offerData.offer.price);
 	}
 
-	private double shareOfFixedCosts(Job job, Tour newTour) {
-		return (((Shipment)job).getSize()/newTour.costs.totalLoad)*costParams.getCostPerVehicle();
+	private void memorize(OfferData offerData) {
+		lastOffer = offerData;
 	}
-
-	private double scale(double marginalCosts) {
-		return marginalCosts*marginalCostScalingFactorForNewService;
-	}
-
-	private void syncTour() {
-		if(tourStatusOutOfSync){
-			tourStatusOutOfSync = false;
-			activityStatusUpdater.process(tour);
-			if(tour.getActivities().size()<=2){
-				active=false;
-			}
-			else{
-				active=true;
-			}
-		}
-	}
-
 
 	public void offerGranted(Job job) {
-		jobs.put(job.getId(), job);
-		if(tourOfLastOffer != null){
-			tour = tourOfLastOffer;
-			tourOfLastOffer = null;
+		if(lastOffer.metaData != null){
+			jobs.put(job.getId(), job);
+			insertJob(job);
+			tourActivityStatusUpdater.process(tour);
+			lastOffer = null;
 		}
 		else {
 			throw new IllegalStateException("cannot grant offer where no offer has been given");
 		}
 	}
 
-	public boolean hasJob(Job job) {
-		if(jobs.containsKey(job.getId())){
-			return true;
-		}
-		return false;
+	private void insertJob(Job job) {
+		Shipment shipment = (Shipment)job;
+		tour.getActivities().add(lastOffer.metaData.deliveryInsertionIndex, new Delivery(shipment));
+		tour.getActivities().add(lastOffer.metaData.pickupInsertionIndex, new Pickup(shipment));
 	}
 
-	public void removeJob(Job job) {
+	/* (non-Javadoc)
+	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#offerRejected(core.algorithms.ruinAndRecreate.RuinAndRecreate.Offer)
+	 */
+	
+	public void offerRejected(Offer offer){
+		lastOffer = null;
+	}
+
+	private void syncTour() {
+		if(tourStatusOutOfSync){
+			tourActivityStatusUpdater.process(tour);
+			tourStatusOutOfSync = false;
+		}
+	}
+
+	public boolean removeJob(Job job) {
 		if(jobs.containsKey(job.getId())){
+			int counter=0;
 			List<TourActivity> acts = new ArrayList<TourActivity>(tour.getActivities());
 			for(TourActivity c : acts){
 				if(c instanceof JobActivity){
 					if(job.getId().equals(((JobActivity) c).getJob().getId())){
 						tour.getActivities().remove(c);
+						counter++;
+						if(counter == 2){
+							break;
+						}
 					}
 				}
 			}
 			tourStatusOutOfSync = true;
 			jobs.remove(job.getId());
+			return true;
 		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return tour.toString();
 	}
 
 	public Vehicle getVehicle() {
@@ -259,8 +228,7 @@ public class RRTourAgent {
 	}
 	
 	private boolean isActive(Tour tour){
-//		syncTour();
-		return tour.getActivities().size()>2;
+		return !tour.isEmpty();
 	}
 	
 	public boolean isActive(){

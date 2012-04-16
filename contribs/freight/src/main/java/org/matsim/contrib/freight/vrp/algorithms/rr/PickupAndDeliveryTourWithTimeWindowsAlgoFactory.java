@@ -9,10 +9,9 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.AvgBeelineDistanceBetwe
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RadialRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RandomRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.SchrimpfsRRThresholdFunction;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryTourFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
 import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
@@ -48,8 +47,8 @@ public class PickupAndDeliveryTourWithTimeWindowsAlgoFactory implements RuinAndR
 	@Override
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution) {
 		TourCostAndTWProcessor tourCostProcessor = new TourCostAndTWProcessor(vrp.getCosts());
-		TourFactory tourFactory = new PickupAndDeliveryTourFactory(vrp.getCosts(), vrp.getGlobalConstraints(), tourCostProcessor);
-		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,tourFactory, vrp.getCosts().getCostParams());
+		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,
+				vrp.getCosts().getCostParams(), new PickupAndDeliveryOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints()));
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);

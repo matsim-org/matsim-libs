@@ -26,11 +26,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.BestInsertion;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryTourFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
 import org.matsim.contrib.freight.vrp.basics.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Tour;
@@ -59,11 +60,10 @@ public class InitialSolution implements InitialSolutionFactory {
 	private RRSolution createEmptySolution(VehicleRoutingProblem vrp) {
 		Collection<RRTourAgent> emptyTours = new ArrayList<RRTourAgent>();
 		TourStatusProcessor statusProcessor = new TourCostAndTWProcessor(vrp.getCosts());
-		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(statusProcessor, new PickupAndDeliveryTourFactory(vrp.getCosts(), 
-				vrp.getGlobalConstraints(), statusProcessor), vrp.getCosts().getCostParams());
+		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(statusProcessor, vrp.getCosts().getCostParams(), 
+				new DistributionOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints()));
 		for (Vehicle vehicle : vrp.getVehicles()) { 
 			RRTourAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory);
-			tourAgent.noFixedCosts = true;
 			emptyTours.add(tourAgent);
 		}
 		return new RRSolution(emptyTours);

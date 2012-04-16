@@ -23,11 +23,10 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryTourFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Costs;
@@ -72,7 +71,7 @@ public class VRPTestCase extends TestCase{
 	
 	public TourStatusProcessor tourStatusProcessor;
 	
-	public TourFactory tourFactory;
+//	public TourFactory tourFactory;
 	
 	
 	/*
@@ -100,7 +99,7 @@ public class VRPTestCase extends TestCase{
 		costs = new ManhattanCosts(locations);
 		constraints = new PickAndDeliveryCapacityAndTWConstraint();
 		tourStatusProcessor = new TourCostAndTWProcessor(costs);
-		tourFactory = new PickupAndDeliveryTourFactory(costs, constraints, tourStatusProcessor);
+//		tourFactory = new PickupAndDeliveryTourFactory(costs, constraints, tourStatusProcessor);
 	}
 
 	
@@ -136,7 +135,8 @@ public class VRPTestCase extends TestCase{
 	
 	protected RRTourAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
 		
-		return new RRTourAgentFactory(tourStatusProcessor, tourFactory, vrp.getCosts().getCostParams()).createTourAgent(tour1, vehicle);
+		return new RRTourAgentFactory(tourStatusProcessor, vrp.getCosts().getCostParams(), 
+				new DistributionOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints())).createTourAgent(tour1, vehicle);
 	}
 	
 	private Coordinate makeCoord(int i, int j) {

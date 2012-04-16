@@ -155,6 +155,7 @@ public class RuinAndRecreate {
 		thresholdFunction.setNofIterations(nOfMutations);
 		thresholdFunction.setInitialThreshold(initialThreshold);
 		
+		
 	}
 
 	private void ruinAndRecreate(RRSolution solution, double upperBound) {
@@ -168,14 +169,16 @@ public class RuinAndRecreate {
 			return;
 		}
 		logger.info("random walk for threshold determination");
-		RRSolution initialSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
+		RRSolution lastSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
 		resetIterations();
 		double[] results = new double[nOfIterations];
 		for(int i=0;i<nOfIterations;i++){
 			printNoIteration(i);
-			ruinAndRecreate(initialSolution, Double.MAX_VALUE);
-			double result = initialSolution.getResult();
+			RRSolution currentSolution = VrpUtils.copySolution(lastSolution, vrp, tourAgentFactory);
+			ruinAndRecreate(currentSolution, Double.MAX_VALUE);
+			double result = currentSolution.getResult();
 			results[i]=result;
+			lastSolution = currentSolution;
 		}
 		StandardDeviation dev = new StandardDeviation();
 		double standardDeviation = dev.evaluate(results);

@@ -12,7 +12,7 @@ import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
 import org.matsim.contrib.freight.vrp.constraints.Constraints;
 import org.matsim.core.utils.misc.Counter;
 
-public class TDDistributionTourFactory implements TourFactory{
+public class TDDistributionTourFactory {
 	
 	private static Logger logger = Logger.getLogger(TDDistributionTourFactory.class);
 	
@@ -24,6 +24,7 @@ public class TDDistributionTourFactory implements TourFactory{
 	
 	private Counter buildTourCounter;
 
+	@Deprecated
 	public TDDistributionTourFactory(Costs costs, Constraints constraints, TourStatusProcessor tourActivityUpdater) {
 		super();
 		this.costs = costs;
@@ -77,11 +78,11 @@ public class TDDistributionTourFactory implements TourFactory{
 	}
 	
 	private boolean localConstraintsMet(TourActivity prevAct, TourActivity nextAct, Delivery newAct) {
-		double earliestDepTimeAtPrevAct = prevAct.getEarliestArrTime() + prevAct.getServiceTime();
+		double earliestDepTimeAtPrevAct = prevAct.getEarliestOperationStartTime() + prevAct.getOperationTime();
 		double tt_prevAct2newAct = getTravelTime(prevAct.getLocationId(), newAct.getLocationId(), earliestDepTimeAtPrevAct);
 		
 		double earliestArrTimeAtNewAct = earliestDepTimeAtPrevAct + tt_prevAct2newAct;
-		double earliestDepTimeAtNewAct = earliestArrTimeAtNewAct + newAct.getServiceTime();
+		double earliestDepTimeAtNewAct = earliestArrTimeAtNewAct + newAct.getOperationTime();
 		double tt_newAct2nextAct = getTravelTime(newAct.getLocationId(),nextAct.getLocationId(),earliestDepTimeAtNewAct);
 		double earliestArrTimeAtNextAct = earliestDepTimeAtNewAct + tt_newAct2nextAct;
 		
@@ -90,28 +91,28 @@ public class TDDistributionTourFactory implements TourFactory{
 //			getGeneralizedCosts(newAct.getLocationId(), nextAct.getLocationId(), earliestDepTimeAtNewAct) -
 //			getGeneralizedCosts(prevAct.getLocationId(), nextAct.getLocationId(), earliestDepTimeAtPrevAct);
 //		//preCheck whether time-constraints are met
-		if(earliestArrTimeAtNewAct > newAct.getLatestArrTime() || earliestArrTimeAtNextAct > nextAct.getLatestArrTime()){
+		if(earliestArrTimeAtNewAct > newAct.getLatestOperationStartTime() || earliestArrTimeAtNextAct > nextAct.getLatestOperationStartTime()){
 			return false;
 		}
 				
-		double latestArrTimeAtNewAct = nextAct.getLatestArrTime() - newAct.getServiceTime() - 
-			getBackwardTravelTime(newAct.getLocationId(),nextAct.getLocationId(),nextAct.getLatestArrTime());
+		double latestArrTimeAtNewAct = nextAct.getLatestOperationStartTime() - newAct.getOperationTime() - 
+			getBackwardTravelTime(newAct.getLocationId(),nextAct.getLocationId(),nextAct.getLatestOperationStartTime());
 		
-		double latestArrTimeAtPrevAct = newAct.getLatestArrTime() - prevAct.getServiceTime() - 
-			getBackwardTravelTime(prevAct.getLocationId(),newAct.getLocationId(), newAct.getLatestArrTime());
+		double latestArrTimeAtPrevAct = newAct.getLatestOperationStartTime() - prevAct.getOperationTime() - 
+			getBackwardTravelTime(prevAct.getLocationId(),newAct.getLocationId(), newAct.getLatestOperationStartTime());
 		
-		if(latestArrTimeAtNewAct < newAct.getEarliestArrTime() || latestArrTimeAtPrevAct < prevAct.getEarliestArrTime()){
+		if(latestArrTimeAtNewAct < newAct.getEarliestOperationStartTime() || latestArrTimeAtPrevAct < prevAct.getEarliestOperationStartTime()){
 			return false;
 		}
 		return true;
 	}
 
 	private double getTotalMarginalInsertionCosts(TourActivity prevAct, TourActivity nextAct, TourActivity newAct) {
-		double earliestDepTimeAtPrevAct = prevAct.getEarliestArrTime() + prevAct.getServiceTime();
+		double earliestDepTimeAtPrevAct = prevAct.getEarliestOperationStartTime() + prevAct.getOperationTime();
 		double tt_prevAct2newAct = getTravelTime(prevAct.getLocationId(), newAct.getLocationId(), earliestDepTimeAtPrevAct);
 		
 		double earliestArrTimeAtNewAct = earliestDepTimeAtPrevAct + tt_prevAct2newAct;
-		double earliestDepTimeAtNewAct = earliestArrTimeAtNewAct + newAct.getServiceTime();
+		double earliestDepTimeAtNewAct = earliestArrTimeAtNewAct + newAct.getOperationTime();
 		double tt_newAct2nextAct = getTravelTime(newAct.getLocationId(),nextAct.getLocationId(),earliestDepTimeAtNewAct);
 		double earliestArrTimeAtNextAct = earliestDepTimeAtNewAct + tt_newAct2nextAct;
 		
@@ -120,17 +121,17 @@ public class TDDistributionTourFactory implements TourFactory{
 			getGeneralizedCosts(newAct.getLocationId(), nextAct.getLocationId(), earliestDepTimeAtNewAct) -
 			getGeneralizedCosts(prevAct.getLocationId(), nextAct.getLocationId(), earliestDepTimeAtPrevAct);
 		//preCheck whether time-constraints are met
-		if(earliestArrTimeAtNewAct > newAct.getLatestArrTime() || earliestArrTimeAtNextAct > nextAct.getLatestArrTime()){
+		if(earliestArrTimeAtNewAct > newAct.getLatestOperationStartTime() || earliestArrTimeAtNextAct > nextAct.getLatestOperationStartTime()){
 			return Double.MAX_VALUE;
 		}
 				
-		double latestArrTimeAtNewAct = nextAct.getLatestArrTime() - newAct.getServiceTime() - 
-			getBackwardTravelTime(newAct.getLocationId(),nextAct.getLocationId(),nextAct.getLatestArrTime());
+		double latestArrTimeAtNewAct = nextAct.getLatestOperationStartTime() - newAct.getOperationTime() - 
+			getBackwardTravelTime(newAct.getLocationId(),nextAct.getLocationId(),nextAct.getLatestOperationStartTime());
 		
-		double latestArrTimeAtPrevAct = newAct.getLatestArrTime() - prevAct.getServiceTime() - 
-			getBackwardTravelTime(prevAct.getLocationId(),newAct.getLocationId(), newAct.getLatestArrTime());
+		double latestArrTimeAtPrevAct = newAct.getLatestOperationStartTime() - prevAct.getOperationTime() - 
+			getBackwardTravelTime(prevAct.getLocationId(),newAct.getLocationId(), newAct.getLatestOperationStartTime());
 		
-		if(latestArrTimeAtNewAct < newAct.getEarliestArrTime() || latestArrTimeAtPrevAct < prevAct.getEarliestArrTime()){
+		if(latestArrTimeAtNewAct < newAct.getEarliestOperationStartTime() || latestArrTimeAtPrevAct < prevAct.getEarliestOperationStartTime()){
 			return Double.MAX_VALUE;
 		}
 		
@@ -140,11 +141,11 @@ public class TDDistributionTourFactory implements TourFactory{
 
 
 	private double getMarginalInsertionCosts(TourActivity prevAct, TourActivity nextAct, TourActivity newAct) {
-		double earliestDepTimeAtPrevAct = prevAct.getEarliestArrTime() + prevAct.getServiceTime();
+		double earliestDepTimeAtPrevAct = prevAct.getEarliestOperationStartTime() + prevAct.getOperationTime();
 		double tt_prevAct2newAct = getTravelTime(prevAct.getLocationId(), newAct.getLocationId(), earliestDepTimeAtPrevAct);
 		
 		double earliestArrTimeAtNewAct = earliestDepTimeAtPrevAct + tt_prevAct2newAct;
-		double earliestDepTimeAtNewAct = earliestArrTimeAtNewAct + newAct.getServiceTime();
+		double earliestDepTimeAtNewAct = earliestArrTimeAtNewAct + newAct.getOperationTime();
 		double tt_newAct2nextAct = getTravelTime(newAct.getLocationId(),nextAct.getLocationId(),earliestDepTimeAtNewAct);
 		double earliestArrTimeAtNextAct = earliestDepTimeAtNewAct + tt_newAct2nextAct;
 		
@@ -153,17 +154,17 @@ public class TDDistributionTourFactory implements TourFactory{
 			getGeneralizedCosts(newAct.getLocationId(), nextAct.getLocationId(), earliestDepTimeAtNewAct) -
 			getGeneralizedCosts(prevAct.getLocationId(), nextAct.getLocationId(), earliestDepTimeAtPrevAct);
 		//preCheck whether time-constraints are met
-		if(earliestArrTimeAtNewAct > newAct.getLatestArrTime() || earliestArrTimeAtNextAct > nextAct.getLatestArrTime()){
+		if(earliestArrTimeAtNewAct > newAct.getLatestOperationStartTime() || earliestArrTimeAtNextAct > nextAct.getLatestOperationStartTime()){
 			return Double.MAX_VALUE;
 		}
 				
-		double latestArrTimeAtNewAct = nextAct.getLatestArrTime() - newAct.getServiceTime() - 
-			getBackwardTravelTime(newAct.getLocationId(),nextAct.getLocationId(),nextAct.getLatestArrTime());
+		double latestArrTimeAtNewAct = nextAct.getLatestOperationStartTime() - newAct.getOperationTime() - 
+			getBackwardTravelTime(newAct.getLocationId(),nextAct.getLocationId(),nextAct.getLatestOperationStartTime());
 		
-		double latestArrTimeAtPrevAct = newAct.getLatestArrTime() - prevAct.getServiceTime() - 
-			getBackwardTravelTime(prevAct.getLocationId(),newAct.getLocationId(), newAct.getLatestArrTime());
+		double latestArrTimeAtPrevAct = newAct.getLatestOperationStartTime() - prevAct.getOperationTime() - 
+			getBackwardTravelTime(prevAct.getLocationId(),newAct.getLocationId(), newAct.getLatestOperationStartTime());
 		
-		if(latestArrTimeAtNewAct < newAct.getEarliestArrTime() || latestArrTimeAtPrevAct < prevAct.getEarliestArrTime()){
+		if(latestArrTimeAtNewAct < newAct.getEarliestOperationStartTime() || latestArrTimeAtPrevAct < prevAct.getEarliestOperationStartTime()){
 			return Double.MAX_VALUE;
 		}
 		return marginalCost;

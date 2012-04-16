@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
@@ -36,6 +38,28 @@ public class RadialRuin implements RuinStrategy{
 			return distance;
 		}
 	}
+	
+	public class RuinWorker implements Callable<Boolean>{
+
+		RRTourAgent agent;
+		List<Job> unassignedJobs;
+		
+		public RuinWorker(RRTourAgent agent, List<Job> unassignedJobs) {
+			super();
+			this.agent = agent;
+			this.unassignedJobs = unassignedJobs;
+		}
+
+		@Override
+		public Boolean call() throws Exception {
+			for(Job j : unassignedJobs){
+				agent.removeJob(j);
+			}
+			return true;
+		}
+		
+	}
+
 	
 	private Logger logger = Logger.getLogger(RadialRuin.class);
 	
@@ -106,13 +130,18 @@ public class RadialRuin implements RuinStrategy{
 		while(descendingIterator.hasNext() && counter<nOfJobs2BeRemoved){
 			ReferencedJob refJob = descendingIterator.next();
 			Job job = refJob.getJob();
-			for(RRTourAgent agent : initialSolution.getTourAgents()){
-				if(agent.hasJob(job)){
-					agent.removeJob(job);
-					unassignedJobs.add(job);
-				}
-			}
+			unassignedJobs.add(job);
+			agentsRemove(initialSolution.getTourAgents(),job);
 			counter++;
+		}
+	}
+	
+
+	private void agentsRemove(Collection<RRTourAgent> agents, Job job) {
+		for(RRTourAgent a : agents){
+			if(a.removeJob(job)){
+				return;
+			}
 		}
 	}
 

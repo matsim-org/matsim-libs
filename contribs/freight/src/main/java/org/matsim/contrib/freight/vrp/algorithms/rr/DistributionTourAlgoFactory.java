@@ -9,10 +9,10 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.AvgDistanceBetweenJobs;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RadialRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RandomRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.SchrimpfsRRThresholdFunction;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionTourFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostProcessor;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
 import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
@@ -25,7 +25,7 @@ public class DistributionTourAlgoFactory implements RuinAndRecreateFactory {
 
 	private int warmUp = 10;
 	
-	private int iterations = 50;
+	private int iterations = 100;
 
 
 	public DistributionTourAlgoFactory() {
@@ -44,8 +44,8 @@ public class DistributionTourAlgoFactory implements RuinAndRecreateFactory {
 	@Override
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution) {
 		TourCostProcessor tourCostProcessor = new TourCostProcessor(vrp.getCosts());
-		TourFactory tourFactory = new DistributionTourFactory(vrp.getCosts(), vrp.getGlobalConstraints(), tourCostProcessor);
-		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,tourFactory, vrp.getCosts().getCostParams());
+		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,vrp.getCosts().getCostParams(), 
+				new DistributionOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints()));
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);

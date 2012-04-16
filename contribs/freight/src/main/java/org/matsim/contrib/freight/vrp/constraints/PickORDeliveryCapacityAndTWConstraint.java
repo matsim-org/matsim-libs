@@ -75,7 +75,7 @@ public class PickORDeliveryCapacityAndTWConstraint implements Constraints {
 //				counterRejected.printCounter();
 				return false;
 			}
-			if(tourAct.getLatestArrTime() < tourAct.getEarliestArrTime()){
+			if(tourAct.getLatestOperationStartTime() < tourAct.getEarliestOperationStartTime()){
 //				logger.debug("timeWindow-conflic on tour " + tour);
 //				counterRejected.incCounter();
 //				counterRejected.printCounter();

@@ -17,7 +17,8 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
-import org.matsim.contrib.freight.vrp.basics.CostParams;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostParams;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
@@ -33,21 +34,20 @@ public class RRTourAgentFactory {
 
 	private TourStatusProcessor tourStatusProcessor;
 	
-	private TourFactory tourBuilder;
+	private CarrierCostParams carrierCostParams;
 	
-	private CostParams costParams;
+	private OfferMaker offerMaker;
 	
-	public RRTourAgentFactory(TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder, CostParams costParams) {
+	public RRTourAgentFactory(TourStatusProcessor tourStatusProcessor, CarrierCostParams carrierCostParams, OfferMaker offerMaker) {
 		super();
 		this.tourStatusProcessor = tourStatusProcessor;
-		this.tourBuilder = tourBuilder;
-		this.costParams = costParams;
+		this.carrierCostParams = carrierCostParams;
+		this.offerMaker = offerMaker;
 	}
 
 	public RRTourAgent createTourAgent(Tour tour, Vehicle vehicle) {
-		RRTourAgent tourAgent = new RRTourAgent(vehicle, tour, tourStatusProcessor, tourBuilder, costParams);
-		tourAgent.marginalCostScalingFactorForNewService = 5.0;
-		tourAgent.fixCostsForService = 100.0;
+		RRTourAgent tourAgent = new RRTourAgent(vehicle, tour, tourStatusProcessor, new CarrierCostFunction(carrierCostParams));
+		tourAgent.setOfferMaker(offerMaker);
 		return tourAgent;
 	}
 }

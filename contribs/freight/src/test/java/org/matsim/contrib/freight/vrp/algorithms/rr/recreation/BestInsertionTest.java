@@ -24,8 +24,10 @@ import java.util.List;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -59,7 +61,10 @@ public class BestInsertionTest extends VRPTestCase{
 		tourBuilder.schedulePickup(s1);
 		tourBuilder.scheduleDelivery(s1);
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		tourAgent1 = new RRTourAgentFactory(tourStatusProcessor, tourFactory, vrp.getCosts().getCostParams()).createTourAgent(tourBuilder.build(), vrp.getVehicles().iterator().next());
+		RRTourAgentFactory rrTourAgentFactory = new RRTourAgentFactory(tourStatusProcessor, 
+				vrp.getCosts().getCostParams(), new DistributionOfferMaker(vrp.getCosts(), constraints));
+
+		tourAgent1 = rrTourAgentFactory.createTourAgent(tourBuilder.build(), vrp.getVehicles().iterator().next());
 		
 		VrpTourBuilder anotherTourBuilder = new VrpTourBuilder();
 		Shipment s2 = createShipment("2", makeId(10,0), makeId(0,0));
@@ -67,7 +72,7 @@ public class BestInsertionTest extends VRPTestCase{
 		anotherTourBuilder.schedulePickup(s2);
 		anotherTourBuilder.scheduleDelivery(s2);
 		anotherTourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		tourAgent2 = new RRTourAgentFactory(tourStatusProcessor, tourFactory, vrp.getCosts().getCostParams()).createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
+		tourAgent2 = rrTourAgentFactory.createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
 		
 		Collection<RRTourAgent> agents = new ArrayList<RRTourAgent>();
 		agents.add(tourAgent1);
@@ -101,7 +106,7 @@ public class BestInsertionTest extends VRPTestCase{
 		double oldCost = solution.getResult();
 		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
 		double newCost = solution.getResult();
-		assertEquals(newCost-oldCost, 4.0);
+		assertEquals(4.0,newCost-oldCost);
 	}
 	
 	public void testTotalCost(){

@@ -17,6 +17,8 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
+import java.util.Iterator;
+
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
@@ -39,7 +41,7 @@ import org.matsim.core.utils.misc.Counter;
  */
 
 public class TourCostAndTWProcessor implements TourStatusProcessor{
-
+	
 	private Costs costs;
 	
 	public Counter counter;
@@ -54,70 +56,75 @@ public class TourCostAndTWProcessor implements TourStatusProcessor{
 	public void process(Tour tour) {
 //		counter.incCounter();
 //		counter.printCounter();
-		if(tour.getActivities().size() <= 2){
-			reset(tour);
+		reset(tour);
+		if(tour.isEmpty()){
 			return;
 		}
 		updateTimeWindowsAndLoadsAtTourActivities(tour);
 	}
 	
 	private void updateTimeWindowsAndLoadsAtTourActivities(Tour tour) {
-		reset(tour);		
-		int nOfActivities = tour.getActivities().size();
-		TourActivity prevAct = tour.getActivities().getFirst();
-		TourActivity nextAct = tour.getActivities().getLast();
-		
-		for(int i=1,j=nOfActivities-2;i<nOfActivities;i++,j--){
-			
-			TourActivity currActFromBehind = tour.getActivities().get(j);
-			TourActivity currActFromFront = tour.getActivities().get(i);
-			
-			double latestArrAtCurrActFromBehind = nextAct.getLatestArrTime() - tour.getActivities().get(j).getServiceTime() - 
-					getBackwardTransportTime(tour.getActivities().get(j), nextAct, nextAct.getLatestArrTime());
-			
-			double late = Math.min(tour.getActivities().get(j).getLatestArrTime(), latestArrAtCurrActFromBehind);
-			tour.getActivities().get(j).setLatestArrTime(late);
-			
-			if(currActFromFront instanceof JobActivity){
-				currActFromFront.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currActFromFront).getCapacityDemand());
-				if(currActFromFront instanceof Pickup){
-					tour.costs.totalLoad += ((Pickup) currActFromFront).getCapacityDemand();
-				}
-			}
-			else{
-				currActFromFront.setCurrentLoad(prevAct.getCurrentLoad());
-			}
-			
-			double earliestStartTimeAtLastActivity = prevAct.getEarliestArrTime() + prevAct.getServiceTime();
-			double earliestArrivalTimeAtCurrentActivity = earliestStartTimeAtLastActivity + getTransportTime(prevAct, currActFromFront, earliestStartTimeAtLastActivity); 
-			double early = Math.max(currActFromFront.getEarliestArrTime(), earliestArrivalTimeAtCurrentActivity);
-			currActFromFront.setEarliestArrTime(early);
-			double waitingTime = 0.0;
-			if(earliestArrivalTimeAtCurrentActivity < currActFromFront.getEarliestArrTime()){
-				waitingTime = currActFromFront.getEarliestArrTime() - earliestArrivalTimeAtCurrentActivity;
-			}
-			
-			double serviceTime = currActFromFront.getServiceTime();
-			double transportTime = this.costs.getTransportTime(prevAct.getLocationId(), currActFromFront.getLocationId(), earliestStartTimeAtLastActivity);
-		
-			tour.costs.transportCosts += this.costs.getTransportCost(prevAct.getLocationId(), currActFromFront.getLocationId(), earliestStartTimeAtLastActivity);
-			tour.costs.transportTime  += transportTime;
-			tour.costs.serviceTime += serviceTime;
-			tour.costs.waitingTime += waitingTime; 	
-			tour.costs.totalDutyTime += waitingTime + serviceTime + transportTime;
-			
-			nextAct = tour.getActivities().get(j);
-			prevAct = currActFromFront;
-		}
+		updateEarliestArrivalTimes(tour);
+		updateLatestArrivalTimes(tour);
 	}
 	
+	private void updateEarliestArrivalTimes(Tour tour) {
+		TourActivity prevAct = null;
+		for(TourActivity currentAct : tour.getActivities()){
+			if(prevAct == null){
+				prevAct = currentAct;
+				continue;
+			}
+			updateLoad(tour,prevAct,currentAct);
+			
+			double startTimeAtPrevAct = prevAct.getEarliestOperationStartTime() + prevAct.getOperationTime();
+			double transportTime = getTransportTime(prevAct, currentAct, startTimeAtPrevAct);
+			double earliestArrTimeAtCurrAct = startTimeAtPrevAct + transportTime; 
+			double earliestOperationStartTime = Math.max(currentAct.getEarliestOperationStartTime(), earliestArrTimeAtCurrAct);
+			currentAct.setEarliestOperationStartTime(earliestOperationStartTime);
+	
+			tour.getTourStats().transportCosts += (this.costs.getTransportCost(prevAct.getLocationId(), currentAct.getLocationId(), startTimeAtPrevAct));
+			tour.getTourStats().transportTime += transportTime;
+			
+			prevAct = currentAct;
+		}
+	
+	}
+
+	private void updateLatestArrivalTimes(Tour tour) {
+		TourActivity prevAct = null;
+		Iterator<TourActivity> actIterator = tour.getActivities().descendingIterator(); 
+		while(actIterator.hasNext()){
+			if(prevAct == null){
+				prevAct = actIterator.next();
+				continue;
+			}
+			TourActivity currAct = actIterator.next();
+			
+			double latestArrAtCurrAct = prevAct.getLatestOperationStartTime() - currAct.getOperationTime() - 
+					getBackwardTransportTime(currAct, prevAct, prevAct.getLatestOperationStartTime());
+			double latestOperationStartTime = Math.min(currAct.getLatestOperationStartTime(), latestArrAtCurrAct);
+			currAct.setLatestOperationStartTime(latestOperationStartTime);
+			
+			prevAct = currAct;
+		}
+		
+	}
+
+	private void updateLoad(Tour tour, TourActivity prevAct, TourActivity currentAct) {
+		if(currentAct instanceof JobActivity){
+			currentAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currentAct).getCapacityDemand());
+			if(currentAct instanceof Pickup){
+				tour.getTourStats().totalLoad += ((Pickup) currentAct).getCapacityDemand();
+			}
+		}
+		else{
+			currentAct.setCurrentLoad(prevAct.getCurrentLoad());
+		}
+	}
+
 	private void reset(Tour tour) {
-		tour.costs.transportCosts = 0.0;
-		tour.costs.transportTime = 0.0;
-		tour.costs.serviceTime = 0.0;
-		tour.costs.waitingTime = 0.0;
-		tour.costs.totalDutyTime = 0.0;
-		tour.costs.totalLoad = 0;
+		tour.getTourStats().reset();
 	}
 
 	private double getTransportTime(TourActivity act1, TourActivity act2, double departureTime) {
@@ -127,4 +134,6 @@ public class TourCostAndTWProcessor implements TourStatusProcessor{
 	private double getBackwardTransportTime(TourActivity act1, TourActivity act2, double arrivalTime) {
 		return costs.getBackwardTransportTime(act1.getLocationId(), act2.getLocationId(), arrivalTime);
 	}
+
+
 }

@@ -1,6 +1,6 @@
 /*
  *  *********************************************************************** *
- *  * project: org.matsim.*
+// *  * project: org.matsim.*
  *  * ${file_name}
  *  *                                                                         *
  *  * *********************************************************************** *
@@ -70,13 +70,36 @@ import org.matsim.core.router.util.TravelTime;
 
 public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationEndsListener {
 
+	public static class MyCarrierCostParams extends CarrierCostParams {
+
+		public static double transportCost_per_second = 50.0/(60.0*60.0);
+		
+		public static double transportCost_per_meter = 1.0/1000.0;
+		
+		public static double waitingCost_per_second = 50.0/(60.0*60.0);
+		
+		public static double serviceCost_per_second = 50.0/(60.0*60.0);
+		
+		public static double cost_per_secondTooLate = 1000.0/(60.0*60.0);
+		
+		public static double cost_per_vehicle = 100.0;
+		
+		
+		public MyCarrierCostParams() {
+			super(transportCost_per_second, transportCost_per_meter, waitingCost_per_second,
+					serviceCost_per_second, cost_per_secondTooLate, cost_per_vehicle);
+			// TODO Auto-generated constructor stub
+		}
+		
+	}
+	
 	static class MyTravelCosts implements TravelDisutility{
 
 		private TravelTime travelTime;
 		
-		private double cost_per_m = new CarrierCostParams().getCostPerMeter();
+		private double cost_per_m = new MyCarrierCostParams().transportCost_per_meter;
 		
-		private double cost_per_s = new CarrierCostParams().getCostPerSecondTransport();
+		private double cost_per_s = new MyCarrierCostParams().transportCost_per_second;
 		
 		public MyTravelCosts(TravelTime travelTime) {
 			super();
@@ -139,7 +162,7 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 		
 //		final LeastCostPathCalculator router = event.getControler().getLeastCostPathCalculatorFactory().createPathCalculator(event.getControler().getScenario().getNetwork(), event.getControler().createTravelCostCalculator(), event.getControler().getTravelTimeCalculator());
 		
-		Costs costs = new NetworkTransportCosts(router, new CarrierCostParams(), event.getControler().getNetwork(), event.getControler().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		Costs costs = new NetworkTransportCosts(router, new MyCarrierCostParams(), event.getControler().getNetwork(), event.getControler().getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		
 		String filename = event.getControler().getControlerIO().getIterationPath(event.getIteration()) + "/" + event.getIteration() + ".vrp.png" ;
 		ChartListener chartListener = new ChartListener();

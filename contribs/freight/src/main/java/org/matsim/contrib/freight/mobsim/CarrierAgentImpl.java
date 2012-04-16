@@ -332,9 +332,9 @@ class CarrierAgentImpl {
 			transport += driver.travelTime;
 			duty += driver.totalDutyTime;
 			dist += driver.distance;
-			score += (-1)*new CarrierCostFunction(new CarrierCostParams()).getCosts(driver.getTransportTime(), 
-					driver.getDistance(), driver.getWaitingTime(), driver.getServiceTime(), driver.getTooLate());
-			score += (-1)*new CarrierCostParams().getCostPerVehicle();
+//			score += (-1)*new CarrierCostFunction(new MyCarrierCostParams()).getCosts(driver.getTransportTime(), 
+//					driver.getDistance(), driver.getWaitingTime(), driver.getServiceTime(), driver.getTooLate());
+//			score += (-1)*new CarrierCostParams().getCostPerVehicle();
 		}
 		carrier.getSelectedPlan().setScore(score);
 	}

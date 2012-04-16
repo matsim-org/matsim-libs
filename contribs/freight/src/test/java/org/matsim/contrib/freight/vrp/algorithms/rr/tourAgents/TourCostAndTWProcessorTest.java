@@ -109,72 +109,72 @@ public class TourCostAndTWProcessorTest extends VRPTestCase{
 
 	public void testEarliestArrStart(){
 		statusUpdater.process(tour);
-		assertEquals(0.0,tour.getActivities().get(0).getEarliestArrTime());
+		assertEquals(0.0,tour.getActivities().get(0).getEarliestOperationStartTime());
 	}
 	
 	public void testLatestArrStart(){
 		statusUpdater.process(tour);
-		assertEquals(0.0,tour.getActivities().get(0).getLatestArrTime());
+		assertEquals(0.0,tour.getActivities().get(0).getLatestOperationStartTime());
 	}
 	
 	public void testEarliestArrAtFirstPickup(){
 		statusUpdater.process(tour);
-		assertEquals(10.0,tour.getActivities().get(1).getEarliestArrTime());
+		assertEquals(10.0,tour.getActivities().get(1).getEarliestOperationStartTime());
 	}
 	
 	public void testEarliestArrAtFirstPickupWithTDCost(){
 		tdTourStatusProcessor.process(tour);
-		assertEquals(10.0,tour.getActivities().get(1).getEarliestArrTime());
+		assertEquals(10.0,tour.getActivities().get(1).getEarliestOperationStartTime());
 	}
 	
 	public void testLatestArrAtFirstPickup(){
 		statusUpdater.process(tour);
-		assertEquals(10.0,tour.getActivities().get(1).getLatestArrTime());
+		assertEquals(10.0,tour.getActivities().get(1).getLatestOperationStartTime());
 	}
 	
 	public void testLatestArrAtFirstPickupWithTDCost(){
 		tdTourStatusProcessor.process(tour);
-		assertEquals(12.0,tour.getActivities().get(1).getLatestArrTime());
+		assertEquals(12.0,tour.getActivities().get(1).getLatestOperationStartTime());
 	}
 	
 	public void testEarliestArrAtSecondPickup(){
 		statusUpdater.process(tour);
-		assertEquals(30.0,tour.getActivities().get(2).getEarliestArrTime());
+		assertEquals(30.0,tour.getActivities().get(2).getEarliestOperationStartTime());
 	}
 	
 	public void testEarliestArrAtSecondPickupWithTDCosts(){
 		tdTourStatusProcessor.process(tour);
-		assertEquals(30.0,tour.getActivities().get(2).getEarliestArrTime());
+		assertEquals(30.0,tour.getActivities().get(2).getEarliestOperationStartTime());
 	}
 	
 	public void testLatestArrAtSecondPickup(){
 		statusUpdater.process(tour);
-		assertEquals(30.0,tour.getActivities().get(2).getLatestArrTime());
+		assertEquals(30.0,tour.getActivities().get(2).getLatestOperationStartTime());
 	}
 	
 	public void testLatestArrAtSecondPickupWithTDCosts(){
 		tdTourStatusProcessor.process(tour);
-		assertEquals(30.0,tour.getActivities().get(2).getLatestArrTime());
+		assertEquals(30.0,tour.getActivities().get(2).getLatestOperationStartTime());
 	}
 	
 	public void testEarliestArrAtEnd(){
 		statusUpdater.process(tour);
-		assertEquals(40.0,tour.getActivities().get(5).getEarliestArrTime());
+		assertEquals(40.0,tour.getActivities().get(5).getEarliestOperationStartTime());
 	}
 	
 	public void testEarliestArrAtEndWithTDCosts(){
 		tdTourStatusProcessor.process(tour);
-		assertEquals(35.0,tour.getActivities().get(5).getEarliestArrTime());
+		assertEquals(35.0,tour.getActivities().get(5).getEarliestOperationStartTime());
 	}
 	
 	public void testLatestArrAtEnd(){
 		statusUpdater.process(tour);
-		assertEquals(Double.MAX_VALUE,tour.getActivities().get(5).getLatestArrTime());
+		assertEquals(Double.MAX_VALUE,tour.getActivities().get(5).getLatestOperationStartTime());
 	}
 	
 	public void testLatestArrAtEndWithTDCosts(){
 		tdTourStatusProcessor.process(tour);
-		assertEquals(Double.MAX_VALUE,tour.getActivities().get(5).getLatestArrTime());
+		assertEquals(Double.MAX_VALUE,tour.getActivities().get(5).getLatestOperationStartTime());
 	}
 	
 

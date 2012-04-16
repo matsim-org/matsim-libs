@@ -41,12 +41,9 @@ public class VrpUtils {
 	
 	public static RRSolution copySolution(RRSolution solution, VehicleRoutingProblem vrp, RRTourAgentFactory tourAgentFactory){
 		List<RRTourAgent> agents = new ArrayList<RRTourAgent>();
-		List<Vehicle> vehicles = new ArrayList<Vehicle>(vrp.getVehicles());
-		List<RRTourAgent> tourAgentsInSolution = new ArrayList<RRTourAgent>(solution.getTourAgents());
-		for(int i=0;i<tourAgentsInSolution.size();i++){
+		for(RRTourAgent agent : solution.getTourAgents()){
 			VrpTourBuilder tourBuilder = new VrpTourBuilder();
-			Vehicle vehicle = vehicles.get(i);
-			RRTourAgent agent = tourAgentsInSolution.get(i);
+			Vehicle vehicle = agent.getVehicle();
 			for(TourActivity tourAct : agent.getTour().getActivities()){
 				tourBuilder.scheduleActivity(tourAct);
 			}

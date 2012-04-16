@@ -28,6 +28,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.basics.CarrierCostParams;
 import org.matsim.contrib.freight.vrp.basics.CostParams;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
@@ -108,40 +109,8 @@ public class RuinAndRecreateTest extends TestCase{
 			}
 
 			@Override
-			public CostParams getCostParams() {
-				return new CostParams() {
-					
-					@Override
-					public double getCostPerVehicle() {
-						return 0;
-					}
-					
-					@Override
-					public double getCostPerSecondWaiting() {
-						return 0;
-					}
-					
-					@Override
-					public double getCostPerSecondTransport() {
-						return 1;
-					}
-					
-					@Override
-					public double getCostPerSecondTooLate() {
-						return 0;
-					}
-					
-					@Override
-					public double getCostPerSecondService() {
-						return 0;
-					}
-					
-					@Override
-					public double getCostPerMeter() {
-						return 1;
-					}
-				};
-			}
+			public CarrierCostParams getCostParams() {
+				return new CarrierCostParams(1.0,1.0,0,0,0,0);			}
 
 		};
 		vrpBuilder = new VrpBuilder(costs, new PickORDeliveryCapacityAndTWConstraint());
@@ -197,6 +166,8 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2","0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3","0", 16));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("4","0", 16));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("5","0", 16));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
 		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
@@ -208,6 +179,8 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 16));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("4", "0", 16));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("5", "0", 16));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
 		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();

@@ -22,22 +22,22 @@ public class End implements TourActivity{
 	}
 
 	@Override
-	public void setEarliestArrTime(double early) {
+	public void setEarliestOperationStartTime(double early) {
 		practical_earliestArrivalTime = early;	
 	}
 
 	@Override
-	public double getEarliestArrTime() {
+	public double getEarliestOperationStartTime() {
 		return practical_earliestArrivalTime;
 	}
 
 	@Override
-	public double getLatestArrTime() {
+	public double getLatestOperationStartTime() {
 		return practical_latestArrivalTime;
 	}
 
 	@Override
-	public void setLatestArrTime(double late) {
+	public void setLatestOperationStartTime(double late) {
 		practical_latestArrivalTime = late;
 	}
 
@@ -47,7 +47,7 @@ public class End implements TourActivity{
 	}
 
 	@Override
-	public double getServiceTime() {
+	public double getOperationTime() {
 		return 0.0;
 	}
 

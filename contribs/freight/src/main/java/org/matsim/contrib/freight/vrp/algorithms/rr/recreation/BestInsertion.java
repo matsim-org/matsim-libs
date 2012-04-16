@@ -18,9 +18,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.recreation;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -41,10 +39,8 @@ import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
  */
 
 public class BestInsertion implements RecreationStrategy{
-
-	private Logger logger = Logger.getLogger(BestInsertion.class);
 	
-	private Map<String, String> cheapestAgents = new HashMap<String, String>();
+	private Logger logger = Logger.getLogger(BestInsertion.class);
 	
 	private Random random = RandomNumberGeneration.getRandom();
 	
@@ -56,81 +52,29 @@ public class BestInsertion implements RecreationStrategy{
 	public void run(RRSolution tentativeSolution, List<Job> unassignedJobs, double upperBound) {
 		Collections.shuffle(unassignedJobs,random);
 		double currentResult = tentativeSolution.getResult();
-		setScaling(tentativeSolution);
 		for(Job unassignedJob : unassignedJobs){
 			if(currentResult >= upperBound){
 				return;
-			}
-			Offer bestOffer = null;
-			boolean firstAgent = true;
-			double bestKnownPrice = Double.MAX_VALUE;
-			RRTourAgent cheapestAgent = getCheapestAgent(tentativeSolution, unassignedJob);
-			if(cheapestAgent != null){
-				bestOffer = cheapestAgent.requestService(unassignedJob, bestKnownPrice);
-				if(bestOffer != null){
-					bestKnownPrice = bestOffer.getPrice();
-					firstAgent = false;
-				}
-			}
+			}		
+			Offer bestOffer = new Offer(null,Double.MAX_VALUE,Double.MAX_VALUE);
 			for(RRTourAgent agent : tentativeSolution.getTourAgents()){
-				if(agent == cheapestAgent){
-					continue;
-				}
-				Offer offer = agent.requestService(unassignedJob,bestKnownPrice);
-				if(offer == null){
-					continue;
-				}
-				if(firstAgent){
-					bestOffer = offer;
-					bestKnownPrice = offer.getPrice();
-					firstAgent = false;
-				}
-				else if(offer.getPrice() < bestOffer.getPrice()){
-					bestOffer = offer;
-					bestKnownPrice = offer.getPrice();
+				Offer o = agent.requestService(unassignedJob, bestOffer.getMarginalCosts());
+				if(o.getPrice() < bestOffer.getPrice()){
+					bestOffer = o;
 				}
 			}
-			if(bestOffer != null){
+			if(!isNull(bestOffer.getTourAgent())){
 				currentResult += bestOffer.getMarginalCosts();
 				bestOffer.getTourAgent().offerGranted(unassignedJob);
-				cheapestAgents.put(unassignedJob.getId(), bestOffer.getTourAgent().getId());
 			}
 			else{
 				throw new IllegalStateException("given the vehicles, could not create a valid solution");
 			}
+			
 		}
 	}
 
-	private void setScaling(RRSolution tentativeSolution) {
-//		RRTourAgent withFewestActivities = null;
-//		for(RRTourAgent a : tentativeSolution.getTourAgents()){
-//			if(!a.isActive()){
-//				continue;
-//			}
-//			if(withFewestActivities == null){
-//				withFewestActivities = a;
-//			}
-//			if(a.getTour().getActivities().size() < withFewestActivities.getTour().getActivities().size()){
-//				withFewestActivities = a;
-//			}
-//		}
-//		if(withFewestActivities != null){
-//			withFewestActivities.scale = true;
-//		}
-	}
-
-	private RRTourAgent getCheapestAgent(RRSolution tentativeSolution, Job unassignedJob) {
-		String agentId = null;
-		if(cheapestAgents.containsKey(unassignedJob.getId())){
-			agentId = cheapestAgents.get(unassignedJob.getId());
-		}
-		if(agentId != null){
-			for(RRTourAgent agent : tentativeSolution.getTourAgents()){
-				if(agent.getId().equals(agentId)){
-					return agent;
-				}
-			}
-		}
-		return null;
+	private boolean isNull(RRTourAgent tourAgent) {
+		return (tourAgent == null);
 	}
 }

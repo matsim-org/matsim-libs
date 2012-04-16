@@ -46,7 +46,7 @@ public class PickAndDeliveryCapacityAndTWConstraint implements Constraints {
 				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentLoad=" + currentLoad + " on tour " + tour);
 				return false;
 			}
-			if(tourAct.getLatestArrTime() < tourAct.getEarliestArrTime()){
+			if(tourAct.getLatestOperationStartTime() < tourAct.getEarliestOperationStartTime()){
 				logger.debug("timeWindow-conflic on tour " + tour);
 				return false;
 			}

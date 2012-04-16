@@ -22,8 +22,8 @@ public class VrpTourBuilder {
 			throw new IllegalStateException("tour has already started");
 		}
 		Start start = new Start(locationId);
-		start.setEarliestArrTime(earliestDeparture);
-		start.setLatestArrTime(latestDeparture);
+		start.setEarliestOperationStartTime(earliestDeparture);
+		start.setLatestOperationStartTime(latestDeparture);
 		tourStarted = true;
 		tour.getActivities().add(start);
 	}
@@ -36,8 +36,8 @@ public class VrpTourBuilder {
 			throw new IllegalStateException("there are still open shipments");
 		}
 		End end = new End(locationId);
-		end.setEarliestArrTime(earliestArrival);
-		end.setLatestArrTime(latestArrival);
+		end.setEarliestOperationStartTime(earliestArrival);
+		end.setLatestOperationStartTime(latestArrival);
 		tour.getActivities().add(end);
 		tourEnded = true;
 	}
@@ -66,10 +66,10 @@ public class VrpTourBuilder {
 	
 	public void scheduleActivity(TourActivity activity){
 		if(activity instanceof Start){
-			scheduleStart(activity.getLocationId(), activity.getEarliestArrTime(), activity.getLatestArrTime());
+			scheduleStart(activity.getLocationId(), activity.getEarliestOperationStartTime(), activity.getLatestOperationStartTime());
 		}
 		if(activity instanceof End){
-			scheduleEnd(activity.getLocationId(), activity.getEarliestArrTime(), activity.getLatestArrTime());
+			scheduleEnd(activity.getLocationId(), activity.getEarliestOperationStartTime(), activity.getLatestOperationStartTime());
 		}
 		if(activity instanceof Pickup){
 			schedulePickup((Shipment)((Pickup) activity).getJob());

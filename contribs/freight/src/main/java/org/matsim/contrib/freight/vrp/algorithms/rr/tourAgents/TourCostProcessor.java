@@ -20,6 +20,7 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
+import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.core.utils.misc.Counter;
@@ -51,32 +52,38 @@ public class TourCostProcessor implements TourStatusProcessor{
 	
 	@Override
 	public void process(Tour tour){
-		if(tour.getActivities().size() <= 2){
-			tour.getCosts().transportCosts = 0.0;
-			tour.getCosts().transportTime = 0.0;
+		tour.getTourStats().reset();
+		if(tour.isEmpty()){
 			return;
 		}
-		reset(tour);
-		counter.incCounter();
-		counter.printCounter();
-		TourActivity prevAct = tour.getActivities().getFirst();
-		for(int i=1;i<tour.getActivities().size();i++){
-			TourActivity toAct = tour.getActivities().get(i);
-			if(toAct instanceof JobActivity){
-				toAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)toAct).getCapacityDemand());
+//		counter.incCounter();
+//		counter.printCounter();
+		TourActivity prevAct = null;
+		for(TourActivity currAct : tour.getActivities()){
+			if(prevAct == null){
+				prevAct = currAct;
+				continue;
 			}
-			else{
-				toAct.setCurrentLoad(prevAct.getCurrentLoad());
-			}
-			tour.costs.transportCosts += costs.getTransportCost(prevAct.getLocationId(),toAct.getLocationId(), 0.0);
-			tour.costs.transportTime  += costs.getTransportTime(prevAct.getLocationId(),toAct.getLocationId(), 0.0);
-			prevAct = toAct;
+			updateLoad(tour, prevAct, currAct);
+			
+			tour.getTourStats().transportCosts += (costs.getTransportCost(prevAct.getLocationId(),currAct.getLocationId(), 0.0));
+			tour.getTourStats().transportTime  += costs.getTransportTime(prevAct.getLocationId(),currAct.getLocationId(), 0.0);
+			
+			prevAct = currAct;
 		}
 	}
-	
-	private void reset(Tour tour) {
-		tour.costs.transportCosts = 0.0;
-		tour.costs.transportTime = 0.0;
+
+	private void updateLoad(Tour tour, TourActivity prevAct, TourActivity currAct) {
+		if(currAct instanceof JobActivity){
+			currAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currAct).getCapacityDemand());
+			if(currAct instanceof Pickup){
+				tour.getTourStats().totalLoad += ((Pickup) currAct).getCapacityDemand();
+			}
+		}
+		else{
+			currAct.setCurrentLoad(prevAct.getCurrentLoad());
+		}
 	}
+
 
 }

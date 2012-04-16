@@ -2,17 +2,40 @@ package org.matsim.contrib.freight.vrp.basics;
 
 public class CarrierCostFunction {
 	
-	private CostParams costParams;
+	public final CarrierCostParams costParams;
 
-	public CarrierCostFunction(CostParams costParams) {
+	private double costs = 0.0;
+	
+	private double transportTime = 0.0;
+	
+	public double getTransportTime() {
+		return transportTime;
+	}
+
+	public CarrierCostFunction(CarrierCostParams costParams) {
 		super();
 		this.costParams = costParams;
 	}
 	
-	public double getCosts(double transportTime_in_seconds, double transportDistance_in_meters, double waitingTime_in_seconds, 
-			double serviceTime_in_seconds, double tooLate_in_seconds){
-		return transportTime_in_seconds*costParams.getCostPerSecondTransport() + transportDistance_in_meters*costParams.getCostPerMeter() +
-			waitingTime_in_seconds*costParams.getCostPerSecondTransport() + serviceTime_in_seconds*costParams.getCostPerSecondTransport() + tooLate_in_seconds*costParams.getCostPerSecondTooLate();
+	public void reset(){
+		costs = 0.0;
+		transportTime = 0.0;
+	}
+	
+	public void addCosts(double value){
+		costs += value;
+	}
+	
+	public void addTransportTime(double value){
+		transportTime += value;
+	}
+	
+	public void addActiveVehicle(){
+		costs += costParams.cost_per_vehicle;
+	}
+	
+	public double getCosts() {	
+		return costs;
 	}
 
 }
