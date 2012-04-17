@@ -85,7 +85,7 @@ public class SpatialAveragingForLinkEmissions {
 	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
 	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-
+	
 	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
 	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
@@ -247,7 +247,7 @@ public class SpatialAveragingForLinkEmissions {
 			}	
 			//TODO set output path
 			//TODO momentan fuer jedes Zeitintervall, passende Ifabfrage o ae
-			String outputPathForR = new String("");
+			String outputPathForR = new String(outPathStub + ".Routput.txt");
 			writeRoutput(sumOfweightedValuesForCell, outputPathForR);
 		}
 //		writer.close();
@@ -268,8 +268,6 @@ public class SpatialAveragingForLinkEmissions {
 		try {
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
 			//inhalt schreiben
-			//TODO header schreiben, also kopfzeile mit den koordinaten
-			
 			String valueString = new String();
 			valueString="\t";
 			//schrittweite zwischen den zellen bezueglich der koordinaten
@@ -278,6 +276,7 @@ public class SpatialAveragingForLinkEmissions {
 			//TODO testen, ob die erste zeile zu lang ist
 			//starte mit "\t", damit links oben in der tabelle ein leeres feld entsteht
 			//TODO sind jetzt x und y vertauscht oder in umgekehrter Reihenfolge?
+			//Kopfzeile
 			for(int i=0; i<sumOfweightedValuesForCell.length;i++){
 				valueString+=Double.toString(xMin+i*xDist)+"\t";
 			}
@@ -292,10 +291,11 @@ public class SpatialAveragingForLinkEmissions {
 				//tabelleninhalt schreiben
 				for(int j = 0; j<sumOfweightedValuesForCell[0].length; j++){
 					try {
-						valueString+=Double.toString(sumOfweightedValuesForCell[i][j])+"\t"; //TODO surround with trycatch
+						valueString+=Double.toString(sumOfweightedValuesForCell[i][j])+"\t"; 
 					} catch (Exception e) {
 						//falls das Feld [i][j] leer ist, setze den Wert 0
-						valueString+=Double.toString(0.0)+"\t";
+						//TODO exception pruefen
+						valueString+="0.0"+"\t";
 					}
 				}
 				//schreiben und zeilenumbruch
@@ -592,6 +592,7 @@ public class SpatialAveragingForLinkEmissions {
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		System.out.println(configFile);
 		configReader.readFile(configFile);
 		Integer lastIteration = config.controler().getLastIteration();
 		return lastIteration;
