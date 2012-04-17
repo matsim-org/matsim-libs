@@ -2,80 +2,81 @@ package playground.benjamin.emissions;
 
 /**
  * This package provides a tool for exhaust emission calculation based on
- * the ``Handbook on Emission Factors for Road Transport'' (HBEFA), version 3.1 (see <link>{@link http://www.hbefa.net}</link>).
+ * the ``Handbook on Emission Factors for Road Transport'' (HBEFA), version 3.1 (see <a href="http://www.hbefa.net">HBEFA</a> ).
  * 
  * <h2>Usage</h2>
  * Execute "RunEmissionToolOnline.java" or "RunEmissionToolOffline.java" from the example package.
  * <ul>
- * <li> {@link playground.benjamin.emissions.example.RunEmissionToolOnline}: Produces an emission events file during the simulation. </li>
- * <li> {@link playground.benjamin.emissions.example.RunEmissionToolOffline}: Produces an emission events file based on a standard MATSim eventsfile. </li>
+ * <li> {@link playground.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline}: Produces an emission events file during the simulation. </li>
+ * <li> {@link playground.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline}: Produces an emission events file based on a standard MATSim eventsfile. </li>
  * </ul>
  * In both cases you will have to specify several input files. See the above classes as examples and the following section for details.
  *
  * <h2>Input files</h2>
  * Required files are:
  * <ul>
- * <li>roadTypeMappingFile: This file needs to map road types in your network to Hbefa 3.1 road types. If you are using a VISUM network, its header could look like this:
- * <code> VISUM_RT_NR;VISUM_RT_NAME;HBEFA_RT_NAME,</code> and this would be a typical line: <code>16;some_name;RUR/MW/120 </code> </li>
+ * <li>roadTypeMappingFile: This file needs to map road types in your network to Hbefa 3.1 road types. 
+ * See the parser {@link playground.benjamin.emissions.EmissionModule#createRoadTypeMapping createRoadTypeMapping} 
+ * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} 
+ * or {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for details.
  * 
- * <li>emissionVehicleFile: This data type is defined in {@link org.matsim.core.config.groups.VspExperimentalConfigGroup}.
+ * <li>emissionVehicleFile: This data type is defined in the VspExperimentalConfigGroup, 
+ * see {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} and described as "definition of a vehicle
+ *  for every person (who is allowed to choose a vehicle in the simulation):" + "\n" +
+ *  " - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n" +
+ *  " - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
+ *  " HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);" </li>
  * 
- * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from Hbefa 3.1. Its header should look like this
- * <code> Case;VehCat;Year;TrafficScenario;Component;RoadCat;TrafficSit;Gradient;V_weighted;EFA_weighted </code>
- * and this would be a typical line: <code> 2005average[3.1];pass. car;2005;"BAU" (D);FC;MW;RUR/MW/80/Freeflow;0%;82.8;47.69 </code></li>
+ * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from Hbefa 3.1. 
+ * See the parser {@link playground.benjamin.emissions.EmissionModule#createAvgHbefaWarmTable createAvgHbefaWarmTable}
+ *  at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} 
+ *  or the {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for details. </li>
  *
- * <li>averageFleetColdEmissionFactorsFile: This file can be exported from Hbefa3.1
- * ( <link>{@link http://www.hbefa.net}</link>).Its header should look like this
- * <code> Case;VehCat;Year;TrafficScenario;Component;RoadCat;AmbientCondPattern;EFA_weighted;EFA_km_weighted </code>
- * and this would be a typical line: <code> 2005average[3.1];pass. car;2005;"BAU" (D);FC;Urban;TØ,0-1h,0-1km;0.99; </code> </li>
+ * <li>averageFleetColdEmissionFactorsFile: This file can be exported from Hbefa 3.1 (<a href="http://www.hbefa.net">HBEFA</a>).
+ * See the parser {@link playground.benjamin.emissions.EmissionModule#createAvgHbefaColdTable createAvgHbefaColdTable}
+ * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} 
+ * or the {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for details. </li>
  * </ul>
  *
  * Optional: To use detailed emission calculation set isUsingDetailedEmissionCalculation to <code>true</code> in the
- * RunEmissionToolOnline or RunEmissionToolOffline class. Define the input paths for
+ * {@link playground.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline} or 
+ * {@link playground.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline} class. 
+ * Define the input paths for
  * <ul>
- * <li>detailedWarmEmissionFactorsFile: With <code>detailedWarmEmissionFactorsFileCase;VehCat;Year;TrafficScenario;Component;RoadCat;TrafficSit;Gradient;IDSubsegment;Subsegment;Technology;SizeClasse;EmConcept;KM;%OfSubsegment;V;V_0%;V_100%;EFA;EFA_0%;EFA_100%;V_weighted;V_weighted_0%;V_weighted_100%;EFA_weighted;EFA_weighted_0%;EFA_weighted_100%
- * </code>
+ * 
+ * <li>detailedWarmEmissionFactorsFile: See the parser 
+ * {@link playground.benjamin.emissions.EmissionModule#createDetailedHbefaWarmTable createDetailedHbefaWarmTable}
+ * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} for details </li>
  *
- * as header and lines like this
- *
- * <code> PC[3.1];pass. car;2010;;FC;;RUR/MW/80/Freeflow;0%;111100;PC petrol <1,4L <ECE;petrol (4S);<1,4L;PC-P-Euro-0;50000,00;1,00;82,80;;;45,03; </code>
- * </code> </li>
- *
- * <li>and detailedColdEmissionFactorsFile: With
- * <code> detailedColdEmissionFactorsFileCase;VehCat;Year;TrafficScenario;Component;RoadCat;AmbientCondPattern;IDSubsegment;Subsegment;Technology;SizeClasse;EmConcept;KM;%OfSubsegment;EFA;EFA_weighted;EFA_km;EFA_km_weighted
- * </code>
- * as header and lines like this <code>
- * 2005detailed[3.1];pass. car;2010;;FC;;TØ,0-1h,0-1km;111100;PC petrol <1,4L <ECE;petrol (4S);<1,4L;PC-P-Euro-0;50000.00;1.00;0.92;;;
+ * <li>and detailedColdEmissionFactorsFile: 
+ * {@link playground.benjamin.emissions.EmissionModule#createDetailedHbefaColdTable createDetailedHbefaColdTable}
+ * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} for details
  * </li>
- * </code>
+ * </ul>
+ * 
+ *  All emission factor files represent tables from Hbefa 3.1, which are read columnwise. 
+ *  Their column headers need to match the parser definition 
+ *  in the respective method of the {@link playground.benjamin.emissions.EmissionModule EmissionModule}.
+ *  Variable detailed vehicle types and traffic situations definitions are mapped to emission values and types. 
  *
  * <h2>Model description</h2>
- * The emissions package contains four subpackages:
- * <ul> <li><code>events</code></li>
- * <li><code>example</code></li>
- * <li><code>test</code></li>
- * <li><code>types</code></li>
- * </ul>
- *
- * <h3> Emissions </h3>
+ * 
+ * <h3>Emissions</h3>
  * The main package contains classes and methods to handle the emission input data and create
- * maps to associate the emissions with corresponding vehicle types, speed, parking time, ...
+ * maps to associate the emissions with corresponding vehicle types, speed, parking time, ... <br/>
  *
- * <h3> Events </h3>
- * This class contains extensions of {@link org.matsim.core.api.experimental.events.Event}
+ * <h3>Events</h3>
+ * This class contains extensions of {@link org.matsim.core.api.experimental.events.Event Event}
  * to handle different types of emissions as events. <code> ColdEmissionAnalysisModule</code>
  * calculates emissions after a cold start, <code> WarmEmissionAnalysisModule</code> calculates
  * warm emissions.
  *
- * <h3> Example</h3>
+ * <h3>Example</h3>
  * This class contains the RunEmissionTool classes and a control listener which implements
- * some functions from {@link org.matsim.core.controler}.
+ * some functions from {@link org.matsim.core.controler Controler}.
  *
- * <h3> Types </h3>
- *
- * ColdPollutant/WarmPollutant are enumerations of emission factors. Currently FC, NOx, NO2, PM, CO2(total)
- * are considered as warm pollutants and FC, NOx, NO2, PM, CO and HC as cold pollutants.
- * These enumerations are expandable.
+ * <h3>Types</h3>
+ * ColdPollutant/WarmPollutant are enumerations of emission factors. 
  * The HbefaVehicleAttributes class contains a default constructor, setting all values to average.
  * This way unknown vehicle types can be handled and emissions calculated.
  * Any instance of the HbefaWarmEmissionFactorKey class contains a vehicle category, a warm pollutant;a road category,
@@ -83,8 +84,8 @@ package playground.benjamin.emissions;
  * Instances of the HbefaColdEmissionFactorKey class contain a vehicle category, a cold pollutant, a parking time range,
  * a distance, which is driven after parking and vehicle attributes.
  * The cold/warm factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
- *
- *
+ * <br/> <br/>
+ * 
  * @author benjamin
  */
 
