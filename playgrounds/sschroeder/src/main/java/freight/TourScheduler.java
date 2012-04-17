@@ -1,11 +1,11 @@
 package freight;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
-
-import java.util.Collection;
-import java.util.Map;
 
 public interface TourScheduler {
 	

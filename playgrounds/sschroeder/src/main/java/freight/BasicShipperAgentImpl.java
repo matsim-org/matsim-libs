@@ -1,11 +1,12 @@
 package freight;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.Contract;
-import playground.mzilske.freight.TSPContract;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.Contract;
+
+import playground.mzilske.freight.TSPContract;
 
 public abstract class BasicShipperAgentImpl implements ShipperAgent{
 	

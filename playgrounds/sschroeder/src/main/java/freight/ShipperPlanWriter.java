@@ -1,15 +1,16 @@
 package freight;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.visum.VisumNetwork.TimeProfile;
-import utils.XmlWriterUtils;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.visum.VisumNetwork.TimeProfile;
+
+import utils.XmlWriterUtils;
 
 
 public class ShipperPlanWriter extends MatsimXmlWriter{

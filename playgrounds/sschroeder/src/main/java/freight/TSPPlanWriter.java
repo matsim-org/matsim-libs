@@ -3,20 +3,25 @@
  */
 package freight;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import playground.mzilske.freight.TSPContract;
-import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TransportChain;
-import playground.mzilske.freight.TransportChain.*;
-import playground.mzilske.freight.TransportServiceProvider;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+
+import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TSPShipment;
+import playground.mzilske.freight.TransportChain;
+import playground.mzilske.freight.TransportChain.ChainActivity;
+import playground.mzilske.freight.TransportChain.ChainElement;
+import playground.mzilske.freight.TransportChain.ChainLeg;
+import playground.mzilske.freight.TransportChain.Delivery;
+import playground.mzilske.freight.TransportChain.PickUp;
+import playground.mzilske.freight.TransportServiceProvider;
 
 /**
  * @author stefan

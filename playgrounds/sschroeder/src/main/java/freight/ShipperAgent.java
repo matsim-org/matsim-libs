@@ -1,10 +1,11 @@
 package freight;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Contract;
-import playground.mzilske.freight.TSPContract;
 
-import java.util.List;
+import playground.mzilske.freight.TSPContract;
 
 public interface ShipperAgent {
 	
