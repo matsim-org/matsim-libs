@@ -17,64 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3.population;
+package playground.droeder.eMobility.population;
+
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+
+import playground.droeder.eMobility.fleet.EVehicle;
 
 /**
  * @author droeder
  *
  */
-public class EActivity{
+public class EPerson {
 	
-	private double plannedStart;
-	private double plannedDuration;
-	private Id dischargingId;
-	private Id chargingId;
-	private Id poiId;
+	private EVehicle vehicle;
+	private Id id;
 
-	public EActivity(Id poiId, double plannedStart, double plannedDuration, Id dischargingId, Id chargingId){
-		this.plannedStart = plannedStart;
-		this.plannedDuration = plannedDuration;
-		this.dischargingId = dischargingId;
-		this.poiId = poiId;
-		this.chargingId = chargingId;
+	public EPerson(Id id, EVehicle vehicle){
+		this.vehicle = vehicle;
+		this.id = id;
 	}
 	
-	public Id getChargingId(){
-		return this.chargingId;
+	public EVehicle getVehicle(){
+		return this.vehicle;
 	}
 
 	/**
 	 * @return
 	 */
-	public double plannedStart() {
-		return this.plannedStart;
+	public Id getId() {
+		return this.id;
 	}
 
-	/**
-	 * @return
-	 */
-	public double plannedDuration() {
-		return this.plannedDuration;
-	}
 
-	/**
-	 * @return
-	 */
-	public Id getDischargingId() {
-		return this.dischargingId;
-	}
-
-	/**
-	 * @return
-	 */
-	public Id getPoiId() {
-		return this.poiId;
-	}
-
-	@Override
-	public String toString(){
-		return ("planned Start: " + plannedStart + " planned Duration: " + this.plannedDuration);
-	}
+	
 }

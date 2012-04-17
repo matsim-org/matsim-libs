@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3;
+package playground.droeder.eMobility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +45,13 @@ import org.matsim.population.algorithms.XY2Links;
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
-import playground.droeder.eMobility.v3.fleet.EFleet;
-import playground.droeder.eMobility.v3.fleet.EVehicle;
-import playground.droeder.eMobility.v3.poi.POI;
-import playground.droeder.eMobility.v3.poi.PoiInfo;
-import playground.droeder.eMobility.v3.population.EActivity;
-import playground.droeder.eMobility.v3.population.EPerson;
-import playground.droeder.eMobility.v3.population.EPopulation;
+import playground.droeder.eMobility.fleet.EFleet;
+import playground.droeder.eMobility.fleet.EVehicle;
+import playground.droeder.eMobility.poi.POI;
+import playground.droeder.eMobility.poi.PoiInfo;
+import playground.droeder.eMobility.population.EActivity;
+import playground.droeder.eMobility.population.EPerson;
+import playground.droeder.eMobility.population.EPopulation;
 
 /**
  * @author droeder

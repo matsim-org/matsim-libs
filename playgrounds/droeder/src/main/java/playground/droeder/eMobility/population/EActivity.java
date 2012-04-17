@@ -17,41 +17,64 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3.events;
+package playground.droeder.eMobility.population;
 
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-
-import playground.droeder.eMobility.v3.population.EPopulation;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author droeder
  *
  */
-public class EPopulationHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class EActivity{
 	
-	private EPopulation population;
+	private double plannedStart;
+	private double plannedDuration;
+	private Id dischargingId;
+	private Id chargingId;
+	private Id poiId;
 
-	public EPopulationHandler(EPopulation p){
-		this.population = p;
+	public EActivity(Id poiId, double plannedStart, double plannedDuration, Id dischargingId, Id chargingId){
+		this.plannedStart = plannedStart;
+		this.plannedDuration = plannedDuration;
+		this.dischargingId = dischargingId;
+		this.poiId = poiId;
+		this.chargingId = chargingId;
+	}
+	
+	public Id getChargingId(){
+		return this.chargingId;
+	}
+
+	/**
+	 * @return
+	 */
+	public double plannedStart() {
+		return this.plannedStart;
+	}
+
+	/**
+	 * @return
+	 */
+	public double plannedDuration() {
+		return this.plannedDuration;
+	}
+
+	/**
+	 * @return
+	 */
+	public Id getDischargingId() {
+		return this.dischargingId;
+	}
+
+	/**
+	 * @return
+	 */
+	public Id getPoiId() {
+		return this.poiId;
 	}
 
 	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
+	public String toString(){
+		return ("planned Start: " + plannedStart + " planned Duration: " + this.plannedDuration);
 	}
-
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		this.population.processEvent(event);		
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.population.processEvent(event);
-	}
-
 }

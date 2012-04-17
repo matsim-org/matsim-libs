@@ -17,43 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3.events;
+package playground.droeder.eMobility.events;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.GenericEventImpl;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+
+import playground.droeder.eMobility.population.EPopulation;
 
 /**
  * @author droeder
  *
  */
-public class SoCChangeEvent extends GenericEventImpl{
-
-	public static final String ACTTYPE = "SoCChangeEvent";
-	public static final String SOC = "stateOfCharge";
-	public static final String LINKID = "linkId";
-	public static final String VEHID = "vehId";
+public class EPopulationHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
-	/**
-	 * @param type
-	 * @param time
-	 */
-	public SoCChangeEvent(Id vehId, double time, double soc, Id linkId) {
-		super(ACTTYPE, time);
-		super.getAttributes().put(SOC, String.valueOf(soc));
-		super.getAttributes().put(LINKID, linkId.toString());
-		super.getAttributes().put(VEHID, vehId.toString());
+	private EPopulation population;
+
+	public EPopulationHandler(EPopulation p){
+		this.population = p;
 	}
 
-	public Id getLinkId(){
-		return new IdImpl(super.getAttributes().get(LINKID));
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		
 	}
-	
-	public double getSoC(){
-		return Double.parseDouble(super.getAttributes().get(SOC));
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		this.population.processEvent(event);		
 	}
-	
-	public Id getVehId(){
-		return new IdImpl(super.getAttributes().get(VEHID));
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		this.population.processEvent(event);
 	}
+
 }

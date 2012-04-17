@@ -17,79 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3;
+package playground.droeder.eMobility.poi;
 
-import org.matsim.api.core.v01.Scenario;
+import java.util.HashMap;
+import java.util.Map;
 
-import playground.droeder.eMobility.v3.fleet.EFleet;
-import playground.droeder.eMobility.v3.poi.PoiInfo;
-import playground.droeder.eMobility.v3.population.EPopulation;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author droeder
  *
  */
-public class EmobilityScenario {
+public class PoiInfo {
 	
-	private Scenario sc;
-	private EFleet fleet;
-	private EPopulation population;
-	private PoiInfo poi;
+	Map<Id, POI> poiMap;
 	
-	public EmobilityScenario(){
-		
+	public PoiInfo(Map<Id, POI> pois){
+		this.poiMap = pois;
 	}
-
-	/**
-	 * @return the sc
-	 */
-	public Scenario getSc() {
-		return sc;
+	
+	public void add(POI poi){
+		this.poiMap.put(poi.getId(), poi);
 	}
-
-	/**
-	 * @param sc the sc to set
-	 */
-	public void setSc(Scenario sc) {
-		this.sc = sc;
+	
+	public PoiInfo(){
+		this.poiMap = new HashMap<Id, POI>();
 	}
-
+	
 	/**
-	 * @return the fleet
-	 */
-	public EFleet getFleet() {
-		return fleet;
-	}
-
-	/**
-	 * @param fleet the fleet to set
-	 */
-	public void setFleet(EFleet fleet) {
-		this.fleet = fleet;
-	}
-
-	/**
-	 * @return the population
-	 */
-	public EPopulation getPopulation() {
-		return population;
-	}
-
-	/**
-	 * @param population the population to set
-	 */
-	public void setPopulation(EPopulation population) {
-		this.population = population;
-	}
-
-	/**
+	 * returns true if there is free charging space and false otherwise
+	 * 
+	 * @param id
+	 * @param time
 	 * @return
 	 */
-	public PoiInfo getPoi() {
-		return this.poi;
-	}
-	
-	public void setPoi(PoiInfo poi){
-		this.poi = poi;
+	public boolean plugVehicle(Id id, double time){
+		return this.poiMap.get(id).plugVehicle(time);
 	}
 }

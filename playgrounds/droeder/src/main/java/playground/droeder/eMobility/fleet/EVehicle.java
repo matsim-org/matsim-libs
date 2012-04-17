@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3.fleet;
+package playground.droeder.eMobility.fleet;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -30,8 +30,8 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
-import playground.droeder.eMobility.v3.events.SoCChangeEvent;
-import playground.droeder.eMobility.v3.population.EActivity;
+import playground.droeder.eMobility.events.SoCChangeEvent;
+import playground.droeder.eMobility.population.EActivity;
 
 /**
  * @author droeder

@@ -17,39 +17,79 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3.population;
+package playground.droeder.eMobility;
 
-import java.util.List;
+import org.matsim.api.core.v01.Scenario;
 
-import org.matsim.api.core.v01.Id;
-
-import playground.droeder.eMobility.v3.fleet.EVehicle;
+import playground.droeder.eMobility.fleet.EFleet;
+import playground.droeder.eMobility.poi.PoiInfo;
+import playground.droeder.eMobility.population.EPopulation;
 
 /**
  * @author droeder
  *
  */
-public class EPerson {
+public class EmobilityScenario {
 	
-	private EVehicle vehicle;
-	private Id id;
-
-	public EPerson(Id id, EVehicle vehicle){
-		this.vehicle = vehicle;
-		this.id = id;
+	private Scenario sc;
+	private EFleet fleet;
+	private EPopulation population;
+	private PoiInfo poi;
+	
+	public EmobilityScenario(){
+		
 	}
-	
-	public EVehicle getVehicle(){
-		return this.vehicle;
+
+	/**
+	 * @return the sc
+	 */
+	public Scenario getSc() {
+		return sc;
+	}
+
+	/**
+	 * @param sc the sc to set
+	 */
+	public void setSc(Scenario sc) {
+		this.sc = sc;
+	}
+
+	/**
+	 * @return the fleet
+	 */
+	public EFleet getFleet() {
+		return fleet;
+	}
+
+	/**
+	 * @param fleet the fleet to set
+	 */
+	public void setFleet(EFleet fleet) {
+		this.fleet = fleet;
+	}
+
+	/**
+	 * @return the population
+	 */
+	public EPopulation getPopulation() {
+		return population;
+	}
+
+	/**
+	 * @param population the population to set
+	 */
+	public void setPopulation(EPopulation population) {
+		this.population = population;
 	}
 
 	/**
 	 * @return
 	 */
-	public Id getId() {
-		return this.id;
+	public PoiInfo getPoi() {
+		return this.poi;
 	}
-
-
 	
+	public void setPoi(PoiInfo poi){
+		this.poi = poi;
+	}
 }

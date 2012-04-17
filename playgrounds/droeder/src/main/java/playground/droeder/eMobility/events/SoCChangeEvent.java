@@ -17,41 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3.poi;
-
-import java.util.HashMap;
-import java.util.Map;
+package playground.droeder.eMobility.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.GenericEventImpl;
 
 /**
  * @author droeder
  *
  */
-public class PoiInfo {
-	
-	Map<Id, POI> poiMap;
-	
-	public PoiInfo(Map<Id, POI> pois){
-		this.poiMap = pois;
-	}
-	
-	public void add(POI poi){
-		this.poiMap.put(poi.getId(), poi);
-	}
-	
-	public PoiInfo(){
-		this.poiMap = new HashMap<Id, POI>();
-	}
+public class SoCChangeEvent extends GenericEventImpl{
+
+	public static final String ACTTYPE = "SoCChangeEvent";
+	public static final String SOC = "stateOfCharge";
+	public static final String LINKID = "linkId";
+	public static final String VEHID = "vehId";
 	
 	/**
-	 * returns true if there is free charging space and false otherwise
-	 * 
-	 * @param id
+	 * @param type
 	 * @param time
-	 * @return
 	 */
-	public boolean plugVehicle(Id id, double time){
-		return this.poiMap.get(id).plugVehicle(time);
+	public SoCChangeEvent(Id vehId, double time, double soc, Id linkId) {
+		super(ACTTYPE, time);
+		super.getAttributes().put(SOC, String.valueOf(soc));
+		super.getAttributes().put(LINKID, linkId.toString());
+		super.getAttributes().put(VEHID, vehId.toString());
+	}
+
+	public Id getLinkId(){
+		return new IdImpl(super.getAttributes().get(LINKID));
+	}
+	
+	public double getSoC(){
+		return Double.parseDouble(super.getAttributes().get(SOC));
+	}
+	
+	public Id getVehId(){
+		return new IdImpl(super.getAttributes().get(VEHID));
 	}
 }

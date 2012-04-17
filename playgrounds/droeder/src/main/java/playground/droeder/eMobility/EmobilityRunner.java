@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3;
+package playground.droeder.eMobility;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.GenericEvent;
@@ -31,10 +31,10 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.energy.EmobEnergyProfileReader;
-import playground.droeder.eMobility.v3.events.EFleetHandler;
-import playground.droeder.eMobility.v3.events.EPopulationHandler;
-import playground.droeder.eMobility.v3.events.SoCChangeEvent;
-import playground.droeder.eMobility.v3.fleet.EFleet;
+import playground.droeder.eMobility.events.EFleetHandler;
+import playground.droeder.eMobility.events.EPopulationHandler;
+import playground.droeder.eMobility.events.SoCChangeEvent;
+import playground.droeder.eMobility.fleet.EFleet;
 
 
 /**

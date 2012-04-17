@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v3.fleet;
+package playground.droeder.eMobility.fleet;
 
 import java.util.HashMap;
 
@@ -34,7 +34,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
-import playground.droeder.eMobility.v3.poi.PoiInfo;
+import playground.droeder.eMobility.poi.PoiInfo;
 
 /**
  * @author droeder
