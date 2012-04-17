@@ -200,6 +200,20 @@ public class PED12ScenarioGen {
 		createPedLink(-60,-1.,-57.5,8.,1.34,true,4,net);
 		createPedLink(-60,-1.,-60,8.,1.34,true,4,net);
 		
+		
+		//1. shelf col
+		////express links
+		for (double y = -1; y >= -36; y -= 5) {
+			createPedLink(-49,y,-49,y-5,1.34,false,4,net);
+		}
+		////shopping links
+		for (double y = -3.5; y >= -33.5; y -= 5) {
+			createPedLink(-50,y,-49,y+2.5,1.34,false,4,net);
+			createPedLink(-50,y,-49,y-2.5,1.34,false,4,net);
+			createPedLink(-50,y,-50,y-5,0.2,false,4,net);
+		}
+		createPedLink(-50,-38.5,-49,-41,1.34,false,4,net);
+		
 		//for debugging only
 		dumpNetworkAsShapeFile(sc,inputDir);
 		
@@ -230,7 +244,7 @@ public class PED12ScenarioGen {
 			net.addNode(n1);
 		}		
 		
-		double cap  = 1./20;//every 20 sec one persin
+		double cap  = 1./20;//every 20 sec one person
 		double lanes = 5.4*0.26 * width;
 		Link l = nf.createLink(new IdImpl(linkID++), n0, n1, net, length, v,cap , lanes);
 		net.addLink(l);
