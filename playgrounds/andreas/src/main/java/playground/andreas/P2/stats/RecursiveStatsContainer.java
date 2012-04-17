@@ -49,17 +49,17 @@ public class RecursiveStatsContainer {
 		meanPax_n_1 =  (this.numberOfEntries * this.arithmeticMeanPax + pax) / (this.numberOfEntries + 1);
 		meanVeh_n_1 =  (this.numberOfEntries * this.arithmeticMeanVeh + veh) / (this.numberOfEntries + 1);
 
-		this.numberOfEntries++;
-
-		if (this.numberOfEntries == 1) {
+		if (this.numberOfEntries == 0) {
 			tempVarCoops_n_1 = 0;
 			tempVarPax_n_1 = 0;
 			tempVarVeh_n_1 = 0;
 		} else {
-			tempVarCoops_n_1 = this.tempVarCoops + this.numberOfEntries / (this.numberOfEntries - 1) * (meanCoops_n_1 - coops) * (meanCoops_n_1 - coops);
-			tempVarPax_n_1 = this.tempVarPax + this.numberOfEntries / (this.numberOfEntries - 1) * (meanPax_n_1 - pax) * (meanPax_n_1 - pax);
-			tempVarVeh_n_1 = this.tempVarVeh + this.numberOfEntries / (this.numberOfEntries - 1) * (meanVeh_n_1 - veh) * (meanVeh_n_1 - veh);
+			tempVarCoops_n_1 = this.tempVarCoops + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanCoops_n_1 - coops) * (meanCoops_n_1 - coops);
+			tempVarPax_n_1 = this.tempVarPax + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanPax_n_1 - pax) * (meanPax_n_1 - pax);
+			tempVarVeh_n_1 = this.tempVarVeh + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanVeh_n_1 - veh) * (meanVeh_n_1 - veh);
 		}
+		
+		this.numberOfEntries++;
 
 		// store em away
 		this.arithmeticMeanCoops = meanCoops_n_1;
