@@ -53,6 +53,8 @@ public class DemandCreatorFromCounts {
 	static String countsPath = "../../detailedEval/teststreckeLandshuterAllee/zaehlstellen_einfluss/";
 	static String outPath = "../../detailedEval/teststreckeLandshuterAllee/sim/input/aussen_sued/";
 
+	//same source for LandshuterAllee:aussen_sued -counts per lane - taken as there is only data available for one lane.
+	//for all other streets choose the two given counts per lane to generate demand for the street
 	static String laneSouth1 = "4013015";
 	static String laneSouth2 = "4013015";
 	
@@ -79,7 +81,7 @@ public class DemandCreatorFromCounts {
 
 			/*inflow times are randomly equally mutated within a 2min time bin;
 			one could think of modelling peak inflows due to upstream signals systems...*/
-			fuzzifyTimes(population);
+			//fuzzifyTimes(population);
 
 			//addTestVehicle(population, testVehiclePath + day + "_travelTimes.csv");
 			writePlans(population, day);
@@ -169,6 +171,7 @@ public class DemandCreatorFromCounts {
 		SortedMap<Integer, Double> aggregatedEndTime2NoOfVehicles = aggregateVehicles(endTime2NoOfVehiclesLane1, endTime2NoOfVehiclesLane2,endTime2NoOfFreightLane1,endTime2NoOfFreightLane2);
 		SortedMap<Integer, Double> aggregatedEndTime2NoOfFreight = aggregateFreight(endTime2NoOfFreightLane1,endTime2NoOfFreightLane2);
 
+		//passenger cars are added to plans
 		for(Entry<Integer, Double> entry : aggregatedEndTime2NoOfVehicles.entrySet()){
 			Integer endTimeInSeconds = entry.getKey();
 			Double vehicelesTotal = entry.getValue();
@@ -199,6 +202,7 @@ public class DemandCreatorFromCounts {
 			}
 		}
 		
+		//freight traffic is added to plans
 		for(Entry<Integer, Double> entry : aggregatedEndTime2NoOfFreight.entrySet()){
 			Integer endTimeInSeconds = entry.getKey();
 			Double freightTotal = entry.getValue();
@@ -248,10 +252,14 @@ public class DemandCreatorFromCounts {
 				System.out.println("Couldn't find mapping for key " + endTime );
 			}
 			else{
-				Double vehicelesTotal = vehiclesLane1 + vehiclesLane2*0.4 - freightLane1 - freightLane2*0.4;
-				aggregatedEndTime2NoOfVehicles.put(endTime, vehicelesTotal);
+				//vehicles from lane 2 for LandshuterAlle: aussen_sued are added by taken 40% of the counts of lane 1
+				//
+				Double passengerCars = vehiclesLane1 + vehiclesLane2*0.4 - freightLane1 - freightLane2*0.4;
+				//for all other calculations
+				//Double vehicelesTotal = vehiclesLane1 + vehiclesLane2 - freightLane1 - freightLane2;
+				aggregatedEndTime2NoOfVehicles.put(endTime, passengerCars);
 
-								System.out.println("End of time interval: " + endTime + "\t" + "Sum of cars: " + vehicelesTotal);
+								System.out.println("End of time interval: " + endTime + "\t" + "Sum of cars: " + passengerCars);
 			}
 		}
 		return aggregatedEndTime2NoOfVehicles;
@@ -271,8 +279,10 @@ public class DemandCreatorFromCounts {
 				System.out.println("Couldn't find mapping for key " + endTime );
 			}
 			else{
-				
+				//freigth from lane 2 for LandshuterAlle: aussen_sued are added by taken 40% of the counts of lane 1
 				Double freightTotal = freightLane1 + freightLane2*0.4;
+				//for all other calculations
+				//Double freightTotal = freightLane1 + freightLane2;
 				aggregatedEndTime2NoOfFreight.put(endTime, freightTotal);
 
 						System.out.println("End of time interval: " + endTime + "\t" + "Sum of cars: " + freightTotal);
