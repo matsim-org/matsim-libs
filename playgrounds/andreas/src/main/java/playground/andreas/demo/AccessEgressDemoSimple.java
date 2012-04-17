@@ -203,7 +203,7 @@ public class AccessEgressDemoSimple {
 		busType.setEgressTime(1.0);
 		
 		// train like
-		VehicleType trainType = vb.createVehicleType(new IdImpl("bus"));
+		VehicleType trainType = vb.createVehicleType(new IdImpl("train"));
 		capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(9999));
 		capacity.setStandingRoom(Integer.valueOf(0));
