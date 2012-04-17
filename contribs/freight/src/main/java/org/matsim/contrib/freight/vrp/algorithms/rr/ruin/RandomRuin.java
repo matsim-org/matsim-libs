@@ -39,28 +39,7 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
  */
 
 public class RandomRuin implements RuinStrategy {
-	
-	public class RuinWorker implements Callable<Boolean>{
 
-		RRTourAgent agent;
-		List<Job> unassignedJobs;
-		
-		public RuinWorker(RRTourAgent agent, List<Job> unassignedJobs) {
-			super();
-			this.agent = agent;
-			this.unassignedJobs = unassignedJobs;
-		}
-
-		@Override
-		public Boolean call() throws Exception {
-			for(Job j : unassignedJobs){
-				agent.removeJob(j);
-			}
-			return true;
-		}
-		
-	}
-	
 	
 	private Logger logger = Logger.getLogger(RandomRuin.class);
 
