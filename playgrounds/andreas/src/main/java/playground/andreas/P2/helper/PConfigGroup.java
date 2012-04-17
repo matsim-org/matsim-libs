@@ -65,7 +65,7 @@ public class PConfigGroup extends Module{
 	private static final String PRICE_PER_VEHICLE_SOLD = "pricePerVehicleSold";
 	private static final String MIN_OPERATION_TIME = "minOperationTime";
 	private static final String USEFRANCHISE = "useFranchise";
-	private static final String WRITESTATS = "writeStats";
+	private static final String WRITESTATS_INTERVAL = "writeStatsInterval";
 	private static final String LOGCOOPS = "logCoops";
 	private static final String WRITE_GEXF_STATS_INTERVAL = "writeGexfStatsInterval";
 	private static final String ROUTE_PROVIDER = "routeProvider";
@@ -93,7 +93,7 @@ public class PConfigGroup extends Module{
 	private double pricePerVehicleBought = 1000.0;
 	private double pricePerVehicleSold = 1000.0;
 	private boolean useFranchise = false;
-	private boolean writeStats = false;
+	private int writeStatsInterval = 0;
 	private boolean logCoops = false;
 	private int writeGexfStatsInterval = 0;
 	private String routeProvider = "SimpleCircleScheduleProvider";
@@ -145,8 +145,8 @@ public class PConfigGroup extends Module{
 			this.minOperationTime = Double.parseDouble(value);
 		} else if (USEFRANCHISE.equals(key)){
 			this.useFranchise = Boolean.parseBoolean(value);
-		} else if (WRITESTATS.equals(key)){
-			this.writeStats = Boolean.parseBoolean(value);
+		} else if (WRITESTATS_INTERVAL.equals(key)){
+			this.writeStatsInterval = Integer.parseInt(value);
 		} else if (LOGCOOPS.equals(key)){
 			this.logCoops = Boolean.parseBoolean(value);			
 		} else if (WRITE_GEXF_STATS_INTERVAL.equals(key)) {
@@ -192,7 +192,7 @@ public class PConfigGroup extends Module{
 		map.put(PRICE_PER_VEHICLE_SOLD, Double.toString(this.pricePerVehicleSold));
 		map.put(MIN_OPERATION_TIME, Double.toString(this.minOperationTime));
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
-		map.put(WRITESTATS, Boolean.toString(this.writeStats));
+		map.put(WRITESTATS_INTERVAL, Integer.toString(this.writeStatsInterval));
 		map.put(LOGCOOPS, Boolean.toString(this.logCoops));
 		map.put(WRITE_GEXF_STATS_INTERVAL, Integer.toString(this.writeGexfStatsInterval));
 		map.put(ROUTE_PROVIDER, this.routeProvider);
@@ -228,7 +228,7 @@ public class PConfigGroup extends Module{
 		map.put(PRICE_PER_VEHICLE_SOLD, "price of one vehicle sold");
 		map.put(MIN_OPERATION_TIME, "min time of operation of each cooperative in seconds");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
-		map.put(WRITESTATS, "will write statistics if set to true");
+		map.put(WRITESTATS_INTERVAL, "number of iterations statistics will be plotted. Set to zero to turn this feature off. Set to infinity to turn off the plots, but write the statistics file anyway");
 		map.put(LOGCOOPS, "will log coops individually if set to true");
 		map.put(WRITE_GEXF_STATS_INTERVAL, "number of iterations the gexf output gets updated. Set to zero to turn this feature off");
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
@@ -305,8 +305,8 @@ public class PConfigGroup extends Module{
 		return this.useFranchise;
 	}
 	
-	public boolean getWriteStats() {
-		return this.writeStats;
+	public int getWriteStatsInterval() {
+		return this.writeStatsInterval;
 	}
 	
 	public boolean getLogCoops() {
