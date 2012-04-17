@@ -372,7 +372,7 @@ public class VehiclesTracker implements MobsimInitializedListener, MobsimEngine,
 					this.internalInterface.arrangeNextAgentState(passenger);
 
 					// remove passenger from map
-					passengerVehicleMap.remove(event.getPersonId());
+					passengerVehicleMap.remove(passengerId);
 				}
 				// remove passengers from list
 				passengers.clear();
