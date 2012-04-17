@@ -58,6 +58,7 @@ public class PControler{
 		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
 		
 		// manipulate config
 		// add "pt interaction" cause controler.init() is called too late and in a protected way
