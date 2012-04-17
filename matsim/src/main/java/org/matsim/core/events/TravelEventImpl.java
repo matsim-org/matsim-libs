@@ -26,7 +26,10 @@ import java.util.Map;
 public class TravelEventImpl extends EventImpl implements TravelEvent {
 
 
-    public static final String EVENT_TYPE = "travelled";
+	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUT_DISTANCE = "distance";
+
+	public static final String EVENT_TYPE = "travelled";
 
     private Id agentId;
     private double distance;
@@ -45,8 +48,8 @@ public class TravelEventImpl extends EventImpl implements TravelEvent {
     @Override
     public Map<String, String> getAttributes() {
         Map<String, String> attributes = super.getAttributes();
-        attributes.put("person", agentId.toString());
-        attributes.put("distance", Double.toString(distance));
+        attributes.put(ATTRIBUTE_PERSON, agentId.toString());
+        attributes.put(ATTRIBUT_DISTANCE, Double.toString(distance));
         return attributes;
     }
 
