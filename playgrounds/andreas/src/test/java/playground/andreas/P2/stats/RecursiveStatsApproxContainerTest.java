@@ -1,0 +1,51 @@
+package playground.andreas.P2.stats;
+
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
+
+
+public class RecursiveStatsApproxContainerTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	public final void testRecursiveStatsContainer() {
+
+		RecursiveStatsApproxContainer stats = new RecursiveStatsApproxContainer(0.1, 3);
+
+		stats.handleNewEntry(1.0, 2.0, 3.0);
+		Assert.assertEquals("mean coop", 1.0, stats.getArithmeticMeanCoops(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("mean pax", 2.0, stats.getArithmeticMeanPax(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("mean veh", 3.0, stats.getArithmeticMeanVeh(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev coop", Double.NaN, stats.getStdDevCoop(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev pax", Double.NaN, stats.getStdDevPax(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev veh", Double.NaN, stats.getStdDevVeh(), MatsimTestUtils.EPSILON);
+		
+		stats.handleNewEntry(2.0, 3.0, 1.0);
+		Assert.assertEquals("mean coop", 1.5, stats.getArithmeticMeanCoops(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("mean pax", 2.5, stats.getArithmeticMeanPax(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("mean veh", 2.0, stats.getArithmeticMeanVeh(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev coop", 0.7071067811865476, stats.getStdDevCoop(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev pax", 0.7071067811865476, stats.getStdDevPax(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev veh", 1.4142135623730951, stats.getStdDevVeh(), MatsimTestUtils.EPSILON);
+		
+		stats.handleNewEntry(3.0, 1.0, 2.0);
+		Assert.assertEquals("mean coop", 2.0, stats.getArithmeticMeanCoops(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("mean pax", 2.0, stats.getArithmeticMeanPax(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("mean veh", 2.0, stats.getArithmeticMeanVeh(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev coop", 1.0, stats.getStdDevCoop(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev pax", 1.0, stats.getStdDevPax(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev veh", 1.0, stats.getStdDevVeh(), MatsimTestUtils.EPSILON);
+		
+		stats.handleNewEntry(1.0, 2.0, 3.0);
+		stats.handleNewEntry(2.0, 3.0, 1.0);
+		stats.handleNewEntry(12.0, 123.0, 1234.0);
+		Assert.assertEquals("mean coop", 2.9190000000000005, stats.getArithmeticMeanCoops(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("mean pax", 14.190000000000001, stats.getArithmeticMeanPax(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("mean veh", 125.191, stats.getArithmeticMeanVeh(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev coop", 1.7181000000000002, stats.getStdDevCoop(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev pax", 11.691, stats.getStdDevPax(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("std dev veh", 111.7719, stats.getStdDevVeh(), MatsimTestUtils.EPSILON);
+	}
+}
