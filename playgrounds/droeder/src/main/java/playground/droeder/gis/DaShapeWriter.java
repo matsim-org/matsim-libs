@@ -67,7 +67,7 @@ public class DaShapeWriter {
 	
 	public static void writeLinks2Shape(String fileName, Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes){
 		if(attributes == null){
-			initLineFeatureType("links", null);
+			initLineFeatureType("links", null, 2);
 		}else{
 			for(SortedMap<String, Object> m : attributes.values()){
 				initLineFeatureType("links", m);
@@ -177,10 +177,13 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes) {
+	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes){
+		initLineFeatureType(name, attributes, 0);
+	}
+	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes, int additional) {
 		AttributeType[] attribs;
 		if(attributes == null){
-			attribs = new AttributeType[2];
+			attribs = new AttributeType[2 + additional];
 		}else{
 			attribs = new AttributeType[attributes.size() + 2];
 		}
@@ -194,6 +197,10 @@ public class DaShapeWriter {
 				attribs[count] = AttributeTypeFactory.newAttributeType(e.getKey(), e.getValue().getClass());
 				count++;
 			}
+		}else{
+			//works only for links
+			attribs[2] = AttributeTypeFactory.newAttributeType("capacity",Double.class);
+			attribs[3] = AttributeTypeFactory.newAttributeType("length",Double.class);
 		}
 		
 		try {
@@ -262,13 +269,16 @@ public class DaShapeWriter {
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
-		
+		SortedMap<String, Object> attr;
 		for(Link l : links.values()){
 			coord = new Coordinate[2];
 			coord[0] = MGC.coord2Coordinate(l.getFromNode().getCoord());
 			coord[1] = MGC.coord2Coordinate(l.getToNode().getCoord());
 			if(attributes == null){
-				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), null);
+				attr = new TreeMap<String, Object>();
+				attr.put("capacity", l.getCapacity());
+				attr.put("length", l.getLength());
+				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attr);
 			}else{
 				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attributes.get(l.getId()));
 			}

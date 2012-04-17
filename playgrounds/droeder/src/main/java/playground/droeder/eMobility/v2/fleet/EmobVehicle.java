@@ -31,7 +31,7 @@ public class EmobVehicle{
 	private Id id;
 	//should be the link
 	private Id position;
-	private boolean changed = false;
+	private boolean changed = true;
 	private double soc;
 	
 	public EmobVehicle(Id id,Link position, double soc){

@@ -49,7 +49,7 @@ public class AddCoordToHafasTransitSchedule {
 	private static final Logger log = Logger
 			.getLogger(AddCoordToHafasTransitSchedule.class);
 	
-	private static String PATH_PREFIX = DRPaths.BVG09 + "BVG-Fahrplan_2008/Daten/1_Mo-Do/";
+	private static String PATH_PREFIX = DRPaths.BERLINSHARED + "BVG-Fahrplan_2008/Daten/1_Mo-Do/";
 	private static String COORDFILE = PATH_PREFIX + "bfkoord";
 //	private static String FILENAME = "D:/Berlin/BVG/berlin-bvg09/pt/nullfall_M44_344_U8/alldat";
 	private static String INFILENAME = DRPaths.PROJECTS + "bvg09/transitSchedule-HAFAS.xml";

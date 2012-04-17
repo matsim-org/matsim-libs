@@ -17,20 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v1;
+package playground.droeder.eMobility.v2;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -38,17 +31,15 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.io.IOUtils;
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.energy.EmobEnergyProfileReader;
-import playground.droeder.eMobility.v1.handler.EmobPersonHandler;
-import playground.droeder.eMobility.v1.handler.EmobVehicleDrivingHandler;
-import playground.droeder.eMobility.v1.subjects.EmobilityPerson;
+import playground.droeder.eMobility.v2.handler.EmobPersonHandler;
+import playground.droeder.eMobility.v2.fleet.EmobFleet;
+import playground.droeder.eMobility.v2.handler.EmobVehicleDrivingHandler;
 import playground.droeder.eMobility.v2.population.EmobPerson;
+import playground.droeder.eMobility.v2.population.EmobPopulation;
 
 /**
  * @author droeder
@@ -57,8 +48,8 @@ import playground.droeder.eMobility.v2.population.EmobPerson;
 public class EmobilityRunner {
 	
 	private Scenario scenario;
-//	private EventsManager manager;
-	private Map<Id, EmobilityPerson> persons;
+	private EmobPopulation population;
+	private EmobFleet fleet;
 	private ChargingProfiles charging;
 	private DisChargingProfiles discharging;
 	private List<EventHandler> handler;
@@ -70,23 +61,14 @@ public class EmobilityRunner {
 	public EmobilityRunner(String configFile) {
 		Config c = ConfigUtils.loadConfig(configFile);
 		this.scenario = ScenarioUtils.loadScenario(c);
-//		this.manager = EventsUtils.createEventsManager();
 		this.handler = new ArrayList<EventHandler>();
-		this.persons = new HashMap<Id, EmobilityPerson>();
+		this.population =  new EmobPopulation();
+		this.fleet = new EmobFleet(null);
 	}
 	
 	public void createAndAddPerson(String eMobPlan){
 		//TODO 
-		EmobilityPerson p = new EmobilityPerson(new IdImpl("emob" + String.valueOf(this.cnt)), new CoordImpl(4588309,5820079), scenario.getNetwork().getNodes().get(new IdImpl("26736131")), 26.0, scenario.getNetwork());
-		p.readDataFromFile(eMobPlan);
-		this.scenario.getPopulation().addPerson(p.createMatsimPerson(this.scenario.getPopulation().getFactory()));
-		this.persons.put(p.getId(), p);
-		this.cnt++;
 		
-//		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new MatsimNetworkRe	ader(sc).readFile(this.scenario.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
-//		new MatsimPopulationReader(sc).readFile(eMobPlans);
-//		for(Person p: sc.getPopulation().getPersons().values()){
 	}
 	
 	public void loadDisChargingProfiles(String file){
@@ -100,21 +82,17 @@ public class EmobilityRunner {
 	public void run(){
 		Controler c = new Controler(this.scenario);
 		EventsManager events = c.getEvents() ;
+		
+		this.fleet.setEventsmanager(events);
+		
+		EmobVehicleDrivingHandler h1 = new EmobVehicleDrivingHandler(c.getNetwork(), this.discharging);
+		EmobPersonHandler h2 = new EmobPersonHandler(h1, population, fleet, this.charging);
 
-		//		this.eHandler = new EmobiltyHandler(this.vehicles, this.charging, this.discharging, this.scenario.getNetwork());
-//		this.handler.add(this.eHandler);
-		EmobVehicleDrivingHandler h1 =  new EmobVehicleDrivingHandler(discharging, this.scenario.getNetwork(), events);
-		EmobPersonHandler h2 = new EmobPersonHandler(persons, h1, charging, events);
-		this.handler.add(h1);
-		this.handler.add(h2);
 		
 		c.addControlerListener(new MyListener(this.handler));
 		
 		c.setDumpDataAtEnd(true);
 		c.setOverwriteFiles(true);
-		
-//		SimulationAfterSimStepListener assl = new MyListener() ;
-//		c.getQueueSimulationListener().add( assl ) ;
 		
 		c.run();
 	}
@@ -141,48 +119,48 @@ public class EmobilityRunner {
 		
 	}
 	
-	/**
-	 * @param outdir2
-	 */
-	public void dumpResults(String outdir) {
-		System.out.println("test");
-		BufferedWriter writer = IOUtils.getBufferedWriter(outdir + "distance.csv");
-		try {
-			writer.write("id;distance;charge;\n");
-			for(Entry<Id, EmobilityPerson> e: this.persons.entrySet()){
-				for(Tuple<Double, Double> ee: e.getValue().getVehicle().getDist2Charge()){
-					writer.write(e.getKey() + ";" + ee.getFirst() +";" + ee.getSecond() + ";");
-					writer.newLine();
-				}
-			}
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		writer = IOUtils.getBufferedWriter(outdir + "time.csv");
-		try {
-			writer.write("id;time;charge;\n");
-			for(Entry<Id, EmobilityPerson> e: this.persons.entrySet()){
-				for(Tuple<Double, Double> ee: e.getValue().getVehicle().getTime2Charge()){
-					writer.write(e.getKey() + ";" + ee.getFirst() +";" + ee.getSecond() + ";");
-					writer.newLine();
-				}
-			}
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	/**
+//	 * @param outdir2
+//	 */
+//	public void dumpResults(String outdir) {
+//		System.out.println("test");
+//		BufferedWriter writer = IOUtils.getBufferedWriter(outdir + "distance.csv");
+//		try {
+//			writer.write("id;distance;charge;\n");
+//			for(Entry<Id, EmobilityPerson> e: this.persons.entrySet()){
+//				for(Tuple<Double, Double> ee: e.getValue().getVehicle().getDist2Charge()){
+//					writer.write(e.getKey() + ";" + ee.getFirst() +";" + ee.getSecond() + ";");
+//					writer.newLine();
+//				}
+//			}
+//			writer.flush();
+//			writer.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		writer = IOUtils.getBufferedWriter(outdir + "time.csv");
+//		try {
+//			writer.write("id;time;charge;\n");
+//			for(Entry<Id, EmobilityPerson> e: this.persons.entrySet()){
+//				for(Tuple<Double, Double> ee: e.getValue().getVehicle().getTime2Charge()){
+//					writer.write(e.getKey() + ";" + ee.getFirst() +";" + ee.getSecond() + ";");
+//					writer.newLine();
+//				}
+//			}
+//			writer.flush();
+//			writer.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	private final static String VWDIR = "D:/VSP/svn/shared/volkswagen_internal/";
 	private final static String SCENARIO = VWDIR + "scenario/";
 	
 	private static final String CONFIG = SCENARIO + "config_base_scenario.xml";
 	private static final String EMOBPLANS = SCENARIO + "input/testplan.txt";
-	private static final String OUTDIR = SCENARIO + "matsimOutput/1/";
+	private static final String OUTDIR = SCENARIO + "matsimOutput/2/";
 	
 	private static final String CHARGINGPROFILE = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";
 	private static final String DISCHARGINGPROFILE = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/DrivingLookupTable_2011-11-25.txt";
@@ -196,6 +174,6 @@ public class EmobilityRunner {
 		
 		runner.run();
 		
-		runner.dumpResults(OUTDIR);
+//		runner.dumpResults(OUTDIR);
 	}
 }

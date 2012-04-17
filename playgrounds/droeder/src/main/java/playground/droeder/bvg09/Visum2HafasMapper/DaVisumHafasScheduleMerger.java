@@ -47,7 +47,7 @@ public class DaVisumHafasScheduleMerger {
 	private static String InNetworkFile = path + "intermediateNetwork.xml";
 	private static String InTransitScheduleFile = path + "intermediateTransitSchedule.xml";
 	private static String HafasTransitScheduleFile = path + "transitSchedule-HAFAS.xml";
-	private static String InVisumNetFile = DRPaths.BVG09 + "nullfall2009-05-25.net";
+	private static String InVisumNetFile = DRPaths.BERLINSHARED + "nullfall2009-05-25.net";
 	// private static String OutNetworkFile = path + "network.xml";
 	private static String OutTransitScheduleFile = path + "mergedTransitSchedule.xml";
 

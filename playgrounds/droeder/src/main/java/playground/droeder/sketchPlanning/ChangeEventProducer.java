@@ -43,7 +43,7 @@ import playground.droeder.DRPaths;
 public class ChangeEventProducer {
 	
 	private static String NETWORK = "D:/VSP/shared-svn/studies/countries/de/berlin/_counts/iv_counts/network-ba16_17_storkower_ext.xml.gz";
-	private static String OUTFILE = DRPaths.STUDIESSKETCH + "changeEvents_ba17_storkower_ext.xml";
+	private static String OUTFILE = DRPaths.SKETCH + "changeEvents_ba17_storkower_ext.xml";
 	private static Set<String> ORIGID2CHANGE = new  HashSet<String>(){{
 //		add("ba16");
 //		add("ba17");

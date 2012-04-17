@@ -35,6 +35,8 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
  */
 public class EmobFleet implements MobsimAfterSimStepListener{
 	
+	public static final String SOCCHANGEEVENT = "SoCChange";
+	
 	private Map<Id, EmobVehicle> fleet;
 	private EventsManager manager;
 
@@ -60,12 +62,20 @@ public class EmobFleet implements MobsimAfterSimStepListener{
 		for(EmobVehicle veh : this.fleet.values()){
 			GenericEvent ge;
 			if(veh.changedSoC()){
-				ge = new GenericEventImpl("SoCChange", e.getSimulationTime());
+				ge = new GenericEventImpl(SOCCHANGEEVENT, e.getSimulationTime());
+				ge.getAttributes().put("veh", veh.getId().toString());
 				ge.getAttributes().put("SoC", String.valueOf(veh.getCurrentSoC()));
 				ge.getAttributes().put("link", String.valueOf(veh.getPositionLinkId()));
 				this.manager.processEvent(ge);
 			}
 		}
+	}
+
+	/**
+	 * @param events
+	 */
+	public void setEventsmanager(EventsManager events) {
+		this.manager = events;
 	}
 
 }
