@@ -89,10 +89,11 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		
-		double betaBrain = sc.getConfig().planCalcScore().getBrainExpBeta(); // scale parameter. tnicolai: test different beta brains (e.g. 02, 1, 10 ...)
-		double betaCarHour = betaBrain * (sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaScale = sc.getConfig().planCalcScore().getBrainExpBeta(); // scale parameter. tnicolai: test different beta brains (e.g. 02, 1, 10 ...)
+		double betaScalePreFactor = 1/betaScale;
+		double betaCarHour = betaScale * (sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
 		double betaCarMin = betaCarHour / 60.; // get utility per minute
-		double betaWalkHour = betaBrain * (sc.getConfig().planCalcScore().getTravelingWalk_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaWalkHour = betaScale * (sc.getConfig().planCalcScore().getTravelingWalk_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
 		double betaWalkMin = betaWalkHour / 60.; // get utility per minute.
 		
 		try{
@@ -103,7 +104,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			log.info("Beta car traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
 			log.info("Beta walk traveling utils/h: " + sc.getConfig().planCalcScore().getTravelingWalk_utils_hr());
 			log.info("Beta performing utils/h: " + sc.getConfig().planCalcScore().getPerforming_utils_hr());
-			log.info("Beta brain (scale factor): " + betaBrain);
+			log.info("Beta scale: " + betaScale);
 			log.info("Beta car traveling per h: " + betaCarHour);
 			log.info("Beta car traveling per min: " + betaCarMin);
 			log.info("Beta walk traveling per h: " + betaWalkHour);
@@ -153,7 +154,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				}
 				
 				// get log sum 
-				double congestedTravelTimesCarLogSum = Math.log( congestedTravelTimesCarSum );
+				double congestedTravelTimesCarLogSum = betaScalePreFactor * Math.log( congestedTravelTimesCarSum );
 
 				// writing accessibility measures of current node in csv format
 				ZoneBasedAccessibilityCSVWriter.write(originZoneID, 
