@@ -74,7 +74,7 @@ public class ScorAttrReader implements TabularFileHandler {
 					"scorAttrFilename");
 			if (scorAttrFilename != null) {
 				System.out
-						.println("BEGINNING of loading scoring function attributes.");
+						.println("BEGINNING of loading scoring function attributes for each plan.");
 				new ScorAttrReader(scorAttrFilename, ctl.getPopulation())
 						.parser();
 				System.out

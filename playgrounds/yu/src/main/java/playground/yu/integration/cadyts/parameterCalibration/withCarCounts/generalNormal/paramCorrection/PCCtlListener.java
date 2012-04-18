@@ -66,7 +66,7 @@ import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 public class PCCtlListener extends BseParamCalibrationControlerListener
-implements StartupListener, ShutdownListener, IterationEndsListener {
+		implements StartupListener, ShutdownListener, IterationEndsListener {
 	private int caliStartTime, caliEndTime;
 	private int avgLlhOverIters = 0, writeLlhInterval = 0;
 	// private Config config;
@@ -80,7 +80,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 	private int paramDim;
 
 	static final String PARAM_NAME_INDEX = "parameterName_",
-	PARAM_STDDEV_INDEX = "paramStddev_";
+			PARAM_STDDEV_INDEX = "paramStddev_";
 	static String[] paramNames/* in configfile */;
 
 	private double[][] paramArrays/* performing, traveling and so on */;
@@ -97,7 +97,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		// BSE_CONFIG_MODULE_NAME, "watching"));
 
 		String parameterDimensionStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-		"parameterDimension");
+				"parameterDimension");
 		if (parameterDimensionStr != null) {
 			paramDim = Integer.parseInt(parameterDimensionStr);// e.g.
 			// =2
@@ -132,8 +132,8 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		List<Integer> calibratedParameterIndices = new ArrayList<Integer>();
 		for (String paramName : paramNames) {
 			calibratedParameterIndices
-			.add(Events2Score4AttrRecorder.attrNameList
-					.indexOf(paramName));
+					.add(Events2Score4AttrRecorder.attrNameList
+							.indexOf(paramName));
 		}
 
 		// INITIALIZING "Calibrator"
@@ -171,14 +171,14 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 					ctlIO.getOutputFilename("parameterCovariance.log"));
 			StringBuffer sb = new StringBuffer("iter\t" + "VAR{"
 					+ paramNames[0]
-					             // "covariance ["
+			// "covariance ["
 			);
 			for (int i = 1; i < paramNames.length; i++) {
 				sb.append(", ");
 				sb.append(paramNames[i]);
 			}
 			sb.append("|eps}"
-					// "]\texpectation of variance\tvariance of expectation"
+			// "]\texpectation of variance\tvariance of expectation"
 			);
 
 			writerCV.writeln(sb);
@@ -202,13 +202,13 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		Config config = ctl.getConfig();
 
 		String avgLlhOverItersStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-		"averageLogLikelihoodOverIterations");
+				"averageLogLikelihoodOverIterations");
 		if (avgLlhOverItersStr != null) {
 			avgLlhOverIters = Integer.parseInt(avgLlhOverItersStr);
 		}
 
 		String writeLlhItervalStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-		"writeLogLikelihoodInterval");
+				"writeLogLikelihoodInterval");
 		if (writeLlhItervalStr != null) {
 			writeLlhInterval = Integer.parseInt(writeLlhItervalStr);
 		}
@@ -217,13 +217,13 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 				BSE_CONFIG_MODULE_NAME, "writeLinkUtilOffsetsInterval");
 		if (writeLinkUtilOffsetsIntervalStr != null) {
 			writeLinkUtilOffsetsInterval = Integer
-			.parseInt(writeLinkUtilOffsetsIntervalStr);
+					.parseInt(writeLinkUtilOffsetsIntervalStr);
 		}
 	}
 
 	private void initializeStrategyManager(Controler ctl) {
 		String deltaStr = ctl.getConfig().findParam(BSE_CONFIG_MODULE_NAME,
-		"delta");
+				"delta");
 		double delta;
 		if (deltaStr == null) {
 			delta = 1e-6;
@@ -233,8 +233,8 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
 		((PCStrMn) ctl.getStrategyManager())
-		.init(calibrator, ctl.getTravelTimeCalculator(),
-				(MultinomialLogitChoice) chooser);
+				.init(calibrator, ctl.getTravelTimeCalculator(),
+						(MultinomialLogitChoice) chooser);
 	}
 
 	@Override
@@ -250,13 +250,13 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 			ControlerIO io = ctl.getControlerIO();
 			// ***************************************************
 			calibrator.setFlowAnalysisFile(io.getIterationFilename(iter,
-			"flowAnalysis.log"));
+					"flowAnalysis.log"));
 			calibrator.afterNetworkLoading(resultsContainer);
 			// ************************************************
 			if (iter % writeLinkUtilOffsetsInterval == 0) {
 				try {
 					DynamicData<Link> linkCostOffsets = calibrator
-					.getLinkCostOffsets();
+							.getLinkCostOffsets();
 					new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(io
 							.getIterationFilename(iter, "linkUtilOffsets.xml"),
 							linkCostOffsets);
@@ -267,18 +267,18 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 			}
 			// ************************************************
 			if (calibrator.getParameterCovarianceExpOfVarComponent()
-					// getParameterCovariance()
-					!= null) {
+			// getParameterCovariance()
+			!= null) {
 				writerCV.writeln(iter
 						// + "\t"
 						// + calibrator.getParameterCovariance()
 						// .toSingleLineString()
 						+ "\t"
 						+ calibrator.getParameterCovarianceExpOfVarComponent()
-						.toSingleLineString()
-						// + "\t"
-						// + calibrator.getParameterCovarianceVarOfExpComponent()
-						// .toSingleLineString()
+								.toSingleLineString()
+				// + "\t"
+				// + calibrator.getParameterCovarianceVarOfExpComponent()
+				// .toSingleLineString()
 				);
 			}
 			writerCV.flush();
@@ -294,7 +294,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 			// // !watching &&
 			// cycleIdx == 0) {
 			MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
-			.getMultinomialLogit();
+					.getMultinomialLogit();
 
 			// *******should after Scoring Listener!!!*******
 
@@ -304,10 +304,10 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 
 				for (int i = 0; i < paramNames.length; i++) {
 					int paramNameIndex = Events2Score4AttrRecorder.attrNameList
-					.indexOf(paramNames[i]/*
-					 * pos. of param in Parameters
-					 * in Cadyts
-					 */);
+							.indexOf(paramNames[i]/*
+												 * pos. of param in Parameters
+												 * in Cadyts
+												 */);
 
 					// double paramScaleFactor =
 					// Events2Score4PC_mnl_mnl.paramScaleFactorList
@@ -325,11 +325,11 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 						// // / paramScaleFactor
 						// ));
 						ScoringConfigGetSetValues
-						.setValue(paramNames[i], value);
+								.setValue(paramNames[i], value);
 					} else/* bse */{
 						config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
 								Double.toString(value
-										// / paramScaleFactor
+								// / paramScaleFactor
 								));
 					}
 					// *****************************************************
@@ -342,7 +342,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 					;
 					sb.append("\t");
 					sb.append(value
-							// /paramScaleFactor
+					// /paramScaleFactor
 					);
 				}
 
@@ -377,7 +377,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		// TESTS: calculate log-likelihood -(q-y)^2/(2sigma^2)
 		if (writeLlhInterval > 0 && avgLlhOverIters > 0) {
 			int nextWriteLlhInterval = writeLlhInterval
-			* (iter / writeLlhInterval + 1);
+					* (iter / writeLlhInterval + 1);
 			if (iter <= nextWriteLlhInterval
 					&& iter > nextWriteLlhInterval - avgLlhOverIters
 					|| iter % writeLlhInterval == 0) {
@@ -404,15 +404,15 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 								double simVal = 0d;
 								if (linkVols != null) {
 									simVal = linkVols[hour - 1]
-									                  * countsScaleFactor;
+											* countsScaleFactor;
 								}
 
 								double minstddev = calibrator
-								.getMinStddev(TYPE.FLOW_VEH_H);
+										.getMinStddev(TYPE.FLOW_VEH_H);
 								double var = Math.max(minstddev * minstddev,
 										calibrator.getVarianceScale() * cntVal);
 								double absLlh = (simVal - cntVal)
-								* (simVal - cntVal) / 2d / var;
+										* (simVal - cntVal) / 2d / var;
 								llhSum -= absLlh;
 								// System.out.println("Accumulated Llh over "
 								// + avgLlhOverIters
@@ -449,7 +449,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		Controler ctl = event.getControler();
 		ControlerIO ctlIO = ctl.getControlerIO();
 		int firstIter = ctl.getFirstIteration(), lastIter = ctl
-		.getLastIteration();
+				.getLastIteration();
 
 		double[] xs = new double[lastIter - firstIter + 1];
 		for (int i = firstIter; i <= lastIter; i++) {
@@ -535,7 +535,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 			}
 
 			XYLineChart chart = new XYLineChart(chartTitle, "iter",
-			"value of parameters") // ,travPerf = new
+					"value of parameters") // ,travPerf = new
 			// XYLineChart("traveling & performing - avg. and sqrt(var)",
 			// "iteration","[h]")
 			;
@@ -564,37 +564,37 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		}
 
 		String caliStartTimeStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-		"startTime");
+				"startTime");
 
 		caliStartTime = caliStartTimeStr != null ? Integer
 				.parseInt(caliStartTimeStr) : DEFAULT_CALIBRATION_START_TIME;
 
-				caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
+		caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
 				"endTime"));
 
-				Map<Id, Count> countsMap = counts.getCounts();
-				for (Id countId : countsMap.keySet()) {
-					Link link = network.getLinks().get(countId);
-					if (link == null) {
-						System.err.println("could not find link " + countId.toString());
-					} else if (isInRange(countId, network)) {
-						// for ...2QGIS
-						links.add(network.getLinks().get(countId));
-						linkIds.add(countId);
-						// ---------GUNNAR'S CODES---------------------
-						for (Volume volume : countsMap.get(countId).getVolumes()
-								.values()) {
-							int hour = volume.getHour();
-							if (hour >= caliStartTime && hour <= caliEndTime) {
-								int start_s = (hour - 1) * 3600;
-								int end_s = hour * 3600 - 1;
-								double val_veh_h = volume.getValue();
-								calibrator.addMeasurement(link, start_s, end_s,
-										val_veh_h, TYPE.FLOW_VEH_H);
-							}
-						}
+		Map<Id, Count> countsMap = counts.getCounts();
+		for (Id countId : countsMap.keySet()) {
+			Link link = network.getLinks().get(countId);
+			if (link == null) {
+				System.err.println("could not find link " + countId.toString());
+			} else if (isInRange(countId, network)) {
+				// for ...2QGIS
+				links.add(network.getLinks().get(countId));
+				linkIds.add(countId);
+				// ---------GUNNAR'S CODES---------------------
+				for (Volume volume : countsMap.get(countId).getVolumes()
+						.values()) {
+					int hour = volume.getHour();
+					if (hour >= caliStartTime && hour <= caliEndTime) {
+						int start_s = (hour - 1) * 3600;
+						int end_s = hour * 3600 - 1;
+						double val_veh_h = volume.getValue();
+						calibrator.addMeasurement(link, start_s, end_s,
+								val_veh_h, TYPE.FLOW_VEH_H);
 					}
 				}
+			}
+		}
 	}
 
 	private void setCalibratorParameters(Config config) {
@@ -604,14 +604,14 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 					BSE_CONFIG_MODULE_NAME, "useApproximateNewton");
 			if (useApproximateNewtonStr != null) {
 				boolean useApproximateNewton = Boolean
-				.parseBoolean(useApproximateNewtonStr);
+						.parseBoolean(useApproximateNewtonStr);
 				calibrator.setUseApproximateNetwton(useApproximateNewton);
 				System.out.println("BSE:\tuseApproximateNetwton\t=\t"
 						+ useApproximateNewton);
 			} else {
 				System.out
-				.println("BSE:\tuseApproximateNetwton\t= default value\t"
-						+ ChoiceParameterCalibrator4.DEFAULT_USE_APPROXIMATE_NEWTON);
+						.println("BSE:\tuseApproximateNetwton\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_USE_APPROXIMATE_NEWTON);
 			}
 		}
 
@@ -621,14 +621,14 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 					BSE_CONFIG_MODULE_NAME, "proportionalAssignment");
 			if (proportionalAssignmentStr != null) {
 				boolean proportionalAssignment = Boolean
-				.parseBoolean(proportionalAssignmentStr);
+						.parseBoolean(proportionalAssignmentStr);
 				System.out.println("BSE:\tproportionalAssignment\t= "
 						+ proportionalAssignment);
 				calibrator.setProportionalAssignment(proportionalAssignment);
 			} else {
 				System.out
-				.println("BSE:\tproportionalAssignment\t= default value\t"
-						+ Calibrator.DEFAULT_PROPORTIONAL_ASSIGNMENT);
+						.println("BSE:\tproportionalAssignment\t= default value\t"
+								+ Calibrator.DEFAULT_PROPORTIONAL_ASSIGNMENT);
 			}
 		}
 
@@ -638,7 +638,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 					BSE_CONFIG_MODULE_NAME, "freezeIteration");
 			if (freezeIterationStr != null) {
 				final int freezeIteration = Integer
-				.parseInt(freezeIterationStr);
+						.parseInt(freezeIterationStr);
 				System.out.println("BSE:\tfreezeIteration\t= "
 						+ freezeIteration);
 				calibrator.setFreezeIteration(freezeIteration);
@@ -651,7 +651,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		// SETTING MINSTDDEV
 		{
 			String minStdDevStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-			"minFlowStddevVehH");
+					"minFlowStddevVehH");
 			if (minStdDevStr != null) {
 				double minStdDev = Double.parseDouble(minStdDevStr);
 				calibrator.setMinStddev(minStdDev, TYPE.FLOW_VEH_H);
@@ -667,14 +667,14 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 					BSE_CONFIG_MODULE_NAME, "preparatoryIterations");
 			if (preparatoryIterationsStr != null) {
 				final int preparatoryIterations = Integer
-				.parseInt(preparatoryIterationsStr);
+						.parseInt(preparatoryIterationsStr);
 				System.out.println("BSE:\tpreparatoryIterations\t= "
 						+ preparatoryIterations);
 				calibrator.setPreparatoryIterations(preparatoryIterations);
 			} else {
 				System.out
-				.println("BSE:\tpreparatoryIterations\t= default value\t"
-						+ Calibrator.DEFAULT_PREPARATORY_ITERATIONS);
+						.println("BSE:\tpreparatoryIterations\t= default value\t"
+								+ Calibrator.DEFAULT_PREPARATORY_ITERATIONS);
 			}
 		}
 		// SETTING varianceScale
@@ -683,7 +683,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 					BSE_CONFIG_MODULE_NAME, "varianceScale");
 			if (varianceScaleStr != null) {
 				final double varianceScale = Double
-				.parseDouble(varianceScaleStr);
+						.parseDouble(varianceScaleStr);
 				System.out.println("BSE:\tvarianceScale\t= " + varianceScale);
 				calibrator.setVarianceScale(varianceScale);
 			} else {
@@ -706,23 +706,23 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 						+ ChoiceParameterCalibrator4.DEFAULT_INITIAL_STEP_SIZE);
 			}
 		}
-		// SETTING msaExponent
-		{
-			/*
-			 * initialStepSize * 1.0 /(iteration ^ msaExponent), if msaExponent
-			 * == 0.5, the step won't so quickly smaller, default value: 1.0
-			 */
-			String msaExponentStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-			"msaExponent");
-			if (msaExponentStr != null) {
-				double msaExponent = Double.parseDouble(msaExponentStr);
-				calibrator.setMsaExponent(msaExponent);
-				System.out.println("BSE:\tmsaExponent\t=" + msaExponent);
-			} else {
-				System.out.println("BSE:\tmsaExponent\t= default value\t"
-						+ ChoiceParameterCalibrator4.DEFAULT_MSA_EXPONENT);
-			}
-		}
+		// SETTING msaExponent deprecated
+		// {
+		// /*
+		// * initialStepSize * 1.0 /(iteration ^ msaExponent), if msaExponent
+		// * == 0.5, the step won't so quickly smaller, default value: 1.0
+		// */
+		// String msaExponentStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+		// "msaExponent");
+		// if (msaExponentStr != null) {
+		// double msaExponent = Double.parseDouble(msaExponentStr);
+		// calibrator.setMsaExponent(msaExponent);
+		// System.out.println("BSE:\tmsaExponent\t=" + msaExponent);
+		// } else {
+		// System.out.println("BSE:\tmsaExponent\t= default value\t"
+		// + ChoiceParameterCalibrator4.DEFAULT_MSA_EXPONENT);
+		// }
+		// }
 	}
 
 	private void setInitialParametersInCalibrator(Config config) {
@@ -740,14 +740,14 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 				initialParams.set(i, Double
 						.parseDouble(ScoringConfigGetSetValues
 								.getValue(paramNames[i]))
-								// * paramScaleFactor
-				);
+				// * paramScaleFactor
+						);
 
 			} else/* bse */{
 				initialParams.set(i, Double.parseDouble(config.findParam(
 						BSE_CONFIG_MODULE_NAME, paramNames[i]))
-						// * paramScaleFactor
-				);
+				// * paramScaleFactor
+						);
 			}
 		}
 
@@ -756,7 +756,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 
 	private void setInitialParameterVariancesInCalibrator(Config config) {
 		String setInitialParamVarStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-		"setInitialParameterVariances");
+				"setInitialParameterVariances");
 		if (setInitialParamVarStr != null) {
 			if (Boolean.parseBoolean(setInitialParamVarStr)) {
 				Vector initialParamVars = new Vector(paramDim);
@@ -783,7 +783,7 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		if (distFilterCenterNodeStr != null) {
 			// set up center and radius of counts stations locations
 			distanceFilterCenterNodeCoord = ctl.getNetwork().getNodes()
-			.get(new IdImpl(distFilterCenterNodeStr)).getCoord();
+					.get(new IdImpl(distFilterCenterNodeStr)).getCoord();
 			distanceFilter = ccg.getDistanceFilter();
 		}
 		// set up volumes analyzer

@@ -743,23 +743,23 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						+ ChoiceParameterCalibrator4.DEFAULT_INITIAL_STEP_SIZE);
 			}
 		}
-		// SETTING msaExponent
-		{
-			/*
-			 * initialStepSize * 1.0 /(iteration ^ msaExponent), if msaExponent
-			 * == 0.5, the step won't so quickly smaller, default value: 1.0
-			 */
-			String msaExponentStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-					"msaExponent");
-			if (msaExponentStr != null) {
-				double msaExponent = Double.parseDouble(msaExponentStr);
-				calibrator.setMsaExponent(msaExponent);
-				System.out.println("BSE:\tmsaExponent\t=" + msaExponent);
-			} else {
-				System.out.println("BSE:\tmsaExponent\t= default value\t"
-						+ ChoiceParameterCalibrator4.DEFAULT_MSA_EXPONENT);
-			}
-		}
+		// SETTING msaExponent deprecated
+		// {
+		// /*
+		// * initialStepSize * 1.0 /(iteration ^ msaExponent), if msaExponent
+		// * == 0.5, the step won't so quickly smaller, default value: 1.0
+		// */
+		// String msaExponentStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+		// "msaExponent");
+		// if (msaExponentStr != null) {
+		// double msaExponent = Double.parseDouble(msaExponentStr);
+		// calibrator.setMsaExponent(msaExponent);
+		// System.out.println("BSE:\tmsaExponent\t=" + msaExponent);
+		// } else {
+		// System.out.println("BSE:\tmsaExponent\t= default value\t"
+		// + ChoiceParameterCalibrator4.DEFAULT_MSA_EXPONENT);
+		// }
+		// }
 		// SETTING parameterUpdateInterval
 		{
 			String parameterUpdateIntervalStr = config.findParam(
