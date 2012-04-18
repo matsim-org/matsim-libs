@@ -57,7 +57,6 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicle;
@@ -413,12 +412,6 @@ public class VehiclesTracker implements MobsimInitializedListener, MobsimEngine,
 	@Override
 	public void doSimStep(double time) {
 		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public Netsim getMobsim() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

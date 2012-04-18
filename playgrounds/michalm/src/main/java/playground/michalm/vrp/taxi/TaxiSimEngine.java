@@ -1,18 +1,23 @@
 package playground.michalm.vrp.taxi;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizerFactory;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.listener.OptimizerEvent;
+import pl.poznan.put.vrp.dynamic.optimizer.listener.OptimizerListener;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.jdbc.JdbcWriter;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
@@ -58,13 +63,10 @@ public class TaxiSimEngine
         vrpData = data.getVrpData();
     }
 
-
-    @Override
     public Netsim getMobsim()
     {
         return netsim;
     }
-
 
     @Override
     public void onPrepareSim()

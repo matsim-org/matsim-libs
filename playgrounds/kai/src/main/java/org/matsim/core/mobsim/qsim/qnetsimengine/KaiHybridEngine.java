@@ -38,11 +38,6 @@ public class KaiHybridEngine implements MobsimEngine {
 	}
 
 	@Override
-	public Netsim getMobsim() {
-		return this.internalInterface.getMobsim() ;
-	}
-
-	@Override
 	public void onPrepareSim() {
 	}
 

@@ -11,7 +11,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
@@ -92,16 +91,6 @@ public class PrioQEngine implements MobsimEngine {
 	public void onPrepareSim() {
 
 		this.simNetwork = new PrioQNetwork(this.scenario,this.sim.getEventsManager(),this.internalInterface);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.matsim.ptproject.qsim.interfaces.SimEngine#getQSim()
-	 */
-	@Override
-	public Netsim getMobsim() {
-		return this.sim;
 	}
 
 	public PrioQNetwork getPrioQNetwork() {

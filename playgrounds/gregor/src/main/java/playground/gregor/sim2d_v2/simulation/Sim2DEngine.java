@@ -31,7 +31,6 @@ import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.PedestrianSignal;
@@ -136,17 +135,6 @@ public class Sim2DEngine implements MobsimEngine {
 		this.floor = new PhysicalFloor(this.scenario, this.sim.getEventsManager(), emitEvents,this.signals,this.internalInterface);
 		this.floor.init();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.matsim.ptproject.qsim.interfaces.SimEngine#getQSim()
-	 */
-	@Override
-	public Netsim getMobsim() {
-		return this.sim;
-	}
-
 
 	public void putDepartingAgentInLimbo(Agent2D agent) {
 		this.activityEndsList.add(agent);

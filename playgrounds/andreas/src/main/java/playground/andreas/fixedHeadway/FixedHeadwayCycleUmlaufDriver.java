@@ -3,7 +3,7 @@ package playground.andreas.fixedHeadway;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.pt.UmlaufDriver;
 import org.matsim.core.utils.misc.Time;
@@ -23,8 +23,8 @@ public class FixedHeadwayCycleUmlaufDriver extends UmlaufDriver {
 	private static int useageCnt = 0 ;
 
 	public FixedHeadwayCycleUmlaufDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTracker,
-			MobsimEngine trEngine) {
-		super(umlauf, TransportMode.car, thisAgentTracker, trEngine);
+			InternalInterface internalInterface) {
+		super(umlauf, TransportMode.car, thisAgentTracker, internalInterface);
 		if ( useageCnt <1 ) {
 			useageCnt++ ;
 			log.info(" will be used. " + Gbl.ONLYONCE );

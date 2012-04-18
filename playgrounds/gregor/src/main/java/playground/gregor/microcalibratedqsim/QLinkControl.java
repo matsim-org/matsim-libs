@@ -153,12 +153,6 @@ public class QLinkControl implements MobsimEngine{
 	}
 
 	@Override
-	public Netsim getMobsim() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void onPrepareSim() {
 		// TODO Auto-generated method stub
 
