@@ -131,26 +131,30 @@ public final class QSim implements VisMobsim, Netsim {
 
 
 	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
+		
+		// These methods must be synchronized, because they are called back
+		// from possibly multi-threaded engines, and they access
+		// global mutable data.
+		
 		@Override
-		public final void arrangeNextAgentState(MobsimAgent agent) {
+		public synchronized void arrangeNextAgentState(MobsimAgent agent) {
 			QSim.this.arrangeNextAgentAction(agent) ;
 		}
 
 		@Override
-		public final Netsim getMobsim() {
+		public Netsim getMobsim() {
 			return QSim.this ;
 		}
 
 		@Override
-		public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
+		public synchronized void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 			QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
 		}
 
 		@Override
-		public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+		public synchronized MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
 			return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
-
 
 	};
 
@@ -271,7 +275,6 @@ public final class QSim implements VisMobsim, Netsim {
 		netEngine.addParkedVehicle(veh, linkId);
 	}
 
-	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
 		netEngine.addParkedVehicle(veh, startLinkId);
 	}

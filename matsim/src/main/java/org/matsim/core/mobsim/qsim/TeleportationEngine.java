@@ -10,7 +10,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.collections.Tuple;
 
 public class TeleportationEngine implements DepartureHandler, MobsimEngine {
@@ -50,11 +49,6 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine {
 				break;
 			}
 		}
-	}
-
-	@Override
-	public Netsim getMobsim() {
-		return internalInterface.getMobsim();
 	}
 
 	@Override

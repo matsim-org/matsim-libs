@@ -32,7 +32,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
-public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
+public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;

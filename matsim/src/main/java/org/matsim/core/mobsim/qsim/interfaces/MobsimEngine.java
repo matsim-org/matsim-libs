@@ -30,19 +30,17 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
  * @author dgrether, nagel
  */
 public interface MobsimEngine extends Steppable {
-  /**
-   *
-   * @return the QSim instance
-   */
-  public Netsim getMobsim();
+
   /**
    * called in a predefined Order when the simulation is started
    */
   public void onPrepareSim();
+ 
   /**
    * Do some clean up.
    */
   public void afterSim();
+  
   public void setInternalInterface(InternalInterface internalInterface);
 
 }

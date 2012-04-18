@@ -51,11 +51,6 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 	}
 
 	@Override
-	public Netsim getMobsim() {
-		return this.mobsim;
-	}
-
-	@Override
 	public void onPrepareSim() {
 		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)this.mobsim.getScenario().getNetwork()).getNetworkChangeEvents();
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {

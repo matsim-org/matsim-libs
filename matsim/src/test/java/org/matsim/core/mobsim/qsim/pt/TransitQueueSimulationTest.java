@@ -613,8 +613,8 @@ public class TransitQueueSimulationTest {
         public final List<SpyHandleStopData> spyData = new ArrayList<SpyHandleStopData>();
 
         public SpyDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-                         final TransitStopAgentTracker agentTracker, final MobsimEngine trEngine) {
-            super(line, route, departure, agentTracker, trEngine);
+                         final TransitStopAgentTracker agentTracker, final TransitQSimEngine trEngine) {
+            super(line, route, departure, agentTracker, trEngine.getInternalInterface());
         }
 
         @Override

@@ -69,8 +69,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		this.multiModalTravelTime = multiModalTravelTime; 
 	}
 
-	@Override
-	public Netsim getMobsim() {
+	Netsim getMobsim() {
 		return qSim;
 	}
 

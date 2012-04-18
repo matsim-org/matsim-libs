@@ -19,7 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.interfaces;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 
 
@@ -31,7 +30,5 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 public interface Netsim extends Mobsim {
 
 	NetsimNetwork getNetsimNetwork();
-
-	void addParkedVehicle(MobsimVehicle veh, Id startLinkId);
 	
 }

@@ -37,8 +37,8 @@ import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -58,11 +58,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private int nextLinkIndex = 0;
 	private final TransitStopAgentTracker agentTracker;
 	private Person dummyPerson;
-	protected final Netsim sim;
 	private TransitRouteStop currentStop = null;
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
-	private MobsimEngine trEngine ;
+	private InternalInterface internalInterface;
 	
 	/* package */ MobsimAgent.State state = MobsimAgent.State.ACTIVITY ; 
 	// yy not so great: implicit instantiation at activity.  kai, nov'11
@@ -80,12 +79,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	@Override
 	public abstract double getActivityEndTime();
 
-	public AbstractTransitDriver(MobsimEngine trEngine2, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriver(InternalInterface internalInterface, TransitStopAgentTracker agentTracker2) {
 		super();
-		this.sim = trEngine2.getMobsim() ;
+		this.internalInterface = internalInterface;
 		this.agentTracker = agentTracker2;
-		this.trEngine = trEngine2 ; 
-		// (has to be of this type in order to work.  might as well fix type in constructor? kai, dec'11)
 	}
 
 	protected void init() {
@@ -165,10 +162,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	protected final void sendTransitDriverStartsEvent(final double now) {
 		// check if "Wenden"
 		if(getTransitLine() == null){
-			this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+			this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 					this.vehicle.getId(), new IdImpl("Wenden"), new IdImpl("Wenden"), new IdImpl("Wenden")));
 		} else {
-			this.sim.getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+			this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 					this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
 		}
 	}
@@ -178,7 +175,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	Netsim getSimulation(){
-		return this.sim;
+		return this.internalInterface.getMobsim();
 	}
 
 	/**Design comments:<ul>
@@ -205,7 +202,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	private void processEventVehicleArrives(final TransitStopFacility stop,
 			final double now) {
-		EventsManager events = this.sim.getEventsManager();
+		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
 			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), stop.getId(),
@@ -231,7 +228,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	private void depart(final double now) {
-		EventsManager events = this.sim.getEventsManager();
+		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(),
 				this.currentStop.getStopFacility().getId(),
 				now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
@@ -264,11 +261,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			if (planAgent instanceof PersonDriverAgentImpl) { 
 				Id agentId = planAgent.getId();
 				Id linkId = planAgent.getCurrentLinkId();
-//				this.getSimulation().unregisterAdditionalAgentOnLink(agentId, linkId);
-				((TransitQSimEngine)this.trEngine).internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId) ;
+				this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId) ;
 			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
-			EventsManager events = this.sim.getEventsManager();
+			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
 					agent.getId(), this.vehicle.getVehicle().getId()));
 		}
@@ -280,11 +276,11 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		boolean handled = this.vehicle.removePassenger(passenger);
 		if(handled){
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
-			EventsManager events = this.sim.getEventsManager();
+			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId()));
 			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
 			agent.endLegAndComputeNextState(time);
-			((TransitQSimEngine)this.trEngine).internalInterface.arrangeNextAgentState(agent) ;
+			this.internalInterface.arrangeNextAgentState(agent) ;
 			// (cannot set trEngine to TransitQSimEngine because there are tests where this will not work. kai, dec'11)
 		}
 		return handled;

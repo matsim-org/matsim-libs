@@ -35,6 +35,7 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -70,7 +71,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private static Logger log = Logger.getLogger(TransitQSimEngine.class);
 
-	private Netsim qSim;
+	private QSim qSim;
 
 	private TransitSchedule schedule = null;
 
@@ -82,22 +83,22 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private AbstractTransitDriverFactory transitDriverFactory = new UmlaufDriverFactory();
 
-	/*package*/ InternalInterface internalInterface = null ;
+	private InternalInterface internalInterface = null ;
+	
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
 	}
 
-	public TransitQSimEngine(Netsim queueSimulation) {
+	public TransitQSimEngine(QSim queueSimulation) {
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker();
 	}
 
-
-	@Override
-	public Netsim getMobsim() {
-		return this.qSim;
+	// For tests (which create an Engine, and externally create Agents as well).
+	public InternalInterface getInternalInterface() {
+		return this.internalInterface;
 	}
 
 	@Override
@@ -149,7 +150,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	private AbstractTransitDriver createAndScheduleVehicleAndDriver(Umlauf umlauf,
 			Vehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle, 5);
-		AbstractTransitDriver driver = this.transitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, this );
+		AbstractTransitDriver driver = this.transitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, internalInterface );
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
@@ -171,7 +172,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 						throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
 					}
 					TransitQVehicle veh = new TransitQVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
-					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this );
+					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, internalInterface );
 					veh.setDriver(driver);
 					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 					driver.setVehicle(veh);

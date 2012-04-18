@@ -53,7 +53,7 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
  * @author dgrether
  * @author dstrippgen
  */
-public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
+public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	private static final class NodeIdComparator implements Comparator<QNode>, Serializable {
 		private static final long serialVersionUID = 1L;
@@ -343,8 +343,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		return this.simLinksList.size();
 	}
 
-	@Override
-	public QSim getMobsim() {
+	QSim getMobsim() {
 		return this.qsim;
 	}
 

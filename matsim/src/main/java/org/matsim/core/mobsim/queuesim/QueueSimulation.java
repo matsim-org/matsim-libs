@@ -49,7 +49,6 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.utils.collections.Tuple;
@@ -449,11 +448,6 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime) {
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
-	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
 		throw new UnsupportedOperationException() ;
 	}
 

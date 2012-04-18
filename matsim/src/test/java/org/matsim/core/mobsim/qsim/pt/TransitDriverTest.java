@@ -34,17 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
-import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
-import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandler;
-import org.matsim.core.mobsim.qsim.pt.TransitDriver;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
-import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -73,41 +63,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
  * @author mrieser
  */
 public class TransitDriverTest extends MatsimTestCase {
-	static class FakeEngine implements MobsimEngine {
-		private Netsim netsim ;
-		
-		@Override
-		public void setInternalInterface( InternalInterface internalInterface ) {
-		}
-
-		/*package*/ FakeEngine() {
-			this.netsim = null;
-		}
-		
-		/*package*/ FakeEngine(Netsim netsim) {
-			this.netsim = netsim;
-		}
-
-		@Override
-		public void afterSim() {
-			throw new UnsupportedOperationException() ;
-		}
-
-		@Override
-		public Netsim getMobsim() {
-			return this.netsim ;
-		}
-
-		@Override
-		public void onPrepareSim() {
-			throw new UnsupportedOperationException() ;
-		}
-
-		@Override
-		public void doSimStep(double time) {
-			throw new UnsupportedOperationException() ;
-		}
-	}
 
 	private static final Logger log = Logger.getLogger(TransitDriverTest.class);
 
@@ -141,8 +96,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		route.setLinkIds(link1.getId(), linkIds, link5.getId());
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
-		MobsimEngine trEngine = new FakeEngine();
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, null);
 
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
@@ -157,7 +111,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals(link2.getId(), driver.chooseNextLinkId());
 		Id nextLinkId = driver.chooseNextLinkId() ;
 		driver.notifyMoveOverNode(nextLinkId);
-		
+
 		assertEquals(link3.getId(), driver.chooseNextLinkId());
 		nextLinkId = driver.chooseNextLinkId() ;
 		driver.notifyMoveOverNode(nextLinkId);
@@ -180,8 +134,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		double depTime = 9876.5;
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
-		MobsimEngine trEngine = new FakeEngine();
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, null);
 		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestCase.EPSILON);
 	}
 
@@ -207,7 +160,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine );
+		tqsim.addMobsimEngine(trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -247,17 +201,18 @@ public class TransitDriverTest extends MatsimTestCase {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-    QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
-	TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
-
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine);
+		
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -329,7 +284,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -375,18 +330,19 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-    ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-    QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
-	TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
-
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine);
+		
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -422,18 +378,19 @@ public class TransitDriverTest extends MatsimTestCase {
 		double departureTime = 9876.0;
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), departureTime);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-    ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-    QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
-	TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
-
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine);
+		
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -468,18 +425,18 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-    ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-    QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
-	TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
-
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine);
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine );
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);

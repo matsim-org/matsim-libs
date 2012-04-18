@@ -1152,8 +1152,8 @@ public class TransitQueueNetworkTest extends TestCase {
     private static class FakeTransitDriver extends TransitDriver {
 
         public FakeTransitDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-                                 final TransitStopAgentTracker agentTracker, final MobsimEngine trEngine) {
-            super(line, route, departure, agentTracker, trEngine);
+                                 final TransitStopAgentTracker agentTracker, final TransitQSimEngine trEngine) {
+            super(line, route, departure, agentTracker, trEngine.getInternalInterface());
         }
 
         @Override

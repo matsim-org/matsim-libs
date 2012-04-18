@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -89,8 +90,8 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	
 	public UmlaufDriver(Umlauf umlauf,
 			String transportMode,
-			TransitStopAgentTracker thisAgentTracker, MobsimEngine trEngine) {
-		super(trEngine, thisAgentTracker);
+			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
+		super(internalInterface, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
 		PersonImpl driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.

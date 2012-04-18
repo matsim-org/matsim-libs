@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -55,8 +55,8 @@ public class TransitDriver extends AbstractTransitDriver {
 	private final Leg currentLeg;
 	
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, 
-			final TransitStopAgentTracker agentTracker, final MobsimEngine trEngine) {
-		super(trEngine, agentTracker);
+			final TransitStopAgentTracker agentTracker, InternalInterface internalInterface) {
+		super(internalInterface, agentTracker);
 		PersonImpl driver = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 		this.carRoute = route.getRoute();
 		Plan plan = new PlanImpl();
