@@ -126,12 +126,12 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		}
 	}
 
-	private void printSimLog(double time) {
+	/*package*/ void printSimLog(double time) {
 		if (time >= this.infoTime) {
 			this.infoTime += INFO_PERIOD;
 			int nofActiveLinks = this.getNumberOfSimulatedLinks();
 			int nofActiveNodes = this.getNumberOfSimulatedNodes();
-			log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) 
+			log.info("SIMULATION (MultiModalSimEngine) AT " + Time.writeTime(time) 
 					+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
 		}
 	}

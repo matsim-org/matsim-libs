@@ -293,7 +293,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		}
 	}
 
-	private void printSimLog(double time) {
+	/*package*/ void printSimLog(double time) {
 		if (time >= this.infoTime) {
 			this.infoTime += INFO_PERIOD;
 			int nofActiveLinks = this.getNumberOfSimulatedLinks();

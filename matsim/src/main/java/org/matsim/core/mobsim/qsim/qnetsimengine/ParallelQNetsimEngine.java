@@ -85,6 +85,8 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	@Override
 	public void doSimStep(final double time) {
 		run(time);
+		
+		this.printSimLog(time);
 	}
 
 	@Override

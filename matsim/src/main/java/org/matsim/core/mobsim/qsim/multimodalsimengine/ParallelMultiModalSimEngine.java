@@ -108,6 +108,8 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		} catch (BrokenBarrierException e) {
 	      	Gbl.errorMsg(e);
 		}
+		
+		this.printSimLog(time);
 	}
 
 	@Override
