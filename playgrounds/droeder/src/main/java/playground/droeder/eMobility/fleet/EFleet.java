@@ -21,12 +21,12 @@ package playground.droeder.eMobility.fleet;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -41,6 +41,7 @@ import playground.droeder.eMobility.poi.PoiInfo;
  *
  */
 public class EFleet implements MobsimAfterSimStepListener{
+	private static final Logger log = Logger.getLogger(EFleet.class);
 	
 	private EventsManager manager;
 	private HashMap<Id, EVehicle> fleet;
@@ -70,6 +71,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 	
 	@Override
 	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
+		log.error("update: " + System.currentTimeMillis());
 		for(EVehicle v: fleet.values()){
 //			if(v.getId().equals(new IdImpl("emob_9"))){
 //				System.out.println(v.getCurrentSoC());
@@ -82,6 +84,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(LinkLeaveEvent event) {
+//		log.error("leave: " + System.currentTimeMillis());
 		this.fleet.get(event.getVehicleId()).disCharge(event.getTime(), this.discharging);
 	}
 
@@ -90,6 +93,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(LinkEnterEvent event) {
+//		log.error("enter: " + System.currentTimeMillis());
 		this.fleet.get(event.getVehicleId()).setLinkEnterInformation(event.getTime(), this.net.getLinks().get(event.getLinkId()).getLength(), event.getLinkId());		
 	}
 
@@ -98,6 +102,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(PersonLeavesVehicleEvent event) {
+		log.error("leaveVeh: " + System.currentTimeMillis());
 		EVehicle v = this.fleet.get(event.getVehicleId());
 		v.finishDriving(event.getTime(), this.discharging, this.poiInfo.plugVehicle(v.getPoiId(), event.getTime()));
 	}
@@ -107,6 +112,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(PersonEntersVehicleEvent event) {
+		log.error("enterVeh: " + System.currentTimeMillis());
 		this.fleet.get(event.getVehicleId()).finishCharging(event.getTime(), this.charging);
 	}
 }
