@@ -2,10 +2,10 @@ package playground.benjamin.emissions;
 
 /**
  * This package provides a tool for exhaust emission calculation based on
- * the ``Handbook on Emission Factors for Road Transport'' (HBEFA), version 3.1 (see <a href="http://www.hbefa.net">HBEFA</a> ).
+ * the ``Handbook on Emission Factors for Road Transport'' (HBEFA), version 3.1 (see <a href="http://www.hbefa.net">http://www.hbefa.net</a>).
  * 
  * <h2>Usage</h2>
- * Execute "RunEmissionToolOnline.java" or "RunEmissionToolOffline.java" from the example package.
+ * Execute {@link playground.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline} or {@link playground.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline} from the example package.
  * <ul>
  * <li> {@link playground.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline}: Produces an emission events file during the simulation. </li>
  * <li> {@link playground.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline}: Produces an emission events file based on a standard MATSim eventsfile. </li>
@@ -18,24 +18,25 @@ package playground.benjamin.emissions;
  * <li>roadTypeMappingFile: This file needs to map road types in your network to Hbefa 3.1 road types. 
  * See the parser {@link playground.benjamin.emissions.EmissionModule#createRoadTypeMapping createRoadTypeMapping} 
  * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} 
- * or {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for details.
+ * or see {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for a detailed description.
  * 
  * <li>emissionVehicleFile: This data type is defined in the VspExperimentalConfigGroup, 
  * see {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} and described as "definition of a vehicle
- *  for every person (who is allowed to choose a vehicle in the simulation):" + "\n" +
- *  " - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n" +
- *  " - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
- *  " HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);" </li>
- * 
+ *  for every person (who is allowed to choose a vehicle in the simulation):
+ *  <ul>
+ *  <li> REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by ";"
+ *  <li> OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain
+ *  HbefaVehicleAttributes ("Technology;SizeClasse;EmConcept"), corresponding to the strings in detailedWarmEmissionFactorsFile (see below)) </li>
+ * </ul>
  * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from Hbefa 3.1. 
  * See the parser {@link playground.benjamin.emissions.EmissionModule#createAvgHbefaWarmTable createAvgHbefaWarmTable}
  *  at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} 
- *  or the {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for details. </li>
+ *  or see the {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for a detailed description. </li>
  *
- * <li>averageFleetColdEmissionFactorsFile: This file can be exported from Hbefa 3.1 (<a href="http://www.hbefa.net">HBEFA</a>).
+ * <li>averageFleetColdEmissionFactorsFile: This file can be exported from Hbefa 3.1.
  * See the parser {@link playground.benjamin.emissions.EmissionModule#createAvgHbefaColdTable createAvgHbefaColdTable}
  * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} 
- * or the {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for details. </li>
+ * or see the {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for a detailed description. </li>
  * </ul>
  *
  * Optional: To use detailed emission calculation set isUsingDetailedEmissionCalculation to <code>true</code> in the
@@ -46,11 +47,11 @@ package playground.benjamin.emissions;
  * 
  * <li>detailedWarmEmissionFactorsFile: See the parser 
  * {@link playground.benjamin.emissions.EmissionModule#createDetailedHbefaWarmTable createDetailedHbefaWarmTable}
- * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} for details </li>
+ * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} for details. </li>
  *
  * <li>and detailedColdEmissionFactorsFile: 
  * {@link playground.benjamin.emissions.EmissionModule#createDetailedHbefaColdTable createDetailedHbefaColdTable}
- * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} for details
+ * at the {@link playground.benjamin.emissions.EmissionModule EmissionModule} for details.
  * </li>
  * </ul>
  * 
@@ -72,18 +73,18 @@ package playground.benjamin.emissions;
  * warm emissions.
  *
  * <h3>Example</h3>
- * This class contains the RunEmissionTool classes and a control listener which implements
+ * This class contains the "RunEmissionTool" classes and a control listener which implements
  * some functions from {@link org.matsim.core.controler Controler}.
  *
  * <h3>Types</h3>
- * ColdPollutant/WarmPollutant are enumerations of emission factors. 
- * The HbefaVehicleAttributes class contains a default constructor, setting all values to average.
- * This way unknown vehicle types can be handled and emissions calculated.
- * Any instance of the HbefaWarmEmissionFactorKey class contains a vehicle category, a warm pollutant;a road category,
+ * {@link playground.benjamin.emissions.types.ColdPollutant ColdPollutant} and {@link playground.benjamin.emissions.types.WarmPollutant WarmPollutant} are enumerations of emission factors. 
+ * {@link playground.benjamin.emissions.types.HbefaVehicleAttributes HbefaVehicleAttributes} contains a default constructor, setting all values to average.
+ * This way a calculation of emissions for undefined vehicle types can be performed.
+ * Any instance of {@link playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey HbefaWarmEmissionFactorKey} contains a vehicle category, a warm pollutant; a road category,
  * a traffic situation and three vehicle attributes (technology, size class, em concept).
- * Instances of the HbefaColdEmissionFactorKey class contain a vehicle category, a cold pollutant, a parking time range,
- * a distance, which is driven after parking and vehicle attributes.
- * The cold/warm factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
+ * Instances of {@link playground.benjamin.emissions.types.HbefaColdEmissionFactorKey HbefaColdEmissionFactorKey} contain a vehicle category, a cold pollutant, a parking time range,
+ * a distance, which is driven after parking and, again, vehicle attributes.
+ * The cold/warm emission factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
  * <br/> <br/>
  * 
  * @author benjamin
