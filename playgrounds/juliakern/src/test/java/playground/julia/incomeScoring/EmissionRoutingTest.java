@@ -121,7 +121,6 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		};
 		
 		this.controler.addControlerListener(startupListener);
-		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
 		assertTrue("Person was expected to be routed through link 11, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
 	}
@@ -160,7 +159,6 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		};
 		
 		this.controler.addControlerListener(startupListener);
-		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
 		assertTrue("Person was expected to be routed through link 13, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
 		
