@@ -96,7 +96,6 @@
 	<xs:complexType name="urbansimParameterType">
 		<xs:sequence>
 			<xs:element name="populationSamplingRate" type="xs:double"/>
-			<xs:element name="accessibilityDestinationSamplingRate" type="xs:double"/>
 			<xs:element name="year" type="xs:nonNegativeInteger"/>
 			<xs:element name="opusHome" type="xs:token"/>
 			<xs:element name="opusDataPath" type="xs:token"/>
@@ -105,7 +104,7 @@
 			<xs:element name="matsim4opusOutput" type="xs:token"/>
 			<xs:element name="matsim4opusTemp" type="xs:token"/>
 			<xs:element name="isTestRun" type="xs:boolean"/>
-			<xs:element name="randomDistributionRadiusForUrbanSimZone" type="xs:double"/>
+			<xs:element name="randomLocationDistributionRadiusForUrbanSimZone" type="xs:double"/>
 			<xs:element name="testParameter" type="xs:token"/>
 			<xs:element name="backupRunData" type="xs:boolean"/>
 		</xs:sequence>
@@ -132,6 +131,7 @@
 	<!-- accessibilityParameter element definition -->
 	<xs:complexType name="accessibilityParameterType">
 		<xs:sequence>
+			<xs:element name="accessibilityDestinationSamplingRate" type="xs:double"/>
 			<xs:element name="useLogitScaleParameterFromMATSim" type="xs:boolean"/>
 			<xs:element name="useCarParameterFromMATSim" type="xs:boolean"/>
 			<xs:element name="useWalkParameterFromMATSim" type="xs:boolean"/>
