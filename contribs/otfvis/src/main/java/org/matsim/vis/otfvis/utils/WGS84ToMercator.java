@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.utils.geometry.transformations;
+package org.matsim.vis.otfvis.utils;
 
 import org.jdesktop.swingx.mapviewer.util.MercatorUtils;
 import org.matsim.api.core.v01.Coord;

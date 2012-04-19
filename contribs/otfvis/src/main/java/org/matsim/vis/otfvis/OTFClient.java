@@ -44,13 +44,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.utils.WGS84ToMercator;
 
 
 /**
