@@ -67,18 +67,16 @@ import playground.benjamin.internalization.InternalizeEmissionsControlerListener
  * @author benjamin
  *
  */
-public class RunInternalizationTest extends MatsimTestCase{
+public class RunInternalizationTest extends MatsimTestCase {
 	
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
 	
-	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
+	static String emissionInputPath = "test/input/playground/julia/incomeScoring/EmissionRoutingTest/detailedEval/emissions/hbefaForMatsim/";
 	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
 	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
 	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
 	static boolean isUsingDetailedEmissionCalculation = false;
-
-	private final String outputDirectory = "../../detailedEval/internalization/test/";
 
 	private Config config;
 	private Scenario scenario;
@@ -94,9 +92,7 @@ public class RunInternalizationTest extends MatsimTestCase{
 		
 		System.out.println("systemout");
 		
-		this.config = new Config();
-		this.config.addCoreModules();
-		this.config.controler().setOutputDirectory(this.outputDirectory);
+		this.config = super.loadConfig(null); // adds all core modules and sets correct output directory
 
 		this.scenario = ScenarioUtils.createScenario(this.config);
 		
@@ -162,7 +158,7 @@ public class RunInternalizationTest extends MatsimTestCase{
 		
 	// controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
-		ccg.setOutputDirectory(outputDirectory);
+//		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(0);
 		ccg.setLastIteration(10);
 		ccg.setMobsim("qsim");

@@ -20,8 +20,6 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
@@ -35,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
@@ -52,13 +49,14 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.testcases.MatsimTestCase;
 
-public class InsertParkingActivitiesTest extends TestCase {
+public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(InsertParkingActivitiesTest.class);
 	
 	public void testInsertParkingActivities() {
-		Config config = ConfigUtils.createConfig();
+		Config config = super.loadConfig(null);
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
 		createFacilities(sc);

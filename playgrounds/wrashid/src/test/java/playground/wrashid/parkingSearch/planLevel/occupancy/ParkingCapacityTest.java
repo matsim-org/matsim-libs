@@ -1,18 +1,37 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
-import junit.framework.TestCase;
-
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
 
-public class ParkingCapacityTest extends TestCase {
+public class ParkingCapacityTest extends MatsimTestCase {
 
 	public void testBasic() {
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = super.loadConfig(null);
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		BaseNonControlerScenario.loadNetwork(sc);
 
 		ParkingCapacity pc = new ParkingCapacity(sc.getActivityFacilities());

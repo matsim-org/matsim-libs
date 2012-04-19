@@ -83,14 +83,10 @@ public class EmissionRoutingTest extends MatsimTestCase{
 	private Vehicles emissionVehicles;
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
-	private String outputDirectory;
 
 	public void testEmissionRouting() {
 		
-		this.outputDirectory = this.getOutputDirectory()+"../../detailedEval/internalization/test/";
-		this.config = new Config();
-		this.config.addCoreModules();
-		this.config.controler().setOutputDirectory(this.outputDirectory);
+		this.config = super.loadConfig(null); // automatically sets the correct output directory
 		this.scenario = ScenarioUtils.createScenario(this.config);
 		
 		createNetwork();
@@ -129,10 +125,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 
 	public void testDistanceRouting() {
 		
-		this.outputDirectory = this.getOutputDirectory()+"../../detailedEval/internalization/test/";
-		this.config = new Config();
-		this.config.addCoreModules();
-		this.config.controler().setOutputDirectory(this.outputDirectory);
+		this.config = super.loadConfig(null); // automatically sets the correct output directory
 		this.scenario = ScenarioUtils.createScenario(this.config);
 		
 		createNetwork();
@@ -168,11 +161,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 
 	public void testTimeRouting() {
 		
-		this.outputDirectory = this.getOutputDirectory()+"../../detailedEval/internalization/test/";
-		this.config = new Config();
-		this.config.addCoreModules();
-		this.config.controler().setOutputDirectory(this.outputDirectory);
-
+		this.config = super.loadConfig(null); // automatically sets the correct output directory
 		this.scenario = ScenarioUtils.createScenario(this.config);
 		
 		createNetwork();
@@ -221,7 +210,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		
 	// controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
-		ccg.setOutputDirectory(outputDirectory);
+//		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(0);
 		ccg.setLastIteration(10);
 		ccg.setMobsim("qsim");

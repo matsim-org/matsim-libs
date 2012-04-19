@@ -1,21 +1,38 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.parkingSearch.planLevel;
 
 import java.util.LinkedList;
 
-import junit.framework.TestCase;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseNonControlerScenario;
 
-public class ParkingGeneralLibTest extends TestCase {
+public class ParkingGeneralLibTest extends MatsimTestCase {
 
 	public void testGetAllParkingFacilityIds() {
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(super.loadConfig(null));
 
 		BaseNonControlerScenario.loadNetwork(sc);
 
@@ -28,7 +45,7 @@ public class ParkingGeneralLibTest extends TestCase {
 	}
 	
 	public void testGetParkingRelatedWalkingDistanceOfWholeDay(){
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(super.loadConfig(null));
 
 		BaseNonControlerScenario.loadNetwork(sc);
 		

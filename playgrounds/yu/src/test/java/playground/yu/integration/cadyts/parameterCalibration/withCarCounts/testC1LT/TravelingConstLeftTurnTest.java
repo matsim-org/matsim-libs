@@ -26,7 +26,6 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.test
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -159,8 +158,7 @@ public class TravelingConstLeftTurnTest extends MatsimTestCase {
 	 */
 	@Test
 	public final void test2ParametersCalibration() {
-		Config config = ConfigUtils.loadConfig(getInputDirectory()
-				+ "config.xml");
+		Config config = super.loadConfig(getInputDirectory() + "config.xml");
 		Controler controler = new PCCtlwithLeftTurnPenalty(config);
 		controler.addControlerListener(new GetCalibratedParameters());
 		controler.setCreateGraphs(false);

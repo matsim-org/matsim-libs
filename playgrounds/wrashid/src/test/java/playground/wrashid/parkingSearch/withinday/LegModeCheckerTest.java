@@ -20,8 +20,6 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
-import junit.framework.TestCase;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +32,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -50,11 +47,12 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
+import org.matsim.testcases.MatsimTestCase;
 
-public class LegModeCheckerTest extends TestCase {
+public class LegModeCheckerTest extends MatsimTestCase {
 
 	public void testUpdateLegMode() {
-		Config config = ConfigUtils.createConfig();
+		Config config = super.loadConfig(null);
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
 		

@@ -23,6 +23,7 @@
  */
 package playground.yu.pseudoPt;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -123,7 +124,8 @@ public class PtTest extends MatsimTestCase {
 	 * Runs the test with a value of -6 for beta_travelingPt.
 	 */
 	public void testbetaPt_6() {
-		Controler controler = new Controler(getInputDirectory() + "config.xml");
+		Config config = super.loadConfig(getInputDirectory() + "config.xml");
+		Controler controler = new Controler(config);
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);
@@ -134,7 +136,8 @@ public class PtTest extends MatsimTestCase {
 	 * Runs the test with a value of -3 for beta_travelingPt
 	 */
 	public void testbetaPt_3() {
-		Controler controler = new Controler(getInputDirectory() + "config.xml");
+		Config config = super.loadConfig(getInputDirectory() + "config.xml");
+		Controler controler = new Controler(config);
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);

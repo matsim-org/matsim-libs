@@ -1,21 +1,38 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.parkingChoice;
 
 import java.util.LinkedList;
 
-import junit.framework.TestCase;
-
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
-public class PrivateParkingTest extends TestCase {
+public class PrivateParkingTest extends MatsimTestCase {
 
 	public void testBaseCase(){
 		assertEquals(2744, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(1),5.0);
@@ -31,7 +48,7 @@ public class PrivateParkingTest extends TestCase {
 	
 	private double walkingDistanceFor3CarScenarioWithVariableParkingCapacity(int parkingCapacity) {
 		ParkingChoiceLib.isTestCaseRun=true;
-		Config config= ConfigUtils.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
+		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
 		Controler controler=new Controler(config);
 		
 		// setup parking infrastructure
@@ -60,7 +77,7 @@ public class PrivateParkingTest extends TestCase {
 	}
 	
 	public void testChagingTheActTypeOfPrivateParkingShouldLeadToLongerWalkingDistances(){
-		Config config=ConfigUtils.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
+		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
 		Controler controler=new Controler(config);
 		
 		// setup parking infrastructure

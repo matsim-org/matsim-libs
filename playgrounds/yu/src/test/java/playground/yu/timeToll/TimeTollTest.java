@@ -24,6 +24,7 @@
 package playground.yu.timeToll;
 
 import org.matsim.analysis.CalcLegTimes;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -70,7 +71,8 @@ public class TimeTollTest extends MatsimTestCase {
 	}
 
 	public void testBetaTraveling_6() {
-		Controler ctl = new Controler(getInputDirectory() + "config.xml");
+		Config config = super.loadConfig(getInputDirectory() + "config.xml");
+		Controler ctl = new Controler(config);
 		ctl.addControlerListener(new TestControlerListener());
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
@@ -78,7 +80,8 @@ public class TimeTollTest extends MatsimTestCase {
 	}
 
 	public void testBetaTraveling_30() {
-		Controler ctl = new Controler(getInputDirectory() + "config.xml");
+		Config config = super.loadConfig(getInputDirectory() + "config.xml");
+		Controler ctl = new Controler(config);
 		ctl.addControlerListener(new TestControlerListener());
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
