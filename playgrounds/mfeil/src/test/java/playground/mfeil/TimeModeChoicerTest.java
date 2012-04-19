@@ -42,7 +42,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -92,7 +92,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
 
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario_input.getNetwork(), this.initializer.getControler().getConfig().travelTimeCalculator());
-		PersonalizableTravelDisutility linkTravelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(linkTravelTimeEstimator, this.initializer.getControler().getConfig().planCalcScore());
+		TravelDisutility linkTravelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(linkTravelTimeEstimator, this.initializer.getControler().getConfig().planCalcScore());
 
 		this.router = new PlansCalcRoute(this.initializer.getControler().getConfig().plansCalcRoute(), this.scenario_input.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator, ((PopulationFactoryImpl) this.initializer.getControler().getPopulation().getFactory()).getModeRouteFactory());
 

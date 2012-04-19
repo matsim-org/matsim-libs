@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
@@ -19,7 +19,7 @@ import playground.christoph.router.util.KnowledgeTools;
  * that it is checked if a Person knows a Link or not. If not, the
  * returned TravelCost is Double.MAX_VALUE. 
  */
-public class KnowledgeTravelCostWrapper implements PersonalizableTravelDisutility, Cloneable{
+public class KnowledgeTravelCostWrapper implements TravelDisutility, Cloneable {
 	
 	protected Person person;
 	protected TravelDisutility travelCostCalculator;
@@ -41,17 +41,7 @@ public class KnowledgeTravelCostWrapper implements PersonalizableTravelDisutilit
 	}
 	
 	@Override
-	public void setPerson(Person person)
-	{
-		this.person = person;
-		if (travelCostCalculator instanceof PersonalizableTravelDisutility)
-		{
-			((PersonalizableTravelDisutility)travelCostCalculator).setPerson(person);
-		}
-	}
-	
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) 
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) 
 	{	
 		NodeKnowledge nodeKnowledge = null;
 		if (checkNodeKnowledge && person != null)
@@ -69,7 +59,7 @@ public class KnowledgeTravelCostWrapper implements PersonalizableTravelDisutilit
 		else
 		{
 //			log.info("Get Costs from TravelCostCalculator");
-			return travelCostCalculator.getLinkTravelDisutility(link, time);
+			return travelCostCalculator.getLinkTravelDisutility(link, time, person, vehicle);
 		}
 	}
 	

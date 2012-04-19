@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -52,7 +52,7 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	private final JointReplanningConfigGroup configGroup;
 	private final Network network;
 	private final Controler controler;
-	private final PersonalizableTravelDisutility travelCost;
+	private final TravelDisutility travelCost;
 	private final PersonalizableTravelTime travelTime;
 	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 

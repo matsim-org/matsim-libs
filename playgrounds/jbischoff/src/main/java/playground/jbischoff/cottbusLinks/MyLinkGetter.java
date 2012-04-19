@@ -36,13 +36,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * @author jbischoff
@@ -180,7 +180,7 @@ public class MyLinkGetter {
 //		log.info("calculating from "+fromNode+" to "+toNode);
 		
 		
-		route = lcp.calcLeastCostPath(fromNode, toNode, 6.0).links;
+		route = lcp.calcLeastCostPath(fromNode, toNode, 6.0, null, null).links;
 		}
 		catch (NullPointerException e){
 			log.error("could not get toNode for "+fromlink + " or fromNode for "+tolink );

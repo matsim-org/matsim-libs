@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNetwork;
@@ -46,11 +48,12 @@ public class CompassRoute extends SimpleRouter {
 		super(network);
 	}
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
-		return findRoute(fromNode, toNode);
+	@Override
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, final Person person, final Vehicle vehicle) {
+		return findRoute(fromNode, toNode, person, vehicle);
 	}
 	
-	private Path findRoute(Node fromNode, Node toNode) {
+	private Path findRoute(Node fromNode, Node toNode, final Person person, final Vehicle vehicle) {
 		Node previousNode = null;
 		Node currentNode = fromNode;
 		Link currentLink;
@@ -59,7 +62,7 @@ public class CompassRoute extends SimpleRouter {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
 
-		Network nw = knowledgeTools.getSubNetwork(this.person, this.network);
+		Network nw = knowledgeTools.getSubNetwork(person, this.network);
 
 		nodes.add(fromNode);
 		

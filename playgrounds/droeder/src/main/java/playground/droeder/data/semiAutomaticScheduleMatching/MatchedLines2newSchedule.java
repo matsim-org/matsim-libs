@@ -50,8 +50,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.droeder.DaFileReader;
 import playground.droeder.DRPaths;
+import playground.droeder.DaFileReader;
 
 /**
  * @author droeder
@@ -195,7 +195,7 @@ public class MatchedLines2newSchedule {
 		if(startLink.getToNode() == null|| endLink.getToNode() == null ){
 			log.info("");
 		}
-		List<Link> links = router.calcLeastCostPath(startLink.getToNode(), endLink.getToNode(), 0).links;
+		List<Link> links = router.calcLeastCostPath(startLink.getToNode(), endLink.getToNode(), 0, null, null).links;
 		Collection<Id> linkIds = new ArrayList<Id>();
 
 		for(Link l: links){

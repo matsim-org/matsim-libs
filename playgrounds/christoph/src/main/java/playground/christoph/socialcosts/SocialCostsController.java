@@ -39,9 +39,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * E
@@ -148,7 +149,7 @@ public class SocialCostsController {
 		}
 	}
 	
-	private static class SocialCostTravelDisutility implements PersonalizableTravelDisutility {
+	private static class SocialCostTravelDisutility implements TravelDisutility {
 
 		private final PersonalizableTravelTime travelTime;
 		private final SocialCostCalculator scc;
@@ -159,10 +160,11 @@ public class SocialCostsController {
 		}
 		
 		@Override
-		public double getLinkTravelDisutility(Link link, double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			double disutility = 0.0;
+			this.travelTime.setPerson(person);
 			disutility += this.travelTime.getLinkTravelTime(link, time);
-			disutility += this.scc.getLinkTravelDisutility(link, time); 
+			disutility += this.scc.getLinkTravelDisutility(link, time, person, vehicle); 
 			return disutility;
 		}
 		
@@ -172,10 +174,6 @@ public class SocialCostsController {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
-		public void setPerson(Person person) {
-			this.travelTime.setPerson(person);
-		}
 	}
 	
 	private static class SocialCostTravelDisutilityFactory implements TravelDisutilityFactory {
@@ -187,7 +185,7 @@ public class SocialCostsController {
 		}
 		
 		@Override
-		public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public TravelDisutility createTravelDisutility(PersonalizableTravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new SocialCostTravelDisutility(travelTime, scc);
 		}
 	}

@@ -26,17 +26,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.vehicles.Vehicle;
 
-/*
+/**
  * 
  * WARNING: Do not use this class without adaptation to HERBIE!!!!!!
  * 
  */
-
-public class HerbieTravelTimeDistanceCostCalculator implements PersonalizableTravelDisutility {
+public class HerbieTravelTimeDistanceCostCalculator implements TravelDisutility {
 
 	private final static Logger log = Logger.getLogger(HerbieTravelTimeDistanceCostCalculator.class);
 	protected final TravelTime timeCalculator;
@@ -77,7 +77,7 @@ public class HerbieTravelTimeDistanceCostCalculator implements PersonalizableTra
 	}
 
 	@Override
-	public double getLinkTravelDisutility(Link link, double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		double distance = link.getLength();
@@ -96,7 +96,4 @@ public class HerbieTravelTimeDistanceCostCalculator implements PersonalizableTra
 //		return marginalUtlOfDistance;
 //	}
 
-	@Override
-	public void setPerson(Person person) {
-	}
 }

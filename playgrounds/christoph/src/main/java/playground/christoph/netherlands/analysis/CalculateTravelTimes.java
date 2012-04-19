@@ -45,7 +45,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -53,6 +52,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.netherlands.zones.SpecialZones;
 import playground.christoph.router.FullNetworkDijkstra;
@@ -285,7 +285,7 @@ public class CalculateTravelTimes {
 				int i = 0;
 				for (Id toId : nodeIds) {
 					Node toNode = scenario.getNetwork().getNodes().get(toId);
-					Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, toNode, startTime);
+					Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, toNode, startTime, null, null);
 					travelTimes[i] = path.travelCost;
 					counter.incCounter();
 					i++;
@@ -294,7 +294,7 @@ public class CalculateTravelTimes {
 		}
 	}
 		
-	public class FreeSpeedTravelCost implements PersonalizableTravelDisutility {
+	public class FreeSpeedTravelCost implements TravelDisutility {
 		private TravelTime travelTime;
 		
 		public FreeSpeedTravelCost(TravelTime travelTime) {
@@ -302,12 +302,7 @@ public class CalculateTravelTimes {
 		}
 		
 		@Override
-		public void setPerson(Person person) {
-			// nothing to do here
-		}
-
-		@Override
-		public double getLinkTravelDisutility(Link link, double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			return travelTime.getLinkTravelTime(link, time);
 		}
 

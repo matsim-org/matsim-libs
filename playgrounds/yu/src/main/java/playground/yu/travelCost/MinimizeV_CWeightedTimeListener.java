@@ -32,9 +32,10 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * switch TravelCostCalculatorFactory evetually also PersonalizableTravelCost
@@ -58,7 +59,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 		}
 
 		@Override
-		public PersonalizableTravelDisutility createTravelDisutility(
+		public TravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new MinimizeV_CWeightedTimeTravelCostCalculator(
@@ -68,7 +69,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 	}
 
 	public static class MinimizeV_CWeightedTimeTravelCostCalculator implements
-			PersonalizableTravelDisutility {
+			TravelDisutility {
 
 		protected final TravelTime timeCalculator;
 		private final VolumesAnalyzer volumes;
@@ -104,8 +105,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 		}
 
 		@Override
-		public double getLinkTravelDisutility(final Link link,
-				final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			int[] vols = volumes.getVolumesForLink(link.getId());
 			double vol = vols != null ? vols[(int) time / 3600] : 0d;
 			return timeCalculator.getLinkTravelTime(link, time)
@@ -131,11 +131,6 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 			// }
 			// return link.getLength() / link.getFreespeed() * travelCostFactor
 			// - marginalUtlOfDistance * link.getLength();
-		}
-
-		@Override
-		public void setPerson(Person person) {
-			// This cost function doesn't change with persons.
 		}
 
 	}

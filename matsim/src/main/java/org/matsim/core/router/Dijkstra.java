@@ -29,11 +29,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -66,6 +68,9 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
  * <p>
  * <code> LeastCostPathCalculator routingAlgo = new Dijkstra(network, costFunction);</code>
  * </p>
+ * 
+ * <h2>Important note</h2>
+ * This class is NOT threadsafe!
  *
  * @see org.matsim.core.router.util.PreProcessDijkstra
  * @see org.matsim.core.router.AStarEuclidean
@@ -120,7 +125,11 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 
 	private final PreProcessDijkstra preProcessData;
 
+
 	private String[] modeRestriction = null;
+	
+	private Person person = null;
+	private Vehicle vehicle = null;
 
 	/**
 	 * Default constructor.
@@ -194,12 +203,14 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 *      org.matsim.core.network.Node, double)
 	 */
 	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
 
 		double arrivalTime = 0;
 		boolean stillSearching = true;
 
-		augmentIterationId();
+		augmentIterationId(); // this call makes the class not threadsafe
+		this.person = person;
+		this.vehicle = vehicle;
 
 		if (this.pruneDeadEnds == true) {
 			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
@@ -366,7 +377,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
-		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime);
+		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();
 		if (!data.isVisited(getIterationId())) {
@@ -511,4 +522,12 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		return this.preProcessData.getNodeData(n);
 	}
 
+	protected final Person getPerson() {
+		return this.person;
+	}
+	
+	protected final Vehicle getVehicle() {
+		return this.vehicle;
+	}
+	
 }

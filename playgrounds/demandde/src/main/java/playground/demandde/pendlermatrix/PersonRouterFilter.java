@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.demandde.pendlermatrix;
 
 import java.util.Collection;
@@ -65,7 +84,7 @@ private Network network;
 		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle);
 		Coord ziel = destination.getCoord();
 		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel);
-		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0);
+		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, person, null);
 		if (isInteresting(path)) {
 			origin.setEndTime(origin.getEndTime() + travelTimeToEntry);
 			sink.process(person);

@@ -33,8 +33,8 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -87,7 +87,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 
 				@Override
-				public PersonalizableTravelDisutility createTravelDisutility(
+				public TravelDisutility createTravelDisutility(
 						PersonalizableTravelTime timeCalculator,
 						PlanCalcScoreConfigGroup cnScoringGroup) {
 					return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), RoadPricing.this.scheme);

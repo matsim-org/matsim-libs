@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.TravelScoringFunction;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,23 +29,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.TravelScoringFunction;
 
 import playground.thibautd.parknride.ParkAndRideChooseModeForSubtour;
 import playground.thibautd.parknride.ParkAndRideConfigGroup;
@@ -50,9 +50,9 @@ import playground.thibautd.parknride.ParkAndRideConstants;
 import playground.thibautd.parknride.ParkAndRideIncluder;
 import playground.thibautd.parknride.ParkAndRideRoutingModule;
 import playground.thibautd.parknride.ParkAndRideUtils;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.TripRouter;
 import playground.thibautd.router.TripRouterFactory;
+import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * An ugly copy-pasted module, to change the cost for pnr change using the strange herbie walk cost
@@ -87,7 +87,7 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					travelScoring);
 	
 		PersonalizableTravelTime carTime = tripRouterFactory.getTravelTimeCalculatorFactory().createTravelTime();
-		PersonalizableTravelDisutility carCost =
+		TravelDisutility carCost =
 			tripRouterFactory.getTravelCostCalculatorFactory().createTravelDisutility(
 					carTime, controler.getConfig().planCalcScore() );
 		TransitRouterNetworkTravelTimeAndDisutility ptTimeCost =

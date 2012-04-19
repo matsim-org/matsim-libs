@@ -26,8 +26,8 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -37,13 +37,13 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class ReRouteDijkstra extends AbstractMultithreadedModule {
 
-	PersonalizableTravelDisutility costCalculator = null;
+	TravelDisutility costCalculator = null;
 	PersonalizableTravelTime timeCalculator = null;
 	Network network = null;
 	private PlansCalcRouteConfigGroup configGroup = null;
 	private final ModeRouteFactory routeFactory;
 
-	public ReRouteDijkstra(Config config, final Network network, final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator, final ModeRouteFactory routeFactory) {
+	public ReRouteDijkstra(Config config, final Network network, final TravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator, final ModeRouteFactory routeFactory) {
 		super(config.global());
 		this.network = network;
 		this.costCalculator = costCalculator;

@@ -24,15 +24,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
  *
  * @author mrieser
  */
-public class TravelTimeAndDistanceBasedTravelDisutility implements PersonalizableTravelDisutility {
+public class TravelTimeAndDistanceBasedTravelDisutility implements TravelDisutility {
 
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfTime;
@@ -60,7 +61,7 @@ public class TravelTimeAndDistanceBasedTravelDisutility implements Personalizabl
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		
 //		if (this.marginalCostOfDistance == 0.0) {
@@ -83,11 +84,4 @@ public class TravelTimeAndDistanceBasedTravelDisutility implements Personalizabl
 		+ this.marginalCostOfDistance * link.getLength();
 	}
 
-	@Override
-	public void setPerson(Person person) {
-		// This cost function doesn't change with persons.
-	}
-	
-	
-	
 }

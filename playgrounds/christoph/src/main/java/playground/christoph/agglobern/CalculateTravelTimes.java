@@ -45,14 +45,13 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.Vehicle;
 
 
 public class CalculateTravelTimes {
@@ -169,8 +168,8 @@ public class CalculateTravelTimes {
 				 */
 				if (fromLink.getFromNode().getId().equals(toLink.getToNode().getId())) {
 					
-					double fromCosts = 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0);
-					double toCosts = 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0);
+					double fromCosts = 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0, null, null);
+					double toCosts = 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0, null, null);
 					double costs = fromDistance/connectorSpeed + fromCosts + toCosts + toDistance/connectorSpeed;
 					travelTimes[from][to] = costs;
 					to++;
@@ -184,18 +183,18 @@ public class CalculateTravelTimes {
 				 * on the middle of the From-Link and ends on the middle of the To-Link.
 				 * Further we assume that both links have a comparable TravelTime.
 				 */
-				Path path = leastCostPathCalculator.calcLeastCostPath(fromLink.getFromNode(), toLink.getToNode(), 0.0);
+				Path path = leastCostPathCalculator.calcLeastCostPath(fromLink.getFromNode(), toLink.getToNode(), 0.0, null, null);
 				List<Link> links = path.links;
 				
 				double pathTravelCost = path.travelCost;
 				if (links != null) {
 					boolean fromLinkIncluded = links.get(0).getId().equals(fromLink.getId());
-					if (fromLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0);
-					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0);
+					if (fromLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0, null, null);
+					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkTravelDisutility(fromLink, 0.0, null, null);
 						
 					boolean toLinkIncluded = links.get(links.size() - 1).getId().equals(toLink.getId());
-					if (toLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkTravelDisutility(toLink, 0.0);
-					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkTravelDisutility(toLink, 0.0);
+					if (toLinkIncluded) pathTravelCost = pathTravelCost - 0.5 * travelCost.getLinkTravelDisutility(toLink, 0.0, null, null);
+					else pathTravelCost = pathTravelCost + 0.5 * travelCost.getLinkTravelDisutility(toLink, 0.0, null, null);
 				}
 				
 				double costs = fromDistance/connectorSpeed + pathTravelCost + toDistance/connectorSpeed;
@@ -307,7 +306,7 @@ public class CalculateTravelTimes {
 		Coord coordWGS84;
 	}
 		
-	public class FreeSpeedTravelCost implements PersonalizableTravelDisutility, TravelDisutility {
+	public class FreeSpeedTravelCost implements TravelDisutility {
 		private TravelTime travelTime;
 		
 		public FreeSpeedTravelCost(TravelTime travelTime) {
@@ -315,12 +314,7 @@ public class CalculateTravelTimes {
 		}
 		
 		@Override
-		public void setPerson(Person person) {
-			// nothing to do here
-		}
-
-		@Override
-		public double getLinkTravelDisutility(Link link, double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			return travelTime.getLinkTravelTime(link, time);
 		}
 

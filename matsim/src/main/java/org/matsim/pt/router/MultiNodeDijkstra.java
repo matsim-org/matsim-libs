@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -59,7 +60,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 		super(network, costFunction, timeFunction, preProcessData);
 	}
 
-	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes) {
+	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
 
 		Set<Node> endNodes = new HashSet<Node>(toNodes.keySet());
 		Set<Node> foundNodes = new HashSet<Node>();

@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.CRSUtilities;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
@@ -97,7 +96,7 @@ public class TravelTimeTask extends AnalyzerTask {
 			Node n1 = ((NetworkImpl)network).getNearestNode(new CoordImpl(points1[0], points1[1]));
 			Node n2 = ((NetworkImpl)network).getNearestNode(new CoordImpl(points2[0], points2[1]));
 			
-			Path path = router.calcLeastCostPath(n1, n2, 0);
+			Path path = router.calcLeastCostPath(n1, n2, 0, null, null);
 			
 			distr.add(path.travelCost);
 		}

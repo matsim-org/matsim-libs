@@ -39,6 +39,7 @@ import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -47,8 +48,8 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,7 +57,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
@@ -88,7 +88,7 @@ public class PlanomatTest extends MatsimTestCase {
 		//store the only existing person
 //		Person p = scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		//read the events once to create a complete test population
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new ScenarioCreatePersonEventHandler(this.scenario));
 		new MatsimEventsReader(events).readFile(this.getClassInputDirectory() + "equil-times-only-1000.events.txt.gz");
 		//now overwrite the testee person in the scenario
@@ -141,10 +141,10 @@ public class PlanomatTest extends MatsimTestCase {
 	private void runATestRun(final PlanomatTestRun testRun) {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.scenario.getConfig().travelTimeCalculator());
-		PersonalizableTravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, this.scenario.getConfig().planCalcScore());
+		TravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, this.scenario.getConfig().planCalcScore());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
@@ -294,7 +294,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 		// init LegTravelTimeEstimator
 		PersonalizableTravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);
-		PersonalizableTravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, this.scenario.getConfig().planCalcScore());
+		TravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, this.scenario.getConfig().planCalcScore());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator, ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());

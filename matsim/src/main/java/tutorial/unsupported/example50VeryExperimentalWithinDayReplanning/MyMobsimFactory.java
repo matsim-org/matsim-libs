@@ -21,14 +21,14 @@ package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 
 /**
  * @author nagel
@@ -36,13 +36,13 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
  */
 public class MyMobsimFactory implements MobsimFactory {
 
-	private PersonalizableTravelDisutility travCostCalc;
+	private TravelDisutility travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
 
 	private enum ReplanningType { general, carPlans }
 	private ReplanningType replanningType = ReplanningType.general ;
 
-	MyMobsimFactory( PersonalizableTravelDisutility travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
+	MyMobsimFactory(TravelDisutility travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}

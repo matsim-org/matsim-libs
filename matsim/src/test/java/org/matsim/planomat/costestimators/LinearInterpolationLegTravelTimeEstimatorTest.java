@@ -38,7 +38,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -63,7 +63,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(network, config.travelTimeCalculator());
-		PersonalizableTravelDisutility linkTravelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(linkTravelTimeEstimator, config.planCalcScore());
+		TravelDisutility linkTravelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(linkTravelTimeEstimator, config.planCalcScore());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
 				config.plansCalcRoute(),

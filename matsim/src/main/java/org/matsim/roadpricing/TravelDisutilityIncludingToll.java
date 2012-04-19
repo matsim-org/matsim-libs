@@ -23,21 +23,22 @@ package org.matsim.roadpricing;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates the travel disutility for links, including tolls. Currently supports distance, cordon and area tolls.
  *
  * @author mrieser
  */
-public class TravelDisutilityIncludingToll implements PersonalizableTravelDisutility {
+public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ final RoadPricingSchemeI scheme;
 	private final TollRouterBehaviour tollCostHandler;
-	private final PersonalizableTravelDisutility costHandler;
+	private final TravelDisutility costHandler;
 
-	public TravelDisutilityIncludingToll(final PersonalizableTravelDisutility costCalculator, final RoadPricingSchemeI scheme) {
+	public TravelDisutilityIncludingToll(final TravelDisutility costCalculator, final RoadPricingSchemeI scheme) {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 
@@ -47,14 +48,13 @@ public class TravelDisutilityIncludingToll implements PersonalizableTravelDisuti
 		else {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme + "\" is not supported.");
 		}
-
 	}
 	
 	private static int wrnCnt = 0 ;
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) {
-		double baseCost = this.costHandler.getLinkTravelDisutility(link, time);
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+		double baseCost = this.costHandler.getLinkTravelDisutility(link, time, person, vehicle);
 		double tollCost = this.tollCostHandler.getTollCost(link, time);
 		if ( wrnCnt < 1 ) {
 			wrnCnt++ ;
@@ -114,11 +114,6 @@ public class TravelDisutilityIncludingToll implements PersonalizableTravelDisuti
 			}
 			return cost.amount;
 		}
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		this.costHandler.setPerson(person);
 	}
 
 }

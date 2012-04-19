@@ -54,11 +54,11 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -100,9 +100,9 @@ public class MyZoneToZoneRouter {
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = ttcf.createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		TravelDisutilityFactory tccf = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator, scenario.getConfig().planCalcScore());
+		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator, scenario.getConfig().planCalcScore());
 		
-		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(travelTimeCalculator);
 		new EventsReaderTXTv1(em).readFile(eventsFilename);
 		
@@ -164,8 +164,8 @@ public class MyZoneToZoneRouter {
 							}
 						}
 						if(count != 0){
-							odMatrix.set(row, col, tt / ((double) count) );
-							iztt.add(tt / ((double) count));
+							odMatrix.set(row, col, tt / count );
+							iztt.add(tt / count);
 						} else{
 							log.warn("   Could not find any links within zone " + zone.getId());
 						}
@@ -183,7 +183,7 @@ public class MyZoneToZoneRouter {
 						Coord tc = new CoordImpl(tp.getX(), tp.getY());
 						Node tn = ni.getNearestNode(tc); 
 						
-						Path p = router.calcLeastCostPath(fn, tn, 25200); /* Use 07:00:00 */
+						Path p = router.calcLeastCostPath(fn, tn, 25200, null, null); /* Use 07:00:00 */
 						if(p != null){
 							odMatrix.set(row, col, p.travelTime);
 						} else{
@@ -207,7 +207,7 @@ public class MyZoneToZoneRouter {
 		if(iztt.size() > 0){
 			/* Sort the intra-zonal travel time list. */
 			Collections.sort(iztt);
-			intraZonalTravelTime = iztt.get(Math.min(0, ((int)Math.round(iztt.size()))-1) );
+			intraZonalTravelTime = iztt.get(Math.min(0, Math.round(iztt.size())-1) );
 		}
 		for(int row = 0; row < odMatrix.rows(); row++){
 			if(odMatrix.get(row, row) == Double.POSITIVE_INFINITY){
@@ -283,7 +283,7 @@ public class MyZoneToZoneRouter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		double density = Math.round((1 - ((double) nullcounter) / (double)(Math.pow(odMatrix.rows(),2)))*100);
+		double density = Math.round((1 - nullcounter / (Math.pow(odMatrix.rows(),2)))*100);
 		log.info("OD matrix written. Density: " + density + "% (" + nullcounter + " entries null)");
 	}
 	
@@ -335,7 +335,7 @@ public class MyZoneToZoneRouter {
 			} finally{
 				t.close();
 			}
-			double density = Math.round((1 - ((double) nullcounter) / (double)(Math.pow(odMatrix.rows(),2)))*100);
+			double density = Math.round((1 - nullcounter / (Math.pow(odMatrix.rows(),2)))*100);
 			log.info("OD matrix written. Density: " + density + "% (" + nullcounter + " entries null)");
 		} catch (CorruptedTableException e) {
 			e.printStackTrace();
@@ -355,7 +355,7 @@ public class MyZoneToZoneRouter {
 			total += d;
 		}
 		if(total != 0){
-			travelTime = total / ((double) list.size());
+			travelTime = total / list.size();
 		}
 		return travelTime;
 	}

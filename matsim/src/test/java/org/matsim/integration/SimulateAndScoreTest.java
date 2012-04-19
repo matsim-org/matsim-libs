@@ -47,7 +47,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
@@ -158,7 +158,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 				scenario.getConfig().vspExperimental()));
 
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, config.travelTimeCalculator());
-		PersonalizableTravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, config.planCalcScore());
+		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, config.planCalcScore());
 		PlansCalcTransitRoute plansCalcRoute = new PlansCalcTransitRoute(config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator,
 				new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(), config.transit(), router.createTransitRouter(), transitSchedule);
 

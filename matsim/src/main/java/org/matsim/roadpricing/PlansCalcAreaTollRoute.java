@@ -38,8 +38,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -64,7 +64,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param factory
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
+	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingScheme scheme) {
 		super(configGroup, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.scheme = scheme;
@@ -118,7 +118,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				// # start searching a route where agent may pay the toll
 				boolean tollRouteInsideTollArea = false;
 				if (toLink != fromLink) {
-					Path path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
+					Path path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex], person, null);
 					if (path == null) {
 						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 					}
@@ -143,7 +143,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * it is possible for the agent to drive around, it will, otherwise there
 					 * will still be a route returned.
 					 */
-					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
+					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex], person, null);
 					noTollRoute = (NetworkRoute) (this.getRouteFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId()));
 					noTollRoute.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 					noTollRoute.setTravelTime((int) path.travelTime);

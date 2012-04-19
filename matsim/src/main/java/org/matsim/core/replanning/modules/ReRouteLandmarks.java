@@ -26,7 +26,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -37,7 +36,7 @@ public class ReRouteLandmarks extends ReRouteDijkstra {
 	private final ModeRouteFactory routeFactory;
 	private PlansCalcRouteConfigGroup configGroup = null;
 
-	public ReRouteLandmarks(Config config, Network network, PersonalizableTravelDisutility costCalculator,
+	public ReRouteLandmarks(Config config, Network network, TravelDisutility costCalculator,
 			PersonalizableTravelTime timeCalculator, TravelDisutility minCostCalculator, final ModeRouteFactory routeFactory) {
 		super(config, network, costCalculator, timeCalculator, routeFactory);
 		this.factory = new AStarLandmarksFactory(network, minCostCalculator, config.global().getNumberOfThreads());

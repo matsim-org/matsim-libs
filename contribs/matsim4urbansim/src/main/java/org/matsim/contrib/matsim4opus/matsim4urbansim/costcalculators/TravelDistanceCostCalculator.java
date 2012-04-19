@@ -21,8 +21,10 @@ package org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * cost calculator for travel distances
@@ -33,7 +35,7 @@ public class TravelDistanceCostCalculator implements TravelDisutility{
 	private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
 	
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		if(link != null)
 			return link.getLength();
 		log.warn("Link is null. Returned 0 as link length.");
@@ -42,6 +44,6 @@ public class TravelDistanceCostCalculator implements TravelDisutility{
 	
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return getLinkTravelDisutility(link, Time.UNDEFINED_TIME);
+		return getLinkTravelDisutility(link, Time.UNDEFINED_TIME, null, null);
 	}
 }

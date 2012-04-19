@@ -267,7 +267,7 @@ public class OsmTransitLineBuilder {
 				for(Node to: findStartNode(net.getValue()).values()){
 					if(!from.equals(to)){
 						router = new Dijkstra(net.getValue(), cost, cost);
-						Path p = router.calcLeastCostPath(from, to, 0);
+						Path p = router.calcLeastCostPath(from, to, 0, null, null);
 						if(!(p==null)){
 							routeNet = NetworkImpl.createNetwork();
 							for(Node node: p.nodes){

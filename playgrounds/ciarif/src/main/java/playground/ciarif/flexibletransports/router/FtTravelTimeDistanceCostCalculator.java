@@ -22,15 +22,13 @@ package playground.ciarif.flexibletransports.router;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 
-public class FtTravelTimeDistanceCostCalculator
-  implements TravelDisutility, PersonalizableTravelDisutility
-{
+public class FtTravelTimeDistanceCostCalculator implements TravelDisutility {
   protected final TravelTime timeCalculator;
   private final double travelCostFactor;
   private final double marginalUtlOfDistance;
@@ -55,7 +53,7 @@ public class FtTravelTimeDistanceCostCalculator
   }
 
   @Override
-	public double getLinkTravelDisutility(Link link, double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
     double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
     return (travelTime * this.travelCostFactor - (this.marginalUtlOfDistance * link.getLength()));
   }
@@ -68,8 +66,4 @@ public class FtTravelTimeDistanceCostCalculator
     return this.marginalUtlOfDistance;
   }
 
-  @Override
-	public void setPerson(Person person)
-  {
-  }
 }

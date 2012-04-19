@@ -23,8 +23,8 @@ package playground.christoph.router;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,10 +38,10 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 public class CostNavigationRoute extends WithinDayDuringLegReplanner {
@@ -54,7 +54,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	protected LeastCostPathCalculator leastCostPathCalculator;
 	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
 	protected TravelDisutilityFactory travelCostFactory;
-	protected PersonalizableTravelDisutility travelCost;
+	protected TravelDisutility travelCost;
 	protected PersonalizableTravelTime travelTime;
 		
 	/*package*/ CostNavigationRoute(Id id, Scenario scenario, Network network, CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, 
@@ -129,7 +129,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		double leastCosts = Double.MAX_VALUE;
 		Id leastCostLinkId = null;
 		for (Link outLink : outLinksMap.values()) {
-			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time);
+			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time, withinDayAgent.getSelectedPlan().getPerson(), null);
 			paths.put(outLink.getId(), path);
 			costs.put(outLink.getId(), path.travelCost);
 			if (path.travelCost < leastCosts) {
@@ -196,7 +196,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		if (nextLinkId.equals(leastCostLinkId)) costNavigationTravelTimeLogger.setFollowed(personId, true);
 		else {
 			costNavigationTravelTimeLogger.setFollowed(personId, false);
-			double c = travelCost.getLinkTravelDisutility(network.getLinks().get(nextLinkId), time);
+			double c = travelCost.getLinkTravelDisutility(network.getLinks().get(nextLinkId), time, null, null);
 			double expectedAlternativeCosts = c * leastCosts/nextPath.travelCost;
 			costNavigationTravelTimeLogger.setExpectedAlternativeTravelTime(personId, expectedAlternativeCosts);
 		}

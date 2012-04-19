@@ -19,18 +19,18 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
+import herbie.running.scoring.TravelScoringFunction;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import herbie.running.scoring.TravelScoringFunction;
 
 import playground.thibautd.parknride.ParkAndRideFacilities;
 import playground.thibautd.parknride.ParkAndRideRoutingModule;
@@ -53,10 +53,10 @@ public class HerbieParkAndRideRoutingModule extends ParkAndRideRoutingModule {
 			final double pnrConnectionDistance,
 			final ParkAndRideFacilities parkAndRideFacilities,
 			final TransitRouterConfig transitRouterConfig,
-			final PersonalizableTravelDisutility carCost,
+			final TravelDisutility carCost,
 			final PersonalizableTravelTime carTime,
 			final TransitRouterNetworkTravelTimeAndDisutility ptTimeCost,
-			final PersonalizableTravelDisutility pnrCost,
+			final TravelDisutility pnrCost,
 			final PersonalizableTravelTime pnrTime) {
 		super(routeFactory, populationFactory, carNetwork, schedule,
 				maxBeelineWalkConnectionDistance, pnrConnectionDistance,

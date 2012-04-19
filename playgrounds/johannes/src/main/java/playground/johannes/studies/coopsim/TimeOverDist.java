@@ -29,6 +29,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -41,6 +42,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.vehicles.Vehicle;
 
 import playground.johannes.coopsim.pysical.TravelTimeDecorator;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
@@ -77,7 +79,7 @@ public class TimeOverDist {
 //		final TravelTime travelTime = new TravelTimeCalculator(network, 900, 86400,	new TravelTimeCalculatorConfigGroup());
 		TravelDisutility travelCost = new TravelDisutility() {
 			@Override
-			public double getLinkTravelDisutility(Link link, double time) {
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 				return travelTime.getLinkTravelTime(link, time);
 			}
 			@Override
@@ -90,7 +92,7 @@ public class TimeOverDist {
 		TravelDisutility travelMinCost = new TravelDisutility() {
 
 			@Override
-			public double getLinkTravelDisutility(Link link, double time) {
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 				return travelTime.getLinkTravelTime(link, time);
 			}
 
@@ -118,7 +120,7 @@ public class TimeOverDist {
 				Point p1 = MatsimCoordUtils.coordToPoint(node1.getCoord());
 				Point p2 = MatsimCoordUtils.coordToPoint(node2.getCoord());
 				if (g.contains(p1) && g.contains(p2)) {
-					Path path = router.calcLeastCostPath(node1, node2, 0);
+					Path path = router.calcLeastCostPath(node1, node2, 0, null, null);
 					double tt = 0;
 					double dist = calc.distance(p1, p2);
 					for (Link link : path.links) {

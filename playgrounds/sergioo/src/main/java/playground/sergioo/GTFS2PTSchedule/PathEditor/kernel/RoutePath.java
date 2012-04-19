@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.AStarEuclidean;
@@ -47,6 +48,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.vehicles.Vehicle;
 
 import others.sergioo.util.geometry.Line2D;
 import others.sergioo.util.geometry.Point2D;
@@ -341,7 +343,7 @@ public class RoutePath {
 	}
 	public void addShortestPath(int indexI) {
 		if(indexI<links.size()-1) {
-			Path path = leastCostPathCalculator.calcLeastCostPath(links.get(indexI).getToNode(), links.get(indexI+1).getFromNode(), 0);
+			Path path = leastCostPathCalculator.calcLeastCostPath(links.get(indexI).getToNode(), links.get(indexI+1).getFromNode(), 0, null, null);
 			if(path!=null) {
 				int i=1;
 				for(Link link:path.links) {
@@ -383,7 +385,7 @@ public class RoutePath {
 					if(prevL==nextL)
 						path = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 					else {
-						path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0);
+						path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0, null, null);
 						if(path == null)
 							path = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 						path.links.add(0,prevL);
@@ -415,7 +417,7 @@ public class RoutePath {
 				if(prevL.equals(nextL))
 					bestPath = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 				else {
-					bestPath = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0);
+					bestPath = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0, null, null);
 					if(bestPath == null)
 						bestPath = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 					else
@@ -432,7 +434,7 @@ public class RoutePath {
 					if(prevL.equals(nextL))
 						path = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 					else {
-						path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0);
+						path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0, null, null);
 						if(path == null)
 							path = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 						else
@@ -609,7 +611,7 @@ public class RoutePath {
 		if(!withShapeCost || trip.getShape()==null) {
 			travelMinCost = new TravelDisutility() {
 				@Override
-				public double getLinkTravelDisutility(Link link, double time) {
+				public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 					return getLinkMinimumTravelDisutility(link);
 				}
 				@Override
@@ -622,7 +624,7 @@ public class RoutePath {
 		else {
 			travelMinCost = new TravelDisutility() {
 				@Override
-				public double getLinkTravelDisutility(Link link, double time) {
+				public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 					return getLinkMinimumTravelDisutility(link);
 				}
 				@Override

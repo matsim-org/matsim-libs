@@ -292,7 +292,7 @@ public class CreateKnowledgeForDatabase {
 	{
 		for (Link link : network.getLinks().values())
 		{
-			((MyLinkImpl) link).setTravelCost(costCalculator.getLinkTravelDisutility(link, Time.UNDEFINED_TIME));
+			((MyLinkImpl) link).setTravelCost(costCalculator.getLinkTravelDisutility(link, Time.UNDEFINED_TIME, null, null));
 		}
 	}
 

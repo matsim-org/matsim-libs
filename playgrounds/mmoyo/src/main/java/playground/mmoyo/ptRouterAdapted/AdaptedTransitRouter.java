@@ -109,7 +109,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 		}
 		
 		// find routes between start and end stops
-		Path p = this.getDijkstra().calcLeastCostPath(wrappedFromNodes, wrappedToNodes);
+		Path p = this.getDijkstra().calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
 
 		if (p == null) {
 			return null;

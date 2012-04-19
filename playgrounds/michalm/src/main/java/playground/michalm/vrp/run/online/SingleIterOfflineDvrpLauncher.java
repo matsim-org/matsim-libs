@@ -1,38 +1,85 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.michalm.vrp.run.online;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 
-import pl.poznan.put.util.jfreechart.*;
+import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
-import pl.poznan.put.vrp.dynamic.chart.*;
+import pl.poznan.put.vrp.dynamic.chart.ChartCreator;
+import pl.poznan.put.vrp.dynamic.chart.RouteChartUtils;
+import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.CustomerImpl;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.model.RequestImpl;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVrpGraph;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.AlgorithmType;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerFactory;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerWithReassignment;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerWithoutReassignment;
 import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
 import pl.poznan.put.vrp.dynamic.simulator.customer.CustomerAction;
 import playground.michalm.util.gis.Schedules2GIS;
-import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.MatsimVrpData;
+import playground.michalm.vrp.data.MatsimVrpDataCreator;
 import playground.michalm.vrp.data.file.DepotReader;
-import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.MatsimVertex;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
 import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
-import playground.michalm.vrp.data.network.shortestpath.sparse.*;
+import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathArc;
+import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathFinder;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
 
 
@@ -56,7 +103,7 @@ public class SingleIterOfflineDvrpLauncher
     private TaxiOptimizerFactory optimizerFactory;
 
     private PersonalizableTravelTime ttimeCalc;
-    private PersonalizableTravelDisutility tcostCalc;
+    private TravelDisutility tcostCalc;
 
 
     private void processArgs()
@@ -106,7 +153,8 @@ public class SingleIterOfflineDvrpLauncher
 
         // order the requests as they would appear in MATSim
         Collections.sort(reorderedPersons, new Comparator<Person>() {
-            public int compare(Person p1, Person p2)
+            @Override
+						public int compare(Person p1, Person p2)
             {
                 int t1 = (int) ((Activity)p1.getSelectedPlan().getPlanElements().get(0))
                         .getEndTime();
@@ -195,7 +243,8 @@ public class SingleIterOfflineDvrpLauncher
 
         DeterministicSimulator simulator = new DeterministicSimulator(data.getVrpData(),
                 24 * 60 * 60, optimizer, new Comparator<CustomerAction>() {
-                    public int compare(CustomerAction ca1, CustomerAction ca2)
+                    @Override
+										public int compare(CustomerAction ca1, CustomerAction ca2)
                     {
                         // order the requests as they would appear in MATSim
                         return ca1.getRequest().getId() - ca2.getRequest().getId();
@@ -209,14 +258,16 @@ public class SingleIterOfflineDvrpLauncher
 
         if (vrpOutFiles) {
             optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VrpData data)
+                @Override
+								public JFreeChart createChart(VrpData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
             optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VrpData data)
+                @Override
+								public JFreeChart createChart(VrpData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);
                 }

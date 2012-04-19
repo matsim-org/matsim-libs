@@ -111,8 +111,8 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		
 		// get Route
 //		Path
-		Path forth = routingAlgo.calcLeastCostPath(startNode, intermediateEndNode, startTime);
-		Path back = routingAlgo.calcLeastCostPath(intermediateStartNode, endNode, startTime + forth.travelTime);
+		Path forth = routingAlgo.calcLeastCostPath(startNode, intermediateEndNode, startTime, null, null);
+		Path back = routingAlgo.calcLeastCostPath(intermediateStartNode, endNode, startTime + forth.travelTime, null, null);
 		
 		List<Link> completeLinkList = new LinkedList<Link>();
 		completeLinkList.addAll(forth.links);

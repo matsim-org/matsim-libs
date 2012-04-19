@@ -334,7 +334,9 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 					plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
 							startLink.getToNode(),
 							endLink.getFromNode(),
-							0.0);
+							0.0,
+							null,
+							null);
 
 				route.setLinkIds(
 						startLink.getId(),

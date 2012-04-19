@@ -22,15 +22,17 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.AStarNodeDataFactory;
-import org.matsim.core.router.util.RoutingNetworkFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.RoutingNetwork;
+import org.matsim.core.router.util.RoutingNetworkFactory;
 import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * <p>
@@ -74,7 +76,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	 * nodes in the routing network.
 	 */
 	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
 		
 		this.routingNetwork.initialize();
 		
@@ -87,7 +89,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 			initializeActiveLandmarks(routingNetworkFromNode, routingNetworkToNode, this.landmarks.length);
 		}
 		
-		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime);
+		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime, person, vehicle);
 	}
 	
 	/*

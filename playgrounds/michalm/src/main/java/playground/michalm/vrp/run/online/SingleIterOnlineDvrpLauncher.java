@@ -1,46 +1,87 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.michalm.vrp.run.online;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Scanner;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.*;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.*;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
-import org.matsim.core.router.util.*;
-import org.matsim.core.scenario.*;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
-import org.matsim.population.algorithms.*;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 
-import pl.poznan.put.util.jfreechart.*;
+import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
-import pl.poznan.put.vrp.dynamic.chart.*;
+import pl.poznan.put.vrp.dynamic.chart.ChartCreator;
+import pl.poznan.put.vrp.dynamic.chart.RouteChartUtils;
+import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVrpGraph;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.AlgorithmType;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerFactory;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerWithPreassignment;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerWithReassignment;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerWithoutReassignment;
 import playground.michalm.util.gis.Schedules2GIS;
-import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.MatsimVrpData;
+import playground.michalm.vrp.data.MatsimVrpDataCreator;
 import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
-import playground.michalm.vrp.data.network.shortestpath.sparse.*;
+import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathArc;
+import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathFinder;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
-import playground.michalm.vrp.taxi.*;
+import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
+import playground.michalm.vrp.taxi.TaxiSimEngine;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
 
 
@@ -64,7 +105,7 @@ public class SingleIterOnlineDvrpLauncher
     private TaxiOptimizerFactory optimizerFactory;
 
     private PersonalizableTravelTime ttimeCalc;
-    private PersonalizableTravelDisutility tcostCalc;
+    private TravelDisutility tcostCalc;
 
     private boolean otfVis;
     public static OTFQueryControl queryControl;
@@ -196,14 +237,16 @@ public class SingleIterOnlineDvrpLauncher
 
         if (vrpOutFiles) {
             taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VrpData data)
+                @Override
+								public JFreeChart createChart(VrpData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
             taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                public JFreeChart createChart(VrpData data)
+                @Override
+								public JFreeChart createChart(VrpData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);
                 }

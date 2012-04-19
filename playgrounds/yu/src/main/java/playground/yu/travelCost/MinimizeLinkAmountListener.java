@@ -32,9 +32,10 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 import playground.yu.utils.NotAnIntersection;
 
@@ -50,7 +51,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 			implements TravelDisutilityFactory {
 
 		@Override
-		public PersonalizableTravelDisutility createTravelDisutility(
+		public TravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new MinimizeLinkAmountTravelCostCalculator(timeCalculator);
@@ -59,7 +60,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 	}
 
 	public static class MinimizeLinkAmountTravelCostCalculator implements
-			PersonalizableTravelDisutility {
+			TravelDisutility {
 		protected final TravelTime timeCalculator;
 
 		public MinimizeLinkAmountTravelCostCalculator(TravelTime timeCalculator) {
@@ -67,8 +68,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 		}
 
 		@Override
-		public double getLinkTravelDisutility(final Link link,
-				final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			double cost = timeCalculator.getLinkTravelTime(link, time);
 			Node from = link.getFromNode();
 			if (!NotAnIntersection.notAnIntersection(from)) {
@@ -87,11 +87,6 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 				cost *= 2d;
 			}
 			return cost;
-		}
-
-		@Override
-		public void setPerson(Person person) {
-			// This cost function doesn't change with persons.
 		}
 
 	}

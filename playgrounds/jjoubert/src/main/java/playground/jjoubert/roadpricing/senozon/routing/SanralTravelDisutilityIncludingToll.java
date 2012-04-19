@@ -22,9 +22,10 @@ package playground.jjoubert.roadpricing.senozon.routing;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.vehicles.Vehicle;
 
 import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
 
@@ -33,14 +34,13 @@ import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
  *
  * @author mrieser
  */
-public class SanralTravelDisutilityIncludingToll implements PersonalizableTravelDisutility {
+public class SanralTravelDisutilityIncludingToll implements TravelDisutility {
 
 	private final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
-	private final PersonalizableTravelDisutility costHandler;
-	private Person person = null;
+	private final TravelDisutility costHandler;
 
-	public SanralTravelDisutilityIncludingToll(final PersonalizableTravelDisutility costCalculator, final RoadPricingScheme scheme) {
+	public SanralTravelDisutilityIncludingToll(final TravelDisutility costCalculator, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 
@@ -54,9 +54,9 @@ public class SanralTravelDisutilityIncludingToll implements PersonalizableTravel
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) {
-		double baseCost = this.costHandler.getLinkTravelDisutility(link, time);
-		double tollCost = this.tollCostHandler.getTollCost(link, time);
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+		double baseCost = this.costHandler.getLinkTravelDisutility(link, time, person, vehicle);
+		double tollCost = this.tollCostHandler.getTollCost(link, time, person);
 		return baseCost + tollCost;
 	}
 	
@@ -67,12 +67,12 @@ public class SanralTravelDisutilityIncludingToll implements PersonalizableTravel
 	}
 
 	private interface TollRouterBehaviour {
-		public double getTollCost(Link link, double time);
+		public double getTollCost(Link link, double time, Person person);
 	}
 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time) {
+		public double getTollCost(final Link link, final double time, final Person person) {
 			Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
 			if (cost == null) {
 				return 0.0;
@@ -83,7 +83,7 @@ public class SanralTravelDisutilityIncludingToll implements PersonalizableTravel
 
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time) {
+		public double getTollCost(final Link link, final double time, final Person person) {
 			RoadPricingScheme.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
 			if (cost == null) {
 				return 0.0;
@@ -97,19 +97,13 @@ public class SanralTravelDisutilityIncludingToll implements PersonalizableTravel
 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time) {
+		public double getTollCost(final Link link, final double time, final Person person) {
 			RoadPricingScheme.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
 			if (cost == null) {
 				return 0.0;
 			}
 			return cost.amount * SanralTollFactor.getTollFactor(person.getId(), link.getId(), time);
 		}
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		this.costHandler.setPerson(person);
-		this.person = person;
 	}
 
 }

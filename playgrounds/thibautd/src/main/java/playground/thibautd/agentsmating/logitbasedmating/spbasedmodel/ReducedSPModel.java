@@ -231,7 +231,9 @@ public class ReducedSPModel extends LogitModel {
 						leastCostAlgo.calcLeastCostPath(
 							network.getLinks().get( perspective.getOrigin().getLinkId() ).getFromNode(),
 							network.getLinks().get( tripToConsider.getOrigin().getLinkId() ).getFromNode(),
-							perspective.getDepartureTime());
+							perspective.getDepartureTime(),
+							null,
+							null);
 					ttEstimate += path.travelTime;
 
 					double dist = 0;
@@ -245,7 +247,9 @@ public class ReducedSPModel extends LogitModel {
 						leastCostAlgo.calcLeastCostPath(
 							network.getLinks().get( tripToConsider.getDestination().getLinkId() ).getFromNode(),
 							network.getLinks().get( perspective.getDestination().getLinkId() ).getFromNode(),
-							perspective.getDepartureTime() + ttEstimate );
+							perspective.getDepartureTime() + ttEstimate,
+							null,
+							null);
 					ttEstimate += path.travelTime;
 
 					dist = 0;

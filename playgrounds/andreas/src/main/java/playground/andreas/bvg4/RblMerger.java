@@ -32,7 +32,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -474,7 +474,7 @@ public class RblMerger {
 		HashMap<Id, HashMap<Id, NetworkRoute>> line2route2networkRouteMap = new HashMap<Id, HashMap<Id,NetworkRoute>>();
 		
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-		PersonalizableTravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, scenario.getConfig().planCalcScore());
+		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, scenario.getConfig().planCalcScore());
 		LeastCostPathCalculator routeAlgo = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCostCalculator, travelTimeCalculator);
 		
 		// for all lines
@@ -499,7 +499,7 @@ public class RblMerger {
 					
 					if(lastLinkId != null){
 						links.add(lastLinkId);
-						Path path = routeAlgo.calcLeastCostPath(scenario.getNetwork().getLinks().get(lastLinkId).getToNode(), scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getFromNode(), 0.0);
+						Path path = routeAlgo.calcLeastCostPath(scenario.getNetwork().getLinks().get(lastLinkId).getToNode(), scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getFromNode(), 0.0, null, null);
 						for (Link link : path.links) {
 							links.add(link.getId());
 						}

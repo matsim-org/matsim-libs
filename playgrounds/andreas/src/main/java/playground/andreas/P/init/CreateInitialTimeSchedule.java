@@ -148,7 +148,7 @@ public class CreateInitialTimeSchedule {
 		int startTime = 0 * 3600;
 		
 		// get Route
-		Path path = routingAlgo.calcLeastCostPath(startNode, endNode, startTime);
+		Path path = routingAlgo.calcLeastCostPath(startNode, endNode, startTime, null, null);
 		NetworkRoute route = new LinkNetworkRouteImpl(startStop.getLinkId(), endStop.getLinkId());
 		route.setLinkIds(startStop.getLinkId(), NetworkUtils.getLinkIds(path.links), endStop.getLinkId());
 		

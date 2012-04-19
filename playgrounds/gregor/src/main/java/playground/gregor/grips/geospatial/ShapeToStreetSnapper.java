@@ -43,7 +43,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.collections.QuadTree;
@@ -86,14 +86,14 @@ public class ShapeToStreetSnapper {
 		fixOneWayStreets();
 		
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
-		PersonalizableTravelDisutility cost = new TravelCost(p);
+		TravelDisutility cost = new TravelCost(p);
 		LeastCostPathCalculator dijkstra = new Dijkstra(this.sc.getNetwork(), cost, fs);
 		
 		List<Node> finalNodes = new ArrayList<Node>();
 		for (int i = 1; i < nodes.size(); i++) {
 			Node n0 = nodes.get(i-1);
 			Node n1 = nodes.get(i);
-			Path path = dijkstra.calcLeastCostPath(n0, n1, 0);
+			Path path = dijkstra.calcLeastCostPath(n0, n1, 0, null, null);
 			if (path != null && (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * ((CoordImpl)n0.getCoord()).calcDistance(n1.getCoord())) ){
 				finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 			}else {
@@ -103,7 +103,7 @@ public class ShapeToStreetSnapper {
 		}
 		Node nn0 = nodes.get(nodes.size()-1);
 		Node nn1 = nodes.get(0);
-		Path path = dijkstra.calcLeastCostPath(nn0, nn1, 0);
+		Path path = dijkstra.calcLeastCostPath(nn0, nn1, 0, null, null);
 		if (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * ((CoordImpl)nn0.getCoord()).calcDistance(nn1.getCoord()) ){
 			finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 		}

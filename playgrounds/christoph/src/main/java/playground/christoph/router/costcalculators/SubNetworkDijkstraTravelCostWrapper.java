@@ -26,8 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.router.SubNetworkDijkstra;
 
@@ -41,7 +41,7 @@ import playground.christoph.router.SubNetworkDijkstra;
  * We don't clone or copy the SubNetworkDijkstra - a new one 
  * has to be created elsewhere using a SubNetworkDijkstraFactory.
  */
-public class SubNetworkDijkstraTravelCostWrapper implements PersonalizableTravelDisutility, Cloneable{
+public class SubNetworkDijkstraTravelCostWrapper implements TravelDisutility, Cloneable {
 
 	private TravelDisutility travelCost;
 	private SubNetworkDijkstra subNetworkDijkstra = null;
@@ -59,20 +59,10 @@ public class SubNetworkDijkstraTravelCostWrapper implements PersonalizableTravel
 	}
 	
 	@Override
-	public void setPerson(Person person)
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle)
 	{
 		if (subNetworkDijkstra != null) subNetworkDijkstra.setPerson(person);
-		
-		if (travelCost instanceof PersonalizableTravelDisutility)
-		{
-			((PersonalizableTravelDisutility) travelCost).setPerson(person);
-		}
-	}
-
-	@Override
-	public double getLinkTravelDisutility(Link link, double time)
-	{
-		return travelCost.getLinkTravelDisutility(link, time);
+		return travelCost.getLinkTravelDisutility(link, time, person, vehicle);
 	}
 	
 	@Override

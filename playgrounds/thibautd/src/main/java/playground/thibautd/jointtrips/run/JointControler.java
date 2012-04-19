@@ -31,9 +31,8 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.TeleportationLegRouter;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.population.JointActingTypes;
@@ -41,14 +40,13 @@ import playground.thibautd.jointtrips.population.PopulationWithJointTripsWriterH
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
 import playground.thibautd.jointtrips.replanning.JointPlansReplanning;
 import playground.thibautd.jointtrips.replanning.JointStrategyManager;
-import playground.thibautd.jointtrips.router.CarPassengerLegRouter;
 import playground.thibautd.jointtrips.router.JointPlanRouter;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.LegRouterWrapper;
 import playground.thibautd.router.PlanRouterWrapper;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.RoutingModuleFactory;
 import playground.thibautd.router.TripRouterFactory;
+import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * Custom controler for handling clique replanning
@@ -78,7 +76,7 @@ public class JointControler extends MultiLegRoutingControler {
 	 * The config has to be set in the scenario before.
 	 */
 	public JointControler(final ScenarioWithCliques scenario) {
-		super((ScenarioImpl) scenario);
+		super(scenario);
 	}
 
 	/*
@@ -171,7 +169,7 @@ public class JointControler extends MultiLegRoutingControler {
 
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(
-			final PersonalizableTravelDisutility travelCosts,
+			final TravelDisutility travelCosts,
 			final PersonalizableTravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 

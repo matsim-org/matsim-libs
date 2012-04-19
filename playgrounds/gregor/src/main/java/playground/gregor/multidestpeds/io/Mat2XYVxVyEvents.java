@@ -39,7 +39,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -109,7 +109,7 @@ public class Mat2XYVxVyEvents {
 
 		Network network = this.sc.getNetwork();
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
-		PersonalizableTravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
+		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
 
 		Set<Ped> excl = new HashSet<Ped>();
@@ -195,7 +195,7 @@ public class Mat2XYVxVyEvents {
 			to = sc.getNetwork().getLinks().get(endLink).getToNode();
 		}
 		
-		Path path = dijkstra.calcLeastCostPath(from, to , 0);
+		Path path = dijkstra.calcLeastCostPath(from, to , 0, null, null);
 		boolean routeAgain = false;
 		if (!path.links.get(0).getId().equals(startLink)) {
 
@@ -227,7 +227,7 @@ public class Mat2XYVxVyEvents {
 		}
 
 		if (routeAgain) {
-			path = dijkstra.calcLeastCostPath(from, to , 0);
+			path = dijkstra.calcLeastCostPath(from, to , 0, null, null);
 		}
 
 		ped.path = path;

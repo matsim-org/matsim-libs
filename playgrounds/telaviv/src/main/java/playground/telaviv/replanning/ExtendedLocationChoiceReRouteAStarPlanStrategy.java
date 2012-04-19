@@ -33,8 +33,8 @@ import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 
 import playground.telaviv.locationchoice.ExtendedLocationChoicePlanModule;
 
@@ -52,7 +52,7 @@ public class ExtendedLocationChoiceReRouteAStarPlanStrategy implements PlanStrat
 		
 		Scenario scenario = controler.getScenario();
 		Network network = controler.getNetwork();
-		PersonalizableTravelDisutility travelCostCalc = controler.createTravelCostCalculator();
+		TravelDisutility travelCostCalc = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		Config config = controler.getConfig();
 		

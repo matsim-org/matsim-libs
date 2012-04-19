@@ -121,7 +121,7 @@ public final class LinkTablesFromPopulation {
 						String toActType = thisActivity.getType();
 						double speed = this.speeds.get(mode).doubleValue();
 
-						Path path = this.router.calcLeastCostPath(fromNode, toNode, time);
+						Path path = this.router.calcLeastCostPath(fromNode, toNode, time, person, null);
 						for (Link link : path.links) {
 							writeLine(mode, time, link.getId(), personId, fromActType, fromFacilityId, toActType, toFacilityId);
 							time += link.getLength() / speed;

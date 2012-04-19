@@ -40,12 +40,12 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -82,7 +82,7 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 	private final NetworkLegRouter routingModule;
 	private final PersonalizableTravelTime travelTime;
-	private final PersonalizableTravelDisutility travelCost;
+	private final TravelDisutility travelCost;
 	private final DepartureDelayAverageCalculator tDepDelayCalc;
 
 	private FixedRouteNetworkRoutingModule(
@@ -195,7 +195,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 			final double departureTime,
 			final Person person) {
 		travelTime.setPerson( person );
-		travelCost.setPerson( person );
 
 		double now = processDeparture( route.getStartLinkId() , departureTime );
 
@@ -246,7 +245,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 			final double departureTime,
 			final Person person) {
 		travelTime.setPerson( person );
-		travelCost.setPerson( person );
 
 		Leg leg = populationFactory.createLeg( mode );
 		double tt = routingModule.routeLeg(

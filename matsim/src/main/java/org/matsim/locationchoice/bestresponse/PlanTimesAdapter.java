@@ -69,7 +69,7 @@ public class PlanTimesAdapter {
 							Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
 							Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
 							
-							Path p = this.leastCostPathCalculatorForward.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime());
+							Path p = this.leastCostPathCalculatorForward.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime(), plan.getPerson(), null);
 							legTravelTime = p.travelTime;
 							
 							//log.info("planElementIndex: " + planElementIndex + "------------");
@@ -83,7 +83,7 @@ public class PlanTimesAdapter {
 							Node fromNode = network.getLinks().get(((ActivityImpl)pe).getLinkId()).getToNode();
 							Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
 																					
-							Path p = this.leastCostPathCalculatorBackward.calcLeastCostPath(fromNode, toNode, -1.0);
+							Path p = this.leastCostPathCalculatorBackward.calcLeastCostPath(fromNode, toNode, -1.0, plan.getPerson(), null);
 							legTravelTime = p.travelTime;
 							//log.info("	Backward travel time: " + legTravelTime / 60.0);
 						}

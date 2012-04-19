@@ -11,13 +11,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 /*
@@ -44,7 +43,7 @@ public class NetworkThiningForDijkstra {
 	
 	public static void main(String[] args)
 	{
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		// load Network
 		//String networkFile = "mysimulations/kt-zurich/input/network.xml";
@@ -162,7 +161,7 @@ public class NetworkThiningForDijkstra {
 				Node outNode = outLink.getToNode();
 				
 				// calculate costs for OutLink
-				double linkCosts = costCalculator.getLinkTravelDisutility(outLink, time);
+				double linkCosts = costCalculator.getLinkTravelDisutility(outLink, time, null, null);
 				
 				double minTravelCosts = travelCostsMap.get(outNode);
 				
@@ -274,7 +273,7 @@ public class NetworkThiningForDijkstra {
 					Node outNode = outLink.getToNode();
 					
 					// calculate costs for OutLink
-					double linkCosts = costCalculator.getLinkTravelDisutility(outLink, time);
+					double linkCosts = costCalculator.getLinkTravelDisutility(outLink, time, null, null);
 					
 					double minTravelCosts = travelCostsMap.get(outNode);
 					

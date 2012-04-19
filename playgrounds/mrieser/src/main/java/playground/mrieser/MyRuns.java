@@ -21,6 +21,10 @@
 package playground.mrieser;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * @author mrieser
@@ -58,12 +62,18 @@ public class MyRuns {
 //			}
 //		}
 
+		CoordinateTransformation t = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
+		Coord c = t.transform(new CoordImpl(679976, 248958));
+		System.out.println(c.getX());
+		System.out.println(c.getY());
 
-		int size = 11;
-		int nOfParts = 3;
-		for (int i = 0; i < nOfParts; i++) {
-			System.out.println(size * (i+1) / nOfParts);
-		}
+
+
+//		int size = 11;
+//		int nOfParts = 3;
+//		for (int i = 0; i < nOfParts; i++) {
+//			System.out.println(size * (i+1) / nOfParts);
+//		}
 
 
 //

@@ -283,7 +283,7 @@ public class PathSetGenerator {
 					removeLinkFromNetwork(l);
 				}
 			}
-			Path path = router.calcLeastCostPath(origin,destination,depTime);
+			Path path = router.calcLeastCostPath(origin,destination,depTime, null, null);
 			routeCnt++;
 			for (StreetSegment segment : streetSegmentSet) {
 				for (Link l : segment.links) {

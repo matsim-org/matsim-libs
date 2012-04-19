@@ -66,7 +66,7 @@ public class NetworkLegRouter implements LegRouter {
 		Path path = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());

@@ -23,10 +23,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -45,24 +46,18 @@ public class IncomeTollTravelCostCalculatorFactory implements TravelDisutilityFa
 	}
 	
 	@Override
-	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		final IncomeTollTravelCostCalculator incomeTollTravelCostCalculator = new IncomeTollTravelCostCalculator(personHouseholdMapping, scheme);
 		
-		return new PersonalizableTravelDisutility() {
-
-			@Override
-			public void setPerson(Person person) {
-				incomeTravelCostCalculator.setPerson(person);
-				incomeTollTravelCostCalculator.setPerson(person);
-			}
+		return new TravelDisutility() {
 
 			//somehow summing up the income related generalized travel costs and the income related toll costs for the router...
 			//remark: this method should be named "getLinkGeneralizedTravelCosts" or "getLinkDisutilityFromTraveling"
 			@Override
-			public double getLinkTravelDisutility(Link link, double time) {
-				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelDisutility(link, time);
-				double additionalGeneralizedTollCost = incomeTollTravelCostCalculator.getLinkTravelDisutility(link, time);
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelDisutility(link, time, person, vehicle);
+				double additionalGeneralizedTollCost = incomeTollTravelCostCalculator.getLinkTravelDisutility(link, time, person, vehicle);
 				return generalizedTravelCost + additionalGeneralizedTollCost;
 			}
 			

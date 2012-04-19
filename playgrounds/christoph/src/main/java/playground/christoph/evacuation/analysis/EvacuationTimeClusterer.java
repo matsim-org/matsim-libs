@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -44,6 +45,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.router.FullNetworkDijkstra;
 import playground.christoph.router.FullNetworkDijkstraFactory;
@@ -251,14 +253,14 @@ public class EvacuationTimeClusterer {
 		}
 
 		@Override
-		public double getLinkTravelDisutility(Link link, double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 //			return getLinkTravelTime(link, time);
 			return link.getLength();
 		}
 
 		@Override
 		public double getLinkMinimumTravelDisutility(Link link) {
-			return getLinkTravelDisutility(link, 0.0);
+			return getLinkTravelDisutility(link, 0.0, null, null);
 		}
 	}
 	
@@ -308,7 +310,7 @@ public class EvacuationTimeClusterer {
 			if (to instanceof Link) toLink = (Link) to;
 			else toLink = network.getLinks().get(((Facility) to).getLinkId());
 			
-			Path path = leastCostPathCalculator.calcLeastCostPath(fromLink.getToNode(), toLink.getToNode(), Time.UNDEFINED_TIME); 
+			Path path = leastCostPathCalculator.calcLeastCostPath(fromLink.getToNode(), toLink.getToNode(), Time.UNDEFINED_TIME, null, null); 
 			
 			return path.travelCost;
 		}

@@ -21,8 +21,8 @@ package org.matsim.core.router.costcalculators;
 
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 
 /**
  * Design remark(s):<ul>
@@ -35,6 +35,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
  */
 public interface TravelDisutilityFactory extends MatsimFactory {
 	
-	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup);
+	public TravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup);
 
 }

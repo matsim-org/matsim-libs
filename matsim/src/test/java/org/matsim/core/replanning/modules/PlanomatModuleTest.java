@@ -32,7 +32,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -73,10 +73,10 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		// - set possible modes such that a scenario consisting only of "car" and "pt" modes is generated
 		config.planomat().setPossibleModes("car,pt");
 
-		EventsManager emptyEvents = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager emptyEvents = EventsUtils.createEventsManager();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), scenario.getNetwork());
-		PersonalizableTravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, config.planCalcScore());
+		TravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, config.planCalcScore());
 
 		Controler dummyControler = new Controler(this.scenario);
 		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());

@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -35,6 +36,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -59,7 +61,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
 		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(0.0, 0.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("1", p.links.get(0).getId().toString());
@@ -69,7 +71,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		// change costs
 		tc.setData(new IdImpl(1), 2.0, 5.0);
 
-		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -79,7 +81,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		// change costs again
 		tc.setData(new IdImpl(1), 2.0, 1.0);
 
-		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("1", p.links.get(0).getId().toString());
@@ -105,7 +107,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(4.0, 4.0));
 		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(1.0, 1.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -115,7 +117,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		// change costs
 		tc.setData(new IdImpl(4), 3.0, 1.0);
 
-		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -125,7 +127,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		// change costs again
 		tc.setData(new IdImpl(6), 7.0, 3.0);
 
-		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -152,7 +154,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(4.0, 4.0));
 		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(1.0, 1.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -163,7 +165,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(3), 3.0, 1.0);
 		tc.setData(new IdImpl(4), 3.0, 1.0);
 
-		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("3", p.links.get(0).getId().toString());
@@ -174,7 +176,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(3), 3.0, 4.0);
 		tc.setData(new IdImpl(6), 7.0, 3.0);
 
-		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -205,7 +207,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
 		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(0.0, 0.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("1", p.links.get(0).getId().toString());
@@ -230,7 +232,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		toNodes.put(f.network.getNodes().get(new IdImpl(8)), new InitialNode(3.0, 3.0));
 		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(1.0, 1.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -254,7 +256,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
 		toNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(3.0, 3.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(0, p.links.size());
 		assertEquals(1, p.nodes.size());
@@ -284,7 +286,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		toNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(1.0, 1.0));
 		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(3.0, 3.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(0, p.links.size());
 		assertEquals(1, p.nodes.size());
@@ -314,7 +316,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		toNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(8.0, 8.0));
 		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(3.0, 3.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -343,7 +345,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(1.0, 1.0));
 		toNodes.put(f.network.getNodes().get(new IdImpl(3)), new InitialNode(3.0, 3.0)); // cannot be reached!
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -372,7 +374,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(1.0, 1.0));
 		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(3.0, 3.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
 		assertEquals("2", p.links.get(0).getId().toString());
@@ -396,7 +398,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
 		toNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(3.0, 3.0));
 
-		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes, null);
 		assertNull("wow, impossible path found!", p);
 	}
 
@@ -456,7 +458,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		}
 
 		@Override
-		public double getLinkTravelDisutility(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			return this.travelCosts.get(link.getId()).doubleValue();
 		}
 		

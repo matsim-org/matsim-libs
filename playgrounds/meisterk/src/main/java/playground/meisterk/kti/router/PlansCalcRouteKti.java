@@ -35,8 +35,8 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 
 import playground.balmermi.world.Layer;
 
@@ -72,7 +72,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	public PlansCalcRouteKti(
 			final PlansCalcRouteConfigGroup group,
 			final Network network,
-			final PersonalizableTravelDisutility costCalculator,
+			final TravelDisutility costCalculator,
 			final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory,
 			final ModeRouteFactory routeFactory,

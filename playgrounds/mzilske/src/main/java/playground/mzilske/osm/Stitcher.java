@@ -133,7 +133,7 @@ public class Stitcher {
 		Node previous = network.getNodes().get(i.next());
 		while (i.hasNext()) {
 			Node next = network.getNodes().get(i.next());
-			Path leastCostPath = router.calcLeastCostPath(previous, next, 0);
+			Path leastCostPath = router.calcLeastCostPath(previous, next, 0, null, null);
 			if (leastCostPath == null) {
 				System.out.println("No route.");
 				return Collections.emptyList();

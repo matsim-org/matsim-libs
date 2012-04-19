@@ -23,14 +23,15 @@ import herbie.running.scoring.TravelScoringFunction;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author thibautd
  */
-public class HerbieParkAndRideCost implements PersonalizableTravelTime, PersonalizableTravelDisutility {
+public class HerbieParkAndRideCost implements PersonalizableTravelTime, TravelDisutility {
 	private final TravelScoringFunction distanceScoring;
 	private final TransitRouterConfig config;
 
@@ -49,9 +50,7 @@ public class HerbieParkAndRideCost implements PersonalizableTravelTime, Personal
 	}
 
 	@Override
-	public double getLinkTravelDisutility(
-			final Link link,
-			final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double transfertime = getLinkTravelTime(link, time);
 		double waittime = config.additionalTransferTime;
 		

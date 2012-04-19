@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNode;
@@ -65,7 +66,7 @@ public class SubNetworkDijkstra extends Dijkstra {
 	 * their children in the Person's SubNetwork.
 	 */
 	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
 		Network subNetwork = this.knowledgeTools.getSubNetwork(person, network);
 		
 		Node newFromNode = subNetwork.getNodes().get(fromNode.getId());
@@ -82,7 +83,7 @@ public class SubNetworkDijkstra extends Dijkstra {
 		if (newToNode == null) 	System.out.println("NewToNode Null!");
 //		else if (newToNode.getId() == null) System.out.println("NewToNodeId Null!");
 		
-		Path path = super.calcLeastCostPath(newFromNode, newToNode, startTime);
+		Path path = super.calcLeastCostPath(newFromNode, newToNode, startTime, person, vehicle);
 		
 		/*
 		 *  The path contains SubNodes and SubLinks - we have to replace them with

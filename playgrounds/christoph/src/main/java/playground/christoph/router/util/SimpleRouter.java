@@ -27,7 +27,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 /*
  * This abstract Class contains some Objects that are used by Simple
@@ -36,14 +37,13 @@ import org.matsim.core.router.util.PersonalizableTravelDisutility;
  * By implementing the PersonalizableTravelCost interface the PlansCalcRoute
  * class hands over the currently handled person by using the setPerson method. 
  */
-public abstract class SimpleRouter implements LeastCostPathCalculator, PersonalizableTravelDisutility {
+public abstract class SimpleRouter implements LeastCostPathCalculator, TravelDisutility {
 	
 	protected KnowledgeTools knowledgeTools;
 	protected Network network;
 	protected Random random;
 	protected LoopRemover loopRemover;
 	protected TabuSelector tabuSelector;
-	protected Person person;
 	
 	public SimpleRouter(Network network) {
 		this.network = network;
@@ -53,17 +53,12 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, Personali
 		this.tabuSelector = new TabuSelector();
 	}
 	
-	@Override
-	public void setPerson(Person person) {
-		this.person = person;
-	}
-
 	/*
 	 * A typical simple Router like a Random Router ignores
 	 * the link travel costs so by default we set them to 0.
 	 */
 	@Override
-	public double getLinkTravelDisutility(Link link, double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		return 0;
 	}
 	

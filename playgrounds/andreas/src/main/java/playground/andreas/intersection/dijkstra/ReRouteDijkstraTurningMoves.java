@@ -27,8 +27,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -36,7 +36,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 
-	PersonalizableTravelDisutility costCalculator = null;
+	TravelDisutility costCalculator = null;
 
 	PersonalizableTravelTime timeCalculator = null;
 
@@ -48,7 +48,7 @@ public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 	
 	private final ModeRouteFactory routeFactory; 
 
-	public ReRouteDijkstraTurningMoves(Config config, final Network network, final PersonalizableTravelDisutility costCalculator,
+	public ReRouteDijkstraTurningMoves(Config config, final Network network, final TravelDisutility costCalculator,
 			final PersonalizableTravelTime timeCalculator, final ModeRouteFactory routeFactory) {
 		super(config.global());
 		this.originalNetwork = network;

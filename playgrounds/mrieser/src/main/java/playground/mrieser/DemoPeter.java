@@ -21,6 +21,7 @@ package playground.mrieser;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -33,6 +34,7 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicle;
 
 public class DemoPeter {
 
@@ -78,8 +80,8 @@ public class DemoPeter {
 
 
 		@Override
-		public double getLinkTravelDisutility(final Link link, final double time) {
-			return super.getLinkTravelDisutility(link, time);
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+			return super.getLinkTravelDisutility(link, time, person, vehicle);
 		}
 
 	}

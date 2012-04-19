@@ -22,7 +22,6 @@ package playground.gregor.sim2d_v2.helper;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -43,9 +42,8 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class UTurnRemover implements PersonAlgorithm, IterationStartsListener{
@@ -60,7 +58,7 @@ public class UTurnRemover implements PersonAlgorithm, IterationStartsListener{
 	public UTurnRemover(Scenario sc){
 		Network network = sc.getNetwork();
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
-		PersonalizableTravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,sc.getConfig().planCalcScore() );
+		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator routeAlgo = new Dijkstra(network, cost, fs);
 		this.router = new NetworkLegRouter(network, routeAlgo, ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory());
 		this.sc =sc;

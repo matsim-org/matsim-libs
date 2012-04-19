@@ -20,9 +20,11 @@
 package playground.tnicolai.matsim4opus.costcalculators;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 public class TravelTimeCostCalculatorTest implements TravelDisutility {
 
@@ -40,7 +42,7 @@ public class TravelTimeCostCalculatorTest implements TravelDisutility {
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		
 		return this.marginalCostOfTime * travelTime;

@@ -34,14 +34,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class SpanningTree {
@@ -92,6 +91,7 @@ public class SpanningTree {
 	static class ComparatorCost implements Comparator<Node> {
 		protected Map<Id, ? extends NodeData> nodeData;
 		ComparatorCost(final Map<Id, ? extends NodeData> nodeData) { this.nodeData = nodeData; }
+		@Override
 		public int compare(final Node n1, final Node n2) {
 			double c1 = getCost(n1);
 			double c2 = getCost(n2);
@@ -146,7 +146,7 @@ public class SpanningTree {
 			Node nn = l.getToNode();
 			NodeData nnData = nodeData.get(nn.getId());
 			if (nnData == null) { nnData = new NodeData(); this.nodeData.put(nn.getId(),nnData); }
-			double visitCost = currCost+tcFunction.getLinkTravelDisutility(l,currTime);
+			double visitCost = currCost+tcFunction.getLinkTravelDisutility(l,currTime, null, null);
 			double visitTime = currTime+ttFunction.getLinkTravelTime(l,currTime);
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
@@ -182,7 +182,7 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 		Config conf = scenario.getConfig();

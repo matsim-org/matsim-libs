@@ -19,19 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
-import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.router.TransitRouterConfig;
-
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
@@ -39,6 +26,18 @@ import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 import herbie.running.scoring.TravelScoringFunction;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.router.TransitRouterConfig;
 
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
@@ -148,7 +147,7 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 	}
 
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
 		PlanAlgorithm router = null;
 		router = super.createRoutingAlgorithm(travelCosts, travelTimes);
 		return router;

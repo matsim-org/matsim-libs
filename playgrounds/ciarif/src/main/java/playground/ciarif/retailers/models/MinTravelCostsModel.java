@@ -25,8 +25,8 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -84,7 +84,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       {
         Network network = this.controler.getNetwork();
         PersonalizableTravelTime travelTime = this.controler.getTravelTimeCalculator();
-        PersonalizableTravelDisutility travelCost = this.controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, this.controler.getConfig().planCalcScore());
+        TravelDisutility travelCost = this.controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, this.controler.getConfig().planCalcScore());
 
         LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 
@@ -124,8 +124,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
     return function.getScore();
   }
 
-  @SuppressWarnings("deprecation")
-private double handleCarLeg(Leg leg, Link fromLink, Link toLink, Network network, PlansCalcRoute pcr, LeastCostPathCalculator routeAlgo)
+  private double handleCarLeg(Leg leg, Link fromLink, Link toLink, Network network, PlansCalcRoute pcr, LeastCostPathCalculator routeAlgo)
     throws RuntimeException
   {
     NetworkRoute route;
@@ -141,7 +140,7 @@ private double handleCarLeg(Leg leg, Link fromLink, Link toLink, Network network
     LeastCostPathCalculator.Path path = null;
     if (toLink != fromLink)
     {
-      path = routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+      path = routeAlgo.calcLeastCostPath(startNode, endNode, depTime, null, null);
       if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 
       route = (NetworkRoute)pcr.getRouteFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());

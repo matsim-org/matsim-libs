@@ -22,22 +22,23 @@ package playground.benjamin.scoring.income;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.Household;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
  * @author bkick after dgrether
  *
  */
-public class IncomeTravelCostCalculator implements PersonalizableTravelDisutility {
+public class IncomeTravelCostCalculator implements TravelDisutility {
 		
 //	private Double betaCost = null;
-	private double incomePerDay;
+//	private double incomePerDay;
 	
 	/*	this parameter has to be equal to the one appearing several times in the scoring function, e.g.
 	 * 	ScoringFromDailyIncome, ScoringFromLeg and ScoringFromToll and eventually other money related parts of the scoring function.
@@ -70,8 +71,21 @@ public class IncomeTravelCostCalculator implements PersonalizableTravelDisutilit
 
 	//calculate generalized travel costs
 	@Override
-	public double getLinkTravelDisutility(Link link, double time) {
-		double betaCost = betaIncomeCar / this.incomePerDay;
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+
+		Household household = this.personHouseholdMapping.getHousehold(person.getId());
+		Income income = household.getIncome();
+		double incomePerDay;
+		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
+			//assumption: 240 working days per year
+			incomePerDay = income.getIncome() / 240;
+		}
+		else {
+			throw new UnsupportedOperationException("Can't calculate income per day");
+		}
+
+		
+		double betaCost = betaIncomeCar / incomePerDay;
 		double distance   = link.getLength();
 		double distanceCost = this.distanceCostFactor * distance;
 		
@@ -91,24 +105,6 @@ public class IncomeTravelCostCalculator implements PersonalizableTravelDisutilit
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
 		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public void setPerson(Person person) {
-		Household household = this.personHouseholdMapping.getHousehold(person.getId());
-		Income income = household.getIncome();
-		this.setIncome(income);
-//		this.betaCost = betaIncomeCar / this.incomePerDay;	
-	}
-
-	private void setIncome(Income income) {
-		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
-			//assumption: 240 working days per year
-			this.incomePerDay = income.getIncome() / 240;
-		}
-		else {
-			throw new UnsupportedOperationException("Can't calculate income per day");
-		}
 	}
 	
 }

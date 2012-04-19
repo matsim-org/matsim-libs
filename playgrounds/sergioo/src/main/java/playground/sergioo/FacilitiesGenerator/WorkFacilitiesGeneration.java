@@ -58,6 +58,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -80,6 +81,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.vehicles.Vehicle;
 
 import others.sergioo.util.algebra.Matrix1DImpl;
 import others.sergioo.util.algebra.Matrix2DImpl;
@@ -555,9 +557,11 @@ public class WorkFacilitiesGeneration {
 			oos.close();
 		}
 		TravelDisutility travelMinCost = new TravelDisutility() {
-			public double getLinkTravelDisutility(Link link, double time) {
+			@Override
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 				return getLinkMinimumTravelDisutility(link);
 			}
+			@Override
 			public double getLinkMinimumTravelDisutility(Link link) {
 				return link.getLength()/WALKING_SPEED;
 			}
@@ -628,7 +632,7 @@ public class WorkFacilitiesGeneration {
 					if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<MAX_TRAVEL_TIME*WALKING_SPEED) {
 						double walkingTime = Double.MAX_VALUE;
 						for(int n=0; n<NUM_NEAR; n++) {
-							double walkingTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0).travelCost;
+							double walkingTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0, null, null).travelCost;
 							if(walkingTimeA<walkingTime)
 								walkingTime = walkingTimeA;
 						}
@@ -646,13 +650,13 @@ public class WorkFacilitiesGeneration {
 						if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<(MAX_TRAVEL_TIME*2/3)*PRIVATE_BUS_SPEED) {
 							double walkingTime = Double.MAX_VALUE;
 							for(int n=0; n<NUM_NEAR; n++) {
-								double walkingTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0).travelCost;
+								double walkingTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0, null, null).travelCost;
 								if(walkingTimeA<walkingTime)
 									walkingTime = walkingTimeA;
 							}
 							double privateBusTime = Double.MAX_VALUE;
 							for(int n=0; n<NUM_NEAR; n++) {
-								double privateBusTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0).travelCost*WALKING_SPEED/PRIVATE_BUS_SPEED;
+								double privateBusTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0, null, null).travelCost*WALKING_SPEED/PRIVATE_BUS_SPEED;
 								if(privateBusTimeA<privateBusTime)
 									privateBusTime = privateBusTimeA;
 							}
@@ -671,7 +675,7 @@ public class WorkFacilitiesGeneration {
 							if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<MAX_TRAVEL_TIME*PRIVATE_BUS_SPEED) {
 								double privateBusTime = Double.MAX_VALUE;
 								for(int n=0; n<NUM_NEAR; n++) {
-									double privateBusTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0).travelCost*WALKING_SPEED/PRIVATE_BUS_SPEED;
+									double privateBusTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0, null, null).travelCost*WALKING_SPEED/PRIVATE_BUS_SPEED;
 									if(privateBusTimeA<privateBusTime)
 										privateBusTime = privateBusTimeA;
 								}

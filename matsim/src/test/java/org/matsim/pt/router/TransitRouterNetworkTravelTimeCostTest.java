@@ -121,12 +121,12 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		}
 
 		double oldCost = - conf.getUtilityOfLineSwitch_utl();
-		double cost1 = tc.getLinkTravelDisutility(testLink, 7.0*3600);
+		double cost1 = tc.getLinkTravelDisutility(testLink, 7.0*3600, null, null);
 		conf.setUtilityOfLineSwitch_utl(0.0);
-		double cost2 = tc.getLinkTravelDisutility(testLink, 6.0*3600); // use different time because of internal caching effects
+		double cost2 = tc.getLinkTravelDisutility(testLink, 6.0*3600, null, null); // use different time because of internal caching effects
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
 		conf.setUtilityOfLineSwitch_utl(-40.125);
-		double cost3 = tc.getLinkTravelDisutility(testLink, 5.0*3600);
+		double cost3 = tc.getLinkTravelDisutility(testLink, 5.0*3600, null, null);
 		assertEquals(40.125, cost3 - cost2, MatsimTestCase.EPSILON);
 	}
 
@@ -150,16 +150,16 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		}
 
 		double oldCost = - conf.getUtilityOfLineSwitch_utl();
-		double cost1 = tc.getLinkTravelDisutility(testLink, 7.0*3600);
+		double cost1 = tc.getLinkTravelDisutility(testLink, 7.0*3600, null, null);
 		conf.setUtilityOfLineSwitch_utl(0.0);
-		double cost2 = tc.getLinkTravelDisutility(testLink, 6.0*3600); // use different time because of internal caching effects
+		double cost2 = tc.getLinkTravelDisutility(testLink, 6.0*3600, null, null); // use different time because of internal caching effects
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
 		conf.additionalTransferTime = 120.0;
-		double cost3 = tc.getLinkTravelDisutility(testLink, 5.0*3600);
+		double cost3 = tc.getLinkTravelDisutility(testLink, 5.0*3600, null, null);
 		assertEquals(-120.0 * conf.getMarginalUtiltityOfWaiting_utl_s(), cost3 - cost2, MatsimTestCase.EPSILON);
 		// test with custom value for utility of waiting, just in case too many of the default marginal utilities are 0.0
 		tc.config.setMarginalUtiltityOfWaiting_utl_s(-12.0 / 3600.0);
-		double cost4 = tc.getLinkTravelDisutility(testLink, 7.0*3600);
+		double cost4 = tc.getLinkTravelDisutility(testLink, 7.0*3600, null, null);
 		assertEquals(120.0 * 12.0 / 3600.0, cost4 - cost2, MatsimTestCase.EPSILON);
 	}
 

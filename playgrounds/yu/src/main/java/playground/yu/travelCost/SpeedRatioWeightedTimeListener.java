@@ -31,9 +31,9 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * switch TravelCostCalculatorFactory evetually also PersonalizableTravelCost
@@ -47,7 +47,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 			implements TravelDisutilityFactory {
 
 		@Override
-		public PersonalizableTravelDisutility createTravelDisutility(
+		public TravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new SpeedRatioWeightedTimeTravelCostCalculator(
@@ -56,8 +56,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 
 	}
 
-	public static class SpeedRatioWeightedTimeTravelCostCalculator implements
-			TravelDisutility, PersonalizableTravelDisutility {
+	public static class SpeedRatioWeightedTimeTravelCostCalculator implements TravelDisutility {
 		private PersonalizableTravelTime timeCalculator;
 
 		public SpeedRatioWeightedTimeTravelCostCalculator(
@@ -66,8 +65,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 		}
 
 		@Override
-		public double getLinkTravelDisutility(final Link link,
-				final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			double travelTime = timeCalculator.getLinkTravelTime(link, time);
 
 			return travelTime
@@ -80,11 +78,6 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 
 			return travelTime
 					/ (link.getLength() / travelTime / link.getFreespeed());
-		}
-
-		@Override
-		public void setPerson(Person person) {
-			// This cost function doesn't change with persons.
 		}
 
 	}

@@ -22,15 +22,16 @@ package org.matsim.contrib.grips.helper.shapetostreetsnapper;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.vehicles.Vehicle;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class TravelCost implements PersonalizableTravelDisutility {
+public class TravelCost implements TravelDisutility {
 	
 	private final Polygon p;
 
@@ -41,7 +42,7 @@ public class TravelCost implements PersonalizableTravelDisutility {
 	}
 	
 	@Override
-	public double getLinkTravelDisutility(Link link, double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		Coordinate c0 = MGC.coord2Coordinate(link.getFromNode().getCoord());
 		Coordinate c1 = MGC.coord2Coordinate(link.getToNode().getCoord());
 		LineString ls = this.geofac.createLineString(new Coordinate[]{c0,c1});
@@ -58,9 +59,4 @@ public class TravelCost implements PersonalizableTravelDisutility {
 		throw new UnsupportedOperationException();
 	}
 	
-	@Override
-	public void setPerson(Person person) {
-		// TODO Auto-generated method stub
-		
-	}
 }

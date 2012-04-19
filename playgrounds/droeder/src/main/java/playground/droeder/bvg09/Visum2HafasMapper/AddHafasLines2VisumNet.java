@@ -231,7 +231,7 @@ public class AddHafasLines2VisumNet {
 		for(TransitRouteStop stop: stops){
 			toNode = visumNet.getLinks().get(stop.getStopFacility().getLinkId()).getToNode();
 			if(!first){
-				p = router.calcLeastCostPath(fromNode, toNode, 0);
+				p = router.calcLeastCostPath(fromNode, toNode, 0, null, null);
 				links.addAll(p.links);
 			}
 			fromNode = toNode;

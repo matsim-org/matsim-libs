@@ -59,7 +59,7 @@ public class SparseShortestPath
     {
         if (fromLink != toLink) {
             Path path = sspFinder.router.calcLeastCostPath(fromLink.getToNode(),
-                    toLink.getFromNode(), departTime);
+                    toLink.getFromNode(), departTime, null, null);
 
             double time = path.travelTime;
             double cost = path.travelCost;
@@ -69,13 +69,13 @@ public class SparseShortestPath
 
             if (ShortestPath.INCLUDE_TO_LINK) {
                 time += sspFinder.travelTime.getLinkTravelTime(toLink, departTime);
-                cost += sspFinder.travelCost.getLinkTravelDisutility(toLink, time);
+                cost += sspFinder.travelCost.getLinkTravelDisutility(toLink, time, null, null);
                 ids[idCount - 1] = toLink.getId();
                 idxShift = 0;
             }
             else {
                 time += sspFinder.travelTime.getLinkTravelTime(fromLink, departTime);
-                cost += sspFinder.travelCost.getLinkTravelDisutility(fromLink, time);
+                cost += sspFinder.travelCost.getLinkTravelDisutility(fromLink, time, null, null);
                 ids[0] = fromLink.getId();
                 idxShift = 1;
             }

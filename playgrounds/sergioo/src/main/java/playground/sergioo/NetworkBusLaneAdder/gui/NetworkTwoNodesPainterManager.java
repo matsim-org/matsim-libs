@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.sergioo.NetworkBusLaneAdder.gui;
 
 import java.util.ArrayList;
@@ -42,7 +61,7 @@ public class NetworkTwoNodesPainterManager extends NetworkPainterManager {
 	public void selectLinks(Dijkstra dijkstra) {
 		selectedLinks.clear();
 		if(selectedNodesId.size()==2) {
-			Path path=dijkstra.calcLeastCostPath(network.getNodes().get(selectedNodesId.get(0)), network.getNodes().get(selectedNodesId.get(1)), 0);
+			Path path=dijkstra.calcLeastCostPath(network.getNodes().get(selectedNodesId.get(0)), network.getNodes().get(selectedNodesId.get(1)), 0, null, null);
 			for(Link link:path.links)
 				selectedLinks.add(link);
 		}

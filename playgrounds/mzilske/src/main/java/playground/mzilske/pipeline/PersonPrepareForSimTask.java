@@ -20,13 +20,12 @@
 package playground.mzilske.pipeline;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -39,7 +38,7 @@ public class PersonPrepareForSimTask implements ScenarioSinkSource {
 	
 	private LeastCostPathCalculatorFactory routerFactory;
 	
-	private PersonalizableTravelDisutility travelCosts;
+	private TravelDisutility travelCosts;
 	
 	private PersonalizableTravelTime travelTimes;
 
@@ -56,7 +55,7 @@ public class PersonPrepareForSimTask implements ScenarioSinkSource {
 
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), travelCosts, travelTimes, routerFactory, routeFactory), (NetworkImpl) scenario.getNetwork());
+				return new PersonPrepareForSim(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), travelCosts, travelTimes, routerFactory, routeFactory), scenario.getNetwork());
 			}
 		});
 		sink.process(scenario);

@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
@@ -46,10 +45,10 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFac
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
@@ -89,7 +88,7 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		 * Create travel cost object
 		 */
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(travelTime, config.planCalcScore());
 		
 		
 		IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCost, travelTime);

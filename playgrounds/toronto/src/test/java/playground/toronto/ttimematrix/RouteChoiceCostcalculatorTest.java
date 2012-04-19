@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -37,6 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.LeastCostPathTree;
 import org.matsim.utils.LeastCostPathTree.NodeData;
+import org.matsim.vehicles.Vehicle;
 
 
 public class RouteChoiceCostcalculatorTest {
@@ -143,7 +145,7 @@ public class RouteChoiceCostcalculatorTest {
 		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
 
 		@Override
-		public double getLinkTravelDisutility(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			if(link != null)
 				return link.getLength();
 			log.warn("Link is null. Reurned 0 as link length.");
@@ -160,7 +162,7 @@ public class RouteChoiceCostcalculatorTest {
 		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
 
 		@Override
-		public double getLinkTravelDisutility(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			if(link != null)
 				return link.getLength();
 			log.warn("Link is null. Reurned 0 as link length.");
@@ -182,7 +184,7 @@ public class RouteChoiceCostcalculatorTest {
 		}
 		
 		@Override
-		public double getLinkTravelDisutility(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			return this.timeCalculator.getLinkTravelTime(link, time);
 		}
 		

@@ -30,12 +30,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.LegRouter;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-
-import playground.thibautd.router.StageActivityTypes;
+import org.matsim.core.router.util.TravelDisutility;
 
 /**
  * Class wrapping a {@link LegRouter} in a {@link RoutingModule}.
@@ -48,7 +45,7 @@ public class LegRouterWrapper implements RoutingModule {
 	private final String mode;
 	private final PopulationFactory populationFactory;
 	private final LegRouter wrapped;
-	private final PersonalizableTravelDisutility travelCost;
+	private final TravelDisutility travelCost;
 	private final PersonalizableTravelTime travelTime;
 
 	/**
@@ -67,7 +64,7 @@ public class LegRouterWrapper implements RoutingModule {
 			final String mode,
 			final PopulationFactory populationFactory,
 			final LegRouter toWrap,
-			final PersonalizableTravelDisutility travelCost,
+			final TravelDisutility travelCost,
 			final PersonalizableTravelTime travelTime) {
 		this.mode = mode;
 		this.populationFactory = populationFactory;
@@ -82,9 +79,6 @@ public class LegRouterWrapper implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		if (travelCost != null) {
-			travelCost.setPerson( person );
-		}
 		if (travelTime != null) {
 			travelTime.setPerson( person );
 		}

@@ -21,14 +21,17 @@
 package org.matsim.locationchoice.bestresponse;
 
 import java.util.ArrayList;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.vehicles.Vehicle;
 
 public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 		
@@ -37,7 +40,7 @@ public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 	}
 
 	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
 		// now construct the path
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();

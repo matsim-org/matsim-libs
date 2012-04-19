@@ -21,8 +21,10 @@ package playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 public class TravelTimeCostCalculator implements TravelDisutility {
 
@@ -41,7 +43,7 @@ public class TravelTimeCostCalculator implements TravelDisutility {
 	}
 	
 	@Override
-	public double getLinkTravelDisutility(Link link, double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		if(link != null){
 			double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 			return travelTime; 	// travel time in seconds

@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -23,6 +24,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.Vehicle;
 
 import playground.telaviv.locationchoice.FullNetworkDijkstra;
 import playground.telaviv.locationchoice.FullNetworkDijkstraFactory;
@@ -178,7 +180,7 @@ public class CreateODDistanceMatrix {
 				
 				for (Id toId : nodeIds) {
 					Node toNode = scenario.getNetwork().getNodes().get(toId);
-					Path path = leastCostPathCalculator.calcLeastCostPath(d.fromNode, toNode, 0.0);
+					Path path = leastCostPathCalculator.calcLeastCostPath(d.fromNode, toNode, 0.0, null, null);
 					d.array[i] = path.travelCost;
 					counter.incCounter();
 					i++;
@@ -195,14 +197,14 @@ public class CreateODDistanceMatrix {
 		}
 
 		@Override
-		public double getLinkTravelDisutility(Link link, double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 //			return getLinkTravelTime(link, time);
 			return link.getLength();
 		}
 
 		@Override
 		public double getLinkMinimumTravelDisutility(Link link) {
-			return getLinkTravelDisutility(link, 0.0);
+			return getLinkTravelDisutility(link, 0.0, null, null);
 		}
 		
 	}

@@ -121,7 +121,7 @@ public class NetworkTransportCosts implements Costs{
 		Id toLinkId = new IdImpl(toId);
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
-		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), time);
+		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), time, null, null);
 		memorize(fromId,toId,time,path,costKey);
 		return path.travelCost;
 	}
@@ -138,13 +138,13 @@ public class NetworkTransportCosts implements Costs{
 		Id toLinkId = new IdImpl(toId);
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
-		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), time);
+		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), time, null, null);
 		memorize(fromId,toId,time,path,costKey);
 		return path.travelTime;
 	}
 
 	private int getTimeSlice(double time) {
-		int timeSlice = (int) time/(int) timeSliceWidth;
+		int timeSlice = (int) time/timeSliceWidth;
 		return timeSlice;
 	}
 

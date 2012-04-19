@@ -52,7 +52,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -173,7 +173,7 @@ public class PreparePopulation {
 		MultiModalTravelTime multiModalTravelTime = multiModalTravelTimeFactory.createTravelTime(); 
 		
 		// create travel costs object and use a multi-model travel time calculator
-		PersonalizableTravelDisutility travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(multiModalTravelTime, 
+		TravelDisutility travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(multiModalTravelTime, 
 				this.scenario.getConfig().planCalcScore());
 
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getModeRouteFactory();

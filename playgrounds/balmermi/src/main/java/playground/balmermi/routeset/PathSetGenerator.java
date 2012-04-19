@@ -184,7 +184,7 @@ public class PathSetGenerator {
 
 			// remove the links from the network, calculate the least cost path and put the links back where they were
 			for (Link l : linkSet) { removeLinkFromNetwork(l); }
-			Path path = router.calcLeastCostPath(origin,destination,depTime);
+			Path path = router.calcLeastCostPath(origin,destination,depTime, null, null);
 			routeCnt++;
 			for (Link l : linkSet) { addLinkToNetwork(l); }
 

@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -40,14 +40,13 @@ import playground.benjamin.emissions.types.WarmPollutant;
  * @author benjamin
  *
  */
-public class EmissionTravelDisutilityCalculator implements PersonalizableTravelDisutility{
+public class EmissionTravelDisutilityCalculator implements TravelDisutility {
 	private static final Logger logger = Logger.getLogger(EmissionTravelDisutilityCalculator.class);
 	
 	TravelTime timeCalculator;
 	double marginalUtlOfMoney;
 	double distanceCostRateCar;
 	double marginalUtlOfTravelTime;
-	Person person;
 	EmissionModule emissionModule;
 	EmissionCostModule emissionCostModule;
 
@@ -62,12 +61,7 @@ public class EmissionTravelDisutilityCalculator implements PersonalizableTravelD
 	}
 
 	@Override
-	public void setPerson(Person person) {
-		this.person = person;
-	}
-
-	@Override
-	public double getLinkTravelDisutility(Link link, double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle v) {
 		double linkTravelDisutility;
 		
 		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time);

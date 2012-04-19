@@ -21,15 +21,17 @@ package playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 public class TravelDistanceCalculator implements TravelDisutility{
 
 	private static final Logger log = Logger.getLogger(TravelDistanceCalculator.class);
 	
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		if(link != null)
 			return link.getLength();	// travel distance in meter
 		log.warn("Link is null. Returned 0 as distance.");
@@ -38,6 +40,6 @@ public class TravelDistanceCalculator implements TravelDisutility{
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return getLinkTravelDisutility(link, Time.UNDEFINED_TIME);
+		return getLinkTravelDisutility(link, Time.UNDEFINED_TIME, null, null);
 	}
 }

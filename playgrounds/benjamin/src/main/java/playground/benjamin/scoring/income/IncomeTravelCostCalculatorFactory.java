@@ -23,9 +23,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -41,22 +42,17 @@ public class IncomeTravelCostCalculatorFactory implements TravelDisutilityFactor
 	}
 	
 	@Override
-	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		// yy why not just "return new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping)"?
 		// Am I overlooking something? kai, mar'12
 		
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		
-		return new PersonalizableTravelDisutility() {
+		return new TravelDisutility() {
 
 			@Override
-			public void setPerson(Person person) {
-				incomeTravelCostCalculator.setPerson(person);
-			}
-
-			@Override
-			public double getLinkTravelDisutility(Link link, double time) {
-				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelDisutility(link, time);
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelDisutility(link, time, person, vehicle);
 				return generalizedTravelCost;
 			}
 			

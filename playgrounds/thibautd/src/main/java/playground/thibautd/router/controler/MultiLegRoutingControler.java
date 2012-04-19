@@ -29,9 +29,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -57,14 +57,9 @@ public class MultiLegRoutingControler extends Controler {
 		super(scenario);
 	}
 
-	//@Override
-	//protected void setUp() {
-	//	super.setUp();
-	//}
-
 	//TODO: check particular settings and handle them
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();

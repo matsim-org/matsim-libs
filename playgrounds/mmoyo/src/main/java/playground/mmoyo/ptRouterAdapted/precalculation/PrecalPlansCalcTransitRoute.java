@@ -36,12 +36,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -63,7 +62,7 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	int kBestRoute = 0;
 
 	public PrecalPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
-			final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
+			final TravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, final MyTransitRouterConfig myTransitRouterConfig) {
 		super(config, network, costCalculator, timeCalculator, factory, routeFactory, transitConfig,

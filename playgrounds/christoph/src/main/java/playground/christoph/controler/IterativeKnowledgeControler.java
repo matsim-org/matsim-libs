@@ -36,8 +36,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -85,7 +85,7 @@ public class IterativeKnowledgeControler extends Controler{
 		this.setTravelDisutilityFactory(new TravelDisutilityFactory() {
 
 			@Override
-			public PersonalizableTravelDisutility createTravelDisutility(
+			public TravelDisutility createTravelDisutility(
 					PersonalizableTravelTime timeCalculator,
 					PlanCalcScoreConfigGroup cnScoringGroup) {
 				return travelCostWrapper;

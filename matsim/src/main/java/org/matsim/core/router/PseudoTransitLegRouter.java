@@ -69,7 +69,7 @@ public class PseudoTransitLegRouter implements LegRouter {
 			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.

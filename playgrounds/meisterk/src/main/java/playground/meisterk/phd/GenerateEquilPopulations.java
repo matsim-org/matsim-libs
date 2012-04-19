@@ -38,12 +38,12 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -98,7 +98,7 @@ public class GenerateEquilPopulations {
 		EventsManager emptyEvents = EventsUtils.createEventsManager();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), scenario.getNetwork());
-		PersonalizableTravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, config.planCalcScore());
+		TravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, config.planCalcScore());
 
 		Controler dummyControler = new Controler(scenario);
 		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
@@ -163,7 +163,7 @@ public class GenerateEquilPopulations {
 				network,
 				scenario.getConfig().travelTimeCalculator());
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(
+		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(
 				travelTimeCalculator,
 				scenario.getConfig().planCalcScore());
 

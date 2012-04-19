@@ -26,8 +26,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 /**<p>
  * CostCalculator and TravelTimeCalculator for Links based on freespeed on links and
@@ -42,7 +43,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
  * @author mrieser
  * @author dgrether
  */
-public class FreespeedTravelTimeAndDisutility implements PersonalizableTravelDisutility, PersonalizableTravelTime, LinkToLinkTravelTime {
+public class FreespeedTravelTimeAndDisutility implements TravelDisutility, PersonalizableTravelTime, LinkToLinkTravelTime {
 	
 	private static final Logger log = Logger.getLogger(FreespeedTravelTimeAndDisutility.class);
 
@@ -84,7 +85,7 @@ public class FreespeedTravelTimeAndDisutility implements PersonalizableTravelDis
 	}
 
 	@Override
-	public double getLinkTravelDisutility(Link link, double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		if (this.marginalUtlOfDistance == 0.0) {
 			return (link.getLength() / link.getFreespeed(time)) * this.travelCostFactor;
 		}

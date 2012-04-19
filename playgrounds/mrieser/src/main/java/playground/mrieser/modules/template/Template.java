@@ -36,12 +36,12 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.vehicles.Vehicle;
 
 import playground.mrieser.modules.MatsimModule;
 
@@ -143,24 +143,19 @@ public class Template implements MatsimModule {
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 
 			@Override
-			public PersonalizableTravelDisutility createTravelDisutility(
+			public TravelDisutility createTravelDisutility(
 					final PersonalizableTravelTime timeCalculator,
 					final PlanCalcScoreConfigGroup cnScoringGroup) {
-				return new PersonalizableTravelDisutility() {
+				return new TravelDisutility() {
 
 					@Override
-					public double getLinkTravelDisutility(final Link link, final double time) {
+					public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 						return 0;
 					}
 
 					@Override
 					public double getLinkMinimumTravelDisutility(final Link link) {
 						return 0;
-					}
-
-					@Override
-					public void setPerson(final Person person) {
-
 					}
 
 				};

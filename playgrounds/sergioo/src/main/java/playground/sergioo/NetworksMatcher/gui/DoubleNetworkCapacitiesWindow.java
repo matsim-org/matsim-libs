@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.sergioo.NetworksMatcher.gui;
 
 import java.awt.BorderLayout;
@@ -28,12 +47,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.Vehicle;
 
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
@@ -43,9 +64,6 @@ import playground.sergioo.Visualizer2D.LayersWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
 public class DoubleNetworkCapacitiesWindow extends LayersWindow implements ActionListener {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	//Enumerations
@@ -181,9 +199,11 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 		panelsPanel.add(layersPanels.get(PanelIds.B));
 		this.add(panelsPanel, BorderLayout.CENTER);
 		TravelDisutility travelMinCost = new TravelDisutility() {
-			public double getLinkTravelDisutility(Link link, double time) {
+			@Override
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 				return getLinkMinimumTravelDisutility(link);
 			}
+			@Override
 			public double getLinkMinimumTravelDisutility(Link link) {
 				return link.getLength();
 			}
@@ -236,7 +256,7 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 		saveUndoLinksChanged();
 		Link linkA=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.A)).getSelectedLink();
 		Node secondNode=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).getSelectedNode();
-		Path path = aStarLandmarksB.calcLeastCostPath(firstNode, secondNode, 0);
+		Path path = aStarLandmarksB.calcLeastCostPath(firstNode, secondNode, 0, null, null);
 		if(path!=null && linkA!=null)
 			for(Link linkB:path.links)
 				linksChanged.put(linkB,new Tuple<Link, Double>(linkA, linkA.getCapacity()));

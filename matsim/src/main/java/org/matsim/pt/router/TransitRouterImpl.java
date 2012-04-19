@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -81,9 +80,6 @@ public class TransitRouterImpl implements TransitRouter {
 
 	@Override
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
-		if (this.travelDisutility instanceof PersonalizableTravelDisutility) {
-			((PersonalizableTravelDisutility) this.travelDisutility).setPerson(person);
-		}
 		if (this.travelTime instanceof PersonalizableTravelTime) {
 			((PersonalizableTravelTime) this.travelTime).setPerson(person);
 		}
@@ -120,7 +116,7 @@ public class TransitRouterImpl implements TransitRouter {
 		}
 
 		// find routes between start and end stops
-		Path p = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes);
+		Path p = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
 
 		if (p == null) {
 			return null;

@@ -127,8 +127,8 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 
 		double depTime = 0.0;
 
-		Path wendenPath = routingAlgo.calcLeastCostPath(startNode, endNode, depTime);
-		wendenPath = routingAlgo.calcLeastCostPath(startNode, endNode, depTime);
+		Path wendenPath = routingAlgo.calcLeastCostPath(startNode, endNode, depTime, null, null);
+		wendenPath = routingAlgo.calcLeastCostPath(startNode, endNode, depTime, null, null);
 		if (wendenPath == null) {
 			throw new RuntimeException("No route found from node "
 					+ startNode.getId() + " to node " + endNode.getId() + ".");

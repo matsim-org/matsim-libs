@@ -67,6 +67,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 import playground.yu.utils.io.SimpleWriter;
 
@@ -80,7 +81,7 @@ public class BusLineAllocator {
 	private class TravelCostFunctionDistance implements TravelDisutility {
 		/** returns only the link length */
 		@Override
-		public double getLinkTravelDisutility(Link link, double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			return link.getLength();
 		}
 		
@@ -568,7 +569,7 @@ public class BusLineAllocator {
 		List<Id> pathLinks = new ArrayList<Id>();
 
 		if (!nodeA.equals(nodeB)) {
-			Path path = this.dijkstra.calcLeastCostPath(nodeA, nodeB, 0);
+			Path path = this.dijkstra.calcLeastCostPath(nodeA, nodeB, 0, null, null);
 			if (path != null)
 				pathLinks.addAll(links2Ids(path.links));
 			else {

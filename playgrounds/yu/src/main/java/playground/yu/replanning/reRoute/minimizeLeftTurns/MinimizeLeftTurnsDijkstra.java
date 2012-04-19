@@ -29,11 +29,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.vehicles.Vehicle;
 
 import playground.yu.utils.LeftTurnIdentifier;
 
@@ -204,7 +206,7 @@ public class MinimizeLeftTurnsDijkstra implements
 	 */
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode,
-			final double startTime) {
+			final double startTime, final Person person, final Vehicle vehicle) {
 
 		double arrivalTime = 0;
 		boolean stillSearching = true;
@@ -370,8 +372,7 @@ public class MinimizeLeftTurnsDijkstra implements
 			final double currTime, final double currCost, final Node toNode) {
 
 		double travelTime = timeFunction.getLinkTravelTime(l, currTime);
-		double travelCost = costFunction.getLinkTravelDisutility(l,
-				currTime);
+		double travelCost = costFunction.getLinkTravelDisutility(l, currTime, null, null);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();
 

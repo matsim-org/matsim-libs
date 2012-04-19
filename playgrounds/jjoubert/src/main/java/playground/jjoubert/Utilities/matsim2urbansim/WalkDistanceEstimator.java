@@ -46,11 +46,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
@@ -121,8 +120,8 @@ public class WalkDistanceEstimator {
 	public void deriveTransitNetworkFromEmme(){
 		log.info("Filtering " + studyArea + "'s MATSim network to account for public transport.");
 		// Read network.
-		sAll = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sPt = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sAll = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sPt = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sAll);
 		nr.readFile(sb.getEmmeNetworkFilename());		
 		
@@ -138,8 +137,8 @@ public class WalkDistanceEstimator {
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator ttc = ttcf.createTravelTimeCalculator(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
 		TravelDisutilityFactory tccf = new TravelCostCalculatorFactoryImpl();
-		PersonalizableTravelDisutility tc = tccf.createTravelDisutility(ttc, sAll.getConfig().planCalcScore());
-		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
+		TravelDisutility tc = tccf.createTravelDisutility(ttc, sAll.getConfig().planCalcScore());
+		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(ttc);
 		new EventsReaderTXTv1(em).readFile(sb.getIterationEventsFile("100"));
 		Dijkstra router = new Dijkstra(sAll.getNetwork(),tc,ttc);
@@ -171,7 +170,7 @@ public class WalkDistanceEstimator {
 							Node oNode = sAll.getNetwork().getNodes().get(new IdImpl(link[1]));
 							Node dNode = sAll.getNetwork().getNodes().get(new IdImpl(link[2]));
 							if(oNode != null && dNode != null){
-								p = router.calcLeastCostPath(oNode, dNode, 21600); // at 06:00 in the morning.
+								p = router.calcLeastCostPath(oNode, dNode, 21600, null, null); // at 06:00 in the morning.
 								// Set all links in path.
 								for(Link ptLink : p.links){
 									ptLink.setAllowedModes(ptSet);

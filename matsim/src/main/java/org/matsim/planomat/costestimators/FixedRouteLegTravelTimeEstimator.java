@@ -107,7 +107,9 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
 						startLink.getToNode(),
 						endLink.getFromNode(),
-						0.0);
+						0.0,
+						this.plan.getPerson(),
+						null);
 
 				newRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
 				newLeg.setRoute(newRoute);
@@ -162,7 +164,9 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
 						startLink.getToNode(),
 						endLink.getFromNode(),
-						0.0);
+						0.0,
+						this.plan.getPerson(),
+						null);
 
 				newRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
 				newLeg.setRoute(newRoute);

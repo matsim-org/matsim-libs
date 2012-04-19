@@ -161,7 +161,7 @@ public class AStarEuclidean extends Dijkstra {
 			final double currTime, final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
-		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime);
+		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.getPerson(), this.getVehicle());
 		AStarNodeData data = getData(n);
 		double nCost = data.getCost();
 		if (!data.isVisited(getIterationId())) {

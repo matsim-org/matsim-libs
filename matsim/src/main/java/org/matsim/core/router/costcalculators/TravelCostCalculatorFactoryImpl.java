@@ -20,8 +20,8 @@
 package org.matsim.core.router.costcalculators;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 public class TravelCostCalculatorFactoryImpl implements TravelDisutilityFactory {
 
 	@Override
-	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		return new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
 	}
 

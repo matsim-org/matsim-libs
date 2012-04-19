@@ -72,6 +72,7 @@ public class DijkstraForSelectNodes {
 	// List of nodes, sorted by their distance to the startnode.
 	private final Comparator<DijkstraNode> shortestDistanceComparator = new Comparator<DijkstraNode>()
 	{
+		@Override
 		public int compare(DijkstraNode a, DijkstraNode b)
 	    {
 			// note that this trick doesn't work for huge distances, close to Integer.MAX_VALUE
@@ -201,7 +202,7 @@ public class DijkstraForSelectNodes {
 	                
 	        for (Iterator<DijkstraNode> iterator = endNodes.iterator(); iterator.hasNext();) 
 	        {
-				DijkstraNode endNode = (DijkstraNode) iterator.next();
+				DijkstraNode endNode = iterator.next();
 				
 				if (node.getNode().equals(endNode.getNode()))
 				{
@@ -453,7 +454,7 @@ public class DijkstraForSelectNodes {
 	{   
 		if (link instanceof MyLinkImpl) return ((MyLinkImpl) link).getTravelCost();
 		
-		return costCalculator.getLinkTravelDisutility(link, time);
+		return costCalculator.getLinkTravelDisutility(link, time, null, null);
 	}
 
 	public void setCostCalculator(TravelDisutility calculator)
@@ -512,6 +513,7 @@ class NodeComparator implements Comparator<Node>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public int compare(final Node o1, final Node o2) {
 		return o1.getId().compareTo(o2.getId());
 	}

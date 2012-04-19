@@ -36,9 +36,9 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -59,7 +59,7 @@ public class DijkstraLegHandler implements LegRouter {
 	 */
 	private final LeastCostPathCalculator routeAlgo;
 	
-	public DijkstraLegHandler(final Network originalNetwork, final Network wrappedNetwork, final PersonalizableTravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator) {
+	public DijkstraLegHandler(final Network originalNetwork, final Network wrappedNetwork, final TravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator) {
 		this.routeAlgo = new DijkstraFactory().createPathCalculator(wrappedNetwork, costCalculator, timeCalculator);
 	}
 	
@@ -68,7 +68,7 @@ public class DijkstraLegHandler implements LegRouter {
 			String legMode = leg.getMode();
 		
 		if (TransportMode.car.equals(legMode)) {
-			return handleCarLeg(leg, fromAct, toAct, depTime);
+			return handleCarLeg(person, leg, fromAct, toAct, depTime);
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legMode + "'.");
 		}
@@ -80,7 +80,7 @@ public class DijkstraLegHandler implements LegRouter {
 	 *
 	 * TODO [an] No other transport means are implemented, yet.
 	 */
-	protected double handleCarLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	protected double handleCarLeg(final Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		double travTime = 0;
 		Id fromLinkId = fromAct.getLinkId();
 		Id toLinkId = toAct.getLinkId();
@@ -93,7 +93,7 @@ public class DijkstraLegHandler implements LegRouter {
 		if (!toLinkId.equals(fromLinkId)) {
 			Path path = null;
 			// do not drive/walk around, if we stay on the same link
-			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 
 			ArrayList<Node> realRouteNodeList = new ArrayList<Node>();

@@ -31,20 +31,18 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.telaviv.locationchoice.FullNetworkDijkstra;
@@ -67,7 +65,7 @@ public class CreateODTravelTimeMatrices {
 	protected int numSlots = 30;	// 30 Hours
 	
 	public static void main(String[] args) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		ZoneMapping zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 		PersonalizableTravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());		
@@ -79,7 +77,7 @@ public class CreateODTravelTimeMatrices {
 		this.zoneMapping = zoneMapping;
 		this.travelTime = travelTime;
 		
-		travelCost = (TravelTimeAndDistanceBasedTravelDisutility) new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());	
+		travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());	
 		getConnectorNodes();
 	}
 	
@@ -221,7 +219,7 @@ public class CreateODTravelTimeMatrices {
 					
 					for (Id toId : nodeIds) {
 						Node toNode = scenario.getNetwork().getNodes().get(toId);
-						Path path = leastCostPathCalculator.calcLeastCostPath(d.fromNode, toNode, time);
+						Path path = leastCostPathCalculator.calcLeastCostPath(d.fromNode, toNode, time, null, null);
 						d.array[i][timeSlot] = path.travelTime;
 						counter.incCounter();
 						i++;

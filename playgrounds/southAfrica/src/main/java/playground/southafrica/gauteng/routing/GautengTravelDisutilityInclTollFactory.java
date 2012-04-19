@@ -24,11 +24,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.roadpricing.RoadPricingSchemeI;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
@@ -47,24 +48,18 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 	}
 
 	@Override
-	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, 
+	public TravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, 
 			PlanCalcScoreConfigGroup cnScoringGroup) {
-		final PersonalizableTravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
+		final TravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
 		final RoadPricingSchemeI localScheme = this.scheme ;
 		final UtilityOfMoneyI localUtlOfMon = this.utlOfMon ;
 		
-		return new PersonalizableTravelDisutility() {
-			private Person person = null ;
+		return new TravelDisutility() {
 			@Override
-			public void setPerson(Person person) {
-				this.person = person ;
-				delegate.setPerson(person);
-			}
-			@Override
-			public double getLinkTravelDisutility(Link link, double time) {
-				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time);
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time, person, vehicle);
 				double toll_usually_positive = 0. ;
-				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, this.person.getId() ) ;
+				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
 				if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
 					toll_usually_positive = link.getLength() * cost.amount ;
 				} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
@@ -73,7 +68,7 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 					throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
 				}
 
-				double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(this.person.getId() ) ; 
+				double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(person.getId() ) ; 
 				
 				linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
 				// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)

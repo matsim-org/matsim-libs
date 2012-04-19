@@ -22,17 +22,15 @@ package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.gen
 import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -91,7 +89,7 @@ public class TestUpperBoundsConstraintsManager {
 			.getCliques().getCliques().get(idSample);
 		this.samplePlan = (JointPlan) sampleClique.getSelectedPlan();
 		// XXX very ugly: find a nice way to get from the "real" code
-		PersonalizableTravelDisutility travelCost = controler.createTravelCostCalculator();
+		TravelDisutility travelCost = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTime = controler.getTravelTimeCalculator();
 		this.configGroup = (JointReplanningConfigGroup)
 			this.controler.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME);

@@ -37,9 +37,9 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -127,7 +127,7 @@ public class RouteSetGenerator {
 			for (int i=0; i<ls.length; i++) { this.removeLinkFromNetwork(ls[i]); }
 //			System.out.println("    ---");
 //			System.out.println("    removed " + ls.length + " links from the net");
-			Path path = this.router.calcLeastCostPath(o,d,time);
+			Path path = this.router.calcLeastCostPath(o,d,time, null, null);
 			NetworkRoute route = null;
 			if (path != null) {
 				route = new LinkNetworkRouteImpl(path.links.get(0).getId(), path.links.get(path.links.size()-1).getId());
@@ -189,7 +189,7 @@ public class RouteSetGenerator {
 		LinkedList<NetworkRoute> localRoutes = new LinkedList<NetworkRoute>(); // routes containing only local streets
 		LinkedList<NetworkRoute> nonLocalRoutes = new LinkedList<NetworkRoute>(); // all other routes
 		LinkedList<Id[]> links = new LinkedList<Id[]>(); // removed links
-		Path path = this.router.calcLeastCostPath(o,d,time);
+		Path path = this.router.calcLeastCostPath(o,d,time, null, null);
 		if (path == null) { throw new RuntimeException("There is no route from " + o.getId() + " to " + d.getId() + "!"); }
 //		routes.add(route);
 

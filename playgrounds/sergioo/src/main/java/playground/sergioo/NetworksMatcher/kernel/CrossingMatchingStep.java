@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -29,6 +30,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.vehicles.Vehicle;
 
 import others.sergioo.util.geometry.Functions2D;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
@@ -221,9 +223,11 @@ public class CrossingMatchingStep extends MatchingStep {
 		applyCapacitiesSimples();
 		JOptionPane.showMessageDialog(null,"Simples done!");
 		TravelDisutility travelMinCost = new TravelDisutility() {
-			public double getLinkTravelDisutility(Link link, double time) {
+			@Override
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 				return getLinkMinimumTravelDisutility(link);
 			}
+			@Override
 			public double getLinkMinimumTravelDisutility(Link link) {
 				return link.getLength();
 			}
@@ -345,7 +349,7 @@ public class CrossingMatchingStep extends MatchingStep {
 			for(Node nodeFrom:nodesMatchingFrom.getComposedNodeB().getNodes())
 				for(Node nodeTo:nodesMatchingTo.getComposedNodeB().getNodes()) {
 					List<Link> linksTo = new ArrayList<Link>();
-					Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0);
+					Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0, null, null);
 					if(path!=null && path.links.size()>0) {
 						double pathLength = 0;
 						for(Link link:path.links)
@@ -382,7 +386,7 @@ public class CrossingMatchingStep extends MatchingStep {
 			for(Node nodeFrom:nodesMatchingFrom.getComposedNodeA().getNodes())
 				for(Node nodeTo:nodesMatchingTo.getComposedNodeA().getNodes()) {
 					List<Link> linksFrom = new ArrayList<Link>();
-					Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0);
+					Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0, null, null);
 					if(path!=null && path.links.size()>0) {
 						double pathLength = 0;
 						for(Link link:path.links)

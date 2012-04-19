@@ -22,11 +22,13 @@ package org.matsim.pt.router;
 
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * TravelTime and TravelCost calculator to be used with the transit network used for transit routing.
@@ -51,7 +53,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)

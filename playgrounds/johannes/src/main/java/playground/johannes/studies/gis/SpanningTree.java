@@ -148,7 +148,7 @@ public class SpanningTree {
 			Node nn = l.getToNode();
 			NodeData nnData = nodeData.get(nn.getId());
 			if (nnData == null) { nnData = new NodeData(); this.nodeData.put(nn.getId(),nnData); }
-			double visitCost = currCost+tcFunction.getLinkTravelDisutility(l,currTime);
+			double visitCost = currCost+tcFunction.getLinkTravelDisutility(l,currTime, null, null);
 			double visitTime = currTime+ttFunction.getLinkTravelTime(l,currTime);
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);

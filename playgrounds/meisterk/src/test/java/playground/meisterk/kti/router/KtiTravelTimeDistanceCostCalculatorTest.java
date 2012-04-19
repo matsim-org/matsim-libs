@@ -73,7 +73,7 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 				this.network,
 				config.travelTimeCalculator());
 
-		this.events = (EventsManager) EventsUtils.createEventsManager();
+		this.events = EventsUtils.createEventsManager();
 		this.events.addHandler(travelTimeCalculator);
 
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
@@ -115,13 +115,13 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 
 		double expectedLinkTravelCost = 6.5;
 
-		double actualLinkTravelCost = this.testee.getLinkTravelDisutility(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:10:00"));
+		double actualLinkTravelCost = this.testee.getLinkTravelDisutility(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:10:00"), null, null);
 		assertEquals(expectedLinkTravelCost, actualLinkTravelCost, MatsimTestCase.EPSILON);
 
-		actualLinkTravelCost = this.testee.getLinkTravelDisutility(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("05:55:55"));
+		actualLinkTravelCost = this.testee.getLinkTravelDisutility(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("05:55:55"), null, null);
 		assertEquals(2.74, actualLinkTravelCost, MatsimTestCase.EPSILON);
 
-		actualLinkTravelCost = this.testee.getLinkTravelDisutility(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:31:00"));
+		actualLinkTravelCost = this.testee.getLinkTravelDisutility(this.network.getLinks().get(TEST_LINK_ID), Time.parseTime("06:31:00"), null, null);
 		assertEquals(2.74, actualLinkTravelCost, MatsimTestCase.EPSILON);
 
 	}

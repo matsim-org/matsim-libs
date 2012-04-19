@@ -51,6 +51,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.utils.LeastCostPathTree;
+import org.matsim.vehicles.Vehicle;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityHelperObject;
@@ -405,7 +406,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 		}
 
 		@Override
-		public double getLinkTravelDisutility(final Link link, final double time) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			
 			return this.marginalCostOfDistance * link.getLength(); // link length in meter
 		}

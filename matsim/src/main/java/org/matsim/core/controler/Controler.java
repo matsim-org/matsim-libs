@@ -81,9 +81,9 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.external.ExternalMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -125,8 +125,8 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -209,7 +209,7 @@ public class Controler {
 	private Counts counts = null;
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
-	private PersonalizableTravelDisutility travelCostCalculator = null;
+	private TravelDisutility travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
@@ -1162,7 +1162,7 @@ public class Controler {
 	 * ===================================================================
 	 */
 
-	public final PersonalizableTravelDisutility createTravelCostCalculator() {
+	public final TravelDisutility createTravelCostCalculator() {
 		return this.travelCostCalculatorFactory.createTravelDisutility(
 				this.travelTimeCalculator, this.config.planCalcScore());
 	}
@@ -1237,7 +1237,7 @@ public class Controler {
 	 *         be used by a single thread, use multiple instances for multiple
 	 *         threads!
 	 */
-	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 

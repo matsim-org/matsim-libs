@@ -154,7 +154,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 			Node fromINode = this.invertedNetwork.getNodes().get(fromLinkId);
 			Node toINode = this.invertedNetwork.getNodes().get(toLinkId);
 			Path path = null;
-			path = this.leastCostPathCalculator.calcLeastCostPath(fromINode, toINode, departureTime);
+			path = this.leastCostPathCalculator.calcLeastCostPath(fromINode, toINode, departureTime, person, null);
 			if (path == null)
 				throw new RuntimeException("No route found on inverted network from link " + fromLinkId
 						+ " to link " + toLinkId + ".");

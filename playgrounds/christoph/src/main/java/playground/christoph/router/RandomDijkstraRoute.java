@@ -26,13 +26,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNetwork;
@@ -47,7 +49,7 @@ public class RandomDijkstraRoute extends SimpleRouter {
 	protected double dijkstraWeightFactor = 0.5;
 	protected LeastCostPathCalculator leastCostPathCalculator;
 	protected TravelDisutilityFactory travelCostFactory;
-	protected PersonalizableTravelDisutility travelCost;
+	protected TravelDisutility travelCost;
 	protected PersonalizableTravelTime travelTime;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
@@ -61,15 +63,16 @@ public class RandomDijkstraRoute extends SimpleRouter {
 		this.leastCostPathCalculator = new DijkstraFactory().createPathCalculator(network, travelCost, travelTime);
 	}
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
-		return findRoute(fromNode, toNode);
+	@Override
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, final Person person, final Vehicle vehicle) {
+		return findRoute(fromNode, toNode, person, vehicle);
 	}
 	
 	public void setDijsktraWeightFactor(double weightFactor) {
 		this.dijkstraWeightFactor = weightFactor;
 	}
 	
-	private Path findRoute(Node fromNode, Node toNode) {
+	private Path findRoute(Node fromNode, Node toNode, final Person person, final Vehicle vehicle) {
 		Node currentNode = fromNode;
 		Link currentLink;
 		double routeLength = 0.0;
@@ -77,7 +80,7 @@ public class RandomDijkstraRoute extends SimpleRouter {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
 		
-		Network nw = knowledgeTools.getSubNetwork(this.person, this.network);
+		Network nw = knowledgeTools.getSubNetwork(person, this.network);
 		
 		boolean useKnowledge = false;
 		if (nw instanceof SubNetwork) {
@@ -95,8 +98,6 @@ public class RandomDijkstraRoute extends SimpleRouter {
 			}
 			
 			useKnowledge = true;
-			
-			this.travelCost.setPerson(person);
 			
 			if (this.leastCostPathCalculator instanceof SubNetworkDijkstra) {
 				((SubNetworkDijkstra)this.leastCostPathCalculator).setNetwork(subNetwork);
@@ -129,7 +130,7 @@ public class RandomDijkstraRoute extends SimpleRouter {
 			 */
 			double[] dijkstraProbabilities = new double[linksArray.length];
 						
-			Path path = this.leastCostPathCalculator.calcLeastCostPath(currentNode, toNode, Time.UNDEFINED_TIME);
+			Path path = this.leastCostPathCalculator.calcLeastCostPath(currentNode, toNode, Time.UNDEFINED_TIME, person, vehicle);
 			
 			Link dijskstraNextLink = null;
 			if (path.links.size() > 0) dijskstraNextLink = path.links.get(0);

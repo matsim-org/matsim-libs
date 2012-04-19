@@ -1,22 +1,36 @@
 package playground.michalm.vrp.data.network.shortestpath.full;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.router.util.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import pl.poznan.put.util.TypedStringTokenizer;
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVrpGraph;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.MatsimVertex;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
 import playground.michalm.vrp.data.network.router.TimeAsTravelCost;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 
@@ -92,7 +106,7 @@ public class FullShortestPathsFinder
                     for (int k = 0; k < NUM_SLOTS; k++) {
                         int departTime = k * TIME_BIN_SIZE;// + travelTimeBinSize/2 TODO
                         Path path = router.calcLeastCostPath(fromLink.getToNode(),
-                                toLink.getFromNode(), departTime);
+                                toLink.getFromNode(), departTime, null, null);
 
                         double time = path.travelTime;
                         double cost = path.travelCost;
@@ -102,13 +116,13 @@ public class FullShortestPathsFinder
 
                         if (ShortestPath.INCLUDE_TO_LINK) {
                             time += travelTime.getLinkTravelTime(toLink, departTime);
-                            cost += travelCost.getLinkTravelDisutility(toLink, time);
+                            cost += travelCost.getLinkTravelDisutility(toLink, time, null, null);
                             ids[idCount - 1] = toLink.getId();
                             idxShift = 0;
                         }
                         else {
                             time += travelTime.getLinkTravelTime(fromLink, departTime);
-                            cost += travelCost.getLinkTravelDisutility(fromLink, time);
+                            cost += travelCost.getLinkTravelDisutility(fromLink, time, null, null);
                             ids[0] = fromLink.getId();
                             idxShift = 1;
                         }

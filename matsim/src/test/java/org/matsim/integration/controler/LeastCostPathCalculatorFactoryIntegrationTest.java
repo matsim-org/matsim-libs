@@ -30,15 +30,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -58,7 +59,7 @@ public class LeastCostPathCalculatorFactoryIntegrationTest {
 
 		DummyRoutingAlgorithmFactory factory = new DummyRoutingAlgorithmFactory(s);
 
-		Controler c = new Controler((ScenarioImpl) s);
+		Controler c = new Controler(s);
 		c.setLeastCostPathCalculatorFactory(factory);
 		c.setCreateGraphs(false);
 		c.run();
@@ -77,7 +78,7 @@ public class LeastCostPathCalculatorFactoryIntegrationTest {
 		}
 
 		@Override
-		public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime) {
+		public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, final Person person, final Vehicle vehicle) {
 			this.counter.incrementAndGet();
 			List<Node> nodes = new ArrayList<Node>(1);
 			nodes.add(node); // add a single node to the route, this will not work in the simulation, but ok for test

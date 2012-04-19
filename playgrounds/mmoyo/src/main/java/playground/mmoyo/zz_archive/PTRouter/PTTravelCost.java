@@ -20,8 +20,10 @@
 package playground.mmoyo.zz_archive.PTRouter;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates the cost of links for the routing algorithm
@@ -34,7 +36,7 @@ public class PTTravelCost implements TravelDisutility{
 	}
 	
 	@Override
-	public double getLinkTravelDisutility(Link link, double time){
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double cost = ptTravelTime.getLinkTravelTime(link, time) ;  
 
 		String type = ((LinkImpl)link).getType();

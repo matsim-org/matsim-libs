@@ -41,8 +41,8 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -123,7 +123,7 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 
 	protected PersonalizableTravelTime travelTime = new FreeSpeedTravelTimeCalculator();
 	protected TravelDisutilityFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-	protected PersonalizableTravelDisutility travelCost = travelCostFactory.createTravelDisutility(travelTime, null);
+	protected TravelDisutility travelCost = travelCostFactory.createTravelDisutility(travelTime, null);
 
 	/*
 	 * How many parallel Threads shall do the Replanning.

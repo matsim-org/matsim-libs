@@ -22,26 +22,22 @@ package playground.christoph.evacuation.router.util;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
-public class PenaltyTravelCost implements PersonalizableTravelDisutility {
+public class PenaltyTravelCost implements TravelDisutility {
 
-	private final PersonalizableTravelDisutility travelCost;
+	private final TravelDisutility travelCost;
 	private final PenaltyCalculator penaltyCalculator;
 	
-	public PenaltyTravelCost(PersonalizableTravelDisutility travelCost, PenaltyCalculator penaltyCalculator) {
+	public PenaltyTravelCost(TravelDisutility travelCost, PenaltyCalculator penaltyCalculator) {
 		this.travelCost = travelCost;
 		this.penaltyCalculator = penaltyCalculator;
 	}
 	
 	@Override
-	public void setPerson(Person person) {
-		travelCost.setPerson(person);
-	}
-
-	@Override
-	public double getLinkTravelDisutility(Link link, double time) {
-		double tc = travelCost.getLinkTravelDisutility(link, time);
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+		double tc = travelCost.getLinkTravelDisutility(link, time, person, vehicle);
 		double penaltyFactor = penaltyCalculator.getPenaltyFactor(link.getId(), time);
 		
 		return tc * penaltyFactor;

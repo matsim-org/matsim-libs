@@ -39,7 +39,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -56,14 +55,14 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 
 	public void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
 		Config config = loadConfig(null);
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
 		Node node12 = network.getNodes().get(new IdImpl("12"));
 		Node node15 = network.getNodes().get(new IdImpl("15"));
 
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
-		Path path = routerAlgo.calcLeastCostPath(node12, node15, 8.0*3600);
+		Path path = routerAlgo.calcLeastCostPath(node12, node15, 8.0*3600, null, null);
 
 		assertEquals("number of nodes wrong.", 4, path.nodes.size());
 		assertEquals("number of links wrong.", 3, path.links.size());
@@ -77,13 +76,13 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 	}
 
 	public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(loadConfig(null));
+		Scenario scenario = ScenarioUtils.createScenario(loadConfig(null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
 		Node node12 = network.getNodes().get(new IdImpl("12"));
 
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
-		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600);
+		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600, null, null);
 
 		assertEquals("number of nodes wrong.", 1, path.nodes.size());
 		assertEquals("number of links wrong.", 0, path.links.size());
@@ -101,11 +100,11 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(createHashSet(TransportMode.car));
-			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0, null, null);
 			assertEquals("wrong number of links.", 2, p.links.size());
 
 			d.setModeRestriction(createHashSet("bus"));
-			p = d.calcLeastCostPath(f.nodes[4], f.nodes[6], 6.0*3600.0);
+			p = d.calcLeastCostPath(f.nodes[4], f.nodes[6], 6.0*3600.0, null, null);
 			assertEquals("wrong number of links.", 3, p.links.size());
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
@@ -124,11 +123,11 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(createHashSet(TransportMode.car));
-			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[7], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[7], 6.0*3600.0, null, null);
 			assertNull("no path should be possible", p);
 
 			d.setModeRestriction(createHashSet("bus"));
-			p = d.calcLeastCostPath(f.nodes[0], f.nodes[6], 6.0*3600.0);
+			p = d.calcLeastCostPath(f.nodes[0], f.nodes[6], 6.0*3600.0, null, null);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
@@ -147,7 +146,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(createHashSet(TransportMode.car, "bus"));
-			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[2], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[2], 6.0*3600.0, null, null);
 			assertNotNull("path should be possible", p);
 			assertEquals("wrong number of links", 2, p.links.size());
 		} else {
@@ -167,7 +166,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(new HashSet<String>());
-			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0, null, null);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
@@ -186,7 +185,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(null);
-			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[0], f.nodes[1], 6.0*3600.0, null, null);
 			assertNotNull("path should be possible", p);
 			assertEquals("wrong number of links", 1, p.links.size());
 		} else {
@@ -207,7 +206,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(createHashSet("bus"));
-			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[6], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[6], 6.0*3600.0, null, null);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
@@ -227,7 +226,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(createHashSet("car"));
-			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[6], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[6], 6.0*3600.0, null, null);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
@@ -248,7 +247,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(createHashSet("bus"));
-			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[2], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[1], f.nodes[2], 6.0*3600.0, null, null);
 			assertNull("no path should be possible", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());
@@ -268,11 +267,11 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 			Dijkstra d = (Dijkstra) routerAlgo;
 
 			d.setModeRestriction(createHashSet(TransportMode.car));
-			Path p = d.calcLeastCostPath(f.nodes[4], f.nodes[3], 6.0*3600.0);
+			Path p = d.calcLeastCostPath(f.nodes[4], f.nodes[3], 6.0*3600.0, null, null);
 			assertNotNull("path should be possible for car.", p);
 
 			d.setModeRestriction(createHashSet("bus"));
-			p = d.calcLeastCostPath(f.nodes[4], f.nodes[3], 6.0*3600.0);
+			p = d.calcLeastCostPath(f.nodes[4], f.nodes[3], 6.0*3600.0, null, null);
 			assertNull("no path should be possible for bus.", p);
 		} else {
 			fail(MODE_RESTRICTION_NOT_SUPPORTED + routerAlgo.getClass().getName());

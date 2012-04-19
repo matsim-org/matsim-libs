@@ -32,7 +32,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
@@ -162,7 +162,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 	private void createPTSchedule() {
 		Network network = this.sc.getNetwork();
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
-		PersonalizableTravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
+		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
 		
 		
@@ -212,7 +212,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 			Node start = l1.getToNode();
 			Node end = l2.getFromNode();
 			
-			Path nr = dijkstra.calcLeastCostPath(start, end, 0);
+			Path nr = dijkstra.calcLeastCostPath(start, end, 0, null, null);
 			List<Link> links = nr.links;
 			
 //			//u-turn starts!
