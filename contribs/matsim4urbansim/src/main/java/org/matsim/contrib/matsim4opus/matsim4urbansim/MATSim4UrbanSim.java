@@ -222,7 +222,7 @@ public class MATSim4UrbanSim {
 		
 		// The following lines register what should be done _after_ the iterations were run:
 		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, parcels) ); 	// creates zone2zone impedance matrix
-		controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				// creates zone based table of log sums (workplce accessibility)
+		controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				// creates zone based table of log sums (workplace accessibility)
 																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., (NetworkImpl) scenario.getNetwork()), 
 																					benchmark));
 		
