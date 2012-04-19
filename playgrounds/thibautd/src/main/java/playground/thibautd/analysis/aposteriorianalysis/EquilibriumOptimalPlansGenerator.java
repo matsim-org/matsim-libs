@@ -187,6 +187,7 @@ public class EquilibriumOptimalPlansGenerator {
 					clique.removePlan( currentPlan );
 				}
 			}
+			if (clique.getPlans().size() > 1) throw new RuntimeException( clique.getPlans().size()+"" );
 		}
 
 		//configGroup.setOptimizeToggle( "false" );
