@@ -21,6 +21,7 @@ package playground.droeder.P2.replanning;
 
 import java.util.ArrayList;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -40,28 +41,14 @@ import playground.droeder.P2.PScenarioHelper;
  *
  */
 public class RandomRouteEndExtensionTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	
 	@Test
     public final void testRun() {
 		Cooperative coop = PScenarioHelper.createCoop2111to2333();
 		PPlan oldPlan = coop.getBestPlan();
-		for(TransitStopFacility s: oldPlan.getStopsToBeServed()){
-			System.out.println(s.getId());
-		}
 		
-		System.out.println();
-		int i = 0;
-		for(TransitRoute r: oldPlan.getLine().getRoutes().values()){
-			System.out.println("---- " + i + " ------");
-			for(TransitRouteStop s: r.getStops()){
-				System.out.println(s.getStopFacility().getLinkId());
-			}
-			i++;
-			System.out.println("###");
-		}
-		
+		// test plan should change
 		ArrayList<String> parameters = new ArrayList<String>();
 		parameters.add("0.7");
 		PPlanStrategy strategy = new RandomRouteEndExtension(parameters);
@@ -69,33 +56,62 @@ public class RandomRouteEndExtensionTest {
 		
 		PPlan newPlan = coop.getBestPlan();
 		
-		for(TransitStopFacility s: newPlan.getStopsToBeServed()){
-			System.out.println(s.getId());
+		Assert.assertEquals(2, oldPlan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(oldPlan.getStopsToBeServed().get(0).getId().toString(), "p_2111");
+		Assert.assertEquals(oldPlan.getStopsToBeServed().get(1).getId().toString(), "p_2333");
+		
+		
+		Assert.assertEquals(3, newPlan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(newPlan.getStopsToBeServed().get(0).getId().toString(), "p_2111");
+		Assert.assertEquals(newPlan.getStopsToBeServed().get(1).getId().toString(), "p_2333");
+		Assert.assertEquals(newPlan.getStopsToBeServed().get(2).getId().toString(), "p_3444");
+		
+		String[] oldPlanLinks = {"2111", "1112", "1222", "2223", "2333", "3332", "3231", "3121", "2111"};
+		for(TransitRoute r: oldPlan.getLine().getRoutes().values()){
+			for(int i = 0; i < r.getStops().size(); i++){
+				Assert.assertEquals( oldPlanLinks[i], r.getStops().get(i).getStopFacility().getLinkId().toString());
+			}
 		}
 		
-		System.out.println();
+		String[] newPlanLinks = {"2111", "1112", "1222", "2223", "2333", "3334", "3444", "4434", "3433", "3332", "3222", "2221", "2111"};
 		for(TransitRoute r: newPlan.getLine().getRoutes().values()){
-			for(TransitRouteStop s: r.getStops()){
-				System.out.println(s.getStopFacility().getLinkId());
+			for(int i = 0; i < r.getStops().size(); i++){
+				Assert.assertEquals(newPlanLinks[i], r.getStops().get(i).getStopFacility().getLinkId().toString());
 			}
-			System.out.println("###");
 		}
-//		
-//		coop.init(coop.getRouteProvider(), strategy, 2);
-//		
-//		newPlan = coop.getBestPlan();
-//		
-//		for(TransitStopFacility s: newPlan.getStopsToBeServed()){
-//			System.out.println(s.getId());
-//		}
-//		
-//		System.out.println();
-//		for(TransitRoute r: newPlan.getLine().getRoutes().values()){
-//			for(TransitRouteStop s: r.getStops()){
-//				System.out.println(s.getStopFacility().getLinkId());
-//			}
-//			System.out.println("###");
-//		}
+		
+		//test plan should stay the same
+		Cooperative coop2 = PScenarioHelper.createCoop2111to2333();
+		oldPlan = coop2.getBestPlan();
+		
+		parameters = new ArrayList<String>();
+		parameters.add("0.5");
+		strategy = new RandomRouteEndExtension(parameters);
+		coop2.init(coop2.getRouteProvider(), strategy, 1);
+		
+		newPlan = coop2.getBestPlan();
+		
+		Assert.assertEquals(2, oldPlan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(oldPlan.getStopsToBeServed().get(0).getId().toString(), "p_2111");
+		Assert.assertEquals(oldPlan.getStopsToBeServed().get(1).getId().toString(), "p_2333");
+		
+		
+		Assert.assertEquals(2, newPlan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(newPlan.getStopsToBeServed().get(0).getId().toString(), "p_2111");
+		Assert.assertEquals(newPlan.getStopsToBeServed().get(1).getId().toString(), "p_2333");
+		
+		for(TransitRoute r: oldPlan.getLine().getRoutes().values()){
+			for(int i = 0; i < r.getStops().size(); i++){
+				Assert.assertEquals(oldPlanLinks[i], r.getStops().get(i).getStopFacility().getLinkId().toString());
+			}
+		}
+		
+		String[] newPlanLinks2 = {"2111", "1112", "1222", "2223", "2333", "3332", "3231", "3121", "2111"};
+		for(TransitRoute r: newPlan.getLine().getRoutes().values()){
+			for(int i = 0; i < r.getStops().size(); i++){
+				Assert.assertEquals(newPlanLinks2[i], r.getStops().get(i).getStopFacility().getLinkId().toString());
+			}
+		}
 	}
 
 }
