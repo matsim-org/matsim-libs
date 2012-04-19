@@ -44,7 +44,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.XY2Links;
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
-import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.fleet.EFleet;
 import playground.droeder.eMobility.fleet.EVehicle;
 import playground.droeder.eMobility.poi.POI;
@@ -131,9 +130,7 @@ public class CreateTestScenario {
 				charge = new IdImpl("FAST");
 			}
 			Activity appointment = (Activity) p.getSelectedPlan().getPlanElements().get(6);
-			System.out.println(appointment.getStartTime() + " " + appointment.getEndTime() + " " + appointment.getType());
 			EActivity ea = new EActivity(appointment.getLinkId(), appointment.getStartTime(), appointment.getMaximumDuration(), disCharge, charge);
-			System.out.println(ea.toString());
 			list.add(ea);
 			
 			Activity firstCarLocation = (Activity) p.getSelectedPlan().getPlanElements().get(2);
@@ -156,34 +153,34 @@ public class CreateTestScenario {
 	 * @param basicPlan
 	 */
 	private Plan modifyBasePlan(Plan basicPlan) {
-		double offset = ((2* MatsimRandom.getRandom().nextDouble())-1 )/ 10.;
+		double offset = ((2* MatsimRandom.getRandom().nextDouble())-1 )/ 3.;
 		
-		List<PlanElement> planElements = new ArrayList<PlanElement>();
-		planElements.addAll(basicPlan.getPlanElements());
+		Plan modified = this.sc.getSc().getPopulation().getFactory().createPlan();
+		for(PlanElement p : basicPlan.getPlanElements()){
+			if(p instanceof Leg){
+				modified.addLeg(new LegImpl((LegImpl)p));
+			}else{
+				modified.addActivity(new ActivityImpl((Activity) p));
+			}
+		}
 		
-		double walkDistance = CoordUtils.calcDistance(((Activity)planElements.get(0)).getCoord(), ((Activity)planElements.get(2)).getCoord());
-		walkDistance += CoordUtils.calcDistance(((Activity)planElements.get(4)).getCoord(), ((Activity)planElements.get(6)).getCoord());
+		double walkDistance = CoordUtils.calcDistance(((Activity)modified.getPlanElements().get(0)).getCoord(), ((Activity)modified.getPlanElements().get(2)).getCoord());
+		walkDistance += CoordUtils.calcDistance(((Activity)modified.getPlanElements().get(4)).getCoord(), ((Activity)modified.getPlanElements().get(6)).getCoord());
 		
-		double driveDistance = CoordUtils.calcDistance(((Activity)planElements.get(2)).getCoord(), ((Activity)planElements.get(4)).getCoord());
+		double driveDistance = CoordUtils.calcDistance(((Activity)modified.getPlanElements().get(2)).getCoord(), ((Activity)modified.getPlanElements().get(4)).getCoord());
 		
 		double time2workPlace = offset*((walkDistance/1.5) + driveDistance/10.0);
 		
-		Activity start = ((Activity)planElements.get(0));
-		Activity app = ((Activity)planElements.get(6));
+		Activity start = ((Activity)modified.getPlanElements().get(0));
+		start.setEndTime(start.getEndTime());
+		Activity app = ((Activity)modified.getPlanElements().get(6));
 		app.setEndTime(start.getEndTime() + app.getMaximumDuration() + time2workPlace);
 		this.duration +=app.getMaximumDuration();
 		this.end += app.getEndTime();
-		Activity end = ((Activity)planElements.get(12));
+		Activity end = ((Activity)modified.getPlanElements().get(12));
 		end.setEndTime(Time.UNDEFINED_TIME);
 		
-		Plan modified = this.sc.getSc().getPopulation().getFactory().createPlan();
-		for(PlanElement p : planElements){
-			if(p instanceof Leg){
-				modified.addLeg((Leg) p);
-			}else{
-				modified.addActivity((Activity) p);
-			}
-		}
+
 		
 		return modified;
 	}
