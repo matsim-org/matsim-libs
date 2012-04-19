@@ -88,11 +88,10 @@ public class SimpleAdaptiveControl implements MobsimEngine, LinkEnterEventHandle
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;		
 	}
-	@Override
+	
 	public Netsim getMobsim() {
 		return this.internalInterface.getMobsim();
 	}
-
 
 	@Override
 	public void reset(int iteration) {
