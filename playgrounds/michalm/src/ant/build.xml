@@ -13,7 +13,17 @@
     </description>
 
 	<property name="lib" location="lib" />
+	<property name="src" location="src" />
+	<property name="target" location="target" />
 
+	<!--matsim-->
+	<property name="matsim.dir" location="../../matsim" />
+	<property name="matsim.target" location="${matsim.dir}/target" />
+
+	<!--matsim-->
+	<property name="otfvis.dir" location="../../contrib/otfvis" />
+	<property name="otfvis.target" location="${otfvis.dir}/target" />
+	
 	<!--util-->
 	<property name="util.dir" location="../../util" />
 	<property name="util.ant" location="${util.dir}/src/ant/build.xml" />
@@ -28,6 +38,13 @@
 	<property name="vrp.dir" location="../../vrp" />
 	<property name="vrp.ant" location="${vrp.dir}/src/ant/build.xml" />
 	<property name="vrp.target" location="${vrp.dir}/target" />
+	
+	<target name="jar" depends="update_libs">
+		<jar destfile="${target}/michalm-playground.jar" basedir="${target}/classes" />
+		<jar destfile="${target}/matsim.jar" basedir="${matsim.target}/classes" />
+		<jar destfile="${target}/otfvis.jar" basedir="${otfvis.target}/classes" />
+	</target>
+
 
 	<target name="update_libs">
 		<ant antfile="${util.ant}" dir="${util.dir}" target="jar" inheritall="false" />

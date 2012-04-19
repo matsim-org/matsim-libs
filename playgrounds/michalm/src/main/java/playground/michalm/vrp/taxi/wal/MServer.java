@@ -17,15 +17,66 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.dynamic;
+package playground.michalm.vrp.taxi.wal;
 
-import org.matsim.api.core.v01.Id;
+import java.io.IOException;
+import java.net.*;
+
+import com.google.common.io.*;
 
 
-public interface DynLeg
+public class MServer
 {
-    Id getNextLinkId();
+    public static final int SOCKET_PORT = 4440;
+
+    private ServerSocket serverSocket = null;
+    private Socket clientSocket = null;
+
+    private LittleEndianDataOutputStream out;
+    private LittleEndianDataInputStream in;
 
 
-    Id getDestinationLinkId();
+    public void initServer()
+    {
+        try {
+            serverSocket = new ServerSocket(SOCKET_PORT);
+
+            //WalClient.launchClient();
+
+            clientSocket = serverSocket.accept();
+
+            out = new LittleEndianDataOutputStream(clientSocket.getOutputStream());
+            in = new LittleEndianDataInputStream(clientSocket.getInputStream());
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public Command readCommand()
+    {
+        return Command.readCommand(in);
+    }
+
+
+    public void writeCommand(Command command)
+    {
+        Command.writeCommand(out, command);
+    }
+
+
+    public void closeServer()
+    {
+        try {
+            out.close();
+            in.close();
+
+            clientSocket.close();
+            serverSocket.close();
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

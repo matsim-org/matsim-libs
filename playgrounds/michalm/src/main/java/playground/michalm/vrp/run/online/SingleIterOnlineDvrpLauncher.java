@@ -83,6 +83,7 @@ import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
+import playground.michalm.vrp.taxi.wal.WalTaxiSimEngine;
 
 
 public class SingleIterOnlineDvrpLauncher
@@ -92,6 +93,7 @@ public class SingleIterOnlineDvrpLauncher
     private String plansFileName;
     private String depotsFileName;
     private String reqIdToVehIdFileName;
+    private String dbFileName;
     private boolean vrpOutFiles;
     private String vrpOutDirName;
 
@@ -111,28 +113,61 @@ public class SingleIterOnlineDvrpLauncher
     public static OTFQueryControl queryControl;
 
 
-    private void processArgs()
+    private void processArgs(String... args)
     {
-        // dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
-        dirName = "D:\\PP-rad\\taxi\\poznan\\";
+        if (args.length == 1) {
+            dirName = args[0];
+        }
+        else {
+            // dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
+            dirName = "D:\\PP-rad\\taxi\\poznan\\";
+        }
 
-        netFileName = dirName + "network.xml";
-        plansFileName = dirName + "plans.xml";
-        depotsFileName = dirName + "depots.xml";
-        reqIdToVehIdFileName = dirName + "reqIdToVehId";
+        if (!dirName.endsWith("\\")) {
+            dirName += "\\";
+        }
 
-        travelTimesFromEvents = true;
-        // eventsFileName =
-        // "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
-        eventsFileName = "d:\\PP-rad\\taxi\\poznan\\output\\ITERS\\it.20\\20.events.xml.gz";
+        if (args.length == 1) {// Wal - do not change the following block
+            netFileName = dirName + "network.xml";
+            plansFileName = dirName + "plans.xml";
+            depotsFileName = dirName + "depots.xml";
+            reqIdToVehIdFileName = dirName + "reqIdToVehId";
+            dbFileName = dirName + "system_state.mdb";
 
-        algorithmType = AlgorithmType.RE_ASSIGNMENT;
+            travelTimesFromEvents = true;
+            // eventsFileName = dirName + "output\\std\\ITERS\\it.10\\10.events.xml.gz";
+            eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
 
-        otfVis = true;
+            algorithmType = AlgorithmType.RE_ASSIGNMENT;
 
-        vrpOutFiles = !true;
-        vrpOutDirName = dirName + "\\vrp_output";
-        new File(vrpOutDirName).mkdir();
+            otfVis = !true;
+
+            vrpOutFiles = !true;
+            vrpOutDirName = dirName + "vrp_output";
+        }
+        else {
+            netFileName = dirName + "network.xml";
+            plansFileName = dirName + "plans.xml";
+            depotsFileName = dirName + "depots.xml";
+            reqIdToVehIdFileName = dirName + "reqIdToVehId";
+            dbFileName = dirName + "system_state.mdb";
+
+            travelTimesFromEvents = true;
+            // eventsFileName = dirName + "output\\std\\ITERS\\it.10\\10.events.xml.gz";
+            eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
+
+            algorithmType = AlgorithmType.RE_ASSIGNMENT;
+
+            otfVis = !true;
+
+            vrpOutFiles = !true;
+            vrpOutDirName = dirName + "vrp_output";
+
+        }
+
+        if (vrpOutFiles) {
+            new File(vrpOutDirName).mkdir();
+        }
     }
 
 
@@ -228,7 +263,7 @@ public class SingleIterOnlineDvrpLauncher
         QSim sim = QSim.createQSimWithDefaultEngines(scenario, events,
                 new DefaultQSimEngineFactory());
 
-        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(sim, data, optimizerFactory);
+        TaxiSimEngine taxiSimEngine = new WalTaxiSimEngine(sim, data, optimizerFactory, dbFileName);
         sim.addMobsimEngine(taxiSimEngine);
         sim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
                 new DefaultAgentFactory(sim), sim));
@@ -277,10 +312,10 @@ public class SingleIterOnlineDvrpLauncher
     }
 
 
-    private void go()
+    private void go(String... args)
         throws IOException
     {
-        processArgs();
+        processArgs(args);
         prepareMatsimData();
         initMatsimVrpData();
         initOptimizerFactory();
@@ -292,6 +327,6 @@ public class SingleIterOnlineDvrpLauncher
     public static void main(String... args)
         throws IOException
     {
-        new SingleIterOnlineDvrpLauncher().go();
+        new SingleIterOnlineDvrpLauncher().go(args);
     }
 }

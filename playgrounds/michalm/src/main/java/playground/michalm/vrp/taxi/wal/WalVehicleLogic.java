@@ -17,15 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.dynamic;
+package playground.michalm.vrp.taxi.wal;
 
-import org.matsim.api.core.v01.Id;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
+import playground.michalm.vrp.taxi.TaxiSimEngine;
 
 
-public interface DynLeg
+public class WalVehicleLogic
 {
-    Id getNextLinkId();
+    private TaxiSimEngine taxiSimEngine;
+    private Vehicle vrpVehicle;
 
 
-    Id getDestinationLinkId();
+    private void scheduleNextTask(double now)
+    {
+        Schedule schedule = vrpVehicle.getSchedule();
+        ScheduleStatus status = schedule.getStatus();
+
+        if (status != ScheduleStatus.UNPLANNED) {
+            throw new RuntimeException("Status is UNPLANNED");
+        }
+        
+        if (status == ScheduleStatus.STARTED) {
+            taxiSimEngine.updateScheduleBeforeNextTask(vrpVehicle, now);
+            taxiSimEngine.optimize(now);// TODO: this may be optional (depending on the algorithm)
+        }
+
+        Task task = schedule.nextTask();
+        status = schedule.getStatus();// REFRESH status!!!
+    }
 }
+
