@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.Event;
 import playground.benjamin.emissions.types.ColdPollutant;
 
 /**
- * Event to indicate that emissions were produced.
+ * Event to indicate that cold emissions were produced.
  * @author benjamin
  *
  */
