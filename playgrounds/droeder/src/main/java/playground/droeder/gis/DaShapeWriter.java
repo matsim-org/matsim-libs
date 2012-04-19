@@ -67,7 +67,7 @@ public class DaShapeWriter {
 	
 	public static void writeLinks2Shape(String fileName, Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes){
 		if(attributes == null){
-			initLineFeatureType("links", null, 2);
+			initLineFeatureType("links", null, true);
 		}else{
 			for(SortedMap<String, Object> m : attributes.values()){
 				initLineFeatureType("links", m);
@@ -178,12 +178,17 @@ public class DaShapeWriter {
 	}
 	
 	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes){
-		initLineFeatureType(name, attributes, 0);
+		initLineFeatureType(name, attributes, false);
 	}
-	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes, int additional) {
+	
+	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes, boolean links) {
 		AttributeType[] attribs;
 		if(attributes == null){
-			attribs = new AttributeType[2 + additional];
+			if(links){
+				attribs = new AttributeType[4];
+			}else{
+				attribs = new AttributeType[2];
+			}
 		}else{
 			attribs = new AttributeType[attributes.size() + 2];
 		}
@@ -198,9 +203,10 @@ public class DaShapeWriter {
 				count++;
 			}
 		}else{
-			//works only for links
-			attribs[2] = AttributeTypeFactory.newAttributeType("capacity",Double.class);
-			attribs[3] = AttributeTypeFactory.newAttributeType("length",Double.class);
+			if(links){
+				attribs[2] = AttributeTypeFactory.newAttributeType("capacity",Double.class);
+				attribs[3] = AttributeTypeFactory.newAttributeType("length",Double.class);
+			}
 		}
 		
 		try {

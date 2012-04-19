@@ -119,8 +119,8 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 			break;
 		}
 		
-		/* find the stop within the greatest distance from the stops2beServed-list  
-		 * use stops2serve and NOT alreadyServed, because alreadyServedd might not be consistent or not necessary for the new route
+		/* find the stop within the greatest distance from the stops2beServed-list, assumin that this is the turning-point of the route  
+		 * use stops2serve and NOT alreadyServed, because alreadyServed might not be consistent or not necessary for the new route
 		 */
 		Integer indexStopInGreatestDistance = findStopInGreatestDistance(stops2serve);
 		if(indexStopInGreatestDistance == null){
@@ -232,7 +232,7 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 		target2 = CoordUtils.plus(base, direction);
 
 		double length = CoordUtils.length(direction);
-		normal = CoordUtils.scalarMult(length, CoordUtils.rotateToRight(direction));
+		normal = CoordUtils.scalarMult(1/length, CoordUtils.rotateToRight(direction));
 		
 		Coordinate[] c = new Coordinate[4];
 		c[0] = MGC.coord2Coordinate(CoordUtils.plus(target1, CoordUtils.scalarMult(length/2, normal)));
