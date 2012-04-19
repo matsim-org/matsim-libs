@@ -71,7 +71,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 	
 	@Override
 	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
-		log.error("update: " + System.currentTimeMillis());
+//		log.error("update: " + e.getSimulationTime());
 		for(EVehicle v: fleet.values()){
 //			if(v.getId().equals(new IdImpl("emob_9"))){
 //				System.out.println(v.getCurrentSoC());
@@ -84,7 +84,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(LinkLeaveEvent event) {
-//		log.error("leave: " + System.currentTimeMillis());
+		log.error("leave: " + event.getTime());
 		this.fleet.get(event.getVehicleId()).disCharge(event.getTime(), this.discharging);
 	}
 

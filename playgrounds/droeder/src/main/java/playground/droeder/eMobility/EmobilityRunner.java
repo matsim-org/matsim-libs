@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.eMobility;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.GenericEvent;
-import org.matsim.core.api.experimental.events.handler.GenericEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -33,8 +29,6 @@ import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.energy.EmobEnergyProfileReader;
 import playground.droeder.eMobility.events.EFleetHandler;
 import playground.droeder.eMobility.events.EPopulationHandler;
-import playground.droeder.eMobility.events.SoCChangeEvent;
-import playground.droeder.eMobility.fleet.EFleet;
 
 
 /**
@@ -43,36 +37,19 @@ import playground.droeder.eMobility.fleet.EFleet;
  */
 public class EmobilityRunner {
 	
-	private static final String DIR = "D:/VSP/svn/shared/volkswagen_internal/";
+	private static final String DIR = "/home/dgrether/shared-svn/projects/volkswagen_internal/";
 
 	private static final String CONFIGFILE = DIR + "scenario/config_base_scenario.xml";
 	private static final String CHARGINGFILE = DIR + "Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";
 	private static final String DISCHARGINGFILE = DIR + "Dokumente_MATSim_AP1und2/DrivingLookupTable_2011-11-25.txt";
 
-	public static void main(String[] args){
-		CreateTestScenario test = new CreateTestScenario();
-		
-		EmobilityRunner runner = new EmobilityRunner();
-		runner.loadChargingProfiles(CHARGINGFILE);
-		runner.loadDisChargingProfiles(DISCHARGINGFILE);
-		
-		runner.run(test.run(CONFIGFILE));
-	}
-
 	private DisChargingProfiles dischargingProfiles;
 	private ChargingProfiles chargingProfiles;
-	private EFleet fleet;
 
-	/**
-	 * @param dischargingfile2
-	 */
 	private void loadDisChargingProfiles(String dischargingfile2) {
 		this.dischargingProfiles = EmobEnergyProfileReader.readDisChargingProfiles(dischargingfile2);		
 	}
 
-	/**
-	 * @param chargingfile2
-	 */
 	private void loadChargingProfiles(String chargingfile2) {
 		this.chargingProfiles = EmobEnergyProfileReader.readChargingProfiles(chargingfile2);		
 	}
@@ -95,11 +72,9 @@ public class EmobilityRunner {
 		
 		
 	}
+	
 	//internal class
 	private class MyListener implements StartupListener{
-		
-		
-
 		private EFleetHandler fHandler;
 		private EPopulationHandler pHandler;
 
@@ -108,9 +83,6 @@ public class EmobilityRunner {
 			this.pHandler = populationHandler;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.matsim.core.controler.listener.StartupListener#notifyStartup(org.matsim.core.controler.events.StartupEvent)
-		 */
 		@Override
 		public void notifyStartup(StartupEvent event) {
 			event.getControler().getEvents().addHandler(this.fHandler);
@@ -118,8 +90,17 @@ public class EmobilityRunner {
 			this.fHandler.getFleet().registerEventsManager(event.getControler().getEvents());
 			event.getControler().getQueueSimulationListener().add(this.fHandler.getFleet());
 		}
-
-		
 	}
+	
+	public static void main(String[] args){
+		CreateTestScenario test = new CreateTestScenario();
+		
+		EmobilityRunner runner = new EmobilityRunner();
+		runner.loadChargingProfiles(CHARGINGFILE);
+		runner.loadDisChargingProfiles(DISCHARGINGFILE);
+		
+		runner.run(test.run(CONFIGFILE));
+	}
+
 
 }

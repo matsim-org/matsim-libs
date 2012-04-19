@@ -45,7 +45,6 @@ public class EFleetHandler implements LinkEnterEventHandler, LinkLeaveEventHandl
 	@Override
 	public void reset(int iteration) {
 		System.err.println("fleet in EFleetHandler: " + fleet);
-		
 	}
 
 	@Override
