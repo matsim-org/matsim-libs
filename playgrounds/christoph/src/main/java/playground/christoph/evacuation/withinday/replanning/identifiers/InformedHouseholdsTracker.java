@@ -43,11 +43,11 @@ import playground.christoph.evacuation.utils.DeterministicRNG;
 public class InformedHouseholdsTracker extends InformedAgentsTracker {
 
 	/*package*/ final int totalHouseholds;	// number of households with more than 0 members
-	/* package*/ final Households households;
-	/* package*/ final DeterministicRNG rng;
-	/* package*/ final Set<Id> informedHouseholds;
-	/* package*/ final Queue<Id> informedHouseholdsInCurrentTimeStep;
-	/* package*/ final PriorityBlockingQueue<Tuple<Id, Double>> informationTime;
+	/*package*/ final Households households;
+	/*package*/ final DeterministicRNG rng;
+	/*package*/ final Set<Id> informedHouseholds;
+	/*package*/ final Queue<Id> informedHouseholdsInCurrentTimeStep;
+	/*package*/ final PriorityBlockingQueue<Tuple<Id, Double>> informationTime;
 
 	private boolean allHouseholdsInformed = false;
 	
@@ -169,8 +169,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 		super.notifyMobsimBeforeSimStep(e);
 	}
 
-	private class InformationTimeComparator implements
-			Comparator<Tuple<Id, Double>>, Serializable, MatsimComparator {
+	private class InformationTimeComparator implements Comparator<Tuple<Id, Double>>, Serializable, MatsimComparator {
 
 		private static final long serialVersionUID = 1L;
 
@@ -183,6 +182,6 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 			}
 			return cmp;
 		}
-
 	}
+
 }

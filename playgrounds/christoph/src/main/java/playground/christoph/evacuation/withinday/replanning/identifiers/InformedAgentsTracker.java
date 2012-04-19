@@ -28,7 +28,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.utils.misc.Time;
 
@@ -38,7 +40,7 @@ import playground.christoph.evacuation.config.EvacuationConfig;
  * To simplify the decision making process, we assume that all members of a household
  * are informed at the same time.
  */
-public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListener {
+public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 	
 	static final Logger log = Logger.getLogger(InformedAgentsTracker.class);
 	
@@ -147,14 +149,28 @@ public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListen
 			this.allAgentsInformed = true;
 			return;
 		}
-		
+	}
+	
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		/*
-		 * Clear the list of agents who have been replanned in the last time step.
+		 * Clear the list of agents who have been replanned in the time step.
 		 */
 		for (Id id : this.replannedAgentsInCurrentTimeStep) {
-			this.toBeInitiallyReplannedAgents.remove(id);
+			boolean removed = this.toBeInitiallyReplannedAgents.remove(id);
+			
+			// debug
+			if (!removed) {
+				log.warn("Initially replanned an agent which was not marked as to be! " + id.toString());
+			}
 		}
 		this.replannedAgentsInCurrentTimeStep.clear();
+		
+		// debug
+		if (this.toBeInitiallyReplannedAgents.size() > 0) {
+			log.warn("Found " + this.toBeInitiallyReplannedAgents.size() + " agents that should " +
+					"have been replanned initally but they were not!");
+		}
 	}
 	
 	private void printStatistics(double time) {
