@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MZ05WegeReader.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.io;
 
 import java.util.HashSet;
@@ -69,6 +85,7 @@ public class MZ05WegeReader implements TabularFileHandler {
 		}
 	}
 
+	@Override
 	public void startRow(final String[] row) {
 		String personId = row[0] + row[1];
 		if (tmpPersonId == null) {
@@ -173,8 +190,8 @@ public class MZ05WegeReader implements TabularFileHandler {
 
 		MZ05WegeReader mz05wr = new MZ05WegeReader(outputBase);
 
-        new TabularFileParser().parse(tfpc, mz05wr);
+		new TabularFileParser().parse(tfpc, mz05wr);
 
-        mz05wr.write();
+		mz05wr.write();
 	}
 }

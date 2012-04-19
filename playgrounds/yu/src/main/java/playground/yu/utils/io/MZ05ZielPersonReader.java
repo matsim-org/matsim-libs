@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MZ05ZielPersonReader.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.io;
 
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -21,6 +37,7 @@ public class MZ05ZielPersonReader implements TabularFileHandler {
 		sw.writeln("linearDistance\tlinearDistance [m]\tlinearDistance [km]");
 	}
 
+	@Override
 	public void startRow(String[] row) {
 		String AW_Distanz = row[37];
 		if (AW_Distanz != null) {
@@ -28,19 +45,20 @@ public class MZ05ZielPersonReader implements TabularFileHandler {
 			if (w2hDist > 0) {
 				zielPersonCnt++;
 				this.AW_Distanz += w2hDist;
-				if (row[23] != null)
+				if (row[23] != null) {
 					if (row[23].equals("1")) {
 						zPKantonZurichCnt++;
 						KantonZurichAW_Distanz += w2hDist;
 					}
+				}
 			}
 		}
 	}
 
 	public void write() {
-		double avgAW_Distanz = AW_Distanz / (double) zielPersonCnt;
+		double avgAW_Distanz = AW_Distanz / zielPersonCnt;
 		double avgKantonZurichAW_Distanz = KantonZurichAW_Distanz
-				/ (double) zPKantonZurichCnt;
+				/ zPKantonZurichCnt;
 		sw.writeln("avg. AW_Distanz\t" + avgAW_Distanz + "\t" + avgAW_Distanz
 				/ 1000.0);
 		sw.writeln("avg. KantonZurichAW_Distanz\t" + avgKantonZurichAW_Distanz
@@ -65,9 +83,9 @@ public class MZ05ZielPersonReader implements TabularFileHandler {
 
 		MZ05ZielPersonReader mz05zpr = new MZ05ZielPersonReader(outputFilename);
 
-        new TabularFileParser().parse(tfpc, mz05zpr);
+		new TabularFileParser().parse(tfpc, mz05zpr);
 
-        mz05zpr.write();
+		mz05zpr.write();
 	}
 
 }

@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PieChart.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.charts;
 
 import org.jfree.chart.ChartFactory;
@@ -13,7 +29,7 @@ import org.matsim.core.utils.charts.ChartUtil;
  * 
  */
 public class PieChart extends ChartUtil {
-	private DefaultPieDataset dataset;
+	private final DefaultPieDataset dataset;
 
 	/**
 	 * @param title
@@ -23,7 +39,7 @@ public class PieChart extends ChartUtil {
 	public PieChart(String title) {
 		super(title, null, null);
 		dataset = new DefaultPieDataset();
-		this.chart = createChart(title, this.dataset);
+		chart = createChart(title, dataset);
 		addDefaultFormatting();
 	}
 
@@ -41,16 +57,18 @@ public class PieChart extends ChartUtil {
 	}
 
 	public void addSeries(final String[] titles, final double[] data) {
-		if (titles.length != data.length)
+		if (titles.length != data.length) {
 			System.err
 					.println("ERROR: \"titles\" has different length as \"data\"");
+		}
 		double sum = 0;
-		for (int i = 0; i < data.length; i++)
+		for (int i = 0; i < data.length; i++) {
 			sum += data[i];
-		for (int i = 0; i < data.length; i++)
+		}
+		for (int i = 0; i < data.length; i++) {
 			dataset.setValue(titles[i] + "\n" + data[i] + "\n"
-					+ ((int) (data[i] / sum * 10000.0)) / 100.0 + "%",
-					data[i]);
+					+ (int) (data[i] / sum * 10000.0) / 100.0 + "%", data[i]);
+		}
 	}
 
 	/**

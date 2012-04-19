@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MZ05ZrhWegeNoReader.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.io;
 
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -29,8 +45,7 @@ public class MZ05ZrhWegeNoReader implements TabularFileHandler {
 	public MZ05ZrhWegeNoReader(final String outputBase) {
 		this.outputBase = outputBase;
 		sw = new SimpleWriter(outputBase + "txt");
-		sw
-				.writeln("Hauptverkehrsmittel aggregiert\tavg. No. of Hauptverkehrsmittel aggregiert von Wegen");
+		sw.writeln("Hauptverkehrsmittel aggregiert\tavg. No. of Hauptverkehrsmittel aggregiert von Wegen");
 	}
 
 	private void reset(final String personId, Double personWeight) {
@@ -39,7 +54,7 @@ public class MZ05ZrhWegeNoReader implements TabularFileHandler {
 		}
 		changePerson = false;
 		tmpPersonId = personId;
-		this.tmpPersonWeight = personWeight;
+		tmpPersonWeight = personWeight;
 		tmpLV_wegNo = 0;
 		tmpMIV_wegNo = 0;
 		tmpOeV_wegNo = 0;
@@ -55,6 +70,7 @@ public class MZ05ZrhWegeNoReader implements TabularFileHandler {
 
 	}
 
+	@Override
 	public void startRow(final String[] row) {
 		String personId = row[0] + row[1];
 		String personWeight = row[2];
@@ -113,13 +129,13 @@ public class MZ05ZrhWegeNoReader implements TabularFileHandler {
 		}
 
 		sw.writeln("avg. No. of Wege LV Kanton Zurich :\t" + LV_wegNo
-				/ this.personCnt);
+				/ personCnt);
 		sw.writeln("avg. No. of Wege MIV Kanton Zurich :\t" + MIV_wegNo
-				/ this.personCnt);
+				/ personCnt);
 		sw.writeln("avg. No. of Wege OeV Kanton Zurich :\t" + OeV_wegNo
-				/ this.personCnt);
+				/ personCnt);
 		sw.writeln("avg. No. of Wege Others Kanton Zurich :\t" + others_wegNo
-				/ this.personCnt);
+				/ personCnt);
 
 		sw.writeln("\nNo. of persons :\t" + personCnt + "\tNo. of Wege :\t"
 				+ (LV_wegNo + MIV_wegNo + OeV_wegNo + others_wegNo));
@@ -147,8 +163,8 @@ public class MZ05ZrhWegeNoReader implements TabularFileHandler {
 
 		MZ05ZrhWegeNoReader mz05wr = new MZ05ZrhWegeNoReader(outputBase);
 
-        new TabularFileParser().parse(tfpc, mz05wr);
+		new TabularFileParser().parse(tfpc, mz05wr);
 
-        mz05wr.write();
+		mz05wr.write();
 	}
 }

@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * OneSampleT_Test.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.math;
 
 import java.util.List;
@@ -73,10 +89,10 @@ public class OneSampleT_Test {
 		double avgX = SimpleStatistics.average(sample);
 		System.out.println("One-sample t-test\taverage x:\t" + avgX);
 		double sampleStandardDeviation = SimpleStatistics
-		.sampleStandardDeviation(sample);
+				.sampleStandardDeviation(sample);
 		System.out
-		.println("One-sample t-test\ts (sample standard deviation):\t"
-				+ sampleStandardDeviation);
+				.println("One-sample t-test\ts (sample standard deviation):\t"
+						+ sampleStandardDeviation);
 		tValue = Math.sqrt(N) * (avgX - mu) / sampleStandardDeviation;
 	}
 

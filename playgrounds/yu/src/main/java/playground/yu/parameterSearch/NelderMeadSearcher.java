@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * NelderMeadSearcher.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.parameterSearch;
 
 import org.apache.commons.math.FunctionEvaluationException;
@@ -24,7 +40,8 @@ public class NelderMeadSearcher {
 	public NelderMeadSearcher(String configFilename) {
 		objectiveFunction = new LLhParamFct(configFilename);
 
-		optimizer = new NelderMead();
+		optimizer = new NelderMead();// used default setting in NelderMead
+		/* rho = 1.0; khi = 2.0; gamma = 0.5; sigma = 0.5; */
 		optimizer.setMaxIterations(objectiveFunction.getMaxIterations());
 		optimizer.setMaxEvaluations(objectiveFunction.getMaxEvaluations());
 		optimizer.setConvergenceChecker(new SimpleScalarValueChecker(

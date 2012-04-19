@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CountsCapacityComparison.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.counts;
 
 import java.io.IOException;
@@ -23,7 +39,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- *
+ * 
  */
 public class CountsCapacityComparison {
 	public static boolean isInRange(final Link link,
@@ -34,7 +50,7 @@ public class CountsCapacityComparison {
 	/**
 	 * compare link capacity with counts-value, in order to check problematical
 	 * link capacites
-	 *
+	 * 
 	 * @param args
 	 * @throws IOException
 	 */
@@ -45,7 +61,8 @@ public class CountsCapacityComparison {
 		final String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
 		final String outputFilename = "../matsimTests/countsCapacityComparison/output_zurich.txt";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
@@ -56,7 +73,7 @@ public class CountsCapacityComparison {
 		sw.writeln("linkId\tx\ty\tCapacity [veh/h]\tmax Value of Counts");
 
 		Coord center = network.getNodes().get(new IdImpl("2531")).getCoord();
-		double capPeriod = (network.getCapacityPeriod()) / 3600.0 * 0.97;
+		double capPeriod = network.getCapacityPeriod() / 3600.0 * 0.97;
 		int n_countStations = 0;
 
 		for (Id linkId : counts.getCounts().keySet()) {
@@ -81,23 +98,22 @@ public class CountsCapacityComparison {
 							// sw.writeln("upward");
 							double capSum = 0.0;
 							smallUpwardLinks = 0;
-							for (Link inLink : upLink.getFromNode().getInLinks().values()) {
+							for (Link inLink : upLink.getFromNode()
+									.getInLinks().values()) {
 								capSum += inLink.getCapacity() / capPeriod;
 								smallUpwardLinks++;
 							}
 							if (capSum <= maxCountsValue) {
-								for (Link inLink : upLink.getFromNode().getInLinks().values()) {
-									sw.writeln(inLink.getId().toString()
-													+ "\t"
-													+ inLink.getCoord().getX()
-													+ "\t"
-													+ inLink.getCoord().getY()
-													+ "\t"
-													+ inLink.getCapacity()
-													/ capPeriod);
+								for (Link inLink : upLink.getFromNode()
+										.getInLinks().values()) {
+									sw.writeln(inLink.getId().toString() + "\t"
+											+ inLink.getCoord().getX() + "\t"
+											+ inLink.getCoord().getY() + "\t"
+											+ inLink.getCapacity() / capPeriod);
 								}
 							}
-							upLink = upLink.getFromNode().getInLinks().values().iterator().next();
+							upLink = upLink.getFromNode().getInLinks().values()
+									.iterator().next();
 						}
 						// downward
 						Link downLink = link;
@@ -108,12 +124,14 @@ public class CountsCapacityComparison {
 							// + downLink.getId().toString());
 							double capSum = 0.0;
 							smallDownwardLinks = 0;
-							for (Link outLink : downLink.getToNode().getOutLinks().values()) {
+							for (Link outLink : downLink.getToNode()
+									.getOutLinks().values()) {
 								capSum += outLink.getCapacity() / capPeriod;
 								smallDownwardLinks++;
 							}
 							if (capSum <= maxCountsValue) {
-								for (Link outLink : downLink.getToNode().getOutLinks().values()) {
+								for (Link outLink : downLink.getToNode()
+										.getOutLinks().values()) {
 									sw.writeln(outLink.getId().toString()
 											+ "\t" + outLink.getCoord().getX()
 											+ "\t" + outLink.getCoord().getY()
@@ -121,7 +139,8 @@ public class CountsCapacityComparison {
 											/ capPeriod);
 								}
 							}
-							downLink = downLink.getToNode().getOutLinks().values().iterator().next();
+							downLink = downLink.getToNode().getOutLinks()
+									.values().iterator().next();
 							// System.out.println("(new) downLink Id:"
 							// + downLink.getId().toString());
 						}

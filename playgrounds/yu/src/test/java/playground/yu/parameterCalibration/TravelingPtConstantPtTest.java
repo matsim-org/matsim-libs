@@ -26,10 +26,10 @@ package playground.yu.parameterCalibration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -37,7 +37,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
 
 /**
  * @author yu
- *
+ * 
  */
 public class TravelingPtConstantPtTest extends MatsimTestCase {
 	@Rule
@@ -65,7 +65,6 @@ public class TravelingPtConstantPtTest extends MatsimTestCase {
 												// the expected value for the
 												// junit test
 
-
 				switch (iteration - baseIter) {
 				case 1:
 					expectedTravelingPt = -3;
@@ -86,7 +85,7 @@ public class TravelingPtConstantPtTest extends MatsimTestCase {
 					expectedTravelingPt = -3;
 					break;
 				case 7:
-					expectedTravelingPt = -3.419853162377692;
+					expectedTravelingPt = -3.2099265811888458;
 					break;
 				case 8:
 					expectedTravelingPt = -3.418639770640792;

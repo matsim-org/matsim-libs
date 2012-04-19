@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * LinkTravelTimeAndDistanceExtractor.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis;
 
 import java.util.HashMap;
@@ -16,18 +32,17 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 public class LinkTravelTimeAndDistanceExtractor implements
 		LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
-	private Map<Id/* person */, LinkEnterEvent> enteredPersons = new HashMap<Id, LinkEnterEvent>();
-	private Network network;
+	private final Map<Id/* person */, LinkEnterEvent> enteredPersons = new HashMap<Id, LinkEnterEvent>();
+	private final Network network;
 	private int cnt = 0;
 	private double sumDist = 0d, sumTravTime = 0d;
 
@@ -61,8 +76,8 @@ public class LinkTravelTimeAndDistanceExtractor implements
 		Id linkId = event.getLinkId();
 		double leaveTime = event.getTime();
 		if (enteredPersons.containsKey(personId)) {
-			if (enteredPersons.get(personId).getLinkId().toString().equals(
-					linkId.toString())) {
+			if (enteredPersons.get(personId).getLinkId().toString()
+					.equals(linkId.toString())) {
 
 				cnt++;
 				sumDist += network.getLinks().get(linkId).getLength();/*
@@ -123,11 +138,12 @@ public class LinkTravelTimeAndDistanceExtractor implements
 
 		Gbl.startMeasurement();
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		LinkTravelTimeAndDistanceExtractor lttade = new LinkTravelTimeAndDistanceExtractor(
 				scenario.getNetwork());

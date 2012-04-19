@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PtOccupancy.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis.pt;
 
 import java.util.HashMap;
@@ -10,6 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -19,7 +36,6 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -65,8 +81,9 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 					Id trId = tr.getId();
 					// System.out.println("TransitRoute:\t" + trId);
 					routeLineIds.put(trId, tlId);
-					for (Departure dp : tr.getDepartures().values())
+					for (Departure dp : tr.getDepartures().values()) {
 						vehRouteIds.put(dp.getVehicleId(), trId);
+					}
 				}
 				// System.out.println("------------------");
 			}
@@ -79,13 +96,15 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		double time = event.getTime();
 
 		Integer occup = occups.get(vehId);
-		if (occup == null)
+		if (occup == null) {
 			occup = 0;
+		}
 		occups.put(vehId, ++occup);
 
 		Map<Double, Integer> timeOccup = timeOccups.get(vehId);
-		if (timeOccup == null)
+		if (timeOccup == null) {
 			timeOccup = new TreeMap<Double, Integer>();
+		}
 		timeOccup.put(time, occups.get(vehId));
 		timeOccups.put(vehId, timeOccup);
 
@@ -93,13 +112,15 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 			Id routeId = vehRouteIds.get(vehId);
 
 			Integer ro = routeOccups.get(routeId);
-			if (ro == null)
+			if (ro == null) {
 				ro = 0;
+			}
 			routeOccups.put(routeId, ++ro);
 
 			Map<Double, Integer> rto = routeTimeOccups.get(routeId);
-			if (rto == null)
+			if (rto == null) {
 				rto = new TreeMap<Double, Integer>();
+			}
 			rto.put(time, routeOccups.get(routeId));
 			routeTimeOccups.put(routeId, rto);
 		}
@@ -150,8 +171,8 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 			double[] xs = new double[size * 2], ys = new double[size * 2];
 			int i = 0;
 			for (Entry<Double, Integer> to : tos.entrySet()) {
-				xs[i] = (to.getKey() - 1.0);
-				ys[i] = (i > 0) ? ys[i - 1] : 0;
+				xs[i] = to.getKey() - 1.0;
+				ys[i] = i > 0 ? ys[i - 1] : 0;
 				xs[i + 1] = to.getKey();
 				ys[i + 1] = to.getValue();
 				i += 2;
@@ -162,8 +183,9 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 
 			writer.writeln("vehId:\t" + vehId
 					+ "\ntime\tthe number of passengers");
-			for (int j = 0; j < size * 2; j++)
+			for (int j = 0; j < size * 2; j++) {
 				writer.writeln(Time.writeTime(xs[j] * 3600.0) + "\t" + ys[j]);
+			}
 			writer.writeln("----------");
 		}
 
@@ -179,8 +201,8 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 			double[] xs = new double[size * 2], ys = new double[size * 2];
 			int i = 0;
 			for (Entry<Double, Integer> to : tos.entrySet()) {
-				xs[i] = (to.getKey()/* time */- 1.0);
-				ys[i] = (i > 0) ? ys[i - 1] : 0;
+				xs[i] = to.getKey()/* time */- 1.0;
+				ys[i] = i > 0 ? ys[i - 1] : 0;
 				xs[i + 1] = to.getKey();
 				ys[i + 1] = to.getValue()/* occupancies */;
 				i += 2;
@@ -188,24 +210,27 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 			Id routeId = rtoEntry.getKey();
 			Id lineId = routeLineIds.get(routeId);
 			TimeLineChart chartR = charts.get(lineId);
-			if (chartR == null)
+			if (chartR == null) {
 				chartR = new TimeLineChart(
 						"TransitRoute occupancies of TransitLine " + lineId,
 						"time", "agents in bus(route) [per.]");
+			}
 
 			chartR.addSeries("route:\t" + routeId, xs, ys);
 			charts.put(lineId, chartR);
 			writer.writeln("routeId:\t" + routeId
 					+ "\ntime\tthe number of passengers");
-			for (int j = 0; j < size * 2; j++)
+			for (int j = 0; j < size * 2; j++) {
 				writer.writeln(Time.writeTime(xs[j] * 3600.0) + "\t" + ys[j]);
+			}
 			writer.writeln("----------");
 		}
-		for (Entry<Id, TimeLineChart> chartEntry : charts.entrySet())
+		for (Entry<Id, TimeLineChart> chartEntry : charts.entrySet()) {
 			chartEntry.getValue()
 					.saveAsPng(
 							outputFilenameBase + "line." + chartEntry.getKey()
 									+ ".png", 1024, 768);
+		}
 
 		writer.close();
 
@@ -219,7 +244,8 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		String scheduleFilename = "../berlin-bvg09/pt/m2_schedule_delay/transitSchedule.xml";
 		String netFilename = "../berlin-bvg09/pt/m2_schedule_delay/network.xml";
 
-		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl s = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		s.getConfig().scenario().setUseTransit(true);
 
 		new MatsimNetworkReader(s).readFile(netFilename);
@@ -234,7 +260,6 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
-		po
-				.write("../berlin-bvg09/pt/m2_schedule_delay/m2_out_100a/m2_out_100a/ITERS/it.1000/1000.occupancies.");
+		po.write("../berlin-bvg09/pt/m2_schedule_delay/m2_out_100a/m2_out_100a/ITERS/it.1000/1000.occupancies.");
 	}
 }

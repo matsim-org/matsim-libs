@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * GeometricDistanceExtractor.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis;
 
 import java.util.HashMap;
@@ -54,31 +70,19 @@ public class GeometricDistanceExtractor extends AbstractPersonAlgorithm
 		writer = new SimpleWriter(outputFilename + ".txt");
 		writer.writeln("mittlere w_dist_obj2\t7.307566679381953");
 		writer.writeln("w_dist_obj2Cnt\t18101.31975827781");
-		writer
-				.writeln("------------------------------------------\nlineCnt\t=\t18471.0\tpersonCnt\t=\t5127.0\n-----------------------------------------");
-		writer
-				.writeln("wegezwecke\tmittlere w_dist_obj2(LV)\tmittlere w_dist_obj2(MIV)\tmittlere w_dist_obj2(OeV)\tmittlere w_dist_obj2(Andere)");
+		writer.writeln("------------------------------------------\nlineCnt\t=\t18471.0\tpersonCnt\t=\t5127.0\n-----------------------------------------");
+		writer.writeln("wegezwecke\tmittlere w_dist_obj2(LV)\tmittlere w_dist_obj2(MIV)\tmittlere w_dist_obj2(OeV)\tmittlere w_dist_obj2(Andere)");
 
-		writer
-				.writeln("Andere\t0.5699637941664182\t6.2757832069950155\t54.111435834469106\t12.966938961723768");
-		writer
-				.writeln("Arbeit\t1.1922130191305493\t9.04248179795842\t10.857171406288717\t18.156876062119938");
-		writer
-				.writeln("Geschaeftliche Taetigkeit und Dienstfahrt\t1.9287975361430263\t14.386517412575252\t33.03721290271486\t44.89536041926112");
-		writer
-				.writeln("Einkauf\t0.7048907318708167\t7.145485757876666\t5.672966627881363\t5.194383866318486");
-		writer
-				.writeln("Rueckkehr nach Hause bzw. auswaertige Unterkunft\t0.23628220556976123\t33.89939347017498\t36.7969730963612\t22.23043650644029");
-		writer
-				.writeln("Service- und Begleitwege\t0.7538780842580616\t4.477992748635797\t9.020955388044248\t3.7");
-		writer
-				.writeln("Freizeit\t0.8075903384505545\t12.197351732261064\t15.037552858176516\t10.778808992470886");
-		writer
-				.writeln("Ausbildung/Schule\t2.1686474725167018\t6.834617991162332\t10.062321375204034\t0.8445631013693445");
-		writer
-				.writeln("total\t1.0401121917578349\t10.162527664979805\t12.191850351016745\t11.763501868608962");
-		writer
-				.writeln("----------------------------------\nMATSim\ntravel purpose\tGeometricDistance [km]");
+		writer.writeln("Andere\t0.5699637941664182\t6.2757832069950155\t54.111435834469106\t12.966938961723768");
+		writer.writeln("Arbeit\t1.1922130191305493\t9.04248179795842\t10.857171406288717\t18.156876062119938");
+		writer.writeln("Geschaeftliche Taetigkeit und Dienstfahrt\t1.9287975361430263\t14.386517412575252\t33.03721290271486\t44.89536041926112");
+		writer.writeln("Einkauf\t0.7048907318708167\t7.145485757876666\t5.672966627881363\t5.194383866318486");
+		writer.writeln("Rueckkehr nach Hause bzw. auswaertige Unterkunft\t0.23628220556976123\t33.89939347017498\t36.7969730963612\t22.23043650644029");
+		writer.writeln("Service- und Begleitwege\t0.7538780842580616\t4.477992748635797\t9.020955388044248\t3.7");
+		writer.writeln("Freizeit\t0.8075903384505545\t12.197351732261064\t15.037552858176516\t10.778808992470886");
+		writer.writeln("Ausbildung/Schule\t2.1686474725167018\t6.834617991162332\t10.062321375204034\t0.8445631013693445");
+		writer.writeln("total\t1.0401121917578349\t10.162527664979805\t12.191850351016745\t11.763501868608962");
+		writer.writeln("----------------------------------\nMATSim\ntravel purpose\tGeometricDistance [km]");
 	}
 
 	@Override
@@ -307,7 +311,8 @@ public class GeometricDistanceExtractor extends AbstractPersonAlgorithm
 		final String outputFilename = "../runs-svn/run1102/ITERS/it.1000/1102.1000.geoDistKanton";
 		String tollFilename = "../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 
 		new MatsimNetworkReader(scenario).readFile(netFilename);

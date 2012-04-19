@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * EnRouteModalSplit4Zrh.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis.forZrh;
 
 import java.io.BufferedWriter;
@@ -28,9 +44,9 @@ import playground.yu.utils.container.CollectionMath;
 /**
  * compute daily En Route/ departures/ arrivals of Zurich and Kanton Zurich
  * respectively with through traffic
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	private double[] throughDep = null, throughArr = null, throughStuck = null,
@@ -47,10 +63,10 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		super(scenario, binSize, nofBins, plans);
 		if (scenario.equals("Zurich") || scenario.equals("Kanton_Zurich")) {
 			// through traffic
-			this.throughDep = new double[nofBins + 1];
-			this.throughArr = new double[nofBins + 1];
-			this.throughEnRoute = new double[nofBins + 1];
-			this.throughStuck = new double[nofBins + 1];
+			throughDep = new double[nofBins + 1];
+			throughArr = new double[nofBins + 1];
+			throughEnRoute = new double[nofBins + 1];
+			throughStuck = new double[nofBins + 1];
 		}
 	}
 
@@ -85,52 +101,56 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] throughCount) {
 		allCount[binIdx]++;
-		if (throughCount != null)
-			if (Integer.parseInt(ae.getPersonId().toString()) > 1000000000)
+		if (throughCount != null) {
+			if (Integer.parseInt(ae.getPersonId().toString()) > 1000000000) {
 				throughCount[binIdx]++;
-			else {
-				if (PlanModeJudger.useCar(plan))
+			} else {
+				if (PlanModeJudger.useCar(plan)) {
 					carCount[binIdx]++;
-				else if (PlanModeJudger.usePt(plan)) {
-					if (ptCount != null)
+				} else if (PlanModeJudger.usePt(plan)) {
+					if (ptCount != null) {
 						ptCount[binIdx]++;
-				} else if (PlanModeJudger.useWalk(plan))
-					if (wlkCount != null)
+					}
+				} else if (PlanModeJudger.useWalk(plan)) {
+					if (wlkCount != null) {
 						wlkCount[binIdx]++;
+					}
+				}
 			}
-		else {
-			if (PlanModeJudger.useCar(plan))
+		} else {
+			if (PlanModeJudger.useCar(plan)) {
 				carCount[binIdx]++;
-			else if (PlanModeJudger.usePt(plan)) {
-				if (ptCount != null)
+			} else if (PlanModeJudger.usePt(plan)) {
+				if (ptCount != null) {
 					ptCount[binIdx]++;
-			} else if (PlanModeJudger.useWalk(plan))
-				if (wlkCount != null)
+				}
+			} else if (PlanModeJudger.useWalk(plan)) {
+				if (wlkCount != null) {
 					wlkCount[binIdx]++;
+				}
+			}
 		}
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		internalHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
-				throughArr);
+		internalHandleEvent(event, arr, carArr, ptArr, wlkArr, throughArr);
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		Id id = event.getPersonId();
 		Integer itg = legCounts.get(id);
-		if (itg == null)
+		if (itg == null) {
 			itg = Integer.valueOf(-1);
+		}
 		legCounts.put(id, itg.intValue() + 1);
-		internalHandleEvent(event, this.dep, this.carDep, this.ptDep, wlkDep,
-				throughDep);
+		internalHandleEvent(event, dep, carDep, ptDep, wlkDep, throughDep);
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		internalHandleEvent(event, this.stuck, this.carStuck, null, null,
-				this.throughStuck);
+		internalHandleEvent(event, stuck, carStuck, null, null, throughStuck);
 	}
 
 	protected void internalHandleEvent(AgentEvent ae, double[] allCount,
@@ -140,8 +160,8 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
 		if (toll != null) {
-			if (TollTools.isInRange(((PlanImpl) selectedPlan).getFirstActivity().getLinkId(),
-					toll)) {
+			if (TollTools.isInRange(((PlanImpl) selectedPlan)
+					.getFirstActivity().getLinkId(), toll)) {
 				this.internalCompute(binIdx, ae, selectedPlan, allCount,
 						carCount, ptCount, wlkCount, throughCount);
 			}
@@ -153,7 +173,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 
 	/**
 	 * Writes the gathered data tab-separated into a text stream.
-	 *
+	 * 
 	 * @param bw
 	 *            The data stream where to write the gathered data.
 	 */
@@ -161,58 +181,53 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	public void write(final BufferedWriter bw) {
 		calcOnRoute();
 		try {
-			bw
-					.write("time\ttimeBin\t"
-							+ "departures\tarrivals\tstuck\ton_route\t"
-							+ "carDepartures\tcarArrivals\tcarStuck\tcarOnRoute\t"
-							+ "ptDepartures\tptArrivals\tptStuck\tptOnRoute\t"
-							+ "walkDepartures\twalkArrivals\twalkStuck\twalkOnRoute\t"
-							+ "throughDepartures\tthroughArrivals\tthroughStuck\tthroughOnRoute\n");
-			for (int i = 0; i < this.dep.length; i++) {
-				bw
-						.write(Time.writeTime(i * this.binSize)
-								+ "\t"
-								+ i * this.binSize
-								+ "\t"
-								+ this.dep[i]
-								+ "\t"
-								+ this.arr[i]
-								+ "\t"
-								+ this.stuck[i]
-								+ "\t"
-								+ this.enRoute[i]
-								+ "\t"
-								+ this.carDep[i]
-								+ "\t"
-								+ this.carArr[i]
-								+ "\t"
-								+ this.carStuck[i]
-								+ "\t"
-								+ this.carEnRoute[i]
-								+ "\t"
-								+ this.ptDep[i]
-								+ "\t"
-								+ this.ptArr[i]
-								+ "\t"
-								+ 0
-								+ "\t"
-								+ this.ptEnRoute[i]
-								+ "\t"
-								+ this.wlkDep[i]
-								+ "\t"
-								+ this.wlkArr[i]
-								+ "\t"
-								+ 0
-								+ "\t"
-								+ this.wlkEnRoute[i]
-								+ "\t"
-								+ ((throughEnRoute != null) ? (this.throughDep[i]
-										+ "\t"
-										+ this.throughArr[i]
-										+ "\t"
-										+ this.throughStuck[i] + "\t" + this.throughEnRoute[i])
-										: (0 + "\t" + 0 + "\t" + 0 + "\t" + 0))
-								+ "\n");
+			bw.write("time\ttimeBin\t"
+					+ "departures\tarrivals\tstuck\ton_route\t"
+					+ "carDepartures\tcarArrivals\tcarStuck\tcarOnRoute\t"
+					+ "ptDepartures\tptArrivals\tptStuck\tptOnRoute\t"
+					+ "walkDepartures\twalkArrivals\twalkStuck\twalkOnRoute\t"
+					+ "throughDepartures\tthroughArrivals\tthroughStuck\tthroughOnRoute\n");
+			for (int i = 0; i < dep.length; i++) {
+				bw.write(Time.writeTime(i * binSize)
+						+ "\t"
+						+ i * binSize
+						+ "\t"
+						+ dep[i]
+						+ "\t"
+						+ arr[i]
+						+ "\t"
+						+ stuck[i]
+						+ "\t"
+						+ enRoute[i]
+						+ "\t"
+						+ carDep[i]
+						+ "\t"
+						+ carArr[i]
+						+ "\t"
+						+ carStuck[i]
+						+ "\t"
+						+ carEnRoute[i]
+						+ "\t"
+						+ ptDep[i]
+						+ "\t"
+						+ ptArr[i]
+						+ "\t"
+						+ 0
+						+ "\t"
+						+ ptEnRoute[i]
+						+ "\t"
+						+ wlkDep[i]
+						+ "\t"
+						+ wlkArr[i]
+						+ "\t"
+						+ 0
+						+ "\t"
+						+ wlkEnRoute[i]
+						+ "\t"
+						+ (throughEnRoute != null ? throughDep[i] + "\t"
+								+ throughArr[i] + "\t" + throughStuck[i] + "\t"
+								+ throughEnRoute[i] : 0 + "\t" + 0 + "\t" + 0
+								+ "\t" + 0) + "\n");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -223,7 +238,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 
 	/**
 	 * Writes the gathered data tab-separated into a text file.
-	 *
+	 * 
 	 * @param filename
 	 *            The name of a file where to write the gathered data.
 	 */
@@ -247,18 +262,21 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		int length = enRoute.length;
 		double[] xs = new double[length];
 		for (int j = 0; j < xs.length; j++) {
-			xs[j] = ((double) j) * (double) this.binSize / 3600.0;
+			xs[j] = (double) j * (double) binSize / 3600.0;
 		}
 		// enRoute chart
 		XYLineChart enRouteChart = new XYLineChart("Leg Histogramm - En Route",
 				"time", "agents en route from " + scenario);
 		enRouteChart.addSeries("drivers", xs, carEnRoute);
-		if (CollectionMath.getSum(ptEnRoute) > 0)
+		if (CollectionMath.getSum(ptEnRoute) > 0) {
 			enRouteChart.addSeries("public transit users", xs, ptEnRoute);
-		if (CollectionMath.getSum(wlkEnRoute) > 0)
+		}
+		if (CollectionMath.getSum(wlkEnRoute) > 0) {
 			enRouteChart.addSeries("walkers", xs, wlkEnRoute);
-		if (CollectionMath.getSum(throughEnRoute) > 0)
+		}
+		if (CollectionMath.getSum(throughEnRoute) > 0) {
 			enRouteChart.addSeries("through", xs, throughEnRoute);
+		}
 		enRouteChart.addSeries("all agents", xs, enRoute);
 		enRouteChart.saveAsPng(filename + "enRoute.png", 1024, 768);
 		// departures chart
@@ -266,24 +284,30 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 				"Leg Histogramm - Departures", "time", "departing agents from "
 						+ scenario);
 		departChart.addSeries("drivers", xs, carDep);
-		if (CollectionMath.getSum(ptDep) > 0)
+		if (CollectionMath.getSum(ptDep) > 0) {
 			departChart.addSeries("public transit users", xs, ptDep);
-		if (CollectionMath.getSum(wlkDep) > 0)
+		}
+		if (CollectionMath.getSum(wlkDep) > 0) {
 			departChart.addSeries("walkers", xs, wlkDep);
-		if (CollectionMath.getSum(throughDep) > 0)
+		}
+		if (CollectionMath.getSum(throughDep) > 0) {
 			departChart.addSeries("through", xs, throughDep);
+		}
 		departChart.addSeries("all agents", xs, dep);
 		departChart.saveAsPng(filename + "departures.png", 1024, 768);
 		// arrivals chart
 		XYLineChart arrChart = new XYLineChart("Leg Histogramm - Arrivals",
 				"time", "arriving agents from " + scenario);
 		arrChart.addSeries("drivers", xs, carArr);
-		if (CollectionMath.getSum(ptArr) > 0)
+		if (CollectionMath.getSum(ptArr) > 0) {
 			arrChart.addSeries("public transit users", xs, ptArr);
-		if (CollectionMath.getSum(wlkArr) > 0)
+		}
+		if (CollectionMath.getSum(wlkArr) > 0) {
 			arrChart.addSeries("walkers", xs, wlkArr);
-		if (CollectionMath.getSum(throughArr) > 0)
+		}
+		if (CollectionMath.getSum(throughArr) > 0) {
 			arrChart.addSeries("through", xs, throughArr);
+		}
 		arrChart.addSeries("all agents", xs, arr);
 		arrChart.saveAsPng(filename + "arrivals.png", 1024, 768);
 	}

@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CarAvailStatistics.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis;
 
 import org.matsim.api.core.v01.population.Person;
@@ -30,36 +46,36 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 			notEmployed_so, notEmployed_ne;
 
 	public CarAvailStatistics() {
-		this.male_al = 0;
-		this.male_so = 0;
-		this.male_ne = 0;
-		this.female_al = 0;
-		this.female_so = 0;
-		this.female_ne = 0;
-		this.ageA_al = 0;
-		this.ageB_al = 0;
-		this.ageC_al = 0;
-		this.ageD_al = 0;
-		this.ageA_so = 0;
-		this.ageB_so = 0;
-		this.ageC_so = 0;
-		this.ageD_so = 0;
-		this.ageA_ne = 0;
-		this.ageB_ne = 0;
-		this.ageC_ne = 0;
-		this.ageD_ne = 0;
-		this.withLicense_al = 0;
-		this.withoutLicense_al = 0;
-		this.withLicense_so = 0;
-		this.withoutLicense_so = 0;
-		this.withLicense_ne = 0;
-		this.withoutLicense_ne = 0;
-		this.isEmployed_al = 0;
-		this.isEmployed_so = 0;
-		this.isEmployed_ne = 0;
-		this.notEmployed_al = 0;
-		this.notEmployed_so = 0;
-		this.notEmployed_ne = 0;
+		male_al = 0;
+		male_so = 0;
+		male_ne = 0;
+		female_al = 0;
+		female_so = 0;
+		female_ne = 0;
+		ageA_al = 0;
+		ageB_al = 0;
+		ageC_al = 0;
+		ageD_al = 0;
+		ageA_so = 0;
+		ageB_so = 0;
+		ageC_so = 0;
+		ageD_so = 0;
+		ageA_ne = 0;
+		ageB_ne = 0;
+		ageC_ne = 0;
+		ageD_ne = 0;
+		withLicense_al = 0;
+		withoutLicense_al = 0;
+		withLicense_so = 0;
+		withoutLicense_so = 0;
+		withLicense_ne = 0;
+		withoutLicense_ne = 0;
+		isEmployed_al = 0;
+		isEmployed_so = 0;
+		isEmployed_ne = 0;
+		notEmployed_al = 0;
+		notEmployed_so = 0;
+		notEmployed_ne = 0;
 	}
 
 	@Override
@@ -72,78 +88,78 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 		if (carAvail != null) {
 			if (carAvail.equals("always")) {
 				if (person.getSex().equals("m")) {
-					this.male_al++;
+					male_al++;
 				} else {
-					this.female_al++;
+					female_al++;
 				}
 				if (age < 30) {
-					this.ageA_al++;
+					ageA_al++;
 				} else if (age >= 30 && age < 50) {
-					this.ageB_al++;
+					ageB_al++;
 				} else if (age >= 50 && age < 70) {
-					this.ageC_al++;
+					ageC_al++;
 				} else {
-					this.ageD_al++;
+					ageD_al++;
 				}
 				if (license.equals("yes")) {
-					this.withLicense_al++;
+					withLicense_al++;
 				} else {
-					this.withoutLicense_al++;
+					withoutLicense_al++;
 				}
 				if (isEmployed) {
-					this.isEmployed_al++;
+					isEmployed_al++;
 				} else {
-					this.notEmployed_al++;
+					notEmployed_al++;
 				}
 			} else if (carAvail.equals("sometimes")) {
 				if (person.getSex().equals("m")) {
-					this.male_so++;
+					male_so++;
 				} else {
-					this.female_so++;
+					female_so++;
 				}
 				if (age < 30) {
-					this.ageA_so++;
+					ageA_so++;
 				} else if (age >= 30 && age < 50) {
-					this.ageB_so++;
+					ageB_so++;
 				} else if (age >= 50 && age < 70) {
-					this.ageC_so++;
+					ageC_so++;
 				} else {
-					this.ageD_so++;
+					ageD_so++;
 				}
 				if (license.equals("yes")) {
-					this.withLicense_so++;
+					withLicense_so++;
 				} else {
-					this.withoutLicense_so++;
+					withoutLicense_so++;
 				}
 				if (isEmployed) {
-					this.isEmployed_so++;
+					isEmployed_so++;
 				} else {
-					this.notEmployed_so++;
+					notEmployed_so++;
 				}
 			} else if (carAvail.equals("never")) {
 				if (person.getSex().equals("m")) {
-					this.male_ne++;
+					male_ne++;
 				} else {
-					this.female_ne++;
+					female_ne++;
 				}
 				if (age < 30) {
-					this.ageA_ne++;
+					ageA_ne++;
 				} else if (age >= 30 && age < 50) {
-					this.ageB_ne++;
+					ageB_ne++;
 				} else if (age >= 50 && age < 70) {
-					this.ageC_ne++;
+					ageC_ne++;
 				} else {
-					this.ageD_ne++;
+					ageD_ne++;
 				}
 				if (license.equals("yes")) {
-					this.withLicense_ne++;
+					withLicense_ne++;
 				} else {
-					this.withoutLicense_ne++;
+					withoutLicense_ne++;
 				}
 				if (isEmployed) {
-					this.isEmployed_ne++;
+					isEmployed_ne++;
 				} else {
-					this.notEmployed_ne++;
+					notEmployed_ne++;
 				}
 			}
 		}
@@ -152,31 +168,25 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 	public void write(final String outputFilename) {
 		SimpleWriter sw = new SimpleWriter(outputFilename + ".txt");
 		sw.writeln("car_avail--always");
-		sw
-				.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
-		sw.writeln("\t" + this.male_al + "\t" + this.female_al + "\t"
-				+ this.ageA_al + "\t" + this.ageB_al + "\t" + this.ageC_al
-				+ "\t" + this.ageD_al + "\t" + this.withLicense_al + "\t"
-				+ this.withoutLicense_al + "\t" + this.isEmployed_al + "\t"
-				+ this.notEmployed_al);
+		sw.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
+		sw.writeln("\t" + male_al + "\t" + female_al + "\t" + ageA_al + "\t"
+				+ ageB_al + "\t" + ageC_al + "\t" + ageD_al + "\t"
+				+ withLicense_al + "\t" + withoutLicense_al + "\t"
+				+ isEmployed_al + "\t" + notEmployed_al);
 		sw.writeln("-----------------------------");
 		sw.writeln("car_avail--sometimes");
-		sw
-				.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
-		sw.writeln("\t" + this.male_so + "\t" + this.female_so + "\t"
-				+ this.ageA_so + "\t" + this.ageB_so + "\t" + this.ageC_so
-				+ "\t" + this.ageD_so + "\t" + this.withLicense_so + "\t"
-				+ this.withoutLicense_so + "\t" + this.isEmployed_so + "\t"
-				+ this.notEmployed_so);
+		sw.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
+		sw.writeln("\t" + male_so + "\t" + female_so + "\t" + ageA_so + "\t"
+				+ ageB_so + "\t" + ageC_so + "\t" + ageD_so + "\t"
+				+ withLicense_so + "\t" + withoutLicense_so + "\t"
+				+ isEmployed_so + "\t" + notEmployed_so);
 		sw.writeln("-----------------------------");
 		sw.writeln("car_avail--never");
-		sw
-				.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
-		sw.writeln("\t" + this.male_ne + "\t" + this.female_ne + "\t"
-				+ this.ageA_ne + "\t" + this.ageB_ne + "\t" + this.ageC_ne
-				+ "\t" + this.ageD_ne + "\t" + this.withLicense_ne + "\t"
-				+ this.withoutLicense_ne + "\t" + this.isEmployed_ne + "\t"
-				+ this.notEmployed_ne);
+		sw.writeln("\tmale\tfemale\tage<30\t30<=age<50\t50<=age<70\tage>70\twith license\twithout license\tis employed\tnot employed");
+		sw.writeln("\t" + male_ne + "\t" + female_ne + "\t" + ageA_ne + "\t"
+				+ ageB_ne + "\t" + ageC_ne + "\t" + ageD_ne + "\t"
+				+ withLicense_ne + "\t" + withoutLicense_ne + "\t"
+				+ isEmployed_ne + "\t" + notEmployed_ne);
 		sw.writeln("-----------------------------");
 		sw.close();
 		BarChart chart = new BarChart("Car Avail", "categories",
@@ -184,120 +194,69 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 						"age<30", "30<=age<50", "50<=age<70", "age>70",
 						"with license", "without license", "is employed",
 						"not employed" });
-		chart
-				.addSeries(
-						"always",
-						new double[] {
-								this.male_al
-										/ (this.male_al + this.male_ne + this.male_so)
-										* 100.0,
-								this.female_al
-										/ (this.female_al + this.female_ne + this.female_so)
-										* 100.0,
-								this.ageA_al
-										/ (this.ageA_al + this.ageA_ne + this.ageA_so)
-										* 100.0,
-								this.ageB_al
-										/ (this.ageB_al + this.ageB_ne + this.ageB_so)
-										* 100.0,
-								this.ageC_al
-										/ (this.ageC_al + this.ageC_ne + this.ageC_so)
-										* 100.0,
-								this.ageD_al
-										/ (this.ageD_al + this.ageD_ne + this.ageD_so)
-										* 100.0,
-								this.withLicense_al
-										/ (this.withLicense_al
-												+ this.withLicense_ne + this.withLicense_so)
-										* 100.0,
-								this.withoutLicense_al
-										/ (this.withoutLicense_al
-												+ this.withoutLicense_ne + this.withoutLicense_so)
-										* 100.0,
-								this.isEmployed_al
-										/ (this.isEmployed_al
-												+ this.isEmployed_ne + this.isEmployed_so)
-										* 100.0,
-								this.notEmployed_al
-										/ (this.notEmployed_al
-												+ this.notEmployed_ne + this.notEmployed_so)
-										* 100.0 });
-		chart
-				.addSeries(
-						"sometimes",
-						new double[] {
-								this.male_so
-										/ (this.male_al + this.male_ne + this.male_so)
-										* 100.0,
-								this.female_so
-										/ (this.female_al + this.female_ne + this.female_so)
-										* 100.0,
-								this.ageA_so
-										/ (this.ageA_al + this.ageA_ne + this.ageA_so)
-										* 100.0,
-								this.ageB_so
-										/ (this.ageB_al + this.ageB_ne + this.ageB_so)
-										* 100.0,
-								this.ageC_so
-										/ (this.ageC_al + this.ageC_ne + this.ageC_so)
-										* 100.0,
-								this.ageD_so
-										/ (this.ageD_al + this.ageD_ne + this.ageD_so)
-										* 100.0,
-								this.withLicense_so
-										/ (this.withLicense_al
-												+ this.withLicense_ne + this.withLicense_so)
-										* 100.0,
-								this.withoutLicense_so
-										/ (this.withoutLicense_al
-												+ this.withoutLicense_ne + this.withoutLicense_so)
-										* 100.0,
-								this.isEmployed_so
-										/ (this.isEmployed_al
-												+ this.isEmployed_ne + this.isEmployed_so)
-										* 100.0,
-								this.notEmployed_so
-										/ (this.notEmployed_al
-												+ this.notEmployed_ne + this.notEmployed_so)
-										* 100.0 });
-		chart
-				.addSeries(
-						"never",
-						new double[] {
-								this.male_ne
-										/ (this.male_al + this.male_ne + this.male_so)
-										* 100.0,
-								this.female_ne
-										/ (this.female_al + this.female_ne + this.female_so)
-										* 100.0,
-								this.ageA_ne
-										/ (this.ageA_al + this.ageA_ne + this.ageA_so)
-										* 100.0,
-								this.ageB_ne
-										/ (this.ageB_al + this.ageB_ne + this.ageB_so)
-										* 100.0,
-								this.ageC_ne
-										/ (this.ageC_al + this.ageC_ne + this.ageC_so)
-										* 100.0,
-								this.ageD_ne
-										/ (this.ageD_al + this.ageD_ne + this.ageD_so)
-										* 100.0,
-								this.withLicense_ne
-										/ (this.withLicense_al
-												+ this.withLicense_ne + this.withLicense_so)
-										* 100.0,
-								this.withoutLicense_ne
-										/ (this.withoutLicense_al
-												+ this.withoutLicense_ne + this.withoutLicense_so)
-										* 100.0,
-								this.isEmployed_ne
-										/ (this.isEmployed_al
-												+ this.isEmployed_ne + this.isEmployed_so)
-										* 100.0,
-								this.notEmployed_ne
-										/ (this.notEmployed_al
-												+ this.notEmployed_ne + this.notEmployed_so)
-										* 100.0 });
+		chart.addSeries(
+				"always",
+				new double[] {
+						male_al / (male_al + male_ne + male_so) * 100.0,
+						female_al / (female_al + female_ne + female_so) * 100.0,
+						ageA_al / (ageA_al + ageA_ne + ageA_so) * 100.0,
+						ageB_al / (ageB_al + ageB_ne + ageB_so) * 100.0,
+						ageC_al / (ageC_al + ageC_ne + ageC_so) * 100.0,
+						ageD_al / (ageD_al + ageD_ne + ageD_so) * 100.0,
+						withLicense_al
+								/ (withLicense_al + withLicense_ne + withLicense_so)
+								* 100.0,
+						withoutLicense_al
+								/ (withoutLicense_al + withoutLicense_ne + withoutLicense_so)
+								* 100.0,
+						isEmployed_al
+								/ (isEmployed_al + isEmployed_ne + isEmployed_so)
+								* 100.0,
+						notEmployed_al
+								/ (notEmployed_al + notEmployed_ne + notEmployed_so)
+								* 100.0 });
+		chart.addSeries(
+				"sometimes",
+				new double[] {
+						male_so / (male_al + male_ne + male_so) * 100.0,
+						female_so / (female_al + female_ne + female_so) * 100.0,
+						ageA_so / (ageA_al + ageA_ne + ageA_so) * 100.0,
+						ageB_so / (ageB_al + ageB_ne + ageB_so) * 100.0,
+						ageC_so / (ageC_al + ageC_ne + ageC_so) * 100.0,
+						ageD_so / (ageD_al + ageD_ne + ageD_so) * 100.0,
+						withLicense_so
+								/ (withLicense_al + withLicense_ne + withLicense_so)
+								* 100.0,
+						withoutLicense_so
+								/ (withoutLicense_al + withoutLicense_ne + withoutLicense_so)
+								* 100.0,
+						isEmployed_so
+								/ (isEmployed_al + isEmployed_ne + isEmployed_so)
+								* 100.0,
+						notEmployed_so
+								/ (notEmployed_al + notEmployed_ne + notEmployed_so)
+								* 100.0 });
+		chart.addSeries(
+				"never",
+				new double[] {
+						male_ne / (male_al + male_ne + male_so) * 100.0,
+						female_ne / (female_al + female_ne + female_so) * 100.0,
+						ageA_ne / (ageA_al + ageA_ne + ageA_so) * 100.0,
+						ageB_ne / (ageB_al + ageB_ne + ageB_so) * 100.0,
+						ageC_ne / (ageC_al + ageC_ne + ageC_so) * 100.0,
+						ageD_ne / (ageD_al + ageD_ne + ageD_so) * 100.0,
+						withLicense_ne
+								/ (withLicense_al + withLicense_ne + withLicense_so)
+								* 100.0,
+						withoutLicense_ne
+								/ (withoutLicense_al + withoutLicense_ne + withoutLicense_so)
+								* 100.0,
+						isEmployed_ne
+								/ (isEmployed_al + isEmployed_ne + isEmployed_so)
+								* 100.0,
+						notEmployed_ne
+								/ (notEmployed_al + notEmployed_ne + notEmployed_so)
+								* 100.0 });
 		chart.addMatsimLogo();
 		chart.saveAsPng(outputFilename + ".png", 1200, 900);
 	}
@@ -312,7 +271,8 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
 		final String outputFilename = "../runs_SVN/run669/it.1000/CarAvail";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		CarAvailStatistics cas = new CarAvailStatistics();

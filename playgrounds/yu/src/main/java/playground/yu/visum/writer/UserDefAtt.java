@@ -1,6 +1,21 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.visum.writer;
 
 /**
@@ -80,8 +95,9 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 		// attID = uda.getATTID();
 		// datenTyp = uda.getDATENTYP();
 		// nachKommaStellen = uda.getNACHKOMMASTELLEN();
-		if (NACHKOMMASTELLEN > 0)
+		if (NACHKOMMASTELLEN > 0) {
 			setPattern();
+		}
 	}
 
 	/* -----------------------------GETTER------------------------------ */
@@ -131,11 +147,12 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	/**
 	 * make UserDefAtt-object comparable
 	 * 
-	 * @param arg0 -
-	 *            an UserDefAtt-object
+	 * @param arg0
+	 *            - an UserDefAtt-object
 	 * @return the result of the comparing between ATTIDs of 2
 	 *         UserDefAtt-objects
 	 */
+	@Override
 	public int compareTo(final UserDefAtt arg0) {
 		return ATTID.compareTo(arg0.ATTID);
 	}
@@ -158,8 +175,9 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	public void setPattern() {
 		StringBuffer sb = new StringBuffer(pattern);
 		sb.append(".");
-		for (int ii = 0; ii < NACHKOMMASTELLEN; ii++)
+		for (int ii = 0; ii < NACHKOMMASTELLEN; ii++) {
 			sb.append("0");
+		}
 		pattern = sb.toString();
 	}
 }

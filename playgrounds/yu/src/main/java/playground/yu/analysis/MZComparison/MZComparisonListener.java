@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MZComparisonListener.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis.MZComparison;
 
 import org.matsim.api.core.v01.population.Population;
@@ -17,13 +33,15 @@ import org.matsim.core.controler.listener.StartupListener;
  */
 public class MZComparisonListener implements IterationEndsListener,
 		StartupListener {
-	private MZComparisonDataIO mzcdi = new MZComparisonDataIO();
+	private final MZComparisonDataIO mzcdi = new MZComparisonDataIO();
 
+	@Override
 	public void notifyStartup(StartupEvent event) {
 		mzcdi.readMZData(event.getControler().getConfig().vspExperimental()
 				.getInputMZ05File());
 	}
 
+	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int iter = event.getIteration();
 		if (iter % 100 == 0) {

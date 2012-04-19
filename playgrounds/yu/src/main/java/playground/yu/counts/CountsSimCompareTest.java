@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CountsSimCompareTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.counts;
 
 import java.io.BufferedWriter;
@@ -32,9 +48,9 @@ import org.matsim.counts.MatsimCountsReader;
 
 /**
  * quote from playground.balmermi.Scenario
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class CountsSimCompareTest {
 	private static boolean isInRange(final Id linkid, final Network net) {
@@ -44,7 +60,8 @@ public class CountsSimCompareTest {
 					+ linkid.toString());
 			return false;
 		}
-		return ((LinkImpl) l).calcDistance(net.getNodes().get(new IdImpl("2531")).getCoord()) < 30000;
+		return ((LinkImpl) l).calcDistance(net.getNodes()
+				.get(new IdImpl("2531")).getCoord()) < 30000;
 	}
 
 	/**
@@ -58,7 +75,8 @@ public class CountsSimCompareTest {
 		double countsScaleFactor = 10.0;
 
 		System.out.println("  reading the network...");
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
@@ -114,20 +132,24 @@ public class CountsSimCompareTest {
 					}
 				}
 				for (Double d : diffs) {
-					int key = ((int) d.doubleValue()) / 25 * 25;
-					if (key == 0 && d > 0)
+					int key = (int) d.doubleValue() / 25 * 25;
+					if (key == 0 && d > 0) {
 						key = 10000;
-					if (key == 0 && d < 0)
+					}
+					if (key == 0 && d < 0) {
 						key = -10000;
+					}
 					if (key >= 0) {
 						Integer num = plusDiffSet.get(key);
-						if (num == null)
+						if (num == null) {
 							num = Integer.valueOf(0);
+						}
 						plusDiffSet.put(key, num + 1);
 					} else {
 						Integer num = minusDiffSet.get(key);
-						if (num == null)
+						if (num == null) {
 							num = Integer.valueOf(0);
+						}
 						minusDiffSet.put(key, num + 1);
 					}
 				}

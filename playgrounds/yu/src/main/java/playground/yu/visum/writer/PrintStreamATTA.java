@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.visum.writer;
 
 import java.io.BufferedOutputStream;
@@ -54,12 +72,13 @@ public abstract class PrintStreamATTA extends PrintStreamVisum9_3A {
 	 * @throws IOException
 	 */
 	public void printTable() throws IOException {
-		for (UserDefAtt uda : this.udas) {
+		for (UserDefAtt uda : udas) {
 			out.writeBytes(SPRT + uda.getATTID());
 		}
 		out.writeBytes("\n");
-		for (String objId : this.udaws.keySet())
+		for (String objId : udaws.keySet()) {
 			printRow(objId);
+		}
 	}
 
 	/**
@@ -68,8 +87,8 @@ public abstract class PrintStreamATTA extends PrintStreamVisum9_3A {
 	 * attribut defined by VISUM-user without printing the tabelhead. The
 	 * function does nothing here, und must be overrided by subclasses.
 	 * 
-	 * @param objID -
-	 *            object-No., the corresponding object identification und its
+	 * @param objID
+	 *            - object-No., the corresponding object identification und its
 	 *            value of the attributs defined by VISUM-user will be print in
 	 *            a line of the table for attribut defined by VISUM-user
 	 * @throws IOException

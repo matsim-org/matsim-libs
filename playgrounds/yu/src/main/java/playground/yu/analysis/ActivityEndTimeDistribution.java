@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FirstDepartureTimeFromHomeDistribution.java
+ * ActivityEndTimeDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *

@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * TextLayer4QGIS.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.qgis;
 
 import java.io.Closeable;
@@ -43,18 +59,19 @@ public abstract class TextLayer4QGIS extends AbstractPersonAlgorithm implements
 	@Override
 	public void run(Person person) {
 		Plan plan = person.getSelectedPlan();
-		if (toll == null)
+		if (toll == null) {
 			run(plan);
-		else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
+		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
 				.getLinkId(), toll)) {
 			run(plan);
 		}
 	}
 
 	public void writeln(String s) {
-		this.writer.writeln(s);
+		writer.writeln(s);
 	}
 
+	@Override
 	public void close() {
 		writer.close();
 	}

@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.visum.filter.finalFilters;
 
 import java.util.ArrayList;
@@ -35,11 +53,14 @@ public class TraVolCal extends FinalEventFilterA {
 		if (enter instanceof LinkEnterEventImpl) {
 			count();
 			long hour = (long) (enter.getTime() / 3600);
-			if (hour > timeBinMax)
+			if (hour > timeBinMax) {
 				timeBinMax = hour;
-			if (hour < timeBinMin)
+			}
+			if (hour < timeBinMin) {
 				timeBinMin = hour;
-//			LinkEnterEvent ele = rebuildEventLinkEnter((LinkEnterEvent) enter);
+			}
+			// LinkEnterEvent ele = rebuildEventLinkEnter((LinkEnterEvent)
+			// enter);
 			String linkId = null;
 			try {
 				linkId = ((LinkEnterEvent) enter).getLinkId().toString();
@@ -51,10 +72,12 @@ public class TraVolCal extends FinalEventFilterA {
 				int traVol = 0;
 				if (traVols.containsKey(linkId)) {
 					inside = traVols.get(linkId);
-					if (inside.containsKey(hour))
+					if (inside.containsKey(hour)) {
 						traVol = inside.get(hour).intValue();
-				} else
+					}
+				} else {
 					inside = new TreeMap<Long, Double>();
+				}
 				inside.put(hour, Double.valueOf(++traVol));
 				traVols.put(linkId, inside);
 			}
@@ -63,10 +86,10 @@ public class TraVolCal extends FinalEventFilterA {
 
 	// ----------------------CONSTUCTOR---------------------------
 	/**
-	 * @param plans -
-	 *            a Plans-object in the simulation
-	 * @param network -
-	 *            a NetworkLayer-object in the simulation
+	 * @param plans
+	 *            - a Plans-object in the simulation
+	 * @param network
+	 *            - a NetworkLayer-object in the simulation
 	 */
 	public TraVolCal(final Population plans, final Network network) {
 		super(plans, network);
@@ -75,8 +98,9 @@ public class TraVolCal extends FinalEventFilterA {
 	/*-----------------OVERRIDE METHODS OF ABSTRACTED---------------- */
 	@Override
 	public List<UserDefAtt> UDAexport() {
-		if (udas.size() > 0)
+		if (udas.size() > 0) {
 			return udas;
+		}
 		for (long i = timeBinMin; i <= timeBinMax; i++) {
 			UserDefAtt uda = new UserDefAtt("LINK", i + "TO"
 					+ Long.toString(i + 1) + "TRAVOL", i + "to"
@@ -90,14 +114,15 @@ public class TraVolCal extends FinalEventFilterA {
 
 	/**
 	 * a function like
-	 * org.matsim.demandmodeling.filters.filter.finalFilters.FinalEventFilterA#UDAexport()for
-	 * Noise evaluation
-	 *
+	 * org.matsim.demandmodeling.filters.filter.finalFilters.FinalEventFilterA
+	 * #UDAexport()for Noise evaluation
+	 * 
 	 * @return a list of UserDefAtt for Noise evaluation
 	 */
 	public List<UserDefAtt> lmUDAexport() {
-		if (udas.size() > 0)
+		if (udas.size() > 0) {
 			return udas;
+		}
 		for (long i = timeBinMin; i <= timeBinMax; i++) {
 			UserDefAtt uda = new UserDefAtt("LINK", i + "TO"
 					+ Long.toString(i + 1) + "LAERM", i + "to"
@@ -111,8 +136,9 @@ public class TraVolCal extends FinalEventFilterA {
 
 	@Override
 	public Map<String, List<Double>> UDAWexport() {
-		if (udaws.size() > 0)
+		if (udaws.size() > 0) {
 			return udaws;
+		}
 		for (String linkID : traVols.keySet()) {
 			List<Double> udaw = new ArrayList<Double>();
 			for (UserDefAtt uda : udas) {
@@ -126,15 +152,16 @@ public class TraVolCal extends FinalEventFilterA {
 
 	/**
 	 * a function like
-	 * org.matsim.demandmodeling.filters.filter.finalFilters.FinalEventFilterA#UDAWexport()
-	 * for noise evaluation
-	 *
+	 * org.matsim.demandmodeling.filters.filter.finalFilters.FinalEventFilterA
+	 * #UDAWexport() for noise evaluation
+	 * 
 	 * @return the TreeMap of values of attributs defined by VISUM9.3-user, but
 	 *         only for noise evaluation
 	 */
 	public Map<String, List<Double>> lmUDAWexport() {
-		if (udaws.size() > 0)
+		if (udaws.size() > 0) {
 			return udaws;
+		}
 		for (String linkID : traVols.keySet()) {
 			List<Double> udaw = new ArrayList<Double>();
 			for (UserDefAtt uda : udas) {

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Run.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,38 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.smearLinkUtilOffsets;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurnWithUnitiveStdDev.withoutAddMeasure;
 
-public class ArrayUtils {
-	public static int[][] complete(int[][] array) {
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] == null) {
-				array[i] = new int[] {};
-			}
-		}
-		return array;
-	}
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 
+import playground.yu.analysis.RouteTravelTimeSummary;
+import playground.yu.counts.CntSimCap4Chart;
+
+/**
+ * @author yu
+ * 
+ */
+public class PC_Run {
+	/** @param args */
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		int[][] array = new int[4][];
-		array[0] = new int[4];
-		array[2] = new int[1];
-		array[3] = new int[3];
-
-		complete(array);
-
-		System.out.println("array:");
-		for (int i = 0; i < array.length; i++) {
-			System.out.println("row:\t" + i + "\t" + array[i]);
-			for (int j = 0; j < array[i].length; j++) {
-				System.out.println("row:\t" + i + "\tcol:\t" + j + "\t"
-						+ array[i][j]);
-			}
+	public static void main(final String[] args) {
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Controler ctl = new PCCtlwithLeftTurnPenalty(config);
+		if (args.length > 1 && Boolean.parseBoolean(args[1])) {
+			ctl.addControlerListener(new CntSimCap4Chart());
+			ctl.addControlerListener(new RouteTravelTimeSummary());
 		}
-		System.out.println("a[1].length =\t" + array[1].length);
+		// TODO set in config
+		// ctl.addControlerListener(new QVProfilControlerListener());
+
+		ctl.setCreateGraphs(false);
+		ctl.setOverwriteFiles(true);
+		ctl.run();
 	}
 
 }

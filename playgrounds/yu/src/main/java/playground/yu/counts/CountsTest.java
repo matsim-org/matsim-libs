@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CountsTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.counts;
 
 import java.util.Map;
@@ -47,8 +63,9 @@ public class CountsTest {
 				System.out.println(output);
 			}
 		}
-		for (int i = 0; i < 24; i++)
-			System.out.println((i + 1) + "\t" + countsSummeValueofTime[i]);
+		for (int i = 0; i < 24; i++) {
+			System.out.println(i + 1 + "\t" + countsSummeValueofTime[i]);
+		}
 
 		System.out.println("--> Done!");
 		Gbl.printElapsedTime();

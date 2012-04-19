@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ModeWithNewAttributeTextLayer4QGIS.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.qgis;
 
 import org.matsim.api.core.v01.Coord;
@@ -21,7 +37,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 	private int count, car6hCount, pt6hCount;
@@ -44,16 +60,18 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		Activity act = ((PlanImpl) plan).getFirstActivity();
 		Coord homeLoc = act.getCoord();
 		double endTime = act.getEndTime();
-//		double travelTime = ((PlanImpl) plan).getNextLeg(act).getTravelTime();
-		this.travelTime += travelTime;
+		// double travelTime = ((PlanImpl)
+		// plan).getNextLeg(act).getTravelTime();
+		travelTime += travelTime;
 		String mode = "";
 
-		if (PlanModeJudger.useCar(plan))
+		if (PlanModeJudger.useCar(plan)) {
 			mode = TransportMode.car;
-		else if (PlanModeJudger.usePt(plan))
+		} else if (PlanModeJudger.usePt(plan)) {
 			mode = TransportMode.pt;
-		else if (PlanModeJudger.useWalk(plan))
+		} else if (PlanModeJudger.useWalk(plan)) {
 			mode = TransportMode.walk;
+		}
 
 		if (endTime ==
 		// 21600.0
@@ -61,10 +79,12 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 			writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode
 					+ "\t6\t" + travelTime);
 			am6hTravelTime += travelTime;
-			if (mode.equals(TransportMode.car))
+			if (mode.equals(TransportMode.car)) {
 				car6hCount++;
-			if (mode.equals(TransportMode.pt))
+			}
+			if (mode.equals(TransportMode.pt)) {
 				pt6hCount++;
+			}
 		} else {
 			writer.writeln(homeLoc.getX() + "\t" + homeLoc.getY() + "\t" + mode
 					+ "\t0\t" + travelTime);
@@ -100,7 +120,8 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		final String plansFilename = "../matsimTests/timeAllocationMutatorTest/it.100/100.plans.xml.gz";
 		final String textFilename = "../matsimTests/timeAllocationMutatorTest/it.100/mode_1.endTime.txt";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();

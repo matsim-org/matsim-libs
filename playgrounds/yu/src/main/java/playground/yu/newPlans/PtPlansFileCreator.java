@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PtPlansFileCreator.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.newPlans;
 
 import java.util.ArrayList;
@@ -30,7 +46,7 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * @author yu
- *
+ * 
  */
 public class PtPlansFileCreator {
 	private int personCount = 0;
@@ -45,13 +61,13 @@ public class PtPlansFileCreator {
 	}
 
 	public Population getPop() {
-		return this.pop;
+		return pop;
 	}
 
 	private Network network = null;
 
 	public Network getNetwork() {
-		return this.network;
+		return network;
 	}
 
 	/**
@@ -71,8 +87,7 @@ public class PtPlansFileCreator {
 		createNorthBus245Person("05:58");
 		for (int i = 6; i < 20; i++) {
 			for (int j = 0; j < 6; j++) {
-				createNorthBus245Person(((i < 10) ? ("0" + i) : i) + ":" + j
-						+ "8");
+				createNorthBus245Person((i < 10 ? "0" + i : i) + ":" + j + "8");
 			}
 		}
 		for (int i = 20; i < 24; i++) {
@@ -94,8 +109,7 @@ public class PtPlansFileCreator {
 
 		for (int i = 7; i < 19; i++) {
 			for (int j = 0; j < 6; j++) {
-				createSouthBus245Person(((i < 10) ? ("0" + i) : i) + ":" + j
-						+ "0");
+				createSouthBus245Person((i < 10 ? "0" + i : i) + ":" + j + "0");
 			}
 		}
 
@@ -116,8 +130,9 @@ public class PtPlansFileCreator {
 
 	public List<Link> getSrcRoute(final int[] nodes) {
 		List<Node> srcRoute = new ArrayList<Node>();
-		for (int i = 0; i < nodes.length; i++)
-			srcRoute.add(this.network.getNodes().get(new IdImpl(nodes[i])));
+		for (int i = 0; i < nodes.length; i++) {
+			srcRoute.add(network.getNodes().get(new IdImpl(nodes[i])));
+		}
 		return RouteUtils.getLinksFromNodes(srcRoute);
 	}
 
@@ -143,7 +158,7 @@ public class PtPlansFileCreator {
 	private void createPtPerson(final String startLinkId, final String endTime,
 			final String endLinkId, final List<Link> srcRoute) {
 
-		PersonImpl p = new PersonImpl(new IdImpl("245-" + this.personCount));
+		PersonImpl p = new PersonImpl(new IdImpl("245-" + personCount));
 		try {
 			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(pl);
@@ -156,10 +171,11 @@ public class PtPlansFileCreator {
 			leg.setRoute(route);
 			Id endLinkID = new IdImpl(endLinkId);
 			pl.createAndAddActivity("w", endLinkID);
-			route.setLinkIds(startLinkID, NetworkUtils.getLinkIds(srcRoute), endLinkID);
-			this.pop.addPerson(p);
-			this.personCount++;
-			System.out.println("i have " + this.pop.getPersons().size()
+			route.setLinkIds(startLinkID, NetworkUtils.getLinkIds(srcRoute),
+					endLinkID);
+			pop.addPerson(p);
+			personCount++;
+			System.out.println("i have " + pop.getPersons().size()
 					+ " persons\t" + startLinkId + "\t" + endTime + "\t"
 					+ endLinkId);
 		} catch (Exception e) {
@@ -175,7 +191,8 @@ public class PtPlansFileCreator {
 		String newPlansFilename = "output/bvg/245.xml.gz";
 		String netFilename = "test/scenarios/berlin/network.xml.gz";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 
 		PtPlansFileCreator pfc = new PtPlansFileCreator();
 		pfc.setNetwork(scenario.getNetwork());

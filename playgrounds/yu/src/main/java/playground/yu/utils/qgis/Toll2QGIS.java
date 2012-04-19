@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Toll2QGIS.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.qgis;
 
 import java.util.Collection;
@@ -31,7 +47,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 	}
 
 	public static class Toll2PolygonGraph extends Network2PolygonGraph {
-		private RoadPricingScheme toll;
+		private final RoadPricingScheme toll;
 
 		public Toll2PolygonGraph(Network network,
 				CoordinateReferenceSystem crs, RoadPricingScheme toll) {
@@ -42,17 +58,17 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 		@Override
 		public Collection<Feature> getFeatures() throws SchemaException,
 				NumberFormatException, IllegalAttributeException {
-			for (int i = 0; i < attrTypes.size(); i++)
+			for (int i = 0; i < attrTypes.size(); i++) {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
+			}
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 
 			for (Id linkId : toll.getLinkIdSet()) {
 				Link link = network.getLinks().get(linkId);
 				// if (link != null) {
 				LinearRing lr = getLinearRing(link);
-				Polygon p = new Polygon(lr, null, this.geofac);
-				MultiPolygon mp = new MultiPolygon(new Polygon[] { p },
-						this.geofac);
+				Polygon p = new Polygon(lr, null, geofac);
+				MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);
 				int size = 8 + parameters.size();
 				Object[] o = new Object[size];
 				o[0] = mp;
@@ -62,7 +78,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				o[4] = link.getLength();
 				o[5] = link.getCapacity() / network.getCapacityPeriod()
 						* 3600.0;
-				o[6] = (((LinkImpl) link).getType() != null) ? Integer
+				o[6] = ((LinkImpl) link).getType() != null ? Integer
 						.parseInt(((LinkImpl) link).getType()) : 0;
 				o[7] = link.getFreespeed();
 				for (int i = 0; i < parameters.size(); i++) {

@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MREtext2Graph.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.tests;
 
 import playground.yu.utils.charts.XYScatterLineChart;
@@ -39,10 +55,12 @@ public class MREtext2Graph {
 		XYScatterLineChart chart = new XYScatterLineChart("", "Hour",
 				"Mean rel. error [%]");
 		double[] xs = new double[24];
-		for (int i = 0; i < 24; i++)
-			xs[i] = (double) (i + 1);
-		for (int i = 0; i < 24; i++)
+		for (int i = 0; i < 24; i++) {
+			xs[i] = (i + 1);
+		}
+		for (int i = 0; i < 24; i++) {
 			System.out.println(xs[i] + "\t" + mre[i]);
+		}
 		chart.addSeries("Mean rel. error", xs, mre);
 		chart.saveAsPng(outputPlot, 640, 480);
 	}

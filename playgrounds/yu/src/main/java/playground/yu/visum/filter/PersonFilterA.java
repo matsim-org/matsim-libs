@@ -1,6 +1,21 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.visum.filter;
 
 import org.matsim.api.core.v01.population.Person;
@@ -15,32 +30,40 @@ import org.matsim.api.core.v01.population.Person;
  * @author yu chen
  */
 public abstract class PersonFilterA extends Filter implements PersonFilterI {
-	/* -------------------MEMBER VARIRABLE----------------------
+	/*
+	 * -------------------MEMBER VARIRABLE----------------------
 	 */
 	private PersonFilterI nextPersonFilter = null;
 
-	/* ---------------------------SETTER---------------------------*/
+	/* ---------------------------SETTER--------------------------- */
 	/**
 	 * This function is normally called in TestRun-Function, e.g. void
-	 * org.matsim.playground.filters.test.PersonFilterTest.testRunIDandActTypeundDepTimeFilter()
+	 * org.matsim.playground.filters.test.PersonFilterTest.
+	 * testRunIDandActTypeundDepTimeFilter()
 	 * 
 	 * @param nextFilter
 	 *            The nextFilter to set.
 	 */
+	@Override
 	public void setNextFilter(PersonFilterI nextFilter) {
-		this.nextPersonFilter = nextFilter;
+		nextPersonFilter = nextFilter;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.matsim.demandmodeling.plans.algorithms.PersonAlgorithm#run(org.matsim.demandmodeling.plans.Person)
-	 *      ----------------------------RUNNER--------------------------
-	 *      000000000000000000000000000000000000000000000000000000000000
-	 *      @Attention: the last PersonFilterA must override the playground.yu.integration.cadyts.demandCalibration.withCarCounts.run(Person
-	 *      person) function
-	 *      000000000000000000000000000000000000000000000000000000000000
+	 * @see
+	 * org.matsim.demandmodeling.plans.algorithms.PersonAlgorithm#run(org.matsim
+	 * .demandmodeling.plans.Person)
+	 * ----------------------------RUNNER--------------------------
+	 * 000000000000000000000000000000000000000000000000000000000000
+	 * 
+	 * @Attention: the last PersonFilterA must override the
+	 * playground.yu.integration
+	 * .cadyts.demandCalibration.withCarCounts.run(Person person) function
+	 * 000000000000000000000000000000000000000000000000000000000000
 	 */
+	@Override
 	public void run(Person person) {
 		if (judge(person)) {
 			count();
@@ -60,7 +83,9 @@ public abstract class PersonFilterA extends Filter implements PersonFilterI {
 	 * This function must be implemented by subclass, inside which some special
 	 * criteria will be provided.
 	 * 
-	 * @param person A person to be judged.
+	 * @param person
+	 *            A person to be judged.
 	 */
+	@Override
 	public abstract boolean judge(Person person);
 }

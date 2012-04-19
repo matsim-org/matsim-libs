@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MZ05EtappenReader.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.io;
 
 import java.util.HashSet;
@@ -41,8 +57,9 @@ public class MZ05EtappenReader implements TabularFileHandler {
 	}
 
 	private void reset(final String personId) {
-		if (!changePerson)
+		if (!changePerson) {
 			append();
+		}
 		changePerson = false;
 		tmpPersonId = personId;
 		tmpEtappenDists.clear();
@@ -76,14 +93,16 @@ public class MZ05EtappenReader implements TabularFileHandler {
 		}
 	}
 
+	@Override
 	public void startRow(final String[] row) {
 		String personId = row[0] + row[1];
-		if (tmpPersonId == null)
+		if (tmpPersonId == null) {
 			reset(personId);
-		else if (!tmpPersonId.equals(personId))
+		} else if (!tmpPersonId.equals(personId)) {
 			reset(personId);
-		else if (changePerson)
+		} else if (changePerson) {
 			return;
+		}
 
 		String e_dist_obj = row[37];
 		String F510 = row[6];
@@ -92,24 +111,28 @@ public class MZ05EtappenReader implements TabularFileHandler {
 			if (tmpEtappeDist >= 0) {
 				tmpEtappenDists.add(tmpEtappeDist);
 				int mode = Integer.parseInt(F510);
-				if (mode >= 1 && mode <= 3)
+				if (mode >= 1 && mode <= 3) {
 					tmpELV++;
-				else if (mode >= 4 && mode <= 8)
+				} else if (mode >= 4 && mode <= 8) {
 					tmpEMIV++;
-				else if (mode >= 9 && mode <= 12)
+				} else if (mode >= 9 && mode <= 12) {
 					tmpEOeV++;
-				else
+				} else {
 					tmpEOthers++;
+				}
 				if (row[14] != null) {
 					if (row[14].equals("1")) {
-						if (tmpPersonKantonZurichId == null)
+						if (tmpPersonKantonZurichId == null) {
 							resetKantonZurich(personId);
-						else if (!tmpPersonKantonZurichId.equals(personId))
+						} else if (!tmpPersonKantonZurichId.equals(personId)) {
 							resetKantonZurich(personId);
-					} else
+						}
+					} else {
 						belongs2KantonZurich = false;
-				} else
+					}
+				} else {
 					belongs2KantonZurich = false;
+				}
 			} else {
 				changePerson = true;
 				return;
@@ -121,8 +144,9 @@ public class MZ05EtappenReader implements TabularFileHandler {
 	}
 
 	public void write() {
-		if (!changePerson)
+		if (!changePerson) {
 			append();
+		}
 		double avgE_DIST_OBJ = e_dist_obj / eCnt;
 		double avgE_DIST_OBJ_KantonZurich = e_dist_obj_KantonZurich
 				/ eCnt_KantonZurich;
@@ -170,8 +194,8 @@ public class MZ05EtappenReader implements TabularFileHandler {
 
 		MZ05EtappenReader mz05er = new MZ05EtappenReader(outputBase);
 
-        new TabularFileParser().parse(tfpc, mz05er);
+		new TabularFileParser().parse(tfpc, mz05er);
 
-        mz05er.write();
+		mz05er.write();
 	}
 }

@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Filter.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.visum.filter;
 
 /**
@@ -20,11 +36,12 @@ public class Filter implements FilterI {
 	 */
 	/**
 	 * This function is called inside function: void
-	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(Event
-	 * event) and void
+	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(Event event)
+	 * and void
 	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(Event
 	 * event), if this Filter is not the last one.
 	 */
+	@Override
 	public void count() {
 		count++;
 	}
@@ -35,6 +52,7 @@ public class Filter implements FilterI {
 	 * 
 	 * @see org.matsim.demandmodeling.filters.filter.FilterI#getCount()
 	 */
+	@Override
 	public int getCount() {
 		return count;
 	}

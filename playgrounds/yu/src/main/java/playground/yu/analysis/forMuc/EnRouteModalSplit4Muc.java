@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * EnRouteModalSplit4Muc.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis.forMuc;
 
 import java.io.BufferedWriter;
@@ -126,8 +142,8 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		internalHandleEvent(event, arr, carArr, ptArr, wlkArr,
-				bikeArr, rideArr, othersArr);
+		internalHandleEvent(event, arr, carArr, ptArr, wlkArr, bikeArr,
+				rideArr, othersArr);
 	}
 
 	@Override
@@ -138,8 +154,8 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 			itg = Integer.valueOf(-1);
 		}
 		legCounts.put(id, itg.intValue() + 1);
-		internalHandleEvent(event, dep, carDep, ptDep, wlkDep,
-				bikeDep, rideDep, othersDep);
+		internalHandleEvent(event, dep, carDep, ptDep, wlkDep, bikeDep,
+				rideDep, othersDep);
 	}
 
 	@Override
@@ -177,30 +193,26 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 	public void write(final BufferedWriter bw) {
 		calcOnRoute();
 		try {
-			bw
-					.write("time\ttimeBin\t"
-							+ "departures\tarrivals\tstuck\ton_route\t"
-							+ "carDepartures\tcarArrivals\tcarStuck\tcarOnRoute\t"
-							+ "ptDepartures\tptArrivals\tptStuck\tptOnRoute\t"
-							+ "walkDepartures\twalkArrivals\twalkStuck\twalkOnRoute\t"
-							+ "bikeDepartures\tbikeArrivals\tbikeStuck\tbikeOnRoute\t"
-							+ "rideDepartures\trideArrivals\trideStuck\trideOnRoute\t"
-							+ "othersDepartures\tothersArrivals\tothersStuck\tothersOnRoute\n");
+			bw.write("time\ttimeBin\t"
+					+ "departures\tarrivals\tstuck\ton_route\t"
+					+ "carDepartures\tcarArrivals\tcarStuck\tcarOnRoute\t"
+					+ "ptDepartures\tptArrivals\tptStuck\tptOnRoute\t"
+					+ "walkDepartures\twalkArrivals\twalkStuck\twalkOnRoute\t"
+					+ "bikeDepartures\tbikeArrivals\tbikeStuck\tbikeOnRoute\t"
+					+ "rideDepartures\trideArrivals\trideStuck\trideOnRoute\t"
+					+ "othersDepartures\tothersArrivals\tothersStuck\tothersOnRoute\n");
 			for (int i = 0; i < dep.length; i++) {
-				bw.write(Time.writeTime(i * binSize) + "\t"
-						+ i * binSize + "\t" + dep[i] + "\t"
-						+ arr[i] + "\t" + stuck[i] + "\t"
-						+ enRoute[i] + "\t" + carDep[i] + "\t"
-						+ carArr[i] + "\t" + carStuck[i] + "\t"
-						+ carEnRoute[i] + "\t" + ptDep[i] + "\t"
-						+ ptArr[i] + "\t" + 0 + "\t" + ptEnRoute[i]
-						+ "\t" + wlkDep[i] + "\t" + wlkArr[i] + "\t"
-						+ 0 + "\t" + wlkEnRoute[i] + "\t"
-						+ bikeDep[i] + "\t" + bikeArr[i] + "\t" + 0
-						+ "\t" + bikeEnRoute[i] + "\t" + rideDep[i]
-						+ "\t" + rideArr[i] + "\t" + rideStuck[i]
-						+ "\t" + rideEnRoute[i] + "\t" + othersDep[i]
-						+ "\t" + othersArr[i] + "\t" + 0 + "\t"
+				bw.write(Time.writeTime(i * binSize) + "\t" + i * binSize
+						+ "\t" + dep[i] + "\t" + arr[i] + "\t" + stuck[i]
+						+ "\t" + enRoute[i] + "\t" + carDep[i] + "\t"
+						+ carArr[i] + "\t" + carStuck[i] + "\t" + carEnRoute[i]
+						+ "\t" + ptDep[i] + "\t" + ptArr[i] + "\t" + 0 + "\t"
+						+ ptEnRoute[i] + "\t" + wlkDep[i] + "\t" + wlkArr[i]
+						+ "\t" + 0 + "\t" + wlkEnRoute[i] + "\t" + bikeDep[i]
+						+ "\t" + bikeArr[i] + "\t" + 0 + "\t" + bikeEnRoute[i]
+						+ "\t" + rideDep[i] + "\t" + rideArr[i] + "\t"
+						+ rideStuck[i] + "\t" + rideEnRoute[i] + "\t"
+						+ othersDep[i] + "\t" + othersArr[i] + "\t" + 0 + "\t"
 						+ othersEnRoute[i] + "\t");
 			}
 		} catch (IOException e) {
@@ -315,7 +327,8 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		chartFilename = args[4], // "../matsimTests/analysis/";
 		tollFilename = args[5];
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);

@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.visum.test;
 
 import java.util.ArrayList;
@@ -28,7 +46,8 @@ public class NewPlansTest {
 	public static void testRun(Config config) {
 
 		System.out.println("TEST RUN ---FilterTest---:");
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(config);
 		// reading all available input
 
 		System.out.println("  reading network xml file... ");
@@ -157,7 +176,9 @@ public class NewPlansTest {
 	 */
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
-		Config config = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario().getConfig();
+		Config config = ScenarioLoaderImpl
+				.createScenarioLoaderImplAndResetRandomSeed(args[0])
+				.loadScenario().getConfig();
 		testRun(config);
 		Gbl.printElapsedTime();
 	}

@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ModeTextLayer4QGIS.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.qgis;
 
 import org.matsim.api.core.v01.Coord;
@@ -21,11 +37,11 @@ import playground.yu.analysis.PlanModeJudger;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 	/**
-	 *dummy constructor, please don't use it.
+	 * dummy constructor, please don't use it.
 	 */
 	public ModeTextLayer4QGIS() {
 
@@ -71,14 +87,16 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		// final String textFilename =
 		// "../matsimTests/scoringTest/output/ITERS/it.100/mode.txt";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
+				scenario.getRoadPricingScheme());
 		tollReader.parse(tollFilename);
 
 		ModeTextLayer4QGIS mtl = new ModeTextLayer4QGIS(textFilename,

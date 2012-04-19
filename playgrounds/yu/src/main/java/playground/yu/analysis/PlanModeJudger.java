@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PlanModeJudger.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis;
 
 import java.util.Iterator;
@@ -13,9 +29,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 /**
  * judge, which transport mode was taken. This class can only be used with
  * plansfile, in that an agent only can take one transport mode in a day.
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class PlanModeJudger {
 	private static boolean useMode(Plan plan, String mode) {
@@ -44,8 +60,9 @@ public class PlanModeJudger {
 					if (!tmpMode.equals(tmpMode2)) {
 						return "undefined";
 					}
-				} else
+				} else {
 					tmpMode = tmpMode2;
+				}
 			}
 		}
 		return tmpMode;

@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CountsSimCompareDayTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.counts;
 
 import java.io.BufferedWriter;
@@ -26,9 +42,9 @@ import org.matsim.counts.MatsimCountsReader;
 
 /**
  * quote from playground.balmermi.Scenario
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class CountsSimCompareDayTest {
 
@@ -43,7 +59,8 @@ public class CountsSimCompareDayTest {
 		double countsScaleFactor = 10.0;
 
 		System.out.println("  reading the network...");
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
@@ -60,9 +77,8 @@ public class CountsSimCompareDayTest {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputPath
 					+ "24h.txt.gz");
-			writer
-					.write("linkId\t"
-							+ "X\tY\tcountValue\tsimValue\tdeviation((sim-count)/count)\n");
+			writer.write("linkId\t"
+					+ "X\tY\tcountValue\tsimValue\tdeviation((sim-count)/count)\n");
 			for (Id linkId : counts.getCounts().keySet()) {
 				Count count = counts.getCount(linkId);
 				Link link = network.getLinks().get(linkId);
@@ -71,8 +87,8 @@ public class CountsSimCompareDayTest {
 					Coord fromCoord = link.getFromNode().getCoord();
 					double x = 0.7 * toCoord.getX() + 0.3 * fromCoord.getX();
 					double y = 0.7 * toCoord.getY() + 0.3 * fromCoord.getY();
-					if ((x != 0 && y != 0)
-							&& (va.getVolumesForLink(linkId) != null)) {
+					if (x != 0 && y != 0
+							&& va.getVolumesForLink(linkId) != null) {
 						double countVal = 0.0;
 						double simVal = 0.0;
 						for (int h = 0; h < 24; h++) {

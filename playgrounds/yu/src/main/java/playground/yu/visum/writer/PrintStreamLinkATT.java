@@ -1,6 +1,21 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.visum.writer;
 
 import java.io.IOException;
@@ -16,7 +31,7 @@ import playground.yu.visum.filter.finalFilters.FinalEventFilterA;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class PrintStreamLinkATT extends PrintStreamATTA {
 	/*------------------------MEMBER VARIABLE-----------------*/
@@ -36,16 +51,19 @@ public class PrintStreamLinkATT extends PrintStreamATTA {
 	public void printRow(String linkID) throws IOException {
 		try {
 			Link link = network.getLinks().get(new IdImpl(linkID));
-			if (link == null)
+			if (link == null) {
 				return;
-			out.writeBytes(((LinkImpl) link).getOrigId() + SPRT + link.getFromNode().getId()
-					+ SPRT + link.getToNode().getId());
+			}
+			out.writeBytes(((LinkImpl) link).getOrigId() + SPRT
+					+ link.getFromNode().getId() + SPRT
+					+ link.getToNode().getId());
 			int i = 0;
 			List<Double> udawList = udaws.get(linkID);
 			for (Double udaw : udawList) {
 				DoubleDF.applyPattern(udas.get(i).getPattern());
-				if (udaw == null)
+				if (udaw == null) {
 					udaw = 0.0;
+				}
 				out.writeBytes(SPRT + DoubleDF.format(udaw));
 				i++;
 			}

@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.visum.filter;
 
 import java.util.List;
@@ -16,11 +34,11 @@ import org.matsim.core.utils.misc.RouteUtils;
 /**
  * transfer the "right" persons to next PersonFilter. These "right" persons
  * don't move on false links and nodes, which should not exist in network(file).
- *
+ * 
  * beurteilen, ob Personen auf nicht existierende Links oder durch nicht
  * existierende Nodes fahren oder andere Aktivitaeten durchfuehren. Die
  * richtigen Personen wurden hier zur NewPlansWriter übertragen.
- *
+ * 
  * @author yu chen
  */
 public class PersonRouteFilter extends PersonFilterA {
@@ -39,16 +57,17 @@ public class PersonRouteFilter extends PersonFilterA {
 	/**
 	 * create a PersonFilter, which deletes Persons moving or staying on some
 	 * links and nodes, which should not exist.
-	 *
-	 * @param linkIds -
-	 *            a list of link-IDs, which should not exist in network-file.
-	 * @param nodeIds -
-	 *            a list of node-IDs, which should not exist in network-file
+	 * 
+	 * @param linkIds
+	 *            - a list of link-IDs, which should not exist in network-file.
+	 * @param nodeIds
+	 *            - a list of node-IDs, which should not exist in network-file
 	 * @param network
 	 */
-	public PersonRouteFilter(final List<Id> linkIds, final List<Id> nodeIds, final Network network) {
-		this.criterionLinkIds = linkIds;
-		this.criterionNodeIds = nodeIds;
+	public PersonRouteFilter(final List<Id> linkIds, final List<Id> nodeIds,
+			final Network network) {
+		criterionLinkIds = linkIds;
+		criterionNodeIds = nodeIds;
 		this.network = network;
 	}
 
@@ -69,23 +88,28 @@ public class PersonRouteFilter extends PersonFilterA {
 						NetworkRoute route = (NetworkRoute) leg.getRoute();
 						if (route != null) {
 							List<Id> linkIds = route.getLinkIds();
-							if (linkIds != null)
+							if (linkIds != null) {
 								for (Id linkId : linkIds) {
-									if (this.criterionLinkIds.contains(linkId))
+									if (criterionLinkIds.contains(linkId)) {
 										return false;
+									}
 								}
-							List<Node> nodes = RouteUtils.getNodes(route, this.network);
-							if (nodes != null)
+							}
+							List<Node> nodes = RouteUtils.getNodes(route,
+									network);
+							if (nodes != null) {
 								for (Node node : nodes) {
-									if (this.criterionNodeIds.contains(node
-											.getId()))
+									if (criterionNodeIds.contains(node.getId())) {
 										return false;
+									}
 								}
+							}
 						}
 					} else {
 						ActivityImpl act = (ActivityImpl) obj;
-						if (this.criterionLinkIds.contains(act.getLinkId()))
+						if (criterionLinkIds.contains(act.getLinkId())) {
 							return false;
+						}
 					}
 					even = !even;
 				}

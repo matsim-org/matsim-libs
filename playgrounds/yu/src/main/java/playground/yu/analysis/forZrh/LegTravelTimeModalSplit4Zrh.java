@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * LegTravelTimeModalSplit4Zrh.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis.forZrh;
 
 import org.matsim.api.core.v01.network.Network;
@@ -26,9 +42,9 @@ import playground.yu.utils.io.SimpleWriter;
 /**
  * compute average leg travel Time of Zurich and Kanton Zurich respectively with
  * through traffic
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 
@@ -57,29 +73,29 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 
 	@Override
 	protected void internalCompute(String agentId, double arrTime) {
-		Double dptTime = this.tmpDptTimes.remove(agentId);
+		Double dptTime = tmpDptTimes.remove(agentId);
 		if (dptTime != null) {
 			int binIdx = getBinIndex(arrTime);
 			double travelTime = arrTime - dptTime;
-			this.travelTimes[binIdx] += travelTime;
-			this.arrCount[binIdx]++;
+			travelTimes[binIdx] += travelTime;
+			arrCount[binIdx]++;
 
 			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
 			if (Integer.parseInt(agentId) < 1000000000) {
 				if (PlanModeJudger.useCar(selectedplan)) {
-					this.carTravelTimes[binIdx] += travelTime;
-					this.carArrCount[binIdx]++;
+					carTravelTimes[binIdx] += travelTime;
+					carArrCount[binIdx]++;
 				} else if (PlanModeJudger.usePt(selectedplan)) {
-					this.ptTravelTimes[binIdx] += travelTime;
-					this.ptArrCount[binIdx]++;
+					ptTravelTimes[binIdx] += travelTime;
+					ptArrCount[binIdx]++;
 				} else if (PlanModeJudger.useWalk(selectedplan)) {
 					wlkTravelTimes[binIdx] += travelTime;
 					wlkArrCount[binIdx]++;
 				}
 			} else {
-				this.throughTravelTimes[binIdx] += travelTime;
-				this.throughArrCount[binIdx]++;
+				throughTravelTimes[binIdx] += travelTime;
+				throughArrCount[binIdx]++;
 			}
 		}
 	}
@@ -87,75 +103,54 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 	@Override
 	public void write(final String filename) {
 		SimpleWriter sw = new SimpleWriter(filename);
-		sw
-				.writeln("time\ttimeBin"
-						+ "\tall_traveltimes [s]\tn._arrivals\tavg. traveltimes [s]"
-						+ "\tcar_traveltimes [s]\tcar_n._arrivals\tcar_avg. traveltimes [s]"
-						+ "\tpt_traveltimes [s]\tpt_n._arrivals\tpt_avg. traveltimes [s]"
-						+ "\twalk_traveltimes [s]\twalk_n._arrivals\twalk_avg. traveltimes [s]"
-						+ "\tthrough_traveltimes [s]\tthrough_n._arrivals\tthrough_avg. traveltimes [s]");
-		for (int i = 0; i < this.travelTimes.length; i++)
-			sw.writeln(Time.writeTime(i * this.binSize) + "\t"
-					+ i * this.binSize + "\t" + this.travelTimes[i] + "\t"
-					+ this.arrCount[i] + "\t"
-					+ this.travelTimes[i] / this.arrCount[i] + "\t"
-					+ this.carTravelTimes[i] + "\t" + this.carArrCount[i]
-					+ "\t"
-					+ this.carTravelTimes[i] / this.carArrCount[i]
-					+ "\t" + this.ptTravelTimes[i] + "\t" + this.ptArrCount[i]
-					+ "\t"
-					+ this.ptTravelTimes[i] / this.ptArrCount[i]
-					+ this.wlkTravelTimes[i] + "\t" + this.wlkArrCount[i]
-					+ "\t" + this.wlkTravelTimes[i]
-					/ this.wlkArrCount[i] + this.throughTravelTimes[i]
-					+ "\t" + this.throughArrCount[i] + "\t"
-					+ this.throughTravelTimes[i]
-					/ this.throughArrCount[i]);
+		sw.writeln("time\ttimeBin"
+				+ "\tall_traveltimes [s]\tn._arrivals\tavg. traveltimes [s]"
+				+ "\tcar_traveltimes [s]\tcar_n._arrivals\tcar_avg. traveltimes [s]"
+				+ "\tpt_traveltimes [s]\tpt_n._arrivals\tpt_avg. traveltimes [s]"
+				+ "\twalk_traveltimes [s]\twalk_n._arrivals\twalk_avg. traveltimes [s]"
+				+ "\tthrough_traveltimes [s]\tthrough_n._arrivals\tthrough_avg. traveltimes [s]");
+		for (int i = 0; i < travelTimes.length; i++) {
+			sw.writeln(Time.writeTime(i * binSize) + "\t" + i * binSize + "\t"
+					+ travelTimes[i] + "\t" + arrCount[i] + "\t"
+					+ travelTimes[i] / arrCount[i] + "\t" + carTravelTimes[i]
+					+ "\t" + carArrCount[i] + "\t"
+					+ carTravelTimes[i] / carArrCount[i] + "\t"
+					+ ptTravelTimes[i] + "\t" + ptArrCount[i] + "\t"
+					+ ptTravelTimes[i] / ptArrCount[i] + wlkTravelTimes[i]
+					+ "\t" + wlkArrCount[i] + "\t" + wlkTravelTimes[i]
+					/ wlkArrCount[i] + throughTravelTimes[i] + "\t"
+					+ throughArrCount[i] + "\t" + throughTravelTimes[i]
+					/ throughArrCount[i]);
+		}
 		sw.write("----------------------------------------\n");
 		double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0, wlkTtSum = 0.0, otherTtSum = 0.0;
 		int nTrips = 0, nCarTrips = 0, nPtTrips = 0, nWlkTrips = 0, nOtherTrips = 0;
-		for (int i = 0; i < this.travelTimes.length; i++) {
-			ttSum += this.travelTimes[i];
-			carTtSum += this.carTravelTimes[i];
-			ptTtSum += this.ptTravelTimes[i];
-			wlkTtSum += this.wlkTravelTimes[i];
+		for (int i = 0; i < travelTimes.length; i++) {
+			ttSum += travelTimes[i];
+			carTtSum += carTravelTimes[i];
+			ptTtSum += ptTravelTimes[i];
+			wlkTtSum += wlkTravelTimes[i];
 			otherTtSum += throughTravelTimes[i];
 
-			nTrips += this.arrCount[i];
-			nCarTrips += this.carArrCount[i];
-			nPtTrips += this.ptArrCount[i];
+			nTrips += arrCount[i];
+			nCarTrips += carArrCount[i];
+			nPtTrips += ptArrCount[i];
 			nWlkTrips += wlkArrCount[i];
 			nOtherTrips += throughArrCount[i];
 		}
-		sw
-				.writeln("the sum of all the traveltimes [s]: "
-						+ ttSum
-						+ "\n"
-						+ "the number of all the Trips: "
-						+ nTrips
-						+ "\n"
-						+ "the sum of all the drivers traveltimes [s]: "
-						+ carTtSum
-						+ "\n"
-						+ "the number of all the drivers Trips: "
-						+ nCarTrips
-						+ "\n"
-						+ "the sum of all the public transit unsers traveltimes [s]: "
-						+ ptTtSum
-						+ "\n"
-						+ "the number of all the public users Trips: "
-						+ nPtTrips
-						+ "\n"
-						+ "the sum of all the walkers traveltimes [s]: "
-						+ wlkTtSum
-						+ "\n"
-						+ "the number of all the walkers Trips: "
-						+ nWlkTrips
-						+ "\n"
-						+ "the sum of all the through-traffic traveltimes [s]: "
-						+ otherTtSum + "\n"
-						+ "the number of all the through-traffic Trips: "
-						+ nOtherTrips);
+		sw.writeln("the sum of all the traveltimes [s]: " + ttSum + "\n"
+				+ "the number of all the Trips: " + nTrips + "\n"
+				+ "the sum of all the drivers traveltimes [s]: " + carTtSum
+				+ "\n" + "the number of all the drivers Trips: " + nCarTrips
+				+ "\n"
+				+ "the sum of all the public transit unsers traveltimes [s]: "
+				+ ptTtSum + "\n" + "the number of all the public users Trips: "
+				+ nPtTrips + "\n"
+				+ "the sum of all the walkers traveltimes [s]: " + wlkTtSum
+				+ "\n" + "the number of all the walkers Trips: " + nWlkTrips
+				+ "\n" + "the sum of all the through-traffic traveltimes [s]: "
+				+ otherTtSum + "\n"
+				+ "the number of all the through-traffic Trips: " + nOtherTrips);
 		sw.close();
 	}
 
@@ -171,7 +166,8 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 		Gbl.startMeasurement();
 		// Gbl.createConfig(null);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 

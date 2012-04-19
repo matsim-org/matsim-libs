@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * LegDepartureTimeChecker.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.analysis;
 
 import org.matsim.api.core.v01.Id;
@@ -9,12 +25,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -23,9 +39,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * check, whether the departure time of leg is later than 24:00
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
@@ -33,25 +49,26 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 	private Id personId = null;
 
 	public LegDepartureTimeChecker(final String outputFilename) {
-		this.sw = new SimpleWriter(outputFilename);
-		this.sw.writeln("personId\ttime[s]\ttime[hh:mm:ss]\tlegNo.");
+		sw = new SimpleWriter(outputFilename);
+		sw.writeln("personId\ttime[s]\ttime[hh:mm:ss]\tlegNo.");
 	}
 
 	@Override
 	public void run(final Person person) {
-		this.personId = person.getId();
+		personId = person.getId();
 		run(person.getSelectedPlan());
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		int c = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				double legDepTime = ((Leg) pe).getDepartureTime();
 				if (legDepTime >= 86400.0) {
-					this.sw.writeln(this.personId + "\t" + legDepTime + "\t"
+					sw.writeln(personId + "\t" + legDepTime + "\t"
 							+ Time.writeTime(legDepTime) + "\t" + c);
-					this.sw.flush();
+					sw.flush();
 				}
 				c++;
 			}
@@ -59,7 +76,7 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 	}
 
 	public void close() {
-		this.sw.close();
+		sw.close();
 	}
 
 	public static void main(final String[] args) {
@@ -71,13 +88,15 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		final String plansFilename = "../runs/run669/it.1000/1000.plans.xml.gz";
 		final String outputFilename = "output/legDepTime_669.1000.txt";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		LegDepartureTimeChecker fldtc = new LegDepartureTimeChecker(outputFilename);
+		LegDepartureTimeChecker fldtc = new LegDepartureTimeChecker(
+				outputFilename);
 		fldtc.run(population);
 
 		fldtc.close();

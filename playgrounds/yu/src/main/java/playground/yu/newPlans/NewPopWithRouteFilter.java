@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * NewPopWithRouteFilter.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.newPlans;
 
 import java.util.List;
@@ -13,27 +29,26 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class NewPopWithRouteFilter extends NewPopulation {
-	private String criterion;
+	private final String criterion;
 	private boolean hasCriterion = false;
 	private PersonImpl pi = null;
 
-	public NewPopWithRouteFilter(Network network, Population population, String filename,
-			String criterion) {
+	public NewPopWithRouteFilter(Network network, Population population,
+			String filename, String criterion) {
 		super(network, population, filename);
 		this.criterion = criterion;
 	}
@@ -44,12 +59,14 @@ public class NewPopWithRouteFilter extends NewPopulation {
 		hasCriterion = false;
 		for (Plan plan : person.getPlans()) {
 			boolean retain = run(plan);
-			if (retain)
+			if (retain) {
 				pi.addPlan(plan);
+			}
 			hasCriterion |= retain;
 		}
-		if (hasCriterion)
+		if (hasCriterion) {
 			pw.writePerson(pi);
+		}
 	}
 
 	public boolean run(Plan plan) {
@@ -77,7 +94,7 @@ public class NewPopWithRouteFilter extends NewPopulation {
 		final String plansFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/plan.routedOevModell.xml.gz";
 		final String outputFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/plan.routedOevModell.BVB344.xml.gz";
 
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl network = (NetworkImpl) s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);
@@ -85,8 +102,8 @@ public class NewPopWithRouteFilter extends NewPopulation {
 		Population population = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(plansFilename);
 
-		NewPopWithRouteFilter npwp = new NewPopWithRouteFilter(network, population,
-				outputFilename, "BVB----344");
+		NewPopWithRouteFilter npwp = new NewPopWithRouteFilter(network,
+				population, outputFilename, "BVB----344");
 		npwp.run(population);
 		npwp.writeEndPlans();
 

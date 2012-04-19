@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * StackedBarChart.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.charts;
 
 import java.awt.Color;
@@ -15,13 +34,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.charts.ChartUtil;
 
 public class StackedBarChart extends ChartUtil {
-	private DefaultCategoryDataset dataset;
+	private final DefaultCategoryDataset dataset;
 
 	public StackedBarChart(String title, String categoryAxisLabel,
 			String valueLabel, PlotOrientation plotOrientation) {
 		super(title, categoryAxisLabel, valueLabel);
 		dataset = new DefaultCategoryDataset();
-		this.chart = createChart(title, categoryAxisLabel, valueLabel, dataset,
+		chart = createChart(title, categoryAxisLabel, valueLabel, dataset,
 				plotOrientation);
 	}
 
@@ -46,40 +65,48 @@ public class StackedBarChart extends ChartUtil {
 	 */
 	public void addSeries(String[] rowKeys, String[] columnKeys,
 			double[][] values) {
-		for (int rowIdx = 0; rowIdx < values.length; rowIdx++)
-			for (int columnIdx = 0; columnIdx < values[rowIdx].length; columnIdx++)
+		for (int rowIdx = 0; rowIdx < values.length; rowIdx++) {
+			for (int columnIdx = 0; columnIdx < values[rowIdx].length; columnIdx++) {
 				dataset.addValue(Double.valueOf(values[rowIdx][columnIdx]),
 						rowKeys[rowIdx], columnKeys[columnIdx]);
+			}
+		}
 	}
 
 	public void addSeries(String[] rowKeys, String[] columnKeys,
 			String[] subCategoryKeys, double[][] values) {
-		for (int rowIdx = 0; rowIdx < values.length; rowIdx++)
-			for (int columnIdx = 0; columnIdx < values[rowIdx].length; columnIdx++)
+		for (int rowIdx = 0; rowIdx < values.length; rowIdx++) {
+			for (int columnIdx = 0; columnIdx < values[rowIdx].length; columnIdx++) {
 				dataset.addValue(Double.valueOf(values[rowIdx][columnIdx]),
 						rowKeys[rowIdx], columnKeys[columnIdx]);
+			}
+		}
 
 		GroupedStackedBarRenderer renderer = new GroupedStackedBarRenderer();
 
 		KeyToGroupMap map = new KeyToGroupMap(subCategoryKeys[0]);
 		int size = rowKeys.length / subCategoryKeys.length;
-		for (int rowIdx = 0; rowIdx < rowKeys.length; rowIdx++)
+		for (int rowIdx = 0; rowIdx < rowKeys.length; rowIdx++) {
 			map.mapKeyToGroup(rowKeys[rowIdx], subCategoryKeys[rowIdx / size]);
+		}
 		renderer.setSeriesToGroupMap(map);
 
 		Color[] paints = new Color[size];
 		Random random = MatsimRandom.getLocalInstance();
-		for (int i = 0; i < paints.length; i++)
+		for (int i = 0; i < paints.length; i++) {
 			paints[i] = new Color(random.nextInt(256), random.nextInt(256),
 					random.nextInt(256));
-		for (int i = 0; i < rowKeys.length; i++)
+		}
+		for (int i = 0; i < rowKeys.length; i++) {
 			renderer.setSeriesPaint(i, paints[i % size]);
+		}
 
 		CategoryPlot plot = (CategoryPlot) chart.getPlot();
 
 		SubCategoryAxis domainAxis = new SubCategoryAxis("subCategory / column");
-		for (int subCtgr = 0; subCtgr < subCategoryKeys.length; subCtgr++)
+		for (int subCtgr = 0; subCtgr < subCategoryKeys.length; subCtgr++) {
 			domainAxis.addSubCategory(subCategoryKeys[subCtgr]);
+		}
 
 		plot.setDomainAxis(domainAxis);
 
@@ -110,15 +137,15 @@ public class StackedBarChart extends ChartUtil {
 		StackedBarChart chart = new StackedBarChart("TITLE", "category",
 				"values", PlotOrientation.VERTICAL);
 		chart.addSeries(new String[] { "subCtgyIdxA+rowIdxA",
-		// "subCtgyIdxA+rowIdxB", "subCtgyIdxA+rowIdxC",
+				// "subCtgyIdxA+rowIdxB", "subCtgyIdxA+rowIdxC",
 				"subCtgyIdxB+rowIdxA",
 		// "subCtgyIdxB+rowIdxB",
-				// "subCtgyIdxB+rowIdxC"
+		// "subCtgyIdxB+rowIdxC"
 				},// rowKeys
 				new String[] { "ctgrA", "ctgrB", "ctgrC", "ctgrD" },// columnKeys
 				new String[] { "subCtgyIdxA", "subCtgyIdxB" },// subCategoryKeys
 				new double[][] {
-				// { 1, 2, 3, 4 },
+						// { 1, 2, 3, 4 },
 						// { 8, 7, 6, 5 },
 						{ 1.9, 2.9, 1.9, 2.9 }, { 2, 3, 4, 1 }
 				// { 3, 4, 5, 6 },

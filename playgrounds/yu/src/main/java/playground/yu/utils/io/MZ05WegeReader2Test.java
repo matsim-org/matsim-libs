@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MZ05WegeReader2Test.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.io;
 
 import java.util.HashMap;
@@ -28,7 +44,7 @@ public class MZ05WegeReader2Test implements TabularFileHandler {
 	/**
 	 * Map<zweck,Tuple<w_dist_obj2Summe,Cnt>>
 	 */
-	private Map<String, double[]> w_dist_obj2Map = new HashMap<String, double[]>();
+	private final Map<String, double[]> w_dist_obj2Map = new HashMap<String, double[]>();
 	final String outputBase;
 	private String personId = "";
 	private String[] rows;
@@ -41,17 +57,18 @@ public class MZ05WegeReader2Test implements TabularFileHandler {
 		// writer.writeln("Wegezwecke\tw_dist_obj2 [km]");
 	}
 
+	@Override
 	public void startRow(final String[] row) {
 		int W_KANTON = Integer.parseInt(row[9]);// 1-ZH-Zuerich
 		if (W_KANTON == 1) {// only for inhabitants in Kanton Zuerich
-			this.rows = row;
+			rows = row;
 			lineCnt++;
 			String tmpPersonId = row[0] + "+" + row[1];
-			if (!this.personId.equals(tmpPersonId)) {
-				this.personId = tmpPersonId;
-				this.personCnt++;
-				this.WP = Double.parseDouble(row[2]);
-				this.personCntWeigted += this.WP;
+			if (!personId.equals(tmpPersonId)) {
+				personId = tmpPersonId;
+				personCnt++;
+				WP = Double.parseDouble(row[2]);
+				personCntWeigted += WP;
 			}
 			wmittela = Integer.parseInt(row[44]);// 1-LV, 2-MIV, 3-OeV,
 			// 4-Andere
@@ -60,85 +77,84 @@ public class MZ05WegeReader2Test implements TabularFileHandler {
 			double w_dist_obj2 = Double.parseDouble(row[48]);
 
 			if (w_dist_obj2 != -99d) {
-				this.w_dist_obj2Sum += w_dist_obj2 * WP;
+				w_dist_obj2Sum += w_dist_obj2 * WP;
 				// if (this.justChangedPerson)
-				this.w_dist_obj2Cnt += WP;
+				w_dist_obj2Cnt += WP;
 			}
 
 			switch (wzweck1) {
 			case 2:
-				this.handleZweck("Arbeit", w_dist_obj2);
+				handleZweck("Arbeit", w_dist_obj2);
 				break;
 			case 3:
-				this.handleZweck("Ausbildung/Schule", w_dist_obj2);
+				handleZweck("Ausbildung/Schule", w_dist_obj2);
 				break;
 			case 4:
-				this.handleZweck("Einkauf", w_dist_obj2);
+				handleZweck("Einkauf", w_dist_obj2);
 				break;
 			case 5:
-				this.handleZweck("Einkauf", w_dist_obj2);
+				handleZweck("Einkauf", w_dist_obj2);
 				break;
 			case 6:
-				this.handleZweck("Geschaeftliche Taetigkeit und Dienstfahrt",
+				handleZweck("Geschaeftliche Taetigkeit und Dienstfahrt",
 						w_dist_obj2);
 				break;
 			case 7:
-				this.handleZweck("Geschaeftliche Taetigkeit und Dienstfahrt",
+				handleZweck("Geschaeftliche Taetigkeit und Dienstfahrt",
 						w_dist_obj2);
 				break;
 			case 8:
-				this.handleZweck("Freizeit", w_dist_obj2);
+				handleZweck("Freizeit", w_dist_obj2);
 				break;
 			case 9:
-				this.handleZweck("Service- und Begleitwege", w_dist_obj2);
+				handleZweck("Service- und Begleitwege", w_dist_obj2);
 				break;
 			case 10:
-				this.handleZweck("Service- und Begleitwege", w_dist_obj2);
+				handleZweck("Service- und Begleitwege", w_dist_obj2);
 				break;
 			case 11:
-				this.handleZweck(
-						"Rueckkehr nach Hause bzw. auswaertige Unterkunft",
+				handleZweck("Rueckkehr nach Hause bzw. auswaertige Unterkunft",
 						w_dist_obj2);
 				break;
 			default:// 12 and -99 ...
-				this.handleZweck("Andere", w_dist_obj2);
+				handleZweck("Andere", w_dist_obj2);
 			}
 		}
 
 	}
 
 	private void handleZweck(String zweck, double w_dist_obj2) {
-		if (w_dist_obj2 == -99d)
+		if (w_dist_obj2 == -99d) {
 			return;
-		double[] w_dist_obj2Local = this.w_dist_obj2Map.get(zweck);
+		}
+		double[] w_dist_obj2Local = w_dist_obj2Map.get(zweck);
 		if (w_dist_obj2Local == null) {
 			w_dist_obj2Local = new double[4];
 		}
-		if (w_dist_obj2 < 0 || WP < 0)
+		if (w_dist_obj2 < 0 || WP < 0) {
 			throw new RuntimeErrorException(new Error(), "dist =\t"
 					+ w_dist_obj2 + " < 0 oder WP =\t" + WP + " < 0\nrow:\t"
 					+ rows.toString());// TODO ...
-		w_dist_obj2Local[this.wmittela - 1] += w_dist_obj2 * WP;
-		this.w_dist_obj2Map.put(zweck, w_dist_obj2Local);
+		}
+		w_dist_obj2Local[wmittela - 1] += w_dist_obj2 * WP;
+		w_dist_obj2Map.put(zweck, w_dist_obj2Local);
 	}
 
 	public void write() {
-		writer.writeln("mittlere w_dist_obj2\t" + this.w_dist_obj2Sum
-				/ this.w_dist_obj2Cnt);
-		writer.writeln("w_dist_obj2Cnt\t" + this.w_dist_obj2Cnt);
-		writer
-				.writeln("------------------------------------------\nlineCnt\t=\t"
-						+ this.lineCnt + "\tpersonCnt\t=\t" + this.personCnt);
+		writer.writeln("mittlere w_dist_obj2\t" + w_dist_obj2Sum
+				/ w_dist_obj2Cnt);
+		writer.writeln("w_dist_obj2Cnt\t" + w_dist_obj2Cnt);
+		writer.writeln("------------------------------------------\nlineCnt\t=\t"
+				+ lineCnt + "\tpersonCnt\t=\t" + personCnt);
 		writer.writeln("-----------------------------------------");
-		writer
-				.writeln("wegezwecke\tmittlere w_dist_obj2(LV)\tmittlere w_dist_obj2(MIV)\tmittlere w_dist_obj2(OeV)\tmittlere w_dist_obj2(Andere)");
+		writer.writeln("wegezwecke\tmittlere w_dist_obj2(LV)\tmittlere w_dist_obj2(MIV)\tmittlere w_dist_obj2(OeV)\tmittlere w_dist_obj2(Andere)");
 
-		for (Entry<String, double[]> entry : this.w_dist_obj2Map.entrySet()) {
+		for (Entry<String, double[]> entry : w_dist_obj2Map.entrySet()) {
 			double[] w_dist_obj2local = entry.getValue();
 			StringBuffer line = new StringBuffer(entry.getKey());
 			for (int i = 0; i < w_dist_obj2local.length; i++) {
 				line.append('\t');
-				line.append(w_dist_obj2local[i] / this.personCnt);
+				line.append(w_dist_obj2local[i] / personCnt);
 			}
 			writer.writeln(line);
 		}
@@ -169,8 +185,8 @@ public class MZ05WegeReader2Test implements TabularFileHandler {
 
 		MZ05WegeReader2Test mz05wr = new MZ05WegeReader2Test(outputBase);
 
-        new TabularFileParser().parse(tfpc, mz05wr);
+		new TabularFileParser().parse(tfpc, mz05wr);
 
-        mz05wr.write();
+		mz05wr.write();
 	}
 }

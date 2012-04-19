@@ -1,5 +1,3 @@
-package playground.yu.scoring.withAttrRecorder;
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * DummyCharyparNagelScoringFunctionFactory4PC.java
@@ -19,6 +17,7 @@ package playground.yu.scoring.withAttrRecorder;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.yu.scoring.withAttrRecorder;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;

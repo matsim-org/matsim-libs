@@ -1,6 +1,22 @@
-/**
- *
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Counts2QGIS.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils.qgis;
 
 import java.util.Collection;
@@ -46,8 +62,9 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 		@Override
 		public Collection<Feature> getFeatures() throws SchemaException,
 				NumberFormatException, IllegalAttributeException {
-			for (int i = 0; i < attrTypes.size(); i++)
+			for (int i = 0; i < attrTypes.size(); i++) {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
+			}
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 			for (Id linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
@@ -64,8 +81,9 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 				o[5] = link.getCapacity() / network.getCapacityPeriod()
 						* 3600.0;
 				o[6] = link.getFreespeed();
-				for (int i = 0; i < parameters.size(); i++)
+				for (int i = 0; i < parameters.size(); i++) {
 					o[i + 7] = parameters.get(i).get(link.getId());
+				}
 				// parameters.get(link.getId().toString()) }
 				Feature ft = ftRoad.create(o, "network");
 				features.add(ft);
@@ -101,8 +119,7 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 		Counts2QGIS c2q = new Counts2QGIS(netFilename, gk4);
 		c2q.setN2g(new Counts2PolygonGraph(c2q.getNetwork(), c2q.crs, c2q
 				.readCounts(countsFilename)));
-		c2q
-				.writeShapeFile("../matsimTests/berlinQGIS/counts4bb_5_hermannstr_counts4Kantstr.shp");
+		c2q.writeShapeFile("../matsimTests/berlinQGIS/counts4bb_5_hermannstr_counts4Kantstr.shp");
 
 		Gbl.printElapsedTime();
 	}

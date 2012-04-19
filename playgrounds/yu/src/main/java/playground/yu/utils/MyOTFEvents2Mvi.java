@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyOTFEvents2Mvi.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.yu.utils;
 
 import java.io.File;
@@ -11,7 +27,7 @@ import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
- *quote from org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI of David
+ * quote from org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI of David
  * Strippgen
  * 
  * @author yu
@@ -50,8 +66,9 @@ public class MyOTFEvents2Mvi {
 		}
 		// -----------WRITES A SHORT EVENTSFILE-----------------
 		String eventsFilename = args[1] + "txt";
-		if (!new File(eventsFilename).exists())
+		if (!new File(eventsFilename).exists()) {
 			eventsFilename += ".gz";
+		}
 
 		SimpleReader sr = new SimpleReader(eventsFilename);
 		String eventsOutputFilename = eventsFilename.replaceAll("events",
@@ -81,7 +98,7 @@ public class MyOTFEvents2Mvi {
 		// ----------------------------------------------------
 		OTFVis.main(new String[] { "-convert", eventsOutputFilename,
 				args[0]/* networkFilename */, args[1] + "mvi"/* mviFilename */,
-				(args.length < 3) ? "300" : args[2] /* snapshotPeriod */});
+				args.length < 3 ? "300" : args[2] /* snapshotPeriod */});
 
 		System.out.println("done.");
 	}
