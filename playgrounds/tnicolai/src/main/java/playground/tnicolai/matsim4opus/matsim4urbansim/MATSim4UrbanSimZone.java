@@ -89,6 +89,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	/**
 	 * prepare MATSim for traffic flow simulation ...
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
 	void runMATSim(){
 		log.info("Starting MATSim from Urbansim");	
@@ -104,7 +105,9 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		cleanNetwork(network);
 		
 		// get the data from UrbanSim (parcels and persons)
-		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear() );
+		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
+													  getMATSim4UrbaSimControlerConfig().getShapeFileCellBasedAccessibility(),
+													  getUrbanSimParameterConfig().getRandomLocationDistributionRadiusForUrbanSimZone());
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		// initializing parcels and zones from UrbanSim input
@@ -197,7 +200,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			
 			// init aggregatedWorkplaces
 			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(zones, jobSampleRate);
+				aggregatedOpportunities = readUrbansimJobs(zones, destinationSampleRate);
 			// creates zone based table of log sums (workplace accessibility)
 			// uses always a 100% jobSample size (see readUrbansimJobs below)
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
@@ -214,7 +217,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			
 			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
 			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(zones, jobSampleRate);
+				aggregatedOpportunities = readUrbansimJobs(zones, destinationSampleRate);
 			
 			if(computeCellBasedAccessibilitiesNetwork){
 				fileExtension = CellBasedAccessibilityControlerListenerV2.NETWORK;
@@ -250,7 +253,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		if(dumpAggegatedWorkplaceData){
 			// init aggregatedWorkplaces
 			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(zones, jobSampleRate);
+				aggregatedOpportunities = readUrbansimJobs(zones, destinationSampleRate);
 			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
 					                                            		aggregatedOpportunities);
 		}

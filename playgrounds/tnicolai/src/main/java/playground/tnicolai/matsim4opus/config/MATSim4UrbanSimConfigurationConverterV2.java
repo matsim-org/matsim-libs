@@ -201,7 +201,8 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 	private void initUrbanSimParameter(Matsim4UrbansimType matsim4UrbanSimParameter){
 		
 		// get every single matsim4urbansim/urbansimParameter
-		double samplingRate 	= matsim4UrbanSimParameter.getUrbansimParameter().getSamplingRate();
+		double populationSamplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getPopulationSamplingRate();
+		double randomLocationDistributionRadiusForUrbanSimZone = matsim4UrbanSimParameter.getUrbansimParameter().getRandomLocationDistributionRadiusForUrbanSimZone();
 		int year 				= matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
 		String opusHome 		= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
 		String opusDataPath 	= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusDataPath() );
@@ -215,8 +216,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		String testParameter 	= matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
 		
 		UrbanSimParameterConfigModule module = this.getUrbanSimParameterConfig();
-		module.setPopulationSampleRate(samplingRate);
-		module.setOpportunitySampleRate(1.); // tnicolai, make configurable
+		module.setPopulationSampleRate(populationSamplingRate);
 		module.setYear(year);
 		module.setOpusHome(opusHome);
 		module.setOpusDataPath(opusDataPath);
@@ -226,6 +226,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		module.setMATSim4OpusTemp(matsim4OpusTemp);
 		module.setMATSim4OpusBackup(matsim4OpusBackup);
 		module.setTestParameter(testParameter);
+		module.setRandomLocationDistributionRadiusForUrbanSimZone(randomLocationDistributionRadiusForUrbanSimZone);
 		module.setBackup(backupRunData);
 		module.setTestRun(isTestRun);	
 		
@@ -240,7 +241,6 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		log.info("UrbanSimParameter settings:");
 		log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
-		log.info("OpportunitySamplingRate: " + module.getOpportunitySampleRate() );
 		log.info("Year: " + module.getYear() ); 
 		log.info("OPUS_HOME: " + Constants.OPUS_HOME );
 		log.info("OPUS_DATA_PATH: " + Constants.OPUS_DATA_PATH );
@@ -250,6 +250,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		log.info("MATSIM_4_OPUS_TEMP: " + Constants.MATSIM_4_OPUS_TEMP ); 
 		log.info("MATSIM_4_OPUS_BACKUP: " + Constants.MATSIM_4_OPUS_BACKUP );
 		log.info("(Custom) Test Parameter: " + module.getTestParameter() );
+		log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getRandomLocationDistributionRadiusForUrbanSimZone());
 		log.info("Backing Up Run Data: " + module.isBackup() );
 		log.info("Is Test Run: " + module.isTestRun() );
 	}
@@ -271,20 +272,20 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		String shapeFile						= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getShapeFileCellBasedAccessibility().getInputFile();
 		if(!Paths.pathExsits(shapeFile)){
 			log.warn("Shape-file " + shapeFile + " not found!");
-			shapeFile = "";
+			shapeFile = null;
 		}
 		
 		boolean computeZone2ZoneImpedance 		= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance();
 		boolean computeAgentPerformanceFeedback	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance();
 		boolean computeZoneBasedAccessibility 	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility();
 		boolean computeCellBasedAccessibility	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility();
-		boolean computeCellBasedAccessibilityNetwork = false;
+		boolean computeCellBasedAccessibilityNetwork   = false;
 		boolean computeCellbasedAccessibilityShapeFile = false;
 		// if cell-based accessibility is enabled, check whether a shapefile is given 
 		// (cell-based shape file computation enabled) or not (cell-based network computation enabled) 
 		if(computeCellBasedAccessibility){ 
-			if(shapeFile.equalsIgnoreCase(""))
-				computeCellBasedAccessibilityNetwork = true;
+			if(shapeFile == null)
+				computeCellBasedAccessibilityNetwork   = true;
 			else
 				computeCellbasedAccessibilityShapeFile = true;
 		}
@@ -333,6 +334,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		PlanCalcScoreConfigGroup cnScoringGroup = scenario.getConfig().planCalcScore();
 		
+		double accessibilityDestinationSamplingRate = matsim4UrbanSimParameter.getAccessibilityParameter().getAccessibilityDestinationSamplingRate();
 		// these parameter define if the beta or logit_scale parameter are taken from MATSim or the config file
 		boolean useMATSimLogitScaleParameter 	= matsim4UrbanSimParameter.getAccessibilityParameter().isUseLogitScaleParameterFromMATSim();
 		boolean useMATSimCarParameter			= matsim4UrbanSimParameter.getAccessibilityParameter().isUseCarParameterFromMATSim();
@@ -393,6 +395,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		}
 		
 		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
+		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
 		module.setUseLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
 		module.setUseRawSumsWithoutLn(useRawSum);
 		module.setUseCarParameterFromMATSim(useMATSimCarParameter);
@@ -420,6 +423,8 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		// view results
 		log.info("AccessibilityParameter settings:");
+		
+		log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
 		log.info("Compute raw sum (not logsum): " + module.isUseRawSumsWithoutLn() );
 		log.info("Logit Scale Parameter: " + module.isUseLogitScaleParameterFromMATSim() ); 
 		
@@ -583,7 +588,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 			scenario.getConfig().addSimulationConfigGroup( simulation );
 		}
 		
-		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getSamplingRate();
+		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
 		
 		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
 		

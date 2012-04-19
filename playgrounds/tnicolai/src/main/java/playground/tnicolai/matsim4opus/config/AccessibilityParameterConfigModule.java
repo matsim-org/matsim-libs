@@ -8,6 +8,8 @@ public class AccessibilityParameterConfigModule extends Module{
 	
 	public static final String GROUP_NAME = "accessibilityParameter";
 	
+	private double accessibilityDestinationSamplingRate;
+	
 	private boolean useLogitScaleParameterFromMATSim;
 	
 	private boolean useCarParameterFromMATSim;
@@ -56,6 +58,14 @@ public class AccessibilityParameterConfigModule extends Module{
 	
 	public AccessibilityParameterConfigModule(String name) {
 		super(name);
+	}
+	
+	public double getAccessibilityDestinationSamplingRate(){
+		return this.accessibilityDestinationSamplingRate;
+	}
+	
+	public void setAccessibilityDestinationSamplingRate(double sampleRate){
+		this.accessibilityDestinationSamplingRate = sampleRate;
 	}
 
     public boolean isUseLogitScaleParameterFromMATSim() {

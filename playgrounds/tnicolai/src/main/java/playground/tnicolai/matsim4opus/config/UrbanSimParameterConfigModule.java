@@ -10,8 +10,6 @@ public class UrbanSimParameterConfigModule extends Module{
 	
 	public static final String POPULATION_SAMPLING_RATE = "populationSampleRate";
 	
-	public static final String OPPORTUNITY_SAMPLING_RATE = "opportunitySampleRate";
-	
 	public static final String YEAR = "year";
 	
 	public static final String OPUS_HOME = "opusHome";
@@ -26,13 +24,13 @@ public class UrbanSimParameterConfigModule extends Module{
 	
 	public static final String IS_TEST_RUN = "isTestRun";
 	
+	public static final String RANDOM_LONCATION_DISTRIBUTION_RADIUS_FOR_URBANSIM_ZONE = "randomLocationDistributionRadiusForUrbanSimZone";
+	
 	public static final String TEST_PARAMETER = "testParameter";
 	
 	public static final String IS_BACKUP_RUN_DATA = "isBackup";
 	
 	private double populationSampleRate;
-	
-	private double opportunitySampleRate;
 	
 	private int year;
 	
@@ -51,6 +49,8 @@ public class UrbanSimParameterConfigModule extends Module{
 	private String matsim4OpusBackup;
 	
 	private boolean isTestRun;
+	
+	private double randomLocationDistributionRadiusForUrbanSimZone;
 	
 	private String testParameter;
 	
@@ -80,12 +80,12 @@ public class UrbanSimParameterConfigModule extends Module{
 		return this.populationSampleRate;
 	}
 	
-	public void setOpportunitySampleRate(double sampleRate){
-		this.opportunitySampleRate = sampleRate;
+	public void setRandomLocationDistributionRadiusForUrbanSimZone(double radius){
+		this.randomLocationDistributionRadiusForUrbanSimZone = radius;
 	}
 	
-	public double getOpportunitySampleRate() {
-		return this.opportunitySampleRate;
+	public double getRandomLocationDistributionRadiusForUrbanSimZone() {
+		return this.randomLocationDistributionRadiusForUrbanSimZone;
 	}
 	
 	public void setYear(int year){

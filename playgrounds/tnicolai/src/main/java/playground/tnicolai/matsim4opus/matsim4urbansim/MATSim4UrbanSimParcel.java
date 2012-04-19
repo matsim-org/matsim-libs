@@ -104,7 +104,7 @@ public class MATSim4UrbanSimParcel {
 	boolean dumpAggegatedWorkplaceData 			  	 = true;
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
-	double jobSampleRate 							 = 1.;
+	double destinationSampleRate 					 = 1.;
 	NetworkBoundaryBox nwBoundaryBox				 = null;
 	
 	/**
@@ -134,6 +134,7 @@ public class MATSim4UrbanSimParcel {
 	/**
 	 * prepare MATSim for traffic flow simulation ...
 	 */
+	@SuppressWarnings("deprecation")
 	void runMATSim(){
 		log.info("Starting MATSim from Urbansim");	
 
@@ -148,7 +149,7 @@ public class MATSim4UrbanSimParcel {
 		cleanNetwork(network);
 		
 		// get the data from UrbanSim (parcels and persons)
-		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear() );
+		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(), null, 0. );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -288,7 +289,7 @@ public class MATSim4UrbanSimParcel {
 			
 			// init aggregatedWorkplaces
 			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
+				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
 			// creates zone based table of log sums (workplace accessibility)
 			// uses always a 100% jobSample size (see readUrbansimJobs below)
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV2(zones, 				
@@ -304,7 +305,7 @@ public class MATSim4UrbanSimParcel {
 		if(dumpAggegatedWorkplaceData){
 			// init aggregatedWorkplaces
 			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
+				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
 			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
 																		aggregatedOpportunities);
 		}
@@ -325,29 +326,30 @@ public class MATSim4UrbanSimParcel {
 	}
 	
 	void setControlerSettings(ScenarioImpl scenario, String[] args) {
-		// setting workplace/job sample rate
-		checkAndSetJobSample(args); // tnicolai make configurable, use opportunitySamplingRate in MATSim4UrbaSimControlerConfigModule
 
-		MATSim4UrbanSimControlerConfigModule module = getMATSim4UrbaSimControlerConfig();
+		AccessibilityParameterConfigModule moduleAccessibility = getAccessibilityParameterConfig();
+		MATSim4UrbanSimControlerConfigModule moduleMATSim4UrbanSim = getMATSim4UrbaSimControlerConfig();
+		
+		this.destinationSampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
 
-		this.computeAgentPerformance	= module.isAgentPerformance();
-		this.computeZone2ZoneImpedance	= module.isZone2ZoneImpedance();
-		this.computeZoneBasedAccessibilities = module.isZoneBasedAccessibility();
-		this.computeCellBasedAccessibility	= module.isCellBasedAccessibility();
-		this.computeCellBasedAccessibilitiesShapeFile = module.isCellBasedAccessibilityShapeFile();
-		this.computeCellBasedAccessibilitiesNetwork = module.isCellBasedAccessibilityNetwork();
-		this.dumpPopulationData = false;
+		this.computeAgentPerformance	= moduleMATSim4UrbanSim.isAgentPerformance();
+		this.computeZone2ZoneImpedance	= moduleMATSim4UrbanSim.isZone2ZoneImpedance();
+		this.computeZoneBasedAccessibilities = moduleMATSim4UrbanSim.isZoneBasedAccessibility();
+		this.computeCellBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
+		this.computeCellBasedAccessibilitiesShapeFile = moduleMATSim4UrbanSim.isCellBasedAccessibilityShapeFile();
+		this.computeCellBasedAccessibilitiesNetwork = moduleMATSim4UrbanSim.isCellBasedAccessibilityNetwork();
+		this.dumpPopulationData 		= false;
 		this.dumpAggegatedWorkplaceData = true;
 		
-		this.cellSizeInMeter 			= module.getCellSizeCellBasedAccessibility();
-		this.shapeFile					= module.getShapeFileCellBasedAccessibility();
+		this.cellSizeInMeter 			= moduleMATSim4UrbanSim.getCellSizeCellBasedAccessibility();
+		this.shapeFile					= moduleMATSim4UrbanSim.getShapeFileCellBasedAccessibility();
 		// using custom bounding box, defining the study area for accessibility computation
 		this.nwBoundaryBox 				= new NetworkBoundaryBox();
-		if(module.isUseCustomBoundingBox()){
-			nwBoundaryBox.setCustomBoundaryBox(module.getBoundingBoxLeft(), 
-													module.getBoundingBoxBottom(), 
-													module.getBoundingBoxRight(), 
-													module.getBoundingBoxTop());
+		if(moduleMATSim4UrbanSim.isUseCustomBoundingBox()){
+			nwBoundaryBox.setCustomBoundaryBox(moduleMATSim4UrbanSim.getBoundingBoxLeft(), 
+													moduleMATSim4UrbanSim.getBoundingBoxBottom(), 
+													moduleMATSim4UrbanSim.getBoundingBoxRight(), 
+													moduleMATSim4UrbanSim.getBoundingBoxTop());
 		}
 		// using boundary of hole network for accessibility computation
 		else{
@@ -355,19 +357,7 @@ public class MATSim4UrbanSimParcel {
 			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
 		}
 	}
-	
-	/**
-	 * Set the jobSample for the starting points
-	 * 
-	 * @param args
-	 */
-	private void checkAndSetJobSample(String[] args) {
 
-		if (args.length >= 2) 
-			jobSampleRate = Double.parseDouble(args[1].trim());
-		log.info("The jobSampleRate is set to " + String.valueOf(jobSampleRate));
-	}
-	
 	/**
 	 * cleaning matsim network
 	 * @param network

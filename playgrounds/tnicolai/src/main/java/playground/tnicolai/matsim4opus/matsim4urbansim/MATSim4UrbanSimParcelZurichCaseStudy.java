@@ -121,7 +121,7 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 			
 			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
 			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
+				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
 			
 			if(computeCellBasedAccessibilitiesNetwork){
 				fileExtension = CellBasedAccessibilityControlerListenerV2.NETWORK;
@@ -162,7 +162,7 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 			
 			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
 			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(parcels, jobSampleRate);
+				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
 			
 			if (computeCellBasedAccessibilitiesNetwork) {
 				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;

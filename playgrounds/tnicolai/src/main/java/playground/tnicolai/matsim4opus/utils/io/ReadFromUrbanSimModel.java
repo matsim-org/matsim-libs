@@ -48,10 +48,11 @@ import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisPopulationCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
+import playground.tnicolai.matsim4opus.utils.misc.RandomLocationDistributor;
 
 /**
  * @author nagel
- *
+ * @author thomas
  */
 public class ReadFromUrbanSimModel {
 
@@ -61,14 +62,26 @@ public class ReadFromUrbanSimModel {
 	private final int year;
 	
 	private PopulationCounter cnt;
+	private String shapefile = null;
+	private double radius 	 = 0.;
 	
 	/**
 	 * constructor
 	 * @param year of current run
 	 */
 	public ReadFromUrbanSimModel ( final int year ) {
-		this.year = year;
-		this.cnt = new PopulationCounter();
+		this.year 	= year;
+		this.cnt 	= new PopulationCounter();
+		this.shapefile = null;
+		this.radius	= 0.;
+	}
+
+	public ReadFromUrbanSimModel(final int year, final String shapefile,
+			final double radius) {
+		this.year	= year;
+		this.cnt	= new PopulationCounter();
+		this.shapefile = shapefile;
+		this.radius	= radius;
 	}
 
 	/**
@@ -274,6 +287,7 @@ public class ReadFromUrbanSimModel {
 		Population mergePop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain all persons from UrbanSim Persons table
 		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain only new persons (id) that don't exist in warm start pop file
 		cnt = new PopulationCounter();
+		RandomLocationDistributor rld = new RandomLocationDistributor(this.shapefile, this.radius);
 		
 		boolean compensationFlag = false;
 
@@ -313,12 +327,14 @@ public class ReadFromUrbanSimModel {
 
 				// get home location id
 				Id homeZoneId = new IdImpl( parts[ indexZoneID_HOME ] );
-				ActivityFacility homeLocation = zones.getFacilities().get( homeZoneId ) ;
+				ActivityFacility homeLocation = zones.getFacilities().get( homeZoneId ); // the home location is the zone centroid
 				if ( homeLocation==null ){
 					log.warn( "homeLocation==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this );
 					continue;
 				}
-				Coord homeCoord = homeLocation.getCoord();
+				// Coord homeCoord = homeLocation.getCoord(); // old version
+				// randomize home location within zone
+				Coord homeCoord = rld.getRandomLocation(homeZoneId, homeLocation.getCoord());
 				if ( homeCoord==null ){
 					log.warn( "homeCoord==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this );
 					continue;
@@ -353,8 +369,9 @@ public class ReadFromUrbanSimModel {
 						continue ;
 					}
 					// complete agent plan
-					Coord workCoord = jobLocation.getCoord() ;
-					CreateHomeWorkHomePlan.completePlanToHwh(plan, workCoord, jobLocation) ;
+					//Coord workCoord = jobLocation.getCoord(); // old version
+					Coord workCoord = rld.getRandomLocation(workZoneId, jobLocation.getCoord());
+					CreateHomeWorkHomePlan.completePlanToHwh(plan, workCoord, jobLocation);
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
