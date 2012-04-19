@@ -319,6 +319,19 @@ public class PScenarioHelper {
 		
 		return coop;
 	}
+	
+	public static Cooperative createCoop2111to1314to4443(){
+		
+		Scenario sc= PScenarioHelper.createTestNetwork();
+		
+		PConfigGroup conf = new PConfigGroup();
+		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(conf.getPIdentifier(), sched, sc.getNetwork(), 10);
+		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
+		coop.init(prov, new Route2111to1314to4443(sched, conf.getPIdentifier()), 0);
+		
+		return coop;
+	}
 
 }
 
@@ -355,5 +368,43 @@ class Route2313to3343 implements PPlanStrategy{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
 }
+
+
+class Route2111to1314to4443 implements PPlanStrategy{
+	
+	private String pId;
+	private TransitSchedule sched;
+
+	public Route2111to1314to4443(TransitSchedule sched, String pId){
+		this.sched = sched;
+		this.pId = pId;
+	}
+
+	@Override
+	public PPlan run(Cooperative cooperative) {
+		Id id = new IdImpl(cooperative.getCurrentIteration());
+		double startTime = 8.0 * 3600.0;
+		double endTime = 16.0 * 3600.0;
+		TransitStopFacility startStop = sched.getFacilities().get(new IdImpl(pId + "2111"));
+		TransitStopFacility middleStop = sched.getFacilities().get(new IdImpl(pId + "1314"));
+		TransitStopFacility endStop = sched.getFacilities().get(new IdImpl(pId + "4443"));
+		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
+		stops.add(startStop);
+		stops.add(middleStop);
+		stops.add(endStop);
+		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
+		return newPlan;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 */
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+
