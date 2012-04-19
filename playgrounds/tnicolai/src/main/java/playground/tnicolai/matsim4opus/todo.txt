@@ -1,16 +1,26 @@
 Todos:
 
-- MATSim4UrbanSim Config: make "opportunity" sampling rate configurable, add "Radius" to spread Home/Worklocations for UrbanSim-Zone
+- Paper for D7.2. (tech report):
+	- Reference to Software issues Paper (we solveld the coupling as follows ... see Paper ...)
+	- What data goes from UrbanSim to MATSim
+	- What does MATSim do with this?
+	- What does MATsim return?
+
+- MATSim4UrbanSim Config: 
+	-make "opportunity" sampling rate configurable
+	- add "Radius" to spread Home/Worklocations for UrbanSim-Zone
+	- for every year running MATsim a separate Config file is needed!!! (there different networks can be defined simulating a changing network over years)
 - add a "Travel model visualization" section: "There are at least two options to visualize matsim: 1. OTFVis or 2. senozon via" -> to be done by senozone ???
 - for UrbanSim ZONE: spread persons within a zone like in "tutorial.unsupported.example80DemandGenerationFromShapefile.DemandGenerator" or use a radius if no shapefile available
 - test different beta values
 - test accessibility measure paired with workers or 1-person hh or income in UrbanSim
-- implement interface for SpatialGrid Interpolation (for returning accessibility values for each parcel)
-- re-implement SpatialGrid: use 2d array of doubles instead of Object
+- implement interface for SpatialGrid Interpolation (for returning accessibility values for each parcel), Theresa's task
+- (Überlegungen: Zählstellen und Reisezeiten sind für Zürich verfügbar. Hiermit kann getestet werden ob die MATSim Simulation realistisch ist. Merken für Paper/Diss)
 
 ------
 
 Tasks Done:
+- change SpatialGrid: use 2d array of doubles instead of Double-objects
 - MATSimZone: test or implement controllers
 - implement ZoneBasedAccessibilityControlerListenerV2 (see Cell-Based approach ...)
 - implement controller for agent-based performance feedback (time spent traveling, money spent traveling, etc.)

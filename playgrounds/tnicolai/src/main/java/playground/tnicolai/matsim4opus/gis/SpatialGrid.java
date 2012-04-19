@@ -243,6 +243,10 @@ public class SpatialGrid{
 		return null;
 	}
 	
+	/**
+	 * just for debugging convenience 
+	 * @param filename
+	 */
 	public void writeToFile(String filename){
 		GridUtils.writeSpatialGridTable(this, filename);
 	}
@@ -253,8 +257,8 @@ public class SpatialGrid{
 	 */
 	public static void main(String args[]){
 		
-		SpatialGrid test = SpatialGrid.readFromFile("/Users/thomas/Development/opus_home/matsim4opus/tmp/carAccessibility_cellsize_100.0SF.txt");
-		test.writeToFile("/Users/thomas/Development/opus_home/matsim4opus/tmp/carAccessibility_cellsize_100.0SF_TEST.txt");
+		SpatialGrid test = SpatialGrid.readFromFile("/Users/thomas/Development/opus_home/data/seattle_parcel/results/interpolationQuickTest/results/400.0travel_time_accessibility.txt");// SpatialGrid.readFromFile("/Users/thomas/Development/opus_home/matsim4opus/tmp/carAccessibility_cellsize_100.0SF.txt");
+		test.writeToFile("/Users/thomas/Development/opus_home/data/seattle_parcel/results/interpolationQuickTest/results/400.0travel_time_accessibilityTEST.txt");
 	}
 
 }
