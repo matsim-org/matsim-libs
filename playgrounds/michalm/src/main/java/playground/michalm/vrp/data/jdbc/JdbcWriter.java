@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.michalm.vrp.data.jdbc;
 
 import java.sql.*;
@@ -20,13 +39,21 @@ import cern.colt.Arrays;
 
 public class JdbcWriter
 {
-    private static final String dbUrl = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};"
-            + "DBQ=d:\\PP-rad\\taxi\\poznan\\baza_vrp.mdb;DriverID=22;READONLY=false";
+    private static final String DB_URL_1 = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=";
+    private static final String DB_URL_2 = ";DriverID=22;READONLY=false";
 
     private VrpData data;
     private MatsimVrpGraph vrpGraph;
 
     private Connection con;
+
+    private PreparedStatement tasksDelete;
+    private PreparedStatement schedulesDelete;
+    private PreparedStatement requestsDelete;
+    private PreparedStatement customersDelete;
+    private PreparedStatement vehiclesDelete;
+    private PreparedStatement depotsDelete;
+    private PreparedStatement vertexesDelete;
 
     private PreparedStatement vertexInsert;
     private PreparedStatement depotInsert;
@@ -47,19 +74,28 @@ public class JdbcWriter
     private PreparedStatement taskStatusUpdate;
 
 
-    public JdbcWriter(MatsimVrpData matsimData)
+    public JdbcWriter(MatsimVrpData matsimData, String dbFileName)
     {
         this.data = matsimData.getVrpData();
         vrpGraph = matsimData.getVrpGraph();
 
         try {
-            con = DriverManager.getConnection(dbUrl, "", "");
+            String url = DB_URL_1 + dbFileName + DB_URL_2;
+            con = DriverManager.getConnection(url, "", "");
 
             if (null == con) {
-                throw new RuntimeException("Unable to connect to data source " + dbUrl);
+                throw new RuntimeException("Unable to connect to data source " + url);
             }
 
             con.setAutoCommit(false);
+
+            tasksDelete = con.prepareStatement("delete * from Tasks");
+            schedulesDelete = con.prepareStatement("delete * from Schedules");
+            requestsDelete = con.prepareStatement("delete * from Requests");
+            customersDelete = con.prepareStatement("delete * from Customers");
+            vehiclesDelete = con.prepareStatement("delete * from Vehicles");
+            depotsDelete = con.prepareStatement("delete * from Depots");
+            vertexesDelete = con.prepareStatement("delete * from Vertexes");
 
             vertexInsert = con.prepareStatement(//
                     "insert into Vertexes (Vertex_Id, Name, X, Y, Link_Id) values (?, ?, ?, ?, ?)");
@@ -86,7 +122,7 @@ public class JdbcWriter
                             + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             plannedTaskDelete = con.prepareStatement(//
-                    "delete from Tasks where status='" + TaskStatus.PLANNED.name() + "'");
+                    "delete * from Tasks where TaskStatus='" + TaskStatus.PLANNED.name() + "'");
 
             driveTaskInsert = con.prepareStatement(//
                     "insert into Tasks (Task_Id, Task_Idx, Schedule_Id, TaskType, TaskStatus, "
@@ -124,6 +160,15 @@ public class JdbcWriter
     public void simulationInitialized()
     {
         try {
+            // clear database
+            tasksDelete.executeUpdate();
+            schedulesDelete.executeUpdate();
+            requestsDelete.executeUpdate();
+            customersDelete.executeUpdate();
+            vehiclesDelete.executeUpdate();
+            depotsDelete.executeUpdate();
+            vertexesDelete.executeUpdate();
+
             // insert Vertex
             for (Vertex v : data.getVrpGraph().getVertices()) {
                 vertexInsert.setInt(1, v.getId());
@@ -157,8 +202,15 @@ public class JdbcWriter
                 scheduleInsert.setInt(1, v.getId());
                 scheduleInsert.setInt(2, v.getId());
                 scheduleInsert.setString(3, v.getSchedule().getStatus().name());
-                scheduleInsert.setString(4, ((DynVehicle)v).getAgentLogic().getDynAgent()
-                        .getCurrentLinkId().toString());
+
+                if (v instanceof DynVehicle) {
+                    scheduleInsert.setString(4, ((DynVehicle)v).getAgentLogic().getDynAgent()
+                            .getCurrentLinkId().toString());
+                }
+                else {
+                    scheduleInsert.setString(4, null);
+                }
+
                 scheduleInsert.executeUpdate();
             }
 
@@ -323,7 +375,7 @@ public class JdbcWriter
         }
     }
 
-
+    
     public void schedulesReoptimized()
     {
         try {
@@ -335,7 +387,26 @@ public class JdbcWriter
                 Schedule s = v.getSchedule();
                 List<Task> tasks = s.getTasks();
 
-                for (int i = s.getCurrentTask().getTaskIdx() + 1; i < s.getTaskCount(); i++) {
+                int firstPlannedTaskIdx;
+
+                switch (s.getStatus()) {
+                    case UNPLANNED:
+                    case COMPLETED:
+                        continue;
+
+                    case PLANNED:
+                        firstPlannedTaskIdx = 0;
+                        break;
+
+                    case STARTED:
+                        firstPlannedTaskIdx = s.getCurrentTask().getTaskIdx() + 1;
+                        break;
+
+                    default:
+                        throw new RuntimeException();
+                }
+
+                for (int i = firstPlannedTaskIdx; i < s.getTaskCount(); i++) {
                     Task t = tasks.get(i);
                     PreparedStatement taskInsert;
 
@@ -534,22 +605,5 @@ public class JdbcWriter
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    public static void main(String[] args)
-        throws SQLException, ClassNotFoundException
-    {
-        new JdbcWriter(null).simulationInitialized();
-
-        try {
-            Thread.sleep(3000);
-            System.out.println("END!");
-        }
-        catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
     }
 }

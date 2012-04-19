@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.michalm.vrp.taxi.taxicab;
 
 import org.matsim.api.core.v01.Id;
@@ -78,7 +97,7 @@ public class TaxiAgentLogic
     {
         Schedule schedule = vrpVehicle.getSchedule();
         ScheduleStatus status = schedule.getStatus();
-
+        
         if (status == ScheduleStatus.UNPLANNED) {
             agent.startActivity(createAfterScheduleActivity(), now);// FINAL ACTIVITY
             return;
@@ -183,7 +202,7 @@ public class TaxiAgentLogic
         currentRequest = task.getRequest();
 
         // serve the customer
-        MobsimAgent passenger = ((TaxiCustomer)currentRequest.getCustomer()).getPassanger();
+        MobsimAgent passenger = ((TaxiCustomer)currentRequest.getCustomer()).getPassenger();
         Id currentLinkId = passenger.getCurrentLinkId();
 
         if (currentLinkId != agent.getCurrentLinkId()) {
@@ -223,7 +242,7 @@ public class TaxiAgentLogic
             @Override
             public void endLeg(double now)
             {
-                MobsimAgent passenger = ((TaxiCustomer)request.getCustomer()).getPassanger();
+                MobsimAgent passenger = ((TaxiCustomer)request.getCustomer()).getPassenger();
 
                 // deliver the passenger
                 EventsManager events = taxiSimEngine.getMobsim().getEventsManager();

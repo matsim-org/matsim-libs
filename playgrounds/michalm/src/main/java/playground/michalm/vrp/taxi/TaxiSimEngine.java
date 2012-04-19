@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.michalm.vrp.taxi;
 
 import java.util.ArrayList;
@@ -27,7 +46,6 @@ import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 public class TaxiSimEngine
     implements MobsimEngine
 {
-    private MatsimVrpData matsimVrpData;
     private VrpData vrpData;
 
     private Netsim netsim;
@@ -59,7 +77,6 @@ public class TaxiSimEngine
         this.netsim = netsim;
         this.optimizerFactory = optimizerFactory;
 
-        matsimVrpData = data;
         vrpData = data.getVrpData();
     }
 
@@ -132,14 +149,6 @@ public class TaxiSimEngine
         // this happens at the end of QSim.doSimStep() therefore "time+1"
         // this value will be used throughout the next QSim.doSimStep()
         vrpData.setTime((int)time + 1); // this can be moved to Before/AfterSimStepListener
-
-        if (time == -3600) {
-            System.err.println("************************ SQL &&&&&&&&&&&&&&&&&&&&&");
-            JdbcWriter writer = new JdbcWriter(matsimVrpData);
-            writer.simulationInitialized();
-            writer.fillWithTaskForTesting();
-            writer.close();
-        }
     }
 
 
