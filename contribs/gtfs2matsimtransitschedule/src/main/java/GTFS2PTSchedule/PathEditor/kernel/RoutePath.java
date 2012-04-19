@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package GTFS2PTSchedule.PathEditor.kernel;
 
 import java.io.FileWriter;
@@ -21,21 +40,21 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PreProcessEuclidean;
-import org.matsim.core.router.util.TravelMinDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessEuclidean;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import util.geometry.Line2D;
+import util.geometry.Point2D;
+import util.geometry.Vector2D;
 import GTFS2PTSchedule.Shape;
 import GTFS2PTSchedule.Stop;
 import GTFS2PTSchedule.StopTime;
 import GTFS2PTSchedule.Trip;
-import util.geometry.Line2D;
-import util.geometry.Point2D;
-import util.geometry.Vector2D;
 
 public class RoutePath {
 	
@@ -278,7 +297,7 @@ public class RoutePath {
 						bestLink = linkN;
 					}
 				}
-			links.add(index+1, (LinkImpl)bestLink);
+			links.add(index+1, bestLink);
 		}	
 	}
 	public void addLinkNetwork(Node fromNode, Node toNode) {
@@ -585,13 +604,15 @@ public class RoutePath {
 	}
 	public void setWithShapeCost() {
 		withShapeCost = !withShapeCost;
-		TravelMinDisutility travelMinCost = null;
+		TravelDisutility travelMinCost = null;
 		PreProcessEuclidean preProcessData = null;
 		if(!withShapeCost || trip.getShape()==null) {
-			travelMinCost = new TravelMinDisutility() {
+			travelMinCost = new TravelDisutility() {
+				@Override
 				public double getLinkTravelDisutility(Link link, double time) {
 					return getLinkMinimumTravelDisutility(link);
 				}
+				@Override
 				public double getLinkMinimumTravelDisutility(Link link) {
 					return link.getLength()/link.getFreespeed();
 				}
@@ -599,10 +620,12 @@ public class RoutePath {
 			
 		}
 		else {
-			travelMinCost = new TravelMinDisutility() {
+			travelMinCost = new TravelDisutility() {
+				@Override
 				public double getLinkTravelDisutility(Link link, double time) {
 					return getLinkMinimumTravelDisutility(link);
 				}
+				@Override
 				public double getLinkMinimumTravelDisutility(Link link) {
 					return (link.getLength()/link.getFreespeed())*Math.pow(trip.getShape().getDistance(link),1);
 				}
@@ -611,6 +634,7 @@ public class RoutePath {
 		preProcessData = new PreProcessEuclidean(travelMinCost);
 		preProcessData.run(network);
 		TravelTime timeFunction = new TravelTime() {	
+			@Override
 			public double getLinkTravelTime(Link link, double time) {
 				return link.getLength()/link.getFreespeed();
 			}

@@ -41,13 +41,13 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 	// not change minTravelCostPerLength
 	private double minTravelCostPerLength = Double.POSITIVE_INFINITY;
 
-	protected TravelMinDisutility costFunction;
+	protected TravelDisutility costFunction;
 
 	/**
 	 * @param costFunction
 	 *          A cost function that returns the minimal possible cost for each link.
 	 */
-	public PreProcessEuclidean(final TravelMinDisutility costFunction) {
+	public PreProcessEuclidean(final TravelDisutility costFunction) {
 		this.costFunction = costFunction;
 	}
 

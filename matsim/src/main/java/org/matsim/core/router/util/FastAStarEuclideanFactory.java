@@ -30,7 +30,7 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 
 	private PreProcessEuclidean preProcessData;
 
-	public FastAStarEuclideanFactory(Network network, final TravelMinDisutility fsttc){
+	public FastAStarEuclideanFactory(Network network, final TravelDisutility fsttc){
 		synchronized (this) {
 				this.preProcessData = new PreProcessEuclidean(fsttc);
 				this.preProcessData.run(network);

@@ -171,6 +171,11 @@ public class SocialCostCalculator implements TravelDisutility,
 	public double getLinkTravelDisutility(Link link, double time) {
 		return calcSocCosts(link.getId(), time);
 	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
@@ -305,6 +310,7 @@ public class SocialCostCalculator implements TravelDisutility,
 		writeSocialCostsPlot(event);
 	}
 
+	@Override
 	public void reset(final int iteration) {		
 		activeAgents.clear();
 		activeTrips.clear();

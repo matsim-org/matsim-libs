@@ -25,7 +25,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -35,7 +34,7 @@ import org.matsim.core.router.util.TravelTime;
 public class ParameterizedTravelCostCalculatorFactoryImpl implements
 		TravelDisutilityFactory {
 	public static class ParameterizedTravelTimeDistanceCostCalculator implements
-			TravelMinDisutility, PersonalizableTravelDisutility {
+			PersonalizableTravelDisutility {
 
 		protected final TravelTime timeCalculator;
 		private final double travelCostFactor;

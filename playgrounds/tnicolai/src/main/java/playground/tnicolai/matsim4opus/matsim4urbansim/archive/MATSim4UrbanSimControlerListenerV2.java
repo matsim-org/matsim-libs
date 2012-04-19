@@ -44,7 +44,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -387,7 +387,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 	
 	// From here Travel Distance Calculator
 	
-	class TravelDistanceCostCalculator implements TravelMinDisutility {
+	class TravelDistanceCostCalculator implements TravelDisutility {
 
 		protected final TravelTime timeCalculator;
 		private final double marginalCostOfDistance;

@@ -58,6 +58,12 @@ public class ParkAndRideTravelTimeCost implements PersonalizableTravelDisutility
 	}
 
 	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	public double getLinkTravelTime(final Link link, final double time) {
 		double distance = link.getLength();
 		return distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -33,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
  *
  * @author mrieser
  */
-public class TravelTimeAndDistanceBasedTravelDisutility implements TravelMinDisutility, PersonalizableTravelDisutility {
+public class TravelTimeAndDistanceBasedTravelDisutility implements PersonalizableTravelDisutility {
 
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfTime;

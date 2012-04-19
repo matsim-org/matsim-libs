@@ -22,7 +22,7 @@ package playground.mzilske.pipeline;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 
 public class AStarLandmarksTask implements ScenarioSinkSourceLeastCostPathCalculator {
 
@@ -31,13 +31,13 @@ public class AStarLandmarksTask implements ScenarioSinkSourceLeastCostPathCalcul
 	private ScenarioSink sink;
 
 	public AStarLandmarksTask(AStarLandmarksFactory factory,
-			TravelMinDisutility travelMinCost) {
+			TravelDisutility travelMinCost) {
 		super();
 		this.factory = factory;
 		this.travelMinCost = travelMinCost;
 	}
 
-	private TravelMinDisutility travelMinCost;
+	private TravelDisutility travelMinCost;
 
 	@Override
 	public void setSink(ScenarioSink sink) {

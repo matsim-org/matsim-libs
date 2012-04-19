@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.TravelScoringFunction;
+
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.network.Link;
@@ -29,9 +32,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.TravelScoringFunction;
 
 /**
  * Travel time disutility taking into account travel distance
@@ -92,6 +92,11 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 				link.getLength(),
 				getLinkTravelTime( link , time ),
 				distanceCost);
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

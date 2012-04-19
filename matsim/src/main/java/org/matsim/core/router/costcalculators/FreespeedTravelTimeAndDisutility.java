@@ -28,7 +28,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinDisutility;
 
 /**<p>
  * CostCalculator and TravelTimeCalculator for Links based on freespeed on links and
@@ -43,7 +42,7 @@ import org.matsim.core.router.util.TravelMinDisutility;
  * @author mrieser
  * @author dgrether
  */
-public class FreespeedTravelTimeAndDisutility implements PersonalizableTravelDisutility, TravelMinDisutility, PersonalizableTravelTime, LinkToLinkTravelTime {
+public class FreespeedTravelTimeAndDisutility implements PersonalizableTravelDisutility, PersonalizableTravelTime, LinkToLinkTravelTime {
 	
 	private static final Logger log = Logger.getLogger(FreespeedTravelTimeAndDisutility.class);
 

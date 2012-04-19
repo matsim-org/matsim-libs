@@ -58,6 +58,11 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 				double linkTravelDisutility = etdc.getLinkTravelDisutility(link, time);
 				return linkTravelDisutility;
 			}
+			
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				return etdc.getLinkMinimumTravelDisutility(link);
+			}
 		};
 	}
 

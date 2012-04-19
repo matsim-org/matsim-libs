@@ -61,12 +61,18 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements Personalizab
 	/**
 	 * @see org.matsim.core.router.util.TravelDisutility#getLinkTravelDisutility(org.matsim.core.network.LinkImpl, double)
 	 */
+	@Override
 	public double getLinkTravelDisutility(Link link, double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		if (this.marginalUtlOfDistance == 0.0) {
 			return travelTime * this.travelCostFactor;
 		}
 		return travelTime * this.travelCostFactor - (this.marginalUtlOfDistance * link.getLength() / this.income);
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
 	}
 	
 	
@@ -83,8 +89,5 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements Personalizab
 	public void setPerson(Person person) {
 		// TODO: put setIncome(person.getIncome()) or some such here, and remoset setIncome.
 	}
-	
-	
-	
 
 }

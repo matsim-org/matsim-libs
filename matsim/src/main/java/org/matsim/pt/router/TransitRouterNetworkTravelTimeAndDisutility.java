@@ -79,6 +79,11 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		}
 		return cost;
 	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public double getLinkTravelTime(final Link link, final double time) {

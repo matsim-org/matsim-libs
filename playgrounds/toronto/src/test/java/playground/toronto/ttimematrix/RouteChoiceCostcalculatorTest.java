@@ -149,6 +149,11 @@ public class RouteChoiceCostcalculatorTest {
 			log.warn("Link is null. Reurned 0 as link length.");
 			return 0.;
 		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	public static class TravelCostCostCalculator implements TravelDisutility{
@@ -160,6 +165,11 @@ public class RouteChoiceCostcalculatorTest {
 				return link.getLength();
 			log.warn("Link is null. Reurned 0 as link length.");
 			return 0.;
+		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			throw new UnsupportedOperationException();
 		}
 	}
 	
@@ -174,6 +184,11 @@ public class RouteChoiceCostcalculatorTest {
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time) {
 			return this.timeCalculator.getLinkTravelTime(link, time);
+		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			throw new UnsupportedOperationException();
 		}
 	}
 }

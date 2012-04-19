@@ -165,6 +165,12 @@ public class SocialCostsController {
 			disutility += this.scc.getLinkTravelDisutility(link, time); 
 			return disutility;
 		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
+		}
 
 		@Override
 		public void setPerson(Person person) {

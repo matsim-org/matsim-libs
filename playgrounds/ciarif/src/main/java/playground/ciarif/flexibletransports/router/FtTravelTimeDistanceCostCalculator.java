@@ -1,15 +1,35 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.flexibletransports.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 
 public class FtTravelTimeDistanceCostCalculator
-  implements TravelMinDisutility, PersonalizableTravelDisutility
+  implements TravelDisutility, PersonalizableTravelDisutility
 {
   protected final TravelTime timeCalculator;
   private final double travelCostFactor;
@@ -27,13 +47,15 @@ public class FtTravelTimeDistanceCostCalculator
     
   }
 
-  public double getLinkMinimumTravelDisutility(Link link) {
+  @Override
+	public double getLinkMinimumTravelDisutility(Link link) {
     return 
       (link.getLength() / link.getFreespeed() * this.travelCostFactor - (
       this.marginalUtlOfDistance * link.getLength()));
   }
 
-  public double getLinkTravelDisutility(Link link, double time) {
+  @Override
+	public double getLinkTravelDisutility(Link link, double time) {
     double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
     return (travelTime * this.travelCostFactor - (this.marginalUtlOfDistance * link.getLength()));
   }
@@ -46,7 +68,8 @@ public class FtTravelTimeDistanceCostCalculator
     return this.marginalUtlOfDistance;
   }
 
-  public void setPerson(Person person)
+  @Override
+	public void setPerson(Person person)
   {
   }
 }

@@ -36,7 +36,6 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -81,9 +80,14 @@ public class TimeOverDist {
 			public double getLinkTravelDisutility(Link link, double time) {
 				return travelTime.getLinkTravelTime(link, time);
 			}
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				// TODO Auto-generated method stub
+				throw new UnsupportedOperationException();
+			}
 		};
 
-		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
+		TravelDisutility travelMinCost = new TravelDisutility() {
 
 			@Override
 			public double getLinkTravelDisutility(Link link, double time) {

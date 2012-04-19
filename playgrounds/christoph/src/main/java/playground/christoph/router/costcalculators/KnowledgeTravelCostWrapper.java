@@ -50,6 +50,7 @@ public class KnowledgeTravelCostWrapper implements PersonalizableTravelDisutilit
 		}
 	}
 	
+	@Override
 	public double getLinkTravelDisutility(final Link link, final double time) 
 	{	
 		NodeKnowledge nodeKnowledge = null;
@@ -70,6 +71,11 @@ public class KnowledgeTravelCostWrapper implements PersonalizableTravelDisutilit
 //			log.info("Get Costs from TravelCostCalculator");
 			return travelCostCalculator.getLinkTravelDisutility(link, time);
 		}
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override

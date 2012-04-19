@@ -46,6 +46,7 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 		this.utlOfMon = utlOfMon ;
 	}
 
+	@Override
 	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, 
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		final PersonalizableTravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
@@ -77,10 +78,15 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 				linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
 				// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
 				
-				return linkTravelDisutility ;
+				return linkTravelDisutility;
+			}
+			
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				// TODO Auto-generated method stub
+				throw new UnsupportedOperationException();
 			}
 		};
-
 	}
 
 }

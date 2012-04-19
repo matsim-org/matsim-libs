@@ -38,9 +38,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.util.TravelMinDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
@@ -243,7 +243,7 @@ public class EvacuationTimeClusterer {
 	}	// ClusterableLocation
 	
 	
-	private static class TravelTimeCost implements TravelTime, TravelMinDisutility {
+	private static class TravelTimeCost implements TravelTime, TravelDisutility {
 
 		@Override
 		public double getLinkTravelTime(Link link, double time) {

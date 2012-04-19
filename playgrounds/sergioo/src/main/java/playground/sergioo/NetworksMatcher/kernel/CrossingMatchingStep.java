@@ -24,22 +24,19 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import others.sergioo.util.geometry.Functions2D;
-
-import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode;
+import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode.Types;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
-import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode.Types;
-import playground.sergioo.Visualizer2D.LayersWindow;
 
 public class CrossingMatchingStep extends MatchingStep {
 
@@ -223,7 +220,7 @@ public class CrossingMatchingStep extends MatchingStep {
 		loadSimpleLinks();
 		applyCapacitiesSimples();
 		JOptionPane.showMessageDialog(null,"Simples done!");
-		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
+		TravelDisutility travelMinCost = new TravelDisutility() {
 			public double getLinkTravelDisutility(Link link, double time) {
 				return getLinkMinimumTravelDisutility(link);
 			}
@@ -232,6 +229,7 @@ public class CrossingMatchingStep extends MatchingStep {
 			}
 		};
 		TravelTime timeFunction = new TravelTime() {	
+			@Override
 			public double getLinkTravelTime(Link link, double time) {
 				return link.getLength();
 			}

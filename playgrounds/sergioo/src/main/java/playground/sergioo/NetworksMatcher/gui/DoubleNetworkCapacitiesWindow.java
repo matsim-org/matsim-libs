@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -180,7 +180,7 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 		panelsPanel.add(layersPanels.get(PanelIds.A));
 		panelsPanel.add(layersPanels.get(PanelIds.B));
 		this.add(panelsPanel, BorderLayout.CENTER);
-		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
+		TravelDisutility travelMinCost = new TravelDisutility() {
 			public double getLinkTravelDisutility(Link link, double time) {
 				return getLinkMinimumTravelDisutility(link);
 			}
@@ -189,6 +189,7 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 			}
 		};
 		TravelTime timeFunction = new TravelTime() {	
+			@Override
 			public double getLinkTravelTime(Link link, double time) {
 				return link.getLength();
 			}

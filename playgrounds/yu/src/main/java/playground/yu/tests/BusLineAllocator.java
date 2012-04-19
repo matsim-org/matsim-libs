@@ -83,6 +83,11 @@ public class BusLineAllocator {
 		public double getLinkTravelDisutility(Link link, double time) {
 			return link.getLength();
 		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			return link.getLength();
+		}
 	}
 
 	private class TravelTimeFunctionFree implements TravelTime {

@@ -24,26 +24,28 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinDisutility;
 
 /**
  * always returns traveltime = 0 to avoid time expansion
  * travelcost is the actual freespeed time, rounded down to integers
  */
-public class FakeTravelTimeCost implements TravelMinDisutility, PersonalizableTravelTime, PersonalizableTravelDisutility {
+public class FakeTravelTimeCost implements PersonalizableTravelTime, PersonalizableTravelDisutility {
 
 	public FakeTravelTimeCost() {
 
 	}
 
+	@Override
 	public double getLinkTravelDisutility(Link link, double time) {
 		return Math.round((link.getLength() / link.getFreespeed()));
 	}
 
+	@Override
 	public double getLinkTravelTime(Link link, double time) {
 		return 0;
 	}
 
+	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
 		return Math.round((link.getLength() / link.getFreespeed()));
 	}

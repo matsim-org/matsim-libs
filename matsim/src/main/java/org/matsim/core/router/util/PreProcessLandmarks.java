@@ -55,11 +55,11 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 	private static final Logger log = Logger.getLogger(PreProcessLandmarks.class);
 
-	public PreProcessLandmarks(final TravelMinDisutility costFunction) {
+	public PreProcessLandmarks(final TravelDisutility costFunction) {
 		this(costFunction, new Rectangle2D.Double());
 	}
 
-	public PreProcessLandmarks(final TravelMinDisutility costFunction, final int landmarkCount) {
+	public PreProcessLandmarks(final TravelDisutility costFunction, final int landmarkCount) {
 		this(costFunction, new Rectangle2D.Double(), landmarkCount);
 	}
 
@@ -68,7 +68,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * @param travelZone The area within which the landmarks should lie. Narrowing the zone where the landmarks should
 	 * be put normally improves the routing speed of {@link org.matsim.core.router.AStarLandmarks}.
 	 */
-	public PreProcessLandmarks(final TravelMinDisutility costFunction,
+	public PreProcessLandmarks(final TravelDisutility costFunction,
 			final Rectangle2D.Double travelZone) {
 		this(costFunction, travelZone, 16);
 	}
@@ -89,7 +89,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * be put normally improves the routing speed of {@link org.matsim.core.router.AStarLandmarks}.
 	 * @param landmarkCount
 	 */
-	public PreProcessLandmarks(final TravelMinDisutility costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
+	public PreProcessLandmarks(final TravelDisutility costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
 		super(costFunction);
 
 		this.travelZone = travelZone;
@@ -159,9 +159,9 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		private final int landmarkIdx;
 		private final Node landmark;
 		private final Map<Node, DeadEndData> nodeData;
-		private final TravelMinDisutility costFunction;
+		private final TravelDisutility costFunction;
 		
-		public Calculator(final int landmarkIdx, final Node landmark, final Map<Node, DeadEndData> nodeData, final TravelMinDisutility costFunction) {
+		public Calculator(final int landmarkIdx, final Node landmark, final Map<Node, DeadEndData> nodeData, final TravelDisutility costFunction) {
 			this.landmarkIdx = landmarkIdx;
 			this.landmark = landmark;
 			this.nodeData = nodeData;

@@ -59,6 +59,12 @@ public class SanralTravelDisutilityIncludingToll implements PersonalizableTravel
 		double tollCost = this.tollCostHandler.getTollCost(link, time);
 		return baseCost + tollCost;
 	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
 
 	private interface TollRouterBehaviour {
 		public double getTollCost(Link link, double time);

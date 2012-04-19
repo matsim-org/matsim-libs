@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
@@ -49,7 +50,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -57,7 +57,6 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ArgumentParser;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.mrieser.core.mobsim.usecases.OptimizedCarSimFactory;
 
@@ -69,12 +68,12 @@ import playground.mrieser.core.mobsim.usecases.OptimizedCarSimFactory;
  */
 public class BenchmarkV2 {
 
-	private final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	public void convertNetwork() {
 		OsmNetworkReader osmReader = new OsmNetworkReader(this.scenario.getNetwork(), new WGS84toCH1903LV03());
 		osmReader.setKeepPaths(false);
-			osmReader.parse("/Volumes/Data/projects/benchmarkV2/zurich.osm");
+		osmReader.parse("/Volumes/Data/projects/benchmarkV2/zurich.osm");
 		new NetworkCleaner().run(this.scenario.getNetwork());
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 			if (link.getFreespeed() == 0.0) {
@@ -200,7 +199,7 @@ public class BenchmarkV2 {
 			c.addModule("parallelEventHandling", m);
 		}
 
-		Controler ctrl = new Controler((ScenarioImpl) this.scenario);
+		Controler ctrl = new Controler(this.scenario);
 		if ("newsim".equals(mobsim)) {
 			System.out.println("using newsim mobsim-factory");
 			OptimizedCarSimFactory factory = new OptimizedCarSimFactory(nOfThreadsSim);

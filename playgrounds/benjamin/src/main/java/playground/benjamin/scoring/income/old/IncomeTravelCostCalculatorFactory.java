@@ -40,6 +40,7 @@ public class IncomeTravelCostCalculatorFactory implements TravelDisutilityFactor
 		this.personHouseholdMapping = personHouseholdMapping;
 	}
 	
+	@Override
 	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		
@@ -54,6 +55,11 @@ public class IncomeTravelCostCalculatorFactory implements TravelDisutilityFactor
 			public double getLinkTravelDisutility(Link link, double time) {
 				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelDisutility(link, time);
 				return generalizedTravelCost;
+			}
+			
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				return incomeTravelCostCalculator.getLinkMinimumTravelDisutility(link);
 			}
 			
 		};

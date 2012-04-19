@@ -34,7 +34,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.utils.NotAnIntersection;
@@ -50,6 +49,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 	public static class MinimizeLinkAmountTravelCostCalculatorFactoryImpl
 			implements TravelDisutilityFactory {
 
+		@Override
 		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
@@ -59,7 +59,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 	}
 
 	public static class MinimizeLinkAmountTravelCostCalculator implements
-			TravelMinDisutility, PersonalizableTravelDisutility {
+			PersonalizableTravelDisutility {
 		protected final TravelTime timeCalculator;
 
 		public MinimizeLinkAmountTravelCostCalculator(TravelTime timeCalculator) {

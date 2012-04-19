@@ -58,6 +58,7 @@ public class SubNetworkDijkstraTravelCostWrapper implements PersonalizableTravel
 		this.subNetworkDijkstra = subNetworkDijkstra;
 	}
 	
+	@Override
 	public void setPerson(Person person)
 	{
 		if (subNetworkDijkstra != null) subNetworkDijkstra.setPerson(person);
@@ -68,9 +69,15 @@ public class SubNetworkDijkstraTravelCostWrapper implements PersonalizableTravel
 		}
 	}
 
+	@Override
 	public double getLinkTravelDisutility(Link link, double time)
 	{
 		return travelCost.getLinkTravelDisutility(link, time);
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		return travelCost.getLinkMinimumTravelDisutility(link);
 	}
 	
 	@Override

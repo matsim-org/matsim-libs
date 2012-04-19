@@ -27,8 +27,6 @@ import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.households.PersonHouseholdMapping;
 
-import playground.benjamin.scoring.income.IncomeTravelCostCalculator;
-
 
 /**
  * @author bkick after dgrether
@@ -42,6 +40,7 @@ public class IncomeTravelCostCalculatorFactory implements TravelDisutilityFactor
 		this.personHouseholdMapping = personHouseholdMapping;
 	}
 	
+	@Override
 	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		// yy why not just "return new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping)"?
 		// Am I overlooking something? kai, mar'12
@@ -59,6 +58,11 @@ public class IncomeTravelCostCalculatorFactory implements TravelDisutilityFactor
 			public double getLinkTravelDisutility(Link link, double time) {
 				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelDisutility(link, time);
 				return generalizedTravelCost;
+			}
+			
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				return incomeTravelCostCalculator.getLinkMinimumTravelDisutility(link);
 			}
 			
 		};

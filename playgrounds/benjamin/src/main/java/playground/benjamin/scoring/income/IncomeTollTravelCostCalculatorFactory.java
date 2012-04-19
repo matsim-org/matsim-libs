@@ -29,9 +29,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 
-import playground.benjamin.scoring.income.IncomeTollTravelCostCalculator;
-import playground.benjamin.scoring.income.IncomeTravelCostCalculator;
-
 
 /**
  * @author bkick after dgrether
@@ -52,6 +49,7 @@ public class IncomeTollTravelCostCalculatorFactory implements TravelDisutilityFa
 				"                     I may be wrong; please let me know if you ever find out (one way or the other. kai, mar'12") ;
 	}
 	
+	@Override
 	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		final IncomeTollTravelCostCalculator incomeTollTravelCostCalculator = new IncomeTollTravelCostCalculator(personHouseholdMapping, scheme);
@@ -71,6 +69,11 @@ public class IncomeTollTravelCostCalculatorFactory implements TravelDisutilityFa
 				double generalizedTravelCost = incomeTravelCostCalculator.getLinkTravelDisutility(link, time);
 				double additionalGeneralizedTollCost = incomeTollTravelCostCalculator.getLinkTravelDisutility(link, time);
 				return generalizedTravelCost + additionalGeneralizedTollCost;
+			}
+			
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				return incomeTollTravelCostCalculator.getLinkMinimumTravelDisutility(link);
 			}
 			
 		};

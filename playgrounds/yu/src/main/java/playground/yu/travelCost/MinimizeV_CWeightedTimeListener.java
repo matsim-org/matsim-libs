@@ -34,7 +34,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -58,6 +57,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 			this.capPeriod = capPeriod;
 		}
 
+		@Override
 		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
@@ -68,7 +68,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 	}
 
 	public static class MinimizeV_CWeightedTimeTravelCostCalculator implements
-			TravelMinDisutility, PersonalizableTravelDisutility {
+			PersonalizableTravelDisutility {
 
 		protected final TravelTime timeCalculator;
 		private final VolumesAnalyzer volumes;

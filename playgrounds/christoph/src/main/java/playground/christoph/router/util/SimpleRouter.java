@@ -53,6 +53,7 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, Personali
 		this.tabuSelector = new TabuSelector();
 	}
 	
+	@Override
 	public void setPerson(Person person) {
 		this.person = person;
 	}
@@ -61,7 +62,13 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, Personali
 	 * A typical simple Router like a Random Router ignores
 	 * the link travel costs so by default we set them to 0.
 	 */
+	@Override
 	public double getLinkTravelDisutility(Link link, double time) {
+		return 0;
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
 		return 0;
 	}
 	

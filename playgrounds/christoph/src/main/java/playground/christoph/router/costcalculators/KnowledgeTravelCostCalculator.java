@@ -77,6 +77,11 @@ public class KnowledgeTravelCostCalculator implements PersonalizableTravelDisuti
 		}
 		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
+	}
 
 	public void checkNodeKnowledge(boolean value) {
 		this.checkNodeKnowledge = value;

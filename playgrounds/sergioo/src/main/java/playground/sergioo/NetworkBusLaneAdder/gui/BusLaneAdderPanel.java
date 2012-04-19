@@ -45,14 +45,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.xml.sax.SAXException;
 
 import others.sergioo.AddressLocator.AddressLocator;
 import others.sergioo.AddressLocator.BadAddressException;
-
 import playground.sergioo.NetworkBusLaneAdder.gui.BusLaneAdderWindow.Labels;
 import playground.sergioo.NetworkBusLaneAdder.gui.BusLaneAdderWindow.Options;
 import playground.sergioo.Visualizer2D.Layer;
@@ -96,7 +95,7 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 		addMouseWheelListener(this);
 		addKeyListener(this);
 		setFocusable(true);
-		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
+		TravelDisutility travelMinCost = new TravelDisutility() {
 			public double getLinkTravelDisutility(Link link, double time) {
 				return getLinkMinimumTravelDisutility(link);
 			}
@@ -108,6 +107,7 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 			}
 		};
 		TravelTime timeFunction = new TravelTime() {	
+			@Override
 			public double getLinkTravelTime(Link link, double time) {
 				if(link.getAllowedModes().contains("bus"))
 					return link.getLength()/BUS_SPEED;

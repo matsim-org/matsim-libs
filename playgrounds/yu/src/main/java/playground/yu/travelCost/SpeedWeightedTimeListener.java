@@ -32,7 +32,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -46,6 +45,7 @@ public class SpeedWeightedTimeListener implements IterationStartsListener {
 	public static class SpeedWeightedTravelCostCalculatorFactoryImpl implements
 			TravelDisutilityFactory {
 
+		@Override
 		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
@@ -55,7 +55,7 @@ public class SpeedWeightedTimeListener implements IterationStartsListener {
 	}
 
 	public static class SpeedWeightedTravelTimeCostCalculator implements
-			TravelMinDisutility, PersonalizableTravelDisutility {
+			PersonalizableTravelDisutility {
 
 		protected final TravelTime timeCalculator;
 

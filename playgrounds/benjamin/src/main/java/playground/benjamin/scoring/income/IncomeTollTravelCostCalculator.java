@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.households.Income;
-import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 
@@ -46,6 +46,11 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelDisut
 
 		@Override
 		public double getLinkTravelDisutility(Link link, double time) {
+			return 0;
+		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
 			return 0;
 		}
 
@@ -83,6 +88,11 @@ public class IncomeTollTravelCostCalculator implements PersonalizableTravelDisut
 		return additionalGeneralizedTollCost;
 	}
 
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
+	}
+	
 	private double getHouseholdIncomePerDay(Person person, PersonHouseholdMapping hhdb) {
 		Income income = hhdb.getHousehold(person.getId()).getIncome();
 		double incomePerDay = this.calculateIncomePerDay(income);

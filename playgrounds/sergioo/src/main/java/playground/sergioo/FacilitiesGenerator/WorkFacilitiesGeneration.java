@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.sergioo.FacilitiesGenerator;
 
 import java.io.EOFException;
@@ -46,29 +65,21 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
-import playground.sergioo.FacilitiesGenerator.gui.WeigthsNetworkWindow;
-import playground.sergioo.FacilitiesGenerator.hits.PersonSchedule;
-import playground.sergioo.FacilitiesGenerator.hits.PointPerson;
-import playground.sergioo.FacilitiesGenerator.hits.Trip;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
 import others.sergioo.util.algebra.Matrix1DImpl;
 import others.sergioo.util.algebra.Matrix2DImpl;
@@ -77,6 +88,11 @@ import others.sergioo.util.algebra.MatrixND;
 import others.sergioo.util.algebra.PointND;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
+import playground.sergioo.FacilitiesGenerator.gui.WeigthsNetworkWindow;
+import playground.sergioo.FacilitiesGenerator.hits.PersonSchedule;
+import playground.sergioo.FacilitiesGenerator.hits.PointPerson;
+import playground.sergioo.FacilitiesGenerator.hits.Trip;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
 public class WorkFacilitiesGeneration {
 
@@ -538,7 +554,7 @@ public class WorkFacilitiesGeneration {
 			oos.writeObject(linksStops);
 			oos.close();
 		}
-		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
+		TravelDisutility travelMinCost = new TravelDisutility() {
 			public double getLinkTravelDisutility(Link link, double time) {
 				return getLinkMinimumTravelDisutility(link);
 			}
@@ -547,6 +563,7 @@ public class WorkFacilitiesGeneration {
 			}
 		};
 		TravelTime timeFunction = new TravelTime() {	
+			@Override
 			public double getLinkTravelTime(Link link, double time) {
 				return link.getLength();
 			}

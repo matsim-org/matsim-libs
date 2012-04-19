@@ -22,8 +22,6 @@ package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
 
-
-
 /**
  * A simple interface to retrieve the disutility to travel on links.
  *
@@ -39,5 +37,11 @@ public interface TravelDisutility {
 	 * @return The disutility to travel over the link <code>link</code>, departing at time <code>time</code>.
 	 */
 	public double getLinkTravelDisutility(Link link, double time);
+	
+	/**
+	 * @param the link for which the minimal travel disutility over all time slots is calculated
+	 * @return Minimal costs to travel over the link <pre>link</pre>, departing at time <pre>time</pre>
+	 */
+	public double getLinkMinimumTravelDisutility(Link link);
 
 }

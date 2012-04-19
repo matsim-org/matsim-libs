@@ -63,6 +63,11 @@ public class TravelDisutilityIncludingToll implements PersonalizableTravelDisuti
 		}
 		return baseCost + tollCost;
 	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		return this.costHandler.getLinkMinimumTravelDisutility(link);
+	}
 
 	private interface TollRouterBehaviour {
 		public double getTollCost(Link link, double time);

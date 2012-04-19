@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
+import herbie.running.scoring.TravelScoringFunction;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.pt.router.TransitRouterConfig;
-
-import herbie.running.scoring.TravelScoringFunction;
 
 /**
  * @author thibautd
@@ -65,6 +65,11 @@ public class HerbieParkAndRideCost implements PersonalizableTravelTime, Personal
 		return -distanceScoring.getWalkScore(link.getLength(), walktime)
 			   -waittime * config.getMarginalUtiltityOfWaiting_utl_s()
 			   - config.getUtilityOfLineSwitch_utl();
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

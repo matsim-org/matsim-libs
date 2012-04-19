@@ -459,6 +459,11 @@ public class MultiNodeDijkstraTest extends TestCase {
 		public double getLinkTravelDisutility(final Link link, final double time) {
 			return this.travelCosts.get(link.getId()).doubleValue();
 		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			throw new UnsupportedOperationException();
+		}
 
 	}
 

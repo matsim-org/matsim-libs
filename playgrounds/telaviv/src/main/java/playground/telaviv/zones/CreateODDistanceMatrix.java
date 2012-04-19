@@ -4,25 +4,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelMinDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.telaviv.locationchoice.FullNetworkDijkstra;
@@ -41,7 +40,7 @@ public class CreateODDistanceMatrix {
 	protected int numOfThreads = 6;
 	
 	public static void main(String[] args) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		ZoneMapping zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 		new CreateODDistanceMatrix(scenario, zoneMapping).calculateODMatrix();
@@ -188,7 +187,7 @@ public class CreateODDistanceMatrix {
 		}
 	}
 	
-	private static class TravelTimeCost implements TravelTime, TravelMinDisutility {
+	private static class TravelTimeCost implements TravelTime, TravelDisutility {
 
 		@Override
 		public double getLinkTravelTime(Link link, double time) {

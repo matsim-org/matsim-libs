@@ -44,6 +44,7 @@ public class IncomeTollTravelCostCalculatorFactory implements TravelDisutilityFa
 		this.scheme = roadPricingScheme;
 	}
 	
+	@Override
 	public PersonalizableTravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		final IncomeTollTravelCostCalculator incomeTollTravelCostCalculator = new IncomeTollTravelCostCalculator(personHouseholdMapping, scheme);
@@ -65,6 +66,10 @@ public class IncomeTollTravelCostCalculatorFactory implements TravelDisutilityFa
 				return generalizedTravelCost + additionalGeneralizedTollCost;
 			}
 			
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				return incomeTravelCostCalculator.getLinkMinimumTravelDisutility(link);
+			}
 		};
 	}
 

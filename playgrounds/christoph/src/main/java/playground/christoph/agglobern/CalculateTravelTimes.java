@@ -31,8 +31,8 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -44,11 +44,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
@@ -79,7 +78,7 @@ public class CalculateTravelTimes {
 	private double connectorSpeed = 45 / 3.6;	// 45 km/h to reach the network
 	
 	public static void main(String[] args) throws Exception {
-		new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		new CalculateTravelTimes(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 	}
 	
 	public CalculateTravelTimes(Scenario scenario) throws IOException {
@@ -109,7 +108,7 @@ public class CalculateTravelTimes {
 	private void initCalulators() {
 		travelTime = new FreeSpeedTravelTimeCalculator();
 		travelCost = new FreeSpeedTravelCost(travelTime);
-		leastCostPathCalculator = new AStarLandmarksFactory(scenario.getNetwork(), (FreeSpeedTravelCost)travelCost).createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
+		leastCostPathCalculator = new AStarLandmarksFactory(scenario.getNetwork(), travelCost).createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
 	}
 	
 	private void readNetworkFile(Scenario scenario) {
@@ -308,21 +307,24 @@ public class CalculateTravelTimes {
 		Coord coordWGS84;
 	}
 		
-	public class FreeSpeedTravelCost implements PersonalizableTravelDisutility, TravelMinDisutility {
+	public class FreeSpeedTravelCost implements PersonalizableTravelDisutility, TravelDisutility {
 		private TravelTime travelTime;
 		
 		public FreeSpeedTravelCost(TravelTime travelTime) {
 			this.travelTime = travelTime;
 		}
 		
+		@Override
 		public void setPerson(Person person) {
 			// nothing to do here
 		}
 
+		@Override
 		public double getLinkTravelDisutility(Link link, double time) {
 			return travelTime.getLinkTravelTime(link, time);
 		}
 
+		@Override
 		public double getLinkMinimumTravelDisutility(Link link) {
 			return travelTime.getLinkTravelTime(link, 0.0);
 		}

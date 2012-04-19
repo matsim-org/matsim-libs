@@ -44,12 +44,10 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -99,26 +97,26 @@ public class CalculateTravelTimes {
 		CalculateTravelTimes calculateTravelTimes = null;
 		
 		// empty network
-		calculateTravelTimes = new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		calculateTravelTimes = new CalculateTravelTimes(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		calculateTravelTimes.outFile = outFileEmpty;
 		calculateTravelTimes.calculateTravelTimes();
 		
 		// morning peak
-		calculateTravelTimes = new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		calculateTravelTimes = new CalculateTravelTimes(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		calculateTravelTimes.outFile = outFileMorning;
 		calculateTravelTimes.startTime = morningPeak - meanTripTravelTime / 2;
 		calculateTravelTimes.useFreeSpeedTravelTime = false;
 		calculateTravelTimes.calculateTravelTimes();
 
 		// midday peak
-		calculateTravelTimes = new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		calculateTravelTimes = new CalculateTravelTimes(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		calculateTravelTimes.outFile = outFileMidday;
 		calculateTravelTimes.startTime = midDay - meanTripTravelTime / 2;
 		calculateTravelTimes.useFreeSpeedTravelTime = false;
 		calculateTravelTimes.calculateTravelTimes();
 
 		// evening peak
-		calculateTravelTimes = new CalculateTravelTimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		calculateTravelTimes = new CalculateTravelTimes(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		calculateTravelTimes.outFile = outFileEvening;
 		calculateTravelTimes.startTime = eveningPeak - meanTripTravelTime / 2;
 		calculateTravelTimes.useFreeSpeedTravelTime = false;
@@ -159,7 +157,7 @@ public class CalculateTravelTimes {
 		}
 		else {
 			travelTime = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-			EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+			EventsManager eventsManager = EventsUtils.createEventsManager();
 			eventsManager.addHandler((TravelTimeCalculator)travelTime);
 			
 			EventsReaderTXTv1 reader = new EventsReaderTXTv1(eventsManager);
@@ -296,21 +294,24 @@ public class CalculateTravelTimes {
 		}
 	}
 		
-	public class FreeSpeedTravelCost implements PersonalizableTravelDisutility, TravelMinDisutility {
+	public class FreeSpeedTravelCost implements PersonalizableTravelDisutility {
 		private TravelTime travelTime;
 		
 		public FreeSpeedTravelCost(TravelTime travelTime) {
 			this.travelTime = travelTime;
 		}
 		
+		@Override
 		public void setPerson(Person person) {
 			// nothing to do here
 		}
 
+		@Override
 		public double getLinkTravelDisutility(Link link, double time) {
 			return travelTime.getLinkTravelTime(link, time);
 		}
 
+		@Override
 		public double getLinkMinimumTravelDisutility(Link link) {
 			return travelTime.getLinkTravelTime(link, 0.0);
 		}

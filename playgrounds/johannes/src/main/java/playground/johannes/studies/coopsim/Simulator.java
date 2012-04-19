@@ -41,7 +41,6 @@ import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -72,7 +71,6 @@ import playground.johannes.coopsim.mental.choice.ActTypeTimeSelector;
 import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;
 import playground.johannes.coopsim.mental.choice.ActivityGroupGenerator;
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
-import playground.johannes.coopsim.mental.choice.ActivityTypeSelector;
 import playground.johannes.coopsim.mental.choice.AltersHome;
 import playground.johannes.coopsim.mental.choice.ArrivalTimeSelector;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
@@ -96,9 +94,7 @@ import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorComposite;
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
-import playground.johannes.mz2005.io.ActivityType;
 import playground.johannes.sna.util.MultiThreading;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.GaussDistribution;
@@ -266,9 +262,15 @@ public class Simulator {
 			public double getLinkTravelDisutility(Link link, double time) {
 				return travelTime.getLinkTravelTime(link, time);
 			}
+
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				// TODO Auto-generated method stub
+				throw new UnsupportedOperationException();
+			}
 		};
 		
-		TravelMinDisutility travelMinCost = new TravelMinDisutility() {
+		TravelDisutility travelMinCost = new TravelDisutility() {
 			
 			@Override
 			public double getLinkTravelDisutility(Link link, double time) {

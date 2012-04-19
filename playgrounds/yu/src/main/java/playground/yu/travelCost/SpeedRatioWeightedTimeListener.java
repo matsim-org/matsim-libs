@@ -33,7 +33,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 
 /**
  * switch TravelCostCalculatorFactory evetually also PersonalizableTravelCost
@@ -46,6 +46,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 	public static class SpeedRatioWeightedTimeTravelCostCalculatorFactoryImpl
 			implements TravelDisutilityFactory {
 
+		@Override
 		public PersonalizableTravelDisutility createTravelDisutility(
 				PersonalizableTravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
@@ -56,7 +57,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 	}
 
 	public static class SpeedRatioWeightedTimeTravelCostCalculator implements
-			TravelMinDisutility, PersonalizableTravelDisutility {
+			TravelDisutility, PersonalizableTravelDisutility {
 		private PersonalizableTravelTime timeCalculator;
 
 		public SpeedRatioWeightedTimeTravelCostCalculator(

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelMinDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 
@@ -34,7 +33,7 @@ import org.matsim.core.utils.misc.Time;
  *  
  * @author cdobler
  */
-public class OnlyTimeDependentTravelDisutilityCalculator implements TravelMinDisutility, PersonalizableTravelDisutility {
+public class OnlyTimeDependentTravelDisutilityCalculator implements PersonalizableTravelDisutility {
 
 	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelDisutilityCalculator.class);
 	

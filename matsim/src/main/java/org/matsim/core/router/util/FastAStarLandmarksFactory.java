@@ -34,11 +34,11 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 		// Nothing to do.
 	}
 	
-	public FastAStarLandmarksFactory(Network network, final TravelMinDisutility fsttc){
+	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc){
 		processNetwork(network, fsttc);
 	}
 
-	public void processNetwork(Network network, final TravelMinDisutility fsttc) {
+	public void processNetwork(Network network, final TravelDisutility fsttc) {
 		synchronized (this) {
 				this.preProcessData = new PreProcessLandmarks(fsttc);
 				this.preProcessData.run(network);

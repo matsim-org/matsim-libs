@@ -47,123 +47,135 @@ import playground.mrieser.modules.MatsimModule;
 
 public class Template implements MatsimModule {
 
+	@Override
 	public void initModule(final Controler c) {
 		System.out.println("hello world.");
 	}
-	
+
 	public void initModule2(final Controler c) {
 		// possible things that could get loaded with a module:
-		
-		
-		
+
+
+
 		// *** RoutingAlgorithm *********************
-		
+
 		LeastCostPathCalculatorFactory routerAlgoFactory = new LeastCostPathCalculatorFactory() {
-			public LeastCostPathCalculator createPathCalculator(Network network, TravelDisutility travelCosts, TravelTime travelTimes) {
+			@Override
+			public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 				return null;
 			}
 		};
 		c.setLeastCostPathCalculatorFactory(routerAlgoFactory);
 		// DISCUSS directly set the algo-factory, or just register to be loaded depending on config?
 		// what about conflicts, if multiple modules try to set that?
-		
-		
-		
-		
+
+
+
+
 		// *** ReplanningModule *********************
-		
+
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		c.getStrategyManager().addStrategy(strategy, 0.5);
 		// TODO needs improvement, not directly add to StrategyManager, but offer option to be loaded via config
 		// register PlanStrategy, PlanSelector, StrategyModule?
-		
-		
-		
-		
+
+
+
+
 		// *** ScoringFunction *********************
-		
+
 		ScoringFunctionFactory scoringFactory = new ScoringFunctionFactory() {
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			@Override
+			public ScoringFunction createNewScoringFunction(final Plan plan) {
 				return null;
 			}
 		};
 		c.setScoringFunctionFactory(scoringFactory);
 		// DISCUSS directly set the sf-factory, or just register to be loaded depending on config?
-		
-		
-		
-		
+
+
+
+
 		// *** ConfigGroup *********************
-		
+
 		Module templateModule = new Module("Template");
 		c.getConfig().addModule("Template", templateModule); // problem: must be called before Controler is fully initialized, but cannot because than its not yet clear which modules need to be laoded. so, could be fixed in Config.java.
-		
-		
-		
-		
+
+
+
+
 		// *** EventHandler *********************
-		
+
 		AgentArrivalEventHandler eventHandler = new AgentArrivalEventHandler() {
-			public void handleEvent(AgentArrivalEvent event) {
+			@Override
+			public void handleEvent(final AgentArrivalEvent event) {
 			}
-			public void reset(int iteration) {
+			@Override
+			public void reset(final int iteration) {
 			}
 		};
 		c.getEvents().addHandler(eventHandler); // problem: getEvents() may return null if not yet initialized
-		
-		
-		
-		
+
+
+
+
 		// *** ControlerListener *********************
-		
+
 		StartupListener cListener = new StartupListener() {
-			public void notifyStartup(StartupEvent event) {
+			@Override
+			public void notifyStartup(final StartupEvent event) {
 				System.out.println("startup");
 			}
 		};
 		c.addControlerListener(cListener);
-		
-		
-		
-		
+
+
+
+
 		// *** Mobsim *********************
-		
+
 		// TODO
-		
-		
-		
+
+
+
 		// *** TravelCostCalculator *********************
-		
+
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 
 			@Override
 			public PersonalizableTravelDisutility createTravelDisutility(
-					PersonalizableTravelTime timeCalculator,
-					PlanCalcScoreConfigGroup cnScoringGroup) {
+					final PersonalizableTravelTime timeCalculator,
+					final PlanCalcScoreConfigGroup cnScoringGroup) {
 				return new PersonalizableTravelDisutility() {
 
-					public double getLinkTravelDisutility(Link link, double time) {
+					@Override
+					public double getLinkTravelDisutility(final Link link, final double time) {
 						return 0;
 					}
-					
+
 					@Override
-					public void setPerson(Person person) {
-						
+					public double getLinkMinimumTravelDisutility(final Link link) {
+						return 0;
 					}
-					
+
+					@Override
+					public void setPerson(final Person person) {
+
+					}
+
 				};
 			}
-			
+
 		};
 		c.setTravelDisutilityFactory(travelCostCalculatorFactory);
-		
+
 		// DISCUSS directly set the calculator, or just register to be loaded depending on config?
-		
-		
-		
-		
+
+
+
+
 		// *** TravelTimeCalculator *********************
-		
+
 //		TravelTime travelTimeCalculator = new TravelTime() {
 //			public double getLinkTravelTime(Link link, double time) {
 //				return 0;
@@ -171,7 +183,7 @@ public class Template implements MatsimModule {
 //		};
 		// TODO
 //		c.setTravelTimeCalculator(travelTimeCalculator);
-		
+
 	}
 
 }

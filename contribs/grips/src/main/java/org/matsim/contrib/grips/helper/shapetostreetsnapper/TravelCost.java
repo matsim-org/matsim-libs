@@ -53,6 +53,12 @@ public class TravelCost implements PersonalizableTravelDisutility {
 	}
 	
 	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	public void setPerson(Person person) {
 		// TODO Auto-generated method stub
 		

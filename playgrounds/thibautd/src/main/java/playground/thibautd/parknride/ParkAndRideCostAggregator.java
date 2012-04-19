@@ -79,6 +79,11 @@ public class ParkAndRideCostAggregator implements PersonalizableTravelTime , Per
 		}
 		return carTravelCost.getLinkTravelDisutility( link , time );
 	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public void setPerson(final Person person) {

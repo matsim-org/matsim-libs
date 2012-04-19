@@ -66,6 +66,7 @@ import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.Time;
 
 
 public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationEndsListener {
@@ -113,6 +114,11 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 //			double genCosts = travelTime.getLinkTravelTime(link, time)*cost_per_s;
 			return genCosts;
 		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			return getLinkTravelDisutility(link, Time.UNDEFINED_TIME);
+		}
 	}
 	
     private static Logger logger = Logger.getLogger(RunMobSimWithCarrier.class);
@@ -126,12 +132,14 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
         this.carrierFilename = carrierFilename;
     }
 
-    public void notifyStartup(StartupEvent event) {
+    @Override
+		public void notifyStartup(StartupEvent event) {
         carriers = new Carriers();
         new CarrierPlanReader(carriers).read(carrierFilename);
        
 	}
 	
+	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getNetwork());

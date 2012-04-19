@@ -105,4 +105,9 @@ public class EmissionTravelDisutilityCalculator implements PersonalizableTravelD
 
 			return linkTravelDisutility;
 	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -26,8 +26,8 @@ import org.matsim.core.router.util.PersonalizableTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.Household;
 import org.matsim.households.Income;
-import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.households.PersonHouseholdMapping;
 
 
 /**
@@ -69,6 +69,7 @@ public class IncomeTravelCostCalculator implements PersonalizableTravelDisutilit
 	}
 
 	//calculate generalized travel costs
+	@Override
 	public double getLinkTravelDisutility(Link link, double time) {
 		double betaCost = betaIncomeCar / this.incomePerDay;
 		double distance   = link.getLength();
@@ -85,6 +86,11 @@ public class IncomeTravelCostCalculator implements PersonalizableTravelDisutilit
 		
 		double generalizedTravelCost = generalizedDistanceCost + generalizedTravelTimeCost;
 		return generalizedTravelCost;
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override

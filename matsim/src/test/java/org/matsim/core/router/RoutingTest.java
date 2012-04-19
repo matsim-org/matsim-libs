@@ -37,7 +37,7 @@ import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelMinDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,7 +50,7 @@ public class RoutingTest extends MatsimTestCase {
 
 	private interface RouterProvider {
 		public String getName();
-		public LeastCostPathCalculatorFactory getFactory(Network network, TravelMinDisutility costCalc, TravelTime timeCalc);
+		public LeastCostPathCalculatorFactory getFactory(Network network, TravelDisutility costCalc, TravelTime timeCalc);
 	}
 
 	public void testDijkstra() {
@@ -60,7 +60,7 @@ public class RoutingTest extends MatsimTestCase {
 				return "Dijkstra";
 			}
 			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new DijkstraFactory();
 			}
 		});
@@ -73,7 +73,7 @@ public class RoutingTest extends MatsimTestCase {
 				return "FastDijkstra";
 			}
 			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new FastDijkstraFactory();
 			}
 		});
@@ -86,7 +86,7 @@ public class RoutingTest extends MatsimTestCase {
 				return "DijkstraPruneDeadends";
 			}
 			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 				preProcessData.run(network);
 				return new DijkstraFactory(preProcessData);
@@ -101,7 +101,7 @@ public class RoutingTest extends MatsimTestCase {
 				return "FastDijkstraPruneDeadends";
 			}
 			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 				preProcessData.run(network);
 				return new FastDijkstraFactory(preProcessData);
@@ -116,7 +116,7 @@ public class RoutingTest extends MatsimTestCase {
 				return "AStarEuclidean";
 			}
 			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new AStarEuclideanFactory(network, costCalc);
 			}
 		});
@@ -129,7 +129,7 @@ public class RoutingTest extends MatsimTestCase {
 				return "FastAStarEuclidean";
 			}
 			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new FastAStarEuclideanFactory(network, costCalc);
 			}
 		});
@@ -142,7 +142,7 @@ public class RoutingTest extends MatsimTestCase {
 				return "AStarLandmarks";
 			}
 			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new AStarLandmarksFactory(network, costCalc);
 			}
 		});
@@ -155,7 +155,7 @@ public class RoutingTest extends MatsimTestCase {
 				return "FastAStarLandmarks";
 			}
 			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinDisutility costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new FastAStarLandmarksFactory(network, costCalc);
 			}
 		});
