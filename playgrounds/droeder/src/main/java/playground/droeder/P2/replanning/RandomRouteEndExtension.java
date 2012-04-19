@@ -90,7 +90,12 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 		
 		List<TransitStopFacility> stopsToServe = createNewStopsToServe(cooperative, tree); 
 		newPlan.setStopsToBeServed((ArrayList<TransitStopFacility>) stopsToServe);
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, (ArrayList<TransitStopFacility>) stopsToServe, new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), 
+																	newPlan.getStartTime(), 
+																	newPlan.getEndTime(), 
+																	1, 
+																	(ArrayList<TransitStopFacility>) stopsToServe, 
+																	new IdImpl(cooperative.getCurrentIteration())));
 		return newPlan;
 	}
 	
@@ -114,7 +119,9 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 			break;
 		}
 		
-		//use stops2serve and NOT alreadyServed, because alreadyServedd might not be consistent or not necessary for the new route
+		/* find the stop within the greatest distance from the stops2beServed-list  
+		 * use stops2serve and NOT alreadyServed, because alreadyServedd might not be consistent or not necessary for the new route
+		 */
 		Integer indexStopInGreatestDistance = findStopInGreatestDistance(stops2serve);
 		if(indexStopInGreatestDistance == null){
 			// normally this should not happen, because there have to be at least 2 stops...
