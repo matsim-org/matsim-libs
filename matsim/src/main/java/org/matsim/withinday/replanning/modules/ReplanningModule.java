@@ -70,7 +70,7 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 		if (config.multiModal().isMultiModalSimulationEnabled()) {
 			MultiModalTravelTime multiModalTravelTime = (MultiModalTravelTime) travelTime;
 			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) pathFactory.createPathCalculator(network, travelCost, travelTime);
-			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, multiModalTravelTime, travelCost, routeAlgo);
+			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, multiModalTravelTime, routeAlgo);
 
 			/*
 			 * A MultiModalTravelTime calculator is used. Before creating a route for a given

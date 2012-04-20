@@ -21,7 +21,6 @@ package org.matsim.core.router;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,7 +35,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleImpl;
 
 /**
  * @author mrieser / senozon
@@ -114,16 +113,7 @@ public class PersonalizableDisutilityIntegrationTest {
 			
 			this.person = new PersonImpl(new IdImpl(1));
 			
-			this.vehicle = new Vehicle() {
-				@Override
-				public Id getId() {
-					return null;
-				}
-				@Override
-				public VehicleType getType() {
-					return null;
-				}
-			};
+			this.vehicle = new VehicleImpl(null, null);
 			
 			this.costFunction = new PersonEnforcingTravelDisutility();
 			this.costFunction.setExpectations(this.person, this.vehicle);

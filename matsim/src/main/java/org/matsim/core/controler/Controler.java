@@ -1261,7 +1261,7 @@ public class Controler {
 
 			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) 
 					this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, travelTime);
-			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, travelTime, travelCosts, routeAlgo);
+			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, travelTime, routeAlgo);
 
 			/*
 			 * A MultiModalTravelTime calculator is used. Before creating a route for a given

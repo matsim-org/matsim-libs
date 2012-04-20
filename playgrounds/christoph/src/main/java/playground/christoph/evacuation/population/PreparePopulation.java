@@ -190,7 +190,7 @@ public class PreparePopulation {
 		IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) 
 			leastCostPathCalculatorFactory.createPathCalculator(this.scenario.getNetwork(), travelCost, multiModalTravelTime);
 		MultiModalLegRouter multiModalLegRouter = new MultiModalLegRouter(this.scenario.getNetwork(), multiModalTravelTime, 
-				travelCost, routeAlgo);
+				routeAlgo);
 
 		return multiModalLegRouter;
 	}

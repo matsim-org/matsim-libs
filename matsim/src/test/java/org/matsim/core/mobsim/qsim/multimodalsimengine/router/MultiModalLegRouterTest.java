@@ -93,7 +93,7 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		
 		IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
 		
-		MultiModalLegRouter multiModalLegRouter = new MultiModalLegRouter(scenario.getNetwork(), travelTime, travelCost, routeAlgo);
+		MultiModalLegRouter multiModalLegRouter = new MultiModalLegRouter(scenario.getNetwork(), travelTime, routeAlgo);
 		
 		Person person = scenario.getPopulation().getFactory().createPerson(scenario.createId("person"));
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
