@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.lib.tools.events;
 
 import java.util.HashSet;
@@ -15,10 +34,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 public class FilterAgents {
@@ -56,7 +73,7 @@ public class FilterAgents {
 
 	private static void startFiltering(HashSet<Id> agentIds, String inputEventsFilePath, String outputEventsFilePath,
 			boolean keepAgentsInFilter) {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		EventsFilter eventsFilter = new EventsFilter(outputEventsFilePath, agentIds, keepAgentsInFilter);
 
@@ -65,8 +82,8 @@ public class FilterAgents {
 		// TODO: make switch between txt/xml general.
 		//EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
 		//reader.readFile(inputEventsFilePath);
-		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(inputEventsFilePath);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(inputEventsFilePath);
 
 		eventsFilter.closeFile();
 	}
@@ -87,6 +104,7 @@ public class FilterAgents {
 		}
 
 		// this method is for the xml events writer, the methods below for the txt case
+		@Override
 		public void handleEvent(final Event event) {
 			Id personId = new IdImpl(event.toString().split("person=\"")[1].split("\"")[0]);
 
