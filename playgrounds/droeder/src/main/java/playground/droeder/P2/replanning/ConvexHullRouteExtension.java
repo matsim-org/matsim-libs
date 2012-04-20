@@ -21,17 +21,13 @@ package playground.droeder.P2.replanning;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -74,6 +70,7 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
 		// create the convex-hull (geotools-method) of all used stops 
 		Geometry hull = this.createConvexHull(currentlyUsedStops);
+		
 		// find currently unused stops inside the convex-hull
 		List<TransitStopFacility> newHullInteriorStops = 
 			this.findNewHullInteriorStops(cooperative.getRouteProvider().getAllPStops(), currentlyUsedStops, hull);
@@ -141,8 +138,7 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 			temp = 0;
 			
 			for(TransitStopFacility t: subroute){
-				log.error(t.getId());
-//				temp += CoordUtils.calcDistance(t.getCoord(), newStop.getCoord());
+				temp += CoordUtils.calcDistance(t.getCoord(), newStop.getCoord());
 			}
 			temp = temp/subroute.size();
 //			log.error("###");

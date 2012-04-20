@@ -37,7 +37,8 @@ import playground.droeder.eMobility.events.EPopulationHandler;
  */
 public class EmobilityRunner {
 	
-	private static final String DIR = "/home/dgrether/shared-svn/projects/volkswagen_internal/";
+	private static final String DIR = "D:/VSP/svn/shared/volkswagen_internal/";
+//	private static final String DIR = "/home/dgrether/shared-svn/projects/volkswagen_internal/";
 
 	private static final String CONFIGFILE = DIR + "scenario/config_base_scenario.xml";
 	private static final String CHARGINGFILE = DIR + "Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";

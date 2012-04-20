@@ -63,7 +63,7 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 	 * inserts a new stop 2 be served to the best plan of an cooperative.
 	 * This is done by spreading out a rectangle between the first stop2beServed and the furthest away stop from the stops2beServed 
 	 * list (assuming this is the turning-point of a route).
-	 * The width of the rectangle is naturally given by the distance of the to stops. The height has to be defined as parameter relativ to the length.
+	 * The width of the rectangle is naturally given by the distance of the to stops. The height has to be defined as parameter relative to the length.
 	 * 
 	 * @param parameter
 	 */
@@ -149,15 +149,10 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 		
 		for(List<TransitStopFacility> subroute: subrouteFacilities){
 			temp = 0;
-			
 			for(TransitStopFacility t: subroute){
-//				log.error(t.getId());
-//				temp += CoordUtils.calcDistance(t.getCoord(), newStop.getCoord());
+				temp += CoordUtils.calcDistance(t.getCoord(), newStop.getCoord());
 			}
 			temp = temp/subroute.size();
-//			log.error("###");
-//			log.error(temp);
-//			System.out.println();
 			dist.add(temp);
 		}
 		
