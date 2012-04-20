@@ -58,6 +58,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author Ihab
  *
  */
+
+// todo: Suchbereich in Suchradius umwandeln...
+
 public class NetworkChange {
 	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/test_network2.xml";
 	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/input/scheduleFile.xml";
@@ -179,8 +182,6 @@ public class NetworkChange {
 			i++;
 		}
 	}
-
-	// todo: Suchbereich in Suchradius umwandeln...
 	
 	private Link setParkAndRideLinks(Link link) {
 		Set<String> modes = new HashSet<String>();
