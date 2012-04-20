@@ -84,6 +84,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 
+	
 	public void testEmissionRouting() {
 		
 		this.config = super.loadConfig(null); // automatically sets the correct output directory
@@ -106,7 +107,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		emissionModule.createEmissionHandler();
 		
 		installTravelCostCalculatorFactory();
-		final RoadUsedHandler handler = new RoadUsedHandler(11) ;
+		final RoadUsedHandler handler = new RoadUsedHandler(13) ;
 						
 		StartupListener startupListener = new StartupListener() {
 			@Override
@@ -116,11 +117,11 @@ public class EmissionRoutingTest extends MatsimTestCase{
 			}
 		};
 		
+		System.out.println("test emission routing");
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
-		assertTrue("Person was expected to be routed through link 11, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
+		assertTrue("Person was expected to be routed through link 13, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
 	}
-
 
 
 	public void testDistanceRouting() {
@@ -140,7 +141,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		pcs.setMarginalUtilityOfMoney(1.0);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 		
-		final RoadUsedHandler handler = new RoadUsedHandler(13) ;
+		final RoadUsedHandler handler = new RoadUsedHandler(11) ;
 						
 		StartupListener startupListener = new StartupListener() {
 			@Override
@@ -150,13 +151,12 @@ public class EmissionRoutingTest extends MatsimTestCase{
 				event.getControler().getEvents().addHandler(handler);
 			}
 		};
-		
+		System.out.println("Distance Routing");
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
-		assertTrue("Person was expected to be routed through link 13, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
+		assertTrue("Person was expected to be routed through link 11, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
 		
 	}
-
 
 
 	public void testTimeRouting() {
@@ -187,21 +187,18 @@ public class EmissionRoutingTest extends MatsimTestCase{
 			}
 		};
 		
+		System.out.println("time routing");
 		this.controler.addControlerListener(startupListener);
 		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
 		assertTrue("Person was expected to be routed through link 9, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
 	}
 	
-	
-
 	private void installTravelCostCalculatorFactory() {
 		emissionCostModule = new EmissionCostModule(1.0);
 		EmissionTravelDisutilityCalculatorFactory emissionTccf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissionTccf);
 	}
-	
-	
 	
 	private void specifyControler() {
 	// controler settings	
