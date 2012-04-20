@@ -1,7 +1,7 @@
 package org.matsim.contrib.freight.vrp;
 
 /**
- * Configures solver for solving the single depot delivery vrp problem.
+ * Configures solver for solving the SINGLE DEPOT DISTRIBUTION/DELIVERY vrp problem.
  */
 
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
@@ -35,6 +36,7 @@ public class DTWSolverFactory implements VRPSolverFactory{
 
 	@Override
 	public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
+		verifyDistributionProblem(shipments,carrierVehicles);
 		ShipmentBasedVRPSolver rrSolver = new ShipmentBasedVRPSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
 		DistributionTourWithTimeWindowsAlgoFactory ruinAndRecreateFactory = new DistributionTourWithTimeWindowsAlgoFactory();
 		addListeners(ruinAndRecreateFactory);
@@ -45,6 +47,27 @@ public class DTWSolverFactory implements VRPSolverFactory{
 		rrSolver.setGlobalConstraints(constraints);
 		
 		return rrSolver;
+	}
+
+	private void verifyDistributionProblem(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles) {
+		Id location = null;
+		for(CarrierVehicle v : carrierVehicles){
+			if(location == null){
+				location = v.getLocation();
+			}
+			else if(!location.toString().equals(v.getLocation().toString())){
+				throw new IllegalStateException("if you use this solver " + this.getClass().toString() + "), all vehicles must have the same depot-location. vehicle " + v.getVehicleId() + " has not.");
+			}
+		}
+		for(CarrierShipment s : shipments){
+			if(location == null){
+				return;
+			}
+			if(!s.getFrom().toString().equals(location.toString())){
+				throw new IllegalStateException("if you use this solver, all shipments must have the same from-location. errorShipment " + s);
+			}
+		}
+		
 	}
 
 	private void addListeners(DistributionTourWithTimeWindowsAlgoFactory ruinAndRecreateFactory) {
