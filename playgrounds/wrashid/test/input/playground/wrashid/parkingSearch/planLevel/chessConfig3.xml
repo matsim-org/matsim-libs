@@ -81,8 +81,6 @@
 	
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
-
-	
 		
 		<param name="ModuleProbability_1" value="1.0" />
 		<param name="Module_1" value="BestScore" />
@@ -107,11 +105,6 @@
 		<param name="parkingActivityDurationPenaltyScalingFactor" value="1.0" />
 		
 		
-	</module>
-	
-	<module name="locationchoice">
-		<param name="constrained" value="true"/>
-		<param name="maxRecursions" value="20"/>
 	</module>
 
 </config>
