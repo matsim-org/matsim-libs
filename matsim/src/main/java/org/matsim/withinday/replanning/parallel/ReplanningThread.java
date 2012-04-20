@@ -29,10 +29,13 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.withinday.events.ReplanningEvent;
+import org.matsim.withinday.events.ReplanningEventImpl;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
@@ -67,6 +70,7 @@ public abstract class ReplanningThread extends Thread {
 	 */
 	protected Map<Id, List<ReplanningTask>> replanningTasks = new TreeMap<Id, List<ReplanningTask>>();
 	protected WithinDayReplanner<AgentsToReplanIdentifier> withinDayReplanner;
+	protected EventsManager eventsManager;
 	
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier betweenReplannerBarrier;
@@ -74,6 +78,10 @@ public abstract class ReplanningThread extends Thread {
 	
 	public ReplanningThread(String counterText) {
 		counter = new Counter(counterText);
+	}
+	
+	public final void setEventsManager(EventsManager eventsManager) {
+		this.eventsManager = eventsManager;
 	}
 	
 	public final void setTime(double time) {
@@ -149,7 +157,18 @@ public abstract class ReplanningThread extends Thread {
 						log.error("Replanning was not successful! Replanner " + withinDayReplanner.getClass().toString() + 
 								", time " + Time.writeTime(time) + ", agent " + withinDayAgent.getId());
 					}
-					else counter.incCounter();
+					else {
+						/*
+						 * If the EventsManager is not null, we create an entry for the events log file.
+						 */
+						if (eventsManager != null) {
+							ReplanningEvent replanningEvent = new ReplanningEventImpl(time, withinDayAgent.getId(), 
+									withinDayReplanner.getClass().getSimpleName());
+							eventsManager.processEvent(replanningEvent);
+						}
+						
+						counter.incCounter();
+					}
 				}
 				else {
 					log.error("WithinDayReplanner is null!");

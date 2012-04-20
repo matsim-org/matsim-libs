@@ -27,6 +27,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
@@ -52,14 +53,19 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 	protected ReplanningThread[] replanningThreads;
 	protected int roundRobin = 0;
 	private int lastRoundRobin = 0;
+	protected EventsManager eventsManager;
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier betweenReplannerBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
-
+	
 	public ParallelReplanner(int numOfThreads) {
 		this.setNumberOfThreads(numOfThreads);
 	}
 
+	public final void setEventsManger(EventsManager eventsManager) {
+		for (ReplanningThread replanningThread : replanningThreads) replanningThread.setEventsManager(eventsManager);
+	}
+	
 	public final void init(String replannerName) {
 		replanningThreads = new InternalReplanningThread[numOfThreads];
 

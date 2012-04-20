@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -92,6 +93,12 @@ public class ReplanningManager implements MobsimBeforeSimStepListener, MobsimIni
 		this.setInitialReplanningModule(initialReplanningModule);
 		this.setDuringActivityReplanningModule(duringActivityReplanningModule);
 		this.setDuringLegReplanningModule(duringLegReplanningModule);
+	}
+	
+	public void setEventsManager(EventsManager eventsManager) {
+		this.parallelInitialReplanner.setEventsManger(eventsManager);
+		this.parallelDuringActivityReplanner.setEventsManger(eventsManager);
+		this.parallelDuringLegReplanner.setEventsManger(eventsManager);
 	}
 	
 	public void doInitialReplanning(boolean value) {
