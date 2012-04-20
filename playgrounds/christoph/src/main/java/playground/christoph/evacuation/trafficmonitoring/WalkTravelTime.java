@@ -255,6 +255,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		
 		this.personFactor = scatterFactor * ageFactor * genderFactor;
 		this.personWalkSpeed = this.referenceWalkSpeed * this.personFactor;
+		this.personId = person.getId();
 	}
 
 }

@@ -89,13 +89,14 @@ public class BikeTravelTime extends WalkTravelTime {
 	
 	@Override
 	public void setPerson(Person person) {
-		super.setPerson(person);
-		
 		/* 
-		 * Only recalculate the person's walk speed factor if
-		 * the person has changed.
+		 * Only recalculate the person's walk speed factor if the person has 
+		 * changed. This check has to be performed before super.setPerson(...)
+		 * is called because there the personId is already updated!
 		 */
 		if (person.getId().equals(personId)) return;
+
+		super.setPerson(person);
 		
 		this.personBikeSpeed = this.referenceBikeSpeed * this.personFactor;
 		
