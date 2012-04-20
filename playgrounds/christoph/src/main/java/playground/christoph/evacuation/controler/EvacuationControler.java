@@ -74,7 +74,7 @@ import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
-import org.matsim.utils.eventsfilecomparison.OnlineEventsComparator;
+//import org.matsim.utils.eventsfilecomparison.OnlineEventsComparator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -414,13 +414,13 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
 		this.initIdentifiers();
 		
-		// debugging - initialize events comparator
-		if (referenceEventsFile != null) {
-			OnlineEventsComparator comparator = new OnlineEventsComparator(referenceEventsFile);
-			this.getEvents().addHandler(comparator);
-			this.addControlerListener(comparator);
-			comparator.run();			
-		}
+//		// debugging - initialize events comparator
+//		if (referenceEventsFile != null) {
+//			OnlineEventsComparator comparator = new OnlineEventsComparator(referenceEventsFile);
+//			this.getEvents().addHandler(comparator);
+//			this.addControlerListener(comparator);
+//			comparator.run();			
+//		}
 	}
 	
 	/*
