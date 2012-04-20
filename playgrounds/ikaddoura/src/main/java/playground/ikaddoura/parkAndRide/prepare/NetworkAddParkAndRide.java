@@ -61,7 +61,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 // todo: Suchbereich in Suchradius umwandeln...
 
-public class NetworkChange {
+public class NetworkAddParkAndRide {
 	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/test_network2.xml";
 	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/input/scheduleFile.xml";
 	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/input/vehiclesFile.xml";
@@ -82,7 +82,7 @@ public class NetworkChange {
 
 //	
 	public static void main(String[] args) {
-		NetworkChange addParkAndRide = new NetworkChange();
+		NetworkAddParkAndRide addParkAndRide = new NetworkAddParkAndRide();
 		addParkAndRide.run();
 	}
 
