@@ -122,7 +122,7 @@ public class DgCreateFlightScenario {
 //		String inputOagFilename = "/media/data/work/repos/"
 //				+ "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
 		
-		String inputOsmFilename = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\osm_daten\\2010-12-28_aeroway_nodes.osm";
+		String inputOsmFilename = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\osm_daten\\2012-04-16_aeroway_nodes.osm";
 		String inputOagFilename = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\oag_rohdaten\\OAGSEP09.CSV";
 
 		//WORLD WIDE AIR TRAFFIC

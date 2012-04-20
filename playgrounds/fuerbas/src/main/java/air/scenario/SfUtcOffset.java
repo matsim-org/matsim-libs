@@ -22,6 +22,7 @@ package air.scenario;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,7 +33,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Reads UTC Offsets for all airports in a OSM file from the webservice www.earthtools.org.
@@ -60,6 +61,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * @author dgrether
  *
  */
+
 public class SfUtcOffset {
 	
 	private static final Logger log = Logger.getLogger(SfUtcOffset.class);
@@ -68,31 +70,39 @@ public class SfUtcOffset {
 //	private static final String OUTPUTFILE_UTC= "/media/data/work/repos/"
 //				+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 	
-	private static final String INPUTFILE_OSM = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\osm_daten\\2010-12-28_aeroway_nodes.osm";
+	private static final String INPUTFILE_AIRPORTS = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\worldwide_airports_with_coords.csv";
 	private static final String OUTPUTFILE_UTC= "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\utc_offsets.txt";
 	
-	private Map<String, Coord> airportsInOsm;
+	private Map<String, Coord> airports;
 	
 	
-	public void writeUtcOffset(String inputOsmFile, String outputFile) throws IOException, InterruptedException{
-		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(
-				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
-						TransformationFactory.WGS84));
-		osmReader.parse(inputOsmFile);
-	
-		log.warn("This tool creates UTC offsets, however ignores daylight saving time");
+	public void writeUtcOffset(String inputAirportListFile, String outputFile) throws IOException, InterruptedException{
+
+		BufferedReader br = new BufferedReader(new FileReader(new File(inputAirportListFile)));
+		while (br.ready()) {
+			String line = br.readLine();
+			String[] entries = line.split("\t");
+			String airportCode = entries[0];
+			String xCoord = entries[1];
+			String yCoord = entries[2];
+			this.airports.put(airportCode, new CoordImpl(xCoord,yCoord));
+		}
 		
-		this.airportsInOsm = osmReader.airports;
-		log.info("Getting UTC offsets for " + this.airportsInOsm.size() + " airports. This will take 2 seconds per airport, at least...");
+		br.close();
+		
+		log.warn("This tool creates UTC offsets, however ignores daylight saving time");
+		log.warn("Using the following inputfile: "+inputAirportListFile);
+		
+		log.info("Getting UTC offsets for " + this.airports.size() + " airports. This will take 2 seconds per airport, at least...");
 		int count = 0;
 		Map<String, Double> airportUTCOffsetMap = new HashMap<String, Double>();
-		for (Entry<String, Coord> e : this.airportsInOsm.entrySet()) {
-			Double utcOffset = getUtcOffset(this.airportsInOsm.get(e.getKey()));
+		for (Entry<String, Coord> e : this.airports.entrySet()) {
+			Double utcOffset = getUtcOffset(this.airports.get(e.getKey()));
 			log.info("  Got offset for airport: " + e.getKey() + " offset: " + utcOffset);
 			airportUTCOffsetMap.put(e.getKey(), utcOffset);
 			count++;
 			if (count % 100 == 0){
-				log.info("  Got UTC offset for " + count + " airports of in total " + this.airportsInOsm.size() + " airports");
+				log.info("  Got UTC offset for " + count + " airports of in total " + this.airports.size() + " airports");
 			}
 		}
 		
@@ -149,7 +159,7 @@ public class SfUtcOffset {
 
 	public static void main(String args[]) throws Exception {
 		SfUtcOffset test = new SfUtcOffset();
-		test.writeUtcOffset(INPUTFILE_OSM, OUTPUTFILE_UTC);
+		test.writeUtcOffset(INPUTFILE_AIRPORTS, OUTPUTFILE_UTC);
 	}
 
 	

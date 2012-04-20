@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package air.scenario;
 
 import java.io.BufferedReader;
@@ -33,6 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.xml.sax.SAXException;
 
@@ -56,16 +58,13 @@ public class SfAirScheduleBuilder {
 
 	public static final String OAG_FLIGHTS_OUTPUT_FILENAME = "oag_flights.txt";
 
-	private static final String missingAirportsOutputFilename = "missing_airports.txt";
-
 	public static final String CITY_PAIRS_OUTPUT_FILENAME = "city_pairs.txt";
 	
 	public static final String UTC_OFFSET_FILE = "utc_offsets.txt";
 
-	protected Map<String, Coord> airportsInOsm = new HashMap<String, Coord>();
+	protected Map<String, Coord> airports = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
 	protected Map<String, Double> routes = new HashMap<String, Double>();
-	protected Map<String, Integer> missingAirports = new HashMap<String, Integer>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	private Map<String, Double> utcOffset = new HashMap<String, Double>();
 	private boolean utcFileInUse = false;
@@ -80,20 +79,28 @@ public class SfAirScheduleBuilder {
 
 	
 	@SuppressWarnings("rawtypes")
-	public void filter(String inputOsmFile, String inputOagFile, String outputDirectory,
+	public void filter(String inputAirportListFile, String inputOagFile, String outputDirectory,
 			String[] countries, String utcOffsetInputfile) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
 		String outputOagFile = outputDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
-		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(
-				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
-						TransformationFactory.WGS84));
-		osmReader.parse(inputOsmFile);
-
+		BufferedReader brAirports = new BufferedReader(new FileReader(new File(inputAirportListFile)));
+		while (brAirports.ready()) {
+			String line = brAirports.readLine();
+			String[] entries = line.split("\t");
+			String airportCode = entries[0];
+			String xCoord = entries[1];
+			String yCoord = entries[2];
+			this.airports.put(airportCode, new CoordImpl(xCoord,yCoord));
+		}
+		
+		brAirports.close();
+		
 		int counter = 0;
-
-		this.airportsInOsm = osmReader.airports;
 		
 //		new UTC Offset functionality, work in progress!
+		
+//		Möglichkeit ohne UTC File abbauen
+		
 		/**@todo check UTC offsets for errors **/ 
 		if (utcOffsetInputfile!=null) {
 			getUtcOffsetMap(utcOffsetInputfile);
@@ -112,13 +119,14 @@ public class SfAirScheduleBuilder {
 			lineEntries = oneLine.split(",");
 
 			if (lines > 0) {
-
 				for (int jj = 0; jj < 81; jj++) {
 					lineEntries[jj] = lineEntries[jj].replaceAll("\"", "");
 				}
 
 				String originCountry = lineEntries[6];
 				String destinationCountry = lineEntries[9];
+				
+//				auslagern in eigene Methode zur Filterung nach Ländern
 				boolean origin = false;
 				boolean destination = false;
 				if (countries != null) {
@@ -135,8 +143,6 @@ public class SfAirScheduleBuilder {
 				}
 
 				if (origin && destination) {
-					
-
 
 					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {	//filter codeshare flights
 
@@ -162,14 +168,14 @@ public class SfAirScheduleBuilder {
 //						double utcOffset = utcOffsetNew.getUtcOffset(this.airportsInOsm.get(originAirport));
 						
 //						Getting UTC Offset from separate file which need to be created with SfUtcOffset
-						if (this.utcFileInUse && this.airportsInOsm.containsKey(originAirport)) {
+						if (this.utcFileInUse && this.airports.containsKey(originAirport)) {
 							double utcOffset = this.utcOffset.get(originAirport);
 							departureInSec = departureInSec - utcOffset;
 							System.out.println("Airport: "+originAirport+" UTC offset was calculated as: "+utcOffset);
 						}
 
 //						version for Europe ONLY (based on manually entered offsets, see below)
-						if (this.utcFileInUse==false && this.airportsInOsm.containsKey(originAirport)) {
+						if (this.utcFileInUse==false && this.airports.containsKey(originAirport)) {
 							double utcOffset = getOffsetUTC(originCountry) * 3600;
 							departureInSec = departureInSec - utcOffset;
 						}
@@ -179,9 +185,6 @@ public class SfAirScheduleBuilder {
 						double stops = Double.parseDouble(lineEntries[15]);
 						String fullRouting = lineEntries[40];
 						
-						this.missingAirports.put(originAirport, 1);
-						this.missingAirports.put(destinationAirport, 1);
-
 						String aircraftType = lineEntries[21];
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
 
@@ -197,14 +200,8 @@ public class SfAirScheduleBuilder {
 						//some error correction code
 						if (lineEntries[14].contains("2") && !flights.containsKey(flightDesignator)
 								&& seatsAvail > 0 && !originAirport.equalsIgnoreCase(destinationAirport)
-								&& this.airportsInOsm.containsKey(originAirport)
-								&& this.airportsInOsm.containsKey(destinationAirport)
-								&& !originAirport.equalsIgnoreCase("HAD")
-								&& !destinationAirport.equalsIgnoreCase("HAD")
-								&& !originAirport.equalsIgnoreCase("BAX")
-								&& !destinationAirport.equalsIgnoreCase("BAX")
-								&& !originAirport.equalsIgnoreCase("CER")
-								&& !destinationAirport.equalsIgnoreCase("CER")
+								&& this.airports.containsKey(originAirport)
+								&& this.airports.containsKey(destinationAirport)
 								&& !aircraftType.equalsIgnoreCase("BUS") && (stops < 1)
 								&& (fullRouting.length() <= 6)) {
 
@@ -228,9 +225,9 @@ public class SfAirScheduleBuilder {
 							flights.put(flightDesignator, "");
 							bwOag.newLine();
 							counter++;
-							this.airportsInOag.put(originAirport, this.airportsInOsm.get(originAirport));
+							this.airportsInOag.put(originAirport, this.airports.get(originAirport));
 							this.airportsInOag
-									.put(destinationAirport, this.airportsInOsm.get(destinationAirport));
+									.put(destinationAirport, this.airports.get(destinationAirport));
 						}
 					}
 				}
@@ -246,30 +243,30 @@ public class SfAirScheduleBuilder {
 
 		// produce some more output
 
-		String outputOsmFile = outputDirectory + AIRPORTS_FROM_OSM_OUTPUT_FILE;
-		String outputMissingAirportsFile = outputDirectory + missingAirportsOutputFilename;
+//		String outputAirportFile = outputDirectory + AIRPORTS_FROM_OSM_OUTPUT_FILE;
+//		String outputMissingAirportsFile = outputDirectory + missingAirportsOutputFilename;
 		String cityPairsFile = outputDirectory + CITY_PAIRS_OUTPUT_FILENAME;
 
-		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputOsmFile)));
-		BufferedWriter bwMissing = new BufferedWriter(new FileWriter(
-				new File(outputMissingAirportsFile)));
+//		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputAirportFile)));
+//		BufferedWriter bwMissing = new BufferedWriter(new FileWriter(
+//				new File(outputMissingAirportsFile)));
 		BufferedWriter bwcityPairs = new BufferedWriter(new FileWriter(new File(cityPairsFile)));
 
-		Iterator it = this.airportsInOag.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it.next();
-			bwOsm.write(pairs.getKey().toString() + "\t" + osmReader.airports.get(pairs.getKey()).getX()
-					+ "\t" + osmReader.airports.get(pairs.getKey()).getY());
-			this.missingAirports.remove(pairs.getKey().toString());
-			bwOsm.newLine();
-		}
-
-		Iterator it2 = this.missingAirports.entrySet().iterator();
-		while (it2.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it2.next();
-			bwMissing.write(pairs.getKey().toString());
-			bwMissing.newLine();
-		}
+//		Iterator it = this.airportsInOag.entrySet().iterator();
+//		while (it.hasNext()) {
+//			Map.Entry pairs = (Map.Entry) it.next();
+//			bwOsm.write(pairs.getKey().toString() + "\t" + this.airports.get(pairs.getKey()).getX()
+//					+ "\t" + this.airports.get(pairs.getKey()).getY());
+//			this.missingAirports.remove(pairs.getKey().toString());
+//			bwOsm.newLine();
+//		}
+//
+//		Iterator it2 = this.missingAirports.entrySet().iterator();
+//		while (it2.hasNext()) {
+//			Map.Entry pairs = (Map.Entry) it2.next();
+//			bwMissing.write(pairs.getKey().toString());
+//			bwMissing.newLine();
+//		}
 
 		Iterator it3 = this.routes.entrySet().iterator();
 		while (it3.hasNext()) {
@@ -283,12 +280,11 @@ public class SfAirScheduleBuilder {
 		log.info("Anzahl der Airports: " + this.airportsInOag.size());
 		log.info("Anzahl der City Pairs: " + this.routes.size());
 		log.info("Anzahl der Flüge: " + counter);
-		log.info("Anzahl der fehlenden Airport: " + this.missingAirports.size());
 
-		bwOsm.flush();
-		bwOsm.close();
-		bwMissing.flush();
-		bwMissing.close();
+//		bwOsm.flush();
+//		bwOsm.close();
+//		bwMissing.flush();
+//		bwMissing.close();
 		bwcityPairs.flush();
 		bwcityPairs.close();
 		br.close();
