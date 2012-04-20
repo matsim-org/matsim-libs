@@ -91,8 +91,8 @@ public class JAXBUnmaschalV2{
 			LoadFile loadFile = new LoadFile(Constants.V2_MATSIM_4_URBANSIM_XSD_MATSIMORG , tempDir , Constants.V2_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			// tnicolai: debugging
-			file2XSD = new File("/Users/thomas/Development/workspace/matsim/src/main/resources/dtd/matsim4urbansim_v2.xsd");
-			log.warn("Running Jaxb in debugging mode. Change this!");
+			//file2XSD = new File("/Users/thomas/Development/workspace/matsim/src/main/resources/dtd/matsim4urbansim_v2.xsd");
+			//log.warn("Running Jaxb in debugging mode. Change this!");
 			
 			if(file2XSD == null || !file2XSD.exists())
 				return null;

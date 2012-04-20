@@ -66,10 +66,6 @@ import com.vividsolutions.jts.geom.Geometry;
  * 	For a better readability some functionality is out-sourced into helper classes
  */
 public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
-	
-	// TODO:
-	// 1) Check Population Sampling --> seems to be ok! 
-	// 2) Distribution of Population (Verteilung ungleichmaessig)!!! -> verteilen 
 
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZone.class);
@@ -202,10 +198,10 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			if(aggregatedOpportunities == null)
 				aggregatedOpportunities = readUrbansimJobs(zones, destinationSampleRate);
 			// creates zone based table of log sums (workplace accessibility)
-			// uses always a 100% jobSample size (see readUrbansimJobs below)
-			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
+			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV2(zones, 				
 																						aggregatedOpportunities, 
-																						benchmark));
+																						benchmark,
+																						this.scenario));
 		}
 		
 		// new method

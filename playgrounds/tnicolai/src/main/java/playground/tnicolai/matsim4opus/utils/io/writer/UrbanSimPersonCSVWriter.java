@@ -27,7 +27,7 @@ public class UrbanSimPersonCSVWriter {
 							    "home2work_travel_time_min," +
 								"home2work_distance_meter," + 
 								"work2home_travel_time_min," +
-								"work3home_distance_meter");
+								"work2home_distance_meter");
 			personWriter.newLine();
 			
 			log.info("... done!");

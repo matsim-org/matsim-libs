@@ -234,7 +234,7 @@ public class MATSim4UrbanSimParcel {
 		}
 		else {
 			log.warn("No plans-file specified in the travel_model_configuration section (OPUS GUI).");
-			log.info("(MATSim is running in COL start mode, i.e. MATSim generates new plans-file from UrbanSim input.)" );
+			log.info("(MATSim is running in COLD start mode, i.e. MATSim generates new plans-file from UrbanSim input.)" );
 			oldPopulation = null;
 		}
 
@@ -291,7 +291,6 @@ public class MATSim4UrbanSimParcel {
 			if(aggregatedOpportunities == null)
 				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
 			// creates zone based table of log sums (workplace accessibility)
-			// uses always a 100% jobSample size (see readUrbansimJobs below)
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV2(zones, 				
 																						aggregatedOpportunities, 
 																						benchmark,
