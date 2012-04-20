@@ -81,9 +81,6 @@ public class EmissionRoutingTest extends MatsimTestCase{
 	private Scenario scenario;
 	private Controler controler;
 	private Vehicles emissionVehicles;
-	private EmissionModule emissionModule;
-	private EmissionCostModule emissionCostModule;
-
 	
 	public void testEmissionRouting() {
 		
@@ -102,11 +99,15 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		pcs.setMarginalUtilityOfMoney(0.6);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 		
-		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
+		EmissionModule emissionModule = new EmissionModule(scenario, this.emissionVehicles);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 		
-		installTravelCostCalculatorFactory();
+		EmissionCostModule emissionCostModule = new EmissionCostModule(1.0);
+		
+		EmissionTravelDisutilityCalculatorFactory emissionTccf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		controler.setTravelDisutilityFactory(emissionTccf);
+		
 		final RoadUsedHandler handler = new RoadUsedHandler(13) ;
 						
 		StartupListener startupListener = new StartupListener() {
@@ -120,7 +121,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		System.out.println("test emission routing");
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
-		assertTrue("Person was expected to be routed through link 13, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
+		assertTrue("Person was expected to be routed through link 13, but was " + handler.getLink(), handler.getWasRoadSelected()==true);
 	}
 
 
@@ -154,7 +155,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		System.out.println("Distance Routing");
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
-		assertTrue("Person was expected to be routed through link 11, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
+		assertTrue("Person was expected to be routed through link 11, but was " + handler.getLink(), handler.getWasRoadSelected()==true);
 		
 	}
 
@@ -191,13 +192,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		this.controler.addControlerListener(startupListener);
 		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
-		assertTrue("Person was expected to be routed through link 9, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
-	}
-	
-	private void installTravelCostCalculatorFactory() {
-		emissionCostModule = new EmissionCostModule(1.0);
-		EmissionTravelDisutilityCalculatorFactory emissionTccf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		controler.setTravelDisutilityFactory(emissionTccf);
+		assertTrue("Person was expected to be routed through link 9, but was " + handler.getLink(), handler.getWasRoadSelected()==true);
 	}
 	
 	private void specifyControler() {
@@ -265,6 +260,8 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		
 		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
+		
+		vcg.setIsUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		vcg.setWritingOutputEvents(false) ;
