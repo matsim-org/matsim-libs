@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.utils.collections.Tuple;
@@ -38,10 +39,13 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.events.HouseholdInformationEventImpl;
+import playground.christoph.evacuation.events.PersonInformationEventImpl;
 import playground.christoph.evacuation.utils.DeterministicRNG;
 
 public class InformedHouseholdsTracker extends InformedAgentsTracker {
 
+	/*package*/ final EventsManager eventsManager;
 	/*package*/ final int totalHouseholds;	// number of households with more than 0 members
 	/*package*/ final Households households;
 	/*package*/ final DeterministicRNG rng;
@@ -49,11 +53,14 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 	/*package*/ final Queue<Id> informedHouseholdsInCurrentTimeStep;
 	/*package*/ final PriorityBlockingQueue<Tuple<Id, Double>> informationTime;
 
+	/*package*/
+	
 	private boolean allHouseholdsInformed = false;
 	
-	public InformedHouseholdsTracker(Households households, Set<Id> agentIds) {
+	public InformedHouseholdsTracker(Households households, Set<Id> agentIds, EventsManager eventsManager) {
 		super(agentIds);
 		
+		this.eventsManager = eventsManager;
 		this.households = households;
 		this.informedHouseholdsInCurrentTimeStep = new ConcurrentLinkedQueue<Id>();
 
@@ -156,10 +163,12 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 				this.informationTime.poll();
 				Household household = households.getHouseholds().get(tuple.getFirst());
 				informedHouseholdsInCurrentTimeStep.add(tuple.getFirst());
+				this.eventsManager.processEvent(new HouseholdInformationEventImpl(time, household.getId()));
 				
 				for (Id memberId : household.getMemberIds()) {
 					this.addToBeInitiallyReplannedAgent(memberId);
 					this.informAgent(memberId);
+					this.eventsManager.processEvent(new PersonInformationEventImpl(time, memberId));
 				}
 			} else {
 				break;

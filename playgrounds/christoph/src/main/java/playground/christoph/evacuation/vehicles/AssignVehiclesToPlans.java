@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -114,13 +113,15 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
     	/*
     	 * Assign vehicles to person's legs.
     	 */
-    	Iterator<Person> iter = vehicleRequiringPersons.iterator();
-    	for (int i = 0; i < vehicleRequiringPersons.size(); i++) {
-    		Person p = iter.next();
+    	int i = 0;
+    	Person p = null;
+    	while (vehicleRequiringPersons.peek() != null) {
+    		p = vehicleRequiringPersons.poll();
     		Id vehicleId = vehicleIds.get(i);
-    		assignVehicleToPerson(p, vehicleIds.get(i));
+    		assignVehicleToPerson(p, vehicleId);
     		mapping.put(p.getId(), vehicleId);
     		assignedVehiclesCounter.incCounter();
+    		i++;
     	}
 	}
 	

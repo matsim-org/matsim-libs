@@ -74,6 +74,7 @@ import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
+import org.matsim.utils.eventsfilecomparison.OnlineEventsComparator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -130,6 +131,9 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class EvacuationControler extends WithinDayController implements MobsimInitializedListener, 
 		MobsimAfterSimStepListener, IterationStartsListener, StartupListener, AfterMobsimListener {
+
+//	public static final String referenceEventsFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac_reference/ITERS/it.0/evac.1.0.events.xml.gz";
+	public static final String referenceEventsFile = null;
 
 	public static final String FILENAME_VEHICLES = "output_vehicles.xml.gz";
 	
@@ -302,7 +306,8 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
 		
-		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds(), this.scenarioData.getPopulation().getPersons().keySet());
+		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds(), 
+				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents());
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
 		this.householdsTracker = new HouseholdsTracker(this.householdObjectAttributes);
@@ -312,7 +317,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
-		
+				
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
 		
 		/*
@@ -401,12 +406,21 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		 * Create and initialize replanning manager and replanning maps.
 		 */
 		super.createAndInitReplanningManager(numReplanningThreads);
+		super.getReplanningManager().setEventsManager(this.getEvents());	// set events manager to create replanning events
 		super.createAndInitActivityReplanningMap();
 		MultiModalTravelTime linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
 		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
 		
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
 		this.initIdentifiers();
+		
+		// debugging - initialize events comparator
+		if (referenceEventsFile != null) {
+			OnlineEventsComparator comparator = new OnlineEventsComparator(referenceEventsFile);
+			this.getEvents().addHandler(comparator);
+			this.addControlerListener(comparator);
+			comparator.run();			
+		}
 	}
 	
 	/*

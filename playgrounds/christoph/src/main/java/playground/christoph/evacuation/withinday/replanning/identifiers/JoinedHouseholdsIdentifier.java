@@ -112,7 +112,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		this.householdMeetingPointMapping = new ConcurrentHashMap<Id, Id>();
 		this.transportModeMapping = new ConcurrentHashMap<Id, String>();
 		this.driverVehicleMapping = new ConcurrentHashMap<Id, Id>();
-		this.householdDepartures = new HashMap<Id, HouseholdDeparture>();
+		this.householdDepartures = new ConcurrentHashMap<Id, HouseholdDeparture>();
 	}
 
 	@Override

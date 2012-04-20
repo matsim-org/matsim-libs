@@ -182,29 +182,7 @@ public class ModeAvailabilityChecker {
 		else if (hasBike) return TransportMode.bike;
 		else return TransportMode.walk;
 	}
-	
-//	/**
-//	 * Return a queue containing a households vehicles that are available
-//	 * at a given facility ordered by the number of seats, starting with 
-//	 * the car with the highest number.
-//	 * 
-//	 * @param availableVehicles
-//	 * @param facilityId
-//	 * @return
-//	 */
-//	public Queue<Vehicle> getAvailableVehicles(Household household, Id facilityId) {
-//		List<Id> availableVehicles = this.getAvailableCars(household, facilityId);
-//		
-//		Queue<Vehicle> queue = new PriorityQueue<Vehicle>(2, new VehicleSeatsComparator());
-//		
-//		for (Id id : availableVehicles) {
-//			Vehicle vehicle = vehicles.getVehicles().get(id);
-//			queue.add(vehicle);
-//		}
-//		
-//		return queue;
-//	}
-		
+			
 	private Queue<Vehicle> getVehiclesQueue(List<Id> vehicleIds) {
 		Queue<Vehicle> queue = new PriorityQueue<Vehicle>(2, new VehicleSeatsComparator());
 		for (Id id : vehicleIds) {

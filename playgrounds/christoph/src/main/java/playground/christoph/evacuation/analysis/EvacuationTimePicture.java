@@ -412,6 +412,17 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					/*
 					 * Use the link where the vehicle is currently located.
 					 */
+//					Id linkId = this.vehiclesTracker.getVehicleDestination(positionId);
+//					while (linkId == null) {
+//						log.error("No vehicle position found for vehicle " + positionId.toString() + " - waiting...");
+//						try {
+//							Thread.sleep(10);
+//						} catch (InterruptedException e1) {
+//							// TODO Auto-generated catch block
+//							e1.printStackTrace();
+//						}
+//						linkId = this.vehiclesTracker.getVehicleDestination(positionId);
+//					}
 					Id linkId = this.vehiclesTracker.getVehicleDestination(positionId);
 					Link link = scenario.getNetwork().getLinks().get(linkId);
 					isInsideArea = coordAnalyzer.isLinkAffected(link);
