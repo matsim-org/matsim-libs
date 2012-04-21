@@ -89,13 +89,20 @@ public class NetworkAddParkAndRide {
 	private void run() {
 		
 		loadScenario();
+		
 		getAllTransitStops();
+		// sammelt ALLE TransitStops und speicher sie in der Liste transitStops
+		
 		getParkAndRideNodes();
+		// sucht für jeden TransitStop in der Liste transitStops den zugehörigen / nächstliegenden car-Link
+		// und speichert jeweils den toNode dieses car-Links in der Liste parkAndRideNodes
+		// toDo: statt quadratweise Ausweitung: Radius
 		
 		for (Node node : this.parkAndRideNodes){
 			System.out.println("Node: "+node.getId().toString());
 		}
 		addParkAndRideLinks();
+		// fügt an jeden Node der Liste parkAndRideNodes einen parkAndRideLink ein. (toDo: zwei Links...)
 		
 		NetworkWriter networkWriter = new NetworkWriter(scenario.getNetwork());
 		networkWriter.write("../../shared-svn/studies/ihab/parkAndRide/input/test_network_modified2.xml");
