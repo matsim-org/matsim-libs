@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.parkAndRide.strategyTest;
+package playground.ikaddoura.parkAndRide.pRscoring;
 
 import org.matsim.core.scoring.interfaces.AgentStuckScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;

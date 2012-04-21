@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.parkAndRide.strategyTest;
+package playground.ikaddoura.parkAndRide.pRscoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
@@ -28,6 +28,8 @@ import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
 
 /**
  * modified normal ActivityScoringFunction, that "pt interaction" and "parkAndRide" are not scored
