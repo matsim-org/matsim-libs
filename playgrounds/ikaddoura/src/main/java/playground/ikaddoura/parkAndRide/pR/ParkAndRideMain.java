@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.parkAndRide.strategyTest;
+package playground.ikaddoura.parkAndRide.pR;
 
 
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +32,8 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+
+import playground.ikaddoura.parkAndRide.pRscoring.ParkAndRideScoringFunctionFactory;
 
 /**
  * @author Ihab

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ikaddoura.parkAndRide.strategyTest;
+package playground.ikaddoura.parkAndRide.pR;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -28,6 +28,10 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
+
+import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideAddRemoveStrategy;
+import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideChangeLocationStrategy;
+import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideTimeAllocationMutator;
 
 /**
  * @author Ihab

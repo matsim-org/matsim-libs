@@ -1,4 +1,4 @@
-package playground.ikaddoura.parkAndRide.strategyTest;
+package playground.ikaddoura.parkAndRide.pR;
 
 import org.matsim.core.api.internal.MatsimParameters;
 
