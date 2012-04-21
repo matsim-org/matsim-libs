@@ -52,6 +52,7 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
+//		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(-999999));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new ParkAndRideActivityScoring(params));
 		return scoringFunctionAccumulator;

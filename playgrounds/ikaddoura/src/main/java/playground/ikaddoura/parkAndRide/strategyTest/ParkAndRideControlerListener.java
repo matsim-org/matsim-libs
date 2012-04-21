@@ -35,14 +35,19 @@ import org.matsim.pt.replanning.TransitActsRemoverStrategy;
  */
 public class ParkAndRideControlerListener implements StartupListener {
 	
-	Controler controler ;
+	Controler controler;
+	AdaptiveCapacityControl adaptiveControl;
 	
-	ParkAndRideControlerListener( Controler ctl ) {
-		this.controler = ctl ;
+	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl) {
+		this.controler = ctl;
+		this.adaptiveControl = adaptiveControl;
+		
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		
+		event.getControler().getEvents().addHandler(adaptiveControl);
 		
 		PlanStrategy strategyAddRemove = new PlanStrategyImpl(new RandomPlanSelector());
 		strategyAddRemove.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
@@ -58,7 +63,6 @@ public class ParkAndRideControlerListener implements StartupListener {
 		strategyTimeAllocation.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig())); // TimeAllocation, not changing "parkAndRide" and "pt interaction"
 		strategyTimeAllocation.addStrategyModule(new ReRoute(controler));
 
-		
 		StrategyManager manager = this.controler.getStrategyManager() ;
 	
 		manager.addStrategy(strategyAddRemove, 0.1);

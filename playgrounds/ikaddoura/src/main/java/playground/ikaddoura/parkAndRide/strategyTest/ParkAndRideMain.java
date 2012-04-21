@@ -23,8 +23,15 @@
  */
 package playground.ikaddoura.parkAndRide.strategyTest;
 
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 
 /**
  * @author Ihab
@@ -37,12 +44,27 @@ public class ParkAndRideMain {
 		String config = "../../shared-svn/studies/ihab/parkAndRide/input/test_config.xml";
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-			
-		controler.addControlerListener(new ParkAndRideControlerListener(controler));
+		
+		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl();
+		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl));
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
 		ParkAndRideScoringFunctionFactory scoringfactory = new ParkAndRideScoringFunctionFactory(planCalcScoreConfigGroup, controler.getNetwork());
 		controler.setScoringFunctionFactory(scoringfactory);
+		
+		final MobsimFactory mf = new QSimFactory();
+		
+		controler.setMobsimFactory(new MobsimFactory() {
+			private QSim mobsim;
+
+			@Override
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+				mobsim = (QSim) mf.createMobsim(sc, eventsManager);
+				mobsim.addMobsimEngine(adaptiveControl);
+				return mobsim;
+			}
+			
+		});
 			
 		controler.run();
 	}

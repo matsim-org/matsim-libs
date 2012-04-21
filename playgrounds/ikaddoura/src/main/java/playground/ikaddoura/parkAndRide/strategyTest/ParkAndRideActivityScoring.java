@@ -189,7 +189,7 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 	
 			if (duration > 0) {
 					
-					System.out.println("Scored Activity: "+act.getType());
+//					System.out.println("Scored Activity: "+act.getType());
 					
 					double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 							* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration());
