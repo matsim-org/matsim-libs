@@ -68,8 +68,9 @@ public class NetworkAddParkAndRide {
 
 	private List<TransitStopFacility> transitStops = new ArrayList<TransitStopFacility>();
 	private List<Node> parkAndRideNodes = new ArrayList<Node>();
+	private Map<TransitStopFacility, Link> transitStop2nearestCarLink = new HashMap<TransitStopFacility, Link>();
 
-	private double searchStep = 100;
+	private double extensionRadius = 100;
 	private int maxSearchSteps = 50;
 	
 // parkAndRide Link:
@@ -104,6 +105,10 @@ public class NetworkAddParkAndRide {
 		addParkAndRideLinks();
 		// fügt an jeden Node der Liste parkAndRideNodes einen parkAndRideLink ein. (toDo: zwei Links...)
 		
+		for (TransitStopFacility stop : this.transitStop2nearestCarLink.keySet()){
+			System.out.println("TranistStop: "+stop.getId().toString()+" "+stop.getCoord().toString()+" --> nächster car-Link: "+this.transitStop2nearestCarLink.get(stop).getId()+" toNode:"+this.transitStop2nearestCarLink.get(stop).getToNode().getCoord().toString());
+		}
+		
 		NetworkWriter networkWriter = new NetworkWriter(scenario.getNetwork());
 		networkWriter.write("../../shared-svn/studies/ihab/parkAndRide/input/test_network_modified2.xml");
 	}
@@ -115,18 +120,21 @@ public class NetworkAddParkAndRide {
 			Id stopLinkId = stop.getLinkId();
 			Link stopLink = scenario.getNetwork().getLinks().get(stopLinkId);
 			if (stopLink.getAllowedModes().contains(TransportMode.car)){
+				this.transitStop2nearestCarLink.put(stop, stopLink);
 				if (!this.parkAndRideNodes.contains(stopLink.getToNode())){
 					this.parkAndRideNodes.add(stopLink.getToNode());
 				}
 			}
 			else {
+				System.out.println("***");
 				System.out.println("TransitStopFacility "+stop.getId()+" liegt nicht auf einem car-Link.");
+				System.out.println("Suche schrittweise nach car-Links im Umkreis des TransitStops...");
 				Coord coord = stop.getCoord();
-				double searchArea = 0; 
+				double searchRadius = 0; 
 				for (int n = 0; n <= maxSearchSteps; n++){
 					if (!hasPRnode){
-						searchArea = searchArea + this.searchStep;
-						System.out.println("Suchbereich: "+searchArea+" um die Koordinaten "+coord.toString()+".");
+						searchRadius = searchRadius + this.extensionRadius;
+						System.out.println("Suchradius: "+searchRadius+" um die Koordinaten "+coord.toString()+".");
 
 						for (Link link : scenario.getNetwork().getLinks().values()){
 							if (!hasPRnode){
@@ -134,14 +142,19 @@ public class NetworkAddParkAndRide {
 									System.out.println("Der Link "+link.getId()+" ist ein car-Link.");
 									double linkToNodeX = link.getToNode().getCoord().getX();
 									double linkToNodeY = link.getToNode().getCoord().getY();
-									double xDiff = Math.abs(linkToNodeX - coord.getX());
-									double yDiff = Math.abs(linkToNodeY - coord.getY());
-									if (xDiff <= searchArea && yDiff <= searchArea){
-										System.out.println("Der Link "+link.getId()+" liegt im Suchbereich um die TransitStopCoordinates "+coord.toString()+".");
+									double xDiff = Math.abs(linkToNodeX - stop.getCoord().getX());
+									double yDiff = Math.abs(linkToNodeY - stop.getCoord().getY());
+									double hyp = Math.sqrt(Math.pow(xDiff, 2)+Math.pow(yDiff, 2));
+									if (hyp <= searchRadius){
+										System.out.println("Der Link "+link.getId()+" liegt im Suchradius um die TransitStopCoordinates "+coord.toString()+".");
+										this.transitStop2nearestCarLink.put(stop, link);
 										if (!this.parkAndRideNodes.contains(link.getToNode())){
 											this.parkAndRideNodes.add(link.getToNode());
 										}
 										hasPRnode = true;
+									}
+									else {
+										System.out.println("Der Link "+link.getId()+" liegt NICHT im Suchradius um die TransitStopCoordinates "+coord.toString()+".");
 									}
 								}
 							}
