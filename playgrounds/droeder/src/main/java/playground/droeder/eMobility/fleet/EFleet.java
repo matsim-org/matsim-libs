@@ -71,11 +71,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 	
 	@Override
 	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
-//		log.error("update: " + e.getSimulationTime());
 		for(EVehicle v: fleet.values()){
-//			if(v.getId().equals(new IdImpl("emob_9"))){
-//				System.out.println(v.getCurrentSoC());
-//			}
 			v.update(this.manager, e.getSimulationTime());
 		}
 	}
@@ -84,7 +80,6 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(LinkLeaveEvent event) {
-		log.error("leave: " + event.getTime());
 		this.fleet.get(event.getVehicleId()).disCharge(event.getTime(), this.discharging);
 	}
 
@@ -93,7 +88,6 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(LinkEnterEvent event) {
-//		log.error("enter: " + System.currentTimeMillis());
 		this.fleet.get(event.getVehicleId()).setLinkEnterInformation(event.getTime(), this.net.getLinks().get(event.getLinkId()).getLength(), event.getLinkId());		
 	}
 
@@ -102,7 +96,6 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(PersonLeavesVehicleEvent event) {
-		log.error("leaveVeh: " + System.currentTimeMillis());
 		EVehicle v = this.fleet.get(event.getVehicleId());
 		v.finishDriving(event.getTime(), this.discharging, this.poiInfo.plugVehicle(v.getPoiId(), event.getTime()));
 	}
@@ -112,7 +105,14 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(PersonEntersVehicleEvent event) {
-		log.error("enterVeh: " + System.currentTimeMillis());
 		this.fleet.get(event.getVehicleId()).finishCharging(event.getTime(), this.charging);
+	}
+
+	/**
+	 * @param vehicleId
+	 * @return
+	 */
+	public boolean containsVehicle(Id vehicleId) {
+		return this.fleet.containsKey(vehicleId);
 	}
 }

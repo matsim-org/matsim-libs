@@ -46,11 +46,13 @@ public class EPopulationHandler implements PersonEntersVehicleEventHandler, Pers
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
+		if(!this.population.containsPerson(event.getPersonId()))  return;
 		this.population.processEvent(event);		
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		if(!this.population.containsPerson(event.getPersonId()))  return;
 		this.population.processEvent(event);
 	}
 

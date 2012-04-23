@@ -29,7 +29,7 @@ import org.matsim.core.events.GenericEventImpl;
  */
 public class SoCChangeEvent extends GenericEventImpl{
 
-	public static final String ACTTYPE = "SoCChangeEvent";
+	public static final String TYPE = "SoCChangeEvent";
 	public static final String SOC = "stateOfCharge";
 	public static final String LINKID = "linkId";
 	public static final String VEHID = "vehId";
@@ -39,7 +39,7 @@ public class SoCChangeEvent extends GenericEventImpl{
 	 * @param time
 	 */
 	public SoCChangeEvent(Id vehId, double time, double soc, Id linkId) {
-		super(ACTTYPE, time);
+		super(TYPE, time);
 		super.getAttributes().put(SOC, String.valueOf(soc));
 		super.getAttributes().put(LINKID, linkId.toString());
 		super.getAttributes().put(VEHID, vehId.toString());

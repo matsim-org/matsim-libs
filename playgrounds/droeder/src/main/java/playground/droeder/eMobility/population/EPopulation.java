@@ -70,4 +70,12 @@ public class EPopulation {
 		this.fleet.processEvent(event);
 	}
 
+	/**
+	 * @param personId
+	 * @return
+	 */
+	public boolean containsPerson(Id personId) {
+		return this.persons.containsKey(personId);
+	}
+
 }

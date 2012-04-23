@@ -49,11 +49,13 @@ public class EFleetHandler implements LinkEnterEventHandler, LinkLeaveEventHandl
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		if(!this.fleet.containsVehicle(event.getVehicleId())) return;
 		this.fleet.processEvent(event);
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		if(!this.fleet.containsVehicle(event.getVehicleId())) return;
 		this.fleet.processEvent(event);
 	}
 
