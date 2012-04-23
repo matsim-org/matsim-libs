@@ -46,11 +46,11 @@ class ExternalControler {
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network80links.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/output_plans_withTimeChoice_9min.xml";
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/populationBusCorridor80linksCar.xml";
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/PaperTEST";
 	
-	static int lastExternalIteration = 20;
-	static int lastInternalIteration = 300;
+	static int lastExternalIteration = 0;
+	static int lastInternalIteration = 0;
 	
 	final OptimizationParameter op = OptimizationParameter.FARE;
 //	final OptimizationParameter op = OptimizationParameter.CAPACITY;
@@ -93,51 +93,49 @@ class ExternalControler {
 			File directory = new File(directoryExtIt);
 			directory.mkdirs();
 			
-
-			// TODO: VehicleScheduleGenerator aufräumen!
-			VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.capacity, networkFile, directoryExtIt);
+			VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, networkFile, directoryExtIt);
 			vsw.writeTransitVehiclesAndSchedule();
 			
-			// TODO: anschauen!
-			InternalControler internalControler = new InternalControler(configFile, extIt, directoryExtIt, lastInternalIteration, populationFile, outputExternalIterationDirPath, this.numberOfBuses, networkFile, fare, ptLegHandler);
-
-			operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
-			users.setParametersForExtIteration(directoryExtIt, sc.getNetwork(), internalControler.getMarginalUtlOfMoney());
-
-			internalControler.run();
-			
-			OperatorUserAnalysis analysis = new OperatorUserAnalysis(directoryExtIt, lastInternalIteration, networkFile);
-			analysis.readEvents(operator, users);
-			
-			users.calculateScore();
-			operator.calculateScore(analysis);
-
-			this.iteration2operatorProfit.put(extIt, operator.getProfit());
-			this.iteration2operatorCosts.put(extIt, operator.getCosts());
-			this.iteration2operatorRevenue.put(extIt, analysis.getRevenue());
-			this.iteration2numberOfBuses.put(extIt, (double) analysis.getNumberOfBusesFromEvents());
-			this.iteration2userScoreSum.put(extIt, users.getLogSum());
-			this.iteration2totalScore.put(extIt, (users.getLogSum() + operator.getProfit()));
-			this.iteration2numberOfCarLegs.put(extIt, analysis.getSumOfCarLegs());
-			this.iteration2numberOfPtLegs.put(extIt, analysis.getSumOfPtLegs());
-			this.iteration2numberOfWalkLegs.put(extIt, analysis.getSumOfWalkLegs());
-			this.iteration2fare.put(extIt, this.fare);
-			this.iteration2capacity.put(extIt,(double) this.capacity);
-			this.iteration2personId2waitTime.put(extIt, ptLegHandler.getPersonId2WaitingTime());
-			
-//			textWriter.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorRevenue, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
-			textWriter.writeWaitingTimes(outputExternalIterationDirPath, extIt, this.iteration2personId2waitTime.get(extIt));
-			
-			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
-			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
-			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
-
-			chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
-			chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
-			chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
-			chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
-			chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorRevenue);
-			
+//			// TODO: anschauen!
+//			InternalControler internalControler = new InternalControler(configFile, extIt, directoryExtIt, lastInternalIteration, populationFile, outputExternalIterationDirPath, this.numberOfBuses, networkFile, fare, ptLegHandler);
+//
+//			operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
+//			users.setParametersForExtIteration(directoryExtIt, sc.getNetwork(), internalControler.getMarginalUtlOfMoney());
+//
+//			internalControler.run();
+//			
+//			OperatorUserAnalysis analysis = new OperatorUserAnalysis(directoryExtIt, lastInternalIteration, networkFile);
+//			analysis.readEvents(operator, users);
+//			
+//			users.calculateScore();
+//			operator.calculateScore(analysis);
+//
+//			this.iteration2operatorProfit.put(extIt, operator.getProfit());
+//			this.iteration2operatorCosts.put(extIt, operator.getCosts());
+//			this.iteration2operatorRevenue.put(extIt, analysis.getRevenue());
+//			this.iteration2numberOfBuses.put(extIt, (double) analysis.getNumberOfBusesFromEvents());
+//			this.iteration2userScoreSum.put(extIt, users.getLogSum());
+//			this.iteration2totalScore.put(extIt, (users.getLogSum() + operator.getProfit()));
+//			this.iteration2numberOfCarLegs.put(extIt, analysis.getSumOfCarLegs());
+//			this.iteration2numberOfPtLegs.put(extIt, analysis.getSumOfPtLegs());
+//			this.iteration2numberOfWalkLegs.put(extIt, analysis.getSumOfWalkLegs());
+//			this.iteration2fare.put(extIt, this.fare);
+//			this.iteration2capacity.put(extIt,(double) this.capacity);
+//			this.iteration2personId2waitTime.put(extIt, ptLegHandler.getPersonId2WaitingTime());
+//			
+////			textWriter.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorRevenue, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
+//			textWriter.writeWaitingTimes(outputExternalIterationDirPath, extIt, this.iteration2personId2waitTime.get(extIt));
+//			
+//			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
+//			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
+//			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
+//
+//			chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
+//			chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
+//			chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
+//			chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
+//			chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorRevenue);
+//			
 			// settings for next external iteration
 			if (extIt < lastExternalIteration){
 				if(op.equals(OptimizationParameter.FARE)) this.fare++;
