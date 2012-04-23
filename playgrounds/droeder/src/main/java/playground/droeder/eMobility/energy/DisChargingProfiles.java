@@ -37,11 +37,11 @@ public class DisChargingProfiles {
 		this.profiles = new HashMap<Id , DisChargingProfile>();
 	}
 	
-	public void addValue(Id id, Double slope, Double speed, double newState){
+	public void addValue(Id id, Double slope, Double speed, double usagePerKm){
 		if(!this.profiles.containsKey(id)){
 			this.profiles.put(id, new DisChargingProfile(id));
 		}
-		this.profiles.get(id).addNewEntry(slope, speed, newState);
+		this.profiles.get(id).addNewEntry(slope, speed, usagePerKm);
 	}
 	
 	public Double getJoulePerKm(Id id, Double  speed, Double slope){

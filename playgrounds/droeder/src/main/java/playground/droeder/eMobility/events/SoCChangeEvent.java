@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package playground.droeder.eMobility.events;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.GenericEventImpl;
 
@@ -28,6 +30,7 @@ import org.matsim.core.events.GenericEventImpl;
  *
  */
 public class SoCChangeEvent extends GenericEventImpl{
+	private static final Logger log = Logger.getLogger(SoCChangeEvent.class);
 
 	public static final String TYPE = "SoCChangeEvent";
 	public static final String SOC = "stateOfCharge";
@@ -43,6 +46,21 @@ public class SoCChangeEvent extends GenericEventImpl{
 		super.getAttributes().put(SOC, String.valueOf(soc));
 		super.getAttributes().put(LINKID, linkId.toString());
 		super.getAttributes().put(VEHID, vehId.toString());
+	}
+
+	/**
+	 * @param event
+	 */
+	public SoCChangeEvent(GenericEvent event) {
+		super(TYPE, event.getTime());
+		if(!event.getAttributes().get("type").equals(TYPE)){
+			log.error("can not create a SoCCahngeEvent from " + event.getAttributes().get("type"));
+			throw new IllegalArgumentException();
+		}else{
+			super.getAttributes().put(SOC, event.getAttributes().get(SOC));
+			super.getAttributes().put(LINKID, event.getAttributes().get(LINKID));
+			super.getAttributes().put(VEHID, event.getAttributes().get(VEHID));
+		}
 	}
 
 	public Id getLinkId(){

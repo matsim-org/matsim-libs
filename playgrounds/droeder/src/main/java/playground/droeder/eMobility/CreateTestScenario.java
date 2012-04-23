@@ -95,7 +95,7 @@ public class CreateTestScenario {
 		PoiInfo poiInfo = new PoiInfo();
 		POI poi;
 		for(Link l: this.sc.getSc().getNetwork().getLinks().values()){
-			poi = new POI(l.getId(), 2, 3600);
+			poi = new POI(l.getId(), 5, 3600);
 			poiInfo.add(poi);
 		}
 		this.sc.setPoi(poiInfo);

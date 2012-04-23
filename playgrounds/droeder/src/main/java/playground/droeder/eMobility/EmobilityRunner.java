@@ -76,7 +76,7 @@ public class EmobilityRunner {
 		
 		c.run();
 		
-		soc.dumpData(scenario.getSc().getConfig().controler().getOutputDirectory() + c.DIRECTORY_ITERS + "/it.0/");	
+		soc.dumpData(scenario.getSc().getConfig().controler().getOutputDirectory() + Controler.DIRECTORY_ITERS + "/it.0/charts/");	
 		
 	}
 	

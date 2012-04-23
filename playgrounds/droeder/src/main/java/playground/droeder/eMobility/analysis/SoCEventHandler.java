@@ -19,12 +19,14 @@
 package playground.droeder.eMobility.analysis;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -47,9 +49,10 @@ import playground.droeder.eMobility.events.SoCChangeEvent;
  *
  */
 public class SoCEventHandler implements GenericEventHandler{
+	private static final Logger log = Logger.getLogger(SoCEventHandler.class);
 	
 	private static String INPUTDIR = "D:/VSP/svn/shared/volkswagen_internal/matsimOutput/3/";
-	private static String OUTPUTDIR = INPUTDIR + "ITERS/it.0/";
+	private static String OUTPUTDIR = INPUTDIR + "ITERS/it.0/charts/";
 	private static String NETWORK = INPUTDIR + "output_network.xml.gz";
 	private static String EVENTS = INPUTDIR + "ITERS/it.0/0.events.xml.gz";
 	private StateStore stateStore;
@@ -67,20 +70,28 @@ public class SoCEventHandler implements GenericEventHandler{
 
 	@Override
 	public void handleEvent(GenericEvent event) {
-		if(event.getAttributes().get("type").equals(SoCChangeEvent.TYPE)){
+		if(event instanceof SoCChangeEvent){
 			SoCChangeEvent e = (SoCChangeEvent) event;
 			stateStore.addValue(e.getVehId(), e.getSoC(), e.getTime(), this.net.getLinks().get(e.getLinkId()).getLength());
-			System.out.println("got SoCEvent");
+		}else if(event.getAttributes().get("type").equals(SoCChangeEvent.TYPE)){
+			SoCChangeEvent e = new SoCChangeEvent(event);
+			stateStore.addValue(e.getVehId(), e.getSoC(), e.getTime(), this.net.getLinks().get(e.getLinkId()).getLength());
 		}
 	}
 	
 	public void dumpData(String directory){
+		log.info("dumping data to " + directory + "...");
+		if(!new File(directory).exists()){
+			new File(directory).mkdirs();
+		}
 		BufferedWriter writer = IOUtils.getBufferedWriter(directory + "stateChange.txt");
-		XYLineChart timeChart = new XYLineChart("TimeDependend SoC-Change", "time [s]", "SoC [kWh]");
-		XYLineChart distChart = new XYLineChart("DistanceDependend SoC-Change", "distance [m]", "SoC [kWh]");
+		XYLineChart timeChart ;
+		XYLineChart distChart ;
 		
 		try {
 			for(StateEntry s: this.stateStore.getEntries()){
+				timeChart = new XYLineChart("TimeDependend SoC-Change", "time [s]", "SoC [kWh]");
+				distChart = new XYLineChart("DistanceDependend SoC-Change", "distance [m]", "SoC [kWh]");;
 				writer.write(s.getId().toString() + "\n");
 				writer.write("time:\t");
 				for(Double d: s.getTime()){
@@ -99,14 +110,15 @@ public class SoCEventHandler implements GenericEventHandler{
 				writer.newLine();
 				
 				timeChart.addSeries(s.getId().toString(), toArray(s.getTime()), toArray(s.getSoC()));
+				timeChart.saveAsPng(directory + s.getId() + "_time2SoCChart.png", 1920, 1200);
 				distChart.addSeries(s.getId().toString(), toArray(s.getDist()), toArray(s.getSoC()));
+				distChart.saveAsPng(directory + s.getId() + "dist2SoCChart.png", 1920, 1200);
 			}
 			
-			timeChart.saveAsPng(directory + "time2SoCChart.png", 1920, 1200);
-			distChart.saveAsPng(directory + "dist2SoCChart.png", 1920, 1200);
 			
 			writer.flush();
 			writer.close();
+			log.info("finished...");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -175,7 +187,11 @@ class StateStore{
 		public void addValue(double soc, double time, double additionalDistance) {
 			this.soc.add(soc);
 			this.time.add(time);
-			this.dist.add(this.dist.get(this.dist.size() -1 ) + additionalDistance);
+			if(this.dist.size() > 0){
+				this.dist.add(this.dist.get(this.dist.size() -1 ) + additionalDistance);
+			}else{
+				this.dist.add(additionalDistance);
+			}
 		}
 		
 		public Double[] getSoC(){

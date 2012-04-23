@@ -21,6 +21,7 @@ package playground.droeder.eMobility.energy;
 
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.droeder.DaFileReader;
@@ -30,6 +31,8 @@ import playground.droeder.DaFileReader;
  *
  */
 public class EmobEnergyProfileReader {
+	private static final Logger log = Logger
+			.getLogger(EmobEnergyProfileReader.class);
 	
 	public static ChargingProfiles readChargingProfiles(String file){
 		ChargingProfiles p = new ChargingProfiles();
@@ -45,8 +48,10 @@ public class EmobEnergyProfileReader {
 		DisChargingProfiles p = new DisChargingProfiles();
 		Set<String[]> values = DaFileReader.readFileContent(file, "\t", true);
 		
+		log.error("currently a factor is used for the discharging-Profiles, because the given values are to low...");
+		
 		for(String[] s: values){
-			p.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), Double.parseDouble(s[3]));
+			p.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), 100 * Double.parseDouble(s[3]));
 		}
 		return p;
 	}
