@@ -32,8 +32,6 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
-import playground.ikaddoura.busCorridor.busCorridorWelfareAnalysis.MyActivityScoringFunction;
-
 public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters params;
