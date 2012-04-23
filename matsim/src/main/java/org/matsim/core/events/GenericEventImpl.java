@@ -21,7 +21,6 @@
 package org.matsim.core.events;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.core.api.experimental.events.GenericEvent;
 
@@ -29,24 +28,26 @@ import org.matsim.core.api.experimental.events.GenericEvent;
  * @author nagel
  *
  */
-public class GenericEventImpl implements GenericEvent {
-	private final Map<String,String> atts = new TreeMap<String,String>() ;
-	private final double time ;
+public class GenericEventImpl extends EventImpl implements GenericEvent {
+	
+	private final String type;
+	private final Map<String, String> attributes;
 	
 	public GenericEventImpl( String type, double time ) {
-		this.atts.put("time", String.valueOf(time));
-		this.time = time;
-		this.atts.put("type", type );
+		super(time);
+		this.type = type;
+		this.attributes = super.getAttributes();
 	}
 
+  @Override
+  public String getEventType() {
+      return this.type;
+  }
+	
 	@Override
 	public Map<String, String> getAttributes() {
-		return atts ;
+		return this.attributes;
 	}
 
-	@Override
-	public double getTime() {
-		return time ;
-	}
 
 }
