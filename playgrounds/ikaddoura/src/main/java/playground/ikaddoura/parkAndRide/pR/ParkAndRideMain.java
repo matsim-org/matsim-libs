@@ -48,7 +48,6 @@ public class ParkAndRideMain {
 		controler.setOverwriteFiles(true);
 //		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 
-		
 		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl();
 		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl));
 		

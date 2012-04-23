@@ -56,12 +56,9 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 		this.pop = this.sc.getPopulation();
 		
 		// all possible Park And Ride facilities
-		parkAndRideLinkIDs.add(new IdImpl("2to3"));
-		parkAndRideLinkIDs.add(new IdImpl("3to4"));
-		parkAndRideLinkIDs.add(new IdImpl("4to5"));
-		parkAndRideLinkIDs.add(new IdImpl("5to6"));
-		parkAndRideLinkIDs.add(new IdImpl("6to7"));
-		parkAndRideLinkIDs.add(new IdImpl("7to8"));
+		parkAndRideLinkIDs.add(new IdImpl("PrA2toPrB2"));
+		parkAndRideLinkIDs.add(new IdImpl("PrA4toPrB4"));
+		parkAndRideLinkIDs.add(new IdImpl("PrA6toPrB6"));
 
 	}
 

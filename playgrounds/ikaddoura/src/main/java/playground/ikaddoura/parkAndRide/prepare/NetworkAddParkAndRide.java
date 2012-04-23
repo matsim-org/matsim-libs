@@ -23,6 +23,10 @@
  */
 package playground.ikaddoura.parkAndRide.prepare;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +57,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
+
 
 /**
  * @author Ihab
@@ -62,12 +68,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 // todo: Suchbereich in Suchradius umwandeln...
 
 public class NetworkAddParkAndRide {
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/test_network2.xml";
+	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/test_network.xml";
 	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/input/scheduleFile.xml";
 	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/input/vehiclesFile.xml";
 
+	private List<ParkAndRideFacility> parkAndRideFacilities = new ArrayList<ParkAndRideFacility>();
 	private List<TransitStopFacility> transitStops = new ArrayList<TransitStopFacility>();
-	private List<Node> parkAndRideNodes = new ArrayList<Node>();
+	private List<Node> carLinkToNodes = new ArrayList<Node>();
 	private Map<TransitStopFacility, Link> transitStop2nearestCarLink = new HashMap<TransitStopFacility, Link>();
 
 	private double extensionRadius = 100;
@@ -76,8 +83,8 @@ public class NetworkAddParkAndRide {
 // parkAndRide Link:
 	private double capacity = 2000;
 	private double freeSpeed = 13.8888888889;
-	private double length = 500;
-	private double nrOfLanes = 5;
+	private double length = 20;
+	private double nrOfLanes = 40;
 	
 	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -99,18 +106,19 @@ public class NetworkAddParkAndRide {
 		// und speichert jeweils den toNode dieses car-Links in der Liste parkAndRideNodes
 		// toDo: statt quadratweise Ausweitung: Radius
 		
-		for (Node node : this.parkAndRideNodes){
+		for (Node node : this.carLinkToNodes){
 			System.out.println("Node: "+node.getId().toString());
 		}
 		addParkAndRideLinks();
-		// fügt an jeden Node der Liste parkAndRideNodes einen parkAndRideLink ein. (toDo: zwei Links...)
-		
+		// fügt an jeden Node der Liste parkAndRideNodes zwei parkAndRideLink ein.
+				
 		for (TransitStopFacility stop : this.transitStop2nearestCarLink.keySet()){
 			System.out.println("TranistStop: "+stop.getId().toString()+" "+stop.getCoord().toString()+" --> nächster car-Link: "+this.transitStop2nearestCarLink.get(stop).getId()+" toNode:"+this.transitStop2nearestCarLink.get(stop).getToNode().getCoord().toString());
 		}
 		
+		printOutParkAndRideFacilites();
 		NetworkWriter networkWriter = new NetworkWriter(scenario.getNetwork());
-		networkWriter.write("../../shared-svn/studies/ihab/parkAndRide/input/test_network_modified2.xml");
+		networkWriter.write("../../shared-svn/studies/ihab/parkAndRide/input/testNetworkParkAndRide.xml");
 	}
 
 	private void getParkAndRideNodes() {
@@ -121,8 +129,8 @@ public class NetworkAddParkAndRide {
 			Link stopLink = scenario.getNetwork().getLinks().get(stopLinkId);
 			if (stopLink.getAllowedModes().contains(TransportMode.car)){
 				this.transitStop2nearestCarLink.put(stop, stopLink);
-				if (!this.parkAndRideNodes.contains(stopLink.getToNode())){
-					this.parkAndRideNodes.add(stopLink.getToNode());
+				if (!this.carLinkToNodes.contains(stopLink.getToNode())){
+					this.carLinkToNodes.add(stopLink.getToNode());
 				}
 			}
 			else {
@@ -148,8 +156,8 @@ public class NetworkAddParkAndRide {
 									if (hyp <= searchRadius){
 										System.out.println("Der Link "+link.getId()+" liegt im Suchradius um die TransitStopCoordinates "+coord.toString()+".");
 										this.transitStop2nearestCarLink.put(stop, link);
-										if (!this.parkAndRideNodes.contains(link.getToNode())){
-											this.parkAndRideNodes.add(link.getToNode());
+										if (!this.carLinkToNodes.contains(link.getToNode())){
+											this.carLinkToNodes.add(link.getToNode());
 										}
 										hasPRnode = true;
 									}
@@ -189,16 +197,31 @@ public class NetworkAddParkAndRide {
 
 	private void addParkAndRideLinks() {
 		int i = 0;
-		for (Node node : this.parkAndRideNodes){
-			Id pRnodeId = new IdImpl("PRnode"+i);
-			Coord coord = scenario.createCoord(node.getCoord().getX()+250, node.getCoord().getY()+250);
-			Node prNode = scenario.getNetwork().getFactory().createNode(pRnodeId, coord);
-			scenario.getNetwork().addNode(prNode);
+		for (Node node : this.carLinkToNodes){
+			Id pRnodeId1 = new IdImpl("PrA"+i);
+			Id pRnodeId2 = new IdImpl("PrB"+i);
+
+			Coord coord1 = scenario.createCoord(node.getCoord().getX()+20, node.getCoord().getY()+20);
+			Coord coord2 = scenario.createCoord(node.getCoord().getX()+10, node.getCoord().getY()+10);
+
+			Node prNode1 = scenario.getNetwork().getFactory().createNode(pRnodeId1, coord1);
+			Node prNode2 = scenario.getNetwork().getFactory().createNode(pRnodeId2, coord2);
+
+			scenario.getNetwork().addNode(prNode1);
+			scenario.getNetwork().addNode(prNode2);
 			
-			Link link1 = scenario.getNetwork().getFactory().createLink(new IdImpl(node.getId()+"to"+prNode.getId()), node, prNode);
-			scenario.getNetwork().addLink(setParkAndRideLinks(link1));
-			Link link2 = scenario.getNetwork().getFactory().createLink(new IdImpl(prNode.getId()+"to"+node.getId()), prNode, node);
-			scenario.getNetwork().addLink(setParkAndRideLinks(link2));	
+			Link link1a = scenario.getNetwork().getFactory().createLink(new IdImpl(node.getId()+"to"+prNode1.getId()), node, prNode1);
+			scenario.getNetwork().addLink(setParkAndRideLinks(link1a));
+			Link link2a = scenario.getNetwork().getFactory().createLink(new IdImpl(prNode1.getId()+"to"+node.getId()), prNode1, node);
+			scenario.getNetwork().addLink(setParkAndRideLinks(link2a));	
+			
+			Link link1b = scenario.getNetwork().getFactory().createLink(new IdImpl(prNode1.getId()+"to"+prNode2.getId()), prNode1, prNode2);
+			scenario.getNetwork().addLink(setParkAndRideLinks(link1b));
+			Link link2b = scenario.getNetwork().getFactory().createLink(new IdImpl(prNode2.getId()+"to"+prNode1.getId()), prNode2, prNode1);
+			scenario.getNetwork().addLink(setParkAndRideLinks(link2b));	
+			
+			this.parkAndRideFacilities.add(new ParkAndRideFacility(i, link1a.getId(), link2a.getId(), link1b.getId(), link2b.getId()));
+			
 			i++;
 		}
 	}
@@ -212,5 +235,35 @@ public class NetworkAddParkAndRide {
 		link.setLength(length);
 		link.setNumberOfLanes(nrOfLanes);
 		return link;
+	}
+	
+
+	private void printOutParkAndRideFacilites() {
+		File file = new File("../../shared-svn/studies/ihab/parkAndRide/input/parkAndRideFacilities.txt");
+	
+	    try {
+	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+	    String zeile1 = "Nr ; Link1a ; Link2a ; Link1b ; Link2b";
+	    bw.write(zeile1);
+	    bw.newLine();
+	
+	    for (ParkAndRideFacility pr : this.parkAndRideFacilities){
+	    	int nr = pr.getNr();
+	    	Id link1a = pr.getLinkArein();
+	    	Id link2a = pr.getLinkAraus();
+	    	Id link1b = pr.getLinkBrein();
+	    	Id link2b = pr.getLinkBraus();
+	    	
+	    	String zeile = nr+ " ; "+link1a+" ; "+link2a+" ; "+link1b+" ; "+link2b;
+	
+	    	bw.write(zeile);
+	        bw.newLine();
+	    }
+	
+	    bw.flush();
+	    bw.close();
+    
+	    } catch (IOException e) {}
+	    System.out.println("ParkAndRideFacilites written to "+file.toString());
 	}
 }

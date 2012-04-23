@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.ikaddoura.parkAndRide.pR;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -32,42 +37,60 @@ import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 
+
 /**
  * @author Ihab
  *
  */
 public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-//	private Map<Id, Integer> linkId2vehicles = new HashMap<Id, Integer>();
+	private Map<Integer, Integer> prNr2vehicles = new HashMap<Integer, Integer>();
+	private Map<Integer, SignalizeableItem> prNr2ampel = new HashMap<Integer, SignalizeableItem>();
+	private List<ParkAndRideFacility> pRfacilities = new ArrayList<ParkAndRideFacility>();
+
+	private Integer maxCapacity = 40;
 	
 	private InternalInterface internalInterface;
-	private Id linkIdParkplatz = new IdImpl("3to4");
-	private Integer maxCapacity = 0;
-	private int vehNumber = 0;
-
-	private SignalizeableItem ampel;
 	
 	@Override
 	public void doSimStep(double time) {
+		System.out.println(this.prNr2vehicles);
 		
-		ampel.setSignalStateAllTurningMoves(SignalGroupState.RED);
-
-		
-//		if (vehNumber >= maxCapacity){
-//			ampel.setSignalStateAllTurningMoves(SignalGroupState.RED);
-////			System.out.println("Ampel rot.");
-//		}
-//		
-//		else {
-//			ampel.setSignalStateAllTurningMoves(SignalGroupState.GREEN);
-////			System.out.println("Ampel grün.");
-//		}
+		for (Integer prNr : this.prNr2ampel.keySet()){
+			if (this.prNr2vehicles.get(prNr) > this.maxCapacity){
+				this.prNr2ampel.get(prNr).setSignalStateAllTurningMoves(SignalGroupState.RED);
+//				System.out.println("Ampel rot.");
+			}
+			
+			else {
+				this.prNr2ampel.get(prNr).setSignalStateAllTurningMoves(SignalGroupState.GREEN);
+//				System.out.println("Ampel grün.");
+			}
+		}
 	}
 
 	@Override
 	public void onPrepareSim() {
-		ampel = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("3to4")) ;
-		ampel.setSignalized(true);
+//   prNr ; A Rein	; A Raus  ; B Rein	   ; B Raus	
+//		2 ; 2toPrA2 ; PrA2to2 ; PrA2toPrB2 ; PrB2toPrA2
+//		4 ; 4toPrA4 ; PrA4to4 ; PrA4toPrB4 ; PrB4toPrA4
+//		6 ; 6toPrA6 ; PrA6to6 ; PrA6toPrB6 ; PrB6toPrA6
+		
+//			Ampel			    prfacility
+		
+		pRfacilities.add(new ParkAndRideFacility(2, new IdImpl("2toPrA2"), new IdImpl("PrA2to2"), new IdImpl("PrA2toPrB2"), new IdImpl("PrB2toPrA2")));
+		pRfacilities.add(new ParkAndRideFacility(4, new IdImpl("4toPrA4"), new IdImpl("PrA4to4"), new IdImpl("PrA4toPrB4"), new IdImpl("PrB4toPrA4")));
+		pRfacilities.add(new ParkAndRideFacility(6, new IdImpl("6toPrA6"), new IdImpl("PrA6to6"), new IdImpl("PrA6toPrB6"), new IdImpl("PrB6toPrA6")));
+
+		for (ParkAndRideFacility pr : this.pRfacilities){
+			this.prNr2vehicles.put(pr.getNr(), 0);
+
+			Id idArein = pr.getLinkArein();
+			SignalizeableItem ampel = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(idArein) ;
+			ampel.setSignalized(true);
+			this.prNr2ampel.put(pr.getNr(), ampel);
+		}
+		System.out.println(this.prNr2vehicles);
 	}
 
 	@Override
@@ -85,23 +108,35 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	@Override
 	public void reset(int iteration) {
-		this.vehNumber = 0;
+		System.out.println("Reset.");
+		this.pRfacilities.clear();
+		this.prNr2ampel.clear();
+		this.prNr2vehicles.clear();
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (linkIdParkplatz.equals(event.getLinkId())){
-			System.out.println("vehNumber um eins erhöht.");
-			this.vehNumber++;
+		for (ParkAndRideFacility pr : this.pRfacilities){
+			Id id = pr.getLinkBrein();
+			if (id.equals(event.getLinkId())){
+				System.out.println("Car entered ParkAndRideFacilty (B rein): " + id.toString());
+				int vehNr = this.prNr2vehicles.get(pr.getNr()) + 1;
+				System.out.println("Auslastung: "+vehNr);
+				this.prNr2vehicles.put(pr.getNr(), vehNr);
+			}
 		}
 	}
 
-
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (linkIdParkplatz.equals(event.getLinkId())){
-			System.out.println("vehNumber um eins verringert.");
-			this.vehNumber--;
+		for (ParkAndRideFacility pr : this.pRfacilities){
+			Id id = pr.getLinkBrein();
+			if (id.equals(event.getLinkId())){
+				System.out.println("Car left ParkAndRideFacilty (B rein): " + id.toString());
+				int vehNr = this.prNr2vehicles.get(pr.getNr()) - 1;
+				System.out.println("Auslastung: "+vehNr);
+				this.prNr2vehicles.put(pr.getNr(), vehNr);
+			}
 		}
 	}
 
