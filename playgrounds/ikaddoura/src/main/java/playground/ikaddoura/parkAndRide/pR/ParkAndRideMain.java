@@ -46,6 +46,8 @@ public class ParkAndRideMain {
 		String config = "../../shared-svn/studies/ihab/parkAndRide/input/test_config.xml";
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
+//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+
 		
 		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl();
 		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl));
