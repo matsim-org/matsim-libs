@@ -57,6 +57,8 @@ class GautengControler {
 		String plansFilename = args[1] ;
 		
 		double baseValueOfTime = Double.parseDouble(args[1]);
+		log.error("this seems to be using args[1] twice. how is this meant to work?  kai, apr'10") ;
+		
 		double valueOfTimeMultiplier = Double.parseDouble(args[2]);
 
 		final Controler controler = new Controler( configFileName ) ;
