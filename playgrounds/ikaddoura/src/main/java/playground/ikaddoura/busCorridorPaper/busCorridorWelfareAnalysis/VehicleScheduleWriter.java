@@ -24,104 +24,56 @@
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * @author Ihab
  *
  */
-public class VehicleScheduleWriter {
+class VehicleScheduleWriter {
+
+	String networkFile;
+	String outputDir;
+	int capacity;
 	
-	private final static Logger log = Logger.getLogger(VehicleScheduleWriter.class);
-	private String networkFile;
-	private String directoryExtIt;
-	private int capacity;
-	private double length;
-	private int busSeats;
-	private int standingRoom;
-	private TransitSchedule schedule;
-	private List<Id> vehicleIDs;
-	private Map<Integer, TimePeriod> day;
-	private Map<Integer, TimePeriod> newDay;
+	double length;
+	int busSeats;
+	int standingRoom;
 	
-	public VehicleScheduleWriter(Map<Integer, TimePeriod> day, int capacity, String networkFile, String directoryExtIt) {
-		
-		this.networkFile = networkFile;
-		this.directoryExtIt = directoryExtIt;
+	public VehicleScheduleWriter(int capacity, String networkFile, String outputDir) {
 		this.capacity = capacity;
-		this.length = getLength();
-		this.standingRoom = getStandingRoom();
-		this.busSeats = getBusSeats();
-		this.day = day;
-	}
-
-	private int getBusSeats() {
-		double busSeats = this.capacity * 0.7; 
-		return (int) busSeats;
-	}
-
-	private int getStandingRoom() {
-		double standingRoom = this.capacity * 0.3;
-		return (int) standingRoom;
-	}
-
-	private double getLength() {
-		double length = 0.1184 * this.capacity + 5.2152; // siehe lineare Regressionsanalyse in "BusCostsEstimations.xls"
-		return length;
-	}
-
-	public void writeTransit() throws IOException {
+		this.networkFile = networkFile;
+		this.outputDir = outputDir;
 		
-		ScheduleVehiclesGenerator generator = new ScheduleVehiclesGenerator();
+		this.length = 0.1184 * this.capacity + 5.2152;   // see linear regression analysis in "BusCostsEstimations.xls"
+		this.busSeats = (int) (this.capacity * 0.7);     // for future functionality (e.g. disutility for standing in bus)
+		this.standingRoom = (int) (this.capacity * 0.3); // for future functionality (e.g. disutility for standing in bus)
+	}
+
+	public void writeTransitVehiclesAndSchedule() throws IOException {
+		
+		VehicleScheduleGenerator generator = new VehicleScheduleGenerator();
 	
-		generator.setStopTime(10.0); // for schedule!
-		generator.setScheduleSpeed(0); // 0 = freeSpeed
-		generator.setPausenzeit(5*60);
-		generator.setNetworkFile(networkFile);
-		generator.setScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
-		generator.setVehicleFile(this.directoryExtIt+"/vehiclesFile.xml");
-		
-		generator.setTransitLineId(new IdImpl("Bus Line"));
-		generator.setRouteId1(new IdImpl("West-Ost"));
-		generator.setRouteId2(new IdImpl("Ost-West"));
-		
-		generator.setVehTypeId(new IdImpl("Bus"));
-		generator.setAccessSeconds(2.0); // seconds per person for entering a vehicle 
-		generator.setEgressSeconds(1.5); // seconds per person for leaving a vehicle
-		generator.setSeats(busSeats);
-		generator.setStandingRoom(standingRoom);
-		generator.setLength(length);
-		
-		generator.setDay(day);		
-		
-		generator.createSchedule();
-		
-		generator.writeScheduleFile();
-		generator.writeVehicleFile();
-		
-		this.setNewDay(generator.getNewDay());
+//		generator.setStopTime(10.0);   // for schedule!
+//		generator.setScheduleSpeed(0); // 0 = freeSpeed
+//		generator.setPausenzeit(5 * 60);
+//		generator.setNetworkFile(networkFile);
+//		generator.setScheduleFile(this.outputDir + "/scheduleFile.xml");
+//		generator.setVehicleFile(this.outputDir + "/vehiclesFile.xml");
+//		
+//		generator.setTransitLineId(new IdImpl("busLine"));
+//		generator.setRouteId1(new IdImpl("west-east"));
+//		generator.setRouteId2(new IdImpl("east-west"));
+//		
+//		generator.setVehTypeId(new IdImpl("bus"));
+//		generator.setAccessSeconds(2.0); // seconds per person for entering a vehicle 
+//		generator.setEgressSeconds(1.5); // seconds per person for leaving a vehicle
+//		generator.setSeats(busSeats);
+//		generator.setStandingRoom(standingRoom);
+//		generator.setLength(length);
+//		
+//		generator.createSchedule();
+//		
+//		generator.writeScheduleFile();
+//		generator.writeVehicleFile();
 	}
-
-	public TransitSchedule getSchedule() {
-		return schedule;
-	}
-	
-	public List<Id> getVehicleIDs() {
-		return vehicleIDs;
-	}
-
-	public void setNewDay(Map<Integer, TimePeriod> newDay) {
-		this.newDay = newDay;
-	}
-
-	public Map<Integer, TimePeriod> getNewDay() {
-		return newDay;
-	}
-
 }

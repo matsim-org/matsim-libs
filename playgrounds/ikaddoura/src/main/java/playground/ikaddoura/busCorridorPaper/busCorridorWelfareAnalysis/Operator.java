@@ -31,63 +31,37 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class Operator {
-	
 	private final static Logger log = Logger.getLogger(Operator.class);
 	
-	private final double COSTS_PER_VEH_HOUR = 33; // in AUD
+	private final double COSTS_PER_VEH_HOUR = 33.; 	 // in AUD
 	private final double OVERHEAD_PERCENTAGE = 1.21; // on top of direct operating costs
 
 	private int capacity;
 	private int numberOfBuses;
 	private double profit;
-	private double revenue;
-	private int numberOfBusesFromEvents;
-	private double vehicleKm;
-	private double vehicleHours;
 	private double costs;
 	private double highestScore = 0;
 	private int iterationWithHighestScore = 0;
-	private double costsPerVehicleDay;
-	private double costsPerVehicleKm;
+	private final double costsPerVehicleDay;
+	private final double costsPerVehicleKm;
 
-	public Operator(int numberOfBuses, int capacity) {
-		this.setNumberOfBuses(numberOfBuses);
-		this.setCapacity(capacity);
-		this.costsPerVehicleDay = getCostsPerVehicleDay();
-		this.costsPerVehicleKm = getCostsPerVehicleKm();
-	}
-	
-	private double getCostsPerVehicleKm() {
-		double costsPerVehicleKm = 0.006 * this.getCapacity() + 0.513; // siehe lineare Regressionsanalyse in "BusCostsEstimations.xls"
-		log.info("CostsPerVehicleKm (AUD): "+costsPerVehicleKm);
-		return costsPerVehicleKm;
+	public Operator() {
+		this.costsPerVehicleDay = 1.6064 * this.capacity + 22.622; // see linear regression analysis in "BusCostsEstimations.xls"
+		log.info("costsPerVehicleDay (AUD): " + costsPerVehicleDay);
+		this.costsPerVehicleKm = 0.006 * this.capacity + 0.513; // see linear regression analysis in "BusCostsEstimations.xls"
+		log.info("CostsPerVehicleKm (AUD): " + costsPerVehicleKm);
 	}
 
-	private double getCostsPerVehicleDay() {
-		double costsPerVehicleDay = 1.6064 * this.getCapacity() + 22.622; // siehe lineare Regressionsanalyse in "BusCostsEstimations.xls"
-		log.info("costsPerVehicleDay (AUD): "+costsPerVehicleDay);
-		return costsPerVehicleDay;
-	}
-
-	public void calculateScore() {
-		log.info("Vehicle-km: "+this.getVehicleKm());
-		log.info("Veh-Time: "+Time.writeTime(this.getVehicleHours()*60*60 , Time.TIMEFORMAT_HHMMSS));
-		this.costs = (numberOfBusesFromEvents * costsPerVehicleDay) + ((vehicleKm * costsPerVehicleKm) + (vehicleHours * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
-		this.profit = this.getRevenue() - this.getCosts();
+	public void calculateScore(OperatorUserAnalysis analysis) {
+		log.info("Vehicle-km: " + analysis.getVehicleKm());
+		log.info("Veh-Time: " + Time.writeTime(analysis.getVehicleHours() * 60 * 60, Time.TIMEFORMAT_HHMMSS));
+		this.costs = (analysis.getNumberOfBusesFromEvents() * costsPerVehicleDay) + ((analysis.getVehicleKm() * costsPerVehicleKm) + (analysis.getVehicleHours() * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
+		this.profit = analysis.getRevenue() - this.costs;
 
 		log.info("OperatorScore calculated: "+this.getProfit());
 	}
 
-	/**
-	 * @return the earnings
-	 */
-	public double getRevenue() {
-		return revenue;
-	}
 
-	/**
-	 * @return the costs
-	 */
 	public double getCosts() {
 		return costs;
 	}
@@ -139,137 +113,8 @@ public class Operator {
 		return (newFare);
 	}
 
-	/**
-	 * @param numberOfBuses the numberOfBuses to set
-	 */
-	public void setNumberOfBuses(int numberOfBuses) {
+	public void setParametersForExtIteration(int capacity, int numberOfBuses) {
+		this.capacity = capacity;
 		this.numberOfBuses = numberOfBuses;
 	}
-
-	/**
-	 * @return the numberOfBuses
-	 */
-	public int getNumberOfBuses() {
-		return numberOfBuses;
-	}
-
-	/**
-	 * @return the capacity
-	 */
-	public int getCapacity() {
-		return capacity;
-	}
-
-	/**
-	 * @param capacity the capacity to set
-	 */
-	public void setCapacity(int capacity) {
-		this.capacity = capacity;
-	}
-
-	/**
-	 * @return the vehicleKm
-	 */
-	public double getVehicleKm() {
-		return vehicleKm;
-	}
-
-	/**
-	 * @param vehicleKm the vehicleKm to set
-	 */
-	public void setVehicleKm(double vehicleKm) {
-		this.vehicleKm = vehicleKm;
-	}
-
-	/**
-	 * @return the vehicleHours
-	 */
-	public double getVehicleHours() {
-		return vehicleHours;
-	}
-
-	/**
-	 * @param vehicleHours the vehicleHours to set
-	 */
-	public void setVehicleHours(double vehicleHours) {
-		this.vehicleHours = vehicleHours;
-	}
-
-	/**
-	 * @param earnings the earnings to set
-	 */
-	public void setRevenue(double earnings) {
-		this.revenue = earnings;
-	}
-
-	/**
-	 * @return the numberOfBusesFromEvents
-	 */
-	public int getNumberOfBusesFromEvents() {
-		return numberOfBusesFromEvents;
-	}
-
-	/**
-	 * @param numberOfBusesFromEvents the numberOfBusesFromEvents to set
-	 */
-	public void setNumberOfBusesFromEvents(int numberOfBusesFromEvents) {
-		this.numberOfBusesFromEvents = numberOfBusesFromEvents;
-	}
-	
-//	public void analyzeScores() {
-//		if (this.profit > this.highestScore){
-//			this.setHighestScore(this.profit);
-//			this.setIterationWithHighestScore(this.extItNr);
-//		}
-//		else {}
-//		
-//		log.info("OperatorScore analyzed.");	
-//	}
-	
-//	public int strategy(Map<Integer, Integer> iteration2numberOfBuses, Map<Integer, Double> iteration2operatorScore) {
-//		
-//		int numberOfBuses = iteration2numberOfBuses.get(this.extItNr);
-//		int newNumberOfBuses = 0;
-//		
-//		if (this.extItNr==0){
-//			newNumberOfBuses = numberOfBuses + 1;  // Start-Strategie
-//		}
-//		
-//		else {
-//			
-//			int numberOfBusesBefore = iteration2numberOfBuses.get(this.extItNr-1);
-//			double score = this.getProfit(); // iteration2providerScore.get(this.extItNr);
-//			double scoreBefore = iteration2operatorScore.get(this.extItNr-1);
-//			
-//			if(numberOfBusesBefore < numberOfBuses & scoreBefore < score){
-//				// mehr Busse, score angestiegen
-//				newNumberOfBuses = numberOfBuses+1;
-//			}
-//			else if(numberOfBusesBefore < numberOfBuses & scoreBefore > score){
-//				// mehr Busse, score gesunken
-//				newNumberOfBuses = numberOfBuses-1;
-//			}
-//			else if (numberOfBusesBefore > numberOfBuses & scoreBefore < score){
-//				// weniger Busse, score angestiegen
-//				newNumberOfBuses = numberOfBuses-1;
-//			}
-//			else if (numberOfBusesBefore > numberOfBuses & scoreBefore > score){
-//				// weniger Busse, score gesunken
-//				newNumberOfBuses = numberOfBuses+1;
-//			}
-//			else {
-//				log.info("Operator score did not change.");
-//				newNumberOfBuses = numberOfBuses;
-//			}
-//		}
-//		
-//		if (newNumberOfBuses == 0){
-//			log.warn("At least one Bus expected!");
-//			newNumberOfBuses = 1;
-//		}
-//		
-//		log.info("OperatorStrategy changed numberOfBuses for next external Iteration to "+newNumberOfBuses+".");
-//		return newNumberOfBuses;
-//	}
-	
 }

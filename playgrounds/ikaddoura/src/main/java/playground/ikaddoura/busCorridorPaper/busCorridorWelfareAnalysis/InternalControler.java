@@ -38,17 +38,17 @@ import org.matsim.pt.config.TransitConfigGroup;
  */
 public class InternalControler {
 
-	private PtLegHandler ptLegHandler;
+	private final PtLegHandler ptLegHandler;
 	
-	private String configFile;
-	private String directoryExtIt;
-	private String outputExternalIterationDirPath;
-	private int lastInternalIteration;
-	private int extItNr;
-	private String populationFile;
-	private String networkFile;
-	private double fare;
-	private final double MONEY_UTILS;
+	private final String configFile;
+	private final String directoryExtIt;
+	private final String outputExternalIterationDirPath;
+	private final int lastInternalIteration;
+	private final int extItNr;
+	private final String populationFile;
+	private final String networkFile;
+	private final double fare;
+	final double MARGINAL_UTILITY_OF_MONEY = 0.14026;
 	
 	private final double TRAVEL_PT = 0; // not used --> instead: TRAVEL_PT_IN_VEHICLE & TRAVEL_PT_WAITING
 	
@@ -68,7 +68,7 @@ public class InternalControler {
 	
 	private final double agentStuckScore = -100;
 	
-	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare, double MONEY_UTILS, PtLegHandler ptLegHandler) {
+	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare, PtLegHandler ptLegHandler) {
 		this.configFile = configFile;
 		this.directoryExtIt = directoryExtIt;
 		this.lastInternalIteration = lastInternalIteration;
@@ -78,7 +78,6 @@ public class InternalControler {
 		this.networkFile = networkFile;
 		this.fare = fare;
 		this.ptLegHandler = ptLegHandler;
-		this.MONEY_UTILS = MONEY_UTILS;
 	}
 	
 	public void run() {
@@ -136,7 +135,7 @@ public class InternalControler {
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
 		planCalcScoreConfigGroup.setTravelingPt_utils_hr(TRAVEL_PT);
-		planCalcScoreConfigGroup.setMarginalUtilityOfMoney(MONEY_UTILS);
+		planCalcScoreConfigGroup.setMarginalUtilityOfMoney(MARGINAL_UTILITY_OF_MONEY);
 		planCalcScoreConfigGroup.setTraveling_utils_hr(TRAVEL_CAR);
 		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(TRAVEL_WALK);
 		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
@@ -147,6 +146,10 @@ public class InternalControler {
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, this.ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm, agentStuckScore);
 		controler.setScoringFunctionFactory(scoringfactory);
 		controler.run();		
+	}
+
+	public double getMarginalUtlOfMoney() {
+		return MARGINAL_UTILITY_OF_MONEY;
 	}
 
 }
