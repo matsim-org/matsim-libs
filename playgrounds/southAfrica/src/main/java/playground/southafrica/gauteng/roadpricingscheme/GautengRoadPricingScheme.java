@@ -74,12 +74,13 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 	public Cost getLinkCostInfo(Id linkId, double time, Id personId) {
 		Cost baseToll = delegate.getLinkCostInfo(linkId, time, personId );
 		if (baseToll == null) {
-//			return new Cost(0.,24*3600.,0.0) ;
+			return new Cost(0.,24*3600.,0.0) ;
 			// yyyyyy this is what causes the cordon setting for the Gauteng scenario to fail: It always
 			// returns a cost object, and so the algo thinks that the agent is always "inside" the area.
 			// I can't say why I programmed it this way; I seem to recall that I copied it from somewhere 
 			// but I cannot find it.  kai, apr'12
-			return null ;
+			// Throws NullPointerException. Changed back to original... just to get SANRAL runs going . jwj, Apr 24 '12/
+//			return null ;
 		}
 		Link link = network.getLinks().get(linkId) ;
 		Person person = population.getPersons().get(personId) ;

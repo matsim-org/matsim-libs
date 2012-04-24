@@ -65,6 +65,7 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 				} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
 						toll_usually_positive = cost.amount ;
 				} else {
+					/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
 					throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
 				}
 
