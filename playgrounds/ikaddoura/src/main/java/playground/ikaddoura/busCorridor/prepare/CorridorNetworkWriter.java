@@ -47,10 +47,10 @@ public class CorridorNetworkWriter {
 	private Scenario scenario;
 	private Network network;
 	private int linkNr = 10; // per direction
-	private double capacity = 2000.0;
+	private double capacity = 200.0;
 	private double freeSpeed = 13.8888888889;
 	private double length = 500.0;
-	private double nrOfLanes = 1.0;
+	private double nrOfLanes = 2.0;
 	// modes: car, bus
 	
 	public static void main(String[] args) {
@@ -67,7 +67,7 @@ public class CorridorNetworkWriter {
 		setLinks();
 		
 		NetworkWriter networkWriter = new NetworkWriter(network);
-		networkWriter.write("../../shared-svn/studies/ihab/busCorridor/input/networkTEST.xml");
+		networkWriter.write("../../shared-svn/studies/ihab/ptTest/input/network.xml");
 	}
 	
 	private void createLinks(int linkNr) {
