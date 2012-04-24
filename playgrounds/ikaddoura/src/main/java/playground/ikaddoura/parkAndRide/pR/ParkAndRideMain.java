@@ -32,6 +32,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.parkAndRide.pRscoring.ParkAndRideScoringFunctionFactory;
 
@@ -46,7 +47,7 @@ public class ParkAndRideMain {
 		String config = "../../shared-svn/studies/ihab/parkAndRide/input/test_config.xml";
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 
 		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl();
 		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl));
