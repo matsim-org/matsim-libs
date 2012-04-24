@@ -44,7 +44,7 @@ public class ParkAndRideMain {
 	
 	public static void main(String[] args) {
 			
-		String config = "../../shared-svn/studies/ihab/parkAndRide/input/test_config.xml";
+		String config = "../../shared-svn/studies/ihab/parkAndRide/input/config.xml";
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());

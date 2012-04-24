@@ -48,23 +48,18 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 	private Map<Integer, SignalizeableItem> prNr2ampel = new HashMap<Integer, SignalizeableItem>();
 	private List<ParkAndRideFacility> pRfacilities = new ArrayList<ParkAndRideFacility>();
 
-	private Integer maxCapacity = 40;
+	private Integer maxCapacity = 10;
 	
 	private InternalInterface internalInterface;
 	
 	@Override
 	public void doSimStep(double time) {
-		System.out.println(this.prNr2vehicles);
 		
 		for (Integer prNr : this.prNr2ampel.keySet()){
-			if (this.prNr2vehicles.get(prNr) > this.maxCapacity){
+			if (this.prNr2vehicles.get(prNr) >= this.maxCapacity){
 				this.prNr2ampel.get(prNr).setSignalStateAllTurningMoves(SignalGroupState.RED);
-//				System.out.println("Ampel rot.");
-			}
-			
-			else {
+			} else {
 				this.prNr2ampel.get(prNr).setSignalStateAllTurningMoves(SignalGroupState.GREEN);
-//				System.out.println("Ampel grün.");
 			}
 		}
 	}
@@ -90,7 +85,6 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 			ampel.setSignalized(true);
 			this.prNr2ampel.put(pr.getNr(), ampel);
 		}
-		System.out.println(this.prNr2vehicles);
 	}
 
 	@Override
@@ -108,7 +102,6 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	@Override
 	public void reset(int iteration) {
-		System.out.println("Reset.");
 		this.pRfacilities.clear();
 		this.prNr2ampel.clear();
 		this.prNr2vehicles.clear();
