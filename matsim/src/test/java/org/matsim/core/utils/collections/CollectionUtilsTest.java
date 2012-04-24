@@ -26,6 +26,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author mrieser
@@ -108,6 +110,16 @@ public class CollectionUtilsTest {
 	public void testNullStringToArray() {
 		String[] array = CollectionUtils.stringToArray(null);
 		Assert.assertEquals(0, array.length);
+	}
+
+	@Test
+	public void testIdSetToString() {
+		Set<Id> set = new LinkedHashSet<Id>();
+		set.add(new IdImpl("Aaa"));
+		set.add(new IdImpl("Bbb"));
+		set.add(new IdImpl("Ddd"));
+		set.add(new IdImpl("Ccc"));
+		Assert.assertEquals("Aaa,Bbb,Ddd,Ccc", CollectionUtils.idSetToString(set));		
 	}
 
 }

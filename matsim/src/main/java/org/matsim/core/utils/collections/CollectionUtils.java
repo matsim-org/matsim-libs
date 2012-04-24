@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.StringUtils;
 
 /**
@@ -30,14 +31,27 @@ import org.matsim.core.utils.misc.StringUtils;
  */
 public abstract class CollectionUtils {
 
-	public static final String setToString(final Set<String> values) {
+	public static final String idSetToString(final Set<Id> values) {
 		boolean isFirst = true;
 		StringBuilder str = new StringBuilder();
-		for (String mode : values) {
+		for (Id id : values) {
 			if (!isFirst) {
 				str.append(',');
 			}
-			str.append(mode);
+			str.append(id.toString());
+			isFirst = false;
+		}
+		return str.toString();
+	}
+
+	public static final String setToString(final Set<String> values) {
+		boolean isFirst = true;
+		StringBuilder str = new StringBuilder();
+		for (String s : values) {
+			if (!isFirst) {
+				str.append(',');
+			}
+			str.append(s);
 			isFirst = false;
 		}
 		return str.toString();
