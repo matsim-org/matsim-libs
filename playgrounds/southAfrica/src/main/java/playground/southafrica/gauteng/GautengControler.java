@@ -19,6 +19,7 @@ import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
+import playground.southafrica.utilities.Header;
 
 class PersonHouseholdMapping {
 	Map<Id,Id> delegate = new HashMap<Id,Id>() ;
@@ -45,21 +46,18 @@ class GautengControler {
 	static Logger log = Logger.getLogger(GautengControler.class) ;
 	
 	public static void main ( String[] args ) {
-		if(args.length != 3){
-			throw new RuntimeException("Must provide three arguments: config file path; " +
+		Header.print(GautengControler.class.toString(), args);
+		if(args.length != 4){
+			throw new RuntimeException("Must provide four arguments: config file path; " +
 					"input plans file; base value of time (for cars) and multiplier for commercial vehicles.") ;
 		}
 		// Get arguments
 		// Read the base Value-of-Time (VoT) for private cars, and the VoT multiplier from the arguments, johan Mar'12
 		String configFileName = args[0] ;
 //		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
-		
 		String plansFilename = args[1] ;
-		
-		double baseValueOfTime = Double.parseDouble(args[1]);
-		log.error("this seems to be using args[1] twice. how is this meant to work?  kai, apr'10") ;
-		
-		double valueOfTimeMultiplier = Double.parseDouble(args[2]);
+		double baseValueOfTime = Double.parseDouble(args[2]);
+		double valueOfTimeMultiplier = Double.parseDouble(args[3]);
 
 		final Controler controler = new Controler( configFileName ) ;
 
