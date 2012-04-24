@@ -91,6 +91,9 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 			newPlan.setEndTime(oldPlan.getEndTime());
 			//insert the new stop at the correct point (minimum average Distance from the subroute to the new Stop) in the sequence of stops 2 serve
 			List<TransitStopFacility> stopsToServe = createNewStopsToServe(cooperative, newStop); 
+			if(stopsToServe == null){
+				return null;
+			}
 			newPlan.setStopsToBeServed((ArrayList<TransitStopFacility>) stopsToServe);
 			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), 
 																		newPlan.getStartTime(), 
@@ -112,6 +115,10 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 		// find the subroutes, between the stops to be served
 		List<List<TransitStopFacility>> subrouteFacilities = this.findSubroutes(cooperative, newStop);
 		List<Double> avDist = calcAvDist(subrouteFacilities, newStop);
+		if(avDist.size() > cooperative.getBestPlan().getStopsToBeServed().size()){
+			log.error("more subroutes then stops2Serve were found. can not create a new Route.");
+			return null;
+		}
 		
 		//calculate the average distance from the new stop to the subroute and add the new stop between the 2 "stops2beServed" of the subroute
 		int index = 0;
