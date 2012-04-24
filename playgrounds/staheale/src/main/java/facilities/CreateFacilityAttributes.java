@@ -1,0 +1,84 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CreateCapacityAttribute.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package facilities;
+
+import java.io.IOException;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+
+public class CreateFacilityAttributes {
+	
+	public static final String CAPACITY = "Capacity";
+	public static final String LOWERBOUND = "LowerThreshold";
+	public static final String UPPERBOUND = "UpperThreshold";
+	public static final String LOWERMARGINALUTILITY = "MarginalUtilityOfUnderArousal";
+	public static final String UPPERMARGINALUTILITY = "MarginalUtilityOfOverArousal";
+	
+	public static void main(String[] args) throws IOException {
+		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
+		ObjectAttributes facilityAttributes = new ObjectAttributes();
+		for (Facility f : scenario.getActivityFacilities().getFacilities().values()) {
+			facilityAttributes.putAttribute(f.getId().toString(),CAPACITY,1);
+		}
+		
+		for (Facility f : scenario.getActivityFacilities().getFacilities().values()) {
+			facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.1);
+		}
+		
+		for (Facility f : scenario.getActivityFacilities().getFacilities().values()) {
+			facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,0.75);
+		}
+		
+		for (Facility f : scenario.getActivityFacilities().getFacilities().values()) {
+			facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-12);
+		}
+		
+		for (Facility f : scenario.getActivityFacilities().getFacilities().values()) {
+			facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-12);
+		}
+		new ObjectAttributesXmlWriter(facilityAttributes).writeFile("./input/facilityAttributes.xml");
+	}
+	
+	public String getCapacity() {
+		return CAPACITY;
+	}
+
+	public String getLowerBound() {
+		return LOWERBOUND;
+	}
+	
+	public String getUpperBound() {
+		return UPPERBOUND;
+	}
+	
+	public String getLowerMarginalUtility() {
+		return LOWERMARGINALUTILITY;
+	}
+	
+	public String getUpperMarginalUtility() {
+		return UPPERMARGINALUTILITY;
+	}
+}
