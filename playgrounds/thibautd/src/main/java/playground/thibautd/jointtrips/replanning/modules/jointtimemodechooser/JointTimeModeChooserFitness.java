@@ -171,7 +171,9 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 			log.debug( "scoring ended." );
 			log.debug( "score: "+plan.getScore() );
 			log.debug( "accumulated negative duration: "+accumulatedNegativeDuration );
+			log.debug( "negative duration penalty: "+(accumulatedNegativeDuration * negativeDurationPenalty) );
 			log.debug( "accumulated unsynchronized duration: "+accumulatedUnsynchronizedTime );
+			log.debug( "unsynchronized duration penalty: "+(accumulatedUnsynchronizedTime * unsynchronizedPenalty) );
 		}
 
 		return plan.getScore() +

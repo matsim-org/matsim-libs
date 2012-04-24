@@ -65,7 +65,7 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 		ScoringFunctionFactory scoringFunctionFactory = controler.getScoringFunctionFactory();
 		JointTimeModeChooserConfigGroup config = (JointTimeModeChooserConfigGroup)
 			controler.getConfig().getModule( JointTimeModeChooserConfigGroup.GROUP_NAME );
-		ConfigurationBuilder builder =
+		JointTimeModeChooserConfigBuilder builder =
 			new JointTimeModeChooserConfigBuilder(
 					jointPlan,
 					config,
@@ -73,7 +73,17 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 					tripRouterFactory,
 					config.isDebugMode() ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
 
+		// first run without synchro
+		builder.setInitialSolution( null );
+		builder.setIsSynchronizing( false  );
 		Solution bestSolution = TabuSearchRunner.runTabuSearch( builder );
+
+		if (jointPlan.getClique().getMembers().size() > 1) {
+			// then start at the found solution and synchronize
+			builder.setInitialSolution( bestSolution );
+			builder.setIsSynchronizing( true  );
+			bestSolution = TabuSearchRunner.runTabuSearch( builder );
+		}
 
 		// two goals here:
 		// 1- the side effect: getRepresentedPlan sets the plan to the represented state

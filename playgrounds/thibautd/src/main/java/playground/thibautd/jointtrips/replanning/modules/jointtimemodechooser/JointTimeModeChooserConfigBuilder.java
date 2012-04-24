@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
@@ -30,6 +33,7 @@ import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.EvolutionPlotter;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
+import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
 import playground.thibautd.tsplanoptimizer.timemodechooser.AllPossibleModesMovesGenerator;
 import playground.thibautd.tsplanoptimizer.timemodechooser.DirectionTabuList;
@@ -41,12 +45,16 @@ import playground.thibautd.tsplanoptimizer.timemodechooser.ModeMovesTabuList;
  */
 public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 	private static final int N_ITER = 1000;
+	private static final List<Integer> RESTRICTED_STEPS = Arrays.asList( 60 , 300 , 1500 );
 
 	private final JointPlan plan;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final TripRouterFactory tripRouterFactory;
 	private final String outputDir;
 	private final JointTimeModeChooserConfigGroup config;
+
+	private boolean penalizeUnsynchro = false;
+	private JointTimeModeChooserSolution internalInitialSolution = null;
 
 	/**
 	 * Creates a builder for optimisation without debuging output
@@ -75,24 +83,53 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 		this.outputDir = analysisOutputDir;
 	}
 
+	/**
+	 * Sets the synchronisation behaviour. The idea is that plans
+	 * should be optimised without taking care of synchronisation,
+	 * and then synchronized (the penalty strategy otherwise tends to trap
+	 * the algorithm in the first synchronized state found).
+	 * Mode is not optimised when synchronizing.
+	 * @param b wether the plans are to synchronize or not
+	 */
+	public void setIsSynchronizing(final boolean b) {
+		penalizeUnsynchro = b;
+	}
+
+	/**
+	 * Sets the initial solution. If null, a solution
+	 * representing the plan passed at construction is used
+	 * as starting point.
+	 * @param s the initial solution
+	 */
+	public void setInitialSolution(final Solution s) {
+		internalInitialSolution =  (JointTimeModeChooserSolution) s;
+	}
+
 	@Override
 	public void buildConfiguration(final TabuSearchConfiguration configuration) {
 		int cliqueSize = plan.getClique().getMembers().size();
 
 		JointTimeModeChooserSolution initialSolution =
+			internalInitialSolution != null ? internalInitialSolution :
 			new JointTimeModeChooserSolution(
 					plan,
 					tripRouterFactory.createTripRouter() );
 		configuration.setInitialSolution( initialSolution );
 
-		int nTabu = initialSolution.getRepresentation().size();
+		// different parameters depending on whether we optimise
+		// with or without synchro, as mode is not optimised when
+		// synchro (thus structure of the tabu list is different),
+		// and we mainly want hill-climbing.
+		int nTabu = penalizeUnsynchro ?
+			1 :
+			initialSolution.getRepresentation().size();
 		if (nTabu < 1) nTabu = 1;
-		int improvementDelay = nTabu;
+		int improvementDelay = penalizeUnsynchro ? 3 : nTabu;
 
 		FitnessFunction fitness =
 			new JointTimeModeChooserFitness(
 					config.getNegativeDurationPenalty(),
-					config.getUnsynchronizedPenalty(),
+					penalizeUnsynchro ? config.getUnsynchronizedPenalty() : 0,
 					scoringFunctionFactory );
 		configuration.setFitnessFunction( fitness );
 
@@ -104,11 +141,16 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 		CompositeMoveGenerator generator = new CompositeMoveGenerator();
 		generator.add( new FixedStepsIntegerMovesGenerator(
 					initialSolution,
-					config.getDurationSteps(),
+					penalizeUnsynchro ?
+						RESTRICTED_STEPS :
+						config.getDurationSteps(),
 					false));
-		generator.add( new AllPossibleModesMovesGenerator(
-					initialSolution,
-					config.getModes()) );
+		if (!penalizeUnsynchro) {
+			// if synchro, just durations are optimized
+			generator.add( new AllPossibleModesMovesGenerator(
+						initialSolution,
+						config.getModes()) );
+		}
 		configuration.setMoveGenerator( generator );
 
 		CompositeTabuChecker tabuChecker = new CompositeTabuChecker();
@@ -121,7 +163,9 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 			configuration.addListener(
 					new EvolutionPlotter(
 						"score evolution, clique "+plan.getPerson().getId()+", "+cliqueSize+" members",
-						outputDir+"/"+plan.getPerson().getId()+"-fitness.png" ) );
+						outputDir+"/"+plan.getPerson().getId()+
+						(penalizeUnsynchro ? "-synchro-" : "-preSynchro-") +
+						"fitness.png" ) );
 		}
 	}
 }

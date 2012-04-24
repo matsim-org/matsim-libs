@@ -53,6 +53,8 @@ import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
  * @author thibautd
  */
 public class JointTimeModeChooserSolution implements Solution {
+	private static enum SharedStatus { driver , passenger , alone }
+
 	private final static double SCENARIO_DUR = 24 * 3600;
 	private final JointPlan plan;
 	private final JointPlanRouter planRouter;
@@ -257,10 +259,24 @@ public class JointTimeModeChooserSolution implements Solution {
 			}
 
 			for (List<PlanElement> subtour : analyseSubtours( planStructure )) {
-				if (!isSharedSubtour( subtour )) {
-					Subtour subtourElement = new Subtour( isCarAvailable , subtour );
-					codedPlanElements.add( subtourElement );
-					values.add( new ValueImpl<String>( subtourElement.getMode() ) );
+				SharedStatus status = isSharedSubtour( subtour );
+				Subtour subtourElement = new Subtour( isCarAvailable , subtour );
+
+				switch (status) {
+					case driver:
+						break;
+					case passenger:
+						subtourElement = new Subtour( false , getNonPassengerLegs( subtour ) );
+						codedPlanElements.add( subtourElement );
+						values.add( new ValueImpl<String>( subtourElement.getMode() ) );
+						break;
+					case alone:
+						subtourElement = new Subtour( isCarAvailable , subtour );
+						codedPlanElements.add( subtourElement );
+						values.add( new ValueImpl<String>( subtourElement.getMode() ) );
+						break;
+					default:
+						throw new RuntimeException( "Unknown: "+status );
 				}
 			}
 
@@ -329,7 +345,7 @@ public class JointTimeModeChooserSolution implements Solution {
 			for (PlanElement pe : planElements) {
 				if (pe instanceof Activity) {
 					if ( now == Time.UNDEFINED_TIME ) {
-						throw new RuntimeException( "got an undefined score for plan element "+pe+" in plan "+plan.getPlanElements() );
+						throw new RuntimeException( "got an undefined start time for plan element "+pe+" in plan "+plan.getPlanElements() );
 					}
 					Activity act = (Activity) pe;
 					// System.out.println( "now="+Time.writeTime( now ) );
@@ -387,17 +403,34 @@ public class JointTimeModeChooserSolution implements Solution {
 		return analyzer.getSubtours();
 	}
 
-	private static boolean isSharedSubtour(final List<PlanElement> subtour) {
+	private static SharedStatus isSharedSubtour(final List<PlanElement> subtour) {
 		boolean hasPickUp = false;
+		boolean passenger = false;
 		for (PlanElement pe : subtour) {
 			if (pe instanceof Activity && ((Activity) pe).getType().equals( JointActingTypes.PICK_UP ) ) {
 				hasPickUp = true;
 			}
+			if (pe instanceof Leg && ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
+				passenger = true;
+			}
 			if (pe instanceof Activity && ((Activity) pe).getType().equals( JointActingTypes.DROP_OFF ) ) {
-				if (hasPickUp) return true;
+				if (hasPickUp) return passenger ? SharedStatus.passenger : SharedStatus.driver;
 			}
 		}
-		return false;
+		return SharedStatus.alone;
+	}
+
+	private static List<PlanElement> getNonPassengerLegs(final List<PlanElement> pes) {
+		List<PlanElement> out = new ArrayList<PlanElement>();
+
+		for (PlanElement pe : pes) {
+			if ( pe instanceof Leg &&
+					!((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
+				out.add( pe );
+			}
+		}
+
+		return out;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
