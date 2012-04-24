@@ -59,7 +59,7 @@ import org.matsim.vehicles.Vehicles;
  * @author Ihab
  *
  */
-class VehicleScheduleGenerator {
+public class VehicleScheduleGenerator {
 	private final static Logger log = Logger.getLogger(VehicleScheduleGenerator.class);
 	
 	private double stopTime;

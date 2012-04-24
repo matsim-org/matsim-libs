@@ -32,7 +32,7 @@ import org.matsim.core.basic.v01.IdImpl;
  * @author Ihab
  *
  */
-class VehicleScheduleWriter {
+public class VehicleScheduleWriter {
 
 	int numberOfBuses;
 	int capacity;
