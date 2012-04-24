@@ -272,7 +272,7 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 	 */
 	@Override
 	public String getName() {
-		return this.STRATEGY_NAME;
+		return STRATEGY_NAME;
 	}
 
 }
