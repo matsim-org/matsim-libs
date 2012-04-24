@@ -59,11 +59,11 @@ class VehicleScheduleWriter {
 		VehicleScheduleGenerator generator = new VehicleScheduleGenerator();
 		
 		generator.setNumberOfBuses(numberOfBuses);
-		generator.setStartTime(4*3600);
-		generator.setEndTime(24*3600);
-		generator.setStopTime(10.0); 
-		generator.setScheduleSpeed(13.888); // m/s ???
-		generator.setPausenzeit(5 * 60);
+		generator.setStartTime(4.0 * 3600);	// [sec]
+		generator.setEndTime(24.0 * 3600);	// [sec]
+		generator.setStopTime(10.0); 		// [sec]
+		generator.setScheduleSpeed(7.0);	// [m/sec] 
+		generator.setPausenzeit(5.0 * 60); 	// [sec]
 		generator.setNetwork(this.network);
 		generator.setScheduleFile(this.outputDir + "/scheduleFile.xml");
 		generator.setVehicleFile(this.outputDir + "/vehiclesFile.xml");
@@ -73,8 +73,8 @@ class VehicleScheduleWriter {
 		generator.setRouteId2(new IdImpl("east-west"));
 		
 		generator.setVehTypeId(new IdImpl("bus"));
-		generator.setAccessSeconds(2.0); // seconds per person for entering a vehicle 
-		generator.setEgressSeconds(1.5); // seconds per person for leaving a vehicle
+		generator.setAccessSeconds(2.0); 	// [sec/person]
+		generator.setEgressSeconds(1.5); 	// [sec/person]
 		generator.setSeats(busSeats);
 		generator.setStandingRoom(standingRoom);
 		generator.setLength(length);
