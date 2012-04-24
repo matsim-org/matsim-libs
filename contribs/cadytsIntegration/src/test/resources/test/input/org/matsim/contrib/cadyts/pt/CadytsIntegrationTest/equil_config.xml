@@ -51,14 +51,6 @@
 		<param name="Module_1" value="org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy" />
 	</module>
 
-	<module name="changeLegMode">
-		<param name="modes" value="car,pt" />
-	</module>
-
-	<module name="TimeAllocationMutator">
-		<param name="mutationRange" value="0" />
-	</module>
-
 	<module name="transit">
 		<param name="transitScheduleFile" value="&INPUTBASE;transitSchedule1bus.xml" />
 		<param name="vehiclesFile" value="&INPUTBASE;vehicles.xml" />

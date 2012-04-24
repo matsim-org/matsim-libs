@@ -38,7 +38,7 @@ public class CadytsPtConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GROUP_NAME = "cadytsPt"; // TODO change to cadytsPt
+	public static final String GROUP_NAME = "cadytsPt";
 
 	public static final String REGRESSION_INERTIA = "regressionInertia";
 	public static final String MIN_FLOW_STDDEV = "minFlowStddevVehH";
@@ -126,6 +126,7 @@ public class CadytsPtConfigGroup extends Module {
 		params.put(WRITE_ANALYSIS_FILE, Boolean.toString(isWriteAnalysisFile()));
 		params.put(START_HOUR, Integer.toString(getStartHour()));
 		params.put(END_HOUR, Integer.toString(getStartHour()));
+		params.put(CALIBRATED_LINES, CollectionUtils.idSetToString(this.calibratedLines));
 
 		return params;
 	}
