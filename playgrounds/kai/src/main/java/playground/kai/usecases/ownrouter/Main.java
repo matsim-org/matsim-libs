@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.mentalmodule;
+package playground.kai.usecases.ownrouter;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -35,7 +35,10 @@ public class Main {
 			@Override
 			public void notifyStartup(StartupEvent controlerEvent) {
 				PlanStrategy strategy = new PlanStrategyImpl(new RandomPlanSelector()) ;
-				strategy.addStrategyModule(new MyTimeMutator() ) ;
+				KnRouter knRouter = new KnRouter() ;
+				strategy.addStrategyModule( knRouter ) ;
+				controler.getEvents().addHandler( knRouter ) ;
+				
 				controler.getStrategyManager().addStrategy(strategy, 0.1 ) ;
 			}
 		}) ;

@@ -29,8 +29,8 @@ import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class TransitControler {
@@ -58,11 +59,11 @@ public class TransitControler {
 
 		Controler tc = new Controler(config) ;
 
-		MobsimFactory mobsimFactory = new MyMobsimFactory() ; 
-		tc.setMobsimFactory(mobsimFactory) ;
-
+		tc.setMobsimFactory(new MyMobsimFactory()) ;
+		tc.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		tc.setOverwriteFiles(true);
 		//		tc.setCreateGraphs(false);
+
 		tc.run();
 	}
 
