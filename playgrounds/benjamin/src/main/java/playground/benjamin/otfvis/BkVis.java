@@ -19,17 +19,19 @@
  * *********************************************************************** */
 package playground.benjamin.otfvis;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.otfvis.OTFVis;
 
 import playground.benjamin.BkPaths;
 
 
 public class BkVis {
+	private final static Logger logger = Logger.getLogger(BkVis.class);
 
 	public static void main(String[] args) {
 		
 		boolean convert = false;
-		String runNumber = "975";
+		String runNumber = "981";
 		String eventsNumber = "1000";
 		
 		String runPath = BkPaths.RUNSSVN + "run" + runNumber + "/";
@@ -38,8 +40,8 @@ public class BkVis {
 //===========================================================================================================
 //		Für den converter-modus:
 		if(convert){
-			String networkFile = runPath + ".output_network.xml.gz";
-			String eventsFile =  eventsPath + runNumber + "." + eventsNumber + ".events.txt.gz";
+			String networkFile = runPath + runNumber + ".output_network.xml.gz";
+			String eventsFile =  eventsPath + runNumber + "." + eventsNumber + ".events.xml.gz";
 			String outputFile = eventsPath + runNumber + "." + eventsNumber + ".events.mvi";
 			String[] array = {
 					"blah",
@@ -48,13 +50,15 @@ public class BkVis {
 					outputFile,
 					"600"};
 			OTFVis.convert(array);
+			logger.info("Events successfully converted to " + outputFile);
 		}
 		else{
 			
 //===========================================================================================================		
 //		Für den mvi-modus:
 //			String otffile = "../../detailedEval/teststrecke/sim/output/20090707/ITERS/it.0/0.otfvis.mvi";
-			String otffile = eventsPath + runNumber + "." + eventsNumber + ".otfvis.mvi";
+//			String otffile = eventsPath + runNumber + "." + eventsNumber + ".otfvis.mvi";
+			String otffile = eventsPath + runNumber + "." + eventsNumber + ".events.mvi";
 
 //===========================================================================================================		
 /*	Für den interactiven Modus:
