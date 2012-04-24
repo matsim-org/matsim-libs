@@ -66,6 +66,9 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 	 */
 	@Override
 	public PPlan run(Cooperative cooperative) {
+		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			return null;
+		}
 		// get a List of served stop-facilities in the sequence they are served
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
 		// create the convex-hull (geotools-method) of all used stops 
@@ -79,7 +82,7 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 		TransitStopFacility newStop = this.drawStop(newHullInteriorStops);
 		if(newStop == null){
 			log.error("can not create a new route for cooperative " + cooperative.getId() + ", because there is no unused stop in the convex hull of the old route. returning old plan...");
-			return cooperative.getBestPlan();
+			return null;
 		}else{
 			// create a new plan 
 			PPlan oldPlan = cooperative.getBestPlan();
