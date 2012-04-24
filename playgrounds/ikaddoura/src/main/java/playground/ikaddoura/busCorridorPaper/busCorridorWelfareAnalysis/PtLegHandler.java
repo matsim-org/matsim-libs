@@ -39,10 +39,10 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
  *
  */
 public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
-	private Map <Id, Double> personId2WaitingTime = new HashMap<Id, Double>();
-	private Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
-	private Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
-	private Map <Id, Double> personId2InVehicleTime = new HashMap<Id, Double>();
+	private final Map <Id, Double> personId2WaitingTime = new HashMap<Id, Double>();
+	private final Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
+	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
+	private final Map <Id, Double> personId2InVehicleTime = new HashMap<Id, Double>();
 
 	@Override
 	public void reset(int iteration) {
@@ -54,29 +54,27 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("bus")){
-
-			personId2PersonEntersVehicleTime.put(event.getPersonId(), event.getTime());
+		Id personId = event.getPersonId();
+		Id vehId = event.getVehicleId();
+		
+		if (personId.toString().contains("person") && vehId.toString().contains("bus")){
+			personId2PersonEntersVehicleTime.put(personId, event.getTime());
 			
-			double waitingTime = 0;
-			if (personId2AgentDepartureTime.containsKey(event.getPersonId())){
-				waitingTime =  event.getTime() - personId2AgentDepartureTime.get(event.getPersonId());
-			}
-			else {
-				System.out.println("Person steigt in Vehicle ein ohne vorher losgegangen zu sein!");
-			}
-			
-			if (personId2WaitingTime.containsKey(event.getPersonId())){
-				double waitingTimeSum = personId2WaitingTime.get(event.getPersonId()) + waitingTime;
-				personId2WaitingTime.put(event.getPersonId(), waitingTimeSum);
+			double waitingTime;
+			if (personId2AgentDepartureTime.get(personId) == null){
+				throw new RuntimeException("Person " + personId + " is entering vehicle " + vehId + " without having departed from an activity. Aborting...");
+			} else {
+				waitingTime =  event.getTime() - personId2AgentDepartureTime.get(personId);
 			}
 			
-			else {
-				personId2WaitingTime.put(event.getPersonId(), waitingTime);
+			if (personId2WaitingTime.get(personId) == null){
+				personId2WaitingTime.put(personId, waitingTime);
+			} else {
+				double waitingTimeSum = personId2WaitingTime.get(personId) + waitingTime;
+				personId2WaitingTime.put(personId, waitingTimeSum);
 			}
-		}
-		else {
-			// keine Person die in einen Bus steigt!
+		} else {
+			// no person enters a bus
 		}
 	}
 
@@ -87,6 +85,7 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 		}
 	}
 
+	// TODO: adjust as above...
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		
@@ -109,17 +108,19 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 		}		
 	}
 
-	/**
-	 * @return the personId2WaitingTime
-	 */
 	public Map<Id, Double> getPersonId2WaitingTime() {
 		return personId2WaitingTime;
 	}
 
-	/**
-	 * @return the personId2InVehicleTime
-	 */
 	public Map<Id, Double> getPersonId2InVehicleTime() {
 		return personId2InVehicleTime;
+	}
+
+	public double getSumOfWaitingTimes() {
+		double sumOfWaitingTimes = 0.0;
+		for(Id personId : personId2WaitingTime.keySet()){
+			sumOfWaitingTimes = sumOfWaitingTimes + personId2WaitingTime.get(personId);
+		}
+		return sumOfWaitingTimes;
 	}
 }

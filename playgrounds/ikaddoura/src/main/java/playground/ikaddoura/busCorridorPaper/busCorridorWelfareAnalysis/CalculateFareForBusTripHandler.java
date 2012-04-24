@@ -23,7 +23,6 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.AgentMoneyEventImpl;
@@ -34,17 +33,14 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
  * @author Ihab
  *
  */
-public class MoneyThrowEventHandler implements PersonEntersVehicleEventHandler {
+public class CalculateFareForBusTripHandler implements PersonEntersVehicleEventHandler {
 
-	private EventsManager events;
-	private double fare;
-	private Population population;
+	private final EventsManager events;
+	private final double fare;
 
-	public MoneyThrowEventHandler(EventsManager events, Population population, double fare) {
+	public CalculateFareForBusTripHandler(EventsManager events, double fare) {
 		this.events = events;
-		this.population = population;
 		this.fare = fare;
-		
 	}
 
 	@Override
@@ -55,14 +51,14 @@ public class MoneyThrowEventHandler implements PersonEntersVehicleEventHandler {
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("bus")){
-			this.fare = calculateFare(event, population);
-			AgentMoneyEvent moneyEvent = new AgentMoneyEventImpl(event.getTime(), event.getPersonId(), fare);
-			this.events.processEvent(moneyEvent); //schickt das MoneyEvent an den EventManager
+			double fareForTrip = calculateFare();
+			AgentMoneyEvent moneyEvent = new AgentMoneyEventImpl(event.getTime(), event.getPersonId(), fareForTrip);
+			this.events.processEvent(moneyEvent);
 		}
 	}
 
-	private double calculateFare(PersonEntersVehicleEvent event, Population population) {
+	// this method needs to be extended when differentiated fares apply.
+	private double calculateFare() {
 		return this.fare;
 	}
-
 }

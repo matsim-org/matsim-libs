@@ -33,16 +33,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -68,7 +63,7 @@ class VehicleScheduleGenerator {
 	private final static Logger log = Logger.getLogger(VehicleScheduleGenerator.class);
 			
 	private double stopTime;
-	private String networkFile;
+	private Network network;
 	private String scheduleFile;
 	private String vehicleFile;
 	private Id transitLineId;
@@ -90,34 +85,29 @@ class VehicleScheduleGenerator {
 	List<Id> vehicleIDs = new ArrayList<Id>();
 	
 	TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
-	private TransitSchedule schedule = sf.createTransitSchedule();
+	private final TransitSchedule schedule = sf.createTransitSchedule();
 	
 	Vehicles veh = VehicleUtils.createVehiclesContainer();
 
 	public void createSchedule() throws IOException {
 			
-		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-		Config config = scen.getConfig();
-		config.network().setInputFile(this.networkFile);
-		ScenarioUtils.loadScenario(scen);		
-		Network network = scen.getNetwork();
+//		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+//		scen.getConfig().scenario().setUseTransit(true);
+//		scen.getConfig().scenario().setUseVehicles(true);
 			
-		scen.getConfig().scenario().setUseTransit(true);
-		scen.getConfig().scenario().setUseVehicles(true);
-			
-		Map<Id,List<Id>> routeID2linkIDs = getIDs(network);
+		Map<Id,List<Id>> routeID2linkIDs = getIDs();
 		
-		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(routeID2linkIDs, network);
+		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(routeID2linkIDs);
 			
 		Map<Id, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
-		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(routeId2transitStopFacilities, network, this.stopTime);
+		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(routeId2transitStopFacilities);
 			
 		Map<Id, TransitRoute> routeId2transitRoute = getRouteId2TransitRoute(routeId2networkRoute, routeId2TransitRouteStops);
 		setTransitLine(routeId2transitRoute);
 		setDepartureIDs(routeId2transitRoute);
 		}
 		
-	private Map<Id,List<Id>> getIDs(Network network) {
+	private Map<Id,List<Id>> getIDs() {
 		Map<Id, List<Id>> routeID2linkIDs = new HashMap<Id, List<Id>>();
 		List<Id> linkIDsRoute1 = new LinkedList<Id>();
 		List<Id> linkIDsRoute2 = new LinkedList<Id>();
@@ -125,10 +115,10 @@ class VehicleScheduleGenerator {
 		// one direction
 		int fromNodeIdRoute1 = 0;
 		int toNodeIdRoute1 = 0;
-		for (int ii = 0; ii<=network.getLinks().size(); ii++){
+		for (int ii = 0; ii <= this.network.getLinks().size(); ii++){
 			fromNodeIdRoute1 = ii;
-			toNodeIdRoute1 = ii+1;
-			for (Link link : network.getLinks().values()){
+			toNodeIdRoute1 = ii + 1;
+			for (Link link : this.network.getLinks().values()){
 				if (Integer.parseInt(link.getFromNode().getId().toString())==fromNodeIdRoute1 && Integer.parseInt(link.getToNode().getId().toString())==toNodeIdRoute1){			
 					linkIDsRoute1.add(link.getId());
 				}
@@ -140,10 +130,10 @@ class VehicleScheduleGenerator {
 		// other direction
 		int fromNodeIdRoute2 = 0;
 		int toNodeIdRoute2 = 0;
-		for (int ii = 0; ii<=network.getLinks().size(); ii++){
+		for (int ii = 0; ii <= this.network.getLinks().size(); ii++){
 			fromNodeIdRoute2 = ii;
 			toNodeIdRoute2 = ii-1;
-			for (Link link : network.getLinks().values()){
+			for (Link link : this.network.getLinks().values()){
 				if (Integer.parseInt(link.getFromNode().getId().toString())==fromNodeIdRoute2 && Integer.parseInt(link.getToNode().getId().toString())==toNodeIdRoute2){			
 					linkIDsRoute2.add(link.getId());
 				}
@@ -162,7 +152,7 @@ class VehicleScheduleGenerator {
 		return routeID2linkIDs;
 	}
 
-	private Map<Id,List<TransitStopFacility>> getStopLinkIDs(Map<Id, List<Id>> routeID2linkIDs, Network network) {
+	private Map<Id,List<TransitStopFacility>> getStopLinkIDs(Map<Id, List<Id>> routeID2linkIDs) {
 		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = new HashMap<Id, List<TransitStopFacility>>();
 			
 		for (Id routeID : routeID2linkIDs.keySet()){
@@ -175,7 +165,7 @@ class VehicleScheduleGenerator {
 					// don't create transitStopFacility!
 				}
 				else {
-					TransitStopFacility transitStopFacility = sf.createTransitStopFacility(linkID, network.getLinks().get(linkID).getToNode().getCoord(), false);
+					TransitStopFacility transitStopFacility = sf.createTransitStopFacility(linkID, this.network.getLinks().get(linkID).getToNode().getCoord(), false);
 					transitStopFacility.setLinkId(linkID);
 					stopFacilitiesRoute.add(transitStopFacility);
 					schedule.addStopFacility(transitStopFacility);
@@ -196,7 +186,7 @@ class VehicleScheduleGenerator {
 		return routeId2NetworkRoute;
 	}
 
-	private Map<Id, List<TransitRouteStop>> getRouteId2TransitRouteStops(Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities, Network network, double stopTime) {
+	private Map<Id, List<TransitRouteStop>> getRouteId2TransitRouteStops(Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities) {
 
 		Map<Id, List<TransitRouteStop>> routeId2transitRouteStops = new HashMap<Id, List<TransitRouteStop>>();
 		
@@ -220,11 +210,11 @@ class VehicleScheduleGenerator {
 				}
 					
 				else {
-//					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.scheduleSpeed; // v = s/t --> t = s/v
-					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed(); // (from link freespeed) v = s/t --> t = s/v
+//					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.scheduleSpeed; // v = s/t --> t = s/v
+					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed(); // (from link freespeed) v = s/t --> t = s/v
 				}
 				arrivalTime = departureTime + travelTimeBus;
-				departureTime = arrivalTime + stopTime;	
+				departureTime = arrivalTime + this.stopTime;	
 				
 				ii++;
 			}
@@ -364,8 +354,8 @@ class VehicleScheduleGenerator {
 		this.stopTime = stopTime;
 	}
 
-	public void setNetworkFile(String networkFile) {
-		this.networkFile = networkFile;
+	public void setNetwork(Network network) {
+		this.network = network;
 	}
 
 	public void setVehicleFile(String vehicleFile) {

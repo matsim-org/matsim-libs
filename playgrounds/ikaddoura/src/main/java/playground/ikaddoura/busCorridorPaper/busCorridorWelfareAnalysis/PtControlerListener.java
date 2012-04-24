@@ -24,70 +24,30 @@
 
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 
 /**
  * @author Ihab
  *
  */
 
-public class MyControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, IterationEndsListener, ShutdownListener {
+public class PtControlerListener implements StartupListener{
 
-	private MoneyThrowEventHandler moneyThrowEventHandler;
-	private double fare;
-	private PtLegHandler inVehWaitHandler;
+	private final double fare;
+	private final PtLegHandler ptLegHandler;
 
-	public MyControlerListener(double fare, PtLegHandler inVehWaitHandler){
+	public PtControlerListener(double fare, PtLegHandler ptLegHandler){
 		this.fare = fare;
-		this.inVehWaitHandler = inVehWaitHandler;
+		this.ptLegHandler = ptLegHandler;
 	}
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		 
-		// Wenn eine Person in ein Vehicle steigt, wirf MoneyEvent
-		this.moneyThrowEventHandler = new MoneyThrowEventHandler(event.getControler().getEvents(), event.getControler().getPopulation(), this.fare);
-		event.getControler().getEvents().addHandler(this.moneyThrowEventHandler);
-	
-		event.getControler().getEvents().addHandler(inVehWaitHandler);
+		EventsManager eventsManager = event.getControler().getEvents();
+		CalculateFareForBusTripHandler fareCalculator = new CalculateFareForBusTripHandler(eventsManager, this.fare);
+		event.getControler().getEvents().addHandler(fareCalculator);
+		event.getControler().getEvents().addHandler(ptLegHandler);
 	}
-
-	
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyScoring(ScoringEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

@@ -25,15 +25,14 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -57,31 +56,14 @@ class ExternalControler {
 	final OptimizationParameter op = OptimizationParameter.NUMBER_OF_BUSES;
 	
 	double fare;
-	int capacity; // standing room + seats (realistic values between 19 and 101!)
+	int capacity;
 	int numberOfBuses;
 	
-	SortedMap<Integer, Double> iteration2operatorProfit = new TreeMap<Integer, Double>();
-	SortedMap<Integer, Double> iteration2operatorCosts = new TreeMap<Integer, Double>();
-	SortedMap<Integer, Double> iteration2operatorRevenue = new TreeMap<Integer, Double>();
-	SortedMap<Integer, Double> iteration2numberOfBuses = new TreeMap<Integer, Double>();
-	SortedMap<Integer, Double> iteration2userScore = new TreeMap<Integer,Double>();
-	SortedMap<Integer, Double> iteration2userScoreSum = new TreeMap<Integer,Double>();
-	SortedMap<Integer, Double> iteration2totalScore = new TreeMap<Integer,Double>();
-	SortedMap<Integer, Integer> iteration2numberOfCarLegs = new TreeMap<Integer, Integer>();
-	SortedMap<Integer, Integer> iteration2numberOfPtLegs = new TreeMap<Integer, Integer>();
-	SortedMap<Integer, Integer> iteration2numberOfWalkLegs = new TreeMap<Integer, Integer>();
-	SortedMap<Integer, Double> iteration2fare = new TreeMap<Integer, Double>();
-	SortedMap<Integer, Double> iteration2capacity = new TreeMap<Integer, Double>();
-	SortedMap<Integer, Map<Id, Double>> iteration2personId2waitTime = new TreeMap<Integer, Map<Id, Double>>();
-
+	SortedMap<Integer, ExtItInformation> extIt2information = new TreeMap<Integer, ExtItInformation>();
 	
 	private void run() throws IOException {
-		PtLegHandler ptLegHandler = new PtLegHandler();
 		ChartFileWriter chartWriter = new ChartFileWriter();
 		TextFileWriter textWriter = new TextFileWriter();
-		
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFile);
 		
 		setDefaultParameters();
 		Operator operator = new Operator();
@@ -89,41 +71,46 @@ class ExternalControler {
 
 		for (int extIt = 0; extIt <= lastExternalIteration ; extIt++){
 			log.info("************* EXTERNAL ITERATION " + extIt + " BEGINS *************");
+			
 			String directoryExtIt = outputExternalIterationDirPath + "/extITERS/extIt." + extIt;
 			File directory = new File(directoryExtIt);
 			directory.mkdirs();
+
+			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
+			new MatsimNetworkReader(sc).readFile(networkFile);
+			new MatsimPopulationReader(sc).readFile(populationFile);
 			
-			VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, networkFile, directoryExtIt);
+			VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, sc.getNetwork(), directoryExtIt);
 			vsw.writeTransitVehiclesAndSchedule();
 			
-//			// TODO: anschauen!
-//			InternalControler internalControler = new InternalControler(configFile, extIt, directoryExtIt, lastInternalIteration, populationFile, outputExternalIterationDirPath, this.numberOfBuses, networkFile, fare, ptLegHandler);
-//
-//			operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
-//			users.setParametersForExtIteration(directoryExtIt, sc.getNetwork(), internalControler.getMarginalUtlOfMoney());
-//
-//			internalControler.run();
-//			
-//			OperatorUserAnalysis analysis = new OperatorUserAnalysis(directoryExtIt, lastInternalIteration, networkFile);
-//			analysis.readEvents(operator, users);
-//			
-//			users.calculateScore();
-//			operator.calculateScore(analysis);
-//
-//			this.iteration2operatorProfit.put(extIt, operator.getProfit());
-//			this.iteration2operatorCosts.put(extIt, operator.getCosts());
-//			this.iteration2operatorRevenue.put(extIt, analysis.getRevenue());
-//			this.iteration2numberOfBuses.put(extIt, (double) analysis.getNumberOfBusesFromEvents());
-//			this.iteration2userScoreSum.put(extIt, users.getLogSum());
-//			this.iteration2totalScore.put(extIt, (users.getLogSum() + operator.getProfit()));
-//			this.iteration2numberOfCarLegs.put(extIt, analysis.getSumOfCarLegs());
-//			this.iteration2numberOfPtLegs.put(extIt, analysis.getSumOfPtLegs());
-//			this.iteration2numberOfWalkLegs.put(extIt, analysis.getSumOfWalkLegs());
-//			this.iteration2fare.put(extIt, this.fare);
-//			this.iteration2capacity.put(extIt,(double) this.capacity);
-//			this.iteration2personId2waitTime.put(extIt, ptLegHandler.getPersonId2WaitingTime());
-//			
-////			textWriter.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorRevenue, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
+			InternalControler internalControler = new InternalControler(sc, directoryExtIt, lastInternalIteration, this.fare);
+
+			operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
+			users.setParametersForExtIteration(directoryExtIt, sc.getNetwork(), internalControler.getMarginalUtlOfMoney());
+
+			internalControler.run();
+			
+			OperatorUserAnalysis analysis = new OperatorUserAnalysis(directoryExtIt, lastInternalIteration, networkFile);
+			analysis.readEvents(operator, users);
+			
+			users.calculateScore();
+			operator.calculateScore(analysis);
+
+			ExtItInformation info = new ExtItInformation();
+			info.setFare(this.fare);
+			info.setCapacity(this.capacity);
+			info.setNumberOfBuses(this.numberOfBuses);
+			info.setOperatorCosts(operator.getCosts());
+			info.setOperatorRevenue(analysis.getRevenue());
+			info.setUsersLogSum(users.getLogSum());
+			info.setNumberOfCarLegs(analysis.getSumOfCarLegs());
+			info.setNumberOfPtLegs(analysis.getSumOfPtLegs());
+			info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
+			info.setSumOfWaitingTimes(internalControler.getSumOfWaitingTimes());
+			
+			extIt2information.put(extIt, info);
+			
+//			textWriter.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorRevenue, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
 //			textWriter.writeWaitingTimes(outputExternalIterationDirPath, extIt, this.iteration2personId2waitTime.get(extIt));
 //			
 //			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
@@ -135,7 +122,7 @@ class ExternalControler {
 //			chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
 //			chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
 //			chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorRevenue);
-//			
+			
 			// settings for next external iteration
 			if (extIt < lastExternalIteration){
 				if(op.equals(OptimizationParameter.FARE)) this.fare++;
@@ -153,12 +140,12 @@ class ExternalControler {
 			this.numberOfBuses = 5;
 		} else if (op.equals(OptimizationParameter.CAPACITY)){
 			this.fare = 2.;
-			this.capacity = 20;
+			this.capacity = 20; // standing room + seats (realistic values between 19 and 101!)
 			this.numberOfBuses = 5;
 		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
 			this.fare = 2.;
-			this.capacity = 20;
-			this.numberOfBuses = 2;
+			this.capacity = 50;
+			this.numberOfBuses = 1;
 		}
 	}
 

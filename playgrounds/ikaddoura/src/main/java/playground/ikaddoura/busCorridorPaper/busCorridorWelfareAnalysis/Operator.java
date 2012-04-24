@@ -38,17 +38,14 @@ public class Operator {
 
 	private int capacity;
 	private int numberOfBuses;
-	private double profit;
 	private double costs;
-	private double highestScore = 0;
-	private int iterationWithHighestScore = 0;
 	private final double costsPerVehicleDay;
 	private final double costsPerVehicleKm;
 
 	public Operator() {
 		this.costsPerVehicleDay = 1.6064 * this.capacity + 22.622; // see linear regression analysis in "BusCostsEstimations.xls"
 		log.info("costsPerVehicleDay (AUD): " + costsPerVehicleDay);
-		this.costsPerVehicleKm = 0.006 * this.capacity + 0.513; // see linear regression analysis in "BusCostsEstimations.xls"
+		this.costsPerVehicleKm = 0.006 * this.capacity + 0.513;    // see linear regression analysis in "BusCostsEstimations.xls"
 		log.info("CostsPerVehicleKm (AUD): " + costsPerVehicleKm);
 	}
 
@@ -56,9 +53,6 @@ public class Operator {
 		log.info("Vehicle-km: " + analysis.getVehicleKm());
 		log.info("Veh-Time: " + Time.writeTime(analysis.getVehicleHours() * 60 * 60, Time.TIMEFORMAT_HHMMSS));
 		this.costs = (analysis.getNumberOfBusesFromEvents() * costsPerVehicleDay) + ((analysis.getVehicleKm() * costsPerVehicleKm) + (analysis.getVehicleHours() * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
-		this.profit = analysis.getRevenue() - this.costs;
-
-		log.info("OperatorScore calculated: "+this.getProfit());
 	}
 
 
@@ -66,53 +60,6 @@ public class Operator {
 		return costs;
 	}
 	
-	/**
-	 * @return the highestScore
-	 */
-	public double getHighestScore() {
-		return highestScore;
-	}
-
-	/**
-	 * @param highestScore the highestScore to set
-	 */
-	public void setHighestScore(double highestScore) {
-		this.highestScore = highestScore;
-	}
-
-	/**
-	 * @return the iterationWithHighestScore
-	 */
-	public int getIterationWithHighestScore() {
-		return iterationWithHighestScore;
-	}
-
-	/**
-	 * @param iterationWithHighestScore the iterationWithHighestScore to set
-	 */
-	public void setIterationWithHighestScore(int iterationWithHighestScore) {
-		this.iterationWithHighestScore = iterationWithHighestScore;
-	}
-
-	/**
-	 * @return the score
-	 */
-	public double getProfit() {
-		return profit;
-	}
-	
-	public int increaseCapacity(int increase) {
-		int newCapacity = this.capacity + increase;
-		log.info("Capacity for next external iteration: "+newCapacity);
-		return newCapacity;
-	}
-	
-	public double increaseFare(double fare, double increase) {
-		double newFare = fare + increase;
-		log.info("Fare for next external iteration: "+newFare);
-		return (newFare);
-	}
-
 	public void setParametersForExtIteration(int capacity, int numberOfBuses) {
 		this.capacity = capacity;
 		this.numberOfBuses = numberOfBuses;

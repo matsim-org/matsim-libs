@@ -25,6 +25,7 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
@@ -33,19 +34,19 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 class VehicleScheduleWriter {
 
-	String networkFile;
-	String outputDir;
-	int capacity;
 	int numberOfBuses;
+	int capacity;
+	Network network;
+	String outputDir;
 	
 	double length;
 	int busSeats;
 	int standingRoom;
 	
-	public VehicleScheduleWriter(int numberOfBuses, int capacity, String networkFile, String outputDir) {
+	public VehicleScheduleWriter(int numberOfBuses, int capacity, Network network, String outputDir) {
 		this.numberOfBuses = numberOfBuses;
 		this.capacity = capacity;
-		this.networkFile = networkFile;
+		this.network = network;
 		this.outputDir = outputDir;
 		
 		this.length = 0.1184 * this.capacity + 5.2152;   // see linear regression analysis in "BusCostsEstimations.xls"
@@ -63,7 +64,7 @@ class VehicleScheduleWriter {
 		generator.setStopTime(10.0); 
 		generator.setScheduleSpeed(13.888); // m/s ???
 		generator.setPausenzeit(5 * 60);
-		generator.setNetworkFile(networkFile);
+		generator.setNetwork(this.network);
 		generator.setScheduleFile(this.outputDir + "/scheduleFile.xml");
 		generator.setVehicleFile(this.outputDir + "/vehiclesFile.xml");
 		

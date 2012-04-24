@@ -23,12 +23,9 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.config.TransitConfigGroup;
 
@@ -38,80 +35,46 @@ import org.matsim.pt.config.TransitConfigGroup;
  */
 public class InternalControler {
 
-	private final PtLegHandler ptLegHandler;
+	PtLegHandler ptLegHandler;
 	
-	private final String configFile;
+	private final Scenario scenario;
 	private final String directoryExtIt;
-	private final String outputExternalIterationDirPath;
 	private final int lastInternalIteration;
-	private final int extItNr;
-	private final String populationFile;
-	private final String networkFile;
 	private final double fare;
+	
+	// TODO: adjust parameters
 	final double MARGINAL_UTILITY_OF_MONEY = 0.14026;
-	
 	private final double TRAVEL_PT = 0; // not used --> instead: TRAVEL_PT_IN_VEHICLE & TRAVEL_PT_WAITING
-	
 	private final double TRAVEL_CAR = 0;
 	private final double TRAVEL_WALK = -1.7568;
 	private final double CONSTANT_CAR = -2.2118;
 	private final double CONSTANT_PT = 0;
-	
-	private final double TRAVEL_PT_IN_VEHICLE = -1.4448; // Utils per Hour
-	private final double TRAVEL_PT_WAITING = -3.6822; // Utils per Hour
-	
 	private final double PERFORMING = 1.8534;
-
 	private final double LATE_ARRIVAL = 0;
 	
 	private final double monetaryCostPerKm = -0.11; // AUD per km 
-	
 	private final double agentStuckScore = -100;
 	
-	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare, PtLegHandler ptLegHandler) {
-		this.configFile = configFile;
+	private final double TRAVEL_PT_IN_VEHICLE = -1.4448; // Utils per Hour
+	private final double TRAVEL_PT_WAITING = -3.6822; // Utils per Hour
+
+	public InternalControler(Scenario scenario, String directoryExtIt, int lastInternalIteration, double fare) {
+		this.scenario = scenario;
 		this.directoryExtIt = directoryExtIt;
 		this.lastInternalIteration = lastInternalIteration;
-		this.extItNr = extItNr;
-		this.populationFile = populationFile;
-		this.outputExternalIterationDirPath = outputExternalIterationDirPath;
-		this.networkFile = networkFile;
 		this.fare = fare;
-		this.ptLegHandler = ptLegHandler;
+		this.ptLegHandler = new PtLegHandler();
 	}
 	
 	public void run() {
 		
-		String population = populationFile;
-		
-		// for using the outputplans of previous external iteration:
-//		String population = null;
-//		if (this.extItNr==0){
-//			population = populationFile;
-//		}
-//		else {
-//			population = this.outputExternalIterationDirPath+"/extITERS/extIt."+(this.extItNr-1)+"/internalIterations/output_plans.xml.gz";
-//		}
-		
-		Config config = new Config();
-		config.addCoreModules();
-		
-		MatsimConfigReader confReader = new MatsimConfigReader(config);
-		confReader.readFile(configFile);
-			
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new MyControlerListener(fare, this.ptLegHandler));
+		controler.addControlerListener(new PtControlerListener(this.fare, this.ptLegHandler));
 		
 		TransitConfigGroup transit = controler.getConfig().transit();
-		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
-		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
-		
-		PlansConfigGroup plans = controler.getConfig().plans();
-		plans.setInputFile(population);
-		
-		NetworkConfigGroup network = controler.getConfig().network();
-		network.setInputFile(networkFile);
+		transit.setTransitScheduleFile(this.directoryExtIt + "/scheduleFile.xml");
+		transit.setVehiclesFile(this.directoryExtIt + "/vehiclesFile.xml");
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		controlerConfGroup.setFirstIteration(0);
@@ -124,14 +87,10 @@ public class InternalControler {
 		else {
 			writeInterval = this.lastInternalIteration;
 		}
-		
 		controlerConfGroup.setWriteEventsInterval(writeInterval);
 		controlerConfGroup.setWritePlansInterval(writeInterval);
 		
-//		controlerConfGroup.setWriteEventsInterval(1);
-//		controlerConfGroup.setWritePlansInterval(1);
-		
-		controlerConfGroup.setOutputDirectory(this.directoryExtIt+"/internalIterations");
+		controlerConfGroup.setOutputDirectory(this.directoryExtIt + "/internalIterations");
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
 		planCalcScoreConfigGroup.setTravelingPt_utils_hr(TRAVEL_PT);
@@ -143,7 +102,8 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setPerforming_utils_hr(PERFORMING);
 		planCalcScoreConfigGroup.setLateArrival_utils_hr(LATE_ARRIVAL);
 		
-		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, this.ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm, agentStuckScore);
+		// TODO: monetaryCostRateCar aus Config bzw. ConfigGroup; Egress vs. Access-Scoring seperately?
+		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm, agentStuckScore);
 		controler.setScoringFunctionFactory(scoringfactory);
 		controler.run();		
 	}
@@ -151,5 +111,8 @@ public class InternalControler {
 	public double getMarginalUtlOfMoney() {
 		return MARGINAL_UTILITY_OF_MONEY;
 	}
-
+	
+	public double getSumOfWaitingTimes() {
+		return this.ptLegHandler.getSumOfWaitingTimes();
+	}
 }

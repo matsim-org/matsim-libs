@@ -27,17 +27,15 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 
 public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters params;
-	private PtLegHandler inVehWaitHandler;
-	private double TRAVEL_PT_IN_VEHICLE;
-	private double TRAVEL_PT_WAITING;
-	private double monetaryCostPerKm;
-	private double agentStuckScore;
+	private final PtLegHandler inVehWaitHandler;
+	private final double TRAVEL_PT_IN_VEHICLE;
+	private final double TRAVEL_PT_WAITING;
+	private final double monetaryCostPerKm;
+	private final double agentStuckScore;
 	
 
 	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup config, PtLegHandler inVehWaitHandler, double TRAVEL_PT_IN_VEHICLE, double TRAVEL_PT_WAITING, double monetaryCostPerKm, double agentStuckScore) {
@@ -62,7 +60,7 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 		return scoringFunctionAccumulator;
 	}
 
-	public CharyparNagelScoringParameters getParams() {
-		return params;
-	}
+//	public CharyparNagelScoringParameters getParams() {
+//		return params;
+//	}
 }
