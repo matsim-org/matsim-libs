@@ -266,9 +266,13 @@ public class JointTimeModeChooserSolution implements Solution {
 					case driver:
 						break;
 					case passenger:
-						subtourElement = new Subtour( false , getNonPassengerLegs( subtour ) );
-						codedPlanElements.add( subtourElement );
-						values.add( new ValueImpl<String>( subtourElement.getMode() ) );
+						List<PlanElement> npl = getNonPassengerLegs( subtour );
+						if (npl.size() > 0) {
+							// if no non-passenger leg, do not add anything
+							subtourElement = new Subtour( false , npl );
+							codedPlanElements.add( subtourElement );
+							values.add( new ValueImpl<String>( subtourElement.getMode() ) );
+						}
 						break;
 					case alone:
 						subtourElement = new Subtour( isCarAvailable , subtour );
