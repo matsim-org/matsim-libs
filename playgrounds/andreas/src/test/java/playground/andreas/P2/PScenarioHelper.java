@@ -32,8 +32,11 @@ import playground.andreas.P2.pbox.BasicCooperative;
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
+import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.replanning.CreateNewPlan;
+import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
 
 /**
  * Creates an car grid network with one pt line.
@@ -302,5 +305,152 @@ public class PScenarioHelper {
 			startTime += 10.0 * 60.0;			
 		}
 		return scenario;
+	}
+	public static Cooperative createCoop2111to2333(){
+		
+		Scenario sc= PScenarioHelper.createTestNetwork();
+		
+		PConfigGroup conf = new PConfigGroup();
+		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(conf.getPIdentifier(), sched, sc.getNetwork(), 10);
+		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
+		coop.init(prov, new Route2313to3343(sched, conf.getPIdentifier()), 0);
+		
+		return coop;
+	}
+	
+	public static Cooperative createCoop2414to3444(){
+		
+		Scenario sc= PScenarioHelper.createTestNetwork();
+		
+		PConfigGroup conf = new PConfigGroup();
+		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(conf.getPIdentifier(), sched, sc.getNetwork(), 10);
+		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
+		coop.init(prov, new Route2414to3444(sched, conf.getPIdentifier()), 0);
+		
+		return coop;
+	}
+	
+	public static Cooperative createCoop2111to1314to4443(){
+		
+		Scenario sc= PScenarioHelper.createTestNetwork();
+		
+		PConfigGroup conf = new PConfigGroup();
+		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(conf.getPIdentifier(), sched, sc.getNetwork(), 10);
+		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
+		coop.init(prov, new Route2111to1314to4443(sched, conf.getPIdentifier()), 0);
+		
+		return coop;
+	}
+
+}
+
+class Route2313to3343 implements PPlanStrategy{
+	
+	private String pId;
+	private TransitSchedule sched;
+
+	public Route2313to3343(TransitSchedule sched, String pId){
+		this.sched = sched;
+		this.pId = pId;
+	}
+
+	@Override
+	public PPlan run(Cooperative cooperative) {
+		Id id = new IdImpl(cooperative.getCurrentIteration());
+		double startTime = 8.0 * 3600.0;
+		double endTime = 16.0 * 3600.0;
+		TransitStopFacility startStop = sched.getFacilities().get(new IdImpl(pId + "2111"));
+		TransitStopFacility endStop = sched.getFacilities().get(new IdImpl(pId + "2333"));
+		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
+		stops.add(startStop);
+		stops.add(endStop);
+		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
+		return newPlan;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 */
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+
+class Route2414to3444 implements PPlanStrategy{
+	
+	private String pId;
+	private TransitSchedule sched;
+
+	public Route2414to3444(TransitSchedule sched, String pId){
+		this.sched = sched;
+		this.pId = pId;
+	}
+
+	@Override
+	public PPlan run(Cooperative cooperative) {
+		Id id = new IdImpl(cooperative.getCurrentIteration());
+		double startTime = 8.0 * 3600.0;
+		double endTime = 16.0 * 3600.0;
+		TransitStopFacility startStop = sched.getFacilities().get(new IdImpl(pId + "2414"));
+		TransitStopFacility endStop = sched.getFacilities().get(new IdImpl(pId + "3444"));
+		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
+		stops.add(startStop);
+		stops.add(endStop);
+		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
+		return newPlan;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 */
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+
+
+class Route2111to1314to4443 implements PPlanStrategy{
+	
+	private String pId;
+	private TransitSchedule sched;
+
+	public Route2111to1314to4443(TransitSchedule sched, String pId){
+		this.sched = sched;
+		this.pId = pId;
+	}
+
+	@Override
+	public PPlan run(Cooperative cooperative) {
+		Id id = new IdImpl(cooperative.getCurrentIteration());
+		double startTime = 8.0 * 3600.0;
+		double endTime = 16.0 * 3600.0;
+		TransitStopFacility startStop = sched.getFacilities().get(new IdImpl(pId + "2111"));
+		TransitStopFacility middleStop = sched.getFacilities().get(new IdImpl(pId + "1314"));
+		TransitStopFacility endStop = sched.getFacilities().get(new IdImpl(pId + "4443"));
+		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
+		stops.add(startStop);
+		stops.add(middleStop);
+		stops.add(endStop);
+		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
+		return newPlan;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 */
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

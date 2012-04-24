@@ -9,10 +9,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConfigGroup.PStrategySettings;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
+import playground.andreas.P2.replanning.modules.ConvexHullRouteExtension;
 import playground.andreas.P2.replanning.modules.MaxRandomEndTimeAllocator;
 import playground.andreas.P2.replanning.modules.MaxRandomStartTimeAllocator;
 import playground.andreas.P2.replanning.modules.RandomEndTimeAllocator;
+import playground.andreas.P2.replanning.modules.RandomRouteEndExtension;
 import playground.andreas.P2.replanning.modules.RandomStartTimeAllocator;
+import playground.andreas.P2.replanning.modules.RectangleHullRouteExtension;
 import playground.andreas.P2.replanning.modules.TimeReduceDemand;
 import playground.andreas.P2.replanning.modules.deprecated.IncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.deprecated.RemoveAllVehiclesButOne;
@@ -71,6 +74,12 @@ public class PStrategyManager {
 			strategy = new AddRandomStop(settings.getParametersAsArrayList());
 		} else if (name.equals(AggressiveIncreaseNumberOfVehicles.STRATEGY_NAME)) {
 			strategy = new AggressiveIncreaseNumberOfVehicles(settings.getParametersAsArrayList());
+		} else if(name.equals(ConvexHullRouteExtension.STRATEGY_NAME)){
+			strategy = new ConvexHullRouteExtension(settings.getParametersAsArrayList());
+		} else if(name.equals(RectangleHullRouteExtension.STRATEGY_NAME)){
+			strategy = new RectangleHullRouteExtension(settings.getParametersAsArrayList());
+		} else if(name.equals(RandomRouteEndExtension.STRATEGY_NAME)){
+			strategy =  new RandomRouteEndExtension(settings.getParametersAsArrayList());
 		} else if (name.equals(TimeReduceDemand.STRATEGY_NAME)) {
 			TimeReduceDemand strat = new TimeReduceDemand(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);

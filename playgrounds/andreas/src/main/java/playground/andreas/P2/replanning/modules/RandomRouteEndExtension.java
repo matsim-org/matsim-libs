@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.P2.replanning;
+package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
 import java.util.Collection;

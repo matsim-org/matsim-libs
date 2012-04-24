@@ -17,22 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.P2.replanning;
+package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
-import playground.droeder.P2.PScenarioHelper;
 
 
 
@@ -45,6 +45,7 @@ public class RandomRouteEndExtensionTest {
 	
 	@Test
     public final void testRun() {
+		MatsimRandom.reset();
 		Cooperative coop = PScenarioHelper.createCoop2111to2333();
 		PPlan oldPlan = coop.getBestPlan();
 		
@@ -56,15 +57,14 @@ public class RandomRouteEndExtensionTest {
 		
 		PPlan newPlan = coop.getBestPlan();
 		
-		Assert.assertEquals(2, oldPlan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(oldPlan.getStopsToBeServed().get(0).getId().toString(), "p_2111");
-		Assert.assertEquals(oldPlan.getStopsToBeServed().get(1).getId().toString(), "p_2333");
+		Assert.assertEquals("p_2111", oldPlan.getStopsToBeServed().get(0).getId().toString());
+		Assert.assertEquals("p_2333", oldPlan.getStopsToBeServed().get(1).getId().toString());
 		
 		
 		Assert.assertEquals(3, newPlan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(newPlan.getStopsToBeServed().get(0).getId().toString(), "p_2111");
-		Assert.assertEquals(newPlan.getStopsToBeServed().get(1).getId().toString(), "p_2333");
-		Assert.assertEquals(newPlan.getStopsToBeServed().get(2).getId().toString(), "p_3444");
+		Assert.assertEquals("p_2111", newPlan.getStopsToBeServed().get(0).getId().toString());
+		Assert.assertEquals("p_2333", newPlan.getStopsToBeServed().get(1).getId().toString());
+		Assert.assertEquals("p_3444", newPlan.getStopsToBeServed().get(2).getId().toString());
 		
 		String[] oldPlanLinks = {"2111", "1112", "1222", "2223", "2333", "3332", "3231", "3121", "2111"};
 		for(TransitRoute r: oldPlan.getLine().getRoutes().values()){
