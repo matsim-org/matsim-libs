@@ -220,8 +220,8 @@ class VehicleScheduleGenerator {
 				}
 					
 				else {
-					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.scheduleSpeed; // v = s/t --> t = s/v
-//					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed(); // (from link freespeed) v = s/t --> t = s/v
+//					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.scheduleSpeed; // v = s/t --> t = s/v
+					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed(); // (from link freespeed) v = s/t --> t = s/v
 				}
 				arrivalTime = departureTime + travelTimeBus;
 				departureTime = arrivalTime + stopTime;	
@@ -271,13 +271,13 @@ class VehicleScheduleGenerator {
 		int routeNr = 0;
 		for (Id routeId : routeId2transitRoute.keySet()){
 			double firstDepartureTime = 0.0;
-			if (routeNr == 0){
+			if (routeNr == 1){
 				firstDepartureTime = this.startTime;
-				log.info("Route 0 --> First Departure Time: "+Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
+				log.info(routeId.toString()+": Route 0 --> First Departure Time: "+Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
 			}
-			else if (routeNr == 1){
+			else if (routeNr == 0){
 				firstDepartureTime = this.startTime + umlaufzeit/2;
-				log.info("Route 1 --> First Departure Time: "+Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
+				log.info(routeId.toString()+": Route 1 --> First Departure Time: "+Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
 
 			}
 			int vehicleIndex = 0;

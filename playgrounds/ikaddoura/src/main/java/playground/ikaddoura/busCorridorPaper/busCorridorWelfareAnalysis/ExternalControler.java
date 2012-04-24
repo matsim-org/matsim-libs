@@ -52,9 +52,9 @@ class ExternalControler {
 	static int lastExternalIteration = 0;
 	static int lastInternalIteration = 0;
 	
-	final OptimizationParameter op = OptimizationParameter.FARE;
+//	final OptimizationParameter op = OptimizationParameter.FARE;
 //	final OptimizationParameter op = OptimizationParameter.CAPACITY;
-//	final OptimizationParameter op = OptimizationParameter.NUMBER_OF_BUSES;
+	final OptimizationParameter op = OptimizationParameter.NUMBER_OF_BUSES;
 	
 	double fare;
 	int capacity; // standing room + seats (realistic values between 19 and 101!)
@@ -158,7 +158,7 @@ class ExternalControler {
 		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
 			this.fare = 2.;
 			this.capacity = 20;
-			this.numberOfBuses = 1;
+			this.numberOfBuses = 2;
 		}
 	}
 
