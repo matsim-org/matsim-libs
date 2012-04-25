@@ -28,6 +28,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
  * @author Ihab
@@ -70,6 +71,7 @@ public class InternalControler {
 		
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.addControlerListener(new PtControlerListener(this.fare, this.ptLegHandler));
 		
 		TransitConfigGroup transit = controler.getConfig().transit();
@@ -89,6 +91,7 @@ public class InternalControler {
 		}
 		controlerConfGroup.setWriteEventsInterval(writeInterval);
 		controlerConfGroup.setWritePlansInterval(writeInterval);
+		controlerConfGroup.setWriteSnapshotsInterval(writeInterval);
 		
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt + "/internalIterations");
 		
@@ -105,6 +108,7 @@ public class InternalControler {
 		// TODO: monetaryCostRateCar aus Config bzw. ConfigGroup; Egress vs. Access-Scoring seperately?
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm, agentStuckScore);
 		controler.setScoringFunctionFactory(scoringfactory);
+
 		controler.run();		
 	}
 
