@@ -110,9 +110,9 @@ class ExternalControler {
 			
 			extIt2information.put(extIt, info);
 			
-//			textWriter.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorRevenue, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
-//			textWriter.writeWaitingTimes(outputExternalIterationDirPath, extIt, this.iteration2personId2waitTime.get(extIt));
-//			
+			textWriter.write(outputExternalIterationDirPath, this.extIt2information);
+			
+			// TODO: adjust chartWriter!
 //			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
 //			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
 //			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
