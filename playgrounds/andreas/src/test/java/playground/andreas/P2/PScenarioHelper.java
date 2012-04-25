@@ -313,6 +313,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(conf.getPIdentifier(), sched, sc.getNetwork(), 10);
+	
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
 		coop.init(prov, new Route2313to3343(sched, conf.getPIdentifier()), 0);
 		
@@ -369,6 +370,7 @@ class Route2313to3343 implements PPlanStrategy{
 		stops.add(endStop);
 		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setNVehicles(2);
 		return newPlan;
 	}
 
@@ -404,6 +406,7 @@ class Route2414to3444 implements PPlanStrategy{
 		stops.add(endStop);
 		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setNVehicles(2);
 		return newPlan;
 	}
 
@@ -442,6 +445,7 @@ class Route2111to1314to4443 implements PPlanStrategy{
 		stops.add(endStop);
 		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setNVehicles(2);
 		return newPlan;
 	}
 

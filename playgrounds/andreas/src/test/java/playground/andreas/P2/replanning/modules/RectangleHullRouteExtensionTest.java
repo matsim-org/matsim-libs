@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
