@@ -74,8 +74,11 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 			
 			// check if activities available (then size of plan elements > 1)
 			// what happens with persons which no activities???
-			if(plan.getPlanElements().size() <= 1) 
+			if(plan.getPlanElements().size() <= 1){
+				write(duration_home_work_min, distance_home_work_meter,
+						duration_work_home_min, distance_work_home_meter, p);
 				continue;
+			}
 			
 			for ( PlanElement pe : plan.getPlanElements() ) {
 				if ( pe instanceof Activity ) {
@@ -106,11 +109,8 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 					}
 				}
 			}
-			UrbanSimPersonCSVWriter.write(p.getId().toString(), 
-										  duration_home_work_min,
-										  distance_home_work_meter, 
-										  duration_work_home_min,
-										  distance_work_home_meter);
+			write(duration_home_work_min, distance_home_work_meter,
+					duration_work_home_min, distance_work_home_meter, p);
 			// for debugging
 			// String personID = p.getId().toString();
 			// log.info("Person[" + personID + "],Home2WorkTravelTime[" + duration_home_work_min
@@ -130,5 +130,25 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 					+ this.benchmark.getDurationInSeconds(benchmarkID) / 60.
 					+ " minutes).");
 		}
+	}
+	
+	/**
+	 * writing agent performances to csv file
+	 * 
+	 * @param duration_home_work_min
+	 * @param distance_home_work_meter
+	 * @param duration_work_home_min
+	 * @param distance_work_home_meter
+	 * @param p
+	 */
+	private void write(double duration_home_work_min,
+			double distance_home_work_meter, double duration_work_home_min,
+			double distance_work_home_meter, Person p) {
+		
+		UrbanSimPersonCSVWriter.write(p.getId().toString(), 
+									  duration_home_work_min,
+									  distance_home_work_meter, 
+									  duration_work_home_min,
+									  distance_work_home_meter);
 	}
 }

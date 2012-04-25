@@ -246,15 +246,15 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					ActivityFacility fac = allFacilities.get(id);
 					if(fac == null)
 						continue;
-					String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString() ;
+					String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString();
 
 					if (isFirstPlanActivity)
 						isFirstPlanActivity = false; 
 					else {
 						matrixEntry = originDestinationMatrix.getEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID));
 						if(matrixEntry != null){
-							double value = matrixEntry.getValue();
-							originDestinationMatrix.setEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), value+1.);
+							double trips = matrixEntry.getValue() + 1.;
+							originDestinationMatrix.setEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), trips);
 						}
 						else	
 							originDestinationMatrix.createEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), 1.);
@@ -263,7 +263,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					lastZoneId = zone_ID; // stores the first activity (e. g. "home")
 				}
 			}
-				
 		}
 		// tnicolai: debugging
 //		for(Id fromId : originDestinationMatrix.getFromLocations().keySet()){

@@ -101,7 +101,7 @@ public class MATSim4UrbanSimParcel {
 	boolean computeZone2ZoneImpedance		   		 = false;
 	boolean computeAgentPerformance					 = false;
 	boolean dumpPopulationData 						 = false;
-	boolean dumpAggegatedWorkplaceData 			  	 = true;
+	boolean dumpAggegatedWorkplaceData 			  	 = false;
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
 	double destinationSampleRate 					 = 1.;

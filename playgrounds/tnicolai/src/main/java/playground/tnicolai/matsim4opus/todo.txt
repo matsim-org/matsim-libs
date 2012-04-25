@@ -1,7 +1,7 @@
 Todos:
 
 - Paper for D7.2. (tech report):
-	- Reference to Software issues Paper (we solveld the coupling as follows ... see Paper ...)
+	- Reference to Software issues Paper (we solved the coupling as follows ... see Paper ...)
 	- What data goes from UrbanSim to MATSim
 	- What does MATSim do with this?
 	- What does MATsim return?
