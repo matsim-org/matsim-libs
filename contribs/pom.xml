@@ -167,6 +167,27 @@
 				</plugins>
 			</reporting>
 		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<defaultGoal>assembly:assembly</defaultGoal>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-jar-plugin</artifactId>
+							<configuration>
+								<archive>
+									<manifest>
+										<addClasspath>true</addClasspath>
+										<classpathPrefix>libs/</classpathPrefix>
+									</manifest>
+								</archive>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
 	</profiles>
 
 	<properties>
