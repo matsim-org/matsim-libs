@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -56,7 +55,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
 	final Person person;
-	
+
 	private MobsimVehicle vehicle;
 
 	Id cachedNextLinkId = null;
@@ -71,13 +70,13 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	private Id currentLinkId = null;
 
 	int currentPlanElementIndex = 0;
-	
+
 	private final Plan plan;
 
 	private transient Id cachedDestinationLinkId;
 
 	private Leg currentLeg;
-	
+
 	private List<Id> cachedRouteLinkIds = null;
 
 	int currentLinkIdIndex;
@@ -97,7 +96,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			Activity firstAct = (Activity) planElements.get(0);				
 			this.currentLinkId = firstAct.getLinkId();
 			this.state = MobsimAgent.State.ACTIVITY ;
-			calculateDepartureTime(firstAct);
+			calculateAndSetDepartureTime(firstAct);
 		}
 	}
 
@@ -111,7 +110,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 						now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		advancePlan();
 	}
-	
+
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
@@ -128,19 +127,19 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			advancePlan() ;
 		}
 	}
-	
+
 	@Override
 	public final void abort(final double now) {
 		this.state = MobsimAgent.State.ABORT ;
 	}
-	
+
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
 	public final void notifyTeleportToLink(final Id linkId) {
 		this.currentLinkId = linkId;
-        double distance = ((Leg) getCurrentPlanElement()).getRoute().getDistance();
-        this.simulation.getEventsManager().processEvent(new TravelEventImpl(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
+		double distance = ((Leg) getCurrentPlanElement()).getRoute().getDistance();
+		this.simulation.getEventsManager().processEvent(new TravelEventImpl(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
 	}
 
 	@Override
@@ -214,7 +213,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		// check if plan has run dry:
 		if ( this.currentPlanElementIndex >= this.getPlanElements().size() ) {
 			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT\n" +
-			"          (but continuing the mobsim).  This used to be an exception ...") ;
+					"          (but continuing the mobsim).  This used to be an exception ...") ;
 			this.state = MobsimAgent.State.ABORT ;
 			return;
 		}
@@ -230,6 +229,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
 		}
 	}
+	
 	private void initializeLeg(Leg leg) {
 		this.state = MobsimAgent.State.LEG ;			
 		Route route = leg.getRoute();
@@ -244,7 +244,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			return;
 		} else {
 			this.cachedDestinationLinkId = route.getEndLinkId();
-			
+
 			// set the route according to the next leg
 			this.currentLeg = leg;
 			this.cachedRouteLinkIds = null;
@@ -253,9 +253,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			return;
 		}
 	}
+	
 	private void initializeActivity(Activity act) {
 		this.state = MobsimAgent.State.ACTIVITY ;
-		
+
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		this.simulation.getEventsManager().processEvent(
 				this.simulation.getEventsManager().getFactory().createActivityStartEvent(
@@ -263,7 +264,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */
-		calculateDepartureTime(act);
+		calculateAndSetDepartureTime(act);
 	}
 
 	/**
@@ -296,9 +297,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		Route route = currentLeg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getId() + " has no route in its leg. Removing the agent from the simulation." );
-//			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
-//			this.simulation.getAgentCounter().decLiving();
-//			this.simulation.getAgentCounter().incLost();
+			//			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
+			//			this.simulation.getAgentCounter().decLiving();
+			//			this.simulation.getAgentCounter().incLost();
 			this.state = MobsimAgent.State.ABORT ;
 			return;
 		}
@@ -309,54 +310,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	 * If this method is called to update a changed ActivityEndTime please
 	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
-	void calculateDepartureTime(Activity act) {
+	void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
-
-		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
-			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
-			this.activityEndTime = Double.POSITIVE_INFINITY ;
-			return ;
-		}
-
-		double departure = 0;
-
-		if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation()
-				.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
-			// person stays at the activity either until its duration is over or until its end time, whatever comes first
-			if (act.getMaximumDuration() == Time.UNDEFINED_TIME) {
-				departure = act.getEndTime();
-			} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-				departure = now + act.getMaximumDuration();
-			} else {
-				departure = Math.min(act.getEndTime(), now + act.getMaximumDuration());
-			}
-		} else if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation()
-				.equals(VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
-			if (act.getEndTime() != Time.UNDEFINED_TIME) {
-				departure = act.getEndTime() ;
-			} else {
-				throw new IllegalStateException("activity end time not set and using something else not allowed. personId: " + this.getPerson().getId());
-			}
-		} else if ( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation()
-				.equals(VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION ) ) {
-			// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
-			if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
-				departure = act.getEndTime();
-			} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME ) {
-				departure = now + act.getMaximumDuration() ;
-			} else {
-				throw new IllegalStateException("neither activity end time nor activity duration defined; don't know what to do. personId: " + this.getPerson().getId());
-			}
-		} else {
-			throw new IllegalStateException("should not happen") ;
-		}
-
-		if (departure < now) {
-			// we cannot depart before we arrived, thus change the time so the time stamp in events will be right
-			//			[[how can events not use the simulation time?  kai, aug'10]]
-			departure = now;
-			// actually, we will depart in (now+1) because we already missed the departing in this time step
-		}
+		String activityDurationInterpretation = this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation();
+		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 
 		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
@@ -366,8 +323,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			}
 			departure = Double.POSITIVE_INFINITY ;
 		}
+
 		this.activityEndTime = departure ;
 	}
+
 	private static int finalActHasDpTimeWrnCnt = 0 ;
 
 
@@ -420,7 +379,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		// note: the method is really only defined for DriverAgent!  kai, oct'10
 		return this.currentLinkId;
 	}
-	
+
 	@Override
 	public final Double getExpectedTravelTime() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
@@ -429,13 +388,13 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		}
 		return ((Leg) currentPlanElement).getTravelTime();
 	}
-	
+
 	@Override
 	public final String getMode() {
 		if( this.currentPlanElementIndex >= this.plan.getPlanElements().size() ) {
 			// just having run out of plan elements it not an argument for not being able to answer the "mode?" question.
 			// this is in most cases called in "abort".  kai, mar'12
-			
+
 			return null ;
 		}
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
@@ -444,7 +403,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		}
 		return ((Leg) currentPlanElement).getMode() ;
 	}
-	
+
 	@Override
 	public final Id getPlannedVehicleId() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();

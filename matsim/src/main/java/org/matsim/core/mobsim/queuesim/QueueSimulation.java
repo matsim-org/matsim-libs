@@ -440,15 +440,4 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		throw new UnsupportedOperationException() ;
 	}
 
-	@Override
-	public Collection<MobsimAgent> getActivityEndsList() {
-		throw new UnsupportedOperationException() ;
-	}
-
-
-	@Override
-	public void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime) {
-		throw new UnsupportedOperationException() ;
-	}
-
 }

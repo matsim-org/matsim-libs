@@ -124,7 +124,7 @@ public class MyWithinDayMobsimListener implements MobsimListener, MobsimBeforeSi
 			// (I) @ activity:
 			double oldTime = -1.;
 			double newTime = -1.;
-			mobsim.rescheduleActivityEnd(withindayAgent, oldTime, newTime);
+			
 			// might be nice to be able to actively remove the agent from the activity, but this is strictly
 			// speaking not necessary since the departure can be scheduled for immediately.  kai, nov'10
 

@@ -20,8 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.interfaces;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -99,20 +97,8 @@ public interface Mobsim extends ObservableMobsim {
 
 	AgentCounterI getAgentCounter();
 
-	/**Method that reschedules the activity end for an agent that is already at an activity.  Necessary for within-day replanning.
-	 * 
-	 * @param agent
-	 * @param oldTime - time when activity end was scheduled previously.  Sometimes necessary so that our book-keeping about
-	 * alive agents remains correct. 
-	 * @param newTime - time when the activity end is now scheduled.  This is here so that "oldTime" and "newTime" do not get
-	 * confused.
-	 */
-	void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) ;
-
 	Scenario getScenario();
 
 	MobsimTimer getSimTimer();
-
-	Collection<MobsimAgent> getActivityEndsList() ;
 
 }

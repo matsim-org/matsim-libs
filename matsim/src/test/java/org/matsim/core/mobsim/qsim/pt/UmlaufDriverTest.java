@@ -389,10 +389,8 @@ public class UmlaufDriverTest extends MatsimTestCase {
 
 		assertTrue(driver.getCurrentPlanElement() instanceof Activity);
 		driver.endActivityAndComputeNextState(0);
-		trEngine.getInternalInterface().arrangeNextAgentState(driver) ;
 		assertTrue(driver.getCurrentPlanElement() instanceof Leg);
 		driver.endLegAndComputeNextState(1);
-		trEngine.getInternalInterface().arrangeNextAgentState(driver) ;
 		assertTrue(driver.getCurrentPlanElement() instanceof Activity);
 	}
 

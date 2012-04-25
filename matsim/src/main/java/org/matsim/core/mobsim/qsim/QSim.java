@@ -156,6 +156,11 @@ public final class QSim implements VisMobsim, Netsim {
 			return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
 
+		@Override
+		public synchronized void rescheduleActivityEnd(MobsimAgent agent) {
+			QSim.this.rescheduleActivityEnd(agent);
+		}
+
 	};
 
 	// everything above this line is private and should remain private. pls
@@ -336,11 +341,18 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	@Override
-	public void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
-		activityEngine.rescheduleActivityEnd(agent, oldTime, newTime);
+	/**
+	 * 
+	 * This will go away. Please do not re-add it to the Mobsim interface.
+	 * Please use the method in InternalInterface if you need within-day replanning.
+	 * You will have to add a QSimEngine to this QSim which either does that or 
+	 * which knows your agents and passes it to them, so they do it themselves.
+	 * 
+	 * @param agent The agent whose current Activity has changed.
+	 */
+	public void rescheduleActivityEnd(final MobsimAgent agent) {
+		activityEngine.rescheduleActivityEnd(agent);
 	}
-
 
 	private void arrangeAgentActivity(MobsimAgent agent) {
 		for (ActivityHandler activityHandler : this.activityHandlers) {
@@ -562,11 +574,6 @@ public final class QSim implements VisMobsim, Netsim {
 	@Override
 	public Collection<MobsimAgent> getAgents() {
 		return Collections.unmodifiableCollection(this.agents);
-	}
-
-	@Override
-	public Collection<MobsimAgent> getActivityEndsList() {
-		return activityEngine.getActivityEndsList();
 	}
 
 	public void addAgentSource(AgentSource agentSource) {

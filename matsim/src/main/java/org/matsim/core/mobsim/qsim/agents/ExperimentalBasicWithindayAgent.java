@@ -37,8 +37,7 @@ import org.matsim.core.population.PlanImpl;
  */
 public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl implements PlanBasedWithinDayAgent {
 
-	public static ExperimentalBasicWithindayAgent createExperimentalBasicWithindayAgent(
-			Person p, Netsim simulation) {
+	public static ExperimentalBasicWithindayAgent createExperimentalBasicWithindayAgent(Person p, Netsim simulation) {
 		ExperimentalBasicWithindayAgent agent = new ExperimentalBasicWithindayAgent(p, simulation);
 		return agent;
 	}
@@ -70,8 +69,8 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	}
 
 	@Override
-	public final void calculateDepartureTime( Activity act ) {
-		super.calculateDepartureTime( act ) ;
+	public final void calculateAndSetDepartureTime(Activity act) {
+		super.calculateAndSetDepartureTime(act);
 	}
 
 	@Override
