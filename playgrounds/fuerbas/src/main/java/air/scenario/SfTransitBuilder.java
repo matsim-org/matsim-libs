@@ -62,6 +62,9 @@ public class SfTransitBuilder {
 		
 	public static final String FLIGHT_TRANSIT_VEHICLES = "flight_transit_vehicles.xml";
 	
+	private static final double TAXI_TOL_TIME = 3*(SfMatsimAirport.taxiwayLength/SfMatsimAirport.taxiwayFreespeed)+	//time for taxi out and taxi in
+												2*(SfMatsimAirport.runwayLength/SfMatsimAirport.runwayFreespeed);	//time for take-off and landing (TOL)
+	
 	private Scenario loadScenario(String inputNetworkFile){
 		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
@@ -99,12 +102,15 @@ public class SfTransitBuilder {
 			String transitRoute = lineEntries[0];
 			String transitLine = lineEntries[1];
 			double departureTime = Double.parseDouble(lineEntries[3]);
+			double duration = Double.parseDouble(lineEntries[4]);
+			double distance = 1000*Double.parseDouble(lineEntries[7]); //km to m
+			double vehicleSpeed =(Math.round(distance/(duration-TAXI_TOL_TIME))*100)/100.;
 			Id originId = new IdImpl(origin);
 			Id destinationId = new IdImpl(destination);
 			Id routeId = new IdImpl(transitRoute);	//origin IATA code + destination IATA code
 			Id transitLineId = new IdImpl(transitLine);		//origin IATA code + destination IATA code + airline IATA code
 			Id flightNumber = new IdImpl(lineEntries[2]);	//flight number
-			Id vehTypeId = new IdImpl(lineEntries[5]+"_"+lineEntries[6]);	//IATA aircraft code + seats avail
+			Id vehTypeId = new IdImpl(lineEntries[5]+"_"+lineEntries[6]+"_"+flightNumber);	//IATA aircraft code + seats avail
 			int aircraftCapacity = Integer.parseInt(lineEntries[6]);
 			List<Id> linkList = new ArrayList<Id>();	//evtl in Map mit Route als key verpacken
 			List<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>();	//evtl in Map mit Route als key verpacken
@@ -162,6 +168,7 @@ public class SfTransitBuilder {
 				VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
 				cap.setSeats(aircraftCapacity);
 				type.setCapacity(cap);
+				type.setMaximumVelocity(vehicleSpeed);
 				veh.getVehicleTypes().put(vehTypeId, type); 
 			}
 			

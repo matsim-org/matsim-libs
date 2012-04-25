@@ -21,12 +21,12 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class SfAirNetworkBuilder {
 
 	public static final String NETWORK_FILENAME = "air_network.xml";
+	private static final double MACH_1 = 343.0;		// [m/s] Ma = (Geschwindigkeit/Schallgeschwindigkeit) = 1 [T=20°C] 
 
-	public void createNetwork(String osmAirports, String cityPairs, String networkOutputFilename) throws IOException {
+	public void createNetwork(String Airports, String cityPairs, String networkOutputFilename) throws IOException {
 		int airportcounter = 0;
 		int linkcounter = 0;
 		
-//		String output = "/home/soeren/workspace/germanAirNetwork";
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.add("pt");
 		allowedModes.add("car");
@@ -34,11 +34,8 @@ public class SfAirNetworkBuilder {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(1.0);		//capacity period set to one second to allow storage capacity = 1 for runway with runway length of 450 meters and 1/60 flow capacity
 		
-		BufferedReader brAirports = new BufferedReader(new FileReader(new File(osmAirports)));
+		BufferedReader brAirports = new BufferedReader(new FileReader(new File(Airports)));
 		BufferedReader brRoutes = new BufferedReader(new FileReader(new File(cityPairs)));
-		
-//		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/osmGermanAirports.txt")));
-//		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairsGermany.txt")));
 		
 		CoordinateTransformation coordtransform =
 			TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
@@ -48,13 +45,10 @@ public class SfAirNetworkBuilder {
 			String[] lineEntries = oneLine.split("\t");
 			String airportCode = lineEntries[0];
 			double xValue = Double.parseDouble(lineEntries[1]);
-//				if (xValue<=-10.) System.out.println(oneLine);
 			double yValue = Double.parseDouble(lineEntries[2]);		
 			Coord coord = new CoordImpl(xValue, yValue);
 			Coord airportCoord = coordtransform.transform(coord);
-			
 			airportcounter++;
-			
 			new SfMatsimAirport(new IdImpl(airportCode), airportCoord).createRunways(network);			
 		}
 		
@@ -64,18 +58,9 @@ public class SfAirNetworkBuilder {
 			String[] lineEntries = oneLine.split("\t");
 			String[] airportCodes = lineEntries[0].split("_");
 			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
-			double flightTime = Double.parseDouble(lineEntries[2]);		
-			if (flightTime>=3600.) flightTime-=600.;//flight time in seconds, assumption: 600secs for taxi/take-off/landing
-			else if (flightTime>=1800 && flightTime<3600.) flightTime-=300.;
-			else flightTime-=120.;
-			double groundSpeed = length/flightTime;	
-				if (groundSpeed<=50.) System.out.println(oneLine+"\t"+groundSpeed);
+			double groundSpeed = MACH_1;	
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];
-			
-			
-			//LÖSCHEN
-//			if ((origin.equalsIgnoreCase("TXL") && destination.equalsIgnoreCase("ZRH")) || (origin.equalsIgnoreCase("ZRH") && destination.equalsIgnoreCase("TXL")) ) {
 			
 			Id originRunway = new IdImpl(origin+"runwayOutbound");
 			Id destinationRunway = new IdImpl(destination+"runwayInbound");
@@ -85,11 +70,7 @@ public class SfAirNetworkBuilder {
 			originToDestination.setFreespeed(groundSpeed);
 			originToDestination.setLength(length);
 			network.addLink(originToDestination);
-			
 			linkcounter++;
-			
-//			} // HIER LÖSCHEN
-			
 		}
 			
 		new NetworkWriter(network).write(networkOutputFilename);
@@ -110,7 +91,7 @@ public class SfAirNetworkBuilder {
 		String baseDirectory = "/home/dgrether/shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
 				
 		String output = baseDirectory + NETWORK_FILENAME;
-		String osmAirports = baseDirectory + SfAirScheduleBuilder.AIRPORTS_FROM_OSM_OUTPUT_FILE;
+		String osmAirports = baseDirectory + SfAirScheduleBuilder.AIRPORTS_OUTPUT_FILE;
 		String cityPairs = baseDirectory + SfAirScheduleBuilder.CITY_PAIRS_OUTPUT_FILENAME;
 		SfAirNetworkBuilder builder = new SfAirNetworkBuilder();
 		builder.createNetwork(osmAirports, cityPairs, output);

@@ -73,7 +73,7 @@ public class SfUtcOffset {
 	private static final String INPUTFILE_AIRPORTS = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\worldwide_airports_with_coords.csv";
 	private static final String OUTPUTFILE_UTC= "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\utc_offsets.txt";
 	
-	private Map<String, Coord> airports;
+	private Map<String, Coord> airports = new HashMap<String,Coord>();
 	
 	
 	public void writeUtcOffset(String inputAirportListFile, String outputFile) throws IOException, InterruptedException{
@@ -118,7 +118,7 @@ public class SfUtcOffset {
 	
 	public static Double getUtcOffset(Coord coord) throws IOException, InterruptedException {
 		
-		Thread.sleep(2*1000); //requirement by the web service provider
+		Thread.sleep(4*1000); //requirement by the web service provider
 		double xCoord = Math.round(coord.getX()*1000.)/1000.;
 		double yCoord = Math.round(coord.getY()*1000.)/1000.;
 		String inputURL = "http://www.earthtools.org/timezone/"+yCoord+"/"+xCoord;	// MATSim y-axis used for latitude (north-south), x-axis for longitude (east-west)

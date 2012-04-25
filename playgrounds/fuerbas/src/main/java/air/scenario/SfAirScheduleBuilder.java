@@ -54,7 +54,7 @@ public class SfAirScheduleBuilder {
 
 	public final static String[] GERMAN_COUNTRIES = { "DE" };
 
-	public static final String AIRPORTS_FROM_OSM_OUTPUT_FILE = "osm_airports.txt";
+	public static final String AIRPORTS_OUTPUT_FILE = "airports.txt";
 
 	public static final String OAG_FLIGHTS_OUTPUT_FILENAME = "oag_flights.txt";
 
@@ -67,11 +67,7 @@ public class SfAirScheduleBuilder {
 	protected Map<String, Double> routes = new HashMap<String, Double>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	private Map<String, Double> utcOffset = new HashMap<String, Double>();
-	private boolean utcFileInUse = false;
 
-	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
-		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null, null);
-	}
 	
 	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory, String utcOffsetInputfile) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
 		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null, utcOffsetInputfile);
@@ -95,17 +91,24 @@ public class SfAirScheduleBuilder {
 		
 		brAirports.close();
 		
+		BufferedReader brUtc = new BufferedReader(new FileReader(new File(utcOffsetInputfile)));
+		while (brUtc.ready()) {
+			String line = brUtc.readLine();
+			String[] entries = line.split("\t");
+			String airportCode = entries[0];
+			double offset = Double.parseDouble(entries[1]);
+			this.utcOffset.put(airportCode, offset);
+		}
+		
+		brUtc.close();
+		
 		int counter = 0;
+		
+		int opscount = 0;
 		
 //		new UTC Offset functionality, work in progress!
 		
 //		Möglichkeit ohne UTC File abbauen
-		
-		/**@todo check UTC offsets for errors **/ 
-		if (utcOffsetInputfile!=null) {
-			getUtcOffsetMap(utcOffsetInputfile);
-			this.utcFileInUse = true;
-		}
 		
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFile)));
 		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(outputOagFile)));
@@ -125,32 +128,20 @@ public class SfAirScheduleBuilder {
 
 				String originCountry = lineEntries[6];
 				String destinationCountry = lineEntries[9];
+				String originAirport = lineEntries[4];
 				
-//				auslagern in eigene Methode zur Filterung nach Ländern
-				boolean origin = false;
-				boolean destination = false;
-				if (countries != null) {
-					for (int ii = 0; ii < countries.length; ii++) {
-						if (originCountry.equalsIgnoreCase(countries[ii]))
-							origin = true;
-						if (destinationCountry.equalsIgnoreCase(countries[ii]))
-							destination = true;
-					}
-				}
-				else {
-					origin = true;
-					destination = true;
-				}
-
-				if (origin && destination) {
-
-					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {	//filter codeshare flights
-
+				if ((countries==null && this.utcOffset.containsKey(originAirport)) 
+						|| (checkOriginCountry(originCountry, countries) && checkDestinationCountry(destinationCountry, countries) 
+								&& this.utcOffset.containsKey(originAirport))) {
+			
+					//filter codeshare flights (see WW_DBF_With_Frequency.DOC from OAG input data)
+					// either "operating marker" set, "shared airline designator" not set or "duplicate" not set
+					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("") || lineEntries[49].equalsIgnoreCase("")) 
+					{	
 						String carrier = lineEntries[0];
 						String flightNumber = lineEntries[1].replaceAll(" ", "0");
 						String flightDesignator = carrier + flightNumber;
 
-						String originAirport = lineEntries[4];
 						String destinationAirport = lineEntries[7];
 						String route = originAirport + "_" + destinationAirport;
 						double flightDistance = Integer.parseInt(lineEntries[42]) * 1.609344; // statute miles to kilometers
@@ -162,24 +153,12 @@ public class SfAirScheduleBuilder {
 						double duration = durationHours + durationMinutes;
 						double departureInSec = Double.parseDouble(lineEntries[10].substring(2)) * 60
 								+ Double.parseDouble(lineEntries[10].substring(0, 2)) * 3600;
-//					Getting UTC Offset of current airport's time zone
-//						worldwide version (gets offset from web service) 
-//						System.out.println("Getting UTC offset for "+originAirport+" in coutry: "+originCountry);
-//						double utcOffset = utcOffsetNew.getUtcOffset(this.airportsInOsm.get(originAirport));
 						
 //						Getting UTC Offset from separate file which need to be created with SfUtcOffset
-						if (this.utcFileInUse && this.airports.containsKey(originAirport)) {
-							double utcOffset = this.utcOffset.get(originAirport);
-							departureInSec = departureInSec - utcOffset;
-							System.out.println("Airport: "+originAirport+" UTC offset was calculated as: "+utcOffset);
-						}
+						double utcOffset = this.utcOffset.get(originAirport);
+						departureInSec = departureInSec - utcOffset;
+//						System.out.println("Airport: "+originAirport+" UTC offset was calculated as: "+utcOffset);
 
-//						version for Europe ONLY (based on manually entered offsets, see below)
-						if (this.utcFileInUse==false && this.airports.containsKey(originAirport)) {
-							double utcOffset = getOffsetUTC(originCountry) * 3600;
-							departureInSec = departureInSec - utcOffset;
-						}
-//					
 						if (departureInSec < 0)
 							departureInSec += 86400.0; // shifting flights with departure on previous day in UTC time +24 hours
 						double stops = Double.parseDouble(lineEntries[15]);
@@ -198,12 +177,18 @@ public class SfAirScheduleBuilder {
 //								&& destinationAirport.equalsIgnoreCase("FRA"))) {
 						
 						//some error correction code
-						if (lineEntries[14].contains("2") && !flights.containsKey(flightDesignator)
-								&& seatsAvail > 0 && !originAirport.equalsIgnoreCase(destinationAirport)
+						if ( 
+//								lineEntries[14].contains("2") && //filter for Tuesday flights only
+								!flights.containsKey(flightDesignator)
+//								&& seatsAvail > 0 //filter for flights with 1 PAX or more only
+//								&& !originAirport.equalsIgnoreCase(destinationAirport)
 								&& this.airports.containsKey(originAirport)
 								&& this.airports.containsKey(destinationAirport)
-								&& !aircraftType.equalsIgnoreCase("BUS") && (stops < 1)
-								&& (fullRouting.length() <= 6)) {
+//								&& !aircraftType.equalsIgnoreCase("BUS") //filter busses
+//								&& !aircraftType.equalsIgnoreCase("TRN") //filter trains
+//								&& (stops < 1)
+//								&& (fullRouting.length() <= 6)
+								) {
 
 							if (!this.routes.containsKey(route)) {
 								this.routes.put(route, duration);
@@ -218,7 +203,7 @@ public class SfAirScheduleBuilder {
 									route + "_" + carrier + "\t" + // TransitLine
 									flightDesignator + "\t" + // vehicleId
 									departureInSec + "\t" + // departure time in seconds
-									this.routes.get(route) + "\t" + // journey time in seconds
+									duration + "\t" + // journey time in seconds
 									aircraftType + "\t" + // aircraft type
 									seatsAvail + "\t" + // seats avail
 									flightDistance); // distance in km
@@ -233,9 +218,7 @@ public class SfAirScheduleBuilder {
 				}
 //				}
 			}
-
 			lines++;
-
 		}
 
 		bwOag.flush();
@@ -243,23 +226,22 @@ public class SfAirScheduleBuilder {
 
 		// produce some more output
 
-//		String outputAirportFile = outputDirectory + AIRPORTS_FROM_OSM_OUTPUT_FILE;
+		String outputAirportFile = outputDirectory + AIRPORTS_OUTPUT_FILE;
 //		String outputMissingAirportsFile = outputDirectory + missingAirportsOutputFilename;
 		String cityPairsFile = outputDirectory + CITY_PAIRS_OUTPUT_FILENAME;
 
-//		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputAirportFile)));
+		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputAirportFile)));
 //		BufferedWriter bwMissing = new BufferedWriter(new FileWriter(
 //				new File(outputMissingAirportsFile)));
 		BufferedWriter bwcityPairs = new BufferedWriter(new FileWriter(new File(cityPairsFile)));
 
-//		Iterator it = this.airportsInOag.entrySet().iterator();
-//		while (it.hasNext()) {
-//			Map.Entry pairs = (Map.Entry) it.next();
-//			bwOsm.write(pairs.getKey().toString() + "\t" + this.airports.get(pairs.getKey()).getX()
-//					+ "\t" + this.airports.get(pairs.getKey()).getY());
-//			this.missingAirports.remove(pairs.getKey().toString());
-//			bwOsm.newLine();
-//		}
+		Iterator it = this.airportsInOag.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pairs = (Map.Entry) it.next();
+			bwOsm.write(pairs.getKey().toString() + "\t" + this.airportsInOag.get(pairs.getKey()).getX()
+					+ "\t" + this.airportsInOag.get(pairs.getKey()).getY());
+			bwOsm.newLine();
+		}
 //
 //		Iterator it2 = this.missingAirports.entrySet().iterator();
 //		while (it2.hasNext()) {
@@ -281,8 +263,8 @@ public class SfAirScheduleBuilder {
 		log.info("Anzahl der City Pairs: " + this.routes.size());
 		log.info("Anzahl der Flüge: " + counter);
 
-//		bwOsm.flush();
-//		bwOsm.close();
+		bwOsm.flush();
+		bwOsm.close();
 //		bwMissing.flush();
 //		bwMissing.close();
 		bwcityPairs.flush();
@@ -290,6 +272,33 @@ public class SfAirScheduleBuilder {
 		br.close();
 
 	}
+	
+	private static boolean checkOriginCountry(String originCountry, String[] countries) {
+		boolean check=false;
+		if (countries != null) {
+			for (int ii = 0; ii < countries.length; ii++) {
+				if (originCountry.equalsIgnoreCase(countries[ii]))
+					check=true;
+				else check=false;
+				}
+		}
+			else check=true;
+		return check;
+	}
+	
+	private static boolean checkDestinationCountry(String destinationCountry, String[] countries) {
+		boolean check=false;
+		if (countries != null) {
+			for (int ii = 0; ii < countries.length; ii++) {
+				if (destinationCountry.equalsIgnoreCase(countries[ii]))
+					check=true;
+				else check=false;
+				}
+		}
+			else check=true;
+		return check;
+	}
+	
 	
 	private void getUtcOffsetMap(String inputfile) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputfile)));

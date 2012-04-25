@@ -33,8 +33,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class SfMatsimAirport {
 	
-	private static final double runwayLength = 1500.0;
-	private static final double taxiwayLength = 500.0;
+	public static final double runwayLength = 1500.0;
+	public static final double taxiwayLength = 500.0;
+	public static final double taxiwayFreespeed = 20.0/3.6;
+	public static final double runwayFreespeed = 220.0/2.6;
 	
 	public Coord coord;
 	public Id id;
@@ -115,11 +117,11 @@ public class SfMatsimAirport {
 		linkRunwayIn.setLength(runwayLength);
 		linkRunwayOut.setLength(runwayLength);
 			
-		linkApron.setFreespeed(20.0/3.6);
-		linkTaxiIn.setFreespeed(20.0/3.6);
-		linkTaxiOut.setFreespeed(20.0/3.6);
-		linkRunwayIn.setFreespeed(220.0/3.6);
-		linkRunwayOut.setFreespeed(250.0/3.6);		
+		linkApron.setFreespeed(taxiwayFreespeed);
+		linkTaxiIn.setFreespeed(taxiwayFreespeed);
+		linkTaxiOut.setFreespeed(taxiwayFreespeed);
+		linkRunwayIn.setFreespeed(runwayFreespeed);
+		linkRunwayOut.setFreespeed(runwayFreespeed);		
 		
 //		add links to network
 				
