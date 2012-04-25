@@ -167,12 +167,21 @@
 				</plugins>
 			</reporting>
 		</profile>
+		
 		<profile>
 			<id>release</id>
 			<build>
 				<defaultGoal>assembly:assembly</defaultGoal>
 				<pluginManagement>
 					<plugins>
+						<plugin>
+							<artifactId>maven-assembly-plugin</artifactId>
+							<configuration>
+								<descriptors>
+									<descriptor>src/main/assembly/assembly-release.xml</descriptor>
+								</descriptors>
+							</configuration>
+						</plugin>
 						<plugin>
 							<artifactId>maven-jar-plugin</artifactId>
 							<configuration>
