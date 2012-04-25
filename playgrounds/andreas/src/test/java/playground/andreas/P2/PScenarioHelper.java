@@ -370,7 +370,6 @@ class Route2313to3343 implements PPlanStrategy{
 		stops.add(endStop);
 		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
-		newPlan.setNVehicles(2);
 		return newPlan;
 	}
 
@@ -406,7 +405,6 @@ class Route2414to3444 implements PPlanStrategy{
 		stops.add(endStop);
 		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
-		newPlan.setNVehicles(2);
 		return newPlan;
 	}
 
@@ -445,7 +443,6 @@ class Route2111to1314to4443 implements PPlanStrategy{
 		stops.add(endStop);
 		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
-		newPlan.setNVehicles(2);
 		return newPlan;
 	}
 

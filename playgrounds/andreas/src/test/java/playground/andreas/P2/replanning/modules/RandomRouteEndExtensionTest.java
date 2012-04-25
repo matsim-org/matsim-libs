@@ -51,6 +51,7 @@ public class RandomRouteEndExtensionTest {
 		ArrayList<String> parameters = new ArrayList<String>();
 		parameters.add("0.7");
 		PPlanStrategy strategy = new RandomRouteEndExtension(parameters);
+		coop.getBestPlan().setNVehicles(2);
 		coop.init(coop.getRouteProvider(), strategy, 1);
 		
 		PPlan newPlan = coop.getBestPlan();

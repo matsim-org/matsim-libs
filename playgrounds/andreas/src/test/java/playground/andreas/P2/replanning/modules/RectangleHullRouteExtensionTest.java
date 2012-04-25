@@ -47,6 +47,7 @@ public class RectangleHullRouteExtensionTest {
 		ArrayList<String> parameters = new ArrayList<String>();
 		parameters.add("0.1");
 		PPlanStrategy strategy = new RectangleHullRouteExtension(parameters);
+		coop.getBestPlan().setNVehicles(2);
 		coop.init(coop.getRouteProvider(), strategy, 1);
 		PPlan newPlan = coop.getBestPlan();
 		

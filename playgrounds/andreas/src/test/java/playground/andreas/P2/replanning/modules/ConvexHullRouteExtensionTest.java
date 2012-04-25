@@ -46,6 +46,7 @@ public class ConvexHullRouteExtensionTest {
 		
 		ArrayList<String> parameters = new ArrayList<String>();
 		PPlanStrategy strategy = new ConvexHullRouteExtension(parameters);
+		coop.getBestPlan().setNVehicles(2);
 		coop.init(coop.getRouteProvider(), strategy, 1);
 		PPlan newPlan = coop.getBestPlan();
 		
