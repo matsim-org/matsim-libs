@@ -63,6 +63,10 @@ public class ReduceStopsToBeServed extends PStrategy implements PPlanStrategy, T
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		
+		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			return null;
+		}
+		
 		ArrayList<TransitStopFacility> stopsToBeServed = getStopsToBeServed(this.line2StartStop2EndStop2TripsMap.get(cooperative.getId()), cooperative.getBestPlan().getLine());
 		
 		if (stopsToBeServed.size() < 2) {

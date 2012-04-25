@@ -82,6 +82,10 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 	 */
 	@Override
 	public PPlan run(Cooperative cooperative) {
+		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			return null;
+		}
+		
 		this.initQuadTree(cooperative);
 		PPlan oldPlan = cooperative.getBestPlan();
 		PPlan newPlan = new PPlan(oldPlan.getId());
@@ -99,6 +103,9 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 																	1, 
 																	(ArrayList<TransitStopFacility>) stopsToServe, 
 																	new IdImpl(cooperative.getCurrentIteration())));
+		
+		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
+		
 		return newPlan;
 	}
 	

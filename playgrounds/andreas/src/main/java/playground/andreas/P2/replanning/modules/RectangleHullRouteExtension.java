@@ -108,6 +108,9 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 																		1, 
 																		(ArrayList<TransitStopFacility>) stopsToServe, 
 																		new IdImpl(cooperative.getCurrentIteration())));
+			
+			cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
+			
 			return newPlan;
 		}
 	}

@@ -101,6 +101,9 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 																		1, 
 																		(ArrayList<TransitStopFacility>) stopsToServe, 
 																		new IdImpl(cooperative.getCurrentIteration())));
+			
+			cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
+			
 			return newPlan;
 		}
 	}
