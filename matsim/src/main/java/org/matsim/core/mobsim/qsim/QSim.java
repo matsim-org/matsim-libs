@@ -131,11 +131,11 @@ public final class QSim implements VisMobsim, Netsim {
 
 
 	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
-		
+
 		// These methods must be synchronized, because they are called back
 		// from possibly multi-threaded engines, and they access
 		// global mutable data.
-		
+
 		@Override
 		public synchronized void arrangeNextAgentState(MobsimAgent agent) {
 			QSim.this.arrangeNextAgentAction(agent) ;
@@ -263,7 +263,7 @@ public final class QSim implements VisMobsim, Netsim {
 				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
 		// to print out the info at the very first
 		// timestep already
-		
+
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.onPrepareSim();
 		}
@@ -427,10 +427,8 @@ public final class QSim implements VisMobsim, Netsim {
 
 		double simStartTime = 0;
 		if (QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
-			if (activityEngine != null) {
-				double firstAgentStartTime = calculateFirstAgentStartTime();
-				simStartTime = Math.floor(Math.max(configuredStartTime, firstAgentStartTime));
-			}
+			double firstAgentStartTime = calculateFirstAgentStartTime();
+			simStartTime = Math.floor(Math.max(configuredStartTime, firstAgentStartTime));
 		} else if (QSimConfigGroup.ONLY_USE_STARTTIME.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
 			simStartTime = configuredStartTime;
 		} else {
