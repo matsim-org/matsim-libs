@@ -23,23 +23,44 @@ package playground.gregor.scenariogen;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -54,6 +75,12 @@ public class PED12ScenarioGen {
 	private static int nodeID = 0;
 	private static int linkID = 0;
 	
+	private static int persID = 0;
+	
+	
+	private static List<Link> shoppingShelfs = new ArrayList<Link>();
+	private static List<Link> cashDesks = new ArrayList<Link>();
+	
 	public static void main(String [] args) {
 		String scDir = "/Users/laemmel/devel/ped12_dobLaem/";
 		String inputDir = scDir + "/input/";
@@ -64,20 +91,187 @@ public class PED12ScenarioGen {
 		createAndSaveEnvironment(inputDir);
 		
 		
-		createAnsSavePopulation(sc,inputDir);
+		createAndSaveNetwork(sc,inputDir);
+		
+		createAndSavePopulation(sc,inputDir);
+		
+		new NetworkWriter(sc.getNetwork()).write(inputDir+"/network.xml");
+		new PopulationWriter(sc.getPopulation(), sc.getNetwork()).writeV5(inputDir+"/plans.xml");
+		
+		c.plans().setInputFile(inputDir+"/plans.xml");
+		c.network().setInputFile(inputDir+"/network.xml");
+		
+		c.controler().setLastIteration(0);
+		c.controler().setOutputDirectory(scDir + "output/");
+		c.controler().setMobsim("hybridQ2D");
+
+		c.strategy().setMaxAgentPlanMemorySize(3);
+
+		c.strategy().addParam("maxAgentPlanMemorySize", "3");
+		c.strategy().addParam("Module_1", "ReRoute");
+		c.strategy().addParam("ModuleProbability_1", "0.1");
+		c.strategy().addParam("Module_2", "ChangeExpBeta");
+		c.strategy().addParam("ModuleProbability_2", "0.9");
+		//
+		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
+		s2d.setFloorShapeFile(inputDir +"/environment.shp");
+
+//		if (model == SC.Helbing) {
+			s2d.setEnableCircularAgentInterActionModule("true");
+			s2d.setEnableEnvironmentForceModule("true");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("true");
+			s2d.setEnableDrivingForceModule("true");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");
+
+//		s2d.setTimeStepSize(""+0.1);
+		QSimConfigGroup qsim = new QSimConfigGroup();
+		qsim.setEndTime(600);
+		//				qsim.setTimeStepSize(1./25.);
+		c.addModule("qsim", qsim);
+		
+		c.addModule("sim2d", s2d);
+		
+		
+		
+		ActivityParams pre = new ActivityParams("h");
+		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
+		// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
+		pre.setMinimalDuration(49);
+		pre.setClosingTime(49);
+		pre.setEarliestEndTime(49);
+		pre.setLatestStartTime(49);
+		pre.setOpeningTime(49);
+
+		sc.getConfig().planCalcScore().addActivityParams(pre);
+		
+		new ConfigWriter(c).write(inputDir + "/config.xml");
+
+		
+	}
+
+	private static void createAndSavePopulation(Scenario sc, String inputDir) {
+		
+		Network network = sc.getNetwork();
+		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
+		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,sc.getConfig().planCalcScore() );
+		Dijkstra dijkstra = new Dijkstra(network, cost, fs);
+		
+		//subway
+		Node n = ((NetworkImpl)sc.getNetwork()).getNearestNode(new CoordImpl(-2,1));
+		Link start = n.getOutLinks().values().iterator().next();
+		Link end = n.getInLinks().values().iterator().next();
+		
+		double depStartTime = 0;
+		double depEndTime = 180;
+		double platformWidth = 2;
+		double maxPersPerSecond = platformWidth * 1.33; //weidmann
+		
+		for (double time = depStartTime; time <= depEndTime; time++) {
+			double personsThisTimeStep = maxPersPerSecond * MatsimRandom.getRandom().nextDouble();
+			int numPers = (int)(personsThisTimeStep+0.5);
+			for (int p = 0; p < numPers; p++) {
+				double persTime = time + MatsimRandom.getRandom().nextDouble();
+				double x = -2 + 3*(MatsimRandom.getRandom().nextDouble()-0.5);
+				double y = 1;
+				Coord actCoord = new CoordImpl(x,y);
+				createSubwayPerson(persTime,start,end,actCoord,sc,dijkstra);
+			}
+			
+			
+		}
+	
 		
 		
 	}
 
-	private static void createAnsSavePopulation(Scenario sc, String inputDir) {
+	private static void createSubwayPerson(double persTime, Link start,
+			Link end, Coord actCoord, Scenario sc, Dijkstra dijkstra) {
+		
+		PopulationFactory pb = sc.getPopulation().getFactory();
+		Id id = sc.createId(Integer.toString(persID++));
+		Person pers = pb.createPerson(id);
+		Plan plan = pb.createPlan();
+		ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", start.getId());
+		act.setCoord(actCoord);
+		act.setEndTime(persTime);
+		plan.addActivity(act);
+		Leg leg = pb.createLeg("walk2d");
+		
+		Route route = createRandomShoppingRoute(start,end,dijkstra);
+		leg.setRoute(route );
+		
+		plan.addLeg(leg);
+		Activity act2 = pb.createActivityFromLinkId("h",end.getId());
+		act2.setEndTime(0);
+		plan.addActivity(act2);
+		pers.addPlan(plan);
+		
+		sc.getPopulation().addPerson(pers);
+	}
+
+
+	private static Route createRandomShoppingRoute(Link start, Link end, Dijkstra dijkstra) {
+		
+		int stopsAtShoppingShelfs = MatsimRandom.getRandom().nextInt(3)+1; // three stops max
+		
+		Link current = start;
+		
+		List<Link> links = new ArrayList<Link>();
+		for (int stop = 0; stop < stopsAtShoppingShelfs; stop++) {
+			
+			Link next = shoppingShelfs.get(MatsimRandom.getRandom().nextInt(shoppingShelfs.size()));
+			Node from = current.getToNode();
+			Node to = next.getFromNode();
+			
+			Path r = dijkstra.calcLeastCostPath(from, to, 0,null,null);
+			links.addAll(r.links);
+			links.add(next);
+			current = next;
+		}
+		
+		
+		Link cashDesk = cashDesks.get(MatsimRandom.getRandom().nextInt(cashDesks.size()));
+		Node from = current.getToNode();
+		Node to = cashDesk.getFromNode();
+		
+		Path r = dijkstra.calcLeastCostPath(from, to, 0,null,null);
+		links.addAll(r.links);
+		links.add(cashDesk);
+		current = cashDesk;		
+		
+		from = current.getToNode();
+		to = end.getFromNode();
+		
+		r = dijkstra.calcLeastCostPath(from, to, 0,null,null);
+		links.addAll(r.links);
+		current = cashDesk;
+		
+		List<Id> linkIds = new ArrayList<Id>();
+		for (Link l : links) {
+			linkIds.add(l.getId());
+		}
+		
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links.get(0).getId(), links.get(links.size()-1).getId());
+		route.setLinkIds(links.get(0).getId(),linkIds ,links.get(links.size()-1).getId());
+		
+		return route;
+	}
+
+	private static void createAndSaveNetwork(Scenario sc, String inputDir) {
 		
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
 		//path from subway to mall entry
+		
 		////stairs
+		//subway platform
+		createPedLink(-2.,1.,-2.,3.,1.34,false,4,net);
 		//up VF,h = 0.610 m/s
-		createPedLink(-2.,1.,-2.,12.,0.61,true,4,net);
+		createPedLink(-2.,3.,-2.,12.,0.61,true,4,net);
 		//down VF,h = 0.694 m/s
-		createPedLink(-2.,12.,-2.,1.,0.694,true,4,net);
+		createPedLink(-2.,12.,-2.,3.,0.694,true,4,net);
 		
 		createPedLink(-2.,12.,-2.,22.,1.34,false,4,net);
 		createPedLink(-2.,22.,-45.5,22.,1.34,false,4,net);
@@ -177,12 +371,12 @@ public class PED12ScenarioGen {
 		createPedLink(-60,22.,-60,18.,1.34,false,2,net);
 		
 		//cash desks
-		createPedCashDeskLink(-47.5,8.,-47.5,18.,1.34,true,.71,net);
-		createPedCashDeskLink(-50,8.,-50,18.,1.34,true,.71,net);
-		createPedCashDeskLink(-52.5,8.,-52.5,18.,1.34,true,.71,net);
-		createPedCashDeskLink(-55,8.,-55,18.,1.34,true,.71,net);
-		createPedCashDeskLink(-57.5,8.,-57.5,18.,1.34,true,.71,net);
-		createPedCashDeskLink(-60,8.,-60,18.,1.34,true,.71,net);
+		cashDesks.add(createPedCashDeskLink(-47.5,8.,-47.5,18.,1.34,true,.71,net));
+		cashDesks.add(createPedCashDeskLink(-50,8.,-50,18.,1.34,true,.71,net));
+		cashDesks.add(createPedCashDeskLink(-52.5,8.,-52.5,18.,1.34,true,.71,net));
+		cashDesks.add(createPedCashDeskLink(-55,8.,-55,18.,1.34,true,.71,net));
+		cashDesks.add(createPedCashDeskLink(-57.5,8.,-57.5,18.,1.34,true,.71,net));
+		cashDesks.add(createPedCashDeskLink(-60,8.,-60,18.,1.34,true,.71,net));
 		
 		//cash desks connectors
 		//1. col
@@ -210,20 +404,88 @@ public class PED12ScenarioGen {
 		for (double y = -3.5; y >= -33.5; y -= 5) {
 			createPedLink(-50,y,-49,y+2.5,1.34,false,4,net);
 			createPedLink(-50,y,-49,y-2.5,1.34,false,4,net);
-			createPedLink(-50,y,-50,y-5,0.2,false,4,net);
+			shoppingShelfs.add(createPedLink(-50,y,-50,y-5,0.2,false,4,net));
 		}
 		createPedLink(-50,-38.5,-49,-41,1.34,false,4,net);
+
+		//2. shelf col
+		////express links
+		for (double y = -1; y >= -36; y -= 5) {
+			createPedLink(-60,y,-60,y-5,1.34,false,4,net);
+		}
+		////shopping links
+		for (double y = -3.5; y >= -33.5; y -= 5) {
+			createPedLink(-62,y,-60,y+2.5,1.34,false,4,net);
+			createPedLink(-62,y,-60,y-2.5,1.34,false,4,net);
+			shoppingShelfs.add(createPedLink(-62,y,-62,y-5,0.2,false,4,net));
+			
+			createPedLink(-58,y,-60,y+2.5,1.34,false,4,net);
+			createPedLink(-58,y,-60,y-2.5,1.34,false,4,net);
+			shoppingShelfs.add(createPedLink(-58,y,-58,y-5,0.2,false,4,net));
+		}
+		createPedLink(-62,-38.5,-60,-41,1.34,false,4,net);
+		createPedLink(-58,-38.5,-60,-41,1.34,false,4,net);
+		
+		//3. shelf col
+		////express links
+		for (double y = 14; y >= -36; y -= 5) {
+			createPedLink(-72,y,-72,y-5,1.34,false,4,net);
+		}
+		////shopping links
+		for (double y = 11.5; y >= -33.5; y -= 5) {
+			createPedLink(-74,y,-72,y+2.5,1.34,false,4,net);
+			createPedLink(-74,y,-72,y-2.5,1.34,false,4,net);
+			shoppingShelfs.add(createPedLink(-74,y,-74,y-5,0.2,false,4,net));
+			
+			createPedLink(-70,y,-72,y+2.5,1.34,false,4,net);
+			createPedLink(-70,y,-72,y-2.5,1.34,false,4,net);
+			shoppingShelfs.add(createPedLink(-70,y,-70,y-5,0.2,false,4,net));
+		}
+		createPedLink(-74,-38.5,-72,-41,1.34,false,4,net);
+		createPedLink(-70,-38.5,-72,-41,1.34,false,4,net);
+		
+		//4. shelf col
+		////express links
+		for (double y = 14; y >= -36; y -= 5) {
+			createPedLink(-84,y,-84,y-5,1.34,false,4,net);
+		}
+		////shopping links
+		for (double y = 11.5; y >= -33.5; y -= 5) {
+			createPedLink(-86,y,-84,y+2.5,1.34,false,4,net);
+			createPedLink(-86,y,-84,y-2.5,1.34,false,4,net);
+			shoppingShelfs.add(createPedLink(-86,y,-86,y-5,0.2,false,4,net));
+			
+			createPedLink(-82,y,-84,y+2.5,1.34,false,4,net);
+			createPedLink(-82,y,-84,y-2.5,1.34,false,4,net);
+			shoppingShelfs.add(createPedLink(-82,y,-82,y-5,0.2,false,4,net));
+		}
+		createPedLink(-86,-38.5,-84,-41,1.34,false,4,net);
+		createPedLink(-82,-38.5,-84,-41,1.34,false,4,net);
+		
+		createPedLink(-49,-41,-60,-41,1.34,false,4,net);
+		createPedLink(-60,-41,-72,-41,1.34,false,4,net);
+		createPedLink(-72,-41,-84,-41,1.34,false,4,net);
+		
+		createPedLink(-82,-13.5,-74,-13.5,1.34,false,4,net);
+		createPedLink(-74,-13.5,-70,-13.5,1.34,false,4,net);
+		createPedLink(-70,-13.5,-62,-13.5,1.34,false,4,net);
+		
+		createPedLink(-84,14,-72,14,1.34,false,4,net);
+		createPedLink(-81.5,22,-81.5,16,1.34,true,4,net);
+		createPedLink(-60,22,-81.5,22,1.34,true,4,net);
+		createPedLink(-81.5,16,-84,14,1.34,true,4,net);
+		createPedLink(-81.5,16,-72,14,1.34,true,4,net);
 		
 		//for debugging only
 		dumpNetworkAsShapeFile(sc,inputDir);
 		
-		new NetworkWriter(net).write(inputDir+"/network.xml");
+		
 		
 	}
 	
 	
 	//pedestrian cash desk link 
-	private static void createPedCashDeskLink(double fromX, double fromY, double toX, double toY,
+	private static Link createPedCashDeskLink(double fromX, double fromY, double toX, double toY,
 			double v,boolean oneWay,double width,NetworkImpl net) {
 		
 		NetworkFactoryImpl nf = net.getFactory();
@@ -253,10 +515,12 @@ public class PED12ScenarioGen {
 			net.addLink(lr);	
 		}
 		
+		return l;
+		
 	}
 
 	//pedestrian link 
-	private static void createPedLink(double fromX, double fromY, double toX, double toY,
+	private static Link createPedLink(double fromX, double fromY, double toX, double toY,
 			double v,boolean oneWay,double width,NetworkImpl net) {
 		
 		NetworkFactoryImpl nf = net.getFactory();
@@ -286,6 +550,7 @@ public class PED12ScenarioGen {
 			net.addLink(lr);	
 		}
 		
+		return l;
 	}
 
 	private static void createAndSaveEnvironment(String inputDir) {

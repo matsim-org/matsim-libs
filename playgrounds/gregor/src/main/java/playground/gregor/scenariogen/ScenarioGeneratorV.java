@@ -45,11 +45,11 @@ public class ScenarioGeneratorV {
 	public static void main(String [] args) {
 		String scDir = "/Users/laemmel/devel/oval/";
 		String inputDir = scDir + "/input/";
-		SC model = SC.Helbing;
+		SC model = SC.Zanlungo;
 
 		double length = 6;
 		double r = 3;
-		double width = .7;
+		double width = 1.;
 
 
 		Config c = ConfigUtils.createConfig();
@@ -108,7 +108,7 @@ public class ScenarioGeneratorV {
 			s2d.setEnablePhysicalEnvironmentForceModule("false");			
 		}
 
-
+//		s2d.setTimeStepSize(""+0.1);
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(300);
 		//				qsim.setTimeStepSize(1./25.);
