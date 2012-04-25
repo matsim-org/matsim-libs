@@ -26,17 +26,17 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		}
 
 		// select agents, which should be replanned within this time step
-		for (MobsimAgent pa : mobsim.getActivityEndsList()) {
-//			PersonAgent agent = (PersonAgent) pa ;
-//			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
-			if ( pa instanceof HasPerson ) {
-				Person person = ((HasPerson)pa).getPerson() ;
-				if ( ((PersonImpl)person).getAge() == 56 ) {
-					System.out.println("found agent");
-					set.add((PlanBasedWithinDayAgent)pa);
-				}
-			}
-		}
+//		for (MobsimAgent pa : mobsim.getActivityEndsList()) {
+////			PersonAgent agent = (PersonAgent) pa ;
+////			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
+//			if ( pa instanceof HasPerson ) {
+//				Person person = ((HasPerson)pa).getPerson() ;
+//				if ( ((PersonImpl)person).getAge() == 56 ) {
+//					System.out.println("found agent");
+//					set.add((PlanBasedWithinDayAgent)pa);
+//				}
+//			}
+//		}
 
 		return set;
 	}

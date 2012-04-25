@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -38,8 +39,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
-
-import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplanner;
 
 public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityReplanner {
 	
@@ -123,17 +122,8 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
 		if (withinDayAgent instanceof PersonDriverAgentImpl) {
-			// yyyy do we have to check that? We have a currentActivity... cdobler, Oct'10
-			boolean found = ((PersonDriverAgentImpl) withinDayAgent).getMobsim().getActivityEndsList().contains(this);
-			
-			// If the agent is not in the activityEndsList return without doing anything else.
-			if (!found) return false;
-			
-			double oldDepartureTime = withinDayAgent.getActivityEndTime();
-		
-			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateDepartureTime(currentActivity);
-			double newDepartureTime = withinDayAgent.getActivityEndTime();
-			((PersonDriverAgentImpl) withinDayAgent).getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
+			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
+			((QSim) ((PersonDriverAgentImpl) withinDayAgent).getMobsim()).rescheduleActivityEnd(withinDayAgent);
 			return true;
 		}
 		else {

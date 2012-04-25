@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -42,7 +43,6 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplanner;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
 public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActivityReplanner {
@@ -163,11 +163,8 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
 		if (withinDayAgent instanceof PersonDriverAgentImpl) {			
-			
-			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateDepartureTime(currentActivity);
-			double newDepartureTime = withinDayAgent.getActivityEndTime();
-			((PersonDriverAgentImpl) withinDayAgent).getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
-						
+			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
+			((QSim) ((PersonDriverAgentImpl) withinDayAgent).getMobsim()).rescheduleActivityEnd(withinDayAgent);
 			return true;
 		}
 		else {

@@ -72,7 +72,7 @@ public class TaxiAgentSource
             Id id = data.getScenario().createId(vrpVeh.getName());
             Id startLinkId = ((MatsimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
 
-            DynAgent taxiAgent = new DynAgent(id, startLinkId, taxiSimEngine.getMobsim(),
+            DynAgent taxiAgent = new DynAgent(id, startLinkId, taxiSimEngine.internalInterface,
                     taxiAgentLogic);
 
             if (isAgentWithPlan) {

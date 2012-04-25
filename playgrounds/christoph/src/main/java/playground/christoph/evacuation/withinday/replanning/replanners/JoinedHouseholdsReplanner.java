@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -159,11 +160,8 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
 		if (withinDayAgent instanceof PersonDriverAgentImpl) {			
-			
-			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateDepartureTime(currentActivity);
-			double newDepartureTime = withinDayAgent.getActivityEndTime();
-			((PersonDriverAgentImpl) withinDayAgent).getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
-						
+			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
+			((QSim) ((PersonDriverAgentImpl) withinDayAgent).getMobsim()).rescheduleActivityEnd(withinDayAgent);
 			return true;
 		}
 		else {

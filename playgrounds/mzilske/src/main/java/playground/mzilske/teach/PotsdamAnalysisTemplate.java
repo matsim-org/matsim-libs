@@ -2,6 +2,7 @@ package playground.mzilske.teach;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
@@ -12,7 +13,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -26,6 +30,8 @@ public class PotsdamAnalysisTemplate implements Runnable {
 	private FeatureType featureType;
 	
 	private GeometryFactory geometryFactory = new GeometryFactory();
+
+	private Scenario scenario;
 	
 	public static void main(String[] args) {
 		PotsdamAnalysisTemplate potsdamAnalysis = new PotsdamAnalysisTemplate();
@@ -37,16 +43,20 @@ public class PotsdamAnalysisTemplate implements Runnable {
 		analyse();
 		initFeatureType();
 		Collection<Feature> features = createFeatures();
-		ShapeFileWriter.writeGeometries(features, "..."); // Hier Dateinamen einfügen 
+		ShapeFileWriter.writeGeometries(features, "output/links");
 	}
 
 	private void analyse() {
-		// Hier etwas ausrechnen, was dann in die Features geschrieben werden soll.
+		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("examples/equil/config.xml"));
 	}
 
-	private ArrayList<Feature> createFeatures() {
-		// Hier Features erzeugen
-		return null;
+	private List<Feature> createFeatures() {
+		List<Feature> features = new ArrayList<Feature>();
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			Feature feature = getFeature(link);
+			features.add(feature);
+		}
+		return features;
 	}
 	
 	
@@ -56,11 +66,13 @@ public class PotsdamAnalysisTemplate implements Runnable {
 	 * 
 	 */
 	private void initFeatureType() {
-		AttributeType [] attribs = new AttributeType[3];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		
-		// Hier weitere Attribute anlegen
+		AttributeType[] attribs = new AttributeType[] {
+				AttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S)),
+				AttributeTypeFactory.newAttributeType("ID", String.class),
+				AttributeTypeFactory.newAttributeType("length", Double.class)
+				
+				// Hier weitere Attribute anlegen
+		};
 		
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -79,12 +91,13 @@ public class PotsdamAnalysisTemplate implements Runnable {
 	 * 
 	 */
 	private Feature getFeature(final Link link) {
-		LineString ls = this.geometryFactory.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())});
-		Object [] attribs = new Object[3];
-		attribs[0] = ls;
-		attribs[1] = link.getId().toString();
-		
-		// Hier die weiteren Attribute ausfüllen
+		Object [] attribs = new Object[] {
+				this.geometryFactory.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())}),
+				link.getId().toString(),
+				link.getLength()
+				
+				// Hier die weiteren Attribute ausfüllen
+		};
 		
 		try {
 			return this.featureType.create(attribs);

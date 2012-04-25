@@ -22,6 +22,7 @@ package playground.michalm.dynamic;
 import org.matsim.api.core.v01.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.utils.misc.Time;
@@ -34,7 +35,7 @@ public class DynAgent implements MobsimDriverAgent {
 
     private MobsimVehicle veh;
 
-    private Mobsim simulation;
+    private InternalInterface simulation;
 
     private EventsManager eventsManager;
 
@@ -57,13 +58,13 @@ public class DynAgent implements MobsimDriverAgent {
 
     // =====
 
-    public DynAgent(Id id, Id startLinkId, Mobsim simulation, DynAgentLogic agentLogic)
+    public DynAgent(Id id, Id startLinkId, InternalInterface internalInterface, DynAgentLogic agentLogic)
     {
         this.id = id;
         this.currentLinkId = startLinkId;
         this.agentLogic = agentLogic;
-        this.simulation = simulation;
-        this.eventsManager = simulation.getEventsManager();
+        this.simulation = internalInterface;
+        this.eventsManager = internalInterface.getMobsim().getEventsManager();
 
         // initial activity
         dynActivity = this.agentLogic.init(this);
@@ -93,8 +94,7 @@ public class DynAgent implements MobsimDriverAgent {
                 if (activityEndTime != dynActivity.getEndTime()) {
                     double oldTime = activityEndTime;
                     activityEndTime = dynActivity.getEndTime();
-
-                    simulation.rescheduleActivityEnd(DynAgent.this, oldTime, activityEndTime);
+                    simulation.rescheduleActivityEnd(DynAgent.this);
                 }
                 break;
 

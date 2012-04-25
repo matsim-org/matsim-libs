@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -81,9 +82,6 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 		executedPlan.addLeg(leg);
 		executedPlan.addActivity(activity);
 		
-		// get old departure time
-		double oldDepartureTime = withinDayAgent.getActivityEndTime();
-		
 		// set new departure time
 		currentActivity.setMaximumDuration(departureTime - currentActivity.getStartTime());
 		currentActivity.setEndTime(departureTime);
@@ -99,11 +97,8 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 		 * the activityEndsList has to be updated.
 		 */
 		if (withinDayAgent instanceof PersonDriverAgentImpl) {	
-			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateDepartureTime(currentActivity);
-			double newDepartureTime = withinDayAgent.getActivityEndTime();
-			
-			((PersonDriverAgentImpl) withinDayAgent).getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
-						
+			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
+			((QSim) ((PersonDriverAgentImpl) withinDayAgent).getMobsim()).rescheduleActivityEnd(withinDayAgent);
 			return true;
 		}
 		else {

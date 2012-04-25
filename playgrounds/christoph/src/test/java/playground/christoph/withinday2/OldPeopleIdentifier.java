@@ -26,21 +26,21 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 		}
 
 		// select agents, which should be replanned within this time step
-		for (MobsimAgent pa : queueSim.getActivityEndsList()) {
-//			PersonAgent agent = (PersonAgent) pa ;
-//			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
-			if ( pa instanceof HasPerson ) {
-				Person person = ((HasPerson)pa).getPerson() ; 
-				// this cast is ok (in my view), since not every MobsimAgent is a Person. kai, jun'11 
-				
-				if ( ((PersonImpl)person).getAge()==56 ) {
-					// this cast is doubtful.  matsim should discuss how it wants to approach this. kai, jun'11 
-					
-					System.out.println("found agent");
-					set.add((PlanBasedWithinDayAgent)pa);
-				}
-			}
-		}
+//		for (MobsimAgent pa : queueSim.getActivityEndsList()) {
+////			PersonAgent agent = (PersonAgent) pa ;
+////			if (((PersonImpl) agent.getPerson()).getAge() == 56) {
+//			if ( pa instanceof HasPerson ) {
+//				Person person = ((HasPerson)pa).getPerson() ; 
+//				// this cast is ok (in my view), since not every MobsimAgent is a Person. kai, jun'11 
+//				
+//				if ( ((PersonImpl)person).getAge()==56 ) {
+//					// this cast is doubtful.  matsim should discuss how it wants to approach this. kai, jun'11 
+//					
+//					System.out.println("found agent");
+//					set.add((PlanBasedWithinDayAgent)pa);
+//				}
+//			}
+//		}
 
 		return set;
 	}

@@ -10,6 +10,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
@@ -197,7 +198,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 			System.out.println("I want to stop my activity.");
 			eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
 			AdapterAgent.this.activityEndTime = now ;
-			simulation.rescheduleActivityEnd(AdapterAgent.this, Double.POSITIVE_INFINITY, now);
+			((QSim) simulation).rescheduleActivityEnd(AdapterAgent.this);
 
 			simulation.getAgentCounter().decLiving(); 
 			// This is necessary because the QSim thinks it must increase the living agents counter in the rescheduling step.  mz
