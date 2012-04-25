@@ -69,9 +69,10 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void doSimStep(double time) {
-		while (activityEndsList.peek() != null) {
-			MobsimAgent agent = activityEndsList.peek().agent;
-			if (agent.getActivityEndTime() <= time) {
+		AgentEntry entry = activityEndsList.peek();
+		while (entry != null) {
+			MobsimAgent agent = entry.agent;
+			if (entry.activityEndTime <= time) {
 				activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
 				agent.endActivityAndComputeNextState(time);
