@@ -416,10 +416,10 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private void initSimTimer() {
 		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().getQSimConfigGroup();
-		Double startTime = qSimConfigGroup.getStartTime();
+		Double configuredStartTime = qSimConfigGroup.getStartTime();
 		this.stopTime = qSimConfigGroup.getEndTime();
-		if (startTime == Time.UNDEFINED_TIME) {
-			startTime = 0.0;
+		if (configuredStartTime == Time.UNDEFINED_TIME) {
+			configuredStartTime = 0.0;
 		}
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) {
 			this.stopTime = Double.MAX_VALUE;
@@ -428,13 +428,11 @@ public final class QSim implements VisMobsim, Netsim {
 		double simStartTime = 0;
 		if (QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
 			if (activityEngine != null) {
-				Double nextActivityEndTime = activityEngine.getNextActivityEndTime();
-				if (nextActivityEndTime != null) {
-					simStartTime = Math.floor(Math.max(startTime, nextActivityEndTime));
-				}
+				double firstAgentStartTime = calculateFirstAgentStartTime();
+				simStartTime = Math.floor(Math.max(configuredStartTime, firstAgentStartTime));
 			}
 		} else if (QSimConfigGroup.ONLY_USE_STARTTIME.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
-			simStartTime = startTime;
+			simStartTime = configuredStartTime;
 		} else {
 			throw new RuntimeException("unkonwn starttimeInterpretation; aborting ...");
 		}
@@ -444,7 +442,13 @@ public final class QSim implements VisMobsim, Netsim {
 
 	}
 
-
+	private double calculateFirstAgentStartTime() {
+		double firstAgentStartTime = Double.POSITIVE_INFINITY;
+		for (MobsimAgent agent : agents) {
+			firstAgentStartTime = Math.min(firstAgentStartTime, agent.getActivityEndTime());
+		}
+		return firstAgentStartTime;
+	}
 
 	// ############################################################################################################################
 	// utility methods (presumably no state change)

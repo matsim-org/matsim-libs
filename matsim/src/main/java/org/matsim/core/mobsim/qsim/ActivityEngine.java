@@ -149,23 +149,6 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		}
 	}
 
-	/**
-	 * Returns the next time an Activity ends. This is only used in the initialization of the QSim to know when to start
-	 * the simulation timer. I plan to remove this and have the QSim itself look at the initial agent population and
-	 * decide for itself.
-	 * 
-	 * @return The next time and Activity ends.
-	 */
-	Double getNextActivityEndTime() {
-		AgentEntry entry = activityEndsList.peek();
-		if (entry != null) {
-			double nextActivityEndTime = entry.agent.getActivityEndTime();
-			return nextActivityEndTime;
-		} else {
-			return null;
-		}
-	}
-
 	private AgentEntry removeAgentFromQueue(MobsimAgent agent) {
 		Iterator<AgentEntry> iterator = activityEndsList.iterator();
 		while (iterator.hasNext()) {
