@@ -88,12 +88,12 @@ public class ReduceStopsToBeServed extends PStrategy implements PPlanStrategy, T
 	}
 
 	private ArrayList<TransitStopFacility> getStopsToBeServed(HashMap<Id,HashMap<Id,Integer>> startStop2EndStop2TripsMap, TransitLine line) {
-		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
+		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<TransitStopFacility>();
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
 		if (startStop2EndStop2TripsMap == null) {
 			// There is no entry for that particular line - possibly no demand - returning empty line
-			return stopsToBeServed;
+			return tempStopsToBeServed;
 		}
 		
 		// calculate standard deviation
@@ -130,13 +130,29 @@ public class ReduceStopsToBeServed extends PStrategy implements PPlanStrategy, T
 		for (TransitRoute route : line.getRoutes().values()) {
 			for (TransitRouteStop stop : route.getStops()) {
 				if (stopIdsAboveTreshold.contains(stop.getStopFacility().getId())) {
-					stopsToBeServed.add(stop.getStopFacility());
+					tempStopsToBeServed.add(stop.getStopFacility());
 				}
 			}
 		}
 		
-		if (stopsToBeServed.get(0).getId() == stopsToBeServed.get(stopsToBeServed.size() - 1).getId()) {
-			stopsToBeServed.remove(stopsToBeServed.size() - 1);
+		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
+		
+		// avoid using a stop twice in a row
+		for (TransitStopFacility stop : tempStopsToBeServed) {
+			if (stopsToBeServed.size() > 1) {
+				if (stopsToBeServed.get(stopsToBeServed.size() - 1).getId() != stop.getId()) {
+					stopsToBeServed.add(stop);
+				}
+			} else {
+				stopsToBeServed.add(stop);
+			}			
+		}
+		
+		// delete last stop, if it is the same as the first one
+		if (stopsToBeServed.size() > 1) {
+			if (stopsToBeServed.get(0).getId() == stopsToBeServed.get(stopsToBeServed.size() - 1).getId()) {
+				stopsToBeServed.remove(stopsToBeServed.size() - 1);
+			}
 		}
 		
 		return stopsToBeServed;
