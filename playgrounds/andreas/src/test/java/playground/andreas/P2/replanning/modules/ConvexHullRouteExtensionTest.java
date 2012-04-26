@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Plansgenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,8 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.P2.replanning.modules;
 
+package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
 
