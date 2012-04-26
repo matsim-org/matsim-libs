@@ -99,7 +99,7 @@ public class ReduceStopsToBeServedTest {
 		// should be able to replan
 		testPlan = strat.run(coop);
 		
-		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle moved from best plan", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Start stop", stopId1.toString(), testPlan.getStopsToBeServed().get(0).getId().toString());

@@ -115,8 +115,6 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 				return null;
 			}
 			
-			cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
-			
 			return newPlan;
 		}
 	}

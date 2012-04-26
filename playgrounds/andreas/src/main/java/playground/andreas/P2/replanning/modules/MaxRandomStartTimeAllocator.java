@@ -47,8 +47,6 @@ public class MaxRandomStartTimeAllocator extends PStrategy implements PPlanStrat
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 
-		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
-		
 		return newPlan;
 	}
 	

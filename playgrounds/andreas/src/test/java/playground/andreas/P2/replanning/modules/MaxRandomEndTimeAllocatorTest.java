@@ -41,7 +41,7 @@ public class MaxRandomEndTimeAllocatorTest {
 		// enough vehicles for testing
 		testPlan = strat.run(coop);
 		
-		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Compare start time", 1200.0, coop.getBestPlan().getEndTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);

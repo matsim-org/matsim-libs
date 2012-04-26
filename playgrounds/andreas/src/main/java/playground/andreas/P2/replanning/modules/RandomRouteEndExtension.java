@@ -109,8 +109,6 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 			return null;
 		}
 		
-		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
-		
 		return newPlan;
 	}
 	

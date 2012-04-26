@@ -87,8 +87,6 @@ public class ReduceStopsToBeServed extends PStrategy implements PPlanStrategy, T
 			return null;
 		}		
 		
-		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
-		
 		return newPlan;
 	}
 

@@ -75,7 +75,7 @@ public class TimeReduceDemandTest {
 		// should be able to replan
 		testPlan = strat.run(coop);
 		
-		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Compare start time", 10000.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Compare end time", 30000.0, coop.getBestPlan().getEndTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
@@ -97,7 +97,7 @@ public class TimeReduceDemandTest {
 		// should be able to replan
 		testPlan = strat.run(coop);
 		
-		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Compare start time", 10000.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Compare end time", 30000.0, coop.getBestPlan().getEndTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
