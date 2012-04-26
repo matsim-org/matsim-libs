@@ -21,13 +21,14 @@
 package org.matsim.withinday.replanning.parallel;
 
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
 /**
  * A class for running {@link WithinDayInitialReplanner} in parallel using threads.
  *
  * @author Christoph Dobler
  */
-public class ParallelInitialReplanner extends ParallelReplanner<WithinDayInitialReplanner> {
+public class ParallelInitialReplanner extends ParallelReplanner<WithinDayInitialReplannerFactory> {
 		
 	public ParallelInitialReplanner(int numOfThreads) {
 		super(numOfThreads);

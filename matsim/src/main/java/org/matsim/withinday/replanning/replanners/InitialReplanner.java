@@ -22,9 +22,9 @@ package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-
 
 /*
  * The InitialReplanner can be used when the Simulations is initialized but
@@ -33,8 +33,8 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
 
 public class InitialReplanner extends WithinDayInitialReplanner {
 
-	/*package*/ InitialReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	/*package*/ InitialReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 
 	@Override

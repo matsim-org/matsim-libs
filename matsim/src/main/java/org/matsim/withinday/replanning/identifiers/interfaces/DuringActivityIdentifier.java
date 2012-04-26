@@ -20,6 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
-public abstract class DuringActivityIdentifier extends AgentsToReplanIdentifier {
+public abstract class DuringActivityIdentifier extends Identifier {
 
 }

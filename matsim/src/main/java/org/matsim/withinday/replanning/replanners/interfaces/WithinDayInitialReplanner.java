@@ -22,16 +22,16 @@ package org.matsim.withinday.replanning.replanners.interfaces;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
-
 
 /*
  * Replans Agents initially after the Simulation has been initialized.
  */
 public abstract class WithinDayInitialReplanner extends WithinDayReplanner<InitialIdentifier> {
 
-	public WithinDayInitialReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	public WithinDayInitialReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 	
 }

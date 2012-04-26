@@ -22,6 +22,7 @@ package playground.christoph.withinday;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
@@ -29,14 +30,16 @@ public class ReplannerOldPeopleFactory extends WithinDayDuringActivityReplannerF
 
 	private Scenario scenario;
 	
-	public ReplannerOldPeopleFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(abstractMultithreadedModule, replanningProbability);
+	public ReplannerOldPeopleFactory(Scenario scenario, ReplanningManager replanningManager,
+			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new ReplannerOldPeople(super.getId(), scenario);
+		WithinDayDuringActivityReplanner replanner = new ReplannerOldPeople(super.getId(), scenario,
+				this.getReplanningManager().getInternalInterface());
 		super.initNewInstance(replanner);
 		return replanner;
 	}

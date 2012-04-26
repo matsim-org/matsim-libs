@@ -28,8 +28,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -40,9 +38,10 @@ public class WithinDayQSimFactoryTest extends MatsimTestCase {
 	 */
 	public void testCreateMobsim() {
 		
-				Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-
+		ReplanningManager replanningManager = new ReplanningManager();
+		
 		QSimConfigGroup qSimConfig = new QSimConfigGroup();
 		scenario.getConfig().addQSimConfigGroup(qSimConfig);
 				
@@ -50,12 +49,12 @@ public class WithinDayQSimFactoryTest extends MatsimTestCase {
 		
 		// number of threads is 1, therefore we expect a non-parallel WithinDayQSim
 		qSimConfig.setNumberOfThreads(1);
-		sim = new WithinDayQSimFactory().createMobsim(scenario, eventsManager);
+		sim = new WithinDayQSimFactory(replanningManager).createMobsim(scenario, eventsManager);
 		assertTrue(sim.getEventsManager().getClass().equals(EventsManagerImpl.class));
 		
 		// number of threads is 1, therefore we expect a parallel WithinDayQSim
 		qSimConfig.setNumberOfThreads(2);
-		sim = new WithinDayQSimFactory().createMobsim(scenario, eventsManager);
+		sim = new WithinDayQSimFactory(replanningManager).createMobsim(scenario, eventsManager);
 		assertTrue(sim.getEventsManager().getClass().equals(SynchronizedEventsManagerImpl.class));
 	}
 }

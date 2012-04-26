@@ -47,9 +47,9 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
 import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
 /**
  * This Controller should give an Example what is needed to run
@@ -86,9 +86,9 @@ public class WithinDayControler extends WithinDayController {
 	protected InitialIdentifier initialIdentifier;
 	protected DuringActivityIdentifier duringActivityIdentifier;
 	protected DuringLegIdentifier duringLegIdentifier;
-	protected WithinDayInitialReplanner initialReplanner;
-	protected WithinDayDuringActivityReplanner duringActivityReplanner;
-	protected WithinDayDuringLegReplanner duringLegReplanner;
+	protected WithinDayInitialReplannerFactory initialReplannerFactory;
+	protected WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
+	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 
 	protected SelectHandledAgentsByProbability selector;
 	protected QSim sim;
@@ -121,7 +121,7 @@ public class WithinDayControler extends WithinDayController {
 
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		
-		super.createAndInitReplanningManager(numReplanningThreads);
+		super.initReplanningManager(numReplanningThreads);
 
 		super.createAndInitTravelTimeCollector();
 		travelTime = super.getTravelTimeCollector();
@@ -134,25 +134,25 @@ public class WithinDayControler extends WithinDayController {
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);
-		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-		super.getReplanningManager().addIntialReplanner(this.initialReplanner);
+		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
+		super.getReplanningManager().addIntialReplannerFactory(this.initialReplannerFactory);
 
 		super.createAndInitActivityReplanningMap();
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringActivityIdentifier, this.pActEndReplanning);
-		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
-		super.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
+		super.getReplanningManager().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 
 		super.createAndInitLinkReplanningMap();
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringLegIdentifier, this.pLeaveLinkReplanning);
-		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-		super.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
+		super.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 	
 	@Override

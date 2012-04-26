@@ -22,6 +22,7 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
@@ -35,9 +36,9 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	
 	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, 
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, 
-			 HouseholdsTracker householdsTracker, ModeAvailabilityChecker modeAvailabilityChecker) {
-		super(abstractMultithreadedModule, replanningProbability);
+			ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
+			double replanningProbability, HouseholdsTracker householdsTracker, ModeAvailabilityChecker modeAvailabilityChecker) {
+		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 		this.householdsTracker = householdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
@@ -45,8 +46,8 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario, 
-				householdsTracker, modeAvailabilityChecker.createInstance());
+		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario,
+				this.getReplanningManager().getInternalInterface(), householdsTracker, modeAvailabilityChecker.createInstance());
 		super.initNewInstance(replanner);
 		return replanner;
 	}

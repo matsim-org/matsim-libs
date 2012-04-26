@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -14,8 +15,8 @@ import org.matsim.withinday.utils.ReplacePlanElements;
 
 public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 
-	/*package*/ ReplannerYoungPeople(Id id, Scenario scenario) {
-		super(id, scenario);
+	/*package*/ ReplannerYoungPeople(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 
 	@Override

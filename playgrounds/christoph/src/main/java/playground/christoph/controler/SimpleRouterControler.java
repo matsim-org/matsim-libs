@@ -224,7 +224,7 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 	@Override
 	protected void runMobSim() {
 		
-		super.createAndInitReplanningManager(numReplanningThreads);
+		super.initReplanningManager(numReplanningThreads);
 		super.getReplanningManager().doDuringActivityReplanning(false);
 		super.getReplanningManager().doDuringLegReplanning(false);
 

@@ -36,7 +36,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.ReplanningEventImpl;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
 
@@ -59,7 +59,7 @@ public abstract class ReplanningThread extends Thread {
 	 *  Threads. Each agents has references to the original Replanners,
 	 *  so we have to identify the corresponding clone! 
 	 */
-	protected Map<Id, WithinDayReplanner<? extends AgentsToReplanIdentifier>> withinDayReplanners = new TreeMap<Id, WithinDayReplanner<? extends AgentsToReplanIdentifier>>();
+	protected Map<Id, WithinDayReplanner<? extends Identifier>> withinDayReplanners = new TreeMap<Id, WithinDayReplanner<? extends Identifier>>();
 	
 	/*
 	 * Use one List of ReplanningTasks per WithinDayReplanner. By doing so
@@ -69,7 +69,7 @@ public abstract class ReplanningThread extends Thread {
 	 * same Agent.
 	 */
 	protected Map<Id, List<ReplanningTask>> replanningTasks = new TreeMap<Id, List<ReplanningTask>>();
-	protected WithinDayReplanner<AgentsToReplanIdentifier> withinDayReplanner;
+	protected WithinDayReplanner<Identifier> withinDayReplanner;
 	protected EventsManager eventsManager;
 	
 	protected CyclicBarrier timeStepStartBarrier;
@@ -109,14 +109,20 @@ public abstract class ReplanningThread extends Thread {
 		list.add(replanningTask);
 	}
 	
-	public final void addWithinDayReplanner(WithinDayReplanner<? extends AgentsToReplanIdentifier> withinDayReplanner) {
+	public final void addWithinDayReplanner(WithinDayReplanner<? extends Identifier> withinDayReplanner) {
 		this.withinDayReplanners.put(withinDayReplanner.getId(), withinDayReplanner);
 		this.replanningTasks.put(withinDayReplanner.getId(), new ArrayList<ReplanningTask>());
 	}
 	
-	public final void removeWithinDayReplanner(WithinDayReplanner<? extends AgentsToReplanIdentifier> withinDayReplanner) {
-		this.withinDayReplanners.remove(withinDayReplanner.getId());
-		this.replanningTasks.remove(withinDayReplanner.getId());
+	public final void removeWithinDayReplanner(Id replannerId) {
+		this.withinDayReplanners.remove(replannerId);
+		this.replanningTasks.remove(replannerId);
+	}
+	
+	public final void resetReplanners() {
+		for (WithinDayReplanner<? extends Identifier> withinDayReplanner : this.withinDayReplanners.values()) {
+			withinDayReplanner.reset();
+		}
 	}
 	
 	/*
@@ -141,7 +147,7 @@ public abstract class ReplanningThread extends Thread {
 					return;
 				}
 
-				WithinDayReplanner<? extends AgentsToReplanIdentifier> withinDayReplanner = this.withinDayReplanners.get(id);
+				WithinDayReplanner<? extends Identifier> withinDayReplanner = this.withinDayReplanners.get(id);
 
 				if (withinDayReplanner != null) {
 					/*

@@ -38,8 +38,15 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
  * ParallelQSimEngine or a DefaultQSimEngine is used.
  */
 public class WithinDayQSimFactory implements MobsimFactory {
+
 	private static final Logger log = Logger.getLogger(WithinDayQSimFactory.class);
 
+	private final ReplanningManager replanningManager;
+	
+	public WithinDayQSimFactory(ReplanningManager replanningManager) {
+		this.replanningManager = replanningManager;
+	}
+	
     public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events) {
         return createWithinDayQSim(scenario, events, new DefaultQSimEngineFactory());
     }
@@ -60,9 +67,10 @@ public class WithinDayQSimFactory implements MobsimFactory {
 		int numOfThreads = 1;
 		if (conf != null) numOfThreads = conf.getNumberOfThreads();
 
+		QSim sim;
 		if (numOfThreads > 1) {
 			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-			QSim sim = createWithinDayQSim(sc, em, new ParallelQNetsimEngineFactory());
+			sim = createWithinDayQSim(sc, em, new ParallelQNetsimEngineFactory());
 			  			  
 			// Get number of parallel Threads
 			log.info("Using parallel QSim with " + numOfThreads + " parallel Threads.");
@@ -70,7 +78,11 @@ public class WithinDayQSimFactory implements MobsimFactory {
 			return sim;
 		}
 		else {
-			return createWithinDayQSim(sc, eventsManager);
+			sim = createWithinDayQSim(sc, eventsManager);
 		}
+		
+		sim.addMobsimEngine(replanningManager);
+		
+		return sim;
 	}
 }

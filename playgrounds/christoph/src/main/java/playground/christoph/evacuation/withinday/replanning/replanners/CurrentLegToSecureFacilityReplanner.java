@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -58,8 +59,8 @@ import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLe
  */
 public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegReplanner {
 
-	/*package*/ CurrentLegToSecureFacilityReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	/*package*/ CurrentLegToSecureFacilityReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 
 	@Override

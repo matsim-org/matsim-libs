@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentsToReplanIdentifier.java
+ * Identifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
  * 
  * @author cdobler
  */
-public abstract class AgentsToReplanIdentifier {
+public abstract class Identifier {
 	
 	private IdentifierFactory identifierFactory;
 	private final Set<AgentFilter> agentFilters = new LinkedHashSet<AgentFilter>();

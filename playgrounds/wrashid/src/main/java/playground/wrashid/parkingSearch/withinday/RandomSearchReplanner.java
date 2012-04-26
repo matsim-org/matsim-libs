@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -48,10 +49,10 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 	private final Random random;
 	private final EditRoutes editRoutes;
 	private final ParkingAgentsTracker parkingAgentsTracker;
-
 	
-	RandomSearchReplanner(Id id, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
-		super(id, scenario);
+	RandomSearchReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+			ParkingAgentsTracker parkingAgentsTracker) {
+		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;
 
 		this.editRoutes = new EditRoutes();

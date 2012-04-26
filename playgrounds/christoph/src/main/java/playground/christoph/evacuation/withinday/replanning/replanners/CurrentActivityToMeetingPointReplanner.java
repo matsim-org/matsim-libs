@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -55,8 +55,9 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
-			HouseholdsTracker householdsTracker, ModeAvailabilityChecker modeAvailabilityChecker) {
-		super(id, scenario);
+			InternalInterface internalInterface, HouseholdsTracker householdsTracker,
+			ModeAvailabilityChecker modeAvailabilityChecker) {
+		super(id, scenario, internalInterface);
 		this.householdsTracker = householdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;		
 	}
@@ -85,9 +86,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			// get the index of the currently performed activity in the selected plan
 			currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
 		} else return false;
-		
-		double oldDepartureTime = withinDayAgent.getActivityEndTime();
-		
+				
 		/*
 		 * Check whether the agent is already at the meeting point.
 		 * If yes, remove activities that are scheduled at a later point in time.
@@ -164,7 +163,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		// it can't become null.  kai, oct'10
 		if (withinDayAgent instanceof PersonDriverAgentImpl) {			
 			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
-			((QSim) ((PersonDriverAgentImpl) withinDayAgent).getMobsim()).rescheduleActivityEnd(withinDayAgent);
+			this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 			return true;
 		}
 		else {

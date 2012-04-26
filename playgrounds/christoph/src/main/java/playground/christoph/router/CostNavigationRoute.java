@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -57,9 +58,10 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	protected TravelDisutility travelCost;
 	protected PersonalizableTravelTime travelTime;
 		
-	/*package*/ CostNavigationRoute(Id id, Scenario scenario, Network network, CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, 
-			TravelDisutilityFactory travelCostFactory, PersonalizableTravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
-		super(id, scenario);
+	/*package*/ CostNavigationRoute(Id id, Scenario scenario, InternalInterface internalInterface, Network network,
+			CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, TravelDisutilityFactory travelCostFactory,
+			PersonalizableTravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
+		super(id, scenario, internalInterface);
 		
 		this.network = network;
 		this.costNavigationTravelTimeLogger = costNavigationTravelTimeLogger;

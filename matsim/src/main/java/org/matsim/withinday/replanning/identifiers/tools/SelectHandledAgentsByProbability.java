@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
@@ -48,10 +48,10 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 	
 	protected Collection<Id> withinDayAgents;
 
-	protected List<Tuple<AgentsToReplanIdentifier, Double>> identifierProbabilities;	// <Identifier, probability for handling an agent>
+	protected List<Tuple<Identifier, Double>> identifierProbabilities;	// <Identifier, probability for handling an agent>
 
 	public SelectHandledAgentsByProbability() {
-		identifierProbabilities = new ArrayList<Tuple<AgentsToReplanIdentifier, Double>>();
+		identifierProbabilities = new ArrayList<Tuple<Identifier, Double>>();
 	}
 	
 	@Override
@@ -70,7 +70,7 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 		double probability;
 		List<Id> agentsToHandle;
 
-		for (Tuple<AgentsToReplanIdentifier, Double> tuple : identifierProbabilities) {
+		for (Tuple<Identifier, Double> tuple : identifierProbabilities) {
 			agentsToHandle = new ArrayList<Id>();
 
 			for (Id agentId : this.withinDayAgents) {
@@ -109,14 +109,14 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 		log.info("Collected " + withinDayAgents.size() + " registered WithinDayAgents.");
 	}
 	
-	public void addIdentifier(AgentsToReplanIdentifier identifier, double probability) { 
-		identifierProbabilities.add(new Tuple<AgentsToReplanIdentifier, Double>(identifier, probability));
+	public void addIdentifier(Identifier identifier, double probability) { 
+		identifierProbabilities.add(new Tuple<Identifier, Double>(identifier, probability));
 	}
 	
-	public void removeIdentifier(AgentsToReplanIdentifier identifier) {
-		Iterator<Tuple<AgentsToReplanIdentifier, Double>> iter = identifierProbabilities.iterator();
+	public void removeIdentifier(Identifier identifier) {
+		Iterator<Tuple<Identifier, Double>> iter = identifierProbabilities.iterator();
 		while (iter.hasNext()) {
-			Tuple<AgentsToReplanIdentifier, Double> tuple = iter.next();
+			Tuple<Identifier, Double> tuple = iter.next();
 			if (identifier == tuple.getFirst()) iter.remove();
 		}
 	}

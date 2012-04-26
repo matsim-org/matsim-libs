@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -44,8 +45,8 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	
 	private static final Logger log = Logger.getLogger(EndActivityAndEvacuateReplanner.class);
 	
-	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 	
 	@Override

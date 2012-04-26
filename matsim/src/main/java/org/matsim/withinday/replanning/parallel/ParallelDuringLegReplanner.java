@@ -20,14 +20,14 @@
 
 package org.matsim.withinday.replanning.parallel;
 
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 /**
  * A class for running {@link WithinDayDuringLegReplanner} in parallel using threads.
  *
  * @author Christoph Dobler
  */
-public class ParallelDuringLegReplanner extends ParallelReplanner<WithinDayDuringLegReplanner> {
+public class ParallelDuringLegReplanner extends ParallelReplanner<WithinDayDuringLegReplannerFactory> {
 
 	public ParallelDuringLegReplanner(int numOfThreads) {
 		super(numOfThreads);

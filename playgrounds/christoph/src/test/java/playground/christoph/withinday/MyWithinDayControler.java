@@ -32,8 +32,8 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.christoph.controler.WithinDayControler;
 
@@ -92,29 +92,29 @@ class MyWithinDayControler extends Controler {
 
 		// replanning while at activity:
 
-		WithinDayDuringActivityReplanner duringActivityReplanner = new ReplannerOldPeopleFactory(this.scenarioData, router, 1.0).createReplanner(); 
+		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory = new ReplannerOldPeopleFactory(this.scenarioData, replanningManager, router, 1.0); 
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
-		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifierFactory(this.sim).createIdentifier());
+		duringActivityReplannerFactory.addIdentifier(new OldPeopleIdentifierFactory(this.sim).createIdentifier());
 		// which persons to replan
 		
-		this.replanningManager.addDuringActivityReplanner(duringActivityReplanner);
+		this.replanningManager.addDuringActivityReplannerFactory(duringActivityReplannerFactory);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 
 		
 		// replanning while on leg:
 		
-		WithinDayDuringLegReplanner duringLegReplanner = new ReplannerYoungPeopleFactory(this.scenarioData, router, 1.0).createReplanner();
+		WithinDayDuringLegReplannerFactory duringLegReplannerFactory = new ReplannerYoungPeopleFactory(this.scenarioData, replanningManager, router, 1.0);
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route
 		
-		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifierFactory(this.sim).createIdentifier());
+		duringLegReplannerFactory.addIdentifier(new YoungPeopleIdentifierFactory(this.sim).createIdentifier());
 		// persons identifier added to replanner
 
-		this.replanningManager.addDuringLegReplanner(duringLegReplanner);
+		this.replanningManager.addDuringLegReplannerFactory(duringLegReplannerFactory);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 	}
@@ -126,7 +126,8 @@ class MyWithinDayControler extends Controler {
 	 * The full initialization of them is done later (we don't have all necessary Objects yet).
 	 */
 	private void createHandlersAndListeners() {
-		replanningManager = new ReplanningManager(numReplanningThreads);
+		replanningManager = new ReplanningManager();
+		replanningManager.initializeReplanningModules(numReplanningThreads);
 	}
 
 	@Override
@@ -143,7 +144,6 @@ class MyWithinDayControler extends Controler {
 		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		// ensure that they are started in the needed order.
 		FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-		fosl.addSimulationInitializedListener(replanningManager);
 		fosl.addSimulationBeforeSimStepListener(replanningManager);
 		sim.addQueueSimulationListeners(fosl);
 		// essentially, can just imagine the replanningManager as a regular MobsimListener

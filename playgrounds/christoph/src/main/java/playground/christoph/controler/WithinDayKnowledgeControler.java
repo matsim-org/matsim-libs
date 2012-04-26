@@ -37,7 +37,6 @@ import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
 import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
@@ -123,7 +122,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 //		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
 //				travelCostWrapper, travelTime);
 		
-		super.createAndInitReplanningManager(numReplanningThreads);
+		super.initReplanningManager(numReplanningThreads);
 
 		super.createAndInitTravelTimeCollector();
 		travelTime = super.getTravelTimeCollector();
@@ -140,23 +139,23 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 //		AbstractMultithreadedModule router = new ReplanningModule(config, network, subNetworkDijkstraTravelCostWrapper, super.getTravelTimeCollectorFactory(), factory, routeFactory); 
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
-		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-		super.getReplanningManager().addIntialReplanner(this.initialReplanner);	
+		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
+		super.getReplanningManager().addIntialReplannerFactory(this.initialReplannerFactory);	
 		
 		super.createAndInitActivityReplanningMap();
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
-		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
-		super.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
+		super.getReplanningManager().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 		
 		super.createAndInitLinkReplanningMap();
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
-		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-		super.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
+		super.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 	/*

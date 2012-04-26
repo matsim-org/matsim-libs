@@ -29,27 +29,25 @@ import java.util.concurrent.CyclicBarrier;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
 
 /*
  * Abstract class that contains the basic elements that are needed
- * to do parallel replanning within the QueueSimulation.
+ * to do parallel replanning within the QSim.
  *
  * Features like the creation of parallel running threads and the
  * split up of the replanning actions have to be implemented in
  * the subclasses.
- * 
- * Please ensure that each ParallelReplanner is registered as 
- * a SimulationListener to the Controller!
  */
-public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends AgentsToReplanIdentifier>> { 
+public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? extends Identifier>> { 
 
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 
 	protected int numOfThreads = 1;	// use by default only one thread
-	protected Set<T> originalReplanners = new LinkedHashSet<T>();
+	protected Set<T> replannerFactories = new LinkedHashSet<T>();
 	protected ReplanningThread[] replanningThreads;
 	protected int roundRobin = 0;
 	private int lastRoundRobin = 0;
@@ -62,7 +60,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 		this.setNumberOfThreads(numOfThreads);
 	}
 
-	public final void setEventsManger(EventsManager eventsManager) {
+	public final void setEventsManager(EventsManager eventsManager) {
 		for (ReplanningThread replanningThread : replanningThreads) replanningThread.setEventsManager(eventsManager);
 	}
 	
@@ -117,7 +115,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 		else lastRoundRobin = roundRobin;
 
 		try {
-			// set current Time & AgentCounter
+			// set current time
 			for (ReplanningThread replannerThread : replanningThreads) {
 				replannerThread.setTime(time);
 			}
@@ -133,25 +131,31 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 		}
 	}
 
-	public final void addWithinDayReplanner(T replanner) {
-		this.originalReplanners.add(replanner);
+	public final void addWithinDayReplannerFactory(T factory) {
+		this.replannerFactories.add(factory);
 
 		for (ReplanningThread replanningThread : this.replanningThreads) {
-			WithinDayReplanner<? extends AgentsToReplanIdentifier> newInstance = replanner.getReplannerFactory().createReplanner();
+			WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
 			replanningThread.addWithinDayReplanner(newInstance);
 		}
 	}
 
-	public final void removeWithinDayReplanner(T replanner) {
-		this.originalReplanners.remove(replanner);
+	public final void removeWithinDayReplannerFactory(T factory) {
+		this.replannerFactories.remove(factory);
 		
 		for (ReplanningThread replanningThread : this.replanningThreads) {
-			replanningThread.removeWithinDayReplanner(replanner);
+			replanningThread.removeWithinDayReplanner(factory.getId());
 		}
 	}
 	
-	public final Set<T> getWithinDayReplanners() {
-		return Collections.unmodifiableSet(this.originalReplanners);
+	public final void resetReplanners() {
+		for (ReplanningThread replanningThread : this.replanningThreads) {
+			replanningThread.resetReplanners();
+		}
+	}
+	
+	public final Set<T> getWithinDayReplannerFactories() {
+		return Collections.unmodifiableSet(this.replannerFactories);
 	}
 
 	public final void addReplanningTask(ReplanningTask replanningTask) {

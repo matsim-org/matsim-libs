@@ -24,23 +24,23 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.parallel.ParallelReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
 
-public abstract class WithinDayReplanningModule<T extends WithinDayReplanner<? extends AgentsToReplanIdentifier>> {
+public abstract class WithinDayReplanningModule<T extends WithinDayReplannerFactory<? extends Identifier>> {
 
 	protected ParallelReplanner<T> parallelReplanner;
 
 	public void doReplanning(double time) {
-		for (T replanner : this.parallelReplanner.getWithinDayReplanners()) {
-			Set<? extends AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers(); 
-			Id replannerId = replanner.getId();
+		for (T factory : this.parallelReplanner.getWithinDayReplannerFactories()) {
+			Set<? extends Identifier> identifiers = factory.getIdentifers(); 
+			Id id = factory.getId();
 			
-			for (AgentsToReplanIdentifier identifier : identifiers) {
+			for (Identifier identifier : identifiers) {
 				for (PlanBasedWithinDayAgent withinDayAgent : identifier.getAgentsToReplan(time)) {
-					ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, replannerId);
+					ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, id);
 					this.parallelReplanner.addReplanningTask(replanningTask);
 				}
 			}

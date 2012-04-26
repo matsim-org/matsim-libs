@@ -20,42 +20,40 @@
 
 package org.matsim.withinday.replanning.replanners.interfaces;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 
 /*
  *	Each WithinDayReplanner needs one or more AgentsToReplanIdentifier
  *	which identifies Agents that need a Replanning of their scheduled
  * 	Plans.
  */
-public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier> 
-	implements Comparator<WithinDayReplanner<T>>, Comparable<WithinDayReplanner<T>> {
+public abstract class WithinDayReplanner<T extends Identifier> {
 	
-	protected Id id;
-	protected Scenario scenario;
+	protected final Id id;
+	protected final Scenario scenario;
+	protected final InternalInterface internalInterface;
+	private final Random random;
+	
 	protected AbstractMultithreadedModule abstractMultithreadedModule;
 	protected PlanAlgorithm routeAlgo;
-	protected double time;
-	private Set<T> identifiers = new HashSet<T>();
+	protected double time = Time.UNDEFINED_TIME;
+	
 	private double replanningProbability = 1.0;
-	private Random random;
-	
-	private WithinDayReplannerFactory replannerFactory;
-	
-	public WithinDayReplanner(Id id, Scenario scenario) {
+
+	public WithinDayReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
 		this.id = id;
 		this.scenario = scenario;
+		this.internalInterface = internalInterface;
 		
 		this.random = MatsimRandom.getLocalInstance();
 	}
@@ -99,38 +97,8 @@ public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier>
 		this.routeAlgo = module.getPlanAlgoInstance();
 	}
 	
-	public final boolean addAgentsToReplanIdentifier(T identifier) {
-		return this.identifiers.add(identifier);
-	}
-	
-	public final boolean removeAgentsToReplanIdentifier(T identifier) {
-		return this.identifiers.remove(identifier);
-	}
-	
-	public final Set<T> getAgentsToReplanIdentifers() {
-		return Collections.unmodifiableSet(identifiers);
-	}
-		
-	public final void setReplannerFactory(WithinDayReplannerFactory factory) {
-		this.replannerFactory = factory;
-	}
-	
-	public final WithinDayReplannerFactory getReplannerFactory() {
-		return replannerFactory;
-	}
-	
-	@Override
-	public int compareTo(WithinDayReplanner<T> r) {
-		return this.id.compareTo(r.getId());
-	}
-	
-	@Override
-	public int compare(WithinDayReplanner<T> r1, WithinDayReplanner<T> r2)  {
-		return r1.getId().compareTo(r2.getId());
-	}
-	
 	public void reset() {
-		
+		this.time = Time.UNDEFINED_TIME;
 	}
 	
 	@Override	
@@ -140,10 +108,5 @@ public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier>
 			return replanner.getId().equals(this.getId());
 		}
 		return false;
-	}
-	
-	@Override
-	public int hashCode() {
-		return this.getId().hashCode();
 	}
 }

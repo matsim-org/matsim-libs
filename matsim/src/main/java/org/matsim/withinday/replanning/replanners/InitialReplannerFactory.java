@@ -22,6 +22,7 @@ package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
@@ -29,14 +30,16 @@ public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 
 	private Scenario scenario;
 	
-	public InitialReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(abstractMultithreadedModule, replanningProbability);
+	public InitialReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
+			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 	}
 
 	@Override
 	public WithinDayInitialReplanner createReplanner() {
-		WithinDayInitialReplanner replanner = new InitialReplanner(super.getId(), scenario);
+		WithinDayInitialReplanner replanner = new InitialReplanner(super.getId(), scenario, 
+				this.getReplanningManager().getInternalInterface());
 		super.initNewInstance(replanner);
 		return replanner;
 	}

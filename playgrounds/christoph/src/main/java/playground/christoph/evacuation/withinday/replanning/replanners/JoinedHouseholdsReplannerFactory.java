@@ -22,6 +22,7 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
@@ -34,9 +35,10 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	private final HouseholdsTracker householdsTracker;
 	private final JoinedHouseholdsIdentifier identifier;
 	
-	public JoinedHouseholdsReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, 
-			double replanningProbability, HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier) {
-		super(abstractMultithreadedModule, replanningProbability);
+	public JoinedHouseholdsReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
+			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
+			HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier) {
+		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 		this.householdsTracker = householdsTracker;
 		this.identifier = identifier;
@@ -45,7 +47,7 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new JoinedHouseholdsReplanner(super.getId(), scenario, 
-				householdsTracker, identifier);
+				this.getReplanningManager().getInternalInterface(), householdsTracker, identifier);
 		super.initNewInstance(replanner);
 		return replanner;
 	}

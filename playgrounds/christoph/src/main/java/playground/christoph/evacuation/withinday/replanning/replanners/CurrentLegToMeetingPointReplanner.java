@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -47,8 +48,9 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 	
 	protected final HouseholdsTracker householdsTracker;
 	
-	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario, HouseholdsTracker householdsTracker) {
-		super(id, scenario);
+	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario,
+			InternalInterface internalInterface, HouseholdsTracker householdsTracker) {
+		super(id, scenario, internalInterface);
 		this.householdsTracker = householdsTracker;
 	}
 

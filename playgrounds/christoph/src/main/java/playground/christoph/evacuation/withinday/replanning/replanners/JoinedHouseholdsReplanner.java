@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -59,8 +59,9 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 	private final HouseholdsTracker householdsTracker;
 	private final JoinedHouseholdsIdentifier identifier;
 	
-	public JoinedHouseholdsReplanner(Id id, Scenario scenario, HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier) {
-		super(id, scenario);
+	public JoinedHouseholdsReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+			HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier) {
+		super(id, scenario, internalInterface);
 		this.householdsTracker = householdsTracker;
 		this.identifier = identifier;
 	}
@@ -85,8 +86,6 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		if (currentPlanElement instanceof Activity) {
 			currentActivity = (Activity) currentPlanElement;
 		} else return false;
-		
-		double oldDepartureTime = withinDayAgent.getActivityEndTime();
 		
 		/*
 		 * Check whether the agent is already at the meeting point.
@@ -161,7 +160,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		// it can't become null.  kai, oct'10
 		if (withinDayAgent instanceof PersonDriverAgentImpl) {			
 			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
-			((QSim) ((PersonDriverAgentImpl) withinDayAgent).getMobsim()).rescheduleActivityEnd(withinDayAgent);
+			this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 			return true;
 		}
 		else {

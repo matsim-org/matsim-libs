@@ -21,8 +21,8 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
@@ -30,14 +30,15 @@ public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActiv
 
 	private Scenario scenario;
 	
-	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(abstractMultithreadedModule, replanningProbability);
+	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new EndActivityAndEvacuateReplanner(super.getId(), scenario);
+		WithinDayDuringActivityReplanner replanner = new EndActivityAndEvacuateReplanner(super.getId(), 
+				scenario, this.getReplanningManager().getInternalInterface());
 		super.initNewInstance(replanner);
 		return replanner;
 	}

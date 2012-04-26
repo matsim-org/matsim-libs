@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -44,8 +45,8 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 
 	private static final Logger log = Logger.getLogger(ExtendCurrentActivityReplanner.class);
 	
-	/*package*/ ExtendCurrentActivityReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	/*package*/ ExtendCurrentActivityReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 	
 	@Override

@@ -21,11 +21,14 @@
 package org.matsim.withinday.replanning.replanners.interfaces;
 
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
-public abstract class WithinDayInitialReplannerFactory extends WithinDayReplannerFactory {
+public abstract class WithinDayInitialReplannerFactory extends WithinDayReplannerFactory<InitialIdentifier> {
 	
-	public WithinDayInitialReplannerFactory(AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(abstractMultithreadedModule, replanningProbability);
+	public WithinDayInitialReplannerFactory(ReplanningManager replanningManager, 
+			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 	}
 	
 	@Override

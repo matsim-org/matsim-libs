@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.withinday.mobsim.ReplanningManager;
 
 /**
  * @author cdobler
@@ -44,13 +45,16 @@ public class EvacuationQSimFactory implements MobsimFactory {
     private final static Logger log = Logger.getLogger(EvacuationQSimFactory.class);
     
     private final PassengerDepartureHandler passengerDepartureHandler;
+    private final ReplanningManager replanningManager;
     
     public EvacuationQSimFactory() {
     	this.passengerDepartureHandler = null;
+    	this.replanningManager = null;
     }
     
-    public EvacuationQSimFactory(PassengerDepartureHandler passengerDepartureHandler) {
+    public EvacuationQSimFactory(PassengerDepartureHandler passengerDepartureHandler, ReplanningManager replanningManager) {
     	this.passengerDepartureHandler = passengerDepartureHandler;
+    	this.replanningManager = replanningManager;
     }
     
     @Override
@@ -79,8 +83,16 @@ public class EvacuationQSimFactory implements MobsimFactory {
         qSim.addAgentSource(agentSource);
         if (this.passengerDepartureHandler != null) qSim.addDepartureHandler(passengerDepartureHandler);
         
+        /*
+         * Once the ReplanningManager is a full MobsimEngine and performs
+         * the replanning in the doSimStep method, it has to be ensured that
+         * it is added as first mobsim engine to the QSim!
+         * So far, it is only added to be able to provide the InternalInterface
+         * to the replanners.
+         */
+        if (this.replanningManager != null) qSim.addMobsimEngine(replanningManager);
+        
         return qSim;
-
     }
 
 }

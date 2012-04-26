@@ -21,9 +21,9 @@
 package org.matsim.withinday.mobsim;
 
 import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
-public class InitialReplanningModule extends WithinDayReplanningModule<WithinDayInitialReplanner> {
+public class InitialReplanningModule extends WithinDayReplanningModule<WithinDayInitialReplannerFactory> {
 	
 	public InitialReplanningModule(ParallelInitialReplanner parallelInitialReplanner) {
 		this.parallelReplanner = parallelInitialReplanner;

@@ -88,9 +88,9 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -154,19 +154,19 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	protected DuringLegIdentifier duringLegRerouteIdentifier;
 	
 	/*
-	 * Replanners
+	 * ReplannerFactories
 	 */
-	protected WithinDayDuringActivityReplanner currentActivityToMeetingPointReplanner;
-	protected WithinDayDuringActivityReplanner joinedHouseholdsReplanner;
-	protected WithinDayDuringLegReplanner currentLegToMeetingPointReplanner;
-	protected WithinDayDuringLegReplanner pickupAgentsReplanner;
-	protected WithinDayDuringLegReplanner duringLegRerouteReplanner;
+	protected WithinDayDuringActivityReplannerFactory currentActivityToMeetingPointReplannerFactory;
+	protected WithinDayDuringActivityReplannerFactory joinedHouseholdsReplannerFactory;
+	protected WithinDayDuringLegReplannerFactory currentLegToMeetingPointReplannerFactory;
+	protected WithinDayDuringLegReplannerFactory pickupAgentsReplannerFactory;
+	protected WithinDayDuringLegReplannerFactory duringLegRerouteReplannerFactory;
 	
 	/*
 	 * Replanners that are used to adapt agent's plans for the first time. They can be disabled
 	 * after all agents have been informed and have adapted their plans.
 	 */
-	protected List<WithinDayReplanner<?>> initialReplanners;
+	protected List<WithinDayReplannerFactory<?>> initialReplannerFactories;
 	
 	protected double duringLegRerouteShare = 0.10;
 	
@@ -366,9 +366,9 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		/*
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
-		 * household.
+		 * household and adds the replanning Manager as mobsim engine.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.passengerDepartureHandler);
+		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.passengerDepartureHandler, this.getReplanningManager());
 		this.setMobsimFactory(mobsimFactory);
 		
 		/*
@@ -405,12 +405,12 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		/*
 		 * Create and initialize replanning manager and replanning maps.
 		 */
-		super.createAndInitReplanningManager(numReplanningThreads);
+		super.initReplanningManager(numReplanningThreads);
 		super.getReplanningManager().setEventsManager(this.getEvents());	// set events manager to create replanning events
 		super.createAndInitActivityReplanningMap();
 		MultiModalTravelTime linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
 		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
-		
+				
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
 		this.initIdentifiers();
 		
@@ -492,18 +492,18 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		if (this.informedHouseholdsTracker.allAgentsInformed()) {
-			if (this.initialReplanners != null) {
+			if (this.initialReplannerFactories != null) {
 				
-				for (WithinDayReplanner<?> replanner : this.initialReplanners) {
-					if (replanner instanceof WithinDayDuringActivityReplanner) {
-						this.getReplanningManager().removeDuringActivityReplanner((WithinDayDuringActivityReplanner) replanner);
-					} else if(replanner instanceof WithinDayDuringLegReplanner) {
-						this.getReplanningManager().removeDuringLegReplanner((WithinDayDuringLegReplanner) replanner);
+				for (WithinDayReplannerFactory<?> factory : this.initialReplannerFactories) {
+					if (factory instanceof WithinDayDuringActivityReplannerFactory) {
+						this.getReplanningManager().removeDuringActivityReplannerFactory((WithinDayDuringActivityReplannerFactory) factory);
+					} else if(factory instanceof WithinDayDuringLegReplannerFactory) {
+						this.getReplanningManager().removeDuringLegReplannerFactory((WithinDayDuringLegReplannerFactory) factory);
 					} 
 				}
 				log.info("Disabled initial within-day replanners");
 				
-				this.initialReplanners = null;
+				this.initialReplannerFactories = null;
 			}
 		}
 	}
@@ -598,36 +598,36 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		/*
 		 * During Activity Replanners
 		 */
-		this.currentActivityToMeetingPointReplanner = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, this.householdsTracker, this.modeAvailabilityChecker).createReplanner();
-		this.currentActivityToMeetingPointReplanner.addAgentsToReplanIdentifier(this.activityPerformingIdentifier);
-		this.getReplanningManager().addTimedDuringActivityReplanner(this.currentActivityToMeetingPointReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.householdsTracker, this.modeAvailabilityChecker);
+		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
+		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.joinedHouseholdsReplanner = new JoinedHouseholdsReplannerFactory(this.scenarioData, router, 1.0, householdsTracker, (JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier).createReplanner();
-		this.joinedHouseholdsReplanner.addAgentsToReplanIdentifier(joinedHouseholdsIdentifier);
-		this.getReplanningManager().addTimedDuringActivityReplanner(this.joinedHouseholdsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, householdsTracker, (JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier);
+		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
+		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
 		/*
 		 * During Leg Replanners
 		 */
-		this.currentLegToMeetingPointReplanner = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsTracker).createReplanner();
-		this.currentLegToMeetingPointReplanner.addAgentsToReplanIdentifier(this.legPerformingIdentifier);
-		this.getReplanningManager().addTimedDuringLegReplanner(this.currentLegToMeetingPointReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, householdsTracker);
+		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
+		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 				
-		this.pickupAgentsReplanner = new PickupAgentReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.pickupAgentsReplanner.addAgentsToReplanIdentifier(this.agentsToPickupIdentifier);
-		this.getReplanningManager().addTimedDuringLegReplanner(this.pickupAgentsReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
+		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.duringLegRerouteReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, duringLegRerouteShare).createReplanner();
-		this.duringLegRerouteReplanner.addAgentsToReplanIdentifier(this.duringLegRerouteIdentifier);
-		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, duringLegRerouteShare);
+		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
+//		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		
 		/*
 		 * Collect Replanners that can be disabled after all agents have been informed.
 		 */
-		this.initialReplanners = new ArrayList<WithinDayReplanner<?>>();
-		this.initialReplanners.add(this.currentActivityToMeetingPointReplanner);
-		this.initialReplanners.add(this.currentLegToMeetingPointReplanner);
+		this.initialReplannerFactories = new ArrayList<WithinDayReplannerFactory<?>>();
+		this.initialReplannerFactories.add(this.currentActivityToMeetingPointReplannerFactory);
+		this.initialReplannerFactories.add(this.currentLegToMeetingPointReplannerFactory);
 	}
 
 	private void addPickupFacilities() {

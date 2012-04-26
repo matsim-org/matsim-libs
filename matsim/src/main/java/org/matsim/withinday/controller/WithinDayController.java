@@ -56,6 +56,7 @@ public class WithinDayController extends Controler {
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
 	
+	private boolean replanningManagerInitialized = false;
 	private ReplanningManager replanningManager;
 	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 	
@@ -144,11 +145,12 @@ public class WithinDayController extends Controler {
 	 * TODO: Add a Within-Day Group to the Config. Then this method
 	 * can be called on startup.
 	 */
-	public void createAndInitReplanningManager(int numOfThreads) {
-		if (this.replanningManager == null) {
+	public void initReplanningManager(int numOfThreads) {
+		if (!replanningManagerInitialized) {
 			log.info("Initialize ReplanningManager");
-			replanningManager = new ReplanningManager(numOfThreads);
-			fosl.addSimulationListener(replanningManager);			
+			replanningManager.initializeReplanningModules(numOfThreads);
+			fosl.addSimulationListener(replanningManager);
+			replanningManagerInitialized = true;
 		}
 	}
 	
@@ -163,14 +165,17 @@ public class WithinDayController extends Controler {
 	 * ===================================================================
 	 */
 	
-	private void init() {		
-		// set WithinDayQSimFactory
-		super.setMobsimFactory(new WithinDayQSimFactory());
+	private void init() {
 		super.getQueueSimulationListener().add(fosl);
+		
+		this.replanningManager = new ReplanningManager();
 	}
 	
 	@Override
 	protected void setUp() {
+				
+		// set WithinDayQSimFactory
+		super.setMobsimFactory(new WithinDayQSimFactory(replanningManager));
 		/*
 		 * SimStepParallelEventsManagerImpl might be moved to org.matsim.
 		 * Then this piece of code could be placed in the controller.
@@ -201,7 +206,7 @@ public class WithinDayController extends Controler {
 		if (replanningManager == null) {
 			log.warn("Within-day replanning modules have not been initialized! Force initialization using 1 replanning thread. " +
 					"Please call createAndInitReplanningManager(int numOfThreads).");
-			createAndInitReplanningManager(1);
+			initReplanningManager(1);
 		}
 		
 		super.runMobSim();

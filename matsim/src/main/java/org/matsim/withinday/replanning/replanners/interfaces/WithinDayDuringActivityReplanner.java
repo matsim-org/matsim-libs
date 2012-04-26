@@ -22,16 +22,16 @@ package org.matsim.withinday.replanning.replanners.interfaces;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-
 
 /*
  * Replans only Agents that are currently performing an Activity.
  */
 public abstract class WithinDayDuringActivityReplanner extends WithinDayReplanner<DuringActivityIdentifier> {
 
-	public WithinDayDuringActivityReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	public WithinDayDuringActivityReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 	
 }

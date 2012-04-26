@@ -23,21 +23,20 @@ package org.matsim.withinday.replanning.replanners;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
-
 
 /*
  * The NextLegReplanner can be used while an Agent is performing an Activity. The
  * Replanner creates a new Route from the current Activity to the next one in
  * the Agent's Plan.
  */
-
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
-	/*package*/ NextLegReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	/*package*/ NextLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 
 	/*
@@ -77,9 +76,6 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 		// new Route for next Leg
 		new EditRoutes().replanFutureLegRoute(executedPlan, currentPlanElementIndex + 1, routeAlgo);
-
-//		// create ReplanningEvent
-//		QSim.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
 
 		return true;
 	}

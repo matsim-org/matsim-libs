@@ -20,51 +20,60 @@
 
 package org.matsim.withinday.replanning.replanners.interfaces;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
+import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningIdGenerator;
 
-public abstract class WithinDayReplannerFactory {
+public abstract class WithinDayReplannerFactory<T extends Identifier> {
 
+	private final ReplanningManager replanningManager;
 	private Id id;
 	private AbstractMultithreadedModule abstractMultithreadedModule;
 	private double replanningProbability = 1.0;
+	private Set<T> identifiers = new HashSet<T>();
 	
-	/*
-	 * I don't think we need the agentCounter here anymore. Counter updates should
-	 * be triggered by calling QSim.rescheduleActivityEnd(...). There, the count
-	 * is in- or decreased, if necessary.
-	 * 
-	 * Removed AgentCounter. cdobler, dec'11
-	 */
-	public WithinDayReplannerFactory(AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+	public WithinDayReplannerFactory(ReplanningManager replanningManager, 
+			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		this.replanningManager = replanningManager;
 		this.abstractMultithreadedModule = abstractMultithreadedModule;
 		this.replanningProbability = replanningProbability;
 		this.id = ReplanningIdGenerator.getNextId();
 	}
 	
-	public abstract WithinDayReplanner<? extends AgentsToReplanIdentifier> createReplanner();
+	public abstract WithinDayReplanner<? extends Identifier> createReplanner();
 	
 	/*
 	 * This method should be called after a new Replanner instance
 	 * has been created. Is there any way to force this???
 	 */
-	public final void initNewInstance(WithinDayReplanner<? extends AgentsToReplanIdentifier> replanner) {
-		replanner.setReplannerFactory(this);
+	public final void initNewInstance(WithinDayReplanner<? extends Identifier> replanner) {
 		replanner.setReplanningProbability(this.replanningProbability);
 		replanner.setAbstractMultithreadedModule(this.abstractMultithreadedModule);
-		additionalParametersForNewInstance(replanner);
 	}
-
-	/*
-	 * Override this method if you want to set additional parameters in 
-	 * a new created WithinDayReplanner instance. 
-	 */
-	public void additionalParametersForNewInstance(WithinDayReplanner<? extends AgentsToReplanIdentifier> replanner) {
+	
+	public final ReplanningManager getReplanningManager() {
+		return this.replanningManager;
 	}
 	
 	public final Id getId() {
 		return this.id;
+	}
+	
+	public final boolean addIdentifier(T identifier) {
+		return this.identifiers.add(identifier);
+	}
+	
+	public final boolean removeIdentifier(T identifier) {
+		return this.identifiers.remove(identifier);
+	}
+	
+	public final Set<T> getIdentifers() {
+		return Collections.unmodifiableSet(identifiers);
 	}
 }

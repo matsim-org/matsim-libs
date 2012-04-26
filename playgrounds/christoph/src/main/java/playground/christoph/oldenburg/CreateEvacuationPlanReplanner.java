@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -40,8 +41,8 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 	
 	private Random random;
 	
-	/*package*/ CreateEvacuationPlanReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	/*package*/ CreateEvacuationPlanReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 		this.random = MatsimRandom.getLocalInstance();
 	}
 

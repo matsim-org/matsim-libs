@@ -54,7 +54,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 	protected int numReplanningThreads = 8;
 
 	protected RandomSearchIdentifier randomSearchIdentifier;
-	protected RandomSearchReplanner randomSearchReplanner;
+	protected RandomSearchReplannerFactory randomSearchReplannerFactory;
 
 	protected LegModeChecker legModeChecker;
 	protected ParkingAgentsTracker parkingAgentsTracker;
@@ -94,9 +94,9 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
 	
-		this.randomSearchReplanner = new RandomSearchReplannerFactory(router, 1.0, this.scenarioData, parkingAgentsTracker).createReplanner();
-		this.randomSearchReplanner.addAgentsToReplanIdentifier(this.randomSearchIdentifier);		
-		this.getReplanningManager().addDuringLegReplanner(this.randomSearchReplanner);
+		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getReplanningManager(), router, 1.0, this.scenarioData, parkingAgentsTracker);
+		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
+		this.getReplanningManager().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
 	}
 	
 	/*
@@ -110,7 +110,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		// connect facilities to network
 		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
 		
-		super.createAndInitReplanningManager(numReplanningThreads);
+		super.initReplanningManager(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitLinkReplanningMap();
 		

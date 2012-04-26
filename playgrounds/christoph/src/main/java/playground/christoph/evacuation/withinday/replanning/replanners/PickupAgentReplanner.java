@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -45,8 +46,8 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 
 	private static final String activityType = "pickup";
 	
-	/*package*/ PickupAgentReplanner(Id id, Scenario scenario) {
-		super(id, scenario);
+	/*package*/ PickupAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+		super(id, scenario, internalInterface);
 	}
 
 	@Override

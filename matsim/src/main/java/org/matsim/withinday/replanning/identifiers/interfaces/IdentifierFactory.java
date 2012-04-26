@@ -28,9 +28,9 @@ public abstract class IdentifierFactory {
 
 	private final Set<AgentFilterFactory> agentFilterFactories = new LinkedHashSet<AgentFilterFactory>();
 	
-	public abstract AgentsToReplanIdentifier createIdentifier();
+	public abstract Identifier createIdentifier();
 	
-	protected final void addAgentFiltersToIdentifier(AgentsToReplanIdentifier identifier) {
+	protected final void addAgentFiltersToIdentifier(Identifier identifier) {
 		for (AgentFilterFactory agentFilterFactory : agentFilterFactories) {
 			identifier.addAgentFilter(agentFilterFactory.createAgentFilter());
 		}

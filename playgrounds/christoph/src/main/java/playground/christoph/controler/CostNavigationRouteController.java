@@ -57,7 +57,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.christoph.router.AnalyzeTravelTimes;
 import playground.christoph.router.CostNavigationRouteFactory;
@@ -96,7 +96,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 	
 	protected int handledAgents;
 	protected DuringLegIdentifier duringLegIdentifier;
-	protected WithinDayDuringLegReplanner duringLegReplanner;
+	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 
 	protected Set<Id> replannedAgents;
 	protected AnalyzeTravelTimes analyzeTravelTimes; 
@@ -152,9 +152,10 @@ public class CostNavigationRouteController extends WithinDayController implement
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
-		this.duringLegReplanner = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, router, 1.0, costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.getLeastCostPathCalculatorFactory()).createReplanner();
-		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
+		this.duringLegReplannerFactory = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, this.getReplanningManager(), router, 1.0, 
+				costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.getLeastCostPathCalculatorFactory());
+		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
+		this.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 	/*
@@ -164,7 +165,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.createAndInitReplanningManager(numReplanningThreads);
+		super.initReplanningManager(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitLinkReplanningMap();
 		

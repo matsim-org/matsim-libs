@@ -20,24 +20,24 @@
 
 package org.matsim.withinday.mobsim;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
 /**
  * This Class implements a SimulationBeforeSimStepListener.
@@ -48,7 +48,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
  * 
  * @author: cdobler
  */
-public class ReplanningManager implements MobsimBeforeSimStepListener, MobsimInitializedListener {
+public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListener {
 
 	private static final Logger log = Logger.getLogger(ReplanningManager.class);
 	
@@ -64,21 +64,20 @@ public class ReplanningManager implements MobsimBeforeSimStepListener, MobsimIni
 	private ParallelDuringActivityReplanner parallelDuringActivityReplanner;
 	private ParallelDuringLegReplanner parallelDuringLegReplanner;
 	
-	private Map<WithinDayDuringActivityReplanner, Double> activateDuringActivityReplanner;
-	private Map<WithinDayDuringActivityReplanner, Double> deactivateDuringActivityReplanner;
-	private Map<WithinDayDuringLegReplanner, Double> activateDuringLegReplanner;
-	private Map<WithinDayDuringLegReplanner, Double> deactivateDuringLegReplanner;
+	private Map<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>> duringActivityReplannerFactory;
+	private Map<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>> duringLegReplannerFactory;
 	
-	public ReplanningManager(int numOfThreads) {
-		initializeReplanningModules(numOfThreads);
-		
-		this.activateDuringActivityReplanner = new TreeMap<WithinDayDuringActivityReplanner, Double>();
-		this.deactivateDuringActivityReplanner = new TreeMap<WithinDayDuringActivityReplanner, Double>();
-		this.activateDuringLegReplanner = new TreeMap<WithinDayDuringLegReplanner, Double>();
-		this.deactivateDuringLegReplanner = new TreeMap<WithinDayDuringLegReplanner, Double>();
+	private InternalInterface internalInterface;
+	
+	public ReplanningManager() {
+		duringActivityReplannerFactory = new LinkedHashMap<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>>();
+		duringLegReplannerFactory = new LinkedHashMap<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>>();
 	}
 	
-	private void initializeReplanningModules(int numOfThreads) {
+	/*
+	 * TODO: Create a config group and get number of threads from there.
+	 */
+	public void initializeReplanningModules(int numOfThreads) {
 		
 		log.info("Initialize Parallel Replanning Modules");
 		this.parallelInitialReplanner = new ParallelInitialReplanner(numOfThreads);
@@ -96,9 +95,9 @@ public class ReplanningManager implements MobsimBeforeSimStepListener, MobsimIni
 	}
 	
 	public void setEventsManager(EventsManager eventsManager) {
-		this.parallelInitialReplanner.setEventsManger(eventsManager);
-		this.parallelDuringActivityReplanner.setEventsManger(eventsManager);
-		this.parallelDuringLegReplanner.setEventsManger(eventsManager);
+		this.parallelInitialReplanner.setEventsManager(eventsManager);
+		this.parallelDuringActivityReplanner.setEventsManager(eventsManager);
+		this.parallelDuringLegReplanner.setEventsManager(eventsManager);
 	}
 	
 	public void doInitialReplanning(boolean value) {
@@ -149,80 +148,91 @@ public class ReplanningManager implements MobsimBeforeSimStepListener, MobsimIni
 		return this.duringLegReplanningModule;
 	}
 
-	public void addIntialReplanner(WithinDayInitialReplanner replanner) {
-		this.parallelInitialReplanner.addWithinDayReplanner(replanner);
+	public void addIntialReplannerFactory(WithinDayInitialReplannerFactory factory) {
+		this.parallelInitialReplanner.addWithinDayReplannerFactory(factory);
 	}
 	
-	public void addDuringActivityReplanner(WithinDayDuringActivityReplanner replanner) {		
-		this.parallelDuringActivityReplanner.addWithinDayReplanner(replanner);
+	public void addDuringActivityReplannerFactory(WithinDayDuringActivityReplannerFactory factory) {		
+		this.parallelDuringActivityReplanner.addWithinDayReplannerFactory(factory);
 	}
 	
-	public void addDuringLegReplanner(WithinDayDuringLegReplanner replanner) {		
-		this.parallelDuringLegReplanner.addWithinDayReplanner(replanner);
+	public void addDuringLegReplannerFactory(WithinDayDuringLegReplannerFactory factory) {		
+		this.parallelDuringLegReplanner.addWithinDayReplannerFactory(factory);
 	}
 	
-	public void removeInitialReplanner(WithinDayInitialReplanner replanner) {
-		this.parallelInitialReplanner.removeWithinDayReplanner(replanner);
+	public void removeInitialReplannerFactory(WithinDayInitialReplannerFactory factory) {
+		this.parallelInitialReplanner.removeWithinDayReplannerFactory(factory);
 	}
 
-	public void removeDuringActivityReplanner(WithinDayDuringActivityReplanner replanner) {
-		this.parallelDuringActivityReplanner.removeWithinDayReplanner(replanner);
+	public void removeDuringActivityReplannerFactory(WithinDayDuringActivityReplannerFactory factory) {
+		this.parallelDuringActivityReplanner.removeWithinDayReplannerFactory(factory);
 	}
 	
-	public void removeDuringLegReplanner(WithinDayDuringLegReplanner replanner) {
-		this.parallelDuringLegReplanner.removeWithinDayReplanner(replanner);
+	public void removeDuringLegReplannerFactory(WithinDayDuringLegReplannerFactory factory) {
+		this.parallelDuringLegReplanner.removeWithinDayReplannerFactory(factory);
 	}
 	
-	public void addTimedDuringActivityReplanner(WithinDayDuringActivityReplanner replanner, double startReplanning, double endReplanning) {
-		this.activateDuringActivityReplanner.put(replanner, startReplanning);
-		this.deactivateDuringActivityReplanner.put(replanner, endReplanning);
+	public void addTimedDuringActivityReplannerFactory(WithinDayDuringActivityReplannerFactory factory, double startReplanning, double endReplanning) {
+		Tuple<Double, Double> tuple = new Tuple<Double, Double>(startReplanning, endReplanning);
+		this.duringActivityReplannerFactory.put(factory, tuple);
 	}
 	
-	public void addTimedDuringLegReplanner(WithinDayDuringLegReplanner replanner, double startReplanning, double endReplanning) {
-		this.activateDuringLegReplanner.put(replanner, startReplanning);
-		this.deactivateDuringLegReplanner.put(replanner, endReplanning);
-	}
-	
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		if (isInitialReplanning()) {
-			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
-		}
-		
-		// reset all replanners
-		for (WithinDayReplanner<?> replanner : parallelInitialReplanner.getWithinDayReplanners()) {
-			replanner.reset();
-		}
-		for (WithinDayReplanner<?> replanner : parallelDuringActivityReplanner.getWithinDayReplanners()) {
-			replanner.reset();
-		}
-		for (WithinDayReplanner<?> replanner : parallelDuringLegReplanner.getWithinDayReplanners()) {
-			replanner.reset();
-		}
+	public void addTimedDuringLegReplannerFactory(WithinDayDuringLegReplannerFactory factory, double startReplanning, double endReplanning) {
+		Tuple<Double, Double> tuple = new Tuple<Double, Double>(startReplanning, endReplanning);
+		this.duringLegReplannerFactory.put(factory, tuple);
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		
-		for (Entry<WithinDayDuringActivityReplanner, Double> entry : activateDuringActivityReplanner.entrySet()) {
-			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringActivityReplanner.addWithinDayReplanner(entry.getKey());
+		double time = e.getSimulationTime();
+		
+		for (Entry<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>> entry : duringActivityReplannerFactory.entrySet()) {
+			if (entry.getValue().getFirst() == time) this.parallelDuringActivityReplanner.addWithinDayReplannerFactory(entry.getKey());
+			if (entry.getValue().getSecond() == time) this.parallelDuringActivityReplanner.removeWithinDayReplannerFactory(entry.getKey());
 		}
-		for (Entry<WithinDayDuringActivityReplanner, Double> entry : deactivateDuringActivityReplanner.entrySet()) {
-			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringActivityReplanner.removeWithinDayReplanner(entry.getKey());
-		}
-		for (Entry<WithinDayDuringLegReplanner, Double> entry : activateDuringLegReplanner.entrySet()) {
-			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringLegReplanner.addWithinDayReplanner(entry.getKey());
-		}
-		for (Entry<WithinDayDuringLegReplanner, Double> entry : deactivateDuringLegReplanner.entrySet()) {
-			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringLegReplanner.removeWithinDayReplanner(entry.getKey());
+		for (Entry<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>> entry : duringLegReplannerFactory.entrySet()) {
+			if (entry.getValue().getFirst() == time) this.parallelDuringLegReplanner.addWithinDayReplannerFactory(entry.getKey());
+			if (entry.getValue().getSecond() == time) this.parallelDuringLegReplanner.removeWithinDayReplannerFactory(entry.getKey());
 		}
 		
 		if (isDuringActivityReplanning()) {
-			duringActivityReplanningModule.doReplanning(e.getSimulationTime());
+			duringActivityReplanningModule.doReplanning(time);
 		}
 
 		if (isDuringLegReplanning()) {
-			duringLegReplanningModule.doReplanning(e.getSimulationTime());
+			duringLegReplanningModule.doReplanning(time);
 		}
+	}
+
+	@Override
+	public void doSimStep(double time) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onPrepareSim() {
+		if (isInitialReplanning()) {
+			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
+		}
+		
+		// reset all replanners
+		parallelInitialReplanner.resetReplanners();
+		parallelDuringActivityReplanner.resetReplanners();
+		parallelDuringLegReplanner.resetReplanners();
+	}
+
+	@Override
+	public void afterSim() {
+		// TODO Auto-generated method stub	
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
+	}
+	
+	public InternalInterface getInternalInterface() {
+		return this.internalInterface;
 	}
 }

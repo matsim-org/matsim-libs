@@ -27,9 +27,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -41,8 +38,8 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 /**
  * @author nagel
@@ -63,14 +60,14 @@ public class MyMobsimFactory implements MobsimFactory {
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		int numReplanningThreads = 1;
 
-		QSim mobsim = new WithinDayQSimFactory().createMobsim(sc, eventsManager);
-		
-		replanningManager = new ReplanningManager(numReplanningThreads);
+		replanningManager = new ReplanningManager();
+		replanningManager.initializeReplanningModules(numReplanningThreads);
 
+		QSim mobsim = new WithinDayQSimFactory(replanningManager).createMobsim(sc, eventsManager);
+		
 		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		// ensure that they are started in the needed order.
 		FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-		fosl.addSimulationInitializedListener(replanningManager);
 		fosl.addSimulationBeforeSimStepListener(replanningManager);
 		mobsim.addQueueSimulationListeners(fosl);
 		// (essentially, can just imagine the replanningManager as a regular MobsimListener)
@@ -103,14 +100,14 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		// replanning while at activity:
 
-		WithinDayDuringActivityReplanner duringActivityReplanner = new OldPeopleReplannerFactory(sc, routerModule, 1.0).createReplanner();
+		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory = new OldPeopleReplannerFactory(sc, replanningManager, routerModule, 1.0);
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.
 
-		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifierFactory(mobsim).createIdentifier());
+		duringActivityReplannerFactory.addIdentifier(new OldPeopleIdentifierFactory(mobsim).createIdentifier());
 		// which persons to replan
 
-		this.replanningManager.addDuringActivityReplanner(duringActivityReplanner);
+		this.replanningManager.addDuringActivityReplannerFactory(duringActivityReplannerFactory);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 
@@ -118,15 +115,15 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		// replanning while on leg:
 
-		WithinDayDuringLegReplanner duringLegReplanner = new YoungPeopleReplannerFactory(sc, routerModule, 1.0).createReplanner();
+		WithinDayDuringLegReplannerFactory duringLegReplannerFactory = new YoungPeopleReplannerFactory(sc, replanningManager, routerModule, 1.0);
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route
 
-		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifierFactory(mobsim).createIdentifier());
+		duringLegReplannerFactory.addIdentifier(new YoungPeopleIdentifierFactory(mobsim).createIdentifier());
 		// persons identifier added to replanner
 
-		this.replanningManager.addDuringLegReplanner(duringLegReplanner);
+		this.replanningManager.addDuringLegReplannerFactory(duringLegReplannerFactory);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 	}
