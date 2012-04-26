@@ -57,9 +57,30 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
  * @author dgrether
  * 
  */
-public class OTFVisFromLastIteration {
+public class BkVisLiveFromLastIteration {
+	private static final Logger log = Logger.getLogger(BkVisLiveFromLastIteration.class);
 
-	private static final Logger log = Logger.getLogger(OTFVisFromLastIteration.class);
+	private final static String runNumber = "981";
+	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+	private final static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+	
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		args = new String[1];
+		args[0] = configFile;
+		String configfile = null;
+		if (args.length == 0) {
+			configfile = chooseFile();
+		}
+		else if (args.length == 1) {
+			configfile = args[0];
+		}
+		else {
+			log.error("not the correct arguments");
+		}
+		if (configfile != null) {
+			new BkVisLiveFromLastIteration().playOutputConfig(configfile);
+		}
+	}
 
 	private void playOutputConfig(String configfile) throws FileNotFoundException, IOException {
 		String currentDirectory = configfile.substring(0, configfile.lastIndexOf("/") + 1);
@@ -204,29 +225,4 @@ public class OTFVisFromLastIteration {
 		System.out.println("No file selected.");
 		return null;
 	}
-
-	/**
-	 * @param args
-	 * @throws IOException
-	 * @throws FileNotFoundException
-	 */
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		// args = new String[1];
-		// args[0] = "/home/dgrether/data/work/matsimOutput/equil/output_config.xml.gz";
-		// args[0] = "/home/dgrether/runs-svn/run749/749.output_config.xml.gz";
-		String configfile = null;
-		if (args.length == 0) {
-			configfile = chooseFile();
-		}
-		else if (args.length == 1) {
-			configfile = args[0];
-		}
-		else {
-			log.error("not the correct arguments");
-		}
-		if (configfile != null) {
-			new OTFVisFromLastIteration().playOutputConfig(configfile);
-		}
-	}
-
 }

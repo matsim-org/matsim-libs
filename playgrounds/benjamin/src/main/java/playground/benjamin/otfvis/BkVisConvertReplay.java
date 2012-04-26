@@ -25,21 +25,18 @@ import org.matsim.contrib.otfvis.OTFVis;
 import playground.benjamin.BkPaths;
 
 
-public class BkVis {
-	private final static Logger logger = Logger.getLogger(BkVis.class);
+public class BkVisConvertReplay {
+	private final static Logger logger = Logger.getLogger(BkVisConvertReplay.class);
+
+	static boolean convert = false;
+	static String runNumber = "981";
+	static String eventsNumber = "1000";
+	
+	static String runPath = BkPaths.RUNSSVN + "run" + runNumber + "/";
+	static String eventsPath = runPath + "ITERS/it." + eventsNumber + "/";
 
 	public static void main(String[] args) {
-		
-		boolean convert = false;
-		String runNumber = "981";
-		String eventsNumber = "1000";
-		
-		String runPath = BkPaths.RUNSSVN + "run" + runNumber + "/";
-		String eventsPath = runPath + "ITERS/it." + eventsNumber + "/";
-		
-//===========================================================================================================
-//		Für den converter-modus:
-		if(convert){
+		if(convert){ // converter-modus
 			String networkFile = runPath + runNumber + ".output_network.xml.gz";
 			String eventsFile =  eventsPath + runNumber + "." + eventsNumber + ".events.xml.gz";
 			String outputFile = eventsPath + runNumber + "." + eventsNumber + ".events.mvi";
@@ -51,34 +48,11 @@ public class BkVis {
 					"600"};
 			OTFVis.convert(array);
 			logger.info("Events successfully converted to " + outputFile);
-		}
-		else{
-			
-//===========================================================================================================		
-//		Für den mvi-modus:
-//			String otffile = "../../detailedEval/teststrecke/sim/output/20090707/ITERS/it.0/0.otfvis.mvi";
+		
+		} else{ // mvi-modus
 //			String otffile = eventsPath + runNumber + "." + eventsNumber + ".otfvis.mvi";
 			String otffile = eventsPath + runNumber + "." + eventsNumber + ".events.mvi";
 
-//===========================================================================================================		
-/*	Für den interactiven Modus:
-		Entweder DgOTFVisReplayLastIteration.java ausführen oder manuell unten die config übergeben und vorher dort folgendes ändern:
-		
-		1. QSim-Modul einschalten ("qsim" statt "simulation"):
-		<module name="qsim">
-			<param name="startTime" value="00:00:00" />
-			<param name="endTime" value="24:00:00" />
-	
-			<param name="flowCapacityFactor" value="0.1" />
-			<param name="storageCapacityFactor" value="0.30" />
-	
-			<param name="stuckTime" value="10" />
-			<param name="removeStuckVehicles" value="no" />
-		</module>
-		
-		2. Pfade zu output_network und zu den output_plans anpassen!*/
-//		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
-		
 		OTFVis.main(new String[] {otffile});
 		}
 	}	
