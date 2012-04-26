@@ -69,6 +69,7 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 		if (cooperative.getBestPlan().getNVehicles() <= 1) {
 			return null;
 		}
+		
 		// get a List of served stop-facilities in the sequence they are served
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
 		// create the convex-hull (geotools-method) of all used stops 
@@ -101,6 +102,11 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 																		1, 
 																		(ArrayList<TransitStopFacility>) stopsToServe, 
 																		new IdImpl(cooperative.getCurrentIteration())));
+			
+			if(cooperative.getFranchise().planRejected(newPlan)){
+				// plan is rejected by franchise system
+				return null;
+			}
 			
 			cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
 			

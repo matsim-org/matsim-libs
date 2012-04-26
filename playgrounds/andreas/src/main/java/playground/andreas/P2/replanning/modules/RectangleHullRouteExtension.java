@@ -77,6 +77,7 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 		if (cooperative.getBestPlan().getNVehicles() <= 1) {
 			return null;
 		}
+		
 		// get a List of served stop-facilities in the sequence they are served
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
 		// create the rectangle
@@ -108,6 +109,11 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 																		1, 
 																		(ArrayList<TransitStopFacility>) stopsToServe, 
 																		new IdImpl(cooperative.getCurrentIteration())));
+			
+			if(cooperative.getFranchise().planRejected(newPlan)){
+				// plan is rejected by franchise system
+				return null;
+			}
 			
 			cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
 			

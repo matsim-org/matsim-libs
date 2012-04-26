@@ -82,6 +82,11 @@ public class ReduceStopsToBeServed extends PStrategy implements PPlanStrategy, T
 		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 		
+		if(cooperative.getFranchise().planRejected(newPlan)){
+			// plan is rejected by franchise system
+			return null;
+		}		
+		
 		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
 		
 		return newPlan;

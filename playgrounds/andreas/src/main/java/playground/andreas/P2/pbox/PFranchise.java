@@ -2,6 +2,7 @@ package playground.andreas.P2.pbox;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -38,8 +39,10 @@ public class PFranchise {
 		}
 		
 		String routeHash = generateRouteHash(plan.getStopsToBeServed());
+		boolean reject = this.routeHashes.contains(routeHash);
+		this.routeHashes.add(routeHash);
 		
-		return this.routeHashes.contains(routeHash);
+		return reject;
 	}
 
 	/**
@@ -51,12 +54,17 @@ public class PFranchise {
 		this.routeHashes = new TreeSet<String>();
 		
 		for (Cooperative cooperative : cooperatives) {
+			Set<String> routesHashesOfCooperative = new TreeSet<String>();
 			for (PPlan plan : cooperative.getAllPlans()) {
-				String routeHash = generateRouteHash(plan.getStopsToBeServed());
+				String routeHash = generateRouteHash(plan.getStopsToBeServed());				
 				if (this.routeHashes.contains(routeHash)) {
-					log.warn("Cooperative " + cooperative.getId() + " with plan " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
+					if (!routesHashesOfCooperative.contains(routeHash)) {
+						// This route is already served by another cooperative
+						log.warn("Cooperative " + cooperative.getId() + " with plan " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
+					}
 				}
 				this.routeHashes.add(routeHash);
+				routesHashesOfCooperative.add(routeHash);
 			}
 		}		
 	}
@@ -68,9 +76,15 @@ public class PFranchise {
 	 * @return
 	 */
 	private String generateRouteHash(ArrayList<TransitStopFacility> stopsToBeServed){
-		StringBuffer sB = new StringBuffer();
+		StringBuffer sB = null;
 		for (TransitStopFacility transitStopFacility : stopsToBeServed) {
-			sB.append(transitStopFacility.getId().toString()); sB.append("-");
+			if (sB == null) {
+				sB = new StringBuffer();
+				sB.append(transitStopFacility.getId().toString());
+			} else {
+				sB.append("-");
+				sB.append(transitStopFacility.getId().toString()); 
+			}			
 		}
 		return sB.toString();
 	}

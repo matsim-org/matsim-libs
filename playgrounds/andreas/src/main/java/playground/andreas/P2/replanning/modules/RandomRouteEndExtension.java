@@ -104,6 +104,11 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 																	(ArrayList<TransitStopFacility>) stopsToServe, 
 																	new IdImpl(cooperative.getCurrentIteration())));
 		
+		if(cooperative.getFranchise().planRejected(newPlan)){
+			// plan is rejected by franchise system
+			return null;
+		}
+		
 		cooperative.getBestPlan().setNVehicles(cooperative.getBestPlan().getNVehicles() - 1);
 		
 		return newPlan;
