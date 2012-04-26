@@ -128,8 +128,8 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		specifyControler();
 //		
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(-6.0);
-		pcs.setMarginalUtilityOfMoney(0.6);
+		pcs.setTraveling_utils_hr(-6.000);
+		pcs.setMarginalUtilityOfMoney(1.0);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 //		
 		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
@@ -147,7 +147,6 @@ public class EmissionRoutingTest extends MatsimTestCase{
 			}
 		};
 		
-//		System.out.println("test emission routing");
 		this.controler.addControlerListener(startupListener);
 		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
@@ -182,7 +181,7 @@ public void testDistanceRouting() {
 				event.getControler().getEvents().addHandler(handler);
 			}
 		};
-		System.out.println("Distance Routing");
+
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
 		assertTrue("Person was expected to be routed through link 11, but was " + handler.getLink(), handler.getWasRoadSelected()==true);
@@ -205,7 +204,8 @@ public void testDistanceRouting() {
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
 		pcs.setTraveling_utils_hr(-6000.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceCostRateCar(-0.0001);
+		//pcs.setMonetaryDistanceCostRateCar(-0.0001);
+		pcs.setMonetaryDistanceCostRateCar(0.000);
 		
 		final RoadUsedHandler handler = new RoadUsedHandler(9) ;
 		
@@ -218,7 +218,6 @@ public void testDistanceRouting() {
 			}
 		};
 		
-		System.out.println("time routing");
 		this.controler.addControlerListener(startupListener);
 		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
@@ -371,6 +370,8 @@ public void testDistanceRouting() {
         Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(-15000.0, -8660.0));
         Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord( -7500.0,  2500.0));
         Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord( -7500.0, -2500.0));
+        Node node10 = network.createAndAddNode(scenario.createId("10"), scenario.createCoord( -7500.0, -5000.0));
+        
         
         network.createAndAddLink(scenario.createId("1"), node1, node2, 1000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("2"), node2, node3, 2000, 27.78, 3600, 1, null, "22");
@@ -381,9 +382,13 @@ public void testDistanceRouting() {
         network.createAndAddLink(scenario.createId("7"), node7, node1, 1000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("8"), node3, node8, 5000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("10"), node3, node9, 5000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("12"), node3, node10, 5000, 27.78, 3600, 1, null, "22");
 
+        //9 time, 11 distance, 13 emissions
+        
         network.createAndAddLink(scenario.createId("9"), node8, node4, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(scenario.createId("11"), node9, node4, 2500, 13.89, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("11"), node9, node4, 2500, 11.33, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("13"), node10, node4, 3750, 20.80, 3600, 1, null, "22");
 	}
 
 	public static void main(String[] args) {

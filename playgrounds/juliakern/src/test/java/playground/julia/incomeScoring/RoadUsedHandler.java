@@ -10,8 +10,10 @@ public class RoadUsedHandler implements LinkLeaveEventHandler{
 	int i;
 	String usedRoadVariant = new String("");
 	
+	//constructor
 public RoadUsedHandler(int j) {
-		i= j;// TODO Auto-generated constructor stub
+		i= j;
+		mer =false;
 	}
 
 @Override
@@ -26,9 +28,9 @@ public void handleEvent(LinkLeaveEvent event) {
 		mer = true;
 	}
 	else{
-		if(event.getLinkId().equals(new IdImpl(Integer.toString(9)))) usedRoadVariant="9";
-		if(event.getLinkId().equals(new IdImpl(Integer.toString(11)))) usedRoadVariant="11";
-		if(event.getLinkId().equals(new IdImpl(Integer.toString(13)))) usedRoadVariant="13";
+		if(event.getLinkId().equals(new IdImpl("9"))) 	usedRoadVariant="9";
+		if(event.getLinkId().equals(new IdImpl("11"))) 	usedRoadVariant="11";
+		if(event.getLinkId().equals(new IdImpl("13"))) 	usedRoadVariant="13";
 		
 	}
 }
