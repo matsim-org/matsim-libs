@@ -599,6 +599,7 @@ public class SpatialAveragingForLinkEmissions {
 	}
 
 	public static void main(String[] args) throws IOException{
+		System.out.println(lastIteration1+"  "+lastIteration2);
 		new SpatialAveragingForLinkEmissions().run();
 	}
 }
