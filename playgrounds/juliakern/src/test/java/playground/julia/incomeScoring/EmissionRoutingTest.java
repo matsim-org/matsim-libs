@@ -86,7 +86,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 	
-	public void testRoutingrun() {
+	public void testEmissionrouting() {
 		
 		this.config = new Config();
 		this.config.addCoreModules();
