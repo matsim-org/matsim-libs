@@ -33,12 +33,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 /**
  * @author Ihab
@@ -50,17 +50,18 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 	ScenarioImpl sc;
 	Network net;
 	Population pop;
-	private List<Id> parkAndRideLinkIDs = new ArrayList<Id>();
+	private List<ParkAndRideFacility> prFacilities = new ArrayList<ParkAndRideFacility>();
 
-	public ParkAndRideAddRemoveStrategy(Controler controler) {
+	public ParkAndRideAddRemoveStrategy(Controler controler, List<ParkAndRideFacility> prFacilities) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
+		this.prFacilities = prFacilities;
 		
-		// all possible Park And Ride facilities
-		parkAndRideLinkIDs.add(new IdImpl("PrA2toPrB2"));
-		parkAndRideLinkIDs.add(new IdImpl("PrA4toPrB4"));
-		parkAndRideLinkIDs.add(new IdImpl("PrA6toPrB6"));
+//		// all possible Park And Ride facilities
+//		prLinkIDs.add(new IdImpl("PRa2toPRb2"));
+//		prLinkIDs.add(new IdImpl("PRa4toPRb4"));
+//		prLinkIDs.add(new IdImpl("PRa6toPRb6"));
 	}
 
 	@Override
@@ -163,10 +164,10 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 	}
 	
 	private Activity createParkAndRideActivity(double random) {
-
-		int max = this.parkAndRideLinkIDs.size();
+		
+		int max = this.prFacilities.size();
 	    int rndInt = (int) (random * max);
-		Id rndLinkId = this.parkAndRideLinkIDs.get(rndInt);
+		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink2in();
 		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
 		
 		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getCoord(), rndLinkId); 

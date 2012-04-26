@@ -24,7 +24,6 @@
 package playground.ikaddoura.parkAndRide.pR;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author Ihab
@@ -33,91 +32,50 @@ import org.matsim.api.core.v01.network.Link;
 public class ParkAndRideFacility {
 
 	private int nr;
-	private Id linkArein; // erster Link (hin)
-	private Id linkAraus; // erster Link (zurück)
-	private Id linkBrein; // zweiter Link (hin)
-	private Id linkBraus; // zweiter Link (zurück)
-	
-	public ParkAndRideFacility(int nummer, Id linkArein, Id linkAraus, Id linkBrein, Id linkBraus) {
-		this.nr = nummer;
-		this.linkArein = linkArein;
-		this.linkAraus = linkAraus;
-		this.linkBrein = linkBrein;
-		this.linkBraus = linkBraus;
-	}
+	private Id prLink1in; // erster Link (hin) (ampel)
+	private Id prLink1out; // erster Link (zurück)
+	private Id prLink2in; // zweiter Link (hin) (parkAndRideLink)
+	private Id prLink2out; // zweiter Link (zurück)
 
-	/**
-	 * @return the linkArein
-	 */
-	public Id getLinkArein() {
-		return linkArein;
-	}
-
-	/**
-	 * @param linkArein the linkArein to set
-	 */
-	public void setLinkArein(Id linkArein) {
-		this.linkArein = linkArein;
-	}
-
-	/**
-	 * @return the linkAraus
-	 */
-	public Id getLinkAraus() {
-		return linkAraus;
-	}
-
-	/**
-	 * @param linkAraus the linkAraus to set
-	 */
-	public void setLinkAraus(Id linkAraus) {
-		this.linkAraus = linkAraus;
-	}
-
-	/**
-	 * @return the linkBrein
-	 */
-	public Id getLinkBrein() {
-		return linkBrein;
-	}
-
-	/**
-	 * @param linkBrein the linkBrein to set
-	 */
-	public void setLinkBrein(Id linkBrein) {
-		this.linkBrein = linkBrein;
-	}
-
-	/**
-	 * @return the linkBraus
-	 */
-	public Id getLinkBraus() {
-		return linkBraus;
-	}
-
-	/**
-	 * @param linkBraus the linkBraus to set
-	 */
-	public void setLinkBraus(Id linkBraus) {
-		this.linkBraus = linkBraus;
-	}
-
-	/**
-	 * @return the nr
-	 */
 	public int getNr() {
 		return nr;
 	}
 
-	/**
-	 * @param nr the nr to set
-	 */
 	public void setNr(int nr) {
 		this.nr = nr;
 	}
 
-	
-	
+	public Id getPrLink1in() {
+		return prLink1in;
+	}
+
+	public void setPrLink1in(Id prLink1in) {
+		this.prLink1in = prLink1in;
+	}
+
+	public Id getPrLink1out() {
+		return prLink1out;
+	}
+
+	public void setPrLink1out(Id prLink1out) {
+		this.prLink1out = prLink1out;
+	}
+
+	public Id getPrLink2in() {
+		return prLink2in;
+	}
+
+	public void setPrLink2in(Id prLink2in) {
+		this.prLink2in = prLink2in;
+	}
+
+	public Id getPrLink2out() {
+		return prLink2out;
+	}
+
+	public void setPrLink2out(Id prLink2out) {
+		this.prLink2out = prLink2out;
+	}
 
 	
 }

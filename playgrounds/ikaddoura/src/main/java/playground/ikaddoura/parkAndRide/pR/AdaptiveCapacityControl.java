@@ -29,7 +29,6 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -46,12 +45,16 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	private Map<Integer, Integer> prNr2vehicles = new HashMap<Integer, Integer>();
 	private Map<Integer, SignalizeableItem> prNr2ampel = new HashMap<Integer, SignalizeableItem>();
-	private List<ParkAndRideFacility> pRfacilities = new ArrayList<ParkAndRideFacility>();
+	private List<ParkAndRideFacility> prFacilities = new ArrayList<ParkAndRideFacility>();
 
 	private Integer maxCapacity = 10;
 	
 	private InternalInterface internalInterface;
 	
+	public AdaptiveCapacityControl(List<ParkAndRideFacility> prFacilities) {
+		this.prFacilities = prFacilities;
+	}
+
 	@Override
 	public void doSimStep(double time) {
 		
@@ -66,22 +69,12 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	@Override
 	public void onPrepareSim() {
-//   prNr ; A Rein	; A Raus  ; B Rein	   ; B Raus	
-//		2 ; 2toPrA2 ; PrA2to2 ; PrA2toPrB2 ; PrB2toPrA2
-//		4 ; 4toPrA4 ; PrA4to4 ; PrA4toPrB4 ; PrB4toPrA4
-//		6 ; 6toPrA6 ; PrA6to6 ; PrA6toPrB6 ; PrB6toPrA6
-		
-//			Ampel			    prfacility
-		
-		pRfacilities.add(new ParkAndRideFacility(2, new IdImpl("2toPrA2"), new IdImpl("PrA2to2"), new IdImpl("PrA2toPrB2"), new IdImpl("PrB2toPrA2")));
-		pRfacilities.add(new ParkAndRideFacility(4, new IdImpl("4toPrA4"), new IdImpl("PrA4to4"), new IdImpl("PrA4toPrB4"), new IdImpl("PrB4toPrA4")));
-		pRfacilities.add(new ParkAndRideFacility(6, new IdImpl("6toPrA6"), new IdImpl("PrA6to6"), new IdImpl("PrA6toPrB6"), new IdImpl("PrB6toPrA6")));
 
-		for (ParkAndRideFacility pr : this.pRfacilities){
+		for (ParkAndRideFacility pr : this.prFacilities){
 			this.prNr2vehicles.put(pr.getNr(), 0);
 
-			Id idArein = pr.getLinkArein();
-			SignalizeableItem ampel = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(idArein) ;
+			Id getPrLink1in = pr.getPrLink1in(); // TODO: ??? pr.getPrLink2in() ??? (testen!)
+			SignalizeableItem ampel = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(getPrLink1in) ;
 			ampel.setSignalized(true);
 			this.prNr2ampel.put(pr.getNr(), ampel);
 		}
@@ -102,17 +95,16 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	@Override
 	public void reset(int iteration) {
-		this.pRfacilities.clear();
 		this.prNr2ampel.clear();
 		this.prNr2vehicles.clear();
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		for (ParkAndRideFacility pr : this.pRfacilities){
-			Id id = pr.getLinkBrein();
-			if (id.equals(event.getLinkId())){
-				System.out.println("Car entered ParkAndRideFacilty (B rein): " + id.toString());
+		for (ParkAndRideFacility pr : this.prFacilities){
+			Id id = pr.getPrLink2in();
+			if (id.toString().equals(event.getLinkId().toString())){
+				System.out.println("Car entered ParkAndRideFacilty: " + id.toString());
 				int vehNr = this.prNr2vehicles.get(pr.getNr()) + 1;
 				System.out.println("Auslastung: "+vehNr);
 				this.prNr2vehicles.put(pr.getNr(), vehNr);
@@ -122,10 +114,11 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		for (ParkAndRideFacility pr : this.pRfacilities){
-			Id id = pr.getLinkBrein();
-			if (id.equals(event.getLinkId())){
-				System.out.println("Car left ParkAndRideFacilty (B rein): " + id.toString());
+		for (ParkAndRideFacility pr : this.prFacilities){
+			Id id = pr.getPrLink2out();
+
+			if (id.toString().equals(event.getLinkId().toString())){
+				System.out.println("Car left ParkAndRideFacilty: " + id.toString());
 				int vehNr = this.prNr2vehicles.get(pr.getNr()) - 1;
 				System.out.println("Auslastung: "+vehNr);
 				this.prNr2vehicles.put(pr.getNr(), vehNr);

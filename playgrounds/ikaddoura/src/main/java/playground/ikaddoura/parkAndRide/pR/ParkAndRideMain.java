@@ -24,6 +24,8 @@
 package playground.ikaddoura.parkAndRide.pR;
 
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -42,15 +44,26 @@ import playground.ikaddoura.parkAndRide.pRscoring.ParkAndRideScoringFunctionFact
  */
 public class ParkAndRideMain {
 	
+	static String configFile = "../../shared-svn/studies/ihab/parkAndRide/input/config.xml";
+	static String prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/input/prFacilities.txt";
+	
 	public static void main(String[] args) {
-			
-		String config = "../../shared-svn/studies/ihab/parkAndRide/input/config.xml";
-		Controler controler = new Controler(config);
+		ParkAndRideMain main = new ParkAndRideMain();
+		main.run();
+	}
+	
+	private void run() {
+		
+		Controler controler = new Controler(configFile);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		
+		PRFileReader prReader = new PRFileReader(prFacilityFile);
+		List<ParkAndRideFacility> prFacilities = prReader.getPrFacilities();
 
-		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl();
-		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl));
+		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(prFacilities);
+		
+		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, prFacilities));
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
 		ParkAndRideScoringFunctionFactory scoringfactory = new ParkAndRideScoringFunctionFactory(planCalcScoreConfigGroup, controler.getNetwork());

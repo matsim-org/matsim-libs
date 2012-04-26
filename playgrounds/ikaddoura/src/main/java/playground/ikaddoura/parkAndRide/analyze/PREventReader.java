@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class PREventReader {
 	
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/testNetworkParkAndRide.xml";
+	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/prNetwork.xml";
 	static String eventFile = "../../shared-svn/studies/ihab/parkAndRide/output1/ITERS/it.100/100.events.xml.gz";
 
 	public static void main(String[] args) {
