@@ -201,7 +201,7 @@ public class SingleDayGarageParkingsCount {
 							int prevBinIndex = (binIndex + 95) % 96;
 							parkingOccupancy[binIndex] = parkingOccupancy[prevBinIndex];
 						} else {
-							parkingOccupancy[binIndex] = parseOccupancyString(parkingOccupancyString);
+							parkingOccupancy[binIndex] = parseAvailableParkingString(parkingOccupancyString);
 						}
 					}
 				}
@@ -235,7 +235,7 @@ public class SingleDayGarageParkingsCount {
 
 	}
 
-	private static Double parseOccupancyString(String parkingOccupancyString) {
+	public static Double parseAvailableParkingString(String parkingOccupancyString) {
 		try {
 			return Double.parseDouble(parkingOccupancyString.split("/")[1].trim());
 		} catch (Exception e) {
@@ -289,7 +289,7 @@ public class SingleDayGarageParkingsCount {
 		parkingCapacities.put("Parkhaus Züri 11 Shopping / Nansenstrasse 5/7", 65.0);
 		// official: 60, increased to 65 due to higher counts.
 		parkingCapacities.put("Parkplatz Bienen / Bienen-/Herdernstrasse", 110.0);
-		parkingCapacities.put("Parkplatz Eisfeld / Thurgauerstrasse 54", 240.0);
+		parkingCapacities.put("Parkplatz Eisfeld / Thurgauerstrasse 54", 280.0);
 		parkingCapacities.put("Parkplatz Stadthof 11 / Wallisellenstrasse 15", 188.0);
 
 		return parkingCapacities;

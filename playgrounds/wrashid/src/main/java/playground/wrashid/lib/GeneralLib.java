@@ -81,6 +81,7 @@ import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
 import playground.wrashid.lib.obj.StringMatrix;
+import playground.wrashid.lib.obj.StringMatrixFilter;
 import playground.wrashid.lib.obj.list.Lists;
 
 public class GeneralLib {
@@ -717,8 +718,8 @@ public class GeneralLib {
 		return list;
 	}
 	
-	// TODO: move implementation to String matrix class...
-	public static StringMatrix readStringMatrix(String fileName, String delim) {
+	
+	public static StringMatrix readStringMatrix(String fileName, String delim, StringMatrixFilter filter){
 		StringMatrix matrix = new StringMatrix();
 
 		try {
@@ -748,7 +749,12 @@ public class GeneralLib {
 					row.add(tokenizer.nextToken());
 				}
 
-				matrix.addRow(row);
+				if (filter!=null && filter.removeLine(line)){
+					
+				} else {
+					matrix.addRow(row);
+				}
+				
 
 				line = br.readLine();
 			}
@@ -759,6 +765,13 @@ public class GeneralLib {
 		}
 
 		return matrix;
+	}
+	
+	
+	
+	// TODO: move implementation to String matrix class...
+	public static StringMatrix readStringMatrix(String fileName, String delim) {
+		return readStringMatrix(fileName,delim,null);
 	}
 
 	/**

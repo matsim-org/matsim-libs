@@ -12,7 +12,7 @@ public class GenerateTabSeparatedNetwork {
 
 	public static void main(String[] args) {
 		
-		Network network = GeneralLib.readNetwork("E:/svn/studies/switzerland/networks/ivtch/network.xml");
+		Network network = GeneralLib.readNetwork("C:/tmp/network.xml");
 		
 		System.out.println("linkId\tfromNode\ttoNode\tfreeSpeed\tcapacity\tnumberOfLanes");
 		
