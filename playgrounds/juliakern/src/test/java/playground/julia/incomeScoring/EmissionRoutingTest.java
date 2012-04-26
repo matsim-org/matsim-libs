@@ -46,6 +46,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
@@ -56,36 +59,66 @@ import org.matsim.vehicles.Vehicles;
 import playground.benjamin.emissions.EmissionModule;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.internalization.EmissionCostModule;
+import playground.benjamin.internalization.EmissionScoringFunctionFactory;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-
+import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
+//import playground.julia.incomeScoring.RoadUsedHandler;
+import playground.julia.incomeScoring.RoadUsedHandler;
+import playground.julia.interpolation.*;
 /**
  * @author benjamin
- * junit testclass for different routing options
- * 
- * This class has three methods which test routings for different generalized costs on a simple network.
- * The network consists of a main route (links 1, 2, 3, 4, 5, 6, 7) with three variants (links 8+9, 10+11, 12+13) 
- * which differ in length and free flow speed.
- * 
- * testTimeRouting uses only the time as generalized costs and should use the 8+9 variant
- * testDistanceRouting uses only the distance as generalized costs and should use the 10+11 variant
- * testEmissionRouting  uses emissions, time and distance as generalized costs and should use the 12+13 variant
  *
  */
 public class EmissionRoutingTest extends MatsimTestCase{
 	
-	/*package*/ final static Id id1 = new IdImpl("1");
-	/*package*/ final static Id id2 = new IdImpl("2");
-	
+	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
+	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
+	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
+	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
+	static boolean isUsingDetailedEmissionCalculation = false;
+
+		private final String outputDirectory = "../../detailedEval/internalization/test/";
 
 	private Config config;
 	private Scenario scenario;
 	private Controler controler;
 	private Vehicles emissionVehicles;
+	private EmissionModule emissionModule;
+	private EmissionCostModule emissionCostModule;
 	
-	public void testEmissionRouting() {
+	public void testRoutingrun() {
+		
+		this.config = new Config();
+		this.config.addCoreModules();
+		this.config.controler().setOutputDirectory(this.outputDirectory);
+
+		this.scenario = ScenarioUtils.createScenario(this.config);
+		
+		createNetwork();
+		createActiveAgents();
+//		createPassiveAgents();
+		createVehicles();
+		
+		this.controler = new Controler(this.scenario);
+		specifyControler();
+		
+		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
+		
+		emissionCostModule = new EmissionCostModule(1.0);
+		
+//		installScoringFunctionFactory();
+		installTravelCostCalculatorFactory();
+		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+		
 		
 		this.config = super.loadConfig(null); // automatically sets the correct output directory
 		this.scenario = ScenarioUtils.createScenario(this.config);
+		
+		this.config = new Config();
+		this.config.addCoreModules();
+		this.config.controler().setOutputDirectory(this.outputDirectory);
 		
 		createNetwork();
 		createActiveAgents();
@@ -93,21 +126,17 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		
 		this.controler = new Controler(this.scenario);
 		specifyControler();
-		
+//		
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
 		pcs.setTraveling_utils_hr(-6.0);
 		pcs.setMarginalUtilityOfMoney(0.6);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
-		
-		EmissionModule emissionModule = new EmissionModule(scenario, this.emissionVehicles);
+//		
+		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
-		
-		EmissionCostModule emissionCostModule = new EmissionCostModule(1.0);
-		
-		EmissionTravelDisutilityCalculatorFactory emissionTccf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		controler.setTravelDisutilityFactory(emissionTccf);
-		
+//		
+		installTravelCostCalculatorFactory();
 		final RoadUsedHandler handler = new RoadUsedHandler(13) ;
 						
 		StartupListener startupListener = new StartupListener() {
@@ -118,14 +147,15 @@ public class EmissionRoutingTest extends MatsimTestCase{
 			}
 		};
 		
-		System.out.println("test emission routing");
+//		System.out.println("test emission routing");
 		this.controler.addControlerListener(startupListener);
+		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
-		assertTrue("Person was expected to be routed through link 13, but was " + handler.getLink(), handler.getWasRoadSelected()==true);
+		assertTrue("Person was expected to be routed through link 13, but was " + handler.getLink(), RoadUsedHandler.getWasRoadSelected()==true);
+		
 	}
-
-
-	public void testDistanceRouting() {
+	
+public void testDistanceRouting() {
 		
 		this.config = super.loadConfig(null); // automatically sets the correct output directory
 		this.scenario = ScenarioUtils.createScenario(this.config);
@@ -195,6 +225,17 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		assertTrue("Person was expected to be routed through link 9, but was " + handler.getLink(), handler.getWasRoadSelected()==true);
 	}
 	
+
+	private void installTravelCostCalculatorFactory() {
+		EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		controler.setTravelDisutilityFactory(emissionTdcf);
+	}
+
+	private void installScoringFunctionFactory() {
+		EmissionScoringFunctionFactory emissionSff = new EmissionScoringFunctionFactory(controler);
+		controler.setScoringFunctionFactory(emissionSff);
+	}
+	
 	private void specifyControler() {
 	// controler settings	
 		controler.setOverwriteFiles(true);
@@ -202,7 +243,7 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		
 	// controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
-//		ccg.setOutputDirectory(outputDirectory);
+		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(0);
 		ccg.setLastIteration(10);
 		ccg.setMobsim("qsim");
@@ -233,6 +274,11 @@ public class EmissionRoutingTest extends MatsimTestCase{
 		act2Params.setTypicalDuration(8 * 3600);
 		pcs.addActivityParams(act2Params);
 		
+		pcs.setBrainExpBeta(1.0);
+		pcs.setTraveling_utils_hr(-6.0);
+		pcs.setMarginalUtilityOfMoney(0.6);
+		pcs.setMonetaryDistanceCostRateCar(-0.0001);
+
 	// strategyConfigGroup
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		
@@ -250,21 +296,32 @@ public class EmissionRoutingTest extends MatsimTestCase{
 
 	// define emission tool input files	
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
-		 String emissionInputPath = (this.getInputDirectory()+"detailedEval/emissions/hbefaForMatsim/");
-		 String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
-		 String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
-		 String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
-		 boolean isUsingDetailedEmissionCalculation = false;
-		 
 		vcg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
 		
 		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 		
-		vcg.setIsUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
-		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		vcg.setWritingOutputEvents(false) ;
+	}
+
+	private void createPassiveAgents() {
+		// TODO: make code homogeneous by using factories!
+		for(int i=0; i<10; i++){
+			PersonImpl person = new PersonImpl (new IdImpl(i));
+			PlanImpl plan = person.createAndAddPlan(true);
+			
+			ActivityImpl home = plan.createAndAddActivity("home", scenario.createId("11"));
+			home.setEndTime(6 * 3600);
+			home.setCoord(scenario.createCoord(0.0, 0.0));
+			
+			plan.createAndAddLeg(TransportMode.walk);
+			
+			ActivityImpl home2 = plan.createAndAddActivity("home", scenario.createId("11"));
+			home2.setCoord(scenario.createCoord(0.0, 0.0));
+			
+			scenario.getPopulation().addPerson(person);
+		}
 	}
 
 	private void createActiveAgents() {
@@ -314,25 +371,24 @@ public class EmissionRoutingTest extends MatsimTestCase{
         Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(-15000.0, -8660.0));
         Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord( -7500.0,  2500.0));
         Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord( -7500.0, -2500.0));
-        Node node10 = network.createAndAddNode(scenario.createId("10"), scenario.createCoord(-7500.0, -3000.0));
         
         network.createAndAddLink(scenario.createId("1"), node1, node2, 1000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("2"), node2, node3, 2000, 27.78, 3600, 1, null, "22");
+//      network.createAndAddLink(scenario.createId("3"), node3, node4, 75000, 10.42, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("4"), node4, node5, 2000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("5"), node5, node6, 1000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("6"), node6, node7, 1000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("7"), node7, node1, 1000, 27.78, 3600, 1, null, "22");
-        
-        //three similar links
         network.createAndAddLink(scenario.createId("8"), node3, node8, 5000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("10"), node3, node9, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(scenario.createId("12"), node3, node10, 5000, 27.78, 3600, 1, null, "22");
-        
-        //time
+
         network.createAndAddLink(scenario.createId("9"), node8, node4, 5000, 27.78, 3600, 1, null, "22");
-        //distance
-        network.createAndAddLink(scenario.createId("11"), node9, node4, 2500, 12.63, 3600, 1, null, "22");
-        //time+emissions
-        network.createAndAddLink(scenario.createId("13"), node10, node4, 3750, 20.83, 3600, 1, null, "22");        
+        network.createAndAddLink(scenario.createId("11"), node9, node4, 2500, 13.89, 3600, 1, null, "22");
 	}
+
+	public static void main(String[] args) {
+		EmissionRoutingTest test = new EmissionRoutingTest();
+		test.run();
+	}
+
 }

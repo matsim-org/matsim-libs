@@ -6,7 +6,7 @@ import org.matsim.core.basic.v01.IdImpl;
 
 public class RoadUsedHandler implements LinkLeaveEventHandler{
 
-	boolean mer;
+	static boolean mer;
 	int i;
 	String usedRoadVariant = new String("");
 	
@@ -34,8 +34,12 @@ public void handleEvent(LinkLeaveEvent event) {
 }
 
 
-public boolean getWasRoadSelected() {
+public static boolean getWasRoadSelected() {
 	return mer;
+}
+
+public static boolean getWasRoadSelectedDummyTrue(){
+	return true;
 }
 
 public String getLink() {
