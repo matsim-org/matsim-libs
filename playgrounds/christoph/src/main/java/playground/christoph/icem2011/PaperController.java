@@ -61,7 +61,7 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 /**
  * Controller for the simulation runs presented in the ICEM 2011 paper. 
@@ -121,7 +121,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	protected DuringLegIdentifier duringLegIdentifier;
 //	protected WithinDayInitialReplanner initialReplanner;
 //	protected WithinDayDuringActivityReplanner duringActivityReplanner;
-	protected WithinDayDuringLegReplanner duringLegReplanner;
+	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 
 	protected SelectHandledAgentsByProbability selector;
 
@@ -176,9 +176,9 @@ public class PaperController extends WithinDayController implements StartupListe
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(identifier, pDuringLegReplanning);
 		this.duringLegIdentifier = new AgentFilteredDuringLegIdentifier(new LinkFilteredDuringLegIdentifier(identifier, this.replanningLinks), this.replanningAgents);
-		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
+		this.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 	/*
@@ -188,7 +188,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.createAndInitReplanningManager(numReplanningThreads);
+		super.initReplanningManager(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 //		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
