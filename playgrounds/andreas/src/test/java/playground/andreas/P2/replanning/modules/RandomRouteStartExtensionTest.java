@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
@@ -38,22 +39,22 @@ import playground.andreas.P2.replanning.PPlanStrategy;
  * @author droeder
  *
  */
-public class RandomRouteEndExtensionTest {
+public class RandomRouteStartExtensionTest {
 	
 	@Test
     public final void testRun() {
 		MatsimRandom.reset();
 		PConfigGroup c = new PConfigGroup();
-		Cooperative coop = PScenarioHelper.createCoop2111to2333();
+		Cooperative coop = PScenarioHelper.createCoop2333to2111();
 		PPlan plan = coop.getBestPlan();
 		//check the initial plan
 		Assert.assertEquals(2, plan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(c.getPIdentifier() + "2111", plan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals(c.getPIdentifier() + "2333", plan.getStopsToBeServed().get(1).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "2333", plan.getStopsToBeServed().get(0).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "2111", plan.getStopsToBeServed().get(1).getId().toString());
 		// set up strategy
 		ArrayList<String> parameters = new ArrayList<String>();
 		parameters.add("0.7");
-		PPlanStrategy strategy = new RandomRouteEndExtension(parameters);
+		PPlanStrategy strategy = new RandomRouteStartExtension(parameters);
 		// run strategy with initial cooperative
 		Assert.assertNull("new plan should be null", strategy.run(coop));
 		// create new Plan
@@ -61,8 +62,8 @@ public class RandomRouteEndExtensionTest {
 		plan = strategy.run(coop);
 		Assert.assertNotNull("new plan should not be null", plan);
 		Assert.assertEquals(3, plan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(c.getPIdentifier() + "2111", plan.getStopsToBeServed().get(0).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "3444", plan.getStopsToBeServed().get(0).getId().toString());
 		Assert.assertEquals(c.getPIdentifier() + "2333", plan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals(c.getPIdentifier() + "3444", plan.getStopsToBeServed().get(2).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "2111", plan.getStopsToBeServed().get(2).getId().toString());
 	}
 }

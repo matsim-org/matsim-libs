@@ -306,6 +306,7 @@ public class PScenarioHelper {
 		}
 		return scenario;
 	}
+	
 	public static Cooperative createCoop2111to2333(){
 		
 		Scenario sc= PScenarioHelper.createTestNetwork();
@@ -315,7 +316,21 @@ public class PScenarioHelper {
 		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(conf.getPIdentifier(), sched, sc.getNetwork(), 10);
 	
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
-		coop.init(prov, new Route2313to3343(sched, conf.getPIdentifier()), 0);
+		coop.init(prov, new Route2111to2333(sched, conf.getPIdentifier()), 0);
+		
+		return coop;
+	}
+	
+	public static Cooperative createCoop2333to2111(){
+		
+		Scenario sc= PScenarioHelper.createTestNetwork();
+		
+		PConfigGroup conf = new PConfigGroup();
+		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(conf.getPIdentifier(), sched, sc.getNetwork(), 10);
+	
+		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
+		coop.init(prov, new Route2333to2111(sched, conf.getPIdentifier()), 0);
 		
 		return coop;
 	}
@@ -348,12 +363,12 @@ public class PScenarioHelper {
 
 }
 
-class Route2313to3343 implements PPlanStrategy{
+class Route2111to2333 implements PPlanStrategy{
 	
 	private String pId;
 	private TransitSchedule sched;
 
-	public Route2313to3343(TransitSchedule sched, String pId){
+	public Route2111to2333(TransitSchedule sched, String pId){
 		this.sched = sched;
 		this.pId = pId;
 	}
@@ -365,6 +380,41 @@ class Route2313to3343 implements PPlanStrategy{
 		double endTime = 16.0 * 3600.0;
 		TransitStopFacility startStop = sched.getFacilities().get(new IdImpl(pId + "2111"));
 		TransitStopFacility endStop = sched.getFacilities().get(new IdImpl(pId + "2333"));
+		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
+		stops.add(startStop);
+		stops.add(endStop);
+		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
+		return newPlan;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 */
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+
+class Route2333to2111 implements PPlanStrategy{
+	
+	private String pId;
+	private TransitSchedule sched;
+
+	public Route2333to2111(TransitSchedule sched, String pId){
+		this.sched = sched;
+		this.pId = pId;
+	}
+
+	@Override
+	public PPlan run(Cooperative cooperative) {
+		Id id = new IdImpl(cooperative.getCurrentIteration());
+		double startTime = 8.0 * 3600.0;
+		double endTime = 16.0 * 3600.0;
+		TransitStopFacility startStop = sched.getFacilities().get(new IdImpl(pId + "2333"));
+		TransitStopFacility endStop = sched.getFacilities().get(new IdImpl(pId + "2111"));
 		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
 		stops.add(startStop);
 		stops.add(endStop);

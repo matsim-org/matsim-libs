@@ -28,6 +28,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
+import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
@@ -41,25 +42,27 @@ public class ConvexHullRouteExtensionTest {
 	@Test
     public final void testRun() {
 		MatsimRandom.reset();
+		PConfigGroup c = new PConfigGroup();
 		Cooperative coop = PScenarioHelper.createCoop2111to1314to4443();
-		PPlan oldPlan = coop.getBestPlan();
-		
+		PPlan plan = coop.getBestPlan();
+		// check the initial plan
+		Assert.assertEquals(3, plan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(c.getPIdentifier() + "2111", plan.getStopsToBeServed().get(0).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "1314", plan.getStopsToBeServed().get(1).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "4443", plan.getStopsToBeServed().get(2).getId().toString());
+		//set up strategy
 		ArrayList<String> parameters = new ArrayList<String>();
 		PPlanStrategy strategy = new ConvexHullRouteExtension(parameters);
+		// run strategy with initial cooperative
+		Assert.assertNull("new plan should be null", strategy.run(coop));
+		// create new Plan
 		coop.getBestPlan().setNVehicles(2);
-		coop.init(coop.getRouteProvider(), strategy, 1);
-		PPlan newPlan = coop.getBestPlan();
-		
-		Assert.assertEquals(3, oldPlan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("p_2111", oldPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("p_1314", oldPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("p_4443", oldPlan.getStopsToBeServed().get(2).getId().toString());
-		
-		Assert.assertEquals(4, newPlan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("p_2111", newPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("p_1314", newPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("p_4443", newPlan.getStopsToBeServed().get(2).getId().toString());
-		Assert.assertEquals("p_1222", newPlan.getStopsToBeServed().get(3).getId().toString());
+		plan = strategy.run(coop);
+		Assert.assertNotNull("new plan should not be null", plan);
+		Assert.assertEquals(4, plan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(c.getPIdentifier() + "2111", plan.getStopsToBeServed().get(0).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "1314", plan.getStopsToBeServed().get(1).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "4443", plan.getStopsToBeServed().get(2).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "1222", plan.getStopsToBeServed().get(3).getId().toString());
 	}
-
 }
