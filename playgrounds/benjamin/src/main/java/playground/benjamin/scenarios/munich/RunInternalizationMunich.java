@@ -37,14 +37,17 @@ public class RunInternalizationMunich {
 
 	static String configFile;
 	static String emissionCostFactor;
+	static String considerCO2Costs;
 
 
 	public static void main(String[] args) {
 		//		configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
 		//		emissionCostFactor = "1.0";
+		//		considerCO2Costs = "true";
 
 		configFile = args[0];
 		emissionCostFactor = args[1];
+		considerCO2Costs = args[2];
 
 		Config config = new Config();
 		config.addCoreModules();
@@ -58,7 +61,7 @@ public class RunInternalizationMunich {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor));
+		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.getBoolean(considerCO2Costs));
 
 		EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissionTducf);

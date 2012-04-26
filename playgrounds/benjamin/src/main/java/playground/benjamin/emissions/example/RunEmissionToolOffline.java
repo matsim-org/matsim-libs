@@ -43,7 +43,7 @@ import playground.benjamin.emissions.EmissionModule;
 public class RunEmissionToolOffline {
 	private static final Logger logger = Logger.getLogger(RunEmissionToolOffline.class);
 
-	final static String runNumber = "985";
+	final static String runNumber = "981";
 	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
 	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
 	final static Integer lastIteration = getLastIteration(configFile);

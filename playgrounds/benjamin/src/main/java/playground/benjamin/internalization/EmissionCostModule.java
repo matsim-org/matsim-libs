@@ -34,6 +34,7 @@ public class EmissionCostModule {
 	private static final Logger logger = Logger.getLogger(EmissionCostModule.class);
 	
 	private final double emissionCostFactor;
+	private boolean considerCO2Costs = false;
 	
 	/*Values taken from IMPACT (Maibach et al.(2008))*/
 	private final double EURO_PER_GRAMM_NOX = 9600. / (1000. * 1000.);
@@ -42,8 +43,20 @@ public class EmissionCostModule {
 	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
 	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 	
+	public EmissionCostModule(double emissionCostFactor, boolean considerCO2Costs) {
+		this.emissionCostFactor = emissionCostFactor;
+		
+		if(considerCO2Costs){
+			this.considerCO2Costs = true;
+			logger.info("CO2 emission costs will be calculated... ");
+		} else {
+			logger.info("CO2 emission costs will NOT be calculated... ");
+		}
+	}
+	
 	public EmissionCostModule(double emissionCostFactor) {
 		this.emissionCostFactor = emissionCostFactor;
+		logger.info("CO2 emission costs will NOT be calculated... ");
 	}
 
 	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions) {
@@ -54,7 +67,10 @@ public class EmissionCostModule {
 			else if(wp.equals(WarmPollutant.NMHC)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_NMVOC;
 			else if(wp.equals(WarmPollutant.SO2)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_SO2;
 			else if(wp.equals(WarmPollutant.PM)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_PM2_5_EXHAUST;
-			else if(wp.equals(WarmPollutant.CO2_TOTAL)); // warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_CO2;
+			else if(wp.equals(WarmPollutant.CO2_TOTAL)){
+				if(this.considerCO2Costs) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_CO2;
+				else ; //do nothing
+			}
 			else ; //do nothing
 		}
 		return this.emissionCostFactor * warmEmissionCosts;
