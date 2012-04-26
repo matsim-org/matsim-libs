@@ -33,6 +33,15 @@ import org.matsim.core.utils.misc.Time;
 
 public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
+	/**
+	 * Agents cannot be added directly to the activityEndsList since that would
+	 * not be thread-safe when within-day replanning is used. There, an agent's 
+	 * activity end time can be modified. As a result, the agent is located at
+	 * the wrong position in the activityEndsList until it is updated by using
+	 * rescheduleActivityEnd(...). However, if another agent is added to the list
+	 * in the mean time, it might be inserted at the wrong position.
+	 * cdobler, apr'12
+	 */
 	private class AgentEntry {
 		public AgentEntry(MobsimAgent agent, double activityEndTime) {
 			this.agent = agent;
