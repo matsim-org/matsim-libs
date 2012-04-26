@@ -39,7 +39,7 @@ public class PTransitSchedule implements TransitSchedule{
 	private TransitSchedule transitSchedule;	
 	
 	public PTransitSchedule(TransitSchedule transitSchedule) {
-		log.warn("check");
+		log.info("Using own implementation of transit schedule - Check, if really needed");
 		this.transitSchedule = transitSchedule;
 	}
 
