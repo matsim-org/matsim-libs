@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -87,7 +88,7 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 	private HashMap<Id,XMLEdgeContent> edgeMap;
 	private HashMap<Id,XMLAttvaluesContent> attValueContentMap;
 
-	private HashMap<Id, Integer> linkId2CountsFromLastIteration;
+	private HashMap<Id, Set<Id>> linkId2CoopIdsFromLastIteration;
 
 	public GexfPCoopCount(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
@@ -117,6 +118,14 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 			
 			attsContent.getAttribute().add(attContent);		
 			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(attsContent);
+			
+			attContent = new XMLAttributeContent();
+			attContent.setId("coopIds");
+			attContent.setTitle("Ids of the cooperatives iteration");
+			attContent.setType(XMLAttrtypeType.STRING);
+			
+			attsContent.getAttribute().add(attContent);		
+			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(attsContent);
 		}
 	}
 
@@ -127,7 +136,7 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 			this.createAttValues();
 			this.eventsHandler = new CountPCoopHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.eventsHandler);
-			this.linkId2CountsFromLastIteration = new HashMap<Id, Integer>();
+			this.linkId2CoopIdsFromLastIteration = new HashMap<Id, Set<Id>>();
 		}
 	}
 
@@ -161,24 +170,38 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 	private void addValuesToGexf(int iteration, CountPCoopHandler handler) {
 		for (Entry<Id, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
 			
-			int countForLink = handler.getCoopCountForLinkId(entry.getKey());
+			Set<Id> coopsForLink = handler.getCoopsForLinkId(entry.getKey());
 			
-			if (this.linkId2CountsFromLastIteration.get(entry.getKey()) != null){
+			// Test, if something changed
+			if (this.linkId2CoopIdsFromLastIteration.get(entry.getKey()) != null){
 				// There is already an entry
-				if (this.linkId2CountsFromLastIteration.get(entry.getKey()).intValue() == countForLink) {
+				if (this.linkId2CoopIdsFromLastIteration.get(entry.getKey()).equals(coopsForLink)) {
 					// same as last iteration - ignore
 					continue;
 				}
 			}
 			
-			XMLAttvalue attValue = new XMLAttvalue();
-			attValue.setFor("weight");
-//			attValue.setValue(Integer.toString(Math.max(1, countForLink)));
-			attValue.setValue(Integer.toString(countForLink));
-			attValue.setStart(Double.toString(iteration));
+			// completely new or not the same
+			XMLAttvalue coopIdValue = new XMLAttvalue();
+			XMLAttvalue coopCountValue = new XMLAttvalue();
+			
+			coopIdValue.setFor("coopIds");
+			coopCountValue.setFor("weight");
+			
+			if (coopsForLink == null) {
+				coopIdValue.setValue("");
+				coopCountValue.setValue("0");
+			} else {
+				coopIdValue.setValue(coopsForLink.toString());
+				coopCountValue.setValue(Integer.toString(coopsForLink.size()));
+			}
+			
+			coopIdValue.setStart(Double.toString(iteration));
+			coopCountValue.setStart(Double.toString(iteration));			
 
-			entry.getValue().getAttvalue().add(attValue);
-			this.linkId2CountsFromLastIteration.put(entry.getKey(), countForLink);
+			entry.getValue().getAttvalue().add(coopIdValue);
+			entry.getValue().getAttvalue().add(coopCountValue);
+			this.linkId2CoopIdsFromLastIteration.put(entry.getKey(), coopsForLink);
 		}
 	}
 

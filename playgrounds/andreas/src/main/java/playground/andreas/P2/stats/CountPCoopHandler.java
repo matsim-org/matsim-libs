@@ -50,12 +50,12 @@ public class CountPCoopHandler implements LinkEnterEventHandler, TransitDriverSt
 		this.vehId2lineIdMap = new HashMap<Id, Id>();
 	}
 
-	public int getCoopCountForLinkId(Id linkId){
+	public Set<Id> getCoopsForLinkId(Id linkId) {
 		Set<Id> lineIds = this.linkId2CoopIdsSetMap.get(linkId);
 		if(lineIds == null){
-			return 0;
+			return null;
 		} else {
-			return lineIds.size();
+			return lineIds;
 		}
 	}
 
