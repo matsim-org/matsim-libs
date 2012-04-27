@@ -36,21 +36,21 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
  * @author aneumann
  *
  */
-public class CountPPassengersHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
-	private static final Logger log = Logger.getLogger(CountPPassengersHandler.class);
+	private static final Logger log = Logger.getLogger(CountPPaxHandler.class);
 	
 	private String pIdentifier;
 	private HashMap<Id, Integer> linkId2CountsTable;
 	private HashMap<Id, Integer> vehId2CountsMap;
 
-	public CountPPassengersHandler(String pIdentifier) {
+	public CountPPaxHandler(String pIdentifier) {
 		this.pIdentifier = pIdentifier;
 		this.linkId2CountsTable = new HashMap<Id, Integer>();
 		this.vehId2CountsMap =  new HashMap<Id, Integer>();
 	}
 
-	public int getCountForLinkId(Id linkId){
+	public int getPaxCountForLinkId(Id linkId){
 		Integer count = this.linkId2CountsTable.get(linkId);
 		if(count == null){
 			return 0;

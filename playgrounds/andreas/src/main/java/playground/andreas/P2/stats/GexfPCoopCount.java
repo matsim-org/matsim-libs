@@ -65,22 +65,22 @@ import playground.andreas.gexf.XMLTimeformatType;
 import playground.andreas.gexf.viz.PositionContent;
 
 /**
- * Uses a {@link CountPPassengersHandler} to count passengers per paratransit vehicle and link and writes them to a gexf network as dynamic link attributes.
+ * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link and writes them to a gexf network as dynamic link attributes.
  * 
  * @author aneumann
  *
  */
-public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
+public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
 	
-	private static final Logger log = Logger.getLogger(GexfOutput.class);
+	private static final Logger log = Logger.getLogger(GexfPCoopCount.class);
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
-	private final static String FILENAME = "pPassCounts.gexf.gz";
+	private final static String FILENAME = "pCoopCount.gexf.gz";
 
 	private ObjectFactory gexfFactory;
 	private XMLGexfContent gexfContainer;
 
-	private CountPPassengersHandler eventsHandler;
+	private CountPCoopHandler eventsHandler;
 	private String pIdentifier;
 	private int getWriteGexfStatsInterval;
 
@@ -89,7 +89,7 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 
 	private HashMap<Id, Integer> linkId2CountsFromLastIteration;
 
-	public GexfOutput(PConfigGroup pConfig){
+	public GexfPCoopCount(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.pIdentifier = pConfig.getPIdentifier();
 		
@@ -112,7 +112,7 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 			
 			XMLAttributeContent attContent = new XMLAttributeContent();
 			attContent.setId("weight");
-			attContent.setTitle("Number of paratransit passengers per iteration");
+			attContent.setTitle("Number of cooperatives per iteration");
 			attContent.setType(XMLAttrtypeType.FLOAT);
 			
 			attsContent.getAttribute().add(attContent);		
@@ -125,7 +125,7 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addNetworkAsLayer(event.getControler().getNetwork(), 0);
 			this.createAttValues();
-			this.eventsHandler = new CountPPassengersHandler(this.pIdentifier);
+			this.eventsHandler = new CountPCoopHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.eventsHandler);
 			this.linkId2CountsFromLastIteration = new HashMap<Id, Integer>();
 		}
@@ -136,7 +136,7 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration(), this.eventsHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfOutput.FILENAME));
+				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPCoopCount.FILENAME));
 			}			
 		}		
 	}
@@ -144,7 +144,7 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getControler().getControlerIO().getOutputFilename(GexfOutput.FILENAME));
+			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPCoopCount.FILENAME));
 		}		
 	}
 
@@ -158,10 +158,10 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 		}		
 	}
 
-	private void addValuesToGexf(int iteration, CountPPassengersHandler handler) {
+	private void addValuesToGexf(int iteration, CountPCoopHandler handler) {
 		for (Entry<Id, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
 			
-			int countForLink = handler.getCountForLinkId(entry.getKey());
+			int countForLink = handler.getCoopCountForLinkId(entry.getKey());
 			
 			if (this.linkId2CountsFromLastIteration.get(entry.getKey()) != null){
 				// There is already an entry
@@ -173,7 +173,8 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 			
 			XMLAttvalue attValue = new XMLAttvalue();
 			attValue.setFor("weight");
-			attValue.setValue(Integer.toString(Math.max(1, countForLink)));
+//			attValue.setValue(Integer.toString(Math.max(1, countForLink)));
+			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
 
 			entry.getValue().getAttvalue().add(attValue);
@@ -186,7 +187,7 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 		try {
 			jc = JAXBContext.newInstance(playground.andreas.gexf.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(GexfOutput.XSD_PATH, m);
+			super.setMarshallerProperties(GexfPCoopCount.XSD_PATH, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(this.gexfContainer, bufout);
 			bufout.close();
