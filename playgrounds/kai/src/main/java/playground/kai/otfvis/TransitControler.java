@@ -99,7 +99,7 @@ public class TransitControler {
 			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 			qSim.addAgentSource(agentSource);
 
-			//			simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+//			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 //			transitEngine.setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 			//			this.events.addHandler(new LogOutputEventHandler());
 
