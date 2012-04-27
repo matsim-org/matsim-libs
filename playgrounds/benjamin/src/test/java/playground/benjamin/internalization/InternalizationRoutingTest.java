@@ -99,13 +99,13 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		installEmissionDisutilityCalculatorFactory();
 		
+		//link 9 time, link 11 distance, link 13 emissions and time and distance
 		int expectedRoad = 13;
 		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(expectedRoad) ;
 
 		StartupListener startupListener = new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				//link 9 time, link 11 distance, link 13 emissions and time and distance
 				event.getControler().getEvents().addHandler(handler);
 			}
 		};
@@ -133,19 +133,20 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.setMarginalUtilityOfMoney(1.0);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
-		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(11) ;
+		//link 9 time, link 11 distance, link 13 emissions and time and distance
+		int expectedRoad = 11;
+		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(expectedRoad) ;
 
 		StartupListener startupListener = new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				//link 9 time, link 11 distance, link 13 emissions and time and distance
 				event.getControler().getEvents().addHandler(handler);
 			}
 		};
 
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
-		assertTrue("Person was expected to be routed through link 11, but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
+		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
 
 	public void testTimeRouting() {
@@ -165,13 +166,13 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		//pcs.setMonetaryDistanceCostRateCar(-0.0001);
 		pcs.setMonetaryDistanceCostRateCar(0.000);
 
-		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(9) ;
+		//link 9 time, link 11 distance, link 13 emissions and time and distance
+		int expectedRoad = 9;
+		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(expectedRoad) ;
 
 		StartupListener startupListener = new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				//link 9 time, link 11 distance, link 13 emissions and time and distance
-
 				event.getControler().getEvents().addHandler(handler);
 			}
 		};
@@ -179,7 +180,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.controler.addControlerListener(startupListener);
 		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
-		assertTrue("Person was expected to be routed through link 9, but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
+		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
 
 	private void installEmissionDisutilityCalculatorFactory() {
@@ -200,7 +201,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		// controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(10);
+		//set to one iteration, use "ccg.setLastIteration(9)" for ten iterations
+		ccg.setLastIteration(0);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
@@ -342,7 +344,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		//9 time, 11 distance, 13 emissions
 		network.createAndAddLink(scenario.createId("9"), node8, node4, 5000, 27.78, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("11"), node9, node4, 2500, 11.33, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("11"), node9, node4, 2500, 10.00, 3600, 1, null, "22");
 		network.createAndAddLink(scenario.createId("13"), node10, node4, 3750, 20.80, 3600, 1, null, "22");
 	}
 }

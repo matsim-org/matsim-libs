@@ -48,8 +48,8 @@ public class InternalizationRoutingTestHandler implements LinkLeaveEventHandler{
 		if (event.getLinkId().equals(new IdImpl(Integer.toString(expectedRoad)))){
 			expectedRoadSelected = true;
 		} else {
-			if(event.getLinkId().equals(new IdImpl("9"))) 	actualRoadSelected = "9";
-			else if(event.getLinkId().equals(new IdImpl("11"))) 	actualRoadSelected = "11";
+			if(event.getLinkId().equals(new IdImpl("9"))) 			actualRoadSelected = "9,";
+			else if(event.getLinkId().equals(new IdImpl("11")))		actualRoadSelected = "11";
 			else if(event.getLinkId().equals(new IdImpl("13"))) 	actualRoadSelected = "13";
 		}
 	}
