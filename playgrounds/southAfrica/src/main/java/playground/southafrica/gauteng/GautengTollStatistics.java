@@ -32,7 +32,7 @@ public class GautengTollStatistics implements EventHandler, AgentMoneyEventHandl
 
 	@Override
 	public void reset(int iteration) {
-		Logger.getLogger(this.getClass()).warn("calling reset ...") ;
+//		Logger.getLogger(this.getClass()).warn("calling reset ...") ;
 		personMoneyMap.clear() ;
 		personCountMap.clear() ;
 		typeMoneyMap.clear() ;
