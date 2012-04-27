@@ -65,6 +65,7 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.time2LinkIdAndDemand.clear();
 		logger.info("Resetting travel demand aggregation to " + this.time2LinkIdAndDemand);

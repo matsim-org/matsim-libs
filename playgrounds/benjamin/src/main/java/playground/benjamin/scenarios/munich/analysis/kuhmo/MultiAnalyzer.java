@@ -52,20 +52,23 @@ import playground.benjamin.utils.BkNumberUtils;
 public class MultiAnalyzer {
 	private static final Logger logger = Logger.getLogger(MultiAnalyzer.class);
 	
-//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/short/";
-//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing/short/";
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing_x100/short/";
+	private static String initialIterationNo = "500";
+	private static String finalIterationNo = "1000";
+	
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase/";
+//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/";
+//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing/";
 	private static String netFile = runDirectory + "output_network.xml.gz";
 	private static String configFile = runDirectory + "output_config.xml.gz";
 
-	private static String initialPlansFile = runDirectory + "ITERS/it.1000/1000.plans.xml.gz";
-	private static String finalPlansFile = runDirectory + "ITERS/it.1100/1100.plans.xml.gz";
+	private static String initialPlansFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + initialIterationNo + ".plans.xml.gz";
+	private static String finalPlansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
 	
-	private static String initialEventsFile = runDirectory + "ITERS/it.1000/1000.events.xml.gz";
-	private static String finalEventsFile = runDirectory + "ITERS/it.1100/1100.events.xml.gz";
+	private static String initialEventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + initialIterationNo + ".events.xml.gz";
+	private static String finalEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
 	
-	private static String initialEmissionEventsFile = runDirectory + "ITERS/it.1000/1000.emission.events.xml.gz";
-	private static String finalEmissionEventsFile = runDirectory + "ITERS/it.1100/1100.emission.events.xml.gz";
+	private static String initialEmissionEventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + initialIterationNo + ".emission.events.xml.gz";
+	private static String finalEmissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
 	
 	private final PersonFilter personFilter;
 	private final int decimalPlace;
@@ -78,8 +81,8 @@ public class MultiAnalyzer {
 	private void run() {
 //		calculateUserWelfareChange(netFile, configFile, initialPlansFile, finalPlansFile);
 //		calculateTollRevenueByUserGroup(finalEventsFile);
-		calculateAverageTripDistanceCar(netFile, initialEventsFile, finalEventsFile);
-//		calculateAverageTripTravelTimePerMode(initialEventsFile, finalEventsFile);
+//		calculateAverageCarDistanceTraveledByUserGroup(netFile, initialEventsFile, finalEventsFile);
+		calculateAverageTravelTimePerMode(initialEventsFile, finalEventsFile);
 //		calculateEmissionChangesByUserGroup(initialEmissionEventsFile, finalEmissionEventsFile);
 	}
 
@@ -96,11 +99,11 @@ public class MultiAnalyzer {
 			Population finalUserGroupPop = personFilter.getPopulation(finalPop, userGroup);
 			
 			double initialUserWelfare = userWelfareCalculator.calculateLogsum(initialUserGroupPop);
-			int initialInvalidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
+			int initialPersonWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
 			userWelfareCalculator.reset();
 			
 			double finalUserWelfare = userWelfareCalculator.calculateLogsum(finalUserGroupPop);
-			int finalInvalidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
+			int finalPersonWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
 			userWelfareCalculator.reset();
 			
 			double userWelfareDiff = finalUserWelfare - initialUserWelfare;
@@ -109,23 +112,23 @@ public class MultiAnalyzer {
 			System.out.println("\n*******************************************************************");
 			System.out.println("VALUES FOR " + userGroup);
 			System.out.println("*******************************************************************");
-			System.out.println("Final user welfare is calculated to\t\t" + BkNumberUtils.roundDouble(finalUserWelfare, decimalPlace));
-			System.out.println("Initial user welfare is calculated to\t\t" + BkNumberUtils.roundDouble(initialUserWelfare, decimalPlace));
+			System.out.println("Final user welfare:\t\t" + BkNumberUtils.roundDouble(finalUserWelfare, decimalPlace));
+			System.out.println("Initial user welfare:\t\t" + BkNumberUtils.roundDouble(initialUserWelfare, decimalPlace));
 			System.out.println("===================================================================");
-			System.out.println("Change in user welfare is calculated to\t\t" + BkNumberUtils.roundDouble(userWelfareDiff, decimalPlace) 
+			System.out.println("Change in user welfare:\t\t" + BkNumberUtils.roundDouble(userWelfareDiff, decimalPlace) 
 						+ " or " + BkNumberUtils.roundDouble(userWelfareDiffPct, decimalPlace) + "%");
 			System.out.println("*******************************************************************");
-			System.out.println("Final users with invalid score (null or <= 0.0):\t" + initialInvalidPlanCnt);
-			System.out.println("Initial users with invalid score (null or <= 0.0):\t" + finalInvalidPlanCnt);
+			System.out.println("Final users with no valid plan (all scores ``== null'' or ``<= 0.0''):\t" + initialPersonWithNoValidPlanCnt);
+			System.out.println("Initial users with no valid plan (all scores ``== null'' or ``<= 0.0''):\t" + finalPersonWithNoValidPlanCnt);
 			System.out.println("*******************************************************************\n");
 		}
 		
 		double initialUserWelfare = userWelfareCalculator.calculateLogsum(initialPop);
-		int initialInvalidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
+		int initialPersonWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
 		userWelfareCalculator.reset();
 		
 		double finalUserWelfare = userWelfareCalculator.calculateLogsum(finalPop);
-		int finalInvalidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
+		int finalPersonWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
 		userWelfareCalculator.reset();
 		
 		double userWelfareDiff = finalUserWelfare - initialUserWelfare;
@@ -134,14 +137,14 @@ public class MultiAnalyzer {
 		System.out.println("\n*******************************************************************");
 		System.out.println("VALUES FOR WHOLE POPULATION");
 		System.out.println("*******************************************************************");
-		System.out.println("Final user welfare is calculated to\t\t" + BkNumberUtils.roundDouble(finalUserWelfare, decimalPlace));
-		System.out.println("Initial user welfare is calculated to\t\t" + BkNumberUtils.roundDouble(initialUserWelfare, decimalPlace));
+		System.out.println("Final user welfare:\t\t" + BkNumberUtils.roundDouble(finalUserWelfare, decimalPlace));
+		System.out.println("Initial user welfare:\t\t" + BkNumberUtils.roundDouble(initialUserWelfare, decimalPlace));
 		System.out.println("===================================================================");
-		System.out.println("Change in user welfare is calculated to\t\t" + BkNumberUtils.roundDouble(userWelfareDiff, decimalPlace) 
+		System.out.println("Change in user welfare:\t\t" + BkNumberUtils.roundDouble(userWelfareDiff, decimalPlace) 
 					+ " or " + BkNumberUtils.roundDouble(userWelfareDiffPct, decimalPlace) + "%");
 		System.out.println("*******************************************************************");
-		System.out.println("Final users with invalid score (null or <= 0.0):\t" + initialInvalidPlanCnt);
-		System.out.println("Initial users with invalid score (null or <= 0.0):\t" + finalInvalidPlanCnt);
+		System.out.println("Final users with no valid plan (all scores ``== null'' or ``<= 0.0''):\t" + initialPersonWithNoValidPlanCnt);
+		System.out.println("Initial users with no valid plan (all scores ``== null'' or ``<= 0.0''):\t" + finalPersonWithNoValidPlanCnt);
 		System.out.println("*******************************************************************\n");
 	}
 
@@ -167,7 +170,7 @@ public class MultiAnalyzer {
 			}
 			// need to take the absolute value since money events are negative from the users' perspective.
 			double absoluteTollRevenueUserGroup = Math.abs(tollRevenueFromGroup);
-			System.out.println("Toll revenue from ``" + userGroup + "'' (" + groupSize + " car users) is calculated to\t" + 
+			System.out.println("Toll revenue from ``" + userGroup + "'' (" + groupSize + " toll payers):\t" + 
 							   BkNumberUtils.roundDouble(absoluteTollRevenueUserGroup, decimalPlace));
 		}
 		
@@ -177,7 +180,7 @@ public class MultiAnalyzer {
 		}
 		double absoluteTollRevenue = Math.abs(tollRevenue);
 		System.out.println("===================================================================");
-		System.out.println("Total toll revenue from " + personId2Toll.size() + " users is calculated to\t\t" +
+		System.out.println("Total toll revenue from " + personId2Toll.size() + " toll payers:\t\t" +
 						   BkNumberUtils.roundDouble(absoluteTollRevenue, decimalPlace));
 		System.out.println("*******************************************************************\n");
 	}
@@ -215,7 +218,7 @@ public class MultiAnalyzer {
 			for(String pollutant : pollutant2FinalEmissions.keySet()){
 				double pollutantDiff = BkNumberUtils.roundDouble(pollutant2FinalEmissions.get(pollutant) - group2InitialTotalEmissions.get(userGroup).get(pollutant), decimalPlace);
 				double pollutantDiffPct = BkNumberUtils.roundDouble(100 * (pollutantDiff / group2InitialTotalEmissions.get(userGroup).get(pollutant)), decimalPlace);
-				System.out.println("Final emissions " + pollutant + " are calculated to\t" 
+				System.out.println("Final emissions for " + pollutant + ":\t" 
 						+ BkNumberUtils.roundDouble(pollutant2FinalEmissions.get(pollutant), decimalPlace) + " [ Change: " + pollutantDiff + " or " + pollutantDiffPct + "% ]");
 			}
 		}
@@ -227,12 +230,12 @@ public class MultiAnalyzer {
 		for(String pollutant : overallFinalTotalEmissions.keySet()){
 			double pollutantDiff = BkNumberUtils.roundDouble(overallFinalTotalEmissions.get(pollutant) - overallInitialTotalEmissions.get(pollutant), decimalPlace);
 			double pollutantDiffPct = BkNumberUtils.roundDouble(100 * (pollutantDiff / overallInitialTotalEmissions.get(pollutant)), decimalPlace);
-			System.out.println("Final emissions " + pollutant + " are calculated to\t" 
+			System.out.println("Final emissions for " + pollutant + ":\t" 
 					+ BkNumberUtils.roundDouble(overallFinalTotalEmissions.get(pollutant), decimalPlace) + " [ Change: " + pollutantDiff + " or " + pollutantDiffPct + "% ]");
 		}
 	}
 
-	private void calculateAverageTripDistanceCar(String netFile, String initialEventsFile, String finalEventsFile) {
+	private void calculateAverageCarDistanceTraveledByUserGroup(String netFile, String initialEventsFile, String finalEventsFile) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc).readFile(netFile);
 		
@@ -266,19 +269,66 @@ public class MultiAnalyzer {
 					finalGroupSize++;
 				}
 			}
-			
 			double initialAvgCarDistance = (initialSumOfCarDistancesInGroup / initialGroupSize) / 1000. ;
 			double finalAvgCarDistance = (finalSumOfCarDistancesInGroup / finalGroupSize) / 1000. ;
-			System.out.println("Initial car distance traveled for ``" + userGroup + "'' (" + initialGroupSize + " car users) is calculated to\t" + 
+			System.out.println("Initial car distance traveled for ``" + userGroup + "'' (" + initialGroupSize + " car users):\t" + 
 							   BkNumberUtils.roundDouble(initialSumOfCarDistancesInGroup / 1000, decimalPlace) + " km or " + BkNumberUtils.roundDouble(initialAvgCarDistance, decimalPlace) + " km in average.");
-			System.out.println("Final car distance traveled for ``" + userGroup + "'' (" + finalGroupSize + " car users) is calculated to\t" + 
+			System.out.println("Final car distance traveled for ``" + userGroup + "'' (" + finalGroupSize + " car users):\t" + 
 					   BkNumberUtils.roundDouble(finalSumOfCarDistancesInGroup / 1000. , decimalPlace) + " km or " + BkNumberUtils.roundDouble(finalAvgCarDistance, decimalPlace) + " km in average.");
 		}
 		// TODO: checksum?
+		System.out.println("*******************************************************************\n");
 	}
 
-	private void calculateAverageTripTravelTimePerMode(String initialEventsFile, String finalEventsFile) {
-		// TODO Auto-generated method stub
+	private void calculateAverageTravelTimePerMode(String initialEventsFile, String finalEventsFile) {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
+		TravelTimePerModeEventHandler ttHandler = new TravelTimePerModeEventHandler();
+		eventsManager.addHandler(ttHandler);
+		
+		eventsReader.parse(initialEventsFile);
+		Map<String, Map<Id, Double>> initialMode2personId2TravelTime = ttHandler.getMode2personId2TravelTime();
+		ttHandler.reset(0);
+		eventsReader.parse(finalEventsFile);
+		Map<String, Map<Id, Double>> finalMode2personId2TravelTime = ttHandler.getMode2personId2TravelTime();
+		
+		for(UserGroup userGroup : UserGroup.values()){
+			System.out.println("\n*******************************************************************");
+			System.out.println("VALUES FOR " + userGroup);
+			System.out.println("*******************************************************************");
+			for(String mode : initialMode2personId2TravelTime.keySet()){
+				Map<Id, Double> initialPersonId2TravelTime = initialMode2personId2TravelTime.get(mode);
+				Map<Id, Double> finalPersonId2TravelTime = finalMode2personId2TravelTime.get(mode);
+				
+				double initialSumOfTravelTimes = 0.0;
+				int initialGroupSize = 0;
+				double finalSumOfTravelTimes = 0.0;
+				int finalGroupSize = 0;
+				
+				for(Id personId : initialPersonId2TravelTime.keySet()){
+					if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
+						initialSumOfTravelTimes += initialPersonId2TravelTime.get(personId);
+						initialGroupSize++;
+//						if(mode.equals("pt") && personId.toString().startsWith("gv")){
+//							System.out.println(personId);
+//						}
+					}
+				}
+				for(Id personId : finalPersonId2TravelTime.keySet()){
+					if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
+						finalSumOfTravelTimes += finalPersonId2TravelTime.get(personId);
+						finalGroupSize++;
+					}
+				}
+				double initialAverageTravelTimeOfMode_mins = (initialSumOfTravelTimes / initialGroupSize) / 60.;
+				double finalAverageTravelTimeOfMode_mins = (finalSumOfTravelTimes / finalGroupSize) / 60.;
+				
+				if(initialGroupSize != 0 || finalGroupSize != 0){
+					System.out.println("Initial average travel time with transport mode " + mode + " (" + initialGroupSize + " users): " + BkNumberUtils.roundDouble(initialAverageTravelTimeOfMode_mins, this.decimalPlace));
+					System.out.println("Final average travel time with transport mode " + mode + " (" + finalGroupSize + " users): " + BkNumberUtils.roundDouble(finalAverageTravelTimeOfMode_mins, this.decimalPlace));
+				}
+			}
+		}
 	}
 
 	private Scenario loadScenario(String netFile, String plansFile) {

@@ -49,7 +49,7 @@ import playground.benjamin.emissions.types.WarmPollutant;
  * @author benjamin
  *
  */
-public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
+public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 
 	Network network;
