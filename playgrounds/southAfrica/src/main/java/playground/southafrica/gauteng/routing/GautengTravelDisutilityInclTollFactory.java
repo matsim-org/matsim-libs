@@ -60,19 +60,25 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time, person, vehicle);
 				double toll_usually_positive = 0. ;
 				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
-				if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
-					toll_usually_positive = link.getLength() * cost.amount ;
-				} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
+				if ( cost != null ) {
+					/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
+					 * Cost objects with amount=0.  kai, apr'12
+					 */
+					if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
+						toll_usually_positive = link.getLength() * cost.amount ;
+					} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
 						toll_usually_positive = cost.amount ;
-				} else {
-					/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
-					throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
-				}
+					} else {
+						/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
+						/* I would rather leave it in since there are more than these two toll types.  kai, apr'12 */
+						throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
+					}
 
-				double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(person.getId() ) ; 
-				
-				linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
-				// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
+					double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(person.getId() ) ; 
+
+					linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
+					// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
+				}
 				
 				return linkTravelDisutility;
 			}
