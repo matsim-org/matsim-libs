@@ -53,7 +53,7 @@ public class CountPCoopHandler implements LinkEnterEventHandler, TransitDriverSt
 	public Set<Id> getCoopsForLinkId(Id linkId) {
 		Set<Id> lineIds = this.linkId2CoopIdsSetMap.get(linkId);
 		if(lineIds == null){
-			return null;
+			return new TreeSet<Id>();
 		} else {
 			return lineIds;
 		}
