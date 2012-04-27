@@ -17,7 +17,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.spatialschema.geometry.primitive.PrimitiveFactory;
 
-import ucar.unidata.geoloc.ogc.WKTParser;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
