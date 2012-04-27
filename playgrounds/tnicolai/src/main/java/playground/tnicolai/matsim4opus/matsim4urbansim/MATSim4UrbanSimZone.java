@@ -102,7 +102,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		
 		// get the data from UrbanSim (parcels and persons)
 		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-													  getMATSim4UrbaSimControlerConfig().getShapeFileCellBasedAccessibility(),
+													  null, // tnicolai april'12: location distribution via shapefile is disabled until a "switch" between Radius and shape-file is implemented getMATSim4UrbaSimControlerConfig().getShapeFileCellBasedAccessibility(),
 													  getUrbanSimParameterConfig().getRandomLocationDistributionRadiusForUrbanSimZone());
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");

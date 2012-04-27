@@ -375,10 +375,10 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 			betaWalkTT		= cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // [utils/h]
 			betaWalkTTPower	= 0.;
 			betaWalkLnTT	= 0.;
-			betaWalkTD		= cnScoringGroup.getMarginalUtilityOfMoney() * 0.0; // getMonetaryDistanceCostRateWalk doesn't exist thus set to 0.0: [utils/money * money/meter] = [utils/meter]
+			betaWalkTD		= 0.; // getMonetaryDistanceCostRateWalk doesn't exist thus set to 0.0: [utils/money * money/meter] = [utils/meter]
 			betaWalkTDPower	= 0.;												
 			betaWalkLnTD	= 0.;
-			betaWalkTC		= cnScoringGroup.getMarginalUtilityOfMoney(); // [utils/money]
+			betaWalkTC		= 0.; // [utils/money]
 			betaWalkTCPower	= 0.;
 			betaWalkLnTC	= 0.;
 		}

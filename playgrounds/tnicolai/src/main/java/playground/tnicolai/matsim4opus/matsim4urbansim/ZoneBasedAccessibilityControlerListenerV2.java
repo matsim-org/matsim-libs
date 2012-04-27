@@ -172,9 +172,9 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					carTDPower = getAsUtilCar(betaCarTDPower, travelDistance_meter * travelDistance_meter, betaWalkTDPower, offsetDistance2NearestNode_meter * offsetDistance2NearestNode_meter);
 					carLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter), betaWalkLnTD, Math.log(offsetDistance2NearestNode_meter));
 					
-					carTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
-					carTCPower 	= 0.;	// since MATSim doesn't gives monetary costs jet 
-					carLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
+					carTC 		= 0.; 	// since MATSim doesn't gives monetary costs yet 
+					carTCPower 	= 0.;	// since MATSim doesn't gives monetary costs yet 
+					carLnTC 	= 0.;	// since MATSim doesn't gives monetary costs yet 
 					
 					// sum congested travel times
 					sumCAR += opportunityWeight
@@ -198,9 +198,9 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					walkTDPower = getAsUtilWalk(betaWalkTDPower, Math.pow( travelDistance_meter + offsetDistance2NearestNode_meter, 2));
 					walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + offsetDistance2NearestNode_meter));
 					
-					walkTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
-					walkTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
-					walkLnTC 	= 0.;	 // since MATSim doesn't gives monetary costs jet 
+					walkTC 		= 0.;	// since MATSim doesn't gives monetary costs yet 
+					walkTCPower = 0.;	// since MATSim doesn't gives monetary costs yet 
+					walkLnTC 	= 0.;	// since MATSim doesn't gives monetary costs yet 
 
 					// sum walk travel times (substitute for distances)
 					sumWALK += opportunityWeight
