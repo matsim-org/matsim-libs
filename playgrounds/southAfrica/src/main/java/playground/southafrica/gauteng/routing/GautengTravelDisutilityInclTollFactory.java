@@ -64,13 +64,15 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 					/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
 					 * Cost objects with amount=0.  kai, apr'12
 					 */
-					if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
+					if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
 						toll_usually_positive = link.getLength() * cost.amount ;
-					} else if ( localScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
+					} else if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
 						toll_usually_positive = cost.amount ;
 					} else {
 						/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
-						/* I would rather leave it in since there are more than these two toll types.  kai, apr'12 */
+						/* This still does not work for cordon, and I currently think it never will.  Marcel's cordon toll
+						 * is different from other software packages, and so I don't want to mirror the
+						 * computation here, especially since we do not need it.  kai, apr'12 */
 						throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
 					}
 
