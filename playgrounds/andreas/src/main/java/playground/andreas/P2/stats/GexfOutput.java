@@ -87,6 +87,8 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 	private HashMap<Id,XMLEdgeContent> edgeMap;
 	private HashMap<Id,XMLAttvaluesContent> attValueContentMap;
 
+	private HashMap<Id, Integer> linkId2CountsFromLastIteration;
+
 	public GexfOutput(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.pIdentifier = pConfig.getPIdentifier();
@@ -125,6 +127,7 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 			this.createAttValues();
 			this.eventsHandler = new CountPPassengersHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.eventsHandler);
+			this.linkId2CountsFromLastIteration = new HashMap<Id, Integer>();
 		}
 	}
 
@@ -157,12 +160,24 @@ public class GexfOutput extends MatsimJaxbXmlWriter implements StartupListener, 
 
 	private void addValuesToGexf(int iteration, CountPPassengersHandler handler) {
 		for (Entry<Id, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
+			
+			int countForLink = handler.getCountForLinkId(entry.getKey());
+			
+			if (this.linkId2CountsFromLastIteration.get(entry.getKey()) != null){
+				// There is already an entry
+				if (this.linkId2CountsFromLastIteration.get(entry.getKey()).intValue() == countForLink) {
+					// same as last iteration - ignore
+					continue;
+				}
+			}
+			
 			XMLAttvalue attValue = new XMLAttvalue();
 			attValue.setFor("weight");
-			attValue.setValue(Integer.toString(Math.max(1, handler.getCountForLinkId(entry.getKey()))));
+			attValue.setValue(Integer.toString(Math.max(1, countForLink)));
 			attValue.setStart(Double.toString(iteration));
 
 			entry.getValue().getAttvalue().add(attValue);
+			this.linkId2CountsFromLastIteration.put(entry.getKey(), countForLink);
 		}
 	}
 
