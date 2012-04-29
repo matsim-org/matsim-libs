@@ -32,7 +32,7 @@ import org.matsim.pt.PtConstants;
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
 
 /**
- * modified normal ActivityScoringFunction, that "pt interaction" and "parkAndRide" are not scored
+ * modified normal ActivityScoringFunction to ignore "pt interaction" and "parkAndRide"
  * @author Ihab
  */
 public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring {
@@ -113,9 +113,7 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 		double tmpScore = 0.0;
 
 		if (act.getType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) || act.getType().toString().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
-			
-			System.out.println("Not scored: "+act.getType());
-		
+					
 		} else {
 			ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 			if (actParams == null) {

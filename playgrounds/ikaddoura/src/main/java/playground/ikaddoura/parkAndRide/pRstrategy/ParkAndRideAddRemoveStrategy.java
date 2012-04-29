@@ -57,11 +57,6 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
 		this.prFacilities = prFacilities;
-		
-//		// all possible Park And Ride facilities
-//		prLinkIDs.add(new IdImpl("PRa2toPRb2"));
-//		prLinkIDs.add(new IdImpl("PRa4toPRb4"));
-//		prLinkIDs.add(new IdImpl("PRa6toPRb6"));
 	}
 
 	@Override
@@ -92,7 +87,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 			if (hasParkAndRide == false){
 				log.info("Plan doesn't contain Park and Ride. Adding Park and Ride...");
 
-				// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus der Liste möglicher P+R Links)
+				// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus den eingelesenen P+R-LinkIDs bzw. der prFacilities)
 				Activity parkAndRide = createParkAndRideActivity(Math.random());
 
 				// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
@@ -170,7 +165,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink2in();
 		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
 		
-		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getCoord(), rndLinkId); 
+		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getToNode().getCoord(), rndLinkId); 
 		parkAndRide.setMaximumDuration(120.0);
 		
 		return parkAndRide;

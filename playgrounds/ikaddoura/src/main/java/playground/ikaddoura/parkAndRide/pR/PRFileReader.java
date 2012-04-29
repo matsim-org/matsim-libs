@@ -48,6 +48,8 @@ public class PRFileReader {
 
 	public List<ParkAndRideFacility> getPrFacilities() {
 		
+		System.out.println("Trying to read Facilities from file "+this.prFacilityFile);
+		
 		 BufferedReader br = null;
 	        try {
 	            br = new BufferedReader(new FileReader(new File(this.prFacilityFile)));

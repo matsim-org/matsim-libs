@@ -107,7 +107,7 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink2in();
 		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
 		
-		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getCoord(), rndLinkId); 
+		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getToNode().getCoord(), rndLinkId); 
 		parkAndRide.setMaximumDuration(120.0);
 		
 		return parkAndRide;

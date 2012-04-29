@@ -76,9 +76,9 @@ public class NetworkAddParkAndRide {
 	private int maxSearchSteps = 50;
 	
 // parkAndRide Link:
-	private double capacity = 2000; // TODO: realistic value!
-	private double freeSpeed = 13.8888888889;
-	private double length = 10;
+	private double capacity = 2000;
+	private double freeSpeed = 2.77778;
+	private double length = 20;
 	private double nrOfLanes = 40;
 	
 	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -93,8 +93,8 @@ public class NetworkAddParkAndRide {
 		
 		loadScenario();
 		getAllTransitStops();		// gathers all TransitStops in List transitStops
-		getParkAndRideNodes();		// searches for all TransitStops in List transitStops the belonging / next car-Link, puts the toNode in List parkAndRideNodes
-		addParkAndRideLinks();		// adds two parkAndRideLinks to every Node in List parkAndRideNodes
+		getParkAndRideNodes();		// searches for each TransitStop in List transitStops the belonging / next car-Link, puts the toNode in List parkAndRideNodes
+		addParkAndRideLinks();		// adds two parkAndRideLinks to each Node in List parkAndRideNodes
 		writeParkAndRideNetwork();	
 		printOutParkAndRideFacilites();
 
@@ -185,8 +185,8 @@ public class NetworkAddParkAndRide {
 			Id pRnodeId1 = new IdImpl("PRa"+i);
 			Id pRnodeId2 = new IdImpl("PRb"+i);
 
-			Coord coord1 = scenario.createCoord(node.getCoord().getX(), node.getCoord().getY()+10);
-			Coord coord2 = scenario.createCoord(node.getCoord().getX()+10, node.getCoord().getY()+10);
+			Coord coord1 = scenario.createCoord(node.getCoord().getX(), node.getCoord().getY()+length);
+			Coord coord2 = scenario.createCoord(node.getCoord().getX(), node.getCoord().getY());
 
 			Node prNode1 = scenario.getNetwork().getFactory().createNode(pRnodeId1, coord1);
 			Node prNode2 = scenario.getNetwork().getFactory().createNode(pRnodeId2, coord2);
