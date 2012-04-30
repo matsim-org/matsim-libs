@@ -49,7 +49,7 @@ class ExternalControler {
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/PaperTEST";
 	
 	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 0;
+	static int lastInternalIteration = 3;
 	
 //	final OptimizationParameter op = OptimizationParameter.FARE;
 //	final OptimizationParameter op = OptimizationParameter.CAPACITY;
@@ -89,11 +89,11 @@ class ExternalControler {
 			operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
 			users.setParametersForExtIteration(sc, internalControler.getMarginalUtlOfMoney());
 			
-			OperatorUserAnalysis analysis = new OperatorUserAnalysis(directoryExtIt, lastInternalIteration, networkFile);
+			OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), directoryExtIt, lastInternalIteration);
 			analysis.readEvents(operator, users);
 			
 			users.calculateScore();
-			operator.calculateScore(analysis);
+			operator.calculateCosts(analysis);
 
 			ExtItInformation info = new ExtItInformation();
 			info.setFare(this.fare);
@@ -134,15 +134,15 @@ class ExternalControler {
 
 	private void setDefaultParameters() {
 		if(op.equals(OptimizationParameter.FARE)){
-			this.fare = 0.;
+			this.fare = -0.;
 			this.capacity = 50;
 			this.numberOfBuses = 5;
 		} else if (op.equals(OptimizationParameter.CAPACITY)){
-			this.fare = 2.;
+			this.fare = -2.;
 			this.capacity = 20; // standing room + seats (realistic values between 19 and 101!)
 			this.numberOfBuses = 5;
 		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
-			this.fare = 2.;
+			this.fare = -2.;
 			this.capacity = 50;
 			this.numberOfBuses = 1;
 		}

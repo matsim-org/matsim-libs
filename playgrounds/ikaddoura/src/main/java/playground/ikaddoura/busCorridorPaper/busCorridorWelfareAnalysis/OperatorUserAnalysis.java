@@ -23,22 +23,20 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioUtils;
+
 
 /**
  * @author Ihab
  *
  */
 public class OperatorUserAnalysis {
-	private final static Logger log = Logger.getLogger(OperatorUserAnalysis.class);
+//	private final static Logger log = Logger.getLogger(OperatorUserAnalysis.class);
 
 	DepartureArrivalEventHandler departureHandler;
 	MoneyEventHandler moneyHandler;
@@ -48,14 +46,9 @@ public class OperatorUserAnalysis {
 	private final String lastEventFile;
 	private final Network network;
 	
-	public OperatorUserAnalysis(String directoryExtIt, int lastInternalIteration, String networkFile) {
+	public OperatorUserAnalysis(Network network, String directoryExtIt, int lastInternalIteration) {
 		this.lastEventFile = directoryExtIt + "/internalIterations/ITERS/it." + lastInternalIteration + "/" + lastInternalIteration + ".events.xml.gz";
-		
-		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-		Config config = scen.getConfig();
-		config.network().setInputFile(networkFile);
-		ScenarioUtils.loadScenario(scen);		
-		this.network = scen.getNetwork();
+		this.network = network;
 	}
 	
 	public void readEvents(Operator operator, Users users){

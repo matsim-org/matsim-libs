@@ -40,14 +40,12 @@ public class DepartureArrivalEventHandler implements AgentDepartureEventHandler,
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
 	private int numberOfWalkLegs; // Walk, not Transit Walk!
-	private double vehicleSeconds;
 	
 	private Map<Id, Double> personID2firstDepartureTime = new HashMap<Id, Double>();
 	private Map<Id, Double> personID2lastArrivalTime = new HashMap<Id, Double>();
 	
 	@Override
 	public void reset(int iteration) {
-		this.vehicleSeconds = 0;
 		this.numberOfPtLegs = 0;
 		this.numberOfCarLegs = 0;
 		this.numberOfWalkLegs = 0;
@@ -110,10 +108,11 @@ public class DepartureArrivalEventHandler implements AgentDepartureEventHandler,
 	
 
 	public double getVehicleHours() {
+		double vehicleSeconds = 0;
 		for (Id id : this.personID2firstDepartureTime.keySet()){
-			this.vehicleSeconds = this.vehicleSeconds + ((this.personID2lastArrivalTime.get(id) - this.personID2firstDepartureTime.get(id)));
+			vehicleSeconds = vehicleSeconds + ((this.personID2lastArrivalTime.get(id) - this.personID2firstDepartureTime.get(id)));
 		}
-		return vehicleSeconds / 3600;
+		return vehicleSeconds / 3600.0;
 	}
 
 }

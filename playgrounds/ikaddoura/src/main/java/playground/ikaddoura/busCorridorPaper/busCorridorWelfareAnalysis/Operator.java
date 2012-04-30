@@ -39,20 +39,23 @@ public class Operator {
 	private int capacity;
 	private int numberOfBuses;
 	private double costs;
-	private final double costsPerVehicleDay;
-	private final double costsPerVehicleKm;
 
-	public Operator() {
-		this.costsPerVehicleDay = 1.6064 * this.capacity + 22.622; // see linear regression analysis in "BusCostsEstimations.xls"
-		log.info("costsPerVehicleDay (AUD): " + costsPerVehicleDay);
-		this.costsPerVehicleKm = 0.006 * this.capacity + 0.513;    // see linear regression analysis in "BusCostsEstimations.xls"
+	public void calculateCosts(OperatorUserAnalysis analysis) {
+		double costsPerVehicleDay = 1.6064 * this.capacity + 22.622; // see linear regression analysis in "BusCostsEstimations.xls"
+		double costsPerVehicleKm = 0.006 * this.capacity + 0.513;    // see linear regression analysis in "BusCostsEstimations.xls"
+		
 		log.info("CostsPerVehicleKm (AUD): " + costsPerVehicleKm);
-	}
-
-	public void calculateScore(OperatorUserAnalysis analysis) {
+		log.info("costsPerVehicleDay (AUD): " + costsPerVehicleDay);
 		log.info("Vehicle-km: " + analysis.getVehicleKm());
-		log.info("Veh-Time: " + Time.writeTime(analysis.getVehicleHours() * 60 * 60, Time.TIMEFORMAT_HHMMSS));
-		this.costs = (analysis.getNumberOfBusesFromEvents() * costsPerVehicleDay) + ((analysis.getVehicleKm() * costsPerVehicleKm) + (analysis.getVehicleHours() * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
+		log.info("Veh-Time: " + Time.writeTime(analysis.getVehicleHours() * 3600, Time.TIMEFORMAT_HHMMSS));
+		log.info("Number of Buses from Events: "+analysis.getNumberOfBusesFromEvents());
+		
+		double capitalCosts = analysis.getNumberOfBusesFromEvents() * costsPerVehicleDay;
+		double kmCosts = analysis.getVehicleKm() * costsPerVehicleKm;
+		double hCosts = analysis.getVehicleHours() * COSTS_PER_VEH_HOUR;
+		
+		this.costs = capitalCosts + ((kmCosts + hCosts) * OVERHEAD_PERCENTAGE);
+		log.info("Operator Costs (AUD): "+this.costs);
 	}
 
 
