@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
  * @author Ihab
@@ -102,6 +103,7 @@ public class InternalControler {
 			
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.addControlerListener(new MyControlerListener(fare, this.ptLegHandler));
 		
 		TransitConfigGroup transit = controler.getConfig().transit();

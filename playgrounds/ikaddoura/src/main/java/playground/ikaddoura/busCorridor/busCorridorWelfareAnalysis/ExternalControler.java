@@ -45,13 +45,13 @@ public class ExternalControler {
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network80links.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/output_plans_withTimeChoice_9min.xml";
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/population1agent.xml";
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/TEST";
 	static int lastExternalIteration = 0;
 	static int lastInternalIteration = 0;
 	
 	// settings for first iteration or if values not changed for all iterations
-	TimePeriod p1 = new TimePeriod(1, "DAY", 8, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
+	TimePeriod p1 = new TimePeriod(1, "DAY", 1, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
 //	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 12, 6*3600, 12*3600);
 //	TimePeriod p3 = new TimePeriod(3, "NVZ", 8, 12*3600, 15*3600);
 //	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 12, 15*3600, 21*3600);
@@ -59,7 +59,7 @@ public class ExternalControler {
 
 	private final double MONEY_UTILS = 0.14026; // has to be positive, because costs are negative!
 	private double fare = -2.0; // negative!
-	private int capacity = 100; // standing room + seats (realistic values between 19 and 101!)
+	private int capacity = 50; // standing room + seats (realistic values between 19 and 101!)
 
 	private int extItNr;
 	private String directoryExtIt;
