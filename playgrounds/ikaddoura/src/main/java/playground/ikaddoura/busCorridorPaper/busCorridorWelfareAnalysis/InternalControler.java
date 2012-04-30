@@ -27,7 +27,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
@@ -68,15 +70,14 @@ public class InternalControler {
 	}
 	
 	public void run() {
+	
+		new TransitScheduleReaderV1(scenario).readFile(this.directoryExtIt + "/scheduleFile.xml");
+		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(this.directoryExtIt + "/vehiclesFile.xml");
 		
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.addControlerListener(new PtControlerListener(this.fare, this.ptLegHandler));
-		
-		TransitConfigGroup transit = controler.getConfig().transit();
-		transit.setTransitScheduleFile(this.directoryExtIt + "/scheduleFile.xml");
-		transit.setVehiclesFile(this.directoryExtIt + "/vehiclesFile.xml");
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		controlerConfGroup.setFirstIteration(0);

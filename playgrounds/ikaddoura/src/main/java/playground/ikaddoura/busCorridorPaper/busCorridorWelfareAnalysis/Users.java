@@ -23,18 +23,11 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author Ihab
@@ -45,20 +38,12 @@ public class Users {
 	private final static Logger log = Logger.getLogger(Users.class);
 
 	private double logSum;
-	private String directoryExtIt;
-
-	private Network network;
+	private Scenario scenario;
 	private double marginalUtlOfMoney;
 
 	public void calculateScore() {
-		
-		List<Double> nonStuckAgentScores = new ArrayList<Double>();
-		
-		String outputPlanFile = this.directoryExtIt + "/internalIterations/output_plans.xml.gz";		
-		
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());		
-		new MatsimPopulationReader(sc).readFile(outputPlanFile);
-		Population population = sc.getPopulation();
+	
+		Population population = scenario.getPopulation();
 		
 		int numberOfAgentsWithOnlyInvalidPlans = 0;
 		int numberOfInvalidPlans = 0;
@@ -99,9 +84,8 @@ public class Users {
 		return logSum;
 	}
 
-	public void setParametersForExtIteration(String directoryExtIt, Network network, double marginalUtilityOfMoney) {
-		this.directoryExtIt = directoryExtIt;
-		this.network = network;
+	public void setParametersForExtIteration(Scenario scenario, double marginalUtilityOfMoney) {
+		this.scenario = scenario;
 		this.marginalUtlOfMoney = marginalUtilityOfMoney;	
 	}
 }

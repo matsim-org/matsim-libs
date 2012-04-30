@@ -45,7 +45,7 @@ class ExternalControler {
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network80links.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/populationBusCorridor80linksCar.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/population1agent.xml";
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/PaperTEST";
 	
 	static int lastExternalIteration = 0;
@@ -84,11 +84,10 @@ class ExternalControler {
 			vsw.writeTransitVehiclesAndSchedule();
 			
 			InternalControler internalControler = new InternalControler(sc, directoryExtIt, lastInternalIteration, this.fare);
+			internalControler.run();
 
 			operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
-			users.setParametersForExtIteration(directoryExtIt, sc.getNetwork(), internalControler.getMarginalUtlOfMoney());
-
-			internalControler.run();
+			users.setParametersForExtIteration(sc, internalControler.getMarginalUtlOfMoney());
 			
 			OperatorUserAnalysis analysis = new OperatorUserAnalysis(directoryExtIt, lastInternalIteration, networkFile);
 			analysis.readEvents(operator, users);
