@@ -43,6 +43,9 @@ public class UCSBTAZ2Coord {
 	public final void assignCoords(Scenario scenario, ObjectAttributes personObjectAttributes, Map<String,Feature> features) {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			int actIndex = 0;
+			Coord homeCoord = null;
+			Coord workCoord = null;
+			Coord educCoord = null;
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity activity = (Activity)pe;
@@ -50,8 +53,23 @@ public class UCSBTAZ2Coord {
 					if (zoneId == null) { Gbl.errorMsg("pid="+person.getId()+": object attribute '"+UCSBStopsParser.ZONE+actIndex+"' not found."); }
 					Feature zone = features.get(zoneId);
 					if (zone == null) { Gbl.errorMsg("zone with id="+zoneId+" not found."); }
-					Coord coord = UCSBUtils.getRandomCoordinate(zone);
-					((ActivityImpl)activity).setCoord(coord);
+					
+					if (activity.getType().startsWith("home")) {
+						if (homeCoord == null) { homeCoord = UCSBUtils.getRandomCoordinate(zone); }
+						((ActivityImpl)activity).setCoord(homeCoord);
+					}
+					else if (activity.getType().startsWith("work")) {
+						if (workCoord == null) { workCoord = UCSBUtils.getRandomCoordinate(zone); }
+						((ActivityImpl)activity).setCoord(workCoord);
+					}
+					else if (activity.getType().startsWith("educ")) {
+						if (educCoord == null) { educCoord = UCSBUtils.getRandomCoordinate(zone); }
+						((ActivityImpl)activity).setCoord(educCoord);
+					}
+					else {
+						Coord coord = UCSBUtils.getRandomCoordinate(zone);
+						((ActivityImpl)activity).setCoord(coord);
+					}
 					actIndex++;
 				}
 			}

@@ -44,12 +44,12 @@ public class PlansRemover {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 
-		args = new String[] {
-				"D:/balmermi/documents/eclipse/output/ucsb/debug/plans.xml.gz",
-				"D:/balmermi/documents/eclipse/output/ucsb/debug/network.xml.gz",
-				"D:/balmermi/documents/eclipse/output/ucsb/debug/pids.txt",
-				"D:/balmermi/documents/eclipse/output/ucsb/debug"
-		};
+//		args = new String[] {
+//				"D:/balmermi/documents/eclipse/output/ucsb/debug/plans.xml.gz",
+//				"D:/balmermi/documents/eclipse/output/ucsb/debug/network.xml.gz",
+//				"D:/balmermi/documents/eclipse/output/ucsb/debug/pids.txt",
+//				"D:/balmermi/documents/eclipse/output/ucsb/debug"
+//		};
 
 		if (args.length != 4) {
 			log.error("PlansRemover inputPlansfile inputNetworkfile inputPidFile outputBase");

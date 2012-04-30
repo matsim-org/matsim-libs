@@ -25,6 +25,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -53,7 +56,7 @@ public abstract class UCSBUtils {
 
 	private final static Logger log = Logger.getLogger(UCSBUtils.class);
 
-	private final static Random r = MatsimRandom.getRandom();
+	public final static Random r = MatsimRandom.getRandom();
 	private final static GeometryFactory geometryFactory = new GeometryFactory();
 
 	public static final NumberFormat formatter = new DecimalFormat("#");
@@ -98,5 +101,12 @@ public abstract class UCSBUtils {
 			idSet.add(id);
 		}
 		return idSet;
+	}
+	
+	public static final String getTimeStamp() {
+        Calendar today = new GregorianCalendar();
+        SimpleDateFormat df = new SimpleDateFormat();
+        df.applyPattern("yyyyMMDD_HHMMss");
+        return df.format(today.getTime());
 	}
 }

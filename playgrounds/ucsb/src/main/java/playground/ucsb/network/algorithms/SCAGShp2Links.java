@@ -61,7 +61,7 @@ public class SCAGShp2Links implements NetworkRunnable {
 	private static final String DIR = "DIR";
 	private static final String FT_LINK_TYPE = "AB_NEW_FAC";
 	private static final String TF_LINK_TYPE = "BA_NEW_FAC";
-	private static final String LINK_TYPE = "TYPE";
+	public static final String LINK_TYPE = "TYPE";
 	private static final String FT_FREESPEED = "AB_POSTEDS";
 	private static final String TF_FREESPEED = "BA_POSTEDS";
 	
@@ -156,6 +156,8 @@ public class SCAGShp2Links implements NetworkRunnable {
 				Set<String> modesTF = new HashSet<String>();
 				if (Integer.parseInt(f.getAttribute(MODE).toString().trim()) == 24) {
 					modesFT.add(TransportMode.pt); modesTF.add(TransportMode.pt);
+//					log.info("pt only link id="+id.toString()+" ignored.");
+//					continue;
 				}
 				else {
 					if (((typeFT >= 20) && (typeFT < 30)) || (typeFT == 84) || (typeFT == 85)) { modesFT.add(HOV); } else { modesFT.add(HOV); modesFT.add(TransportMode.car); }
@@ -194,6 +196,22 @@ public class SCAGShp2Links implements NetworkRunnable {
 			Gbl.errorMsg("fCnt "+fCnt+": IOException while parsing "+linkShpFile+".");
 		}
 		log.info("done. (creating links)");
+		
+		removePtLinks(network, linkObjectAttributes);
+	}
+	
+	private final void removePtLinks(Network network, ObjectAttributes linkObjectAttributes) {
+		Set<Id> linkIdsToRemove = new HashSet<Id>();
+		for (Link l : network.getLinks().values()) {
+			if ((l.getAllowedModes().size() == 1) && (l.getAllowedModes().contains(TransportMode.pt))) {
+				linkIdsToRemove.add(l.getId());
+			}
+		}
+		for (Id lid : linkIdsToRemove) {
+			network.removeLink(lid);
+			linkObjectAttributes.removeAllAttributes(lid.toString());
+		}
+		log.info(linkIdsToRemove.size()+" links with pt only removed.");
 	}
 	
 	private final void cleanUp(Link link) {

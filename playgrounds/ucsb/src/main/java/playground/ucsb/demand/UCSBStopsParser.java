@@ -37,13 +37,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import playground.ucsb.network.algorithms.SCAGShp2Links;
 
 /**
  * @author balmermi
@@ -83,7 +84,7 @@ public class UCSBStopsParser {
 		case 4: return TransportMode.ride; // driven by parent (for child)
 		case 5: return TransportMode.ride; // driven by other (for child)
 		case 6: return TransportMode.ride; // school bus (for child)
-		case 7: return TransportMode.car;  // shared ride driver (drive by car with passenger)
+		case 7: return SCAGShp2Links.HOV;  // shared ride driver (drive by car with passenger)
 		default:
 			Gbl.errorMsg(new IllegalArgumentException("modeNo="+modeNo+" not allowed."));
 			return null;
