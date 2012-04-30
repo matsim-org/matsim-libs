@@ -48,8 +48,8 @@ class ExternalControler {
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/population1agent.xml";
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/PaperTEST";
 	
-	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 3;
+	static int lastExternalIteration = 1;
+	static int lastInternalIteration = 0;
 	
 //	final OptimizationParameter op = OptimizationParameter.FARE;
 //	final OptimizationParameter op = OptimizationParameter.CAPACITY;
@@ -62,8 +62,8 @@ class ExternalControler {
 	SortedMap<Integer, ExtItInformation> extIt2information = new TreeMap<Integer, ExtItInformation>();
 	
 	private void run() throws IOException {
-		ChartFileWriter chartWriter = new ChartFileWriter();
-		TextFileWriter textWriter = new TextFileWriter();
+		ChartFileWriter chartWriter = new ChartFileWriter(outputExternalIterationDirPath);
+		TextFileWriter textWriter = new TextFileWriter(outputExternalIterationDirPath);
 		
 		setDefaultParameters();
 		Operator operator = new Operator();
@@ -109,18 +109,8 @@ class ExternalControler {
 			
 			extIt2information.put(extIt, info);
 			
-			textWriter.write(outputExternalIterationDirPath, this.extIt2information);
-			
-			// TODO: adjust chartWriter!
-//			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
-//			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
-//			chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
-//
-//			chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
-//			chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
-//			chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
-//			chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
-//			chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorRevenue);
+			textWriter.write(this.extIt2information);
+			chartWriter.write(this.extIt2information);
 			
 			// settings for next external iteration
 			if (extIt < lastExternalIteration){

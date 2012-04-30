@@ -16,8 +16,14 @@ import org.matsim.core.utils.misc.Time;
 public class TextFileWriter {
 	private final static Logger log = Logger.getLogger(TextFileWriter.class);
 
-	public void write(String outputExternalIterationDirPath, SortedMap<Integer, ExtItInformation> extIt2information) {
-		File file = new File(outputExternalIterationDirPath+"/busNumberScoreStats.txt");
+	private String outputExternalIterationDirPath;
+	
+	public TextFileWriter(String outputExternalIterationDirPath) {
+		this.outputExternalIterationDirPath = outputExternalIterationDirPath;
+	}
+
+	public void write(SortedMap<Integer, ExtItInformation> extIt2information) {
+		File file = new File(this.outputExternalIterationDirPath+"/busNumberScoreStats.txt");
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
