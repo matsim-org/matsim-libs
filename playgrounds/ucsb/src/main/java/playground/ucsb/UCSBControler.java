@@ -37,6 +37,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 
+import playground.ucsb.analysis.VolumeCounterControlerListener;
 import playground.ucsb.network.algorithms.SCAGShp2Links;
 
 public class UCSBControler extends Controler {
@@ -99,6 +100,9 @@ public class UCSBControler extends Controler {
 	}
 
 	public static void main(final String[] args) {
-		new UCSBControler(args[0]).run();
+		String configFile = args[0] ;
+		UCSBControler controler = new UCSBControler( configFile ) ;
+		controler.addControlerListener(new VolumeCounterControlerListener());
+		controler.run();
 	}
 }
