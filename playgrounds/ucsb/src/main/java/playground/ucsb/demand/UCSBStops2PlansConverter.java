@@ -142,7 +142,7 @@ public class UCSBStops2PlansConverter {
 		UCSBSingleTripsConverter converter = new UCSBSingleTripsConverter(goodsTazFeatures);
 		File file = new File(inputBaseGoods);
 		for (int i=0; i<file.list().length; i++) {
-			if (file.list()[i].endsWith(".txt.gz")) {
+			if (file.list()[i].endsWith(".txt")) {
 				converter.createPlansFromTripFile(inputBaseGoods+"/"+file.list()[i],scenario.getPopulation(),popFraction);
 			}
 		}
