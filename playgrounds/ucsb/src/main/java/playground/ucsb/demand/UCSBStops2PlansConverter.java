@@ -119,7 +119,7 @@ public class UCSBStops2PlansConverter {
 		String base = outputBase+"/subnet";
 		if (!(new File(base).mkdir())) { throw new RuntimeException("Could not create "+base); }
 		new NetworkWriter(scenario.getNetwork()).write(base+"/network.xml.gz");
-		new NetworkWriteAsTable(base).run(scenario.getNetwork());
+		new NetworkWriteAsTable(base,10.0).run(scenario.getNetwork());
 		log.info("done. (extracting)");
 
 		log.info("parsing "+cemdapStopsFile+" file...");

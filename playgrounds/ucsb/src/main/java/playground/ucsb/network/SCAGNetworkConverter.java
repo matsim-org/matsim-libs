@@ -86,7 +86,7 @@ public class SCAGNetworkConverter {
 		String base = outputBase+"/complete";
 		if (!(new File(base).mkdir())) { throw new RuntimeException("Could not create "+base); }
 		new NetworkWriter(scenario.getNetwork()).write(base+"/network.xml.gz");
-		new NetworkWriteAsTable(base).run(scenario.getNetwork());
+		new NetworkWriteAsTable(base,10.0).run(scenario.getNetwork());
 		new ObjectAttributesXmlWriter(nodeObjectAttributes).writeFile(base+"/nodeObjectAttributes.xml.gz");
 		new ObjectAttributesXmlWriter(linkObjectAttributes).writeFile(base+"/linkObjectAttributes.xml.gz");
 		
@@ -100,7 +100,7 @@ public class SCAGNetworkConverter {
 		base = outputBase+"/cleaned";
 		if (!(new File(base).mkdir())) { throw new RuntimeException("Could not create "+base); }
 		new NetworkWriter(scenario.getNetwork()).write(base+"/network.xml.gz");
-		new NetworkWriteAsTable(base).run(scenario.getNetwork());
+		new NetworkWriteAsTable(base,10.0).run(scenario.getNetwork());
 		new ObjectAttributesXmlWriter(nodeObjectAttributes).writeFile(base+"/nodeObjectAttributes.xml.gz");
 		new ObjectAttributesXmlWriter(linkObjectAttributes).writeFile(base+"/linkObjectAttributes.xml.gz");
 	}
