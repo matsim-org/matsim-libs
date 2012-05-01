@@ -48,6 +48,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.ucsb.UCSBUtils;
 import playground.ucsb.network.algorithms.SCAGShp2Links;
+import playground.ucsb.singleTrips.UCSBSingleTripsConverter;
 
 /**
  * @author balmermi
@@ -67,32 +68,38 @@ public class UCSBStops2PlansConverter {
 //		String localOutBase = "D:/balmermi/documents/eclipse/output/ucsb";
 //		args = new String[] {
 //				localInBase+"/demand/CEMDAP/stops_total_actual.dat.gz",
+//				localInBase+"/demand/goods_trips",
 //				localInBase+"/geographics/TAZ/taz_Project_UTM_Zone_11N.shp",
 //				"TAZ2K",
-//				localOutBase+"/scagnetwork/20120411/cleaned/network.xml.gz",
-//				localOutBase+"/scagnetwork/20120411/cleaned/linkObjectAttributes.xml.gz",
-//				"0.002",
+//				"ID",
+//				localOutBase+"/scagnetwork/cleaned/network.xml.gz",
+//				localOutBase+"/scagnetwork/cleaned/linkObjectAttributes.xml.gz",
+//				"0.001",
 //				localOutBase+"/demand"
 //		};
 
-		if (args.length != 7) {
-			log.error("UCSBStops2PlansConverter cemdapStopsFile tazShapeFile tazIdName networkFile linkObjectAttributeFile popFraction outputBase");
+		if (args.length != 9) {
+			log.error("UCSBStops2PlansConverter cemdapStopsFile inputBaseGoods tazShapeFile tazCemdapIdName tazGoodsIdName networkFile linkObjectAttributeFile popFraction outputBase");
 			System.exit(-1);
 		}
 		
 		// store input parameters
 		String cemdapStopsFile = args[0];
-		String tazShapeFile = args[1];
-		String tazIdName = args[2];
-		String networkFile = args[3];
-		String linkObjectAttributeFile = args[4];
-		Double popFraction = Double.parseDouble(args[5]);
-		String outputBase = args[6];
+		String inputBaseGoods = args[1];
+		String tazShapeFile = args[2];
+		String tazCemdapIdName = args[3];
+		String tazGoodsIdName = args[4];
+		String networkFile = args[5];
+		String linkObjectAttributeFile = args[6];
+		Double popFraction = Double.parseDouble(args[7]);
+		String outputBase = args[8];
 
 		// print input parameters
 		log.info("cemdapStopsFile: "+cemdapStopsFile);
+		log.info("inputBaseGoods: "+inputBaseGoods);
 		log.info("tazShapeFile: "+tazShapeFile);
-		log.info("tazIdName: "+tazIdName);
+		log.info("tazCemdapIdName: "+tazCemdapIdName);
+		log.info("tazGoodsIdName: "+tazGoodsIdName);
 		log.info("networkFile: "+networkFile);
 		log.info("linkObjectAttributeFile: "+linkObjectAttributeFile);
 		log.info("popFraction: "+popFraction);
@@ -119,13 +126,27 @@ public class UCSBStops2PlansConverter {
 		new UCSBStopsParser().parse(cemdapStopsFile, scenario, personObjectAttributes, popFraction);
 		log.info("done. (parsing)");
 
-		log.info("reading "+tazShapeFile+" file...");
-		Map<String,Feature> features = UCSBUtils.getFeatureMap(tazShapeFile, tazIdName);
+		log.info("reading "+tazShapeFile+" file for cemdap...");
+		Map<String,Feature> cemdapTazFeatures = UCSBUtils.getFeatureMap(tazShapeFile, tazCemdapIdName);
+		log.info("done. (reading)");
+
+		log.info("reading "+tazShapeFile+" file for goods...");
+		Map<String,Feature> goodsTazFeatures = UCSBUtils.getFeatureMap(tazShapeFile, tazGoodsIdName);
 		log.info("done. (reading)");
 
 		log.info("assigning coordinates to activities...");
-		new UCSBTAZ2Coord().assignCoords(scenario, personObjectAttributes, features);
+		new UCSBTAZ2Coord().assignCoords(scenario, personObjectAttributes, cemdapTazFeatures);
 		log.info("done. (assigning)");
+		
+		log.info("reading goods trip matrices from "+inputBaseGoods+" ...");
+		UCSBSingleTripsConverter converter = new UCSBSingleTripsConverter(goodsTazFeatures);
+		File file = new File(inputBaseGoods);
+		for (int i=0; i<file.list().length; i++) {
+			if (file.list()[i].endsWith(".txt.gz")) {
+				converter.createPlansFromTripFile(inputBaseGoods+"/"+file.list()[i],scenario.getPopulation(),popFraction);
+			}
+		}
+		log.info("done. (reading)");
 		
 		log.info("assigning activities to links...");
 		new XY2Links((ScenarioImpl)scenario).run(scenario.getPopulation());

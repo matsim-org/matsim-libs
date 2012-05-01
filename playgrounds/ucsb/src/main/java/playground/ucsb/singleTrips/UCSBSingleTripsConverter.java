@@ -61,7 +61,7 @@ public class UCSBSingleTripsConverter {
 		this.features = features;
 	}
 	
-	private final void createPlansFromTripFile(String tripFile, Population population, double fraction) {
+	public final void createPlansFromTripFile(String tripFile, Population population, double fraction) {
 		String[] nameParts = tripFile.split("[/\\.]", -1);
 		String timeSlide = nameParts[nameParts.length-3].substring(0,2);
 		String type = nameParts[nameParts.length-3].substring(2);
@@ -143,15 +143,16 @@ public class UCSBSingleTripsConverter {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String localInBase = "D:/balmermi/documents/eclipse/input/raw/america/usa/losAngeles/UCSB/0000";
-		String localOutBase = "D:/balmermi/documents/eclipse/output/ucsb";
-		args = new String[] {
-				localInBase+"/demand/goods_trips",
-				localInBase+"/geographics/TAZ/taz_Project_UTM_Zone_11N.shp",
-				"ID",
-				"0.002",
-				localOutBase+"/demand"
-		};
+
+//		String localInBase = "D:/balmermi/documents/eclipse/input/raw/america/usa/losAngeles/UCSB/0000";
+//		String localOutBase = "D:/balmermi/documents/eclipse/output/ucsb";
+//		args = new String[] {
+//				localInBase+"/demand/goods_trips",
+//				localInBase+"/geographics/TAZ/taz_Project_UTM_Zone_11N.shp",
+//				"ID",
+//				"0.002",
+//				localOutBase+"/demand"
+//		};
 
 		if (args.length != 5) {
 			log.error("UCSBSingleTripsConverter inputBase tazShapeFile tazIdName popFraction outputBase");
