@@ -63,8 +63,8 @@ public class UCSBSingleTripsConverter {
 	
 	public final void createPlansFromTripFile(String tripFile, Population population, double fraction) {
 		String[] nameParts = tripFile.split("[/\\.]", -1);
-		String timeSlide = nameParts[nameParts.length-3].substring(0,2);
-		String type = nameParts[nameParts.length-3].substring(2);
+		String timeSlide = nameParts[nameParts.length-2].substring(0,2);
+		String type = nameParts[nameParts.length-2].substring(2);
 		log.info("create plans (timeSlide="+timeSlide+";type="+type+") from trip file + "+tripFile+"...");
 		int lineCnt = 0;
 		int personCnt = 0;
