@@ -45,23 +45,22 @@ public class InternalControler {
 	private final int lastInternalIteration;
 	private final double fare;
 	
-	private final double MARGINAL_UTILITY_OF_MONEY = 0.14026;
-	private final double PERFORMING = 1.8534;
+	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
+	private final double PERFORMING = 0.96;
 
-	private final double CONSTANT_CAR = -2.2118;
+	private final double CONSTANT_CAR = 0.0;
 	private final double TRAVEL_CAR = 0.0;
 	private final double MONETARY_DISTANCE_COST_RATE_CAR = -0.00011;
 
 	private final double CONSTANT_WALK = 0.0;
-	private final double TRAVEL_WALK = -1.7568;
+	private final double TRAVEL_WALK = 0.0; // not needed because of differentiation in access and egress time
 
-	private final double CONSTANT_PT = 0.0;
+	private final double CONSTANT_PT = -2.08;
 	private final double TRAVEL_PT = 0.0; // not needed because of the following differentiation:
-	private final double TRAVEL_PT_IN_VEHICLE = -1.4448;
-	private final double TRAVEL_PT_WAITING = -3.6822;
-	// TODO: access / egress scoring?!?
-//	private final double TRAVEL_PT_ACCESS;
-//	private final double TRAVEL_PT_EGRESS;
+	private final double TRAVEL_PT_IN_VEHICLE = -0.18;
+	private final double TRAVEL_PT_WAITING = -0.096;
+	private final double TRAVEL_PT_ACCESS = 0.0;
+	private final double TRAVEL_PT_EGRESS = -2.34;
 	private final double MONETARY_DISTANCE_COST_RATE_PT = 0.0;
 
 	private final double LATE_ARRIVAL = 0.0;
@@ -123,7 +122,7 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setEarlyDeparture_utils_hr(EARLY_DEPARTURE);
 		planCalcScoreConfigGroup.setWaiting_utils_hr(WAITING);
 		
-		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE);
+		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE, TRAVEL_PT_ACCESS, TRAVEL_PT_EGRESS);
 		controler.setScoringFunctionFactory(scoringfactory);
 
 		controler.run();		

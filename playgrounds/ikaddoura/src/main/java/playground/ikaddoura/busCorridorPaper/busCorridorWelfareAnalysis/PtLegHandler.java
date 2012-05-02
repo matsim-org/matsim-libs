@@ -27,23 +27,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.pt.PtConstants;
 
 /**
  * @author Ihab
  *
  */
-public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ActivityEndEventHandler {
 	private final Map <Id, Double> personId2WaitingTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2InVehicleTime = new HashMap<Id, Double>();
-
+	private boolean isEgress = false;
+	
 	@Override
 	public void reset(int iteration) {
 		personId2WaitingTime.clear();
@@ -80,32 +87,38 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (event.getLegMode().toString().equals("pt")){
-			personId2AgentDepartureTime.put(event.getPersonId(), event.getTime());
-		}
-	}
-
-	// TODO: adjust as above...
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+		Id personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){
-			double inVehicleTime = 0;
-			if (personId2PersonEntersVehicleTime.containsKey(event.getPersonId())){
-				inVehicleTime = event.getTime() - personId2PersonEntersVehicleTime.get(event.getPersonId());
-			}
-			else {
-				System.out.println("Person kommt an ohne in ein Vehicle gestiegen zu sein!");
+			personId2AgentDepartureTime.put(personId, event.getTime());
+		} else {
+			// not a pt Leg
+		}
+		
+	}
+
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		Id personId = event.getPersonId();
+		
+		if (event.getLegMode().toString().equals("pt")){
+			double inVehicleTime = 0.0;
+			if (personId2PersonEntersVehicleTime.get(personId) == null){
+				throw new RuntimeException("Person " + personId + " is arriving without having departed from an activity. Aborting...");
+			} else {
+				inVehicleTime = event.getTime() - personId2PersonEntersVehicleTime.get(personId);
 			}
 			
-			if (personId2InVehicleTime.containsKey(event.getPersonId())){
-				double inVehicleTimeSum = personId2InVehicleTime.get(event.getPersonId()) + inVehicleTime;
-				personId2InVehicleTime.put(event.getPersonId(), inVehicleTimeSum);
-			}
-			else {
-				personId2InVehicleTime.put(event.getPersonId(), inVehicleTime);
-			}
-		}		
+			if (personId2InVehicleTime.get(personId) == null) {
+				personId2InVehicleTime.put(personId, inVehicleTime);
+			} else {
+				double inVehicleTimeSum = personId2InVehicleTime.get(personId) + inVehicleTime;
+				personId2InVehicleTime.put(personId, inVehicleTimeSum);
+			}			
+			
+		} else {
+			// not a pt Leg
+		}
 	}
 
 	public Map<Id, Double> getPersonId2WaitingTime() {
@@ -123,4 +136,20 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 		}
 		return sumOfWaitingTimes;
 	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+			this.isEgress = true;
+		}
+	}
+
+	public boolean isEgress() {
+		return isEgress;
+	}
+
+	public void setEgress(boolean isEgress) {
+		this.isEgress = isEgress;
+	}
+
 }

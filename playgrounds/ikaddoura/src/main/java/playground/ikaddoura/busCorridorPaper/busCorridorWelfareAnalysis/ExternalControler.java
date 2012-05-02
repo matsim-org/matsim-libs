@@ -49,7 +49,7 @@ class ExternalControler {
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/PaperTEST";
 	
 	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 0;
+	static int lastInternalIteration = 1;
 	
 //	final OptimizationParameter op = OptimizationParameter.FARE;
 //	final OptimizationParameter op = OptimizationParameter.CAPACITY;

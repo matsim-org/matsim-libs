@@ -33,7 +33,6 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.core.utils.misc.Time;
 
 public class MyLegScoringFunction implements LegScoring, BasicScoring {
 	private final static Logger log = Logger.getLogger(MyLegScoringFunction.class);
@@ -43,7 +42,11 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 
 	private final double TRAVEL_PT_IN_VEHICLE;
 	private final double TRAVEL_PT_WAITING;
+	private final double TRAVEL_PT_ACCESS;
+	private final double TRAVEL_PT_EGRESS;
+
 	private final Id personId;
+	private final PtLegHandler ptLegHandler;
 	Map <Id, Double> personId2InVehTime;
 	Map <Id, Double> personId2WaitingTime;
 
@@ -58,17 +61,23 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 			final CharyparNagelScoringParameters params,
 			Network network,
 			Id personId,
+			PtLegHandler ptLegHandler,
 			Map <Id, Double> personId2InVehTime,
 			Map <Id, Double> personId2WaitingTime,
 			double travelingPtInVehicle,
-			double travelingPtWaiting) {
+			double travelingPtWaiting,
+			double access,
+			double egress) {
 		this.params = params;
 		this.network = network;
 		this.personId = personId;
+		this.ptLegHandler = ptLegHandler;
 		this.personId2InVehTime = personId2InVehTime;
 		this.personId2WaitingTime = personId2WaitingTime;
 		this.TRAVEL_PT_IN_VEHICLE = travelingPtInVehicle;
 		this.TRAVEL_PT_WAITING = travelingPtWaiting;
+		this.TRAVEL_PT_ACCESS = access;
+		this.TRAVEL_PT_EGRESS = egress;
 		this.reset();
 	}
 
@@ -115,6 +124,7 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 //			log.warn("inVehTime: " + Time.writeTime(inVehTime, Time.TIMEFORMAT_HHMMSS));
 //			log.warn("waitingTime: " + Time.writeTime(waitingTime, Time.TIMEFORMAT_HHMMSS));
 		}
+		
 		return this.score;
 	}
 
@@ -137,17 +147,6 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += this.params.constantCar ;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			//			double inVehTime;
-			//			double waitingTime;
-			//			
-			//			if (this.personId2InVehTime.get(personId) == null || this.personId2WaitingTime.get(personId) == null){
-			//				throw new RuntimeException("Person " + personId + " does not have either a in-vehicle time or a waiting time. Aborting...");
-			//			} else {
-			//				inVehTime = this.personId2InVehTime.get(personId);
-			//				waitingTime = this.personId2WaitingTime.get(personId);
-			//			}
-			//			tmpScore += (this.TRAVEL_PT_IN_VEHICLE / 3600) * inVehTime;
-			//			tmpScore += (this.TRAVEL_PT_WAITING / 3600) * waitingTime;
 
 			tmpScore += this.params.constantPt;
 
@@ -155,7 +154,17 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
 				throw new RuntimeException("Marginal utility of distance walk is deprecated and should not be used. Aborting...");
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s;
+						
+			if (!this.ptLegHandler.isEgress()){
+//				System.out.println("AccessTime: " + travelTime);
+				tmpScore += travelTime * this.TRAVEL_PT_ACCESS / 3600.0;
+			} else {
+//				System.out.println("EgressTime: " + travelTime);
+				tmpScore += travelTime * this.TRAVEL_PT_EGRESS / 3600.0;
+				this.ptLegHandler.setEgress(false);
+			}
+			
+			// A transit_walk leg shouldn't have a constant because it already has the constant of the pt leg!? (ihab)
 			tmpScore += this.params.constantWalk ;
 
 		} else {

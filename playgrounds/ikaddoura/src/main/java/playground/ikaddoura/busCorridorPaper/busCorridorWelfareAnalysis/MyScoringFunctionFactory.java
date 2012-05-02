@@ -35,32 +35,36 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters params;
-	private final PtLegHandler inVehWaitHandler;
+	private final PtLegHandler ptLegHandler;
 	private final double TRAVEL_PT_IN_VEHICLE;
 	private final double TRAVEL_PT_WAITING;
+	private final double TRAVEL_PT_ACCESS;
+	private final double TRAVEL_PT_EGRESS;
 	private final double stuckScore;
 	private Network network;
 	
 
-	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Network network, PtLegHandler inVehWaitHandler, double travelingPtInVehicle, double travelingPtWaiting, double stuckScore) {
+	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Network network, PtLegHandler ptLegHandler, double travelingPtInVehicle, double travelingPtWaiting, double stuckScore, double access, double egress) {
 		this.params = new CharyparNagelScoringParameters(planCalcScoreConfigGroup);
 		this.network = network;
-		this.inVehWaitHandler = inVehWaitHandler;
+		this.ptLegHandler = ptLegHandler;
 		this.TRAVEL_PT_IN_VEHICLE = travelingPtInVehicle;
 		this.TRAVEL_PT_WAITING = travelingPtWaiting;
 		this.stuckScore = stuckScore;
+		this.TRAVEL_PT_ACCESS = access;
+		this.TRAVEL_PT_EGRESS = egress;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		
 		Id personId = plan.getPerson().getId();
-		Map <Id, Double> personId2InVehTime = this.inVehWaitHandler.getPersonId2InVehicleTime();
-		Map <Id, Double> personId2WaitingTime = this.inVehWaitHandler.getPersonId2WaitingTime();
+		Map <Id, Double> personId2InVehTime = this.ptLegHandler.getPersonId2InVehicleTime();
+		Map <Id, Double> personId2WaitingTime = this.ptLegHandler.getPersonId2WaitingTime();
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		scoringFunctionAccumulator.addScoringFunction(new MyLegScoringFunction(this.params, network, personId, personId2InVehTime, personId2WaitingTime, this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING));
+		scoringFunctionAccumulator.addScoringFunction(new MyLegScoringFunction(this.params, network, personId, this.ptLegHandler, personId2InVehTime, personId2WaitingTime, this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING, this.TRAVEL_PT_ACCESS, this.TRAVEL_PT_EGRESS));
 		scoringFunctionAccumulator.addScoringFunction(new MyMoneyScoringFunction(this.params));
 		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(this.stuckScore));
 		scoringFunctionAccumulator.addScoringFunction(new MyActivityScoringFunction(this.params));
