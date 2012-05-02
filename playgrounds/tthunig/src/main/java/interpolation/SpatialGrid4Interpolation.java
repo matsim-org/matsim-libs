@@ -83,7 +83,28 @@ public class SpatialGrid4Interpolation {
 		logger.info("At coordinate x="+ center.getX() + " y="+ center.getY() + " the stored value is ="+ sg.getValue(center));
 		logger.info("At coordinate x="+ corner.getX() + " y="+ corner.getY() + " the stored value is ="+ sg.getValue(corner));
 
-		double[][] test = sg.getMatrix();
+//		double[][] test = sg.getMatrix();
+		
+		SpatialGrid interp_sg= MyBiLinearInterpolator.myBiLinearGridInterpolation(sg);
+		
+		logger.info("The interpolated SpatialGrid looks like :");
+		
+		for(int row = 0; row < interp_sg.getNumRows(); row++){
+			for(int col = 0; col < interp_sg.getNumCols(0); col++){
+				System.out.print( interp_sg.getValue(row, col) + " " );
+			}
+			System.out.println();
+		}
+		
+		Point nearcenter = factory.createPoint(new Coordinate(3.5,4.));
+		Point nearcenter2 = factory.createPoint(new Coordinate(4.,3.5));
+		Point nearcenter3 = factory.createPoint(new Coordinate(4.5,3.5));
+		Point farcenter = factory.createPoint(new Coordinate(2.3, 1.7));
+		logger.info("At coordinate x="+ nearcenter.getX() + " y="+ nearcenter.getY() + " the stored value is ="+ MyBiLinearInterpolator.myBiLinearValueInterpolation(sg, nearcenter.getX(), nearcenter.getY()));
+		logger.info("At coordinate x="+ nearcenter2.getX() + " y="+ nearcenter2.getY() + " the stored value is ="+ MyBiLinearInterpolator.myBiLinearValueInterpolation(sg, nearcenter2.getX(), nearcenter2.getY()));
+		logger.info("At coordinate x="+ nearcenter3.getX() + " y="+ nearcenter3.getY() + " the stored value is ="+ MyBiLinearInterpolator.myBiLinearValueInterpolation(sg, nearcenter3.getX(), nearcenter3.getY()));
+		logger.info("At coordinate x="+ farcenter.getX() + " y="+ farcenter.getY() + " the stored value is ="+ MyBiLinearInterpolator.myBiLinearValueInterpolation(sg, farcenter.getX(), farcenter.getY()));
+		
 		logger.info("...done");
 	}
 }
