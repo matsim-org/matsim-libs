@@ -62,12 +62,22 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	//Id: person
 	LinkedListValueHashMap<Id,Double> energyConsumptionOfLegs;
 	
+	//Id: person
+	DoubleValueHashMap<Id> tripLengthOfCurrentLegInMeters;
+
+	//Id: person
+	LinkedListValueHashMap<Id,Double> tripLengthOfLegsInMeters;
+	
 	// agent Id, linkId
 	HashMap<Id,Id> lastLinkEntered;
 	
 	
 	public LinkedListValueHashMap<Id, Double> getEnergyConsumptionOfLegs() {
 		return energyConsumptionOfLegs;
+	}
+	
+	public LinkedListValueHashMap<Id, Double> getTripLengthOfLegsInMeters() {
+		return tripLengthOfLegsInMeters;
 	}
 
 	private LinkedListValueHashMap<Id, Vehicle> vehicles;
@@ -88,7 +98,11 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	public void reset(int iteration) {
 		timeOfEnteringOrWaitingToEnterCurrentLink=new HashMap<Id, Double>();
 		energyConsumptionOfCurrentLeg=new DoubleValueHashMap<Id>();
+		tripLengthOfCurrentLegInMeters=new DoubleValueHashMap<Id>();
+		
 		energyConsumptionOfLegs=new LinkedListValueHashMap<Id, Double>();
+		tripLengthOfLegsInMeters=new LinkedListValueHashMap<Id, Double>();
+		
 		lastLinkEntered = new HashMap<Id, Id>();
 	}
 
@@ -146,6 +160,7 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		Double energyConsumptionOnLink=energyConsumptionModel.getEnergyConsumptionForLinkInJoule(vehicle, timeSpendOnLink, link);
 		
 		energyConsumptionOfCurrentLeg.incrementBy(personId, energyConsumptionOnLink);
+		tripLengthOfCurrentLegInMeters.incrementBy(personId, link.getLength());
 		
 		resetLinkEnteranceTime(personId);
 	}
@@ -157,6 +172,10 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	private void handleLegCompletion(Id personId) {
 		energyConsumptionOfLegs.put(personId, energyConsumptionOfCurrentLeg.get(personId));
 		energyConsumptionOfCurrentLeg.put(personId, 0.0);
+		
+		tripLengthOfLegsInMeters.put(personId, tripLengthOfCurrentLegInMeters.get(personId));
+		tripLengthOfCurrentLegInMeters.put(personId, 0.0);
+		
 	}
 	
 	private void resetLastLinkEntered(Id personId){

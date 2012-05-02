@@ -88,13 +88,14 @@ public class ExportParkingTimesAndEnergyConsumptions {
 
 	private static void printParkingTimesAndEnergyConsumptionTable(ParkingTimesPlugin parkingTimesPlugin,
 			EnergyConsumptionPlugin energyConsumptionPlugin) {
-		System.out.println("agentId\tstartParking\tendParking\tlinkId\tactType\tenergyConsumptionsInJoules");
+		System.out.println("agentId\tstartParking\tendParking\tlinkId\tactType\tenergyConsumptionsInJoules\ttripLengthInMeters");
 		for (Id personId: parkingTimesPlugin.getParkingTimeIntervals().getKeySet()){
 			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimesPlugin.getParkingTimeIntervals().get(personId);
 			LinkedList<Double> energyConsumptionOfLegs = energyConsumptionPlugin.getEnergyConsumptionOfLegs().get(personId);
+			LinkedList<Double> tripLengthOfLegs = energyConsumptionPlugin.getTripLengthOfLegsInMeters().get(personId);
 			
 			for (int i=0;i<parkingIntervals.size();i++){
-				System.out.println(personId + "\t" + GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getArrivalTime()) + "\t" + GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getDepartureTime()) + "\t" + parkingIntervals.get(i).getLinkId() + "\t" + parkingIntervals.get(i).getActTypeOfFirstActDuringParking() + "\t"  + energyConsumptionOfLegs.get(i));
+				System.out.println(personId + "\t" + GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getArrivalTime()) + "\t" + GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getDepartureTime()) + "\t" + parkingIntervals.get(i).getLinkId() + "\t" + parkingIntervals.get(i).getActTypeOfFirstActDuringParking() + "\t"  + energyConsumptionOfLegs.get(i) + "\t" + tripLengthOfLegs.get(i));
 			}
 		}
 	}

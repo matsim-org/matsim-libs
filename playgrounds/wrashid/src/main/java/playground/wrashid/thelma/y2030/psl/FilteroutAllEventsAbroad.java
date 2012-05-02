@@ -70,7 +70,7 @@ public class FilteroutAllEventsAbroad {
 		
 		
 		
-		StringMatrix parkingTimesMatrix = GeneralLib.readStringMatrix("A:/for marina/3. april 2012_1/parkingTimesAndEnergyConsumptionCH.txt");
+		StringMatrix parkingTimesMatrix = GeneralLib.readStringMatrix("C:/eTmp/parkingTimesAndEnergyConsumptionCH.txt");
 		// detect agents, which perform activities outside Switzerland
 		HashMap<Id,Id> foreignActAgents=new HashMap<Id,Id>();
 		for (int i=1;i<parkingTimesMatrix.getNumberOfRows();i++){
