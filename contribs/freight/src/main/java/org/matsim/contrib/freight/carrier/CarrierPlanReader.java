@@ -14,6 +14,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 
 
@@ -62,7 +63,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	
 	private CarrierVehicle currentVehicle = null;
 	
-	private TourBuilder currentTourBuilder = null;
+	private ScheduledTourBuilder currentTourBuilder = null;
 	
 	private Double currentStartTime = null; 
 	
@@ -81,6 +82,10 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	public CarrierPlan currentPlan = null;
 	
 	public Carriers carriers;
+
+	private double currentLegTransTime;
+
+	private double currentLegDepTime;
 
     public CarrierPlanReader(Carriers carriers) {
         super();
@@ -175,56 +180,62 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			scheduledTours = new ArrayList<ScheduledTour>();
 		}
 		if(name.equals("tour")){
-			currentTourBuilder = new TourBuilder();
 			String vehicleId = atts.getValue("vehicleId");
 			currentVehicle = vehicles.get(vehicleId);
-			currentStartTime = Double.parseDouble(atts.getValue(START));
+			currentTourBuilder = new ScheduledTourBuilder(currentVehicle);
 		}
 		if(name.equals("leg")){
-			currentLeg = new Leg();
+			currentLegDepTime = getDouble(atts.getValue("dep_time"));
+			currentLegTransTime = getDouble(atts.getValue("transp_time"));
 		}
 		if(name.equals(ACTIVITY)){
 			if(atts.getValue(TYPE).equals("start")){
-				currentTourBuilder.scheduleStart(currentVehicle.getLocation(), currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime());
+				currentTourBuilder.scheduleStart(getDouble(atts.getValue("end_time")));
 				previousActLoc = currentVehicle.getLocation();
 			}
 			else if(atts.getValue(TYPE).equals("pickup")){
 				String id = atts.getValue(SHIPMENTID);
 				CarrierShipment s = currentShipments.get(id);
 				finishLeg(s.getFrom());
-				currentTourBuilder.schedulePickup(s);
+				currentTourBuilder.schedulePickup(s,getDouble(atts.getValue("end_time")));
 				previousActLoc = s.getFrom();
 			}
 			else if(atts.getValue(TYPE).equals("delivery")){
 				String id = atts.getValue(SHIPMENTID);
 				CarrierShipment s = currentShipments.get(id);
 				finishLeg(s.getTo());
-				currentTourBuilder.scheduleDelivery(s);
+				currentTourBuilder.scheduleDelivery(s,getDouble(atts.getValue("end_time")));
 				previousActLoc = s.getTo();
 			}
 			else if(atts.getValue(TYPE).equals("end")){
 				finishLeg(currentVehicle.getLocation());
-				currentTourBuilder.scheduleEnd(currentVehicle.getLocation());
+				currentTourBuilder.scheduleEnd();
 			}
 		}
 	}
 
 	private void finishLeg(Id toLocation) {
+		LinkNetworkRouteImpl route = null;
 		if(previousRouteContent != null){
 			List<Id> linkIds = NetworkUtils.getLinkIds(previousRouteContent);
-			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(previousActLoc, toLocation);
+			route = new LinkNetworkRouteImpl(previousActLoc, toLocation);
 			if(!linkIds.isEmpty()){
 				route.setLinkIds(previousActLoc, linkIds, toLocation);
 			}
-			currentLeg.setRoute(route);
 		}
-		currentTourBuilder.addLeg(currentLeg);
+		currentTourBuilder.scheduleLeg(route, currentLegDepTime, currentLegTransTime);
 		currentLeg = null;
 		previousRouteContent = null;
 	}
 
-	private double getDouble(String value) {
-		return Double.parseDouble(value);
+	private double getDouble(String timeString) {
+		if(timeString.contains(":")){
+			return Time.parseTime(timeString);
+		}
+		else{
+			return Double.parseDouble(timeString);
+		}
+		
 	}
 
 	@Override
@@ -241,8 +252,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			currentCarrier.setSelectedPlan(currentPlan);
 		}
 		if(name.equals("tour")){
-			Tour tour = currentTourBuilder.build();
-			ScheduledTour sTour = new ScheduledTour(tour, currentVehicle, currentStartTime);
+			ScheduledTour sTour = currentTourBuilder.build();
 			scheduledTours.add(sTour);
 		}
 	}
@@ -250,8 +260,6 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	private int getInt(String value) {
 		return Integer.parseInt(value);
 	}
-
-
 
 	private Id makeId(String value) {
 		return new IdImpl(value);

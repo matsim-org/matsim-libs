@@ -14,6 +14,7 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Time;
 
 
 public class CarrierPlanWriter extends MatsimXmlWriter{
@@ -67,7 +68,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		writer.write("\t\t\t<vehicles>\n");
 		for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
 			writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId() + "\" linkId=\"" + v.getLocation() + "\"" +
-			" cap=\"" + v.getCapacity() + "\" earliestStart=\"" + v.getEarliestStartTime() + "\" latestEnd=\"" + v.getLatestEndTime() + "\"/>\n");
+			" cap=\"" + v.getCapacity() + "\" earliestStart=\"" + getTime(v.getEarliestStartTime()) + "\" latestEnd=\"" + getTime(v.getLatestEndTime()) + "\"/>\n");
 		}
 		writer.write("\t\t\t</vehicles>\n");
 	}
@@ -83,14 +84,18 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 			writer.write("from=\"" + s.getFrom() + "\" ");
 			writer.write("to=\"" + s.getTo() + "\" ");
 			writer.write("size=\"" + s.getSize() + "\" ");
-			writer.write("startPickup=\"" + s.getPickupTimeWindow().getStart() + "\" ");
-			writer.write("endPickup=\""  + s.getPickupTimeWindow().getEnd() + "\" ");
-			writer.write("startDelivery=\"" + s.getDeliveryTimeWindow().getStart() + "\" ");
-			writer.write("endDelivery=\"" + s.getDeliveryTimeWindow().getEnd()  + "\" ");
-			writer.write("pickupServiceTime=\"" + s.getPickupServiceTime()  + "\" ");
-			writer.write("deliveryServiceTime=\"" + s.getDeliveryServiceTime()  + "\"/>\n");		
+			writer.write("startPickup=\"" + getTime(s.getPickupTimeWindow().getStart()) + "\" ");
+			writer.write("endPickup=\""  + getTime(s.getPickupTimeWindow().getEnd()) + "\" ");
+			writer.write("startDelivery=\"" + getTime(s.getDeliveryTimeWindow().getStart()) + "\" ");
+			writer.write("endDelivery=\"" + getTime(s.getDeliveryTimeWindow().getEnd())  + "\" ");
+			writer.write("pickupServiceTime=\"" + getTime(s.getPickupServiceTime())  + "\" ");
+			writer.write("deliveryServiceTime=\"" + getTime(s.getDeliveryServiceTime())  + "\"/>\n");		
 		}
 		writer.write("\t\t\t</shipments>\n");
+	}
+
+	private String getTime(double time) {
+		return Time.writeTime(time);
 	}
 
 	private void writeScheduledTours(Carrier carrier, BufferedWriter writer) throws IOException {
@@ -100,13 +105,12 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		writer.write("\t\t\t<tours>\n");
 		for(ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()){
 			writer.write("\t\t\t\t<tour ");
-			writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId() + "\" ");
-			writer.write("start=\"" + tour.getDeparture() + "\">\n");
-			writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START + "\" />\n");
+			writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId() + "\">\n");
+			writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START + "\" end_time=\"" + Time.writeTime(tour.getDeparture()) + "\"/>\n");
 			for(TourElement tourElement : tour.getTour().getTourElements()){
 				if(tourElement instanceof Leg){
 					Leg leg = (Leg) tourElement;
-					writer.write("\t\t\t\t\t<leg>");
+					writer.write("\t\t\t\t\t<leg dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\" transp_time=\"" + Time.writeTime(leg.getExpectedTransportTime()) + "\">");
 					if(leg.getRoute() != null){
 						writer.write("\n");
 						writer.write("\t\t\t\t\t\t<route>");
@@ -131,7 +135,8 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 					ShipmentBasedActivity act = (ShipmentBasedActivity) tourElement;
 					writer.write("\t\t\t\t\t<act ");
 					writer.write("type=\"" + act.getActivityType() + "\" ");
-					writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\"");
+					writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\" ");
+					writer.write("end_time=\"" + Time.writeTime(act.getExpectedActEnd()) + "\"");
 					writer.write("/>\n");
 				}
 				

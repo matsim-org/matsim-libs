@@ -232,14 +232,14 @@ class CarrierAgentImpl {
 				else if(tourElement instanceof TourActivity){
 					TourActivity act = (TourActivity) tourElement;
 					Activity tourElementActivity = new ActivityImpl(act.getActivityType(), act.getLocation());
-					double endTime = Math.max(lastLeg.getArrivalTime() + act.getDuration(), act.getTimeWindow().getStart() + act.getDuration());
+					double endTime = act.getExpectedActEnd();
 					tourElementActivity.setEndTime(endTime);
 					plan.addActivity(tourElementActivity);
 				}
 			}
 			Activity endActivity = new ActivityImpl(FreightConstants.END, scheduledTour.getVehicle().getLocation());
 			plan.addActivity(endActivity);
-			Id driverId = createDriverId();
+			Id driverId = createDriverId(scheduledTour.getVehicle());
 			Person driverPerson = createDriverPerson(driverId);
             driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
@@ -289,8 +289,8 @@ class CarrierAgentImpl {
 		return person;
 	}
 
-	private Id createDriverId() {
-		IdImpl id = new IdImpl("fracht_"+carrier.getId()+"_"+nextId);
+	private Id createDriverId(CarrierVehicle carrierVehicle) {
+		IdImpl id = new IdImpl("fracht_"+carrier.getId()+"_veh_" + carrierVehicle.getVehicleId());
 		driverIds.add(id);
 		++nextId;
 		return id;

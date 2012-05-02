@@ -42,6 +42,10 @@ public class Tour {
 		public abstract void setExpectedArrival(double arrivalTime);
 		
 		public abstract double getExpectedArrival();
+
+		public abstract void setExpectedActEnd(double currTime);
+		
+		public abstract double getExpectedActEnd();
 	}
 	
 	public static abstract class ShipmentBasedActivity extends TourActivity {
@@ -88,6 +92,8 @@ public class Tour {
 		private double expActStartTime;
 		
 		private double expActArrTime;
+		
+		private double expActEndTime;
 
 		public Pickup(CarrierShipment shipment) {
 			this.shipment = shipment;
@@ -139,6 +145,19 @@ public class Tour {
 			return expActArrTime;
 		}
 
+		@Override
+		public void setExpectedActEnd(double currTime) {
+			this.expActEndTime = currTime;
+		}
+
+		@Override
+		public double getExpectedActEnd() {
+			return this.expActEndTime;
+			
+		}
+		
+		
+
 	};
 	
 	public static class Delivery extends ShipmentBasedActivity {
@@ -148,6 +167,8 @@ public class Tour {
 		private double expActStartTime;
 		
 		private double expArrTime;
+
+		private double expActEndTime;
 
 		public Delivery(CarrierShipment shipment) {
 			this.shipment = shipment;
@@ -197,6 +218,17 @@ public class Tour {
 		public double getExpectedArrival() {
 			return expArrTime;
 		}
+
+		@Override
+		public void setExpectedActEnd(double currTime) {
+			this.expActEndTime = currTime;
+			
+		}
+
+		@Override
+		public double getExpectedActEnd() {
+			return this.expActEndTime;
+		}
 		
 	};
 	
@@ -215,6 +247,8 @@ public class Tour {
 		private double expActStartTime;
 		
 		private double expArrTime;
+
+		private double expActEndTime;
 		
 		public GeneralActivity(String type, Id location, Double earliestStart, Double latestStart, Double duration) {
 			super();
@@ -263,6 +297,16 @@ public class Tour {
 		@Override
 		public double getExpectedArrival() {
 			return expArrTime;
+		}
+
+		@Override
+		public void setExpectedActEnd(double currTime) {
+			this.expActEndTime = currTime;
+		}
+
+		@Override
+		public double getExpectedActEnd() {
+			return this.expActEndTime;
 		}
 		
 	}
