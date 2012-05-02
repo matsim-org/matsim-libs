@@ -58,12 +58,15 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	
 	private String pIdentifier;
 	private Network net;
+	private LeastCostPathCalculator routingAlgo;
 	private TransitSchedule scheduleWithStopsOnly;
 	
 	public ComplexCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, int iteration) {
 		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
+		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
+		this.routingAlgo = new Dijkstra(this.net, tC, tC);
 	}
 
 	@Override
@@ -103,9 +106,6 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		tempStopsToBeServed.add(stopsToBeServed.get(0));
 		
 		// create links - network route		
-		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
-		LeastCostPathCalculator routingAlgo = new Dijkstra(this.net, tC, tC);
-				
 		Id startLinkId = null;
 		Id lastLinkId = null;
 		
@@ -119,7 +119,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 			
 			if(lastLinkId != null){
 				links.add(this.net.getLinks().get(lastLinkId));
-				Path path = routingAlgo.calcLeastCostPath(this.net.getLinks().get(lastLinkId).getToNode(), this.net.getLinks().get(stop.getLinkId()).getFromNode(), 0.0, null, null);
+				Path path = this.routingAlgo.calcLeastCostPath(this.net.getLinks().get(lastLinkId).getToNode(), this.net.getLinks().get(stop.getLinkId()).getFromNode(), 0.0, null, null);
 
 				for (Link link : path.links) {
 					links.add(link);
