@@ -45,11 +45,11 @@ class ExternalControler {
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network80links.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/population1agent.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/populationBusCorridor80linksCar.xml";
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/PaperTEST";
 	
 	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 1;
+	static int lastInternalIteration = 0;
 	
 //	final OptimizationParameter op = OptimizationParameter.FARE;
 //	final OptimizationParameter op = OptimizationParameter.CAPACITY;

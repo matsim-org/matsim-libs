@@ -24,6 +24,7 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -38,10 +39,12 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 	private final double TRAVEL_PT_IN_VEHICLE;
 	private final double TRAVEL_PT_WAITING;
 	private final double stuckScore;
+	private Network network;
 	
 
-	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup planCalcScoreConfigGroup, PtLegHandler inVehWaitHandler, double travelingPtInVehicle, double travelingPtWaiting, double stuckScore) {
+	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Network network, PtLegHandler inVehWaitHandler, double travelingPtInVehicle, double travelingPtWaiting, double stuckScore) {
 		this.params = new CharyparNagelScoringParameters(planCalcScoreConfigGroup);
+		this.network = network;
 		this.inVehWaitHandler = inVehWaitHandler;
 		this.TRAVEL_PT_IN_VEHICLE = travelingPtInVehicle;
 		this.TRAVEL_PT_WAITING = travelingPtWaiting;
@@ -57,7 +60,7 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		scoringFunctionAccumulator.addScoringFunction(new MyLegScoringFunction(this.params, personId, personId2InVehTime, personId2WaitingTime, this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING));
+		scoringFunctionAccumulator.addScoringFunction(new MyLegScoringFunction(this.params, network, personId, personId2InVehTime, personId2WaitingTime, this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING));
 		scoringFunctionAccumulator.addScoringFunction(new MyMoneyScoringFunction(this.params));
 		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(this.stuckScore));
 		scoringFunctionAccumulator.addScoringFunction(new MyActivityScoringFunction(this.params));
