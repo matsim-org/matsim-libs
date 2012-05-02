@@ -89,7 +89,17 @@ public class MyBiLinearInterpolator {
 		double xWeight= xCoord-x1;
 		double yWeight= yCoord-y1;
 		
-		return (values[y1][x1]*(1-yWeight) + values[y2][x1]*yWeight) * (1-xWeight) + (values[y1][x2]*(1-yWeight) + values[y2][x2]*yWeight) * xWeight; //FEHLER?!
+		if (xWeight==0){
+			if (yWeight==0){
+				return values[y1][x1];
+			}
+			return values[y1][x1]*(1-yWeight) + values[y2][x1]*yWeight;
+		}
+		if (yWeight==0){
+			return values[y1][x1]*(1-xWeight) + values[y1][x2]*xWeight;
+		}
+		
+		return (values[y1][x1]*(1-yWeight) + values[y2][x1]*yWeight) * (1-xWeight) + (values[y1][x2]*(1-yWeight) + values[y2][x2]*yWeight) * xWeight;
 	}
 	
 	/**
@@ -102,13 +112,29 @@ public class MyBiLinearInterpolator {
 	 * @return interpolierter Wert am Punkt (xCoord, yCoord)
 	 */
 	public static double myBiLinearValueInterpolation(SpatialGrid sg, double xCoord, double yCoord){
-		double x1= xCoord-(xCoord % sg.getResolution());
+		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
+		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
+		
+		double x1= xCoord-xDif;
 		double x2= x1+sg.getResolution();
-		double y1= yCoord-(yCoord % sg.getResolution());
+		double y1= yCoord-yDif;
 		double y2= y1+sg.getResolution();
 		
-		double xWeight= (xCoord % sg.getResolution())/sg.getResolution();
-		double yWeight= (yCoord % sg.getResolution())/sg.getResolution();
+		double xWeight= xDif/sg.getResolution();
+		double yWeight= yDif/sg.getResolution();
+		
+		if (xDif==0){
+			if (yDif==0){
+				//xWeigt=yWeight=0
+				return sg.getMatrix()[sg.getRow(yCoord)][sg.getColumn(xCoord)];
+			}
+			//xWeight=0
+			return sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]*(1-yWeight) + sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]*yWeight;
+		}
+		if (yDif==0){
+			//yWeight=0
+			return sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]*(1-xWeight) + sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]*xWeight;
+		}
 		
 		return (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]*(1-yWeight) + sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]*yWeight) * (1-xWeight) + (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]*(1-yWeight) + sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x2)]*yWeight) * xWeight;
 	}

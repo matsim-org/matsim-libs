@@ -13,28 +13,39 @@ import org.apache.commons.math.analysis.BivariateRealFunction;
 import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolator;
 import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpolator;
 
+/**
+ * interpolates data on a grid without SpatialGrid
+ * 
+ * interpolation methods:
+ * 	bicubic spline interpolation from apache 
+ * 	bilinear interpolation (own implementation)
+ * 
+ * @author tthunig
+ *
+ */
 public class Interpolate {
 	
 	static double[] x_coord;
 	static double[] y_coord;
 	
 	/**
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String resolution= "3200.0";
+		String resolution= "6400.0";
 		boolean printData= false; //should be false, with increasing resolution; otherwise the data will be printed to the console
 		boolean plotData= false; //should be false, with increasing resolution; otherwise the data will be plotted
 		int numberOfInterp= 1;
 		
 		bicubicSplineInterpolation(resolution, "java-versuch1-Bicubic", numberOfInterp, printData, plotData);
-		//myBiLinearSplineInterpolation(resolution, "java-versuch2-Bilinear_selbst", printData, plotData);
+//		myBiLinearInterpolation(resolution, "java-versuch2-Bilinear_selbst", printData, plotData);
 		
 		System.out.println("\ndone");
 	}
 	
 	/**
-	 * reads the given data and interpolates it with bilinear spline interpolation
+	 * reads the given data and interpolates it with bilinear interpolation (own implementation)
 	 * writes the interpolated data with the original coordinates in a txt file
 	 * 
 	 * @param resolution the resolution of the data to interpolate
@@ -42,7 +53,7 @@ public class Interpolate {
 	 * @param printData should be false, with increasing resolution; otherwise the data will be printed to the console
 	 * @param plotData should be false, with increasing resolution; otherwise the data will be plotted
 	 */
-	public static void myBiLinearSplineInterpolation(String resolution, String directory, boolean printData, boolean plotData){
+	public static void myBiLinearInterpolation(String resolution, String directory, boolean printData, boolean plotData){
 		System.out.println("interpolate file " + resolution);
 		
 		System.out.println("\nread data...");
@@ -215,8 +226,14 @@ public class Interpolate {
 //		}
 //	}
 	
-	//liest datenmatrix ein, schneidet dabei 1. zeile und 1. spalte ab
-	public static double[][] read(String file){
+	/**
+	 * reads data from the given file without coordinates (first row, first column)
+	 * saves data in an array
+	 * 
+	 * @param file the filename
+	 * @return array with the data without the coordinates
+	 */
+	static double[][] read(String file){
 		ArrayList<String[]> lines= new ArrayList<String[]>();
 		try {
 			BufferedReader in= new BufferedReader(new FileReader(file));
@@ -232,15 +249,20 @@ public class Interpolate {
 			e.printStackTrace();
 		}
 		
-		//schreibe eingelesene Daten in ein double[][]
+		//writes data in a double[][]
 		double[][] values= parse(lines);
 		
-		//schneide Koordinaten ab (1.Spalte und 1.Zeile)
+		//skip coordinates
 		return skip(values);
 	}
 	
-	//schreibt matrix in file mit tabs getrennt
-	public static void write(double[][] matrix, String file){
+	/**
+	 * writes a given data array in a file, separated by tabs
+	 * 
+	 * @param matrix the data to write out
+	 * @param file the filename
+	 */
+	static void write(double[][] matrix, String file){
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
 			
@@ -262,8 +284,15 @@ public class Interpolate {
 		}
 	}
 	
-	//gibt matrix mit koordinaten zurück
-	public static double[][] merge(double[][] a, double[] x, double[] y){
+	/**
+	 * returns array with coordinates
+	 * 
+	 * @param a the data array
+	 * @param x the x-coordinate vector
+	 * @param y the y-coordinate vector
+	 * @return merged array
+	 */
+	static double[][] merge(double[][] a, double[] x, double[] y){
 		double[][] b= new double[a.length+1][a[0].length+1];
 		for (int i=1; i<b.length; i++){
 			b[i][0]= y[i-1];
@@ -275,21 +304,32 @@ public class Interpolate {
 		return b;
 	}
 	
-	//schreibt Daten aus der ArrayList in ein double[][]
-	public static double[][] parse(ArrayList<String[]> lines){
+	/**
+	 * converts data from ArrayList<String[]> to double[][]
+	 * 
+	 * @param lines the ArrayList to convert
+	 * @return converted ArrayList
+	 */
+	static double[][] parse(ArrayList<String[]> lines){
 		String[][] linearray= lines.toArray(new String[1][]);
 		double[][] values= new double[linearray.length][linearray[0].length];
 		for (int i=0; i<values.length; i++){
 			for (int j=0; j<values[0].length; j++){
-				if(i!=0 || j!=0) //Koordinatenlücke
+				if(i!=0 || j!=0) //omit empty corner
 					values[i][j]= Double.parseDouble(linearray[i][j]);
 			}
 		}
 		return values;
 	}
 	
-	//berechnet Laenge des Koordinatenvektors in Interpolationstiefe i und Ausgangslaenge l
-	public static int coordLength(int i, int l){
+	/**
+	 * calculates the length of the coordinate vector in interpolation depth i and initial length l
+	 * 
+	 * @param i the interpolation depth
+	 * @param l the initial length of the coordinate vector
+	 * @return length of the coordinate vector in interpolation depth i
+	 */
+	static int coordLength(int i, int l){
 		int sum= 0;
 		for (int j=0; j<i; j++){
 			sum+= Math.pow(2, j);
@@ -297,8 +337,14 @@ public class Interpolate {
 		return l * (int)Math.pow(2,i) - sum;
 	}
 	
-	//erzeugt eigenen Koordinatenvektor mit gegebener Länge und Schrittweite (aufsteigend)
-	public static double[] coord(int length, double step){
+	/**
+	 * creates a coordinate vector with given length and step size
+	 * 
+	 * @param length
+	 * @param step
+	 * @return a coordinate vector (0, step, 2*step, ..., (length-1)*step)
+	 */
+	static double[] coord(int length, double step){
 		double[] x= new double[length];
 		for (int i=0; i<length; i++){
 			x[i]= i*step; 
@@ -306,9 +352,13 @@ public class Interpolate {
 		return x;
 	}
 	
-	//erzeugt Koordinatenvektoren mit Hilfe der alten Koordinaten passend zur Interpolationstiefe
-	//returns array mit x-Koordinaten als 1.Eintrag (1.Zeile), y-Koordinaten als 2.Eintrag (2.Zeile), Achtung: x- und y-Koordinaten haben in der Regel nicht die gleiche Länge!
-	public static double[][] originalCoord(int i){
+	/**
+	 * creates new coordinate vector for the interpolation depth from old coordinates
+	 * 
+	 * @param i the interpolation depth
+	 * @return array with x-coordinates as first row and y-coordinates as second row. attention: x- and y-coordinates have usually not the same size
+	 */
+	static double[][] originalCoord(int i){
 		double[][] new_coord= new double[2][];
 		new_coord[0]= new double[coordLength(i,x_coord.length)];
 		new_coord[1]= new double[coordLength(i,y_coord.length)];
@@ -325,8 +375,13 @@ public class Interpolate {
 		return new_coord;
 	}
 	
-	//gibt array a ohne 1.Spalte und 1.Zeile zurück, speichert Koordinaten in Datenfeld
-	public static double[][] skip(double[][] a){
+	/**
+	 * skips coordinates (first row and first column) from the given array
+	 * 
+	 * @param a the array to skip
+	 * @return array a without first row and column
+	 */
+	static double[][] skip(double[][] a){
 		double[][] values= new double[a.length-1][a[1].length-1];
 		x_coord= new double[values[0].length];
 		y_coord= new double[values.length];
@@ -340,8 +395,12 @@ public class Interpolate {
 		return values;
 	}
 	
-	//schreibe array auf die console
-	public static void print(double[][] a){
+	/**
+	 * prints the given array to the console
+	 * 
+	 * @param a the array to print
+	 */
+	static void print(double[][] a){
 		for (int i=0; i<a.length; i++){
 			for (int j=0; j<a[0].length; j++){
 				System.out.print(a[i][j] + ", "); 

@@ -1,18 +1,29 @@
 package interpolation;
 
 import org.apache.commons.math.MathException;
-import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolatingFunction;
+import org.apache.commons.math.analysis.BivariateRealFunction;
 import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolator;
+import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpolator;
 
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
+/**
+ * interpolates data on a grid. uses SpatialGrid
+ * 
+ * interpolation methods:
+ * 	bicubic spline interpolation from apache 
+ * 	bilinear interpolation (own implementation)
+ * 
+ * @author tthunig
+ *
+ */
 public class InterpolateSpatialGrid {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String resolution = "6400.0";
+		String resolution = "6400.0"; //bicubic schafft bis 400.0, bilinear bis 100.0 (100.0 kann R nicht mehr zeichnen)
 		String directory= "java-versuch3-SpatialGrid";
 
 		System.out.println("interpolate file " + resolution + ":");
@@ -26,7 +37,7 @@ public class InterpolateSpatialGrid {
 		double[] x = coord(sg.getXmin(), sg.getXmax(), sg.getResolution());
 		double[] y = coord(sg.getYmin(), sg.getYmax(), sg.getResolution());
 		
-		// generate new coordinates and SpatialGrid for higher resolution
+		// generate new coordinates for higher resolution
 		double[] x_new = coord(sg.getXmin(), sg.getXmax(), sg.getResolution() / 2);
 		double[] y_new = coord(sg.getYmin(), sg.getYmax(), sg.getResolution() / 2);
 		
@@ -50,19 +61,29 @@ public class InterpolateSpatialGrid {
 	 * @return new SpatialGrid with higher resolution
 	 */
 	private static SpatialGrid myBiLinearSplineInterpolation(SpatialGrid sg, double[] x, double[] y, double[] x_new, double[] y_new) {
-//		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
-//		
+		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
+		
+		System.out.println("\ninterpolate...");
+		// calculate new values for higher resolution
+		for (int k = 0; k < y_new.length; k++) {
+			for (int l = 0; l < x_new.length; l++) {
+				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyBiLinearInterpolator.myBiLinearValueInterpolation(sg.getMatrix(), sg_new.getColumn(x_new[l])/2., sg_new.getRow(y_new[k])/2.));
+			}
+		}
+		return sg_new;
+		
+//		//alternative 1
 //		System.out.println("\ninterpolate...");
 //		// calculate new values for higher resolution
 //		for (int k = 0; k < y_new.length; k++) {
 //			for (int l = 0; l < x_new.length; l++) {
-//				//FEHLER!!
-//				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyBiLinearInterpolator.myBiLinearValueInterpolation(sg.getMatrix(), sg_new.getColumn(x_new[l]), sg_new.getRow(y_new[k])));
+//				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyBiLinearInterpolator.myBiLinearValueInterpolation(sg, x_new[l], y_new[k]));
 //			}
 //		}
 //		return sg_new;		
 		
-		return MyBiLinearInterpolator.myBiLinearGridInterpolation(sg); //alternative, falls MyBilinearInterpolator mit SpatialGrid arbeiten soll
+//		//alternative 2
+//		return MyBiLinearInterpolator.myBiLinearGridInterpolation(sg);
 	}
 
 
@@ -79,18 +100,18 @@ public class InterpolateSpatialGrid {
 	private static SpatialGrid bicubicSplineInterpolation(SpatialGrid sg, double[] x, double[] y, double[] x_new, double[] y_new) {
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		
+		double[] x_default= coord(0,x.length-1,1);
+		double[] y_default= coord(0,y.length-1,1);
+		
 		System.out.println("\ninterpolate...");
 		try {
-			BicubicSplineInterpolator interpolator = new BicubicSplineInterpolator();
-			BicubicSplineInterpolatingFunction function = interpolator.interpolate(y, x,
-					sg.getMatrix());
+			BivariateRealGridInterpolator interpolator = new BicubicSplineInterpolator();
+			BivariateRealFunction func= interpolator.interpolate(y_default, x_default, sg.getMatrix()); //benoetigt default Koordinaten (0,1,2,...)
 
 			// calculate new values for higher resolution
 			for (int k = 0; k < y_new.length; k++) {
 				for (int l = 0; l < x_new.length; l++) {
-					sg_new.setValue(sg_new.getRow(y_new[k]),
-							sg_new.getColumn(x_new[l]),
-							function.value(y_new[k], x_new[l]));
+					sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), func.value(k/2., l/2.));
 				}
 			}
 		} catch (MathException e) {
