@@ -25,7 +25,9 @@
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 /**
@@ -33,7 +35,7 @@ import org.matsim.core.controler.listener.StartupListener;
  *
  */
 
-public class PtControlerListener implements StartupListener{
+public class PtControlerListener implements StartupListener, ScoringListener{
 
 	private final double fare;
 	private final PtLegHandler ptLegHandler;
@@ -49,5 +51,10 @@ public class PtControlerListener implements StartupListener{
 		CalculateFareForBusTripHandler fareCalculator = new CalculateFareForBusTripHandler(eventsManager, this.fare);
 		event.getControler().getEvents().addHandler(fareCalculator);
 		event.getControler().getEvents().addHandler(ptLegHandler);
+	}
+
+	@Override
+	public void notifyScoring(ScoringEvent event) {
+		System.out.println("Scoring begins...");
 	}
 }

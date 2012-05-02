@@ -48,8 +48,8 @@ class ExternalControler {
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/population1agent.xml";
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/PaperTEST";
 	
-	static int lastExternalIteration = 1;
-	static int lastInternalIteration = 0;
+	static int lastExternalIteration = 0;
+	static int lastInternalIteration = 1;
 	
 //	final OptimizationParameter op = OptimizationParameter.FARE;
 //	final OptimizationParameter op = OptimizationParameter.CAPACITY;

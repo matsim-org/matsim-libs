@@ -36,7 +36,6 @@ public class MyMoneyScoringFunction implements MoneyScoring, BasicScoring {
 	public MyMoneyScoringFunction(final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
-
 	}
 
 	@Override
@@ -46,8 +45,7 @@ public class MyMoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	@Override
 	public void addMoney(final double amount) {
-		this.score += amount * this.params.marginalUtilityOfMoney ; // linear mapping of money to score
-//		this.score += amount;
+		this.score += amount * this.params.marginalUtilityOfMoney ;
 	}
 
 	@Override

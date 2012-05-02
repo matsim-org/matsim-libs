@@ -45,21 +45,29 @@ public class InternalControler {
 	private final int lastInternalIteration;
 	private final double fare;
 	
-	// TODO: adjust parameters
-	final double MARGINAL_UTILITY_OF_MONEY = 0.14026;
-	private final double TRAVEL_PT = 0; // not used --> instead: TRAVEL_PT_IN_VEHICLE & TRAVEL_PT_WAITING
-	private final double TRAVEL_CAR = 0;
-	private final double TRAVEL_WALK = -1.7568;
-	private final double CONSTANT_CAR = -2.2118;
-	private final double CONSTANT_PT = 0;
+	private final double MARGINAL_UTILITY_OF_MONEY = 0.14026;
 	private final double PERFORMING = 1.8534;
-	private final double LATE_ARRIVAL = 0;
-	
-	private final double monetaryCostPerKm = -0.11; // AUD per km 
-	private final double agentStuckScore = -100;
-	
-	private final double TRAVEL_PT_IN_VEHICLE = -1.4448; // Utils per Hour
-	private final double TRAVEL_PT_WAITING = -3.6822; // Utils per Hour
+
+	private final double CONSTANT_CAR = -2.2118;
+	private final double TRAVEL_CAR = 0.0;
+	private final double MONETARY_DISTANCE_COST_RATE_CAR = -0.00011;
+
+	private final double CONSTANT_WALK = 0.0;
+	private final double TRAVEL_WALK = -1.7568;
+
+	private final double CONSTANT_PT = 0.0;
+	private final double TRAVEL_PT = 0.0; // not needed because of the following differentiation:
+	private final double TRAVEL_PT_IN_VEHICLE = -1.4448;
+	private final double TRAVEL_PT_WAITING = -3.6822;
+	// TODO: access / egress scoring?!?
+//	private final double TRAVEL_PT_ACCESS;
+//	private final double TRAVEL_PT_EGRESS;
+	private final double MONETARY_DISTANCE_COST_RATE_PT = 0.0;
+
+	private final double LATE_ARRIVAL = 0.0;
+	private final double EARLY_DEPARTURE = 0.0;
+	private final double WAITING = 0.0;
+	private final double STUCK_SCORE = -100;
 
 	public InternalControler(Scenario scenario, String directoryExtIt, int lastInternalIteration, double fare) {
 		this.scenario = scenario;
@@ -97,17 +105,25 @@ public class InternalControler {
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt + "/internalIterations");
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
-		planCalcScoreConfigGroup.setTravelingPt_utils_hr(TRAVEL_PT);
 		planCalcScoreConfigGroup.setMarginalUtilityOfMoney(MARGINAL_UTILITY_OF_MONEY);
-		planCalcScoreConfigGroup.setTraveling_utils_hr(TRAVEL_CAR);
-		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(TRAVEL_WALK);
-		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
-		planCalcScoreConfigGroup.setConstantPt(CONSTANT_PT);
 		planCalcScoreConfigGroup.setPerforming_utils_hr(PERFORMING);
-		planCalcScoreConfigGroup.setLateArrival_utils_hr(LATE_ARRIVAL);
+
+		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
+		planCalcScoreConfigGroup.setTraveling_utils_hr(TRAVEL_CAR);
+		planCalcScoreConfigGroup.setMonetaryDistanceCostRateCar(MONETARY_DISTANCE_COST_RATE_CAR);
+
+		planCalcScoreConfigGroup.setConstantWalk(CONSTANT_WALK);
+		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(TRAVEL_WALK);
+		planCalcScoreConfigGroup.setMonetaryDistanceCostRatePt(MONETARY_DISTANCE_COST_RATE_PT);
 		
-		// TODO: monetaryCostRateCar aus Config bzw. ConfigGroup; Egress vs. Access-Scoring seperately?
-		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm, agentStuckScore);
+		planCalcScoreConfigGroup.setConstantPt(CONSTANT_PT);
+		planCalcScoreConfigGroup.setTravelingPt_utils_hr(TRAVEL_PT);
+
+		planCalcScoreConfigGroup.setLateArrival_utils_hr(LATE_ARRIVAL);
+		planCalcScoreConfigGroup.setEarlyDeparture_utils_hr(EARLY_DEPARTURE);
+		planCalcScoreConfigGroup.setWaiting_utils_hr(WAITING);
+		
+		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE);
 		controler.setScoringFunctionFactory(scoringfactory);
 
 		controler.run();		
