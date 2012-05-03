@@ -2,28 +2,38 @@ package interpolation;
 
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
+/**
+ * implements bilinear interpolation
+ * (uses linear spline interpolation with separation: first horizontal then vertical)
+ * 
+ * requires values on a grid, either as double[][] or as SpatialGrid
+ * 
+ * @author tthunig
+ *
+ */
 public class MyBiLinearInterpolator {
 
 	/**
-	 * interpoliert Werte auf einem Gitter mit bilinearen Splines auf das naechsthoehere Gitter
+	 * interpolates values on a grid given as double[][] with bilinear interpolation to a higher resolution
 	 * 
-	 * @param values die Werte der Stuetzpunkte auf dem Gitter
-	 * @return die interpolierten Werte auf dem naechsthoehere Gitter
+	 * @param values the known values on the grid
+	 * @return grid with higher resolution
 	 */
 	public static double[][] myBiLinearGridInterpolation(double[][] values){
 		double[][] interp_values= new double[Interpolate.coordLength(1, values.length)][Interpolate.coordLength(1, values[0].length)];
-		//interp_values füllen:
+		
+		// calculate new values for higher resolution
 		for (int i=0; i<interp_values.length; i++){
 			for (int j=0; j<interp_values[0].length; j++){
-				//i und j gerade, also alte punkte
+				//i and j even - old grid value
 				if (i%2==0 && j%2==0){
 					interp_values[i][j]= values[i/2][j/2];
 				}
-				//i und j ungerade, also alter gittermittelpunkt -> bilde mittelwert zwischen den 4 benachbarten gitterecken
+				//i and j odd - old grid center -> calculate mean value of the 4 neighboring grid corners
 				else if (i%2==1 && j%2==1){
 					interp_values[i][j]= (values[i/2][j/2] + values[i/2][(j/2)+1] + values[(i/2)+1][j/2] + values[(i/2)+1][(j/2)+1])/4;
 				}
-				//entweder i oder j gerade, also wert auf alter gitterkante -> bilde mittelwert zwischen den 2 benachbarten gitterecken
+				//either i or j even - value on old grid edge -> calculate mean value of the 2 neighboring grid corners
 				else if (i%2==0){
 					interp_values[i][j]= (values[i/2][j/2] + values[i/2][(j/2)+1])/2;
 				}
@@ -36,10 +46,10 @@ public class MyBiLinearInterpolator {
 	}
 	
 	/**
-	 * interpoliert Werte auf einem Gitter mit bilinearen Splines auf das naechsthoehere Gitter
+	 * interpolates values on a grid given as SpatialGrid with bilinear interpolation to a higher resolution
 	 * 
-	 * @param sg das SpatialGrid mit den Werte der Stuetzpunkte auf dem Gitter
-	 * @return die interpolierten Werte auf dem naechsthoehere Gitter als SpatialGrid
+	 * @param sg the SpatialGrid to interpolate
+	 * @return SpatialGrid with higher resolution
 	 */
 	public static SpatialGrid myBiLinearGridInterpolation(SpatialGrid sg){
 		// generate new coordinates for higher resolution
@@ -51,15 +61,15 @@ public class MyBiLinearInterpolator {
 				sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		for (int i=0; i<y_new.length; i++){
 			for (int j=0; j<x_new.length; j++){
-				//i und j gerade, also alte punkte
+				//i and j even - old grid value
 				if (i%2==0 && j%2==0){
 					sg_new.setValue(sg_new.getRow(y_new[i]), sg_new.getColumn(x_new[j]), sg.getMatrix()[i/2][j/2]);
 				}
-				//i und j ungerade, also alter gittermittelpunkt -> bilde mittelwert zwischen den 4 benachbarten gitterecken
+				//i and j odd - old grid center -> calculate mean value of the 4 neighboring grid corners
 				else if (i%2==1 && j%2==1){
 					sg_new.setValue(sg_new.getRow(y_new[i]), sg_new.getColumn(x_new[j]), (sg.getMatrix()[i/2][j/2] + sg.getMatrix()[i/2][(j/2)+1] + sg.getMatrix()[(i/2)+1][j/2] + sg.getMatrix()[(i/2)+1][(j/2)+1])/4);
 				}
-				//entweder i oder j gerade, also wert auf alter gitterkante -> bilde mittelwert zwischen den 2 benachbarten gitterecken
+				//either i or j even - value on old grid edge -> calculate mean value of the 2 neighboring grid corners
 				else if (i%2==0){
 					sg_new.setValue(sg_new.getRow(y_new[i]), sg_new.getColumn(x_new[j]), (sg.getMatrix()[i/2][j/2] + sg.getMatrix()[i/2][(j/2)+1])/2);
 				}
@@ -72,13 +82,13 @@ public class MyBiLinearInterpolator {
 	}
 	
 	/**
-	 * gibt interpolierten Wert an einem beliebigen Punkt zurück, benoetigt dazu Werte auf Gitter
-	 * verwendet Verfahren der bilinearen Splineinterpolation, indem lineare Splineinterpolation durch Separation erweitert wird (zuerst horizontal, dann vertikal)
+	 * interpolates value on a arbitrary point with bilinear interpolation
+	 * requires values on a grid as double[][]
 	 * 
-	 * @param values die Werte der Stuetzpunkte auf dem Gitter
-	 * @param xCoord x-Koordinate vom zu interpolierenden Punkt
-	 * @param yCoord y-Koordinate vom zu interpolierenden Punkt
-	 * @return interpolierter Wert am Punkt (xCoord, yCoord)
+	 * @param values the known values on the grid
+	 * @param xCoord the x-coordinate of the point to interpolate
+	 * @param yCoord the y-coordinate of the point to interpolate
+	 * @return interpolated value on the point (xCoord, yCoord)
 	 */
 	public static double myBiLinearValueInterpolation(double[][] values, double xCoord, double yCoord){
 		int x1= (int)xCoord;
@@ -103,13 +113,13 @@ public class MyBiLinearInterpolator {
 	}
 	
 	/**
-	 * gibt interpolierten Wert fuer das gegebene SpatialGrid an einem beliebigen Punkt zurück, benoetigt dazu Werte auf Gitter
-	 * verwendet Verfahren der bilinearen Splineinterpolation, indem lineare Splineinterpolation durch Separation erweitert wird (zuerst horizontal, dann vertikal)
+	 * interpolates value on a arbitrary point with bilinear interpolation
+	 * requires values on a grid as SpatialGrid
 	 * 
-	 * @param sg das SpatialGrid mit den Werte der Stuetzpunkte auf dem Gitter
-	 * @param xCoord x-Koordinate vom zu interpolierenden Punkt
-	 * @param yCoord y-Koordinate vom zu interpolierenden Punkt
-	 * @return interpolierter Wert am Punkt (xCoord, yCoord)
+	 * @param sg the values on the grid as SpatialGrid
+	 * @param xCoord the x-coordinate of the point to interpolate
+	 * @param yCoord the y-coordinate of the point to interpolate
+	 * @return interpolated value on the point (xCoord, yCoord)
 	 */
 	public static double myBiLinearValueInterpolation(SpatialGrid sg, double xCoord, double yCoord){
 		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
