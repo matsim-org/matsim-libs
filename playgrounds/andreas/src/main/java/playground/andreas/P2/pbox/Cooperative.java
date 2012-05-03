@@ -38,7 +38,7 @@ import playground.andreas.P2.scoring.ScoreContainer;
  */
 public interface Cooperative {
 	
-	public void init(PRouteProvider pRouteProvider, PPlanStrategy initialStrategy, int iteration);
+	public void init(PRouteProvider pRouteProvider, PPlanStrategy initialStrategy, int iteration, double initialBudget);
 	
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap);
 	

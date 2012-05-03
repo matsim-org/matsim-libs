@@ -115,7 +115,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.initInitialCooperatives(this.pConfig.getNumberOfCooperatives());
 		
 		for (Cooperative cooperative : this.cooperatives) {
-			cooperative.init(this.routeProvider, this.initialStrategy, event.getControler().getFirstIteration());
+			cooperative.init(this.routeProvider, this.initialStrategy, event.getControler().getFirstIteration(), pConfig.getInitialBudget());
 		}		
 		
 		// collect the transit schedules from all cooperatives
@@ -236,7 +236,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		for (int i = 0; i < numberOfNewCoopertives; i++) {
 			this.counter++;
 			BasicCooperative cooperative = new BasicCooperative(new IdImpl(this.pConfig.getPIdentifier() + this.counter), this.pConfig, this.franchise);
-			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1);
+			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
 			this.cooperatives.add(cooperative);
 		}
 			
@@ -244,7 +244,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		for (int i = this.cooperatives.size(); i < this.pConfig.getNumberOfCooperatives(); i++) {
 			this.counter++;
 			BasicCooperative cooperative = new BasicCooperative(new IdImpl(this.pConfig.getPIdentifier() + this.counter), this.pConfig, this.franchise);
-			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1);
+			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
 			this.cooperatives.add(cooperative);
 		}
 	}
