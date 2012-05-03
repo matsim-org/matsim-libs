@@ -199,8 +199,8 @@ public class VehicleScheduleGenerator {
 				
 				if (ii==transitStopFacilities.size()-1){
 				} else {
-					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.scheduleSpeed;
-//					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed();
+//					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.scheduleSpeed;
+					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed();
 				}
 				
 				arrivalTime = departureTime + travelTimeBus;

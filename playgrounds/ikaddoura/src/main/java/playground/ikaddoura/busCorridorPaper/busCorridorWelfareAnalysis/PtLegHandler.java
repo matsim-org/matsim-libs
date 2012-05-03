@@ -27,13 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -49,7 +46,8 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 	private final Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2InVehicleTime = new HashMap<Id, Double>();
-	private boolean isEgress = false;
+	
+	private final Map <Id, Boolean> personId2IsEgress = new HashMap<Id, Boolean>();
 	
 	@Override
 	public void reset(int iteration) {
@@ -140,16 +138,13 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-			this.isEgress = true;
+			this.personId2IsEgress.put(event.getPersonId(), true);
 		}
 	}
 
-	public boolean isEgress() {
-		return isEgress;
+	public Map<Id, Boolean> getPersonId2IsEgress() {
+		return personId2IsEgress;
 	}
-
-	public void setEgress(boolean isEgress) {
-		this.isEgress = isEgress;
-	}
+	
 
 }

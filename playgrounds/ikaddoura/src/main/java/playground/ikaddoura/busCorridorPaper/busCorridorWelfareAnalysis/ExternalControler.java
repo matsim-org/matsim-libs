@@ -44,12 +44,12 @@ class ExternalControler {
 	private final static Logger log = Logger.getLogger(ExternalControler.class);
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network80links.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline_withoutTimeChoice.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/populationBusCorridor80linksCar.xml";
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/PaperTEST";
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/paperTest";
 	
 	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 1;
+	static int lastInternalIteration = 0;
 	
 //	final OptimizationParameter op = OptimizationParameter.FARE;
 //	final OptimizationParameter op = OptimizationParameter.CAPACITY;
@@ -114,7 +114,7 @@ class ExternalControler {
 			
 			// settings for next external iteration
 			if (extIt < lastExternalIteration){
-				if(op.equals(OptimizationParameter.FARE)) this.fare++;
+				if(op.equals(OptimizationParameter.FARE)) this.fare--;
 				if(op.equals(OptimizationParameter.CAPACITY)) this.capacity = this.capacity + 10;
 				if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)) this.numberOfBuses++;
 			}

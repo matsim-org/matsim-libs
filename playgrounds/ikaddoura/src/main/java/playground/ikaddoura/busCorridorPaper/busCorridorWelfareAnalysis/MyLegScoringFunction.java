@@ -154,14 +154,20 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
 				throw new RuntimeException("Marginal utility of distance walk is deprecated and should not be used. Aborting...");
 			}
-						
-			if (!this.ptLegHandler.isEgress()){
-//				System.out.println("AccessTime: " + travelTime);
+			
+			if (this.ptLegHandler.getPersonId2IsEgress().get(personId) == null){
+				this.ptLegHandler.getPersonId2IsEgress().put(personId, false);
+			}
+			
+			if (!this.ptLegHandler.getPersonId2IsEgress().get(personId)){
+				System.out.println("AccessTime: " + travelTime);
+				System.out.println("(personId: " + personId);
 				tmpScore += travelTime * this.TRAVEL_PT_ACCESS / 3600.0;
 			} else {
-//				System.out.println("EgressTime: " + travelTime);
+				System.out.println("EgressTime: " + travelTime);
+				System.out.println("(personId: " + personId);
 				tmpScore += travelTime * this.TRAVEL_PT_EGRESS / 3600.0;
-				this.ptLegHandler.setEgress(false);
+				this.ptLegHandler.getPersonId2IsEgress().put(personId, false);	
 			}
 			
 			// A transit_walk leg shouldn't have a constant because it already has the constant of the pt leg!? (ihab)
