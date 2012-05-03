@@ -103,12 +103,12 @@ public class SfMatsimAirport {
 		
 //		c_storage != 1; c_storage = (length*n_lanes)/7.5
 		
-		linkApron.setCapacity(1.);
-		linkTaxiIn.setCapacity(1./60.);
+		linkApron.setCapacity(10.);
+		linkTaxiIn.setCapacity(1.);
 		linkTaxiIn.setNumberOfLanes(0.015);	
-		linkTaxiOut.setCapacity(1./60.);
-		linkRunwayIn.setCapacity(1./60.);			
-		linkRunwayOut.setCapacity(1./60.);
+		linkTaxiOut.setCapacity(1.);
+		linkRunwayIn.setCapacity(60.);
+		linkRunwayOut.setCapacity(60.);
 		linkRunwayOut.setNumberOfLanes(0.005);
 		
 		linkApron.setLength(taxiwayLength);

@@ -103,8 +103,9 @@ public class SfTransitBuilder {
 			String transitLine = lineEntries[1];
 			double departureTime = Double.parseDouble(lineEntries[3]);
 			double duration = Double.parseDouble(lineEntries[4]);
-			double distance = 1000*Double.parseDouble(lineEntries[7]); //km to m
-			double vehicleSpeed =(Math.round(distance/(duration-TAXI_TOL_TIME))*100)/100.;
+			double distance = 1000*(Double.parseDouble(lineEntries[7])); //km to m
+			double vehicleSpeed =(100*Math.round(distance/(duration-TAXI_TOL_TIME)))/100.;
+//				if (vehicleSpeed< 100.) System.out.println("VEHICLE SPEED: "+vehicleSpeed);
 			Id originId = new IdImpl(origin);
 			Id destinationId = new IdImpl(destination);
 			Id routeId = new IdImpl(transitRoute);	//origin IATA code + destination IATA code

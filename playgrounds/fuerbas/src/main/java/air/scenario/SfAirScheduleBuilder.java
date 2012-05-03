@@ -167,14 +167,8 @@ public class SfAirScheduleBuilder {
 						String aircraftType = lineEntries[21];
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
 
-//						use this line to filter desired airports: currently all flights to/from FRA, MUC, DUS
-//						for fixed city pairs use: originAirport.equalsIgnoreCase("FRA") && destinationAirport.equalsIgnoreCase("MUC") and vice versa
-//						if ((originAirport.equalsIgnoreCase("FRA") 
-//								|| destinationAirport.equalsIgnoreCase("MUC")
-//								|| originAirport.equalsIgnoreCase("MUC")
-//								&& destinationAirport.equalsIgnoreCase("MUC"))
-//								|| (originAirport.equalsIgnoreCase("MUC")
-//								&& destinationAirport.equalsIgnoreCase("FRA"))) {
+
+
 						
 						//some error correction code
 						if ( 
@@ -184,10 +178,15 @@ public class SfAirScheduleBuilder {
 //								&& !originAirport.equalsIgnoreCase(destinationAirport)
 								&& this.airports.containsKey(originAirport)
 								&& this.airports.containsKey(destinationAirport)
-//								&& !aircraftType.equalsIgnoreCase("BUS") //filter busses
-//								&& !aircraftType.equalsIgnoreCase("TRN") //filter trains
+								&& !aircraftType.equalsIgnoreCase("BUS") //filter busses
+								&& !aircraftType.equalsIgnoreCase("RFS")
+								&& !aircraftType.equalsIgnoreCase("TRN") //filter trains
 //								&& (stops < 1)
 //								&& (fullRouting.length() <= 6)
+								&& (destinationAirport.equalsIgnoreCase("MUC")
+								|| originAirport.equalsIgnoreCase("MUC"))
+//						use this line to filter desired airports: currently all flights to/from MUC
+//						for fixed city pairs use: originAirport.equalsIgnoreCase("FRA") && destinationAirport.equalsIgnoreCase("MUC") and vice versa
 								) {
 
 							if (!this.routes.containsKey(route)) {
@@ -215,8 +214,7 @@ public class SfAirScheduleBuilder {
 									.put(destinationAirport, this.airports.get(destinationAirport));
 						}
 					}
-				}
-//				}
+				}	
 			}
 			lines++;
 		}

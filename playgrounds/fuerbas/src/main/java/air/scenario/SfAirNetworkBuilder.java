@@ -21,7 +21,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class SfAirNetworkBuilder {
 
 	public static final String NETWORK_FILENAME = "air_network.xml";
-	private static final double MACH_1 = 343.0;		// [m/s] Ma = (Geschwindigkeit/Schallgeschwindigkeit) = 1 [T=20°C] 
+	private static final double MACH_2 = 686.0;	
 
 	public void createNetwork(String Airports, String cityPairs, String networkOutputFilename) throws IOException {
 		int airportcounter = 0;
@@ -32,7 +32,7 @@ public class SfAirNetworkBuilder {
 		allowedModes.add("car");
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		network.setCapacityPeriod(1.0);		//capacity period set to one second to allow storage capacity = 1 for runway with runway length of 450 meters and 1/60 flow capacity
+		network.setCapacityPeriod(60.0);	
 		
 		BufferedReader brAirports = new BufferedReader(new FileReader(new File(Airports)));
 		BufferedReader brRoutes = new BufferedReader(new FileReader(new File(cityPairs)));
@@ -58,7 +58,7 @@ public class SfAirNetworkBuilder {
 			String[] lineEntries = oneLine.split("\t");
 			String[] airportCodes = lineEntries[0].split("_");
 			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
-			double groundSpeed = MACH_1;	
+			double groundSpeed = MACH_2;	
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];
 			

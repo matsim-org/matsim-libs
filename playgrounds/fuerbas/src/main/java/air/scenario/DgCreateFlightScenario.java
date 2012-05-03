@@ -37,8 +37,8 @@ public class DgCreateFlightScenario {
 //		String utcOffsetfile = "/media/data/work/repos/"
 //		+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 		
-		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\";
-//		String baseDirectory = "Z:\\WinHome\\flight_model_muc_fra\\";
+//		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\";
+		String baseDirectory = "Z:\\WinHome\\flight_model_muc_all_flights\\";
 		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
