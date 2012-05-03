@@ -67,6 +67,30 @@ public class MatsimXmlParserTest {
 		Assert.assertEquals("value", parser.lastAttributes.getValue(0));
 		Assert.assertEquals("value", parser.lastAttributes.getValue("someAttribute"));
 	}
+
+	/**
+	 * Tests that reading XML files with CRLF as newline characters works as expected.
+	 * Based on a (non-reproducible) bug message on the users-mailing list 2012-04-26. 
+	 */
+	@Test
+	public void testParsing_WindowsLinebreaks() {
+		String str = "<?xml version='1.0' encoding='UTF-8'?>\r\n" +
+				"<root>\r\n" +
+				"<dummy someAttribute=\"value1\">content</dummy>\r\n" +
+				"<dummy2 someAttribute2=\"value2\">content2</dummy2>\r\n" +
+				"</root>";
+
+		TestParser parser = new TestParser();
+		parser.setValidating(false);
+		
+		parser.parse(new ByteArrayInputStream(str.getBytes()));
+		Assert.assertEquals("dummy2", parser.lastStartTag);
+		Assert.assertEquals("root", parser.lastEndTag);
+		Assert.assertEquals(1, parser.lastAttributes.getLength());
+		Assert.assertEquals("someAttribute2", parser.lastAttributes.getLocalName(0));
+		Assert.assertEquals("value2", parser.lastAttributes.getValue(0));
+		Assert.assertEquals("value2", parser.lastAttributes.getValue("someAttribute2"));
+	}
 	
 	private static class TestParser extends MatsimXmlParser {
 
