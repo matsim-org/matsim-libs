@@ -179,7 +179,7 @@ public class SfAirScheduleBuilder {
 								&& this.airports.containsKey(originAirport)
 								&& this.airports.containsKey(destinationAirport)
 								&& !aircraftType.equalsIgnoreCase("BUS") //filter busses
-								&& !aircraftType.equalsIgnoreCase("RFS")
+								&& !aircraftType.equalsIgnoreCase("RFS") //filter bus/train
 								&& !aircraftType.equalsIgnoreCase("TRN") //filter trains
 //								&& (stops < 1)
 //								&& (fullRouting.length() <= 6)
