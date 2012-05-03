@@ -42,11 +42,14 @@ public class MaxRandomStartTimeAllocator extends PStrategy implements PPlanStrat
 	private final static Logger log = Logger.getLogger(MaxRandomStartTimeAllocator.class);
 	public static final String STRATEGY_NAME = "MaxRandomStartTimeAllocator";
 	
+	private final int mutationRange;
+	
 	public MaxRandomStartTimeAllocator(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 0){
-			log.error("There are no parameters allowed for that module");
+		if(parameter.size() != 1){
+			log.error("Missing parameter: 1 - Mutation range in seconds");
 		}
+		this.mutationRange = Integer.parseInt(parameter.get(0));
 	}
 
 	@Override
@@ -60,7 +63,8 @@ public class MaxRandomStartTimeAllocator extends PStrategy implements PPlanStrat
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
 		// get a valid new start time
-		double newStartTime = cooperative.getBestPlan().getStartTime() * MatsimRandom.getRandom().nextDouble();
+		double newStartTime = Math.max(0.0, cooperative.getBestPlan().getStartTime() - MatsimRandom.getRandom().nextDouble() * this.mutationRange);
+		newStartTime = Math.min(newStartTime, cooperative.getBestPlan().getEndTime() - cooperative.getMinOperationTime());
 		newPlan.setStartTime(newStartTime);
 		
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());

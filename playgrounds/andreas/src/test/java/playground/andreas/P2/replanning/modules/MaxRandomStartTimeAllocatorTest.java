@@ -39,7 +39,9 @@ public class MaxRandomStartTimeAllocatorTest {
     public final void testRun() {
 	
 		Cooperative coop = PScenarioHelper.createTestCooperative();
-		MaxRandomStartTimeAllocator strat = new MaxRandomStartTimeAllocator(new ArrayList<String>());
+		ArrayList<String> param = new ArrayList<String>();
+		param.add("0");
+		MaxRandomStartTimeAllocator strat = new MaxRandomStartTimeAllocator(param);
 		PPlan testPlan = null;
 		
 		coop.getBestPlan().setStartTime(1200.0);
@@ -57,6 +59,19 @@ public class MaxRandomStartTimeAllocatorTest {
 		
 		coop.getBestPlan().setNVehicles(2);
 		
+		// enough vehicles for testing, but mutation range 0
+		testPlan = strat.run(coop);
+		
+		Assert.assertEquals("Compare number of vehicles", 2.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 1200.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
+		Assert.assertNotNull("Test plan should be not null", testPlan);
+		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 1200.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+		
+		param = new ArrayList<String>();
+		param.add("900");
+		strat = new MaxRandomStartTimeAllocator(param);
+		
 		// enough vehicles for testing
 		testPlan = strat.run(coop);
 		
@@ -64,6 +79,6 @@ public class MaxRandomStartTimeAllocatorTest {
 		Assert.assertEquals("Compare start time", 1200.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 309.8854943476884, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 545.9676034727197, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
 	}
 }

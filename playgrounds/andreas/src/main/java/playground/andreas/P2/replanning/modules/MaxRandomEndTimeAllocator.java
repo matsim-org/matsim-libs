@@ -42,11 +42,14 @@ public class MaxRandomEndTimeAllocator extends PStrategy implements PPlanStrateg
 	private final static Logger log = Logger.getLogger(MaxRandomEndTimeAllocator.class);	
 	public static final String STRATEGY_NAME = "MaxRandomEndTimeAllocator";
 	
+	private final int mutationRange;
+	
 	public MaxRandomEndTimeAllocator(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 0){
-			log.error("There are no parameters allowed for that module");
+		if(parameter.size() != 1){
+			log.error("Missing parameter: 1 - Mutation range in seconds");
 		}
+		this.mutationRange = Integer.parseInt(parameter.get(0));
 	}
 	
 	@Override
@@ -61,7 +64,8 @@ public class MaxRandomEndTimeAllocator extends PStrategy implements PPlanStrateg
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
 		
 		// get a valid new end time
-		double newEndTime = cooperative.getBestPlan().getEndTime() + (24.0 * 3600.0 - cooperative.getBestPlan().getEndTime()) * MatsimRandom.getRandom().nextDouble();
+		double newEndTime = Math.min(24 * 3600.0, cooperative.getBestPlan().getEndTime() + MatsimRandom.getRandom().nextDouble() * this.mutationRange);
+		newEndTime = Math.max(newEndTime, cooperative.getBestPlan().getStartTime() + cooperative.getMinOperationTime());
 		newPlan.setEndTime(newEndTime);
 		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
