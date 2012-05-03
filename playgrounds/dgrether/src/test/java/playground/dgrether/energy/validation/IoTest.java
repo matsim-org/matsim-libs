@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.energy.validation;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Calendar;
@@ -69,7 +70,12 @@ public class IoTest {
 		poiTimeInfo.setUsedCapacity(4.);
 		poiInfo.getPoiTimeInfos().add(poiTimeInfo);
 		
-		new ValidationInfoWriter(list).writeFile(this.testUtils.getOutputDirectory() +  "erValidationInfo.xml");
+		String outfile = this.testUtils.getOutputDirectory() +  "erValidationInfo.xml";
+		
+		System.err.println(outfile);
+		System.err.println(new File("file").getAbsolutePath());
+		
+		new ValidationInfoWriter(list).writeFile(outfile);
 	}
 
 	@Test

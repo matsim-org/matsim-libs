@@ -49,7 +49,7 @@ public class ValidationInfoWriter {
 			ctx = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
 			Marshaller marshaller = ctx.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
-			marshaller.marshal(this.validationInformation, new FileOutputStream("erValidationInfo.xml"));
+			marshaller.marshal(this.validationInformation, new FileOutputStream(filename));
 		} catch (JAXBException e) {
 			e.printStackTrace();
 			ex = new RuntimeException(e);
