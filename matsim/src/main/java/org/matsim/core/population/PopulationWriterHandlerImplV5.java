@@ -243,7 +243,8 @@ import org.matsim.core.utils.misc.Time;
 				out.write(" ");
 				out.write(linkId.toString());
 			}
-			if (!nr.getEndLinkId().equals(nr.getStartLinkId())) {
+			// If the start links equals the end link additionally check if its is a round trip. 
+			if (!nr.getEndLinkId().equals(nr.getStartLinkId()) || nr.getLinkIds().size() > 0) {
 				out.write(" ");
 				out.write(nr.getEndLinkId().toString());
 			}

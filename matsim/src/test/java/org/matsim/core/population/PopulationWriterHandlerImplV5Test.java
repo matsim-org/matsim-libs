@@ -55,6 +55,9 @@ public class PopulationWriterHandlerImplV5Test {
 	@Test
 	public void test_writeNetworkRoute_sameStartEndLink() {
 		doTestWriteNetworkRoute("1", "", "1", "1");
+		
+		// round trip
+		doTestWriteNetworkRoute("1", "2 3", "1", "1 2 3 1");
 	}
 
 	@Test
