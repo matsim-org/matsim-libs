@@ -26,14 +26,13 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
-import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
@@ -55,12 +54,14 @@ public class BasicCooperative implements Cooperative{
 	private final double costPerVehicleBuy;
 	private final double costPerVehicleSell;
 	private final double minOperationTime;
+	
+	private CoopState coopState;
 
 	private PPlan bestPlan;
 	private PPlan testPlan;
 
 	private TransitLine currentTransitLine;
-	private int numberOfIterationsWithoutScoring;
+	private int numberOfIterationsForProspecting;
 	
 	private double budget;
 	private double budgetLastIteration;
@@ -72,7 +73,7 @@ public class BasicCooperative implements Cooperative{
 
 	public BasicCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
-		this.numberOfIterationsWithoutScoring = pConfig.getNumberOfIterationsWithoutScoring();
+		this.numberOfIterationsForProspecting = pConfig.getNumberOfIterationsForProspecting();
 		this.costPerVehicleBuy = pConfig.getPricePerVehicleBought();
 		this.costPerVehicleSell = pConfig.getPricePerVehicleSold();
 		this.minOperationTime = pConfig.getMinOperationTime();
@@ -80,15 +81,16 @@ public class BasicCooperative implements Cooperative{
 	}
 
 	public void init(PRouteProvider pRouteProvider, PPlanStrategy initialStrategy, int iteration, double initialBudget) {
+		this.coopState = CoopState.PROSPECTING;
 		this.budget = initialBudget;
 		this.currentIteration = iteration;
 		this.routeProvider = pRouteProvider;
 		this.bestPlan = initialStrategy.run(this);
 		
-		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
-		for (TransitRoute route : this.bestPlan.getLine().getRoutes().values()) {
-			this.currentTransitLine.addRoute(route);
-		}
+//		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
+//		for (TransitRoute route : this.bestPlan.getLine().getRoutes().values()) {
+//			this.currentTransitLine.addRoute(route);
+//		}
 		this.testPlan = null;
 	}
 
@@ -105,13 +107,34 @@ public class BasicCooperative implements Cooperative{
 				route.setDescription(plan.toString(this.budget + this.score));
 			}
 		}
+		
+		if (this.score > 0.0) {
+			this.coopState = CoopState.INBUSINESS;
+		}
+		
+		if (this.coopState.equals(CoopState.PROSPECTING)) {
+			if(this.numberOfIterationsForProspecting == 0){
+				if (this.score < 0.0) {
+					// no iterations for prospecting left and score still negative - terminate
+					this.coopState = CoopState.BANKRUPT;
+				}
+			}
+			this.numberOfIterationsForProspecting--;
+		}
 
 		this.budget += this.score;
 		
-		if(this.numberOfIterationsWithoutScoring > 0){
-			this.budget = Math.max(this.budget, 0.0);
-			this.numberOfIterationsWithoutScoring--;
-		}		
+		
+		// check, if bankrupt
+		if(this.budget < 0){
+			// insufficient, sell vehicles
+			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) Math.floor(this.budget / this.costPerVehicleSell));
+			
+			if(this.bestPlan.getNVehicles() - numberOfVehiclesToSell < 1){
+				// can not balance the budget by selling vehicles, bankrupt
+				this.coopState = CoopState.BANKRUPT;
+			}
+		}
 	}
 
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
@@ -136,18 +159,16 @@ public class BasicCooperative implements Cooperative{
 			
 			if(this.bestPlan.getNVehicles() - numberOfVehiclesToSell < 1){
 				// can not balance the budget by selling vehicles, bankrupt
+				log.error("This should not be possible at this time.");
+				this.coopState = CoopState.BANKRUPT;
 				return;
 			}
 
 			// can balance the budget, so sell vehicles
 			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - numberOfVehiclesToSell);
 			this.budget += this.costPerVehicleSell * numberOfVehiclesToSell;
-			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
+//			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
 		}
-		
-		if(this.budget < 0){
-			log.error("There should be no inbalanced budget at this time.");
-		}		
 
 //		if(this.budget > this.costPerVehicleBuy * 1.5){
 //			while (this.budget > this.costPerVehicleBuy * 1.5) {
@@ -157,14 +178,14 @@ public class BasicCooperative implements Cooperative{
 //			}					
 //		} else {
 			// replan
-			if(this.numberOfIterationsWithoutScoring > 0){
-				PPlanStrategy strategy = pStrategyManager.getTimeReduceDemand();
-				this.testPlan = strategy.run(this);
-				if (this.testPlan != null) {
-					this.bestPlan = this.testPlan;
-					this.testPlan = null;
-				}			
-			} else {
+//			if(this.numberOfIterationsForProspecting > 0){
+//				PPlanStrategy strategy = pStrategyManager.getTimeReduceDemand();
+//				this.testPlan = strategy.run(this);
+//				if (this.testPlan != null) {
+//					this.bestPlan = this.testPlan;
+//					this.testPlan = null;
+//				}			
+//			} else {
 				
 				// First buy vehicles
 				PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
@@ -194,7 +215,7 @@ public class BasicCooperative implements Cooperative{
 //						this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 //					}
 				}
-			}
+//			}
 //		}
 		
 		// reinitialize the plan
@@ -258,6 +279,11 @@ public class BasicCooperative implements Cooperative{
 
 	public double getCostPerVehicleSell() {
 		return costPerVehicleSell;
+	}
+
+	@Override
+	public CoopState getCoopState() {
+		return this.coopState;
 	}
 
 	public void setBudget(double budget) {

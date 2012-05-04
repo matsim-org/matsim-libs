@@ -93,7 +93,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 			}
 		}		
 		
-		log.info("added " + n + " departures");		
+//		log.info("added " + n + " departures");		
 		return line;
 	}
 

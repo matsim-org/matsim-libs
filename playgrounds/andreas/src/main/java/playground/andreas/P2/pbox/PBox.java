@@ -49,6 +49,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
 import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
@@ -112,11 +113,12 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.routeProvider = this.initRouteProvider(event.getControler().getNetwork(), this.pConfig, this.pStopsOnly);
 
 		// init initial set of cooperatives
-		this.initInitialCooperatives(this.pConfig.getNumberOfCooperatives());
+		this.initInitialCooperatives(event.getControler().getFirstIteration(), this.pConfig.getNumberOfCooperatives());
 		
 		for (Cooperative cooperative : this.cooperatives) {
 			cooperative.init(this.routeProvider, this.initialStrategy, event.getControler().getFirstIteration(), pConfig.getInitialBudget());
-		}		
+			cooperative.replan(this.strategyManager, event.getControler().getFirstIteration());
+		}
 		
 		// collect the transit schedules from all cooperatives
 		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
@@ -135,13 +137,13 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		// This is different from the default behavior, since this is NOT called in the first iteration
 		
+		// Adapt number of cooperatives
+		this.handleBankruptCopperatives(event.getIteration());
+		
 		// Replan all cooperatives
 		for (Cooperative cooperative : this.cooperatives) {
 			cooperative.replan(this.strategyManager, event.getIteration());
 		}
-		
-		// Adapt number of cooperatives
-		this.handleBankruptCopperatives(event.getIteration());
 		
 		// Collect current lines offered
 		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
@@ -188,32 +190,40 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}
 	}
 
-	private void initInitialCooperatives(int numberOfCooperatives) {
+	private void initInitialCooperatives(int iteration, int numberOfCooperatives) {
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
-			this.counter++;
-			Cooperative cooperative = new BasicCooperative(new IdImpl(this.pConfig.getPIdentifier() + this.counter), this.pConfig, this.franchise);
+			Cooperative cooperative = new BasicCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
 			cooperatives.add(cooperative);
 		}		
 	}
 
 	private void handleBankruptCopperatives(int iteration) {
 		
-		LinkedList<Cooperative> nonBankruptCooperatives = new LinkedList<Cooperative>();
-		int numberOfCooperativesWithZeroBudget = 0;
+		LinkedList<Cooperative> cooperativesToKeep = new LinkedList<Cooperative>();
+		int coopsProspecting = 0;
+		int coopsInBusiness = 0;
+		int coopsBankrupt = 0;
 		
 		// Get cooperatives with positive budget
 		for (Cooperative cooperative : this.cooperatives) {
-			if(cooperative.getBudget() >= 0){
-				nonBankruptCooperatives.add(cooperative);
+			if(cooperative.getCoopState().equals(CoopState.PROSPECTING)){
+				cooperativesToKeep.add(cooperative);
+				coopsProspecting++;
 			}
-			if(cooperative.getBudget() == 0){
-				numberOfCooperativesWithZeroBudget++;
+			
+			if(cooperative.getCoopState().equals(CoopState.INBUSINESS)){
+				cooperativesToKeep.add(cooperative);
+				coopsInBusiness++;
+			}
+			
+			if(cooperative.getCoopState().equals(CoopState.BANKRUPT)){
+				coopsBankrupt++;
 			}
 		}
 		
-		// get the number of bankrupt coops
-		int numberOfNewCoopertives = this.cooperatives.size() - nonBankruptCooperatives.size();
+		// get the number of new coops
+		int numberOfNewCoopertives = coopsBankrupt;
 		
 		if(this.pConfig.getUseAdaptiveNumberOfCooperatives()){
 			// adapt the number of cooperatives
@@ -226,24 +236,22 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 //			}
 			
 			// calculate the exact number necessary
-			numberOfNewCoopertives = (int) ((nonBankruptCooperatives.size() - numberOfCooperativesWithZeroBudget) * (1.0/this.pConfig.getShareOfCooperativesWithProfit() - 1.0) + 0.0000000000001) - numberOfCooperativesWithZeroBudget;
+			numberOfNewCoopertives = (int) (coopsInBusiness * (1.0/this.pConfig.getShareOfCooperativesWithProfit() - 1.0) + 0.0000000000001) - coopsProspecting;
 		}
 		
 		// delete bankrupt ones
-		this.cooperatives = nonBankruptCooperatives;
+		this.cooperatives = cooperativesToKeep;
 			
 		// recreate all other
 		for (int i = 0; i < numberOfNewCoopertives; i++) {
-			this.counter++;
-			BasicCooperative cooperative = new BasicCooperative(new IdImpl(this.pConfig.getPIdentifier() + this.counter), this.pConfig, this.franchise);
+			BasicCooperative cooperative = new BasicCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
 			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
 			this.cooperatives.add(cooperative);
 		}
 			
 		// too few cooperatives in play, increase to the minimum specified in the config
 		for (int i = this.cooperatives.size(); i < this.pConfig.getNumberOfCooperatives(); i++) {
-			this.counter++;
-			BasicCooperative cooperative = new BasicCooperative(new IdImpl(this.pConfig.getPIdentifier() + this.counter), this.pConfig, this.franchise);
+			BasicCooperative cooperative = new BasicCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
 			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
 			this.cooperatives.add(cooperative);
 		}
@@ -312,6 +320,9 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}		
 	}
 
-	
+	private Id createNewIdForCooperative(int iteration){
+		this.counter++;
+		return new IdImpl(this.pConfig.getPIdentifier() + iteration + "_" + this.counter);
+	}
 	
 }

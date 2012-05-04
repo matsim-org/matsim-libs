@@ -36,6 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.plan.PPlan;
@@ -158,8 +159,8 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 				budget += cooperative.getBudget();
 				score += coopScore;				
 				
-				// statistics for each coop with cash
-				if(cooperative.getBudget() + (coopVeh - 1) * pConfig.getPricePerVehicleSold() > 0){
+				// statistics for each coop in business
+				if(cooperative.getCoopState().equals(CoopState.INBUSINESS)){
 					coopPos++;
 					paxPos += coopPax;
 					vehPos += coopVeh;
@@ -177,7 +178,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 			
 			try {
 				this.pStatsWriter.write(event.getIteration() + "\t" + (int) coop + "\t" + (int) coopPos + "\t" + (int) pax + "\t" + (int) paxPos + "\t" + (int) veh + "\t" + (int) vehPos + "\t" +
-						budget + "\t" + budgetPos + "\t" + score + "\t" + scorePos + "\t" + sharePosCoop + "\t" + sharePosPax + "\t" + sharePosVeh + "\t" +
+						(budget / coop) + "\t" + (budgetPos / coopPos) + "\t" + (score / coop) + "\t" + (scorePos / coopPos) + "\t" + sharePosCoop + "\t" + sharePosPax + "\t" + sharePosVeh + "\t" +
 						statsApproxContainer.getArithmeticMeanCoops() + "\t" + statsApproxContainer.getStdDevCoop() + "\t" + statsApproxContainer.getArithmeticMeanPax() + "\t" + statsApproxContainer.getStdDevPax() + "\t" + 
 						statsApproxContainer.getArithmeticMeanVeh() + "\t" + statsApproxContainer.getStdDevVeh() + "\t" +
 						statsContainer.getArithmeticMeanCoops() + "\t" + statsContainer.getStdDevCoop() + "\t" + statsContainer.getArithmeticMeanPax() + "\t" + statsContainer.getStdDevPax() + "\t" + 
@@ -196,10 +197,10 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 				this.history[INDEX_NPAXPOS][index] = paxPos;
 				this.history[INDEX_NVEH][index] = veh;
 				this.history[INDEX_NVEHPOS][index] = vehPos;
-				this.history[INDEX_NBUDGET][index] = budget;
-				this.history[INDEX_NBUDGETPOS][index] = budgetPos;
-				this.history[INDEX_NSCORE][index] = score;
-				this.history[INDEX_NSCOREPOS][index] = scorePos;
+				this.history[INDEX_NBUDGET][index] = budget / coop;
+				this.history[INDEX_NBUDGETPOS][index] = budgetPos / coopPos;
+				this.history[INDEX_NSCORE][index] = score / coop;
+				this.history[INDEX_NSCOREPOS][index] = scorePos / coopPos;
 				
 				this.history[INDEX_SHAREPOSCOOP][index] = sharePosCoop;
 				this.history[INDEX_SHAREPOSPAX][index] = sharePosPax;
@@ -221,7 +222,8 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 
 						XYLineChart size = new XYLineChart("Paratransit Statistics", "iteration", "coops/fleet size");
 						XYLineChart scores = new XYLineChart("Paratransit Statistics", "iteration", "score/budget");
-						XYLineChart shares = new XYLineChart("Paratransit Statistics", "iteration", "shares of positive coops");
+						XYLineChart passengers = new XYLineChart("Paratransit Statistics", "iteration", "pax");
+						XYLineChart shares = new XYLineChart("Paratransit Statistics", "iteration", "shares of coops in business");
 						XYLineChart relaxCoop = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of coops");
 						XYLineChart relaxPax = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of passengers");
 						XYLineChart relaxVeh = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of vehicles");
@@ -242,17 +244,18 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 						size.addSeries("N pos veh", iterations, values);
 
 						System.arraycopy(this.history[INDEX_NBUDGET], 0, values, 0, index + 1);
-						scores.addSeries("budget", iterations, values);
+						scores.addSeries("budget per coop", iterations, values);
 						System.arraycopy(this.history[INDEX_NBUDGETPOS], 0, values, 0, index + 1);
-						scores.addSeries("pos budget", iterations, values);
+						scores.addSeries("pos budget per pos coop", iterations, values);
 						System.arraycopy(this.history[INDEX_NSCORE], 0, values, 0, index + 1);
-						scores.addSeries("score", iterations, values);
+						scores.addSeries("score per coop", iterations, values);
 						System.arraycopy(this.history[INDEX_NSCOREPOS], 0, values, 0, index + 1);
-						scores.addSeries("pos score", iterations, values);
+						scores.addSeries("pos score per pos coop", iterations, values);
+						
 						System.arraycopy(this.history[INDEX_NPAX], 0, values, 0, index + 1);
-						scores.addSeries("N pax", iterations, values);
+						passengers.addSeries("N pax", iterations, values);
 						System.arraycopy(this.history[INDEX_NPAXPOS], 0, values, 0, index + 1);
-						scores.addSeries("N pos pax", iterations, values);	
+						passengers.addSeries("N pos pax", iterations, values);	
 
 						System.arraycopy(this.history[INDEX_SHAREPOSCOOP], 0, values, 0, index + 1);
 						shares.addSeries("share pos coop", iterations, values);
@@ -284,6 +287,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 
 						size.addMatsimLogo();
 						scores.addMatsimLogo();
+						passengers.addMatsimLogo();
 						shares.addMatsimLogo();
 						relaxCoop.addMatsimLogo();
 						relaxPax.addMatsimLogo();
@@ -291,6 +295,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 
 						size.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_size.png"), 800, 600);
 						scores.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_score.png"), 800, 600);
+						passengers.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_pax.png"), 800, 600);
 						shares.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_shares.png"), 800, 600);
 						relaxCoop.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxCoop.png"), 800, 600);
 						relaxPax.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxPax.png"), 800, 600);
