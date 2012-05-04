@@ -114,9 +114,9 @@ public class SpatialAveragingForLinkEmissions {
 
 	// define all relevant parameters
 	//TODO uses these noOfBins
-	final int noOfTimeBins = 60;
-	final int noOfXbins = 160;
-	final int noOfYbins = 120;
+	final int noOfTimeBins = 6; //was 60
+	final int noOfXbins = 160; //was 160
+	final int noOfYbins = 120; //was 120
 	final int minimumNoOfLinksInCell = 0;
 	//TODO what does the smoothing radius do?
 	final double smoothingRadius_m = 500.; 
@@ -265,7 +265,10 @@ public class SpatialAveragingForLinkEmissions {
 	private void writeRoutput(double[][] sumOfweightedValuesForCell,
 			String outputPathForR) {
 
+		//noOfXbins = 160
+		System.out.println("start r output ");
 		try {
+			System.out.println("trying output");
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
 			//inhalt schreiben
 			String valueString = new String();
@@ -284,13 +287,14 @@ public class SpatialAveragingForLinkEmissions {
 			buffW.newLine();
 			valueString="";
 			
-			for(int i = 0; i< sumOfweightedValuesForCell.length; i++){
+			for(int i = 0; i< sumOfweightedValuesForCell[0].length; i++){
 				//koordinaten als ersten eintrag in die zeile schreiben
 				valueString+=Double.toString(yMin+i*yDist)+"\t";
 				
 				//tabelleninhalt schreiben
-				for(int j = 0; j<sumOfweightedValuesForCell[0].length; j++){
+				for(int j = 0; j<sumOfweightedValuesForCell.length; j++){
 					try {
+						//TODO evtl sollte hier [j][i]stehen
 						valueString+=Double.toString(sumOfweightedValuesForCell[i][j])+"\t"; 
 					} catch (Exception e) {
 						//falls das Feld [i][j] leer ist, setze den Wert 0
@@ -305,9 +309,11 @@ public class SpatialAveragingForLinkEmissions {
 			}
 		buffW.close();	
 		} catch (IOException e) {
+			System.out.println("failed r output");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}	
+		System.out.println("finsished r output, wrote output to "+ outputPathForR);
 	}
 
 	private boolean isInMunichShape(Coord cellCentroid) {
