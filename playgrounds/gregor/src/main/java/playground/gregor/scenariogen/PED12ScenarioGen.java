@@ -119,7 +119,7 @@ public class PED12ScenarioGen {
 
 		new NetworkWriter(sc.getNetwork()).write(inputDir+"/network.xml");
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork()).writeV5(inputDir+"/plans.xml");
-
+		
 		c.plans().setInputFile(inputDir+"/plans.xml");
 		c.network().setInputFile(inputDir+"/network.xml");
 
@@ -175,8 +175,6 @@ public class PED12ScenarioGen {
 		createTrafficLights(sc,inputDir);
 
 		new ConfigWriter(c).write(inputDir + "/config.xml");
-
-
 	}
 
 
@@ -309,8 +307,6 @@ public class PED12ScenarioGen {
 				Coord actCoord = new CoordImpl(x,y);
 				createSubwayPerson(persTime,start,end,actCoord,sc,dijkstra);
 			}
-
-
 		}
 		
 		double time = depStartTime;
@@ -321,13 +317,7 @@ public class PED12ScenarioGen {
 			time += incr;
 			
 		}
-
-
-
 	}
-
-
-
 
 	private static void createSubwayPerson(double persTime, Link start,
 			Link end, Coord actCoord, Scenario sc, Dijkstra dijkstra) {
@@ -376,7 +366,7 @@ public class PED12ScenarioGen {
 		Leg shopping = pb.createLeg("walk2d");
 		
 		Route route = createRandomShoppingRoute(parkingLot,parkingLot,dijkstra);
-		shopping.setRoute(route );
+		shopping.setRoute(route);
 
 		plan.addLeg(shopping);
 		Activity intoTheCar = pb.createActivityFromLinkId("h",parkingLot.getId());
@@ -396,8 +386,7 @@ public class PED12ScenarioGen {
 		
 	}
 
-	private static Route createSimpleCarRoute(Link from, Link to,
-			Dijkstra dijkstra) {
+	private static Route createSimpleCarRoute(Link from, Link to, Dijkstra dijkstra) {
 		
 		
 		Path r = dijkstra.calcLeastCostPath(from.getToNode(), to.getFromNode(), 0,null,null);
@@ -407,11 +396,10 @@ public class PED12ScenarioGen {
 			linkIds.add(l.getId());
 		}
 
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(r.links.get(0).getId(), r.links.get(r.links.size()-1).getId());
-		route.setLinkIds(r.links.get(0).getId(),linkIds.subList(0, linkIds.size()-1) ,r.links.get(r.links.size()-1).getId());
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(from.getId(), to.getId());
+		route.setLinkIds(from.getId(), linkIds, to.getId());
 
 		return route;
-		
 	}
 
 
@@ -449,16 +437,15 @@ public class PED12ScenarioGen {
 
 		r = dijkstra.calcLeastCostPath(from, to, 0,null,null);
 		links.addAll(r.links);
-		current = cashDesk;
 
 		List<Id> linkIds = new ArrayList<Id>();
 		for (Link l : links) {
 			linkIds.add(l.getId());
 		}
 
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links.get(0).getId(), links.get(links.size()-1).getId());
-		route.setLinkIds(links.get(0).getId(),linkIds.subList(0, linkIds.size()-1)  ,links.get(links.size()-1).getId());
-
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(start.getId(), end.getId());
+		route.setLinkIds(start.getId(), linkIds, end.getId());
+		
 		return route;
 	}
 
