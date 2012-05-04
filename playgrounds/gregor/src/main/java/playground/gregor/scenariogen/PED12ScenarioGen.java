@@ -89,14 +89,19 @@ public class PED12ScenarioGen {
 	private static int linkID = 0;
 
 	private static int persID = 0;
-	
+
 
 
 	private static List<Link> shoppingShelfs = new ArrayList<Link>();
 	private static List<Link> cashDesks = new ArrayList<Link>();
 
 	private static List<Link> pedCrossing = new ArrayList<Link>();
-	
+
+	private static List<Link> parkingLots = new ArrayList<Link>();
+	private static Link carStart;
+	private static Link carTrafficLight;
+	private static Link carStop;
+
 	public static void main(String [] args) {
 		String scDir = "/Users/laemmel/devel/ped12_dobLaem/";
 		String inputDir = scDir + "/input/";
@@ -217,7 +222,7 @@ public class PED12ScenarioGen {
 			settings1.setOnset(8);
 			settings1.setDropping(9);
 		}
-		
+
 		for (Link l  : pedCrossing){
 			Id id = l.getId();
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
@@ -225,14 +230,27 @@ public class PED12ScenarioGen {
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 			SignalPlanData plan = control.getFactory().createSignalPlanData(id);
 			controller.addSignalPlanData(plan);
-			plan.setCycleTime(30);
+			plan.setCycleTime(60);
 			plan.setOffset(0);
 			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(id);
 			plan.addSignalGroupSettings(settings1);
-			settings1.setOnset(15);
-			settings1.setDropping(30);
+			settings1.setOnset(0);
+			settings1.setDropping(20);
 		}
 		
+		Id id = carTrafficLight.getId();
+		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
+		control.addSignalSystemControllerData(controller);
+		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+		SignalPlanData plan = control.getFactory().createSignalPlanData(id);
+		controller.addSignalPlanData(plan);
+		plan.setCycleTime(60);
+		plan.setOffset(0);
+		SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(id);
+		plan.addSignalGroupSettings(settings1);
+		settings1.setOnset(30);
+		settings1.setDropping(55);
+
 	}
 	private static void createSignalSystemsAndGroups(Scenario scenario,
 			SignalsData signalsData) {
@@ -242,7 +260,7 @@ public class PED12ScenarioGen {
 
 
 		for (Link l : cashDesks) {
-			
+
 			Id id = l.getId();
 			SignalSystemData sys = systems.getFactory().createSignalSystemData(id);
 			systems.addSignalSystemData(sys);
@@ -251,9 +269,9 @@ public class PED12ScenarioGen {
 			signal.setLinkId(l.getId());
 			SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 		}
-		
+
 		for (Link l : pedCrossing) {
-			
+
 			Id id = l.getId();
 			SignalSystemData sys = systems.getFactory().createSignalSystemData(id);
 			systems.addSignalSystemData(sys);
@@ -294,10 +312,22 @@ public class PED12ScenarioGen {
 
 
 		}
+		
+		double time = depStartTime;
+		double incr = 6; //every 6 seconds one car
+		for (Link parkingLot : parkingLots) {
+			createCarPerson(time,sc,dijkstra,parkingLot);
+			
+			time += incr;
+			
+		}
 
 
 
 	}
+
+
+
 
 	private static void createSubwayPerson(double persTime, Link start,
 			Link end, Coord actCoord, Scenario sc, Dijkstra dijkstra) {
@@ -322,6 +352,66 @@ public class PED12ScenarioGen {
 		pers.addPlan(plan);
 
 		sc.getPopulation().addPerson(pers);
+	}
+
+	
+	private static void createCarPerson(double time, Scenario sc,
+			Dijkstra dijkstra, Link parkingLot) {
+
+		PopulationFactory pb = sc.getPopulation().getFactory();
+		Id id = sc.createId(Integer.toString(persID++));
+		Person pers = pb.createPerson(id);
+		Plan plan = pb.createPlan();
+		ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", carStart.getId());
+		act.setEndTime(time);
+		plan.addActivity(act);
+		
+		Route routeCar = createSimpleCarRoute(carStart,parkingLot,dijkstra);
+		Leg legCar = pb.createLeg("car");
+		legCar.setRoute(routeCar);
+		plan.addLeg(legCar);
+		ActivityImpl park = (ActivityImpl) pb.createActivityFromLinkId("h", parkingLot.getId());
+		park.setEndTime(0);
+		plan.addActivity(park);
+		Leg shopping = pb.createLeg("walk2d");
+		
+		Route route = createRandomShoppingRoute(parkingLot,parkingLot,dijkstra);
+		shopping.setRoute(route );
+
+		plan.addLeg(shopping);
+		Activity intoTheCar = pb.createActivityFromLinkId("h",parkingLot.getId());
+		intoTheCar.setEndTime(0);
+		plan.addActivity(intoTheCar);
+		
+		
+		
+		Route routeCar2 = createSimpleCarRoute(parkingLot,carStop,dijkstra);
+		Leg driveHome = pb.createLeg("car");
+		driveHome.setRoute(routeCar2);
+		plan.addLeg(driveHome);
+		ActivityImpl done = (ActivityImpl) pb.createActivityFromLinkId("h",carStop.getId());
+		plan.addActivity(done);
+		pers.addPlan(plan);
+		sc.getPopulation().addPerson(pers);
+		
+	}
+
+	private static Route createSimpleCarRoute(Link from, Link to,
+			Dijkstra dijkstra) {
+		
+		
+		Path r = dijkstra.calcLeastCostPath(from.getToNode(), to.getFromNode(), 0,null,null);
+		
+		List<Id> linkIds = new ArrayList<Id>();
+		for (Link l : r.links) {
+			linkIds.add(l.getId());
+		}
+
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(r.links.get(0).getId(), r.links.get(r.links.size()-1).getId());
+		route.setLinkIds(r.links.get(0).getId(),linkIds.subList(0, linkIds.size()-1) ,r.links.get(r.links.size()-1).getId());
+
+		return route;
+		
 	}
 
 
@@ -367,7 +457,7 @@ public class PED12ScenarioGen {
 		}
 
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links.get(0).getId(), links.get(links.size()-1).getId());
-		route.setLinkIds(links.get(0).getId(),linkIds ,links.get(links.size()-1).getId());
+		route.setLinkIds(links.get(0).getId(),linkIds.subList(0, linkIds.size()-1)  ,links.get(links.size()-1).getId());
 
 		return route;
 	}
@@ -386,32 +476,32 @@ public class PED12ScenarioGen {
 		createPedLink(-2.,12.,-2.,3.,0.694,true,4,net);
 
 		createPedLink(-2.,12.,-2.,22.,1.34,false,4,net);
-		
+
 		pedCrossing.add(createPedLink(-2.,22.,-3.,22.,1.34,false,4,net));
-		
+
 		createPedLink(-3.,22.,-12.,22.,1.34,false,4,net);
-		
+
 		pedCrossing.add(createPedLink(-13.,22.,-12.,22.,1.34,false,4,net));
-		
+
 		createPedLink(-13.,22.,-45.5,22.,1.34,false,4,net);
 
 		//parking lot
 		//1.row
-		createPedLink(-14.,19.,-14.,8.,1.34,false,4,net);
-		createPedLink(-18.,19.,-18.,8.,1.34,false,4,net);
-		createPedLink(-22.,19.,-22.,8.,1.34,false,4,net);
-		createPedLink(-26.,19.,-26.,8.,1.34,false,4,net);
-		createPedLink(-30.,19.,-30.,8.,1.34,false,4,net);
-		createPedLink(-34.,19.,-34.,8.,1.34,false,4,net);
-		createPedLink(-38.,19.,-38.,8.,1.34,false,4,net);
-		createPedLink(-42.,19.,-42.,8.,1.34,false,4,net);
+		parkingLots.add(createPedLink(-14.,19.,-14.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-18.,19.,-18.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-22.,19.,-22.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-26.,19.,-26.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-30.,19.,-30.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-34.,19.,-34.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-38.,19.,-38.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-42.,19.,-42.,8.,1.34,false,4,net));
 		//2. row
-		createPedLink(-14.,-4.,-14.,8.,1.34,false,4,net);
-		createPedLink(-18.,-4.,-18.,8.,1.34,false,4,net);
-		createPedLink(-22.,-4.,-22.,8.,1.34,false,4,net);
-		createPedLink(-26.,-4.,-26.,8.,1.34,false,4,net);
-		createPedLink(-30.,-4.,-30.,8.,1.34,false,4,net);
-		createPedLink(-34.,-4.,-34.,8.,1.34,false,4,net);
+		parkingLots.add(createPedLink(-14.,-4.,-14.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-18.,-4.,-18.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-22.,-4.,-22.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-26.,-4.,-26.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-30.,-4.,-30.,8.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-34.,-4.,-34.,8.,1.34,false,4,net));
 		//connections
 		createPedLink(-14.,8.,-18.,8.,1.34,false,4,net);
 		createPedLink(-18.,8.,-22.,8.,1.34,false,4,net);
@@ -422,19 +512,19 @@ public class PED12ScenarioGen {
 		createPedLink(-38.,8.,-42.,8.,1.34,false,4,net);
 		createPedLink(-42.,8.,-45.5,8.,1.34,false,4,net);
 		//3. row
-		createPedLink(-14.,-6.,-14.,-18.,1.34,false,4,net);
-		createPedLink(-18.,-6.,-18.,-18.,1.34,false,4,net);
-		createPedLink(-22.,-6.,-22.,-18.,1.34,false,4,net);
-		createPedLink(-26.,-6.,-26.,-18.,1.34,false,4,net);
-		createPedLink(-30.,-6.,-30.,-18.,1.34,false,4,net);
-		createPedLink(-34.,-6.,-34.,-18.,1.34,false,4,net);
+		parkingLots.add(createPedLink(-14.,-6.,-14.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-18.,-6.,-18.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-22.,-6.,-22.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-26.,-6.,-26.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-30.,-6.,-30.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-34.,-6.,-34.,-18.,1.34,false,4,net));
 		//4. row
-		createPedLink(-14.,-29.,-14.,-18.,1.34,false,4,net);
-		createPedLink(-18.,-29.,-18.,-18.,1.34,false,4,net);
-		createPedLink(-22.,-29.,-22.,-18.,1.34,false,4,net);
-		createPedLink(-26.,-29.,-26.,-18.,1.34,false,4,net);
-		createPedLink(-30.,-29.,-30.,-18.,1.34,false,4,net);
-		createPedLink(-34.,-29.,-34.,-18.,1.34,false,4,net);
+		parkingLots.add(createPedLink(-14.,-29.,-14.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-18.,-29.,-18.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-22.,-29.,-22.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-26.,-29.,-26.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-30.,-29.,-30.,-18.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-34.,-29.,-34.,-18.,1.34,false,4,net));
 		//connections
 		createPedLink(-14.,-18.,-18.,-18.,1.34,false,4,net);
 		createPedLink(-18.,-18.,-22.,-18.,1.34,false,4,net);
@@ -443,21 +533,21 @@ public class PED12ScenarioGen {
 		createPedLink(-30.,-18.,-34.,-18.,1.34,false,4,net);
 		createPedLink(-34.,-18.,-45.5,-18.,1.34,false,4,net);
 		//5. row
-		createPedLink(-14.,-31.,-14.,-43.,1.34,false,4,net);
-		createPedLink(-18.,-31.,-18.,-43.,1.34,false,4,net);
-		createPedLink(-22.,-31.,-22.,-43.,1.34,false,4,net);
-		createPedLink(-26.,-31.,-26.,-43.,1.34,false,4,net);
-		createPedLink(-30.,-31.,-30.,-43.,1.34,false,4,net);
-		createPedLink(-34.,-31.,-34.,-43.,1.34,false,4,net);
+		parkingLots.add(createPedLink(-14.,-31.,-14.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-18.,-31.,-18.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-22.,-31.,-22.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-26.,-31.,-26.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-30.,-31.,-30.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-34.,-31.,-34.,-43.,1.34,false,4,net));
 		//6. row
-		createPedLink(-14.,-54.,-14.,-43.,1.34,false,4,net);
-		createPedLink(-18.,-54.,-18.,-43.,1.34,false,4,net);
-		createPedLink(-22.,-54.,-22.,-43.,1.34,false,4,net);
-		createPedLink(-26.,-54.,-26.,-43.,1.34,false,4,net);
-		createPedLink(-30.,-54.,-30.,-43.,1.34,false,4,net);
-		createPedLink(-34.,-54.,-34.,-43.,1.34,false,4,net);
-		createPedLink(-38.,-54.,-38.,-43.,1.34,false,4,net);
-		createPedLink(-42.,-54.,-42.,-43.,1.34,false,4,net);
+		parkingLots.add(createPedLink(-14.,-54.,-14.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-18.,-54.,-18.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-22.,-54.,-22.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-26.,-54.,-26.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-30.,-54.,-30.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-34.,-54.,-34.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-38.,-54.,-38.,-43.,1.34,false,4,net));
+		parkingLots.add(createPedLink(-42.,-54.,-42.,-43.,1.34,false,4,net));
 		//connections
 		createPedLink(-14.,-43.,-18.,-43.,1.34,false,4,net);
 		createPedLink(-18.,-43.,-22.,-43.,1.34,false,4,net);
@@ -493,27 +583,27 @@ public class PED12ScenarioGen {
 		createPedCashDeskLink(-47.5,8.,-47.5,16.,1.34,true,.1,net);
 		cashDesks.add(createPedCashDeskLink(-47.5,16.,-47.5,17.,1.34,true,.5,net));
 		createPedCashDeskLink(-47.5,17.,-47.5,18.,1.34,true,.5,net);
-		
+
 		createPedCashDeskLink(-50,8.,-50,16.,1.34,true,.5,net);
 		cashDesks.add(createPedCashDeskLink(-50,16.,-50,17.,1.34,true,.5,net));
 		createPedCashDeskLink(-50,17.,-50,18.,1.34,true,.5,net);
-		
+
 		createPedCashDeskLink(-52.5,8.,-52.5,16.,1.34,true,.5,net);
 		cashDesks.add(createPedCashDeskLink(-52.5,16.,-52.5,17.,1.34,true,.5,net));
 		createPedCashDeskLink(-52.5,17.,-52.5,18.,1.34,true,.5,net);
-		
+
 		createPedCashDeskLink(-55,8.,-55,16.,1.34,true,.5,net);
 		cashDesks.add(createPedCashDeskLink(-55,16.,-55,17.,1.34,true,.5,net));
 		createPedCashDeskLink(-55,17.,-55,18.,1.34,true,.5,net);
-		
+
 		createPedCashDeskLink(-57.5,8.,-57.5,16.,1.34,true,.5,net);
 		cashDesks.add(createPedCashDeskLink(-57.5,16.,-57.5,17.,1.34,true,.5,net));
 		createPedCashDeskLink(-57.5,17.,-57.5,18.,1.34,true,.5,net);
-		
+
 		createPedCashDeskLink(-60,8.,-60,16.,1.34,true,.1,net);
 		cashDesks.add(createPedCashDeskLink(-60,16.,-60,17.,1.34,true,.5,net));
 		createPedCashDeskLink(-60,17.,-60,18.,1.34,true,.5,net);
-		
+
 		//cash desks connectors
 		//1. col
 		createPedLink(-49,-1.,-47.5,8.,1.34,true,4,net);
@@ -612,6 +702,15 @@ public class PED12ScenarioGen {
 		createPedLink(-81.5,16,-84,14,1.34,true,4,net);
 		createPedLink(-81.5,16,-72,14,1.34,true,4,net);
 
+		
+		carStart = createCarLink(-8, 100, -8, 50, 50/3.6, true, 1, net);
+		carTrafficLight = createCarLink(-8,50,-8,32,50/3.6,true,1,net);
+		createCarLink(-8,32,-8,8,50/3.6,true,1,net);
+		createCarLink(-8,8,-14,8,1.34,true,1,net);
+		createCarLink(-8,8,-8,-43,50/3.6,true,1,net);
+		createCarLink(-14,-43,-8,-43,1.34,true,1,net);
+		carStop = createCarLink(-8,-43,-8,-70,50/36,true,1,net);
+		
 		//for debugging only
 		dumpNetworkAsShapeFile(sc,inputDir);
 
@@ -654,6 +753,41 @@ public class PED12ScenarioGen {
 		return l;
 
 	}
+	
+	//pedestrian link 
+	private static Link createCarLink(double fromX, double fromY, double toX, double toY,
+			double v,boolean oneWay,double width,NetworkImpl net) {
+
+		NetworkFactoryImpl nf = net.getFactory();
+
+		CoordImpl from =  new CoordImpl(fromX, fromY);
+		CoordImpl to =  new CoordImpl(toX, toY);
+		double length = from.calcDistance(to);
+
+		Node n0 = net.getNearestNode(from);
+		if (n0 == null || from.calcDistance(n0.getCoord()) > EPSILON) {
+			n0 = nf.createNode(new IdImpl(nodeID++), from);
+			net.addNode(n0);
+		}
+
+		Node n1 = net.getNearestNode(to);
+		if (to.calcDistance(n1.getCoord()) > EPSILON) {
+			n1 = nf.createNode(new IdImpl(nodeID++), to);
+			net.addNode(n1);
+		}		
+
+		double cap  = 600;
+		double lanes = 1;
+		Link l = nf.createLink(new IdImpl(linkID++), n0, n1, net, length, v,cap , lanes);
+		net.addLink(l);
+		if (!oneWay) {
+			Link lr = nf.createLink(new IdImpl(linkID++), n1, n0, net, length, v,cap , lanes);
+			net.addLink(lr);	
+		}
+
+		return l;
+	}
+
 
 	//pedestrian link 
 	private static Link createPedLink(double fromX, double fromY, double toX, double toY,
