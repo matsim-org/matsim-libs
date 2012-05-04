@@ -194,7 +194,7 @@ public class Sim2DConfigGroup extends Module {
 
 
 
-	private void setEnableMentalLinkSwitch(String value) {
+	public void setEnableMentalLinkSwitch(String value) {
 		this.enableMentalLinkSwitch = Boolean.parseBoolean(value);
 	}
 

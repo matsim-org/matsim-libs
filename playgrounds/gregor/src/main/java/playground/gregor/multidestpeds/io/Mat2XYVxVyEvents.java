@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkImpl;
@@ -181,12 +182,18 @@ public class Mat2XYVxVyEvents {
 		
 		Id startLink = getLinkId(ped.coords.get(time),ped.velocities.get(time),sc);
 
+		if (startLink.toString().equals("27")) {
+			startLink = new IdImpl("1");
+		}
+		
 		Node from = sc.getNetwork().getLinks().get(startLink).getFromNode();
+		
 		
 		Node to = null;
 		Id endLink = null;
 		if (ped.id.toString().contains("g")) {
-			Coordinate toC = new Coordinate(2,-10);
+//			Coordinate toC = new Coordinate(2,-10);
+			Coordinate toC = ped.coords.get(ped.arrived);
 			endLink = getLinkId(toC,ped.velocities.get(ped.arrived),sc);
 			to = sc.getNetwork().getLinks().get(endLink).getToNode();
 		} else {

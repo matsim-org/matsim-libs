@@ -95,7 +95,8 @@ public class ScenarioGenerator {
 			s2d.setEnableVelocityObstacleModule("true");
 			s2d.setEnablePhysicalEnvironmentForceModule("false");			
 		}
-		//s2d.setTimeStepSize(""+(1/25.));
+		s2d.setTimeStepSize(""+(1/25.));
+		s2d.setEnableMentalLinkSwitch("false");
 		String shpFile = s2d.getFloorShapeFile();
 		ShapeFileReader r = new ShapeFileReader();
 		r.readFileAndInitialize(shpFile);
@@ -153,10 +154,13 @@ public class ScenarioGenerator {
 	private static void createNetwork(Scenario sc, String dir, Set<Feature> set) {
 
 		createLeftToRight(sc,set);
-		createTopToBottom(sc,set);
-
-
-
+		createTopToBottom1(sc,set);
+		createTopToBottom2(sc,set);
+		createTopToBottom3(sc,set);
+		createTopToBottom4(sc,set);
+		createTopToBottom5(sc,set);
+		createTopToBottom6(sc,set);
+		createTopToBottom7(sc,set);
 
 		String networkOutputFile = dir+"/network.xml";
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
@@ -176,19 +180,19 @@ public class ScenarioGenerator {
 
 		List<Coordinate> coords = new ArrayList<Coordinate>();
 
-		coords.add(new Coordinate(-10,-2.));
-		coords.add(new Coordinate(-7.5,-2.));
-		coords.add(new Coordinate(-5,-2.));
-		coords.add(new Coordinate(-2.5,-2.));
-		coords.add(new Coordinate(0,-2.));
-		coords.add(new Coordinate(2,-2));
-		coords.add(new Coordinate(5,-2.));
-		coords.add(new Coordinate(7.5,-2.));
-		coords.add(new Coordinate(10,-2.));
-		coords.add(new Coordinate(12.5,-2.));
-		coords.add(new Coordinate(15,-2.));
-		coords.add(new Coordinate(17.5,-2.));
-		coords.add(new Coordinate(20,-2.));
+		coords.add(new Coordinate(-10,-1.4));
+		coords.add(new Coordinate(-7.5,-1.4));
+		coords.add(new Coordinate(-5,-1.4));
+		coords.add(new Coordinate(-2.5,-1.4));
+		coords.add(new Coordinate(0,-1.4));
+		coords.add(new Coordinate(2,-1.4));
+		coords.add(new Coordinate(5,-1.4));
+		coords.add(new Coordinate(7.5,-1.4));
+		coords.add(new Coordinate(10,-1.4));
+		coords.add(new Coordinate(12.5,-1.4));
+		coords.add(new Coordinate(15,-1.4));
+		coords.add(new Coordinate(17.5,-1.4));
+		coords.add(new Coordinate(20,-1.4));
 
 		for (Coordinate coord : coords) {
 			CoordImpl c = new CoordImpl(coord.x,coord.y);
@@ -214,6 +218,9 @@ public class ScenarioGenerator {
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
 			double w = Math.min(2*estWidth(c0,c1,set),5);
+			if (linkId <= 4) {
+				w= 3;
+			}
 			double cap  = w * 1.33;
 			double lanes = 5.4*0.26 * w;
 			double freespeed = 1.34;
@@ -233,8 +240,8 @@ public class ScenarioGenerator {
 		//		links.add(l);
 
 	}
-
-	private static void createTopToBottom(Scenario sc, Set<Feature> set) {
+	
+	private static void createTopToBottom7(Scenario sc, Set<Feature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -243,19 +250,310 @@ public class ScenarioGenerator {
 		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
 
 		List<Coordinate> coords = new ArrayList<Coordinate>();
-		coords.add(new Coordinate(2,10));
-		coords.add(new Coordinate(2,7.5));
-		coords.add(new Coordinate(2,4.5));
-		coords.add(new Coordinate(2,2));
-		coords.add(new Coordinate(2,-.5));
-		coords.add(new Coordinate(2,-2));
-		coords.add(new Coordinate(2,-7));
-		coords.add(new Coordinate(2,-8));
-		coords.add(new Coordinate(2,-10));
-		coords.add(new Coordinate(2,-12.5));
-		coords.add(new Coordinate(2,-15));
-		coords.add(new Coordinate(2,-17.5));
-		coords.add(new Coordinate(2,-20));
+		coords.add(new Coordinate(0,-1.4));
+		coords.add(new Coordinate(0,-3.5));
+//		coords.add(new Coordinate(2,-1.4));
+//		coords.add(new Coordinate(2,-7));
+//		coords.add(new Coordinate(2,-8));
+//		coords.add(new Coordinate(2,-10));
+//		coords.add(new Coordinate(2,-12.5));
+//		coords.add(new Coordinate(2,-15));
+//		coords.add(new Coordinate(2,-17.5));
+//		coords.add(new Coordinate(2,-20));
+		//		for (double y = 10; y >= -7; y -= 0.5) {
+		//			coords.add(new Coordinate(2,y));	
+		//			if (y == 0) {
+		//				y -= 4.5;
+		//			}
+		//		}
+
+		for (Coordinate coord : coords) {
+			CoordImpl c = new CoordImpl(coord.x,coord.y);
+			Node tmp = ((NetworkImpl)sc.getNetwork()).getNearestNode(c);
+			NodeImpl n;
+			if (tmp != null && c.calcDistance(tmp.getCoord()) <= 0.0000001) {
+				n = (NodeImpl) tmp;
+			} else {
+				Id nid = new IdImpl(nodeId++);
+				n= nf.createNode(nid, c);
+				sc.getNetwork().addNode(n);
+			}
+			nodes.add(n);
+		}
+		for (int i = 0; i < nodes.size()-1; i++) {
+			NodeImpl n0 = nodes.get(i);
+			NodeImpl n1 = nodes.get(i+1);
+			Id lid = new IdImpl(linkId++);
+
+			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
+			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
+
+			double w = Math.min(2*estWidth(c0,c1,set),5);
+			double cap  = w * 1.33;
+			double lanes = 5.4*0.26 * w;
+			double freespeed = 1.34;
+			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
+			sc.getNetwork().addLink(l);
+			links.add(l);
+		}
+	}
+	
+	private static void createTopToBottom6(Scenario sc, Set<Feature> set) {
+		List<Link> links = new ArrayList<Link>();
+
+		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
+
+
+		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
+
+		List<Coordinate> coords = new ArrayList<Coordinate>();
+		coords.add(new Coordinate(0,-3.5));
+		coords.add(new Coordinate(12.5,-1.4));
+//		coords.add(new Coordinate(2,-1.4));
+//		coords.add(new Coordinate(2,-7));
+//		coords.add(new Coordinate(2,-8));
+//		coords.add(new Coordinate(2,-10));
+//		coords.add(new Coordinate(2,-12.5));
+//		coords.add(new Coordinate(2,-15));
+//		coords.add(new Coordinate(2,-17.5));
+//		coords.add(new Coordinate(2,-20));
+		//		for (double y = 10; y >= -7; y -= 0.5) {
+		//			coords.add(new Coordinate(2,y));	
+		//			if (y == 0) {
+		//				y -= 4.5;
+		//			}
+		//		}
+
+		for (Coordinate coord : coords) {
+			CoordImpl c = new CoordImpl(coord.x,coord.y);
+			Node tmp = ((NetworkImpl)sc.getNetwork()).getNearestNode(c);
+			NodeImpl n;
+			if (tmp != null && c.calcDistance(tmp.getCoord()) <= 0.0000001) {
+				n = (NodeImpl) tmp;
+			} else {
+				Id nid = new IdImpl(nodeId++);
+				n= nf.createNode(nid, c);
+				sc.getNetwork().addNode(n);
+			}
+			nodes.add(n);
+		}
+		for (int i = 0; i < nodes.size()-1; i++) {
+			NodeImpl n0 = nodes.get(i);
+			NodeImpl n1 = nodes.get(i+1);
+			Id lid = new IdImpl(linkId++);
+
+			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
+			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
+
+			double w = Math.min(2*estWidth(c0,c1,set),5);
+			double cap  = w * 1.33;
+			double lanes = 5.4*0.26 * w;
+			double freespeed = 1.34;
+			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
+			sc.getNetwork().addLink(l);
+			links.add(l);
+		}
+	}
+	
+
+	private static void createTopToBottom5(Scenario sc, Set<Feature> set) {
+		List<Link> links = new ArrayList<Link>();
+
+		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
+
+
+		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
+
+		List<Coordinate> coords = new ArrayList<Coordinate>();
+		coords.add(new Coordinate(2,1));
+		coords.add(new Coordinate(-5,-1.4));
+//		coords.add(new Coordinate(2,-1.4));
+//		coords.add(new Coordinate(2,-7));
+//		coords.add(new Coordinate(2,-8));
+//		coords.add(new Coordinate(2,-10));
+//		coords.add(new Coordinate(2,-12.5));
+//		coords.add(new Coordinate(2,-15));
+//		coords.add(new Coordinate(2,-17.5));
+//		coords.add(new Coordinate(2,-20));
+		//		for (double y = 10; y >= -7; y -= 0.5) {
+		//			coords.add(new Coordinate(2,y));	
+		//			if (y == 0) {
+		//				y -= 4.5;
+		//			}
+		//		}
+
+		for (Coordinate coord : coords) {
+			CoordImpl c = new CoordImpl(coord.x,coord.y);
+			Node tmp = ((NetworkImpl)sc.getNetwork()).getNearestNode(c);
+			NodeImpl n;
+			if (tmp != null && c.calcDistance(tmp.getCoord()) <= 0.0000001) {
+				n = (NodeImpl) tmp;
+			} else {
+				Id nid = new IdImpl(nodeId++);
+				n= nf.createNode(nid, c);
+				sc.getNetwork().addNode(n);
+			}
+			nodes.add(n);
+		}
+		for (int i = 0; i < nodes.size()-1; i++) {
+			NodeImpl n0 = nodes.get(i);
+			NodeImpl n1 = nodes.get(i+1);
+			Id lid = new IdImpl(linkId++);
+
+			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
+			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
+
+			double w = Math.min(2*estWidth(c0,c1,set),5);
+			double cap  = w * 1.33;
+			double lanes = 5.4*0.26 * w;
+			double freespeed = 1.34;
+			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
+			sc.getNetwork().addLink(l);
+			links.add(l);
+		}
+	}
+	
+	private static void createTopToBottom4(Scenario sc, Set<Feature> set) {
+		List<Link> links = new ArrayList<Link>();
+
+		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
+
+
+		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
+
+		List<Coordinate> coords = new ArrayList<Coordinate>();
+		coords.add(new Coordinate(2,1));
+		coords.add(new Coordinate(-2.5,-1.4));
+//		coords.add(new Coordinate(2,-1.4));
+//		coords.add(new Coordinate(2,-7));
+//		coords.add(new Coordinate(2,-8));
+//		coords.add(new Coordinate(2,-10));
+//		coords.add(new Coordinate(2,-12.5));
+//		coords.add(new Coordinate(2,-15));
+//		coords.add(new Coordinate(2,-17.5));
+//		coords.add(new Coordinate(2,-20));
+		//		for (double y = 10; y >= -7; y -= 0.5) {
+		//			coords.add(new Coordinate(2,y));	
+		//			if (y == 0) {
+		//				y -= 4.5;
+		//			}
+		//		}
+
+		for (Coordinate coord : coords) {
+			CoordImpl c = new CoordImpl(coord.x,coord.y);
+			Node tmp = ((NetworkImpl)sc.getNetwork()).getNearestNode(c);
+			NodeImpl n;
+			if (tmp != null && c.calcDistance(tmp.getCoord()) <= 0.0000001) {
+				n = (NodeImpl) tmp;
+			} else {
+				Id nid = new IdImpl(nodeId++);
+				n= nf.createNode(nid, c);
+				sc.getNetwork().addNode(n);
+			}
+			nodes.add(n);
+		}
+		for (int i = 0; i < nodes.size()-1; i++) {
+			NodeImpl n0 = nodes.get(i);
+			NodeImpl n1 = nodes.get(i+1);
+			Id lid = new IdImpl(linkId++);
+
+			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
+			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
+
+			double w = Math.min(2*estWidth(c0,c1,set),5);
+			double cap  = w * 1.33;
+			double lanes = 5.4*0.26 * w;
+			double freespeed = 1.34;
+			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
+			sc.getNetwork().addLink(l);
+			links.add(l);
+		}
+	}
+	
+	private static void createTopToBottom3(Scenario sc, Set<Feature> set) {
+		List<Link> links = new ArrayList<Link>();
+
+		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
+
+
+		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
+
+		List<Coordinate> coords = new ArrayList<Coordinate>();
+		coords.add(new Coordinate(2,1));
+		coords.add(new Coordinate(5,-1.4));
+//		coords.add(new Coordinate(2,-1.4));
+//		coords.add(new Coordinate(2,-7));
+//		coords.add(new Coordinate(2,-8));
+//		coords.add(new Coordinate(2,-10));
+//		coords.add(new Coordinate(2,-12.5));
+//		coords.add(new Coordinate(2,-15));
+//		coords.add(new Coordinate(2,-17.5));
+//		coords.add(new Coordinate(2,-20));
+		//		for (double y = 10; y >= -7; y -= 0.5) {
+		//			coords.add(new Coordinate(2,y));	
+		//			if (y == 0) {
+		//				y -= 4.5;
+		//			}
+		//		}
+
+		for (Coordinate coord : coords) {
+			CoordImpl c = new CoordImpl(coord.x,coord.y);
+			Node tmp = ((NetworkImpl)sc.getNetwork()).getNearestNode(c);
+			NodeImpl n;
+			if (tmp != null && c.calcDistance(tmp.getCoord()) <= 0.0000001) {
+				n = (NodeImpl) tmp;
+			} else {
+				Id nid = new IdImpl(nodeId++);
+				n= nf.createNode(nid, c);
+				sc.getNetwork().addNode(n);
+			}
+			nodes.add(n);
+		}
+		for (int i = 0; i < nodes.size()-1; i++) {
+			NodeImpl n0 = nodes.get(i);
+			NodeImpl n1 = nodes.get(i+1);
+			Id lid = new IdImpl(linkId++);
+
+			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
+			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
+
+			double w = Math.min(2*estWidth(c0,c1,set),5);
+			double cap  = w * 1.33;
+			double lanes = 5.4*0.26 * w;
+			double freespeed = 1.34;
+			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
+			sc.getNetwork().addLink(l);
+			links.add(l);
+		}
+	}
+	private static void createTopToBottom2(Scenario sc, Set<Feature> set) {
+		List<Link> links = new ArrayList<Link>();
+
+		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
+
+
+		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
+
+		List<Coordinate> coords = new ArrayList<Coordinate>();
+		coords.add(new Coordinate(2,1));
+		coords.add(new Coordinate(4,-3.5));
+		coords.add(new Coordinate(4,-7.5));
+		coords.add(new Coordinate(4,-9.5));
+		coords.add(new Coordinate(4,-11.5));
+		coords.add(new Coordinate(4,-15.5));
+//		coords.add(new Coordinate(2,-1.4));
+//		coords.add(new Coordinate(2,-7));
+//		coords.add(new Coordinate(2,-8));
+//		coords.add(new Coordinate(2,-10));
+//		coords.add(new Coordinate(2,-12.5));
+//		coords.add(new Coordinate(2,-15));
+//		coords.add(new Coordinate(2,-17.5));
+//		coords.add(new Coordinate(2,-20));
 		//		for (double y = 10; y >= -7; y -= 0.5) {
 		//			coords.add(new Coordinate(2,y));	
 		//			if (y == 0) {
@@ -290,6 +588,81 @@ public class ScenarioGenerator {
 			double cap  = w * 1.33;
 			double lanes = 5.4*0.26 * w;
 			double freespeed = 1.34;
+			if (i == 1) {
+				freespeed = 0.61;
+			}
+			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
+			sc.getNetwork().addLink(l);
+			links.add(l);
+		}
+
+
+	}
+
+	private static void createTopToBottom1(Scenario sc, Set<Feature> set) {
+		List<Link> links = new ArrayList<Link>();
+
+		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
+
+
+		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
+
+		List<Coordinate> coords = new ArrayList<Coordinate>();
+		coords.add(new Coordinate(2,10));
+		coords.add(new Coordinate(2,7.5));
+		coords.add(new Coordinate(2,4.5));
+		coords.add(new Coordinate(2,1));
+		coords.add(new Coordinate(0,-3.5));
+		coords.add(new Coordinate(0,-7.5));
+		coords.add(new Coordinate(0,-9.5));
+		coords.add(new Coordinate(0,-11.5));
+		coords.add(new Coordinate(0,-15.5));
+//		coords.add(new Coordinate(2,-1.4));
+//		coords.add(new Coordinate(2,-7));
+//		coords.add(new Coordinate(2,-8));
+//		coords.add(new Coordinate(2,-10));
+//		coords.add(new Coordinate(2,-12.5));
+//		coords.add(new Coordinate(2,-15));
+//		coords.add(new Coordinate(2,-17.5));
+//		coords.add(new Coordinate(2,-20));
+		//		for (double y = 10; y >= -7; y -= 0.5) {
+		//			coords.add(new Coordinate(2,y));	
+		//			if (y == 0) {
+		//				y -= 4.5;
+		//			}
+		//		}
+
+		for (Coordinate coord : coords) {
+			CoordImpl c = new CoordImpl(coord.x,coord.y);
+			Node tmp = ((NetworkImpl)sc.getNetwork()).getNearestNode(c);
+			NodeImpl n;
+			if (tmp != null && c.calcDistance(tmp.getCoord()) <= 0.0000001) {
+				n = (NodeImpl) tmp;
+			} else {
+				Id nid = new IdImpl(nodeId++);
+				n= nf.createNode(nid, c);
+				sc.getNetwork().addNode(n);
+			}
+			nodes.add(n);
+		}
+
+
+		for (int i = 0; i < nodes.size()-1; i++) {
+			NodeImpl n0 = nodes.get(i);
+			NodeImpl n1 = nodes.get(i+1);
+			Id lid = new IdImpl(linkId++);
+
+			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
+			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
+
+			double w = Math.min(2*estWidth(c0,c1,set),5);
+			double cap  = w * 1.33;
+			double lanes = 5.4*0.26 * w;
+			double freespeed = 1.34;
+			if (i == 4) {
+				freespeed = 0.61;
+			}
 			double length = c0.distance(c1); //-freespeed*((QSimConfigGroup)(sc.getConfig().getModule("qsim"))).getTimeStepSize();
 			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
 			sc.getNetwork().addLink(l);
@@ -301,7 +674,7 @@ public class ScenarioGenerator {
 
 	private static double estWidth(Coordinate c0, Coordinate c1, Set<Feature> set) {
 		LineString ls = GisDebugger.geofac.createLineString(new Coordinate[]{c0,c1});
-		double minDist = 10;
+		double minDist = 3;
 		for (Feature ft : set) {
 			Geometry geo = ft.getDefaultGeometry();
 			double dist = ls.distance(geo);
@@ -309,7 +682,8 @@ public class ScenarioGenerator {
 				minDist = dist;
 			}
 		}
-		return Math.max(minDist, 1.4);
+		return minDist;
+//		return Math.max(minDist, 1.4);
 	}
 
 }

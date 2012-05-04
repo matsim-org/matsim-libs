@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,10 +34,12 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -134,7 +135,13 @@ public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHan
 		P p = this.lastPosition.get(event.getPersonId());
 		Person pers = this.fac.createPerson(p.id);
 		Plan plan = this.fac.createPlan();
-		Activity actS = this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.orig));
+		ActivityImpl actS =  (ActivityImpl) this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.orig));
+		Id linkId = ((NetworkImpl)this.sc.getNetwork()).getNearestLink(MGC.coordinate2Coord(p.orig)).getId();
+		if (linkId.toString().equals("16")) {
+			linkId = new IdImpl("3");
+		}
+		actS.setLinkId(linkId);
+		
 		double time = getEndTime(p);
 		actS.setEndTime(time);
 		Leg leg = this.fac.createLeg(this.mode);
