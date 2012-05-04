@@ -127,11 +127,16 @@ public class VelocityCalculator {
 			PersonImpl p = (PersonImpl) person;
 			
 			// get gender factor
-			if (p.getSex().equals("m")) genderFactor = maleScaleFactor;
-			else if (p.getSex().equals("f")) genderFactor = femaleScaleFactor;
-			else {
+			if (p.getSex() == null) {
 				if (genderWarnCount < 10) {
 					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
+				}
+			} else if (p.getSex().equalsIgnoreCase("m")) genderFactor = maleScaleFactor;
+			else if (p.getSex().equalsIgnoreCase("f")) genderFactor = femaleScaleFactor;
+			else {
+				if (genderWarnCount < 10) {
+					incGenderWarnCount("Person's gender is not defined correct - expected 'm' or 'f' but found " +
+							p.getSex() + ". Ignoring gender dependent walk speed factor.");
 				}
 			}
 			
