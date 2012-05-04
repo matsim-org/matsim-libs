@@ -87,7 +87,7 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 				List<Integer> planElementIndex = getPlanElementIndex(planElements);
 				if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
 				
-				Activity parkAndRide = createParkAndRideActivity(Math.random());
+				Activity parkAndRide = createParkAndRideActivity(Math.random(), plan);
 
 				for (int i = 0; i < planElements.size(); i++) {
 					if (i==planElementIndex.get(0)){ // first Park and Ride Activity
@@ -100,11 +100,11 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 			}
 	}
 	
-	private Activity createParkAndRideActivity(double random) {
+	private Activity createParkAndRideActivity(double random, Plan plan) {
 
 		int max = this.prFacilities.size();
 	    int rndInt = (int) (random * max);
-		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink2in();
+		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink3in();
 		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
 		
 		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getToNode().getCoord(), rndLinkId); 

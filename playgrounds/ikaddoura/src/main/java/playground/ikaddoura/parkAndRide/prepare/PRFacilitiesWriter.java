@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParkAndRideFacility.java
+ * PRFacilityWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,78 +21,53 @@
 /**
  * 
  */
-package playground.ikaddoura.parkAndRide.pR;
+package playground.ikaddoura.parkAndRide.prepare;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 /**
  * @author Ihab
  *
  */
-public class ParkAndRideFacility {
+public class PRFacilitiesWriter {
 
-	private Id id;
-	private Id prLink1in; 
-	private Id prLink1out;
-	private Id prLink2in; // SignalizeableItem
-	private Id prLink2out;
-	private Id prLink3in; // parkAndRideActivity
-	private Id prLink3out;
-
-	public Id getId() {
-		return id;
-	}
-
-	public void setId(Id id) {
-		this.id = id;
-	}
-
-	public Id getPrLink1in() {
-		return prLink1in;
-	}
-
-	public void setPrLink1in(Id prLink1in) {
-		this.prLink1in = prLink1in;
-	}
-
-	public Id getPrLink1out() {
-		return prLink1out;
-	}
-
-	public void setPrLink1out(Id prLink1out) {
-		this.prLink1out = prLink1out;
-	}
-
-	public Id getPrLink2in() {
-		return prLink2in;
-	}
-
-	public void setPrLink2in(Id prLink2in) {
-		this.prLink2in = prLink2in;
-	}
-
-	public Id getPrLink2out() {
-		return prLink2out;
-	}
-
-	public void setPrLink2out(Id prLink2out) {
-		this.prLink2out = prLink2out;
-	}
-
-	public Id getPrLink3in() {
-		return prLink3in;
-	}
-
-	public void setPrLink3in(Id prLink3in) {
-		this.prLink3in = prLink3in;
-	}
-
-	public Id getPrLink3out() {
-		return prLink3out;
-	}
-
-	public void setPrLink3out(Id prLink3out) {
-		this.prLink3out = prLink3out;
-	}
+	public void write(List<ParkAndRideFacility> parkAndRideFacilities, String prFacilitiesFile) {
+		File file = new File(prFacilitiesFile);
+		
+	    try {
+	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+	    String zeile1 = "Id ; Link1in ; Link1out ; Link2in ; Link2out ; Link3in ; Link3out";
+	    bw.write(zeile1);
+	    bw.newLine();
 	
+	    for (ParkAndRideFacility pr : parkAndRideFacilities){
+	    	Id id = pr.getId();
+	    	Id link1in = pr.getPrLink1in();
+	    	Id link1out = pr.getPrLink1out();
+	    	Id link2in = pr.getPrLink2in();
+	    	Id link2out = pr.getPrLink2out();
+	    	Id link3in = pr.getPrLink3in();
+	    	Id link3out = pr.getPrLink3out();
+	    	
+	    	String zeile = id + " ; " + link1in + " ; " + link1out + " ; " + link2in + " ; " + link2out + " ; " + link3in + " ; " + link3out;
+	
+	    	bw.write(zeile);
+	        bw.newLine();
+	    }
+	
+	    bw.flush();
+	    bw.close();
+    
+	    } catch (IOException e) {}
+	    System.out.println("ParkAndRideFacilites written to "+file.toString());		
+	}
+
 }

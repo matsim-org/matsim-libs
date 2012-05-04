@@ -162,7 +162,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 		
 		int max = this.prFacilities.size();
 	    int rndInt = (int) (random * max);
-		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink2in();
+		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink3in();
 		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
 		
 		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getToNode().getCoord(), rndLinkId); 

@@ -60,11 +60,13 @@ public class PRFileReader {
 	                if (lineCounter > 0) {
 	                	String[] parts = line.split(" ; "); 
 	                	ParkAndRideFacility prFacility = new ParkAndRideFacility();
-	                	prFacility.setNr(Integer.parseInt(parts[0]));
+	                	prFacility.setId(new IdImpl(parts[0]));
 	                	prFacility.setPrLink1in(new IdImpl(parts[1]));
 	                	prFacility.setPrLink1out(new IdImpl(parts[2]));
 	                	prFacility.setPrLink2in(new IdImpl(parts[3]));
 	                	prFacility.setPrLink2out(new IdImpl(parts[4]));
+	                	prFacility.setPrLink3in(new IdImpl(parts[5]));
+	                	prFacility.setPrLink3out(new IdImpl(parts[6]));
 	                	this.prFacilities.add(prFacility);
 	                	prCounter++;
 	                }

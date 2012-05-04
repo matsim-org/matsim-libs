@@ -56,10 +56,6 @@ public class ParkAndRideControlerListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		
 		event.getControler().getEvents().addHandler(adaptiveControl);
-		System.out.println("controlerlistener");
-		for (ParkAndRideFacility pr : this.prFacilities){
-			System.out.println("-->"+pr.getNr()+" "+pr.getPrLink1in());
-		}
 		
 		PlanStrategy strategyAddRemove = new PlanStrategyImpl(new RandomPlanSelector());
 		strategyAddRemove.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
