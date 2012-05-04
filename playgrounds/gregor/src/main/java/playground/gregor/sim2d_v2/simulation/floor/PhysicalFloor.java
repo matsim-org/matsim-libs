@@ -270,8 +270,8 @@ public class PhysicalFloor implements Floor {
 	}
 	private void validateVelocity(Force f, double v0) {
 		double v = Math.sqrt(Math.pow(f.getVx(), 2)+Math.pow(f.getVy(), 2));
-		if (v > 2*v0) {
-			double scale = (2*v0)/v;
+		if (v > 1.25*v0) {
+			double scale = (1.25*v0)/v;
 			f.setVx(f.getVx()*scale);
 			f.setVy(f.getVy()*scale);
 		}

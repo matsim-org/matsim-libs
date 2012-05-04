@@ -45,6 +45,7 @@ public class PathForceModule implements ForceModule {
 	private HashMap<Id, LinkInfo> linkGeos;
 
 	int redraws = 0;
+	private final Scenario sc;
 
 	private static final double VIRTUAL_LENGTH = 1000;
 
@@ -62,6 +63,7 @@ public class PathForceModule implements ForceModule {
 	 */
 	public PathForceModule(PhysicalFloor floor, Scenario scenario) {
 		this.floor = floor;
+		this.sc = scenario;
 
 	}
 
@@ -127,8 +129,8 @@ public class PathForceModule implements ForceModule {
 
 
 
-
-		double f = Apath * Math.exp(pathDist / Bpath);
+		double bpath = 0.71 * this.sc.getNetwork().getLinks().get(agent.getMentalLink()).getNumberOfLanes(time);
+		double f = Apath * Math.exp(pathDist / bpath);
 
 
 		Point orig = ls.getStartPoint();
