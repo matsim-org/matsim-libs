@@ -100,6 +100,8 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 							planElements.add(1, pop.getFactory().createLeg(TransportMode.car));
 							planElements.add(2, parkAndRide);
 							planElements.add(3, pop.getFactory().createLeg(TransportMode.pt));
+						} else {
+						throw new RuntimeException(" Activity 'home' is not first planElement. Aborting...");
 						}
 					}
 				}

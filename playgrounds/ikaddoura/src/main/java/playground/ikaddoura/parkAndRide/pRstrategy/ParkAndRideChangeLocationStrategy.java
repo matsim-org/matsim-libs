@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -101,10 +102,32 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 	}
 	
 	private Activity createParkAndRideActivity(double random, Plan plan) {
+		Coord homeCoord = null;
+		Coord workCoord = null;
 
-		int max = this.prFacilities.size();
+		for (PlanElement pE : plan.getPlanElements()){
+			if (pE instanceof Activity){
+				Activity act = (Activity) pE;
+				if (act.getType().toString().equals("home")){
+					homeCoord = act.getCoord();
+				}
+				if (act.getType().toString().equals("work")){
+					workCoord = act.getCoord();
+				}
+			}
+		}
+		
+		if (homeCoord == null || workCoord == null){
+			throw new RuntimeException("Plan doesn't have home or work activity. Aborting...");
+		}
+		
+		System.out.println("Home: " + homeCoord + " / Work: " + workCoord);
+		EllipseSearch ellipseSearch = new EllipseSearch();
+		List<ParkAndRideFacility> prFacilitiesInEllipse = ellipseSearch.getPRFacilities(this.net, this.prFacilities, homeCoord, workCoord);
+		
+		int max = prFacilitiesInEllipse.size();
 	    int rndInt = (int) (random * max);
-		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink3in();
+		Id rndLinkId = prFacilitiesInEllipse.get(rndInt).getPrLink3in();
 		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
 		
 		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getToNode().getCoord(), rndLinkId); 

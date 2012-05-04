@@ -54,7 +54,6 @@ public class ParkAndRideControlerListener implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
 		event.getControler().getEvents().addHandler(adaptiveControl);
 		
 		PlanStrategy strategyAddRemove = new PlanStrategyImpl(new RandomPlanSelector());
