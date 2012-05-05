@@ -30,14 +30,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.vehicles.Vehicle;
 
 import playground.sergioo.passivePlanning.core.router.util.PathV2;
 import playground.sergioo.passivePlanning.core.scenario.ScenarioSimplerNetwork;
@@ -53,11 +55,13 @@ public class ComposedLinkFactory implements LinkFactory {
 
 	//Constructors
 	public ComposedLinkFactory(Network baseNetwork, Network simplerNetwork, String mode) {
-		TravelMinCost travelMinCost =  new TravelMinCost() {
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				return getLinkMinimumTravelCost(link);
+		TravelDisutility travelMinCost =  new TravelDisutility() {
+			@Override
+			public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+				return getLinkMinimumTravelDisutility(link);
 			}
-			public double getLinkMinimumTravelCost(Link link) {
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
 				return link.getLength()/link.getFreespeed();
 			}
 		};
@@ -101,7 +105,7 @@ public class ComposedLinkFactory implements LinkFactory {
 		double shortestLength = Double.MAX_VALUE;
 		for(Node nodeInA:nodeA.getNodes())
 			for(Node nodeInB:nodeB.getNodes()) {
-				Path path = leastCostPathCalculator.calcLeastCostPath(nodeInA, nodeInB, 0);
+				Path path = leastCostPathCalculator.calcLeastCostPath(nodeInA, nodeInB, 0, null, null);
 				if(path != null) {
 					PathV2 pathV2 = new PathV2(path);
 					double length = pathV2.getLength();

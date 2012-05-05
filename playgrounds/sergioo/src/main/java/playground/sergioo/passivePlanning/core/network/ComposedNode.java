@@ -10,14 +10,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vehicles.Vehicle;
 
 public class ComposedNode implements Node {
 
@@ -74,11 +76,13 @@ public class ComposedNode implements Node {
 					outLinks.add(link);
 		}
 		//Test paths for all combinations
-		TravelMinCost travelMinCost =  new TravelMinCost() {
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				return getLinkMinimumTravelCost(link);
+		TravelDisutility travelMinCost =  new TravelDisutility() {
+			@Override
+			public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+				return getLinkMinimumTravelDisutility(link);
 			}
-			public double getLinkMinimumTravelCost(Link link) {
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
 				return link.getLength()/link.getFreespeed();
 			}
 		};
@@ -92,7 +96,7 @@ public class ComposedNode implements Node {
 		LeastCostPathCalculator leastCostPathCalculator = new FastDijkstra(subNetwork, travelMinCost, timeFunction, preProcessData);
 		for(Link inLink:inLinks)
 			for(Link outLink:outLinks)
-				if(leastCostPathCalculator.calcLeastCostPath(inLink.getToNode(), outLink.getFromNode(), 0) == null)
+				if(leastCostPathCalculator.calcLeastCostPath(inLink.getToNode(), outLink.getFromNode(), 0, null, null) == null)
 					return false;
 		return true;
 	}

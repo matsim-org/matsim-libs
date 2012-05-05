@@ -3,23 +3,19 @@ package playground.sergioo.passivePlanning.core.mobsim.passivePlanning;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.households.PersonHouseholdMapping;
-import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.sergioo.passivePlanning.api.population.BasePerson;
 import playground.sergioo.passivePlanning.core.mobsim.passivePlanning.definitions.HasBasePerson;
 import playground.sergioo.passivePlanning.core.mobsim.passivePlanning.definitions.SinglePlannerAgent;
-import playground.sergioo.passivePlanning.core.population.BaseSocialPerson;
 import playground.sergioo.passivePlanning.core.population.decisionMakers.SocialDecisionMaker;
 import playground.sergioo.passivePlanning.core.scenario.ScenarioSimplerNetwork;
 import playground.sergioo.passivePlanning.population.parallelPassivePlanning.PassivePlannerManager;
@@ -148,6 +144,11 @@ public class PassivePlannerTransitAgent implements MobsimDriverPassengerAgent, H
 	@Override
 	public BasePerson getBasePerson() {
 		return basePerson;
+	}
+	@Override
+	public Id getDesiredAccessStopId() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

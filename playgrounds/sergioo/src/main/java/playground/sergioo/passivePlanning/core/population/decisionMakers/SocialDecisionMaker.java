@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
@@ -23,9 +24,10 @@ import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.Household;
+import org.matsim.vehicles.Vehicle;
 
 import playground.sergioo.passivePlanning.core.network.ComposedLink;
 import playground.sergioo.passivePlanning.core.population.decisionMakers.types.EndTimeDecisionMaker;
@@ -57,7 +59,7 @@ public class SocialDecisionMaker implements TypeOfActivityDecisionMaker, StartTi
 		}
 	
 	}
-	private class TravelMinCostSimplerNetwork implements TravelMinCost {
+	private class TravelMinCostSimplerNetwork implements TravelDisutility {
 	
 		//Attributes
 		private String mode;
@@ -67,7 +69,7 @@ public class SocialDecisionMaker implements TypeOfActivityDecisionMaker, StartTi
 			this.mode = mode;
 		}
 		@Override
-		public double getLinkGeneralizedTravelCost(Link link, double time) {
+		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 			time = time%periodsTime;
 			double sum = 0, tSum = 0;
 			for(int i=0; i<periods.length; i++) {
@@ -80,7 +82,7 @@ public class SocialDecisionMaker implements TypeOfActivityDecisionMaker, StartTi
 			return sum/tSum;
 		}
 		@Override
-		public double getLinkMinimumTravelCost(Link link) {
+		public double getLinkMinimumTravelDisutility(Link link) {
 			double min = Double.MAX_VALUE;
 			for(int i=0; i<periods.length; i++)
 				if(knownTravelTimes.get(mode).get(link.getId())[i]<min)
@@ -225,7 +227,7 @@ public class SocialDecisionMaker implements TypeOfActivityDecisionMaker, StartTi
 			travelMinCostSimple.setMode(mode);
 			travelTimeSimple.setMode(mode);
 			LeastCostPathCalculator leastCostPathCalculator = new FastDijkstra(scenario.getSimplerNetwork(mode), travelMinCostSimple, travelTimeSimple);
-			Path path = leastCostPathCalculator.calcLeastCostPath(((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(startLink.getCoord(), mode).getFromNode(), ((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(endLink.getCoord(), mode).getToNode(), time);
+			Path path = leastCostPathCalculator.calcLeastCostPath(((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(startLink.getCoord()).getFromNode(), ((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(endLink.getCoord()).getToNode(), time, null, null);
 			if(path.travelTime<minTime) {
 				minTime = path.travelTime;
 				bestPath = path.links;
@@ -250,15 +252,15 @@ public class SocialDecisionMaker implements TypeOfActivityDecisionMaker, StartTi
 		Node prevNode = startLink.getToNode(), currNode = null;
 		for(Link link:bestPath) {
 			currNode = ((ComposedLink)link).getStartNode();
-			Path internalNodePath = leastCostPathCalculator.calcLeastCostPath(prevNode, currNode, time);
+			Path internalNodePath = leastCostPathCalculator.calcLeastCostPath(prevNode, currNode, time, null, null);
 			for(Link linkFull:internalNodePath.links)
 				links.add(linkFull.getId());
 			prevNode = ((ComposedLink)link).getEndNode();
-			Path path = leastCostPathCalculator.calcLeastCostPath(currNode, prevNode, time);
+			Path path = leastCostPathCalculator.calcLeastCostPath(currNode, prevNode, time, null, null);
 			for(Link linkFull:path.links)
 				links.add(linkFull.getId());
 		}
-		Path path = leastCostPathCalculator.calcLeastCostPath(prevNode, endLink.getFromNode(), time);
+		Path path = leastCostPathCalculator.calcLeastCostPath(prevNode, endLink.getFromNode(), time, null, null);
 		for(Link linkFull:path.links)
 			links.add(linkFull.getId());
 		networkRoute.setLinkIds(startLink.getId(), links, endLink.getId());
