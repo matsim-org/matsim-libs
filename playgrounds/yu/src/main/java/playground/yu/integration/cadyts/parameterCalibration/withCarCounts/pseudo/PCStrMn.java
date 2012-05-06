@@ -311,40 +311,40 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	 */
 	private void generateScoreCorrections(Person person) {
 		for (Plan plan : person.getPlans()) {
-			if (generateScoreCorrection(plan)
-			/*
-			 * &&!hasTooLowCount(plan) variance * count >= minStdDev ^ 2, too
-			 * low count will NOT be considered for the least squares
-			 * calculation
-			 */) {
+			// ------------------------------
+			generateScoreCorrection(plan);
+			// if (generateScoreCorrection(plan)) {
 
-				Map<String, Object> customAttrs = plan.getCustomAttributes();
-				/* set attr and uc values */
-				Map<String, Double> tmpNameVals = new TreeMap<String, Double>();
-				for (String paramName : PCCtlListener.paramNames) {
-					Object ob = customAttrs.get(paramName);
-					tmpNameVals.put(paramName,
-							ob == null ? 0d : ((Number) ob).doubleValue());
-				}
+			Map<String, Object> customAttrs = plan.getCustomAttributes();
+			/* set attr and uc values */
+			Map<String, Double> tmpNameVals = new TreeMap<String, Double>();
+			for (String paramName : PCCtlListener.paramNames) {
+				Object ob = customAttrs.get(paramName);
+				tmpNameVals.put(paramName,
+						ob == null ? 0d : ((Number) ob).doubleValue());
+			}
 
-				boolean allZero = true;
-				for (Double value : tmpNameVals.values()) {
-					if (value != 0d) {
-						allZero = false;
-						break;
-					}
-				}
-				if (allZero) {
-					return;
-				}
+			// boolean allZero = true;
+			// for (Double value : tmpNameVals.values()) {
+			// if (value != 0d) {
+			// allZero = false;
+			// break;
+			// }
+			// }
+			// if (allZero) {
+			// continue;// debugged
+			// }
 
+			double uc = (Double) customAttrs.get(UTILITY_CORRECTION);
+			if (uc != 0d) {
 				correctedPlanNb++;
-				utilCorrs.add((Double) customAttrs.get(UTILITY_CORRECTION));
+				utilCorrs.add(uc);
 				for (Entry<String, Double> entry : tmpNameVals.entrySet()) {
 					attrs.get(entry.getKey()).add(entry.getValue());
 				}
-
 			}
+
+			// }
 		}
 	}
 

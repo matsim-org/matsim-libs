@@ -22,15 +22,16 @@ package playground.yu.parameterSearch;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.optimization.GoalType;
 import org.apache.commons.math.optimization.OptimizationException;
+import org.apache.commons.math.optimization.RealPointValuePair;
 import org.apache.commons.math.optimization.SimpleScalarValueChecker;
 import org.apache.commons.math.optimization.direct.NelderMead;
 
 /**
  * An attempt to use Nelder-Mead Method to search the best parameters in scoring
  * function
- * 
+ *
  * @author C
- * 
+ *
  */
 public class NelderMeadSearcher {
 
@@ -51,8 +52,11 @@ public class NelderMeadSearcher {
 
 	public void run() throws OptimizationException,
 			FunctionEvaluationException, IllegalArgumentException {
-		optimizer.optimize(objectiveFunction, GoalType.MAXIMIZE,
-				objectiveFunction.getFirstPoint());
+		RealPointValuePair pointValPair = optimizer.optimize(objectiveFunction,
+				GoalType.MAXIMIZE, objectiveFunction.getFirstPoint());
+		System.out.println("We have found an optimum, point\t"
+				+ pointValPair.getPoint() + "\tvalue\t"
+				+ pointValPair.getValue());
 	}
 
 	/**

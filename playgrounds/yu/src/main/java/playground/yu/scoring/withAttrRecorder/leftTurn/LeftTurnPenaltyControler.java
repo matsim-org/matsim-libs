@@ -30,7 +30,7 @@ import playground.yu.scoring.withAttrRecorder.Controler4AttrRecorder;
 
 /**
  * @author yu
- * 
+ *
  */
 public class LeftTurnPenaltyControler extends Controler4AttrRecorder {
 	/**
@@ -40,7 +40,7 @@ public class LeftTurnPenaltyControler extends Controler4AttrRecorder {
 		Config config;
 		if (args.length < 1) {
 			config = ConfigUtils
-					.loadConfig("test/input/2car1ptRoutes/writeScorAttrs/cfgCarTrav-3.5leftTurn-0.3.xml");
+					.loadConfig("test/input/2car1ptRoutes/writeScorAttrs/cfgTrav-4.44cLT-1.01.xml");
 		} else/* args.length>=1 */{
 			config = ConfigUtils.loadConfig(args[0]);
 		}

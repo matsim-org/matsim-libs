@@ -30,10 +30,11 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.PlansScoringWithLeftTurnPenalty4PC;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader.ScorAttrReadListener;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
+import playground.yu.tests.parameterCalibration.naiveWithoutUC.SimCntLogLikelihoodCtlListener;
 
 /**
  * @author yu
- * 
+ *
  */
 public class CtlWithLeftTurnPenaltyLs extends BseParamCalibrationControler {
 
@@ -42,6 +43,7 @@ public class CtlWithLeftTurnPenaltyLs extends BseParamCalibrationControler {
 		extension = new PCCtlListener();
 		addControlerListener(extension);
 		addControlerListener(new ScorAttrReadListener());
+		addControlerListener(new SimCntLogLikelihoodCtlListener());
 	}
 
 	/**

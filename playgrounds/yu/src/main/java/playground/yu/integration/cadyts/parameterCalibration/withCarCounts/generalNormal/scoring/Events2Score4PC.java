@@ -53,7 +53,7 @@ import utilities.math.Vector;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		MultinomialLogitChoice, CadytsChoice {
@@ -249,7 +249,7 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 	 * set Attr. plans of a person. This method should be called after
 	 * removedPlans, i.e. there should be only choiceSetSize plans in the memory
 	 * of an agent.
-	 * 
+	 *
 	 * @param person
 	 */
 	@Override
@@ -298,13 +298,13 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 * 
+	 *
 	 * @param person
 	 * @param monetaryDistanceCostRateCarStats
 	 */
 	@Override
 	public void setPersonScore(Person person) {
-
+		Vector coeff = mnl.getCoeff();
 		for (Plan plan : person.getPlans()) {
 
 			// calculate utility of the plan
@@ -312,10 +312,10 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 
 			Object uc = plan.getCustomAttributes().get(
 					BseStrategyManager.UTILITY_CORRECTION);
-			double utilCorrection = addUCtoScore ? (uc != null ? (Double) uc
-					: 0d) : 0d;
+			double utilCorrection = addUCtoScore ? uc != null ? (Double) uc
+					: 0d : 0d;
 
-			Vector coeff = mnl.getCoeff();
+
 			double util = coeff/*
 								 * s. the attributes order in
 								 * Events2Score4PC2.attrNameList

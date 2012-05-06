@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -91,6 +92,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private static int countTimeBin = 3600;
 	private Network network = null;
 	private double minStdDev, varianceScale;
+
+	private CalcLinkStats linkStats;
 
 	// private final boolean writeQGISFile = true;
 
@@ -236,16 +239,25 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 					Volume vol = count.getVolume(hour);
 
+					double[] avgVols = linkStats.getAvgLinkVolumes(linkId);
+					if (avgVols == null) {
+						avgVols = new double[24];
+					}
+
 					if (vol != null) {
 						double countVal = vol.getValue();
 						if (countVal != 0d/* zeroCount */) {
+
 							double simVal = resultsContainer.getSimValue(
 									network.getLinks().get(linkId),
 									entryTime_s, entryTime_s + 3599,
 									TYPE.FLOW_VEH_H);
+
+							simVal = avgVols[hour - 1] * countsScaleFactor;
 							uc += (countVal - simVal)
 									/ Math.max(minStdDev * minStdDev,
-											countsScaleFactor * countVal);
+											varianceScale * countVal);
+							// System.out.println("uc =\t"+uc);
 						}
 					}
 
@@ -513,21 +525,21 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		// }
 		// }
 		// SETTING parameterUpdateInterval
-		{
-			String parameterUpdateIntervalStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "parameterUpdateInterval");
-			if (parameterUpdateIntervalStr != null) {
-				int parameterUpdateInterval = Integer
-						.parseInt(parameterUpdateIntervalStr);
-				calibrator.setParameterUpdateInterval(parameterUpdateInterval);
-				System.out.println("BSE:\tparameterUpdateInterval\t="
-						+ parameterUpdateInterval);
-			} else {
-				System.out
-						.println("BSE:\tparameterUpdateInterval\t= default value\t"
-								+ ChoiceParameterCalibrator4.DEFAULT_PARAMETER_UPDATE_INTERVAL);
-			}
-		}
+		// {
+		// String parameterUpdateIntervalStr = config.findParam(
+		// BSE_CONFIG_MODULE_NAME, "parameterUpdateInterval");
+		// if (parameterUpdateIntervalStr != null) {
+		// int parameterUpdateInterval = Integer
+		// .parseInt(parameterUpdateIntervalStr);
+		// calibrator.setParameterUpdateInterval(parameterUpdateInterval);
+		// System.out.println("BSE:\tparameterUpdateInterval\t="
+		// + parameterUpdateInterval);
+		// } else {
+		// System.out
+		// .println("BSE:\tparameterUpdateInterval\t= default value\t"
+		// + ChoiceParameterCalibrator4.DEFAULT_PARAMETER_UPDATE_INTERVAL);
+		// }
+		// }
 	}
 
 	private void setInitialParametersInCalibrator(Config config) {
@@ -595,10 +607,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 		// set up volumes analyzer
 		volumes = ctl.getVolumes();
-		/*
-		 * volumes = new VolumesAnalyzer(3600, 30 * 3600,
-		 * network);ctl.getEvents().addHandler(volumes);
-		 */
+
+		linkStats = ctl.getLinkStats();
 	}
 
 	@Override

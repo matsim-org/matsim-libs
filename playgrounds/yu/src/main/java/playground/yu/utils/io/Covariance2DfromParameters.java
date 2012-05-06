@@ -38,9 +38,9 @@ import utilities.math.Vector;
  * calculates var{E{...}} (variance of expectation, the 2nd part of total
  * variance), see also: {@link http
  * ://en.wikipedia.org/wiki/Law_of_total_covariance}
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class Covariance2DfromParameters {
 	public class ParameterFileHandler implements TabularFileHandler {
@@ -86,8 +86,8 @@ public class Covariance2DfromParameters {
 		int width;
 		if (args.length != 3) {
 			// paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
-			paramFilename = "test/input/bln2pct/CGmsd100pureParams.log";
-			outputFilename = "test/output/bln2pct/CGmsd100varOfExp1kWindows.log";
+			paramFilename = "test/input/bln2pct/CHmsd80pureParams.log";
+			outputFilename = "test/output/bln2pct/CHmsd80varOfExp1kWindows.log";
 			width = 1000;
 		} else {
 			paramFilename = args[0];
