@@ -22,10 +22,12 @@ package playground.gregor.scenariogen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,6 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -55,7 +58,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -80,20 +85,18 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-
 public class PED12ScenarioGen {
 
 	private static final double EPSILON = 0.0001;
 	private static GeometryFactory geofac = new GeometryFactory();
 	private static int nodeID = 0;
 	private static int linkID = 0;
-
 	private static int persID = 0;
-
-
-
-	private static List<Link> shoppingShelfs = new ArrayList<Link>();
-	private static List<Link> cashDesks = new ArrayList<Link>();
+	private static String idMarker = "ped_";
+	private static String parkingMarker = "parking_";
+		
+	/*package*/ static List<Link> shoppingShelfs = new ArrayList<Link>();
+	/*private*/ static List<Link> cashDesks = new ArrayList<Link>();
 
 	private static List<Link> pedCrossing = new ArrayList<Link>();
 
@@ -102,16 +105,23 @@ public class PED12ScenarioGen {
 	private static Link carTrafficLight;
 	private static Link carStop;
 
+	private static Set<String> walkModes = CollectionUtils.stringToSet("walk,walk2d");
+	private static Set<String> carModes = CollectionUtils.stringToSet("walk,walk2d,car");
+	
+	/*package*/ static Id carInNode;
+	/*package*/ static Id carOutNode;
+	/*package*/ static Id walkSubwayInNode;
+	/*package*/ static Id walkInNode;
+	
 	public static void main(String [] args) {
-		String scDir = "/Users/laemmel/devel/ped12_dobLaem/";
-		String inputDir = scDir + "/input/";
+		String scDir = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/";
+		String inputDir = scDir + "input_2d";
 
 		Config c = ConfigUtils.createConfig();
 		c.scenario().setUseSignalSystems(true);
 		Scenario sc = ScenarioUtils.createScenario(c);
 
 		createAndSaveEnvironment(inputDir);
-
 
 		createAndSaveNetwork(sc,inputDir);
 
@@ -151,13 +161,13 @@ public class PED12ScenarioGen {
 
 		//		s2d.setTimeStepSize(""+0.1);
 		QSimConfigGroup qsim = new QSimConfigGroup();
-		qsim.setEndTime(600);
+		qsim.setEndTime(86400);
+		qsim.setRemoveStuckVehicles(false);
+		qsim.setNumberOfThreads(2);
 		//				qsim.setTimeStepSize(1./25.);
 		c.addModule("qsim", qsim);
 
 		c.addModule("sim2d", s2d);
-
-
 
 		ActivityParams pre = new ActivityParams("h");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
@@ -170,13 +180,10 @@ public class PED12ScenarioGen {
 
 		sc.getConfig().planCalcScore().addActivityParams(pre);
 
-
-
 		createTrafficLights(sc,inputDir);
 
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 	}
-
 
 	private static void createTrafficLights(Scenario sc, String inputDir) {
 		SignalsData signalsData = sc.getScenarioElement(SignalsData.class);
@@ -194,19 +201,19 @@ public class PED12ScenarioGen {
 		signalsWriter.setSignalControlOutputFilename(signalControlFile);
 		signalsWriter.writeSignalsData(signalsData);
 
-
 		Config c = sc.getConfig();
 		SignalSystemsConfigGroup signalsConfig = c.signalSystems();
 		signalsConfig.setSignalSystemFile(signalSystemsFile);
 		signalsConfig.setSignalGroupsFile(signalGroupsFile);
 		signalsConfig.setSignalControlFile(signalControlFile);
 	}
+	
 	private static void createSignalControl(Scenario scenario, SignalsData sd) {
 		int cycle = 10;
 		SignalControlData control = sd.getSignalControlData();
 
 		//signal system 3, 4 control
-		for (Link l  : cashDesks){
+		for (Link l  : cashDesks) {
 			Id id = l.getId();
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
 			control.addSignalSystemControllerData(controller);
@@ -221,7 +228,7 @@ public class PED12ScenarioGen {
 			settings1.setDropping(9);
 		}
 
-		for (Link l  : pedCrossing){
+		for (Link l  : pedCrossing) {
 			Id id = l.getId();
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
 			control.addSignalSystemControllerData(controller);
@@ -256,7 +263,6 @@ public class PED12ScenarioGen {
 		SignalSystemsData systems = signalsData.getSignalSystemsData();
 		SignalGroupsData groups = signalsData.getSignalGroupsData();
 
-
 		for (Link l : cashDesks) {
 
 			Id id = l.getId();
@@ -278,17 +284,28 @@ public class PED12ScenarioGen {
 			signal.setLinkId(l.getId());
 			SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 		}
+		
+		Id id = carTrafficLight.getId();
+		SignalSystemData sys = systems.getFactory().createSignalSystemData(id);
+		systems.addSignalSystemData(sys);
+		SignalData signal = systems.getFactory().createSignalData(id);
+		sys.addSignalData(signal);
+		signal.setLinkId(carTrafficLight.getId());
+		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 	}
 
 	private static void createAndSavePopulation(Scenario sc, String inputDir) {
 
 		Network network = sc.getNetwork();
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
-		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,sc.getConfig().planCalcScore() );
+		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,sc.getConfig().planCalcScore());
 		Dijkstra dijkstra = new Dijkstra(network, cost, fs);
-
+		Coord coord;
+		CoordinateTransformer transformer = new CoordinateTransformer(dx, dy, da);
+		
 		//subway
-		Node n = ((NetworkImpl)sc.getNetwork()).getNearestNode(new CoordImpl(-2,1));
+		coord = transformer.transformCoord(9, 1);
+		Node n = ((NetworkImpl)sc.getNetwork()).getNearestNode(coord);
 		Link start = n.getOutLinks().values().iterator().next();
 		Link end = n.getInLinks().values().iterator().next();
 
@@ -304,18 +321,17 @@ public class PED12ScenarioGen {
 				double persTime = time + MatsimRandom.getRandom().nextDouble();
 				double x = -2 + 3*(MatsimRandom.getRandom().nextDouble()-0.5);
 				double y = 1;
-				Coord actCoord = new CoordImpl(x,y);
+				Coord actCoord = coord = transformer.transformCoord(x, y);
 				createSubwayPerson(persTime,start,end,actCoord,sc,dijkstra);
 			}
 		}
 		
 		double time = depStartTime;
-		double incr = 6; //every 6 seconds one car
 		for (Link parkingLot : parkingLots) {
-			createCarPerson(time,sc,dijkstra,parkingLot);
+			createCarPerson(time, sc, dijkstra, parkingLot);
 			
-			time += incr;
-			
+			// every 30 to 90 seconds a new car
+			time += 30 + MatsimRandom.getRandom().nextInt(60);
 		}
 	}
 
@@ -332,8 +348,10 @@ public class PED12ScenarioGen {
 		plan.addActivity(act);
 		Leg leg = pb.createLeg("walk2d");
 
+		dijkstra.setModeRestriction(walkModes);
 		Route route = createRandomShoppingRoute(start,end,dijkstra);
-		leg.setRoute(route );
+		leg.setRoute(route);
+		dijkstra.setModeRestriction(null);
 
 		plan.addLeg(leg);
 		Activity act2 = pb.createActivityFromLinkId("h",end.getId());
@@ -374,7 +392,6 @@ public class PED12ScenarioGen {
 		plan.addActivity(intoTheCar);
 		
 		
-		
 		Route routeCar2 = createSimpleCarRoute(parkingLot,carStop,dijkstra);
 		Leg driveHome = pb.createLeg("car");
 		driveHome.setRoute(routeCar2);
@@ -383,13 +400,12 @@ public class PED12ScenarioGen {
 		plan.addActivity(done);
 		pers.addPlan(plan);
 		sc.getPopulation().addPerson(pers);
-		
 	}
 
 	private static Route createSimpleCarRoute(Link from, Link to, Dijkstra dijkstra) {
 		
-		
-		Path r = dijkstra.calcLeastCostPath(from.getToNode(), to.getFromNode(), 0,null,null);
+		dijkstra.setModeRestriction(CollectionUtils.stringToSet(TransportMode.car));
+		Path r = dijkstra.calcLeastCostPath(from.getToNode(), to.getFromNode(), 0, null, null);
 		
 		List<Id> linkIds = new ArrayList<Id>();
 		for (Link l : r.links) {
@@ -399,12 +415,15 @@ public class PED12ScenarioGen {
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(from.getId(), to.getId());
 		route.setLinkIds(from.getId(), linkIds, to.getId());
 
+		dijkstra.setModeRestriction(null);
 		return route;
 	}
 
 
 	private static Route createRandomShoppingRoute(Link start, Link end, Dijkstra dijkstra) {
 
+		dijkstra.setModeRestriction(walkModes);
+		
 		int stopsAtShoppingShelfs = MatsimRandom.getRandom().nextInt(3)+1; // three stops max
 
 		Link current = start;
@@ -416,18 +435,17 @@ public class PED12ScenarioGen {
 			Node from = current.getToNode();
 			Node to = next.getFromNode();
 
-			Path r = dijkstra.calcLeastCostPath(from, to, 0,null,null);
+			Path r = dijkstra.calcLeastCostPath(from, to, 0, null, null);
 			links.addAll(r.links);
 			links.add(next);
 			current = next;
 		}
 
-
 		Link cashDesk = cashDesks.get(MatsimRandom.getRandom().nextInt(cashDesks.size()));
 		Node from = current.getToNode();
 		Node to = cashDesk.getFromNode();
 
-		Path r = dijkstra.calcLeastCostPath(from, to, 0,null,null);
+		Path r = dijkstra.calcLeastCostPath(from, to, 0, null, null);
 		links.addAll(r.links);
 		links.add(cashDesk);
 		current = cashDesk;		
@@ -446,108 +464,140 @@ public class PED12ScenarioGen {
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(start.getId(), end.getId());
 		route.setLinkIds(start.getId(), linkIds, end.getId());
 		
+		dijkstra.setModeRestriction(null);
 		return route;
 	}
 
 	private static void createAndSaveNetwork(Scenario sc, String inputDir) {
 
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
+		Link l; 
 		//path from subway to mall entry
 
-		////stairs
+		//stairs
 		//subway platform
-		createPedLink(-2.,1.,-2.,3.,1.34,false,4,net);
+		l = createPedLink(9.,1.,9.,3.,1.34,false,4,net);
+		walkSubwayInNode = l.getFromNode().getId();
 		//up VF,h = 0.610 m/s
-		createPedLink(-2.,3.,-2.,12.,0.61,true,4,net);
+		createPedLink(9.,3.,9.,12.,0.61,true,4,net);
 		//down VF,h = 0.694 m/s
-		createPedLink(-2.,12.,-2.,3.,0.694,true,4,net);
+		createPedLink(9.,12.,9.,3.,0.694,true,4,net);
 
-		createPedLink(-2.,12.,-2.,22.,1.34,false,4,net);
+		createPedLink(9.,12.,9.,22.,1.34,false,4,net);
+		
+		l = createPedLink(9.,22.,-1.,22.,1.34,false,4,net);
+		walkInNode = l.getFromNode().getId();
+		
+		pedCrossing.add(createPedLink(-1.,22.,-3.,22.,1.34,false,4,net));
 
-		pedCrossing.add(createPedLink(-2.,22.,-3.,22.,1.34,false,4,net));
-
+		// crossing the street
 		createPedLink(-3.,22.,-12.,22.,1.34,false,4,net);
 
-		pedCrossing.add(createPedLink(-13.,22.,-12.,22.,1.34,false,4,net));
+		pedCrossing.add(createPedLink(-14.,22.,-12.,22.,1.34,false,4,net));
 
-		createPedLink(-13.,22.,-45.5,22.,1.34,false,4,net);
+		createPedLink(-14.,22.,-45.5,22.,1.34,false,4,net);
 
 		//parking lot
+		double vParking = 20/3.6;
 		//1.row
-		parkingLots.add(createPedLink(-14.,19.,-14.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-18.,19.,-18.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-22.,19.,-22.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-26.,19.,-26.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-30.,19.,-30.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-34.,19.,-34.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-38.,19.,-38.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-42.,19.,-42.,8.,1.34,false,4,net));
+		parkingLots.add(createParkingLink(-14.,15.,-14.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-18.,15.,-18.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-22.,15.,-22.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-26.,15.,-26.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-30.,15.,-30.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-34.,15.,-34.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-38.,15.,-38.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-42.,15.,-42.,8.,vParking,false,4,net));
 		//2. row
-		parkingLots.add(createPedLink(-14.,-4.,-14.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-18.,-4.,-18.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-22.,-4.,-22.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-26.,-4.,-26.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-30.,-4.,-30.,8.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-34.,-4.,-34.,8.,1.34,false,4,net));
+		parkingLots.add(createParkingLink(-14.,1.,-14.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-18.,1.,-18.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-22.,1.,-22.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-26.,1.,-26.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-30.,1.,-30.,8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-34.,1.,-34.,8.,vParking,false,4,net));
 		//connections
-		createPedLink(-14.,8.,-18.,8.,1.34,false,4,net);
-		createPedLink(-18.,8.,-22.,8.,1.34,false,4,net);
-		createPedLink(-22.,8.,-26.,8.,1.34,false,4,net);
-		createPedLink(-26.,8.,-30.,8.,1.34,false,4,net);
-		createPedLink(-30.,8.,-34.,8.,1.34,false,4,net);
-		createPedLink(-34.,8.,-38.,8.,1.34,false,4,net);
-		createPedLink(-38.,8.,-42.,8.,1.34,false,4,net);
-		createPedLink(-42.,8.,-45.5,8.,1.34,false,4,net);
+		createCarLink(-14.,8.,-18.,8.,vParking,false,4,net);
+		createCarLink(-18.,8.,-22.,8.,vParking,false,4,net);
+		createCarLink(-22.,8.,-26.,8.,vParking,false,4,net);
+		createCarLink(-26.,8.,-30.,8.,vParking,false,4,net);
+		createCarLink(-30.,8.,-34.,8.,vParking,false,4,net);
+		createCarLink(-34.,8.,-38.,8.,vParking,false,4,net);
+		createCarLink(-38.,8.,-42.,8.,vParking,false,4,net);
+		createCarLink(-42.,8.,-45.5,8.,vParking,false,4,net);
 		//3. row
-		parkingLots.add(createPedLink(-14.,-6.,-14.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-18.,-6.,-18.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-22.,-6.,-22.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-26.,-6.,-26.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-30.,-6.,-30.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-34.,-6.,-34.,-18.,1.34,false,4,net));
+		parkingLots.add(createParkingLink(-14.,-1.,-14.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-18.,-1.,-18.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-22.,-1.,-22.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-26.,-1.,-26.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-30.,-1.,-30.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-34.,-1.,-34.,-8.,vParking,false,4,net));
 		//4. row
-		parkingLots.add(createPedLink(-14.,-29.,-14.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-18.,-29.,-18.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-22.,-29.,-22.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-26.,-29.,-26.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-30.,-29.,-30.,-18.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-34.,-29.,-34.,-18.,1.34,false,4,net));
+		parkingLots.add(createParkingLink(-14.,-15.,-14.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-18.,-15.,-18.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-22.,-15.,-22.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-26.,-15.,-26.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-30.,-15.,-30.,-8.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-34.,-15.,-34.,-8.,vParking,false,4,net));
 		//connections
-		createPedLink(-14.,-18.,-18.,-18.,1.34,false,4,net);
-		createPedLink(-18.,-18.,-22.,-18.,1.34,false,4,net);
-		createPedLink(-22.,-18.,-26.,-18.,1.34,false,4,net);
-		createPedLink(-26.,-18.,-30.,-18.,1.34,false,4,net);
-		createPedLink(-30.,-18.,-34.,-18.,1.34,false,4,net);
-		createPedLink(-34.,-18.,-45.5,-18.,1.34,false,4,net);
+		createCarLink(-14.,-8.,-18.,-8.,vParking,false,4,net);
+		createCarLink(-18.,-8.,-22.,-8.,vParking,false,4,net);
+		createCarLink(-22.,-8.,-26.,-8.,vParking,false,4,net);
+		createCarLink(-26.,-8.,-30.,-8.,vParking,false,4,net);
+		createCarLink(-30.,-8.,-34.,-8.,vParking,false,4,net);
+		createCarLink(-34.,-8.,-45.5,-8.,vParking,false,4,net);	
 		//5. row
-		parkingLots.add(createPedLink(-14.,-31.,-14.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-18.,-31.,-18.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-22.,-31.,-22.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-26.,-31.,-26.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-30.,-31.,-30.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-34.,-31.,-34.,-43.,1.34,false,4,net));
+		parkingLots.add(createParkingLink(-14.,-17.,-14.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-18.,-17.,-18.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-22.,-17.,-22.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-26.,-17.,-26.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-30.,-17.,-30.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-34.,-17.,-34.,-24.,vParking,false,4,net));
 		//6. row
-		parkingLots.add(createPedLink(-14.,-54.,-14.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-18.,-54.,-18.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-22.,-54.,-22.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-26.,-54.,-26.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-30.,-54.,-30.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-34.,-54.,-34.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-38.,-54.,-38.,-43.,1.34,false,4,net));
-		parkingLots.add(createPedLink(-42.,-54.,-42.,-43.,1.34,false,4,net));
+		parkingLots.add(createParkingLink(-14.,-31.,-14.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-18.,-31.,-18.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-22.,-31.,-22.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-26.,-31.,-26.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-30.,-31.,-30.,-24.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-34.,-31.,-34.,-24.,vParking,false,4,net));
 		//connections
-		createPedLink(-14.,-43.,-18.,-43.,1.34,false,4,net);
-		createPedLink(-18.,-43.,-22.,-43.,1.34,false,4,net);
-		createPedLink(-22.,-43.,-26.,-43.,1.34,false,4,net);
-		createPedLink(-26.,-43.,-30.,-43.,1.34,false,4,net);
-		createPedLink(-30.,-43.,-34.,-43.,1.34,false,4,net);
-		createPedLink(-34.,-43.,-38.,-43.,1.34,false,4,net);
-		createPedLink(-38.,-43.,-42.,-43.,1.34,false,4,net);
-		createPedLink(-42.,-43.,-45.5,-43.,1.34,false,4,net);
+		createCarLink(-14.,-24.,-18.,-24.,vParking,false,4,net);
+		createCarLink(-18.,-24.,-22.,-24.,vParking,false,4,net);
+		createCarLink(-22.,-24.,-26.,-24.,vParking,false,4,net);
+		createCarLink(-26.,-24.,-30.,-24.,vParking,false,4,net);
+		createCarLink(-30.,-24.,-34.,-24.,vParking,false,4,net);
+		createCarLink(-34.,-24.,-45.5,-24.,vParking,false,4,net);	
+		//7. row
+		parkingLots.add(createParkingLink(-14.,-33.,-14.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-18.,-33.,-18.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-22.,-33.,-22.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-26.,-33.,-26.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-30.,-33.,-30.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-34.,-33.,-34.,-40.,vParking,false,4,net));
+		//8. row
+		parkingLots.add(createParkingLink(-14.,-47.,-14.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-18.,-47.,-18.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-22.,-47.,-22.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-26.,-47.,-26.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-30.,-47.,-30.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-34.,-47.,-34.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-38.,-47.,-38.,-40.,vParking,false,4,net));
+		parkingLots.add(createParkingLink(-42.,-47.,-42.,-40.,vParking,false,4,net));
+		//connections
+		createCarLink(-14.,-40.,-18.,-40.,vParking,false,4,net);
+		createCarLink(-18.,-40.,-22.,-40.,vParking,false,4,net);
+		createCarLink(-22.,-40.,-26.,-40.,vParking,false,4,net);
+		createCarLink(-26.,-40.,-30.,-40.,vParking,false,4,net);
+		createCarLink(-30.,-40.,-34.,-40.,vParking,false,4,net);
+		createCarLink(-34.,-40.,-38.,-40.,vParking,false,4,net);
+		createCarLink(-38.,-40.,-42.,-40.,vParking,false,4,net);
+		createCarLink(-42.,-40.,-45.5,-40.,vParking,false,4,net);
+
 		//path parking lot entry mall
-		createPedLink(-45.5,-43.,-45.5,-18.,1.34,false,4,net);
-		createPedLink(-45.5,-18.,-45.5,8.,1.34,false,4,net);
+		createCarLink(-45.5,-40.,-45.5,-24.,vParking,false,4,net);
+		createCarLink(-45.5,-24.,-45.5,-8.,vParking,false,4,net);
+		createCarLink(-45.5,-8.,-45.5,8.,vParking,false,4,net);
 		createPedLink(-45.5,8.,-45.5,22.,1.34,false,4,net);
+		
 		//into mall
 		createPedLink(-45.5,22.,-47.5,22.,1.34,false,4,net);
 
@@ -690,50 +740,53 @@ public class PED12ScenarioGen {
 		createPedLink(-81.5,16,-72,14,1.34,true,4,net);
 
 		
-		carStart = createCarLink(-8, 100, -8, 50, 50/3.6, true, 1, net);
+		carStart = createCarLink(-8, 110, -8, 100, 50/3.6, true, 1, net);
+		createCarLink(-8, 100, -8, 50, 50/3.6, true, 1, net);
 		carTrafficLight = createCarLink(-8,50,-8,32,50/3.6,true,1,net);
 		createCarLink(-8,32,-8,8,50/3.6,true,1,net);
 		createCarLink(-8,8,-14,8,1.34,true,1,net);
-		createCarLink(-8,8,-8,-43,50/3.6,true,1,net);
-		createCarLink(-14,-43,-8,-43,1.34,true,1,net);
-		carStop = createCarLink(-8,-43,-8,-70,50/36,true,1,net);
+		createCarLink(-8,8,-8,-40,50/3.6,true,1,net);
+		createCarLink(-14,-40,-8,-40,1.34,true,1,net);
+		carStop = createCarLink(-8,-40,-8,-70,50/36,true,1,net);
 		
+		carInNode = carStart.getFromNode().getId();
+		carOutNode = carStop.getToNode().getId();
+
 		//for debugging only
 		dumpNetworkAsShapeFile(sc,inputDir);
-
-
-
 	}
-
 
 	//pedestrian cash desk link 
 	private static Link createPedCashDeskLink(double fromX, double fromY, double toX, double toY,
 			double v,boolean oneWay,double width,NetworkImpl net) {
 
 		NetworkFactoryImpl nf = net.getFactory();
-
-		CoordImpl from =  new CoordImpl(fromX, fromY);
-		CoordImpl to =  new CoordImpl(toX, toY);
-		double length = from.calcDistance(to);
+		CoordinateTransformer transformer = new CoordinateTransformer(dx, dy, da);
+		
+		Coord from = transformer.transformCoord(fromX, fromY);
+		Coord to = transformer.transformCoord(toX, toY);
+		double length = CoordUtils.calcDistance(from, to);
 
 		Node n0 = net.getNearestNode(from);
-		if (n0 == null || from.calcDistance(n0.getCoord()) > EPSILON) {
-			n0 = nf.createNode(new IdImpl(nodeID++), from);
+		if (n0 == null || CoordUtils.calcDistance(from, n0.getCoord()) > EPSILON) {
+			n0 = nf.createNode(new IdImpl(idMarker + nodeID++), from);
 			net.addNode(n0);
 		}
 
 		Node n1 = net.getNearestNode(to);
-		if (to.calcDistance(n1.getCoord()) > EPSILON) {
-			n1 = nf.createNode(new IdImpl(nodeID++), to);
+		if (CoordUtils.calcDistance(to, n1.getCoord()) > EPSILON) {
+			n1 = nf.createNode(new IdImpl(idMarker + nodeID++), to);
 			net.addNode(n1);
 		}		
 
 		double cap  = 1./20;//every 20 sec one person
 		double lanes = 5.4*0.26 * width;
-		Link l = nf.createLink(new IdImpl(linkID++), n0, n1, net, length, v,cap , lanes);
+		Link l = nf.createLink(new IdImpl(idMarker + linkID++), n0, n1, net, length, v,cap , lanes);
+		l.setAllowedModes(walkModes);
 		net.addLink(l);
 		if (!oneWay) {
-			Link lr = nf.createLink(new IdImpl(linkID++), n1, n0, net, length, v,cap , lanes);
+			Link lr = nf.createLink(new IdImpl(idMarker + linkID++), n1, n0, net, length, v,cap , lanes);
+			lr.setAllowedModes(walkModes);
 			net.addLink(lr);	
 		}
 
@@ -741,69 +794,111 @@ public class PED12ScenarioGen {
 
 	}
 	
-	//pedestrian link 
+	//car link 
 	private static Link createCarLink(double fromX, double fromY, double toX, double toY,
-			double v,boolean oneWay,double width,NetworkImpl net) {
+			double v, boolean oneWay, double width, NetworkImpl net) {
 
 		NetworkFactoryImpl nf = net.getFactory();
-
-		CoordImpl from =  new CoordImpl(fromX, fromY);
-		CoordImpl to =  new CoordImpl(toX, toY);
-		double length = from.calcDistance(to);
+		CoordinateTransformer transformer = new CoordinateTransformer(dx, dy, da);
+		
+		Coord from = transformer.transformCoord(fromX, fromY);
+		Coord to = transformer.transformCoord(toX, toY);
+		double length = CoordUtils.calcDistance(from, to);
 
 		Node n0 = net.getNearestNode(from);
-		if (n0 == null || from.calcDistance(n0.getCoord()) > EPSILON) {
-			n0 = nf.createNode(new IdImpl(nodeID++), from);
+		if (n0 == null || CoordUtils.calcDistance(from, n0.getCoord()) > EPSILON) {
+			n0 = nf.createNode(new IdImpl(idMarker + nodeID++), from);
 			net.addNode(n0);
 		}
 
 		Node n1 = net.getNearestNode(to);
-		if (to.calcDistance(n1.getCoord()) > EPSILON) {
-			n1 = nf.createNode(new IdImpl(nodeID++), to);
+		if (CoordUtils.calcDistance(to, n1.getCoord()) > EPSILON) {
+			n1 = nf.createNode(new IdImpl(idMarker + nodeID++), to);
 			net.addNode(n1);
 		}		
 
 		double cap  = 600;
 		double lanes = 1;
-		Link l = nf.createLink(new IdImpl(linkID++), n0, n1, net, length, v,cap , lanes);
+		Link l = nf.createLink(new IdImpl(idMarker + linkID++), n0, n1, net, length, v, cap, lanes);
+		l.setAllowedModes(carModes);
 		net.addLink(l);
 		if (!oneWay) {
-			Link lr = nf.createLink(new IdImpl(linkID++), n1, n0, net, length, v,cap , lanes);
-			net.addLink(lr);	
+			Link lr = nf.createLink(new IdImpl(idMarker + linkID++), n1, n0, net, length, v, cap, lanes);
+			lr.setAllowedModes(carModes);
+			net.addLink(lr);
 		}
 
 		return l;
 	}
 
-
-	//pedestrian link 
-	private static Link createPedLink(double fromX, double fromY, double toX, double toY,
-			double v,boolean oneWay,double width,NetworkImpl net) {
+	// pedestrian link 
+	private static Link createParkingLink(double fromX, double fromY, double toX, double toY,
+			double v, boolean oneWay, double width, NetworkImpl net) {
 
 		NetworkFactoryImpl nf = net.getFactory();
+		CoordinateTransformer transformer = new CoordinateTransformer(dx, dy, da);
 
-		CoordImpl from =  new CoordImpl(fromX, fromY);
-		CoordImpl to =  new CoordImpl(toX, toY);
-		double length = from.calcDistance(to);
+		Coord from = transformer.transformCoord(fromX, fromY);
+		Coord to = transformer.transformCoord(toX, toY);
+		double length = CoordUtils.calcDistance(from, to);
 
 		Node n0 = net.getNearestNode(from);
-		if (n0 == null || from.calcDistance(n0.getCoord()) > EPSILON) {
-			n0 = nf.createNode(new IdImpl(nodeID++), from);
+		if (n0 == null || CoordUtils.calcDistance(from, n0.getCoord()) > EPSILON) {
+			n0 = nf.createNode(new IdImpl(idMarker + nodeID++), from);
 			net.addNode(n0);
 		}
 
 		Node n1 = net.getNearestNode(to);
-		if (to.calcDistance(n1.getCoord()) > EPSILON) {
-			n1 = nf.createNode(new IdImpl(nodeID++), to);
+		if (CoordUtils.calcDistance(to, n1.getCoord()) > EPSILON) {
+			n1 = nf.createNode(new IdImpl(idMarker + nodeID++), to);
 			net.addNode(n1);
 		}		
 
 		double cap  = width * 1.33;
 		double lanes = 5.4*0.26 * width;
-		Link l = nf.createLink(new IdImpl(linkID++), n0, n1, net, length, v,cap , lanes);
+		Link l = nf.createLink(new IdImpl(idMarker + parkingMarker + linkID++), n0, n1, net, length, v, cap, lanes);
+		l.setAllowedModes(carModes);
 		net.addLink(l);
 		if (!oneWay) {
-			Link lr = nf.createLink(new IdImpl(linkID++), n1, n0, net, length, v,cap , lanes);
+			Link lr = nf.createLink(new IdImpl(idMarker + linkID++), n1, n0, net, length, v, cap , lanes);
+			lr.setAllowedModes(carModes);
+			net.addLink(lr);	
+		}
+
+		return l;
+	}
+	
+	// pedestrian link 
+	private static Link createPedLink(double fromX, double fromY, double toX, double toY,
+			double v, boolean oneWay, double width, NetworkImpl net) {
+
+		NetworkFactoryImpl nf = net.getFactory();
+		CoordinateTransformer transformer = new CoordinateTransformer(dx, dy, da);
+		
+		Coord from = transformer.transformCoord(fromX, fromY);
+		Coord to = transformer.transformCoord(toX, toY);
+		double length = CoordUtils.calcDistance(from, to);
+
+		Node n0 = net.getNearestNode(from);
+		if (n0 == null || CoordUtils.calcDistance(from, n0.getCoord()) > EPSILON) {
+			n0 = nf.createNode(new IdImpl(idMarker + nodeID++), from);
+			net.addNode(n0);
+		}
+
+		Node n1 = net.getNearestNode(to);
+		if (CoordUtils.calcDistance(to, n1.getCoord()) > EPSILON) {
+			n1 = nf.createNode(new IdImpl(idMarker + nodeID++), to);
+			net.addNode(n1);
+		}		
+
+		double cap  = width * 1.33;
+		double lanes = 5.4*0.26 * width;
+		Link l = nf.createLink(new IdImpl(idMarker + linkID++), n0, n1, net, length, v,cap , lanes);
+		l.setAllowedModes(walkModes);
+		net.addLink(l);
+		if (!oneWay) {
+			Link lr = nf.createLink(new IdImpl(idMarker + linkID++), n1, n0, net, length, v,cap , lanes);
+			lr.setAllowedModes(walkModes);
 			net.addLink(lr);	
 		}
 
@@ -812,170 +907,201 @@ public class PED12ScenarioGen {
 
 	private static void createAndSaveEnvironment(String inputDir) {
 
-
-
 		//stairway boundary from subway station
 		List<Coordinate> stair = new ArrayList<Coordinate>();
-		stair.add(getC(0,12));
-		stair.add(getC(0,0));
-		stair.add(getC(-4,0));
-		stair.add(getC(-4,12));
+		stair.add(getC(11,12));
+		stair.add(getC(11,0));
+		stair.add(getC(7,0));
+		stair.add(getC(7,12));
 		crLs(stair,"stairway");
 
 		//curbside
 		List<Coordinate> curbs = new ArrayList<Coordinate>();
-		curbs.add(getC(-4,12));
-		curbs.add(getC(-4,20));
+		curbs.add(getC(7,12));
+		curbs.add(getC(7,20));
 		crLs(curbs,"curbside01");
 
 		//parking lot
 		List<Coordinate> parking = new ArrayList<Coordinate>();
-		parking.add(getC(-12,20));
-		parking.add(getC(-44,20));
+		parking.add(getC(-12,16));
+		parking.add(getC(-44,16));
 		crLs(parking,"parking01");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-44,20));
-		parking.add(getC(-44,12));
+		parking.add(getC(-44,16));
+		parking.add(getC(-44,11));
 		crLs(parking,"parking02");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-40,20));
-		parking.add(getC(-40,12));
+		parking.add(getC(-40,16));
+		parking.add(getC(-40,11));
 		crLs(parking,"parking03");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-36,20));
-		parking.add(getC(-36,12));
+		parking.add(getC(-36,16));
+		parking.add(getC(-36,11));
 		crLs(parking,"parking04");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-32,20));
-		parking.add(getC(-32,12));
+		parking.add(getC(-32,16));
+		parking.add(getC(-32,11));
 		crLs(parking,"parking05");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-28,20));
-		parking.add(getC(-28,12));
+		parking.add(getC(-28,16));
+		parking.add(getC(-28,11));
 		crLs(parking,"parking06");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-24,20));
-		parking.add(getC(-24,12));
+		parking.add(getC(-24,16));
+		parking.add(getC(-24,11));
 		crLs(parking,"parking07");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-20,20));
-		parking.add(getC(-20,12));
+		parking.add(getC(-20,16));
+		parking.add(getC(-20,11));
 		crLs(parking,"parking08");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-16,20));
-		parking.add(getC(-16,12));
+		parking.add(getC(-16,16));
+		parking.add(getC(-16,11));
 		crLs(parking,"parking09");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-12,20));
-		parking.add(getC(-12,12));
+		parking.add(getC(-12,16));
+		parking.add(getC(-12,11));
 		crLs(parking,"parking10");
 
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-12,-5));
-		parking.add(getC(-36,-5));
+		parking.add(getC(-12,0));
+		parking.add(getC(-36,0));
 		crLs(parking,"parking11");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-12,3));
-		parking.add(getC(-12,-13));
+		parking.add(getC(-12,5));
+		parking.add(getC(-12,-5));
 		crLs(parking,"parking12");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-16,3));
-		parking.add(getC(-16,-13));
+		parking.add(getC(-16,5));
+		parking.add(getC(-16,-5));
 		crLs(parking,"parking13");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-20,3));
-		parking.add(getC(-20,-13));
+		parking.add(getC(-20,5));
+		parking.add(getC(-20,-5));
 		crLs(parking,"parking14");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-24,3));
-		parking.add(getC(-24,-13));
+		parking.add(getC(-24,5));
+		parking.add(getC(-24,-5));
 		crLs(parking,"parking15");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-28,3));
-		parking.add(getC(-28,-13));
+		parking.add(getC(-28,5));
+		parking.add(getC(-28,-5));
 		crLs(parking,"parking16");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-32,3));
-		parking.add(getC(-32,-13));
+		parking.add(getC(-32,5));
+		parking.add(getC(-32,-5));
 		crLs(parking,"parking17");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-36,3));
-		parking.add(getC(-36,-13));
+		parking.add(getC(-36,5));
+		parking.add(getC(-36,-5));
 		crLs(parking,"parking18");
 
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-12,-30));
-		parking.add(getC(-36,-30));
+		parking.add(getC(-12,-16));
+		parking.add(getC(-36,-16));
 		crLs(parking,"parking19");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-12,-22));
-		parking.add(getC(-12,-38));
+		parking.add(getC(-12,-11));
+		parking.add(getC(-12,-21));
 		crLs(parking,"parking20");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-16,-22));
-		parking.add(getC(-16,-38));
+		parking.add(getC(-16,-11));
+		parking.add(getC(-16,-21));
 		crLs(parking,"parking21");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-20,-22));
-		parking.add(getC(-20,-38));
+		parking.add(getC(-20,-11));
+		parking.add(getC(-20,-21));
 		crLs(parking,"parking22");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-24,-22));
-		parking.add(getC(-24,-38));
+		parking.add(getC(-24,-11));
+		parking.add(getC(-24,-21));
 		crLs(parking,"parking23");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-28,-22));
-		parking.add(getC(-28,-38));
+		parking.add(getC(-28,-11));
+		parking.add(getC(-28,-21));
 		crLs(parking,"parking24");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-32,-22));
-		parking.add(getC(-32,-38));
+		parking.add(getC(-32,-11));
+		parking.add(getC(-32,-21));
 		crLs(parking,"parking25");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-36,-22));
-		parking.add(getC(-36,-38));
+		parking.add(getC(-36,-11));
+		parking.add(getC(-36,-21));
 		crLs(parking,"parking26");
 
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-12,-55));
-		parking.add(getC(-44,-55));
+		parking.add(getC(-12,-32));
+		parking.add(getC(-36,-32));
 		crLs(parking,"parking27");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-12,-55));
-		parking.add(getC(-12,-47));
+		parking.add(getC(-12,-27));
+		parking.add(getC(-12,-37));
 		crLs(parking,"parking28");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-16,-55));
-		parking.add(getC(-16,-47));
-		crLs(parking,"parking29");		
+		parking.add(getC(-16,-27));
+		parking.add(getC(-16,-37));
+		crLs(parking,"parking29");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-20,-55));
-		parking.add(getC(-20,-47));
+		parking.add(getC(-20,-27));
+		parking.add(getC(-20,-37));
 		crLs(parking,"parking30");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-24,-55));
-		parking.add(getC(-24,-47));
+		parking.add(getC(-24,-27));
+		parking.add(getC(-24,-37));
 		crLs(parking,"parking31");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-28,-55));
-		parking.add(getC(-28,-47));
+		parking.add(getC(-28,-27));
+		parking.add(getC(-28,-37));
 		crLs(parking,"parking32");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-32,-55));
-		parking.add(getC(-32,-47));
+		parking.add(getC(-32,-27));
+		parking.add(getC(-32,-37));
 		crLs(parking,"parking33");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-36,-55));
-		parking.add(getC(-36,-47));
+		parking.add(getC(-36,-27));
+		parking.add(getC(-36,-37));
 		crLs(parking,"parking34");
+		
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-40,-55));
-		parking.add(getC(-40,-47));
+		parking.add(getC(-12,-48));
+		parking.add(getC(-44,-48));
 		crLs(parking,"parking35");
 		parking = new ArrayList<Coordinate>();
-		parking.add(getC(-44,-55));
-		parking.add(getC(-44,-47));
+		parking.add(getC(-12,-48));
+		parking.add(getC(-12,-43));
 		crLs(parking,"parking36");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-16,-48));
+		parking.add(getC(-16,-43));
+		crLs(parking,"parking37");		
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-20,-48));
+		parking.add(getC(-20,-43));
+		crLs(parking,"parking38");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-24,-48));
+		parking.add(getC(-24,-43));
+		crLs(parking,"parking39");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-28,-48));
+		parking.add(getC(-28,-43));
+		crLs(parking,"parking40");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-32,-48));
+		parking.add(getC(-32,-43));
+		crLs(parking,"parking41");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-36,-48));
+		parking.add(getC(-36,-43));
+		crLs(parking,"parking42");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-40,-48));
+		parking.add(getC(-40,-43));
+		crLs(parking,"parking43");
+		parking = new ArrayList<Coordinate>();
+		parking.add(getC(-44,-48));
+		parking.add(getC(-44,-43));
+		crLs(parking,"parking44");
 
 		//mall
 		List<Coordinate> mall = new ArrayList<Coordinate>();
@@ -1088,16 +1214,94 @@ public class PED12ScenarioGen {
 	}
 
 	private static Coordinate getC(double x, double y) {
-		return new Coordinate(x,y);
+//		return new Coordinate(x,y);
+		return new CoordinateTransformer(dx, dy, da).transformCoordinate(x, y);
 	}
 
+	/*package*/ static String EPSG = "EPSG: 32632";	
 	private static void dumpNetworkAsShapeFile(Scenario sc, String inputDir) {
 		final Network network = sc.getNetwork();
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "EPSG: 32632");
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, EPSG);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		new Links2ESRIShape(network,inputDir+"/links_ls.shp", builder).write();
 	}
 
+	
+	/*
+	 * To be overwritten to transform coordinates when
+	 * merging with zurich network.
+	 */
+	public static double dx = 0;
+	public static double dy = 0;
+	public static double da = 0;
+	
+	private static class CoordinateTransformer implements NetworkRunnable {
+
+		private final double dx;
+		private final double dy;
+		private final double da;
+		private final double cosA;
+		private final double sinA;
+		
+		public CoordinateTransformer(double dx, double dy, double da) {
+			this.dx = dx;
+			this.dy = dy;
+			this.da = da;
+			
+			cosA = Math.cos(da * Math.PI / 180);
+			sinA = Math.sin(da * Math.PI / 180);
+		}
+		
+		public Coord transformCoord(double x, double y) {
+			
+			// rotate coordinate
+			double X = (x * cosA - y * sinA);
+			double Y = (x * sinA + y * cosA);
+			
+			// move coordinate
+			X += dx;
+			Y += dy;
+			
+			return new CoordImpl(X,Y);
+		}
+		
+		public Coordinate transformCoordinate(double x, double y) {
+
+			Coordinate coordinate = new Coordinate(x,y);
+			
+			// rotate coordinate
+			coordinate.x = (x * cosA - y * sinA);
+			coordinate.y = (x * sinA + y * cosA);
+			
+			// move coordinate
+			coordinate.x += dx;
+			coordinate.y += dy;
+			
+			return coordinate;
+		}
+		
+		@Override
+		public void run(Network network) {
+			
+//			// rotate network
+//			double cosA = Math.cos(da * Math.PI / 180);
+//			double sinA = Math.sin(da * Math.PI / 180);
+//			for (Node node : network.getNodes().values()) {
+//				Coord coord = node.getCoord();
+//				double x = coord.getX();
+//				double y = coord.getY();
+//				coord.setX(x * cosA - y * sinA);
+//				coord.setY(x * sinA + y * cosA);
+//			}
+//			
+//			// move network
+//			for (Node node : network.getNodes().values()) {
+//				Coord coord = node.getCoord();
+//				coord.setX(coord.getX() + dx);
+//				coord.setY(coord.getY() + dy);
+//			}
+		}
+	}
 }
