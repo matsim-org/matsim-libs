@@ -21,6 +21,7 @@
 package playground.southafrica.utilities;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 
 public class Header {
 	private final static Logger LOG = Logger.getLogger(Header.class);
@@ -33,9 +34,12 @@ public class Header {
 			LOG.info("args[" + i + "]: " + args[i]);
 		}
 		LOG.info("----------------------------------------------------------------------");
+		Gbl.printSystemInfo();
+		Gbl.startMeasurement();
 	}
 
 	public static void printFooter(){
+		Gbl.printElapsedTime();
 		LOG.info("----------------------------------------------------------------------");
 		LOG.info("                               Done");
 		LOG.info("======================================================================");

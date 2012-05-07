@@ -28,7 +28,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
@@ -39,19 +38,15 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsFactory;
-import org.matsim.households.HouseholdsFactoryImpl;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
-import com.jhlabs.math.SCNoise;
 
 import playground.southafrica.utilities.Header;
 
@@ -275,11 +270,11 @@ public class Census2001SampleParser {
 			String[] sa = personMap.get(pid).split(",");
 			String quarterType = sa[0];
 			int age = Integer.parseInt(sa[1]);
-			String gender = sa[2];
+			String gender = sa[2].equalsIgnoreCase("Male") ? "m" : "f";
 			String relationship = sa[3];
 			String race = sa[4];
 			String school = sa[5];
-			boolean employment = Boolean.parseBoolean(sa[6]);
+			boolean employment = sa[6].equalsIgnoreCase("Yes") ? true : false;
 			String mainPlaceOfWork = sa[7];
 			String modeToMain = sa[8];
 			Double income = Double.parseDouble(sa[9]);
@@ -322,7 +317,8 @@ public class Census2001SampleParser {
 	
 	
 	public void writePopulationAndAttributes(String outputFolder){
-		
+		writeHouseholds(outputFolder);
+		writePopulation(outputFolder);
 	}
 	
 	/**
