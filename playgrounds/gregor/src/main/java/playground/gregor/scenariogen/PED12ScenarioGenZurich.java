@@ -23,6 +23,7 @@ package playground.gregor.scenariogen;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -44,6 +45,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -54,7 +56,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -67,6 +68,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.gregor.sim2d_v3.random.XORShiftRandom;
@@ -74,18 +76,15 @@ import playground.gregor.sim2d_v3.random.XORShiftRandom;
 public class PED12ScenarioGenZurich {
 
 	static final Logger log = Logger.getLogger(PED12ScenarioGenZurich.class);
-	
-//	public static String shoppingNetwork = "/home/cdobler/workspace/matsim/mysimulations/ped2012/input_2d/network.xml";
-//	public static String zurichNetwork = "/home/cdobler/workspace/matsim/mysimulations/ped2012/input_zh/network_ivtch.xml.gz";
-//	public static String mergedNetwork = "/home/cdobler/workspace/matsim/mysimulations/ped2012/input/network.xml.gz";
-//	public static String zurichPopulation = "/home/cdobler/workspace/matsim/mysimulations/ped2012/input_zh/100.plans_0.10_0.50.xml.gz";
-//	public static String mergedPopulation = "/home/cdobler/workspace/matsim/mysimulations/ped2012/input/plans.xml.gz";
 
-	public static String shoppingNetwork = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/input_2d/network.xml";
-	public static String zurichNetwork = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/input_zh/network_ivtch.xml.gz";
-	public static String mergedNetwork = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/input/network.xml.gz";
-	public static String zurichPopulation = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/input_zh/plans_25pct.xml.gz";
-	public static String mergedPopulation = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/input/plans.xml.gz";
+	public static String baseDir = "/home/cdobler/workspace/matsim/mysimulations/ped2012/";
+//	public static String baseDir = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/";
+	
+	public static String shoppingNetwork = baseDir + "input_2d/network.xml";
+	public static String zurichNetwork = baseDir + "input_zh/network_ivtch.xml.gz";
+	public static String mergedNetwork = baseDir + "input/network.xml.gz";
+	public static String zurichPopulation = baseDir + "input_zh/plans_25pct.xml.gz";
+	public static String mergedPopulation = baseDir + "input/plans.xml.gz";
 	
 	public static List<Link> shoppingShelfs = new ArrayList<Link>();
 	public static List<Link> cashDesks = new ArrayList<Link>();
@@ -117,9 +116,9 @@ public class PED12ScenarioGenZurich {
 		// load zurich scenario
 		Config zurichConfig = ConfigUtils.createConfig();
 		zurichConfig.network().setInputFile(zurichNetwork);
-//		zurichConfig.plans().setInputFile(zurichPopulation);
+		zurichConfig.plans().setInputFile(zurichPopulation);
 		Scenario zurichScenario = ScenarioUtils.loadScenario(zurichConfig);
-		
+				
 		// convert zurich network to multi-modal network
 		zurichConfig.multiModal().setCreateMultiModalNetwork(true);
 		zurichConfig.multiModal().setCutoffValueForNonCarModes(80/3.6);
@@ -166,6 +165,8 @@ public class PED12ScenarioGenZurich {
 
 		// create road
 		transportModes = CollectionUtils.stringToSet(modes);
+		// people should *not* walk on the road to the shopping center
+		transportModes.remove(TransportMode.walk);
 		
 		// connect incoming link
 		fromNode = zurichNetwork.getNodes().get(zurichScenario.createId("2796"));
@@ -199,10 +200,15 @@ public class PED12ScenarioGenZurich {
 		link = networkFactory.createLink(zurichScenario.createId("pedConnector" + linkCount++), node, zurichNetwork.getNodes().get(PED12ScenarioGen.walkInNode));
 		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
 		link.setAllowedModes(transportModes);
+		link.setCapacity(10.0);
+		link.setFreespeed(1.34);
 		zurichNetwork.addLink(link);
+		
 		link = networkFactory.createLink(zurichScenario.createId("pedConnector" + linkCount++), zurichNetwork.getNodes().get(PED12ScenarioGen.walkInNode), node);
 		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
 		link.setAllowedModes(transportModes);
+		link.setCapacity(10.0);
+		link.setFreespeed(1.34);
 		zurichNetwork.addLink(link);
 		// create walk-walk2d switch link
 		
@@ -212,11 +218,15 @@ public class PED12ScenarioGenZurich {
 		link = networkFactory.createLink(zurichScenario.createId("pedConnector" + linkCount++), zurichNetwork.getNodes().get(zurichScenario.createId("2793")), node);
 		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
 		link.setAllowedModes(transportModes);
+		link.setCapacity(10.0);
+		link.setFreespeed(1.34);
 		zurichNetwork.addLink(link);
 
 		link = networkFactory.createLink(zurichScenario.createId("pedConnector" + linkCount++), node, zurichNetwork.getNodes().get(zurichScenario.createId("2793")));
 		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
 		link.setAllowedModes(transportModes);
+		link.setCapacity(10.0);
+		link.setFreespeed(1.34);
 		zurichNetwork.addLink(link);
 		// create pavement
 		
@@ -231,10 +241,15 @@ public class PED12ScenarioGenZurich {
 		link = networkFactory.createLink(zurichScenario.createId("pedConnector" + linkCount++), node, zurichNetwork.getNodes().get(PED12ScenarioGen.walkSubwayInNode));
 		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
 		link.setAllowedModes(transportModes);
+		link.setCapacity(10.0);
+		link.setFreespeed(1.34);
 		zurichNetwork.addLink(link);
+		
 		link = networkFactory.createLink(zurichScenario.createId("pedConnector" + linkCount++), zurichNetwork.getNodes().get(PED12ScenarioGen.walkSubwayInNode), node);
 		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
 		link.setAllowedModes(transportModes);
+		link.setCapacity(10.0);
+		link.setFreespeed(1.34);
 		zurichNetwork.addLink(link);
 		// create walk-walk2d switch link
 		
@@ -242,13 +257,19 @@ public class PED12ScenarioGenZurich {
 		transportModes = CollectionUtils.stringToSet(TransportMode.walk);
 		
 		link = networkFactory.createLink(zurichScenario.createId("pedConnector" + linkCount++), zurichNetwork.getNodes().get(zurichScenario.createId("3502")), node);
-		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
+		// increase length by 25% to keep other walk connection attractive
+		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()) * 1.25);
 		link.setAllowedModes(transportModes);
+		link.setCapacity(10.0);
+		link.setFreespeed(1.34);
 		zurichNetwork.addLink(link);
 
 		link = networkFactory.createLink(zurichScenario.createId("pedConnector" + linkCount++), node, zurichNetwork.getNodes().get(zurichScenario.createId("3502")));
-		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
+		// increase length by 25% to keep other walk connection attractive
+		link.setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()) * 1.25);
 		link.setAllowedModes(transportModes);
+		link.setCapacity(10.0);
+		link.setFreespeed(1.34);
 		zurichNetwork.addLink(link);
 		// connect shopping center with main station
 		
@@ -263,26 +284,43 @@ public class PED12ScenarioGenZurich {
 		
 		// write merged network
 		new NetworkWriter(zurichScenario.getNetwork()).write(mergedNetwork);
+		PED12ScenarioGen.dumpNetworkAsShapeFile(zurichScenario, baseDir + "input");
 		
 		// create shopping population
 		createPEDPopulation(zurichScenario);
 		
 		// write shopping population
-		new PopulationWriter(zurichScenario.getPopulation(), zurichNetwork).write(mergedPopulation);
+		new PopulationWriter(zurichScenario.getPopulation(), zurichNetwork).writeV5(mergedPopulation);
 	}
 	
 	/*
-	 * Update activity types from e.g. h12 to home
+	 * Ensure that all activities can be reached.
+	 * Update activity types from e.g. h12 to home.
+	 * Drop non-NetworkRoutes.
 	 */
 	private static void prepareZurichPopulation(Scenario scenario) {
-		
-		for (Person person : scenario.getPopulation().getPersons().values()) {	
+
+		Counter removedPersons = new Counter("Removed persons: ");
+		Iterator<? extends Person> iter = scenario.getPopulation().getPersons().values().iterator();
+		while(iter.hasNext()) {
+			Person person = iter.next();
+						
 			for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 				if (planElement instanceof Activity) {
 					Activity activity = (Activity) planElement;
+
+					/*
+					 * Check available transport modes. If walk is not available, the
+					 * agent might not reach the activity. Therefore remove the agent.
+					 */
+					Link link = scenario.getNetwork().getLinks().get((activity.getLinkId()));
+					if (!link.getAllowedModes().contains(TransportMode.walk)) {
+						iter.remove();
+						removedPersons.incCounter();
+						break;
+					}
 					
 					String type = activity.getType();
-					
 					if (type.startsWith("w")) {		
 						activity.setType("work");
 					} else if (type.startsWith("h")) {
@@ -297,9 +335,16 @@ public class PED12ScenarioGenZurich {
 						activity.setType("tta");
 					}
 					else log.warn("Unknown activity type: " + type);
+				} else if (planElement instanceof Leg) {
+					Leg leg = (Leg) planElement;
+					Route route = leg.getRoute();
+					if (route != null && !(route instanceof NetworkRoute)) {
+						leg.setRoute(null);
+					}
 				}
 			}
 		}
+		removedPersons.printCounter();
 	}
 	
 	private static void createPEDPopulation(Scenario scenario) {
@@ -358,86 +403,88 @@ public class PED12ScenarioGenZurich {
 		}
 		
 		// manage parking lots
-		parkingLotQueue = new PriorityQueue<Tuple<Id,Double>>(numCarAgents, new ParkingComparator());
-		for (Link link : network.getLinks().values()) {
-			Id linkId = link.getId();
-			if (linkId.toString().toLowerCase().contains("parking")) {
-				/*
-				 * Time when the parking lot becomes available:
-				 * 08:00:00 + a random value to avoid that the parking
-				 * lots are filled from first to last
-				 */
-				double t = 8*3600 + random.nextDouble() * 3600;
-				parkingLotQueue.add(new Tuple<Id, Double>(linkId, t));
+		if (numCarAgents > 0) {
+			parkingLotQueue = new PriorityQueue<Tuple<Id,Double>>(numCarAgents, new ParkingComparator());
+			for (Link link : network.getLinks().values()) {
+				Id linkId = link.getId();
+				if (linkId.toString().toLowerCase().contains("parking")) {
+					/*
+					 * Time when the parking lot becomes available:
+					 * 08:00:00 + a random value to avoid that the parking
+					 * lots are filled from first to last
+					 */
+					double t = 8*3600 + random.nextDouble() * 3600;
+					parkingLotQueue.add(new Tuple<Id, Double>(linkId, t));
+				}
 			}
-		}
-		
-		double departureTime = 8 * 3600;
-		double dt = 8 * 3600 / numCarAgents;
-		for (int i = 0; i < numCarAgents; i++) {
 			
-			Id id = scenario.createId("pedAgent" + pedCount++);
-			PersonImpl pers = (PersonImpl) populationFactory.createPerson(id);
-			Plan plan = populationFactory.createPlan();
-			
-			// set random age and gender
-			pers.setAge((int)(10 + Math.round(random.nextDouble() * 60)));	// 10 .. 70 years old
-			if (random.nextDouble() > 0.5) pers.setSex("m");
-			else pers.setSex("f");
-			
-			// distance 500 ... 5500m to shopping center -> ensure that agents do not start with walk2d
-			double homeX = dx + Math.signum(random.nextDouble() - 0.5) * (random.nextDouble() + 0.1) * 5500;
-			double homeY = dy + Math.signum(random.nextDouble() - 0.5) * (random.nextDouble() + 0.1) * 5500;
-			Coord homeCoord = scenario.createCoord(homeX, homeY);
-			
-			Link homeLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink(homeCoord);
-			homeCoord = homeLink.getCoord();
-		
-			ActivityImpl act = (ActivityImpl) populationFactory.createActivityFromLinkId("home", homeLink.getId());
-			act.setCoord(homeCoord);
-			// leave home between 08:00 and 16:00
-			departureTime += dt * random.nextDouble();
-			act.setEndTime(departureTime);
-			plan.addActivity(act);
-			Leg leg = populationFactory.createLeg("car");
-			
-			Id parkingLinkId = parkingLotQueue.poll().getFirst();
-			Link parkingLink = network.getLinks().get(parkingLinkId);
-			Route route = createSimpleCarRoute(homeLink, parkingLink, dijkstra);
-			leg.setRoute(route);
-			plan.addLeg(leg);
-			
-			act = (ActivityImpl) populationFactory.createActivityFromLinkId("parking", parkingLinkId);
-			act.setCoord(parkingLink.getCoord());
-			act.setEndTime(0);
-			plan.addActivity(act);
-			
-			Leg shopping = populationFactory.createLeg("walk2d");
-			
-			route = createRandomShoppingRoute(parkingLink, dijkstra);
-			shopping.setRoute(route);
-			plan.addLeg(shopping);
-
-			act = (ActivityImpl) populationFactory.createActivityFromLinkId("parking", parkingLinkId);
-			act.setEndTime(0);
-			plan.addActivity(act);
-			
-			route = createSimpleCarRoute(parkingLink, homeLink, dijkstra);
-			leg = populationFactory.createLeg("car");
-			leg.setRoute(route);
-			plan.addLeg(leg);
-			
-			act = (ActivityImpl) populationFactory.createActivityFromLinkId("home", homeLink.getId());
-			plan.addActivity(act);
-			pers.addPlan(plan);
-
-			scenario.getPopulation().addPerson(pers);
-			
-			/* 
-			 * Re-insert parking lot into the queue - assuming that it will
-			 * be available at a later point in time. 
-			 */
-			parkingLotQueue.add(new Tuple<Id, Double>(parkingLinkId, departureTime + 600));
+			double departureTime = 8 * 3600;
+			double dt = 8 * 3600 / numCarAgents;
+			for (int i = 0; i < numCarAgents; i++) {
+				
+				Id id = scenario.createId("pedAgent" + pedCount++);
+				PersonImpl pers = (PersonImpl) populationFactory.createPerson(id);
+				Plan plan = populationFactory.createPlan();
+				
+				// set random age and gender
+				pers.setAge((int)(10 + Math.round(random.nextDouble() * 60)));	// 10 .. 70 years old
+				if (random.nextDouble() > 0.5) pers.setSex("m");
+				else pers.setSex("f");
+				
+				// distance 500 ... 5500m to shopping center -> ensure that agents do not start with walk2d
+				double homeX = dx + Math.signum(random.nextDouble() - 0.5) * (random.nextDouble() + 0.1) * 5500;
+				double homeY = dy + Math.signum(random.nextDouble() - 0.5) * (random.nextDouble() + 0.1) * 5500;
+				Coord homeCoord = scenario.createCoord(homeX, homeY);
+				
+				Link homeLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink(homeCoord);
+				homeCoord = homeLink.getCoord();
+				
+				ActivityImpl act = (ActivityImpl) populationFactory.createActivityFromLinkId("home", homeLink.getId());
+				act.setCoord(homeCoord);
+				// leave home between 08:00 and 16:00
+				departureTime += dt * random.nextDouble();
+				act.setEndTime(departureTime);
+				plan.addActivity(act);
+				Leg leg = populationFactory.createLeg("car");
+				
+				Id parkingLinkId = parkingLotQueue.poll().getFirst();
+				Link parkingLink = network.getLinks().get(parkingLinkId);
+				Route route = createSimpleCarRoute(homeLink, parkingLink, dijkstra);
+				leg.setRoute(route);
+				plan.addLeg(leg);
+				
+				act = (ActivityImpl) populationFactory.createActivityFromLinkId("parking", parkingLinkId);
+				act.setCoord(parkingLink.getCoord());
+				act.setEndTime(0);
+				plan.addActivity(act);
+				
+				Leg shopping = populationFactory.createLeg("walk2d");
+				
+				route = createRandomShoppingRoute(parkingLink, dijkstra);
+				shopping.setRoute(route);
+				plan.addLeg(shopping);
+				
+				act = (ActivityImpl) populationFactory.createActivityFromLinkId("parking", parkingLinkId);
+				act.setEndTime(0);
+				plan.addActivity(act);
+				
+				route = createSimpleCarRoute(parkingLink, homeLink, dijkstra);
+				leg = populationFactory.createLeg("car");
+				leg.setRoute(route);
+				plan.addLeg(leg);
+				
+				act = (ActivityImpl) populationFactory.createActivityFromLinkId("home", homeLink.getId());
+				plan.addActivity(act);
+				pers.addPlan(plan);
+				
+				scenario.getPopulation().addPerson(pers);
+				
+				/* 
+				 * Re-insert parking lot into the queue - assuming that it will
+				 * be available at a later point in time. 
+				 */
+				parkingLotQueue.add(new Tuple<Id, Double>(parkingLinkId, departureTime + 600));
+			}
 		}
 	}
 	
@@ -518,7 +565,7 @@ public class PED12ScenarioGenZurich {
 		}
 		
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links.get(0).getId(), links.get(links.size()-1).getId());
-		route.setLinkIds(links.get(0).getId(), linkIds, links.get(links.size()-1).getId());
+		route.setLinkIds(links.get(0).getId(), linkIds.subList(1, links.size()-1), links.get(links.size()-1).getId());
 		
 		return route;
 	}
@@ -554,7 +601,11 @@ public class PED12ScenarioGenZurich {
 				NetworkRoute route = (NetworkRoute) walkLeg.getRoute();
 				List<PlanElement> replacement = new ArrayList<PlanElement>();
 				
-				List<Id> linkIds = route.getLinkIds();
+//				List<Id> linkIds = route.getLinkIds();
+				List<Id> linkIds = new ArrayList<Id>();
+				linkIds.add(route.getStartLinkId());
+				linkIds.addAll(route.getLinkIds());
+				linkIds.add(route.getEndLinkId());
 				
 				String currentMode = null;
 				int startRouteIndex = 0;

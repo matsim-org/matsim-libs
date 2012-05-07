@@ -94,7 +94,10 @@ public class PED12ScenarioGen {
 	private static int persID = 0;
 	private static String idMarker = "ped_";
 	private static String parkingMarker = "parking_";
-		
+	
+	/*package*/ enum SC {Helbing,Zanlungo,vanDenBerg};
+	/*package*/ static final SC model = SC.Zanlungo;
+	
 	/*package*/ static List<Link> shoppingShelfs = new ArrayList<Link>();
 	/*private*/ static List<Link> cashDesks = new ArrayList<Link>();
 
@@ -114,8 +117,10 @@ public class PED12ScenarioGen {
 	/*package*/ static Id walkInNode;
 	
 	public static void main(String [] args) {
-		String scDir = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/";
+		String scDir = "/home/cdobler/workspace/matsim/mysimulations/ped2012/";
 		String inputDir = scDir + "input_2d";
+//		String scDir = "/Users/laemmel/devel/ped12_dobLaem/";
+//		String inputDir = scDir + "/input/";
 
 		Config c = ConfigUtils.createConfig();
 		c.scenario().setUseSignalSystems(true);
@@ -148,16 +153,47 @@ public class PED12ScenarioGen {
 		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
 		s2d.setFloorShapeFile(inputDir +"/environment.shp");
 
-		//Helbing
-		s2d.setEnableCircularAgentInterActionModule("true");
-		s2d.setEnableEnvironmentForceModule("true");
-		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
-		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
-		s2d.setEnablePathForceModule("true");
-		s2d.setEnableDrivingForceModule("true");
-		s2d.setEnableVelocityObstacleModule("false");
-		s2d.setEnablePhysicalEnvironmentForceModule("false");
+		if (model == SC.Helbing) {
+			s2d.setEnableCircularAgentInterActionModule("true");
+			s2d.setEnableEnvironmentForceModule("true");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("true");
+			s2d.setEnableDrivingForceModule("true");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");
+		} else if (model == SC.Zanlungo) {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("true");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("true");
+			s2d.setEnablePathForceModule("true");
+			s2d.setEnableDrivingForceModule("true");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		} else if (model == SC.vanDenBerg) {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("false");
+			s2d.setEnableDrivingForceModule("false");
+			s2d.setEnableVelocityObstacleModule("true");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		}
 		s2d.setEnableMentalLinkSwitch("true");
+
+		
+//		//Helbing
+//		s2d.setEnableCircularAgentInterActionModule("true");
+//		s2d.setEnableEnvironmentForceModule("true");
+//		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+//		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+//		s2d.setEnablePathForceModule("true");
+//		s2d.setEnableDrivingForceModule("true");
+//		s2d.setEnableVelocityObstacleModule("false");
+//		s2d.setEnablePhysicalEnvironmentForceModule("false");
+//		s2d.setEnableMentalLinkSwitch("true");
 
 		//		s2d.setTimeStepSize(""+0.1);
 		QSimConfigGroup qsim = new QSimConfigGroup();
@@ -1218,7 +1254,7 @@ public class PED12ScenarioGen {
 	}
 
 	/*package*/ static String EPSG = "EPSG: 32632";	
-	private static void dumpNetworkAsShapeFile(Scenario sc, String inputDir) {
+	/*package*/ static void dumpNetworkAsShapeFile(Scenario sc, String inputDir) {
 		final Network network = sc.getNetwork();
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, EPSG);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
