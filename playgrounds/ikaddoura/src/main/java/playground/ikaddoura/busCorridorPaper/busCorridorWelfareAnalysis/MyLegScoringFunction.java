@@ -33,9 +33,9 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.core.utils.misc.Time;
 
 public class MyLegScoringFunction implements LegScoring, BasicScoring {
-	private final static Logger log = Logger.getLogger(MyLegScoringFunction.class);
 
 	protected double score;
 	private double lastTime;
@@ -120,9 +120,8 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 			waitingTime = this.personId2WaitingTime.get(personId);
 			this.score += (this.TRAVEL_PT_IN_VEHICLE / 3600) * inVehTime;
 			this.score += (this.TRAVEL_PT_WAITING / 3600) * waitingTime;
-			
-//			log.warn("inVehTime: " + Time.writeTime(inVehTime, Time.TIMEFORMAT_HHMMSS));
-//			log.warn("waitingTime: " + Time.writeTime(waitingTime, Time.TIMEFORMAT_HHMMSS));
+//			System.out.println("inVehTime: " + inVehTime + " --> " + Time.writeTime(inVehTime, Time.TIMEFORMAT_HHMMSS));
+//			System.out.println("waitingTime: " + waitingTime + " --> " + Time.writeTime(waitingTime, Time.TIMEFORMAT_HHMMSS));
 		}
 		
 		return this.score;
@@ -160,12 +159,12 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 			}
 			
 			if (!this.ptLegHandler.getPersonId2IsEgress().get(personId)){
-				System.out.println("AccessTime: " + travelTime);
-				System.out.println("(personId: " + personId);
+//				System.out.println("AccessTime: " + travelTime);
+//				System.out.println("(personId: " + personId);
 				tmpScore += travelTime * this.TRAVEL_PT_ACCESS / 3600.0;
 			} else {
-				System.out.println("EgressTime: " + travelTime);
-				System.out.println("(personId: " + personId);
+//				System.out.println("EgressTime: " + travelTime);
+//				System.out.println("(personId: " + personId);
 				tmpScore += travelTime * this.TRAVEL_PT_EGRESS / 3600.0;
 				this.ptLegHandler.getPersonId2IsEgress().put(personId, false);	
 			}

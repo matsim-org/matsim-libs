@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -39,7 +40,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 public class DepartureArrivalEventHandler implements AgentDepartureEventHandler, AgentArrivalEventHandler{
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
-	private int numberOfWalkLegs; // Walk, not Transit Walk!
+	private int numberOfWalkLegs; // TransitWalk
 	
 	private Map<Id, Double> personID2firstDepartureTime = new HashMap<Id, Double>();
 	private Map<Id, Double> personID2lastArrivalTime = new HashMap<Id, Double>();
@@ -73,7 +74,7 @@ public class DepartureArrivalEventHandler implements AgentDepartureEventHandler,
 			}
 		}
 		
-		if(event.getLegMode().toString().equals("walk")){
+		if(event.getLegMode().toString().equals(TransportMode.transit_walk)){
 			this.numberOfWalkLegs++;
 		}
 	}

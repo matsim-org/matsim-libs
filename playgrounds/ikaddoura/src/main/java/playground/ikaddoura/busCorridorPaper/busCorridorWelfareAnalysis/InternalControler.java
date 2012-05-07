@@ -28,6 +28,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -48,19 +49,19 @@ public class InternalControler {
 	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
 	private final double PERFORMING = 0.96;
 
-	private final double CONSTANT_CAR = 0.0;
+	private final double CONSTANT_CAR = -1.0;
 	private final double TRAVEL_CAR = 0.0;
-	private final double MONETARY_DISTANCE_COST_RATE_CAR = -0.00011;
+	private final double MONETARY_DISTANCE_COST_RATE_CAR = -0.00040;
 
 	private final double CONSTANT_WALK = 0.0;
-	private final double TRAVEL_WALK = 0.0; // not needed because of differentiation in access and egress time
-
-	private final double CONSTANT_PT = -2.08;
+	private final double TRAVEL_WALK = -20.0; // only needed for the ptRouter to avoid transit walks over longer distances, not used for scoring because of the following differentiation in access and egress time
+	private final double TRAVEL_PT_ACCESS = -0.0;
+	private final double TRAVEL_PT_EGRESS = -2.34;
+	
+	private final double CONSTANT_PT = 0.0;	//-2.08
 	private final double TRAVEL_PT = 0.0; // not needed because of the following differentiation:
 	private final double TRAVEL_PT_IN_VEHICLE = -0.18;
 	private final double TRAVEL_PT_WAITING = -0.096;
-	private final double TRAVEL_PT_ACCESS = 0.0;
-	private final double TRAVEL_PT_EGRESS = -2.34;
 	private final double MONETARY_DISTANCE_COST_RATE_PT = 0.0;
 
 	private final double LATE_ARRIVAL = 0.0;
@@ -80,7 +81,7 @@ public class InternalControler {
 	
 		new TransitScheduleReaderV1(scenario).readFile(this.directoryExtIt + "/scheduleFile.xml");
 		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(this.directoryExtIt + "/vehiclesFile.xml");
-		
+
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
@@ -125,6 +126,11 @@ public class InternalControler {
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE, TRAVEL_PT_ACCESS, TRAVEL_PT_EGRESS);
 		controler.setScoringFunctionFactory(scoringfactory);
 
+		// the schedule and vehicles to appear in the outputConfig
+		TransitConfigGroup transit = controler.getConfig().transit();
+		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
+		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
+		
 		controler.run();		
 	}
 
