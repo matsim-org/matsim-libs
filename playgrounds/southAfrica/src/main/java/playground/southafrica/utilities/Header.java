@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 public class Header {
 	private final static Logger LOG = Logger.getLogger(Header.class);
 	
-	public static void print(String classString, String[] args){
+	public static void printHeader(String classString, String[] args){
 		LOG.info("======================================================================");
 		LOG.info(classString);
 		LOG.info("----------------------------------------------------------------------");
@@ -34,5 +34,12 @@ public class Header {
 		}
 		LOG.info("----------------------------------------------------------------------");
 	}
+
+	public static void printFooter(){
+		LOG.info("----------------------------------------------------------------------");
+		LOG.info("                               Done");
+		LOG.info("======================================================================");
+	}
+
 }
 

@@ -46,7 +46,7 @@ class GautengControler {
 	static Logger log = Logger.getLogger(GautengControler.class) ;
 	
 	public static void main ( String[] args ) {
-		Header.print(GautengControler.class.toString(), args);
+		Header.printHeader(GautengControler.class.toString(), args);
 		if(args.length != 4){
 			throw new RuntimeException("Must provide four arguments: config file path; " +
 					"input plans file; base value of time (for cars) and multiplier for commercial vehicles.") ;

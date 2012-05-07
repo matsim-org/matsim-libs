@@ -79,16 +79,15 @@ public abstract class SanralTollFactor {
 		}
 
 	}
+    
 	
 	/* From the counting station data I've inferred that the split between 
 	 * Class B and C is about 50:50, assuming that `Short' represents Class B, 
 	 * and `Medium' and `Long' combined represent Class C vehicles. */
 	private final static double fractionClassB = 0.50;
 	
-	public static double getTollFactor(final Person person, final Id linkId, final double time) {
-		Id vehicleId = person.getId() ;
-		// yyyyyy aaarrrrgh ... (assuming vehId = personId).  kai, mar'12
-		
+	
+	public static double getTollFactor(final Id vehicleId, final Id linkId, final double time){		
 		double timeDiscount = getTimeDiscount(time);
 		double tagDiscount = 0.00;
 		double ptDiscount = 0.00;
@@ -139,7 +138,15 @@ public abstract class SanralTollFactor {
 			break ;
 		}
 		return getDiscountEligibility(linkId) ? sizeFactor*(1 - Math.min(1.0, timeDiscount + tagDiscount + ptDiscount)) : sizeFactor;
+		
 	}
+	
+	public static double getTollFactor(final Person person, final Id linkId, final double time) {
+		// yyyyyy aaarrrrgh ... (assuming vehId = personId).  kai, mar'12
+		Id vehicleId = person.getId() ;
+		return getTollFactor(vehicleId, linkId, time);
+	}
+	
 	
 	private static double getTimeDiscount(double time){
 		/* First get the real time of day. */
