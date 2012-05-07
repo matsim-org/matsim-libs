@@ -19,7 +19,7 @@ public class MyBiLinearInterpolator {
 	 * @param values the known values on the grid
 	 * @return grid with higher resolution
 	 */
-	public static double[][] myBiLinearGridInterpolation(double[][] values){
+	static double[][] myBiLinearGridInterpolation(double[][] values){
 		double[][] interp_values= new double[Interpolate.coordLength(1, values.length)][Interpolate.coordLength(1, values[0].length)];
 		
 		// calculate new values for higher resolution
@@ -51,7 +51,7 @@ public class MyBiLinearInterpolator {
 	 * @param sg the SpatialGrid to interpolate
 	 * @return SpatialGrid with higher resolution
 	 */
-	public static SpatialGrid myBiLinearGridInterpolation(SpatialGrid sg){
+	static SpatialGrid myBiLinearGridInterpolation(SpatialGrid sg){
 		// generate new coordinates for higher resolution
 		double[] x_new = InterpolateSpatialGrid.coord(sg.getXmin(), sg.getXmax(), sg.getResolution() / 2);
 		double[] y_new = InterpolateSpatialGrid.coord(sg.getYmin(), sg.getYmax(), sg.getResolution() / 2);
@@ -85,11 +85,14 @@ public class MyBiLinearInterpolator {
 	 * interpolates value on a arbitrary point with bilinear interpolation
 	 * requires values on a grid as double[][]
 	 * 
+	 * please use ...
+	 * 
 	 * @param values the known values on the grid
 	 * @param xCoord the x-coordinate of the point to interpolate
 	 * @param yCoord the y-coordinate of the point to interpolate
 	 * @return interpolated value on the point (xCoord, yCoord)
 	 */
+	@Deprecated
 	public static double myBiLinearValueInterpolation(double[][] values, double xCoord, double yCoord){
 		int x1= (int)xCoord;
 		int x2= x1+1;
