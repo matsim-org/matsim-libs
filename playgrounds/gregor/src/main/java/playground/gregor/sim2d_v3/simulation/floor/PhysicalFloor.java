@@ -115,17 +115,17 @@ public class PhysicalFloor implements Floor {
 		calculateEnvelope();
 		
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
-			this.forceUpdater.addDynamiccForceModule(new VelocityObstacleForceII(this, this.scenario));
-			this.forceUpdater.addDynamiccForceModule(new PhysicalAgentInteractionForce(this, this.scenario));
+			this.forceUpdater.addDynamicForceModule(new VelocityObstacleForceII(this, this.scenario));
+			this.forceUpdater.addDynamicForceModule(new PhysicalAgentInteractionForce(this, this.scenario));
 //			this.forceUpdater.addForceModule(new PhysicalEnvironmentForce(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){
-			this.forceUpdater.addDynamiccForceModule(new CircularAgentInteractionModule(this, this.scenario));
+			this.forceUpdater.addDynamicForceModule(new CircularAgentInteractionModule(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCollisionPredictionAgentInteractionModule()){
-			this.forceUpdater.addDynamiccForceModule(new CollisionPredictionAgentInteractionModule(this, this.scenario));
+			this.forceUpdater.addDynamicForceModule(new CollisionPredictionAgentInteractionModule(this, this.scenario));
 		}
 
 		if (this.scenario.getConfig().scenario().isUseSignalSystems()) {

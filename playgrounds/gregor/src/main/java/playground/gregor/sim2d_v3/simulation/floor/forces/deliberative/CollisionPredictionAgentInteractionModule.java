@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CollisionPredictionAgentInteractionModule.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sim2d_v3.simulation.floor.forces.deliberative;
 
 import java.util.Collection;
@@ -17,12 +37,9 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
-public class CollisionPredictionAgentInteractionModule implements
-DynamicForceModule {
-
+public class CollisionPredictionAgentInteractionModule implements DynamicForceModule {
 
 	private final PhysicalFloor floor;
-
 
 	private final double quadUpdateInterval = 0.1;
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
@@ -35,9 +52,6 @@ DynamicForceModule {
 	public double Ai=1.13*PhysicalAgentRepresentation.AGENT_WEIGHT;
 	public double lambda=.29;
 
-
-
-
 	protected  Quadtree agentsQuad;
 
 	//Laemmel constant
@@ -49,14 +63,12 @@ DynamicForceModule {
 		this.Bi = conf.getBi();
 		this.Ai = conf.getAi();
 		this.lambda = conf.getLambda();
-
 	}
 
 	@Override
 	public void run(Agent2D agent,double time) {
 		double fx = 0;
 		double fy = 0;
-
 
 		double minX = agent.getPosition().x - neighborhoodSensingRange;
 		double maxX = agent.getPosition().x + neighborhoodSensingRange;
@@ -74,13 +86,10 @@ DynamicForceModule {
 		double v_i = Math.sqrt(agent.getVx()*agent.getVx() + agent.getVy()*agent.getVy());
 		double decel = v_i / t_i;
 
-
-
 		for (Agent2D other : l) {
 			if (other == agent) {
 				continue;
 			}
-
 
 			double dist = other.getPosition().distance(agent.getPosition());
 			if (dist > neighborhoodSensingRange || dist < 0.1) {
@@ -98,12 +107,10 @@ DynamicForceModule {
 
 			fx += anostropyWeight * term1 * v.x/projectedDist;
 			fy += anostropyWeight * term1 * v.y/projectedDist;
-
 		}
 
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);
-
 	}
 
 	private double getPhi(Agent2D agent, Agent2D other) {
@@ -123,7 +130,6 @@ DynamicForceModule {
 
 		}
 
-
 		return phi;
 	}
 
@@ -141,15 +147,12 @@ DynamicForceModule {
 		v.x = dPrimeX_ij;
 		v.y = dPrimeY_ij;
 
-
 		return v;
 	}
 
 	private double getTi(Collection<Agent2D> l, Agent2D agent) {
 
 		double t_i = Double.POSITIVE_INFINITY;
-
-
 
 		for (Agent2D other : l) {
 			if (other == agent) {
@@ -182,13 +185,11 @@ DynamicForceModule {
 		}
 		ti /= relV;
 		return ti;
-
 	}
 
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -199,13 +200,11 @@ DynamicForceModule {
 
 			this.lastQuadUpdate = time;
 		}
-
 	}
 
 	@Override
 	public void forceUpdate() {
 		// TODO Auto-generated method stub
-
 	}
 
 	protected void updateAgentQuadtree() {
@@ -219,8 +218,6 @@ DynamicForceModule {
 
 	private static final class Vector {
 		double x;
-
 		double y;
 	}
-
 }

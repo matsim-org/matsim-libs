@@ -27,7 +27,7 @@ public interface ForceUpdater {
 	
 	public boolean addForceModule(ForceModule forceModule);
 	
-	public boolean addDynamiccForceModule(DynamicForceModule dynamicForceModule);
+	public boolean addDynamicForceModule(DynamicForceModule dynamicForceModule);
 	
 	public void init();
 	

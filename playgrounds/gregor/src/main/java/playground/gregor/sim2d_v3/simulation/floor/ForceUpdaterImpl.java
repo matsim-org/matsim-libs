@@ -59,7 +59,7 @@ public class ForceUpdaterImpl implements ForceUpdater {
 	}
 
 	@Override
-	public boolean addDynamiccForceModule(DynamicForceModule dynamicForceModule) {
+	public boolean addDynamicForceModule(DynamicForceModule dynamicForceModule) {
 		return this.dynamicForceModules.add(dynamicForceModule);
 	}
 
@@ -103,7 +103,7 @@ public class ForceUpdaterImpl implements ForceUpdater {
 	
 	@Override
 	public void updateForces(double time) {
-		updateDynamicForces();
+		updateDynamicForces(time);
 
 		if (this.numOfThreads > 1) {
 			updateForcesMultiThreaded(time);
@@ -126,8 +126,7 @@ public class ForceUpdaterImpl implements ForceUpdater {
 	}
 
 	@Override
-	public void updateDynamicForces(double time) {
-		
+	public void updateDynamicForces(double time) { 
 		for (DynamicForceModule m : this.dynamicForceModules) {
 			m.update(time);
 		}
