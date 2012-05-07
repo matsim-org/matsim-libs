@@ -64,7 +64,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 	private final String shopsOf2005Filename = "input/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 	//private TreeMap<Id, shopsOf2005> shops = new TreeMap<Id, shopsOf2005>();
-	private QuadTree<ActivityOptionImpl> shoppingQuadTree;
+	private QuadTree<ActivityFacilitiesImpl> shoppingQuadTree;
 
 
 	public AddOpentimes(final ScenarioImpl scenario) {
@@ -83,7 +83,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		log.info("Reading shops Of 2005 xml file...done.");
 	}
 	
-	private QuadTree<ActivityOptionImpl> buildShopsQuadTree(ActivityFacilitiesImpl shopsOf2005) {
+	private QuadTree<ActivityFacilitiesImpl> buildShopsQuadTree(ActivityFacilitiesImpl shopsOf2005) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -102,9 +102,9 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		maxy += 1.0;
 		log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 
-		QuadTree<ActivityOptionImpl> quadtree = new QuadTree<ActivityOptionImpl>(minx, miny, maxx, maxy);
+		QuadTree<ActivityFacilitiesImpl> quadtree = new QuadTree<ActivityFacilitiesImpl>(minx, miny, maxx, maxy);
 		for (final ActivityFacility f : shoppingFacilities.values()) {
-			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityOptionImpl) f);
+			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilitiesImpl) f);
 		}
 		return quadtree;
 	}
@@ -136,8 +136,8 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		if (activities.containsKey(FacilitiesProduction.ACT_TYPE_SHOP_RETAIL)) {
 			Double x = facility.getCoord().getX();
 			Double y = facility.getCoord().getY();
-			ActivityOptionImpl closestShop = this.shoppingQuadTree.get(x,y);
-			closestShopOpentimes = closestShop.getOpeningTimes();	
+			ActivityFacilitiesImpl closestShop = this.shoppingQuadTree.get(x,y);
+		//	closestShopOpentimes = closestShop.getOpeningTimes();	
 		}
 		
 		//List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
