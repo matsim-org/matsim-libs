@@ -362,7 +362,6 @@ public class PED12ScenarioGen {
 		sc.getPopulation().addPerson(pers);
 	}
 
-	
 	private static void createCarPerson(double time, Scenario sc,
 			Dijkstra dijkstra, Link parkingLot) {
 
