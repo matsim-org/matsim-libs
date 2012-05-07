@@ -8,4 +8,11 @@
   <groupId>playground</groupId>
   <artifactId>staheale</artifactId>
   <name>staheale</name>
+  <dependencies>
+  	<dependency>
+  		<groupId>commons-io</groupId>
+  		<artifactId>commons-io</artifactId>
+  		<version>1.2</version>
+  	</dependency>
+  </dependencies>
 </project>

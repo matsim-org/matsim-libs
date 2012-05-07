@@ -44,7 +44,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 //import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI.KTIYear;
 //import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensus;
 //import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensusParser;
-import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
+//import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
 import input.FacilitiesProduction;
 import input.FacilitiesProduction.KTIYear;
 
@@ -54,7 +54,7 @@ import input.AgentInteractionEnterpriseCensus.ProductionSector;
 import input.AgentInteractionEnterpriseCensusParser;
 
 
-public class FacilitiesCreation extends FacilitiesAllActivitiesFTE {
+public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 
 	private TreeMap<String, String> facilityActivities = new TreeMap<String, String>();
 
@@ -67,7 +67,7 @@ public class FacilitiesCreation extends FacilitiesAllActivitiesFTE {
 	private AgentInteractionEnterpriseCensus myCensus;
 	
 	public FacilitiesCreation(KTIYear ktiYear) {
-		super(null);
+		//super(null);
 		this.ktiYear = ktiYear;
 	
 	}

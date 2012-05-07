@@ -64,7 +64,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 	private final String shopsOf2005Filename = "input/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 	//private TreeMap<Id, shopsOf2005> shops = new TreeMap<Id, shopsOf2005>();
-	private QuadTree<ActivityFacilitiesImpl> shoppingQuadTree;
+	private QuadTree<ActivityFacility> shoppingQuadTree;
 
 
 	public AddOpentimes(final ScenarioImpl scenario) {
@@ -83,7 +83,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		log.info("Reading shops Of 2005 xml file...done.");
 	}
 	
-	private QuadTree<ActivityFacilitiesImpl> buildShopsQuadTree(ActivityFacilitiesImpl shopsOf2005) {
+	private QuadTree<ActivityFacility> buildShopsQuadTree(ActivityFacilitiesImpl shopsOf2005) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -102,9 +102,9 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		maxy += 1.0;
 		log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 
-		QuadTree<ActivityFacilitiesImpl> quadtree = new QuadTree<ActivityFacilitiesImpl>(minx, miny, maxx, maxy);
+		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 		for (final ActivityFacility f : shoppingFacilities.values()) {
-			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilitiesImpl) f);
+			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
 		}
 		return quadtree;
 	}
@@ -136,7 +136,9 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		if (activities.containsKey(FacilitiesProduction.ACT_TYPE_SHOP_RETAIL)) {
 			Double x = facility.getCoord().getX();
 			Double y = facility.getCoord().getY();
-			ActivityFacilitiesImpl closestShop = this.shoppingQuadTree.get(x,y);
+			ActivityFacility closestShop = this.shoppingQuadTree.get(x,y);
+			// TODO: days!
+			closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon);
 		//	closestShopOpentimes = closestShop.getOpeningTimes();	
 		}
 		
