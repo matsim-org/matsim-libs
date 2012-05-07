@@ -37,6 +37,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
 
 import playground.gregor.sim2d_v3.events.XYDataWriter;
 import playground.gregor.sim2d_v3.router.Walk2DLegRouter;
@@ -63,7 +64,13 @@ public class Controller2D extends Controler implements StartupListener {
 		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 		this.addMobsimFactory("hybridQ2D",factory);
 		if (this.config.scenario().isUseSignalSystems()) {
-			this.setSignalsControllerListenerFactory(new Sim2DSignalsControllerListenerFactory(factory));
+//			this.setSignalsControllerListenerFactory(new Sim2DSignalsControllerListenerFactory(factory));
+//			this.setSignalsControllerListenerFactory(new DefaultSignalsControllerListenerFactory());
+			
+			HybridSignalsControllerListenerFactory signalsFactory = new HybridSignalsControllerListenerFactory();
+			signalsFactory.addSignalsControllerListenerFactory(new Sim2DSignalsControllerListenerFactory(factory));
+			signalsFactory.addSignalsControllerListenerFactory(new DefaultSignalsControllerListenerFactory());
+			this.setSignalsControllerListenerFactory(signalsFactory);
 		}
 		
 		this.addCoreControlerListener(this);
