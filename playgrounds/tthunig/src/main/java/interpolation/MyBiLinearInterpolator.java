@@ -14,11 +14,14 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 public class MyBiLinearInterpolator {
 
 	/**
-	 * interpolates values on a grid given as double[][] with bilinear interpolation to a higher resolution
+	 * interpolates the values on a grid given as double[][] with bilinear interpolation to a higher resolution
+	 * 
+	 * please use myBiLinearGridInterpolation(SpatialGrid sg)
 	 * 
 	 * @param values the known values on the grid
 	 * @return grid with higher resolution
 	 */
+	@Deprecated
 	static double[][] myBiLinearGridInterpolation(double[][] values){
 		double[][] interp_values= new double[Interpolate.coordLength(1, values.length)][Interpolate.coordLength(1, values[0].length)];
 		
@@ -46,7 +49,7 @@ public class MyBiLinearInterpolator {
 	}
 	
 	/**
-	 * interpolates values on a grid given as SpatialGrid with bilinear interpolation to a higher resolution
+	 * interpolates the values on a grid given as SpatialGrid with bilinear interpolation to a higher resolution
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @return SpatialGrid with higher resolution
@@ -82,10 +85,10 @@ public class MyBiLinearInterpolator {
 	}
 	
 	/**
-	 * interpolates value on a arbitrary point with bilinear interpolation
+	 * interpolates the value on a arbitrary point with bilinear interpolation
 	 * requires values on a grid as double[][]
 	 * 
-	 * please use ...
+	 * please use myBiLinearValueInterpolation(SpatialGrid sg, double xCoord, double yCoord)
 	 * 
 	 * @param values the known values on the grid
 	 * @param xCoord the x-coordinate of the point to interpolate
@@ -116,7 +119,7 @@ public class MyBiLinearInterpolator {
 	}
 	
 	/**
-	 * interpolates value on a arbitrary point with bilinear interpolation
+	 * interpolates the value on a arbitrary point with bilinear interpolation
 	 * requires values on a grid as SpatialGrid
 	 * 
 	 * @param sg the values on the grid as SpatialGrid

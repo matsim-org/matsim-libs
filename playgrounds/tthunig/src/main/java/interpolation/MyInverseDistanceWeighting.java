@@ -23,7 +23,7 @@ public class MyInverseDistanceWeighting {
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
 	public static double myAllValuesIDW(SpatialGrid sg, double xCoord, double yCoord){
-		return myAllValuesIDWFactor(sg, xCoord, yCoord, 1);
+		return myAllValuesIDW(sg, xCoord, yCoord, 1);
 	}
 	
 	/**
@@ -37,19 +37,20 @@ public class MyInverseDistanceWeighting {
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
 	public static double myAllValuesIDWSquare(SpatialGrid sg, double xCoord, double yCoord){
-		return myAllValuesIDWFactor(sg, xCoord, yCoord, 2);
+		return myAllValuesIDW(sg, xCoord, yCoord, 2);
 	}
 	
 	/**
 	 * interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with variable power of weights
-	 * z(u_0)= Sum((1/d_i^factor)*z(u_i)) / Sum (1/d_i^factor)
+	 * z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp)
 	 * 
 	 * @param sg the SpatialGrid with the known values
 	 * @param xCoord
 	 * @param yCoord
+	 * @param exp the exponent for the weights
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
-	public static double myAllValuesIDWFactor(SpatialGrid sg, double xCoord, double yCoord, double factor) { //TODO factor
+	public static double myAllValuesIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
 		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
 		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
 		if (xDif==0){
@@ -59,13 +60,13 @@ public class MyInverseDistanceWeighting {
 			}
 		}
 		
-		//z(u_0)= Sum((1/d_i^factor)*z(u_i)) / Sum (1/d_i^factor)
+		//z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp)
 		double[][] weights= new double[sg.getMatrix().length][sg.getMatrix()[0].length];
 		double value=0;
 		double weightsum=0;
 		for (int i=0; i<weights.length; i++){
 			for (int j=0; j<weights[0].length; j++){
-				weights[i][j]= Math.pow(distance(sg.getXmin()+j*sg.getResolution(), sg.getYmin()+i*sg.getResolution(), xCoord, yCoord), factor);
+				weights[i][j]= Math.pow(distance(sg.getXmin()+j*sg.getResolution(), sg.getYmin()+i*sg.getResolution(), xCoord, yCoord), exp);
 				value+= sg.getMatrix()[i][j]/weights[i][j];
 				weightsum+= 1/weights[i][j];
 			}
@@ -84,7 +85,7 @@ public class MyInverseDistanceWeighting {
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
 	public static double my4NeighborsIDW(SpatialGrid sg, double xCoord, double yCoord){
-		return my4NeighborsIDWFactor(sg, xCoord, yCoord, 1);
+		return my4NeighborsIDW(sg, xCoord, yCoord, 1);
 	}
 	
 	/**
@@ -98,7 +99,7 @@ public class MyInverseDistanceWeighting {
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
 	public static double my4NeighborsIDWSquare(SpatialGrid sg, double xCoord, double yCoord){
-		return my4NeighborsIDWFactor(sg, xCoord, yCoord, 2);
+		return my4NeighborsIDW(sg, xCoord, yCoord, 2);
 	}
 	
 	/**
@@ -108,9 +109,10 @@ public class MyInverseDistanceWeighting {
 	 * @param sg the SpatialGrid with the known values
 	 * @param xCoord
 	 * @param yCoord
+	 * @param exp the exponent for the weights
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
-	public static double my4NeighborsIDWFactor(SpatialGrid sg, double xCoord, double yCoord, double factor) {
+	public static double my4NeighborsIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
 		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
 		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
 		if (xDif==0){
@@ -125,12 +127,26 @@ public class MyInverseDistanceWeighting {
 		double y1= yCoord-yDif;
 		double y2= y1+sg.getResolution();
 		
-		double d11= Math.pow(distance(x1, y1, xCoord, yCoord), factor);
-		double d12= Math.pow(distance(x1, y2, xCoord, yCoord), factor);
-		double d21= Math.pow(distance(x2, y1, xCoord, yCoord), factor);
-		double d22= Math.pow(distance(x2, y2, xCoord, yCoord), factor);
+		double d11= Math.pow(distance(x1, y1, xCoord, yCoord), exp);
+		double d12= Math.pow(distance(x1, y2, xCoord, yCoord), exp);
+		double d21= Math.pow(distance(x2, y1, xCoord, yCoord), exp);
+		double d22= Math.pow(distance(x2, y2, xCoord, yCoord), exp);
 		
-		double value= (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]/d11 //TODO: abfangen, wenn Rand erreicht (s.MyBilinearInterpolation)
+		//interpolation on the boundary
+		if (xCoord == sg.getXmax()){
+			//consider only 2 neighbors (left and right)
+			return (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]/d11
+					+ sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]/d12) 
+					/ (1/d11 + 1/d12);
+		}
+		if (yCoord == sg.getYmax()){
+			//consider only 2 neighbors (up and down)
+			return (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]/d11
+					+ sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]/d21) 
+					/ 1/11 + 1/d21;
+		}
+		
+		double value= (
 				+ sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]/d12 
 				+ sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]/d21 
 				+ sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x2)]/d22) 

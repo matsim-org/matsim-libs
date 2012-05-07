@@ -54,7 +54,7 @@ public class Interpolation {
 				log.warn("BiCubic interpolation not available yet!");
 				break;
 		case 2: log.warn("IDW interpolation not tested yet!");
-				return MyInverseDistanceWeighting.my4NeighborsIDWFactor(sg, x, y, exp);		
+				return MyInverseDistanceWeighting.my4NeighborsIDW(sg, x, y, exp);		
 		}
 		return Double.NaN;
 	}

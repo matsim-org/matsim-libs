@@ -4,6 +4,7 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.analysis.BivariateRealFunction;
 import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolator;
 import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpolator;
+import org.matsim.matrices.Matrix;
 
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
@@ -41,15 +42,17 @@ public class InterpolateSpatialGrid {
 		double[] x_new = coord(sg.getXmin(), sg.getXmax(), sg.getResolution() / 2);
 		double[] y_new = coord(sg.getYmin(), sg.getYmax(), sg.getResolution() / 2);
 		
-//		SpatialGrid sg_bicubic= bicubicSplineInterpolation(sg, x, y, x_new, y_new);
+		SpatialGrid sg_bicubic= bicubicSplineInterpolation(sg, x, y, x_new, y_new);
+		sg_bicubic.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_bicubic_transp.txt");
+		
 //		SpatialGrid sg_bilinear= myBiLinearSplineInterpolation(sg, x, y, x_new, y_new);
-//		SpatialGrid sg_allValuesIDW= myAllValuesIDW(sg, x, y, x_new, y_new);
-		SpatialGrid sg_4NeighborsIDW= my4NeighborsIDW(sg, x, y, x_new, y_new);
-
-//		sg_bicubic.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_bicubic.txt");
 //		sg_bilinear.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_bilinear.txt");
-//		sg_allValuesIDW.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_allValuesIDW.txt");
-		sg_4NeighborsIDW.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_4NeighborsIDW.txt");
+		
+//		double exp=0.3;
+//		SpatialGrid sg_allValuesIDW= myAllValuesIDW(sg, x, y, x_new, y_new, exp);
+//		sg_allValuesIDW.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_allValuesIDW_exp" + exp + ".txt");
+//		SpatialGrid sg_4NeighborsIDW= my4NeighborsIDW(sg, x, y, x_new, y_new, exp);
+//		sg_4NeighborsIDW.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_4NeighborsIDW_exp" + exp + ".txt");
 		
 		System.out.println("\ndone");
 	}
@@ -107,10 +110,12 @@ public class InterpolateSpatialGrid {
 		double[] x_default= coord(0,x.length-1,1);
 		double[] y_default= coord(0,y.length-1,1);
 		
+		double[][] grid= flip(sg.getMatrix()); //TODO: ohne das ist es gespiegelt
+		
 		System.out.println("\ninterpolate...");
 		try {
 			BivariateRealGridInterpolator interpolator = new BicubicSplineInterpolator();
-			BivariateRealFunction func= interpolator.interpolate(y_default, x_default, sg.getMatrix()); //benoetigt default Koordinaten (0,1,2,...)
+			BivariateRealFunction func= interpolator.interpolate(y_default, x_default, grid); //benoetigt default Koordinaten (0,1,2,...)
 
 			// calculate new values for higher resolution
 			for (int k = 0; k < y_new.length; k++) {
@@ -125,6 +130,22 @@ public class InterpolateSpatialGrid {
 	}
 	
 	/**
+	 * flips the given matrix horizontal
+	 * 
+	 * @param matrix
+	 * @return the horizontal mirrored matrix
+	 */
+	private static double[][] flip(double[][] matrix) {
+		double[][] flip= new double[matrix.length][matrix[0].length];
+		for (int i=0; i<flip.length; i++){
+			for (int j=0; j<flip[0].length; j++){
+				flip[i][j]= matrix[matrix.length-1-i][j];
+			}
+		}
+		return flip;
+	}
+
+	/**
 	 * interpolates the given data with inverse distance weighting (own implementation)
 	 * 
 	 * @param sg the SpatialGrid to interpolate
@@ -134,14 +155,14 @@ public class InterpolateSpatialGrid {
 	 * @param y_new the y-coordinate vector for higher resolution
 	 * @return new SpatialGrid with higher resolution
 	 */
-	private static SpatialGrid myAllValuesIDW(SpatialGrid sg, double[] x, double[] y, double[] x_new, double[] y_new) {
+	private static SpatialGrid myAllValuesIDW(SpatialGrid sg, double[] x, double[] y, double[] x_new, double[] y_new, double exp) {
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		
 		System.out.println("\ninterpolate...");
 		// calculate new values for higher resolution
 		for (int k = 0; k < y_new.length; k++) {
 			for (int l = 0; l < x_new.length; l++) {
-				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyInverseDistanceWeighting.myAllValuesIDW(sg, x_new[l], y_new[k]));
+				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyInverseDistanceWeighting.myAllValuesIDW(sg, x_new[l], y_new[k], exp));
 			}
 		}
 		return sg_new;
@@ -158,14 +179,14 @@ public class InterpolateSpatialGrid {
 	 * @param y_new the y-coordinate vector for higher resolution
 	 * @return new SpatialGrid with higher resolution
 	 */
-	private static SpatialGrid my4NeighborsIDW(SpatialGrid sg, double[] x, double[] y, double[] x_new, double[] y_new) {
+	private static SpatialGrid my4NeighborsIDW(SpatialGrid sg, double[] x, double[] y, double[] x_new, double[] y_new, double exp) {
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		
 		System.out.println("\ninterpolate...");
 		// calculate new values for higher resolution
 		for (int k = 0; k < y_new.length; k++) {
 			for (int l = 0; l < x_new.length; l++) {
-				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyInverseDistanceWeighting.my4NeighborsIDW(sg, x_new[l], y_new[k]));
+				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyInverseDistanceWeighting.my4NeighborsIDW(sg, x_new[l], y_new[k], exp));
 			}
 		}
 		return sg_new;
