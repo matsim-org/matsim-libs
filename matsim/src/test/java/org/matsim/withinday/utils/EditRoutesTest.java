@@ -353,7 +353,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createPlanAlgorithm() {
-		PersonalizableTravelTime travelTime = new FreeSpeedTravelTimeCalculatorFactory().createFreeSpeedTravelTimeCalculator();
+		PersonalizableTravelTime travelTime = new FreeSpeedTravelTimeCalculatorFactory().createTravelTime();
 		TravelDisutility travelCost = new OnlyTimeDependentTravelDisutilityCalculator(travelTime);
 		planAlgorithm = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
 				travelCost, travelTime, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());

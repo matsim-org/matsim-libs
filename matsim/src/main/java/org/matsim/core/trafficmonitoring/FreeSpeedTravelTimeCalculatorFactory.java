@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,11 +20,13 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 
-public class FreeSpeedTravelTimeCalculatorFactory implements MatsimFactory {
+public class FreeSpeedTravelTimeCalculatorFactory implements PersonalizableTravelTimeFactory {
 
-	public FreeSpeedTravelTimeCalculator createFreeSpeedTravelTimeCalculator() {
+	@Override
+	public PersonalizableTravelTime createTravelTime() {
 		return new FreeSpeedTravelTimeCalculator();
 	}
 }
