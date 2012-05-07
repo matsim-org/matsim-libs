@@ -15,6 +15,14 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
  */
 public class BiCubicInterpolator {
 
+	/**
+	 * just for testing
+	 * please use biCubicInterpolation(SpatialGrid sg, double[][] flip, double xCoord, double yCoord)
+	 * 
+	 * @param sg the SpatialGrid to interpolate
+	 * @return interpolated SpatialGrid with higher resolution
+	 */
+	@Deprecated
 	static SpatialGrid biCubicGridInterpolation(SpatialGrid sg){
 		// generate new coordinates for higher resolution
 		double[] x_new = InterpolateSpatialGrid.coord(sg.getXmin(), sg.getXmax(), sg.getResolution() / 2);
@@ -25,7 +33,7 @@ public class BiCubicInterpolator {
 				sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		for (int i=0; i<y_new.length; i++){
 			for (int j=0; j<x_new.length; j++){
-				sg_new.setValue(sg_new.getRow(y_new[i]), sg_new.getColumn(x_new[j]), biCubicInterpolation(sg, x_new[j], y_new[i]));
+				sg_new.setValue(sg_new.getRow(y_new[i]), sg_new.getColumn(x_new[j]), biCubicInterpolation(sg, flip(sg.getMatrix()), x_new[j], y_new[i]));
 			}
 		}
 		return sg_new;
@@ -40,15 +48,13 @@ public class BiCubicInterpolator {
 	 * @param yCoord the y-coordinate of the point to interpolate
 	 * @return interpolated value on the point (xCoord, yCoord)
 	 */
-	public static double biCubicInterpolation(SpatialGrid sg, double xCoord, double yCoord){
-		double[] x_default= coord(0,sg.getMatrix()[0].length-1,1);
-		double[] y_default= coord(0,sg.getMatrix().length-1,1);
-		
-		double[][] grid= flip(sg.getMatrix()); //TODO: ohne das ist es gespiegelt
+	public static double biCubicInterpolation(SpatialGrid sg, double[][] flip, double xCoord, double yCoord){
+		double[] x_default= coord(0,flip[0].length-1,1);
+		double[] y_default= coord(0,flip.length-1,1);
 		
 		try {
 			BivariateRealGridInterpolator interpolator = new BicubicSplineInterpolator();
-			BivariateRealFunction func = interpolator.interpolate(y_default, x_default, sg.getMatrix()); //benoetigt default Koordinaten (0,1,2,...)
+			BivariateRealFunction func = interpolator.interpolate(y_default, x_default, flip); //benoetigt default Koordinaten (0,1,2,...)
 			
 			return func.value(transform(yCoord, sg.getYmin(), sg.getResolution()), transform(xCoord, sg.getXmin(), sg.getResolution()));
 		} catch (MathException e) {
@@ -93,6 +99,7 @@ public class BiCubicInterpolator {
 	 * @param matrix
 	 * @return the horizontal mirrored matrix
 	 */
+	@Deprecated
 	private static double[][] flip(double[][] matrix) {
 		double[][] flip= new double[matrix.length][matrix[0].length];
 		for (int i=0; i<flip.length; i++){

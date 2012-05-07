@@ -100,11 +100,29 @@ public class SpatialGrid4Interpolation {
 		Point nearcenter2 = factory.createPoint(new Coordinate(4.,3.5));
 		Point nearcenter3 = factory.createPoint(new Coordinate(4.5,3.5));
 		Point farcenter = factory.createPoint(new Coordinate(2.3, 1.7));
-		logger.info("At coordinate x="+ nearcenter.getX() + " y="+ nearcenter.getY() + " the stored value is ="+ BiCubicInterpolator.biCubicInterpolation(sg, nearcenter.getX(), nearcenter.getY()));
-		logger.info("At coordinate x="+ nearcenter2.getX() + " y="+ nearcenter2.getY() + " the stored value is ="+ BiCubicInterpolator.biCubicInterpolation(sg, nearcenter2.getX(), nearcenter2.getY()));
-		logger.info("At coordinate x="+ nearcenter3.getX() + " y="+ nearcenter3.getY() + " the stored value is ="+ BiCubicInterpolator.biCubicInterpolation(sg, nearcenter3.getX(), nearcenter3.getY()));
-		logger.info("At coordinate x="+ farcenter.getX() + " y="+ farcenter.getY() + " the stored value is ="+ BiCubicInterpolator.biCubicInterpolation(sg, farcenter.getX(), farcenter.getY()));
+		logger.info("At coordinate x="+ nearcenter.getX() + " y="+ nearcenter.getY() + " the stored value is ="+ BiCubicInterpolator.biCubicInterpolation(sg, flip(sg.getMatrix()), nearcenter.getX(), nearcenter.getY()));
+		logger.info("At coordinate x="+ nearcenter2.getX() + " y="+ nearcenter2.getY() + " the stored value is ="+ BiCubicInterpolator.biCubicInterpolation(sg, flip(sg.getMatrix()), nearcenter2.getX(), nearcenter2.getY()));
+		logger.info("At coordinate x="+ nearcenter3.getX() + " y="+ nearcenter3.getY() + " the stored value is ="+ BiCubicInterpolator.biCubicInterpolation(sg, flip(sg.getMatrix()), nearcenter3.getX(), nearcenter3.getY()));
+		logger.info("At coordinate x="+ farcenter.getX() + " y="+ farcenter.getY() + " the stored value is ="+ BiCubicInterpolator.biCubicInterpolation(sg, flip(sg.getMatrix()), farcenter.getX(), farcenter.getY()));
 		
 		logger.info("...done");
+	}
+	
+	/**
+	 * just for testing 
+	 * flips the given matrix horizontal
+	 * 
+	 * @param matrix
+	 * @return the horizontal mirrored matrix
+	 */
+	@Deprecated
+	private static double[][] flip(double[][] matrix) {
+		double[][] flip= new double[matrix.length][matrix[0].length];
+		for (int i=0; i<flip.length; i++){
+			for (int j=0; j<flip[0].length; j++){
+				flip[i][j]= matrix[matrix.length-1-i][j];
+			}
+		}
+		return flip;
 	}
 }
