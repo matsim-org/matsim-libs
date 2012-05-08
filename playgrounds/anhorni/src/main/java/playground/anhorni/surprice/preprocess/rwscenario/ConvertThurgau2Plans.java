@@ -48,12 +48,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class ConvertThurgau2Plans {
 
-	private static final String HOME = "h";
-	private static final String WORK = "w";
-	private static final String LEIS = "l";
-	private static final String SHOP = "s";	
-	private static final String EDUC = "e";
-	private static final String OTHR = "o";
+	private static final String HOME = "home";
+	private static final String WORK = "work";
+	private static final String LEIS = "leisure";
+	private static final String SHOP = "shop";	
+	private static final String EDUC = "education";
+	private static final String OTHER = "other";
 	private static final String MALE = "m";
 	private static final String FEMALE = "f";
 	
@@ -130,15 +130,15 @@ public class ConvertThurgau2Plans {
 		// destination activity type -------------------------------------------------
 		int purpose = Integer.parseInt(entrs[24].trim());
 		String acttype = null;
-		if 		(purpose == 1) { acttype = OTHR; }	// Pick up/Drop off
-		else if (purpose == 2) { acttype = OTHR; }	// Private business
+		if 		(purpose == 1) { acttype = OTHER; }	// Pick up/Drop off
+		else if (purpose == 2) { acttype = OTHER; }	// Private business
 		else if (purpose == 3) { acttype = WORK; }	// Work related
 		else if (purpose == 4) { acttype = EDUC; }	// School
 		else if (purpose == 5) { acttype = WORK; }	// Work
 		else if (purpose == 6) { acttype = SHOP; }	// Shopping daily
 		else if (purpose == 7) { acttype = SHOP; }	// Shopping long-term
 		else if (purpose == 8) { acttype = LEIS; }	// Leisure
-		else if (purpose == 9) { acttype = OTHR; }	// Other
+		else if (purpose == 9) { acttype = OTHER; }	// Other
 		else if (purpose == 10) { acttype = HOME; }	// Home
 		else { Gbl.errorMsg("pid=" + pid + ": purpose=" + purpose + " not known!"); }
 		
@@ -336,9 +336,10 @@ public class ConvertThurgau2Plans {
 
 		log.info("      remove non home based day plans...");
 		this.removeNonHomeBasedPlans(population);
-		
-		log.info("      remove plans with act type '"+ OTHR +"'...");
-		this.removePlansWithTypeOther(population);
+
+		// keep them
+		//log.info("      remove plans with act type '"+ OTHR +"'...");
+		//this.removePlansWithTypeOther(population);
 
 		log.info("      remove plans with mode undefined ...");
 		this.removePlansModeTypeUndef(population);
@@ -394,7 +395,7 @@ public class ConvertThurgau2Plans {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
 						Activity act = (Activity) pe;
-						if (act.getType().startsWith(OTHR)) {
+						if (act.getType().startsWith(OTHER)) {
 							removePlans.add(plan);
 							removeCnt++;
 						}
