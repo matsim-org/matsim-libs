@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
+import javax.swing.JFileChooser;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -70,11 +72,14 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 		addLayer(new Layer(networkPainter));
 		ArrowsPainter arrowsPainter = new ArrowsPainter();
 		for(Entry<Tuple<Id, Id>, Tuple<Boolean, Double>> data:ids.entrySet()) {
-			arrowsPainter.addLine(stopsBase.get(data.getKey().getFirst().toString()),mPAreas.get(data.getKey().getSecond()).getCoord());
-			if(data.getValue().getFirst())
-				arrowsPainter.addColor(new Color(data.getValue().getSecond().floatValue()*0.5f+0.5f,0,0));
-			else
-				arrowsPainter.addColor(new Color(data.getValue().getSecond().floatValue()*0.5f+0.5f,data.getValue().getSecond().floatValue()*0.25f+0.5f,0));
+			if(data.getValue().getSecond()>0.01) {
+				arrowsPainter.addLine(stopsBase.get(data.getKey().getFirst().toString()),mPAreas.get(data.getKey().getSecond()).getCoord());
+				float scale = 50;
+				if(data.getValue().getFirst())
+					arrowsPainter.addColor(new Color(-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,0,0));
+				else
+					arrowsPainter.addColor(new Color(-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,0));
+			}
 		}
 		addLayer(new Layer(arrowsPainter));
 		this.setBackground(backgroundColor);
@@ -157,8 +162,11 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 		case 'v':
 			viewAll();
 			break;
-		case 's':
-			saveImage("png", new File("./data/prueba.png"));
+		case 'i':
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.showSaveDialog(this);
+			File file = jFileChooser.getSelectedFile();
+			saveImage(file.getName().split("\\.")[file.getName().split("\\.").length-1], file);
 			break;
 		}
 		repaint();

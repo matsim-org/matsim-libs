@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -179,7 +180,7 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 		coordsPanel.add(lblCoords[1]);
 		infoPanel.add(coordsPanel, BorderLayout.EAST);
 		this.add(infoPanel, BorderLayout.SOUTH);
-		pack();
+		super.setSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 	}
 	public void refreshLabel(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		labels[label.ordinal()].setText(((BusLaneAdderPanel)layersPanels.get(PanelIds.ONE)).getLabelText(label));

@@ -56,10 +56,10 @@ import others.sergioo.AddressLocator.AddressLocator;
 import others.sergioo.AddressLocator.BadAddressException;
 import playground.sergioo.NetworkBusLaneAdder.gui.BusLaneAdderWindow.Labels;
 import playground.sergioo.NetworkBusLaneAdder.gui.BusLaneAdderWindow.Options;
+import playground.sergioo.Visualizer2D.ImagePainter;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.LinesPainter;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.ImagePainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
 public class BusLaneAdderPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
@@ -142,6 +142,37 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 	}
 	public List<Link> getLinks() {
 		return ((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).getSelectedLinks();
+	}
+	public void findAddress() {
+		requestFocus();
+		try {
+			addressLocator.locate(JOptionPane.showInputDialog("Insert the desired address")+" Singapore");
+			posLocation = 0;
+			if(addressLocator.getNumResults()>1)
+				JOptionPane.showMessageDialog(this, "Many results: "+addressLocator.getNumResults()+".");
+			try {
+				JOptionPane.showMessageDialog(this, addressLocator.getLocation(posLocation).toString());
+				centerCamera(addressLocator.getLocation(posLocation));
+			} catch (HeadlessException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (BadAddressException e) {
+			JOptionPane.showMessageDialog(this, "No results");
+		}
 	}
 	public String getLabelText(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		try {
@@ -257,37 +288,6 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 	@Override
 	public void keyReleased(KeyEvent e) {
 		
-	}
-	public void findAddress() {
-		requestFocus();
-		try {
-			addressLocator.locate(JOptionPane.showInputDialog("Insert the desired address")+" Singapore");
-			posLocation = 0;
-			if(addressLocator.getNumResults()>1)
-				JOptionPane.showMessageDialog(this, "Many results: "+addressLocator.getNumResults()+".");
-			try {
-				JOptionPane.showMessageDialog(this, addressLocator.getLocation(posLocation).toString());
-				centerCamera(addressLocator.getLocation(posLocation));
-			} catch (HeadlessException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (BadAddressException e) {
-			JOptionPane.showMessageDialog(this, "No results");
-		}
 	}
 	
 }
