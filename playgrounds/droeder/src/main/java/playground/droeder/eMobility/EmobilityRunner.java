@@ -21,18 +21,22 @@ package playground.droeder.eMobility;
 
 import java.util.GregorianCalendar;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.energy.trafficstate.TrafficStateControlerListener;
-import playground.dgrether.energy.trafficstate.TrafficStateXmlWriter;
 import playground.dgrether.energy.validation.ObjectFactory;
 import playground.dgrether.energy.validation.PoiInfo;
 import playground.dgrether.energy.validation.PoiTimeInfo;
 import playground.dgrether.energy.validation.ValidationInfoWriter;
 import playground.dgrether.energy.validation.ValidationInformation;
+import playground.droeder.DaFileReader;
+import playground.droeder.eMobility.IO.AdditionalEDataReader;
 import playground.droeder.eMobility.analysis.SoCEventHandler;
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
@@ -51,11 +55,12 @@ public class EmobilityRunner {
 	private static final String DIR = "D:/VSP/svn/shared/volkswagen_internal/";
 //	private static final String DIR = "/home/dgrether/shared-svn/projects/volkswagen_internal/";
 
-	private static final String CONFIGFILE = DIR + "scenario/config_base_scenario.xml";
-	private static final String BASICPLAN = DIR + "scenario/input/basicAgent.xml";
+	private static final String CONFIGFILE = DIR + "scenario/config_empty_scenario.xml";
+	private static final String ENERGYAGENTS = DIR + "scenario/input/testPlans.xml";
 	private static final String APPOINTMENTS = DIR + "scenario/input/testAppointments.txt";
 	private static final String CHARGINGFILE = DIR + "Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";
 	private static final String DISCHARGINGFILE = DIR + "Dokumente_MATSim_AP1und2/DrivingLookupTable_2011-11-25.txt";
+	private static final String POIFILE = DIR + "scenario/input/poiInfo.xml";
 
 	private DisChargingProfiles dischargingProfiles;
 	private ChargingProfiles chargingProfiles;
@@ -88,6 +93,34 @@ public class EmobilityRunner {
 		c.run();
 		
 		soc.dumpData(scenario.getSc().getConfig().controler().getOutputDirectory() + Controler.DIRECTORY_ITERS + "/it.0/charts/");
+		this.dumppoiData(scenario);
+	}
+	
+	private void dumppoiData(EmobilityScenario eSc){
+		ObjectFactory f = new ObjectFactory();
+		ValidationInformation vInfo = f.createValidationInformationList();
+		PoiInfo info;
+		PoiTimeInfo tInfo;
+		
+		int start, end;
+		
+		for(POI p: eSc.getPoi().getPOIs()){
+			info = f.createPoiInfo();
+			info.setMaximalCapacity(p.getMaxSpace());
+			info.setPoiID(p.getId().toString());
+			for(int i = 0; i < p.getMaxLoad().length; i++){
+				tInfo = new PoiTimeInfo();
+				start = (int) (p.getTimeBinSize() * i);
+				end = (int) (start + p.getTimeBinSize());
+				tInfo.setStartTime(new GregorianCalendar(1979, 01, 01, 0, 0, start));
+				tInfo.setEndTime(new GregorianCalendar(1979, 01, 01, 0, 0, end));
+				tInfo.setUsedCapacity(p.getMaxLoad()[i]);
+				info.getPoiTimeInfos().add(tInfo);
+			}
+			vInfo.add(info);
+		}
+		
+		new ValidationInfoWriter(vInfo).writeFile(eSc.getSc().getConfig().controler().getOutputDirectory() + "poiInfo.xml");
 	}
 	
 	//internal class
@@ -114,40 +147,32 @@ public class EmobilityRunner {
 	}
 	
 	public static void main(String[] args){
-		CreateTestScenario test = new CreateTestScenario();
-		EmobilityScenario sc = test.run(CONFIGFILE, BASICPLAN, APPOINTMENTS);
-		
-		EmobilityRunner runner = new EmobilityRunner();
-		runner.loadChargingProfiles(CHARGINGFILE);
-		runner.loadDisChargingProfiles(DISCHARGINGFILE);
-		runner.run(sc);
-		
-		
-		ObjectFactory f = new ObjectFactory();
-		ValidationInformation vInfo = f.createValidationInformationList();
-		PoiInfo info;
-		PoiTimeInfo tInfo;
-		
-		int start, end;
-		
-		for(POI p: sc.getPoi().getPOIs()){
-			info = f.createPoiInfo();
-			info.setMaximalCapacity(p.getMaxSpace());
-			info.setPoiID(p.getId().toString());
-			for(int i = 0; i < p.getMaxLoad().length; i++){
-				tInfo = new PoiTimeInfo();
-				start = (int) (p.getTimeBinSize() * i);
-				end = (int) (start + p.getTimeBinSize());
-				tInfo.setStartTime(new GregorianCalendar(1979, 01, 01, 0, 0, start));
-				tInfo.setEndTime(new GregorianCalendar(1979, 01, 01, 0, 0, end));
-				tInfo.setUsedCapacity(p.getMaxLoad()[i]);
-				info.getPoiTimeInfos().add(tInfo);
-			}
-			vInfo.add(info);
+		if(args.length == 1){
+			String[] inputFiles = DaFileReader.readFileContent(args[0], ";", false).iterator().next();
+			Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(inputFiles[0]));
+			EmobilityScenario eSc = new EmobilityScenario();
+			eSc.setSc(sc);
+			AdditionalEDataReader reader = new AdditionalEDataReader(eSc);
+			reader.readAppointments(inputFiles[1], inputFiles[2]);
+			reader.readPOI(inputFiles[3], 3600);
+			
+			EmobilityRunner runner = new EmobilityRunner();
+			runner.loadChargingProfiles(inputFiles[4]);
+			runner.loadDisChargingProfiles(inputFiles[5]);
+			runner.run(eSc);
+		}else{
+			Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(CONFIGFILE));
+			EmobilityScenario eSc = new EmobilityScenario();
+			eSc.setSc(sc);
+			AdditionalEDataReader reader = new AdditionalEDataReader(eSc);
+			reader.readAppointments(ENERGYAGENTS, APPOINTMENTS);
+			reader.readPOI(POIFILE, 3600);
+			
+			EmobilityRunner runner = new EmobilityRunner();
+			runner.loadChargingProfiles(CHARGINGFILE);
+			runner.loadDisChargingProfiles(DISCHARGINGFILE);
+			runner.run(eSc);
 		}
-		
-		new ValidationInfoWriter(vInfo).writeFile(sc.getSc().getConfig().controler().getOutputDirectory() + "vInfo.xml");
 	}
-
 
 }

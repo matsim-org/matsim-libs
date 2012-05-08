@@ -16,31 +16,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.IO;
+package playground.droeder.eMobility.events;
 
-import org.apache.log4j.Logger;
-
-import playground.droeder.eMobility.EmobilityScenario;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.GenericEvent;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.GenericEventImpl;
 
 /**
  * @author droeder
  *
  */
-public class AdditionalPlansReader {
-	private static final Logger log = Logger
-			.getLogger(AdditionalPlansReader.class);
+public class VehicleParkEvent extends GenericEventImpl{
 	
-	 private EmobilityScenario eSc;
+	public static final String TYPE = "ParkingEvent";
+	public static final String PLUGGED = "plugged";
+	public static final String PARKINGLOTID = "parkingLotId";
+	
 
-	public AdditionalPlansReader(EmobilityScenario sc){
-		 this.eSc = sc;
-		 if(this.eSc.getSc() == null){
-			 throw new RuntimeException("need MatsimSceanrio...");
-		 }
-	 }
+	/**
+	 * @param type
+	 * @param time
+	 */
+	public VehicleParkEvent(double time, boolean plugged, Id parkingLotId) {
+		super(TYPE, time);
+		super.getAttributes().put(PLUGGED, String.valueOf(plugged));
+		super.getAttributes().put(PARKINGLOTID, parkingLotId.toString());
+	}
 	
-	public void readAppointments(String matsimPlan, String appointmentsFile){
-		
+	public VehicleParkEvent(GenericEvent e){
+		super(e.getAttributes().get("type"), e.getTime());
+		super.getAttributes().put(PLUGGED, e.getAttributes().get(PLUGGED));
+		super.getAttributes().put(PARKINGLOTID, e.getAttributes().get(PARKINGLOTID));
+	}
+	
+	public Id getParkingLotId(){
+		return new IdImpl(super.getAttributes().get(PARKINGLOTID));
+	}
+	
+	public boolean isPlugged(){
+		return new Boolean(super.getAttributes().get(PLUGGED));
 	}
 
 }

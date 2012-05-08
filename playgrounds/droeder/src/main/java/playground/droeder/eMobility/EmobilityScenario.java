@@ -22,7 +22,7 @@ package playground.droeder.eMobility;
 import org.matsim.api.core.v01.Scenario;
 
 import playground.droeder.eMobility.fleet.EFleet;
-import playground.droeder.eMobility.poi.PoiInfo;
+import playground.droeder.eMobility.poi.PoiList;
 import playground.droeder.eMobility.population.EPopulation;
 
 /**
@@ -34,7 +34,7 @@ public class EmobilityScenario {
 	private Scenario sc;
 	private EFleet fleet;
 	private EPopulation population;
-	private PoiInfo poi;
+	private PoiList poi;
 	
 	public EmobilityScenario(){
 		
@@ -85,11 +85,11 @@ public class EmobilityScenario {
 	/**
 	 * @return
 	 */
-	public PoiInfo getPoi() {
+	public PoiList getPoi() {
 		return this.poi;
 	}
 	
-	public void setPoi(PoiInfo poi){
+	public void setPoi(PoiList poi){
 		this.poi = poi;
 	}
 }

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.population;
+package playground.droeder.eMobility.fleet;
 
 import org.matsim.api.core.v01.Id;
 

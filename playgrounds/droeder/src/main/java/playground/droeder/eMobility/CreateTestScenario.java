@@ -40,11 +40,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.droeder.DaFileReader;
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
+import playground.droeder.eMobility.fleet.EActivity;
 import playground.droeder.eMobility.fleet.EFleet;
 import playground.droeder.eMobility.fleet.EVehicle;
 import playground.droeder.eMobility.poi.POI;
-import playground.droeder.eMobility.poi.PoiInfo;
-import playground.droeder.eMobility.population.EActivity;
+import playground.droeder.eMobility.poi.PoiList;
 import playground.droeder.eMobility.population.EPerson;
 import playground.droeder.eMobility.population.EPopulation;
 
@@ -95,7 +95,7 @@ public class CreateTestScenario {
 	}
 	
 	private void createPoi() {
-		PoiInfo poiInfo = new PoiInfo();
+		PoiList poiInfo = new PoiList();
 		POI poi;
 		for(Id l: this.poiLinks){
 			poi = new POI(l, 5, 3600);

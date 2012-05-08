@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Plansgenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,46 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.events;
+package playground.droeder.eMobility.poi;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.GenericEvent;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.GenericEventImpl;
 
 /**
  * @author droeder
  *
  */
-public class VehiclePlugEvent extends GenericEventImpl{
+public class PoiList {
 	
-	public static final String TYPE = "ParkingEvent";
-	public static final String PLUGGED = "plugged";
-	public static final String PARKINGLOTID = "parkingLotId";
+	Map<Id, POI> poiMap;
 	
-
+	public PoiList(Map<Id, POI> pois){
+		this.poiMap = pois;
+	}
+	
+	public void add(POI poi){
+		this.poiMap.put(poi.getId(), poi);
+	}
+	
+	public PoiList(){
+		this.poiMap = new HashMap<Id, POI>();
+	}
+	
+	public Collection<POI>  getPOIs(){
+		return this.poiMap.values();
+	}
+	
 	/**
-	 * @param type
+	 * returns true if there is free charging space and false otherwise
+	 * 
+	 * @param id
 	 * @param time
+	 * @return
 	 */
-	public VehiclePlugEvent(double time, boolean plugged, Id parkingLotId) {
-		super(TYPE, time);
-		super.getAttributes().put(PLUGGED, String.valueOf(plugged));
-		super.getAttributes().put(PARKINGLOTID, parkingLotId.toString());
+	public boolean plugVehicle(Id id, double time){
+		if(this.poiMap.containsKey(id)){
+			return this.poiMap.get(id).plugVehicle(time);
+		}else{
+			return false;
+		}
 	}
 	
-	public VehiclePlugEvent(GenericEvent e){
-		super(e.getAttributes().get("type"), e.getTime());
-		super.getAttributes().put(PLUGGED, e.getAttributes().get(PLUGGED));
-		super.getAttributes().put(PARKINGLOTID, e.getAttributes().get(PARKINGLOTID));
+	public void unplugVehicle(Id id, double time){
+		if(!this.poiMap.containsKey(id)) return;
+		this.poiMap.get(id).unplugVehicle(time);
 	}
-	
-	public Id getParkingLotId(){
-		return new IdImpl(super.getAttributes().get(PARKINGLOTID));
-	}
-	
-	public boolean isPlugged(){
-		return new Boolean(super.getAttributes().get(PLUGGED));
-	}
-
 }

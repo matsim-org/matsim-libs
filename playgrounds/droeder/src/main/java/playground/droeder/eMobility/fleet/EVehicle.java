@@ -31,7 +31,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.events.SoCChangeEvent;
-import playground.droeder.eMobility.population.EActivity;
 
 /**
  * @author droeder
