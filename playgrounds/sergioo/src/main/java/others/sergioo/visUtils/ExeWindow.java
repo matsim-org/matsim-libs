@@ -17,9 +17,19 @@ import javax.swing.JFrame;
 
 public class ExeWindow extends JFrame implements ActionListener {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	//Classes
 	private class JExeButton extends JButton {
-		
+	
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+	
 		//Attributes
 		private String path;
 		
