@@ -20,7 +20,7 @@ public class ArrowsPainter extends Painter {
 	//Attributes
 	private List<Tuple<Coord,Coord>> arrows = new ArrayList<Tuple<Coord,Coord>>();
 	private List<Color> colors = new ArrayList<Color>();
-	private double longArrow = 10;
+	private double longArrow = 30;
 	private double angle = Math.PI/6;
 	//Methods
 	public void addLine(Coord pointA, Coord pointB) {

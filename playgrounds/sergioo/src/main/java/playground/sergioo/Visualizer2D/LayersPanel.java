@@ -189,7 +189,10 @@ public abstract class LayersPanel extends JPanel {
 	}
 	protected void saveImage(String type, File file, int width, int height) {
 		Image windowImage = this.createImage(width, height);
+		Camera camera = new Camera();
+		camera.copyCamera(this.camera);
 		this.setSize(new Dimension(width, height));
+		this.camera.copyCamera(camera);
 		this.paintComponent(windowImage.getGraphics());
 		try {
 			ImageIO.write((RenderedImage) windowImage, type, file);

@@ -5,11 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.bcel.generic.CASTORE;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
-import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.PrepareNetworkProcess;
 
 
@@ -20,10 +18,6 @@ public class MatchingProcess {
 	//Attributes
 
 	private final List<NetworksStep> steps;
-	
-	private Network initialNetworkA;
-
-	private Network initialNetworkB;
 
 	private Network finalNetworkA;
 
@@ -47,8 +41,6 @@ public class MatchingProcess {
 	}
 
 	public void execute(Network networkA, Network networkB) {
-		initialNetworkA = networkA;
-		initialNetworkB = networkB;
 		for(NetworksStep step:steps) {
 			Network[] networks = step.execute(networkA, networkB);
 			networkA = networks[0];
