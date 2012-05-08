@@ -263,11 +263,39 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 							a = f.createActivityOption(FacilitiesProduction.WORK_SECTOR3);
 						}
 						a.setCapacity((double) tempFacilities.get(tempFacilityId));
-
-						// add more activities as planned for KTI Year 2008
+								
 						if (this.facilityActivities.containsKey(activityId)) {
 							a = f.createActivityOption(this.facilityActivities.get(activityId));
-							a.setCapacity((double) 1);
+						
+							//shop retail capacity is assumed to depend on sales area where arbitrary 50% are subtracted for shelfs, cash points etc., then a LOS E value of 1.35 P/m2 is assumed for capacity definition; for sales area a random pick in the given intervals is performed 
+							
+							if (this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500)) {
+								a.setCapacity((double) 0.5*(2500 + random.nextInt(4500))*1.35);
+							} else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET1000)) {
+								a.setCapacity((double) 0.5*(1000 + random.nextInt(1500))*1.35);
+							} else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET400)) {
+								a.setCapacity((double) 0.5*(400 + random.nextInt(599))*1.35);
+							} else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET100)) {
+								a.setCapacity((double) 0.5*(100 + random.nextInt(299))*1.35);
+							} else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_LT100)) {
+								a.setCapacity((double) 0.5*(20 + random.nextInt(79))*1.35);
+							}
+							
+							//shop retail other sales area is assumed to vary between 20 and 1000 m2
+							
+							else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER)) {
+								a.setCapacity((double) 0.5*(20 + random.nextInt(980))*1.35);
+							}
+							
+							//shop service is assumed to depend on the number of people working there, one employee can serve arbitrary 1 customer, subtract 10% for vacancies and 20% for shift operation
+							
+							else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER)) {
+								a.setCapacity((double) Math.max(1,(tempFacilities.get(tempFacilityId))*0.7));
+							}
+							
+							else
+								a.setCapacity((double) 1);
+
 						}
 					}
 
