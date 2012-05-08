@@ -163,6 +163,7 @@ public class Constants {
 	public static final int MATSIM_PROPERTIES_FILE_NOT_FOUND = 1;
 	public static final int EXCEPTION_OCCURED	= 2;
 	public static final int UNMARSCHALLING_FAILED = 3;
+	public static final int NO_MATSIM_NETWORK = 4;
 	
 	/** MATSim 4 UrbanSim (urbansimParameter) parameter names **/
 	public static final String URBANSIM_PARAMETER = "urbansimParameter";

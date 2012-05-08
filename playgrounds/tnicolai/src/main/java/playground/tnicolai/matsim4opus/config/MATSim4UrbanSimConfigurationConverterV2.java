@@ -133,7 +133,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 			Matsim4UrbansimType matsim4UrbanSimParameter = matsimConfig.getMatsim4Urbansim();
 			
 			// init standard MATSim config first, this may be overwritten from MATSim4UrbanSim config
-			initStandradMATSimConfig(matsimParameter);
+			initExternalMATSimConfig(matsimParameter);
 			
 			// MATSim4UrbanSim config initiation
 			initGlobalSettings();
@@ -153,7 +153,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		return true;
 	}
 	
-	private void initStandradMATSimConfig(ConfigType matsimParameter){
+	private void initExternalMATSimConfig(ConfigType matsimParameter){
 		String standardMATSimConfig = matsimParameter.getMatsimConfig().getInputFile();
 		if(standardMATSimConfig != null && Paths.pathExsits(standardMATSimConfig)){
 			log.info("Initializing MATSim from standard MATSim config file: " + standardMATSimConfig);
@@ -452,15 +452,23 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 	/**
 	 * setting MATSim network
 	 * 
+	 * NOTE: If the MATSim4UrbanSim network section contains a road network 
+	 * this overwrites a previous network, e.g. from an external MATSim configuration
+	 * 
 	 * @param matsimParameter
 	 */
 	private void initNetwork(ConfigType matsimParameter){
 		log.info("Setting NetworkConfigGroup to config...");
 		String networkFile = matsimParameter.getNetwork().getInputFile();
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) scenario.getConfig().getModule(NetworkConfigGroup.GROUP_NAME);
-		// set network
-		networkCG.setInputFile( networkFile );
-		
+		if(!networkFile.isEmpty())
+			// set MATSim4UrbanSim network
+			networkCG.setInputFile( networkFile );
+		else if (networkCG.getInputFile().isEmpty()){
+			log.error("Missing MATSim network! The network must be be specified either directly in the MATSim4UrbanSim configuration or in an external MATSim configuration.");
+			System.exit( Constants.NO_MATSIM_NETWORK );
+		}
+			
 		log.info("NetworkConfigGroup settings:");
 		log.info("Network: " + networkCG.getInputFile());
 		log.info("... done!");
