@@ -80,9 +80,9 @@ public class DurationArrivalTimeTask extends TrajectoryAnalyzerTask {
 			}
 		}
 
-		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toNativeArray(), durations.toNativeArray(), 3600);
-//		Discretizer d = FixedSampleSizeDiscretizer.create(arrivals.toNativeArray(), 1, 50);
-//		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toNativeArray(), durations.toNativeArray(), d);
+//		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toNativeArray(), durations.toNativeArray(), 3600);
+		Discretizer d = FixedSampleSizeDiscretizer.create(arrivals.toNativeArray(), 100, 100);
+		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toNativeArray(), durations.toNativeArray(), d);
 		try {
 			if(purpose == null)
 				TXTWriter.writeMap(map, "arr", "dur", String.format("%1$s/dur_arr.txt", getOutputDirectory()));

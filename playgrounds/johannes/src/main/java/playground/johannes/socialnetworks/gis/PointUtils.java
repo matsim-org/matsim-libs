@@ -20,9 +20,9 @@
 package playground.johannes.socialnetworks.gis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -37,7 +37,7 @@ public class PointUtils {
 
 	private static final GeometryFactory geometryFactory = new GeometryFactory();
 
-	public static Envelope envelope(Set<Point> points) {
+	public static Envelope envelope(Collection<Point> points) {
 		double xmin = Double.MAX_VALUE;
 		double xmax = Double.MIN_VALUE;
 		double ymin = Double.MAX_VALUE;

@@ -36,20 +36,24 @@ public class LogIntervalSampleAnalyzer extends IntervalSampleAnalyzer {
 
 	private final int div;
 
+	private final int numSeeds;
+	
 	private double prev = -1;
 
 	public LogIntervalSampleAnalyzer(Map<String, AnalyzerTask> tasks, Collection<PiEstimator> estimators,
-			String output, double base, int div) {
+			String output, double base, int div, int numSeeds) {
 		super(tasks, estimators, output);
 		this.base = base;
 		this.div = div;
-
+		this.numSeeds = numSeeds;
 	}
 
 	@Override
 	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		int n = sampler.getNumSampledVertices();
-		if (n >= div) {
+		if(n == numSeeds) {
+			dump(sampler);
+		} else if (n >= div) {
 			double log_n = Math.log(n / div) / Math.log(base);
 			log_n = Math.floor(log_n);
 

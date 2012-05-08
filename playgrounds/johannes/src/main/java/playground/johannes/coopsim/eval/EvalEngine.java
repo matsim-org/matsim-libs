@@ -48,7 +48,5 @@ public class EvalEngine {
 			t.getPerson().getSelectedPlan().setScore(score);
 			persons.add(t.getPerson().getId());
 		}
-		
-//		System.out.println("Trajectories: " + trajectories.size() + ", persons: " + persons.size());
 	}
 }

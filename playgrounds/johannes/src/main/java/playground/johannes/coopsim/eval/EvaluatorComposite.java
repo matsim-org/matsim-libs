@@ -38,13 +38,13 @@ public class EvaluatorComposite extends Composite<Evaluator> implements Evaluato
 		double score = 0;
 		
 		for(Evaluator e : components) {
-//			Profiler.resume(e.getClass().getName());
+			Profiler.resume(e.getClass().getName());
 			score += e.evaluate(trajectory);
-//			Profiler.pause(e.getClass().getName());
+			Profiler.pause(e.getClass().getName());
 		}
 		
 		if(Double.isInfinite(score))
-			logger.warn("Infinite score.");
+			logger.warn("*** Infinite score. ***");
 		else if (Double.isNaN(score)) {
 			logger.warn("*** Score is NaN! Treating like negative infinity. ***");
 			return Double.NEGATIVE_INFINITY;

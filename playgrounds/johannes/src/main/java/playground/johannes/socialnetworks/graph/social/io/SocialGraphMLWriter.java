@@ -24,7 +24,11 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.sna.graph.Graph;
@@ -98,7 +102,7 @@ public class SocialGraphMLWriter extends SpatialGraphMLWriter {
 	}
 
 	private void writePlansFile(SocialGraph graph, String filename) {
-		Population pop = new PopulationImpl(null);
+		Population pop = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		for(SocialVertex vertex : graph.getVertices()) {
 			pop.addPerson(vertex.getPerson().getPerson());
 		}

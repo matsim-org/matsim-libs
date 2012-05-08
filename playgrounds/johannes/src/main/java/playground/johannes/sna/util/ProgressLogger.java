@@ -30,18 +30,18 @@ public class ProgressLogger {
 	
 	private static final String DOT = ".";
 
-	private static int maxVal;
+	private static long maxVal;
 	
-	private static int minorTickVal;
+	private static long minorTickVal;
 	
-	private static int majorTickVal;
+	private static long majorTickVal;
 	
-	private static int counter;
+	private static long counter;
 	
-	public static void init(int max, int minorTick, int majorTick) {
+	public static void init(long max, long minorTick, long majorTick) {
 		maxVal = max;
-		minorTickVal = (int) Math.ceil(max/100.0 * minorTick);
-		majorTickVal = (int) Math.ceil(max/100.0 * majorTick);
+		minorTickVal = (long) Math.ceil(max/100.0 * minorTick);
+		majorTickVal = (long) Math.ceil(max/100.0 * majorTick);
 		counter = 0;
 		System.out.print("\tProgress: 0%");
 	}

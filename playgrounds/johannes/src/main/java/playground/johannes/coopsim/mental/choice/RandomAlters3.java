@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScoreSlopeConvergence.java
+ * RadomAlters.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim;
+package playground.johannes.coopsim.mental.choice;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class ScoreSlopeConvergence implements ConvergenceCriterion {
+public class RandomAlters3 implements ActivityGroupGenerator {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.coopsim.ConvergenceCriterion#achivedConvergence()
-	 */
+	private final Random random;
+
+	private final double min;
+
+	public RandomAlters3(Random random) {
+		this(0, random);
+	}
+
+	public RandomAlters3(int min, Random random) {
+		this.random = random;
+		this.min = min;
+	}
+
 	@Override
-	public boolean achivedConvergence() {
-		// TODO Auto-generated method stub
-		return false;
+	public List<SocialVertex> generate(SocialVertex ego) {
+		List<SocialVertex> group = new ArrayList<SocialVertex>(ego.getNeighbours().size() + 1);
+		group.add(ego);
+
+		double proba = random.nextDouble();
+		for (int i = 0; i < ego.getNeighbours().size(); i++) {
+			if (random.nextDouble() < proba) {
+				group.add(ego.getNeighbours().get(i));
+			}
+		}
+
+		while (group.size() < min + 1) {
+			SocialVertex alter = ego.getNeighbours().get(random.nextInt(ego.getNeighbours().size()));
+			if (!group.contains(alter))
+				group.add(alter);
+
+			if (group.size() == ego.getNeighbours().size() + 1)
+				break;
+		}
+
+		return group;
 	}
 
 }

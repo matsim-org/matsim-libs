@@ -42,6 +42,7 @@ import playground.johannes.sna.graph.SparseGraphBuilder;
 import playground.johannes.sna.graph.SparseVertex;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.io.GraphMLWriter;
+import playground.johannes.sna.util.ProgressLogger;
 
 /**
  * Random graph generator that connects vertices with constant probability.
@@ -147,6 +148,7 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 
 		Random random = new Random(randomSeed);
 		List<V> vertices = new ArrayList<V>((Collection<? extends V>) graph.getVertices());
+		ProgressLogger.init(m, 1, 5);
 		for (int i = 0; i < m; i++) {
 			E edge = null;
 			while (edge == null) {
@@ -154,11 +156,11 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 				V vj = vertices.get(random.nextInt((int)n));
 				edge = builder.addEdge(graph, vi, vj);
 			}
-			
-			if(i % 10000 == 0)
-				logger.info(String.format("Created %1$s of %2$s edges.", i+1, m));
+			ProgressLogger.step();
+//			if(i % 10000 == 0)
+//				logger.info(String.format("Created %1$s of %2$s edges.", i+1, m));
 		}
-
+		ProgressLogger.termiante();
 		return graph;
 	}
 

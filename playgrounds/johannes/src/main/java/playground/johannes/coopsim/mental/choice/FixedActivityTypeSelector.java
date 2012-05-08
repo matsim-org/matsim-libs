@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -36,23 +33,12 @@ public class FixedActivityTypeSelector implements ChoiceSelector {
 	
 	private final Map<SocialVertex, String> types;
 	
-	private final Random random;
-	
-	public FixedActivityTypeSelector(Map<SocialVertex, String> types, Random random) {
+	public FixedActivityTypeSelector(Map<SocialVertex, String> types) {
 		this.types = types;
-		this.random = random;
 	}
 	
 	@Override
 	public Map<String, Object> select(Map<String, Object> choices) {
-//		@SuppressWarnings("unchecked")
-//		List<SocialVertex> egos = (List<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
-//		
-//		List<String> choiceSet = new ArrayList<String>(egos.size());
-//		for(SocialVertex ego : egos)
-//			choiceSet.add(types.get(ego));
-//		
-//		String time = choiceSet.get(random.nextInt(choiceSet.size()));
 		
 		choices.put(KEY, types.get(choices.get(EgoSelector.KEY)));
 	

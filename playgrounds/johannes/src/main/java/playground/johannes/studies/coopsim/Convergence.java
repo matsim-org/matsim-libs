@@ -41,9 +41,9 @@ public class Convergence {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String root = "/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run182/";
+		String root = "/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run252/";
 		File outputDir = new File(root + "/output");
-		String property = "score";
+		String property = "d_trip_culture";
 		
 		File analysisDir = new File(root + "/analysis");
 		analysisDir.mkdirs();

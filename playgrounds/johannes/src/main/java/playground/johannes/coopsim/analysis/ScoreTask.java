@@ -23,17 +23,20 @@ import gnu.trove.TDoubleArrayList;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import playground.johannes.coopsim.ConvergenceCriterion;
-import playground.johannes.coopsim.eval.ActivityDurationEvaluator;
 import playground.johannes.coopsim.eval.ActivityEvaluator;
-import playground.johannes.coopsim.eval.JointActivityEvaluator;
+import playground.johannes.coopsim.eval.ActivityTypeEvaluator;
+import playground.johannes.coopsim.eval.JointActivityEvaluator2;
 import playground.johannes.coopsim.eval.LegEvaluator;
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.math.DummyDiscretizer;
+import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * @author illenberger
@@ -62,18 +65,26 @@ public class ScoreTask extends TrajectoryAnalyzerTask implements ConvergenceCrit
 		DescriptiveStatistics legScores = LegEvaluator.stopLogging();
 		results.put("score_leg", legScores);
 		
-		DescriptiveStatistics jointScore = JointActivityEvaluator.stopLogging();
-		results.put("score_join", jointScore);
+		Map<String, DescriptiveStatistics> jointScore = JointActivityEvaluator2.stopLogging();
+//		Map<String, DescriptiveStatistics> jointScore = JointActivityEvaluator.stopLogging();
+		for(Entry<String, DescriptiveStatistics> entry : jointScore.entrySet()) {
+			results.put("score_join_" + entry.getKey(), entry.getValue());
+		}
 		
-		DescriptiveStatistics durScore = ActivityDurationEvaluator.stopLogging();
-		results.put("score_dur", durScore);
 		
+		DescriptiveStatistics typeScore = ActivityTypeEvaluator.stopLogging();
+		results.put("score_type", typeScore);
+			
 		try {
 			writeHistograms(allScores, "score", 50, 50);
 			writeHistograms(actScores, "score_act", 50, 50);
 			writeHistograms(legScores, "score_leg", 50, 50);
-			writeHistograms(jointScore, "score_join", 50, 50);
-			writeHistograms(durScore, "score_dur", 50, 50);
+			for(Entry<String, DescriptiveStatistics> entry : jointScore.entrySet()) {
+				writeHistograms(entry.getValue(), new LinearDiscretizer(0.5), "score_join_" + entry.getKey(), false);
+				writeHistograms(entry.getValue(), "score_join_" + entry.getKey(), 50, 50);
+			}
+			
+			writeHistograms(typeScore, new DummyDiscretizer(), "score_type", false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

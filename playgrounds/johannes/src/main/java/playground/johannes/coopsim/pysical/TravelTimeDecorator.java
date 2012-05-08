@@ -30,17 +30,16 @@ public class TravelTimeDecorator implements TravelTime {
 
 	private final TravelTime delegate;
 	
-	public TravelTimeDecorator(TravelTime delegate) {
+	private final double ttFactor;
+	
+	public TravelTimeDecorator(TravelTime delegate, double ttFactor) {
 		this.delegate = delegate;
+		this.ttFactor = ttFactor;
 	}
 	
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
-		if(link.getFreespeed() < 10) {
-			return delegate.getLinkTravelTime(link, time) * 100.0;
-		} else {
-			return delegate.getLinkTravelTime(link, time);
-		}
+		return delegate.getLinkTravelTime(link, time) * ttFactor;
 	}
 
 }

@@ -36,16 +36,12 @@ import playground.johannes.coopsim.pysical.Trajectory;
 public class ActivityEvaluator2 implements Evaluator {
 
 	private final static Logger logger = Logger.getLogger(ActivityEvaluator2.class);
-	
-	private static int tZeroCount;
-	
+
 	private final static String HOME = "home";
-	
+
 	private final static String IDLE = "idle";
 
 	private final static double IDLE_PENALTY = -1E6;
-	
-	private final static double SCALE = -1.0;
 
 	private final double beta;
 
@@ -54,9 +50,9 @@ public class ActivityEvaluator2 implements Evaluator {
 	private final Map<String, Double> priorities;
 
 	private static boolean isLogging;
-	
+
 	private static DescriptiveStatistics stats;
-	
+
 	public ActivityEvaluator2(double beta, Map<Person, ActivityDesires> desires, Map<String, Double> priorities) {
 		this.beta = beta;
 		this.desires = desires;
@@ -66,63 +62,57 @@ public class ActivityEvaluator2 implements Evaluator {
 	@Override
 	public double evaluate(Trajectory trajectory) {
 		double score = 0;
-		for (int i = 0; i < trajectory.getElements().size(); i += 2) {
+		double t_sum = 0;
+		double t_star_sum = 0;
+
+		for (int i = 2; i < trajectory.getElements().size() - 2; i += 2) {
 			Activity act = (Activity) trajectory.getElements().get(i);
+
+			double t = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
+			t_sum += t;
 
 			if (act.getType().equals(IDLE)) {
 				score += IDLE_PENALTY;
-			} else {// if(!act.getType().equals(HOME)) {
-				double t = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
+				t_star_sum += t;
+			} else {
+				double v_star = getPriority(act.getType());
 
-				ActivityDesires desire = desires.get(trajectory.getPerson());
-				double t_star = desire.getActivityDuration(act.getType());
-				
-				if (act.getType().equals(HOME)) {
-					String lType = ((Activity) trajectory.getElements().get(2)).getType();
-					if (lType.equals(IDLE))
-						t_star = 14400; // arbitrary
-					else {
-						double t_start = desire.getActivityStartTime(lType);
-						double t_dur = desire.getActivityDuration(lType);
-								
-						if (i == 0) {
-							t_star = t_start;
-						} else if(i == 4) {
-							t_star = 86400 - (t_start + t_dur);
-						} else {
-							throw new RuntimeException("Not a starting or ending home activity!");
-						}
-						
-						t_star = Math.max(t_star, 1);
-					}
+				if (beta == 0) {
+					score += v_star;
+				} else {
+
+					ActivityDesires desire = desires.get(trajectory.getPerson());
+					double t_star = desire.getActivityDuration(act.getType());
+
+					score += calcScore(t, t_star, v_star);
+
+					t_star_sum += t_star;
 				}
-				
-				double priority = getPriority(act.getType());
-
-//				double t_zero = t_star * Math.exp(SCALE / (t_star * priority * beta));
-//				double t_zero = t_star * Math.exp(SCALE / (t_star * priority));
-//				double t_zero = t_star * Math.exp(-t_star);
-				
-//				if (t_zero < 0.0001) {
-//					t_zero = 0.0001;
-//					tZeroCount++;
-//					if(tZeroCount % 10000 == 0)
-//						logger.warn("10000 repeated warnings: t_zero<0.0001, setting t_zero=0.0001. index = " + i);
-//				}
-
-//				t = Math.max(t, 2.0);
-				t_star = t_star/3600.0;
-				
-				score += (beta*3600.0) * t_star * Math.log((t/3600.0) / t_star * Math.exp(priority));
 			}
 		}
 
-		
-		
-		if(isLogging)
+		if (beta == 0) {
+			score += getPriority(HOME);
+		} else {
+			double t_home = 86400 - t_sum;
+			double t_star_home = 86400 - t_star_sum;
+			if (t_home <= 0 || t_star_home <= 0) {
+				throw new RuntimeException(String.format("t_home=%1$s, t_start_home=%2$s.", t_home, t_star_home));
+			}
+
+			score += calcScore(t_home, t_star_home, getPriority(HOME));
+		}
+		if (isLogging)
 			stats.addValue(score);
-		
+
 		return score;
+	}
+
+	private double calcScore(double t, double t_star, double v_star) {
+		double beta_h = beta * 3600.0;
+		double t_star_h = t_star / 3600.0;
+		double t_h = t / 3600.0;
+		return beta_h * t_star_h * Math.log(t_h / t_star_h * Math.exp(v_star / (beta_h * t_star_h)));
 	}
 
 	private double getPriority(String type) {
@@ -133,7 +123,7 @@ public class ActivityEvaluator2 implements Evaluator {
 		stats = new DescriptiveStatistics();
 		isLogging = true;
 	}
-	
+
 	public static DescriptiveStatistics stopLogging() {
 		isLogging = false;
 		return stats;

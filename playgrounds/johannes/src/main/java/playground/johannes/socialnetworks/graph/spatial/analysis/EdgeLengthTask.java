@@ -47,7 +47,7 @@ public class EdgeLengthTask extends AnalyzerTask {
 		if(outputDirectoryNotNull()) {
 			try {
 				writeHistograms(stats, new LinearDiscretizer(1000.0), KEY, false);
-				writeHistograms(stats, KEY, 100, 100);
+				writeHistograms(stats, KEY, 50, 1);
 				writeCumulativeHistograms(stats, KEY, 100, 100);
 				writeRawData(stats, KEY);
 			} catch (IOException e) {

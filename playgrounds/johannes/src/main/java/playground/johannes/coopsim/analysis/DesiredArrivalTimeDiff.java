@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityOvertimeEvaluator.java
+ * DesiredArrivalTimeDiff.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,11 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.eval;
+package playground.johannes.coopsim.analysis;
 
 import java.util.Map;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 
@@ -32,55 +31,24 @@ import playground.johannes.coopsim.pysical.Trajectory;
  * @author illenberger
  *
  */
-public class ActivityDurationEvaluator implements Evaluator {
+public class DesiredArrivalTimeDiff extends DesireDifference {
 
-	private final static String HOME = "home";
-	
-	private final double beta;
-	
-	private final Map<Person, ActivityDesires> desires;
-	
-	private static boolean isLogging;
-	
-	private static DescriptiveStatistics stats;
-	
-	public ActivityDurationEvaluator(double beta, Map<Person, ActivityDesires> desires) {
-		this.beta = beta;
-		this.desires = desires;
+	public DesiredArrivalTimeDiff(Map<Person, ActivityDesires> desires) {
+		super(desires);
 	}
-	
+
 	@Override
-	public double evaluate(Trajectory trajectory) {
-		double score = 0;
-		for(int i = 0; i < trajectory.getElements().size(); i += 2) {
-			Activity act = (Activity)trajectory.getElements().get(i);
-			
-			if(!act.getType().equals(HOME) && !act.getType().equals("idle")) {
-				double duration = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
-				double desiredDuration = desires.get(trajectory.getPerson()).getActivityDuration(act.getType());
-				
-				double frac = duration / desiredDuration;
-				if(frac > 1) {
-					score -= beta * Math.exp(frac - 1);
-				} else if (frac < 1) {
-					score -= beta * Math.exp(1/frac - 1);
-				}
-			}
+	protected double getDifference(Trajectory t, ActivityDesires desire) {
+		Activity act = (Activity) t.getElements().get(2);
+		String type = act.getType();
+		
+		Double desiredStartTime = desire.getActivityStartTime(type);
+		if(desiredStartTime != null) {
+			double realizedStartTime = t.getTransitions().get(2);
+			return realizedStartTime - desiredStartTime;
+		} else {
+			return Double.NaN;
 		}
-		
-		if(isLogging)
-			stats.addValue(score);
-		
-		return score;
 	}
 
-	public static void startLogging() {
-		stats = new DescriptiveStatistics();
-		isLogging = true;
-	}
-	
-	public static DescriptiveStatistics stopLogging() {
-		isLogging = false;
-		return stats;
-	}
 }

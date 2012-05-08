@@ -36,10 +36,12 @@ import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+import playground.johannes.socialnetworks.graph.spatial.analysis.GridAccessibility;
 
 /**
  * @author illenberger
@@ -56,7 +58,7 @@ public class TripDistanceAccessibilityTask extends TrajectoryAnalyzerTask {
 	public TripDistanceAccessibilityTask(SocialGraph graph, ActivityFacilities facilities) {
 		this.facilities = facilities;
 		this.graph = graph;
-		this.accessibility = new Accessibility(new GravityCostFunction(1.4, 0));
+		this.accessibility = new GridAccessibility(new GravityCostFunction(1.4, 0, CartesianDistanceCalculator.getInstance()), 2000);
 	}
 
 	@Override

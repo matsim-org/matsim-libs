@@ -73,7 +73,7 @@ public class DegreeTask extends ModuleAnalyzerTask<Degree> {
 			try {
 				writeHistograms(stats, new LinearDiscretizer(1.0), key, false);
 				writeHistograms(stats, new LinearDiscretizer(5.0), key + "_5", false);
-				writeHistograms(stats, key, 12, 1);
+				writeHistograms(stats, key, 13, 1);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -181,6 +181,23 @@ public class TXTWriter {
 		writer.close();
 	}
 	
+	public static void writeScatterPlot(TDoubleObjectHashMap<DescriptiveStatistics> table, String file) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		
+		TDoubleObjectIterator<DescriptiveStatistics> it = table.iterator();
+		for(int i = 0; i < table.size(); i++) {
+			it.advance();
+			double[] vals = it.value().getValues();
+			for(int j = 0; j < vals.length; j++) {
+				writer.write(String.valueOf(it.key()));
+				writer.write(TAB);
+				writer.write(String.valueOf(vals[j]));
+				writer.newLine();
+			}
+		}
+		writer.close();
+	}
+	
 	public static void writeStatistics(TDoubleObjectHashMap<DescriptiveStatistics> statsMap, String xLab, String file) throws IOException {
 		double[] keys = statsMap.keys();
 		Arrays.sort(keys);

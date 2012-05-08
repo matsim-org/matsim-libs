@@ -64,7 +64,7 @@ public class ParallelPseudoSim {
 	private Future<?>[] futures;
 	
 	private final ExecutorService executor;
-
+	
 	public ParallelPseudoSim(int numThreads) {
 		executor = Executors.newFixedThreadPool(numThreads);
 		
@@ -206,7 +206,7 @@ public class ParallelPseudoSim {
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
+	public void finalize() throws Throwable {
 		super.finalize();
 		executor.shutdown();
 	}

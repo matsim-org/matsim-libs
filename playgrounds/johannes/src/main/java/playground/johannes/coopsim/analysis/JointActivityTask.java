@@ -20,7 +20,9 @@
 package playground.johannes.coopsim.analysis;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -77,14 +79,18 @@ public class JointActivityTask extends TrajectoryAnalyzerTask {
 			}
 			
 			int visitors = 0;
+			List<Person> alterPersons = new ArrayList<Person>(ego.getNeighbours().size());
 			for (SocialVertex alter : ego.getNeighbours()) {
 				double time = tracker.timeOverlap(person, alter.getPerson().getPerson());
 				if (time > 0) {
 					timeStatsType.addValue(time);
 					timeStatsAll.addValue(time);
-					visitors++;
 				}
+				
+				alterPersons.add(alter.getPerson().getPerson());
 			}
+			
+			visitors = tracker.metAlters(person, alterPersons);
 			visitorStatsType.addValue(visitors);
 			visitorStatsAll.addValue(visitors);
 		}

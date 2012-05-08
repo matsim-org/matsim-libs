@@ -27,9 +27,9 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeAccessibilityTask;
-import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
 import playground.johannes.socialnetworks.graph.social.io.Population2SocialGraph;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+import playground.johannes.socialnetworks.graph.spatial.analysis.GridAccessibility;
 
 /**
  * @author illenberger
@@ -43,9 +43,10 @@ public class MZAgeDistribution {
 	 */
 	public static void main(String[] args) throws IOException {
 		Population2SocialGraph reader = new Population2SocialGraph();
-		SocialGraph graph = reader.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.005.xml", CRSUtils.getCRS(21781));
+		SocialGraph graph = reader.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.01.xml", CRSUtils.getCRS(21781));
 		
-		GraphAnalyzer.analyze(graph, new AgeAccessibilityTask(new Accessibility(new GravityCostFunction(1.2, 0, new CartesianDistanceCalculator()))), "/Users/jillenberger/Work/phd/doc/tex/ch3/fig/data/");
+		Accessibility access = new GridAccessibility(new GravityCostFunction(1.4, 0, new CartesianDistanceCalculator()), 1500);
+		GraphAnalyzer.analyze(graph, new AgeAccessibilityTask(access), "/Users/jillenberger/Work/phd/doc/tex/ch5/fig/data/");
 	}
 
 }

@@ -58,17 +58,7 @@ public class EdgeLengthAccessibilityTask extends ModuleAnalyzerTask<Accessibilit
 		if (accessValues == null)
 			accessValues = module.values(graph.getVertices());
 
-//		TObjectDoubleHashMap<Vertex> edgeLengthMean = EdgeLengthMean.getInstance().values(graph.getVertices());
-
 		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 1, 50);
-//		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(edgeLengthMean, accessValues,
-//				discretizer);
-		
-//		try {
-//			TXTWriter.writeMap(correl, "A", "d_mean", getOutputDirectory() + "d_mean_A.txt");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 		
 		TObjectDoubleHashMap<Edge> lengths = new EdgeLength().values(graph.getEdges());
 		double[] xVals = new double[lengths.size() * 2];

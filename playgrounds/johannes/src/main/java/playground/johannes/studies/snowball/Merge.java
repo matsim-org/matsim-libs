@@ -66,42 +66,40 @@ public class Merge {
 			BufferedReader dumpReader;
 			if(constParamKey.equalsIgnoreCase("alpha")) {
 				valueReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, property)));
-//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/runs/run202/analysis/", dumpKey, constParam, dumpProperty)));
-				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, dumpProperty)));
+//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, dumpProperty)));
 			} else if(constParamKey.equalsIgnoreCase("seed")) {
 				valueReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, property)));
-//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/runs/run202/analysis/", constParam, dumpKey, dumpProperty)));
-				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, dumpProperty)));
+//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, dumpProperty)));
 			} else
 				throw new IllegalArgumentException(String.format("Constant parameter %1$s unknown.", constParamKey));
 			
 			String valueLine;// = valueReader.readLine();
 			String dumpLine;
 			while((valueLine = valueReader.readLine()) != null) {
-				dumpLine = dumpReader.readLine();
-				if(dumpLine == null)
-					break;
+//				dumpLine = dumpReader.readLine();
+//				if(dumpLine == null)
+//					break;
 				
 				String tokens[] = valueLine.split("\t");
-//				int key = (int) Double.parseDouble(tokens[0]);
+				int key = (int) Double.parseDouble(tokens[0]);
 				if (!tokens[1].equals("null")) {
 					double val = Double.parseDouble(tokens[1]);
 
-					tokens = dumpLine.split("\t");
-					if (!tokens[1].equals("null")) {
-						int key = (int) Double.parseDouble(tokens[1]);
+//					tokens = dumpLine.split("\t");
+//					if (!tokens[1].equals("null")) {
+//						int key = (int) Double.parseDouble(tokens[1]);
 
 						row.put(key, val);
 						dumpKeys.add(key);
-					} else {
-						System.err.println("Null key");
-					}
+//					} else {
+//						System.err.println("Null key");
+//					}
 				} else {
 					System.err.println("Null value");
 				}
 			}
 			valueReader.close();
-			dumpReader.close();
+//			dumpReader.close();
 			
 			table.put(dumpKey, row);
 		}

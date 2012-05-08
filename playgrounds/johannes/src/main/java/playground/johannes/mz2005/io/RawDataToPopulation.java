@@ -83,7 +83,7 @@ public class RawDataToPopulation {
 		/*
 		 * generate population
 		 */
-		Population pop = new PopulationImpl(null);
+		Population pop = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		TripComparator comparator = new TripComparator();
 		for (PersonDataContainer pContainer : persons.values()) {
 			if (pContainer.trips.size() > 0) {

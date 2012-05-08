@@ -29,6 +29,7 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -44,7 +45,8 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 //		addTask(new CoordAvailTask());
 //		EdgeLengthTask distanceTask = new EdgeLengthTask();
 //		distanceTask.setModule(EdgeLength.getInstance());
-//		addTask(new EdgeLengthTask());
+		EdgeLength.getInstance().setIgnoreZero(true);
+		addTask(new EdgeLengthTask());
 		
 //		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
 //		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
@@ -54,18 +56,18 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 		access.setTargets(points);
 		
 //		addTask(new DegreeAccessibilityTask(access));
-		addTask(new EdgeLengthAccessibilityTask(access));
+//		addTask(new EdgeLengthAccessibilityTask(access));
 		
 //		AcceptancePropaCategoryTask t = new AcceptancePropaCategoryTask(access);
 //		t.setBoundary(boundary);
 //		t.setDestinations(points);
 //		addTask(t);
 //		
-//		TransitivityAccessibilityTask tatask = new TransitivityAccessibilityTask(access);
-//		addTask(tatask);
+		TransitivityAccessibilityTask tatask = new TransitivityAccessibilityTask(access);
+		addTask(tatask);
 //		
-		addTask(new F2FFreqEdgeLengthTask());
-		addTask(new TripTask());
-		addTask(new F2FFrequencyTask());
+//		addTask(new F2FFreqEdgeLengthTask());
+//		addTask(new TripTask());
+//		addTask(new F2FFrequencyTask());
 	}
 }

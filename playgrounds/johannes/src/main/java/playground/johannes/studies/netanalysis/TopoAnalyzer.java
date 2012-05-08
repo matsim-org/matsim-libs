@@ -29,6 +29,7 @@ import playground.johannes.sna.util.MultiThreading;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthDegreeTask;
 
 /**
  * @author illenberger

@@ -54,7 +54,6 @@ import playground.johannes.socialnetworks.graph.social.generators.ErgmAge;
 import playground.johannes.socialnetworks.graph.social.generators.ErgmGender;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.social.io.SocialSparseVertexPool;
-import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.generators.ErgmLnDistance;
 import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
@@ -151,7 +150,7 @@ public class ErgmSimulator {
 		array.addAnalyzerTask(new TopologyAnalyzerTask(), "topo");
 		AnalyzerTaskComposite spatialTask = new AnalyzerTaskComposite();
 		spatialTask.addTask(new SpatialAnalyzerTask());
-		spatialTask.addTask(new ExtendedSpatialAnalyzerTask());
+//		spatialTask.addTask(new ExtendedSpatialAnalyzerTask());
 		array.addAnalyzerTask(spatialTask, "spatial");
 		array.addAnalyzerTask(new SocialAnalyzerTask(), "social");
 		
@@ -174,7 +173,8 @@ public class ErgmSimulator {
 			
 		} else if("random".equalsIgnoreCase(type)) {
 			ErdosRenyiGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> generator = new ErdosRenyiGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(builder);
-			double p = 10/(double)(persons.size() - 1);
+			double p = 14.8/(double)(persons.size() - 1);
+			generator.setRandomDrawMode(true);
 			graph = generator.generate(persons.size(), p, randomSeed);
 			
 		} else if("lognormal".equalsIgnoreCase(type)) {

@@ -45,7 +45,7 @@ public class SweepMerge2D {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		File root = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run163/");
+		File root = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run205/");
 		String property = "d_trip_home";
 		int valIdx = 1;
 		String parameterKey1 = "traveling";
@@ -79,10 +79,10 @@ public class SweepMerge2D {
 					double paramValue1 = Double.parseDouble(config.findParam("planCalcScore", parameterKey1));
 					double paramValue2 = Double.parseDouble(config.findParam("planCalcScore", parameterKey2));
 					
-					int start = dirs.length - 20;
+					int start = dirs.length - 10;
 					start = Math.max(0, start);
-					if(dirs.length < 20) {
-						logger.warn("Less than 20 samples.");
+					if(dirs.length < 10) {
+						logger.warn("Less than 10 samples.");
 					}
 					DescriptiveStatistics stat = new DescriptiveStatistics();
 					for(int i = start; i < dirs.length; i++) {

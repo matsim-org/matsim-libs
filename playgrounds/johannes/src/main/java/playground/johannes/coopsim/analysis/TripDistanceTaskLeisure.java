@@ -66,9 +66,9 @@ public class TripDistanceTaskLeisure extends TrajectoryAnalyzerTask {
 			for (double d : values)
 				linStats.addValue(lin.discretize(d));
 
-			TrajectoryAnalyzerTask.overwriteStratification(50, 1);
+//			TrajectoryAnalyzerTask.overwriteStratification(50, 1);
 			writeHistograms(linStats, key + ".lin", 50, 50);
-			TrajectoryAnalyzerTask.overwriteStratification(30, 1);
+//			TrajectoryAnalyzerTask.overwriteStratification(30, 1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

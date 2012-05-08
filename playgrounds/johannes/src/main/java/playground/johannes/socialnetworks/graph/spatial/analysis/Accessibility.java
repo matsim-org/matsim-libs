@@ -93,7 +93,7 @@ public class Accessibility extends AbstractSpatialProperty {
 			TObjectDoubleIterator<Vertex> it = thread.values.iterator();
 			for(int i = 0; i < thread.values.size(); i++) {
 				it.advance();
-				values.put(it.key(), it.value());
+				values.put(it.key(), it.value()/(double)targets.size());
 			}
 		}
 		

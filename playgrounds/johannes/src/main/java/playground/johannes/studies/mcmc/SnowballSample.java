@@ -25,12 +25,12 @@ import java.util.Set;
 
 import org.geotools.feature.Feature;
 
+import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.analysis.DegreeTask;
 import playground.johannes.sna.graph.analysis.FixedSizeRandomPartition;
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.sna.graph.analysis.RandomPartition;
 import playground.johannes.sna.graph.analysis.VertexFilter;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialSparseEdge;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.sna.graph.spatial.SpatialSparseVertex;
@@ -56,6 +56,7 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
@@ -76,7 +77,8 @@ public class SnowballSample {
 	 */
 	public static void main(String[] args) throws IOException {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialSparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/output/plain/graph.graphml");
+		SpatialSparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/ergm/raw/graph.graphml");
+//		SpatialSparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/ergm/small/graph.graphml");
 		
 		Set<Feature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
 		Geometry geometry = features.iterator().next().getDefaultGeometry();
@@ -85,28 +87,34 @@ public class SnowballSample {
 		
 		sampler.setBuilder(new SpatialSampledGraphProjectionBuilder<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>());
 		sampler.setSeedGenerator(new SeedGenerator(geometry));
-		sampler.setResponseGenerator(new RandomPartition<SpatialSparseVertex>(0.1));
+		sampler.setResponseGenerator(new RandomPartition<SpatialSparseVertex>(0.2));
 		sampler.setListener(new SampleSizeListener());
 		
 		sampler.run(graph);
 		
+		Set<Point> choiceSet = new HashSet<Point>();
+		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.10.xml");
+		for(SpatialVertex v : graph2.getVertices()) {	
+			choiceSet.add(v.getPoint());
+		}
+		
 		AnalyzerTaskArray array = new AnalyzerTaskArray();
+		
 		array.addAnalyzerTask(new TopologyAnalyzerTask(), "topo");
+		
 		AnalyzerTaskComposite spatialTask = new AnalyzerTaskComposite();
 		spatialTask.addTask(new EdgeLengthTask());
 		EdgeLength.getInstance().setIgnoreZero(true);
 		
-		Set<Point> choiceSet = new HashSet<Point>();
-//		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("");
-		for(SpatialVertex v : graph.getVertices()) {	
-			choiceSet.add(v.getPoint());
-		}
+
 //		AcceptanceProbabilityTask accTask = new AcceptanceProbabilityTask(choiceSet);
 //		accTask.setModule(new ObservedAcceptanceProbability());
 //		spatialTask.addTask(accTask);
+		
 		Accessibility access = new ObservedAccessibility(new GravityCostFunction(1.4, 0, new CartesianDistanceCalculator()));
 		access.setTargets(choiceSet);
 		CachedAccessibility cachedAccess = new CachedAccessibility(access);
+//		
 		spatialTask.addTask(new DegreeAccessibilityTask(cachedAccess));
 		spatialTask.addTask(new EdgeLengthAccessibilityTask(cachedAccess));
 		spatialTask.addTask(new TransitivityAccessibilityTask(cachedAccess));
@@ -115,6 +123,7 @@ public class SnowballSample {
 //		t.setBoundary(boundary);
 		t.setDestinations(choiceSet);
 		spatialTask.addTask(t);
+		
 		array.addAnalyzerTask(spatialTask, "spatial");
 		
 		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
@@ -124,12 +133,18 @@ public class SnowballSample {
 		composite.addTask(kTask);
 		composite.addTask(new WaveSizeTask());
 		array.addAnalyzerTask(composite, "snowball");
-		estim.update(sampler.getSampledGraph());
-		GraphAnalyzer.analyze(sampler.getSampledGraph(), array, "/Users/jillenberger/Work/socialnets/mcmc/output/snowball/");
+		
+
+//		estim.update(sampler.getSampledGraph());
+//		GraphAnalyzer.analyze(sampler.getSampledGraph(), array, "/Users/jillenberger/Work/socialnets/mcmc/output/snowball/");
+		GraphAnalyzer.analyze(sampler.getSampledGraph(), array, "/Users/jillenberger/Work/socialnets/mcmc/ergm/");
+//		GraphAnalyzer.analyze(sampler.getSampledGraph(), array, "/Users/jillenberger/Work/socialnets/mcmc/naive/");
+//		GraphAnalyzer.analyze(graph, spatialTask, "/Users/jillenberger/Work/socialnets/mcmc/ergm/small/");
 		
 		SpatialGraphKMLWriter writer = new SpatialGraphKMLWriter();
 		writer.setDrawEdges(false);
-		writer.write((SpatialGraph) sampler.getSampledGraph(), "/Users/jillenberger/Work/socialnets/mcmc/output/snowball/graph.kmz");
+//		writer.write((SpatialGraph) sampler.getSampledGraph(), "/Users/jillenberger/Work/socialnets/mcmc/ergm/snowball/graph.kmz");
+//		writer.write((SpatialGraph) sampler.getSampledGraph(), "/Users/jillenberger/Work/socialnets/mcmc/naive/snowball/graph.kmz");
 	}
 
 	private static class SeedGenerator implements VertexFilter<SpatialSparseVertex> {
@@ -161,8 +176,9 @@ public class SnowballSample {
 
 		@Override
 		public boolean beforeSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
-//			if(sampler.getSampledGraph().getVertices().size() > 12363)
-			if(sampler.getNumSampledVertices() > 700)
+//			if(sampler.getSampledGraph().getVertices().size() > 7000)
+			if(sampler.getSampledGraph().getVertices().size() > 12363)
+//			if(sampler.getNumSampledVertices() > 700)
 				return false;
 			else
 				return true;

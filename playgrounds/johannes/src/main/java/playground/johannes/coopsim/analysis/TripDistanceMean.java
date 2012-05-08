@@ -79,6 +79,7 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 						double d = calculator.distance(MatsimCoordUtils.coordToPoint(source), MatsimCoordUtils.coordToPoint(dest));
 						d_sum += d;
 						cnt++;
+						
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
 					}

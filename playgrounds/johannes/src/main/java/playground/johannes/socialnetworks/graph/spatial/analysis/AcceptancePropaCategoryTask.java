@@ -24,7 +24,6 @@ import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,14 +37,11 @@ import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinLogDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.ObservedAcceptanceProbability;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -99,8 +95,8 @@ public class AcceptancePropaCategoryTask extends ModuleAnalyzerTask<Accessibilit
 		TDoubleObjectHashMap<?> partitions = partitioner.partition(normValues);
 		TDoubleObjectIterator<?> it = partitions.iterator();
 
-		AcceptanceProbability propa = new ObservedAcceptanceProbability();
-//		AcceptanceProbability propa = new AcceptanceProbability();
+//		AcceptanceProbability propa = new ObservedAcceptanceProbability();
+		AcceptanceProbability propa = new AcceptanceProbability();
 
 		Map<String, TDoubleDoubleHashMap> histograms = new HashMap<String, TDoubleDoubleHashMap>();
 		Map<String, DescriptiveStatistics> distributions = new HashMap<String, DescriptiveStatistics>();
@@ -118,10 +114,10 @@ public class AcceptancePropaCategoryTask extends ModuleAnalyzerTask<Accessibilit
 				if(values.length > 0) {
 					TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, FixedSampleSizeDiscretizer.create(values, 1, 50), true);
 					sum += Histogram.sum(hist);
-					histograms.put(String.format("p_accept-cat%1$.0f", key), hist);
-					distributions.put(String.format("p_accept-cat%1$.0f", key), distr);
+					histograms.put(String.format("p_accept-cat%1$.4f", key), hist);
+					distributions.put(String.format("p_accept-cat%1$.4f", key), distr);
 				}
-				writeHistograms(distr, new LinLogDiscretizer(1000.0, 2), String.format("p_accept-cat%1$.0f.log", key), true);
+				writeHistograms(distr, new LinLogDiscretizer(1000.0, 2), String.format("p_accept-cat%1$.4f.log", key), true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

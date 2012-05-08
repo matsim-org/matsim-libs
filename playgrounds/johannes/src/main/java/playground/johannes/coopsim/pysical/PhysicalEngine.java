@@ -21,12 +21,11 @@ package playground.johannes.coopsim.pysical;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
 import playground.johannes.sna.util.MultiThreading;
 
@@ -45,12 +44,15 @@ public class PhysicalEngine {
 	private final VisitorTracker tracker;
 	
 	public PhysicalEngine(Network network) {
+		this(network, 1.0);
+	}
+	
+	public PhysicalEngine(Network network, double ttFactor) {
 		this.network = network;
-//		this.pseudoSim = new PseudoSim();
 		this.pseudoSim = new ParallelPseudoSim(MultiThreading.getNumAllowedThreads());
-		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
-//		this.travelTime = new TravelTimeDecorator(new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup()));
 		this.tracker = new VisitorTracker();
+		
+		this.travelTime = new TravelTimeCalculator(ttFactor);
 	}
 	
 	public TravelTime getTravelTime() {
@@ -73,5 +75,20 @@ public class PhysicalEngine {
 	public void finalize() throws Throwable {
 		super.finalize();
 		pseudoSim.finalize();
+	}
+	
+	private static class TravelTimeCalculator implements TravelTime {
+
+		private final double factor;
+		
+		public TravelTimeCalculator(double factor) {
+			this.factor = factor;
+		}
+		
+		@Override
+		public double getLinkTravelTime(Link link, double time) {
+			return factor * link.getLength() / link.getFreespeed();
+		}
+		
 	}
 }

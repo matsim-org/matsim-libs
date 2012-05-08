@@ -60,7 +60,7 @@ public class TransitivityAccessibilityTask extends ModuleAnalyzerTask<Accessibil
 		
 		TObjectDoubleHashMap<Vertex> localClustering = Transitivity.getInstance().values(graph.getVertices());
 		
-		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 50, 200);
+		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 1, 30);
 		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(localClustering, accessValues,	discretizer);
 		
 		try {

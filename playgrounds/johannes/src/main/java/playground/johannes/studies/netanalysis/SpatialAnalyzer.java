@@ -21,16 +21,20 @@ package playground.johannes.studies.netanalysis;
 
 import java.io.IOException;
 
-
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.sna.util.MultiThreading;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.social.analysis.AgeAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthDegreeTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
@@ -45,6 +49,8 @@ public class SpatialAnalyzer {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
+		MultiThreading.setNumAllowedThreads(8);
+		
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialGraph graph = reader.readGraph(args[0]);
 		
@@ -56,12 +62,15 @@ public class SpatialAnalyzer {
 		SpatialCostFunction func = new GravityCostFunction(1.4, 0, new CartesianDistanceCalculator());
 		
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+		task.addTask(new EdgeLengthDegreeTask());
 		Accessibility access = new Accessibility(func);
+//		task.addTask(new AcceptanceProbabilityTask());
 		task.addTask(new AcceptancePropaCategoryTask(access));
 		task.addTask(new TransitivityAccessibilityTask(access));
-		task.addTask(new SpatialAnalyzerTask());
-		task.addTask(new ExtendedSpatialAnalyzerTask());
-//		task.addTask(new AgeAccessibilityTask(func));
+//		EdgeLength.getInstance().setIgnoreZero(true);
+//		task.addTask(new SpatialAnalyzerTask());
+//		task.addTask(new ExtendedSpatialAnalyzerTask());
+//		task.addTask(new AgeAccessibilityTask(access));
 		
 //		Accessibility access = new Accessibility(func);
 //		task.addTask(new AcceptancePropaCategoryTask(access));

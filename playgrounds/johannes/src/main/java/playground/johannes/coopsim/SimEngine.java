@@ -35,10 +35,10 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
-import playground.johannes.coopsim.eval.ActivityDurationEvaluator;
 import playground.johannes.coopsim.eval.ActivityEvaluator;
+import playground.johannes.coopsim.eval.ActivityTypeEvaluator;
 import playground.johannes.coopsim.eval.EvalEngine;
-import playground.johannes.coopsim.eval.JointActivityEvaluator;
+import playground.johannes.coopsim.eval.JointActivityEvaluator2;
 import playground.johannes.coopsim.eval.LegEvaluator;
 import playground.johannes.coopsim.mental.MentalEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
@@ -147,13 +147,13 @@ public class SimEngine {
 		/*
 		 * run mental layer
 		 */
-//		Profiler.resume("mental engine");
+		Profiler.resume("mental engine");
 		List<SocialVertex> egos = mentalEngine.nextState();
-//		Profiler.pause("mental engine");
+		Profiler.pause("mental engine");
 		/*
 		 * get alters
 		 */
-//		Profiler.resume("step preprocessing");
+		Profiler.resume("step preprocessing");
 		Set<SocialVertex> altersLevel1 = new HashSet<SocialVertex>();
 		for (SocialVertex ego : egos) {
 			for (SocialVertex alter : ego.getNeighbours()) {
@@ -191,18 +191,18 @@ public class SimEngine {
 			plans.add(plan);
 			alter2Scores.add(new Tuple<Plan, Double>(plan, plan.getScore()));
 		}
-//		Profiler.pause("step preprocessing");
+		Profiler.pause("step preprocessing");
 		/*
 		 * run physical layer
 		 */
-//		Profiler.resume("physical engine");
+		Profiler.resume("physical engine");
 		trajectoryBuilder.reset(0);
 		physicalEngine.run(plans, eventsManager);
-//		Profiler.pause("physical engine");
+		Profiler.pause("physical engine");
 		/*
 		 * evaluate plans
 		 */
-//		Profiler.resume("evaluation & postprocessing");
+		Profiler.resume("evaluation & postprocessing");
 		evalEngine.evaluate(trajectoryBuilder.trajectories());
 		/*
 		 * accept/reject state
@@ -224,15 +224,15 @@ public class SimEngine {
 				tuple.getFirst().setScore(tuple.getSecond());
 			}
 		}
-//		Profiler.pause("evaluation & postprocessing");
+		Profiler.pause("evaluation & postprocessing");
 	}
 
 	public void drawSample(int iter) {
-//		Profiler.stop("mental engine", true);
-//		Profiler.stop("step preprocessing", true);
-//		Profiler.stop("physical engine", true);
-//		Profiler.stop("evaluation & postprocessing", true);
-//		Profiler.stopAll();
+		Profiler.stop("mental engine", true);
+		Profiler.stop("step preprocessing", true);
+		Profiler.stop("physical engine", true);
+		Profiler.stop("evaluation & postprocessing", true);
+		Profiler.stopAll();
 		
 		LoggerUtils.setVerbose(false);
 
@@ -243,8 +243,9 @@ public class SimEngine {
 
 		ActivityEvaluator.startLogging();
 		LegEvaluator.startLogging();
-		JointActivityEvaluator.startLogging();
-		ActivityDurationEvaluator.startLogging();
+		JointActivityEvaluator2.startLogging();
+//		JointActivityEvaluator.startLogging();
+		ActivityTypeEvaluator.startLogging();
 		
 		trajectoryBuilder.reset(iter);
 		physicalEngine.run(plans, eventsManager);

@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.snowball2.sim;
 import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
-import playground.johannes.sna.snowball.analysis.SnowballStatistics;
 
 /**
  * @author illenberger
@@ -40,8 +39,8 @@ public class RDSEstimator implements PiEstimator {
 	
 	@Override
 	public void update(SampledGraph graph) {
-		int it = SnowballStatistics.getInstance().lastIteration(graph.getVertices());
-		int n = SnowballStatistics.getInstance().numVerticesSampledTotal(graph.getVertices())[it];
+//		int it = SnowballStatistics.getInstance().lastIteration(graph.getVertices());
+//		int n = SnowballStatistics.getInstance().numVerticesSampledTotal(graph.getVertices())[it];
 
 		double sum_k = 0;
 		for (SampledVertex v : graph.getVertices()) {
@@ -50,7 +49,7 @@ public class RDSEstimator implements PiEstimator {
 			}
 		}
 
-		denominator = N * n / sum_k;
+		denominator = N / sum_k;
 	}
 
 	@Override

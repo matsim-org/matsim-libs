@@ -21,31 +21,37 @@ package playground.johannes.studies.netgeneration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.analysis.DegreeTask;
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraphBuilder;
-import playground.johannes.sna.graph.spatial.SpatialSparseVertex;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AccessibilityTask;
+import playground.johannes.socialnetworks.graph.social.io.Population2SocialGraph;
+import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+import playground.johannes.socialnetworks.graph.spatial.analysis.CachedAccessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
@@ -53,24 +59,34 @@ import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGra
  */
 public class SpatialRandomGraph {
 
+	private static final Logger logger = Logger.getLogger(SpatialRandomGraph.class);
+	
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		String graphfile = args[0];
+		String outfile = args[1];
 		Random random = new Random(1);
 		
 		CoordinateReferenceSystem crs = CRSUtils.getCRS(21781);
-		SpatialSparseGraph graph = new Population2SpatialGraph(crs).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
+//		SpatialSparseGraph graph = new Population2SpatialGraph(crs).read(graphfile);
+//		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
+		SocialSparseGraph graph = new Population2SocialGraph().read(graphfile, crs);
+		SocialSparseGraphBuilder builder = new SocialSparseGraphBuilder(graph.getCoordinateReferenceSysten());
 		
 		double k_mean = 14.8;
 		
 		DistanceCalculator calc = new CartesianDistanceCalculator();
 		
-		List<SpatialSparseVertex> vertices = new ArrayList<SpatialSparseVertex>(graph.getVertices());
+//		List<SpatialSparseVertex> vertices = new ArrayList<SpatialSparseVertex>(graph.getVertices());
+		List<SocialSparseVertex> vertices = new ArrayList<SocialSparseVertex>(graph.getVertices());
 		
-		ProgressLogger.init(vertices.size() * vertices.size() / 2, 1, 5);
+		double m = 0.5 * k_mean * vertices.size();
+		
+		logger.info("Calculating sum...");
+		ProgressLogger.init((long) (0.5 * vertices.size() * (vertices.size() - 1)), 1, 5);
 		double sum = 0;
 		for(int i = 0; i < vertices.size(); i++) {
 			for(int j = i+1; j < vertices.size(); j++) {
@@ -85,15 +101,18 @@ public class SpatialRandomGraph {
 			}
 		}
 		ProgressLogger.termiante();
+		logger.info("Done.");
 		
-		double m = 0.5 * k_mean * vertices.size();
+		logger.info(String.format("Insering %1$s edges...", m));
 		double c = m / sum;
 		
-		ProgressLogger.init((int) m, 1, 5);
+		ProgressLogger.init((long) m, 1, 5);
 		int edgecount = 0;
 		while(edgecount < m) {
-			SpatialSparseVertex v_i = vertices.get(random.nextInt(vertices.size()));
-			SpatialSparseVertex v_j = vertices.get(random.nextInt(vertices.size()));
+//			SpatialSparseVertex v_i = vertices.get(random.nextInt(vertices.size()));
+//			SpatialSparseVertex v_j = vertices.get(random.nextInt(vertices.size()));
+			SocialSparseVertex v_i = vertices.get(random.nextInt(vertices.size()));
+			SocialSparseVertex v_j = vertices.get(random.nextInt(vertices.size()));
 			if(v_i != v_j) {
 				double d = calc.distance(v_i.getPoint(), v_j.getPoint());
 				double p = c * Math.pow(d, -1.4);
@@ -105,7 +124,7 @@ public class SpatialRandomGraph {
 				}
 			}
 		}
-		
+		logger.info("Done.");
 //		ProgressLogger.init(vertices.size() * vertices.size() / 2, 1, 5);
 //		
 //		for(int i = 0; i < vertices.size(); i++) {
@@ -123,19 +142,30 @@ public class SpatialRandomGraph {
 //		}
 //		ProgressLogger.termiante();
 		
-		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
-		writer.write(graph, "/Users/jillenberger/Work/socialnets/mcmc/output/graph.graphml");
+		SocialGraphMLWriter writer = new SocialGraphMLWriter();
+		writer.write(graph, outfile + "/graph.graphml");
 		
 //		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 //		SpatialGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/output/plain/graph.graphml");
 		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
 		composite.addTask(new DegreeTask());
 		composite.addTask(new EdgeLengthTask());
-//		composite.addTask(new AccessibilityTask(new GravityCostFunction(1.4, 0, CartesianDistanceCalculator.getInstance())));
-//		composite.addTask(new AcceptanceProbabilityTask());
-		composite.addTask(new DegreeAccessibilityTask(new GravityCostFunction(1.4, 0, CartesianDistanceCalculator.getInstance())));
 		
-		GraphAnalyzer.analyze(graph, composite, "/Users/jillenberger/Work/socialnets/mcmc/output/");
+		Accessibility access = new Accessibility(new GravityCostFunction(1.4, 0, new CartesianDistanceCalculator()));
+		CachedAccessibility cachedAccess = new CachedAccessibility(access);
+		
+		composite.addTask(new DegreeAccessibilityTask(cachedAccess));
+		composite.addTask(new EdgeLengthAccessibilityTask(cachedAccess));
+		composite.addTask(new TransitivityAccessibilityTask(cachedAccess));
+		
+		AcceptancePropaCategoryTask t = new AcceptancePropaCategoryTask(cachedAccess);
+		Set<Point> points = new HashSet<Point>();
+		for(SpatialVertex v : graph.getVertices())
+			points.add(v.getPoint());
+		t.setDestinations(points);
+		composite.addTask(t);
+		
+		GraphAnalyzer.analyze(graph, composite, outfile);
 	}
 
 }

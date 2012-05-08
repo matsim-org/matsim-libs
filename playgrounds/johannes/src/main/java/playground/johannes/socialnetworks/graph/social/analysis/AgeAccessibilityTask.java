@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
@@ -63,12 +65,16 @@ public class AgeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 			else
 				xVals = module.values(graph.getVertices());
 			
-			TObjectDoubleHashMap<Vertex> yVals = Age.getInstance().values(spatialGraph.getVertices());
-			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals,
-					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 50));
-
 			try {
+				TObjectDoubleHashMap<Vertex> yVals = Age.getInstance().values(spatialGraph.getVertices());
+				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals,
+					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 100));
+
 				TXTWriter.writeMap(correl, "A", "age", getOutputDirectory() + "age_mean_A.txt");
+				
+				TDoubleObjectHashMap<DescriptiveStatistics> table = VertexPropertyCorrelation.statistics(yVals, xVals, new LinearDiscretizer(xVals.getValues(), 200));
+				TXTWriter.writeBoxplotStats(table, String.format("%1$s/age_A.table.txt", getOutputDirectory()));
+				TXTWriter.writeScatterPlot(table, String.format("%1$s/age_A.xy.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

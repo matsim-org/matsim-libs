@@ -117,6 +117,8 @@ public class EstimatedDegree extends Degree {
 	public double assortativity(Graph g) {
 		SampledGraph graph = (SampledGraph) g;
 		int iteration = SnowballStatistics.getInstance().lastIteration(graph.getVertices());
+		if(iteration == 0)
+			return Double.NaN;
 		
 		double product = 0;
 		double sum = 0;
