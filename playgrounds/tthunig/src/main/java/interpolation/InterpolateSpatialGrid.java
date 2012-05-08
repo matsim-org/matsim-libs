@@ -9,23 +9,28 @@ import org.matsim.matrices.Matrix;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
+ * class for testing implemented interpolation methods
  * interpolates data on a grid. uses SpatialGrid
  * 
  * interpolation methods:
  * 	bicubic spline interpolation from apache 
  * 	bilinear interpolation (own implementation)
+ *  inverse distance weighting with arbitrary weighting exponent (own implementation)
+ *		considering all known values
+ *		considering only 4 neighboring values
  * 
  * @author tthunig
  *
  */
+@Deprecated
 public class InterpolateSpatialGrid {
-
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		String resolution = "6400.0"; //bicubic schafft bis 400.0, bilinear bis 100.0 (100.0 kann R nicht mehr zeichnen)
-		String directory= "java-versuch3-SpatialGrid";
+		String directory= "java-versuch4-SpatialGridTest";
 
 		System.out.println("interpolate file " + resolution + ":");
 
@@ -43,10 +48,10 @@ public class InterpolateSpatialGrid {
 		double[] y_new = coord(sg.getYmin(), sg.getYmax(), sg.getResolution() / 2);
 		
 		SpatialGrid sg_bicubic= bicubicSplineInterpolation(sg, x, y, x_new, y_new);
-		sg_bicubic.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_bicubic_transp.txt");
+		sg_bicubic.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_bicubic.txt");
 		
-//		SpatialGrid sg_bilinear= myBiLinearSplineInterpolation(sg, x, y, x_new, y_new);
-//		sg_bilinear.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_bilinear.txt");
+		SpatialGrid sg_bilinear= myBiLinearSplineInterpolation(sg, x, y, x_new, y_new);
+		sg_bilinear.writeToFile("Z:/WinHome/opus_home_shared/data/seattle_parcel/results/interpolationQuickTest/interpolation/" + directory + "/" + resolution + "_bilinear.txt");
 		
 //		double exp=0.3;
 //		SpatialGrid sg_allValuesIDW= myAllValuesIDW(sg, x, y, x_new, y_new, exp);
@@ -68,6 +73,7 @@ public class InterpolateSpatialGrid {
 	 * @return new SpatialGrid with higher resolution
 	 */
 	private static SpatialGrid myBiLinearSplineInterpolation(SpatialGrid sg, double[] x, double[] y, double[] x_new, double[] y_new) {
+	/* alte variante (MyBilinearInterpolator nutzt SpatialGrid nicht; ValueInterpolation)
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		
 		System.out.println("\ninterpolate...");
@@ -78,19 +84,19 @@ public class InterpolateSpatialGrid {
 			}
 		}
 		return sg_new;
+	 */
 		
-//		//alternative 1
-//		System.out.println("\ninterpolate...");
-//		// calculate new values for higher resolution
-//		for (int k = 0; k < y_new.length; k++) {
-//			for (int l = 0; l < x_new.length; l++) {
-//				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyBiLinearInterpolator.myBiLinearValueInterpolation(sg, x_new[l], y_new[k]));
-//			}
-//		}
-//		return sg_new;		
+	/* alternative 1 (MyBiLinearInterpolator nutzt SpatialGrid; ValueInterpolation) */
+		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		
-//		//alternative 2
-//		return MyBiLinearInterpolator.myBiLinearGridInterpolation(sg);
+		System.out.println("\ninterpolate...");
+		// calculate new values for higher resolution
+		for (int k = 0; k < y_new.length; k++) {
+			for (int l = 0; l < x_new.length; l++) {
+				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), MyBiLinearInterpolator.myBiLinearValueInterpolation(sg, x_new[l], y_new[k]));
+			}
+		}
+		return sg_new;
 	}
 
 
@@ -105,6 +111,7 @@ public class InterpolateSpatialGrid {
 	 * @return new SpatialGrid with higher resolution
 	 */
 	private static SpatialGrid bicubicSplineInterpolation(SpatialGrid sg, double[] x, double[] y, double[] x_new, double[] y_new) {
+	/* alte variante ohne wrapper:
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		
 		double[] x_default= coord(0,x.length-1,1);
@@ -127,26 +134,26 @@ public class InterpolateSpatialGrid {
 			e.printStackTrace();
 		}
 		return sg_new;
-	}
-	
-	/**
-	 * flips the given matrix horizontal
-	 * 
-	 * @param matrix
-	 * @return the horizontal mirrored matrix
 	 */
-	private static double[][] flip(double[][] matrix) {
-		double[][] flip= new double[matrix.length][matrix[0].length];
-		for (int i=0; i<flip.length; i++){
-			for (int j=0; j<flip[0].length; j++){
-				flip[i][j]= matrix[matrix.length-1-i][j];
+		
+	/* alternative 1 (BiCubicInterpolator nutzt SpatialGrid; ValueInterpolation) */
+		BiCubicInterpolator interpolator= new BiCubicInterpolator(sg);
+		
+		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
+		
+		System.out.println("\ninterpolate...");
+		// calculate new values for higher resolution
+		for (int k = 0; k < y_new.length; k++) {
+			for (int l = 0; l < x_new.length; l++) {
+				sg_new.setValue(sg_new.getRow(y_new[k]), sg_new.getColumn(x_new[l]), interpolator.biCubicInterpolation(x_new[l], y_new[k]));
 			}
 		}
-		return flip;
+		return sg_new;
 	}
 
 	/**
 	 * interpolates the given data with inverse distance weighting (own implementation)
+	 * considers all known values
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @param x the original x-coordinate vector
@@ -200,7 +207,7 @@ public class InterpolateSpatialGrid {
 	 * @param resolution
 	 * @return coordinate vector from min to max with the given resolution
 	 */
-	static double[] coord(double min, double max, double resolution) {
+	private static double[] coord(double min, double max, double resolution) {
 		double[] coord = new double[(int) ((max - min) / resolution) + 1];
 		coord[0] = min;
 		for (int i = 1; i < coord.length; i++) {

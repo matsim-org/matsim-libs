@@ -14,7 +14,7 @@ public class Interpolation {
 	public static final int INVERSE_DISTANCE_WEIGHTING = 2;
 	
 	private SpatialGrid sg = null;
-	private double[][] flip_sg = null;
+	private BiCubicInterpolator biCubicInterpolator = null;
 	
 	private double exp = 1.;
 	private int interpolationMethod = -1;
@@ -43,8 +43,11 @@ public class Interpolation {
 		this.interpolationMethod = method;
 		this.exp = exp;
 		if(this.interpolationMethod == BICUBIC){
-			log.info("Mirroring the Spatial grid for interpolation ...");
-			this.flip_sg = flip(this.sg.getMatrix());
+			log.info("Creating object for bicubic interpolation ...");
+			this.biCubicInterpolator= new BiCubicInterpolator(this.sg);
+		}
+		if(this.interpolationMethod == INVERSE_DISTANCE_WEIGHTING){
+			log.warn("IDW interpolation not usefull for accessibility interpolation.");
 		}
 	}
 
@@ -72,28 +75,10 @@ public class Interpolation {
 		
 		switch(this.interpolationMethod){
 		case 0: return MyBiLinearInterpolator.myBiLinearValueInterpolation(this.sg, x, y);
-		case 1: log.warn("BiCubic interpolation not tested yet!"); //TODO
-				return BiCubicInterpolator.biCubicInterpolation(this.sg, this.flip_sg, x, y);
-		case 2: log.warn("IDW interpolation not usefull for our needs.");
-				return MyInverseDistanceWeighting.my4NeighborsIDW(this.sg, x, y, exp);		
+		case 1: return biCubicInterpolator.biCubicInterpolation(x, y);
+		case 2: return MyInverseDistanceWeighting.my4NeighborsIDW(this.sg, x, y, exp);		
 		}
 		return Double.NaN;
-	}
-	
-	/**
-	 * flips the given matrix horizontal
-	 * 
-	 * @param matrix
-	 * @return the horizontal mirrored matrix
-	 */
-	private static double[][] flip(double[][] matrix) {
-		double[][] flip= new double[matrix.length][matrix[0].length];
-		for (int i=0; i<flip.length; i++){
-			for (int j=0; j<flip[0].length; j++){
-				flip[i][j]= matrix[matrix.length-1-i][j];
-			}
-		}
-		return flip;
 	}
 	
 	/**

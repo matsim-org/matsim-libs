@@ -14,9 +14,10 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 public class MyBiLinearInterpolator {
 
 	/**
-	 * interpolates the values on a grid given as double[][] with bilinear interpolation to a higher resolution
+	 * old implementation without SpatialGrid
+	 * please use myBiLinearValueInterpolation(SpatialGrid sg, double xCoord, double yCoord)
 	 * 
-	 * please use myBiLinearGridInterpolation(SpatialGrid sg)
+	 * interpolates the values on a grid given as double[][] with bilinear interpolation to a higher resolution
 	 * 
 	 * @param values the known values on the grid
 	 * @return grid with higher resolution
@@ -49,15 +50,19 @@ public class MyBiLinearInterpolator {
 	}
 	
 	/**
+	 * just for testing
+	 * please use myBiLinearValueInterpolation(SpatialGrid sg, double xCoord, double yCoord)
+	 * 
 	 * interpolates the values on a grid given as SpatialGrid with bilinear interpolation to a higher resolution
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @return SpatialGrid with higher resolution
 	 */
+	@Deprecated
 	static SpatialGrid myBiLinearGridInterpolation(SpatialGrid sg){
 		// generate new coordinates for higher resolution
-		double[] x_new = InterpolateSpatialGrid.coord(sg.getXmin(), sg.getXmax(), sg.getResolution() / 2);
-		double[] y_new = InterpolateSpatialGrid.coord(sg.getYmin(), sg.getYmax(), sg.getResolution() / 2);
+		double[] x_new = coord(sg.getXmin(), sg.getXmax(), sg.getResolution() / 2);
+		double[] y_new = coord(sg.getYmin(), sg.getYmax(), sg.getResolution() / 2);
 		
 		// calculate new values for higher resolution
 		SpatialGrid sg_new= new SpatialGrid(sg.getXmin(), sg.getYmin(),
@@ -85,10 +90,11 @@ public class MyBiLinearInterpolator {
 	}
 	
 	/**
+	 * old implementation without SpatialGrid
+	 * please use myBiLinearValueInterpolation(SpatialGrid sg, double xCoord, double yCoord)
+	 * 
 	 * interpolates the value on a arbitrary point with bilinear interpolation
 	 * requires values on a grid as double[][]
-	 * 
-	 * please use myBiLinearValueInterpolation(SpatialGrid sg, double xCoord, double yCoord)
 	 * 
 	 * @param values the known values on the grid
 	 * @param xCoord the x-coordinate of the point to interpolate
@@ -153,5 +159,25 @@ public class MyBiLinearInterpolator {
 		}
 		
 		return (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]*(1-yWeight) + sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]*yWeight) * (1-xWeight) + (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]*(1-yWeight) + sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x2)]*yWeight) * xWeight;
+	}
+	
+	/**
+	 * necessary for the deprecated method myBiLinearGridInterpolation(SpatialGrid sg)
+	 * 
+	 * creates a coordinate vector
+	 * 
+	 * @param min the minimum coordinate
+	 * @param max the maximum coordinate
+	 * @param resolution
+	 * @return coordinate vector from min to max with the given resolution
+	 */
+	@Deprecated
+	private static double[] coord(double min, double max, double resolution) {
+		double[] coord = new double[(int) ((max - min) / resolution) + 1];
+		coord[0] = min;
+		for (int i = 1; i < coord.length; i++) {
+			coord[i] = min + i * resolution;
+		}
+		return coord;
 	}
 }

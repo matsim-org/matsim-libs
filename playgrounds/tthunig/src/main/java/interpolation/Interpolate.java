@@ -14,6 +14,8 @@ import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolator;
 import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpolator;
 
 /**
+ * just for testing, please use Interpolation.java
+ * 
  * interpolates data on a grid without SpatialGrid
  * 
  * interpolation methods:
@@ -23,6 +25,7 @@ import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpola
  * @author tthunig
  *
  */
+@Deprecated
 public class Interpolate {
 	
 	static double[] x_coord;
