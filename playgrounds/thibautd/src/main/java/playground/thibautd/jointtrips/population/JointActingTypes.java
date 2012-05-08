@@ -28,6 +28,7 @@ public interface JointActingTypes {
 	public static final String DROP_OFF = "drop_off";
 
 	public static final String PASSENGER = "car_passenger";
+	public static final String DRIVER = "car_driver";
 
 	//planFile constants
 	public static final String PICK_UP_SPLIT_EXPR = "_";

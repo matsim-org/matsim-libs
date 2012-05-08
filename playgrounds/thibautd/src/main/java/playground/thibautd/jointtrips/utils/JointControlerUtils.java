@@ -19,11 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.utils;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -33,6 +39,9 @@ import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.jointtrips.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.jointtrips.population.CliquesXmlReader;
+import playground.thibautd.jointtrips.population.DriverRoute;
+import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.PassengerRoute;
 import playground.thibautd.jointtrips.population.PopulationWithJointTripsReader;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
 import playground.thibautd.jointtrips.run.JointControler;
@@ -83,6 +92,7 @@ public class JointControlerUtils {
 	 */
 	public static ScenarioWithCliques createScenario(final Config config) {
 		ScenarioWithCliques scenario = new ScenarioWithCliques(config);
+		tuneScenario( scenario );
 
 		//(new ScenarioLoaderImpl(scenario)).loadScenario();
 		// ScenarioUtils.loadScenario(scenario);
@@ -90,6 +100,7 @@ public class JointControlerUtils {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadNetwork();
 		loader.loadActivityFacilities();
+		// TODO: adapt to new state
 		(new PopulationWithJointTripsReader(scenario)).readFile(config.plans().getInputFile());
 
 		try {
@@ -99,6 +110,30 @@ public class JointControlerUtils {
 		}
 
 		return scenario;
+	}
+
+	private static void tuneScenario(final Scenario sc) {
+		ModeRouteFactory rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
+		rFactory.setRouteFactory(
+				JointActingTypes.DRIVER,
+				new RouteFactory() {
+					@Override
+					public Route createRoute(
+						final Id s,
+						final Id e) {
+						return new DriverRoute( s , e );
+					}
+				});
+		rFactory.setRouteFactory(
+				JointActingTypes.PASSENGER,
+				new RouteFactory() {
+					@Override
+					public Route createRoute(
+						final Id s,
+						final Id e) {
+						return new PassengerRoute( s , e );
+					}
+				});
 	}
 
 	/**

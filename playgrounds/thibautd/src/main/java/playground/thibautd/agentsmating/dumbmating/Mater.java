@@ -175,6 +175,7 @@ public class Mater {
 				secondPuName,
 				firstOD,
 				secondOD);
+		((PersonImpl) clique.get( 0 )).setCarAvail( "always" );
 
 		for (int i=1; i < clique.size(); i++) {
 			Person currentMember = clique.get(i);
@@ -187,6 +188,9 @@ public class Mater {
 					secondOD);
 			if (this.randomGen.nextDouble() < pNoCar) {
 				((PersonImpl) currentMember).setCarAvail("never");
+			}
+			else {
+				((PersonImpl) currentMember).setCarAvail("always");
 			}
 		}
 	}

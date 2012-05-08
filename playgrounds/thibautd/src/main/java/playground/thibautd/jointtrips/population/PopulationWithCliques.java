@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -58,7 +59,7 @@ public class PopulationWithCliques implements Population {
 	public PopulationWithCliques(final ScenarioWithCliques sc) {
 		log.debug("PopulationWithCliques initialized by passing it a scenarioWithCliques");
 		this.populationDelegate = new PopulationImpl(sc);
-		this.factory = new PopulationWithCliquesFactory(sc);
+		this.factory = new PopulationFactoryImpl(sc);
 		this.cliques = new PopulationOfCliques(sc);
 	}
 

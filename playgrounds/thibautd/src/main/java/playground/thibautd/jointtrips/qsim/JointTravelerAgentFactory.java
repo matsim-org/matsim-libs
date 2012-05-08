@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTripParticipationImpl.java
+ * JointTravelerAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtrips.population.jointtrippossibilities;
+package playground.thibautd.jointtrips.qsim;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 
 /**
  * @author thibautd
  */
-public class JointTripParticipationImpl implements JointTripParticipation {
-	private final Id agentId;
-	private final Id originId;
-	private final Id destinationId;
+public class JointTravelerAgentFactory implements AgentFactory {
+	private final AgentFactory factory;
 
-	/*package*/ JointTripParticipationImpl(
-			final Id agentId,
-			final Id originId,
-			final Id destinationId) {
-		this.agentId = agentId;
-		this.originId = originId;
-		this.destinationId = destinationId;
+	public JointTravelerAgentFactory(final AgentFactory wrapped) {
+		factory = wrapped;
 	}
 
 	@Override
-	public Id getAgentId() {
-		return agentId;
-	}
-
-	@Override
-	public Id getOriginActivityId() {
-		return originId;
-	}
-
-	@Override
-	public Id getDestinationActivityId() {
-		return destinationId;
+	public MobsimAgent createMobsimAgentFromPerson(final Person p) {
+		return new JointTravelerAgent( (MobsimDriverAgent) factory.createMobsimAgentFromPerson( p ) );
 	}
 }
 

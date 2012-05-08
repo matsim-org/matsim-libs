@@ -33,7 +33,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 
-import playground.thibautd.jointtrips.population.JointLeg;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
@@ -71,36 +70,12 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 
 	@Override
 	public double computeFitnessValue(final Solution solution) {
-	//	String key = toKey( solution );
-	//	Double cachedScore = cache.get( key );
-
-	//	n++;
-	//	if (cachedScore == null) {
-	//		nc++;
-	//		cachedScore = reallyComputeFitness( solution );
-	//		cache.put( key , cachedScore );
-	//	}
-
-	//	return cachedScore;
-	//}
-
-	//private static String toKey(final Solution solution) {
-	//	StringBuffer buffer = new StringBuffer();
-
-	//	for (Value val : solution.getRepresentation()) {
-	//		buffer.append( "-&-"+val.getValue() );
-	//	}
-
-	//	return buffer.toString();
-	//}
-
-	//private double reallyComputeFitness(final Solution solution) {
 		JointPlan plan = (JointPlan) solution.getRepresentedPlan();
 
 		if (DEBUG) log.debug( "start scoring" );
 
 		double accumulatedNegativeDuration = 0;
-		LinkedList<JointLeg> sharedLegs = new LinkedList<JointLeg>();
+		//LinkedList<JointLeg> sharedLegs = new LinkedList<JointLeg>();
 
 		for (Plan individualPlan : plan.getIndividualPlans().values()) {
 			double score;
@@ -121,9 +96,9 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 				else if (pe instanceof Leg) {
 					scoringFunction.handleLeg( (Leg) pe );
 
-					if (((JointLeg) pe).getJoint()) {
-						sharedLegs.add( (JointLeg) pe );
-					}
+					//if (((JointLeg) pe).getJoint()) {
+					//	sharedLegs.add( (JointLeg) pe );
+					//}
 				}
 				else {
 					throw new RuntimeException( "unknown PlanElement type "+pe.getClass() );
@@ -145,27 +120,27 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 		}
 
 		double accumulatedUnsynchronizedTime = 0;
-		while (sharedLegs.size() > 0) {
-			List<JointLeg> linkedLegs = new ArrayList<JointLeg>();
-			JointLeg leg = sharedLegs.removeFirst();
-			linkedLegs.addAll( leg.getLinkedElements().values() );
+		//while (sharedLegs.size() > 0) {
+		//	List<JointLeg> linkedLegs = new ArrayList<JointLeg>();
+		//	JointLeg leg = sharedLegs.removeFirst();
+		//	linkedLegs.addAll( leg.getLinkedElements().values() );
 
-			for (JointLeg linkedLeg : linkedLegs) {
-				sharedLegs.remove( linkedLeg );
-			}
+		//	for (JointLeg linkedLeg : linkedLegs) {
+		//		sharedLegs.remove( linkedLeg );
+		//	}
 
-			linkedLegs.add( leg );
+		//	linkedLegs.add( leg );
 
-			double minDepartureTime = Double.POSITIVE_INFINITY;
-			double maxDepartureTime = Double.NEGATIVE_INFINITY;
+		//	double minDepartureTime = Double.POSITIVE_INFINITY;
+		//	double maxDepartureTime = Double.NEGATIVE_INFINITY;
 
-			for (JointLeg currLeg : linkedLegs) {
-				minDepartureTime = Math.min( minDepartureTime , currLeg.getDepartureTime() );
-				maxDepartureTime = Math.max( maxDepartureTime , currLeg.getDepartureTime() );
-			}
+		//	for (JointLeg currLeg : linkedLegs) {
+		//		minDepartureTime = Math.min( minDepartureTime , currLeg.getDepartureTime() );
+		//		maxDepartureTime = Math.max( maxDepartureTime , currLeg.getDepartureTime() );
+		//	}
 
-			accumulatedUnsynchronizedTime += maxDepartureTime - minDepartureTime;
-		}
+		//	accumulatedUnsynchronizedTime += maxDepartureTime - minDepartureTime;
+		//}
 
 		if (DEBUG) {
 			log.debug( "scoring ended." );

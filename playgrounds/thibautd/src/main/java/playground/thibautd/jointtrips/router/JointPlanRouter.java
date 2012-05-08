@@ -22,24 +22,30 @@ package playground.thibautd.jointtrips.router;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
-import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.DriverRoute;
+import playground.thibautd.jointtrips.population.PassengerRoute;
 import playground.thibautd.router.PlanRouter;
 import playground.thibautd.router.TripRouter;
 
 /**
  * Based on the {@link PlanRouter}, but modifies "old" plan elements
- * rather than inserting new ones. Car passenger mode is specially handled,
- * using explicitly {@link CarPassengerLegRouter}.
+ * rather than inserting new ones. 
  *
  * @author thibautd
  */
 public class JointPlanRouter extends PlanRouter {
-	private final CarPassengerLegRouter passengerRouter = new CarPassengerLegRouter();
+	private static final Logger log =
+		Logger.getLogger(JointPlanRouter.class);
+
+	//private final CarPassengerLegRouter passengerRouter = new CarPassengerLegRouter();
 
 	public JointPlanRouter(
 			final TripRouter routingHandler,
@@ -52,33 +58,69 @@ public class JointPlanRouter extends PlanRouter {
 		super( routingHandler );
 	}
 
+	@Override
 	public void updatePlanElements(
 			final Plan plan,
 			final List<PlanElement> newPlanElements) {
 		Iterator<PlanElement> toChange = plan.getPlanElements().iterator();
 		Iterator<PlanElement> changeInfo = newPlanElements.iterator() ;
 
-		while (toChange.hasNext()) {
-			PlanElement peToChange = toChange.next();
-			PlanElement peChangeInfo = changeInfo.next();
+		try {
+			while (toChange.hasNext()) {
+				PlanElement peToChange = toChange.next();
+				PlanElement peChangeInfo = changeInfo.next();
 
-			if (peToChange instanceof Leg) {
-				Leg legToChange = (Leg) peToChange;
-				Leg legChangeInfo = (Leg) peChangeInfo;
+				if (peToChange instanceof Leg) {
+					Leg legToChange = (Leg) peToChange;
+					Leg legChangeInfo = (Leg) peChangeInfo;
 
-				if ( legToChange.getMode().equals( JointActingTypes.PASSENGER ) ) {
-					passengerRouter.routeLeg( null , legToChange , null , null , legChangeInfo.getDepartureTime() );
-				}
-				else {
-					legToChange.setMode( legChangeInfo.getMode() );
+					Route oldRoute = legToChange.getRoute();
+					//legToChange.setMode( legChangeInfo.getMode() );
 					legToChange.setDepartureTime( legChangeInfo.getDepartureTime() );
 					legToChange.setTravelTime( legChangeInfo.getTravelTime() );
 					legToChange.setRoute( legChangeInfo.getRoute() );
+
+					// we do not want to loose (nor change) co-traveler information
+					try {
+						if (oldRoute instanceof DriverRoute) {
+							((DriverRoute) legToChange.getRoute()).setPassengerIds(
+									((DriverRoute) oldRoute).getPassengersIds() );
+						}
+						else if (oldRoute instanceof PassengerRoute) {
+							((PassengerRoute) legToChange.getRoute()).setDriverId(
+									((PassengerRoute) oldRoute).getDriverId() );
+						}
+					}
+					catch (ClassCastException e) {
+						throw new RuntimeException( "unexpected route type incompatibility when "
+								+"updating "+legToChange.getRoute()+" with "+oldRoute );
+					}
 				}
 			}
+			if (changeInfo.hasNext()) {
+				throw new RuntimeException( "incompatible size" );
+			}
 		}
-		if (changeInfo.hasNext()) {
-			throw new RuntimeException( plan.getPlanElements()+" and "+newPlanElements+" have incompatible size" );
+		catch (Exception e) {
+			throwInformativeError( plan.getPlanElements() , newPlanElements , e );;
 		}
+	}
+
+	private static synchronized void throwInformativeError(
+			final List<PlanElement> toChange,
+			final List<PlanElement> changeInfo,
+			final Throwable e) {
+		log.error( " ################### ERROR ################ " );
+		log.error( " to update:" );
+		int i=0;
+		for (PlanElement pe : toChange) log.error( (++i)+": "+pe );
+		log.error( " with:" );
+		i=0;
+		for (PlanElement pe : changeInfo) log.error( (++i)+": "+pe );
+
+		throw new RuntimeException(
+				// "problem while updating "+toChange+" of size "+toChange.size()
+				//+" with "+changeInfo+" of size "+changeInfo.size(),
+				e);
 	}
 }

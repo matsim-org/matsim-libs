@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.NetworkLegRouter;
@@ -104,7 +105,7 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 		this.travelTime = routerFactory.getTravelTimeCalculatorFactory().createTravelTime();
 		this.travelCost = routerFactory.getTravelCostCalculatorFactory().createTravelDisutility( travelTime , scoreConfigGroup );
 
-		routes = extractRoutes( plan );
+		routes = extractRoutes( plan , mainMode );
 
 		// if no route is found, the shortest path without congestion will be used
 		FreespeedTravelTimeAndDisutility freeFlowTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
@@ -119,7 +120,7 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 					routeFactory);
 	}
 
-	private static Map<Tuple<Id, Id>, NetworkRoute> extractRoutes(final Plan plan) {
+	private static Map<Tuple<Id, Id>, NetworkRoute> extractRoutes(final Plan plan , final String mode) {
 		Map<Tuple<Id, Id>, NetworkRoute> routes = new HashMap<Tuple<Id, Id>, NetworkRoute>();
 
 		OdIterator iterator = new OdIterator( plan.getPlanElements() );
@@ -127,7 +128,7 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 		for (Od od = iterator.next(); od != null; od = iterator.next()) {
 			Route route = od.leg.getRoute();
 
-			if (route instanceof NetworkRoute) {
+			if (od.leg.getMode().equals( mode ) && route instanceof NetworkRoute) {
 				routes.put(
 						extractOD( od.origin , od.destination ),
 						(NetworkRoute) route.clone());
@@ -423,9 +424,9 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	}
 
 	private static class Od {
-		public static Activity origin;
-		public static Leg leg;
-		public static Activity destination;
+		public final Activity origin;
+		public final Leg leg;
+		public final Activity destination;
 
 		public Od(final Activity o, final Leg l, final Activity d) {
 			origin = o;

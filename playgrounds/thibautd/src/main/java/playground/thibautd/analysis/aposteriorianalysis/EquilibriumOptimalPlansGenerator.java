@@ -43,7 +43,6 @@ import playground.thibautd.jointtrips.config.CliquesConfigGroup;
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.Clique;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilitiesUtils;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
 import playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser.JointTimeModeChooserModule;
 import playground.thibautd.jointtrips.run.JointControler;
@@ -197,22 +196,23 @@ public class EquilibriumOptimalPlansGenerator {
 
 
 	private boolean writeUntoggledJointTrips(final String file) {
-		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
+		//ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
 
-		for (Clique clique : scenario.getCliques().getCliques().values()) {
-			JointPlan plan = (JointPlan) clique.getSelectedPlan();
+		//for (Clique clique : scenario.getCliques().getCliques().values()) {
+		//	JointPlan plan = (JointPlan) clique.getSelectedPlan();
 
-			if (plan.getJointTripPossibilities() == null) {
-				return false;
-			}
+		//	if (plan.getJointTripPossibilities() == null) {
+		//		return false;
+		//	}
 
-			JointTripPossibilitiesUtils.includeAllJointTrips( plan );
-		}
+		//	JointTripPossibilitiesUtils.includeAllJointTrips( plan );
+		//}
 
-		//configGroup.setOptimizeToggle( "false" );
-		optimiseSelectedPlans();
-		writePopulation( file );
-		return true;
+		////configGroup.setOptimizeToggle( "false" );
+		//optimiseSelectedPlans();
+		//writePopulation( file );
+		//return true;
+		return false;
 	}
 
 	//private void writeToggledOptimalJointTrips(final String file) {

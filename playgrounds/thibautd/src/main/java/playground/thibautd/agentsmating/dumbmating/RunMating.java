@@ -45,10 +45,10 @@ public class RunMating {
 		//Mater.TripChaining.BOTH;
 	private static final String popFile = "testcases/equil/plans2000.xml.gz";
 	private static final String netFile = "../../trunk/examples/equil/network.xml";
-	private static final String outputPrefix = "testcases/matings/2-10-together-";
+	private static final String outputPrefix = "testcases/matings/2-10-noCar-";
 	private static final int minCliqueSize = 2;
 	private static final int maxCliqueSize = 10;
-	private static final double pNoCar = 0.6d;
+	private static final double pNoCar = 1d;
 
 	public static void main(String[] args) {
 		//String popFile = args[0];

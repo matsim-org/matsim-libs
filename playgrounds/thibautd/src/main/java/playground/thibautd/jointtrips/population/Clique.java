@@ -32,9 +32,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
-import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilitiesUtils;
-
 /**
  * Defines a "clique" agregating several agents.
  *
@@ -322,12 +319,7 @@ public class Clique implements Person {
 	 * Otherwise, the selected plans of the individuals are grouped in a joint plan,
 	 * the other plans are discarded.
 	 * <BR>
-	 * If the plan type identify joint plans, the plans are assumed synchronized.
-	 * Otherwise, the plans are synchronised at construction.
-	 * <BR><BR>
-	 * CAUTION: importing from the plan dump will produce valid plans, but not a strict
-	 * copy of the imported plans: the leg ids, that are used to resolve linked legs,
-	 * are not dumped. This poses problems when using the JointTripPosssibilities
+	 * This is a leftover from the previous approach, and should be removed
 	 */
 	public void buildJointPlanFromIndividualPlans() {
 		if (this.plans.isEmpty()) {
@@ -337,7 +329,6 @@ public class Clique implements Person {
 			JointPlan newJointPlan;
 			PlanImpl currentPlan;
 			List<? extends Plan> memberPlans;
-			boolean toSynchronize = true;
 			
 			for (Person member : this.getMembers().values()) {
 				memberPlans = member.getPlans();
@@ -369,9 +360,6 @@ public class Clique implements Person {
 								}
 							}
 						}
-						// assume that if several plans are given, they are synchronized
-						// (TODO pass by the config)
-						toSynchronize = false;
 					}
 				}
 				else {
@@ -388,8 +376,7 @@ public class Clique implements Person {
 				newJointPlan = new JointPlan(
 						this,
 						entry.getValue(),
-						true, //add at individual level
-						toSynchronize);
+						true); //add at individual level
 				//TODO: use this.addPlan (when implemented)
 				this.plans.add(newJointPlan);
 				if (entry.getKey().equals(selected)) {
@@ -401,24 +388,6 @@ public class Clique implements Person {
 			throw new UnsupportedOperationException(
 					"Clique.buildJointPlanFromIndividualPlans() cannot be ran "+
 					"when the clique already contains joint plans.");
-		}
-
-		constructAndSetJointTripPossibilities();
-	}
-
-	private void constructAndSetJointTripPossibilities() {
-		if ( plans.size() == 1 ) {
-			JointPlan plan = plans.get( 0 );
-			JointTripPossibilities possibilities =
-				JointTripPossibilitiesUtils.extractJointTripPossibilities( plan );
-
-			plan.setJointTripPossibilities( possibilities );
-		}
-		else if ( warnNoJointTripPossibilities ) {
-			warnNoJointTripPossibilities = false;
-			log.warn( "can create joint trip possibilities only if one and only one joint plan" );
-			log.warn( "this was not the case for clique "+getId() );
-			log.warn( "this message is given only once." );
 		}
 	}
 

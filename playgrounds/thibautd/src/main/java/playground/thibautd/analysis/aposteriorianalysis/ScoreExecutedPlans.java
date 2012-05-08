@@ -24,10 +24,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scoring.EventsToScore;
 
-import playground.thibautd.jointtrips.population.PopulationWithCliques;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.scoring.JointEventsToScore;
 import playground.thibautd.jointtrips.utils.JointControlerUtils;
 
 /**
@@ -47,8 +46,8 @@ public class ScoreExecutedPlans {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(
-				new JointEventsToScore(
-					(PopulationWithCliques) scenario.getPopulation(),
+				new EventsToScore(
+					scenario,
 					controler.getScoringFunctionFactory()));
 		(new MatsimEventsReader(eventsManager)).readFile(inputEvents);
 		(new PopulationWriter(scenario.getPopulation(), scenario.getNetwork())).write(outputFile);

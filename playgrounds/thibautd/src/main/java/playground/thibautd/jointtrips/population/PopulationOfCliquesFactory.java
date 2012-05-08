@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.population.PopulationFactoryImpl;
 
 /**
  * @author thibautd
@@ -34,11 +35,11 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 public class PopulationOfCliquesFactory implements PopulationFactory {
 	//not used
 	//private final ScenarioWithCliques scenario;
-	private final PopulationWithCliquesFactory factoryDelegate;
+	private final PopulationFactory factoryDelegate;
 
 	public PopulationOfCliquesFactory(ScenarioWithCliques sc) {
 		//this.scenario = sc;
-		this.factoryDelegate = new PopulationWithCliquesFactory(sc);
+		this.factoryDelegate = new PopulationFactoryImpl(sc);
 	}
 
 	/*

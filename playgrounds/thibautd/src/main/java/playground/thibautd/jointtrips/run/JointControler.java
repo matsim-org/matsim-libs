@@ -20,27 +20,36 @@
 package playground.thibautd.jointtrips.run;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.TeleportationLegRouter;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
+import playground.thibautd.jointtrips.population.DriverRoute;
 import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.jointtrips.population.PopulationWithJointTripsWriterHandler;
+import playground.thibautd.jointtrips.population.PassengerRoute;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
+import playground.thibautd.jointtrips.qsim.JointQSimFactory;
 import playground.thibautd.jointtrips.replanning.JointPlansReplanning;
 import playground.thibautd.jointtrips.replanning.JointStrategyManager;
+import playground.thibautd.jointtrips.router.DriverRoutingModule;
 import playground.thibautd.jointtrips.router.JointPlanRouter;
+import playground.thibautd.jointtrips.router.PassengerRoutingModule;
 import playground.thibautd.router.LegRouterWrapper;
 import playground.thibautd.router.PlanRouterWrapper;
 import playground.thibautd.router.RoutingModule;
@@ -84,6 +93,51 @@ public class JointControler extends MultiLegRoutingControler {
 	 * overrided methods
 	 * =========================================================================
 	 */
+	@Override
+	protected void setUp() {
+		super.setUp();
+
+		ParallelPersonAlgorithmRunner.run(
+				getPopulation(),
+				getConfig().global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+					@Override
+					public AbstractPersonAlgorithm getPersonAlgorithm() {
+						return new ImportedJointRoutesChecker( getTripRouterFactory().createTripRouter() );
+					}
+		});
+
+	}
+
+	@Override
+	protected void loadData() {
+		setMobsimFactory( new JointQSimFactory() );
+
+		// this is done in JointControlerUtils
+		//ModeRouteFactory rFactory = ((PopulationFactoryImpl) getPopulation().getFactory()).getModeRouteFactory();
+		//rFactory.setRouteFactory(
+		//		JointActingTypes.DRIVER,
+		//		new RouteFactory() {
+		//			@Override
+		//			public Route createRoute(
+		//				final Id s,
+		//				final Id e) {
+		//				return new DriverRoute( s , e );
+		//			}
+		//		});
+		//rFactory.setRouteFactory(
+		//		JointActingTypes.PASSENGER,
+		//		new RouteFactory() {
+		//			@Override
+		//			public Route createRoute(
+		//				final Id s,
+		//				final Id e) {
+		//				return new PassengerRoute( s , e );
+		//			}
+		//		});
+		super.loadData();
+	}
+
 	/**
 	 * Same as the loadCoreListeners of the base class, excepts that it loads a
 	 * JointPlanReplanning instance instead of a PlansReplanning one.
@@ -144,16 +198,25 @@ public class JointControler extends MultiLegRoutingControler {
 					public RoutingModule createModule(
 							final String mainMode,
 							final TripRouterFactory factory) {
-						return new LegRouterWrapper(
+						return new PassengerRoutingModule(
 							mainMode,
 							getPopulation().getFactory(),
-							// "fake" router to avoid exceptions
-							new TeleportationLegRouter(
-								factory.getModeRouteFactory(),
-								1,
-								1),
-							null,
-							null);
+							factory.getModeRouteFactory());
+					}
+				});
+		routerFactory.setRoutingModuleFactory(
+				JointActingTypes.DRIVER,
+				new RoutingModuleFactory() {
+					@Override
+					public RoutingModule createModule(
+							final String mainMode,
+							final TripRouterFactory factory) {
+						return new DriverRoutingModule(
+							mainMode,
+							getPopulation().getFactory(),
+							factory.getRoutingModuleFactories().get( TransportMode.car ).createModule(
+								TransportMode.car,
+								factory));
 					}
 				});
 
@@ -174,32 +237,33 @@ public class JointControler extends MultiLegRoutingControler {
 		PlansCalcRoute plansCalcRoute = null;
 
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();
-		plansCalcRoute = new PlanRouterWrapper(
-				getConfig().plansCalcRoute(),
-				getNetwork(),
-				travelCosts,
-				travelTimes,
-				getLeastCostPathCalculatorFactory(),
-				tripRouterFactory.getModeRouteFactory(),
-				tripRouterFactory,
-				new JointPlanRouter( tripRouterFactory.createTripRouter() ));
+		//plansCalcRoute = new PlanRouterWrapper(
+		//		getConfig().plansCalcRoute(),
+		//		getNetwork(),
+		//		travelCosts,
+		//		travelTimes,
+		//		getLeastCostPathCalculatorFactory(),
+		//		tripRouterFactory.getModeRouteFactory(),
+		//		tripRouterFactory,
+		//		new JointPlanRouter( tripRouterFactory.createTripRouter() ));
 
-		return plansCalcRoute;
+		//return plansCalcRoute;
+		return new JointPlanRouter( tripRouterFactory.createTripRouter() );
 	}
 
-	/**
-	 * Exports plans in an importable format
-	 */
-	@Override
-	protected void shutdown(final boolean unexpected) {
-		super.shutdown(unexpected);
+	///**
+	// * Exports plans in an importable format
+	// */
+	//@Override
+	//protected void shutdown(final boolean unexpected) {
+	//	super.shutdown(unexpected);
 
-		ControlerIO io = getControlerIO();
-		if (io != null) {
-			PopulationWriter popWriter = new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges());
-			popWriter.setWriterHandler(new PopulationWithJointTripsWriterHandler(this.network,(this.getScenario()).getKnowledges()));
+	//	ControlerIO io = getControlerIO();
+	//	if (io != null) {
+	//		PopulationWriter popWriter = new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges());
+	//		popWriter.setWriterHandler(new PopulationWithJointTripsWriterHandler(this.network,(this.getScenario()).getKnowledges()));
 
-			popWriter.write(io.getOutputFilename(FILENAME_POPULATION));
-		}
-	}
+	//		popWriter.write(io.getOutputFilename(FILENAME_POPULATION));
+	//	}
+	//}
 }

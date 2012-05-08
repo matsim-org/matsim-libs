@@ -28,7 +28,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -36,9 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.misc.Time;
 
-import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
 import playground.thibautd.jointtrips.scoring.HomogeneousScoreAggregatorFactory;
 import playground.thibautd.jointtrips.scoring.ScoresAggregator;
 import playground.thibautd.jointtrips.scoring.ScoresAggregatorFactory;
@@ -46,26 +43,16 @@ import playground.thibautd.jointtrips.scoring.ScoresAggregatorFactory;
 /**
  * class for handling synchronized plans.
  * It implements the plan interface to be compatible with the StrategyManager.
+ *
+ * FIXME: currently, the JointPlan is responsible for "inserting" itself at
+ * the individual level. This is quite messy, and should be moved at an upper level.
  * @author thibautd
  */
 public class JointPlan implements Plan {
 	private static final Logger log =
 		Logger.getLogger(JointPlan.class);
 
-	// durations for syncing:
-	private final static double pickUpDuration = 0d;
-	// this will also be used for DO
-	private final static double minimalDuration = 1d;
-
 	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
-	/**
-	 * for robust resolution of links between activities.
-	 */
-	private final Map<Id, JointLeg> legsMap = new HashMap<Id, JointLeg>();
-	private final Map<Id, JointActivity> actMap = new HashMap<Id, JointActivity>();
-	/**
-	 * true if the individual plans are maintained at the individual level.
-	 */
 	private final boolean setAtIndividualLevel;
 
 	private final Clique clique;
@@ -73,8 +60,8 @@ public class JointPlan implements Plan {
 	private ScoresAggregator aggregator = null;
 	// for replanning modules to be able to replicate aggregator
 	private final ScoresAggregatorFactory aggregatorFactory;
-	private final String individualPlanType;
-	private JointTripPossibilities jointTripPossibilities = null;
+	//private final String individualPlanType;
+	//private JointTripPossibilities jointTripPossibilities = null;
 
 	//private Id currentIndividual = null;
 	//private Iterator<Id> individualsIterator;
@@ -97,19 +84,7 @@ public class JointPlan implements Plan {
 			final Clique clique,
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel) {
-		this(clique, plans, addAtIndividualLevel, true);
-	}
-
-
-	/**
-	 * Initilizes with an {@link HomogeneousScoreAggregatorFactory}
-	 */
-	public JointPlan(
-			final Clique clique,
-			final Map<Id, ? extends Plan> plans,
-			final boolean addAtIndividualLevel,
-			final boolean toSynchronize) {
-		this(clique, plans, addAtIndividualLevel, toSynchronize, new HomogeneousScoreAggregatorFactory());
+		this(clique, plans, addAtIndividualLevel, new HomogeneousScoreAggregatorFactory());
 	}
 
 	/**
@@ -129,152 +104,22 @@ public class JointPlan implements Plan {
 			final Clique clique,
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel,
-			final boolean toSynchronize,
 			final ScoresAggregatorFactory aggregatorFactory) {
 		this.setAtIndividualLevel = addAtIndividualLevel;
+
+		if (addAtIndividualLevel) {
+			for (Person person : clique.getMembers().values()) {
+				Plan plan = plans.get( person.getId() );
+				if (!person.getPlans().contains( plan )) {
+					person.addPlan( plan );
+				}
+			}
+		}
 		this.clique = clique;
-
-		// in the plan file, pu activities are numbered. If two pick ups have
-		// the same number in the same joint plan, the following legs are
-		// considered joint.
-		// This structure "accumulates" the legs to join during the construction,
-		// in order to be able to link all related legs.
-		Map<String, List<JointLeg>> toLink = new HashMap<String, List<JointLeg>>();
-		String actType;
-		String currentJointEpisodeId = null;
-		JointLeg currentLeg;
-		JointActivity currentActivity;
-
-		//TODO: check for consistency (referenced IDs, etc)
-		for (Map.Entry<Id, ? extends Plan> entry : plans.entrySet()) {
-			Id id = entry.getKey();
-			PlanImpl currentPlan = new PlanImpl(this.clique.getMembers().get(id));
-
-			for (PlanElement pe : entry.getValue().getPlanElements()) {
-				if (pe instanceof Activity) {
-					//if (pe instanceof JointActivity) {
-					//	currentActivity = (JointActivity) pe;
-					//}
-					//else {
-						currentActivity = new JointActivity((Activity) pe, 
-								this.clique.getMembers().get(id));
-					//}
-					actType = currentActivity.getType();
-
-					if (actType.matches(JointActingTypes.PICK_UP_REGEXP)) {
-						// the next leg will be to associate with this id
-						currentJointEpisodeId =
-							actType.split(JointActingTypes.PICK_UP_SPLIT_EXPR)[1];
-						currentActivity.setType(JointActingTypes.PICK_UP);
-					}
-
-					currentPlan.addActivity(currentActivity);
-				}
-				else {
-					//if (pe instanceof JointLeg) {
-					//	currentLeg = (JointLeg) pe;
-					//} else  {
-						currentLeg = new JointLeg((Leg) pe,
-								(Person) this.clique.getMembers().get(id));
-					//}
-
-					if (currentJointEpisodeId != null) {
-						// this leg is a shared leg, remember this.
-						if (!toLink.containsKey(currentJointEpisodeId)) {
-							toLink.put(currentJointEpisodeId, new ArrayList<JointLeg>());
-						}
-
-						toLink.get(currentJointEpisodeId).add(currentLeg);
-						currentJointEpisodeId = null;
-					}
-
-					currentPlan.addLeg(currentLeg);
-				}
-			}
-
-			if (this.individualPlans.put(id, currentPlan) != null) {
-				// normally impossible, as we iterate on a set, but we are
-				// never too sure...
-				throw new RuntimeException("id collision");
-			}
-
-			currentPlan.setScore(entry.getValue().getScore());
-
-			if (addAtIndividualLevel) {
-				this.clique.getMembers().get(id).addPlan(currentPlan);
-			}
-		}
-
-		// create the links that where encoded in the activity types names
-		for (List<JointLeg> legsToLink : toLink.values()) {
-			for (JointLeg leg : legsToLink) {
-				if (leg.getMode().equals(TransportMode.car)) {
-					leg.setIsDriver(true);
-				}
-				for (JointLeg linkedLeg : legsToLink) {
-					if (leg != linkedLeg) {
-						leg.addLinkedElementById(linkedLeg.getId());
-					}
-				}	
-			}
-		}
-
-		this.constructLegsMap();
-		this.individualPlanType = this.setIndividualPlanTypes();
-
-		if (toSynchronize) {
-			this.synchronize();
-		}
-
+		this.individualPlans.putAll( plans );
 		this.aggregatorFactory = aggregatorFactory;
 		this.aggregator =
 			aggregatorFactory.createScoresAggregator(this.individualPlans.values());
-	}
-
-	/**
-	 * If the plan is to be added a the individual level, this method attach
-	 * it a type identifying all individual plans pertaining to the same joint
-	 * plan.
-	 *
-	 * @return the type used
-	 */
-	private String  setIndividualPlanTypes() {
-		if (this.setAtIndividualLevel) {
-			String type = this.clique.getNextIndividualPlanType();
-
-			for (Plan plan :  this.individualPlans.values()) {
-				((PlanImpl) plan).setType(type);
-			}
-
-			return type;
-		}
-		return null;
-	}
-
-	private void synchronize() {
-		Map<Id, IndividualValuesWrapper> individualValues = getIndividualValueWrappers();
-		List<JointLeg> accessedLegs = new ArrayList<JointLeg>();
-		
-		while (notAllPlansSynchronized(individualValues)) {
-			for (Id id : individualValues.keySet()) {
-				examineNextActivity(id, individualValues, accessedLegs);
-			}
-		}
-
-		for (List<PlanElement> pes : getIndividualPlanElements().values()) {
-			((Activity) pes.get( 0 )).setStartTime( Time.UNDEFINED_TIME );
-			((Activity) pes.get( pes.size() - 1 )).setEndTime( Time.UNDEFINED_TIME );
-		}
-	}
-
-	private Map<Id, IndividualValuesWrapper> getIndividualValueWrappers() {
-		Map<Id, IndividualValuesWrapper> out = new HashMap<Id, IndividualValuesWrapper>();
-
-		for (Id id : individualPlans.keySet()) {
-			out.put(id, new IndividualValuesWrapper());
-		}
-
-		return out;
 	}
 
 	/**
@@ -282,54 +127,22 @@ public class JointPlan implements Plan {
 	 */
 	public JointPlan(final JointPlan plan) {
 		this(	plan.getClique(),
-				plan.getIndividualPlans(),
+				cloneIndividualPlans( plan ),
 				plan.setAtIndividualLevel,
-				false, // just copy the plan: do not try to synchronize
 				plan.getScoresAggregatorFactory());
-		this.setJointTripPossibilities( plan.getJointTripPossibilities() );
+		//this.setJointTripPossibilities( plan.getJointTripPossibilities() );
 	}
 
-	private void constructLegsMap() {
-		if (this.legsMap.size() > 0) {
-			throw new RuntimeException( "leg map not empty at initialisation" );
+	private static Map<Id, Plan> cloneIndividualPlans(final JointPlan plan) {
+		Map<Id , Plan> plans = new HashMap<Id, Plan>();
+
+		for (Map.Entry<Id, Plan> indiv : plan.getIndividualPlans().entrySet()) {
+			PlanImpl newPlan = new PlanImpl( indiv.getValue().getPerson() );
+			newPlan.copyPlan( indiv.getValue() );
+			plans.put( indiv.getKey() , newPlan );
 		}
-
-		for (PlanElement pe : this.getPlanElements()) {
-			if (pe instanceof JointLeg) {
-				JointLeg leg = (JointLeg) pe;
-				leg.setJointPlan( this );
-				JointLeg old = this.legsMap.put(leg.getId(), leg);
-
-				if (old != null) {
-					throw new IllegalArgumentException("duplicate id found during"
-							+" JointPlan construction for clique "+clique.getId()+
-							": leg "+leg.getId()+
-							" for person "+leg.getPerson().getId()+
-							" with mode "+leg.getMode()+
-							" conflicts with leg "+old.getId()+
-							" for person "+old.getPerson().getId()+
-							" with mode "+old.getMode());
-				}
-			}
-			else if (pe instanceof JointActivity) {
-				JointActivity act = (JointActivity) pe;
-				JointActivity old = actMap.put(act.getId(), act);
-
-				if (old != null) {
-					throw new IllegalArgumentException("duplicate id found during"
-							+" JointPlan construction for clique "+clique.getId()+
-							": act "+act.getId()+
-							" for person "+act.getPerson().getId()+
-							" with type "+act.getType()+
-							" conflicts with act "+old.getId()+
-							" for person "+old.getPerson().getId()+
-							" with type "+old.getType());
-				}
-			}
-			else {
-				throw new RuntimeException( "unexpected plan element type "+pe.getClass().getName() );
-			}
-		}
+		
+		return plans;
 	}
 
 	/*
@@ -480,7 +293,7 @@ public class JointPlan implements Plan {
 						this.individualPlans.get(currentIndividual.getId()));
 				// replace it by the new plan
 				currentPlan = (PlanImpl) plan.getIndividualPlan(currentIndividual);
-				currentPlan.setType(this.individualPlanType);
+				//currentPlan.setType(this.individualPlanType);
 				currentIndividual.addPlan(currentPlan);
 				// set it as selected if it was the selected plan
 				if (this.isSelected()) {
@@ -498,10 +311,6 @@ public class JointPlan implements Plan {
 		// the collection in the aggregator points towards the values collection
 		// of the map, but it would become messy (and implementation dependant)
 		this.aggregator = this.aggregatorFactory.createScoresAggregator(this.individualPlans.values());
-		this.legsMap.clear();
-		this.legsMap.putAll(plan.legsMap);
-		this.actMap.clear();
-		this.actMap.putAll(plan.actMap);
 	}
 
 	/**
@@ -530,85 +339,29 @@ public class JointPlan implements Plan {
 		return output;
 	}
 
-	/**
-	 * Returns a leg given its Id.
-	 * used to resolve links between joint legs.
-	 *
-	 * @throws LinkedElementsResolutionException if the corresponding leg is not found
-	 */
-	public JointLeg getLegById(final Id legId) {
-		JointLeg leg = this.legsMap.get(legId);
+	///**
+	// * Returns a leg given its Id.
+	// * used to resolve links between joint legs.
+	// *
+	// * @throws LinkedElementsResolutionException if the corresponding leg is not found
+	// */
+	//public JointLeg getLegById(final Id legId) {
+	//	throw new UnsupportedOperationException( "will be removed" );
+	//}
 
-		if (leg == null) {
-			throw new LinkedElementsResolutionException(
-					"legs links could not be resolved, when searching for leg with id "+legId+
-					" in plan with registered legs "+legsMap.keySet()+" and plan elements: "+
-					getIndividualPlanElements()+", for clique "+clique);
-		}
-
-		return leg;
-	}
-
-	/**
-	 * Returns an act given its Id.
-	 *
-	 * @throws LinkedElementsResolutionException if the corresponding leg is not found
-	 */
-	public JointActivity getActById(final Id actId) {
-		JointActivity act = actMap.get(actId);
-
-		if (act == null) {
-			throw new LinkedElementsResolutionException(
-					"acts links could not be resolved, when searching for act with id "+actId+
-					" in plan with registered activities "+actMap.keySet()+" and plan elements: "+
-					getIndividualPlanElements()+", for clique "+clique);
-		}
-
-		return act;
-	}
+	///**
+	// * Returns an act given its Id.
+	// *
+	// * @throws LinkedElementsResolutionException if the corresponding leg is not found
+	// */
+	//public JointActivity getActById(final Id actId) {
+	//	throw new UnsupportedOperationException( "will be removed" );
+	//}
 
 	/**
-	 * Returns the "type" of the plan.
-	 * This allows to make sure that the most "general" plan will not be removed.
-	 * @return a string, corresponding to a list of the ids of the origins of joint trips,
-	 * separated by "-". No shared leg corresponds to the type "". The Ids are ordered
-	 * by their natural ordering, so that the order is always the same.
 	 */
 	public String getType() {
-
-		List<Id> jointOrigins = new ArrayList<Id>();
-		Id currentNonPuDoAct = null;
-
-		for (PlanElement pe : getPlanElements()) {
-			if ((pe instanceof JointActivity)) {
-				if( !((Activity) pe).getType().equals( JointActingTypes.PICK_UP ) &&
-					!((Activity) pe).getType().equals( JointActingTypes.DROP_OFF ) ) {
-					currentNonPuDoAct = ((JointActivity) pe).getId();
-				}
-			}
-			else if (pe instanceof JointLeg) {
-				if ( ((JointLeg) pe).getJoint() ) {
-					jointOrigins.add( currentNonPuDoAct );
-				}
-			}
-			else {
-				throw new RuntimeException( "unexpected plan element type "+pe.getClass() );
-			}
-		}
-
-		Collections.sort( jointOrigins );
-		StringBuffer type = new StringBuffer();
-		boolean notFirst = false;
-		for (Id id : jointOrigins) {
-				if (notFirst) {
-					type.append( "-" );
-				} else {
-					notFirst = true;
-				}
-				type.append( id );
-		}
-
-		return type.toString();
+		return "jointPlan";
 	}
 
 	@Override
@@ -621,145 +374,19 @@ public class JointPlan implements Plan {
 		return this.aggregatorFactory;
 	}
 
-	public JointTripPossibilities getJointTripPossibilities() {
-		return jointTripPossibilities;
-	}
+	//public JointTripPossibilities getJointTripPossibilities() {
+	//	return jointTripPossibilities;
+	//}
 
-	/**
-	 * Sets the joint trip possibilities information
-	 * @param possibilities the information to set (can be null)
-	 * @return the previously set possibilities information (can be null)
-	 */
-	public JointTripPossibilities setJointTripPossibilities(
-			final JointTripPossibilities possibilities) {
-		JointTripPossibilities old = this.jointTripPossibilities;
-		this.jointTripPossibilities = possibilities;
-		return old;
-	}
-
-	/*
-	 * =========================================================================
-	 * plan synchronization helpers
-	 * =========================================================================
-	 */
-	private static class IndividualValuesWrapper {
-		public int indexInPlan = 0;
-		public double now = 0d;
-		public boolean isFinished = false;
-	}
-
-	private boolean notAllPlansSynchronized(
-			final Map<Id, IndividualValuesWrapper> IndividualValues) {
-		for (IndividualValuesWrapper value : IndividualValues.values()) {
-			if (value.isFinished == false) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * To call iteratively to synchronize plans.
-	 * It works in the following way:
-	 * <ul>
-	 * <li> for individual legs/activities, it just make them begin
-	 * at the end of the last act/leg </li>
-	 * <li> for joint legs, it makes the PU end at the latest passenger arrival </li>
-	 * </ul>
-	 */
-	private void examineNextActivity(
-			final Id id,
-			final Map<Id, IndividualValuesWrapper> individualValues,
-			final List<JointLeg> accessedLegs) {
-		IndividualValuesWrapper currentIndividualValues = individualValues.get(id);
-		PlanElement currentPlanElement;
-
-		try {
-			currentPlanElement = this.individualPlans.get(id)
-				.getPlanElements().get(currentIndividualValues.indexInPlan);
-		} catch (IndexOutOfBoundsException e) {
-			// no more plan elements for this individual
-			currentIndividualValues.isFinished = true;
-			return;
-		}
-
-		if (currentPlanElement instanceof Leg) {
-			JointLeg leg;
-			double travelTime;
-
-			try {
-				leg = (JointLeg) currentPlanElement;
-			} catch (ClassCastException e) {
-				throw new RuntimeException("JointPlan contained non-JointLeg legs");
-			}
-
-			leg.setDepartureTime(currentIndividualValues.now);
-			travelTime = leg.getTravelTime();
-			currentIndividualValues.now += (travelTime == Time.UNDEFINED_TIME ?
-					0d : travelTime);
-			// leg.setArrivalTime(currentIndividualValues.now);
-			// ensures that passenger legs with new times will be copied again.
-			leg.routeToCopy();
-
-			currentIndividualValues.indexInPlan++;
-
-			return;
-		}
-
-		Activity act = (Activity) currentPlanElement;
-
-		if (!act.getType().equals(JointActingTypes.PICK_UP)) {
-			double endTime = act.getEndTime();
-			if (endTime == Time.UNDEFINED_TIME) {
-				endTime = currentIndividualValues.now + act.getMaximumDuration();
-			}
-
-			act.setStartTime(currentIndividualValues.now);
-			currentIndividualValues.now =
-				currentIndividualValues.now < endTime ?
-				endTime :
-				currentIndividualValues.now + minimalDuration;
-			act.setEndTime(currentIndividualValues.now);
-
-			currentIndividualValues.indexInPlan++;
-		}
-		else {
-			// test if linked legs are planned
-			JointLeg sharedRide = (JointLeg) this.individualPlans.get(id)
-				.getPlanElements().get(currentIndividualValues.indexInPlan + 1);
-			Map<Id, JointLeg> linkedLegs = sharedRide.getLinkedElements();
-			if (accessedLegs.containsAll(linkedLegs.values())) {
-				// for other legs to be aware
-				accessedLegs.add(sharedRide);
-				// if yes, compute duration and set activity
-				double soonestStartTime = currentIndividualValues.now;
-				for (JointLeg leg : linkedLegs.values()) {
-					soonestStartTime = Math.max(
-							soonestStartTime,
-							leg.getDepartureTime());
-				}
-				act.setStartTime(currentIndividualValues.now);
-				currentIndividualValues.now = soonestStartTime;
-				act.setEndTime(currentIndividualValues.now);
-				sharedRide.setDepartureTime(currentIndividualValues.now);
-				currentIndividualValues.indexInPlan++;
-			}
-			// else, add joint leg as accessed 
-			else {
-				accessedLegs.add(sharedRide);
-				sharedRide.setDepartureTime(
-						currentIndividualValues.now + pickUpDuration);
-			}
-		}
-	}
-
-	public static class LinkedElementsResolutionException extends RuntimeException {
-		public LinkedElementsResolutionException(final String msg) {
-			super(msg);
-		}
-
-		public LinkedElementsResolutionException(final String msg, final Throwable cause) {
-			super(msg, cause);
-		}
-	}
+	///**
+	// * Sets the joint trip possibilities information
+	// * @param possibilities the information to set (can be null)
+	// * @return the previously set possibilities information (can be null)
+	// */
+	//public JointTripPossibilities setJointTripPossibilities(
+	//		final JointTripPossibilities possibilities) {
+	//	JointTripPossibilities old = this.jointTripPossibilities;
+	//	this.jointTripPossibilities = possibilities;
+	//	return old;
+	//}
 }

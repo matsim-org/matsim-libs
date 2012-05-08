@@ -50,7 +50,6 @@ import playground.thibautd.agentsmating.logitbasedmating.basic.PlatformBasedMode
 import playground.thibautd.agentsmating.logitbasedmating.framework.PlatformBasedModeChooser;
 import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTimeEstimatorFactory;
 import playground.thibautd.householdsfromcensus.CliquesWriter;
-import playground.thibautd.jointtrips.population.PopulationWithJointTripsWriterHandler;
 import playground.thibautd.utils.MoreIOUtils;
 import playground.thibautd.utils.TransitActRemoverCorrectTravelTime;
 
@@ -200,9 +199,9 @@ public class RunReducedSPModel {
 				scenario.getPopulation(),
 				scenario.getNetwork(),
 				((ScenarioImpl) scenario).getKnowledges());
-		popWriter.setWriterHandler(new PopulationWithJointTripsWriterHandler(
-					scenario.getNetwork(),
-					((ScenarioImpl) scenario).getKnowledges()));
+		//popWriter.setWriterHandler(new PopulationWithJointTripsWriterHandler(
+		//			scenario.getNetwork(),
+		//			((ScenarioImpl) scenario).getKnowledges()));
 		popWriter.write( outputPath+"/populationWithModeSet.xml.gz" );
 
 		(new CliquesWriter(cliques)).writeFile( outputPath+"/cliques.xml.gz");

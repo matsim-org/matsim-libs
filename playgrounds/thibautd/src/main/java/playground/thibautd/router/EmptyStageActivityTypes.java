@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTripsSelectorMoveGenerator.java
+ * EmptyStageActivityTypes.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtrips.replanning.modules.jointtripsselector;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import playground.thibautd.tsplanoptimizer.framework.Move;
-import playground.thibautd.tsplanoptimizer.framework.MoveGenerator;
+package playground.thibautd.router;
 
 /**
  * @author thibautd
  */
-public class JointTripsSelectorMoveGenerator implements MoveGenerator {
-	private final List<Move> moves;
+public final class EmptyStageActivityTypes implements StageActivityTypes {
+	public static final EmptyStageActivityTypes INSTANCE = new EmptyStageActivityTypes();
 
-	public JointTripsSelectorMoveGenerator(final int size) {
-		List<Move> moves = new ArrayList<Move>();
-
-		for (int i=0; i < size; i++) {
-			moves.add( new MutateOneBoolean( i ) );
-		}
-
-		this.moves = Collections.unmodifiableList( moves );
-	}
-
+	private EmptyStageActivityTypes() {}
 	@Override
-	public Collection<Move> generateMoves() {
-		return moves;
+	public final boolean isStageActivity(final String activityType) {
+		return false;
 	}
 }
 

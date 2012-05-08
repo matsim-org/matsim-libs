@@ -21,7 +21,7 @@ package playground.thibautd.jointtrips.replanning.modules.reroute;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.replanning.JointPlanAlgorithm;
@@ -37,10 +37,10 @@ import playground.thibautd.jointtrips.replanning.JointPlanAlgorithm;
  */
 public class JointReRouteAlgo extends JointPlanAlgorithm {
 
-	private final PlansCalcRoute routingAlgo;
+	private final PlanAlgorithm routingAlgo;
 
 	public JointReRouteAlgo(final Controler controler) {
-		this.routingAlgo = (PlansCalcRoute) controler.createRoutingAlgorithm();
+		this.routingAlgo = controler.createRoutingAlgorithm();
 	}	
 
 	public void run(final JointPlan plan) {

@@ -22,6 +22,14 @@ package playground.thibautd.tsplanoptimizer.framework;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+
 /**
  * Class responsible for running the tabu search defined by the
  * {@link TabuSearchConfiguration} defined by a {@link ConfigurationBuilder}.
@@ -29,6 +37,9 @@ import java.util.List;
  * @author thibautd
  */
 public class TabuSearchRunner {
+	private static final Logger log =
+		Logger.getLogger(TabuSearchRunner.class);
+
 
 	/**
 	 * Runs the process.
@@ -91,6 +102,7 @@ public class TabuSearchRunner {
 						iterationBestScore = newScore;
 					}
 					else if (Double.isNaN( newScore ) || Double.isInfinite( newScore )) {
+						logInvalidSolution( newSolution );
 						throw new RuntimeException( "got invalid score: "+newScore );
 					}
 				}
@@ -123,6 +135,23 @@ public class TabuSearchRunner {
 		}
 
 		return currentBestSolution;
+	}
+
+	private static void logInvalidSolution(final Solution newSolution) {
+		log.error( "INVALID SOLUTION!" );
+		int i=0;
+		for (PlanElement pe : newSolution.getRepresentedPlan().getPlanElements()) {
+			log.error( (++i)+": "+pe );
+			if (pe instanceof Leg) {
+				Route route = ((Leg) pe).getRoute();
+				if (route instanceof GenericRoute) {
+					log.error( "     "+((GenericRoute) route).getRouteType()+" from "+route.getStartLinkId()+" to "+route.getEndLinkId()+": "+((GenericRoute) route).getRouteDescription() );
+				}
+				else if (route instanceof NetworkRoute) {
+					log.error( "     "+route.getClass().getSimpleName()+" from "+route.getStartLinkId()+" to "+route.getEndLinkId()+": "+((NetworkRoute) route).getLinkIds() );
+				}
+			}
+		}
 	}
 }
 

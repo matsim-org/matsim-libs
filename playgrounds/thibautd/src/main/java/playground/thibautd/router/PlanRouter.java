@@ -212,7 +212,8 @@ public class PlanRouter implements PlanAlgorithm {
 			}
 		}
 		else {
-			return now + ((Leg) pe).getTravelTime();
+			double tt = ((Leg) pe).getTravelTime();
+			return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
 		}
 	}	
 

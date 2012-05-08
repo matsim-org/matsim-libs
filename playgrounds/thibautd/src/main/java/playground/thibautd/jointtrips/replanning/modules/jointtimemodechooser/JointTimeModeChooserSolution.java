@@ -23,7 +23,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,9 +41,10 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
+import playground.thibautd.jointtrips.population.DriverRoute;
 import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.jointtrips.population.JointLeg;
 import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.population.PassengerRoute;
 import playground.thibautd.jointtrips.router.JointPlanRouter;
 import playground.thibautd.router.TripRouter;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
@@ -53,6 +58,9 @@ import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
  * @author thibautd
  */
 public class JointTimeModeChooserSolution implements Solution {
+	private static final Logger log =
+		Logger.getLogger(JointTimeModeChooserSolution.class);
+
 	private static enum SharedStatus { driver , passenger , alone }
 
 	private final static double SCENARIO_DUR = 24 * 3600;
@@ -153,6 +161,7 @@ public class JointTimeModeChooserSolution implements Solution {
 
 	@Override
 	public Plan getRepresentedPlan() {
+		//log.warn( "TODO: synchronisation! (do it in a joint router?)" );
 		Iterator<List<Value>> individualValues = values.values.iterator();
 		Iterator<List<PlanElement>> individualElements =  values.associatedPlanElements.iterator();
 
@@ -343,8 +352,9 @@ public class JointTimeModeChooserSolution implements Solution {
 	}	
 
 	private void enforceTimeConsistency(final JointPlan plan) {
-		for (List<PlanElement> planElements : plan.getIndividualPlanElements().values()) {
-			// System.out.println( "new plan" );
+		for (Map.Entry< Id , List<PlanElement> > entry : plan.getIndividualPlanElements().entrySet()) {
+			Id currentAgent = entry.getKey();
+			List<PlanElement> planElements = entry.getValue();
 			double now = 0;
 			for (PlanElement pe : planElements) {
 				if (pe instanceof Activity) {
@@ -384,14 +394,41 @@ public class JointTimeModeChooserSolution implements Solution {
 				else {
 					((Leg) pe).setDepartureTime( now );
 					if ( ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
-						Route route = ((Leg) pe).getRoute();
-						((Leg) pe).setTravelTime( route.getTravelTime() );
+						PassengerRoute route = (PassengerRoute) ((Leg) pe).getRoute();
+						double tt =	searchDriverTravelTime(
+							plan,
+							route.getStartLinkId(),
+							route.getEndLinkId(),
+							route.getDriverId(),
+							currentAgent);
+						((Leg) pe).setTravelTime( tt );
 					}
 				}
 				now = updateNow( now , pe );
 			}
 			((Activity) planElements.get( 0 )).setStartTime( Time.UNDEFINED_TIME );
 		}
+	}
+
+	private static double searchDriverTravelTime(
+			final JointPlan plan,
+			final Id origin,
+			final Id destination,
+			final Id driver,
+			final Id passenger) {
+		for (PlanElement pe : plan.getIndividualPlanElements().get( driver )) {
+			if (pe instanceof Leg) {
+				Route r = ((Leg) pe).getRoute();
+
+				if (r instanceof DriverRoute &&
+						r.getStartLinkId().equals( origin ) &&
+						r.getEndLinkId().equals( destination ) &&
+						((DriverRoute) r).getPassengersIds().contains( passenger )) {
+					return r.getTravelTime();
+				}
+			}
+		}
+		return Time.UNDEFINED_TIME;
 	}
 
 	private static List<List<PlanElement>> analyseSubtours(

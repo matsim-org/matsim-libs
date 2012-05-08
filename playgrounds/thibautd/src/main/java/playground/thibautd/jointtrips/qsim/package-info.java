@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTripsSelectorModule.java
+ * package-info.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtrips.replanning.modules.jointtripsselector;
-
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser.JointTimeModeChooserModule;
 
 /**
+ * Provides plugins for the QSim to allow fine joint traveling simulation.
+ *
  * @author thibautd
  */
-public class JointTripsSelectorModule extends AbstractMultithreadedModule {
-	private final AbstractMultithreadedModule optDelegate;
-	private final Controler controler;
-
-	public JointTripsSelectorModule(final Controler controler) {
-		super(controler.getConfig().global());
-		optDelegate = new JointTimeModeChooserModule( controler );
-		this.controler = controler;
-	}
-
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		PlanAlgorithm subroutine = optDelegate.getPlanAlgoInstance();
-
-		return new JointTripsSelector(
-				subroutine,
-				controler.getScoringFunctionFactory());
-	}
-}
+package playground.thibautd.jointtrips.qsim;
 
