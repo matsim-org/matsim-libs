@@ -42,6 +42,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.anhorni.surprice.Surprice;
+import playground.anhorni.surprice.preprocess.Analyzer;
 
 
 public class Merger {	
@@ -85,6 +86,7 @@ public class Merger {
 	}
 	
 	private void writeWeek(String outPath) {
+		new Analyzer().writeHeader(outPath);
 		for (int dow = 0; dow < 7; dow++) {
 			int counter = 0;
 			int nextMsg = 1;
@@ -99,6 +101,7 @@ public class Merger {
 				person.addPlan(plan);
 				((PersonImpl)person).setSelectedPlan(plan);				
 			}
+			new Analyzer().run(this.scenario.getPopulation(), outPath, Surprice.days.get(dow));
 			log.info("Writing population with plans ..." + outPath + "/" + dow + "/plans.xml.gz");
 			new File(outPath + "/" + dow + "/").mkdirs();
 			new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + dow + "/plans.xml.gz");
