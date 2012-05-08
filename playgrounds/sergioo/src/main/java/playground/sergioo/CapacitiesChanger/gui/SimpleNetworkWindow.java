@@ -27,6 +27,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -106,14 +107,15 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 	
 	//Methods
 	public SimpleNetworkWindow() {
-		setTitle("Capacities changer");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		JFileChooser fileChooser = new JFileChooser();
+		JFileChooser fileChooser = new JFileChooser("C:\\Users\\sergioo\\workspace\\playgrounds\\sergioo\\data\\MATSim-Sin-2.0\\input\\network");
 		fileChooser.showOpenDialog(this);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(fileChooser.getSelectedFile().getAbsolutePath());
+		File file = fileChooser.getSelectedFile();
+		setTitle("Capacities changer: "+file.getName());
+		new MatsimNetworkReader(scenario).readFile(file.getAbsolutePath());
 		layersPanels.put(PanelIds.ONE, new NetworkPanel(this, new SimpleSelectionNetworkPainter(scenario.getNetwork())));
 		this.add(layersPanels.get(PanelIds.ONE), BorderLayout.CENTER);
 		option = Options.ZOOM;
@@ -184,7 +186,7 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 				((NetworkPanel)layersPanels.get(PanelIds.ONE)).selectNode(res);
 	}
 	public void save() {
-		JFileChooser fileChooser = new JFileChooser();
+		JFileChooser fileChooser = new JFileChooser("C:\\Users\\sergioo\\workspace\\playgrounds\\sergioo\\data\\MATSim-Sin-2.0\\input\\network");
 		fileChooser.showSaveDialog(this);
 		((NetworkPanel)layersPanels.get(PanelIds.ONE)).saveNetwork(fileChooser.getSelectedFile());
 	}
