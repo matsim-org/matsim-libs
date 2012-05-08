@@ -110,7 +110,7 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		JFileChooser fileChooser = new JFileChooser("C:\\Users\\sergioo\\workspace\\playgrounds\\sergioo\\data\\MATSim-Sin-2.0\\input\\network");
+		JFileChooser fileChooser = new JFileChooser("./MATSim-Sin-2.0/input/network");
 		fileChooser.showOpenDialog(this);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		File file = fileChooser.getSelectedFile();
@@ -186,7 +186,7 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 				((NetworkPanel)layersPanels.get(PanelIds.ONE)).selectNode(res);
 	}
 	public void save() {
-		JFileChooser fileChooser = new JFileChooser("C:\\Users\\sergioo\\workspace\\playgrounds\\sergioo\\data\\MATSim-Sin-2.0\\input\\network");
+		JFileChooser fileChooser = new JFileChooser("./MATSim-Sin-2.0/input/network");
 		fileChooser.showSaveDialog(this);
 		((NetworkPanel)layersPanels.get(PanelIds.ONE)).saveNetwork(fileChooser.getSelectedFile());
 	}
