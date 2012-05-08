@@ -9,10 +9,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
+import others.sergioo.visUtils.JetColor;
+
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
 public class SimpleSelectionNetworkPainter extends NetworkPainter {
+	
+	//Constants
+	private static final float MAX_WIDTH = 7;
 	
 	//Attributes
 	private Color selectedLinkColor = Color.CYAN;
@@ -21,22 +26,28 @@ public class SimpleSelectionNetworkPainter extends NetworkPainter {
 	private boolean withSelected = true;
 	private double minCapacity;
 	private double maxCapacity;
+	private double minFreeSpeed;
+	private double maxFreeSpeed;
 	
 	//Methods
 	public SimpleSelectionNetworkPainter(Network network) {
 		super(network);
+		networkPainterManager = new CarNetworkPainterManager(network);
 		calculateMinMax();
 	}
 	public SimpleSelectionNetworkPainter(Network network, Color networkColor) {
 		super(network, networkColor);
+		networkPainterManager = new CarNetworkPainterManager(network);
 		calculateMinMax();
 	}
 	public SimpleSelectionNetworkPainter(Network network, Color networkColor, Stroke networkStroke) {
 		super(network, networkColor, networkStroke);
+		networkPainterManager = new CarNetworkPainterManager(network);
 		calculateMinMax();
 	}
 	public SimpleSelectionNetworkPainter(Network network, Color networkColor, Stroke networkStroke, Color selectedLinkColor, Color selectedNodeColor, Stroke selectedStroke) {
 		super(network, networkColor, networkStroke);
+		networkPainterManager = new CarNetworkPainterManager(network);
 		this.selectedLinkColor = selectedLinkColor;
 		this.selectedNodeColor = selectedNodeColor;
 		this.selectedStroke = selectedStroke;
@@ -51,21 +62,35 @@ public class SimpleSelectionNetworkPainter extends NetworkPainter {
 			if(link.getCapacity()<minCapacity)
 				minCapacity = link.getCapacity();
 		}
+		minFreeSpeed = Double.MAX_VALUE;
+		maxFreeSpeed = 0;
+		for(Link link:networkPainterManager.getNetwork().getLinks().values()) {
+			if(link.getFreespeed()>maxFreeSpeed)
+				maxFreeSpeed = link.getFreespeed();
+			if(link.getFreespeed()<minFreeSpeed)
+				minFreeSpeed = link.getFreespeed();
+		}
 	}
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		try {
 			for(Link link:networkPainterManager.getNetworkLinks(layersPanel.getCamera()))
-				paintSimpleLink(g2, layersPanel, link, new BasicStroke(2.5f), getCapacityColor(link.getCapacity()));
+				paintSimpleLink(g2, layersPanel, link, new BasicStroke(getCapacityWidth(link.getCapacity())), getFreeSpeedColor(link.getFreespeed()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		if(withSelected)
 			paintSelected(g2, layersPanel);
 	}
-	private Color getCapacityColor(double capacity) {
+	private Color getFreeSpeedColor(double freeSpeed) {
+		float prop = (float) ((freeSpeed-3*minFreeSpeed)/(maxFreeSpeed-3*minFreeSpeed));
+		if(prop<0)
+			prop=0;
+		return JetColor.getJetColor(prop);
+	}
+	private float getCapacityWidth(double capacity) {
 		float prop = (float) ((capacity-minCapacity)/(maxCapacity-minCapacity));
-		return new Color(1-prop, 0, prop);
+		return prop*MAX_WIDTH;
 	}
 	private void paintSelected(Graphics2D g2, LayersPanel layersPanel) {
 		Link link=networkPainterManager.getSelectedLink();
