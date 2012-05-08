@@ -38,11 +38,13 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
 public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActivityReplanner {
@@ -53,13 +55,15 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	
 	protected final HouseholdsTracker householdsTracker;
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
+	protected final PTTravelTimeKTI ptTravelTime;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
 			InternalInterface internalInterface, HouseholdsTracker householdsTracker,
-			ModeAvailabilityChecker modeAvailabilityChecker) {
+			ModeAvailabilityChecker modeAvailabilityChecker, PTTravelTimeKTI ptTravelTime) {
 		super(id, scenario, internalInterface);
 		this.householdsTracker = householdsTracker;
-		this.modeAvailabilityChecker = modeAvailabilityChecker;		
+		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.ptTravelTime = ptTravelTime;
 	}
 	
 	@Override
@@ -141,8 +145,29 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			int position = executedPlan.getActLegIndex(currentActivity) + 1;
 			executedPlan.insertLegAct(position, legToMeeting, meetingActivity);
 			
-			// calculate route for the leg to the rescue facility
+			// calculate route for the leg to the rescue facility using the identified mode
 			new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+			
+			// if the person has to walk, we additionally try pt
+			if (transportMode.equals(TransportMode.walk)) {
+				double travelTimePT = ptTravelTime.calcSwissPtTravelTime(currentActivity, meetingActivity, this.time);
+				double travelTimeWalk = legToMeeting.getTravelTime();
+				
+				// If using pt is faster than walking switch to pt.
+				if (travelTimePT < travelTimeWalk) {
+					legToMeeting.setMode(TransportMode.pt);
+					
+					// calculate route for the leg to the rescue facility
+					new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+					
+					// set travel time
+					legToMeeting.getRoute().setTravelTime(travelTimePT);
+					
+					// set speed
+					double routeLength = RouteUtils.calcDistance((NetworkRoute) legToMeeting.getRoute(), scenario.getNetwork());
+					ptTravelTime.setPersonSpeed(withinDayAgent.getId(), routeLength / travelTimePT);
+				}
+			}
 			
 			meetingActivity.setStartTime(legToMeeting.getDepartureTime() + legToMeeting.getTravelTime());
 			

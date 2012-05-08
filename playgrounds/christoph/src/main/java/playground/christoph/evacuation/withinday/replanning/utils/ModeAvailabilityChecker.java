@@ -158,14 +158,14 @@ public class ModeAvailabilityChecker {
 		 * Otherwise check for the other modes 
 		 */
 		boolean hasBike = false;
-		boolean hasPt = false;
+//		boolean hasPt = false;
 		boolean hasRide = false;
 		
 		if (currentActivityIndex > 0) {
 			Leg previousLeg = (Leg) plan.getPlanElements().get(currentActivityIndex - 1);
 			String transportMode = previousLeg.getMode();
 			if (transportMode.equals(TransportMode.bike)) hasBike = true;
-			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
+//			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
 			else if (transportMode.equals(TransportMode.ride)) hasRide = true;
 		}
 		
@@ -173,12 +173,12 @@ public class ModeAvailabilityChecker {
 			Leg nextLeg = (Leg) plan.getPlanElements().get(currentActivityIndex + 1);
 			String transportMode = nextLeg.getMode();
 			if (transportMode.equals(TransportMode.bike)) hasBike = true;
-			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
+//			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
 			else if (transportMode.equals(TransportMode.ride)) hasRide = true;
 		}
 		
 		if (hasRide) return TransportMode.ride;
-		else if (hasPt) return TransportMode.pt;
+//		else if (hasPt) return TransportMode.pt;
 		else if (hasBike) return TransportMode.bike;
 		else return TransportMode.walk;
 	}

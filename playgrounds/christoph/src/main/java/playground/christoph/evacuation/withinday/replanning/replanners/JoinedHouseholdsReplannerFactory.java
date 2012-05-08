@@ -27,6 +27,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 
 public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityReplannerFactory {
@@ -34,20 +35,24 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	private final Scenario scenario;
 	private final HouseholdsTracker householdsTracker;
 	private final JoinedHouseholdsIdentifier identifier;
+	private final PTTravelTimeKTIFactory ptTravelTimeFactory;
 	
 	public JoinedHouseholdsReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
-			HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier) {
+			HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier,
+			PTTravelTimeKTIFactory ptTravelTimeFactory) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 		this.householdsTracker = householdsTracker;
 		this.identifier = identifier;
+		this.ptTravelTimeFactory = ptTravelTimeFactory;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new JoinedHouseholdsReplanner(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), householdsTracker, identifier);
+				this.getReplanningManager().getInternalInterface(), householdsTracker, identifier,
+				ptTravelTimeFactory.createTravelTime());
 		super.initNewInstance(replanner);
 		return replanner;
 	}

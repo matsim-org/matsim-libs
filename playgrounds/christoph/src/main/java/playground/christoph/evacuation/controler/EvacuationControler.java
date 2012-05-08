@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -108,6 +109,7 @@ import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIFactory;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
@@ -126,6 +128,8 @@ import playground.christoph.evacuation.withinday.replanning.replanners.PickupAge
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
+import playground.meisterk.kti.config.KtiConfigGroup;
+import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -191,7 +195,11 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 
 	protected PersonalizableTravelTimeFactory walkTravelTimeFactory;
 	protected PersonalizableTravelTimeFactory bikeTravelTimeFactory;
+	protected PersonalizableTravelTimeFactory ptTravelTimeFactory;
 	protected PersonalizableTravelTimeFactory travelTimeCollectorWrapperFactory;
+	
+	protected KtiConfigGroup ktiConfigGroup;
+	protected PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	
 	/*
 	 * Analysis modules
@@ -204,6 +212,12 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	public EvacuationControler(String[] args) {
 		super(args);
 		
+		/*
+		 * Create the empty object. They are filled in the loadData() method.
+		 */
+		this.ktiConfigGroup = new KtiConfigGroup();
+		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(this.ktiConfigGroup);
+		
 		new EvacuationConfigReader().readFile(args[1]);
 		
 		// Use a Scoring Function, that only scores the travel times!
@@ -214,6 +228,23 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		super.addControlerListener(this);
 	}
 
+	@Override
+	protected void loadData() {
+		super.loadData();
+	
+		/*
+		 * The KTIConfigGroup is loaded as generic Module. We replace this
+		 * generic object with a KtiConfigGroup object and copy all its parameter.
+		 */
+		Module module = this.config.getModule(KtiConfigGroup.GROUP_NAME);
+		this.config.removeModule(KtiConfigGroup.GROUP_NAME);
+		this.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+		
+		for (Entry<String, String> entry : module.getParams().entrySet()) {
+			this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());
+		}
+	}
+	
 	/*
 	 * When the Controller Startup Event is created, the EventsManager
 	 * has already been initialized. Therefore we can initialize now
@@ -273,18 +304,21 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		travelTimeCollectorWrapperFactory = new TravelTimeFactoryWrapper(this.getTravelTimeCollector());
 		
 		/*
-		 * Use advanced walk- and bike travel time calculators
+		 * Use advanced walk-, bike and pt travel time calculators
 		 */
 		this.walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
 		this.bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
+		this.ptTravelTimeFactory = new PTTravelTimeKTIFactory(this.scenarioData, 
+				new PTTravelTimeFactory(this.config.plansCalcRoute(), travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
+		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.pt, ptTravelTimeFactory);
 		
 		/*
-		 * Use the TravelTimeCollector as ride and pt travel time estimator
+		 * Use the TravelTimeCollector as ride travel time estimator
 		 */
-		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.pt, 
-				new PTTravelTimeFactory(this.config.plansCalcRoute(), travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
+//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.pt, 
+//				new PTTravelTimeFactory(this.config.plansCalcRoute(), travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.ride, 
 				new RideTravelTimeFactory(travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
 		
@@ -598,11 +632,13 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		/*
 		 * During Activity Replanners
 		 */
-		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.householdsTracker, this.modeAvailabilityChecker);
+		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.householdsTracker, 
+				this.modeAvailabilityChecker, (PTTravelTimeKTIFactory) this.ptTravelTimeFactory);
 		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, householdsTracker, (JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier);
+		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, householdsTracker,
+				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (PTTravelTimeKTIFactory) this.ptTravelTimeFactory);
 		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 

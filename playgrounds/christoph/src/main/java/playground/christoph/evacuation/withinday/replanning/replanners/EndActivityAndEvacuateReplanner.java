@@ -37,16 +37,24 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
+
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
 
 public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityReplanner {
 	
 	private static final Logger log = Logger.getLogger(EndActivityAndEvacuateReplanner.class);
 	
-	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	private final PTTravelTimeKTI ptTravelTime;
+	
+	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+			PTTravelTimeKTI ptTravelTime) {
 		super(id, scenario, internalInterface);
+		this.ptTravelTime = ptTravelTime;
 	}
 	
 	@Override
@@ -104,10 +112,9 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId("rescueFacility")).getCoord();
 		((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 		
-		// by default we use a car...
-//		Leg legToRescue = factory.createLeg(TransportMode.car);
+		// create a leg using the identified transport mode
 		Leg legToRescue = factory.createLeg(transportMode);
-			
+		
 		// add new activity
 		int position = executedPlan.getActLegIndex(currentActivity) + 1;
 		executedPlan.insertLegAct(position, legToRescue, rescueActivity);
@@ -115,6 +122,27 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// calculate route for the leg to the rescue facility
 		new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
 
+		// if the person has to walk, we additionally try pt
+		if (transportMode.equals(TransportMode.walk)) {
+			double travelTimePT = ptTravelTime.calcSwissPtTravelTime(currentActivity, rescueActivity, this.time);
+			double travelTimeWalk = legToRescue.getTravelTime();
+			
+			// If using pt is faster than walking switch to pt.
+			if (travelTimePT < travelTimeWalk) {
+				legToRescue.setMode(TransportMode.pt);
+				
+				// calculate route for the leg to the rescue facility
+				new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+				
+				// set travel time
+				legToRescue.getRoute().setTravelTime(travelTimePT);
+				
+				// set speed
+				double routeLength = RouteUtils.calcDistance((NetworkRoute) legToRescue.getRoute(), scenario.getNetwork());
+				ptTravelTime.setPersonSpeed(withinDayAgent.getId(), routeLength / travelTimePT);
+			}
+		}
+		
 		/*
 		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
@@ -142,16 +170,14 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	private String identifyTransportMode(int currentActivityIndex, Plan selectedPlan) {
 		
 		boolean hasCar = false;
-		boolean hasBike = false;
-		boolean hasPt = false;
 		boolean hasRide = false;
+		boolean hasBike = false;
 		
 		if (currentActivityIndex > 0) {
 			Leg previousLeg = (Leg) selectedPlan.getPlanElements().get(currentActivityIndex - 1);
 			String transportMode = previousLeg.getMode();
 			if (transportMode.equals(TransportMode.car)) hasCar = true;
 			else if (transportMode.equals(TransportMode.bike)) hasBike = true;
-			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
 			else if (transportMode.equals(TransportMode.ride)) hasRide = true;
 		}
 		
@@ -160,13 +186,11 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 			String transportMode = nextLeg.getMode();
 			if (transportMode.equals(TransportMode.car)) hasCar = true;
 			else if (transportMode.equals(TransportMode.bike)) hasBike = true;
-			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
 			else if (transportMode.equals(TransportMode.ride)) hasRide = true;
 		}
 		
 		if (hasCar) return TransportMode.car;
 		else if (hasRide) return TransportMode.ride;
-		else if (hasPt) return TransportMode.pt;
 		else if (hasBike) return TransportMode.bike;
 		else return TransportMode.walk;
 	}	
