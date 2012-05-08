@@ -124,7 +124,6 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	}
 	private void paintPoints(Graphics2D g2) {
 		Color[] colors = new Color[]{new Color(255,255,0),new Color(255,0,0),new Color(0,0,255)};
-		int i=0;
 		Collection<Coord>[] allStops = window.getStopPoints();
 		for(int k=allStops.length-1; k>=0; k--) {
 			g2.setStroke(new BasicStroke(allStops.length-k+2));
@@ -134,7 +133,6 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 				g2.drawLine(camera.getIntX(point.getX())-2*pointsSize, camera.getIntY(point.getY()), camera.getIntX(point.getX())+2*pointsSize, camera.getIntY(point.getY()));
 				g2.drawLine(camera.getIntX(point.getX()), camera.getIntY(point.getY())-2*pointsSize, camera.getIntX(point.getX()), camera.getIntY(point.getY())+2*pointsSize);
 			}
-			i++;
 		}
 	}
 	private void paintNetwork(Graphics2D g2) {
@@ -146,7 +144,6 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private void paintLines(Graphics2D g2) {
 		Set<Link>[] allLinks = window.getLinks();
 		Color[] colors = new Color[]{new Color(127,127,0),new Color(127,0,0),new Color(0,0,127)};
-		int i=0;
 		for(int k=allLinks.length-1; k>=0; k--) {
 			Set<Link> links = allLinks[k];
 			g2.setColor(colors[k]);
@@ -154,7 +151,6 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			for(Link link:links)
 				if(link!=null)
 					paintLink(link, g2);
-			i++;
 		}
 	}
 	private void paintSelected(Graphics2D g2) {
