@@ -382,18 +382,20 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		if (route instanceof NetworkRoute) {
-			for (Node n : RouteUtils.getNodes((NetworkRoute) route, this.network)) {
-				out.write(n.getId().toString());
-				out.write(" ");
-			}
-		} else if (route instanceof GenericRoute) {
+		if (route instanceof GenericRoute) {
 			String rd = ((GenericRoute) route).getRouteDescription();
 			if (rd != null) {
 				out.write(rd);
 				out.write(" "); // this is at the moment only to maintain binary compatibility
 			}
 		}
+		else if (route instanceof NetworkRoute) {
+			for (Node n : RouteUtils.getNodes((NetworkRoute) route, this.network)) {
+				out.write(n.getId().toString());
+				out.write(" ");
+			}
+		}
+
 		out.write("\n");
 	}
 

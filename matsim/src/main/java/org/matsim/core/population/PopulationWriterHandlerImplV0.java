@@ -254,12 +254,13 @@ import org.matsim.population.Desires;
 	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route>");
 
-		if (route instanceof NetworkRoute) {
+		if (route instanceof GenericRoute) {
+			out.write(((GenericRoute) route).getRouteDescription());
+		}
+		else if (route instanceof NetworkRoute) {
 			for (Node n : RouteUtils.getNodes((NetworkRoute) route, this.network)) {
 				out.write(n.getId() + " ");
 			}
-		} else if (route instanceof GenericRoute) {
-			out.write(((GenericRoute) route).getRouteDescription());
 		}
 	}
 

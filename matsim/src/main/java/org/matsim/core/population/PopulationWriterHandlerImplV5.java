@@ -230,7 +230,17 @@ import org.matsim.core.utils.misc.Time;
 
 	private void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
-		if (route instanceof NetworkRoute) {
+
+		if (route instanceof GenericRoute) {
+			out.write("type=\"");
+			out.write(((GenericRoute) route).getRouteType());
+			out.write("\">");
+			String rd = ((GenericRoute) route).getRouteDescription();
+			if (rd != null) {
+				out.write(rd);
+			}
+		}
+		else if (route instanceof NetworkRoute) {
 			NetworkRoute nr = (NetworkRoute) route;
 			
 			if ( nr.getVehicleId()!=null ) {
@@ -247,14 +257,6 @@ import org.matsim.core.utils.misc.Time;
 			if (!nr.getEndLinkId().equals(nr.getStartLinkId()) || nr.getLinkIds().size() > 0) {
 				out.write(" ");
 				out.write(nr.getEndLinkId().toString());
-			}
-		} else if (route instanceof GenericRoute) {
-			out.write("type=\"");
-			out.write(((GenericRoute) route).getRouteType());
-			out.write("\">");
-			String rd = ((GenericRoute) route).getRouteDescription();
-			if (rd != null) {
-				out.write(rd);
 			}
 		}
 	}
