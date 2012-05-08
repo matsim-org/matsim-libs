@@ -19,19 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import java.util.TreeSet;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.scoring.LegScoringFunction;
 import herbie.running.scoring.TravelScoringFunction;
+
+import java.util.TreeSet;
+
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 /**
  * @author thibautd

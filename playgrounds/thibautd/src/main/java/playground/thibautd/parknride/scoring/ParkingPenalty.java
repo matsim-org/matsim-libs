@@ -20,7 +20,6 @@
 package playground.thibautd.parknride.scoring;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author thibautd

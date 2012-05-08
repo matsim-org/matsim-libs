@@ -19,21 +19,26 @@
  * *********************************************************************** */
 package playground.thibautd.parknride;
 
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.FACILITY_TAG;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.ID_ATT;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.LINK_ID_ATT;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.NAME_ATT;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.ROOT_TAG;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.STOP_TAG;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.X_COORD_ATT;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.Y_COORD_ATT;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.Counter;
-
-import java.util.Stack;
-
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
-
-import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.*;
 
 /**
  * reads an xml file containing PnR facilities.

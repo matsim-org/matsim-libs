@@ -36,8 +36,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import playground.thibautd.utils.charts.XYChartUtils;
-
 /**
  * Event handler that computes statistics about the evolution of chosen
  * modes across the MATSim iterations.

@@ -20,7 +20,6 @@
 package playground.thibautd.planomat.api;
 
 import org.jgap.Configuration;
-
 import org.matsim.api.core.v01.population.Plan;
 
 /**

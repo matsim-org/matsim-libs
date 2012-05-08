@@ -25,14 +25,12 @@ import java.util.List;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
+import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
-import org.jgap.InvalidConfigurationException;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.matsim.testcases.MatsimTestUtils;
 
 /**

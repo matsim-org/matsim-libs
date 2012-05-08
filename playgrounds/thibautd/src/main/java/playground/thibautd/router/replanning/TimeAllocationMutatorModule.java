@@ -20,18 +20,16 @@
 package playground.thibautd.router.replanning;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.replanning.TransitPlanMutateTimeAllocation;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.TripRouter;
+import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * @author thibautd

@@ -20,7 +20,6 @@
 package playground.thibautd.utils.charts;
 
 import org.apache.log4j.Logger;
-
 import org.jfree.chart.JFreeChart;
 import org.matsim.core.utils.charts.ChartUtil;
 

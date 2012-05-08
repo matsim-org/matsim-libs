@@ -19,16 +19,23 @@
  * *********************************************************************** */
 package playground.thibautd.parknride;
 
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.FACILITY_TAG;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.ID_ATT;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.LINK_ID_ATT;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.NAME_ATT;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.ROOT_TAG;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.STOP_TAG;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.X_COORD_ATT;
+import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.Y_COORD_ATT;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Counter;
-
-import static playground.thibautd.parknride.ParkAndRideFacilitiesXmlSchemaNames.*;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * Writes a {@link ParkAndRideFacilities} object to an XML file.

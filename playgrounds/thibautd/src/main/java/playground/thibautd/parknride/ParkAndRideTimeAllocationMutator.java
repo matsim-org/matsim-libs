@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.parknride;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
@@ -29,11 +27,9 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.thibautd.router.CompositeStageActivityTypes;
+import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.replanning.TimeAllocationMutatorModule;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.StageActivityTypesImpl;
 
 /**
  * @author thibautd

@@ -21,8 +21,6 @@ package playground.thibautd.tsplanoptimizer.timemodechooser;
 
 import java.util.List;
 
-import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
-import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;

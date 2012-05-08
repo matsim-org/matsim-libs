@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
+import herbie.running.config.HerbieConfigGroup;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import herbie.running.config.HerbieConfigGroup;
 
 import playground.thibautd.analysis.listeners.ActivityTypesAnalysis;
 import playground.thibautd.analysis.listeners.ModeAnalysis;

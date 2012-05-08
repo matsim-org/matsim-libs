@@ -20,7 +20,6 @@
 package playground.thibautd.planomat.basic;
 
 import org.apache.log4j.Logger;
-
 import org.jgap.Configuration;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.CrossoverOperator;

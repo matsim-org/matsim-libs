@@ -24,7 +24,6 @@ import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.event.EventManager;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.StockRandomGenerator;
-
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.planomat.PlanomatGABreeder;

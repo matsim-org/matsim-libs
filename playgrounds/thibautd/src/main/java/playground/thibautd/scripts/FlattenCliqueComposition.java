@@ -21,7 +21,6 @@ package playground.thibautd.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.Stack;
 
 import org.matsim.core.utils.io.IOUtils;

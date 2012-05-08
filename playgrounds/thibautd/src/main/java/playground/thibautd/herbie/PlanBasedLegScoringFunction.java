@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
+import herbie.running.scoring.LegScoringFunction;
+
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.population.Leg;
@@ -26,8 +28,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
-
-import herbie.running.scoring.LegScoringFunction;
 
 /**
  * Uses the plan elements from the plan rather than the ones constructed from the

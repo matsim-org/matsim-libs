@@ -20,8 +20,8 @@
 package playground.thibautd.jointtrips.utils;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

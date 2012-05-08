@@ -19,15 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.TravelScoringFunction;
+
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.TravelScoringFunction;
 
 /**
  * Initialises a TransitRouterFactory, which takes into account the travel distance

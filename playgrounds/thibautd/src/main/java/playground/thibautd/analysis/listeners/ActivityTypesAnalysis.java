@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.controler.events.ControlerEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;

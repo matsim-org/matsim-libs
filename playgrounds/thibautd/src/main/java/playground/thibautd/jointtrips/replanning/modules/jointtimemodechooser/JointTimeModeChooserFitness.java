@@ -19,12 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;

@@ -30,8 +30,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 
-import playground.thibautd.router.TripRouterFactory;
-
 /**
  * Allows to create {@link TripRouter} instances, and gives access to factories
  * for the basic elements used for routing.
