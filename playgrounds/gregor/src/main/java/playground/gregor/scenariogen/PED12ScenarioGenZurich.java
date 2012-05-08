@@ -49,7 +49,15 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -65,6 +73,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -77,8 +86,8 @@ public class PED12ScenarioGenZurich {
 
 	static final Logger log = Logger.getLogger(PED12ScenarioGenZurich.class);
 
-	public static String baseDir = "/home/cdobler/workspace/matsim/mysimulations/ped2012/";
-//	public static String baseDir = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/";
+//	public static String baseDir = "/home/cdobler/workspace/matsim/mysimulations/ped2012/";
+	public static String baseDir = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/";
 	
 	public static String shoppingNetwork = baseDir + "input_2d/network.xml";
 	public static String zurichNetwork = baseDir + "input_zh/network_ivtch.xml.gz";
@@ -300,25 +309,31 @@ public class PED12ScenarioGenZurich {
 	 */
 	private static void prepareZurichPopulation(Scenario scenario) {
 
-		Counter removedPersons = new Counter("Removed persons: ");
+		Network network = scenario.getNetwork();
+		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
+		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
+				new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(new FreeSpeedTravelTimeCalculatorFactory(), 
+				new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
+				new FreeSpeedTravelTimeCalculatorFactory(), new WalkTravelTimeFactory(configGroup)));
+
+		MultiModalTravelTimeWrapper wrapper = multiModalTravelTimeFactory.createTravelTime();
+		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(wrapper, scenario.getConfig().planCalcScore());
+		Dijkstra dijkstra = new FastDijkstra(network, cost, wrapper);
+		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), wrapper, dijkstra);
+		
+		Counter removedPersons = new Counter ("removed persons: ");
 		Iterator<? extends Person> iter = scenario.getPopulation().getPersons().values().iterator();
 		while(iter.hasNext()) {
 			Person person = iter.next();
-						
-			for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
+			Plan plan = person.getSelectedPlan();
+			for (int index = 0; index < plan.getPlanElements().size(); index++) {
+				PlanElement planElement = plan.getPlanElements().get(index);
 				if (planElement instanceof Activity) {
 					Activity activity = (Activity) planElement;
-
-					/*
-					 * Check available transport modes. If walk is not available, the
-					 * agent might not reach the activity. Therefore remove the agent.
-					 */
-					Link link = scenario.getNetwork().getLinks().get((activity.getLinkId()));
-					if (!link.getAllowedModes().contains(TransportMode.walk)) {
-						iter.remove();
-						removedPersons.incCounter();
-						break;
-					}
 					
 					String type = activity.getType();
 					if (type.startsWith("w")) {		
@@ -340,6 +355,21 @@ public class PED12ScenarioGenZurich {
 					Route route = leg.getRoute();
 					if (route != null && !(route instanceof NetworkRoute)) {
 						leg.setRoute(null);
+						
+						Activity fromAct = (Activity) plan.getPlanElements().get(index-1);
+						Activity toAct = (Activity) plan.getPlanElements().get(index+1);
+						try {
+							legRouter.routeLeg(person, leg, fromAct, toAct, leg.getDepartureTime());							
+						}
+						/*
+						 * If no route is found, a RuntimeException is thrown.
+						 * We catch it and remove the agent from the population.
+						 */
+						catch (java.lang.RuntimeException e) {
+							iter.remove();
+							removedPersons.incCounter();
+							break;
+						}
 					}
 				}
 			}

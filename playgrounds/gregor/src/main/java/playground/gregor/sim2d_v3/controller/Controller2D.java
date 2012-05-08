@@ -36,6 +36,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
 
@@ -54,7 +55,7 @@ public class Controller2D extends Controler implements StartupListener {
 //		this.config.addQSimConfigGroup(new QSimConfigGroup());
 //		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 5* 60);
 		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
-		this.addMobsimFactory("hybridQ2D",new HybridQ2DMobsimFactory());
+		this.addMobsimFactory("hybridQ2D", new HybridQ2DMobsimFactory());
 	}
 
 	public Controller2D(Scenario sc) {
@@ -105,6 +106,13 @@ public class Controller2D extends Controler implements StartupListener {
 		Scenario sc = ScenarioUtils.createScenario(c);
 		((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
 		((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
+		
+		if (c.multiModal().isMultiModalSimulationEnabled()) {
+			for (String transportMode : CollectionUtils.stringToArray(c.multiModal().getSimulatedModes())) {
+				((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory(transportMode, new LinkNetworkRouteFactory());
+			}	
+		}
+				
 		ScenarioUtils.loadScenario(sc);
 
 		Controler controller = new Controller2D(sc);

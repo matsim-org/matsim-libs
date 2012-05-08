@@ -117,7 +117,8 @@ public class PED12ScenarioGen {
 	/*package*/ static Id walkInNode;
 	
 	public static void main(String [] args) {
-		String scDir = "/home/cdobler/workspace/matsim/mysimulations/ped2012/";
+//		String scDir = "/home/cdobler/workspace/matsim/mysimulations/ped2012/";
+		String scDir = "D:/Users/Christoph/workspace/matsim/mysimulations/ped2012/";
 		String inputDir = scDir + "input_2d";
 //		String scDir = "/Users/laemmel/devel/ped12_dobLaem/";
 //		String inputDir = scDir + "/input/";
