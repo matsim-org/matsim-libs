@@ -19,18 +19,27 @@
  * *********************************************************************** */
 package playground.droeder.eMobility;
 
-import org.matsim.api.core.v01.network.Node;
+import java.util.GregorianCalendar;
+
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.dgrether.energy.trafficstate.TrafficStateControlerListener;
+import playground.dgrether.energy.trafficstate.TrafficStateXmlWriter;
+import playground.dgrether.energy.validation.ObjectFactory;
+import playground.dgrether.energy.validation.PoiInfo;
+import playground.dgrether.energy.validation.PoiTimeInfo;
+import playground.dgrether.energy.validation.ValidationInfoWriter;
+import playground.dgrether.energy.validation.ValidationInformation;
 import playground.droeder.eMobility.analysis.SoCEventHandler;
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.energy.EmobEnergyProfileReader;
 import playground.droeder.eMobility.events.EFleetHandler;
 import playground.droeder.eMobility.events.EPopulationHandler;
+import playground.droeder.eMobility.poi.POI;
 
 
 /**
@@ -69,15 +78,16 @@ public class EmobilityRunner {
 		scenario.getPopulation().init(fleetHandler.getFleet());
 		
 		SoCEventHandler soc = new SoCEventHandler(scenario.getSc().getNetwork());
+		TrafficStateControlerListener trafficState = new TrafficStateControlerListener();
 		c.addControlerListener(new MyListener(fleetHandler, populationHandler, soc));
+		c.addControlerListener(trafficState);
 		
 		c.setDumpDataAtEnd(true);
 		c.setOverwriteFiles(true);
 		
 		c.run();
 		
-		soc.dumpData(scenario.getSc().getConfig().controler().getOutputDirectory() + Controler.DIRECTORY_ITERS + "/it.0/charts/");	
-		
+		soc.dumpData(scenario.getSc().getConfig().controler().getOutputDirectory() + Controler.DIRECTORY_ITERS + "/it.0/charts/");
 	}
 	
 	//internal class
@@ -105,12 +115,38 @@ public class EmobilityRunner {
 	
 	public static void main(String[] args){
 		CreateTestScenario test = new CreateTestScenario();
+		EmobilityScenario sc = test.run(CONFIGFILE, BASICPLAN, APPOINTMENTS);
 		
 		EmobilityRunner runner = new EmobilityRunner();
 		runner.loadChargingProfiles(CHARGINGFILE);
 		runner.loadDisChargingProfiles(DISCHARGINGFILE);
-		EmobilityScenario sc = test.run(CONFIGFILE, BASICPLAN, APPOINTMENTS);
 		runner.run(sc);
+		
+		
+		ObjectFactory f = new ObjectFactory();
+		ValidationInformation vInfo = f.createValidationInformationList();
+		PoiInfo info;
+		PoiTimeInfo tInfo;
+		
+		int start, end;
+		
+		for(POI p: sc.getPoi().getPOIs()){
+			info = f.createPoiInfo();
+			info.setMaximalCapacity(p.getMaxSpace());
+			info.setPoiID(p.getId().toString());
+			for(int i = 0; i < p.getMaxLoad().length; i++){
+				tInfo = new PoiTimeInfo();
+				start = (int) (p.getTimeBinSize() * i);
+				end = (int) (start + p.getTimeBinSize());
+				tInfo.setStartTime(new GregorianCalendar(1979, 01, 01, 0, 0, start));
+				tInfo.setEndTime(new GregorianCalendar(1979, 01, 01, 0, 0, end));
+				tInfo.setUsedCapacity(p.getMaxLoad()[i]);
+				info.getPoiTimeInfos().add(tInfo);
+			}
+			vInfo.add(info);
+		}
+		
+		new ValidationInfoWriter(vInfo).writeFile(sc.getSc().getConfig().controler().getOutputDirectory() + "vInfo.xml");
 	}
 
 

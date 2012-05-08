@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.droeder.eMobility.poi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -28,16 +31,36 @@ import org.matsim.api.core.v01.Id;
 public class POI {
 	
 	private double maxSpace;
-	private Double[] maxLoad  = new Double[48];
+	private List<Double> currentLoad;
 	private double timeBinSize;
 	private Id id;
 	private int currentSlot = 0;
+	private List<Double> maxLoad;
 	
 	public POI(Id id, double maxSpace, double timeBinSize){
+		this(id,maxSpace, timeBinSize, 0.);
+	}
+	
+	public POI(Id id, double maxSpace, double timeBinSize, double currentLoad){
 		this.maxSpace = maxSpace;
 		this.timeBinSize = timeBinSize;
 		this.id = id;
-		this.maxLoad[currentSlot] = 0.;
+		this.currentLoad = new ArrayList<Double>();
+		this.currentLoad.add(this.currentSlot, currentLoad);
+		this.maxLoad = new ArrayList<Double>();
+		this.maxLoad.add(this.currentSlot, currentLoad);
+	}
+	
+	public double getTimeBinSize(){
+		return this.timeBinSize;
+	}
+	
+	public Double[] getMaxLoad(){
+		return this.maxLoad.toArray(new Double[this.currentLoad.size()]);
+	}
+	
+	public double getMaxSpace(){
+		return this.maxSpace;
 	}
 
 	/**
@@ -46,7 +69,8 @@ public class POI {
 	private void init(int slot) {
 		if(slot > this.currentSlot){
 			for(int i = (this.currentSlot + 1) ; i < (slot +1); i++){
-				this.maxLoad[i] = this.maxLoad[this.currentSlot];
+				this.currentLoad.add(i, this.currentLoad.get(this.currentSlot));
+				this.maxLoad.add(i, this.currentLoad.get(this.currentSlot));
 			}
 			this.currentSlot = slot;
 		}
@@ -58,7 +82,7 @@ public class POI {
 	 */
 	private boolean hasFreeChargingSpace(int slot) {
 		this.init(slot);
-		if(this.maxLoad[slot] < this.maxSpace){
+		if(this.currentLoad.get(slot) < this.maxSpace){
 			return true;
 		}else{
 			return false;
@@ -68,7 +92,8 @@ public class POI {
 	public boolean plugVehicle(double time){
 		int slot = this.getSlot(time);
 		if(hasFreeChargingSpace(slot)){
-			this.maxLoad[slot]++;
+			this.currentLoad.set(slot, this.currentLoad.get(slot) + 1);
+			this.maxLoad.set(slot, Math.max(this.maxLoad.get(slot), this.currentLoad.get(slot)));
 			return true;
 		}else{
 			return false;
@@ -78,13 +103,13 @@ public class POI {
 	public void unplugVehicle (double time){
 		int slot = this.getSlot(time);
 		this.init(slot);
-		this.maxLoad[slot]--;
+		this.currentLoad.set(slot, this.currentLoad.get(slot) - 1);
 	}
 	
 	
 	private int getSlot(double time){
-		return (int) (time / timeBinSize);
-	}
+		return (int) (time / this.timeBinSize);
+	} 
 
 	/**
 	 * @return

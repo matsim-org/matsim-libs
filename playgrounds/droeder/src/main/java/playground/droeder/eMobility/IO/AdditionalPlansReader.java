@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Plansgenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,50 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.poi;
+package playground.droeder.eMobility.IO;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.log4j.Logger;
 
-import org.matsim.api.core.v01.Id;
+import playground.droeder.eMobility.EmobilityScenario;
 
 /**
  * @author droeder
  *
  */
-public class PoiInfo {
+public class AdditionalPlansReader {
+	private static final Logger log = Logger
+			.getLogger(AdditionalPlansReader.class);
 	
-	Map<Id, POI> poiMap;
+	 private EmobilityScenario eSc;
+
+	public AdditionalPlansReader(EmobilityScenario sc){
+		 this.eSc = sc;
+		 if(this.eSc.getSc() == null){
+			 throw new RuntimeException("need MatsimSceanrio...");
+		 }
+	 }
 	
-	public PoiInfo(Map<Id, POI> pois){
-		this.poiMap = pois;
+	public void readAppointments(String matsimPlan, String appointmentsFile){
+		
 	}
-	
-	public void add(POI poi){
-		this.poiMap.put(poi.getId(), poi);
-	}
-	
-	public PoiInfo(){
-		this.poiMap = new HashMap<Id, POI>();
-	}
-	
-	public Collection<POI>  getPOIs(){
-		return this.poiMap.values();
-	}
-	
-	/**
-	 * returns true if there is free charging space and false otherwise
-	 * 
-	 * @param id
-	 * @param time
-	 * @return
-	 */
-	public boolean plugVehicle(Id id, double time){
-		return this.poiMap.get(id).plugVehicle(time);
-	}
-	
-	public void unplugVehicle(Id id, double time){
-		this.poiMap.get(id).unplugVehicle(time);
-	}
+
 }

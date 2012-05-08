@@ -27,6 +27,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -34,6 +38,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
+import playground.droeder.eMobility.events.VehiclePlugEvent;
 import playground.droeder.eMobility.poi.PoiInfo;
 
 /**
@@ -75,7 +80,7 @@ public class EFleet implements MobsimAfterSimStepListener{
 			v.update(this.manager, e.getSimulationTime());
 		}
 	}
-
+	
 	/**
 	 * @param event
 	 */
@@ -97,7 +102,13 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 */
 	public void processEvent(PersonLeavesVehicleEvent event) {
 		EVehicle v = this.fleet.get(event.getVehicleId());
-		v.finishDriving(event.getTime(), this.discharging, this.poiInfo.plugVehicle(v.getPoiId(), event.getTime()));
+		if(v.getPoiId() == null) return;
+		boolean plug = this.poiInfo.plugVehicle(v.getPoiId(), event.getTime());
+		this.manager.processEvent(new VehiclePlugEvent(event.getTime(), plug, v.getPoiId()));
+		if(plug){
+			v.finishDriving(event.getTime(), this.discharging, plug);
+			System.out.println("plug: " + v.getId() + " at " + event.getTime() + ", " + v.getPoiId());
+		}
 	}
 
 
@@ -105,7 +116,13 @@ public class EFleet implements MobsimAfterSimStepListener{
 	 * @param event
 	 */
 	public void processEvent(PersonEntersVehicleEvent event) {
-		this.fleet.get(event.getVehicleId()).finishCharging(event.getTime(), this.charging);
+		EVehicle v = this.fleet.get(event.getVehicleId());
+		Id poiId = v.getPoiId();
+		if(v.finishCharging(event.getTime(), this.charging)){
+			// unplug only if the vehicle was plugged...
+			this.poiInfo.unplugVehicle(poiId, event.getTime());
+			System.out.println("unplug: " + v.getId() + " at " + event.getTime() + ", " + poiId);
+		}
 	}
 
 	/**
@@ -115,4 +132,6 @@ public class EFleet implements MobsimAfterSimStepListener{
 	public boolean containsVehicle(Id vehicleId) {
 		return this.fleet.containsKey(vehicleId);
 	}
+
+
 }

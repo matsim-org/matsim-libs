@@ -20,31 +20,26 @@
 package playground.droeder.eMobility;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.eMobility.energy.ChargingProfiles;
+import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.fleet.EFleet;
 import playground.droeder.eMobility.fleet.EVehicle;
 import playground.droeder.eMobility.poi.POI;
@@ -73,9 +68,17 @@ public class CreateTestScenario {
 		}
 	}
 	
+	private List<Id> poiLinks = new ArrayList<Id>();
+	
 	public EmobilityScenario run(String configFile, String basicPlansFile, String appointmentsFile){
 		this.loadConfig(configFile);
 		Plan basicPlan = loadBasicPlan(basicPlansFile, configFile);
+		poiLinks.add(((Activity) basicPlan.getPlanElements().get(0)).getLinkId());
+		poiLinks.add(((Activity) basicPlan.getPlanElements().get(2)).getLinkId());
+		poiLinks.add(((Activity) basicPlan.getPlanElements().get(4)).getLinkId());
+		poiLinks.add(((Activity) basicPlan.getPlanElements().get(6)).getLinkId());
+		poiLinks.add(((Activity) basicPlan.getPlanElements().get(8)).getLinkId());
+		
 		PopulationFactory factory = this.sc.getSc().getPopulation().getFactory();
 		Person p;
 		
@@ -94,8 +97,8 @@ public class CreateTestScenario {
 	private void createPoi() {
 		PoiInfo poiInfo = new PoiInfo();
 		POI poi;
-		for(Link l: this.sc.getSc().getNetwork().getLinks().values()){
-			poi = new POI(l.getId(), 5, 3600);
+		for(Id l: this.poiLinks){
+			poi = new POI(l, 5, 3600);
 			poiInfo.add(poi);
 		}
 		this.sc.setPoi(poiInfo);
@@ -121,6 +124,8 @@ public class CreateTestScenario {
 			
 			EActivity ea = new EActivity(new IdImpl(app[3]), startTime, endTime - startTime, disCharge, charge);
 			list.add(ea);
+			EActivity ea2 = new EActivity(new IdImpl(app[1]), 0.0, 0.0, disCharge, ChargingProfiles.NONE);
+			list.add(ea2);
 			
 			EVehicle ev = new EVehicle(new IdImpl(EPopulation.IDENTIFIER + app[0]), Double.parseDouble(app[2]), this.sc.getSc().getNetwork().getLinks().get(new IdImpl(app[1])), list);
 			fleet.addVehicle(ev);

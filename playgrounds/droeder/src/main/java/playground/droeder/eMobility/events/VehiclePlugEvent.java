@@ -19,6 +19,7 @@
 package playground.droeder.eMobility.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.GenericEventImpl;
 
@@ -26,7 +27,7 @@ import org.matsim.core.events.GenericEventImpl;
  * @author droeder
  *
  */
-public class ParkingEvent extends GenericEventImpl{
+public class VehiclePlugEvent extends GenericEventImpl{
 	
 	public static final String TYPE = "ParkingEvent";
 	public static final String PLUGGED = "plugged";
@@ -37,10 +38,16 @@ public class ParkingEvent extends GenericEventImpl{
 	 * @param type
 	 * @param time
 	 */
-	public ParkingEvent(double time, boolean plugged, Id parkingLotId) {
+	public VehiclePlugEvent(double time, boolean plugged, Id parkingLotId) {
 		super(TYPE, time);
 		super.getAttributes().put(PLUGGED, String.valueOf(plugged));
 		super.getAttributes().put(PARKINGLOTID, parkingLotId.toString());
+	}
+	
+	public VehiclePlugEvent(GenericEvent e){
+		super(e.getAttributes().get("type"), e.getTime());
+		super.getAttributes().put(PLUGGED, e.getAttributes().get(PLUGGED));
+		super.getAttributes().put(PARKINGLOTID, e.getAttributes().get(PARKINGLOTID));
 	}
 	
 	public Id getParkingLotId(){

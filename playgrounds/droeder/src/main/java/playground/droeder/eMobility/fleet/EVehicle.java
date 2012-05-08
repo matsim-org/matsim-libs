@@ -104,15 +104,10 @@ public class EVehicle {
 	 * @param discharging
 	 */
 	public void disCharge(double time, DisChargingProfiles discharging) {
+		if(currentActivity == null) return;
 		double disChargePerKmInJoule = discharging.getJoulePerKm(currentActivity.getDischargingId(), this.linkLength / (time - linkEnterTime), 0.0);
 		double discharge = disChargePerKmInJoule * this.linkLength / 1000. * 2.778 * Math.pow(10, -7);
-//		if(this.id.equals(new IdImpl("emob_9"))){
-//			System.out.println("   hasChanged?: " + hasChanged);
-//		}
 		this.setSoC(this.soc - discharge);
-//		if(this.id.equals(new IdImpl("emob_9"))){
-//			System.out.println("vehId: " + this.id + "  time: " + time + "  disChargingId: " + currentActivity.getDischargingId() + "   hasChanged?: " + hasChanged + "  SoC: " + this.soc);
-//		}
 	}
 
 
@@ -122,20 +117,21 @@ public class EVehicle {
 	 * @param discharging
 	 */
 	public void finishDriving(double time, DisChargingProfiles discharging, boolean charge) {
-		double disChargePerKmInJoule = discharging.getJoulePerKm(currentActivity.getDischargingId(), this.linkLength / (time - linkEnterTime), 0.0);
-		double discharge = disChargePerKmInJoule * this.linkLength / 1000. * 2.778 * Math.pow(10, -7);
-//		if(this.id.equals(new IdImpl("emob_9"))){
-//			System.out.println("   hasChanged?: " + hasChanged);
-//		}
-		this.setSoC(this.soc - discharge);
-		this.setLinkEnterTime(time);
-		this.charge = charge;
-//		if(this.id.equals(new IdImpl("emob_9"))){
-//			System.out.println("vehId: " + this.id + "  time: " + time + "  disChargingId: " + currentActivity.getDischargingId() + "   hasChanged?: " + hasChanged + "  SoC: " + this.soc);
-//		}
+		if(this.currentActivity == null){
+			this.charge = false;
+		}else{
+			double disChargePerKmInJoule = discharging.getJoulePerKm(currentActivity.getDischargingId(), this.linkLength / (time - linkEnterTime), 0.0);
+			double discharge = disChargePerKmInJoule * this.linkLength / 1000. * 2.778 * Math.pow(10, -7);
+			this.setSoC(this.soc - discharge);
+			this.setLinkEnterTime(time);
+			this.charge = charge;
+		}
 	}
 	
 	public Id getPoiId(){
+		if(this.currentActivity == null){
+			return null;
+		}
 		return this.currentActivity.getPoiId();
 	}
 	
@@ -145,7 +141,7 @@ public class EVehicle {
 	 * @param time
 	 * @param charging
 	 */
-	public void finishCharging(double time, ChargingProfiles charging) {
+	public boolean finishCharging(double time, ChargingProfiles charging) {
 		if(this.charge){
 			double duration, start;
 			if(currentActivity.plannedStart() < this.linkEnterTime){
@@ -159,20 +155,14 @@ public class EVehicle {
 				duration = currentActivity.plannedDuration();
 			}
 			this.setSoC(charging.getNewState(currentActivity.getChargingId(), duration, this.soc));
-//			if(this.id.equals(new IdImpl("emob_9"))){
-//				System.out.println("vehId: " + this.id + 
-//									"  time: " + time + 
-//									"  start: " + start + 
-//									"  duration: " + duration +
-//									"  plannedDuration: " + currentActivity.plannedDuration()+
-//									"  chargingId: " + currentActivity.getChargingId() + 
-//									"  SoC: " + this.soc);
-//			}
 		}
 		this.setLinkEnterTime(time);
 		if(this.chargingActs.hasNext()){
 			currentActivity = this.chargingActs.next();
+		}else{
+			currentActivity = null;
 		}
+		return this.charge;
 	}
 	
 

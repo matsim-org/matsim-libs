@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -51,16 +52,18 @@ import playground.droeder.eMobility.events.SoCChangeEvent;
 public class SoCEventHandler implements GenericEventHandler{
 	private static final Logger log = Logger.getLogger(SoCEventHandler.class);
 	
-	private static String INPUTDIR = "D:/VSP/svn/shared/volkswagen_internal/matsimOutput/3/";
+	private static String INPUTDIR = "D:/VSP/svn/shared/volkswagen_internal/matsimOutput/test/";
 	private static String OUTPUTDIR = INPUTDIR + "ITERS/it.0/charts/";
 	private static String NETWORK = INPUTDIR + "output_network.xml.gz";
 	private static String EVENTS = INPUTDIR + "ITERS/it.0/0.events.xml.gz";
 	private StateStore stateStore;
 	private Network net;
+	private Map<Id, Id> lastTravelledLink;
 
 	public SoCEventHandler(Network net){
 		this.net = net;
 		this.stateStore = new StateStore();
+		this.lastTravelledLink = new HashMap<Id, Id>();
 	}
 
 	@Override
@@ -70,13 +73,27 @@ public class SoCEventHandler implements GenericEventHandler{
 
 	@Override
 	public void handleEvent(GenericEvent event) {
+		SoCChangeEvent e;
 		if(event instanceof SoCChangeEvent){
-			SoCChangeEvent e = (SoCChangeEvent) event;
-			stateStore.addValue(e.getVehId(), e.getSoC(), e.getTime(), this.net.getLinks().get(e.getLinkId()).getLength());
+			e = (SoCChangeEvent) event;
+//			stateStore.addValue(e.getVehId(), e.getSoC(), e.getTime(), this.net.getLinks().get(e.getLinkId()).getLength());
 		}else if(event.getAttributes().get("type").equals(SoCChangeEvent.TYPE)){
-			SoCChangeEvent e = new SoCChangeEvent(event);
-			stateStore.addValue(e.getVehId(), e.getSoC(), e.getTime(), this.net.getLinks().get(e.getLinkId()).getLength());
+			e = new SoCChangeEvent(event);
+		}else{
+			return;
 		}
+		Double travelledDistance;
+		if(!this.lastTravelledLink.containsKey(e.getVehId())){
+			travelledDistance = this.net.getLinks().get(e.getLinkId()).getLength();
+		}else{
+			if(this.lastTravelledLink.get(e.getVehId()).equals(e.getLinkId())){
+				travelledDistance = 0.;
+			}else{
+				travelledDistance = this.net.getLinks().get(e.getLinkId()).getLength();
+			}
+		}
+		this.stateStore.addValue(e.getVehId(), e.getSoC(), e.getTime(), travelledDistance);
+		this.lastTravelledLink.put(e.getVehId(), e.getLinkId());
 	}
 	
 	public void dumpData(String directory){
