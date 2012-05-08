@@ -56,7 +56,6 @@ import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.LayersWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 
 public class NetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	
@@ -147,12 +146,25 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 			if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
 				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
 				Link link = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().getSelectedLink();
-				link.setCapacity(Double.parseDouble(JOptionPane.showInputDialog("New capacity", link.getCapacity())));
+				try {
+					link.setCapacity(Double.parseDouble(JOptionPane.showInputDialog("New capacity", link.getCapacity())));
+				} catch(Exception e2) {
+					
+				}
 				((SimpleSelectionNetworkPainter)getActiveLayer().getPainter()).calculateMinMax();
 				window.refreshLabel(Labels.LINK);
 			}
-			else if(e.getButton()==MouseEvent.BUTTON3)	
-				camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			else if(e.getButton()==MouseEvent.BUTTON3) {
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				Link link = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().getSelectedLink();
+				try {
+					link.setFreespeed(Double.parseDouble(JOptionPane.showInputDialog("New free speed", link.getFreespeed())));
+				} catch(Exception e2) {
+					
+				}
+				((SimpleSelectionNetworkPainter)getActiveLayer().getPainter()).calculateMinMax();
+				window.refreshLabel(Labels.LINK);
+			}
 		}
 		else {
 			if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
@@ -180,7 +192,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	public String getLabelText(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		try {
-			return (String) NetworkPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
+			return (String) CarNetworkPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
