@@ -1,5 +1,6 @@
 package playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -19,8 +20,10 @@ public class NetworkPainterManager {
 	
 	//Attributes
 	protected Network network;
-	private Id selectedLinkId;
-	private Id selectedNodeId;
+	protected Id selectedLinkId;
+	protected Id selectedNodeId;
+	protected Collection<Link> selectedLinks = new ArrayList<Link>();
+	protected Collection<Node> selectedNodes = new ArrayList<Node>();
 	
 	//Methods
 	/**
@@ -165,5 +168,31 @@ public class NetworkPainterManager {
 			selectedNodeId = null;
 		return node;
 	}
+	public void selectLinks(Collection<Link> links) {
+		selectedLinks.addAll(links);
+	}
+	public void addLink(double x, double y) {
+		selectedLinks.add(network.getLinks().get(getIdNearestLink(x, y)));
+	}
+	public void removeLink(double x, double y) {
+		selectedLinks.remove(network.getLinks().get(getIdNearestLink(x, y)));
+	}
+	public Collection<? extends Link> getSelectedLinks() {
+		return selectedLinks;
+	}
+	public void selectNodes(Collection<Node> nodes) {
+		selectedNodes.addAll(nodes);
+	}
+	public void addNode(double x, double y) {
+		selectedNodes.add(network.getNodes().get(getIdNearestNode(x, y)));
+	}
+	public void removeNode(double x, double y) {
+		selectedNodes.remove(network.getNodes().get(getIdNearestNode(x, y)));
+	}
+	public Collection<? extends Node> getSelectedNodes() {
+		return selectedNodes;
+	}
+	
+	
 	
 }

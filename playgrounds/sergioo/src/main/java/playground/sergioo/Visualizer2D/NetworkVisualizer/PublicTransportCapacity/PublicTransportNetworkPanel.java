@@ -34,15 +34,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.sergioo.Visualizer2D.Camera;
+import playground.sergioo.Visualizer2D.ImagePainter;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.ImagePainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.PublicTransport.PublicTransportNetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransportCapacity.PublicTransportNetworkWindow.Option;
@@ -174,7 +175,10 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 			((PublicTransportNetworkPainter)getPrincipalLayer().getPainter()).setWeight(((PublicTransportNetworkPainter)getPrincipalLayer().getPainter()).getWeight()*1.5f);
 			break;
 		case 'i':
-			saveImage("bmp", new File(JOptionPane.showInputDialog("File location", "./data/test1.bmp")), Integer.parseInt(JOptionPane.showInputDialog("Width", "12040")),  Integer.parseInt(JOptionPane.showInputDialog("Height", "6012")));
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.showSaveDialog(this);
+			File file = jFileChooser.getSelectedFile();
+			saveImage(file.getName().split("\\.")[file.getName().split("\\.").length-1], file, Integer.parseInt(JOptionPane.showInputDialog("Width", "12040")),  Integer.parseInt(JOptionPane.showInputDialog("Height", "6012")));
 			break;
 		}
 		repaint();

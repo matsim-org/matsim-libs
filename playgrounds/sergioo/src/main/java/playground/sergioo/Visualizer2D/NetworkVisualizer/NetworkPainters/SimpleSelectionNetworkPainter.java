@@ -38,8 +38,13 @@ public class SimpleSelectionNetworkPainter extends NetworkPainter {
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		super.paint(g2, layersPanel);
-		if(withSelected)
+		if(withSelected) {
 			paintSelected(g2, layersPanel);
+			for(Link link:networkPainterManager.getSelectedLinks())
+				paintSimpleLink(g2, layersPanel, link, selectedStroke, selectedLinkColor);
+			for(Node node:networkPainterManager.getSelectedNodes())
+				paintCircle(g2, layersPanel, node.getCoord(), 5, selectedNodeColor);
+		}
 	}
 	private void paintSelected(Graphics2D g2, LayersPanel layersPanel) {
 		Link link=networkPainterManager.getSelectedLink();

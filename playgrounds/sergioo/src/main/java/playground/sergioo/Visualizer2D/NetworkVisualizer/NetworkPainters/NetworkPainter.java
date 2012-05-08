@@ -20,7 +20,7 @@ public class NetworkPainter extends Painter {
 	private static final double LONG_ARROW = 10;
 	
 	//Attributes
-	protected final NetworkPainterManager networkPainterManager;
+	protected NetworkPainterManager networkPainterManager;
 	private Color networkColor = Color.LIGHT_GRAY;
 	private Stroke networkStroke = new BasicStroke(0.5f);
 	
