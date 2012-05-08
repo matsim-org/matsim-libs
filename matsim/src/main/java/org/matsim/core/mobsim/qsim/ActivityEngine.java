@@ -111,14 +111,19 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		activityEndsList.add(new AgentEntry(agent, agent.getActivityEndTime()));
-		internalInterface.registerAdditionalAgentOnLink(agent);
-		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
-			internalInterface.getMobsim().getAgentCounter().decLiving() ;
+		/*
+		 * Add the agent to the activityEndsList if it is not its last
+		 * activity and register it on the link. Otherwise decrease the
+		 * agents counter by one.
+		 */
+		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
+			internalInterface.getMobsim().getAgentCounter().decLiving();
+		} else {
+			activityEndsList.add(new AgentEntry(agent, agent.getActivityEndTime()));
+			internalInterface.registerAdditionalAgentOnLink(agent);			
 		}
 		return true;
 	}
-
 
 	/**
 	 * For within-day replanning. Tells this engine that the activityEndTime the agent reports may have changed since 
