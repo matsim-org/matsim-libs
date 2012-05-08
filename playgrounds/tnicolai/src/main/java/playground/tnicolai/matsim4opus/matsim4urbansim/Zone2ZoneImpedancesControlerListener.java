@@ -117,7 +117,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			ProgressBar bar = new ProgressBar( zones.length );
 			log.info("Processing " + zones.length + " UrbanSim zones ...");
 
-			// main for loop, dumping out zone2zone impedances (travel times) and workplace accessibility in two separate files
+			// main for loop, dumping out zone2zone impedances (travel times)
 			for(int fromZoneIndex = 0; fromZoneIndex < zones.length; fromZoneIndex++){
 				
 				// progress bar

@@ -332,7 +332,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		betaWalkTD, betaWalkTDPower, betaWalkLnTD,
 		betaWalkTC, betaWalkTCPower, betaWalkLnTC;
 		
-		PlanCalcScoreConfigGroup cnScoringGroup = scenario.getConfig().planCalcScore();
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		
 		double accessibilityDestinationSamplingRate = matsim4UrbanSimParameter.getAccessibilityParameter().getAccessibilityDestinationSamplingRate();
 		// these parameter define if the beta or logit_scale parameter are taken from MATSim or the config file
@@ -345,16 +345,17 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 			logitScaleParameter = scenario.getConfig().planCalcScore().getBrainExpBeta();
 		else
 			logitScaleParameter = matsim4UrbanSimParameter.getAccessibilityParameter().getLogitScaleParameter();
+	
 		
 		if(useMATSimCarParameter){
 			// usually travelling_utils are negative
-			betaCarTT 	   	= cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // [utils/h]
+			betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 			betaCarTTPower	= 0.;
 			betaCarLnTT		= 0.;
-			betaCarTD		= cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar(); // this is [utils/money * money/meter] = [utils/meter]
-			betaCarTDPower	= 0.;																							// useful setting for MonetaryDistanceCostRateCar: 10cent/km (only fuel) or 
-			betaCarLnTD		= 0.;																							// 80cent/km (including taxes, insurance ...)
-			betaCarTC		= cnScoringGroup.getMarginalUtilityOfMoney(); // [utils/money]
+			betaCarTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar(); 	// this is [utils/money * money/meter] = [utils/meter]
+			betaCarTDPower	= 0.;																														// useful setting for MonetaryDistanceCostRateCar: 10cent/km (only fuel) or 
+			betaCarLnTD		= 0.;																														// 80cent/km (including taxes, insurance ...)
+			betaCarTC		= 0.;//planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money], (no computation of money in MATSim implemented yet)
 			betaCarTCPower	= 0.;
 			betaCarLnTC		= 0.;
 		}
@@ -372,13 +373,13 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		if(useMATSimWalkParameter){
 			// usually travelling_utils are negative
-			betaWalkTT		= cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr(); // [utils/h]
+			betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 			betaWalkTTPower	= 0.;
 			betaWalkLnTT	= 0.;
-			betaWalkTD		= 0.; // getMonetaryDistanceCostRateWalk doesn't exist thus set to 0.0: [utils/money * money/meter] = [utils/meter]
+			betaWalkTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk(); // [utils/meter]
 			betaWalkTDPower	= 0.;												
 			betaWalkLnTD	= 0.;
-			betaWalkTC		= 0.; // [utils/money]
+			betaWalkTC		= 0.;// [utils/money], not available in MATSim
 			betaWalkTCPower	= 0.;
 			betaWalkLnTC	= 0.;
 		}
