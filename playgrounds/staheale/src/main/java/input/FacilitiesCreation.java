@@ -267,6 +267,8 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 						if (this.facilityActivities.containsKey(activityId)) {
 							a = f.createActivityOption(this.facilityActivities.get(activityId));
 						
+							//--------------------shop retail capacity definition
+							
 							//shop retail capacity is assumed to depend on sales area where arbitrary 50% are subtracted for shelfs, cash points etc., then a LOS E value of 1.35 P/m2 is assumed for capacity definition; for sales area a random pick in the given intervals is performed 
 							
 							if (this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500)) {
@@ -287,10 +289,88 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 								a.setCapacity((double) 0.5*(20 + random.nextInt(980))*1.35);
 							}
 							
-							//shop service is assumed to depend on the number of people working there, one employee can serve arbitrary 1 customer, subtract 10% for vacancies and 20% for shift operation
+							//-------------------------shop service capacity definition
+							
+							//capacity is assumed to depend on the number of people working there, one employee can serve 1 customer, subtract 10% for vacancies and 20% for shift operation
 							
 							else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER)) {
 								a.setCapacity((double) Math.max(1,(tempFacilities.get(tempFacilityId))*0.7));
+							}
+							
+							//-------------------------sports & fun capacity definition
+							
+							//bar, disco, dancings, arcades casino: capacity is assumed to depend on the number of people working there, one employee can serve between 10-20 customer, subtract 10% for vacancies and 20% for shift operation
+				
+							else if(this.facilityActivities.containsKey("B015540A") || this.facilityActivities.containsKey("B019234B") || this.facilityActivities.containsKey("B019234C")|| this.facilityActivities.containsKey("B019271A")) {
+								a.setCapacity((double) (tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(10)));
+							}
+							
+							//dancing school, other sportive activities like tennis or golf schools: capacity is assumed to depend on the number of people working there, one employee can serve between 20-30 customer, subtract 10% for vacancies and 20% for shift operation
+							
+							else if(this.facilityActivities.containsKey("B019234A") || this.facilityActivities.containsKey("B019262B") || this.facilityActivities.containsKey("B019272A")) {
+								a.setCapacity((double) (tempFacilities.get(tempFacilityId))*0.7*(20 + random.nextInt(10)));
+							}
+							
+							//operation of sport facilities: arbitrary set to vary between 20 and 20'000
+							
+							else if(this.facilityActivities.containsKey("B019261A")) {
+								a.setCapacity((double) (20 + random.nextInt(9980)));
+							}
+							
+							//sport clubs: arbitrary set to vary between 10 and 50
+							
+							else if(this.facilityActivities.containsKey("B019262A")) {
+								a.setCapacity((double) (10 + random.nextInt(40)));
+							}
+							
+							//sauna, solarium, gym, thermal bath, etc.: arbitrary set to vary between 10 and 100
+							
+							else if(this.facilityActivities.containsKey("B019304A")|| this.facilityActivities.containsKey("B019304B") || this.facilityActivities.containsKey("B019304C")) {
+								a.setCapacity((double) (10 + random.nextInt(90)));
+							}
+							
+							//amusement parks: arbitrary set to vary between 100 and 1000
+							
+							else if(this.facilityActivities.containsKey("B019233A")) {
+								a.setCapacity((double) (100 + random.nextInt(990)));
+							}
+							
+							//-------------------------gastro & culture capacity definition
+							
+							//restaurant, canteen: arbitrary set to vary between 25 and 200
+				
+							else if(this.facilityActivities.containsKey("B015530A") || this.facilityActivities.containsKey("B015551A")) {
+								a.setCapacity((double) (25 + random.nextInt(175)));
+							}
+							
+							//cinema: arbitrary set to vary between 200 and 800
+							
+							else if(this.facilityActivities.containsKey("B019213A")) {
+								a.setCapacity((double) (200 + random.nextInt(600)));
+							}
+							
+							//theater, orchestra, circus, etc.: arbitrary set to vary between 100 and 1400
+							
+							else if(this.facilityActivities.containsKey("B019231A") || this.facilityActivities.containsKey("B019231B") || this.facilityActivities.containsKey("B019234D")) {
+								a.setCapacity((double) (100 + random.nextInt(1300)));
+							}
+							
+							//libraries: arbitrary set to vary between 20 and 200
+							
+							else if(this.facilityActivities.containsKey("B019251A")) {
+								a.setCapacity((double) (20 + random.nextInt(180)));
+							}
+							
+							//museum: arbitrary set to vary between 50 and 700
+							
+							else if(this.facilityActivities.containsKey("B019252A")) {
+								a.setCapacity((double) (50 + random.nextInt(650)));
+							}
+							
+							//zoo, gardens, natural parks: arbitrary set to vary between 50 and 1000
+							
+							else if(this.facilityActivities.containsKey("B019253A")) {
+								a.setCapacity((double) (50 + random.nextInt(950)));
 							}
 							
 							else
