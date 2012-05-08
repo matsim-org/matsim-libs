@@ -22,6 +22,7 @@ package playground.sergioo.Visualizer2D.NetworkVisualizer;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -51,6 +52,8 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 	public enum Options implements LayersWindow.Options {
 		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
 		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
+		ADD_LINK("<html>L<br/>I<br/>N<br/>K<br/>S</html>"),
+		ADD_NODE("<html>N<br/>O<br/>D<br/>E<br/>S</html>"),
 		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
 		private String caption;
 		private Options(String caption) {
@@ -63,7 +66,9 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 	}
 	public enum Labels implements LayersWindow.Labels {
 		LINK("Link"),
-		NODE("Node");
+		NODE("Node"),
+		LINKS("Links"),
+		NODES("Nodes");
 		private String text;
 		private Labels(String text) {
 			this.text = text;
@@ -124,7 +129,7 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		coordsPanel.add(lblCoords[1]);
 		infoPanel.add(coordsPanel, BorderLayout.EAST);
 		this.add(infoPanel, BorderLayout.SOUTH);
-		pack();
+		super.setSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 	}
 	public void refreshLabel(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		labels[label.ordinal()].setText(((NetworkPanel)layersPanels.get(PanelIds.ONE)).getLabelText(label));

@@ -28,9 +28,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import javax.swing.JFileChooser;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -99,6 +102,22 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
 				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().unselectNode();
+				window.refreshLabel(Labels.NODE);
+			}
+			else if(window.getOption().equals(Options.ADD_LINK) && e.getButton()==MouseEvent.BUTTON1) {
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().addLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				window.refreshLabel(Labels.LINK);
+			}
+			else if(window.getOption().equals(Options.ADD_LINK) && e.getButton()==MouseEvent.BUTTON3) {
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().removeLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				window.refreshLabel(Labels.LINK);
+			}
+			else if(window.getOption().equals(Options.ADD_NODE) && e.getButton()==MouseEvent.BUTTON1) {
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().addNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				window.refreshLabel(Labels.NODE);
+			}
+			else if(window.getOption().equals(Options.ADD_NODE) && e.getButton()==MouseEvent.BUTTON3) {
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().removeNode(getWorldX(e.getX()),getWorldY(e.getY()));
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
@@ -173,6 +192,12 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 		case 'o':
 			((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().selectOppositeLink();
 			window.refreshLabel(Labels.LINK);
+			break;
+		case 'i':
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.showSaveDialog(this);
+			File file = jFileChooser.getSelectedFile();
+			saveImage(file.getName().split("\\.")[file.getName().split("\\.").length-1], file);
 			break;
 		case 'v':
 			viewAll();
