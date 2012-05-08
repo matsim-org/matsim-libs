@@ -72,7 +72,8 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.shopsOf2005 = scenario.getActivityFacilities();
 		this.shopsOf2005.setName("shopsOf2005");
-		this.shoppingQuadTree = this.buildShopsQuadTree(shopsOf2005);
+		TreeMap<Id,ActivityFacility> shoppingFacilities = this.shopsOf2005.getFacilitiesForActivityType("shop");
+		this.shoppingQuadTree = this.buildShopsQuadTree(shoppingFacilities);
 		log.info(" shoppingQuadTree size: " +this.shoppingQuadTree.size());
 	}
 
@@ -83,12 +84,11 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		log.info("Reading shops Of 2005 xml file...done.");
 	}
 	
-	private QuadTree<ActivityFacility> buildShopsQuadTree(ActivityFacilitiesImpl shopsOf2005) {
+	private QuadTree<ActivityFacility> buildShopsQuadTree(TreeMap<Id,ActivityFacility> shoppingFacilities) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		TreeMap<Id,ActivityFacility> shoppingFacilities = this.shopsOf2005.getFacilitiesForActivityType("shop");
 		
 		for (final ActivityFacility f : shoppingFacilities.values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
@@ -126,7 +126,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 		//closest shop
 		
-		Map<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
+		TreeMap<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
 
 	//	log.info("TreeMap defined");
 		
@@ -137,9 +137,13 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 			Double x = facility.getCoord().getX();
 			Double y = facility.getCoord().getY();
 			ActivityFacility closestShop = this.shoppingQuadTree.get(x,y);
-			// TODO: days!
-			closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon);
-		//	closestShopOpentimes = closestShop.getOpeningTimes();	
+			closestShopOpentimes.put(DayType.mon, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon));
+			closestShopOpentimes.put(DayType.tue, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.tue));
+			closestShopOpentimes.put(DayType.wed, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.wed));
+			closestShopOpentimes.put(DayType.thu,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.thu));
+			closestShopOpentimes.put(DayType.fri, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.fri));
+			closestShopOpentimes.put(DayType.sat,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sat));
+			closestShopOpentimes.put(DayType.sun,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sun));
 		}
 		
 		//List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
