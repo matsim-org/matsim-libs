@@ -57,6 +57,10 @@ import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.thibautd.parknride.routingapproach.RoutingParkAndRideIncluder;
+import playground.thibautd.parknride.routingapproach.ParkAndRideRoutingModule;
+import playground.thibautd.parknride.routingapproach.ParkAndRideTravelTimeCost;
+import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
 import playground.thibautd.router.LegRouterWrapper;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.TransitRouterWrapper;
@@ -167,7 +171,7 @@ public class RoutesTest {
 
 			Facility pnrFacility =
 				pnrTrip.size() > 1 ?
-				ParkAndRideIncluder.identifyPnrFacility(
+				RoutingParkAndRideIncluder.identifyPnrFacility(
 						pnrTrip,
 						facilities ) :
 				od.getFirst();
