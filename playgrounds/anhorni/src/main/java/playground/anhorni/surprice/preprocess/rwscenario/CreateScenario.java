@@ -34,8 +34,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -94,7 +96,16 @@ public class CreateScenario {
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 	}
 	
-	private void createToll(String outPath) {		
+	private void createToll(String outPath) {	
+		
+		NetworkImpl network = (NetworkImpl)this.scenario.getNetwork();
+		
+		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
+			((ActivityFacilityImpl)facility).setLinkId(
+					network.getNearestLink(facility.getCoord()).getId()
+					);
+		}
+		
 		// dummy zone
 		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
 		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);

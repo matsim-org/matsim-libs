@@ -79,13 +79,7 @@ public class AdaptFacilities {
 		
 		log.info("add act opt other ................");
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			
-			NetworkImpl network = (NetworkImpl)this.scenario.getNetwork();
-			
-			((ActivityFacilityImpl)facility).setLinkId(
-					network.getNearestLink(facility.getCoord()).getId()
-					);
-			
+						
 			if (otherFacQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY(), 100.0).size() == 0 
 					&& (facility.getActivityOptions().containsKey("home") ||
 							facility.getActivityOptions().containsKey("work") ||
