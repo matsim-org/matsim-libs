@@ -26,6 +26,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.anhorni.surprice.Surprice;
+import playground.anhorni.surprice.preprocess.CreateToll;
 
 public class CreateScenario {
 
@@ -65,6 +66,14 @@ public class CreateScenario {
 		populationCreator.createPopulation(this.scenario, config);	
 				
 		CreateToll tollCreator = new CreateToll();
-		tollCreator.create(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"), populationCreator.getTollZone()); // TODO: different schemes for different days
+		tollCreator.create(
+				config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"), 
+				populationCreator.getTollZone(),
+				8.0 * 3600.0,
+				12.0 * 3600.0,
+				10.0,
+				"area",
+				"chessboard example"); 
+		// TODO: different schemes for different days
 	}
 }

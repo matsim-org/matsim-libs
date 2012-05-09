@@ -18,23 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess.miniscenario;
+package playground.anhorni.surprice.preprocess;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 
+import playground.anhorni.surprice.preprocess.miniscenario.Zone;
+
 public class CreateToll {
 	       
-    public void create(String path, Zone tollZone) { 	    	
+    public void create(String path, Zone tollZone, double startTime, double endTime, double amount, String type, String desc) { 	    	
     	RoadPricingScheme scheme = new RoadPricingScheme();
-    	scheme.setType("area");
+    	scheme.setType(type);
     	scheme.setName("surprice");
-    	scheme.setDescription("chessboard example");
-    	
-    	double startTime = 8.0 * 3600.0;
-    	double endTime = 12.0 * 3600.0;
-    	double amount = 10.0;    	
+    	scheme.setDescription(desc); 	
     	
     	scheme.addCost(startTime, endTime, amount);
     	

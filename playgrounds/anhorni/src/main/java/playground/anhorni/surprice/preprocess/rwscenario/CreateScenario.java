@@ -41,11 +41,13 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;
 import playground.anhorni.surprice.preprocess.Analyzer;
 
 
-public class Merger {	
+public class CreateScenario {	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 	private ConvertThurgau2Plans thurgauConverter = new ConvertThurgau2Plans();
 	private TreeMap<Id, PersonHomeWork> personHWFacilities = new TreeMap<Id, PersonHomeWork>();
@@ -59,7 +61,7 @@ public class Merger {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
 		}		
-		Merger creator = new Merger();
+		CreateScenario creator = new CreateScenario();
 		creator.run(args[0]);
 	}
 	
@@ -102,9 +104,10 @@ public class Merger {
 				((PersonImpl)person).setSelectedPlan(plan);				
 			}
 			new Analyzer().run(this.scenario.getPopulation(), outPath, Surprice.days.get(dow));
-			log.info("Writing population with plans ..." + outPath + "/" + dow + "/plans.xml.gz");
+			log.info("Writing population with plans ..." + outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
 			new File(outPath + "/" + dow + "/").mkdirs();
-			new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + dow + "/plans.xml.gz");
+			new PopulationWriter(
+					this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
 		}	
 	}
 		
