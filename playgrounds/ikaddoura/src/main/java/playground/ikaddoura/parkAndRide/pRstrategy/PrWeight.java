@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.Id;
  * @author Ihab
  *
  */
-public class PREntry implements Comparable<PREntry> {
-	private Id id;
+public class PrWeight implements Comparable<PrWeight> {
+	private Id id; // ParkAndRideFacility-Id
 	private double weight;
 	
-	public PREntry(Id id, Double weight) {
+	public PrWeight(Id id, Double weight) {
 		this.id = id;
 		this.weight = weight;
 	}
@@ -45,7 +45,7 @@ public class PREntry implements Comparable<PREntry> {
 		return weight;
 	}
 	
-	public int compareTo(PREntry entry) {
+	public int compareTo(PrWeight entry) {
 		if (this.weight > entry.getWeight()) {
 			return 1;
 		} else if (this.weight == entry.getWeight()) {

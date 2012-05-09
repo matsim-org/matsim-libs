@@ -20,10 +20,13 @@
 package playground.ikaddoura.parkAndRide.pRstrategy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -49,13 +52,14 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 	Network net;
 	Population pop;
 	private List<ParkAndRideFacility> prFacilities = new ArrayList<ParkAndRideFacility>();
+	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
 
-	public ParkAndRideChangeLocationStrategy(Controler controler, List<ParkAndRideFacility> prFacilities) {
+	public ParkAndRideChangeLocationStrategy(Controler controler, List<ParkAndRideFacility> prFacilities, Map<Id, List<PrWeight>> personId2prWeights) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
 		this.prFacilities = prFacilities;
-
+		this.personId2prWeights = personId2prWeights;
 	}
 
 	@Override
@@ -121,10 +125,20 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 		}
 		
 		System.out.println("Home: " + homeCoord + " / Work: " + workCoord);
-		EllipseSearch ellipseSearch = new EllipseSearch();
-		Link rndPRLink = ellipseSearch.getPRLink(this.net, this.prFacilities, homeCoord, workCoord);
 		
-		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndPRLink.getToNode().getCoord(), rndPRLink.getId()); 
+		List<PrWeight> prWeights;
+		EllipseSearch ellipseSearch = new EllipseSearch();
+
+		if (this.personId2prWeights.get(plan.getPerson().getId()) == null){
+			prWeights = ellipseSearch.getPrWeights(this.net, this.prFacilities, homeCoord, workCoord);
+			this.personId2prWeights.put(plan.getPerson().getId(), prWeights);
+		} else {
+			prWeights = this.personId2prWeights.get(plan.getPerson().getId());
+		}
+		
+		Link rndPrLink = ellipseSearch.getRndPrLink(this.net, prWeights);
+		
+		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndPrLink.getToNode().getCoord(), rndPrLink.getId()); 
 		parkAndRide.setMaximumDuration(120.0);
 		
 		return parkAndRide;

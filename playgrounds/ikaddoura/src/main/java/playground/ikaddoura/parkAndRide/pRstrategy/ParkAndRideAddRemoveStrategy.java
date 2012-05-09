@@ -20,7 +20,9 @@
 package playground.ikaddoura.parkAndRide.pRstrategy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -51,12 +53,14 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 	Network net;
 	Population pop;
 	private List<ParkAndRideFacility> prFacilities = new ArrayList<ParkAndRideFacility>();
-
-	public ParkAndRideAddRemoveStrategy(Controler controler, List<ParkAndRideFacility> prFacilities) {
+	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
+	
+	public ParkAndRideAddRemoveStrategy(Controler controler, List<ParkAndRideFacility> prFacilities, Map<Id, List<PrWeight>> personId2prWeights) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
 		this.prFacilities = prFacilities;
+		this.personId2prWeights = personId2prWeights;
 	}
 
 	@Override

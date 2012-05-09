@@ -41,14 +41,14 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  */
 public class EllipseSearch {
 
-	public Link getPRLink(Network network, List<ParkAndRideFacility> prFacilities, Coord homeCoord, Coord workCoord) {
-		
-		List <PREntry> prEntries = new ArrayList<PREntry>();
-		double weightSum = 0.0;
+	
+
+	public List<PrWeight> getPrWeights(Network net, List<ParkAndRideFacility> prFacilities, Coord homeCoord, Coord workCoord) {
+		List <PrWeight> prWeights = new ArrayList<PrWeight>();
 		
 		for (ParkAndRideFacility pr : prFacilities){
 			Id prId = pr.getPrLink3in();
-			Coord prCoord = network.getLinks().get(prId).getToNode().getCoord();	
+			Coord prCoord = net.getLinks().get(prId).getToNode().getCoord();	
 			 
 			 double xHomeToPR = Math.abs(homeCoord.getX() - prCoord.getX());
 			 double yHomeToPR = Math.abs(homeCoord.getY() - prCoord.getY());
@@ -61,22 +61,36 @@ public class EllipseSearch {
 			 double r = distHomeToPR + distWorkToPR;
 			 double weight = 1 / Math.pow(r, 2);
 			
-			 prEntries.add(new PREntry(pr.getId(), weight));
-			 weightSum = weightSum + weight;
+			 prWeights.add(new PrWeight(pr.getId(), weight));
 		}
-		System.out.println("weightsSum: " + weightSum);
+		return prWeights;
+	}
+	
+	private double getHyp(double a, double b) {
+		double aSquare = Math.pow(a, 2);
+		double bSquare = Math.pow(b, 2);
+		return Math.sqrt(aSquare + bSquare);
+	}
+	
+	public Link getRndPrLink(Network net, List<PrWeight> prWeights) {
 
 //		System.out.println("unsortedList:");
 //		for (PREntry entry : prEntries) {
 //			System.out.println("id / value: " + entry.getId() + " / " + entry.getWeight());
 //		}
 
-		Collections.sort(prEntries);
+		Collections.sort(prWeights);
 
 //		System.out.println("sortedList:");
 //		for (PREntry entry : prEntries) {
 //			System.out.println("id / value: " + entry.getId() + " / " + entry.getWeight());
 //		}
+		
+		double weightSum = 0.0;
+		for (PrWeight prWeight : prWeights){
+			weightSum = weightSum + prWeight.getWeight();
+		}
+		System.out.println("weightsSum: " + weightSum);
 
 		Random random = new Random();
 		double rnd = random.nextDouble() * weightSum;
@@ -84,7 +98,7 @@ public class EllipseSearch {
 
 		Id weightedRndId = null;
 		double cumulatedWeight = 0.0;
-		for (PREntry entry : prEntries) {
+		for (PrWeight entry : prWeights) {
 			cumulatedWeight = cumulatedWeight + entry.getWeight();
 			if (cumulatedWeight >= rnd) {
 				weightedRndId = entry.getId();
@@ -93,14 +107,8 @@ public class EllipseSearch {
 		}
 		System.out.println("weightedRndId: " + weightedRndId.toString());
 		
-		Link rndPRLink = network.getLinks().get(weightedRndId);
+		Link rndPRLink = net.getLinks().get(weightedRndId);
 		return rndPRLink;
-	}
-
-	private double getHyp(double a, double b) {
-		double aSquare = Math.pow(a, 2);
-		double bSquare = Math.pow(b, 2);
-		return Math.sqrt(aSquare + bSquare);
 	}
 
 }
