@@ -58,7 +58,7 @@
 		<artifactId>cadyts</artifactId>
 		<version>1.2.0-20120418</version>
 		<scope>system</scope>
-		<systemPath>${basedir}/lib/cadyts_r679.jar</systemPath>
+		<systemPath>${basedir}/lib/cadyts_r687.jar</systemPath>
 	</dependency>
 		
 		<dependency>
