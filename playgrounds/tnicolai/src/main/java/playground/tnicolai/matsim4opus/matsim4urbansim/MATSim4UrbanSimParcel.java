@@ -336,7 +336,8 @@ public class MATSim4UrbanSimParcel {
 			}
 			
 			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV2(measuringPoints, 
-																						 aggregatedOpportunities, 
+																						 aggregatedOpportunities,
+																						 parcels,
 																						 carGrid,
 																						 walkGrid, 
 																						 fileExtension, 
@@ -352,8 +353,7 @@ public class MATSim4UrbanSimParcel {
 			// init aggregatedWorkplaces
 			if(aggregatedOpportunities == null)
 				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
-			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
-																		aggregatedOpportunities);
+			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(aggregatedOpportunities);
 		}
 		
 		// to count number of cars per h on a link

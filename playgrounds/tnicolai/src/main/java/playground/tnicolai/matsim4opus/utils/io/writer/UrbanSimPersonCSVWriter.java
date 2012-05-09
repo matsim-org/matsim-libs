@@ -17,10 +17,11 @@ public class UrbanSimPersonCSVWriter {
 	/**
 	 * writes the header for persons csv file
 	 */
-	public static void initUrbanSimPersonWriter(String file){
+	public static void initUrbanSimPersonWriter(){
 		try{
 			log.info("Initializing UrbanSimZoneCSVWriter ...");
-			personWriter = IOUtils.getBufferedWriter( file );
+			personWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
 			personWriter.write( Constants.PERSON_ID + "," +

@@ -9,9 +9,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -23,12 +25,14 @@ import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
+import playground.tnicolai.matsim4opus.interpolation.Interpolation;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
+import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
@@ -77,6 +81,9 @@ import com.vividsolutions.jts.geom.Point;
  *  improvements april'12
  *  - accessibility calculation uses configurable betas (coming from UrbanSim) for car/walk travel times, -distances and -costs
  *  - replaced "SpatialGrid<Double>" by "SpatialGrid" using double instead of Double-objects
+ *  
+ *  improvements may'12
+ *  - including interpolated (spatial grid) feedback for each parcel 
  * 
  * @author thomas
  * 
@@ -90,6 +97,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 	 */
 	public CellBasedAccessibilityControlerListenerV2(ZoneLayer<CounterObject> startZones, 						// needed for google earth plots (not supported by now tnicolai feb'12)
 													 AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
+													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
 													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
 													 String fileExtension,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
@@ -101,6 +109,8 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		this.measuringPoints = startZones;
 		assert (aggregatedOpportunities != null);
 		this.aggregatedOpportunities = aggregatedOpportunities;
+		assert (parcels != null);
+		this.parcels = parcels;
 		assert (carGrid != null);
 		this.carGrid = carGrid;
 		assert (walkGrid != null);
@@ -291,7 +301,8 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 						/ 60. + " minutes).");
 			}
 			accCsvWriter.close();
-			dumpResults();
+			writePlottingData();
+			writeParcelAccessibilities();
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -302,8 +313,9 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 
 	// This needs to be executed only once at the end of the accessibility computation
 	// A synchronization is may be not needed
-	private void dumpResults() throws IOException{
-		log.info("Writing files ...");
+	private void writePlottingData() throws IOException{
+		
+		log.info("Writing plotting files ...");
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(carGrid, Constants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
 				+ "carAccessibility_cellsize_" + carGrid.getResolution()
@@ -332,7 +344,48 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 										+ walkGrid.getResolution()
 										+ CellBasedAccessibilityControlerListenerV2.fileExtension
 										+ Constants.FILE_TYPE_KMZ);
-		log.info("Writing files done!");
+		log.info("Writing plotting files done!");
+	}
+	
+	/**
+	 * 
+	 */
+	private void writeParcelAccessibilities() {
+		// from here accessibility feedback for each parcel
+		UrbanSimParcelCSVWriter.initUrbanSimZoneWriter();
+		
+		Interpolation carGridInterpolation = new Interpolation(carGrid, Interpolation.BILINEAR);
+		Interpolation walkGridInterpolation= new Interpolation(walkGrid, Interpolation.BILINEAR);
+		
+		if(this.parcels != null){
+			
+			int numberOfParcels = this.parcels.getFacilities().size();
+			double carAccessibility = Double.NaN;
+			double walkAccessibility= Double.NaN;
+			
+			log.info(numberOfParcels + " parcels are now processing ...");
+			
+			Iterator<ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
+			ProgressBar bar = new ProgressBar( numberOfParcels );
+			
+			while(parcelIterator.hasNext()){
+				
+				bar.update();
+				
+				ActivityFacility parcel = parcelIterator.next();
+				
+				// for testing
+				// double car = carGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
+				// double walk= walkGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
+				
+				carAccessibility = carGridInterpolation.interpolate( parcel.getCoord() );
+				walkAccessibility= walkGridInterpolation.interpolate( parcel.getCoord() );
+				
+				UrbanSimParcelCSVWriter.write(parcel.getId(), carAccessibility, walkAccessibility);
+			}
+			log.info("... done!");
+			UrbanSimParcelCSVWriter.close();
+		}
 	}
 	
 	/**

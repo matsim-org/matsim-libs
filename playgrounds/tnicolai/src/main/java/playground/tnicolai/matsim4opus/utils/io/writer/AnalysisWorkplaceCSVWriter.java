@@ -15,16 +15,18 @@ public class AnalysisWorkplaceCSVWriter {
 	
 	private static final Logger log = Logger.getLogger(AnalysisWorkplaceCSVWriter.class);
 	
+	public static final String FILE_NAME= "aggregated_workplaces.csv";
 	/**
 	 * Writing aggregated workplace data to disc
 	 * @param file
 	 * @param jobClusterArray
 	 */
-	public static void writeAggregatedWorkplaceData2CSV(final String file, final AggregateObject2NearestNode[] jobClusterArray){
+	public static void writeAggregatedWorkplaceData2CSV(final AggregateObject2NearestNode[] jobClusterArray){
 		
 		try{
-			log.info("Dumping aggregated workplace information as csv to " + file + " ...");
-			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( file );
+			log.info("Initializing AnalysisWorkplaceCSVWriter ...");
+			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing (aggregated workplace) data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
 			bwAggregatedWP.write(Constants.ZONE_ID +","+ 

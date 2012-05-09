@@ -19,10 +19,11 @@ public class AnalysisZoneCSVWriterV2 {
 	/**
 	 * writes the header of accessibility data csv file
 	 */
-	public static void initAccessiblityWriter(String file){
+	public static void initAccessiblityWriter(){
 		try{
 			log.info("Initializing AnalysisZoneCSVWriterV2 ...");
-			zoneCSVWriter = IOUtils.getBufferedWriter( file );
+			zoneCSVWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
 			zoneCSVWriter.write( Constants.ZONE_ID + "," +

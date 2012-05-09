@@ -25,10 +25,11 @@ public class UrbanSimZoneCSVWriterV2 {
 	/**
 	 * writes the header for zones csv file
 	 */
-	public static void initUrbanSimZoneWriter(String file){
+	public static void initUrbanSimZoneWriter(){
 		try{
 			log.info("Initializing UrbanSimZoneCSVWriterV2 ...");
-			zoneWriter = IOUtils.getBufferedWriter( file );
+			zoneWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
 			zoneWriter.write( Constants.ZONE_ID + "," +

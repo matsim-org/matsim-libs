@@ -16,6 +16,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	
 	private static final Logger log = Logger.getLogger(AnalysisCellBasedAccessibilityCSVWriterV2.class);
 	private static BufferedWriter accessibilityDataWriter = null;
+	public static final String FILE_NAME= "accessibility_indicators_ersa.csv";
 	
 	/**
 	 * writes the header of accessibility data csv file
@@ -23,7 +24,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	public AnalysisCellBasedAccessibilityCSVWriterV2(String fileExtension){
 		try{
 			log.info("Initializing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
-			accessibilityDataWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + fileExtension +"_accessibility_indicators_ersa.csv" );
+			accessibilityDataWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + fileExtension + FILE_NAME );
 			
 			// create header
 			accessibilityDataWriter.write( Constants.ZONE_ID + "," +

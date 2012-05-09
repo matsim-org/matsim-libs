@@ -110,11 +110,22 @@ public class SpatialGrid{
 
 	public double getValue(Point point) {
 		if(isInBounds(point))
-			return matrix[getRow(point.getY())][getColumn(point.getX())];
+			return getValue(point.getX(), point.getY());
+//			return matrix[getRow(point.getY())][getColumn(point.getX())];
+//		
+//		log.warn("This point lies outside the boundary!!!");
+//		log.warn("Boundary: xmin:"+this.minX+", ymin:"+ this.minY+", xmax:"+this.maxX+", maxy:"+this.maxY);
+//		log.warn("Point: x:"+point.getX()+ ", y:"+point.getY());
+		return Double.NaN;
+	}
+	
+	public double getValue(double x, double y){
+		if(isInBounds(x, y))
+			return matrix[getRow(y)][getColumn(x)];
 		
 		log.warn("This point lies outside the boundary!!!");
 		log.warn("Boundary: xmin:"+this.minX+", ymin:"+ this.minY+", xmax:"+this.maxX+", maxy:"+this.maxY);
-		log.warn("Point: x:"+point.getX()+ ", y:"+point.getY());
+		log.warn("Point: x:"+x+ ", y:"+y);
 		return Double.NaN;
 	}
 	
@@ -128,7 +139,11 @@ public class SpatialGrid{
 	
 	public boolean isInBounds(Point point) {
 		return point.getX() >= minX && point.getX() <= maxX &&
-				point.getY() >= minY && point.getY() <= maxY;
+			   point.getY() >= minY && point.getY() <= maxY;
+	}
+	
+	public boolean isInBounds(double x, double y){
+		return (x >= minX && x <= maxX && y >= minY && y <= maxY);
 	}
 	
 	public double getValue(int row, int col) {

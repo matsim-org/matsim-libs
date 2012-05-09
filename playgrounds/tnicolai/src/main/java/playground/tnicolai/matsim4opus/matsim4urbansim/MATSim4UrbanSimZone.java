@@ -204,7 +204,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 																						this.scenario));
 		}
 		
-		// new method
+		// tnicolai: this is implemented for testing and visualization purposes (remove for final release)
 		if(computeCellBasedAccessibility){
 			SpatialGrid carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
@@ -234,7 +234,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			}
 			
 			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV2(measuringPoints, 
-																						 aggregatedOpportunities, 
+																						 aggregatedOpportunities,
+																						 zones,
 																						 carGrid,
 																						 walkGrid, 
 																						 fileExtension, 
@@ -250,8 +251,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			// init aggregatedWorkplaces
 			if(aggregatedOpportunities == null)
 				aggregatedOpportunities = readUrbansimJobs(zones, destinationSampleRate);
-			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
-					                                            		aggregatedOpportunities);
+			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(aggregatedOpportunities);
 		}
 	}
 

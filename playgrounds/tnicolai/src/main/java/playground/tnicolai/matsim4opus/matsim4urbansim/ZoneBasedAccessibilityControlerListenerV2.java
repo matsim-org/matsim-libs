@@ -69,12 +69,10 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
-		UrbanSimZoneCSVWriterV2.initUrbanSimZoneWriter(Constants.MATSIM_4_OPUS_TEMP +
-													   UrbanSimZoneCSVWriterV2.FILE_NAME);
+		UrbanSimZoneCSVWriterV2.initUrbanSimZoneWriter();
 		// in contrast to the file above this contains all information about
 		// zones but is not dedicated as input for UrbanSim, use for analysis
-		AnalysisZoneCSVWriterV2.initAccessiblityWriter(Constants.MATSIM_4_OPUS_TEMP + 
-													   AnalysisZoneCSVWriterV2.FILE_NAME);
+		AnalysisZoneCSVWriterV2.initAccessiblityWriter();
 		
 		initAccessibilityParameter(scenario);
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListener!");

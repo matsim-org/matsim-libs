@@ -206,7 +206,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 //		writeSpatialGridTables();
 		SpatialGridTableWriterERSA_V2.writeTableAndCSV(this.travelTimeAccessibilityGrid, this.travelCostAccessibilityGrid, this.travelDistanceAccessibilityGrid, this.travelTimeAccessibilityMap, this.travelCostAccessibilityMap, this.travelDistanceAccessibilityMap, this.resolutionMeter);
 		SpatialGrid2KMZWriter.writeKMZFiles(this.travelTimeAccessibilityGrid, this.travelCostAccessibilityGrid, this.travelDistanceAccessibilityGrid);
-		AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedJobArray );
+		AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV( this.aggregatedJobArray );
 		// accessibility measure were written while computing, just closing file now .
 //		CellBasedAccessibilityCSVWriter.close();
 	}

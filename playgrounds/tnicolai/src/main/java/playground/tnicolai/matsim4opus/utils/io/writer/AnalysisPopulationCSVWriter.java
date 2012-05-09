@@ -16,16 +16,18 @@ public class AnalysisPopulationCSVWriter {
 	
 	private static final Logger log = Logger.getLogger(AnalysisPopulationCSVWriter.class);
 	
+	public static final String FILE_NAME= "population.csv";
 	/**
 	 * writing raw population data to disc
 	 * @param file
 	 * @param personLocations
 	 */
-	public static void writePopulationData2CSV(final String file, final Map<Id, PersonAndJobsObject> personLocations){
+	public static void writePopulationData2CSV(final Map<Id, PersonAndJobsObject> personLocations){
 		
 		try{
-			log.info("Dumping person information as csv to " + file + " ...");
-			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( file );
+			log.info("Initializing AnalysisPopulationCSVWriter ...");
+			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing (population) data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
 			bwPopulation.write(Constants.PERSON_ID +","+ 

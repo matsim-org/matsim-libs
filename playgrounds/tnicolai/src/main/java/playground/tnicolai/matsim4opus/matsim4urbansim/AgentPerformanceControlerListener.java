@@ -38,8 +38,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 		// writing agent performances continuously into "persons.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
-		UrbanSimPersonCSVWriter.initUrbanSimPersonWriter(Constants.MATSIM_4_OPUS_TEMP + 
-														 UrbanSimPersonCSVWriter.FILE_NAME);
+		UrbanSimPersonCSVWriter.initUrbanSimPersonWriter();
 	}
 	
 	/**

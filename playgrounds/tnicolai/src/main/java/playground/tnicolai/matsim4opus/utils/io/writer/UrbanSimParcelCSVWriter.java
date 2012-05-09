@@ -44,10 +44,11 @@ public class UrbanSimParcelCSVWriter {
 	/**
 	 * writes the header for zones csv file
 	 */
-	public static void initUrbanSimZoneWriter(String file){
+	public static void initUrbanSimZoneWriter(){
 		try{
 			log.info("Initializing UrbanSimParcelCSVWriter ...");
-			parcelWriter = IOUtils.getBufferedWriter( file );
+			parcelWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
 			parcelWriter.write( Constants.PARCEL_ID + "," +
@@ -75,8 +76,7 @@ public class UrbanSimParcelCSVWriter {
 		try{
 			assert(UrbanSimParcelCSVWriter.parcelWriter != null);
 			parcelWriter.write( parcelID + "," + 
-								carAccessibility + "," + 
-								walkAccessibility );
+								carAccessibility);
 			parcelWriter.newLine();
 		}
 		catch(Exception e){
