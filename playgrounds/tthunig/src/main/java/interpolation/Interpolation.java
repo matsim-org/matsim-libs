@@ -60,7 +60,7 @@ public class Interpolation {
 	public double interpolate(Coord coord){
 		if(sg != null && coord != null)
 			return interpolate(coord.getX(), coord.getY());
-		log.warn("ERROR");
+		log.warn("Either the spatial grid is not initialized or the coordinates are zero!");
 		return Double.NaN;
 	}
 	
