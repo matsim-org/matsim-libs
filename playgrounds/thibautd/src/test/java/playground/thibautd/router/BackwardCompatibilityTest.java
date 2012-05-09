@@ -54,6 +54,7 @@ import playground.thibautd.router.controler.MultiLegRoutingControler;
  * @author thibautd
  */
 @RunWith(Parameterized.class)
+	@Ignore
 public class BackwardCompatibilityTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
