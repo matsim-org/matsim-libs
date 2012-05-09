@@ -3,6 +3,7 @@ package playground.balmermi;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 
 public class ConfigurationWriter {
 
@@ -10,6 +11,7 @@ public class ConfigurationWriter {
 		Config c = new Config();
 		c.addCoreModules();
 		c.addQSimConfigGroup(new QSimConfigGroup());
-		new ConfigWriter(c).write("../../config.xml");
+		c.addSimulationConfigGroup(new SimulationConfigGroup());
+		new ConfigWriter(c).write("../../../config_default.xml");
 	}
 }
