@@ -36,6 +36,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.DefaultRoutingModuleFactory;
+import playground.thibautd.router.PlanRouter;
 import playground.thibautd.router.PlanRouterWrapper;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.RoutingModuleFactory;
@@ -63,16 +64,19 @@ public class MultiLegRoutingControler extends Controler {
 		PlansCalcRoute plansCalcRoute = null;
 
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();
-		plansCalcRoute = new PlanRouterWrapper(
-				getConfig().plansCalcRoute(),
-				getNetwork(),
-				travelCosts,
-				travelTimes,
-				getLeastCostPathCalculatorFactory(),
-				tripRouterFactory.getModeRouteFactory(),
-				tripRouterFactory);
+		//plansCalcRoute = new PlanRouterWrapper(
+		//		getConfig().plansCalcRoute(),
+		//		getNetwork(),
+		//		travelCosts,
+		//		travelTimes,
+		//		getLeastCostPathCalculatorFactory(),
+		//		tripRouterFactory.getModeRouteFactory(),
+		//		tripRouterFactory);
 
-		return plansCalcRoute;
+		//return plansCalcRoute;
+		return new PlanRouter(
+				tripRouterFactory.createTripRouter(),
+				getScenario().getActivityFacilities());
 	}
 
 	/**

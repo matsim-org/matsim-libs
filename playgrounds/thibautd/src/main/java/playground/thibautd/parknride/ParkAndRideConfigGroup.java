@@ -19,33 +19,23 @@
  * *********************************************************************** */
 package playground.thibautd.parknride;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Module;
 
+import playground.thibautd.utils.ReflectiveModule;
 
 /**
  * @author thibautd
  */
-public class ParkAndRideConfigGroup extends Module {
+public class ParkAndRideConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "parkAndRide";
 
 	public static enum InsertionStrategy { Routing , Random };
 
-	public static final String FACILITIES_FILE = "facilities";
-	public static final String ALL_MODES = "availableModes";
-	public static final String CHAIN_MODES = "chainBasedModes";
-	public static final String INSERT_STRAT = "insertionStrategy";
-	public static final String FAC_CHANGE_PROB = "facilityChangeProbability";
-	public static final String LOCAL_SEARCH_RADIUS = "localSearchRadius";
-
-	private String facilitiesFile = null;
-	private String[] modes = new String[]{
+	private String facilities = null;
+	private String[] availableModes = new String[]{
 		TransportMode.car, TransportMode.pt, TransportMode.bike,
 			TransportMode.walk, ParkAndRideConstants.PARK_N_RIDE_LINK_MODE};
-	private String[] chainModes = new String[]{ TransportMode.car , TransportMode.bike };
+	private String[] chainBasedModes = new String[]{ TransportMode.car , TransportMode.bike };
 	private InsertionStrategy insertionStrategy = InsertionStrategy.Random;
 	private double facilityChangeProbability = 0.9;
 	private double localSearchRadius = 5000;
@@ -54,101 +44,81 @@ public class ParkAndRideConfigGroup extends Module {
 		super( GROUP_NAME );
 	}
 
-	@Override
-	public void addParam(
-			final String param_name,
-			final String value) {
-		if (FACILITIES_FILE.equals( param_name )) {
-			setFacilities( value );
-		}
-		else if (ALL_MODES.equals( param_name )) {
-		}
-		else if (CHAIN_MODES.equals( param_name )) {
-		}
-		else if (INSERT_STRAT.equals( param_name )) {
-		}
-		else if (FAC_CHANGE_PROB.equals( param_name )) {
-		}
-		else if (LOCAL_SEARCH_RADIUS.equals( param_name )) {
-		}
-	}
-
-	@Override
-	public String getValue(final String param_name) {
-		if (FACILITIES_FILE.equals( param_name )) {
-			return getFacilities();
-		}
-		else if (ALL_MODES.equals( param_name )) {
-		}
-		else if (CHAIN_MODES.equals( param_name )) {
-		}
-		else if (INSERT_STRAT.equals( param_name )) {
-		}
-		else if (FAC_CHANGE_PROB.equals( param_name )) {
-		}
-		else if (LOCAL_SEARCH_RADIUS.equals( param_name )) {
-		}
-
-		return null;
-	}
-
-	@Override
-	public Map<String, String> getParams() {
-		// linked hash map: the order in the file will correspond
-		// to the order defined here
-		Map<String, String> map = new LinkedHashMap<String, String>();
-
-		addParameterToMap( map , FACILITIES_FILE );
-		addParameterToMap( map , ALL_MODES );
-		addParameterToMap( map , CHAIN_MODES );
-		addParameterToMap( map , INSERT_STRAT );
-		addParameterToMap( map , FAC_CHANGE_PROB );
-		addParameterToMap( map , LOCAL_SEARCH_RADIUS );
-
-		return map;
-	}
-
 	// /////////////////////////////////////////////////////////////////////////
 	// getters/setters
 	// /////////////////////////////////////////////////////////////////////////
 	public void setFacilities(final String fileName) {
-		facilitiesFile = fileName;
+		facilities = fileName;
 	}
 
 	public String getFacilities() {
-		return facilitiesFile;
+		return facilities;
 	}
 
 	public void setAvailableModes(final String value) {
-		modes = value.split(",");
+		availableModes = value.split(",");
 		
-		for (int i=0; i<modes.length; i++) {
-			modes[ i ] = modes[ i ].trim();
+		for (int i=0; i<availableModes.length; i++) {
+			availableModes[ i ] = availableModes[ i ].trim();
 		}
 	}
 
 	public String[] getAvailableModes() {
-		return modes;
+		return availableModes;
+	}
+
+	public String getAvailableModesAsString() {
+		return arrayToString( availableModes );
+	}
+
+	private String arrayToString(final String[] a) {
+		StringBuffer b = new StringBuffer();
+
+		if (a.length > 0) {
+			b.append( a[0] );
+			for (int i=1; i < a.length; i++) {
+				b.append( "," );
+				b.append( a[ i ] );
+			}
+		}
+
+		return b.toString();
 	}
 
 	public void setChainBasedModes(final String value) {
-		chainModes = value.split(",");
+		chainBasedModes = value.split(",");
 		
-		for (int i=0; i<modes.length; i++) {
-			chainModes[ i ] = chainModes[ i ].trim();
+		for (int i=0; i<availableModes.length; i++) {
+			chainBasedModes[ i ] = chainBasedModes[ i ].trim();
 		}
 	}
 
 	public String[] getChainBasedModes() {
-		return chainModes;
+		return chainBasedModes;
+	}
+
+	public String getChainBasedModesAsString() {
+		return arrayToString( chainBasedModes );
+	}
+
+	public void setInsertionStrategy(final String value) {
+		insertionStrategy = InsertionStrategy.valueOf( value );
 	}
 
 	public InsertionStrategy getInsertionStrategy() {
 		return insertionStrategy;
 	}
 
+	public void setFacilityChangeProbability(final String value) {
+		this.facilityChangeProbability = Double.parseDouble( value );
+	}
+
 	public double getFacilityChangeProbability() {
 		return facilityChangeProbability;
+	}
+
+	public void setLocalSearchRadius(final String value) {
+		this.localSearchRadius = Double.parseDouble( value );
 	}
 
 	public double getLocalSearchRadius() {
