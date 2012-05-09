@@ -314,58 +314,56 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				.getMultinomialLogit();
 
 		// *******should after Scoring Listener!!!*******
+		// if (calibrator.getInitialStepSize() != 0d) {//deprecated
 
-		if (calibrator.getInitialStepSize() != 0d) {
+		StringBuffer sb = new StringBuffer(Integer.toString(iter));
 
-			StringBuffer sb = new StringBuffer(Integer.toString(iter));
+		for (int i = 0; i < paramNames.length; i++) {
+			int paramNameIndex = Events2Score4AttrRecorder.attrNameList
+					.indexOf(paramNames[i]/*
+										 * pos. of param in Parameters in Cadyts
+										 */);
 
-			for (int i = 0; i < paramNames.length; i++) {
-				int paramNameIndex = Events2Score4AttrRecorder.attrNameList
-						.indexOf(paramNames[i]/*
-											 * pos. of param in Parameters in
-											 * Cadyts
-											 */);
+			// double paramScaleFactor =
+			// Events2Score4PC_mnl_mnl.paramScaleFactorList
+			// .get(paramNameIndex);
 
-				// double paramScaleFactor =
-				// Events2Score4PC_mnl_mnl.paramScaleFactorList
-				// .get(paramNameIndex);
-
-				double value = avgParams.get(i);
-				// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
-				// AGAIN!!!***
-				if (scoringCfg.getParams().containsKey(paramNames[i])) {
-					scoringCfg.addParam(paramNames[i], Double.toString(value
-					// / paramScaleFactor
-							));
-					// ScoringConfigGetSetValues
-					// .setValue(paramNames[i], value);
-				} else/* bse */{
-					config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
-							Double.toString(value
-							// / paramScaleFactor
-							));
-				}
-				// *****************************************************
-				// ****SET CALIBRATED PARAMETERS IN MNL*****************
-				mnl.setParameter(paramNameIndex, value);
-
-				// text output
-				paramArrays[i][iter - firstIter] = value;
-				sb.append("\t");
-				sb.append(value);
+			double value = avgParams.get(i);
+			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
+			// AGAIN!!!***
+			if (scoringCfg.getParams().containsKey(paramNames[i])) {
+				scoringCfg.addParam(paramNames[i], Double.toString(value
+				// / paramScaleFactor
+						));
+				// ScoringConfigGetSetValues
+				// .setValue(paramNames[i], value);
+			} else/* bse */{
+				config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
+						Double.toString(value
+						// / paramScaleFactor
+						));
 			}
+			// *****************************************************
+			// ****SET CALIBRATED PARAMETERS IN MNL*****************
+			mnl.setParameter(paramNameIndex, value);
 
-			// ********calibrator.getParameters() JUST FOR
-			// ANALYSIS********
-			utilities.math.Vector params = calibrator.getParameters();
-			for (int i1 = 0; i1 < paramNames.length; i1++) {
-				sb.append("\t");
-				sb.append(params.get(i1));
-			}
-
-			writer.writeln(sb);
-			writer.flush();
+			// text output
+			paramArrays[i][iter - firstIter] = value;
+			sb.append("\t");
+			sb.append(value);
 		}
+
+		// ********calibrator.getParameters() JUST FOR
+		// ANALYSIS********
+		utilities.math.Vector params = calibrator.getParameters();
+		for (int i1 = 0; i1 < paramNames.length; i1++) {
+			sb.append("\t");
+			sb.append(params.get(i1));
+		}
+
+		writer.writeln(sb);
+		writer.flush();
+		// }
 		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
 		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setMultinomialLogit(mnl);
