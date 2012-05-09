@@ -36,6 +36,7 @@ public class Analyzer {
 		double avgWork = 0;
 		double avgShop = 0;
 		double avgLeisure = 0;
+		double avgEducation = 0;
 		double avgOther = 0;
 				
 		for (Person person : population.getPersons().values()) {
@@ -46,34 +47,33 @@ public class Analyzer {
 						avgHome++;
 					} else if (act.getType().startsWith("w")) {
 						avgWork++;
-					} else if (act.getType().startsWith("w")) {
-						avgWork++;
 					} else if (act.getType().startsWith("s")) {
 						avgShop++;
 					} else if (act.getType().startsWith("l")) {
 						avgLeisure++;
 					} else if (act.getType().startsWith("e")) {
-						avgWork++;
+						avgEducation++;
 					} else if (act.getType().startsWith("o")) {
 						avgOther++;
 					}
 				}
 			}			
-			avgNumberOfActs += person.getSelectedPlan().getPlanElements().size() -1 / 2.0;
+			avgNumberOfActs += ((person.getSelectedPlan().getPlanElements().size() - 1) / 2.0);
 		}
 		avgHome /= population.getPersons().size();
 		avgWork /= population.getPersons().size();
 		avgShop /= population.getPersons().size();
 		avgLeisure /= population.getPersons().size();
 		avgOther /= population.getPersons().size();
+		avgEducation /= population.getPersons().size();
 		avgNumberOfActs /= population.getPersons().size();
-		this.write(avgNumberOfActs, avgHome, avgWork, avgShop, avgLeisure, avgOther, outPath, day);
+		this.write(avgNumberOfActs, avgHome, avgWork, avgShop, avgLeisure, avgEducation, avgOther, outPath, day);
 	}
 	
 	public void writeHeader(String outPath) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt", true)); 
-			bufferedWriter.write("day\th\tw\ts\tl\te\to");
+			bufferedWriter.write("day\tavg\th\tw\ts\tl\te\to");
 			bufferedWriter.newLine();			
 		    bufferedWriter.flush();
 		    bufferedWriter.close();
@@ -83,11 +83,11 @@ public class Analyzer {
 		}
 	}
 	
-	private void write(double avgNumberOfActs, double avgHome, double avgWork, double avgShop, double avgLeisure, 
+	private void write(double avgNumberOfActs, double avgHome, double avgWork, double avgShop, double avgLeisure, double avgEducation,
 			double avgOther, String outPath, String day) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt", true)); 
-			bufferedWriter.append(day + " " + avgNumberOfActs);
+			bufferedWriter.append(day + "\t" + avgNumberOfActs + "\t" + avgHome  + "\t" + avgWork  + "\t" + avgShop  + "\t" + avgLeisure  +  "\t" + avgEducation + "\t" + avgOther);
 			bufferedWriter.newLine();			
 		    bufferedWriter.flush();
 		    bufferedWriter.close();
