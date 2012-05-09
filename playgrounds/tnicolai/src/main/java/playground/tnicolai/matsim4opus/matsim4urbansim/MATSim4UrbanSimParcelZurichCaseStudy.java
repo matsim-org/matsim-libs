@@ -100,11 +100,10 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 	@Override
 	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
 		
-		// The following lines register what should be executed _after_ the iterations are done:		
-		
+		// The following lines register what should be executed _after_ the iterations are done:			
 //
 //		
-//		// old method
+//		// old cell-based accessibility method
 //		//if(computeCellBasedAccessibility){
 //		if(false){
 //

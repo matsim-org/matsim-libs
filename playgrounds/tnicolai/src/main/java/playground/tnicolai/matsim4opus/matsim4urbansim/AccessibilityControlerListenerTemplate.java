@@ -1,9 +1,6 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -14,7 +11,6 @@ import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
 
 public class AccessibilityControlerListenerTemplate{
 	
