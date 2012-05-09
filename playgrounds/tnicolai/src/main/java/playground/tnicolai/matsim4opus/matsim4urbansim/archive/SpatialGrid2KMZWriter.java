@@ -50,12 +50,12 @@ public class SpatialGrid2KMZWriter {
 		assert (travelDistanceAccessibilityGrid != null);
 		assert (travelCostAccessibilityGrid != null);
 
-		log.info("Writing " + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + " ...");
-		write(travelTimeAccessibilityGrid, Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY);
-		log.info("Writing " + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + " ...");
-		write(travelDistanceAccessibilityGrid, Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY);
-		log.info("Writing " + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + " ...");
-		write(travelCostAccessibilityGrid, Constants.ERSA_TRAVEL_COST_ACCESSIBILITY);
+		log.info("Writing " + Constants.TRAVEL_TIME_ACCESSIBILITY + " ...");
+		write(travelTimeAccessibilityGrid, Constants.TRAVEL_TIME_ACCESSIBILITY);
+		log.info("Writing " + Constants.TRAVEL_DISTANCE_ACCESSIBILITY + " ...");
+		write(travelDistanceAccessibilityGrid, Constants.TRAVEL_DISTANCE_ACCESSIBILITY);
+		log.info("Writing " + Constants.TRAVEL_COST_ACCESSIBILITY + " ...");
+		write(travelCostAccessibilityGrid, Constants.TRAVEL_COST_ACCESSIBILITY);
 
 		log.info("Done with writing Google Erath files ...");
 	}

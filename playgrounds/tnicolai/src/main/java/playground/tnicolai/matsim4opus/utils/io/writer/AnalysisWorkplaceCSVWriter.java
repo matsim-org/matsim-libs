@@ -27,12 +27,12 @@ public class AnalysisWorkplaceCSVWriter {
 			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			bwAggregatedWP.write(Constants.ERSA_ZONE_ID +","+ 
-								 Constants.ERSA_PARCEL_ID +","+ 
-								 Constants.ERSA_NEARESTNODE_ID +","+
-								 Constants.ERSA_NEARESTNODE_X_COORD +","+ 
-								 Constants.ERSA_NEARESTNODE_Y_COORD +","+
-								 Constants.ERSA_WORKPLACES_COUNT);
+			bwAggregatedWP.write(Constants.ZONE_ID +","+ 
+								 Constants.PARCEL_ID +","+ 
+								 Constants.NEARESTNODE_ID +","+
+								 Constants.NEARESTNODE_X_COORD +","+ 
+								 Constants.NEARESTNODE_Y_COORD +","+
+								 Constants.WORKPLACES_COUNT);
 			bwAggregatedWP.newLine();
 			
 			for(int i = 0; i < jobClusterArray.length; i++){
@@ -66,11 +66,11 @@ public class AnalysisWorkplaceCSVWriter {
 			BufferedWriter bwWorkplaces = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			bwWorkplaces.write(Constants.ERSA_JOB_ID +","+ 
-								 Constants.ERSA_PARCEL_ID +","+ 
-								 Constants.ERSA_ZONE_ID +","+
-								 Constants.ERSA_X_COORDNIATE +","+ 
-								 Constants.ERSA_Y_COORDINATE);
+			bwWorkplaces.write(Constants.JOB_ID +","+ 
+								 Constants.PARCEL_ID +","+ 
+								 Constants.ZONE_ID +","+
+								 Constants.X_COORDINATE +","+ 
+								 Constants.Y_COORDINATE);
 			bwWorkplaces.newLine();
 			
 			Iterator<PersonAndJobsObject> jobIterator = jobSampleList.iterator();

@@ -23,18 +23,19 @@ public class UrbanSimZoneCSVWriter {
 	public static final String FILE_NAME= "zones.csv";
 	
 	/**
-	 * writes the header for zones csv file
+	 * writes the header for zones csv file, this is the old version use UrbanSimZoneCSVWriterV2 instead
 	 */
+	@Deprecated
 	public static void initUrbanSimZoneWriter(String file){
 		try{
 			log.info("Initializing UrbanSimZoneCSVWriter ...");
 			accessibilityDataWriter = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			accessibilityDataWriter.write( Constants.ERSA_ZONE_ID + "," +
-										   Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
-										   Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
-										   Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY);
+			accessibilityDataWriter.write( Constants.ZONE_ID + "," +
+										   Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
+										   Constants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
+										   Constants.WALK_TRAVEL_TIME_ACCESSIBILITY);
 			accessibilityDataWriter.newLine();
 			
 			log.info("... done!");
@@ -51,6 +52,7 @@ public class UrbanSimZoneCSVWriter {
 	 * @param freespeedTravelTimesCarLogSum
 	 * @param travelTimesWalkLogSum
 	 */
+	@Deprecated
 	public static void write(Id zoneID,
 							 double congestedTravelTimesCarLogSum, 
 							 double freespeedTravelTimesCarLogSum, 
@@ -72,6 +74,7 @@ public class UrbanSimZoneCSVWriter {
 	/**
 	 * finalize and close csv file
 	 */
+	@Deprecated
 	public static void close(){
 		try {
 			log.info("Closing UrbanSimZoneCSVWriter ...");

@@ -134,7 +134,7 @@ public class FixedSizeGrid {
 		logger.info("The matrix has a relolution of " + currResolution + " meter.");
 		
 		try{
-			BufferedWriter ttWriter = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + currResolution + Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + Constants.FILE_TYPE_TXT);
+			BufferedWriter ttWriter = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + currResolution + Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + Constants.FILE_TYPE_TXT);
 			
 			// writing x coordinates (header)
 			for(int col = 0; (col < colPoints); col++ ){

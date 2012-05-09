@@ -307,21 +307,21 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		GridUtils.writeSpatialGridTable(
 				congestedTravelTimeAccessibilityGrid,
 				Constants.MATSIM_4_OPUS_TEMP
-						+ Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY
+						+ Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY
 						+ "_cellsize_"
 						+ congestedTravelTimeAccessibilityGrid.getResolution()
 						+ fileExtension + Constants.FILE_TYPE_TXT);
 		GridUtils.writeSpatialGridTable(
 				freespeedTravelTimeAccessibilityGrid,
 				Constants.MATSIM_4_OPUS_TEMP
-						+ Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY
+						+ Constants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY
 						+ "_cellsize_"
 						+ freespeedTravelTimeAccessibilityGrid.getResolution()
 						+ fileExtension + Constants.FILE_TYPE_TXT);
 		GridUtils.writeSpatialGridTable(
 				walkTravelTimeAccessibilityGrid,
 				Constants.MATSIM_4_OPUS_TEMP
-						+ Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY
+						+ Constants.WALK_TRAVEL_TIME_ACCESSIBILITY
 						+ "_cellsize_"
 						+ walkTravelTimeAccessibilityGrid.getResolution()
 						+ fileExtension + Constants.FILE_TYPE_TXT);
@@ -330,7 +330,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 				startZones, 
 				congestedTravelTimeAccessibilityGrid, 
 				Constants.MATSIM_4_OPUS_TEMP
-				+ Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY
+				+ Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY
 				+ "_cellsize_"
 				+ congestedTravelTimeAccessibilityGrid.getResolution()
 				+ fileExtension + Constants.FILE_TYPE_KMZ);
@@ -338,7 +338,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 				startZones, 
 				freespeedTravelTimeAccessibilityGrid, 
 				Constants.MATSIM_4_OPUS_TEMP
-				+ Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY
+				+ Constants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY
 				+ "_cellsize_"
 				+ freespeedTravelTimeAccessibilityGrid.getResolution()
 				+ fileExtension + Constants.FILE_TYPE_KMZ);
@@ -346,7 +346,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 				startZones, 
 				walkTravelTimeAccessibilityGrid, 
 				Constants.MATSIM_4_OPUS_TEMP
-				+ Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY
+				+ Constants.WALK_TRAVEL_TIME_ACCESSIBILITY
 				+ "_cellsize_"
 				+ walkTravelTimeAccessibilityGrid.getResolution()
 				+ fileExtension + Constants.FILE_TYPE_KMZ);

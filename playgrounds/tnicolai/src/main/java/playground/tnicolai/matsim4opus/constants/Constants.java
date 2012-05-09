@@ -116,21 +116,44 @@ public class Constants {
 	public static final String TAB_SEPERATOR = "[\t\n]+";
 	public static final String TAB = "\t";
 	public static final String NEW_LINE	= "\r\n";
-	public static final String PARCEL_ID = "parcel_id";
 	public static final String PERSON_ID = "person_id";
 	public static final String JOB_ID = "job_id";
+	public static final String PARCEL_ID = "parcel_id";
 	public static final String PARCEL_ID_HOME = "parcel_id_home";
 	public static final String PARCEL_ID_WORK = "parcel_id_work";
+	public static final String ZONE_ID = "zone_id";
 	public static final String ZONE_ID_HOME = "zone_id_home";
 	public static final String ZONE_ID_WORK = "zone_id_work";
+	public static final String ZONE_CENTROID_X_COORD = "x_coord_zonecentroid";
+	public static final String ZONE_CENTROID_Y_COORD = "y_coord_zonecentroid";
+	public static final String NEARESTNODE_ID = "nearest_node_id";
+	public static final String NEARESTNODE_X_COORD = "x_coord_nn";
+	public static final String NEARESTNODE_Y_COORD = "y_coord_nn";
 	public static final String X_COORDINATE_SP = "x_coord_sp";
 	public static final String Y_COORDINATE_SP = "y_coord_sp";
 	public static final String X_COORDINATE = "xcoord";
 	public static final String Y_COORDINATE = "ycoord";
-	public static final String ZONE_ID = "zone_id";
 	public static final String FACILITY_DESCRIPTION = "urbansim location";
 	public static final String ACT_HOME = "home";
 	public static final String ACT_WORK = "work";
+	
+	/** UrbanSim and/or MATSim output file header items */
+	// public static final String ERSA_ZONE_ID = "zone_id";
+	// public static final String ERSA_PARCEL_ID = "parcel_id";
+	// public static final String ERSA_PERSON_ID = "person_id";
+	// public static final String ERSA_JOB_ID = "job_id";
+	// public static final String ERSA_X_COORDNIATE = "x_coordinate";
+	// public static final String ERSA_Y_COORDINATE = "y_coordinate";
+	public static final String ACCESSIBILITY_BY_CAR = "car_accessibility";
+	public static final String ACCESSIBILITY_BY_WALK = "walk_accessibility";
+	public static final String TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
+	public static final String TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";
+	public static final String TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
+	public static final String CONGESTED_TRAVEL_TIME_ACCESSIBILITY = "congested_travel_time_accessibility";
+	public static final String FREESPEED_TRAVEL_TIME_ACCESSIBILITY = "freespeed_travel_time_accessibility";
+	public static final String WALK_TRAVEL_TIME_ACCESSIBILITY = "walk_travel_time_accessibility";
+	public static final String PERSONS_COUNT = "persons";
+	public static final String WORKPLACES_COUNT = "workplaces";
 	
 	/** xsd on matsim.org */
 	public static final String CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
@@ -204,27 +227,6 @@ public class Constants {
 	public static final String BETA_WALK_TRAVEL_COSTS = "betaWalkTravelCost";
 	public static final String BETA_WALK_LN_TRAVEL_COSTS = "betaWalkTravelCostPower2";
 	public static final String BETA_WALK_TRAVEL_COSTS_POWER = "betaWalkLnTravelCost";
-	
-	/** UrbanSim and/or MATSim output file header items */
-	public static final String ERSA_ZONE_ID = "zone_id";
-	public static final String ERSA_ZONE_X_COORD = "x_coord_zonecentroid";
-	public static final String ERSA_ZONE_Y_COORD = "y_coord_zonecentroid";
-	public static final String ERSA_PARCEL_ID = "parcel_id";
-	public static final String ERSA_PERSON_ID = "person_id";
-	public static final String ERSA_JOB_ID = "job_id";
-	public static final String ERSA_NEARESTNODE_ID = "nearest_node_id";
-	public static final String ERSA_NEARESTNODE_X_COORD = "x_coord_nn";
-	public static final String ERSA_NEARESTNODE_Y_COORD = "y_coord_nn";
-	public static final String ERSA_X_COORDNIATE = "x_coordinate";
-	public static final String ERSA_Y_COORDINATE = "y_coordinate";
-	public static final String ERSA_TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
-	public static final String ERSA_TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";
-	public static final String ERSA_TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
-	public static final String ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY = "congested_travel_time_accessibility";
-	public static final String ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY = "freespeed_travel_time_accessibility";
-	public static final String ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY = "walk_travel_time_accessibility";
-	public static final String ERSA_PERSONS_COUNT = "persons";
-	public static final String ERSA_WORKPLACES_COUNT = "workplaces";
 	
 	/** Spatial IDs and spatial conversion factors */
 	public static final int SRID_WASHINGTON_NORTH = 2926;	// srid 2285 also worked, but was last updated in 2001 instead of 2007

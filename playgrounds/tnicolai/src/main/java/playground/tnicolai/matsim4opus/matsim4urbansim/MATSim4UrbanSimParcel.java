@@ -35,13 +35,19 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import playground.tnicolai.matsim4opus.config.AccessibilityParameterConfigModule;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV2;
 import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.gis.GridUtils;
+import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
+import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
@@ -256,7 +262,7 @@ public class MATSim4UrbanSimParcel {
 		
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
-		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
+		controler.setCreateGraphs(true);	// sets, whether output Graphs are created
 		
 		log.info("Adding controler listener ...");
 		addControlerListener(zones, parcels, controler);
@@ -275,6 +281,9 @@ public class MATSim4UrbanSimParcel {
 	 * @param controler
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler) {
+		
+		// set spatial reference id (not necessary but needed to match the outcomes with google maps)
+		int srid = Constants.SRID_SWITZERLAND; // Constants.SRID_WASHINGTON_NORTH
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
@@ -295,6 +304,44 @@ public class MATSim4UrbanSimParcel {
 																						aggregatedOpportunities, 
 																						benchmark,
 																						this.scenario));
+		}
+		
+		// new method
+		if(computeCellBasedAccessibility){
+			SpatialGrid carGrid;					// matrix for car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
+			ZoneLayer<CounterObject>  measuringPoints;
+			String fileExtension;
+			
+			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
+			if(aggregatedOpportunities == null)
+				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
+			
+			if(computeCellBasedAccessibilitiesNetwork){
+				fileExtension = CellBasedAccessibilityControlerListenerV2.NETWORK;
+				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
+																			   nwBoundaryBox.getBoundingBox(),
+																			   srid);
+				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+			}
+			else{
+				fileExtension = CellBasedAccessibilityControlerListenerV2.SHAPE_FILE;
+				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
+				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
+																				   boundary, 
+																				   srid);
+				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+			}
+			
+			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV2(measuringPoints, 
+																						 aggregatedOpportunities, 
+																						 carGrid,
+																						 walkGrid, 
+																						 fileExtension, 
+																						 benchmark, 
+																						 this.scenario));
 		}
 		
 		if(dumpPopulationData)

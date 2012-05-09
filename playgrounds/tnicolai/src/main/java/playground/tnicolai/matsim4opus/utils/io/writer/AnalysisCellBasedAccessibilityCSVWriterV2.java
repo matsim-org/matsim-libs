@@ -26,14 +26,14 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 			accessibilityDataWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + fileExtension +"_accessibility_indicators_ersa.csv" );
 			
 			// create header
-			accessibilityDataWriter.write( Constants.ERSA_ZONE_ID + "," +
-										   Constants.ERSA_X_COORDNIATE + "," +
-										   Constants.ERSA_Y_COORDINATE + "," + 
-										   Constants.ERSA_NEARESTNODE_ID + "," +
-										   Constants.ERSA_NEARESTNODE_X_COORD + "," +
-										   Constants.ERSA_NEARESTNODE_Y_COORD + "," + 
-										   "car_accessibility," +
-										   "walk_accessibility");
+			accessibilityDataWriter.write( Constants.ZONE_ID + "," +
+										   Constants.X_COORDINATE + "," +
+										   Constants.Y_COORDINATE + "," + 
+										   Constants.NEARESTNODE_ID + "," +
+										   Constants.NEARESTNODE_X_COORD + "," +
+										   Constants.NEARESTNODE_Y_COORD + "," + 
+										   Constants.ACCESSIBILITY_BY_CAR + "," +
+										   Constants.ACCESSIBILITY_BY_WALK);
 			accessibilityDataWriter.newLine();
 			
 			log.info("... done!");

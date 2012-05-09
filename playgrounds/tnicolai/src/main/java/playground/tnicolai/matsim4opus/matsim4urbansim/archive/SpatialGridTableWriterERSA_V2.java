@@ -46,19 +46,19 @@ public class SpatialGridTableWriterERSA_V2 {
 			log.info("Writing Travel Time Accessibility Measures ...");
 			writeTable(travelTimeAccessibilityGrid,
 					Constants.MATSIM_4_OPUS_TEMP
-							+ Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY
+							+ Constants.TRAVEL_TIME_ACCESSIBILITY
 							+ "_GridSize_" + resolutionMeter);
 			// Travel Distance Accessibility Table
 			log.info("Writing Travel Distance Accessibility Measures ...");
 			writeTable(travelDistanceAccessibilityGrid,
 					Constants.MATSIM_4_OPUS_TEMP
-							+ Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY
+							+ Constants.TRAVEL_DISTANCE_ACCESSIBILITY
 							+ "_GridSize_" + resolutionMeter);
 			// Travel Cost Accessibility Table
 			log.info("Writing Travel Cost Accessibility Measures ...");
 			writeTable(travelCostAccessibilityGrid,
 					Constants.MATSIM_4_OPUS_TEMP
-							+ Constants.ERSA_TRAVEL_COST_ACCESSIBILITY
+							+ Constants.TRAVEL_COST_ACCESSIBILITY
 							+ "_GridSize_" + resolutionMeter);
 		} catch (Exception e) {
 			e.printStackTrace();

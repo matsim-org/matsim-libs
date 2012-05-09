@@ -394,12 +394,12 @@ public class ERSAControlerListener implements ShutdownListener{
 		
 		BufferedWriter accessibilityIndicatorWriter = IOUtils.getBufferedWriter( filename );
 		// create header
-		accessibilityIndicatorWriter.write( Constants.ERSA_ZONE_ID + "," +
-											Constants.ERSA_X_COORDNIATE + "," +
-											Constants.ERSA_Y_COORDINATE + "," + 
-											Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "," +
-											Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "," + 
-											Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY);
+		accessibilityIndicatorWriter.write( Constants.ZONE_ID + "," +
+											Constants.X_COORDINATE + "," +
+											Constants.Y_COORDINATE + "," + 
+											Constants.TRAVEL_TIME_ACCESSIBILITY + "," +
+											Constants.TRAVEL_COST_ACCESSIBILITY + "," + 
+											Constants.TRAVEL_DISTANCE_ACCESSIBILITY);
 		accessibilityIndicatorWriter.newLine();
 		return accessibilityIndicatorWriter;
 	}	

@@ -32,10 +32,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
@@ -46,16 +49,17 @@ import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
  */
 public class CreateJonesCityNetwork {
 	
-	private static final String filename = "/Users/thomas/Development/opus_home/data/jonescity_zone/tables20120503/zones_for_network_generation.csv";
+	private static final String filename = "/Users/thomas/Development/opus_home/data/jonescity_zone/tabels20120504/zones4network.csv";
+	private static final String networkname = "/Users/thomas/Development/opus_home/data/jonescity_zone/testNetwork.xml";
+	private static final String shapefilename = "/Users/thomas/Development/opus_home/data/jonescity_zone/testNetwork.shp";
 	private static ScenarioImpl scenario = null;
 	
-	private static final int numberOfLanes = 1;
-	private static final double capacity = 1000.;
+	private static final double stepSize = 1.41421356237310;
 	
-	private static final double xmin = 0.;
-	private static final double ymin = 0.;
-	private static final double xmax = 1.;
-	private static final double ymax = 1.;
+	private static double freeSpeed = -1.;
+	private static double length = -1.;
+	private static double lanes = -1.;
+	private static double capacity = -1;
 	
 	private static final String separator = ",";
 
@@ -63,6 +67,11 @@ public class CreateJonesCityNetwork {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		freeSpeed 	= 50. * (1000./3600.); // 50kmh in meter/sec
+		length 		= 1000 * stepSize;	   // should be 1,41km
+		capacity 	= 1000.;
+		lanes		= 2.;		
 
 		// empty scenario
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils
@@ -82,19 +91,81 @@ public class CreateJonesCityNetwork {
 			final int indexYCoodinate = idxFromKey.get(Constants.Y_COORDINATE);
 			final int indexZoneID = idxFromKey.get(Constants.ZONE_ID);
 
-			Iterator<Node> nodes = addNodes2Network(network, reader, indexXCoodinate, indexYCoodinate, indexZoneID);
+			addNodes2Network(network, reader, indexXCoodinate, indexYCoodinate, indexZoneID);
+			addLinks2Network(network);
 			
-			while(nodes.hasNext()){
-				Node node = nodes.next();
-				System.out.println(node.getId() + "," + node.getCoord().getX() + "," + node.getCoord().getY());
-			}
+			// Consistency check
+			concistencyCheck(network);
 			
-			// TODO sort nodes into right order according to their coordinates (from xmin>xmax and ymin>ymax)
-			// Add links between the nodes
+			new NetworkWriter(network).write(networkname);
+			new Links2ESRIShape(network, shapefilename, TransformationFactory.WGS84).write();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @param network
+	 */
+	private static void concistencyCheck(NetworkImpl network) {
+		int nodeSize = network.getNodes().values().size();
+		int linkSize = network.getLinks().values().size();
+		int steps = (int)Math.sqrt(nodeSize);
+		int part1 = nodeSize-(steps*2);
+		int expectedNumberOfLinks = 2*(2*part1 + 2*steps);
+		if(expectedNumberOfLinks != linkSize)
+			System.out.println("The network might be inconsistent");
+	}
+
+	/**
+	 * @param network
+	 */
+	private static void addLinks2Network(NetworkImpl network) {
+		
+		int zones = network.getNodes().size();
+		int steps = (int)Math.sqrt(zones)-1;
+		double maxValue = steps * stepSize;
+		double minValue = 0.;
+		long linkID = 0;
+		
+		for(double x = minValue; x < maxValue; x = x+stepSize ){
+			System.out.println("X-Coord:" + x);
+			for(double y = minValue; y < maxValue; y = y+stepSize){
+				System.out.println("Y-Coord:" + y);
+				
+				Node currentNode = network.getNearestNode(new CoordImpl(x,y));
+				// add link to northern neighbor
+				linkID = addLink(network, maxValue, linkID, currentNode, new CoordImpl(x, y + stepSize));
+				// add link to western neighbor
+				linkID = addLink(network, maxValue, linkID, currentNode, new CoordImpl(x+ stepSize, y));
+			}
+		}
+	}
+
+	/**
+	 * @param network
+	 * @param maxValue
+	 * @param linkID
+	 * @param currentNode
+	 * @param neighbor
+	 */
+	private static long addLink(NetworkImpl network, double maxValue,
+								long linkID, Node currentNode, Coord neighbor) {
+		
+		if (neighbor.getX() < maxValue
+		 && neighbor.getY() < maxValue) {
+			
+			Node neighborNode = network.getNearestNode(neighbor);
+			if(neighborNode != currentNode){
+				network.createAndAddLink(new IdImpl(linkID++), currentNode, neighborNode, length, freeSpeed, capacity, lanes);
+				network.createAndAddLink(new IdImpl(linkID++), neighborNode, currentNode, length, freeSpeed, capacity, lanes);
+			}
+		}
+		else
+			System.out.println("This lies outside the network: x="+ neighbor.getX() + " y="+ neighbor.getY());
+		
+		return linkID;
 	}
 
 	/**
@@ -110,6 +181,7 @@ public class CreateJonesCityNetwork {
 			BufferedReader reader, final int indexXCoodinate,
 			final int indexYCoodinate, final int indexZoneID)
 			throws IOException, NumberFormatException {
+
 		String line;
 		// temporary variables, needed to construct nodes
 		IdImpl zoneID;
@@ -130,5 +202,4 @@ public class CreateJonesCityNetwork {
 		}
 		return network.getNodes().values().iterator();
 	}
-
 }

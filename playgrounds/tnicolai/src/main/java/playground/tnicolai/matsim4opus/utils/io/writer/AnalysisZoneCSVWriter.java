@@ -24,14 +24,14 @@ public class AnalysisZoneCSVWriter {
 			zoneCSVWriter = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			zoneCSVWriter.write( Constants.ERSA_ZONE_ID + "," +
-										   Constants.ERSA_ZONE_X_COORD + "," +
-										   Constants.ERSA_ZONE_Y_COORD + "," +
-										   Constants.ERSA_NEARESTNODE_X_COORD + "," +
-										   Constants.ERSA_NEARESTNODE_Y_COORD + "," +
-										   Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
-										   Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
-										   Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY);
+			zoneCSVWriter.write( Constants.ZONE_ID + "," +
+								 Constants.ZONE_CENTROID_X_COORD + "," +
+								 Constants.ZONE_CENTROID_Y_COORD + "," +
+								 Constants.NEARESTNODE_X_COORD + "," +
+								 Constants.NEARESTNODE_Y_COORD + "," +
+								 Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
+								 Constants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
+								 Constants.WALK_TRAVEL_TIME_ACCESSIBILITY);
 			zoneCSVWriter.newLine();
 			
 			log.info("... done!");

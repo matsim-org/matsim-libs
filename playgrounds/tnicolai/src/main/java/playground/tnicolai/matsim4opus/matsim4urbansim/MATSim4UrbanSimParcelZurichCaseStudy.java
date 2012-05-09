@@ -30,15 +30,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.gis.GridUtils;
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
-import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.scenario.zurich.ZurichUtilities;
 import playground.tnicolai.matsim4opus.scenario.zurich.ZurichUtilitiesZurichBigRoads;
-import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * This class extends MATSim4UrbanSimV2 including two extra accessibility measurements
@@ -107,91 +100,52 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 	@Override
 	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
 		
-		// set spatial reference id (not necessary but needed to match the outcomes with google maps)
-		int srid = Constants.SRID_SWITZERLAND; // Constants.SRID_WASHINGTON_NORTH
-		
 		// The following lines register what should be executed _after_ the iterations are done:		
 		
-		// new method
-		if(computeCellBasedAccessibility){
-			SpatialGrid carGrid;					// matrix for car related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
-			ZoneLayer<CounterObject>  measuringPoints;
-			String fileExtension;
-			
-			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
-			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
-			
-			if(computeCellBasedAccessibilitiesNetwork){
-				fileExtension = CellBasedAccessibilityControlerListenerV2.NETWORK;
-				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
-																			   nwBoundaryBox.getBoundingBox(),
-																			   srid);
-				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-			}
-			else{
-				fileExtension = CellBasedAccessibilityControlerListenerV2.SHAPE_FILE;
-				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
-				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
-																				   boundary, 
-																				   srid);
-				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-			}
-			
-			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV2(measuringPoints, 
-																						 aggregatedOpportunities, 
-																						 carGrid,
-																						 walkGrid, 
-																						 fileExtension, 
-																						 benchmark, 
-																						 this.scenario));
-		}
-		
-		// old method
-		//if(computeCellBasedAccessibility){
-		if(false){
-
-			SpatialGrid congestedTravelTimeAccessibilityGrid;
-			SpatialGrid freespeedTravelTimeAccessibilityGrid;
-			SpatialGrid walkTravelTimeAccessibilityGrid;
-			ZoneLayer<CounterObject>  measuringPoints;
-			String fileExtension;
-			
-			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
-			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
-			
-			if (computeCellBasedAccessibilitiesNetwork) {
-				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;
-				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
-																			   nwBoundaryBox.getBoundingBox(),
-																			   srid);
-				congestedTravelTimeAccessibilityGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				freespeedTravelTimeAccessibilityGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkTravelTimeAccessibilityGrid		 = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-			}
-			else{
-				fileExtension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
-				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
-				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
-																				   boundary, 
-																				   srid);
-				congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				walkTravelTimeAccessibilityGrid      = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-			} 
-			
-			controler.addControlerListener( new CellBasedAccessibilityControlerListener(measuringPoints, 
-																							 aggregatedOpportunities,
-																							 congestedTravelTimeAccessibilityGrid, 
-																							 freespeedTravelTimeAccessibilityGrid, 
-																							 walkTravelTimeAccessibilityGrid,
-																							 fileExtension,
-																							 benchmark) );
-		}
+//
+//		
+//		// old method
+//		//if(computeCellBasedAccessibility){
+//		if(false){
+//
+//			SpatialGrid congestedTravelTimeAccessibilityGrid;
+//			SpatialGrid freespeedTravelTimeAccessibilityGrid;
+//			SpatialGrid walkTravelTimeAccessibilityGrid;
+//			ZoneLayer<CounterObject>  measuringPoints;
+//			String fileExtension;
+//			
+//			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
+//			if(aggregatedOpportunities == null)
+//				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
+//			
+//			if (computeCellBasedAccessibilitiesNetwork) {
+//				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;
+//				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
+//																			   nwBoundaryBox.getBoundingBox(),
+//																			   srid);
+//				congestedTravelTimeAccessibilityGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+//				freespeedTravelTimeAccessibilityGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+//				walkTravelTimeAccessibilityGrid		 = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+//			}
+//			else{
+//				fileExtension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
+//				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
+//				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
+//																				   boundary, 
+//																				   srid);
+//				congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+//				freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+//				walkTravelTimeAccessibilityGrid      = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+//			} 
+//			
+//			controler.addControlerListener( new CellBasedAccessibilityControlerListener(measuringPoints, 
+//																							 aggregatedOpportunities,
+//																							 congestedTravelTimeAccessibilityGrid, 
+//																							 freespeedTravelTimeAccessibilityGrid, 
+//																							 walkTravelTimeAccessibilityGrid,
+//																							 fileExtension,
+//																							 benchmark) );
+//		}
 	}
 	
 	/**

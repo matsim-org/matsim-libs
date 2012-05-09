@@ -28,10 +28,10 @@ public class AnalysisPopulationCSVWriter {
 			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			bwPopulation.write(Constants.ERSA_PERSON_ID +","+ 
-								 Constants.ERSA_PARCEL_ID +","+ 
-								 Constants.ERSA_X_COORDNIATE +","+ 
-								 Constants.ERSA_Y_COORDINATE);
+			bwPopulation.write(Constants.PERSON_ID +","+ 
+								 Constants.PARCEL_ID +","+ 
+								 Constants.X_COORDINATE +","+ 
+								 Constants.Y_COORDINATE);
 			bwPopulation.newLine();
 			
 			Iterator<PersonAndJobsObject> personIterator = personLocations.values().iterator();
@@ -68,11 +68,11 @@ public class AnalysisPopulationCSVWriter {
 			BufferedWriter bwAggregatedPopulation = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			bwAggregatedPopulation.write(Constants.ERSA_PARCEL_ID +","+ 
-					 		   Constants.ERSA_NEARESTNODE_ID +","+
-					 		   Constants.ERSA_NEARESTNODE_X_COORD +","+ 
-					 		   Constants.ERSA_NEARESTNODE_Y_COORD +","+
-					 		   Constants.ERSA_PERSONS_COUNT);
+			bwAggregatedPopulation.write(Constants.PARCEL_ID +","+ 
+					 		   Constants.NEARESTNODE_ID +","+
+					 		   Constants.NEARESTNODE_X_COORD +","+ 
+					 		   Constants.NEARESTNODE_Y_COORD +","+
+					 		   Constants.PERSONS_COUNT);
 			bwAggregatedPopulation.newLine();
 			
 			Iterator<AggregateObject2NearestNode> personIterator = personClusterMap.values().iterator();

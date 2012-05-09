@@ -1,0 +1,101 @@
+/* *********************************************************************** *
+ * project: org.matsim.													   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,     *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+/**
+ * 
+ */
+package playground.tnicolai.matsim4opus.utils.io.writer;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.tnicolai.matsim4opus.constants.Constants;
+
+/**
+ * @author thomas
+ *
+ */
+public class UrbanSimParcelCSVWriter {
+
+	private static final Logger log 	= Logger.getLogger(UrbanSimParcelCSVWriter.class);
+	private static BufferedWriter parcelWriter = null;
+	public static final String FILE_NAME= "parcels.csv";
+	
+	/**
+	 * writes the header for zones csv file
+	 */
+	public static void initUrbanSimZoneWriter(String file){
+		try{
+			log.info("Initializing UrbanSimParcelCSVWriter ...");
+			parcelWriter = IOUtils.getBufferedWriter( file );
+			
+			// create header
+			parcelWriter.write( Constants.PARCEL_ID + "," +
+								Constants.ACCESSIBILITY_BY_CAR + "," +
+								Constants.ACCESSIBILITY_BY_WALK);
+			parcelWriter.newLine();
+			
+			log.info("... done!");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * writing the parcel data (accessibilities) to csv file
+	 * @param node
+	 * @param carAccessibility
+	 * @param walkAccessibility
+	 */
+	public static void write(Id parcelID,
+							 double carAccessibility, 
+							 double walkAccessibility){
+		
+		try{
+			assert(UrbanSimParcelCSVWriter.parcelWriter != null);
+			parcelWriter.write( parcelID + "," + 
+								carAccessibility + "," + 
+								walkAccessibility );
+			parcelWriter.newLine();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * finalize and close csv file
+	 */
+	public static void close(){
+		try {
+			log.info("Closing UrbanSimZoneCSVWriterV2 ...");
+			assert(UrbanSimParcelCSVWriter.parcelWriter != null);
+			parcelWriter.flush();
+			parcelWriter.close();
+			log.info("... done!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+}
