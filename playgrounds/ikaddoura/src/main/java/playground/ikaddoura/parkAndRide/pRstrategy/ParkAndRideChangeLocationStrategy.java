@@ -91,7 +91,7 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 				List<Integer> planElementIndex = getPlanElementIndex(planElements);
 				if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
 				
-				Activity parkAndRide = createParkAndRideActivity(Math.random(), plan);
+				Activity parkAndRide = createParkAndRideActivity(plan);
 
 				for (int i = 0; i < planElements.size(); i++) {
 					if (i==planElementIndex.get(0)){ // first Park and Ride Activity
@@ -104,33 +104,12 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 			}
 	}
 	
-	private Activity createParkAndRideActivity(double random, Plan plan) {
-		Coord homeCoord = null;
-		Coord workCoord = null;
-
-		for (PlanElement pE : plan.getPlanElements()){
-			if (pE instanceof Activity){
-				Activity act = (Activity) pE;
-				if (act.getType().toString().equals("home")){
-					homeCoord = act.getCoord();
-				}
-				if (act.getType().toString().equals("work")){
-					workCoord = act.getCoord();
-				}
-			}
-		}
-		
-		if (homeCoord == null || workCoord == null){
-			throw new RuntimeException("Plan doesn't have home or work activity. Aborting...");
-		}
-		
-		System.out.println("Home: " + homeCoord + " / Work: " + workCoord);
-		
+	private Activity createParkAndRideActivity(Plan plan) {
 		List<PrWeight> prWeights;
 		EllipseSearch ellipseSearch = new EllipseSearch();
 
 		if (this.personId2prWeights.get(plan.getPerson().getId()) == null){
-			prWeights = ellipseSearch.getPrWeights(this.net, this.prFacilities, homeCoord, workCoord);
+			prWeights = ellipseSearch.getPrWeights(this.net, this.prFacilities, plan);
 			this.personId2prWeights.put(plan.getPerson().getId(), prWeights);
 		} else {
 			prWeights = this.personId2prWeights.get(plan.getPerson().getId());

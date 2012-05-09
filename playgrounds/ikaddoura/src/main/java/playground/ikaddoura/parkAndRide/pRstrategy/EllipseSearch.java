@@ -32,6 +32,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
@@ -41,10 +44,29 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  */
 public class EllipseSearch {
 
-	
-
-	public List<PrWeight> getPrWeights(Network net, List<ParkAndRideFacility> prFacilities, Coord homeCoord, Coord workCoord) {
+	public List<PrWeight> getPrWeights(Network net, List<ParkAndRideFacility> prFacilities, Plan plan) {
 		List <PrWeight> prWeights = new ArrayList<PrWeight>();
+		
+		Coord homeCoord = null;
+		Coord workCoord = null;
+
+		for (PlanElement pE : plan.getPlanElements()){
+			if (pE instanceof Activity){
+				Activity act = (Activity) pE;
+				if (act.getType().toString().equals("home")){
+					homeCoord = act.getCoord();
+				}
+				if (act.getType().toString().equals("work")){
+					workCoord = act.getCoord();
+				}
+			}
+		}
+		
+		if (homeCoord == null || workCoord == null){
+			throw new RuntimeException("Plan doesn't have home or work activity. Aborting...");
+		}
+		
+		System.out.println("Home: " + homeCoord + " / Work: " + workCoord);
 		
 		for (ParkAndRideFacility pr : prFacilities){
 			Id prId = pr.getPrLink3in();

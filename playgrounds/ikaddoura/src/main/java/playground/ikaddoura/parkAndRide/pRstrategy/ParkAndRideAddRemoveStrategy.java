@@ -92,7 +92,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 				log.info("Plan doesn't contain Park and Ride. Adding Park and Ride...");
 
 				// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus den eingelesenen P+R-LinkIDs bzw. der prFacilities)
-				Activity parkAndRide = createParkAndRideActivity(Math.random());
+				Activity parkAndRide = createParkAndRideActivity(plan);
 
 				// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
 				for (int i = 0; i < planElements.size(); i++) {
@@ -164,14 +164,20 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 		}
 	}
 	
-	private Activity createParkAndRideActivity(double random) {
+	private Activity createParkAndRideActivity(Plan plan) {
+		List<PrWeight> prWeights;
+		EllipseSearch ellipseSearch = new EllipseSearch();
+
+		if (this.personId2prWeights.get(plan.getPerson().getId()) == null){
+			prWeights = ellipseSearch.getPrWeights(this.net, this.prFacilities, plan);
+			this.personId2prWeights.put(plan.getPerson().getId(), prWeights);
+		} else {
+			prWeights = this.personId2prWeights.get(plan.getPerson().getId());
+		}
 		
-		int max = this.prFacilities.size();
-	    int rndInt = (int) (random * max);
-		Id rndLinkId = this.prFacilities.get(rndInt).getPrLink3in();
-		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
+		Link rndPrLink = ellipseSearch.getRndPrLink(this.net, prWeights);
 		
-		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getToNode().getCoord(), rndLinkId); 
+		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndPrLink.getToNode().getCoord(), rndPrLink.getId()); 
 		parkAndRide.setMaximumDuration(120.0);
 		
 		return parkAndRide;
