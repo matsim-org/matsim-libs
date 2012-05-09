@@ -24,7 +24,9 @@
 package playground.ikaddoura.parkAndRide.pRstrategy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,40 +41,60 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  */
 public class EllipseSearch {
 
-	public List<ParkAndRideFacility> getPRFacilities(Network network, List<ParkAndRideFacility> prFacilities, Coord homeCoord, Coord workCoord) {
+	public Link getPRLink(Network network, List<ParkAndRideFacility> prFacilities, Coord homeCoord, Coord workCoord) {
 		
-		List<ParkAndRideFacility> prFacilitiesInEllipse = new ArrayList<ParkAndRideFacility>();
-
-		double xHomeToWork = homeCoord.getX() - workCoord.getX();
-		double yHomeToWork = homeCoord.getY() - workCoord.getY();
-
-		double distHomeToWork = getHyp(xHomeToWork, yHomeToWork);
-		double addDistanceOtherDirection = 0;
-		double majorAxis = distHomeToWork + (2 * addDistanceOtherDirection);
-		double minorAxis = majorAxis / 2.0;
-
-		double xCenter = Math.abs(homeCoord.getX() + workCoord.getX()) / 2.0;
-		double yCenter = Math.abs(homeCoord.getY() + workCoord.getY()) / 2.0;
-		System.out.println("xCenter: " + xCenter);
-		System.out.println("yCenter: " + yCenter);
+		List <PREntry> prEntries = new ArrayList<PREntry>();
+		double weightSum = 0.0;
 		
 		for (ParkAndRideFacility pr : prFacilities){
 			Id prId = pr.getPrLink3in();
-			for (Link link : network.getLinks().values()){
-				if (prId.toString().equals(link.getId().toString())){
-					Coord prCoord = link.getToNode().getCoord();					
-					double a = majorAxis / 2.0;
-					double b = minorAxis / 2.0;
-					double v = (Math.pow((prCoord.getX() - xCenter), 2) / Math.pow(a, 2)) + (Math.pow((prCoord.getY() - yCenter), 2) / Math.pow(b, 2));
-					if ( v <= 1){
-						System.out.println("ParkAndRideFacility " + prCoord + " liegt innerhalb der Ellipse. Adding to List...");
-					} else {
-						System.out.println("ParkAndRideFacility " + prCoord + " liegt außerhalb der Ellipse.");
-					}
-				}
+			Coord prCoord = network.getLinks().get(prId).getToNode().getCoord();	
+			 
+			 double xHomeToPR = Math.abs(homeCoord.getX() - prCoord.getX());
+			 double yHomeToPR = Math.abs(homeCoord.getY() - prCoord.getY());
+			 double distHomeToPR = getHyp(xHomeToPR, yHomeToPR);
+			 
+			 double xWorkToPR = Math.abs(workCoord.getX() - prCoord.getX());
+			 double yWorkToPR = Math.abs(workCoord.getY() - prCoord.getY());
+			 double distWorkToPR = getHyp(xWorkToPR, yWorkToPR);
+
+			 double r = distHomeToPR + distWorkToPR;
+			 double weight = 1 / Math.pow(r, 2);
+			
+			 prEntries.add(new PREntry(pr.getId(), weight));
+			 weightSum = weightSum + weight;
+		}
+		System.out.println("weightsSum: " + weightSum);
+
+//		System.out.println("unsortedList:");
+//		for (PREntry entry : prEntries) {
+//			System.out.println("id / value: " + entry.getId() + " / " + entry.getWeight());
+//		}
+
+		Collections.sort(prEntries);
+
+//		System.out.println("sortedList:");
+//		for (PREntry entry : prEntries) {
+//			System.out.println("id / value: " + entry.getId() + " / " + entry.getWeight());
+//		}
+
+		Random random = new Random();
+		double rnd = random.nextDouble() * weightSum;
+		System.out.println("rnd: " + rnd);
+
+		Id weightedRndId = null;
+		double cumulatedWeight = 0.0;
+		for (PREntry entry : prEntries) {
+			cumulatedWeight = cumulatedWeight + entry.getWeight();
+			if (cumulatedWeight >= rnd) {
+				weightedRndId = entry.getId();
+				break;
 			}
 		}
-		return prFacilitiesInEllipse;
+		System.out.println("weightedRndId: " + weightedRndId.toString());
+		
+		Link rndPRLink = network.getLinks().get(weightedRndId);
+		return rndPRLink;
 	}
 
 	private double getHyp(double a, double b) {

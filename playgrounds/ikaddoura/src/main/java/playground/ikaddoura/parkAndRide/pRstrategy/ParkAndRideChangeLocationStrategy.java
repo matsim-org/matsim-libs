@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -123,14 +122,9 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 		
 		System.out.println("Home: " + homeCoord + " / Work: " + workCoord);
 		EllipseSearch ellipseSearch = new EllipseSearch();
-		List<ParkAndRideFacility> prFacilitiesInEllipse = ellipseSearch.getPRFacilities(this.net, this.prFacilities, homeCoord, workCoord);
+		Link rndPRLink = ellipseSearch.getPRLink(this.net, this.prFacilities, homeCoord, workCoord);
 		
-		int max = prFacilitiesInEllipse.size();
-	    int rndInt = (int) (random * max);
-		Id rndLinkId = prFacilitiesInEllipse.get(rndInt).getPrLink3in();
-		Link rndParkAndRideLink = this.net.getLinks().get(rndLinkId);
-		
-		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndParkAndRideLink.getToNode().getCoord(), rndLinkId); 
+		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndPRLink.getToNode().getCoord(), rndPRLink.getId()); 
 		parkAndRide.setMaximumDuration(120.0);
 		
 		return parkAndRide;
