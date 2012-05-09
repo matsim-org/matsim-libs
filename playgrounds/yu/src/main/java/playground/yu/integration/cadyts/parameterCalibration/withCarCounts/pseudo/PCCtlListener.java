@@ -63,7 +63,6 @@ import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunct
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.Vector;
 import cadyts.calibrators.Calibrator;
-import cadyts.calibrators.analytical.ChoiceParameterCalibrator4;
 import cadyts.demand.PlanStep;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
@@ -399,21 +398,21 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void setCalibratorParameters(Config config) {
 		// SETTING setUseApproximateNewton
-		{
-			String useApproximateNewtonStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "useApproximateNewton");
-			if (useApproximateNewtonStr != null) {
-				boolean useApproximateNewton = Boolean
-						.parseBoolean(useApproximateNewtonStr);
-				calibrator.setUseApproximateNetwton(useApproximateNewton);
-				System.out.println("BSE:\tuseApproximateNetwton\t=\t"
-						+ useApproximateNewton);
-			} else {
-				System.out
-						.println("BSE:\tuseApproximateNetwton\t= default value\t"
-								+ ChoiceParameterCalibrator4.DEFAULT_USE_APPROXIMATE_NEWTON);
-			}
-		}
+		// {
+		// String useApproximateNewtonStr = config.findParam(
+		// BSE_CONFIG_MODULE_NAME, "useApproximateNewton");
+		// if (useApproximateNewtonStr != null) {
+		// boolean useApproximateNewton = Boolean
+		// .parseBoolean(useApproximateNewtonStr);
+		// calibrator.setUseApproximateNetwton(useApproximateNewton);
+		// System.out.println("BSE:\tuseApproximateNetwton\t=\t"
+		// + useApproximateNewton);
+		// } else {
+		// System.out
+		// .println("BSE:\tuseApproximateNetwton\t= default value\t"
+		// + ChoiceParameterCalibrator4.DEFAULT_USE_APPROXIMATE_NEWTON);
+		// }
+		// }
 
 		// SETTING proportionalAssignment
 		{
@@ -494,19 +493,19 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 
 		// SETTING parameterStepSize
-		{
-			String initialStepSizeStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "initialStepSize");
-			System.out.print("BSE:\tparameterStepSize\t= ");
-			if (initialStepSizeStr != null) {
-				double initialStepSize = Double.parseDouble(initialStepSizeStr);
-				System.out.println(initialStepSize);
-				calibrator.setInitialStepSize(initialStepSize);
-			} else {
-				System.out.println("default value\t"
-						+ ChoiceParameterCalibrator4.DEFAULT_INITIAL_STEP_SIZE);
-			}
-		}
+		// {
+		// String initialStepSizeStr = config.findParam(
+		// BSE_CONFIG_MODULE_NAME, "initialStepSize");
+		// System.out.print("BSE:\tparameterStepSize\t= ");
+		// if (initialStepSizeStr != null) {
+		// double initialStepSize = Double.parseDouble(initialStepSizeStr);
+		// System.out.println(initialStepSize);
+		// calibrator.setInitialStepSize(initialStepSize);
+		// } else {
+		// System.out.println("default value\t"
+		// + ChoiceParameterCalibrator4.DEFAULT_INITIAL_STEP_SIZE);
+		// }
+		// }
 		// SETTING msaExponent deprecated
 		// {
 		// /*

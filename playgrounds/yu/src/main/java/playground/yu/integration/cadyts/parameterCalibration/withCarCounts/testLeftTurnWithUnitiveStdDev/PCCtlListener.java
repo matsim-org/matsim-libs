@@ -636,21 +636,21 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void setCalibratorParameters(Config config) {
 		// SETTING setUseApproximateNewton
-		{
-			String useApproximateNewtonStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "useApproximateNewton");
-			if (useApproximateNewtonStr != null) {
-				boolean useApproximateNewton = Boolean
-						.parseBoolean(useApproximateNewtonStr);
-				calibrator.setUseApproximateNetwton(useApproximateNewton);
-				System.out.println("BSE:\tuseApproximateNetwton\t=\t"
-						+ useApproximateNewton);
-			} else {
-				System.out
-						.println("BSE:\tuseApproximateNetwton\t= default value\t"
-								+ ChoiceParameterCalibrator4.DEFAULT_USE_APPROXIMATE_NEWTON);
-			}
-		}
+		// {
+		// String useApproximateNewtonStr = config.findParam(
+		// BSE_CONFIG_MODULE_NAME, "useApproximateNewton");
+		// if (useApproximateNewtonStr != null) {
+		// boolean useApproximateNewton = Boolean
+		// .parseBoolean(useApproximateNewtonStr);
+		// calibrator.setUseApproximateNetwton(useApproximateNewton);
+		// System.out.println("BSE:\tuseApproximateNetwton\t=\t"
+		// + useApproximateNewton);
+		// } else {
+		// System.out
+		// .println("BSE:\tuseApproximateNetwton\t= default value\t"
+		// + ChoiceParameterCalibrator4.DEFAULT_USE_APPROXIMATE_NEWTON);
+		// }
+		// }
 
 		// SETTING proportionalAssignment
 		{
@@ -730,19 +730,19 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 
 		// SETTING parameterStepSize
-		{
-			String initialStepSizeStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "initialStepSize");
-			System.out.print("BSE:\tparameterStepSize\t= ");
-			if (initialStepSizeStr != null) {
-				double initialStepSize = Double.parseDouble(initialStepSizeStr);
-				System.out.println(initialStepSize);
-				calibrator.setInitialStepSize(initialStepSize);
-			} else {
-				System.out.println("default value\t"
-						+ ChoiceParameterCalibrator4.DEFAULT_INITIAL_STEP_SIZE);
-			}
-		}
+		// {
+		// String initialStepSizeStr = config.findParam(
+		// BSE_CONFIG_MODULE_NAME, "initialStepSize");
+		// System.out.print("BSE:\tparameterStepSize\t= ");
+		// if (initialStepSizeStr != null) {
+		// double initialStepSize = Double.parseDouble(initialStepSizeStr);
+		// System.out.println(initialStepSize);
+		// calibrator.setInitialStepSize(initialStepSize);
+		// } else {
+		// System.out.println("default value\t"
+		// + ChoiceParameterCalibrator4.DEFAULT_INITIAL_STEP_SIZE);
+		// }
+		// }
 		// SETTING msaExponent deprecated
 		// {
 		// /*
@@ -774,6 +774,96 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				System.out
 						.println("BSE:\tparameterUpdateInterval\t= default value\t"
 								+ ChoiceParameterCalibrator4.DEFAULT_PARAMETER_UPDATE_INTERVAL);
+			}
+		}
+		/*
+		 * finiteDifferenceEps – maxTrustregionIterations –
+		 * maxParameterNormChange – allowIncreasedInitialTrustregion –
+		 * trustregionTerminationGradientNorm
+		 */
+		// SETTING finiteDifferenceEps
+		{
+			String finiteDifferenceEpsStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "finiteDifferenceEps");
+			if (finiteDifferenceEpsStr != null) {
+				double finiteDifferenceEps = Double
+						.parseDouble(finiteDifferenceEpsStr);
+				calibrator.setFiniteDifferenceEps(finiteDifferenceEps);
+				System.out.println("BSE:\tfiniteDifferenceEps\t="
+						+ finiteDifferenceEps);
+			} else {
+				System.out
+						.println("BSE:\tfiniteDifferenceEps\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_FINITE_DIFFERENCE_EPS);
+			}
+		}
+		// SETTING maxTrustregionIterations
+		{
+			String maxTrustregionIterationsStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "maxTrustregionIterations");
+			if (maxTrustregionIterationsStr != null) {
+				int maxTrustregionIterations = Integer
+						.parseInt(maxTrustregionIterationsStr);
+				calibrator
+						.setMaxTrustregionIterations(maxTrustregionIterations);
+				System.out.println("BSE:\tmaxTrustregionIterations\t="
+						+ maxTrustregionIterations);
+			} else {
+				System.out
+						.println("BSE:\tmaxTrustregionIterations\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_MAX_TRUSTREGION_ITERATIONS);
+			}
+		}
+		// SETTING maxParameterNormChange
+		{
+			String maxParameterNormChangeStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "maxParameterNormChange");
+			if (maxParameterNormChangeStr != null) {
+				int maxParameterNormChange = Integer
+						.parseInt(maxParameterNormChangeStr);
+				calibrator.setMaxParameterNormChange(maxParameterNormChange);
+				System.out.println("BSE:\tmaxParameterNormChange\t="
+						+ maxParameterNormChange);
+			} else {
+				System.out
+						.println("BSE:\tmaxParameterNormChange\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_MAX_PARAMETER_NORM_CHANGE);
+			}
+		}
+		// SETTING allowIncreasedInitialTrustregion
+		{
+			String allowIncreasedInitialTrustregionStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "allowIncreasedInitialTrustregion");
+			if (allowIncreasedInitialTrustregionStr != null) {
+				boolean allowIncreasedInitialTrustregion = Boolean
+						.parseBoolean(allowIncreasedInitialTrustregionStr);
+				calibrator
+						.setAllowIncreasedInitialTrustregion(allowIncreasedInitialTrustregion);
+				System.out.println("BSE:\tallowIncreasedInitialTrustregion\t="
+						+ allowIncreasedInitialTrustregion);
+			} else {
+				System.out
+						.println("BSE:\tallowIncreasedInitialTrustregion\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_ALLOW_INCREASED_INITIAL_TRUSTREGION);
+			}
+		}
+		// SETTING trustregionTerminationGradientNorm
+		{
+			String trustregionTerminationGradientNormStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME,
+					"trustregionTerminationGradientNorm");
+			if (trustregionTerminationGradientNormStr != null) {
+				double trustregionTerminationGradientNorm = Double
+						.parseDouble(trustregionTerminationGradientNormStr);
+				calibrator
+						.setTrustregionTerminationGradientNorm(trustregionTerminationGradientNorm);
+				System.out
+						.println("BSE:\ttrustregionTerminationGradientNorm\t="
+								+ trustregionTerminationGradientNorm);
+			} else {
+				System.out
+						.println("BSE:\ttrustregionTerminationGradientNorm\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_TRUSTREGION_TERMINATION_GRADIENT_NORM);
 			}
 		}
 	}
