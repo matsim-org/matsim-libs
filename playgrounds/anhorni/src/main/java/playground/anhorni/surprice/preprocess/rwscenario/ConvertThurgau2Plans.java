@@ -45,6 +45,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class ConvertThurgau2Plans {
 
@@ -85,7 +87,7 @@ public class ConvertThurgau2Plans {
 		this.outputfile = outPath + "/plansThurgau.xml";
 				
 		try {
-			this.convert();
+			this.convert(outPath);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
@@ -194,7 +196,7 @@ public class ConvertThurgau2Plans {
 		return plan;
 	}
 
-	public void convert() throws Exception {
+	public void convert(String outPath) throws Exception {
 		
 		Population population = this.scenario.getPopulation();
 		
@@ -242,7 +244,7 @@ public class ConvertThurgau2Plans {
 		log.info("      done.");
 		log.info("      # persons parsed = " + person_strings.size());
 
-		this.createPersons();
+		this.createPersons(outPath);
 		
 		this.addPlans(person_strings);
 		
@@ -288,8 +290,8 @@ public class ConvertThurgau2Plans {
 		}
 	}
 	
-	private void createPersons() throws Exception {
-		
+	private void createPersons(String outPath) throws Exception {
+		ObjectAttributes votFactors = new ObjectAttributes();
 		Population population = this.scenario.getPopulation();
 		
 		FileReader fr = new FileReader(this.inputfileF2);
@@ -314,12 +316,27 @@ public class ConvertThurgau2Plans {
 			}
 			else { 
 				Gbl.errorMsg("pid=" + id + ": g=" + g + " not known!");
+			}
+			String houseHoldIncomeString = entrs[95].trim();
+			int householdIncome = -99;
+			if (!houseHoldIncomeString.equals("")) {
+				householdIncome = Integer.parseInt(houseHoldIncomeString);
 			}			
 			PersonImpl person = new PersonImpl(id);
 			person.setAge(age);
 			person.setSex(gender);
 			population.addPerson(person);
+			
+			double votFactor = this.convertIncome2VOT(householdIncome);
+			votFactors.putAttribute(id.toString(), "income", votFactor);
 		}
+		log.info("Writing incomes to " + outPath + "votFactor.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(votFactors);
+		attributesWriter.writeFile(outPath + "/votFactors.xml");
+	}
+	
+	private double convertIncome2VOT(int householdIncome) {
+		return 1.0;
 	}
 	
 	private void write() {

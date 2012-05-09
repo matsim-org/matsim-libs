@@ -20,13 +20,15 @@
 
 package playground.anhorni.surprice.preprocess;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
-
 import playground.anhorni.surprice.preprocess.miniscenario.Zone;
 
 public class CreateToll {
+	
+	private final static Logger log = Logger.getLogger(CreateToll.class);
 	       
     public void create(String path, Zone tollZone, double startTime, double endTime, double amount, String type, String desc) { 	    	
     	RoadPricingScheme scheme = new RoadPricingScheme();
@@ -39,8 +41,9 @@ public class CreateToll {
     	// add links of center area
     	for (Id linkId : tollZone.getlinksInZone()) {
     		scheme.addLink(linkId);
-    	}    	    	
+    	} 
+    	log.info("Writing tolls to " + path + "/tolls.xml");
     	RoadPricingWriterXMLv1 tollWriter = new RoadPricingWriterXMLv1(scheme);
-    	tollWriter.writeFile(path + "tolls.xml");	
+    	tollWriter.writeFile(path + "/tolls.xml");	
     }
 }

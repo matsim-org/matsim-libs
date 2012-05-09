@@ -25,11 +25,13 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -41,10 +43,13 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;
 import playground.anhorni.surprice.preprocess.Analyzer;
+import playground.anhorni.surprice.preprocess.CreateToll;
+import playground.anhorni.surprice.preprocess.miniscenario.Zone;
 
 
 public class CreateScenario {	
@@ -84,7 +89,33 @@ public class CreateScenario {
 		// merge ................................................................
 		this.merge();
 		
+		this.createToll(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+		
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+	}
+	
+	private void createToll(String outPath) {		
+		// dummy zone
+		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
+		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
+		double radius = 1000.0;
+
+		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
+			if (bellevue.calcDistance(facility.getCoord()) < radius) {
+				tollZone.addFacility(facility);
+			}
+		}
+		
+		CreateToll tollCreator = new CreateToll();
+		tollCreator.create(
+				outPath, 
+				tollZone,
+				8.0 * 3600.0,
+				12.0 * 3600.0,
+				10.0,
+				"area",
+				"chessboard example"); 
+		// TODO: different schemes for different days
 	}
 	
 	private void writeWeek(String outPath) {
@@ -105,7 +136,7 @@ public class CreateScenario {
 			}
 			new Analyzer().run(this.scenario.getPopulation(), outPath, Surprice.days.get(dow));
 			log.info("Writing population with plans ..." + outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
-			new File(outPath + "/" + dow + "/").mkdirs();
+			new File(outPath + "/" + DayConverter.getDayString(dow) + "/").mkdirs();
 			new PopulationWriter(
 					this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
 		}	
