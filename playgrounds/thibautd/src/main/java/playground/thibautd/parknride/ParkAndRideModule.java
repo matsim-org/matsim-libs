@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -40,6 +41,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 
+import playground.thibautd.parknride.mutationapproach.HeuristicParkAndRideIncluder;
+import playground.thibautd.parknride.routingapproach.ParkAndRideRoutingModule;
+import playground.thibautd.parknride.routingapproach.ParkAndRideTravelTimeCost;
+import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
+import playground.thibautd.parknride.routingapproach.RoutingParkAndRideIncluder;
+import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 import playground.thibautd.router.TripRouter;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
@@ -59,6 +66,46 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		TripRouterFactory tripRouterFactory = controler.getTripRouterFactory();
 		TripRouter tripRouter = tripRouterFactory.createTripRouter();
+		ParkAndRideFacilities facilities = ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() );
+		ParkAndRideIncluder includer;
+
+		ParkAndRideConfigGroup configGroup = ParkAndRideUtils.getConfigGroup( controler.getConfig() );
+		switch (configGroup.getInsertionStrategy()) {
+			case Routing:
+				includer = createRoutingIncluder(tripRouterFactory , tripRouter);
+				break;
+			case Random:
+				includer = new HeuristicParkAndRideIncluder(
+						facilities,
+						tripRouter);
+				break;
+			default:
+				throw new RuntimeException();
+		}
+
+		Random rand = MatsimRandom.getLocalInstance();
+		ParkAndRideChooseModeForSubtour algo =
+			new ParkAndRideChooseModeForSubtour(
+					includer,
+					new FacilityChanger(
+						rand,
+						tripRouter,
+						((ParkAndRideScoringFunctionFactory) controler.getScoringFunctionFactory()).getPenaltyFactory(),
+						facilities,
+						configGroup.getLocalSearchRadius()),
+					tripRouter,
+					new ModesChecker( configGroup.getAvailableModes() ),
+					configGroup.getAvailableModes(),
+					configGroup.getChainBasedModes(),
+					configGroup.getFacilityChangeProbability(),
+					rand);
+
+		return algo;
+	}
+
+	private ParkAndRideIncluder createRoutingIncluder(
+			final TripRouterFactory tripRouterFactory,
+			final TripRouter tripRouter) {
 		TransitRouterConfig transitConfig =
 			new TransitRouterConfig(
 					controler.getConfig().planCalcScore(),
@@ -92,24 +139,10 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					ptTimeCost,
 					timeCost,
 					timeCost);
-
-		ParkAndRideIncluder includer =
-			new ParkAndRideIncluder(
-					ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() ),
-					routingModule,
-					tripRouter);
-
-		ParkAndRideConfigGroup configGroup = ParkAndRideUtils.getConfigGroup( controler.getConfig() );
-		ParkAndRideChooseModeForSubtour algo =
-			new ParkAndRideChooseModeForSubtour(
-					includer,
-					tripRouter,
-					new ModesChecker( configGroup.getAvailableModes() ),
-					configGroup.getAvailableModes(),
-					configGroup.getChainBasedModes(),
-					MatsimRandom.getLocalInstance());
-
-		return algo;
+		return new RoutingParkAndRideIncluder(
+				ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() ),
+				routingModule,
+				tripRouter);
 	}
 
 	private static class ModesChecker implements PermissibleModesCalculator {

@@ -25,21 +25,30 @@ import java.util.Map;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 
+
 /**
  * @author thibautd
  */
 public class ParkAndRideConfigGroup extends Module {
 	public static final String GROUP_NAME = "parkAndRide";
 
+	public static enum InsertionStrategy { Routing , Random };
+
 	public static final String FACILITIES_FILE = "facilities";
 	public static final String ALL_MODES = "availableModes";
 	public static final String CHAIN_MODES = "chainBasedModes";
+	public static final String INSERT_STRAT = "insertionStrategy";
+	public static final String FAC_CHANGE_PROB = "facilityChangeProbability";
+	public static final String LOCAL_SEARCH_RADIUS = "localSearchRadius";
 
 	private String facilitiesFile = null;
 	private String[] modes = new String[]{
 		TransportMode.car, TransportMode.pt, TransportMode.bike,
 			TransportMode.walk, ParkAndRideConstants.PARK_N_RIDE_LINK_MODE};
 	private String[] chainModes = new String[]{ TransportMode.car , TransportMode.bike };
+	private InsertionStrategy insertionStrategy = InsertionStrategy.Random;
+	private double facilityChangeProbability = 0.9;
+	private double localSearchRadius = 5000;
 
 	public ParkAndRideConfigGroup() {
 		super( GROUP_NAME );
@@ -52,6 +61,16 @@ public class ParkAndRideConfigGroup extends Module {
 		if (FACILITIES_FILE.equals( param_name )) {
 			setFacilities( value );
 		}
+		else if (ALL_MODES.equals( param_name )) {
+		}
+		else if (CHAIN_MODES.equals( param_name )) {
+		}
+		else if (INSERT_STRAT.equals( param_name )) {
+		}
+		else if (FAC_CHANGE_PROB.equals( param_name )) {
+		}
+		else if (LOCAL_SEARCH_RADIUS.equals( param_name )) {
+		}
 	}
 
 	@Override
@@ -59,6 +78,17 @@ public class ParkAndRideConfigGroup extends Module {
 		if (FACILITIES_FILE.equals( param_name )) {
 			return getFacilities();
 		}
+		else if (ALL_MODES.equals( param_name )) {
+		}
+		else if (CHAIN_MODES.equals( param_name )) {
+		}
+		else if (INSERT_STRAT.equals( param_name )) {
+		}
+		else if (FAC_CHANGE_PROB.equals( param_name )) {
+		}
+		else if (LOCAL_SEARCH_RADIUS.equals( param_name )) {
+		}
+
 		return null;
 	}
 
@@ -69,6 +99,11 @@ public class ParkAndRideConfigGroup extends Module {
 		Map<String, String> map = new LinkedHashMap<String, String>();
 
 		addParameterToMap( map , FACILITIES_FILE );
+		addParameterToMap( map , ALL_MODES );
+		addParameterToMap( map , CHAIN_MODES );
+		addParameterToMap( map , INSERT_STRAT );
+		addParameterToMap( map , FAC_CHANGE_PROB );
+		addParameterToMap( map , LOCAL_SEARCH_RADIUS );
 
 		return map;
 	}
@@ -106,6 +141,18 @@ public class ParkAndRideConfigGroup extends Module {
 
 	public String[] getChainBasedModes() {
 		return chainModes;
+	}
+
+	public InsertionStrategy getInsertionStrategy() {
+		return insertionStrategy;
+	}
+
+	public double getFacilityChangeProbability() {
+		return facilityChangeProbability;
+	}
+
+	public double getLocalSearchRadius() {
+		return localSearchRadius;
 	}
 }
 

@@ -49,16 +49,6 @@ public class ParkAndRideFacilities implements MatsimToplevelContainer {
 		this.facilities.put( facility.getId() , facility );
 	}
 
-	//public Collection<Id> getParkAndRideStopsIds() {
-	//	List<Id> ids = new ArrayList<Id>();
-
-	//	for (ParkAndRideFacility facility : facilities) {
-	//		ids.addAll( facility.getStopsFacilitiesIds() );
-	//	}
-
-	//	return new HashSet<Id>(ids);
-	//}
-
 	@Override
 	public MatsimFactory getFactory() {
 		throw new UnsupportedOperationException( "TODO" );

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride;
+package playground.thibautd.parknride.routingapproach;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -27,7 +27,7 @@ import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
 
-import playground.thibautd.parknride.ParkAndRideRouterNetwork.ParkAndRideLink;
+import playground.thibautd.parknride.routingapproach.ParkAndRideRouterNetwork.ParkAndRideLink;
 
 /**
  * A cost calculator for routing park and ride.

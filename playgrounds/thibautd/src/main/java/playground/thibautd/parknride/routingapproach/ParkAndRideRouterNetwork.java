@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride;
+package playground.thibautd.parknride.routingapproach;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,6 +46,9 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import playground.thibautd.parknride.ParkAndRideFacilities;
+import playground.thibautd.parknride.ParkAndRideFacility;
 
 /**
  * Network based on the transit router network.

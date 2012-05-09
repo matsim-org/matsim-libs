@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -39,13 +40,18 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
+import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
+import playground.thibautd.parknride.routingapproach.RoutingParkAndRideIncluder;
 import playground.thibautd.router.ActivityWrapperFacility;
+import playground.thibautd.router.StageActivityTypes;
+import playground.thibautd.router.StageActivityTypesImpl;
 import playground.thibautd.router.TripRouter;
 
 /**
@@ -60,6 +66,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		Logger.getLogger(ParkAndRideChooseModeForSubtour.class);
 	// enable during developement to get more checks
 	private static final boolean SELF_CHECKING = true;
+	private static final StageActivityTypes PNR_TYPES = new StageActivityTypesImpl( Collections.singleton(ParkAndRideConstants.PARKING_ACT) );
 
 	private static class Candidate {
 		Integer subTourIndex;
@@ -72,6 +79,8 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 	private final PlanAnalyzeSubtours planAnalyzeSubtours;
 	private final TripRouter tripRouter;
 	private final ParkAndRideIncluder includer;
+	private final double facilityChangeProbability;
+	private final FacilityChanger changer;
 
 	private PermissibleModesCalculator permissibleModesCalculator;
 	private TripStructureAnalysisLayerOption tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.link;
@@ -86,11 +95,14 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 	 */
 	public ParkAndRideChooseModeForSubtour(
 			final ParkAndRideIncluder includer,
+			final FacilityChanger changer,
 			final TripRouter tripRouter,
 			final PermissibleModesCalculator permissibleModesCalculator,
 			final String[] modes,
 			final String[] chainBasedModes,
+			final double facilityChangeProbability,
 			final Random rng) {
+		this.changer = changer;
 		this.includer = includer;
 		this.tripRouter = tripRouter;
 		this.permissibleModesCalculator = permissibleModesCalculator;
@@ -98,12 +110,86 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
 		this.rng = rng;
 		this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		this.facilityChangeProbability = facilityChangeProbability;
 		log.info("Chain based modes: " + this.chainBasedModes.toString());
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		List<PlanElement> planStructure = includer.extractPlanStructure( plan );
+		if (isPnrPlan( plan.getPlanElements() )) {
+			if (rng.nextDouble() <= facilityChangeProbability) {
+				runFacilityChoice( plan );
+				return;
+			}
+		}
+
+		runModeChoice( plan );
+	}
+
+	private void runFacilityChoice(final Plan plan) {
+		List<PlanElement> planStructure =
+			ParkAndRideUtils.extractPlanStructure(
+					tripRouter,
+					PNR_TYPES,
+					plan );
+		checkSequence( planStructure );
+		planAnalyzeSubtours.setTripStructureAnalysisLayer( tripStructureAnalysisLayer );
+		planAnalyzeSubtours.run( wrapPlanStructure( planStructure ) );
+
+		List<Integer> pnrSubtours = new ArrayList<Integer>();
+
+		int sub = 0;
+		for ( List<PlanElement> subtour : planAnalyzeSubtours.getSubtours() ) {
+			if ( containsFlaggedPnrTrip( subtour ) ) {
+				pnrSubtours.add( sub );
+			}
+			sub++;
+		}
+		List<PlanElement> choosenSubtour =
+			getSubtourWithoutSubsubtours(
+					pnrSubtours.get( rng.nextInt( pnrSubtours.size() ) ),
+					planStructure);	
+
+		reinsertPnrInteraction( choosenSubtour , plan );
+		changer.changePnrFacilityAndRouteSubtour(
+				plan,
+				choosenSubtour);
+	}
+
+	private void reinsertPnrInteraction(
+			final List<PlanElement> choosenSubtour,
+			final Plan plan) {
+		// TODO: check that the removed elements are as expected (mode...)
+		int subStartIndex = plan.getPlanElements().indexOf( choosenSubtour.get( 0 ) );
+
+		choosenSubtour.remove( 1 );
+		choosenSubtour.add( 1 , new LegImpl( TransportMode.pt ) );
+		choosenSubtour.add( 1 , plan.getPlanElements().get( subStartIndex + 2 ) );
+		choosenSubtour.add( 1 , new LegImpl( TransportMode.car ) );
+
+
+		int subEndIndex = plan.getPlanElements().indexOf( choosenSubtour.get( choosenSubtour.size() - 1 ) );
+		choosenSubtour.remove( choosenSubtour.size() - 2 );
+		choosenSubtour.add( choosenSubtour.size() - 1 , new LegImpl( TransportMode.pt ) );
+		choosenSubtour.add( choosenSubtour.size() - 1 , plan.getPlanElements().get( subEndIndex - 2 ) );
+		choosenSubtour.add( choosenSubtour.size() - 1 , new LegImpl( TransportMode.car ) );
+	}
+
+	private static boolean containsFlaggedPnrTrip(final List<PlanElement> structure) {
+		for (PlanElement pe : structure) {
+			if (pe instanceof Leg && ((Leg) pe).getMode().equals( ParkAndRideUtils.PNR_TRIP_FLAG) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void runModeChoice(final Plan plan) {
+		List<PlanElement> planStructure =
+			ParkAndRideUtils.extractPlanStructure(
+					tripRouter,
+					PNR_TYPES,
+					plan );
 		checkSequence( planStructure );
 		Id homeLocation = null;
 
@@ -127,7 +213,11 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 
 			if (!choiceSet.isEmpty()) {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
-				List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
+				//List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
+				List<PlanElement> subTour =
+					getSubtourWithoutSubsubtours(
+							whatToDo.subTourIndex,
+							planStructure);
 				changeLegModeTo(
 						plan,
 						subTour,
@@ -136,6 +226,47 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		}
 
 		checkSequence( plan.getPlanElements() );
+	}
+
+	private List<PlanElement> getSubtourWithoutSubsubtours(
+			final int subtourIndex,
+			final List<PlanElement> planStructure) {
+		List<PlanElement> out = new ArrayList<PlanElement>();
+
+		int[] subtourAppartenance = planAnalyzeSubtours.getSubtourIndexation();
+		int lastElementAdded = -1;
+
+		// parse the leg appartenance, and only retain legs having
+		// this exact subtour index, as well as their ODs.
+		// This is necessary, because PlanAnalyzeSubtours#getSubtours()
+		// returns the "full" subtours (ie, the sub-subtours are also
+		// included, which is something we do not want here).
+		// td, may 2012
+		for (int i=0; i < subtourAppartenance.length; i++) {
+			if ( subtourAppartenance[ i ] == subtourIndex ) {
+				// the leg is in the subtour
+				int legIndex = (i * 2) + 1;
+				if ( legIndex != lastElementAdded ) {
+					// origin:
+					out.add( planStructure.get( legIndex - 1 ) );
+				}
+				// leg and destination:
+				out.add( planStructure.get( legIndex ) );
+				out.add( planStructure.get( legIndex + 1 ) );
+				lastElementAdded = legIndex + 1;
+			}
+		}
+
+		return out;
+	}
+
+	private static boolean isPnrPlan(final List<PlanElement> seq) {
+		for (PlanElement e : seq) {
+			if (e instanceof Activity && PNR_TYPES.isStageActivity(((Activity) e).getType())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Plan wrapPlanStructure(final List<PlanElement> planStructure) {
@@ -347,7 +478,22 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 			Activity origin = (Activity) iter.next();
 
 			while (iter.hasNext()) {
-				iter.next(); // skip leg
+				PlanElement pe = iter.next();
+				if (pe instanceof Activity) {
+					// this can happen due to skipping sub-subtours.
+					// just do one step forward.
+					// Moreover, due to the fact that this method is called
+					// on subsets of subtours from the changeLegToPnr,
+					// it is not sure that there are still elements...
+					if (iter.hasNext()) {
+						origin = (Activity) pe;
+						iter.next();
+					}
+					else {
+						break;
+					}
+				}
+
 				Activity destination = (Activity) iter.next();
 				List<? extends PlanElement> trip =
 					tripRouter.calcRoute(
@@ -372,7 +518,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		this.tripStructureAnalysisLayer = tripStructureAnalysisLayer;
 	}
 
-	private static double getEndTime(
+	/*private*/ static double getEndTime(
 			final Activity act,
 			final List<PlanElement> plan) {
 		double endTime = act.getEndTime();

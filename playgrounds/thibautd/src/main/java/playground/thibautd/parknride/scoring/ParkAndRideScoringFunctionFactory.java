@@ -71,6 +71,10 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 		return new Listener( penalties );
 	}
 
+	public ParkingPenaltyFactory getPenaltyFactory() {
+		return parkingPenaltyFactory;
+	}
+
 	private static class Listener implements StartupListener {
 		private final ParkingPenaltyFactory parkingPenaltyFactory;
 

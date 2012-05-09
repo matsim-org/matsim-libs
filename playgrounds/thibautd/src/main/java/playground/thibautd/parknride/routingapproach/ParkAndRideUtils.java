@@ -17,16 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride;
+package playground.thibautd.parknride.routingapproach;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.thibautd.parknride.ParkAndRideConfigGroup;
+import playground.thibautd.parknride.ParkAndRideFacilities;
+import playground.thibautd.parknride.ParkAndRideFacilitiesXmlReader;
+import playground.thibautd.router.StageActivityTypes;
+import playground.thibautd.router.TripRouter;
 
 /**
  * @author thibautd
  */
 public class ParkAndRideUtils {
+	public static String PNR_TRIP_FLAG = "pnr";
 	private ParkAndRideUtils() {}
 
 	/**
@@ -71,5 +86,40 @@ public class ParkAndRideUtils {
 	public static ParkAndRideFacilities getParkAndRideFacilities(final Scenario scenario) {
 		return scenario.getScenarioElement( ParkAndRideFacilities.class );
 	}
+
+	/**
+	 * extracts the plan structure considering pnr trips as individual
+	 * trips with mode {@link TransportMode#pt}.
+	 */
+	public static List<PlanElement> extractPlanStructure(
+			final TripRouter tripRouter,
+			final StageActivityTypes pnrTypes,
+			final Plan plan) {
+		List<PlanElement> planStructure = tripRouter.tripsToLegs( plan );
+
+		// then, remove park and ride trips, and mark them as pt
+		Iterator<PlanElement> iter = planStructure.iterator();
+		Leg lastLeg = null;
+		for (PlanElement pe = iter.next(); iter.hasNext(); pe = iter.next()) {
+			if (pe instanceof Activity  &&
+					pnrTypes.isStageActivity(
+						((Activity) pe).getType() )) {
+				// remove the activity
+				iter.remove();
+				// remove the following leg
+				iter.next();
+				iter.remove();
+				// set the trip to pnr
+				lastLeg.setMode( PNR_TRIP_FLAG );
+			}
+			if (pe instanceof Leg) {
+				lastLeg = (Leg) pe;
+			}
+		}
+
+		return planStructure;
+	}
+
+
 }
 

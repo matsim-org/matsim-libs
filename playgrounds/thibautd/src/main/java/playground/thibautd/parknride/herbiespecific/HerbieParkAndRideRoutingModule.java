@@ -33,7 +33,7 @@ import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.thibautd.parknride.ParkAndRideFacilities;
-import playground.thibautd.parknride.ParkAndRideRoutingModule;
+import playground.thibautd.parknride.routingapproach.ParkAndRideRoutingModule;
 
 /**
  * Modifies the definition of the walk cost.
