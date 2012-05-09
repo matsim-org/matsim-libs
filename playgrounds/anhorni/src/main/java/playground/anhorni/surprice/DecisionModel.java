@@ -38,10 +38,10 @@ public class DecisionModel {
 		int numberOfActsDone = this.memory.getNumberOfActivities(type, day);
 		double numberOfActsPlanned = 0.0;
 		
-		if (day.equals("Sat")) {
+		if (day.equals("sat")) {
 			numberOfActsPlanned = this.activityFrequenciesSat.get(type);
 		}
-		else if (day.equals("Sun")) {
+		else if (day.equals("sun")) {
 			numberOfActsPlanned = this.activityFrequenciesSun.get(type);
 		}
 		else {
@@ -56,10 +56,10 @@ public class DecisionModel {
 	}
 	
 	public void setFrequency(String type, String day, double frequency) {
-		if (day.equals("Sat")) {
+		if (day.equals("sat")) {
 			this.activityFrequenciesSat.put(type, frequency);
 		}
-		else if (day.equals("Sun")) {
+		else if (day.equals("sun")) {
 			this.activityFrequenciesSun.put(type, frequency);
 		}
 		else {

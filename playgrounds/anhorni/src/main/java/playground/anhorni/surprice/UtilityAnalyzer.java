@@ -148,7 +148,7 @@ public class UtilityAnalyzer {
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt")); 
-			bufferedWriter.write("Zone\tMon\tTue\tWed\tThu\tFri\tSat\tSun\n");
+			bufferedWriter.write("Zone\tmon\ttue\twed\tthu\tfri\tsat\tsun\n");
 			for (Zone zone : this.zones) {
 				Utilities uPerZone = utilitiesPerZone.get(zone.getName());
 				

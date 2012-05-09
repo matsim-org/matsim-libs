@@ -55,11 +55,11 @@ public class AgentMemory {
 	}
 	
 	public void addPlan(Plan plan, String day) {
-		if (day.equals("Sat")) {
+		if (day.equals("sat")) {
 			this.plansSat.add(plan);		
 			this.countActs(plan, this.activitiesSat);
 		}
-		else if (day.equals("Sun")) {
+		else if (day.equals("sun")) {
 			this.plansSun.add(plan);		
 			this.countActs(plan, this.activitiesSun);
 		}
@@ -72,12 +72,12 @@ public class AgentMemory {
 	}
 	
 	public Plan getRandomPlanAndRemove(String day, Random random) {
-		if (day.equals("Sat")) {
+		if (day.equals("sat")) {
 			Plan plan = this.plansSat.get(0);	
 			this.plansSat.clear();
 			return plan;
 		}
-		else if (day.equals("Sun")) {
+		else if (day.equals("sun")) {
 			Plan plan = this.plansSun.get(0);	
 			this.plansSun.clear();
 			return plan;		
@@ -91,11 +91,11 @@ public class AgentMemory {
 	}
 	
 	public int getNumberOfActivities(String type, String day) {
-		if (day.equals("Sat")) {
+		if (day.equals("sat")) {
 			if (this.activitiesSat.containsKey(type)) return this.activitiesSat.get(type);
 			else return 0;
 		}
-		else if (day.equals("Sun")) {
+		else if (day.equals("sun")) {
 			if (this.activitiesSun.containsKey(type)) return this.activitiesSun.get(type);
 			else return 0;			
 		}

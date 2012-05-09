@@ -83,8 +83,8 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
     	
     	double f = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "f"));
     	
-		// adapt for Tue - Sun: 
-		if (!this.day.equals("Mon")) {
+		// adapt for tue - sun: 
+		if (!this.day.equals("mon")) {
 			String mode = this.memory.getMainModePreviousDay(this.day);
 			
 			if (mode.equals("car")) {

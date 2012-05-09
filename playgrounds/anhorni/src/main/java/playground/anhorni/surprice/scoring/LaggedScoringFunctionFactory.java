@@ -28,7 +28,6 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.anhorni.surprice.AgentMemories;
-import playground.anhorni.surprice.Surprice;
 
 public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory{
 	
@@ -51,7 +50,7 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 		
 		LaggedActivityScoringFunction scoringFunction = new LaggedActivityScoringFunction(
 				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(),
-				Double.parseDouble((String) this.incomes.getAttribute(plan.getPerson().getId().toString(), "income")));
+				Double.parseDouble((String) this.incomes.getAttribute(plan.getPerson().getId().toString(), "income")), this.day);
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		
 		scoringFunctionAccumulator.addScoringFunction(new LaggedLegScoringFunction(

@@ -17,31 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess.miniscenario;
+package playground.anhorni.surprice;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
 
-import playground.anhorni.surprice.AgentMemory;
-import playground.anhorni.surprice.DecisionModel;
-
-public class DecisionModelCreator {
+public class DayConverter {
 	
-	public DecisionModel createDecisionModelForAgent(PersonImpl person, AgentMemory memory) {
-		DecisionModel model = new DecisionModel();
-		model.setMemory(memory);
-		
-		model.setFrequency("work", "mon-fri", 1);
-		model.setFrequency("shop", "mon-fri", 0.2);
-		model.setFrequency("leisure", "mon-fri", 0.2);
-		
-		model.setFrequency("work", "sat", 0);
-		model.setFrequency("shop", "sat", 1);
-		model.setFrequency("leisure", "sat", 0);
-		
-		model.setFrequency("work", "sun", 0);
-		model.setFrequency("shop", "sun", 0);
-		model.setFrequency("leisure", "sun", 1);
-		
-		return model;
+	public static String getDayString(int day) {
+		return Surprice.days.get(day);
+	}
+	
+	public static int getDayInt(String day) {
+		return Surprice.days.indexOf(day);
+	}
+	
+	public static DayType getDayType(String day) {
+		if (day.equals("mon")) {
+			return DayType.mon;
+		} else if (day.equals("tue")) {
+			return DayType.tue;
+		} else if (day.equals("tue")) {
+			return DayType.tue;
+		} else if (day.equals("wed")) {
+			return DayType.wed;
+		} else if (day.equals("thu")) {
+			return DayType.thu;
+		} else if (day.equals("fri")) {
+			return DayType.fri;
+		} else if (day.equals("sat")) {
+			return DayType.sat;
+		} else if (day.equals("sun")) {
+			return DayType.sun;
+		} else {
+			return DayType.wk;
+		}
 	}
 }

@@ -19,28 +19,43 @@
 
 package playground.anhorni.surprice.scoring;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
+import org.matsim.core.utils.misc.Time;
 
+import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;
 
-public class LaggedActivityScoringFunction extends CharyparNagelOpenTimesScoringFunction {
+public class LaggedActivityScoringFunction extends ActivityScoringFunction {
 	
 	private CharyparNagelScoringParameters params;
 	private double votFactor;
 	private Config config;
+	private final ActivityFacilities facilities;
+	private DayType day;
 		
-	public LaggedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config, ActivityFacilities facilities, double votFactor) {
-		super(plan, params, facilities);
+	public LaggedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
+			ActivityFacilities facilities, double votFactor, String day) {
+		super(params);
 		super.reset();
 		this.params = params;
 		this.config = config;
 		this.votFactor = votFactor;
+		this.facilities = facilities;
+		this.day = DayConverter.getDayType(day);
 	}
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
@@ -119,5 +134,50 @@ public class LaggedActivityScoringFunction extends CharyparNagelOpenTimesScoring
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * f * (minimalDuration - duration);
 		}
 		return tmpScore;
+	}
+	
+	protected double[] getOpeningInterval(Activity act) {
+
+		// openInterval has two values
+		// openInterval[0] will be the opening time
+		// openInterval[1] will be the closing time
+		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+
+		boolean foundAct = false;
+
+		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
+		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
+		String facilityActType = null;
+		Set<OpeningTime> opentimes = null;
+
+		while (facilityActTypeIterator.hasNext() && !foundAct) {
+
+			facilityActType = facilityActTypeIterator.next();
+			if (act.getType().substring(0, 1).equals(facilityActType.substring(0, 1))) {
+				foundAct = true;
+
+				// choose appropriate opentime:
+				// if none is given, use undefined opentimes
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(day);
+				if (opentimes == null) {
+					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wkday);
+				}
+				if (opentimes != null) {
+					// ignoring lunch breaks with the following procedure:
+					// if there is only one wed/wkday open time interval, use it
+					// if there are two or more, use the earliest start time and the latest end time
+					openInterval[0] = Double.MAX_VALUE;
+					openInterval[1] = Double.MIN_VALUE;
+					for (OpeningTime opentime : opentimes) {
+						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
+						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+					}
+				}
+			}
+		}
+		if (!foundAct) {
+			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+		}
+		return openInterval;
 	}
 }
