@@ -31,7 +31,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.ActivityUtilityParameters;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -46,6 +46,7 @@ public class LaggedActivityScoringFunction extends ActivityScoringFunction {
 	private Config config;
 	private final ActivityFacilities facilities;
 	private DayType day;
+	private Plan plan;
 		
 	public LaggedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
 			ActivityFacilities facilities, double votFactor, String day) {
@@ -56,6 +57,7 @@ public class LaggedActivityScoringFunction extends ActivityScoringFunction {
 		this.votFactor = votFactor;
 		this.facilities = facilities;
 		this.day = DayConverter.getDayType(day);
+		this.plan = plan;
 	}
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
@@ -65,11 +67,11 @@ public class LaggedActivityScoringFunction extends ActivityScoringFunction {
 			f = this.votFactor;
 		}
 
-		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
-		if (actParams == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
-					"(module name=\"planCalcScore\" in the config file).");
-		}
+//		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
+//		if (actParams == null) {
+//			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
+//					"(module name=\"planCalcScore\" in the config file).");
+//		}
 
 		double tmpScore = 0.0;
 		double[] openingInterval = this.getOpeningInterval(act);
@@ -100,36 +102,37 @@ public class LaggedActivityScoringFunction extends ActivityScoringFunction {
 		}
 
 		// disutility if too late
-		double latestStartTime = actParams.getLatestStartTime();
+		double latestStartTime = closingTime;
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += this.params.marginalUtilityOfLateArrival_s * f * (activityStart - latestStartTime);
 		}
 
 		// utility of performing an action, duration is >= 1, thus log is no problem
-		double typicalDuration = actParams.getTypicalDuration();
+		double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(act.getType());
 
 		if (duration > 0) {
+			double zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0));
 			double utilPerf = this.params.marginalUtilityOfPerforming_s * f * typicalDuration
-					* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration());
+					* Math.log((duration / 3600.0) / zeroUtilityDuration);
 			double utilWait = this.params.marginalUtilityOfWaiting_s * f * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
 			tmpScore += 2 * this.params.marginalUtilityOfLateArrival_s * f * Math.abs(duration);
 		}
 
-		// disutility if stopping too early
-		double earliestEndTime = actParams.getEarliestEndTime();
-		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * f * (earliestEndTime - activityEnd);
-		}
+//		// disutility if stopping too early
+//		double earliestEndTime = actParams.getEarliestEndTime();
+//		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
+//			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * f * (earliestEndTime - activityEnd);
+//		}
 
-		// disutility if going to away to late
+		// disutility if going away to late
 		if (activityEnd < departureTime) {
 			tmpScore += this.params.marginalUtilityOfWaiting_s * f * (departureTime - activityEnd);
 		}
 
 		// disutility if duration was too short
-		double minimalDuration = actParams.getMinimalDuration();
+		double minimalDuration = typicalDuration / 3.0;
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * f * (minimalDuration - duration);
 		}

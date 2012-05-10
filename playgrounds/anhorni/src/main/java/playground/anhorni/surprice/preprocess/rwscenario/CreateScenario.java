@@ -95,6 +95,8 @@ public class CreateScenario {
 		
 		this.createToll(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 		
+		this.createDesiresForPersons();
+		
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 		
 		this.writeVOTs(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
@@ -288,6 +290,28 @@ public class CreateScenario {
 				this.personWeeksMZ.get(person.getId()).setCurrentWeek(week);
 			}
 			this.personWeeksMZ.get(person.getId()).addDay(dow, person.getSelectedPlan());
+		}
+	}
+	
+	private void createDesiresForPersons() {
+		log.info("creating desires");
+		int counter = 0;
+		int nextMsg = 1;
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {			
+			counter++;
+			if (counter % nextMsg == 0) {
+				nextMsg *= 2;
+				log.info(" person # " + counter);
+			}
+			((PersonImpl)person).getDesires().getActivityDurations().clear();
+			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Activity) {
+					ActivityImpl act = (ActivityImpl)pe;				
+					if (act.getType().startsWith("w")) {
+						
+					}
+				}
+			}
 		}
 	}
 	
