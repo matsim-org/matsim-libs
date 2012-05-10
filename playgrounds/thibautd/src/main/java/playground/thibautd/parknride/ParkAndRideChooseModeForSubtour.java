@@ -526,7 +526,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		double endTime = act.getEndTime();
 
 		if (endTime == Time.UNDEFINED_TIME) {
-			double startTime = act.getStartTime();
+			double startTime = 0;
 
 			if (startTime == Time.UNDEFINED_TIME) {
 				for (PlanElement pe : plan) {
@@ -535,13 +535,13 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 						double currentEnd = currentAct.getEndTime();
 						double currentStart = currentAct.getStartTime();
 						double dur = (currentAct instanceof ActivityImpl ? ((ActivityImpl) currentAct).getMaximumDuration() : Time.UNDEFINED_TIME);
-						if (currentEnd != Time.UNDEFINED_TIME) {
+						if (currentEnd != Time.UNDEFINED_TIME && currentEnd > startTime) {
 							// use fromcurrentAct.currentEnd as time for routing
 							startTime = currentEnd;
 						}
 						else if ((currentStart != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
 							// use fromcurrentAct.currentStart + fromcurrentAct.duration as time for routing
-							startTime = currentStart + dur;
+							startTime = Math.max( currentStart , startTime ) + dur;
 						}
 						else if (dur != Time.UNDEFINED_TIME) {
 							// use last used time + fromcurrentAct.duration as time for routing
@@ -559,6 +559,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 				}
 			}
 
+			startTime = Math.max( startTime , act.getStartTime() );
 			endTime = startTime + act.getMaximumDuration();
 		}
 
