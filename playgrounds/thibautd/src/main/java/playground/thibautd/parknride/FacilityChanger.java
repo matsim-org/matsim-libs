@@ -21,6 +21,7 @@ package playground.thibautd.parknride;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -103,12 +104,7 @@ public class FacilityChanger {
 		}
 
 		ParkAndRideFacility fac = facilities.getFacilities().get( pnrFirst.getFacilityId() );
-		Collection<ParkAndRideFacility> neighbors =
-			facilitiesQT.get(
-					fac.getCoord().getX(),
-					fac.getCoord().getY(),
-					searchRadius);
-		neighbors.remove( fac );
+		Collection<ParkAndRideFacility> neighbors = getNeighbors( fac , searchRadius );
 
 		ParkAndRideFacility newFac =
 			chooseFac(
@@ -125,6 +121,18 @@ public class FacilityChanger {
 		rerouteSubtour( plan , subtour );
 	}
 
+	private Collection<ParkAndRideFacility> getNeighbors(
+			final ParkAndRideFacility fac,
+			final double currentRadius) {
+		Collection<ParkAndRideFacility> neighbors =
+				facilitiesQT.get(
+						fac.getCoord().getX(),
+						fac.getCoord().getY(),
+						currentRadius);
+		neighbors.remove( fac );
+		// TODO: max recursion depth / maximum search radius?
+		return neighbors.size() > 1 ? neighbors : getNeighbors( fac , currentRadius * 2 );
+	}
 
 	private static void updateFacility(
 			final Activity act,
