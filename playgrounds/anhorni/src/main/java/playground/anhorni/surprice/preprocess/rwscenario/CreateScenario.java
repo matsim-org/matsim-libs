@@ -116,8 +116,7 @@ public class CreateScenario {
 			}			
 			double vot = r * f;
 			votFactors.putAttribute(personWeeks.getPerson().getId().toString(), "vot", vot);
-		}
-		
+		}		
 		log.info("Writing vots to " + outPath + "/votFactor.xml");
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(votFactors);
 		attributesWriter.writeFile(outPath + "/votFactors.xml");

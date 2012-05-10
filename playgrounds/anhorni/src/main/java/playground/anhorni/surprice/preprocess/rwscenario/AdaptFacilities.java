@@ -19,12 +19,17 @@
 
 package playground.anhorni.surprice.preprocess.rwscenario;
 
+import java.util.Map;
+import java.util.SortedSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -93,6 +98,22 @@ public class AdaptFacilities {
 				
 				for (DayType day : DayType.values()) {				
 					actOpt.addOpeningTime(new OpeningTimeImpl(day, 0.0 * 3600, 24.0 * 3600));
+				}
+			}
+			ActivityOptionImpl actOpt2 = (ActivityOptionImpl) facility.getActivityOptions().get("work_sector2");
+			ActivityOptionImpl actOpt3 = (ActivityOptionImpl) facility.getActivityOptions().get("work_sector3");
+			
+			ActivityOptionImpl actOpt = actOpt2;		
+			if (actOpt3 != null) actOpt = actOpt3;
+			
+			if (actOpt != null) {
+				((ActivityFacilityImpl)facility).createActivityOption("work");
+				
+				Map<DayType,SortedSet<OpeningTime>> otss = actOpt.getOpeningTimes();
+				for (SortedSet<OpeningTime> ots : otss.values()) {
+					for (OpeningTime ot : ots) {
+						facility.getActivityOptions().get("work").addOpeningTime(ot);
+					}
 				}
 			}
 		}
