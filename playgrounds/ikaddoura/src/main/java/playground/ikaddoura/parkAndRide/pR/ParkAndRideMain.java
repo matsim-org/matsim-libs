@@ -24,8 +24,9 @@
 package playground.ikaddoura.parkAndRide.pR;
 
 
-import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -59,11 +60,11 @@ public class ParkAndRideMain {
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		
 		PRFileReader prReader = new PRFileReader(prFacilityFile);
-		List<ParkAndRideFacility> prFacilities = prReader.getPrFacilities();
+		Map<Id, ParkAndRideFacility> id2prFacility = prReader.getId2prFacility();
 
-		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(prFacilities);
+		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(id2prFacility);
 		
-		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, prFacilities));
+		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility));
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
 		ParkAndRideScoringFunctionFactory scoringfactory = new ParkAndRideScoringFunctionFactory(planCalcScoreConfigGroup, controler.getNetwork());
@@ -80,7 +81,6 @@ public class ParkAndRideMain {
 				mobsim.addMobsimEngine(adaptiveControl);
 				return mobsim;
 			}
-			
 		});
 			
 		controler.run();

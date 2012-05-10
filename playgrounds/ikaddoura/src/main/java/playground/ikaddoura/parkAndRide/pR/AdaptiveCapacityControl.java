@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package playground.ikaddoura.parkAndRide.pR;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -45,14 +43,14 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	private Map<Id, Integer> prId2vehicles = new HashMap<Id, Integer>();
 	private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
-	private List<ParkAndRideFacility> prFacilities = new ArrayList<ParkAndRideFacility>();
+	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 
 	private Integer maxCapacity = 20;
 	
 	private InternalInterface internalInterface;
 	
-	public AdaptiveCapacityControl(List<ParkAndRideFacility> prFacilities) {
-		this.prFacilities = prFacilities;
+	public AdaptiveCapacityControl(Map<Id, ParkAndRideFacility> id2prFacility) {
+		this.id2prFacility = id2prFacility;
 	}
 
 	@Override
@@ -70,7 +68,7 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 	@Override
 	public void onPrepareSim() {
 
-		for (ParkAndRideFacility pr : this.prFacilities){
+		for (ParkAndRideFacility pr : this.id2prFacility.values()){
 			this.prId2vehicles.put(pr.getId(), 0);
 
 			Id prLink2in = pr.getPrLink2in();
@@ -101,7 +99,7 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		for (ParkAndRideFacility pr : this.prFacilities){
+		for (ParkAndRideFacility pr : this.id2prFacility.values()){
 			Id id = pr.getPrLink3in();
 			if (id.toString().equals(event.getLinkId().toString())){
 				System.out.println("Car entered ParkAndRideFacilty: " + id.toString());
@@ -114,7 +112,7 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		for (ParkAndRideFacility pr : this.prFacilities){
+		for (ParkAndRideFacility pr : this.id2prFacility.values()){
 			Id id = pr.getPrLink3out();
 
 			if (id.toString().equals(event.getLinkId().toString())){

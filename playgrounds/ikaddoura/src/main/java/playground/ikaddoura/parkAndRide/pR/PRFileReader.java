@@ -28,9 +28,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
@@ -39,14 +40,14 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class PRFileReader {
 	
-	private List<ParkAndRideFacility> prFacilities = new ArrayList<ParkAndRideFacility>();
+	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 	private String prFacilityFile;
 
 	public PRFileReader(String prFacilityFile) {
 		this.prFacilityFile = prFacilityFile;
 	}
 
-	public List<ParkAndRideFacility> getPrFacilities() {
+	public Map<Id, ParkAndRideFacility> getId2prFacility() {
 		
 		System.out.println("Trying to read Facilities from file "+this.prFacilityFile);
 		
@@ -67,7 +68,7 @@ public class PRFileReader {
 	                	prFacility.setPrLink2out(new IdImpl(parts[4]));
 	                	prFacility.setPrLink3in(new IdImpl(parts[5]));
 	                	prFacility.setPrLink3out(new IdImpl(parts[6]));
-	                	this.prFacilities.add(prFacility);
+	                	this.id2prFacility.put(prFacility.getId(), prFacility);
 	                	prCounter++;
 	                }
 	                lineCounter++;
@@ -85,6 +86,6 @@ public class PRFileReader {
 	                }
 	            }
 	        }
-			return this.prFacilities;
+			return this.id2prFacility;
 	}
 }

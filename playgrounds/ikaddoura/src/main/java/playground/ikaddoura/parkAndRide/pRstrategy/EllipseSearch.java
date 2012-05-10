@@ -24,10 +24,13 @@
 package playground.ikaddoura.parkAndRide.pRstrategy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -43,8 +46,9 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  *
  */
 public class EllipseSearch {
+	private static final Logger log = Logger.getLogger(EllipseSearch.class);
 
-	public List<PrWeight> getPrWeights(Network net, List<ParkAndRideFacility> prFacilities, Plan plan) {
+	public List<PrWeight> getPrWeights(int nrPrFacilities, Network net, Map<Id, ParkAndRideFacility> id2prFacility, Plan plan) {
 		List <PrWeight> prWeights = new ArrayList<PrWeight>();
 		
 		Coord homeCoord = null;
@@ -66,70 +70,101 @@ public class EllipseSearch {
 			throw new RuntimeException("Plan doesn't have home or work activity. Aborting...");
 		}
 		
-		System.out.println("Home: " + homeCoord + " / Work: " + workCoord);
-		
-		for (ParkAndRideFacility pr : prFacilities){
-			Id prId = pr.getPrLink3in();
-			Coord prCoord = net.getLinks().get(prId).getToNode().getCoord();	
-			 
-			 double xHomeToPR = Math.abs(homeCoord.getX() - prCoord.getX());
-			 double yHomeToPR = Math.abs(homeCoord.getY() - prCoord.getY());
-			 double distHomeToPR = getHyp(xHomeToPR, yHomeToPR);
-			 
-			 double xWorkToPR = Math.abs(workCoord.getX() - prCoord.getX());
-			 double yWorkToPR = Math.abs(workCoord.getY() - prCoord.getY());
-			 double distWorkToPR = getHyp(xWorkToPR, yWorkToPR);
-
-			 double r = distHomeToPR + distWorkToPR;
-			 double weight = 1 / Math.pow(r, 2);
+		if (nrPrFacilities == 0) {
+			log.info("Getting weights for all ParkAndRide Facilities...");
+			for (ParkAndRideFacility pr : id2prFacility.values()) {
+				Id prLinkId = pr.getPrLink3in();
+				Coord prCoord = net.getLinks().get(prLinkId).getToNode().getCoord();
+				double weight = calculateWeight(homeCoord, workCoord, prCoord);
+				prWeights.add(new PrWeight(pr.getId(), weight));
+			}
+		} else {
 			
-			 prWeights.add(new PrWeight(pr.getId(), weight));
+			if (nrPrFacilities > id2prFacility.size()){
+				throw new RuntimeException("Number of ParkAndRide Facilities to calculate the weight for is higher than number of available ParkAndRide Facilities.");
+			}
+			
+			log.info("Getting weights for " + nrPrFacilities + " randomly chosen ParkAndRide Facilities...");
+			Collection<ParkAndRideFacility> prFacilities = id2prFacility.values();
+			List<ParkAndRideFacility> prFacilityList = new ArrayList<ParkAndRideFacility>();
+			prFacilityList.addAll(prFacilities);
+
+			List<Id> insertedPrIds = new ArrayList<Id>();
+			for (int n = 0; n < nrPrFacilities; ){
+			
+				Random rnd = new Random();
+				int rndKey = (int) (rnd.nextDouble() * prFacilities.size());
+				ParkAndRideFacility pr = prFacilityList.get(rndKey);
+				
+				if (insertedPrIds.contains(pr.getId())){
+					log.info("Weight for ParkAndRide Facility " + pr.getId().toString() + " already calculated. Chosing again... ");
+				} else {
+					log.info("Calculating weight for ParkAndRide Facility " + pr.getId().toString() + "...");					
+
+					Id prLinkId = pr.getPrLink3in();
+					Coord prCoord = net.getLinks().get(prLinkId).getToNode().getCoord();
+					double weight = calculateWeight(homeCoord, workCoord, prCoord);
+					
+					prWeights.add(new PrWeight(pr.getId(), weight));
+					insertedPrIds.add(pr.getId());
+					n++;
+				}
+			}
 		}
 		return prWeights;
 	}
-	
+
+	private double calculateWeight(Coord homeCoord, Coord workCoord, Coord prCoord) {
+
+		double xHomeToPR = Math.abs(homeCoord.getX() - prCoord.getX());
+		double yHomeToPR = Math.abs(homeCoord.getY() - prCoord.getY());
+		double distHomeToPR = getHyp(xHomeToPR, yHomeToPR);
+
+		double xWorkToPR = Math.abs(workCoord.getX() - prCoord.getX());
+		double yWorkToPR = Math.abs(workCoord.getY() - prCoord.getY());
+		double distWorkToPR = getHyp(xWorkToPR, yWorkToPR);
+
+		double r = (distHomeToPR + distWorkToPR) / 1000.0;
+		double weight = 1 / Math.pow(r, 2);
+
+		return weight;
+	}
+
 	private double getHyp(double a, double b) {
 		double aSquare = Math.pow(a, 2);
 		double bSquare = Math.pow(b, 2);
 		return Math.sqrt(aSquare + bSquare);
 	}
 	
-	public Link getRndPrLink(Network net, List<PrWeight> prWeights) {
-
-//		System.out.println("unsortedList:");
-//		for (PREntry entry : prEntries) {
-//			System.out.println("id / value: " + entry.getId() + " / " + entry.getWeight());
-//		}
-
+	public Link getRndPrLink(Network net, Map<Id, ParkAndRideFacility> id2prFacility, List<PrWeight> prWeights) {
+		if (prWeights.isEmpty()){
+			throw new RuntimeException("For no ParkAndRide Facility a weight calculated. Aborting...");
+		}
 		Collections.sort(prWeights);
 
-//		System.out.println("sortedList:");
-//		for (PREntry entry : prEntries) {
-//			System.out.println("id / value: " + entry.getId() + " / " + entry.getWeight());
+//		for (PrWeight prWeight : prWeights) {
+//			System.out.println("id / value: " + prWeight.getId() + " / " + prWeight.getWeight());
 //		}
 		
 		double weightSum = 0.0;
 		for (PrWeight prWeight : prWeights){
 			weightSum = weightSum + prWeight.getWeight();
 		}
-		System.out.println("weightsSum: " + weightSum);
 
 		Random random = new Random();
 		double rnd = random.nextDouble() * weightSum;
-		System.out.println("rnd: " + rnd);
 
-		Id weightedRndId = null;
+		Id chosenPrId = null;
 		double cumulatedWeight = 0.0;
 		for (PrWeight entry : prWeights) {
 			cumulatedWeight = cumulatedWeight + entry.getWeight();
 			if (cumulatedWeight >= rnd) {
-				weightedRndId = entry.getId();
+				chosenPrId = entry.getId();
 				break;
 			}
 		}
-		System.out.println("weightedRndId: " + weightedRndId.toString());
-		
-		Link rndPRLink = net.getLinks().get(weightedRndId);
+		log.info("Chosen ParkAndRide Facility ID: " + chosenPrId.toString());
+		Link rndPRLink = net.getLinks().get(id2prFacility.get(chosenPrId).getPrLink3in());
 		return rndPRLink;
 	}
 

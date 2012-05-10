@@ -49,17 +49,18 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 	private static final Logger log = Logger.getLogger(ParkAndRideAddRemoveStrategy.class);
 
-	ScenarioImpl sc;
-	Network net;
-	Population pop;
-	private List<ParkAndRideFacility> prFacilities = new ArrayList<ParkAndRideFacility>();
+	private ScenarioImpl sc;
+	private Network net;
+	private Population pop;
+	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
+	private int nrOfPrFacilitiesForReplanning = 2; // 0 means all P+R-Facilities are used for replanning
 	
-	public ParkAndRideAddRemoveStrategy(Controler controler, List<ParkAndRideFacility> prFacilities, Map<Id, List<PrWeight>> personId2prWeights) {
+	public ParkAndRideAddRemoveStrategy(Controler controler, Map<Id, ParkAndRideFacility> id2prFacility, Map<Id, List<PrWeight>> personId2prWeights) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
-		this.prFacilities = prFacilities;
+		this.id2prFacility = id2prFacility;
 		this.personId2prWeights = personId2prWeights;
 	}
 
@@ -71,7 +72,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 	public void handlePlan(Plan plan) {
 		if (plan.getPerson().getId().toString().contains("car")) { // checks if car is available
 			
-			log.info("Car is available. Park and Ride is possible.");
+			log.info("Car is available. ParkAndRide is possible.");
 			
 			List<PlanElement> planElements = plan.getPlanElements();
 			List<Integer> planElementIndex = new ArrayList<Integer>();
@@ -89,7 +90,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 			}
 			
 			if (hasParkAndRide == false){
-				log.info("Plan doesn't contain Park and Ride. Adding Park and Ride...");
+				log.info("Plan doesn't contain ParkAndRide. Adding ParkAndRide...");
 
 				// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus den eingelesenen P+R-LinkIDs bzw. der prFacilities)
 				Activity parkAndRide = createParkAndRideActivity(plan);
@@ -99,13 +100,13 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 					PlanElement pe = planElements.get(i);
 					if (pe instanceof Activity) {
 						Activity act = (Activity) pe;
-						if (act.getType().equals("home") && i==0){
+						if (act.getType().toString().equals("home") && i==0){
 							planElements.remove(1);
 							planElements.add(1, pop.getFactory().createLeg(TransportMode.car));
 							planElements.add(2, parkAndRide);
 							planElements.add(3, pop.getFactory().createLeg(TransportMode.pt));
 						} else {
-						throw new RuntimeException(" Activity 'home' is not first planElement. Aborting...");
+							// other activities
 						}
 					}
 				}
@@ -121,13 +122,15 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.car));
 							planElements.add(size-2, parkAndRide);
 							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.pt));	
+						} else {
+							// other activity
 						}
 					} 
 				}
 				
 				// change all carLegs between parkAndRideActivities to ptLegs
 				List <Integer> parkAndRidePlanElementIndex = getPlanElementIndex(planElements);
-				if (parkAndRidePlanElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
+				if (parkAndRidePlanElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities, don't know what's happening...");
 				for (int i = 0; i < planElements.size(); i++) {
 					PlanElement pe = planElements.get(i);
 					if (i>parkAndRidePlanElementIndex.get(0) && i < parkAndRidePlanElementIndex.get(1)){
@@ -142,9 +145,9 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 				
 			}
 			else {
-				log.info("Plan contains a parkAndRide Activity. Removing the ParkAndRide Activity and the belonging ptLeg...");
+				log.info("Plan contains a ParkAndRide Activity. Removing the ParkAndRide Activity and the belonging pt Leg...");
 				
-				if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRideActivities, don't know what's happening...");
+				if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities, don't know what's happening...");
 				 
 				for (int i = 0; i < planElements.size(); i++) {
 					if (i==planElementIndex.get(0)){
@@ -169,16 +172,19 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 		EllipseSearch ellipseSearch = new EllipseSearch();
 
 		if (this.personId2prWeights.get(plan.getPerson().getId()) == null){
-			prWeights = ellipseSearch.getPrWeights(this.net, this.prFacilities, plan);
+			log.info("Weights for ParkAndRide Facilities for person " + plan.getPerson().getId().toString() + " not calculated before. Calculate Weights...");
+			prWeights = ellipseSearch.getPrWeights(this.nrOfPrFacilitiesForReplanning, this.net, this.id2prFacility, plan);
 			this.personId2prWeights.put(plan.getPerson().getId(), prWeights);
 		} else {
+			log.info("Weights for ParkAndRide Facilities for person " + plan.getPerson().getId().toString() + " already calculated before.");
 			prWeights = this.personId2prWeights.get(plan.getPerson().getId());
 		}
 		
-		Link rndPrLink = ellipseSearch.getRndPrLink(this.net, prWeights);
+		log.info("Chose ParkAndRide Facility depending on weight...");
+		Link rndPrLink = ellipseSearch.getRndPrLink(this.net, this.id2prFacility, prWeights);
 		
 		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndPrLink.getToNode().getCoord(), rndPrLink.getId()); 
-		parkAndRide.setMaximumDuration(120.0);
+		parkAndRide.setMaximumDuration(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_DURATION);
 		
 		return parkAndRide;
 	}

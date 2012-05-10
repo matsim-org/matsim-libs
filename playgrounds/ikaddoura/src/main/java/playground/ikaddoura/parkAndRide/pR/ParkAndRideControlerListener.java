@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.ikaddoura.parkAndRide.pR;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,13 +47,13 @@ public class ParkAndRideControlerListener implements StartupListener {
 	
 	Controler controler;
 	AdaptiveCapacityControl adaptiveControl;
-	private List<ParkAndRideFacility> prFacilities = new ArrayList<ParkAndRideFacility>();
+	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
 	
-	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, List<ParkAndRideFacility> prFacilities) {
+	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility) {
 		this.controler = ctl;
 		this.adaptiveControl = adaptiveControl;
-		this.prFacilities = prFacilities;
+		this.id2prFacility = id2prFacility;
 	}
 
 	@Override
@@ -63,12 +62,12 @@ public class ParkAndRideControlerListener implements StartupListener {
 		
 		PlanStrategy strategyAddRemove = new PlanStrategyImpl(new RandomPlanSelector());
 		strategyAddRemove.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategyAddRemove.addStrategyModule(new ParkAndRideAddRemoveStrategy(controler, prFacilities, personId2prWeights)); // only if car is available: P+R added (if plan doesn't contain P+R) or P+R removed (if plan contains P+R)
+		strategyAddRemove.addStrategyModule(new ParkAndRideAddRemoveStrategy(controler, id2prFacility, personId2prWeights)); // only if car is available: P+R added (if plan doesn't contain P+R) or P+R removed (if plan contains P+R)
 		strategyAddRemove.addStrategyModule(new ReRoute(controler));
 		
 		PlanStrategy strategyChangeLocation = new PlanStrategyImpl(new RandomPlanSelector());
 		strategyChangeLocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, prFacilities, personId2prWeights)); // if plan contains P+R: change to other P+R location
+		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, id2prFacility, personId2prWeights)); // if plan contains P+R: change to other P+R location
 		strategyChangeLocation.addStrategyModule(new ReRoute(controler));
 		
 		PlanStrategy strategyTimeAllocation = new PlanStrategyImpl(new RandomPlanSelector());
@@ -77,13 +76,13 @@ public class ParkAndRideControlerListener implements StartupListener {
 
 		StrategyManager manager = this.controler.getStrategyManager() ;
 	
-		manager.addStrategy(strategyAddRemove, 0.1);
+		manager.addStrategy(strategyAddRemove, 100.0);
 		manager.addChangeRequest(90, strategyAddRemove, 0);
 				
-		manager.addStrategy(strategyChangeLocation, 0.1);
+		manager.addStrategy(strategyChangeLocation, 0.0);
 		manager.addChangeRequest(90, strategyChangeLocation, 0);
 		
-		manager.addStrategy(strategyTimeAllocation, 0.1);
+		manager.addStrategy(strategyTimeAllocation, 0.0);
 		manager.addChangeRequest(90, strategyTimeAllocation, 0);
 
 	}
