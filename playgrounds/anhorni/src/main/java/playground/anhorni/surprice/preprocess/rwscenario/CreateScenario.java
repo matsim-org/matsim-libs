@@ -304,14 +304,45 @@ public class CreateScenario {
 				log.info(" person # " + counter);
 			}
 			((PersonImpl)person).getDesires().getActivityDurations().clear();
+			
+			double wDur = 0.0; int wCount = 0;
+			double sDur = 0.0; int sCount = 0;
+			double lDur = 0.0; int lCount = 0;
+			double eDur = 0.0; int eCount = 0;
+			double oDur = 0.0; int oCount = 0;
+			int hCount = 0;
+						
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Activity) {
-					ActivityImpl act = (ActivityImpl)pe;				
+					ActivityImpl act = (ActivityImpl)pe;					
 					if (act.getType().startsWith("w")) {
-						
+						wDur += (act.getEndTime() - act.getStartTime()); wCount++;
+					} else if (act.getType().startsWith("s")) {
+						sDur += (act.getEndTime() - act.getStartTime()); sCount++;
+					} else if (act.getType().startsWith("l")) {
+						lDur += (act.getEndTime() - act.getStartTime()); lCount++;
+					} else if (act.getType().startsWith("e")) {
+						eDur += (act.getEndTime() - act.getStartTime()); eCount++;
+					} else if (act.getType().startsWith("o")) {
+						oDur += (act.getEndTime() - act.getStartTime()); oCount++;
+					} else if (act.getType().startsWith("h")) {
+						hCount++;
 					}
 				}
 			}
+			wDur /= wCount;
+			sDur /= sCount;
+			lDur /= lCount;
+			eDur /= eCount;
+			oDur /= oCount;
+			double hDur = Math.max(10.0, 24.0 * 3600.0 - wDur - sDur - lDur - eDur - oDur);	
+			
+			((PersonImpl)person).getDesires().putActivityDuration("work", wDur);
+			((PersonImpl)person).getDesires().putActivityDuration("shop", sDur);
+			((PersonImpl)person).getDesires().putActivityDuration("leisure", lDur);
+			((PersonImpl)person).getDesires().putActivityDuration("education", eDur);
+			((PersonImpl)person).getDesires().putActivityDuration("other", oDur);
+			((PersonImpl)person).getDesires().putActivityDuration("home", hDur);			
 		}
 	}
 	
