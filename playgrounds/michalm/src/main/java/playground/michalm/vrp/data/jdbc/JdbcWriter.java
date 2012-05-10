@@ -22,6 +22,8 @@ package playground.michalm.vrp.data.jdbc;
 import java.sql.*;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
+
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
@@ -69,9 +71,11 @@ public class JdbcWriter
     private PreparedStatement requestStatusUpdate;
     private PreparedStatement scheduleStatusUpdate;
 
-    private int taskId = 0;
     private PreparedStatement taskTimesUpdate;
     private PreparedStatement taskStatusUpdate;
+    private PreparedStatement scheduleCurrentTaskUpdate;
+
+    private PreparedStatement scheduleCurrentLinkUpdate;
 
 
     public JdbcWriter(MatsimVrpData matsimData, String dbFileName)
@@ -106,7 +110,7 @@ public class JdbcWriter
             vehicleInsert = con.prepareStatement(//
                     "insert into Vehicles (Vehicle_Id, Name, Depot_Id, Capacity, Cost, T0, T1, "
                             + "TimeLimit, VehicleType) " //
-                            + "values (?, ?, ?, ?, ?, ?, ?, ?, 'V')");
+                            + "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             scheduleInsert = con.prepareStatement(//
                     "insert into Schedules (Schedule_Id, Vehicle_Id, Status, CurrentTask_Id, CurrentLink_Id) "
@@ -135,7 +139,7 @@ public class JdbcWriter
                             + "values (?, ?, ?, '" + TaskType.SERVE.name() + "', ?, ?, ?, ?, ?)");
 
             waitTaskInsert = con.prepareStatement(//
-                    "insert into Tasks (Task_Id, Task_Idx, Schedule_Id, TaskType, TaskStatus,"
+                    "insert into Tasks (Task_Id, Task_Idx, Schedule_Id, TaskType, TaskStatus, "
                             + "BeginTime, EndTime, Vertex_Id) " //
                             + "values (?, ?, ?, '" + TaskType.WAIT.name() + "', ?, ?, ?, ?)");
 
@@ -149,7 +153,13 @@ public class JdbcWriter
                     "update Tasks set BeginTime=?, EndTime=? where Schedule_Id=? and Task_Idx=?");
 
             taskStatusUpdate = con.prepareStatement(//
-                    "update Tasks set Status=? where Schedule_Id=? and Task_Idx=?");
+                    "update Tasks set TaskStatus=? where Schedule_Id=? and Task_Idx=?");
+
+            scheduleCurrentTaskUpdate = con.prepareStatement(//
+                    "update Schedules set CurrentTask_Id=? where Schedule_Id=?");
+
+            scheduleCurrentLinkUpdate = con.prepareStatement(//
+                    "update Schedules set CurrentLink_Id=? where Schedule_Id=?");
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
@@ -197,6 +207,7 @@ public class JdbcWriter
                 vehicleInsert.setInt(6, v.getT0());
                 vehicleInsert.setInt(7, v.getT1());
                 vehicleInsert.setInt(8, v.getTimeLimit());
+                vehicleInsert.setString(9, v instanceof DynVehicle ? "V" : "R");
                 vehicleInsert.executeUpdate();
 
                 scheduleInsert.setInt(1, v.getId());
@@ -247,7 +258,8 @@ public class JdbcWriter
     }
 
 
-    public void fillWithTaskForTesting()
+    // currently unused
+    private void fillWithTaskForTesting()
     {
         try {
             PreparedStatement scheduleCurrentTaskUpdate = con.prepareStatement("update Schedules "
@@ -289,7 +301,8 @@ public class JdbcWriter
                             throw new RuntimeException("Unsupported TaskType: " + t.getType());
                     }
 
-                    taskInsert.setInt(1, taskId++);
+                    int taskId = createTaskId(t);
+                    taskInsert.setInt(1, taskId);
                     taskInsert.setInt(2, t.getTaskIdx());
                     taskInsert.setInt(3, v.getId());
                     taskInsert.setString(4, t.getStatus().name());
@@ -298,7 +311,7 @@ public class JdbcWriter
                     taskInsert.executeUpdate();
 
                     if (t.getStatus() == TaskStatus.STARTED) {
-                        scheduleCurrentTaskUpdate.setInt(1, taskId - 1);
+                        scheduleCurrentTaskUpdate.setInt(1, taskId);
                         scheduleCurrentTaskUpdate.setInt(2, v.getId());
                         scheduleCurrentTaskUpdate.executeUpdate();
                     }
@@ -375,7 +388,7 @@ public class JdbcWriter
         }
     }
 
-    
+
     public void schedulesReoptimized()
     {
         try {
@@ -440,7 +453,7 @@ public class JdbcWriter
                             throw new RuntimeException("Unsupported TaskType: " + t.getType());
                     }
 
-                    taskInsert.setInt(1, taskId++);
+                    taskInsert.setInt(1, createTaskId(t));
                     taskInsert.setInt(2, t.getTaskIdx());
                     taskInsert.setInt(3, v.getId());
                     taskInsert.setString(4, t.getStatus().name());
@@ -504,6 +517,12 @@ public class JdbcWriter
     }
 
 
+    private int createTaskId(Task task)
+    {
+        return task.getSchedule().getVehicle().getId() * 10000 + task.getTaskIdx();
+    }
+
+
     public void scheduleUpdated(Schedule schedule)
     {
         try {
@@ -546,32 +565,37 @@ public class JdbcWriter
                 oldTask = Schedules.getPreviousTask(newTask);
             }
 
-            // update Schedule
-            if (oldTask == null) { // planned -> started
+            if (oldTask == null) { // update SCHEDULE: planned -> started
                 scheduleStatusUpdate.setString(1, ScheduleStatus.STARTED.name());
                 scheduleStatusUpdate.setInt(2, scheduleId);
                 scheduleStatusUpdate.executeUpdate();
 
             }
-            else if (newTask == null) { // started -> completed
-                scheduleStatusUpdate.setString(1, ScheduleStatus.COMPLETED.name());
-                scheduleStatusUpdate.setInt(2, scheduleId);
-                scheduleStatusUpdate.executeUpdate();
-            }
-
-            // update Tasks
-            if (oldTask != null) { // started -> performed
+            else {// update TASK: started -> performed
                 taskStatusUpdate.setString(1, TaskStatus.PERFORMED.name());
                 taskStatusUpdate.setInt(2, scheduleId);
                 taskStatusUpdate.setInt(3, oldTask.getTaskIdx());
                 taskStatusUpdate.executeUpdate();
             }
 
-            if (newTask != null) { // planned -> started
+            if (newTask == null) { // update SCHEDULE: started -> completed
+                scheduleStatusUpdate.setString(1, ScheduleStatus.COMPLETED.name());
+                scheduleStatusUpdate.setInt(2, scheduleId);
+                scheduleStatusUpdate.executeUpdate();
+
+                scheduleCurrentTaskUpdate.setNull(1, Types.INTEGER);
+                scheduleCurrentTaskUpdate.setInt(2, scheduleId);
+                scheduleCurrentTaskUpdate.executeUpdate();
+            }
+            else {// update TASK: planned -> started
                 taskStatusUpdate.setString(1, TaskStatus.STARTED.name());
                 taskStatusUpdate.setInt(2, scheduleId);
-                taskStatusUpdate.setInt(3, oldTask.getTaskIdx());
+                taskStatusUpdate.setInt(3, newTask.getTaskIdx());
                 taskStatusUpdate.executeUpdate();
+
+                scheduleCurrentTaskUpdate.setInt(1, createTaskId(newTask));
+                scheduleCurrentTaskUpdate.setInt(2, scheduleId);
+                scheduleCurrentTaskUpdate.executeUpdate();
             }
 
             // update Request
@@ -588,6 +612,21 @@ public class JdbcWriter
                 requestStatusUpdate.setInt(2, newRequest.getId());
                 requestStatusUpdate.executeUpdate();
             }
+
+            con.commit();
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void nextLink(Vehicle vehicle, Id linkId)
+    {
+        try {
+            scheduleCurrentLinkUpdate.setString(1, linkId.toString());
+            scheduleCurrentLinkUpdate.setInt(2, vehicle.getId());
+            scheduleCurrentLinkUpdate.executeUpdate();
 
             con.commit();
         }

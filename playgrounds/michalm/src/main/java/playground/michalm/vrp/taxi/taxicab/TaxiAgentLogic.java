@@ -37,10 +37,10 @@ import playground.michalm.vrp.taxi.TaxiSimEngine;
 public class TaxiAgentLogic
     implements DynAgentLogic
 {
-    private TaxiSimEngine taxiSimEngine;
-    private MatsimVrpGraph vrpGraph;
+    private final TaxiSimEngine taxiSimEngine;
+    private final MatsimVrpGraph vrpGraph;
 
-    private Vehicle vrpVehicle;
+    private final Vehicle vrpVehicle;
     private DynAgent agent;
 
     private Request currentRequest;
@@ -58,7 +58,7 @@ public class TaxiAgentLogic
     public DynActivity init(DynAgent adapterAgent)
     {
         this.agent = adapterAgent;
-        return createBeforeScheduleActivity();
+        return createBeforeScheduleActivity();// INITIAL ACTIVITY (activate the agent in QSim)
     }
 
 
@@ -70,21 +70,19 @@ public class TaxiAgentLogic
 
 
     @Override
-    public void endActivityAndAssumeControl(DynActivity oldActivity, double now)
+    public DynAction computeNextAction(DynAction oldAction, double now)
     {
-        scheduleNextTask(now);
+        if (oldAction instanceof TaxiLeg) {
+            ((TaxiLeg)oldAction).endLeg(now);// handle passenger-related stuff
+        }
+
+        return scheduleNextTask(now);
     }
 
 
     @Override
-    public void endLegAndAssumeControl(DynLeg oldLeg, double now)
-    {
-        if (oldLeg instanceof TaxiLeg) {
-            ((TaxiLeg)oldLeg).endLeg(now);// handle passenger-related stuff
-        }
-
-        scheduleNextTask(now);
-    }
+    public void notifyMoveOverNode(Id oldLinkId, Id newLinkId)
+    {}
 
 
     public void schedulePossiblyChanged()
@@ -93,29 +91,26 @@ public class TaxiAgentLogic
     }
 
 
-    private void scheduleNextTask(double now)
+    private DynAction scheduleNextTask(double now)
     {
         Schedule schedule = vrpVehicle.getSchedule();
         ScheduleStatus status = schedule.getStatus();
-        
+
         if (status == ScheduleStatus.UNPLANNED) {
-            agent.startActivity(createAfterScheduleActivity(), now);// FINAL ACTIVITY
-            return;
+            return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
 
         int time = (int)now;
 
-        if (status == ScheduleStatus.STARTED) {
-            taxiSimEngine.updateScheduleBeforeNextTask(vrpVehicle, now);
-            taxiSimEngine.optimize(now);// TODO: this may be optional (depending on the algorithm)
+        if (status == ScheduleStatus.STARTED) {//TODO: should also be called if PLANNED???????
+            taxiSimEngine.updateAndOptimizeBeforeNextTask(vrpVehicle, now);
         }
 
         Task task = schedule.nextTask();
         status = schedule.getStatus();// REFRESH status!!!
 
         if (status == ScheduleStatus.COMPLETED) {
-            agent.startActivity(createAfterScheduleActivity(), now);// FINAL ACTIVITY
-            return;
+            return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
 
         if (task.getSchedule().getVehicle().getId() == printVehId) {
@@ -135,23 +130,19 @@ public class TaxiAgentLogic
                 // System.err.println("fromLink" + fromLinkId + " toLink: " + toLinkId);
 
                 if (currentRequest != null) {
-                    agent.startLeg(createLegWithPassenger((DriveTask)task, time, currentRequest),
-                            now);
+                    DynLeg leg = createLegWithPassenger((DriveTask)task, time, currentRequest);
                     currentRequest = null;
+                    return leg;
                 }
                 else {
-                    agent.startLeg(createLeg((DriveTask)task, time), now);
+                    return createLeg((DriveTask)task, time);
                 }
-                break;
 
             case SERVE:
-                agent.startActivity(createServeActivity((ServeTask)task, now), now);
-
-                break;
+                return createServeActivity((ServeTask)task, now);
 
             case WAIT:
-                agent.startActivity(TaxiTaskActivity.createWaitActivity((WaitTask)task), now);
-                break;
+                return TaxiTaskActivity.createWaitActivity((WaitTask)task);
 
             default:
                 throw new IllegalStateException();
@@ -212,7 +203,7 @@ public class TaxiAgentLogic
         // if
         // (taxiSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),currentLinkId)
         // == null) {
-        if (taxiSimEngine.internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(),
+        if (taxiSimEngine.getInternalInterface().unregisterAdditionalAgentOnLink(passenger.getId(),
                 currentLinkId) == null) {
             throw new RuntimeException("Passenger id=" + passenger.getId()
                     + "is not waiting for taxi");
@@ -252,8 +243,8 @@ public class TaxiAgentLogic
 
                 passenger.notifyTeleportToLink(passenger.getDestinationLinkId());
                 passenger.endLegAndComputeNextState(now);
-                TaxiAgentLogic.this.taxiSimEngine.internalInterface
-                        .arrangeNextAgentState(passenger);
+                TaxiAgentLogic.this.taxiSimEngine.getInternalInterface().arrangeNextAgentState(
+                        passenger);
             }
         };
     }

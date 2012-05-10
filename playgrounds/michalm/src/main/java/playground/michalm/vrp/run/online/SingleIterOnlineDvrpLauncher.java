@@ -19,69 +19,44 @@
 
 package playground.michalm.vrp.run.online;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.NetworkLegRouter;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 
-import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
-import pl.poznan.put.vrp.dynamic.chart.ChartCreator;
-import pl.poznan.put.vrp.dynamic.chart.RouteChartUtils;
-import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
+import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVrpGraph;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.AlgorithmType;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerFactory;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerWithPreassignment;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerWithReassignment;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerWithoutReassignment;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.util.gis.Schedules2GIS;
-import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.MatsimVrpDataCreator;
+import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.DepotReader;
-import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
-import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathArc;
-import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathFinder;
+import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.data.network.shortestpath.sparse.*;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
-import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
-import playground.michalm.vrp.taxi.TaxiSimEngine;
+import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
 import playground.michalm.vrp.taxi.wal.WalTaxiSimEngine;
 
@@ -91,26 +66,25 @@ public class SingleIterOnlineDvrpLauncher
     private String dirName;
     private String netFileName;
     private String plansFileName;
+    private String taxiCustomersFileName;
     private String depotsFileName;
     private String reqIdToVehIdFileName;
     private String dbFileName;
     private boolean vrpOutFiles;
     private String vrpOutDirName;
 
-    private boolean travelTimesFromEvents;
+    private AlgorithmConfig algorithmConfig;
     private String eventsFileName;
 
     private Scenario scenario;
     private MatsimVrpData data;
 
-    private AlgorithmType algorithmType;
     private TaxiOptimizerFactory optimizerFactory;
-
-    private PersonalizableTravelTime ttimeCalc;
-    private TravelDisutility tcostCalc;
 
     private boolean otfVis;
     public static OTFQueryControl queryControl;
+
+    private boolean wal;
 
 
     private void processArgs(String... args)
@@ -119,8 +93,8 @@ public class SingleIterOnlineDvrpLauncher
             dirName = args[0];
         }
         else {
-            // dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
-            dirName = "D:\\PP-rad\\taxi\\poznan\\";
+            dirName = "D:\\PP-rad\\taxi\\mielec\\";
+            // dirName = "D:\\PP-rad\\taxi\\poznan\\";
         }
 
         if (!dirName.endsWith("\\")) {
@@ -134,35 +108,59 @@ public class SingleIterOnlineDvrpLauncher
             reqIdToVehIdFileName = dirName + "reqIdToVehId";
             dbFileName = dirName + "system_state.mdb";
 
-            travelTimesFromEvents = true;
             // eventsFileName = dirName + "output\\std\\ITERS\\it.10\\10.events.xml.gz";
             eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
 
-            algorithmType = AlgorithmType.RE_ASSIGNMENT;
+            algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
 
             otfVis = !true;
 
             vrpOutFiles = !true;
             vrpOutDirName = dirName + "vrp_output";
+
+            wal = true;
+
+            taxiCustomersFileName = null;
         }
         else {
             netFileName = dirName + "network.xml";
-            plansFileName = dirName + "plans.xml";
-            depotsFileName = dirName + "depots.xml";
+
+            // plansFileName = dirName + "plans.xml";
+            plansFileName = dirName + "output\\std\\ITERS\\it.20\\20.plans.xml.gz";
+
+            // depotsFileName = dirName + "depots-5_taxis-10.xml";
+            depotsFileName = dirName + "depots-5_taxis-15.xml";
             reqIdToVehIdFileName = dirName + "reqIdToVehId";
             dbFileName = dirName + "system_state.mdb";
 
-            travelTimesFromEvents = true;
-            // eventsFileName = dirName + "output\\std\\ITERS\\it.10\\10.events.xml.gz";
-            eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
+            eventsFileName = dirName + "output\\std\\ITERS\\it.20\\20.events.xml.gz";
 
-            algorithmType = AlgorithmType.RE_ASSIGNMENT;
+            algorithmConfig = AlgorithmConfig.NOS_STRAIGHT_LINE;
+            algorithmConfig = AlgorithmConfig.NOS_TRAVEL_DISTANCE;
+            algorithmConfig = AlgorithmConfig.NOS_FREE_FLOW;
+            algorithmConfig = AlgorithmConfig.NOS_24_H;
+            algorithmConfig = AlgorithmConfig.NOS_15_MIN;
+            // algorithmConfig = AlgorithmConfig.OTS_REQ_FREE_FLOW;
+            // algorithmConfig = AlgorithmConfig.OTS_REQ_24_H;
+            // algorithmConfig = AlgorithmConfig.OTS_REQ_15_MIN;
+            // algorithmConfig = AlgorithmConfig.OTS_DRV_FREE_FLOW;
+            // algorithmConfig = AlgorithmConfig.OTS_DRV_24_H;
+            // algorithmConfig = AlgorithmConfig.OTS_DRV_15_MIN;
+            // algorithmConfig = AlgorithmConfig.RES_REQ_FREE_FLOW;
+            // algorithmConfig = AlgorithmConfig.RES_REQ_24_H;
+            // algorithmConfig = AlgorithmConfig.RES_REQ_15_MIN;
+            // algorithmConfig = AlgorithmConfig.RES_DRV_FREE_FLOW;
+            // algorithmConfig = AlgorithmConfig.RES_DRV_24_H;
+            // algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
 
             otfVis = !true;
 
             vrpOutFiles = !true;
             vrpOutDirName = dirName + "vrp_output";
 
+            wal = false;
+
+            taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
         }
 
         if (vrpOutFiles) {
@@ -172,6 +170,7 @@ public class SingleIterOnlineDvrpLauncher
 
 
     private void prepareMatsimData()
+        throws IOException
     {
         Config config = ConfigUtils.createConfig();
         scenario = ScenarioUtils.createScenario(config);
@@ -179,36 +178,53 @@ public class SingleIterOnlineDvrpLauncher
         new MatsimNetworkReader(scenario).readFile(netFileName);
         new MatsimPopulationReader(scenario).readFile(plansFileName);
 
-        ttimeCalc = travelTimesFromEvents ? TravelTimeCalculators.createTravelTimeFromEvents(
-                eventsFileName, scenario) : new FreeSpeedTravelTimeCalculator();
-        tcostCalc = new OnlyTimeDependentTravelDisutilityCalculator(ttimeCalc);
+        List<String> taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
 
-        DijkstraFactory leastCostPathCalculatorFactory = new DijkstraFactory();
-
-        ModeRouteFactory routeFactory = ((PopulationFactoryImpl)scenario.getPopulation()
-                .getFactory()).getModeRouteFactory();
-
-        final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(),
-                scenario.getNetwork(), tcostCalc, ttimeCalc, leastCostPathCalculatorFactory,
-                routeFactory);
-
-        routingAlgorithm.addLegHandler("taxi", new NetworkLegRouter(scenario.getNetwork(),
-                routingAlgorithm.getLeastCostPathCalculator(), routingAlgorithm.getRouteFactory()));
-
-        ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 1,
-                new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-                    @Override
-                    public AbstractPersonAlgorithm getPersonAlgorithm()
-                    {
-                        return new PersonPrepareForSim(routingAlgorithm, (ScenarioImpl)scenario);
-                    }
-                });
+        for (String id : taxiCustomerIds) {
+            Person person = scenario.getPopulation().getPersons().get(scenario.createId(id));
+            Leg leg = (Leg)person.getSelectedPlan().getPlanElements().get(1);
+            leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
+        }
     }
 
 
     private void initMatsimVrpData()
         throws IOException
     {
+        scenario.getConfig().travelTimeCalculator()
+                .setTraveltimeBinSize(algorithmConfig.ttimeSource.travelTimeBinSize);
+
+        PersonalizableTravelTime ttimeCalc;
+        TravelDisutility tcostCalc;
+
+        switch (algorithmConfig.ttimeSource) {
+            case FREE_FLOW_SPEED:
+                ttimeCalc = new FreeSpeedTravelTimeCalculator();
+                break;
+
+            case EVENTS_15_MIN:
+            case EVENTS_24_H:
+                ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
+                        scenario);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        switch (algorithmConfig.tcostSource) {
+            case DISTANCE:
+                tcostCalc = new DistanceAsTravelCost();
+                break;
+
+            case TIME:
+                tcostCalc = new TimeAsTravelCost(ttimeCalc);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+
         data = MatsimVrpDataCreator.create(scenario);
         new DepotReader(scenario, data).readFile(depotsFileName);
 
@@ -223,13 +239,21 @@ public class SingleIterOnlineDvrpLauncher
     private void initOptimizerFactory()
         throws IOException
     {
-        switch (algorithmType) {
-            case NO_RE_ASSIGNMENT:
-                optimizerFactory = TaxiOptimizerWithoutReassignment.FACTORY;
+        switch (algorithmConfig.algorithmType) {
+            case NO_SCHEDULING:
+                optimizerFactory = IdleTaxiDispatcher.createFactory(
+                        algorithmConfig == AlgorithmConfig.NOS_STRAIGHT_LINE,
+                        algorithmConfig.optimizationPolicy);
                 break;
 
-            case RE_ASSIGNMENT:
-                optimizerFactory = TaxiOptimizerWithReassignment.FACTORY;
+            case ONE_TIME_SCHEDULING:
+                optimizerFactory = TaxiOptimizerWithoutReassignment
+                        .createFactory(algorithmConfig.optimizationPolicy);
+                break;
+
+            case RE_SCHEDULING:
+                optimizerFactory = TaxiOptimizerWithReassignment
+                        .createFactory(algorithmConfig.optimizationPolicy);
                 break;
 
             case PRE_ASSIGNMENT:
@@ -243,7 +267,8 @@ public class SingleIterOnlineDvrpLauncher
                     reqIdToVehMapping[i] = vehicles.get(scanner.nextInt());
                 }
 
-                optimizerFactory = TaxiOptimizerWithPreassignment.createFactory(reqIdToVehMapping);
+                optimizerFactory = TaxiOptimizerWithPreassignment.createFactory(reqIdToVehMapping,
+                        algorithmConfig.optimizationPolicy);
                 break;
 
             default:
@@ -263,7 +288,8 @@ public class SingleIterOnlineDvrpLauncher
         QSim sim = QSim.createQSimWithDefaultEngines(scenario, events,
                 new DefaultQSimEngineFactory());
 
-        TaxiSimEngine taxiSimEngine = new WalTaxiSimEngine(sim, data, optimizerFactory, dbFileName);
+        TaxiSimEngine taxiSimEngine = wal ? new WalTaxiSimEngine(sim, data, optimizerFactory,
+                dbFileName) : new TaxiSimEngine(sim, data, optimizerFactory);
         sim.addMobsimEngine(taxiSimEngine);
         sim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
                 new DefaultAgentFactory(sim), sim));
@@ -273,7 +299,7 @@ public class SingleIterOnlineDvrpLauncher
         if (vrpOutFiles) {
             taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 @Override
-								public JFreeChart createChart(VrpData data)
+                public JFreeChart createChart(VrpData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
@@ -281,7 +307,7 @@ public class SingleIterOnlineDvrpLauncher
 
             taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 @Override
-								public JFreeChart createChart(VrpData data)
+                public JFreeChart createChart(VrpData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);
                 }
@@ -307,8 +333,8 @@ public class SingleIterOnlineDvrpLauncher
                     .write();
         }
 
-        ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+        // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
+        // ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
     }
 
 

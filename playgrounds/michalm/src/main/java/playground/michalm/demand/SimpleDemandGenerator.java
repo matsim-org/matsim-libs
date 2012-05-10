@@ -34,6 +34,8 @@ import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
 
+import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
+
 import cern.jet.random.Uniform;
 import cern.jet.random.engine.MersenneTwister;
 
@@ -79,7 +81,7 @@ public class SimpleDemandGenerator
             act.setEndTime(uniform.nextIntFromTo(0, 23 * 60 * 60));
             plan.addActivity(act);
 
-            plan.addLeg(pf.createLeg("taxi"));
+            plan.addLeg(pf.createLeg(TaxiModeDepartureHandler.TAXI_MODE));
 
             link = links.get(uniform.nextIntFromTo(0, linkCount - 1));
             act = pf.createActivityFromLinkId("dummy", link.getId());

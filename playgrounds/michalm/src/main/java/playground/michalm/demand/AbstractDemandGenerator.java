@@ -109,10 +109,22 @@ public class AbstractDemandGenerator
 
     private int id = 0;
 
+    private static int ID_LENGTH = 6;
+
 
     Plan createPlan()
     {
-        Person person = pf.createPerson(scenario.createId(Integer.toString(id++)));
+        String strId = Integer.toString(id);
+        StringBuilder sb = new StringBuilder(ID_LENGTH);
+
+        for (int i = ID_LENGTH - strId.length(); i > 0; i--) {
+            sb.append(' ');
+        }
+
+        sb.append(strId);
+        id++;
+
+        Person person = pf.createPerson(scenario.createId(sb.toString()));
         scenario.getPopulation().addPerson(person);
 
         Plan plan = pf.createPlan();

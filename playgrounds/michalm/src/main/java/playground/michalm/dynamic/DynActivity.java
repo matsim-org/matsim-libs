@@ -20,6 +20,7 @@
 package playground.michalm.dynamic;
 
 public interface DynActivity
+    extends DynAction
 {
     String getActivityType();
 

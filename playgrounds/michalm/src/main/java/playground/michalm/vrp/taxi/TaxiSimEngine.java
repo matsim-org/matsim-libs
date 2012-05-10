@@ -19,26 +19,21 @@
 
 package playground.michalm.vrp.taxi;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
 
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Request;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizerFactory;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.OptimizerEvent;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.OptimizerListener;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
+import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy.OptimizerAction;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.jdbc.JdbcWriter;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 
@@ -46,23 +41,39 @@ import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 public class TaxiSimEngine
     implements MobsimEngine
 {
-    private VrpData vrpData;
+    private final VrpData vrpData;
+    private final Netsim netsim;
+    private final VrpOptimizerFactory optimizerFactory;
 
-    private Netsim netsim;
-
-    private VrpOptimizerFactory optimizerFactory;
+    //////////// begin: TO BE MOVED TO TAXI_OPTIMIZER?
     private TaxiOptimizer optimizer;
-    private TaxiEvaluator taxiEvaluator = new TaxiEvaluator();
+    private final TaxiOptimizationPolicy optimizePolicy;
+    private final TaxiEvaluator taxiEvaluator = new TaxiEvaluator();
+    private final List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
+    //////////// end:   TO BE MOVED TO TAXI_OPTIMIZER?
 
-    private List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
-    private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
+    private final List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
 
-    /**
-     * yyyyyy This should not be public. An easy fix would be to put vrp.taxi.taxicab and vrp.taxi
-     * into the same package and reduce visibility to package level. Alternatively, the internal
-     * interface can be passed to the taxicabs somehow (during initialization?). kai, dec'11
-     */
-    public InternalInterface internalInterface = null;
+    private InternalInterface internalInterface;
+
+
+    public TaxiSimEngine(Netsim netsim, MatsimVrpData data, TaxiOptimizerFactory optimizerFactory)
+    {
+        this.netsim = netsim;
+        this.optimizerFactory = optimizerFactory;
+
+        vrpData = data.getVrpData();
+        optimizePolicy = optimizerFactory.getOptimizationPolicy();
+    }
+
+
+    // TODO should not be PUBLIC!!!
+    // probably all actions on InternalInterface should be carried out via TaxiSimEngine...
+    // but for now, let it be public...
+    public InternalInterface getInternalInterface()
+    {
+        return internalInterface;
+    }
 
 
     @Override
@@ -72,18 +83,11 @@ public class TaxiSimEngine
     }
 
 
-    public TaxiSimEngine(Netsim netsim, MatsimVrpData data, VrpOptimizerFactory optimizerFactory)
-    {
-        this.netsim = netsim;
-        this.optimizerFactory = optimizerFactory;
-
-        vrpData = data.getVrpData();
-    }
-
     public Netsim getMobsim()
     {
         return netsim;
     }
+
 
     @Override
     public void onPrepareSim()
@@ -117,7 +121,13 @@ public class TaxiSimEngine
     }
 
 
-    public void optimize(double now)
+    protected boolean update(Vehicle vrpVehicle)
+    {
+        return optimizer.updateSchedule(vrpVehicle);
+    }
+
+
+    protected void optimize(double now)
     {
         optimizer.optimize();
         System.err.println("Optimization @simTime=" + vrpData.getTime());
@@ -128,9 +138,28 @@ public class TaxiSimEngine
     }
 
 
-    public void updateScheduleBeforeNextTask(Vehicle vrpVehicle, double now)
+    public void updateAndOptimizeBeforeNextTask(Vehicle vrpVehicle, double now)
     {
-        optimizer.updateSchedule(vrpVehicle);
+        OptimizerAction action = optimizePolicy.calculateAction(vrpVehicle.getSchedule());
+
+        switch (action) {
+            case NO:
+                throw new UnsupportedOperationException();// TODO CURRENTLY UNSUPPORTED!!!!!!
+
+            case UPDATE:
+                update(vrpVehicle);
+                break;
+
+            case REOPTIMIZE:
+                if (update(vrpVehicle)) {
+                    optimize(now);
+                }
+
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
 

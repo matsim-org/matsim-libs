@@ -17,16 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.dynamic;
+package playground.michalm.vrp.taxi.wal;
 
 import org.matsim.api.core.v01.Id;
 
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import playground.michalm.dynamic.DynAction;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
+import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 
-public interface DynLeg
-    extends DynAction
+
+public class WalTaxiAgentLogic
+    extends TaxiAgentLogic
 {
-    Id getNextLinkId();
+    private final WalTaxiSimEngine taxiSimEngine;
+    private final Vehicle vrpVehicle;
 
 
-    Id getDestinationLinkId();
+    public WalTaxiAgentLogic(Vehicle vrpVehicle, MatsimVrpGraph vrpGraph,
+            WalTaxiSimEngine taxiSimEngine)
+    {
+        super(vrpVehicle, vrpGraph, taxiSimEngine);
+
+        this.taxiSimEngine = taxiSimEngine;
+        this.vrpVehicle = vrpVehicle;
+    }
+
+    
+    @Override
+    public DynAction computeNextAction(DynAction oldAction, double now)
+    {
+        DynAction nextAction = super.computeNextAction(oldAction, now);
+        taxiSimEngine.nextTask(vrpVehicle);
+        return nextAction;
+    }
+
+    @Override
+    public void notifyMoveOverNode(Id oldLinkId, Id newLinkId)
+    {
+        taxiSimEngine.notifyMoveOverNode(vrpVehicle, oldLinkId, newLinkId);
+    }
 }

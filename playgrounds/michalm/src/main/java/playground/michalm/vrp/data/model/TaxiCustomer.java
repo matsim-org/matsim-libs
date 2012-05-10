@@ -33,11 +33,11 @@ public class TaxiCustomer
     private MobsimAgent passenger;
 
 
-    public TaxiCustomer(int id, Vertex vertex, MobsimAgent passanger)
+    public TaxiCustomer(int id, Vertex vertex, MobsimAgent passenger)
     {
         this.id = id;
         this.vertex = vertex;
-        this.passenger = passanger;
+        this.passenger = passenger;
     }
 
 

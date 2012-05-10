@@ -19,14 +19,5 @@
 
 package playground.michalm.dynamic;
 
-import org.matsim.api.core.v01.Id;
-
-
-public interface DynLeg
-    extends DynAction
-{
-    Id getNextLinkId();
-
-
-    Id getDestinationLinkId();
-}
+public interface DynAction
+{}

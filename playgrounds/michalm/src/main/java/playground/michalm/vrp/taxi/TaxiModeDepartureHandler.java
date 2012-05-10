@@ -34,7 +34,7 @@ import playground.michalm.vrp.data.network.*;
 public class TaxiModeDepartureHandler
     implements DepartureHandler
 {
-    private static final String TAXI_MODE = "taxi";
+    public static final String TAXI_MODE = "taxi";
 
     private MatsimVrpData data;
     private TaxiSimEngine taxiSimEngine;
@@ -83,7 +83,7 @@ public class TaxiModeDepartureHandler
             requests.add(request);
 
             // taxiSimEngine.getMobsim().registerAdditionalAgentOnLink(agent);
-            taxiSimEngine.internalInterface.registerAdditionalAgentOnLink(agent);
+            taxiSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
 
             taxiSimEngine.taxiRequestSubmitted(request, now);
 

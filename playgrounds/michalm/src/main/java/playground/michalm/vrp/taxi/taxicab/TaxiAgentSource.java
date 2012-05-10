@@ -33,6 +33,7 @@ import playground.michalm.vrp.data.model.DynVehicle;
 import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.driver.VrpSchedulePlanFactory;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
+import playground.michalm.vrp.taxi.wal.*;
 
 
 public class TaxiAgentSource
@@ -64,15 +65,25 @@ public class TaxiAgentSource
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
         for (Vehicle vrpVeh : vehicles) {
-            TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, data.getVrpGraph(),
-                    taxiSimEngine);
+            TaxiAgentLogic taxiAgentLogic;
+            
+            if (taxiSimEngine instanceof WalTaxiSimEngine) {//TODO (temporarily, to be removed)
+                taxiAgentLogic = new WalTaxiAgentLogic(vrpVeh, data.getVrpGraph(),
+                        (WalTaxiSimEngine)taxiSimEngine);
+            }
+            else {
+                taxiAgentLogic = new TaxiAgentLogic(vrpVeh, data.getVrpGraph(),
+                        taxiSimEngine);
+            }
+
             taxiSimEngine.addAgentLogic(taxiAgentLogic);
+            
             ((DynVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);
 
             Id id = data.getScenario().createId(vrpVeh.getName());
             Id startLinkId = ((MatsimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
 
-            DynAgent taxiAgent = new DynAgent(id, startLinkId, taxiSimEngine.internalInterface,
+            DynAgent taxiAgent = new DynAgent(id, startLinkId, taxiSimEngine.getInternalInterface(),
                     taxiAgentLogic);
 
             if (isAgentWithPlan) {

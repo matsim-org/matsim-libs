@@ -21,8 +21,7 @@ package playground.michalm.vrp.data.network.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -39,13 +38,16 @@ public class TimeAsTravelCost
 
 
     @Override
-    public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle)
+    public double getLinkTravelDisutility(final Link link, final double time, final Person person,
+            final Vehicle vehicle)
     {
         return travelTime.getLinkTravelTime(link, time);
     }
 
+
     @Override
-    public double getLinkMinimumTravelDisutility(Link link) {
-    	throw new UnsupportedOperationException();
+    public double getLinkMinimumTravelDisutility(Link link)
+    {
+        return link.getLength() / link.getFreespeed();
     }
 }

@@ -39,14 +39,12 @@ public class WalVehicleLogic
         if (status != ScheduleStatus.UNPLANNED) {
             throw new RuntimeException("Status is UNPLANNED");
         }
-        
+
         if (status == ScheduleStatus.STARTED) {
-            taxiSimEngine.updateScheduleBeforeNextTask(vrpVehicle, now);
-            taxiSimEngine.optimize(now);// TODO: this may be optional (depending on the algorithm)
+            taxiSimEngine.updateAndOptimizeBeforeNextTask(vrpVehicle, now);
         }
 
         Task task = schedule.nextTask();
         status = schedule.getStatus();// REFRESH status!!!
     }
 }
-

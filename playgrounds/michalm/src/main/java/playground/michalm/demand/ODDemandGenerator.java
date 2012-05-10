@@ -20,6 +20,7 @@
 package playground.michalm.demand;
 
 import java.io.*;
+import java.util.*;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,6 +45,8 @@ public class ODDemandGenerator
     private final double flowCoeff; // artificial increase/decrease of the flow
     private final double taxiProbability; // for internal flow (i.e. between internal zones: 0-8)
 
+    private final List<Person> taxiCustomers = new ArrayList<Person>();
+
 
     public ODDemandGenerator(String networkFileName, String zonesXMLFileName,
             String zonesShpFileName, String odMatrixFileName, String idField, double hours,
@@ -59,7 +62,6 @@ public class ODDemandGenerator
         // read OD matrix
         zoneCount = fileOrderedZones.size();
         odMatrix = Array2DReader.getDoubleArray(new File(odMatrixFileName), zoneCount);
-
     }
 
 
@@ -82,7 +84,7 @@ public class ODDemandGenerator
 
                 boolean isInternalFlow = oZone.getType() == Type.INTERNAL
                         && dZone.getType() == Type.INTERNAL;
-                
+
                 int count = (int)Math.round(hours * odFlow);
 
                 for (int k = 0; k < count; k++) {
@@ -96,7 +98,10 @@ public class ODDemandGenerator
 
                     if (isInternalFlow && taxiProbability > 0
                             && uniform.nextDoubleFromTo(0, 1) < taxiProbability) {
-                        plan.addLeg(pf.createLeg("taxi"));
+                        // plan.addLeg(pf.createLeg(TaxiModeDepartureHandler.TAXI_MODE));
+
+                        plan.addLeg(pf.createLeg(TransportMode.car));
+                        taxiCustomers.add(plan.getPerson());
                     }
                     else {
                         plan.addLeg(pf.createLeg(TransportMode.car));
@@ -107,6 +112,36 @@ public class ODDemandGenerator
                 }
             }
         }
+    }
+
+
+    private void writeTaxiCustomers(String taxiCustomersFileName)
+        throws IOException
+    {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(taxiCustomersFileName)));
+
+        for (Person p : taxiCustomers) {
+            bw.write(p.getId().toString());
+            bw.newLine();
+        }
+
+        bw.close();
+    }
+
+
+    public static List<String> readTaxiCustomerIds(String taxiCustomersFileName)
+        throws IOException
+    {
+        BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFileName)));
+        List<String> taxiCustomerIds = new ArrayList<String>();
+
+        String line;
+        while ( (line = br.readLine()) != null) {
+            taxiCustomerIds.add(line);
+        }
+
+        br.close();
+        return taxiCustomerIds;
     }
 
 
@@ -125,9 +160,13 @@ public class ODDemandGenerator
         double flowCoeff = 0.5;
         double taxiProbability = 0.01;
 
+        String taxiFileName = dirName + "taxiCustomers_" + ((int) (taxiProbability * 100))
+                + "_pc.txt";
+
         ODDemandGenerator dg = new ODDemandGenerator(networkFileName, zonesXMLFileName,
                 zonesShpFileName, odMatrixFileName, idField, hours, flowCoeff, taxiProbability);
         dg.generate();
         dg.write(plansFileName);
+        dg.writeTaxiCustomers(taxiFileName);
     }
 }

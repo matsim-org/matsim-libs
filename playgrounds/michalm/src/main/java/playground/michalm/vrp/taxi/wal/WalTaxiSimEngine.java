@@ -22,14 +22,14 @@ package playground.michalm.vrp.taxi.wal;
 import java.util.List;
 import java.util.concurrent.*;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizerFactory;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerFactory;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.jdbc.JdbcWriter;
 import playground.michalm.vrp.data.model.DynVehicle;
@@ -40,7 +40,6 @@ import playground.michalm.vrp.taxi.wal.Command.CommandType;
 
 public class WalTaxiSimEngine
     extends TaxiSimEngine
-    implements ScheduleListener
 {
     private JdbcWriter jdbcWriter;
     private String dbFileName;
@@ -60,7 +59,7 @@ public class WalTaxiSimEngine
 
 
     public WalTaxiSimEngine(Netsim netsim, MatsimVrpData data,
-            VrpOptimizerFactory optimizerFactory, String dbFileName)
+            TaxiOptimizerFactory optimizerFactory, String dbFileName)
     {
         super(netsim, data, optimizerFactory);
         this.dbFileName = dbFileName;
@@ -108,8 +107,10 @@ public class WalTaxiSimEngine
 
             System.err.println("Creating a vehicle with the default params...");
             int vehId = vehicles.size();
-            Vehicle vehicle = new VehicleImpl(vehId, "real_" + realVehId, depot, 1, 0, startTime,
-                    endTime, endTime - startTime);
+            // Vehicle vehicle = new VehicleImpl(vehId, "real_" + realVehId, depot, 1, 0, startTime,
+            // endTime, endTime - startTime);
+            Vehicle vehicle = new VehicleImpl(vehId, "real_" + realVehId, depot, 1, 0, 0,
+                    24 * 60 * 60, 24 * 60 * 60);
             vehicles.add(vehicle);
         }
 
@@ -180,18 +181,18 @@ public class WalTaxiSimEngine
             }
         }
 
-        try {
-            long realTime = (System.currentTimeMillis()) % (24 * 60 * 60 * 1000);
-            long simTime = (long) (time * 1000);
-            long simAheadOfReal = simTime - realTime;
-
-            if (simAheadOfReal > 0) {
-                Thread.sleep(simAheadOfReal);
-            }
-        }
-        catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // long realTime = (System.currentTimeMillis()) % (24 * 60 * 60 * 1000);
+        // long simTime = (long) (time * 1000);
+        // long simAheadOfReal = simTime - realTime;
+        //
+        // if (simAheadOfReal > 0) {
+        // Thread.sleep(simAheadOfReal);
+        // }
+        // }
+        // catch (InterruptedException e) {
+        // throw new RuntimeException(e);
+        // }
     }
 
 
@@ -204,17 +205,17 @@ public class WalTaxiSimEngine
         }
         else if (simTime == nextTaskTime) {
             if (schedule.getStatus() == ScheduleStatus.STARTED) {
-                updateScheduleBeforeNextTask(schedule.getVehicle(), now);
-                optimize(now);// TODO: this may be optional (depending on the algorithm)
+                updateAndOptimizeBeforeNextTask(schedule.getVehicle(), now);
             }
 
             schedule.nextTask();
+            nextTask(schedule.getVehicle());
         }
     }
 
 
     @Override
-    public void optimize(double now)
+    protected void optimize(double now)
     {
         super.optimize(now);
 
@@ -226,13 +227,17 @@ public class WalTaxiSimEngine
 
 
     @Override
-    public void updateScheduleBeforeNextTask(Vehicle vrpVehicle, double now)
+    protected boolean update(Vehicle vrpVehicle)
     {
-        super.updateScheduleBeforeNextTask(vrpVehicle, now);
-
-        jdbcWriter.scheduleUpdated(vrpVehicle.getSchedule());
-        mServer.writeCommand(new Command(CommandType.SCHEDULE_UPDATED, vrpVehicle.getId()));
-    }
+        if (super.update(vrpVehicle)) {
+            jdbcWriter.scheduleUpdated(vrpVehicle.getSchedule());
+            mServer.writeCommand(new Command(CommandType.SCHEDULE_UPDATED, vrpVehicle.getId()));
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
 
 
     @Override
@@ -253,17 +258,18 @@ public class WalTaxiSimEngine
     }
 
 
-    @Override
-    public void currentTaskChanged(Schedule schedule)
+    public void nextTask(Vehicle vrpVehicle)
     {
-        jdbcWriter.nextTask(schedule);
-        mServer.writeCommand(new Command(CommandType.NEXT_TASK, schedule.getVehicle().getId()));
+        jdbcWriter.nextTask(vrpVehicle.getSchedule());
+        mServer.writeCommand(new Command(CommandType.NEXT_TASK, vrpVehicle.getId()));
     }
 
 
-    @Override
-    public void taskAdded(Task task)
-    {}
+    public void notifyMoveOverNode(Vehicle vrpVehicle, Id oldLinkId, Id newLinkId)
+    {
+        jdbcWriter.nextLink(vrpVehicle, newLinkId);
+        mServer.writeCommand(new Command(CommandType.NEXT_LINK, vrpVehicle.getId()));
+    }
 
 
     @Override
