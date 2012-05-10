@@ -63,13 +63,28 @@ public class EmissionCostModule {
 		double warmEmissionCosts = 0.0;
 		
 		for(WarmPollutant wp : warmEmissions.keySet()){
-			if(wp.equals(WarmPollutant.NOX)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_NOX;
-			else if(wp.equals(WarmPollutant.NMHC)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_NMVOC;
-			else if(wp.equals(WarmPollutant.SO2)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_SO2;
-			else if(wp.equals(WarmPollutant.PM)) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_PM2_5_EXHAUST;
-			else if(wp.equals(WarmPollutant.CO2_TOTAL)){
-				if(this.considerCO2Costs) warmEmissionCosts += warmEmissions.get(wp) * EURO_PER_GRAMM_CO2;
-				else ; //do nothing
+			if(wp.equals(WarmPollutant.NOX)) {
+				double noxCosts = warmEmissions.get(wp) * EURO_PER_GRAMM_NOX;
+				warmEmissionCosts += noxCosts;
+//				logger.warn("emissions: " + warmEmissions.get(wp) + "\t noxCosts: " + noxCosts);
+			} else if(wp.equals(WarmPollutant.NMHC)) {
+				double nmhcCosts = warmEmissions.get(wp) * EURO_PER_GRAMM_NMVOC;
+				warmEmissionCosts += nmhcCosts;
+//				logger.warn("emissions: " + warmEmissions.get(wp) + "\t nmhcCosts: " + nmhcCosts);
+			} else if(wp.equals(WarmPollutant.SO2)) {
+				double so2Costs = warmEmissions.get(wp) * EURO_PER_GRAMM_SO2;
+				warmEmissionCosts += so2Costs;
+//				logger.warn("emissions: " + warmEmissions.get(wp) + "\t so2Costs: " + so2Costs);
+			} else if(wp.equals(WarmPollutant.PM)) {
+				double pmCosts = warmEmissions.get(wp) * EURO_PER_GRAMM_PM2_5_EXHAUST;
+				warmEmissionCosts += pmCosts;
+//				logger.warn("emissions: " + warmEmissions.get(wp) + "\t  pmCosts: " + pmCosts);
+			} else if(wp.equals(WarmPollutant.CO2_TOTAL)){
+				if(this.considerCO2Costs) {
+					double co2Costs = warmEmissions.get(wp) * EURO_PER_GRAMM_CO2;
+					warmEmissionCosts += co2Costs;
+//					logger.warn("emissions: " + warmEmissions.get(wp) + "\t co2Costs: " + co2Costs);
+				} else ; //do nothing
 			}
 			else ; //do nothing
 		}

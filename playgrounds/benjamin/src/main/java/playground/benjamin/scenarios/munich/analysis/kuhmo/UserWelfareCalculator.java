@@ -88,10 +88,10 @@ public class UserWelfareCalculator {
 				}
 			} else{
 				/* my version: */
-				double expScoreOfPlan = Math.exp(betaLogit * plan.getScore());
+//				double expScoreOfPlan = Math.exp(betaLogit * plan.getScore());
 				/* Kais version: */
-//				bestScore = getBestScore(person);
-//				double expScoreOfPlan = Math.exp(betaLogit * (plan.getScore() - bestScore));
+				bestScore = getBestScore(person);
+				double expScoreOfPlan = Math.exp(betaLogit * (plan.getScore() - bestScore));
 				
 				sumOfExpScore += expScoreOfPlan;
 			}
@@ -105,9 +105,9 @@ public class UserWelfareCalculator {
 			}
 		} else{
 			/* my version: */
-			logsumOfPerson = (1. / (betaLogit * marginalUtlOfMoney)) * Math.log(sumOfExpScore);
+//			logsumOfPerson = (1. / (betaLogit * marginalUtlOfMoney)) * Math.log(sumOfExpScore);
 			/* Kais version: */
-//			logsumOfPerson = bestScore + (1. / (betaLogit * marginalUtlOfMoney)) * Math.log(sumOfExpScore);
+			logsumOfPerson = (bestScore + (1. / betaLogit ) * Math.log(sumOfExpScore)) / marginalUtlOfMoney;
 		}
 		return logsumOfPerson;
 	}

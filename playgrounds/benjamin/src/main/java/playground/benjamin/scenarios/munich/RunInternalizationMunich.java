@@ -61,7 +61,7 @@ public class RunInternalizationMunich {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.getBoolean(considerCO2Costs));
+		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 		EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissionTducf);

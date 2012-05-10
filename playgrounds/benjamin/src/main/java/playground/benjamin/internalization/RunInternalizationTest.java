@@ -97,7 +97,7 @@ public class RunInternalizationTest {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 		
-		emissionCostModule = new EmissionCostModule(1.0);
+		emissionCostModule = new EmissionCostModule(1.0, Boolean.parseBoolean("true"));
 		
 //		installScoringFunctionFactory();
 		installTravelCostCalculatorFactory();
@@ -124,7 +124,7 @@ public class RunInternalizationTest {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(10);
+		ccg.setLastIteration(0);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);

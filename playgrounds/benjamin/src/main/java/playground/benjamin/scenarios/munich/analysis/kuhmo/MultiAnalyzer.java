@@ -52,12 +52,12 @@ import playground.benjamin.utils.BkNumberUtils;
 public class MultiAnalyzer {
 	private static final Logger logger = Logger.getLogger(MultiAnalyzer.class);
 	
-	private static String initialIterationNo = "500";
-	private static String finalIterationNo = "1000";
+	private static String initialIterationNo = "1000";
+	private static String finalIterationNo = "1500";
 	
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase/";
+//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase_1/";
 //	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/";
-//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing/";
 	private static String netFile = runDirectory + "output_network.xml.gz";
 	private static String configFile = runDirectory + "output_config.xml.gz";
 
@@ -79,11 +79,11 @@ public class MultiAnalyzer {
 	}
 
 	private void run() {
-//		calculateUserWelfareChange(netFile, configFile, initialPlansFile, finalPlansFile);
-//		calculateTollRevenueByUserGroup(finalEventsFile);
-//		calculateAverageCarDistanceTraveledByUserGroup(netFile, initialEventsFile, finalEventsFile);
+		calculateUserWelfareChange(netFile, configFile, initialPlansFile, finalPlansFile);
+		calculateTollRevenueByUserGroup(finalEventsFile);
+		calculateAverageCarDistanceTraveledByUserGroup(netFile, initialEventsFile, finalEventsFile);
 		calculateAverageTravelTimePerMode(initialEventsFile, finalEventsFile);
-//		calculateEmissionChangesByUserGroup(initialEmissionEventsFile, finalEmissionEventsFile);
+		calculateEmissionChangesByUserGroup(initialEmissionEventsFile, finalEmissionEventsFile);
 	}
 
 	private void calculateUserWelfareChange(String netFile, String configFile, String initialPlansFile, String finalPlansFile) {
@@ -329,6 +329,8 @@ public class MultiAnalyzer {
 				}
 			}
 		}
+		// TODO: checksum?
+		System.out.println("*******************************************************************\n");
 	}
 
 	private Scenario loadScenario(String netFile, String plansFile) {
@@ -343,5 +345,4 @@ public class MultiAnalyzer {
 		MultiAnalyzer ma = new MultiAnalyzer();
 		ma.run();
 	}
-
 }
