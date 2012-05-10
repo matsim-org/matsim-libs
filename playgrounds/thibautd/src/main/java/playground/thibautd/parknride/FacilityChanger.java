@@ -102,6 +102,9 @@ public class FacilityChanger {
 		if ( !pnrFirst.getType().equals( ParkAndRideConstants.PARKING_ACT ) ) {
 			throw new RuntimeException( "What!? "+pnrFirst.getType()+" in "+subtour );
 		}
+		if ( !pnrLast.getType().equals( ParkAndRideConstants.PARKING_ACT ) ) {
+			throw new RuntimeException( "What!? "+pnrLast.getType()+" in "+subtour );
+		}
 
 		ParkAndRideFacility fac = facilities.getFacilities().get( pnrFirst.getFacilityId() );
 		Collection<ParkAndRideFacility> neighbors = getNeighbors( fac , searchRadius );

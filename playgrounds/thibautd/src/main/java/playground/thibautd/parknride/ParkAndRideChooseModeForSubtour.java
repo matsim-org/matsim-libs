@@ -136,19 +136,21 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		planAnalyzeSubtours.setTripStructureAnalysisLayer( tripStructureAnalysisLayer );
 		planAnalyzeSubtours.run( wrapPlanStructure( planStructure ) );
 
-		List<Integer> pnrSubtours = new ArrayList<Integer>();
+		List< List<PlanElement> > pnrSubtours = new ArrayList< List<PlanElement> >();
 
 		int sub = 0;
 		for ( List<PlanElement> subtour : planAnalyzeSubtours.getSubtours() ) {
-			if ( containsFlaggedPnrTrip( subtour ) ) {
-				pnrSubtours.add( sub );
+			List<PlanElement> cleanSubtour =
+				getSubtourWithoutSubsubtours(
+						sub,
+						planStructure);	
+
+			if ( containsFlaggedPnrTrip( cleanSubtour ) ) {
+				pnrSubtours.add( cleanSubtour );
 			}
 			sub++;
 		}
-		List<PlanElement> choosenSubtour =
-			getSubtourWithoutSubsubtours(
-					pnrSubtours.get( rng.nextInt( pnrSubtours.size() ) ),
-					planStructure);	
+		List<PlanElement> choosenSubtour = pnrSubtours.get( rng.nextInt( pnrSubtours.size() ) );
 
 		reinsertPnrInteraction( choosenSubtour , plan );
 		changer.changePnrFacilityAndRouteSubtour(
