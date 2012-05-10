@@ -330,12 +330,12 @@ public class CreateScenario {
 					}
 				}
 			}
-			wDur /= wCount;
-			sDur /= sCount;
-			lDur /= lCount;
-			eDur /= eCount;
-			oDur /= oCount;
-			double hDur = Math.max(10.0, 24.0 * 3600.0 - wDur - sDur - lDur - eDur - oDur);	
+			wDur /= Math.max(1.0, wCount);
+			sDur /= Math.max(1.0, sCount);
+			lDur /= Math.max(1.0, lCount);
+			eDur /= Math.max(1.0, eCount);
+			oDur /= Math.max(1.0, oCount);
+			double hDur = Math.max(10.0, 24.0 * 3600.0 - wDur - sDur - lDur - eDur - oDur) / hCount;	
 			
 			((PersonImpl)person).getDesires().putActivityDuration("work", wDur);
 			((PersonImpl)person).getDesires().putActivityDuration("shop", sDur);
