@@ -817,8 +817,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			String maxParameterNormChangeStr = config.findParam(
 					BSE_CONFIG_MODULE_NAME, "maxParameterNormChange");
 			if (maxParameterNormChangeStr != null) {
-				int maxParameterNormChange = Integer
-						.parseInt(maxParameterNormChangeStr);
+				double maxParameterNormChange = Double
+						.parseDouble(maxParameterNormChangeStr);
 				calibrator.setMaxParameterNormChange(maxParameterNormChange);
 				System.out.println("BSE:\tmaxParameterNormChange\t="
 						+ maxParameterNormChange);
