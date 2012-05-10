@@ -45,11 +45,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
 
 public class ConvertThurgau2Plans {
-
 	private static final String HOME = "home";
 	private static final String WORK = "work";
 	private static final String LEIS = "leisure";
@@ -66,7 +64,7 @@ public class ConvertThurgau2Plans {
 	private String outputfile;
 	
 	private TreeMap<Id, PersonWeeks> personWeeks = new TreeMap<Id, PersonWeeks>();
-	
+		
 	private final static Logger log = Logger.getLogger(ConvertThurgau2Plans.class);
 	
 	public static void main(final String[] args) {
@@ -287,11 +285,11 @@ public class ConvertThurgau2Plans {
 				this.personWeeks.get(pid).addDay((int) Math.floor(plan.getScore()), plan);
 			}		
 			this.personWeeks.get(pid).setIsWorker();
+			this.personWeeks.get(pid).setIncome((Double)person.getCustomAttributes().get("vot"));
 		}
 	}
 	
 	private void createPersons(String outPath) throws Exception {
-		ObjectAttributes votFactors = new ObjectAttributes();
 		Population population = this.scenario.getPopulation();
 		
 		FileReader fr = new FileReader(this.inputfileF2);
@@ -328,15 +326,21 @@ public class ConvertThurgau2Plans {
 			population.addPerson(person);
 			
 			double votFactor = this.convertIncome2VOT(householdIncome);
-			votFactors.putAttribute(id.toString(), "income", votFactor);
+			person.getCustomAttributes().put("vot", votFactor);
 		}
-		log.info("Writing incomes to " + outPath + "votFactor.xml");
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(votFactors);
-		attributesWriter.writeFile(outPath + "/votFactors.xml");
 	}
 	
 	private double convertIncome2VOT(int householdIncome) {
-		return 1.0;
+		// TODO: more sophisticated conversion here
+		/* 1: below 2000 CHF
+		 * 2: 2001 - 3000 CHF
+		 * 3: 3001 - 4000 CHF
+		 * 4: 4001 - 5000 CHF
+		 * 5: 5001 - 7500 CHF
+		 * 6: 7501 - 10000 CHF
+		 * 7: beyond 10000 CHF 
+		 */		
+		return householdIncome;
 	}
 	
 	private void write() {

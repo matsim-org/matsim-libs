@@ -46,6 +46,8 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;
@@ -94,6 +96,31 @@ public class CreateScenario {
 		this.createToll(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 		
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+		
+		this.writeVOTs(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+	}
+	
+	private void writeVOTs(String outPath) {
+		ObjectAttributes votFactors = new ObjectAttributes();
+		
+		for (PersonWeeks personWeeks : personWeeksMZ.values()) {
+			double r = Math.abs(random.nextGaussian() * Surprice.stdDev + Surprice.mean);
+			
+			double f = personWeeks.getIncome();
+			
+			f = f / 3.0 + 1.0;
+			
+			// income null
+			if (f < 0) {
+				f = 1.0;
+			}			
+			double vot = r * f;
+			votFactors.putAttribute(personWeeks.getPerson().getId().toString(), "vot", vot);
+		}
+		
+		log.info("Writing vots to " + outPath + "/votFactor.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(votFactors);
+		attributesWriter.writeFile(outPath + "/votFactors.xml");
 	}
 	
 	private void createToll(String outPath) {	
@@ -122,10 +149,10 @@ public class CreateScenario {
 				outPath, 
 				tollZone,
 				8.0 * 3600.0,
-				12.0 * 3600.0,
+				18.0 * 3600.0,
 				10.0,
 				"area",
-				"chessboard example"); 
+				"ZH scenario"); 
 		// TODO: different schemes for different days
 	}
 	
@@ -254,7 +281,7 @@ public class CreateScenario {
 					}					
 				}
 			}
-			// assign shop, leisure and education locations according to Balmers neighborhood search
+			// assign shop, leisure, education and other according to Balmers neighborhood search
 			secLocationAssigner.run(person);
 			
 			if (this.personWeeksMZ.get(person.getId()) == null) {

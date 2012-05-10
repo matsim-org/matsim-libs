@@ -35,6 +35,7 @@ public class PersonWeeks {
 	private int currentWeek = - 1;
 	private boolean isWorker = false;
 	private double pweight = 1.0;
+	private double income = 0.0;
 	
 	private final static Logger log = Logger.getLogger(PersonWeeks.class);		
 	
@@ -115,5 +116,13 @@ public class PersonWeeks {
 	}
 	public void setCurrentWeek(int currentWeek) {
 		this.currentWeek = currentWeek;
+	}
+
+	public double getIncome() {
+		return income;
+	}
+
+	public void setIncome(double income) {
+		this.income = income;
 	}
 }
