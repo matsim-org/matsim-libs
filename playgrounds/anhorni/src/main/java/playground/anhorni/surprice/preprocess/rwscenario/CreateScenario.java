@@ -94,9 +94,7 @@ public class CreateScenario {
 		this.merge();
 		
 		this.createToll(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
-		
-		this.createDesiresForPersons();
-		
+				
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 		
 		this.writeVOTs(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
@@ -174,6 +172,9 @@ public class CreateScenario {
 				((PersonImpl)person).setSelectedPlan(plan);				
 			}
 			new Analyzer().run(this.scenario.getPopulation(), outPath, Surprice.days.get(dow));
+			
+			this.createDesiresForPersons();
+			
 			log.info("Writing population with plans ..." + outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
 			new File(outPath + "/" + DayConverter.getDayString(dow) + "/").mkdirs();
 			new PopulationWriter(
@@ -337,12 +338,12 @@ public class CreateScenario {
 			oDur /= Math.max(1.0, oCount);
 			double hDur = Math.max(10.0, 24.0 * 3600.0 - wDur - sDur - lDur - eDur - oDur) / hCount;	
 			
-			((PersonImpl)person).getDesires().putActivityDuration("work", wDur);
-			((PersonImpl)person).getDesires().putActivityDuration("shop", sDur);
-			((PersonImpl)person).getDesires().putActivityDuration("leisure", lDur);
-			((PersonImpl)person).getDesires().putActivityDuration("education", eDur);
-			((PersonImpl)person).getDesires().putActivityDuration("other", oDur);
-			((PersonImpl)person).getDesires().putActivityDuration("home", hDur);			
+			if (wDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("work", wDur);
+			if (sDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("shop", sDur);
+			if (lDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("leisure", lDur);
+			if (eDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("education", eDur);
+			if (oDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("other", oDur);
+			if (hDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("home", hDur);			
 		}
 	}
 	
