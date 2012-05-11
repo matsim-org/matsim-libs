@@ -68,7 +68,7 @@ public class SingleRunControler extends Controler {
       
       ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.config.locationchoice());
 	  ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
-	  ActTypeConverter actTypeConverter = defineFlexibleActivities.createActivityTypeConverter();
+	  ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
             
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
 			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon, actTypeConverter);
