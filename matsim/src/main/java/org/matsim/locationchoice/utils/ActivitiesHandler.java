@@ -33,9 +33,11 @@ public class ActivitiesHandler {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
 	private static final Logger log = Logger.getLogger(ActivitiesHandler.class);
 	private LocationChoiceConfigGroup dcconfig;
+	private ActTypeConverter converter = null;
 
 	public ActivitiesHandler(final LocationChoiceConfigGroup dcconfig) {
 		this.dcconfig = dcconfig;
+		this.createActivityTypeConverter();
 		this.initFlexibleTypes(dcconfig);
 	}
 	
@@ -71,16 +73,16 @@ public class ActivitiesHandler {
 		return scaleEpsilon;
 	}
 	
-	public ActTypeConverter createActivityTypeConverter() {
+	private void createActivityTypeConverter() {
 		String types = this.dcconfig.getFlexibleTypes();
 		String[] tentries = types.split(",", -1);
 		
 		// check if demand = v1
 		if (tentries[0].length() == 1) {
-			return new ActTypeConverter(true);
+			this.converter = new ActTypeConverter(true);
 		}
 		else {
-			return new ActTypeConverter(false);
+			this.converter = new ActTypeConverter(false);
 		}
 	}
 
@@ -94,7 +96,7 @@ public class ActivitiesHandler {
 	private void getFlexibleActs(Plan plan, List<Activity> flexibleActivities) {
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
 			Activity act = (Activity)plan.getPlanElements().get(i);
-			if (this.flexibleTypes.contains(act.getType())) {
+			if (this.flexibleTypes.contains(this.converter.convertType(act.getType()))) {
 				flexibleActivities.add(act);
 			}
 		}
@@ -105,7 +107,7 @@ public class ActivitiesHandler {
 		if (!types.equals("null")) {
 			String[] entries = types.split(",", -1);
 			for (int i = 0; i < entries.length; i++) {
-				this.flexibleTypes.add(entries[i].trim());
+				this.flexibleTypes.add(this.converter.convertType(entries[i].trim()));
 			}
 		}
 	}
@@ -116,6 +118,14 @@ public class ActivitiesHandler {
 
 	public void setFlexibleTypes(HashSet<String> flexibleTypes) {
 		this.flexibleTypes = flexibleTypes;
+	}
+
+	public ActTypeConverter getConverter() {
+		return converter;
+	}
+
+	public void setConverter(ActTypeConverter converter) {
+		this.converter = converter;
 	}
 
 }

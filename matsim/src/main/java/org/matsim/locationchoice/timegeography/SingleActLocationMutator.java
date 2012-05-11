@@ -117,7 +117,8 @@ public class SingleActLocationMutator extends LocationMutator {
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;
 		ArrayList<ActivityFacility> facilitySet =
-			(ArrayList<ActivityFacility>) this.quadTreesOfType.get(act.getType()).get(midPointX, midPointY, radius);
+				(ArrayList<ActivityFacility>) this.quadTreesOfType.get(this.defineFlexibleActivities.getConverter().convertType(act.getType())).
+				get(midPointX, midPointY, radius);
 
 		ActivityFacility facility = null;
 		if (facilitySet.size() > 1) {

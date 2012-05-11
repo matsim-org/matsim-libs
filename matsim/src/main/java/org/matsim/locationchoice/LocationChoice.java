@@ -100,12 +100,13 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private void initLocal() {
 		this.defineFlexibleActivities(this.controler.getConfig().locationchoice());
 		((NetworkImpl) this.network).connect();
+		
+		this.createActivityTypeConverter();
 		this.initTrees(this.controler.getFacilities(), this.controler.getConfig().locationchoice());
 		
 		//only compute oa for best response module
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
 		if (algorithm.equals("bestResponse")) {
-			this.createActivityTypeConverter();
 			this.createEpsilonScaleFactors();
 			this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
 			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues,
@@ -118,7 +119,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 	
 	private void createActivityTypeConverter() {
-		this.actTypeConverter = this.defineFlexibleActivities.createActivityTypeConverter(); 		
+		this.actTypeConverter = this.defineFlexibleActivities.getConverter(); 		
 	}
 	
 	private void createEpsilonScaleFactors() {
