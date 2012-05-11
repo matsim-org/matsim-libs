@@ -61,6 +61,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 	}
 
 	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
+		setPerson( person );
 
 		Set<Node> endNodes = new HashSet<Node>(toNodes.keySet());
 		Set<Node> foundNodes = new HashSet<Node>();

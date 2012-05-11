@@ -525,6 +525,10 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	protected final Person getPerson() {
 		return this.person;
 	}
+
+	protected final void setPerson(final Person person) {
+		this.person = person;
+	}
 	
 	protected final Vehicle getVehicle() {
 		return this.vehicle;
