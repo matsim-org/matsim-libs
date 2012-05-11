@@ -63,6 +63,7 @@ import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
 import utilities.misc.DynamicData;
 import cadyts.calibrators.Calibrator;
+import cadyts.calibrators.analytical.ChoiceParameterCalibrator4;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
@@ -728,6 +729,112 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		// + ChoiceParameterCalibrator4.DEFAULT_MSA_EXPONENT);
 		// }
 		// }
+		// SETTING parameterUpdateInterval
+		{
+			String parameterUpdateIntervalStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "parameterUpdateInterval");
+			if (parameterUpdateIntervalStr != null) {
+				int parameterUpdateInterval = Integer
+						.parseInt(parameterUpdateIntervalStr);
+				calibrator.setParameterUpdateInterval(parameterUpdateInterval);
+				System.out.println("BSE:\tparameterUpdateInterval\t="
+						+ parameterUpdateInterval);
+			} else {
+				System.out
+						.println("BSE:\tparameterUpdateInterval\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_PARAMETER_UPDATE_INTERVAL);
+			}
+		}
+		/*
+		 * finiteDifferenceEps – maxTrustregionIterations –
+		 * maxParameterNormChange – allowIncreasedInitialTrustregion –
+		 * trustregionTerminationGradientNorm
+		 */
+		// SETTING finiteDifferenceEps
+		{
+			String finiteDifferenceEpsStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "finiteDifferenceEps");
+			if (finiteDifferenceEpsStr != null) {
+				double finiteDifferenceEps = Double
+						.parseDouble(finiteDifferenceEpsStr);
+				calibrator.setFiniteDifferenceEps(finiteDifferenceEps);
+				System.out.println("BSE:\tfiniteDifferenceEps\t="
+						+ finiteDifferenceEps);
+			} else {
+				System.out
+						.println("BSE:\tfiniteDifferenceEps\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_FINITE_DIFFERENCE_EPS);
+			}
+		}
+		// SETTING maxTrustregionIterations
+		{
+			String maxTrustregionIterationsStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "maxTrustregionIterations");
+			if (maxTrustregionIterationsStr != null) {
+				int maxTrustregionIterations = Integer
+						.parseInt(maxTrustregionIterationsStr);
+				calibrator
+						.setMaxTrustregionIterations(maxTrustregionIterations);
+				System.out.println("BSE:\tmaxTrustregionIterations\t="
+						+ maxTrustregionIterations);
+			} else {
+				System.out
+						.println("BSE:\tmaxTrustregionIterations\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_MAX_TRUSTREGION_ITERATIONS);
+			}
+		}
+		// SETTING maxParameterNormChange
+		{
+			String maxParameterNormChangeStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "maxParameterNormChange");
+			if (maxParameterNormChangeStr != null) {
+				double maxParameterNormChange = Double
+						.parseDouble(maxParameterNormChangeStr);
+				calibrator.setMaxParameterNormChange(maxParameterNormChange);
+				System.out.println("BSE:\tmaxParameterNormChange\t="
+						+ maxParameterNormChange);
+			} else {
+				System.out
+						.println("BSE:\tmaxParameterNormChange\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_MAX_PARAMETER_NORM_CHANGE);
+			}
+		}
+		// SETTING allowIncreasedInitialTrustregion
+		{
+			String allowIncreasedInitialTrustregionStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "allowIncreasedInitialTrustregion");
+			if (allowIncreasedInitialTrustregionStr != null) {
+				boolean allowIncreasedInitialTrustregion = Boolean
+						.parseBoolean(allowIncreasedInitialTrustregionStr);
+				calibrator
+						.setAllowIncreasedInitialTrustregion(allowIncreasedInitialTrustregion);
+				System.out.println("BSE:\tallowIncreasedInitialTrustregion\t="
+						+ allowIncreasedInitialTrustregion);
+			} else {
+				System.out
+						.println("BSE:\tallowIncreasedInitialTrustregion\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_ALLOW_INCREASED_INITIAL_TRUSTREGION);
+			}
+		}
+		// SETTING trustregionTerminationGradientNorm
+		{
+			String trustregionTerminationGradientNormStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME,
+					"trustregionTerminationGradientNorm");
+			if (trustregionTerminationGradientNormStr != null) {
+				double trustregionTerminationGradientNorm = Double
+						.parseDouble(trustregionTerminationGradientNormStr);
+				calibrator
+						.setTrustregionTerminationGradientNorm(trustregionTerminationGradientNorm);
+				System.out
+						.println("BSE:\ttrustregionTerminationGradientNorm\t="
+								+ trustregionTerminationGradientNorm);
+			} else {
+				System.out
+						.println("BSE:\ttrustregionTerminationGradientNorm\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_TRUSTREGION_TERMINATION_GRADIENT_NORM);
+			}
+		}
 	}
 
 	private void setInitialParametersInCalibrator(Config config) {
