@@ -24,7 +24,6 @@
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 //import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -51,8 +50,7 @@ public class OperatorUserAnalysis {
 		this.network = network;
 	}
 	
-	public void readEvents(Operator operator, Users users){
-		
+	public void readEvents(){
 		EventsManager events = EventsUtils.createEventsManager();
 		this.departureHandler = new DepartureArrivalEventHandler();
 		this.moneyHandler = new MoneyEventHandler();
@@ -66,9 +64,6 @@ public class OperatorUserAnalysis {
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(this.lastEventFile);
-		
-//		linksHandler.setTakt(day);
-		
 	}
 
 	protected double getVehicleHours() {

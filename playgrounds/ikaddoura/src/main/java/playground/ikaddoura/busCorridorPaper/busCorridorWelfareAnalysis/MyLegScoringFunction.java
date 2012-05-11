@@ -22,7 +22,6 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -33,7 +32,6 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.core.utils.misc.Time;
 
 public class MyLegScoringFunction implements LegScoring, BasicScoring {
 
@@ -169,8 +167,8 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 				this.ptLegHandler.getPersonId2IsEgress().put(personId, false);	
 			}
 			
-			// A transit_walk leg shouldn't have a constant because it already has the constant of the pt leg!? (ihab)
-			tmpScore += this.params.constantWalk ;
+// A transit_walk leg shouldn't have a constant because it already has the constant of the pt leg!?! (ihab, benjamin; mai'12)
+//			tmpScore += this.params.constantWalk ;
 
 		} else {
 			throw new RuntimeException("Transport mode " + leg.getMode() + " is unknown for this scenario. Aborting...");

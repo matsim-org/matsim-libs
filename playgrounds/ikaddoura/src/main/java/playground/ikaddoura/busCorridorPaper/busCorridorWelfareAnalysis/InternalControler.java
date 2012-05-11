@@ -43,18 +43,17 @@ public class InternalControler {
 	
 	private final Scenario scenario;
 	private final String directoryExtIt;
-	private final int lastInternalIteration;
 	private final double fare;
 	
 	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
 	private final double PERFORMING = 0.96;
 
-	private final double CONSTANT_CAR = -1.0;
+	private final double CONSTANT_CAR = -0.65;
 	private final double TRAVEL_CAR = 0.0;
 	private final double MONETARY_DISTANCE_COST_RATE_CAR = -0.00040;
 
 	private final double CONSTANT_WALK = 0.0;
-	private final double TRAVEL_WALK = -20.0; // only needed for the ptRouter to avoid transit walks over longer distances, not used for scoring because of the following differentiation in access and egress time
+	private final double TRAVEL_WALK = -20.0; // only needed for the ptRouter to avoid transit walks over longer distances, not used for scoring because of the following differentiation in access and egress time:
 	private final double TRAVEL_PT_ACCESS = -0.0;
 	private final double TRAVEL_PT_EGRESS = -2.34;
 	
@@ -69,10 +68,9 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	public InternalControler(Scenario scenario, String directoryExtIt, int lastInternalIteration, double fare) {
+	public InternalControler(Scenario scenario, String directoryExtIt, double fare) {
 		this.scenario = scenario;
 		this.directoryExtIt = directoryExtIt;
-		this.lastInternalIteration = lastInternalIteration;
 		this.fare = fare;
 		this.ptLegHandler = new PtLegHandler();
 	}
@@ -89,14 +87,15 @@ public class InternalControler {
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		controlerConfGroup.setFirstIteration(0);
-		controlerConfGroup.setLastIteration(this.lastInternalIteration);
+		int lastInternalIteration = this.scenario.getConfig().controler().getLastIteration();
+		controlerConfGroup.setLastIteration(lastInternalIteration);
 		
 		int writeInterval = 0;
-		if (this.lastInternalIteration==0){
+		if (lastInternalIteration == 0){
 			writeInterval = 1;
 		}
 		else {
-			writeInterval = this.lastInternalIteration;
+			writeInterval = lastInternalIteration;
 		}
 		controlerConfGroup.setWriteEventsInterval(writeInterval);
 		controlerConfGroup.setWritePlansInterval(writeInterval);
