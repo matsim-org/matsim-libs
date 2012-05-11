@@ -59,6 +59,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+//import playground.julia.interpolation.EmissionUtils;
 import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
@@ -105,7 +106,7 @@ public class SpatialAveragingForLinkEmissions {
 	Map<Double, Map<Id, Double>> time2CountsPerLink1;
 	Map<Double, Map<Id, Double>> time2CountsPerLink2;
 
-	//TODO probably use these coordinates
+	//coordinates
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static double xMin = 4452550.25;
 	static double xMax = 4479483.33;
@@ -113,12 +114,10 @@ public class SpatialAveragingForLinkEmissions {
 	static double yMax = 5345696.81;
 
 	// define all relevant parameters
-	//TODO uses these noOfBins
 	final int noOfTimeBins = 6; //was 60
 	final int noOfXbins = 160; //was 160
 	final int noOfYbins = 120; //was 120
 	final int minimumNoOfLinksInCell = 0;
-	//TODO what does the smoothing radius do?
 	final double smoothingRadius_m = 500.; 
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean baseCaseOnly = true;
@@ -176,16 +175,16 @@ public class SpatialAveragingForLinkEmissions {
 
 		Collection<Feature> features = new ArrayList<Feature>();
 
+		double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
+		
 		for(double endOfTimeInterval : time2EmissionMapToAnalyze.keySet()){
 			Map<Id, Map<String, Double>> emissionMapToAnalyze = time2EmissionMapToAnalyze.get(endOfTimeInterval);
 			// String outFile = outPathStub + (int) endOfTimeInterval + ".txt";
 			// eWriter.writeLinkLocation2Emissions(listOfPollutants, deltaEmissionsTotal, network, outFile);
 
 			int[][] noOfLinksInCell = new int[noOfXbins][noOfYbins];
-			//TODO which one of these should be the output?
-			//TODO ask Benjamin about weights and weighted values
 			double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
-			double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
+			sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
 
 			//calculate weighted values and weights for every link, every bin
 			for(Link link : network.getLinks().values()){
@@ -204,7 +203,7 @@ public class SpatialAveragingForLinkEmissions {
 						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 							double value = emissionMapToAnalyze.get(linkId).get(pollutant2analyze);
-							//exponentialfunktion ueber den abstand -> gaussglocke
+							//exponential function (distance)
 							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
 							sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
 							sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
@@ -213,7 +212,7 @@ public class SpatialAveragingForLinkEmissions {
 				}
 			}
 			
-			//Skalierung
+			//scaling
 			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
@@ -245,11 +244,15 @@ public class SpatialAveragingForLinkEmissions {
 					}
 				}
 			}	
-			//TODO set output path
-			//TODO momentan fuer jedes Zeitintervall, passende Ifabfrage o ae
-			String outputPathForR = new String(outPathStub + ".Routput.txt");
+
+			String outputPathForR = new String(outPathStub + ".Routput"+endOfTimeInterval+".txt");
 			writeRoutput(sumOfweightedValuesForCell, outputPathForR);
+			
 		}
+
+		//TODO momentan fuer jedes Zeitintervall, passende Ifabfrage o ae
+		String outputPathForR = new String(outPathStub + ".Routput.txt");
+		writeRoutput(sumOfweightedValuesForCell, outputPathForR);
 //		writer.close();
 //		logger.info("Finished writing output to " + outPathStub + "." + pollutant2analyze + ".smoothed.txt");
 
@@ -264,56 +267,83 @@ public class SpatialAveragingForLinkEmissions {
 
 	private void writeRoutput(double[][] sumOfweightedValuesForCell,
 			String outputPathForR) {
-
-		//noOfXbins = 160
-		System.out.println("start r output ");
+		
 		try {
-			System.out.println("trying output");
+//			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
+//			String valueString = new String();
+//			valueString="\t";
+//			
+//			//step size between coordinates
+//			double xDist=(xMax-xMin)/noOfXbins;
+//			double yDist=(yMax-yMin)/noOfYbins;
+//			
+//			//first line containing coordinates
+//			for(int i=0; i<sumOfweightedValuesForCell.length;i++){
+//				valueString+=Double.toString(xMin+i*xDist)+"\t";
+//			}
+//			buffW.write(valueString);
+//			buffW.newLine();
+//			valueString="";
+//			
+//			for(int i = 0; i< sumOfweightedValuesForCell[0].length; i++){
+//				//coordinates as header
+//				valueString+=Double.toString(yMin+i*yDist)+"\t";
+//				
+//				//table contents
+//				for(int j = 0; j<sumOfweightedValuesForCell.length; j++){
+//					try {
+//						valueString+=Double.toString(sumOfweightedValuesForCell[i][j])+"\t"; 
+//					} catch (Exception e) {
+//						//if the array wasnt initialized at [i][j] use 0.0
+//						valueString+="0.0"+"\t";
+//					}
+//				}
+//				//write line + line break
+//				buffW.write(valueString);
+//				buffW.newLine();
+//				valueString="";
+//			}
+//		buffW.close();	
+			
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
-			//inhalt schreiben
 			String valueString = new String();
 			valueString="\t";
-			//schrittweite zwischen den zellen bezueglich der koordinaten
+			
+			//step size between coordinates
 			double xDist=(xMax-xMin)/noOfXbins;
 			double yDist=(yMax-yMin)/noOfYbins;
-			//TODO testen, ob die erste zeile zu lang ist
-			//starte mit "\t", damit links oben in der tabelle ein leeres feld entsteht
-			//TODO sind jetzt x und y vertauscht oder in umgekehrter Reihenfolge?
-			//Kopfzeile
-			for(int i=0; i<sumOfweightedValuesForCell.length;i++){
-				valueString+=Double.toString(xMin+i*xDist)+"\t";
+			
+			//first line containing coordinates
+			for(int i=0; i<sumOfweightedValuesForCell[0].length;i++){
+				valueString+=Double.toString(yMin+i*yDist)+"\t";
 			}
 			buffW.write(valueString);
 			buffW.newLine();
 			valueString="";
 			
-			for(int i = 0; i< sumOfweightedValuesForCell[0].length; i++){
-				//koordinaten als ersten eintrag in die zeile schreiben
-				valueString+=Double.toString(yMin+i*yDist)+"\t";
+			for(int i = 0; i< sumOfweightedValuesForCell.length; i++){
+				//coordinates as header
+				valueString+=Double.toString(xMin+i*xDist)+"\t";
 				
-				//tabelleninhalt schreiben
-				for(int j = 0; j<sumOfweightedValuesForCell.length; j++){
+				//table contents
+				for(int j = 0; j<sumOfweightedValuesForCell[0].length; j++){
 					try {
-						//TODO evtl sollte hier [j][i]stehen
-						valueString+=Double.toString(sumOfweightedValuesForCell[i][j])+"\t"; 
+						valueString+=Double.toString(sumOfweightedValuesForCell[j][i])+"\t"; 
 					} catch (Exception e) {
-						//falls das Feld [i][j] leer ist, setze den Wert 0
-						//TODO exception pruefen
+						//if the array wasnt initialized at [i][j] use 0.0
 						valueString+="0.0"+"\t";
 					}
 				}
-				//schreiben und zeilenumbruch
+				//write line + line break
 				buffW.write(valueString);
 				buffW.newLine();
 				valueString="";
 			}
 		buffW.close();	
 		} catch (IOException e) {
-			System.out.println("failed r output");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.warn("Failed to write output file for R.");
 		}	
-		System.out.println("finsished r output, wrote output to "+ outputPathForR);
+		logger.info("Finished writing output for R to " + outputPathForR);
 	}
 
 	private boolean isInMunichShape(Coord cellCentroid) {
