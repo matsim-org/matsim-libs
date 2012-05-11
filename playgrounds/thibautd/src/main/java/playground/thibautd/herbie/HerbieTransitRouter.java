@@ -121,8 +121,8 @@ public class HerbieTransitRouter implements TransitRouter {
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost =
 				//- (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-				//wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 				distanceScoring.getWalkScore( distance , initialTime );
+			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
 		// find possible end stops
@@ -139,8 +139,8 @@ public class HerbieTransitRouter implements TransitRouter {
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost =
 				// - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-				// wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 				distanceScoring.getWalkScore( distance , initialTime );
+			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
 		// find routes between start and end stops
