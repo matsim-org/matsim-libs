@@ -25,7 +25,6 @@ import herbie.running.scoring.TravelScoringFunction;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -68,6 +67,11 @@ public class HerbieTransitRouterFactory implements TransitRouterFactory {
 					herbieConfig,
 					config,
 					travelScoring);
-		return new TransitRouterImpl(this.config, this.routerNetwork, ttCalculator, ttCalculator);
+		return new HerbieTransitRouter(
+				this.config,
+				this.routerNetwork,
+				ttCalculator,
+				ttCalculator,
+				travelScoring);
 	}
 }

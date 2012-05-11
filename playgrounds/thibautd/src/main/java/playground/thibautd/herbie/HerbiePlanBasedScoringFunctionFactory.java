@@ -37,6 +37,8 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
+import herbie.running.scoring.LegScoringFunction;
+
 /**
  * @author thibautd
  */
@@ -77,7 +79,8 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 		scoringFunctionAccumulator.addScoringFunction(
 				new PlanBasedLegScoringFunction(
 					plan,
-					new HerbieLegWithNetworkPtDistanceScoringFunction(
+					//new HerbieLegWithNetworkPtDistanceScoringFunction(
+					new LegScoringFunction(
 						plan, 
 						params,
 						config,
