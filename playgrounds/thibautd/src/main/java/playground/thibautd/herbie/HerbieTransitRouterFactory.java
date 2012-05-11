@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.scoring.TravelScoringFunction;
 
@@ -62,11 +64,12 @@ public class HerbieTransitRouterFactory implements TransitRouterFactory {
 
 	@Override
 	public TransitRouter createTransitRouter() {
-		HerbieTransitTravelTimeAndDisutility ttCalculator =
-			new HerbieTransitTravelTimeAndDisutility(
-					herbieConfig,
-					config,
-					travelScoring);
+		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
+		//HerbieTransitTravelTimeAndDisutility ttCalculator =
+		//	new HerbieTransitTravelTimeAndDisutility(
+		//			herbieConfig,
+		//			config,
+		//			travelScoring);
 		return new HerbieTransitRouter(
 				this.config,
 				this.routerNetwork,

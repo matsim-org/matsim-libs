@@ -121,7 +121,7 @@ public class HerbieTransitRouter implements TransitRouter {
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost =
 				//- (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-				distanceScoring.getWalkScore( distance , initialTime );
+				- distanceScoring.getWalkScore( distance , initialTime );
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -139,7 +139,7 @@ public class HerbieTransitRouter implements TransitRouter {
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost =
 				// - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-				distanceScoring.getWalkScore( distance , initialTime );
+				- distanceScoring.getWalkScore( distance , initialTime );
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -155,7 +155,7 @@ public class HerbieTransitRouter implements TransitRouter {
 		double directWalkCost =
 			// CoordUtils.calcDistance(fromCoord, toCoord) /
 			// this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-			distanceScoring.getWalkScore( 
+			- distanceScoring.getWalkScore( 
 					directDist,
 					directWalkTime);
 
