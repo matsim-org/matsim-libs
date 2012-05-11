@@ -47,7 +47,7 @@ public class TreesBuilder {
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	
-	private ActTypeConverter converter;
+	private ActTypeConverter converter = new ActTypeConverter(true);
 
 
 	public TreesBuilder(HashSet<String> flexibleTypes, Network network, LocationChoiceConfigGroup config) {
