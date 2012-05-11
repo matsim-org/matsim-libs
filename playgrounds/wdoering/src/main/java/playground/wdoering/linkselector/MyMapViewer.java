@@ -35,13 +35,16 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
@@ -69,6 +72,16 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private Thread thread;
 
 	private HashMap<Id, Coord[]> links;
+
+	private GeotoolsTransformation ct;
+	
+	private Point currentMousePosition = null;
+
+	private CoordImpl mousePoint;
+
+	private Object GeoPosition;
+
+	private GeoPosition wPoint; 
 
 	public MyMapViewer() {
 		super();
@@ -125,16 +138,21 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	@Override
 	public void mousePressed(MouseEvent e) {
 		
-		if (e.getButton() == MouseEvent.BUTTON1) {
+		if (e.getButton() == MouseEvent.BUTTON1)
+		{
 			this.editMode = true;
-			if (this.thread != null) {
+			if (this.thread != null)
+			{
 //				System.out.println("interrupt");
 				this.thread.stop();
 			}
+			
 			this.snapper.reset();
+			
 			Rectangle b = this.getViewportBounds();
 			Point p0 = e.getPoint();
 			Point wldPoint = new Point(p0.x+b.x,p0.y+b.y);
+			
 			this.c0 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
 		}
 		
@@ -158,12 +176,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			Point p1 = e.getPoint();
 			Rectangle b = this.getViewportBounds();
 			Point wldPoint = new Point(p1.x+b.x,p1.y+b.y);
+			
 			this.c1 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
 			this.snapper.setCoordinates(this.c0,this.c1);
 //			this.thread.interrupt();
 			this.thread = new Thread(this.snapper);
 			this.thread.start();
-//			this.thread.
 			repaint();
 		}
 	}
@@ -207,39 +225,56 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	}
 
 	@Override
-	public void mouseDragged(MouseEvent arg0) {
-		if (!this.editMode) {
-			for (MouseMotionListener m : this.mm) {
+	public void mouseDragged(MouseEvent arg0)
+	{
+		if (!this.editMode)
+		{
+			for (MouseMotionListener m : this.mm)
+			{
 				m.mouseDragged(arg0);
 			}
+			
 		} else {
-			Point p = arg0.getPoint();
-			Rectangle b = this.getViewportBounds();
-			Point wldPoint = new Point(p.x+b.x,p.y+b.y);
-			this.c1 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
+//			Point p = arg0.getPoint();
+//			Rectangle b = this.getViewportBounds();
+//			Point wldPoint = new Point(p.x+b.x,p.y+b.y);
+//			this.c1 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
 			repaint();
 		}
 		
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent arg0) {
-		if (!this.editMode) {
-			for (MouseMotionListener m : this.mm) {
+	public void mouseMoved(MouseEvent arg0)
+	{
+		
+		if (!this.editMode)
+		{
+//			System.out.println("x: " + arg0.getX() + " | y: " + arg0.getY());
+			
+			this.currentMousePosition = new Point(arg0.getX(), arg0.getY());
+			repaint();
+			
+			for (MouseMotionListener m : this.mm)
+			{
 				m.mouseMoved(arg0);
 			}
 		}		
 	}
 
 	@Override
-	public void paint(Graphics g) {
+	public void paint(Graphics g)
+	{
 		super.paint(g);
-		if (this.c0 != null && this.c1 != null) {
+		if (this.c0 != null && this.c1 != null)
+		{
 			Rectangle b = this.getViewportBounds();
 			Point2D wldPoint0 = this.getTileFactory().geoToPixel(this.c0, this.getZoom());
 			Point2D wldPoint1 = this.getTileFactory().geoToPixel(this.c1, this.getZoom());
+			
 			Point sc0 = new Point((int)(wldPoint0.getX() - b.x), (int)(wldPoint0.getY() - b.y));
 			Point sc1 = new Point((int)(wldPoint1.getX() - b.x), (int)(wldPoint1.getY() - b.y));
+			
 			g.setColor(Color.black);
 			Graphics2D g2D = (Graphics2D) g;     
 		    g2D.setStroke(new BasicStroke(5F));
@@ -250,25 +285,73 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			Polygon p = this.snapper.getPolygon();
 			
 			if (links==null)
+			{
 				links = this.snapper.getNetworkLinks();
+//				ct =  new GeotoolsTransformation("EPSG:32633", "EPSG:4326"); 
+				
+			}
 				
 			if (links!=null)
+				
+				wPoint = null;
+			
+				if (currentMousePosition!=null)
+				{
+					Point wldPoint = new Point(currentMousePosition.x+b.x,currentMousePosition.y+b.y);
+					wPoint = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
+					
+				}
+				
 				for (Coord[] fromTo : links.values())
 				{
-					
+//					System.out.println("from: " + fromTo[0] + "| to: " + fromTo[1]);
 					
 					Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(fromTo[0].getY(),fromTo[0].getX()), this.getZoom());
 					Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(fromTo[1].getY(), fromTo[1].getX()), this.getZoom());
+					
+//					System.out.println("from2d before b: " + from2D.getX() + ", " + from2D.getY());
 					
 					int x1 = (int) (from2D.getX()-b.x);
 					int y1 = (int) (from2D.getY()-b.y);
 					int x2 = (int) (to2D.getX()-b.x);
 					int y2 = (int) (to2D.getY()-b.y);
 					
-//					System.out.println(x1 + " ,-,-,-,- " + y1);
 					
 					g2D.setStroke(new BasicStroke(5F));
 					g.setColor(Color.yellow);
+					
+					if (wPoint!=null)
+					{
+//						int mouseX = currentMousePosition.x;
+//						int mouseY = currentMousePosition.y;
+//						
+//						int maxX = Math.max(x2,x1);
+//						int maxY = Math.max(y2,y1);
+//						
+//						int minX = Math.min(x2,x1);
+//						int minY = Math.min(y2,y1);
+						
+						int x =(x2-x1);
+						int y =(y2-y1);
+						
+						CoordImpl wCoord = new CoordImpl(wPoint.getLongitude(), wPoint.getLatitude());
+						Collection<Node> nodes = this.snapper.getNearestNodes(wCoord);
+						
+						for (Node node : nodes)
+						{
+							System.out.println("_:_:_:_:_:_" + node.getId());
+						}
+						
+//						if ( (y2-y1)*x3 + (-(x2-x1) * y3 ) == (y2-y1)*x2 + (-(x2-x1)*y2))
+//						if ((mouseX <= maxX) && (mouseX >= minX) && (mouseY <= maxY) && (mouseY >= minY))
+						{
+							g2D.setStroke(new BasicStroke(8F));
+							g.setColor(Color.blue);
+						
+						}
+						
+					}
+					
 					g.drawLine(x1,y1,x2,y2);
 					g.setColor(Color.CYAN);
 				}
@@ -291,11 +374,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				g.fillPolygon(x, y, p.getExteriorRing().getNumPoints());
 				
 				
-			} else {
-				int r = (int) (Math.sqrt(Math.pow(sc0.x-sc1.x, 2)+Math.pow(sc0.y-sc1.y, 2))+0.5);
-				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
-				g.setColor(new Color(255,0,0,128));
-				g.fillOval(sc0.x-r+1, sc0.y-r+1, 2*r-2, 2*r-2);
+			}
+			else
+			{
+//				int r = (int) (Math.sqrt(Math.pow(sc0.x-sc1.x, 2)+Math.pow(sc0.y-sc1.y, 2))+0.5);
+//				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
+//				g.setColor(new Color(255,0,0,128));
+//				g.fillOval(sc0.x-r+1, sc0.y-r+1, 2*r-2, 2*r-2);
 			}
 		}
 	}

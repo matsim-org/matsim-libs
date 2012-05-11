@@ -46,6 +46,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.algorithms.PolygonalCircleApproximation;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -103,7 +104,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		this.targetS = c.global().getCoordinateSystem();
 		this.sc = ScenarioUtils.createScenario(c);
 		
-		CoordinateTransformation ct =  new GeotoolsTransformation("EPSG:4326", c.global().getCoordinateSystem());
+		GeotoolsTransformation ct = new GeotoolsTransformation("EPSG:4326", c.global().getCoordinateSystem());
 		OsmNetworkReader reader = new OsmNetworkReader(this.sc.getNetwork(), ct, true);
 		reader.setKeepPaths(true);
 		reader.parse(this.net);
@@ -134,7 +135,8 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	}
 
 	@Override
-	public void run() {
+	public void run()
+	{
 		CoordinateReferenceSystem sourceCRS = MGC.getCRS("EPSG:4326");
 //		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:3395");
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(this.targetS);
@@ -222,20 +224,36 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	public Collection<Node> getNearestNodes(Coord coord)
+	{
+		Collection<Node> nodes = ((NetworkImpl)sc.getNetwork()).getNearestNodes(coord, 1);
+		return nodes;
+	}
+	
+	
 
 	public HashMap<Id, Coord[]> getNetworkLinks()
 	{
+		
 		if (this.sc!=null)
 		{
-			
+			GeotoolsTransformation ct = new GeotoolsTransformation(sc.getConfig().global().getCoordinateSystem(),"EPSG:4326");
 			HashMap<Id, Coord[]> links = new HashMap<Id, Coord[]>();
 			
 //			Map<Id, ? extends org.matsim.api.core.v01.network.Node> networkNodes = sc.getNetwork().getNodes();
 			Map<Id, ? extends org.matsim.api.core.v01.network.Link> networkLinks = sc.getNetwork().getLinks();
 			
+			Coord coord = null;
+			
+//			LinkImpl x = ((NetworkImpl)sc.getNetwork()).getNearestLink(coord);
+			
 			for (Link link: networkLinks.values())
 			{
-				Coord[] fromTo =  {link.getFromNode().getCoord(), link.getToNode().getCoord()};			
+				Coord[] fromTo =  {ct.transform(link.getFromNode().getCoord()), ct.transform(link.getToNode().getCoord())};
+				
+//				System.out.println("from: " + fromTo[0] + "| to: " + fromTo[1]);
+				
 				links.put(link.getId(),fromTo);
 				
 			}

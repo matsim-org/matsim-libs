@@ -21,7 +21,9 @@
 package playground.wdoering.linkselector;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,13 +33,17 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.JLabel;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
+
+
 
 public class EvacuationAreaSelector implements ActionListener{
 
@@ -48,8 +54,15 @@ public class EvacuationAreaSelector implements ActionListener{
 	private MyMapViewer jMapViewer;
 	private JButton saveButton;
 	private JButton openBtn;
+	private JTextField blockField;
 
 	private ShapeToStreetSnapperThreadWrapper snapper;
+
+	private JPanel blockPanel;
+
+	private JLabel blockLabel;
+
+	private JButton blockButton;
 
 	/**
 	 * Launch the application.
@@ -102,6 +115,24 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 		JPanel panel = new JPanel();
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
+		
+		blockPanel = new JPanel(new GridLayout(22, 1));
+		
+		JPanel innerBlockPanel = new JPanel(new BorderLayout());
+		
+		blockLabel = new JLabel(" Gesperrt ab ");
+		blockField = new JTextField("12:00");
+		blockButton = new JButton("ok");
+		
+		blockPanel.setSize(new Dimension(80, 200));
+		
+		blockPanel.add(blockLabel);
+		blockPanel.add(blockField);
+		blockPanel.add(blockButton);
+		
+		innerBlockPanel.add(blockPanel, BorderLayout.CENTER);
+		
+		this.frame.getContentPane().add(innerBlockPanel, BorderLayout.EAST);
 		
 		this.openBtn = new JButton("Open");
 		panel.add(this.openBtn);
