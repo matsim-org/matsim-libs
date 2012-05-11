@@ -214,7 +214,6 @@ public class FareHandler implements
 		ScenarioImpl scenario = event.getControler().getScenario();
 		policies = new FarePolicies(scenario);
 		scenario.addScenarioElement(policies);
-		scenario.addScenarioElement(new AgentSensitivities(scenario));
 	}
 	
 	@Override

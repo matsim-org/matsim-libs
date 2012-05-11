@@ -1,5 +1,7 @@
 package playground.pbouman.transitfares;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
@@ -10,6 +12,7 @@ import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
 
+import playground.pbouman.agentproperties.AgentProperties;
 import playground.pbouman.transitfares.FarePolicies.DiscountInterval;
 
 public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime, TravelDisutility
@@ -19,6 +22,23 @@ public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime
 	
 	private ScenarioImpl scenario;
 	private TransitRouterNetworkTravelTimeAndDisutility calc;
+	
+	private Map<String,AgentProperties> agentProps;
+	private double minimumMoneyUtility;
+	
+	public TransitFareRouterNetworkTimeAndDisutilityCalc(final TransitRouterConfig config, final ScenarioImpl scenario, Map<String,AgentProperties> props)
+	{
+		this(config,scenario);
+		if (props != null)
+		{
+			agentProps = props;
+			minimumMoneyUtility = Double.POSITIVE_INFINITY;
+			for (AgentProperties ap : props.values())
+			{
+				minimumMoneyUtility = Math.min(minimumMoneyUtility,ap.getMoneyUtility());
+			}
+		}
+	}
 	
 	public TransitFareRouterNetworkTimeAndDisutilityCalc(final TransitRouterConfig config, final ScenarioImpl scenario)
 	{
@@ -77,17 +97,26 @@ public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime
 		}
 		
 		double fac = 1;
-		AgentSensitivities as = null;
-		if (scenario.getScenarioElement(AgentSensitivities.class) != null)
-			as = (AgentSensitivities) scenario.getScenarioElement(AgentSensitivities.class);
-		if (as != null)
-		{
-			fac = as.getSensitivity(person.getId());
-		}
-
 		double costDisutility = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		
-		return fac * cost * (-costDisutility);
+		if (agentProps != null && person != null)
+		{
+			costDisutility = agentProps.get(person.getId().toString()).getMoneyUtility();
+		}
+		else
+		{
+			AgentSensitivities as = null;
+			if (scenario.getScenarioElement(AgentSensitivities.class) != null)
+				as = (AgentSensitivities) scenario.getScenarioElement(AgentSensitivities.class);
+			if (as != null)
+			{
+				fac = as.getSensitivity(person.getId());
+			}
+		}
+
+		
+		
+		return fac * cost * costDisutility;
 
 	}
 
@@ -134,17 +163,26 @@ public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime
 		}
 		
 		double fac = 1;
-		AgentSensitivities as = null;
-		if (scenario.getScenarioElement(AgentSensitivities.class) != null)
-			as = (AgentSensitivities) scenario.getScenarioElement(AgentSensitivities.class);
-		if (as != null)
-		{
-			fac = as.getMinimumSensitivity();
-		}
-
 		double costDisutility = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		
-		return fac * cost * (-costDisutility);
+		if (agentProps != null)
+		{
+			costDisutility = minimumMoneyUtility;
+		}
+		else
+		{
+			AgentSensitivities as = null;
+			if (scenario.getScenarioElement(AgentSensitivities.class) != null)
+				as = (AgentSensitivities) scenario.getScenarioElement(AgentSensitivities.class);
+			if (as != null)
+			{
+				fac = as.getMinimumSensitivity();
+			}
+		}
+
+		
+		
+		return fac * cost * costDisutility;
 
 	}
 
