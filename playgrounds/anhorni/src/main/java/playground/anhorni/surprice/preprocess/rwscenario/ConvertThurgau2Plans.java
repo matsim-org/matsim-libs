@@ -120,7 +120,7 @@ public class ConvertThurgau2Plans {
 		
 		// departure time (min => sec.)
 		String dp[] = (entrs[6].trim()).split(":", -1);
-		int departure = Integer.parseInt(dp[0].trim()) * 3600 + Integer.parseInt(dp[1].trim()) * 60;
+		int departure = Integer.parseInt(dp[0].trim()) * 3600 + Integer.parseInt(dp[1].trim()) * 60 + 5; // add 5 seconds to not have div by 0
 		
 		// arrival time (min => sec.)
 		String ar[] = (entrs[7].trim()).split(":", -1);
