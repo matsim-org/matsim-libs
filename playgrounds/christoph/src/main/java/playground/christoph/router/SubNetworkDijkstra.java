@@ -45,7 +45,7 @@ import playground.christoph.router.util.KnowledgeTools;
  */
 public class SubNetworkDijkstra extends Dijkstra {
 	
-	private Person person;
+	//private Person person;
 	private KnowledgeTools knowledgeTools = new KnowledgeTools();
 	
 	public SubNetworkDijkstra(Network network, TravelDisutility costFunction, TravelTime timeFunction) {
@@ -56,9 +56,9 @@ public class SubNetworkDijkstra extends Dijkstra {
 		this.network = network;
 	}
 	
-	public void setPerson(Person person) {
-		this.person = person;
-	}
+	//public void setPerson(Person person) {
+	//	this.person = person;
+	//}
 	
 	/*
 	 * The handed over fromNode and toNode are Nodes from the
@@ -67,6 +67,7 @@ public class SubNetworkDijkstra extends Dijkstra {
 	 */
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
+		setPerson( person );
 		Network subNetwork = this.knowledgeTools.getSubNetwork(person, network);
 		
 		Node newFromNode = subNetwork.getNodes().get(fromNode.getId());

@@ -61,7 +61,8 @@ public class SubNetworkDijkstraTravelCostWrapper implements TravelDisutility, Cl
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle)
 	{
-		if (subNetworkDijkstra != null) subNetworkDijkstra.setPerson(person);
+		// the person is now passed as an argument to Dijkstra
+		// if (subNetworkDijkstra != null) subNetworkDijkstra.setPerson(person);
 		return travelCost.getLinkTravelDisutility(link, time, person, vehicle);
 	}
 	
