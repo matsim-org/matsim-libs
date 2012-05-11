@@ -30,16 +30,18 @@ public class AlgorithmConfig
 {
     public enum TravelTimeSource
     {
-        FREE_FLOW_SPEED(24 * 60 * 60), // no eventsFileName
-        EVENTS_24_H(24 * 60 * 60), // based on eventsFileName, with 24-hour time interval
-        EVENTS_15_MIN(15 * 60); // based on eventsFileName, with 15-minute time interval
+        FREE_FLOW_SPEED(24 * 60 * 60, 1), // no eventsFileName
+        EVENTS_24_H(24 * 60 * 60, 1), // based on eventsFileName, with 24-hour time interval
+        EVENTS_15_MIN(15 * 60, 24 * 4); // based on eventsFileName, with 15-minute time interval
 
         final int travelTimeBinSize;
+        final int numSlots;
 
 
-        private TravelTimeSource(int travelTimeBinSize)
+        private TravelTimeSource(int travelTimeBinSize, int numSlots)
         {
             this.travelTimeBinSize = travelTimeBinSize;
+            this.numSlots = numSlots;
         }
     }
 

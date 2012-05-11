@@ -108,7 +108,7 @@ public class DepotReader
 
         String name = atts.getValue("name");
         if (name == null) {
-            name = "D_" + id;
+            name = "V_" + id;
         }
 
         int capacity = getInt(atts, "id", 1);
@@ -116,8 +116,8 @@ public class DepotReader
         double cost = getDouble(atts, "cost", 0);
 
         int t0 = getInt(atts, "t0", 0);
-        int t1 = getInt(atts, "t1", 86400); // default: 24 * 3600
-        int tLimit = getInt(atts, "tLimit", t1 - t0); // default: t1-t0
+        int t1 = getInt(atts, "t1", 24 * 60 * 60);
+        int tLimit = getInt(atts, "tLimit", t1 - t0);
 
         vehicles.add(new DynVehicle(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
     }

@@ -148,7 +148,7 @@ public class ODDemandGenerator
     public static void main(String[] args)
         throws ConfigurationException, IOException, SAXException, ParserConfigurationException
     {
-        String dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
+        String dirName = "D:\\PP-rad\\taxi\\mielec\\";
         String networkFileName = dirName + "network.xml";
         String zonesXMLFileName = dirName + "zones.xml";
         String zonesShpFileName = dirName + "GIS\\zones_with_no_zone.SHP";
@@ -158,7 +158,7 @@ public class ODDemandGenerator
 
         double hours = 2;
         double flowCoeff = 0.5;
-        double taxiProbability = 0.01;
+        double taxiProbability = 0.10;
 
         String taxiFileName = dirName + "taxiCustomers_" + ((int) (taxiProbability * 100))
                 + "_pc.txt";

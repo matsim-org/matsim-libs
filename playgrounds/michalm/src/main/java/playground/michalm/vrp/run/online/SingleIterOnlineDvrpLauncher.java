@@ -42,10 +42,12 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 
+import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVrpGraph;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
@@ -104,8 +106,12 @@ public class SingleIterOnlineDvrpLauncher
         if (args.length == 1) {// Wal - do not change the following block
             netFileName = dirName + "network.xml";
             plansFileName = dirName + "plans.xml";
+
             depotsFileName = dirName + "depots.xml";
             reqIdToVehIdFileName = dirName + "reqIdToVehId";
+
+            taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
+
             dbFileName = dirName + "system_state.mdb";
 
             // eventsFileName = dirName + "output\\std\\ITERS\\it.10\\10.events.xml.gz";
@@ -120,7 +126,6 @@ public class SingleIterOnlineDvrpLauncher
 
             wal = true;
 
-            taxiCustomersFileName = null;
         }
         else {
             netFileName = dirName + "network.xml";
@@ -130,16 +135,24 @@ public class SingleIterOnlineDvrpLauncher
 
             // depotsFileName = dirName + "depots-5_taxis-10.xml";
             depotsFileName = dirName + "depots-5_taxis-15.xml";
-            reqIdToVehIdFileName = dirName + "reqIdToVehId";
-            dbFileName = dirName + "system_state.mdb";
+            taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
+
+            // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
+            // depotsFileName = dirName + "depots-5_taxis-150.xml";
+
+            taxiCustomersFileName = dirName + "taxiCustomers_20_pc.txt";
+            depotsFileName = dirName + "depots-5_taxis-500.xml";
+
+            // reqIdToVehIdFileName = dirName + "reqIdToVehId";
+            // dbFileName = dirName + "system_state.mdb";
 
             eventsFileName = dirName + "output\\std\\ITERS\\it.20\\20.events.xml.gz";
 
-            algorithmConfig = AlgorithmConfig.NOS_STRAIGHT_LINE;
-            algorithmConfig = AlgorithmConfig.NOS_TRAVEL_DISTANCE;
-            algorithmConfig = AlgorithmConfig.NOS_FREE_FLOW;
-            algorithmConfig = AlgorithmConfig.NOS_24_H;
-            algorithmConfig = AlgorithmConfig.NOS_15_MIN;
+            // algorithmConfig = AlgorithmConfig.NOS_STRAIGHT_LINE;
+            // algorithmConfig = AlgorithmConfig.NOS_TRAVEL_DISTANCE;
+            // algorithmConfig = AlgorithmConfig.NOS_FREE_FLOW;
+            // algorithmConfig = AlgorithmConfig.NOS_24_H;
+            // algorithmConfig = AlgorithmConfig.NOS_15_MIN;
             // algorithmConfig = AlgorithmConfig.OTS_REQ_FREE_FLOW;
             // algorithmConfig = AlgorithmConfig.OTS_REQ_24_H;
             // algorithmConfig = AlgorithmConfig.OTS_REQ_15_MIN;
@@ -151,7 +164,7 @@ public class SingleIterOnlineDvrpLauncher
             // algorithmConfig = AlgorithmConfig.RES_REQ_15_MIN;
             // algorithmConfig = AlgorithmConfig.RES_DRV_FREE_FLOW;
             // algorithmConfig = AlgorithmConfig.RES_DRV_24_H;
-            // algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
+            algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
 
             otfVis = !true;
 
@@ -160,7 +173,6 @@ public class SingleIterOnlineDvrpLauncher
 
             wal = false;
 
-            taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
         }
 
         if (vrpOutFiles) {
@@ -191,8 +203,10 @@ public class SingleIterOnlineDvrpLauncher
     private void initMatsimVrpData()
         throws IOException
     {
-        scenario.getConfig().travelTimeCalculator()
-                .setTraveltimeBinSize(algorithmConfig.ttimeSource.travelTimeBinSize);
+        int travelTimeBinSize = algorithmConfig.ttimeSource.travelTimeBinSize;
+        int numSlots = algorithmConfig.ttimeSource.numSlots;
+
+        scenario.getConfig().travelTimeCalculator().setTraveltimeBinSize(travelTimeBinSize);
 
         PersonalizableTravelTime ttimeCalc;
         TravelDisutility tcostCalc;
@@ -230,7 +244,8 @@ public class SingleIterOnlineDvrpLauncher
 
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
 
-        SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
+        SparseShortestPathFinder sspf = new SparseShortestPathFinder(data, travelTimeBinSize,
+                numSlots);
         SparseShortestPathArc[][] arcs = sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
         ((FixedSizeVrpGraph)data.getVrpGraph()).setArcs(arcs);
     }
@@ -334,7 +349,7 @@ public class SingleIterOnlineDvrpLauncher
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        // ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
     }
 
 
@@ -347,6 +362,13 @@ public class SingleIterOnlineDvrpLauncher
         initOptimizerFactory();
         runSim();
         generateVrpOutput();
+
+        // check
+        for (Request r : data.getVrpData().getRequests()) {
+            if (r.getStatus() != ReqStatus.PERFORMED) {
+                throw new IllegalStateException();
+            }
+        }
     }
 
 
