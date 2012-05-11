@@ -162,6 +162,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
 		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.network, config);
+		treesBuilder.setActTypeConverter(actTypeConverter);
 		treesBuilder.createTrees(facilities);
 		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
