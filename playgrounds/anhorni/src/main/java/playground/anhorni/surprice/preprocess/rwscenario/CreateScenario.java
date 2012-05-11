@@ -331,11 +331,11 @@ public class CreateScenario {
 					}
 				}
 			}
-			wDur /= Math.max(1.0, wCount);
-			sDur /= Math.max(1.0, sCount);
-			lDur /= Math.max(1.0, lCount);
-			eDur /= Math.max(1.0, eCount);
-			oDur /= Math.max(1.0, oCount);
+			if (wCount > 0) wDur = Math.max(1.0 * 3600.0, wDur / wCount);
+			if (sCount > 0) sDur = Math.max(3.0 * 60.0, sDur / sCount);
+			if (lCount > 0) lDur = Math.max(5.0 * 60.0, lDur / lCount);
+			if (eCount > 0) eDur = Math.max(5.0 * 60.0, eDur / eCount);
+			if (oCount > 0) oDur = Math.max(1.0 * 30.0, oDur / oCount);
 			double hDur = Math.max(10.0, 24.0 * 3600.0 - wDur - sDur - lDur - eDur - oDur) / hCount;	
 			
 			if (wDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("work", wDur);
