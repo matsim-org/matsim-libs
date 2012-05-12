@@ -215,11 +215,11 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 
 			if (!choiceSet.isEmpty()) {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
-				//List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
-				List<PlanElement> subTour =
-					getSubtourWithoutSubsubtours(
-							whatToDo.subTourIndex,
-							planStructure);
+				List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
+				//List<PlanElement> subTour =
+				//	getSubtourWithoutSubsubtours(
+				//			whatToDo.subTourIndex,
+				//			planStructure);
 				changeLegModeTo(
 						plan,
 						subTour,
@@ -481,20 +481,20 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 
 			while (iter.hasNext()) {
 				PlanElement pe = iter.next();
-				if (pe instanceof Activity) {
-					// this can happen due to skipping sub-subtours.
-					// just do one step forward.
-					// Moreover, due to the fact that this method is called
-					// on subsets of subtours from the changeLegToPnr,
-					// it is not sure that there are still elements...
-					if (iter.hasNext()) {
-						origin = (Activity) pe;
-						iter.next();
-					}
-					else {
-						break;
-					}
-				}
+				//if (pe instanceof Activity) {
+				//	// this can happen due to skipping sub-subtours.
+				//	// just do one step forward.
+				//	// Moreover, due to the fact that this method is called
+				//	// on subsets of subtours from the changeLegToPnr,
+				//	// it is not sure that there are still elements...
+				//	if (iter.hasNext()) {
+				//		origin = (Activity) pe;
+				//		iter.next();
+				//	}
+				//	else {
+				//		break;
+				//	}
+				//}
 
 				Activity destination = (Activity) iter.next();
 				List<? extends PlanElement> trip =

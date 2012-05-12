@@ -21,7 +21,6 @@ package playground.thibautd.parknride;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -35,6 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.thibautd.parknride.scoring.ParkingPenalty;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
@@ -51,19 +51,22 @@ public class FacilityChanger {
 	private final ParkingPenaltyFactory penalty;
 	private final Random random;
 	private final TripRouter router;
+	private final double priceOfDistance;
 
 	public FacilityChanger(
 			final Random random,
 			final TripRouter router,
 			final ParkingPenaltyFactory penalty,
 			final ParkAndRideFacilities facilities,
-			final double searchRadius) {
+			final double searchRadius,
+			final double priceOfDistance) {
 		this.router = router;
 		this.penalty = penalty;
 		this.searchRadius = searchRadius;
 		this.facilities = facilities;
 		this.facilitiesQT = createQuadTree( facilities );
 		this.random = random;
+		this.priceOfDistance = priceOfDistance;
 	}
 
 	private static QuadTree<ParkAndRideFacility> createQuadTree(
@@ -114,9 +117,13 @@ public class FacilityChanger {
 					random.nextDouble(),
 					neighbors,
 					penalty.createPenalty( plan ),
-					fac.getCoord(),
+					// the subtour is a "structure", so that trips are one leg
+					((Activity) subtour.get( 0 )).getCoord(),
+					((Activity) subtour.get( 4 )).getCoord(),
+					((Activity) subtour.get( subtour.size() - 5 )).getCoord(),
 					ParkAndRideChooseModeForSubtour.getEndTime( pnrFirst , plan.getPlanElements()),
-					ParkAndRideChooseModeForSubtour.getEndTime( pnrLast, plan.getPlanElements() ));
+					ParkAndRideChooseModeForSubtour.getEndTime( pnrLast, plan.getPlanElements() ),
+					priceOfDistance);
 
 		updateFacility( pnrFirst , newFac );
 		updateFacility( pnrLast , newFac );
@@ -149,9 +156,12 @@ public class FacilityChanger {
 			final double randomChoice,
 			final Collection<ParkAndRideFacility> neighbors,
 			final ParkingPenalty penalty,
-			final Coord parkCoord,
+			final Coord origin,
+			final Coord accessDestination,
+			final Coord egressOrigin,
 			final double parkTime,
-			final double unparkTime) {
+			final double unparkTime,
+			final double priceOfDistance) {
 		ParkAndRideFacility[] fs = new ParkAndRideFacility[neighbors.size()];
 		double[] ps = new double[fs.length];
 		double sum = 0;
@@ -161,12 +171,15 @@ public class FacilityChanger {
 			fs[ i ] = f;
 
 			penalty.reset();
-			penalty.park( parkTime , parkCoord );
+			penalty.park( parkTime , f.getCoord() );
 			penalty.unPark( unparkTime );
 			penalty.finish();
 
+			double dist = calcDistance( origin , f.getCoord() , accessDestination , egressOrigin );
+
 			// "logit-like" choice
-			sum += Math.exp( -penalty.getPenalty() );
+			// The variance will depend on the scale of the penalty...
+			sum += Math.exp( penalty.getPenalty() - dist * priceOfDistance );
 			ps[ i ] = sum;
 			i++;
 		}
@@ -179,6 +192,16 @@ public class FacilityChanger {
 		}
 
 		throw new RuntimeException( "unexpected. choice="+choice+", sum="+sum );
+	}
+
+	private static double calcDistance(
+			final Coord origin,
+			final Coord pnr,
+			final Coord accessDest,
+			final Coord egressOr) {
+		return CoordUtils.calcDistance( origin , pnr ) * 2
+			+ CoordUtils.calcDistance( pnr , accessDest )
+			+ CoordUtils.calcDistance( pnr , egressOr );
 	}
 
 	private void rerouteSubtour(

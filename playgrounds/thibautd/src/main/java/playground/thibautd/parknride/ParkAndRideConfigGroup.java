@@ -39,6 +39,7 @@ public class ParkAndRideConfigGroup extends ReflectiveModule {
 	private InsertionStrategy insertionStrategy = InsertionStrategy.Random;
 	private double facilityChangeProbability = 0.9;
 	private double localSearchRadius = 5000;
+	private double priceOfDistance = 1;
 
 	public ParkAndRideConfigGroup() {
 		super( GROUP_NAME );
@@ -123,6 +124,14 @@ public class ParkAndRideConfigGroup extends ReflectiveModule {
 
 	public double getLocalSearchRadius() {
 		return localSearchRadius;
+	}
+
+	public void setPriceOfDistance(final String value) {
+		this.priceOfDistance = Double.parseDouble( value );
+	}
+
+	public double getPriceOfDistance() {
+		return priceOfDistance;
 	}
 }
 
