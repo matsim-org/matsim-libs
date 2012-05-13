@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
@@ -46,6 +47,10 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
+		if (!sc.getConfig().controler().getMobsim().equals("hybridQ2D")) {
+			throw new RuntimeException("This factory does not make sense for " + sc.getConfig().controler().getMobsim()  );
+		}
+		
 		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
@@ -72,28 +77,15 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		
-		AgentFactory agentFactory;
-
-		if (!sc.getConfig().controler().getMobsim().equals("hybridQ2D")) {
-			throw new RuntimeException("This factory does not make sense for " + sc.getConfig().controler().getMobsim()  );
-		} else {
-			agentFactory = new Sim2DAgentFactory(qSim,sc);
-		}
-
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 
-		Sim2DEngine e = new Sim2DEngine(qSim, (Sim2DAgentFactory) agentFactory);
+		Sim2DEngine e = new Sim2DEngine(qSim);
 		this.sim2DEngine = e;
 		qSim.addMobsimEngine(e);
 		Sim2DDepartureHandler d = new Sim2DDepartureHandler(e);
 		qSim.addDepartureHandler(d);
-		
-		
-//		//DEBUG
-//		QLinkControl contr = new QLinkControl(qSim);
-//		qSim.addMobsimEngine(contr);
-//		//END DEBUG
 		
 		return qSim;
 	}

@@ -36,10 +36,17 @@ import org.matsim.core.mobsim.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v3.controller.PedestrianSignal;
 import playground.gregor.sim2d_v3.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v3.simulation.floor.DefaultVelocityCalculator;
+import playground.gregor.sim2d_v3.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v3.simulation.floor.PhysicalFloor;
+import playground.gregor.sim2d_v3.simulation.floor.VelocityCalculator;
+import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.LinkSwitcher;
+import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.MentalLinkSwitcher;
 
 /**
  * @author laemmel
@@ -57,10 +64,12 @@ public class Sim2DEngine implements MobsimEngine {
 
 	private final Sim2DConfigGroup sim2ConfigGroup;
 	private final double sim2DStepSize;
-	private final Sim2DAgentFactory agentFactory;
 	private final QSim sim;
 
 	private PhysicalFloor floor;
+	
+	private VelocityCalculator velocityCalculator;
+	private final LinkSwitcher mlsw;
 	
 	private final Queue<MobsimAgent> activityEndsList = new PriorityQueue<MobsimAgent>(500, new PlanAgentDepartureTimeComparator());
 	
@@ -78,15 +87,31 @@ public class Sim2DEngine implements MobsimEngine {
 	 * @param sim
 	 * @param random
 	 */
-	public Sim2DEngine(QSim sim, Sim2DAgentFactory agentFactory) {
+	public Sim2DEngine(QSim sim) {
 		this.scenario = sim.getScenario();
 		this.sim2ConfigGroup = (Sim2DConfigGroup)this.scenario.getConfig().getModule("sim2d");
 		this.sim = sim;
-		this.agentFactory = agentFactory;
 		this.sim2DStepSize = this.sim2ConfigGroup.getTimeStepSize();
 		double factor = this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize() / this.sim2DStepSize;
 		if (factor != Math.round(factor)) {
 			throw new RuntimeException("QSim time step size has to be a multiple of sim2d time step size");
+		}
+		
+		/*
+		 * Moved here from Sim2DAgentFactory which is not necessary anymore.
+		 */
+		this.velocityCalculator = new DefaultVelocityCalculator(scenario.getConfig().plansCalcRoute());
+		Sim2DConfigGroup s2d = (Sim2DConfigGroup) scenario.getConfig().getModule("sim2d");
+		
+		if (s2d.isEnableMentalLinkSwitch()){
+			this.mlsw = new MentalLinkSwitcher(scenario);
+		} else {
+			this.mlsw = new LinkSwitcher() {
+				@Override
+				public void checkForMentalLinkSwitch(Id curr, Id next, Agent2D agent) {
+					// nothing to do here
+				}
+			};
 		}
 	}
 
@@ -170,7 +195,7 @@ public class Sim2DEngine implements MobsimEngine {
 		 * agents when the simulation starts?
 		 */
 		if (!this.agents2D.containsKey(agent.getId())) {
-			this.agents2D.put(agent.getId(), this.agentFactory.createAgent2DFromMobsimAgent(agent));
+			this.agents2D.put(agent.getId(), this.createAgent2DFromMobsimAgent(agent));
 		}
 		
 		this.activityEndsList.add(agent);
@@ -178,6 +203,31 @@ public class Sim2DEngine implements MobsimEngine {
 	
 	public void addSignal(PedestrianSignal sig) {
 		this.signals.put(sig.getLinkId(), sig);
+	}
+	
+	public void setVelocityCalculator(VelocityCalculator velocityCalculator) {
+		this.velocityCalculator = velocityCalculator;
+	}
+	
+	/*
+	 * Moved here from Sim2DAgentFactory which is not necessary anymore.
+	 */
+	private Agent2D createAgent2DFromMobsimAgent(MobsimDriverAgent mobsimDriverAgent) {
+		
+//		PhysicalAgentRepresentation par = new VelocityDependentEllipse();
+		PhysicalAgentRepresentation par = new PhysicalAgentRepresentation() {
+			@Override
+			public void update(double v, double alpha, Coordinate pos) {
+				// TODO Auto-generated method stub
+			}
+			@Override
+			public void translate(Coordinate pos) {
+				// TODO Auto-generated method stub
+			}
+		};
+		
+		Agent2D agent = new Agent2D(mobsimDriverAgent, this.scenario, this.velocityCalculator, this.mlsw, par);
+		return agent;
 	}
 
 }
