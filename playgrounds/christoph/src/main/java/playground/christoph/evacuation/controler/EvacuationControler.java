@@ -22,12 +22,16 @@ package playground.christoph.evacuation.controler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
@@ -75,6 +79,7 @@ import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
+import org.matsim.matrices.Matrix;
 //import org.matsim.utils.eventsfilecomparison.OnlineEventsComparator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -93,6 +98,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 
+import playground.balmermi.world.Layer;
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
@@ -130,6 +136,8 @@ import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
+import playground.meisterk.kti.router.SwissHaltestelle;
+import playground.meisterk.kti.router.SwissHaltestellen;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -199,7 +207,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	protected PersonalizableTravelTimeFactory travelTimeCollectorWrapperFactory;
 	
 	protected KtiConfigGroup ktiConfigGroup;
-	protected PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	
 	/*
 	 * Analysis modules
@@ -216,7 +223,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		 * Create the empty object. They are filled in the loadData() method.
 		 */
 		this.ktiConfigGroup = new KtiConfigGroup();
-		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(this.ktiConfigGroup);
 		
 		new EvacuationConfigReader().readFile(args[1]);
 		
@@ -351,8 +357,13 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
-				
+		
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
+		
+		/*
+		 * Update PT Travel time Matrices (requires CoordAnalyzer)
+		 */
+		initKTIPTRouter();
 		
 		/*
 		 * Read household-vehicles-assignment files.
@@ -455,6 +466,66 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 //			this.addControlerListener(comparator);
 //			comparator.run();			
 //		}
+	}
+	
+	/*
+	 * Update PT Travel time Matrices
+	 */
+	private void initKTIPTRouter() {
+		PlansCalcRouteKtiInfo pcrKTIi = ((PTTravelTimeKTIFactory) this.ptTravelTimeFactory).getPlansCalcRouteKtiInfo();
+		/*
+		 * Identify affected stops and zones
+		 */
+		SwissHaltestellen swissHaltestellen = pcrKTIi.getHaltestellen();
+		Layer municipalities = pcrKTIi.getLocalWorld().getLayer("municipality");
+		Set<Id> affectedMunicipalities = new LinkedHashSet<Id>();
+		for (SwissHaltestelle swissHaltestelle : swissHaltestellen.getHaltestellenMap().values()) {
+			Coord coord = swissHaltestelle.getCoord();
+			boolean isAffected = this.coordAnalyzer.isCoordAffected(coord);
+			
+			if (isAffected) {
+				for (BasicLocation location : municipalities.getNearestLocations(coord)) {
+					affectedMunicipalities.add(location.getId());
+				}
+			}
+		}
+		log.info("total municipalities: " + municipalities.getLocations().size());
+		log.info("affected municipalities: " + affectedMunicipalities.size());
+		
+		/*
+		 * Create exit/rescue entry in the municipalities and haltestellen data structures
+		 */
+		log.info("creating additional entries in the PT travel time matrix...");
+		Id rescueFacilityId = scenarioData.createId("rescueFacility");
+		Id rescueLinkId = scenarioData.getActivityFacilities().getFacilities().get(rescueFacilityId).getLinkId();
+		Link rescueLink = scenarioData.getNetwork().getLinks().get(rescueLinkId);
+		municipalities.getLocations().put(rescueLinkId, rescueLink);
+		swissHaltestellen.addHaltestelle(scenarioData.createId("rescueHaltestelle"), 
+				EvacuationConfig.getRescueCoord().getX(), EvacuationConfig.getRescueCoord().getY());
+		
+		/*
+		 * Create entries in the travel time matrix
+		 * 
+		 * If the municipality is affected, calculate the minimal travel time
+		 * to the next non-affected municipality. Otherwise use a travel time of 1.0.
+		 */
+		Matrix ptMatrix = pcrKTIi.getPtTravelTimes();
+		for (Id fromId : municipalities.getLocations().keySet()) {
+			if (affectedMunicipalities.contains(fromId)) {
+				
+				double minTT = Double.MAX_VALUE;
+				for (Id id : municipalities.getLocations().keySet()) {
+					if (affectedMunicipalities.contains(id)) continue;
+					else if (id.equals(rescueLinkId)) continue;
+					double tt = ptMatrix.getEntry(fromId, id).getValue();
+					if (tt < minTT) minTT = tt;
+				}
+				ptMatrix.createEntry(fromId, rescueLinkId, minTT);
+			} else {
+				ptMatrix.createEntry(fromId, rescueLinkId, 1.0);
+			}
+		}
+		log.info("done.");
 	}
 	
 	/*

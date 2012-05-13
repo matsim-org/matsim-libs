@@ -100,7 +100,11 @@ public class CoordAnalyzer {
 		} else return isAffected;
 	}
 	
-	private boolean isCoordAffected(Coord coord) {
+	/*
+	 * If possible, use one of the other methods. They cache
+	 * nodes/links/facilities.
+	 */
+	public boolean isCoordAffected(Coord coord) {
 		Point point = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
 		return affectedArea.contains(point);
 	}

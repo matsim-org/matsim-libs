@@ -160,6 +160,12 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 			
 			// If using pt is faster than walking switch to pt.
 			if (travelTimePT < travelTimeWalk) {
+				
+//				log.info("PT (" + travelTimePT  + ") is faster than walking (" + travelTimeWalk + 
+//						"). Person " + withinDayAgent.getId().toString() +
+//						", age " + ((PersonImpl) withinDayAgent.getSelectedPlan().getPerson()).getAge() +
+//						", walk distance (in route) " + legToMeeting.getRoute().getDistance());
+				
 				legToMeeting.setMode(TransportMode.pt);
 				
 				// calculate route for the leg to the rescue facility

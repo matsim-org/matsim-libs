@@ -166,7 +166,8 @@ public class AddExitLinksToNetwork {
 		 * Otherwise the AStarLandmarks algorithm could be confused and loose some performance.
 		 */
 //		Coord rescueCoord = scenario.createCoord(0.0, 0.0);
-		Coord rescueCoord = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0);
+//		Coord rescueCoord = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0);
+		Coord rescueCoord = EvacuationConfig.getRescueCoord();
 		Node rescueNode = network.getFactory().createNode(scenario.createId("rescueNode"), rescueCoord);
 		network.addNode(rescueNode);
 		
@@ -174,7 +175,7 @@ public class AddExitLinksToNetwork {
 		for (Node node : getExitNodes().values()) {
 			counter++;
 			Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink" + counter), node, rescueNode);
-			rescueLink.setLength(10000);
+			rescueLink.setLength(10);	// use short links for non-vehicular traffic
 			rescueLink.setCapacity(1000000);
 			rescueLink.setFreespeed(1000000);			
 //			rescueLink.setCapacity(Double.MAX_VALUE);
@@ -198,7 +199,8 @@ public class AddExitLinksToNetwork {
 		 * rescue facility that is the destination of the evacuated persons.
 		 */
 //		Coord rescueCoord2 = scenario.createCoord(1.0, 1.0);
-		Coord rescueCoord2 = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
+//		Coord rescueCoord2 = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
+		Coord rescueCoord2 = scenario.createCoord(rescueCoord.getX() + 1.0, rescueCoord.getY() + 1.0);
 		Node rescueNode2 = network.getFactory().createNode(scenario.createId("rescueNode2"), rescueCoord2);
 		network.addNode(rescueNode2);
 		
@@ -206,7 +208,7 @@ public class AddExitLinksToNetwork {
 //		rescueLink.setLength(100000);
 //		rescueLink.setCapacity(Double.MAX_VALUE);
 //		rescueLink.setFreespeed(Double.MAX_VALUE);
-		rescueLink.setLength(10000);
+		rescueLink.setLength(10);	// use short links for non-vehicular traffic
 		rescueLink.setCapacity(1000000);
 		rescueLink.setFreespeed(1000000);
 		Set<String> allowedTransportModes = new HashSet<String>();

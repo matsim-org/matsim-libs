@@ -33,4 +33,8 @@ public class EvacuationConfig {
 	 */
 	public static boolean createEvacuationTimePicture = true;
 	public static boolean countAgentsInEvacuationArea = true;
+	
+	public static Coord getRescueCoord() {
+		return new CoordImpl(centerCoord.getX() + 50000.0, centerCoord.getY() + 50000.0);
+	}
 }

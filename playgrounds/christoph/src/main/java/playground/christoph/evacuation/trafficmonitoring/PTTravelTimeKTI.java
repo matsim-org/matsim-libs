@@ -106,7 +106,10 @@ public class PTTravelTimeKTI implements PersonalizableTravelTime {
 
 		KtiPtRoute newRoute = new KtiPtRoute(fromAct.getLinkId(), toAct.getLinkId(), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
 
-		final double timeInVehicle = newRoute.getInVehicleTime();
+		double timeInVehicle = newRoute.getInVehicleTime();
+
+		// add time penalty for pseudo dynamic pt travel times
+		timeInVehicle = addTimePenalty(timeInVehicle, depTime);
 
 		final double walkAccessEgressDistance = newRoute.calcAccessEgressDistance(fromAct, toAct);
 		final double walkAccessEgressTime = walkAccessEgressDistance / configGroup.getWalkSpeed();
@@ -118,4 +121,44 @@ public class PTTravelTimeKTI implements PersonalizableTravelTime {
 		return travelTime;
 	}
 
+	/*
+	 * The underlying travel time matrix is not time dependent. Therefore
+	 * we have to add some kind of time dependent filter. We assume that there
+	 * is almost no PT available between 1:00 and 5:00.
+	 * 
+	 * We use the following penalty factors, which are linear interpolated
+	 * 0:00-1:00: 1.0-3.0
+	 * 1:00-2:00: 3.0-15.0
+	 * 2:00-4:00: 25.0
+	 * 4:00-5:00: 15.0-3.0
+	 * 5:00-6:00: 3.0-1.0
+	 */
+	private double addTimePenalty(double timeInVehicle, double depTime) {
+		
+		double penaltyFactor;
+		if (depTime > 6*3600) {
+			penaltyFactor = 1.0;
+		}
+		else if (depTime > 5*3600) {
+			double dt = (depTime - 5*3600);
+			penaltyFactor = 1.0 + 2.0*(3600.0-dt)/3600.0; 
+		}
+		else if (depTime > 4*3600) {
+			double dt = (depTime - 4*3600);
+			penaltyFactor = 3.0 + 12.0*(3600.0-dt)/3600.0;
+		}
+		else if (depTime > 2*3600) {
+			penaltyFactor = 15.0;
+		}
+		else if (depTime > 1*3600) {
+			double dt = (depTime - 1*3600);
+			penaltyFactor = 15.0 - 12.0*(3600.0-dt)/3600.0;
+		}
+		else {
+			penaltyFactor =  1.0 + 2.0 * (depTime / 3600.0);
+		}
+
+		return penaltyFactor * timeInVehicle;
+	}
+	
 }
