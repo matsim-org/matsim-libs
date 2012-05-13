@@ -23,6 +23,7 @@ package playground.meisterk.kti.router;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,8 +80,25 @@ public class SwissHaltestellen {
 	 * @return
 	 */
 	public SwissHaltestelle getHaltestelle(Id id) {
-		
 		return this.haltestellenMap.get(id);
+	}
+
+	/** 
+	 * cdobler, may'12
+	 */
+	public Map<Id, SwissHaltestelle> getHaltestellenMap() {
+		return Collections.unmodifiableMap(this.haltestellenMap);
+	}
+	
+	/** 
+	 * Added this method to be able to add stops not only during initialization.
+	 * cdobler, may'12
+	 */
+	public void addHaltestelle(Id id, double x, double y) {
+		CoordImpl coord = new CoordImpl(x, y);
+		SwissHaltestelle swissStop = new SwissHaltestelle(id, coord);
+		this.haltestellen.put(coord.getX(), coord.getY(), swissStop);
+		this.haltestellenMap.put(swissStop.getId(), swissStop);
 	}
 	
 }
