@@ -41,9 +41,14 @@ public class VisumNodesRowHandler implements VisumNetworkRowHandler {
 	@Override
 	public void handleRow(Map<String, String> row) {
 		Id id = new IdImpl(row.get("NR"));
-		Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD")
-				.replace(',', '.')), Double.parseDouble(row.get("YKOORD")
-				.replace(',', '.')));
+
+		String xStr = row.get("XKOORD"), yStr = row.get("YKOORD");
+		if (xStr == null || yStr == null) {
+			return;
+		}
+		System.out.println("xStr:" + xStr + "\tyStr:" + yStr);
+		Coord coord = new CoordImpl(Double.parseDouble(xStr.replace(',', '.')),
+				Double.parseDouble(yStr.replace(',', '.')));
 		network.createAndAddNode(id, coord);
 	}
 

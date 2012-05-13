@@ -31,7 +31,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import playground.yu.utils.container.Collection2Array;
 
 /**
- * saves informastion about daily traffic load curve
+ * saves information about daily traffic load curve
  * 
  * @author Qiuhan
  * 
