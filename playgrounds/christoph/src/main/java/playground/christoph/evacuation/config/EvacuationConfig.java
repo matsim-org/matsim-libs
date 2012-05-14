@@ -27,6 +27,8 @@ public class EvacuationConfig {
 
 	public static double affectedAreaTimePenaltyFactor = 1.20;
 	public static double affectedAreaDistanceBuffer = 2500.0;
+
+	public static double ptTravelTimePenaltyFactor = Double.MAX_VALUE;
 	
 	/*
 	 * Analysis modules

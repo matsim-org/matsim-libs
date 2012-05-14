@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.balmermi.world.Layer;
+import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
@@ -121,44 +122,72 @@ public class PTTravelTimeKTI implements PersonalizableTravelTime {
 		return travelTime;
 	}
 
+//	/*
+//	 * The underlying travel time matrix is not time dependent. Therefore
+//	 * we have to add some kind of time dependent filter. We assume that there
+//	 * is almost no PT available between 1:00 and 5:00.
+//	 * 
+//	 * We use the following penalty factors, which are linear interpolated
+//	 * 0:00-1:00: 1.0-3.0
+//	 * 1:00-2:00: 3.0-15.0
+//	 * 2:00-4:00: 25.0
+//	 * 4:00-5:00: 15.0-3.0
+//	 * 5:00-6:00: 3.0-1.0
+//	 */
+//	private double addTimePenalty(double timeInVehicle, double depTime) {
+//		
+//		double penaltyFactor;
+//		if (depTime > 6*3600) {
+//			penaltyFactor = 1.0;
+//		}
+//		else if (depTime > 5*3600) {
+//			double dt = (depTime - 5*3600);
+//			penaltyFactor = 1.0 + 2.0*(3600.0-dt)/3600.0; 
+//		}
+//		else if (depTime > 4*3600) {
+//			double dt = (depTime - 4*3600);
+//			penaltyFactor = 3.0 + 52.0*(3600.0-dt)/3600.0;
+//		}
+//		else if (depTime > 2*3600) {
+//			penaltyFactor = 55.0;
+//		}
+//		else if (depTime > 1*3600) {
+//			double dt = (depTime - 1*3600);
+//			penaltyFactor = 55.0 - 52.0*(3600.0-dt)/3600.0;
+//		}
+//		else {
+//			penaltyFactor =  1.0 + 2.0 * (depTime / 3600.0);
+//		}
+//
+//		return penaltyFactor * timeInVehicle;
+//	}
+	
 	/*
-	 * The underlying travel time matrix is not time dependent. Therefore
-	 * we have to add some kind of time dependent filter. We assume that there
-	 * is almost no PT available between 1:00 and 5:00.
-	 * 
-	 * We use the following penalty factors, which are linear interpolated
-	 * 0:00-1:00: 1.0-3.0
-	 * 1:00-2:00: 3.0-15.0
-	 * 2:00-4:00: 25.0
-	 * 4:00-5:00: 15.0-3.0
-	 * 5:00-6:00: 3.0-1.0
+	 * New approach for penalty time: if the person tries to depart to early, we add time
+	 * between the scheduled departure and the assumed first PT connection to the travel
+	 * time.
 	 */
 	private double addTimePenalty(double timeInVehicle, double depTime) {
+
 		
-		double penaltyFactor;
+		double penaltyFactor = 1.0;
+		if (depTime >= EvacuationConfig.evacuationTime) penaltyFactor = EvacuationConfig.ptTravelTimePenaltyFactor;
+		
+		double penaltyTime;
 		if (depTime > 6*3600) {
-			penaltyFactor = 1.0;
+			penaltyTime = 0.0;
 		}
 		else if (depTime > 5*3600) {
-			double dt = (depTime - 5*3600);
-			penaltyFactor = 1.0 + 2.0*(3600.0-dt)/3600.0; 
-		}
-		else if (depTime > 4*3600) {
-			double dt = (depTime - 4*3600);
-			penaltyFactor = 3.0 + 12.0*(3600.0-dt)/3600.0;
-		}
-		else if (depTime > 2*3600) {
-			penaltyFactor = 15.0;
+			penaltyTime =  1800.0;
 		}
 		else if (depTime > 1*3600) {
-			double dt = (depTime - 1*3600);
-			penaltyFactor = 15.0 - 12.0*(3600.0-dt)/3600.0;
+			// assume that the first available pt connection departs at 5:30
+			penaltyTime = 5.5 * 3600 - depTime;
 		}
 		else {
-			penaltyFactor =  1.0 + 2.0 * (depTime / 3600.0);
+			penaltyTime =  1800.0;
 		}
-
-		return penaltyFactor * timeInVehicle;
+		return penaltyTime + timeInVehicle * penaltyFactor;
 	}
 	
 }

@@ -41,6 +41,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String HOUSEHOLDOBJECTATTRIBUTES = "householdobjectattributes";
 	public static String ANALYSIS = "analysis";
 	public static String FILE = "file";
+	public static String PT = "pt";
 	
 	public static String TIME = "time";
 	public static String X = "x";
@@ -53,6 +54,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String FILENAME = "fileName";
 	public static String CREATEEVACUATIONTIMEPICTURE = "createEvacuationTimePicture";
 	public static String COUNTAGENTSINEVACUATIONAREA = "countAgentsInEvacuationArea";
+	public static String TRAVELTIMEPENALTYFACTOR = "travelTimePenaltyFactor";
 	
 	private String path = "";
 	private boolean readVehicleFleet = false;
@@ -90,8 +92,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			EvacuationConfig.evacuationArea.clear();
 		} else if (HOUSEHOLDOBJECTATTRIBUTES.equalsIgnoreCase(name)) {
 			EvacuationConfig.householdObjectAttributesFile = atts.getValue(FILENAME);
-		}
-		else if (FILE.equalsIgnoreCase(name)) {
+		} else if (FILE.equalsIgnoreCase(name)) {
 			if (readEvacuationArea && !readVehicleFleet) {
 				EvacuationConfig.evacuationArea.add(path + atts.getValue(FILENAME));
 			} else if (readVehicleFleet && !readEvacuationArea) {
@@ -100,7 +101,9 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		} else if (ANALYSIS.equalsIgnoreCase(name)) {
 			EvacuationConfig.createEvacuationTimePicture = Boolean.valueOf(atts.getValue(CREATEEVACUATIONTIMEPICTURE));
 			EvacuationConfig.countAgentsInEvacuationArea = Boolean.valueOf(atts.getValue(COUNTAGENTSINEVACUATIONAREA));
-		} else {
+		} else if (PT.equalsIgnoreCase(name)) {
+			EvacuationConfig.ptTravelTimePenaltyFactor = Double.valueOf(atts.getValue(TRAVELTIMEPENALTYFACTOR));
+		}else {
 			log.warn("Ignoring startTag: " + name);
 		}
 	}
@@ -121,6 +124,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		} else if (HOUSEHOLDOBJECTATTRIBUTES.equalsIgnoreCase(name)) {
 		} else if (FILE.equalsIgnoreCase(name)) {
 		} else if(ANALYSIS.equalsIgnoreCase(name)) {
+		} else if(PT.equalsIgnoreCase(name)) {
 		} else log.warn("Ignoring endTag: " + name);
 	}
 	
