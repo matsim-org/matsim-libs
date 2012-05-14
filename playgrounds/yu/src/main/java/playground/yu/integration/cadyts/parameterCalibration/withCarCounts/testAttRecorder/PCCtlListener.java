@@ -835,6 +835,20 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 								+ ChoiceParameterCalibrator4.DEFAULT_TRUSTREGION_TERMINATION_GRADIENT_NORM);
 			}
 		}
+		// SETTING useHessian
+		{
+			String useHessianStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+					"useHessian");
+			if (useHessianStr != null) {
+				boolean useHessian = Boolean.parseBoolean(useHessianStr);
+				calibrator.setUseHessian(useHessian);
+				System.out.println("BSE:\tuseHessian\t=" + useHessian);
+			} else {
+				System.out
+						.println("BSE:\ttrustregionTerminationGradientNorm\t= default value\t"
+								+ ChoiceParameterCalibrator4.DEFAULT_USE_HESSIAN);
+			}
+		}
 	}
 
 	private void setInitialParametersInCalibrator(Config config) {
