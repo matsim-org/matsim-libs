@@ -22,6 +22,7 @@ package org.matsim.pt.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -91,6 +92,10 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private double utilityOfLineSwitch_utl;
 
+	public TransitRouterConfig(final Config config) {
+		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
+	}
+	
 	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, 
 			final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig ) 
 	{
