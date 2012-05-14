@@ -37,10 +37,13 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 import playground.thibautd.jointtrips.config.CliquesConfigGroup;
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
+import playground.thibautd.jointtrips.config.JointTripPossibilitiesConfigGroup;
 import playground.thibautd.jointtrips.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.jointtrips.population.CliquesXmlReader;
 import playground.thibautd.jointtrips.population.DriverRoute;
 import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilitiesXMLReader;
 import playground.thibautd.jointtrips.population.PassengerRoute;
 import playground.thibautd.jointtrips.population.PopulationWithJointTripsReader;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
@@ -103,6 +106,8 @@ public class JointControlerUtils {
 		// TODO: adapt to new state
 		(new PopulationWithJointTripsReader(scenario)).readFile(config.plans().getInputFile());
 
+		scenario.setJointTripPossibilities( readPossibilities( config ) );
+
 		try {
 			new CliquesXmlReader(scenario).parse();
 		} catch (Exception e) {
@@ -110,6 +115,19 @@ public class JointControlerUtils {
 		}
 
 		return scenario;
+	}
+
+	private static JointTripPossibilities readPossibilities(final Config config) {
+		String file = ((JointTripPossibilitiesConfigGroup)
+					config.getModule( JointTripPossibilitiesConfigGroup.GROUP_NAME )).getPossibilitiesFile();
+
+		if (file != null) {
+			JointTripPossibilitiesXMLReader reader = new JointTripPossibilitiesXMLReader();
+			reader.parse( file );
+			return reader.getJointTripPossibilities();
+		}
+
+		return null;
 	}
 
 	private static void tuneScenario(final Scenario sc) {
@@ -145,6 +163,7 @@ public class JointControlerUtils {
 		CliquesConfigGroup cliquesConfigGroup = new CliquesConfigGroup();
 		JointTripsMutatorConfigGroup mutatorConfigGroup = new JointTripsMutatorConfigGroup();
 		JointTimeModeChooserConfigGroup tmcConfigGroup = new JointTimeModeChooserConfigGroup();
+		JointTripPossibilitiesConfigGroup possibilitiesConfigGroup = new JointTripPossibilitiesConfigGroup();
 
 		Config config = ConfigUtils.createConfig();
 
@@ -155,6 +174,7 @@ public class JointControlerUtils {
 		config.addModule(CliquesConfigGroup.GROUP_NAME, cliquesConfigGroup);
 		config.addModule(JointTripsMutatorConfigGroup.GROUP_NAME, mutatorConfigGroup);
 		config.addModule(JointTimeModeChooserConfigGroup.GROUP_NAME, tmcConfigGroup);
+		config.addModule(JointTripPossibilitiesConfigGroup.GROUP_NAME, possibilitiesConfigGroup);
 
 		//read the config file
 		ConfigUtils.loadConfig(config, configFile);

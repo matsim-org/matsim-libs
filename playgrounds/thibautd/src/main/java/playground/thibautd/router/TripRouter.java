@@ -108,6 +108,10 @@ public class TripRouter {
 	 * @return the simplified sequence of plan elements
 	 */
 	public List<PlanElement> tripsToLegs(final List<PlanElement> plan) {
+		return tripsToLegs( plan , checker );
+	}
+
+	public static List<PlanElement> tripsToLegs(final List<PlanElement> plan, final StageActivityTypes checker) {
 		List<PlanElement> simplifiedPlan = new ArrayList<PlanElement>();
 		List<PlanElement> currentTrip = new ArrayList<PlanElement>();
 

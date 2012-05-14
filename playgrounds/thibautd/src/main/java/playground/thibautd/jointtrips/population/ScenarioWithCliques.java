@@ -23,19 +23,22 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
+
 /**
  * @author thibautd
  */
 public class ScenarioWithCliques extends ScenarioImpl {
 	private static final Logger log =
 		Logger.getLogger(ScenarioWithCliques.class);
+	private JointTripPossibilities possibilities = null;
 
 	/*
 	 * =========================================================================
 	 * Constructors
 	 * =========================================================================
 	 */
-	public ScenarioWithCliques(Config config) {
+	public ScenarioWithCliques(final Config config) {
 		super(config);
 		super.setPopulation(new PopulationWithCliques(this));
 		log.debug("populations initialized");
@@ -48,6 +51,14 @@ public class ScenarioWithCliques extends ScenarioImpl {
 	 */
 	public PopulationOfCliques getCliques() {
 		return ((PopulationWithCliques) this.getPopulation()).getCliques();
+	}
+
+	public JointTripPossibilities getJointTripPossibilities() {
+		return this.possibilities;
+	}
+
+	public void setJointTripPossibilities(final JointTripPossibilities possibilities) {
+		this.possibilities = possibilities;
 	}
 }
 

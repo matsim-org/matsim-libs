@@ -19,16 +19,29 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.jointtrips.population.DriverRoute;
 import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.population.PassengerRoute;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 
@@ -70,7 +83,8 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 		if (DEBUG) log.debug( "start scoring" );
 
 		double accumulatedNegativeDuration = 0;
-		//LinkedList<JointLeg> sharedLegs = new LinkedList<JointLeg>();
+
+		JointTimes jointTimes = new JointTimes();
 
 		for (Plan individualPlan : plan.getIndividualPlans().values()) {
 			double score;
@@ -91,9 +105,19 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 				else if (pe instanceof Leg) {
 					scoringFunction.handleLeg( (Leg) pe );
 
-					//if (((JointLeg) pe).getJoint()) {
-					//	sharedLegs.add( (JointLeg) pe );
-					//}
+					Route r = ((Leg) pe).getRoute();
+					if (r instanceof DriverRoute) {
+						jointTimes.notifyDriverStartTime(
+								individualPlan.getPerson().getId(),
+								((DriverRoute) r).getPassengersIds(),
+								((Leg) pe).getDepartureTime());
+					}
+					else if (r instanceof PassengerRoute) {
+						jointTimes.notifyPassengerStartTime(
+								individualPlan.getPerson().getId(),
+								((PassengerRoute) r).getDriverId(),
+								((Leg) pe).getDepartureTime());
+					}
 				}
 				else {
 					throw new RuntimeException( "unknown PlanElement type "+pe.getClass() );
@@ -114,40 +138,57 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 			individualPlan.setScore( score );
 		}
 
-		double accumulatedUnsynchronizedTime = 0;
-		//while (sharedLegs.size() > 0) {
-		//	List<JointLeg> linkedLegs = new ArrayList<JointLeg>();
-		//	JointLeg leg = sharedLegs.removeFirst();
-		//	linkedLegs.addAll( leg.getLinkedElements().values() );
-
-		//	for (JointLeg linkedLeg : linkedLegs) {
-		//		sharedLegs.remove( linkedLeg );
-		//	}
-
-		//	linkedLegs.add( leg );
-
-		//	double minDepartureTime = Double.POSITIVE_INFINITY;
-		//	double maxDepartureTime = Double.NEGATIVE_INFINITY;
-
-		//	for (JointLeg currLeg : linkedLegs) {
-		//		minDepartureTime = Math.min( minDepartureTime , currLeg.getDepartureTime() );
-		//		maxDepartureTime = Math.max( maxDepartureTime , currLeg.getDepartureTime() );
-		//	}
-
-		//	accumulatedUnsynchronizedTime += maxDepartureTime - minDepartureTime;
-		//}
-
-		if (DEBUG) {
-			log.debug( "scoring ended." );
-			log.debug( "score: "+plan.getScore() );
-			log.debug( "accumulated negative duration: "+accumulatedNegativeDuration );
-			log.debug( "negative duration penalty: "+(accumulatedNegativeDuration * negativeDurationPenalty) );
-			log.debug( "accumulated unsynchronized duration: "+accumulatedUnsynchronizedTime );
-			log.debug( "unsynchronized duration penalty: "+(accumulatedUnsynchronizedTime * unsynchronizedPenalty) );
-		}
-
 		return plan.getScore() +
 			(accumulatedNegativeDuration * negativeDurationPenalty) -
-			(accumulatedUnsynchronizedTime * unsynchronizedPenalty);
+			(jointTimes.getCumulatedUnsynchronisedTime() * unsynchronizedPenalty);
+	}
+
+	private static class JointTimes {
+		private final Map< Tuple<Id, Id> , List<Double> > driverDepartures = new HashMap< Tuple<Id,Id>, List<Double> >();
+		private final Map< Tuple<Id, Id> , List<Double> > passengerDepartures = new HashMap< Tuple<Id,Id>, List<Double> >();
+		
+		public void notifyDriverStartTime(
+				final Id driverId,
+				final Collection<Id> passengersIds,
+				final double time) {
+			for (Id passenger : passengersIds) {
+				Tuple<Id, Id> tuple = new Tuple<Id, Id>( driverId , passenger );
+				List<Double> times = driverDepartures.get( tuple );
+				if (times == null) {
+					times = new ArrayList<Double>();
+					driverDepartures.put( tuple , times );
+				}
+				times.add( time );
+			}
+		}
+
+		public void notifyPassengerStartTime(
+				final Id passengerId,
+				final Id driverId,
+				final double time) {
+			Tuple<Id, Id> tuple = new Tuple<Id, Id>( driverId , passengerId );
+			List<Double> times = passengerDepartures.get( tuple );
+			if (times == null) {
+				times = new ArrayList<Double>();
+				passengerDepartures.put( tuple , times );
+			}
+			times.add( time );
+		}
+
+		public double getCumulatedUnsynchronisedTime() {
+			double cumul = 0;
+			for (Map.Entry< Tuple<Id, Id> , List<Double> > entry : driverDepartures.entrySet()) {
+				Iterator<Double> passengerTimes = passengerDepartures.get( entry.getKey() ).iterator();
+				Iterator<Double> driverTimes = entry.getValue().iterator();
+
+				while (driverTimes.hasNext()) {
+					double d = driverTimes.next();
+					double p = passengerTimes.next();
+
+					cumul += Math.abs( p - d );
+				}
+			}
+			return cumul;
+		}
 	}
 }

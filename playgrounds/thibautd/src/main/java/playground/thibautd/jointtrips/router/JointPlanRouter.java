@@ -61,47 +61,45 @@ public class JointPlanRouter extends PlanRouter {
 	public void updatePlanElements(
 			final Plan plan,
 			final List<PlanElement> newPlanElements) {
-		Iterator<PlanElement> toChange = plan.getPlanElements().iterator();
-		Iterator<PlanElement> changeInfo = newPlanElements.iterator() ;
+		// "transmit" joint info before update
+		JointRouteIterator oldPlan = new JointRouteIterator( plan.getPlanElements() );
+		JointRouteIterator newPlan = new JointRouteIterator( newPlanElements ) ;
 
-		try {
-			while (toChange.hasNext()) {
-				PlanElement peToChange = toChange.next();
-				PlanElement peChangeInfo = changeInfo.next();
+		Route oldRoute = oldPlan.nextJointRoute();
+		Route newRoute = newPlan.nextJointRoute();
 
-				if (peToChange instanceof Leg) {
-					Leg legToChange = (Leg) peToChange;
-					Leg legChangeInfo = (Leg) peChangeInfo;
+		while (oldRoute != null) {
+			if (oldRoute instanceof DriverRoute) {
+				((DriverRoute) newRoute).setPassengerIds( ((DriverRoute) oldRoute).getPassengersIds() );
+			}
+			else {
+				((PassengerRoute) newRoute).setDriverId( ((PassengerRoute) oldRoute).getDriverId() );
+			}
 
-					Route oldRoute = legToChange.getRoute();
-					//legToChange.setMode( legChangeInfo.getMode() );
-					legToChange.setDepartureTime( legChangeInfo.getDepartureTime() );
-					legToChange.setTravelTime( legChangeInfo.getTravelTime() );
-					legToChange.setRoute( legChangeInfo.getRoute() );
+			oldRoute = oldPlan.nextJointRoute();
+			newRoute = newPlan.nextJointRoute();
+		}
 
-					// we do not want to loose (nor change) co-traveler information
-					try {
-						if (oldRoute instanceof DriverRoute) {
-							((DriverRoute) legToChange.getRoute()).setPassengerIds(
-									((DriverRoute) oldRoute).getPassengersIds() );
-						}
-						else if (oldRoute instanceof PassengerRoute) {
-							((PassengerRoute) legToChange.getRoute()).setDriverId(
-									((PassengerRoute) oldRoute).getDriverId() );
-						}
-					}
-					catch (ClassCastException e) {
-						throw new RuntimeException( "unexpected route type incompatibility when "
-								+"updating "+legToChange.getRoute()+" with "+oldRoute );
-					}
+		super.updatePlanElements( plan , newPlanElements );
+	}
+
+	private static class JointRouteIterator {
+		private final Iterator<PlanElement> pes;
+
+		public JointRouteIterator( final List<PlanElement> pes ) {
+			this.pes = pes.iterator();
+		}
+
+		public Route nextJointRoute() {
+			while (pes.hasNext()) {
+				PlanElement pe = pes.next();
+				if (pe instanceof Leg &&
+						(((Leg) pe).getRoute() instanceof DriverRoute ||
+						 ((Leg) pe).getRoute() instanceof PassengerRoute)) {
+					return ((Leg) pe).getRoute();
 				}
 			}
-			if (changeInfo.hasNext()) {
-				throw new RuntimeException( "incompatible size" );
-			}
-		}
-		catch (Exception e) {
-			throwInformativeError( plan.getPlanElements() , newPlanElements , e );;
+			return null;
 		}
 	}
 

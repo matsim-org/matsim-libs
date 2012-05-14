@@ -245,7 +245,14 @@ public class JointPlan implements Plan {
 		for (Map.Entry<Id, Plan> entry : this.individualPlans.entrySet()) {
 			output.put(
 					entry.getKey(),
-					Collections.unmodifiableList( entry.getValue().getPlanElements() ));
+					// do not make the lists unmodifiable: acting
+					// on the plan element list is the only way to
+					// change plan structure, andwe do not track anything,
+					// so that it is safe.
+					// It would be possible by getting the plan elements from the
+					// individual plans anyway...
+					//Collections.unmodifiableList( entry.getValue().getPlanElements() ));
+					entry.getValue().getPlanElements() );
 		}
 
 		return output;
