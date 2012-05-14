@@ -31,7 +31,7 @@ public class DoubleConverter implements AttributeConverter<Double> {
 	}
 
 	@Override
-	public String convertToObject(Double o) {
-		return o.toString();
+	public String convertToString(Object o) {
+		return ((Double) o).toString();
 	}
 }

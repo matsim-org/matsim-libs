@@ -80,20 +80,20 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 			writeStartTag(TAG_OBJECT, xmlAttributes);
 			xmlAttributes.clear();
 			// sort attributes by name
-			Map<String,Object> objAttributes = new TreeMap<String, Object>();
+			Map<String, Object> objAttributes = new TreeMap<String, Object>();
 			for (Map.Entry<String, Object> objAttribute : entry.getValue().entrySet()) {
 				objAttributes.put(objAttribute.getKey(), objAttribute.getValue());
 			}
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
-				Class<?> clazz = objAttribute.getValue().getClass();
+				Class<? extends Object> clazz = objAttribute.getValue().getClass();
 				AttributeConverter<?> conv = this.converters.get(clazz.getCanonicalName());
 				if (conv != null) {
 					xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTENAME, objAttribute.getKey()));
 					xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTECLASS, clazz.getCanonicalName()));
 					writeStartTag(TAG_ATTRIBUTE, xmlAttributes);
 					xmlAttributes.clear();
-					writeContent(objAttribute.getValue().toString(), false);
+					writeContent(conv.convertToString(objAttribute.getValue()), false);
 					writeEndTag(TAG_ATTRIBUTE);
 				} else {
 					if (missingConverters.add(clazz)) {

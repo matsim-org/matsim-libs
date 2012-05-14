@@ -10,6 +10,6 @@ public interface AttributeConverter<T> {
 
 	public T convert(final String value);
 
-	public String convertToObject(final T o);
+	public String convertToString(final Object o);
 
 }

@@ -154,8 +154,9 @@ public class ObjectAttributesXmlReaderTest {
 			return new MyTuple(Integer.valueOf(parts[0]), Integer.valueOf(parts[1]));
 		}
 		@Override
-		public String convertToObject(MyTuple o) {
-			return o.a + "," + o.b;
+		public String convertToString(Object o) {
+			MyTuple t = (MyTuple) o;
+			return t.a + "," + t.b;
 		}
 	}
 }

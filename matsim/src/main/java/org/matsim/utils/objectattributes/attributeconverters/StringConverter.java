@@ -41,7 +41,7 @@ public class StringConverter implements AttributeConverter<String> {
 	}
 
 	@Override
-	public String convertToObject(String o) {
-		return o;
+	public String convertToString(Object o) {
+		return (String) o;
 	}
 }
