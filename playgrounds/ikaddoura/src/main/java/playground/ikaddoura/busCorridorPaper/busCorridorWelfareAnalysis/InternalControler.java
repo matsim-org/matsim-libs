@@ -90,16 +90,16 @@ public class InternalControler {
 		int lastInternalIteration = this.scenario.getConfig().controler().getLastIteration();
 		controlerConfGroup.setLastIteration(lastInternalIteration);
 		
-		int writeInterval = 0;
-		if (lastInternalIteration == 0){
-			writeInterval = 1;
-		}
-		else {
-			writeInterval = lastInternalIteration;
-		}
-		controlerConfGroup.setWriteEventsInterval(writeInterval);
-		controlerConfGroup.setWritePlansInterval(writeInterval);
-		controlerConfGroup.setWriteSnapshotsInterval(writeInterval);
+//		int writeInterval = 0;
+//		if (lastInternalIteration == 0){
+//			writeInterval = 1;
+//		}
+//		else {
+//			writeInterval = lastInternalIteration;
+//		}
+//		controlerConfGroup.setWriteEventsInterval(writeInterval);
+//		controlerConfGroup.setWritePlansInterval(writeInterval);
+//		controlerConfGroup.setWriteSnapshotsInterval(writeInterval);
 		
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt + "/internalIterations");
 		

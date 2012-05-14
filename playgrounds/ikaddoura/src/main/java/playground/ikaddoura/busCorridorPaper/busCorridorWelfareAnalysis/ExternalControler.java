@@ -54,28 +54,28 @@ class ExternalControler {
 	int numberOfBuses;
 	
 	public static void main(final String[] args) throws IOException {
-//		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
-//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/paper_fare_withoutTimeChoice";
-//		lastExternalIteration = 1;
+		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/paper_initialCarPtDemand";
+		lastExternalIteration = 0;
+		
+//		op = OptimizationParameter.FARE;
+//		op = OptimizationParameter.CAPACITY;
+		op = OptimizationParameter.NUMBER_OF_BUSES;
+		
+//		configFile = args[0];
+//		outputExternalIterationDirPath = args[1];
+//		lastExternalIteration = Integer.parseInt(args[2]);
+//		String opString = args[3];
 //		
-////		op = OptimizationParameter.FARE;
-////		op = OptimizationParameter.CAPACITY;
-//		op = OptimizationParameter.NUMBER_OF_BUSES;
-		
-		configFile = args[0];
-		outputExternalIterationDirPath = args[1];
-		lastExternalIteration = Integer.parseInt(args[2]);
-		String opString = args[3];
-		
-		if(opString.equals(OptimizationParameter.FARE.toString())){
-			op = OptimizationParameter.FARE;
-		} else if(opString.equals(OptimizationParameter.CAPACITY.toString())){
-			op = OptimizationParameter.CAPACITY;
-		} else if(opString.equals(OptimizationParameter.NUMBER_OF_BUSES.toString())){
-			op = OptimizationParameter.NUMBER_OF_BUSES;
-		} else {
-			throw new RuntimeException("Optimization parameter " + opString + " is unknown. Aborting... ");
-		}
+//		if(opString.equals(OptimizationParameter.FARE.toString())){
+//			op = OptimizationParameter.FARE;
+//		} else if(opString.equals(OptimizationParameter.CAPACITY.toString())){
+//			op = OptimizationParameter.CAPACITY;
+//		} else if(opString.equals(OptimizationParameter.NUMBER_OF_BUSES.toString())){
+//			op = OptimizationParameter.NUMBER_OF_BUSES;
+//		} else {
+//			throw new RuntimeException("Optimization parameter " + opString + " is unknown. Aborting... ");
+//		}
 		
 		log.info("Analyzing optimization parameter " + op);
 		ExternalControler externalControler = new ExternalControler();
