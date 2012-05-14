@@ -39,6 +39,8 @@ import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 import herbie.running.scoring.LegScoringFunction;
 
+import playground.thibautd.jointtrips.herbie.scoring.HerbieJointLegScoringFunction;
+
 /**
  * @author thibautd
  */
@@ -80,7 +82,9 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 				new PlanBasedLegScoringFunction(
 					plan,
 					//new HerbieLegWithNetworkPtDistanceScoringFunction(
-					new LegScoringFunction(
+					// this is the same as the classic herbie scoring function,
+					// with handling of "joint" modes.
+					new HerbieJointLegScoringFunction(
 						plan, 
 						params,
 						config,

@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import herbie.running.scoring.LegScoringFunction;
-
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 
