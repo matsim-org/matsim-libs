@@ -56,8 +56,9 @@ class GautengControler {
 		String configFileName = args[0] ;
 //		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
 		String plansFilename = args[1] ;
-		double baseValueOfTime = Double.parseDouble(args[2]);
-		double valueOfTimeMultiplier = Double.parseDouble(args[3]);
+		String tollFilename = args[2];
+		double baseValueOfTime = Double.parseDouble(args[3]);
+		double valueOfTimeMultiplier = Double.parseDouble(args[4]);
 
 		final Controler controler = new Controler( configFileName ) ;
 
@@ -65,6 +66,10 @@ class GautengControler {
 		
 		/* Allow for the plans file to be passed as argument. */
 		controler.getConfig().plans().setInputFile(plansFilename) ;
+		
+		/* Allow for the road pricing filename to be passed as an argument. */
+		controler.getConfig().roadpricing().setTollLinksFile(tollFilename);
+		
 		
 		Scenario sc = controler.getScenario();
 		
