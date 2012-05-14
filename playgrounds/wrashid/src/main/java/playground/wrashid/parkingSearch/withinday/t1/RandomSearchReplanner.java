@@ -44,6 +44,8 @@ import org.matsim.withinday.utils.EditRoutes;
  * 
  * @author cdobler
  */
+
+
 public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 
 	private final Random random;
@@ -70,10 +72,13 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 		Id linkId = withinDayAgent.getCurrentLinkId();
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 
+		// das zählen vom route index wird beim start link begonnen, d.h. letzter
+		// index ist links.size()+1
 		int routeIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Id startLink = route.getStartLinkId();
+		// actung: links enthält start und end link nicht!!!!!
 		List<Id> links = new ArrayList<Id>(route.getLinkIds()); // create a copy
 																// that can be
 																// modified
@@ -108,7 +113,9 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 			}
 			// end link
 			else if (routeIndex == links.size() + 1) {
+				// rw question: is the sequence right, bzw. was geschieht oben?
 				links.add(endLink);
+				// in diesem moment is endLink==link.getId()
 				endLink = randomNextLink(link).getId();
 			}
 			// link in between
@@ -124,12 +131,16 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 			// mit next leg ist der walk leg nach der nächsten parking activity gemeint.
 			boolean updateNextLeg = false;
 
-			// if the current linkId is different than the parking activity planned
+			// if the current linkId is different than the link id of the parking activity planned
 	
+			// rw: TODO: den fall noch abdecken, wo alte und neue parking facility auf gleichem link liegt.
+			
 			if (linkId != activity.getLinkId()) {
 				/*
 				 * move the parking activity after this leg
 				 */
+				
+				// if old parking and new parking are on different links, update parking facility id
 				ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities()
 						.get(parkingFacilityId);
 				activity.setCoord(facility.getCoord());
@@ -145,6 +156,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 				 * RW new comment: wir müssen beim letzen parking das nicht
 				 * machen, weil hier geht es ja nur um nicht ausgeführte Teile
 				 * des Plans.
+				 * 
 				 */
 				for (int i = withinDayAgent.getCurrentPlanElementIndex() + 2; i < plan.getPlanElements().size(); i++) {
 					PlanElement planElement = plan.getPlanElements().get(i);
@@ -155,16 +167,21 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 							a.setLinkId(linkId);
 							a.setFacilityId(parkingFacilityId);
 
-							// update walk leg to parking activity
+							
+							//es wird die abfahrts parking activity gesucht und davon sowohl der vorhergehende walk leg
+							// und der anschliessende car leg repariert.
 							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i - 1, routeAlgo);
 
 							// update car leg from parking activity
 							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i + 1, routeAlgo);
+							break;
 						}
 					}
 				}
 			}
 
+			// repair car route to parking (discard unused rest)
+			
 			// as we have found a parking on our way to the planned parking, we discard the rest
 			// of the route.
 			if (linkId != route.getEndLinkId()) {
@@ -181,6 +198,9 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 				updateNextLeg = true;
 			}
 
+			
+			// repair walk from old parking to "work" activity
+			
 			// adapt next walk leg.
 			if (updateNextLeg) {
 				editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),

@@ -144,7 +144,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 			/*
 			 * If the agent is within distance 'd' to target activity or OR If the
 			 * agent enters the link where its next non-parking activity is
-			 * performed, mark him ash searching Agent.
+			 * performed, mark him a searching Agent.
 			 * 
 			 * (this is actually handling a special case, where already at departure time
 			 * the agent is within distance 'd' of next activity).
