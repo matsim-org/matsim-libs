@@ -47,9 +47,10 @@ class GautengControler {
 	
 	public static void main ( String[] args ) {
 		Header.printHeader(GautengControler.class.toString(), args);
-		if(args.length != 4){
+		if(args.length != 6){
 			throw new RuntimeException("Must provide four arguments: config file path; " +
-					"input plans file; base value of time (for cars) and multiplier for commercial vehicles.") ;
+					"input plans file; road pricing file to use; base value of time (for cars); " +
+					"multiplier for commercial vehicles; and number of threads to use (globally).") ;
 		}
 		// Get arguments
 		// Read the base Value-of-Time (VoT) for private cars, and the VoT multiplier from the arguments, johan Mar'12
@@ -59,6 +60,7 @@ class GautengControler {
 		String tollFilename = args[2];
 		double baseValueOfTime = Double.parseDouble(args[3]);
 		double valueOfTimeMultiplier = Double.parseDouble(args[4]);
+		int numberOfThreads = Integer.parseInt(args[5]);
 
 		final Controler controler = new Controler( configFileName ) ;
 
@@ -69,6 +71,9 @@ class GautengControler {
 		
 		/* Allow for the road pricing filename to be passed as an argument. */
 		controler.getConfig().roadpricing().setTollLinksFile(tollFilename);
+		
+		/* Set number of threads. */
+		controler.getConfig().global().setNumberOfThreads(numberOfThreads);
 		
 		
 		Scenario sc = controler.getScenario();
