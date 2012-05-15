@@ -28,14 +28,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 public class DistanceCalculations {
 
-	public static double getLegDistance(LinkNetworkRouteImpl route, Network network)
+	public static double getLegDistance(NetworkRoute route, Network network)
 	{
 		List<Id> ids = route.getLinkIds();
 		
@@ -55,7 +55,7 @@ public class DistanceCalculations {
 		return distance;
 	}
 	
-	public static double getLegDistance(GenericRouteImpl route, Network network){
+	public static double getLegDistance(GenericRoute route, Network network){
 		
 		double distance = 0.0;
 		
@@ -98,19 +98,19 @@ public class DistanceCalculations {
 	
 	public static double getLegDistance(Route route, Network network) 
 	{
-		if(route instanceof LinkNetworkRouteImpl) {
-			return getLegDistance((LinkNetworkRouteImpl) route, network);
+		if(route instanceof NetworkRoute) {
+			return getLegDistance((NetworkRoute) route, network);
 		}
 		else if(route instanceof ExperimentalTransitRoute){
 			return getLegDistance((ExperimentalTransitRoute) route, network);
 		}
 		else {
-			return getLegDistance((GenericRouteImpl) route, network);
+			return getLegDistance((GenericRoute) route, network);
 		}
 	}
 	
 
-	public static double getWalkDistance(GenericRouteImpl route, Network network) {
+	public static double getWalkDistance(GenericRoute route, Network network) {
 		Coord fromCoord = network.getLinks().get(route.getStartLinkId()).getCoord();
 		Coord toCoord = network.getLinks().get(route.getEndLinkId()).getCoord();
 		return CoordUtils.calcDistance(fromCoord, toCoord);
