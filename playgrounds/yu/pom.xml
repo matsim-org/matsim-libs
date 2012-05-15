@@ -56,9 +56,9 @@
 	<dependency>
 		<groupId>cadyts</groupId>
 		<artifactId>cadyts</artifactId>
-		<version>1.2.0-20120418</version>
+		<version>1.2.0-20120515</version>
 		<scope>system</scope>
-		<systemPath>${basedir}/lib/cadyts_r693.jar</systemPath>
+		<systemPath>${basedir}/lib/cadyts_r694.jar</systemPath>
 	</dependency>
 		
 		<dependency>
