@@ -1251,7 +1251,7 @@ public class Controler {
 			plansCalcRoute = new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory(),routeFactory, this.config.transit(),
 					this.transitRouterFactory.createTransitRouter(), this.scenarioData.getTransitSchedule());
-			log.warn("As simulation of public transit is enabled a leg router for area tolls is used. Other features, " +
+			log.warn("As simulation of public transit is enabled a leg router for transit is used. Other features, " +
 					"e.g. multimodal simulation, may not work as expected.");
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			// Note: we don't use the given TravelTime object! Instead we use a MultiModalTravelTime object!
