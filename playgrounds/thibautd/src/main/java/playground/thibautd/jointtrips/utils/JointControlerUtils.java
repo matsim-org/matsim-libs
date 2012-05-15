@@ -159,13 +159,17 @@ public class JointControlerUtils {
 	 * @return a loaded config, including proper setting of joint trips specific groups
 	 */
 	public static Config createConfig(final String configFile) {
+		Config config = ConfigUtils.createConfig();
+		loadConfig( config , configFile );
+		return config;
+	}
+
+	public static void loadConfig(final Config config, final String configFile) {
 		JointReplanningConfigGroup jointConfigGroup = new JointReplanningConfigGroup();
 		CliquesConfigGroup cliquesConfigGroup = new CliquesConfigGroup();
 		JointTripsMutatorConfigGroup mutatorConfigGroup = new JointTripsMutatorConfigGroup();
 		JointTimeModeChooserConfigGroup tmcConfigGroup = new JointTimeModeChooserConfigGroup();
 		JointTripPossibilitiesConfigGroup possibilitiesConfigGroup = new JointTripPossibilitiesConfigGroup();
-
-		Config config = ConfigUtils.createConfig();
 
 		// /////////////////////////////////////////////////////////////////////
 		// initialize the config before passing it to the controler
@@ -178,8 +182,6 @@ public class JointControlerUtils {
 
 		//read the config file
 		ConfigUtils.loadConfig(config, configFile);
-
-		return config;
 	}
 
 	/**
