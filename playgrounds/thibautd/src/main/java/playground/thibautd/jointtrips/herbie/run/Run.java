@@ -41,10 +41,10 @@ public class Run {
 	public static void main(String[] args) {
 		String configFile = args[0];
 
-		Config conf = ConfigUtils.createConfig();
-		conf.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
-		JointControlerUtils.loadConfig( conf , configFile );
-		ScenarioWithCliques sc = JointControlerUtils.createScenario(configFile); 
+		Config config = ConfigUtils.createConfig();
+		config.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
+		JointControlerUtils.loadConfig( config , configFile );
+		ScenarioWithCliques sc = JointControlerUtils.createScenario( config ); 
 		Controler controler = new JointHerbieControler( sc );
 		controler.addControlerListener(new CliqueScoreStats(
 					"scoresStats",
