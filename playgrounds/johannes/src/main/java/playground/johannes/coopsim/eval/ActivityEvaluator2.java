@@ -47,7 +47,7 @@ public class ActivityEvaluator2 implements Evaluator {
 
 	private final Map<Person, ActivityDesires> desires;
 
-	private final Map<String, Double> priorities;
+//	private final Map<String, Double> priorities;
 
 	private static boolean isLogging;
 
@@ -56,7 +56,7 @@ public class ActivityEvaluator2 implements Evaluator {
 	public ActivityEvaluator2(double beta, Map<Person, ActivityDesires> desires, Map<String, Double> priorities) {
 		this.beta = beta;
 		this.desires = desires;
-		this.priorities = priorities;
+//		this.priorities = priorities;
 	}
 
 	@Override
@@ -116,7 +116,8 @@ public class ActivityEvaluator2 implements Evaluator {
 	}
 
 	private double getPriority(String type) {
-		return priorities.get(type);
+		return 1;
+//		return priorities.get(type);
 	}
 
 	public static void startLogging() {

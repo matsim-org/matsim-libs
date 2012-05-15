@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityDurationTask.java
+ * TripDurationArrivalTime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,37 +31,63 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityDurationTask extends TrajectoryAnalyzerTask {
+public class TripDurationArrivalTime extends TrajectoryAnalyzerTask {
 
+	/* (non-Javadoc)
+	 * @see playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask#analyze(java.util.Set, java.util.Map)
+	 */
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
+		for (Trajectory t : trajectories) {
+			for (int i = 0; i < t.getElements().size(); i += 2) {
+				purposes.add(((Activity) t.getElements().get(i)).getType());
+			}
+		}
+
+		purposes.add(null);
+		for (String purpose : purposes) {
+			analyze(trajectories, purpose);
+		}
+
+	}
+
+	public void analyze(Set<Trajectory> trajectories, String type) {
+		TDoubleArrayList arrivals = new TDoubleArrayList(trajectories.size());
+		TDoubleArrayList durations = new TDoubleArrayList(trajectories.size());
+		
 		for(Trajectory t : trajectories) {
-			for(int i = 0; i < t.getElements().size(); i += 2) {
-				purposes.add(((Activity)t.getElements().get(i)).getType());
+			for(int i = 2; i < t.getElements().size(); i += 2) {
+				Activity act = (Activity) t.getElements().get(i);
+				if(type == null || act.getType().endsWith(type)) {
+					double start = t.getTransitions().get(i - 1);
+					double end = t.getTransitions().get(i);
+					
+					arrivals.add(end);
+					durations.add(end- start);
+				}
 			}
 		}
 		
-		for(String purpose : purposes) {
-			ActivityDuration duration = new ActivityDuration(purpose);
-			DescriptiveStatistics stats = duration.statistics(trajectories, true);
-			
-			String key = "dur_act_" + purpose;
-			results.put(key, stats);
-			
-			try {
-//				writeHistograms(stats, new LinearDiscretizer(60.0), key, false);
-//				writeHistograms(stats, key, 100, 50);
-				writeHistograms(stats, key, 30, 1);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		Discretizer disc = FixedSampleSizeDiscretizer.create(arrivals.toNativeArray(), 50, 50);
+		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toNativeArray(), durations.toNativeArray(), disc);
+		if(type == null)
+			type = "all";
+		
+		try {
+			TXTWriter.writeMap(map, "arrival", "tripDuration", String.format("%1$s/tripdur_arr.%2$s.txt", getOutputDirectory(), type));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-
 }

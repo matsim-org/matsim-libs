@@ -45,15 +45,15 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 //		addTask(new CoordAvailTask());
 //		EdgeLengthTask distanceTask = new EdgeLengthTask();
 //		distanceTask.setModule(EdgeLength.getInstance());
-		EdgeLength.getInstance().setIgnoreZero(true);
-		addTask(new EdgeLengthTask());
+//		EdgeLength.getInstance().setIgnoreZero(true);
+//		addTask(new EdgeLengthTask());
 		
 //		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
 //		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
 //		addTask(acceptTask);
 		
-		Accessibility access = new ObservedAccessibility(new GravityCostFunction(1.4, 0));
-		access.setTargets(points);
+//		Accessibility access = new ObservedAccessibility(new GravityCostFunction(1.4, 0));
+//		access.setTargets(points);
 		
 //		addTask(new DegreeAccessibilityTask(access));
 //		addTask(new EdgeLengthAccessibilityTask(access));
@@ -63,11 +63,11 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 //		t.setDestinations(points);
 //		addTask(t);
 //		
-		TransitivityAccessibilityTask tatask = new TransitivityAccessibilityTask(access);
-		addTask(tatask);
+//		TransitivityAccessibilityTask tatask = new TransitivityAccessibilityTask(access);
+//		addTask(tatask);
 //		
 //		addTask(new F2FFreqEdgeLengthTask());
-//		addTask(new TripTask());
+		addTask(new TripTask());
 //		addTask(new F2FFrequencyTask());
 	}
 }

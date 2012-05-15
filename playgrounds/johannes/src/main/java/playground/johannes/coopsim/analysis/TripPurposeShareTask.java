@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityDurationTask.java
+ * TripPurposeShare.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
+
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,36 +31,59 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.mz2005.io.ActivityType;
+import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityDurationTask extends TrajectoryAnalyzerTask {
+public class TripPurposeShareTask extends TrajectoryAnalyzerTask {
 
+	/* (non-Javadoc)
+	 * @see playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask#analyze(java.util.Set, java.util.Map)
+	 */
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Set<String> purposes = new HashSet<String>();
+		TObjectIntHashMap<String> hist = new TObjectIntHashMap<String>();
+		
 		for(Trajectory t : trajectories) {
-			for(int i = 0; i < t.getElements().size(); i += 2) {
-				purposes.add(((Activity)t.getElements().get(i)).getType());
+			for(int i = 1; i < t.getElements().size(); i += 2) {
+				Activity prev = (Activity) t.getElements().get(i - 1);
+				Activity next = (Activity) t.getElements().get(i + 1);
+				
+				if(!prev.getFacilityId().equals(next.getFacilityId())) {
+					hist.adjustOrPutValue(next.getType(), 1, 1);
+				}
 			}
 		}
+
+		TObjectIntIterator<String> it = hist.iterator();
+		int sumHome = 0;
+		int sum = 0;
+		for(int i = 0; i < hist.size(); i++) {
+			it.advance();
+			sumHome += it.value();
+			if(!it.key().equals(ActivityType.home.name()))
+				sum += it.value();
+		}
 		
-		for(String purpose : purposes) {
-			ActivityDuration duration = new ActivityDuration(purpose);
-			DescriptiveStatistics stats = duration.statistics(trajectories, true);
-			
-			String key = "dur_act_" + purpose;
-			results.put(key, stats);
-			
-			try {
-//				writeHistograms(stats, new LinearDiscretizer(60.0), key, false);
-//				writeHistograms(stats, key, 100, 50);
-				writeHistograms(stats, key, 30, 1);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		TObjectDoubleHashMap<String> histWHome = new TObjectDoubleHashMap<String>();
+		TObjectDoubleHashMap<String> histWOHome = new TObjectDoubleHashMap<String>();
+		it = hist.iterator();
+		for(int i = 0; i < hist.size(); i++) {
+			it.advance();
+			histWHome.put(it.key(), it.value()/(double)sumHome);
+			if(!it.key().equals(ActivityType.home.name()))
+				histWOHome.put(it.key(), it.value()/(double)sum);
+		}
+		
+		
+		try {
+			TXTWriter.writeMap(histWOHome, "type", "p", String.format("%1$s/tripPurposeShare.nohome.txt", getOutputDirectory()));
+			TXTWriter.writeMap(histWHome, "type", "p", String.format("%1$s/tripPurposeShare.txt", getOutputDirectory()));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

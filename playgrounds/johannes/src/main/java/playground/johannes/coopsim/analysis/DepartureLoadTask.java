@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityDurationTask.java
+ * DepartureLoadTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,13 +31,20 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityDurationTask extends TrajectoryAnalyzerTask {
+public class DepartureLoadTask extends TrajectoryAnalyzerTask {
 
+	private Discretizer discretizer = new LinearDiscretizer(900.0);
+	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
@@ -44,21 +54,36 @@ public class ActivityDurationTask extends TrajectoryAnalyzerTask {
 			}
 		}
 		
+		purposes.add(null);
+		
 		for(String purpose : purposes) {
-			ActivityDuration duration = new ActivityDuration(purpose);
-			DescriptiveStatistics stats = duration.statistics(trajectories, true);
-			
-			String key = "dur_act_" + purpose;
-			results.put(key, stats);
-			
-			try {
-//				writeHistograms(stats, new LinearDiscretizer(60.0), key, false);
-//				writeHistograms(stats, key, 100, 50);
-				writeHistograms(stats, key, 30, 1);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			analyze(trajectories, purpose);
 		}
 	}
 
+	private void analyze(Set<Trajectory> trajectories, String type) {
+//		TDoubleDoubleHashMap load = new TDoubleDoubleHashMap();
+		TDoubleArrayList samples = new TDoubleArrayList(trajectories.size());
+		
+		for(Trajectory t : trajectories) {
+			for(int i = 1; i < t.getTransitions().size() - 1; i += 2) {
+				Activity act = (Activity) t.getElements().get(i + 1);
+				if(type == null || act.getType().equals(type)) {
+					double time = t.getTransitions().get(i);
+//					load.adjustOrPutValue(discretizer.discretize(time), 1, 1);
+					samples.add(time);
+				}
+			}
+		}
+		
+		try {
+			if(type == null)
+				type = "all";
+			
+			TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toNativeArray(), FixedSampleSizeDiscretizer.create(samples.toNativeArray(), 50, 50), true);
+			TXTWriter.writeMap(load, "time", "n", String.format("%1$s/depload.%2$s.txt", getOutputDirectory(), type));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

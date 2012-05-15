@@ -41,6 +41,7 @@ import playground.johannes.coopsim.analysis.ActTypeShareTask;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.ActivityLoadTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
+import playground.johannes.coopsim.analysis.DepartureLoadTask;
 import playground.johannes.coopsim.analysis.DistanceArrivalTimeTask;
 import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
 import playground.johannes.coopsim.analysis.LegLoadTask;
@@ -50,15 +51,15 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceMean;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.analysis.TripDistanceTaskLeisure;
+import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
 import playground.johannes.coopsim.analysis.TripDurationTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.mz2005.analysis.ActivityChainsTask;
-import playground.johannes.mz2005.analysis.EscortsActivtyTypeTask;
 import playground.johannes.mz2005.analysis.TrajectoryPlanBuilder;
-import playground.johannes.mz2005.analysis.TripDistEscortTask;
 import playground.johannes.mz2005.io.EscortData;
 import playground.johannes.mz2005.utils.FacilityFromActivity;
+import playground.johannes.mz2005.validate.AllowLegMode;
 import playground.johannes.mz2005.validate.RoundTrips;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
@@ -86,11 +87,11 @@ public class Analyzer {
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 //		reader.readFile("/Users/jillenberger/Desktop/run/plans.xml.gz");
-		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/04-04-2012/plans.xml");
+		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/plans.sun.vcg.xml");
 //		reader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/horni/zh10PctEps.100.plans.xml");
 		
 		
-		EscortData escortData = EscortData.read("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/04-04-2012/escort.txt", scenario.getPopulation());
+		EscortData escortData = EscortData.read("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/escort.sun.txt", scenario.getPopulation());
 		
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);
 		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.cg.xml");
@@ -142,16 +143,18 @@ public class Analyzer {
 //		composite.addTask(new TripDistanceTask(facilities, CartesianDistanceCalculator.getInstance()));
 //		composite.addTask(new TripDistanceAccessibilityTask(graph, facilities));
 		composite.addTask(new ActivityChainsTask());
-		composite.addTask(new TripDistEscortTask(escortData, facilities, WGS84DistanceCalculator.getInstance()));
-		composite.addTask(new EscortsActivtyTypeTask(escortData));
+//		composite.addTask(new TripDistEscortTask(escortData, facilities, WGS84DistanceCalculator.getInstance()));
+//		composite.addTask(new EscortsActivtyTypeTask(escortData));
 		composite.addTask(new DurationArrivalTimeTask());
 		composite.addTask(new ActivityLoadTask());
 		composite.addTask(new LegLoadTask());
 		composite.addTask(new DistanceArrivalTimeTask(new TripDistanceMean(null, facilities, WGS84DistanceCalculator.getInstance())));
-		composite.addTask(new TripAcceptanceProba(facilities, WGS84DistanceCalculator.getInstance()));
-		
+//		composite.addTask(new TripAcceptanceProba(facilities, WGS84DistanceCalculator.getInstance()));
+		composite.addTask(new DepartureLoadTask());
+		composite.addTask(new TripDurationArrivalTime());
+				
 //		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Desktop/run/");
-		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/04-04-2012/all/");
+		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/07-09-2011/sun/all/");
 //		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/horni/analysis/");
 	}
 

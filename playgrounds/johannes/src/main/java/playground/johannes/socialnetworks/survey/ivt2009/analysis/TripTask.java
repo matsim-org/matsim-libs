@@ -37,6 +37,8 @@ import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.social.analysis.F2FFrequency;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
+import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
+import playground.johannes.socialnetworks.statistics.WeightedSampleMean;
 
 /**
  * @author illenberger
@@ -51,7 +53,7 @@ public class TripTask extends AnalyzerTask {
 		
 		TObjectDoubleHashMap<Edge> f2fFreq = F2FFrequency.getInstance().values(graph.getEdges());
 		
-		DescriptivePiStatistics stats = new DescriptivePiStatistics();
+		DescriptivePiStatistics stats = new WSMStatsFactory().newInstance();
 		
 		int count = 0;
 		
@@ -67,7 +69,7 @@ public class TripTask extends AnalyzerTask {
 		}
 		
 		System.out.println("Number of edges with dist and freq: " + count);
-		
+		statsMap.put("trips", stats);
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 50), true);
 		Histogram.normalize(hist);
 		try {

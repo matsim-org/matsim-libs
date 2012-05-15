@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.sna.util.TXTWriter;
@@ -72,11 +73,14 @@ public class LegLoadTask extends TrajectoryAnalyzerTask {
 			for(int i = 1; i < trajectory.getElements().size() - 1; i += 2) {
 				Activity act = (Activity) trajectory.getElements().get(i + 1);
 				if(type == null || act.getType().equals(type)) {
-					int start = (int) (trajectory.getTransitions().get(i)/resolution);
-					int end = (int) (trajectory.getTransitions().get(i+1)/resolution);
-					for(int time = start; time < end; time++) {
-						loadMap.adjustOrPutValue(time, 1, 1);
-					}
+//					Leg leg = (Leg) trajectory.getElements().get(i);
+//					if (!leg.getMode().equals("car")) {
+						int start = (int) (trajectory.getTransitions().get(i) / resolution);
+						int end = (int) (trajectory.getTransitions().get(i + 1) / resolution);
+						for (int time = start; time < end; time++) {
+							loadMap.adjustOrPutValue(time, 1, 1);
+						}
+//					}
 				}
 			}
 		}

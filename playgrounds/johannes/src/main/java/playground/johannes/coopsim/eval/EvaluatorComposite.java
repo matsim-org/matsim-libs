@@ -37,7 +37,8 @@ public class EvaluatorComposite extends Composite<Evaluator> implements Evaluato
 	public double evaluate(Trajectory trajectory) {
 		double score = 0;
 		
-		for(Evaluator e : components) {
+		for(int i = 0; i < components.size(); i++) {
+			Evaluator e = components.get(i);
 			Profiler.resume(e.getClass().getName());
 			score += e.evaluate(trajectory);
 			Profiler.pause(e.getClass().getName());

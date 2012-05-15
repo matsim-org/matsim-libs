@@ -144,11 +144,11 @@ public class SnowballAnalyzer {
 		
 		FilteredAnalyzerTask task = new FilteredAnalyzerTask(obsEstim);
 //		task.addFilter(new DefaultFilter(), "full");
-		task.addFilter(new SpatialFilter((GraphBuilder) builder, chBorder), "ch");
-//		SpatialFilterComposite composite = new SpatialFilterComposite();
-//		composite.addComponent(new SpatialFilter((GraphBuilder) builder, chBorder));
-//		composite.addComponent(new SpatialFilter((GraphBuilder) builder, zrhBorder, true));
-//		task.addFilter(composite, "zrh");
+//		task.addFilter(new SpatialFilter((GraphBuilder) builder, chBorder), "ch");
+		SpatialFilterComposite composite = new SpatialFilterComposite();
+		composite.addComponent(new SpatialFilter((GraphBuilder) builder, chBorder));
+		composite.addComponent(new SpatialFilter((GraphBuilder) builder, zrhBorder, true));
+		task.addFilter(composite, "zrh");
 		
 		
 		return task;

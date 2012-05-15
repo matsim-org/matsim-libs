@@ -168,42 +168,79 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 		return sum;
 	}
 	
-	public int metAlters(Person person, Collection<Person> alters) {
-		PersonData data = personData.get(person.getId());
-		if(data == null)
+//	public int metAlters(Person person, Collection<Person> alters) {
+//		PersonData data = personData.get(person.getId());
+//		if(data == null)
+//			return 0;
+//
+//		int sum = 0;
+////		for (Visit visit : data.visits) {
+//		for(int i = 0; i < data.visits.size(); i++) {
+//			Visit visit = data.visits.get(i);
+//			List<Visitor> visitors = facilityData.get(visit.facilityId);
+//			List<Person> linkedAlters = new LinkedList<Person>(alters);
+//
+//			for (Visitor visitor : visitors) {
+//			
+//				if(linkedAlters.isEmpty())
+//					break;
+//				
+//				Person match = null;
+////				for (Person alter : linkedAlters) {
+//				for(int k = 0; k < linkedAlters.size(); k++) {
+//					Person alter = linkedAlters.get(k);
+//					if (alter.getId().equals(visitor.personId)) {
+//						double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
+//						double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
+//						double delta = Math.max(0.0, end - start);
+//						if(delta > 0)
+//							sum++;
+//						
+//						match = alter;
+//						break;
+//					}
+//				}
+//				
+//				if(match != null) {
+//					linkedAlters.remove(match);
+//				}
+//
+//			}
+//		}
+//
+//		return sum;
+//	}
+	
+	public int metAlters(Person person, List<Person> alters) {
+		PersonData egoData = personData.get(person.getId());
+		if(egoData == null)
 			return 0;
 
 		int sum = 0;
-		for (Visit visit : data.visits) {
-			List<Visitor> visitors = facilityData.get(visit.facilityId);
-			List<Person> linkedAlters = new LinkedList<Person>(alters);
-
-			for (Visitor visitor : visitors) {
+		
+		for(int i = 0; i < egoData.visits.size(); i++) {
+			Visit egoVisit = egoData.visits.get(i);
 			
-				if(linkedAlters.isEmpty())
-					break;
+			for(int k = 0; k < alters.size(); k++) {
+				Person alter = alters.get(k);
+				PersonData alterData = personData.get(alter.getId());
 				
-				Person match = null;
-				for (Person alter : linkedAlters) {
-					if (alter.getId().equals(visitor.personId)) {
-						double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
-						double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
-						double delta = Math.max(0.0, end - start);
-						if(delta > 0)
-							sum++;
-						
-						match = alter;
-						break;
+				if(alterData != null) {
+					for(int j = 0; j < alterData.visits.size(); j++) {
+						Visit alterVisit = alterData.visits.get(j);
+				
+						if(alterVisit.facilityId.equals(egoVisit.facilityId)) {
+							double start = Math.max(egoVisit.startEvent.getTime(), alterVisit.startEvent.getTime());
+							double end = Math.min(egoVisit.endEvent.getTime(), alterVisit.endEvent.getTime());
+							double delta = end - start;
+							if(delta > 0)
+								sum++;
+						}
 					}
 				}
-				
-				if(match != null) {
-					linkedAlters.remove(match);
-				}
-
 			}
 		}
-
+		
 		return sum;
 	}
 	

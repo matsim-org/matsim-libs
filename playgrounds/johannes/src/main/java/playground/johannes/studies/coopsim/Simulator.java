@@ -60,6 +60,7 @@ import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.ActivityLoadTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
 import playground.johannes.coopsim.analysis.CoordinationComplexityTask;
+import playground.johannes.coopsim.analysis.DepartureLoadTask;
 import playground.johannes.coopsim.analysis.DesiredTimeDiffTask;
 import playground.johannes.coopsim.analysis.DistanceVisitorsTask;
 import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
@@ -73,7 +74,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TransitionProbaAnalyzer;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.analysis.TripDurationTask;
-import playground.johannes.coopsim.analysis.VisitorsAccessibilityTask;
+import playground.johannes.coopsim.analysis.TripPurposeShareTask;
 import playground.johannes.coopsim.eval.ActivityEvaluator2;
 import playground.johannes.coopsim.eval.ActivityTypeEvaluator;
 import playground.johannes.coopsim.eval.EvalEngine;
@@ -110,7 +111,6 @@ import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
 import playground.johannes.sna.util.MultiThreading;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.GaussDistribution;
@@ -127,6 +127,8 @@ import playground.johannes.socialnetworks.utils.XORShiftRandom;
 public class Simulator {
 	
 	private static final Logger logger = Logger.getLogger(Simulator.class);
+	
+	private static final String SOCNET_MODULE_NAME = "socialnets";
 
 	private static SocialGraph graph;
 	
@@ -159,12 +161,12 @@ public class Simulator {
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
 		int iterations = (int) Double.parseDouble(config.getParam("controler", "lastIteration"));
 		String output = config.getParam("controler", "outputDirectory");
-		int sampleInterval = (int) Double.parseDouble(config.getParam("socialnets", "sampleinterval"));
+		int sampleInterval = (int) Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "sampleinterval"));
 		/*
 		 * initialize physical engine
 		 */
 		logger.info("Initializing physical engine...");
-		String strval = config.findParam("socialnets", "ttFactor");
+		String strval = config.findParam(SOCNET_MODULE_NAME, "ttFactor");
 		double ttFactor = 1.0;
 		if(strval != null)
 			ttFactor = Double.parseDouble(strval);
@@ -188,13 +190,13 @@ public class Simulator {
 		 * load desires
 		 */
 		logger.info("Initializing desires...");
-		loadDesires(config.findParam("socialnets", "desirefile"), random);
+		loadDesires(config.findParam(SOCNET_MODULE_NAME, "desirefile"), random);
 		/*
 		 * initialize choice selectors
 		 */
 		logger.info("Initializing choice selectors...");
 		if(config.getParam("socialnets", "noncooperative") != null) {
-			nonCooperativeMode = Boolean.parseBoolean(config.getParam("socialnets", "noncooperative"));
+			nonCooperativeMode = Boolean.parseBoolean(config.getParam(SOCNET_MODULE_NAME, "noncooperative"));
 			if(nonCooperativeMode)
 				logger.warn("*\n*** Simulation runs in non-cooperative mode! ***\n*");
 		}
@@ -209,7 +211,7 @@ public class Simulator {
 		 */
 		logger.info("Initializing mental engine...");
 		
-		boolean includeAlters = Boolean.parseBoolean(config.getParam("socialnets", "includeAlters"));
+		boolean includeAlters = Boolean.parseBoolean(config.getParam(SOCNET_MODULE_NAME, "includeAlters"));
 		int threads = config.global().getNumberOfThreads();
 		MultiThreading.setNumAllowedThreads(threads);
 		MentalEngine mental;
@@ -222,13 +224,13 @@ public class Simulator {
 		 */
 		logger.info("Initializing evaluation engine...");
 		Map<String, Double> priorities = new HashMap<String, Double>();
-		priorities.put(ActivityType.home.name(), Double.parseDouble(config.getParam("socialnets", "priority_home")));
-		priorities.put(ActivityType.visit.name(), Double.parseDouble(config.getParam("socialnets", "priority_visit")));
-		priorities.put(ActivityType.culture.name(), Double.parseDouble(config.getParam("socialnets", "priority_culture")));
-		priorities.put(ActivityType.gastro.name(), Double.parseDouble(config.getParam("socialnets", "priority_gastro")));
+		priorities.put(ActivityType.home.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "priority_home")));
+		priorities.put(ActivityType.visit.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "priority_visit")));
+		priorities.put(ActivityType.culture.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "priority_culture")));
+		priorities.put(ActivityType.gastro.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "priority_gastro")));
 		
-		double beta_join = Double.parseDouble(config.getParam("socialnets", "beta_join"));
-		double delta_type = Double.parseDouble(config.getParam("socialnets", "delta_type"));
+		double beta_join = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "beta_join"));
+		double delta_type = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "delta_type"));
 		double beta_act = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getPerforming_utils_hr() / 3600.0;
 		double beta_leg = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getTraveling_utils_hr() / 3600.0;
 	
@@ -239,9 +241,9 @@ public class Simulator {
 		evaluator.addComponent(new LegEvaluator(beta_leg));
 		evaluator.addComponent(new ActivityEvaluator2(beta_act, personDesires, priorities));
 //		evaluator.addComponent(new JointActivityEvaluator(beta_join, physical.getVisitorTracker(), graph));
-		double fVisit = Double.parseDouble(config.getParam("socialnets", "alterProba_visit"));
-		double fCulture = Double.parseDouble(config.getParam("socialnets", "alterProba_culture"));
-		double fGastro = Double.parseDouble(config.getParam("socialnets", "alterProba_gastro"));
+		double fVisit = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "alterProba_visit"));
+		double fCulture = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "alterProba_culture"));
+		double fGastro = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "alterProba_gastro"));
 //		double beta_coordinate = Double.parseDouble(config.getParam("socialnets", "beta_coordinate"));
 		evaluator.addComponent(new JointActivityEvaluator2(beta_join, physical.getVisitorTracker(), graph, fVisit, fCulture, fGastro));
 //		evaluator.addComponent(new JointActivityEvaluator(beta_join, physical.getVisitorTracker(), graph));
@@ -336,7 +338,7 @@ public class Simulator {
 			}
 		};
 		
-		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, travelMinCost);
+		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, travelMinCost, MultiThreading.getNumAllowedThreads());
 		LeastCostPathCalculator router = factory.createPathCalculator(network, travelCost, travelTime);
 		NetworkLegRouter legRouter = new NetworkLegRouter(network, router, new ModeRouteFactory());
 		
@@ -425,8 +427,8 @@ public class Simulator {
 //			e.printStackTrace();
 //		}
 //		System.exit(0);
-		facilitySelector.addGenerator(ActivityType.gastro.name(), new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam("socialnets", "choiceset_gastro"), graph), random));
-		facilitySelector.addGenerator(ActivityType.culture.name(), new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam("socialnets", "choiceset_culture"), graph), random));
+		facilitySelector.addGenerator(ActivityType.gastro.name(), new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam(SOCNET_MODULE_NAME, "choiceset_gastro"), graph), random));
+		facilitySelector.addGenerator(ActivityType.culture.name(), new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam(SOCNET_MODULE_NAME, "choiceset_culture"), graph), random));
 
 		choiceSelector.addComponent(facilitySelector);
 		/*
@@ -498,9 +500,9 @@ public class Simulator {
 			 * activity types
 			 */
 			ChoiceSet<String> actTypeChoiceSet = new ChoiceSet<String>(random);
-			actTypeChoiceSet.addChoice(ActivityType.visit.name(), 58);
-			actTypeChoiceSet.addChoice(ActivityType.gastro.name(), 14);
-			actTypeChoiceSet.addChoice(ActivityType.culture.name(), 28);
+			actTypeChoiceSet.addChoice(ActivityType.visit.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_visit")));
+			actTypeChoiceSet.addChoice(ActivityType.gastro.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_gastro")));
+			actTypeChoiceSet.addChoice(ActivityType.culture.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_culture")));
 
 			for(SocialVertex v : graph.getVertices()) {
 				ActivityDesires desire = personDesires.get(v.getPerson().getPerson());
@@ -620,9 +622,11 @@ public class Simulator {
 		composite.addTask(new DurationArrivalTimeTask());
 		composite.addTask(new LegLoadTask());
 		composite.addTask(new DesiredTimeDiffTask(personDesires));
-		composite.addTask(new VisitorsAccessibilityTask(physical.getVisitorTracker(), graph));
+//		composite.addTask(new VisitorsAccessibilityTask(physical.getVisitorTracker(), graph));
 		composite.addTask(new DistanceVisitorsTask(physical.getVisitorTracker(), graph, facilities));
 		composite.addTask(new CoordinationComplexityTask(physical.getVisitorTracker(), personDesires, graph));
+		composite.addTask(new DepartureLoadTask());
+		composite.addTask(new TripPurposeShareTask());
 		return composite;
 	}
 	

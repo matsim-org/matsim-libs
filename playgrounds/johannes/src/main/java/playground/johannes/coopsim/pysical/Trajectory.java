@@ -104,7 +104,7 @@ public class Trajectory {
 			elements.add(element);
 			transitions.add(endTime);
 		} else {
-			throw new RuntimeException("Previous end time and succeeding start time have to equal!");
+			throw new RuntimeException("Previous end time and succeeding start time have to be equal!");
 		}
 	}
 }
