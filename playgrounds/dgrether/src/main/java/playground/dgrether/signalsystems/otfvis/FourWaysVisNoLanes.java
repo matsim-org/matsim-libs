@@ -25,6 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -60,7 +61,7 @@ public class FourWaysVisNoLanes {
     loader.loadScenario();
     
     EventsManager events = EventsUtils.createEventsManager();
-    QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
+    QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
     OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 	OTFClientLive.run(scenario.getConfig(), server);
     otfVisQSim.run();

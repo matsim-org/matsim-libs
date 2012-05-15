@@ -26,7 +26,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -174,28 +177,37 @@ public class RunLongLink {
 
 		});
 		events.addHandler(eventsToLegs);
-
-		QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, new QNetsimEngineFactory() {
-
-			@Override
-			public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
-				NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
-
+		QSim qSim1 = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim1.addMobsimEngine(activityEngine);
+		qSim1.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new QNetsimEngineFactory() {
+		
 					@Override
-					public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-						return new QLinkImpl(link, network, toQueueNode, new FIFOVehicleQ());
+					public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
+						NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
+		
+							@Override
+							public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+								return new QLinkImpl(link, network, toQueueNode, new FIFOVehicleQ());
+							}
+		
+							@Override
+							public QNode createNetsimNode(final Node node, QNetwork network) {
+								return new QNode(node, network);
+							}
+		
+		
+						};
+						return new QNetsimEngine((QSim) sim, random, netsimNetworkFactory) ;
 					}
+				}.createQSimEngine(qSim1, MatsimRandom.getRandom());
+		qSim1.addMobsimEngine(netsimEngine);
+		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim1.addMobsimEngine(teleportationEngine);
 
-					@Override
-					public QNode createNetsimNode(final Node node, QNetwork network) {
-						return new QNode(node, network);
-					}
-
-
-				};
-				return new QNetsimEngine((QSim) sim, random, netsimNetworkFactory) ;
-			}
-		});
+		QSim qSim = qSim1;
 
 		//		QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
 

@@ -37,6 +37,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
@@ -132,7 +133,7 @@ public class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		QSim sim = QSim.createQSimAndAddAgentSource(this.scenarioData, this.events);
+		QSim sim = (QSim) new QSimFactory().createMobsim(this.scenarioData, this.events);
 		if (useOTFVis) {
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenarioData.getConfig(), this.scenarioData, events, sim);
 			OTFClientLive.run(this.scenarioData.getConfig(), server);

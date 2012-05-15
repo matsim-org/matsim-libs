@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -54,7 +55,7 @@ public class LaneLayoutTestShowNetwork {
 		loader.loadScenario();
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(sc, events);
+		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(sc, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, otfVisQSim);
 		OTFClientLive.run(sc.getConfig(), server);
 		otfVisQSim.run();

@@ -33,6 +33,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -55,7 +56,7 @@ public class ScenarioPlayer {
 
 	public static void play(final Scenario scenario, final EventsManager events) {
 		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
-		final QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+		final QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();

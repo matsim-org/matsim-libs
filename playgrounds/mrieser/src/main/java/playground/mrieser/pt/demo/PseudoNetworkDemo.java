@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -108,7 +109,7 @@ public class PseudoNetworkDemo {
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 
-		final QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+		final QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);

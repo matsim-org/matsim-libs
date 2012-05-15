@@ -34,10 +34,13 @@ import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -45,6 +48,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -69,10 +73,16 @@ public class JointQSimFactory implements MobsimFactory {
 		// assumptions of the order in which function calls are made
 		QNetsimEngineFactory netsimEngFactory;
 		netsimEngFactory = new DefaultQSimEngineFactory();
-        QSim qSim = QSim.createQSimWithDefaultEngines(
-				sc,
-				new DriverArtifactsSwallower( eventsManager ),
-				netsimEngFactory);
+		QSim qSim1 = new QSim(sc, new DriverArtifactsSwallower( eventsManager ));
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim1.addMobsimEngine(activityEngine);
+		qSim1.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1, MatsimRandom.getRandom());
+		qSim1.addMobsimEngine(netsimEngine);
+		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim1.addMobsimEngine(teleportationEngine);
+        QSim qSim = qSim1;
 
 		// set specific engine
 		JointTripsEngine jointEngine = new JointTripsEngine( qSim );

@@ -25,6 +25,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -67,7 +68,7 @@ public class CottbusLiveVis {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
-		QSim qSim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			AdaptiveControllHead adaptiveControllHead = new AdaptiveControllHead();
 			CarsOnLaneHandler carsOnLaneHandler = new CarsOnLaneHandler();

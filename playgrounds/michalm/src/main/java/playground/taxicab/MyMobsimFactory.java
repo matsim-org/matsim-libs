@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 /**
@@ -35,7 +36,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	@Override
 	public Mobsim createMobsim(final Scenario sc, EventsManager events) {
 
-		final QSim mobsim = QSim.createQSimAndAddAgentSource(sc, events);
+		final QSim mobsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		
 		// add the taxi departure handler to the mobsim:
 		DepartureHandler departureHandler = new TaxiModeDepartureHandler(mobsim) ;

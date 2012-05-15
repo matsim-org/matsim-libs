@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -56,7 +57,7 @@ public class OccupancyCounts {
 
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final QSim sim = QSim.createQSimAndAddAgentSource(scenario, (events));
+		final QSim sim = (QSim) new QSimFactory().createMobsim(scenario, (events));
 		sim.run();
 	}
 
@@ -99,7 +100,7 @@ public class OccupancyCounts {
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
 
-		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 

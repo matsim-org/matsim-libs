@@ -36,6 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -313,7 +314,7 @@ public class TwoLinesDemo {
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
 
-		QSim sim = QSim.createQSimAndAddAgentSource(this.scenario, events);
+		QSim sim = (QSim) new QSimFactory().createMobsim(this.scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();

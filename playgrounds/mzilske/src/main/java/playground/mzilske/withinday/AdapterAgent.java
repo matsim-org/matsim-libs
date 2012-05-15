@@ -10,6 +10,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -139,7 +140,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 		@Override
 		public void done() {
 			System.out.println("I'm done. I am at: " + currentLinkId);
-			simulation.getAgentCounter().decLiving();
+			simulation.getMobsim().getAgentCounter().decLiving();
 			AdapterAgent.this.living = false;
 		}
 
@@ -178,7 +179,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 
 	private Id currentLinkId;
 
-	private Mobsim simulation;
+	private InternalInterface simulation;
 
 	private EventsManager eventsManager;
 
@@ -198,9 +199,9 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 			System.out.println("I want to stop my activity.");
 			eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
 			AdapterAgent.this.activityEndTime = now ;
-			((QSim) simulation).rescheduleActivityEnd(AdapterAgent.this);
+			simulation.rescheduleActivityEnd(AdapterAgent.this);
 
-			simulation.getAgentCounter().decLiving(); 
+			simulation.getMobsim().getAgentCounter().decLiving(); 
 			// This is necessary because the QSim thinks it must increase the living agents counter in the rescheduling step.  mz
 			// The intention there was that an agent that is no longer alive has an activity end time of infinity (rather
 			// than removing it completely from teh mobsim).  The number of
@@ -211,18 +212,18 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 		
 	};
 
-	public AdapterAgent(Plan selectedPlan, Mobsim simulation) {
+	public AdapterAgent(Plan selectedPlan, InternalInterface simulation) {
 	    this(selectedPlan, simulation, new MzPlanAgentImpl(selectedPlan));
     }
 	
-	public AdapterAgent(Plan selectedPlan, Mobsim simulation, RealAgent realAgent) {
+	public AdapterAgent(Plan selectedPlan, InternalInterface simulation, RealAgent realAgent) {
 		id = selectedPlan.getPerson().getId();
 
 		this.realAgent = realAgent;
 		
 		currentLinkId = ((Activity) selectedPlan.getPlanElements().get(0)).getLinkId();
 		this.simulation = simulation;
-		this.eventsManager = simulation.getEventsManager();
+		this.eventsManager = simulation.getMobsim().getEventsManager();
 		
 	}
 	

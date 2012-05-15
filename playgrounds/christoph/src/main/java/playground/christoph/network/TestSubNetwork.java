@@ -31,6 +31,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -125,7 +126,7 @@ public class TestSubNetwork {
 	}
 
 	private void initReplanner() {
-		QSim sim = QSim.createQSimAndAddAgentSource(this.scenario, (EventsUtils.createEventsManager()));
+		QSim sim = (QSim) new QSimFactory().createMobsim(this.scenario, (EventsUtils.createEventsManager()));
 		qNetwork = sim.getNetsimNetwork();
 
 		travelTime = new KnowledgeTravelTimeCalculator(qNetwork);

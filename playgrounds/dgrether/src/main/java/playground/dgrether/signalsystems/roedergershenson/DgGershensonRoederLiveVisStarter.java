@@ -23,6 +23,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -67,7 +68,7 @@ public class DgGershensonRoederLiveVisStarter {
 		}
 
 		SignalEngine engine = new QSimSignalEngine(signalManager);
-		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);

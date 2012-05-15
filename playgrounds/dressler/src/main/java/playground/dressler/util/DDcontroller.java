@@ -32,6 +32,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -119,7 +120,7 @@ public class DDcontroller {
 			EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 			events.addHandler(eventWriter);
 
-			QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+			QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 //			sim.openNetStateWriter("./output/simout", netFilename, 10); // NetVis is no longer supported
 			sim.run();
 

@@ -27,6 +27,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -41,7 +42,7 @@ public class ScenarioPlayer {
 		events.addHandler(writer);
 		events.addHandler(writertxt);
 		
-		final QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+		final QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);

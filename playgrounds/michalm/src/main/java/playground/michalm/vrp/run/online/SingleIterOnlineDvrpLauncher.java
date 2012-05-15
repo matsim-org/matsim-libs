@@ -30,9 +30,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.Dijkstra;
@@ -299,9 +303,17 @@ public class SingleIterOnlineDvrpLauncher
         scenario.getConfig().addQSimConfigGroup(qSimConfig);
 
         EventsManager events = EventsUtils.createEventsManager();
+		QSim qSim = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim, MatsimRandom.getRandom());
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine(teleportationEngine);
 
-        QSim sim = QSim.createQSimWithDefaultEngines(scenario, events,
-                new DefaultQSimEngineFactory());
+        QSim sim = qSim;
 
         TaxiSimEngine taxiSimEngine = wal ? new WalTaxiSimEngine(sim, data, optimizerFactory,
                 dbFileName) : new TaxiSimEngine(sim, data, optimizerFactory);

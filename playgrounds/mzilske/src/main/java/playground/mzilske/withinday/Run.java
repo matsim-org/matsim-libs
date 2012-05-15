@@ -12,11 +12,17 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -25,6 +31,46 @@ import playground.mzilske.logevents.LogOutputEventHandler;
 
 public class Run {
 	
+	private static final class AdapterAgentFactory implements AgentFactory, MobsimEngine {
+		private final QSim qSim;
+		
+		private InternalInterface internalInterface;
+
+		private AdapterAgentFactory(QSim qSim) {
+			this.qSim = qSim;
+		}
+
+		@Override
+		public MobsimAgent createMobsimAgentFromPerson(Person p) {
+			AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), this.internalInterface);
+			qSim.addQueueSimulationListeners(adapterAgent);
+			return adapterAgent;
+		}
+
+		@Override
+		public void doSimStep(double time) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onPrepareSim() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterSim() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setInternalInterface(InternalInterface internalInterface) {
+			this.internalInterface = internalInterface;
+		}
+	}
+
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
@@ -64,19 +110,20 @@ public class Run {
 		
 		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new LogOutputEventHandler());
-		final QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
+		QSim qSim1 = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim1.addMobsimEngine(activityEngine);
+		qSim1.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1, MatsimRandom.getRandom());
+		qSim1.addMobsimEngine(netsimEngine);
+		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim1.addMobsimEngine(teleportationEngine);
+		final QSim qSim = qSim1;
 
 		
-		AgentFactory fac = new AgentFactory() {
-
-			@Override
-			public MobsimAgent createMobsimAgentFromPerson(Person p) {
-				AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), qSim);
-				qSim.addQueueSimulationListeners(adapterAgent);
-				return adapterAgent;
-			}
-			
-		};
+		AdapterAgentFactory fac = new AdapterAgentFactory(qSim);
+		qSim.addMobsimEngine(fac);
 		
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), fac, qSim);
 		qSim.addAgentSource(agentSource);

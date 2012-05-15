@@ -25,6 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -85,7 +86,7 @@ public class FourWaysVis {
 		SignalEngine engine = new QSimSignalEngine(manager);
 
 		
-		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 		
 		//		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());

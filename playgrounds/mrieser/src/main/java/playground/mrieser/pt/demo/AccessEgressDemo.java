@@ -37,6 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -202,7 +203,7 @@ public class AccessEgressDemo {
 		RouteTimeDiagram diagram = new RouteTimeDiagram();
 		events.addHandler(diagram);
 
-		final QSim sim = QSim.createQSimAndAddAgentSource(this.scenario, events);
+		final QSim sim = (QSim) new QSimFactory().createMobsim(this.scenario, events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);
 		OTFClientLive.run(this.scenario.getConfig(), server);

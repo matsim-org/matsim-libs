@@ -36,10 +36,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -222,7 +225,16 @@ public class CostNavigationRouteController extends WithinDayController implement
 		 * ... otherwise the events file is parsed and analyzed.
 		 */
 		else {
-			QSim qSim = QSim.createQSimWithDefaultEngines(scenarioData, events, new DefaultQSimEngineFactory());
+			QSim qSim1 = new QSim(scenarioData, events);
+			ActivityEngine activityEngine = new ActivityEngine();
+			qSim1.addMobsimEngine(activityEngine);
+			qSim1.addActivityHandler(activityEngine);
+			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1, MatsimRandom.getRandom());
+			qSim1.addMobsimEngine(netsimEngine);
+			qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			qSim1.addMobsimEngine(teleportationEngine);
+			QSim qSim = qSim1;
 			ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
 			PopulationAgentSource agentSource = new PopulationAgentSource(scenarioData.getPopulation(), agentFactory, qSim);
 			qSim.addAgentSource(agentSource);

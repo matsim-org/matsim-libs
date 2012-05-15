@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -196,7 +197,7 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(visScenario, events);
+		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(visScenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		otfVisQSim.run();
