@@ -62,8 +62,7 @@ public class SfTransitBuilder {
 		
 	public static final String FLIGHT_TRANSIT_VEHICLES = "flight_transit_vehicles.xml";
 	
-	private static final double TAXI_TOL_TIME = 3*(SfMatsimAirport.taxiwayLength/SfMatsimAirport.taxiwayFreespeed)+	//time for taxi out and taxi in
-												2*(SfMatsimAirport.runwayLength/SfMatsimAirport.runwayFreespeed);	//time for take-off and landing (TOL)
+	private static final double TAXI_TOL_TIME = SfMatsimAirport.TAXI_TOL_TIME;
 	
 	private Scenario loadScenario(String inputNetworkFile){
 		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
@@ -105,7 +104,6 @@ public class SfTransitBuilder {
 			double duration = Double.parseDouble(lineEntries[4]);
 			double distance = 1000*(Double.parseDouble(lineEntries[7])); //km to m
 			double vehicleSpeed =(100*Math.round(distance/(duration-TAXI_TOL_TIME)))/100.;
-//				if (vehicleSpeed< 100.) System.out.println("VEHICLE SPEED: "+vehicleSpeed);
 			Id originId = new IdImpl(origin);
 			Id destinationId = new IdImpl(destination);
 			Id routeId = new IdImpl(transitRoute);	//origin IATA code + destination IATA code

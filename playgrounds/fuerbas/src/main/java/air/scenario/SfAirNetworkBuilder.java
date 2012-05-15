@@ -21,7 +21,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class SfAirNetworkBuilder {
 
 	public static final String NETWORK_FILENAME = "air_network.xml";
-	private static final double MACH_2 = 686.0;	
+	private static final double MACH_2 = 686.0;
+	public static final double CAP_PERIOD = 3600.0;
 
 	public void createNetwork(String Airports, String cityPairs, String networkOutputFilename) throws IOException {
 		int airportcounter = 0;
@@ -32,7 +33,7 @@ public class SfAirNetworkBuilder {
 		allowedModes.add("car");
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		network.setCapacityPeriod(60.0);	
+		network.setCapacityPeriod(CAP_PERIOD);	
 		
 		BufferedReader brAirports = new BufferedReader(new FileReader(new File(Airports)));
 		BufferedReader brRoutes = new BufferedReader(new FileReader(new File(cityPairs)));
@@ -52,13 +53,14 @@ public class SfAirNetworkBuilder {
 			new SfMatsimAirport(new IdImpl(airportCode), airportCoord).createRunways(network);			
 		}
 		
-		
 		while (brRoutes.ready()) {
 			String oneLine = brRoutes.readLine();
 			String[] lineEntries = oneLine.split("\t");
 			String[] airportCodes = lineEntries[0].split("_");
 			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
 			double groundSpeed = MACH_2;	
+			double duration = Double.parseDouble(lineEntries[2]);
+//			groundSpeed = Math.round(100*length/(duration-SfMatsimAirport.TAXI_TOL_TIME))/100.;	//set for older MATSim version, where max. speed in VehicleType ist not supported
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];
 			
@@ -66,7 +68,9 @@ public class SfAirNetworkBuilder {
 			Id destinationRunway = new IdImpl(destination+"runwayInbound");
 			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), network.getNodes().get(originRunway), network.getNodes().get(destinationRunway));
 			originToDestination.setAllowedModes(allowedModes);
-			originToDestination.setCapacity(1.0);
+			
+//			WARNUNG HINZUFÜGEN, CAP*5
+			originToDestination.setCapacity(1.0*CAP_PERIOD*5.);
 			originToDestination.setFreespeed(groundSpeed);
 			originToDestination.setLength(length);
 			network.addLink(originToDestination);

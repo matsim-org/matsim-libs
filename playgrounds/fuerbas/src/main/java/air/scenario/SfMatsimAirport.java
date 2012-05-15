@@ -23,6 +23,7 @@ package air.scenario;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +38,8 @@ public class SfMatsimAirport {
 	public static final double taxiwayLength = 500.0;
 	public static final double taxiwayFreespeed = 20.0/3.6;
 	public static final double runwayFreespeed = 220.0/2.6;
+	public static final double TAXI_TOL_TIME = 3*(taxiwayLength/taxiwayFreespeed)+	//time for taxi out and taxi in
+			2*(runwayLength/runwayFreespeed);	//time for take-off and landing (TOL)
 	
 	public Coord coord;
 	public Id id;
@@ -103,13 +106,15 @@ public class SfMatsimAirport {
 		
 //		c_storage != 1; c_storage = (length*n_lanes)/7.5
 		
-		linkApron.setCapacity(10.);
-		linkTaxiIn.setCapacity(1.);
-		linkTaxiIn.setNumberOfLanes(0.015);	
-		linkTaxiOut.setCapacity(1.);
-		linkRunwayIn.setCapacity(60.);
-		linkRunwayOut.setCapacity(60.);
-		linkRunwayOut.setNumberOfLanes(0.005);
+//		WARNING HINZUFÜGEN, CAP*5 NEHMEN
+		
+		linkApron.setCapacity(1.*network.getCapacityPeriod()*5.);
+		linkTaxiIn.setCapacity((1./60)*network.getCapacityPeriod()*5.);
+		linkTaxiIn.setNumberOfLanes(0.015*5.);	
+		linkTaxiOut.setCapacity((1./60)*network.getCapacityPeriod()*5.);
+		linkRunwayIn.setCapacity(1.*network.getCapacityPeriod()*5.);
+		linkRunwayOut.setCapacity(1.*network.getCapacityPeriod()*5.);
+		linkRunwayOut.setNumberOfLanes(0.005*5.);
 		
 		linkApron.setLength(taxiwayLength);
 		linkTaxiIn.setLength(taxiwayLength);

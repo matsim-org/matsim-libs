@@ -167,27 +167,27 @@ public class SfAirScheduleBuilder {
 						String aircraftType = lineEntries[21];
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
 
-
-
-						
 						//some error correction code
 						if ( 
 //								lineEntries[14].contains("2") && //filter for Tuesday flights only
 								!flights.containsKey(flightDesignator)
-//								&& seatsAvail > 0 //filter for flights with 1 PAX or more only
-//								&& !originAirport.equalsIgnoreCase(destinationAirport)
+								&& seatsAvail > 0 //filter for flights with 1 PAX or more only
+								&& !originAirport.equalsIgnoreCase(destinationAirport)
 								&& this.airports.containsKey(originAirport)
 								&& this.airports.containsKey(destinationAirport)
 								&& !aircraftType.equalsIgnoreCase("BUS") //filter busses
 								&& !aircraftType.equalsIgnoreCase("RFS") //filter bus/train
 								&& !aircraftType.equalsIgnoreCase("TRN") //filter trains
-//								&& (stops < 1)
-//								&& (fullRouting.length() <= 6)
-								&& (destinationAirport.equalsIgnoreCase("MUC")
-								|| originAirport.equalsIgnoreCase("MUC"))
+								&& (stops < 1)
+								&& (fullRouting.length() <= 6)
+//								&& destinationAirport.equalsIgnoreCase("MUC")
+//								&& originAirport.equalsIgnoreCase("MUC")
+//								)
 //						use this line to filter desired airports: currently all flights to/from MUC
 //						for fixed city pairs use: originAirport.equalsIgnoreCase("FRA") && destinationAirport.equalsIgnoreCase("MUC") and vice versa
 								) {
+							
+//							if (destinationAirport.equalsIgnoreCase("MUC")) duration = duration-(17.4*60);	//17.4 minutes duration for MUC STAR arrivals
 
 							if (!this.routes.containsKey(route)) {
 								this.routes.put(route, duration);
@@ -197,7 +197,7 @@ public class SfAirScheduleBuilder {
 
 							if ((flightDistance * 1000 / duration) <= 40.)
 								log.debug("too low speed :" + flightDesignator);
-
+							
 							bwOag.write(route + "\t" + // TransitRoute
 									route + "_" + carrier + "\t" + // TransitLine
 									flightDesignator + "\t" + // vehicleId

@@ -34,20 +34,29 @@ public class SfFlightDelayAnalysis {
 
 	/**
 	 * @author fuerbas
+	 * When using SfAirController flight delays can be analyzed using this class. Range of delays may be determined by
+	 * MIN_MAX_DELAY, any delays larger (or smaller for negative values) will be accumulated. DELAY_OUTPUT_INTERVAL
+	 * can be used to define an interval within which delay will be accumulated.
 	 */
 	
 	private Map<String, Double> actualArrival;
 	private Map<String, Double> scheduledArrival;
-	private Map<Integer, Integer> delay;	
+	private Map<Integer, Integer> delay;
+	private Map<Integer, Integer> delayAcc;
 	
-	private static String actualTimes = "Z:\\WinHome\\flight_model_muc_all_flights\\run\\ITERS\\it.0\\0.statistic.csv";
-	private static String scheduledTimes= "Z:\\WinHome\\flight_model_muc_all_flights\\oag_flights.txt";
-	private static String delayOutput = "Z:\\WinHome\\flight_model_muc_all_flights\\run\\delay.csv";
+	private static final int MIN_MAX_DELAY = 60;	//set desired min./max. delay
+	private static final int DELAY_OUTPUT_INTERVAL = 5;
+	
+	private static String actualTimes = "Z:\\WinHome\\munich_output\\ITERS\\it.0\\0.statistic.csv";
+	private static String scheduledTimes= "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\oag_flights.txt";
+	private static String delayOutput = "Z:\\WinHome\\munich_output\\delay.csv";
+	private static String delayOutputAcc = "Z:\\WinHome\\munich_output\\delay_acc.csv";
 	
 	public SfFlightDelayAnalysis() {
 		this.actualArrival = new HashMap<String, Double>(); 
 		this.scheduledArrival = new HashMap<String, Double>();
 		this.delay = new TreeMap<Integer, Integer>();
+		this.delayAcc = new TreeMap<Integer, Integer>();
 	}
 	
 	public static void main(String[] args) {
@@ -66,32 +75,24 @@ public class SfFlightDelayAnalysis {
 		BufferedReader brActual = new BufferedReader(new FileReader(new File(actualTimes)));
 		BufferedReader brScheduled = new BufferedReader(new FileReader(new File(scheduledTimes)));
 		BufferedWriter bwDelay = new BufferedWriter(new FileWriter(new File(delayOutput)));
-		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File("Z:\\WinHome\\flight_model_muc_all_flights\\run\\delayByFlight.csv")));
+		BufferedWriter bwDelayAcc = new BufferedWriter(new FileWriter(new File(delayOutputAcc)));
+		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File("Z:\\WinHome\\munich_output\\delayByFlight.csv")));
 		
-		this.delay.put(0, 0);
-		this.delay.put(1, 0);
-		this.delay.put(2, 0);
-		this.delay.put(3, 0);
-		this.delay.put(4, 0);
-		this.delay.put(5, 0);
-		this.delay.put(10, 0);
-		this.delay.put(15, 0);
-		this.delay.put(20, 0);
-		this.delay.put(25, 0);
-		this.delay.put(30, 0);
-		this.delay.put(31, 0);
+		for (int kk=0; kk<=(MIN_MAX_DELAY+1); kk++) {
+			this.delay.put(kk, 0);
+			this.delay.put(-kk, 0);
+		}
 		
-		this.delay.put(-1, 0);
-		this.delay.put(-2, 0);
-		this.delay.put(-3, 0);
-		this.delay.put(-4, 0);
-		this.delay.put(-5, 0);
-		this.delay.put(-10, 0);
-		this.delay.put(-15, 0);
-		this.delay.put(-20, 0);
-		this.delay.put(-25, 0);
-		this.delay.put(-30, 0);
-		this.delay.put(-31, 0);
+		for (int kk=0; kk<=(MIN_MAX_DELAY+1); kk++) {
+			if (kk%DELAY_OUTPUT_INTERVAL == 0) {
+				this.delayAcc.put(kk, 0);
+				this.delayAcc.put(-kk, 0);			
+			}
+			else if (kk == (MIN_MAX_DELAY+1)) {
+				this.delayAcc.put(kk, 0);
+				this.delayAcc.put(-kk, 0);
+			}
+		}
 		
 		int lines = 0;
 			
@@ -113,151 +114,63 @@ public class SfFlightDelayAnalysis {
 			String line = brScheduled.readLine();
 			String[] entries = line.split("\t");
 			String flightNumber = entries[2];
+			if (this.actualArrival.containsKey(flightNumber)) {
 			Double arrival = Double.parseDouble(entries[3])+Double.parseDouble(entries[4]);
 			this.scheduledArrival.put(flightNumber, arrival/60);
-			Double flightDelay = this.actualArrival.get(flightNumber)-this.scheduledArrival.get(flightNumber);
-			if (flightDelay >=60.) System.out.println(flightNumber+"..."+flightDelay+"STA"+this.scheduledArrival.get(flightNumber)+"ATA"+this.actualArrival.get(flightNumber));
+			long flightDelay = Math.round(this.actualArrival.get(flightNumber)-this.scheduledArrival.get(flightNumber));
+			
 			bwDelaySingleFlights.write(this.actualArrival.get(flightNumber)+"\t"+flightDelay);
 			bwDelaySingleFlights.newLine();
 			
-				if (flightDelay == 0.) {
-					Integer soFar = this.delay.get(0);
+				if (flightDelay==0) {
+					int soFar = this.delay.get(0);
 					soFar++;
 					this.delay.put(0, soFar);
+					this.delayAcc.put(0, soFar);
+				}
+			
+				for (int ii=1; ii<=MIN_MAX_DELAY; ii++) {
+					if (flightDelay == ii) {
+						int soFar = this.delay.get(ii);
+						soFar++;
+						this.delay.put(ii, soFar);
+						int delay;
+						if (ii%DELAY_OUTPUT_INTERVAL == 0) delay = ii;
+						else delay = ii - (ii%DELAY_OUTPUT_INTERVAL) + DELAY_OUTPUT_INTERVAL;
+						int soFarAcc = this.delayAcc.get(delay);
+						soFarAcc++;
+						this.delayAcc.put(delay, soFarAcc);
+					}
+					else if (flightDelay>MIN_MAX_DELAY) {
+						int soFar = this.delay.get(MIN_MAX_DELAY+1);
+						soFar++;
+						this.delay.put(MIN_MAX_DELAY+1, soFar);
+						this.delayAcc.put(MIN_MAX_DELAY+1, soFar);
+						break;
+					}
 				}
 				
-				if (flightDelay > 0. && flightDelay < 1.) {
-					Integer soFar = this.delay.get(1);
-					soFar++;
-					this.delay.put(1, soFar);
+				for (int jj=1; jj<=MIN_MAX_DELAY; jj++) {
+					if (flightDelay == (-jj)) {
+						int soFar = this.delay.get(-jj);
+						soFar++;
+						this.delay.put(-jj, soFar);
+						int delay;
+						if (jj%DELAY_OUTPUT_INTERVAL == 0) delay = -jj;
+						else delay = -(jj - (jj%DELAY_OUTPUT_INTERVAL) + DELAY_OUTPUT_INTERVAL);
+						int soFarAcc = this.delayAcc.get(delay);
+						soFarAcc++;
+						this.delayAcc.put(delay, soFarAcc);
+					}
+					else if (flightDelay<-MIN_MAX_DELAY) {
+						int soFar = this.delay.get(-(MIN_MAX_DELAY+1));
+						soFar++;
+						this.delay.put(-(MIN_MAX_DELAY+1), soFar);
+						this.delayAcc.put(-(MIN_MAX_DELAY+1), soFar);
+						break;
+					}
 				}
-				
-				if (flightDelay >=1. && flightDelay < 2.) {
-					Integer soFar = this.delay.get(2);
-					soFar++;
-					this.delay.put(2, soFar);
-				}
-				
-				if (flightDelay >=2. && flightDelay < 3.) {
-					Integer soFar = this.delay.get(3);
-					soFar++;
-					this.delay.put(3, soFar);
-				}
-				
-				if (flightDelay >=3. && flightDelay < 4.) {
-					Integer soFar = this.delay.get(4);
-					soFar++;
-					this.delay.put(4, soFar);
-				}
-				
-				if (flightDelay >=4. && flightDelay < 5.) {
-					Integer soFar = this.delay.get(5);
-					soFar++;
-					this.delay.put(5, soFar);
-				}
-				
-				if (flightDelay >= 5. && flightDelay < 10.) {
-					Integer soFar = this.delay.get(10);
-					soFar++;
-					this.delay.put(10, soFar);
-				}
-				
-				if (flightDelay >= 10. && flightDelay < 15.) {
-					Integer soFar = this.delay.get(15);
-					soFar++;
-					this.delay.put(15, soFar);
-				}
-				
-				if (flightDelay >= 15. && flightDelay < 20.) {
-					Integer soFar = this.delay.get(20);
-					soFar++;
-					this.delay.put(20, soFar);
-				}
-				
-				if (flightDelay >= 20. && flightDelay < 25.) {
-					Integer soFar = this.delay.get(25);
-					soFar++;
-					this.delay.put(25, soFar);
-				}
-				
-				if (flightDelay >= 25. && flightDelay < 30.) {
-					Integer soFar = this.delay.get(30);
-					soFar++;
-					this.delay.put(30, soFar);
-				}
-				
-				if (flightDelay >= 30.) {
-					Integer soFar = this.delay.get(31);
-					soFar++;
-					this.delay.put(31, soFar);
-				}
-				
-				if (flightDelay < 0. && flightDelay >-1.) {
-					Integer soFar = this.delay.get(-1);
-					soFar++;
-					this.delay.put(-1, soFar);
-				}
-				
-				if (flightDelay <=-1. && flightDelay >-2.) {
-					Integer soFar = this.delay.get(-2);
-					soFar++;
-					this.delay.put(-2, soFar);
-				}
-				
-				if (flightDelay <=-2. && flightDelay >-3.) {
-					Integer soFar = this.delay.get(-3);
-					soFar++;
-					this.delay.put(-3, soFar);
-				}
-				
-				if (flightDelay <= -3. && flightDelay >-4.) {
-					Integer soFar = this.delay.get(-4);
-					soFar++;
-					this.delay.put(-4, soFar);
-				}
-				
-				if (flightDelay <= -4. && flightDelay >-5.) {
-					Integer soFar = this.delay.get(-5);
-					soFar++;
-					this.delay.put(-5, soFar);
-				}
-				
-				if (flightDelay <= -5. && flightDelay >-10.) {
-					Integer soFar = this.delay.get(-10);
-					soFar++;
-					this.delay.put(-10, soFar);
-				}
-				
-				if (flightDelay <= -10. && flightDelay >-15.) {
-					Integer soFar = this.delay.get(-15);
-					soFar++;
-					this.delay.put(-15, soFar);
-				}
-				
-				if (flightDelay <= -15. && flightDelay >-20.) {
-					Integer soFar = this.delay.get(-20);
-					soFar++;
-					this.delay.put(-20, soFar);
-				}
-				
-				if (flightDelay <= -20. && flightDelay >-25.) {
-					Integer soFar = this.delay.get(-25);
-					soFar++;
-					this.delay.put(-25, soFar);
-				}
-				
-				if (flightDelay <= -25. && flightDelay >-30.) {
-					Integer soFar = this.delay.get(-30);
-					soFar++;
-					this.delay.put(-30, soFar);
-				}
-				
-				if (flightDelay <= -30.) {
-					Integer soFar = this.delay.get(-31);
-					soFar++;
-					this.delay.put(-31, soFar);
-				}				
-				
+			}
 		}
 		
 		brScheduled.close();
@@ -265,6 +178,8 @@ public class SfFlightDelayAnalysis {
 		
 		bwDelay.write("Delay in minutes \t Number of Delays");
 		bwDelay.newLine();
+		bwDelayAcc.write("Delay in minutes \t Number of Delays");
+		bwDelayAcc.newLine();
 		
 		Iterator it = this.delay.entrySet().iterator();
 	    while (it.hasNext()) {
@@ -273,8 +188,18 @@ public class SfFlightDelayAnalysis {
 	        bwDelay.newLine();
 	    }
 	    
+		Iterator it2 = this.delayAcc.entrySet().iterator();
+	    while (it2.hasNext()) {
+	        Map.Entry pairs = (Map.Entry)it2.next();
+	        bwDelayAcc.write(pairs.getKey().toString()+"\t"+pairs.getValue());
+	        bwDelayAcc.newLine();
+	    }
+	    
 	    bwDelay.flush();
 	    bwDelay.close();
+	    
+	    bwDelayAcc.flush();
+	    bwDelayAcc.close();
 		
 	}
 

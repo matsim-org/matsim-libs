@@ -37,8 +37,8 @@ public class DgCreateFlightScenario {
 //		String utcOffsetfile = "/media/data/work/repos/"
 //		+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 		
-//		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\";
-		String baseDirectory = "Z:\\WinHome\\flight_model_muc_all_flights\\";
+		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_outbound\\";
+//		String baseDirectory = "Z:\\WinHome\\flight_model_muc_all_flights\\";
 		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
@@ -80,10 +80,11 @@ public class DgCreateFlightScenario {
 	}
 	
 	public static void createGermanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
-		String baseDirectory = "/media/data/work/repos/"
-				+ "shared-svn/studies/countries/de/flight/sf_oag_flight_model/";
+		
+		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\";
+		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.GERMAN_COUNTRIES, SfAirScheduleBuilder.UTC_OFFSET_FILE);
+		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.GERMAN_COUNTRIES, utcOffsetfile);
 
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
 		String outputOsmAirportsFilename = baseDirectory + SfAirScheduleBuilder.AIRPORTS_OUTPUT_FILE;
@@ -132,7 +133,7 @@ public class DgCreateFlightScenario {
 //		createEuropeanFlightScenario(inputOsmFilename, inputOagFilename);
 		
 		// GERMAN AIR TRAFFIC
-//		createGermanFlightScenario(inputOsmFilename, inputOagFilename);
+//		createGermanFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 	}
 
