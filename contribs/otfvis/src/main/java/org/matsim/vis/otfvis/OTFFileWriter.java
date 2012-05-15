@@ -86,16 +86,12 @@ public final class OTFFileWriter implements SnapshotWriter {
 	private void writeQuad() {
 		try {
 			this.zos.putNextEntry(new ZipEntry("quad.bin"));
-			onAdditionalQuadData(this.connect);
+			this.quad.addAdditionalElement(this.writer);
 			new ObjectOutputStream(this.zos).writeObject(this.quad);
 			this.zos.closeEntry();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	protected void onAdditionalQuadData(OTFConnectionManager connect) {
-		this.quad.addAdditionalElement(this.writer);
 	}
 
 	private void writeConstData() {
@@ -117,11 +113,6 @@ public final class OTFFileWriter implements SnapshotWriter {
 	public void beginSnapshot(final double time) {
 		this.positions.clear();
 		this.lastTime = time;
-	}
-
-	public boolean dump(final int time_s) {
-		writeDynData(time_s);
-		return true;
 	}
 
 	private void writeDynData(final int time_s) {
@@ -148,7 +139,7 @@ public final class OTFFileWriter implements SnapshotWriter {
 
 	@Override
 	public void endSnapshot() {
-		dump((int)this.lastTime);
+		writeDynData((int)this.lastTime);
 	}
 
 	@Override
