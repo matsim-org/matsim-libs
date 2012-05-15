@@ -27,7 +27,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 // extends EnterpriseCensus of Meister
@@ -38,7 +38,7 @@ public class AgentInteractionEnterpriseCensus {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static Logger log = Logger.getLogger(AgentInteractionEnterpriseCensus.class);
+	//private static Logger log = Logger.getLogger(AgentInteractionEnterpriseCensus.class);
 
 	// config variables
 
@@ -248,33 +248,33 @@ public class AgentInteractionEnterpriseCensus {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void printHectareAggregationReport() {
-		
-		int numEntries = 0;
-		for (Integer reli : this.hectareAggregation.keySet()) {
-			for (String noga : this.hectareAggregation.get(reli).keySet()) {
-//				System.out.println(reli + ":" + noga + " -> " + this.hectareAggregation.get(reli).get(noga).toString());
-				numEntries++;
-			}
-		}		
-
-		log.info("Number of hectare aggregation entries: " + numEntries);
-
-	}
-	
-	public void printPresenceCodesReport() {
-		
-		int numPresenceCodes = 0;
-		
-		for (Integer reli : this.presenceCodes.keySet()) {
-			for (String noga : this.presenceCodes.get(reli)) {
-//				System.out.println(reli + " -> " + noga);
-				numPresenceCodes++;
-			}
-		}
-		
-		log.info("Number of presence code entries: " + numPresenceCodes);
-		
-	}
-
+//	public void printHectareAggregationReport() {
+//		
+//		int numEntries = 0;
+//		for (Integer reli : this.hectareAggregation.keySet()) {
+//			for (String noga : this.hectareAggregation.get(reli).keySet()) {
+////				System.out.println(reli + ":" + noga + " -> " + this.hectareAggregation.get(reli).get(noga).toString());
+//				numEntries++;
+//			}
+//		}		
+//
+//		log.info("Number of hectare aggregation entries: " + numEntries);
+//
+//	}
+//	
+//	public void printPresenceCodesReport() {
+//		
+//		int numPresenceCodes = 0;
+//		
+//		for (Integer reli : this.presenceCodes.keySet()) {
+//			for (String noga : this.presenceCodes.get(reli)) {
+////				System.out.println(reli + " -> " + noga);
+//				numPresenceCodes++;
+//			}
+//		}
+//		
+//		log.info("Number of presence code entries: " + numPresenceCodes);
+//		
+//	}
+//
 }

@@ -22,16 +22,11 @@ package input;
 
 import java.io.IOException;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-
-//import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
-//import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
-//import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI.KTIYear;
 import input.FacilitiesCreation;
 import input.AddOpentimes;
 
@@ -90,9 +85,12 @@ public class FacilitiesProduction {
 				);
 
 		new FacilitiesCreation(ktiYear).run(facilities);
-		AddOpentimes addOpentimes = new AddOpentimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		AddOpentimes addOpentimes = new AddOpentimes();
 		addOpentimes.init();
-		addOpentimes.run(facilities);
+		for (ActivityFacility facility: facilities.getFacilities().values()) {
+			addOpentimes.run(facility);
+		}
+		
 
 		System.out.println("  writing facilities file... ");
 		new FacilitiesWriter(facilities).write("output/facilities.xml.gz");

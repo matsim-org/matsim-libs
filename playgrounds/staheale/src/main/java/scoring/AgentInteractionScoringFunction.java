@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -38,7 +39,8 @@ public class AgentInteractionScoringFunction extends CharyparNagelOpenTimesScori
 	//private final TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private CharyparNagelScoringParameters params;
 	private FacilityOccupancy occupancies;
-	private CreateFacilityAttributes capacities;
+	private CreateFacilityAttributes attributes;
+	private ActivityOption facility;
 	
 
 	public AgentInteractionScoringFunction(final Plan plan, final CharyparNagelScoringParameters params, final TreeMap<Id, FacilityOccupancy> facilityOccupancies, final ActivityFacilities facilities, final TreeMap<Id, CreateFacilityAttributes> facilityAttributes) {
@@ -123,24 +125,23 @@ public class AgentInteractionScoringFunction extends CharyparNagelOpenTimesScori
 		}
 				
 		// ------------disutilities of agent interaction----------- 
-		String cap = capacities.getCapacity();
-		double capacity = Double.parseDouble(cap);
+		double capacity = facility.getCapacity();
 		double occupancy = occupancies.getOccupancyPerHour(activityStart);
 		double load = occupancy/capacity;
 		
 		// disutility of agent interaction underarousal
-		String thresholdUnderArousal = capacities.getLowerBound();
+		String thresholdUnderArousal = attributes.getLowerBound();
 		double lowerBound = Double.parseDouble(thresholdUnderArousal);
-		String lowerMUtility = capacities.getLowerMarginalUtility();
+		String lowerMUtility = attributes.getLowerMarginalUtility();
 		double lowerMarginalUtility = Double.parseDouble(lowerMUtility);
 		if ((load < lowerBound) && load>0) {
 			tmpScore += lowerMarginalUtility/load * (minimalDuration - duration);
 		}
 		
 		// disutility of agent interaction overarousal
-		String thresholdOverArousal = capacities.getUpperBound();
+		String thresholdOverArousal = attributes.getUpperBound();
 		double upperBound = Double.parseDouble(thresholdOverArousal);
-		String upperMUtility = capacities.getUpperMarginalUtility();
+		String upperMUtility = attributes.getUpperMarginalUtility();
 		double upperMarginalUtility = Double.parseDouble(upperMUtility);
 		if ((load > upperBound)) {
 			tmpScore += upperMarginalUtility*load * (minimalDuration - duration);

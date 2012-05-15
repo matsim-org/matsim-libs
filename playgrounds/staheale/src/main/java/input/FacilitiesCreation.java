@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+//import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 
 import org.matsim.core.basic.v01.IdImpl;
@@ -93,8 +95,8 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 			e.printStackTrace();
 		}
 
-		myCensus.printPresenceCodesReport();
-		myCensus.printHectareAggregationReport();
+	//	myCensus.printPresenceCodesReport();
+	//	myCensus.printHectareAggregationReport();
 
 		log.info("Reading enterprise census files into EnterpriseCensus object...done.");
 	}
@@ -147,7 +149,7 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 		int additionalFTEs = Integer.MIN_VALUE;
 
 		int hectareCnt = 0, facilityCnt = 0;
-		int skip = 1;
+		//int skip = 1;
 		int numFacilities, numFTEs, numSectorFTE = Integer.MAX_VALUE, sizeRange;
 		String X, Y, attributeId, tempFacilityId, activityId = null;
 		HashSet<String> presenceCodeItems = null;
@@ -233,7 +235,7 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before
 						a = f.createActivityOption("work");
-						a.setCapacity((double) tempFacilities.get(tempFacilityId));
+						a.setCapacity((double) Math.max(1,tempFacilities.get(tempFacilityId)));
 
 						// create the other activities
 						if (this.facilityActivities.containsKey(attributeId)) {
@@ -259,10 +261,10 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 						// set the capacity to the number of fulltime equivalents revealed
 						if (sector.equals(ProductionSector.SECTOR2)) {
 							a = f.createActivityOption(FacilitiesProduction.WORK_SECTOR2);
-							a.setCapacity((double) tempFacilities.get(tempFacilityId));
+							a.setCapacity((double) Math.max(1,tempFacilities.get(tempFacilityId)));
 						} else if(sector.equals(ProductionSector.SECTOR3)) {
 							a = f.createActivityOption(FacilitiesProduction.WORK_SECTOR3);
-							a.setCapacity((double) tempFacilities.get(tempFacilityId));
+							a.setCapacity((double) Math.max(1,tempFacilities.get(tempFacilityId)));
 						}
 								
 						if (this.facilityActivities.containsKey(activityId)) {
@@ -271,107 +273,127 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 							//--------------------shop retail capacity definition
 							
 							//shop retail capacity is assumed to depend on sales area where arbitrary 50% are subtracted for shelfs, cash points etc., then a LOS E value of 1.35 P/m2 is assumed for capacity definition; for sales area a random pick in the given intervals is performed 
-							
-						if (this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500)) {
-							a.setCapacity((double) Math.round(0.5*(2500 + random.nextInt(4500))*1.35));
-						} else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET1000)) {
-							a.setCapacity((double) Math.round(0.5*(1000 + random.nextInt(1500))*1.35));
-						} else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET400)) {
-							a.setCapacity((double) Math.round(0.5*(400 + random.nextInt(599))*1.35));
-						} else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET100)) {
-							a.setCapacity((double) Math.round(0.5*(100 + random.nextInt(299))*1.35));
-						} else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_LT100)) {
-							a.setCapacity((double) Math.round(0.5*(20 + random.nextInt(79))*1.35));
+										
+						if (f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500)) {
+							double n = Math.round(0.675*(random.nextInt(4500) + 2501));
+							a.setCapacity((double) n);
+							//log.info("capacity of shop retail gt2500 set to " +n);
+						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET1000)) {
+							double x = Math.round(0.675*(1000 + random.nextInt(1501)));
+							a.setCapacity((double) x);
+							log.info("capacity of shop retail get1000 set to " +x);
+						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET400)) {
+							a.setCapacity((double) Math.round(0.675*(400 + random.nextInt(600))));
+						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET100)) {
+							double z = Math.round(0.675*(100 + random.nextInt(300)));
+							a.setCapacity((double) z);
+							//log.info("capacity of shop retail get100 set to " +z);
+						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_LT100)) {
+							a.setCapacity((double) Math.round(0.675*(20 + random.nextInt(80))));
 						}
 							
 						//shop retail other sales area is assumed to vary between 20 and 1000 m2
 							
-						else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER)) {
-							a.setCapacity((double) Math.round(0.5*(20 + random.nextInt(980))*1.35));
+						else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER)) {
+							a.setCapacity((double) Math.round(0.675*(20 + random.nextInt(981))));
 						}
 						
 						//-------------------------shop service capacity definition
 						
 						//capacity is assumed to depend on the number of people working there, one employee can serve 1 customer, subtract 10% for vacancies and 20% for shift operation
 							
-						else if(this.facilityActivities.containsKey(FacilitiesProduction.SHOP_SERVICE)) {
-							a.setCapacity((double) Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7)));
+						else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_SERVICE)) {
+							double v = Math.max(1,Math.round((tempFacilities.get(tempFacilityId)*0.7)));
+							a.setCapacity((double) v);
+							//log.info("setting shop service capacity to " +v);
 						}
 							
 						//-------------------------sports & fun capacity definition
 							
 						//bar, disco, dancings, arcades casino: capacity is assumed to depend on the number of people working there, one employee can serve between 10-20 customer, subtract 10% for vacancies and 20% for shift operation
 				
-						else if(this.facilityActivities.containsKey("B015540A") || this.facilityActivities.containsKey("B019234B") || this.facilityActivities.containsKey("B019234C")|| this.facilityActivities.containsKey("B019271A")) {
-							a.setCapacity((double) Math.round((tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(10))));
+						else if(f.getActivityOptions().containsKey("B015540A") || f.getActivityOptions().containsKey("B019234B") || f.getActivityOptions().containsKey("B019234C")|| f.getActivityOptions().containsKey("B019271A")) {
+							double y = Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(11))));
+							a.setCapacity((double) y);
+							//log.info("setting capacity for bar, disco, etc. with a value of: " +y);
 						}
 						
 						//dancing school, other sportive activities like tennis or golf schools: capacity is assumed to depend on the number of people working there, one employee can serve between 20-30 customer, subtract 10% for vacancies and 20% for shift operation
 						
-						else if(this.facilityActivities.containsKey("B019234A") || this.facilityActivities.containsKey("B019262B") || this.facilityActivities.containsKey("B019272A")) {
-							a.setCapacity((double) Math.round((tempFacilities.get(tempFacilityId))*0.7*(20 + random.nextInt(10))));
+						else if(f.getActivityOptions().containsKey("B019234A") || f.getActivityOptions().containsKey("B019262B") || f.getActivityOptions().containsKey("B019272A")) {
+							a.setCapacity((double) Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(20 + random.nextInt(11)))));
 						}
 						
 						//operation of sport facilities: arbitrary set to vary between 20 and 20'000
 						
-						else if(this.facilityActivities.containsKey("B019261A")) {
-							a.setCapacity((double) (20 + random.nextInt(9980)));
+						else if(f.getActivityOptions().containsKey("B019261A")) {
+							int m = random.nextInt(20);
+							if (m<1){
+								a.setCapacity((double) (800 + random.nextInt(29201)));
+							}
+							else {
+								a.setCapacity((double) (20 + random.nextInt(780)));
+							}
+							log.info("setting capacity for sport facilities");
+
 						}
 						
 						//sport clubs: arbitrary set to vary between 10 and 50
 							
-						else if(this.facilityActivities.containsKey("B019262A")) {
-							a.setCapacity((double) (10 + random.nextInt(40)));
+						else if(f.getActivityOptions().containsKey("B019262A")) {
+							a.setCapacity((double) (10 + random.nextInt(41)));
+							log.info("setting capacity for sport club");
 						}
 							
 						//sauna, solarium, gym, thermal bath, etc.: arbitrary set to vary between 10 and 100
 							
-						else if(this.facilityActivities.containsKey("B019304A")|| this.facilityActivities.containsKey("B019304B") || this.facilityActivities.containsKey("B019304C")) {
-							a.setCapacity((double) (10 + random.nextInt(90)));
+						else if(f.getActivityOptions().containsKey("B019304A")|| f.getActivityOptions().containsKey("B019304B") || f.getActivityOptions().containsKey("B019304C")) {
+							a.setCapacity((double) (10 + random.nextInt(91)));
+							log.info("setting capacity for sauna, solarium, gym, etc.");
 						}
 							
 						//amusement parks: arbitrary set to vary between 100 and 1000
 							
-						else if(this.facilityActivities.containsKey("B019233A")) {
-							a.setCapacity((double) (100 + random.nextInt(990)));
+						else if(f.getActivityOptions().containsKey("B019233A")) {
+							a.setCapacity((double) (100 + random.nextInt(991)));
 						}
 							
 						//-------------------------gastro & culture capacity definition
 							
 						//restaurant, canteen: arbitrary set to vary between 25 and 200
 				
-						else if(this.facilityActivities.containsKey("B015530A") || this.facilityActivities.containsKey("B015551A")) {
-							a.setCapacity((double) (25 + random.nextInt(175)));
+						else if(f.getActivityOptions().containsKey("B015530A") || f.getActivityOptions().containsKey("B015551A")) {
+							a.setCapacity((double) (25 + random.nextInt(176)));
 						}
 							
 						//cinema: arbitrary set to vary between 200 and 800
 							
-						else if(this.facilityActivities.containsKey("B019213A")) {
-							a.setCapacity((double) (200 + random.nextInt(600)));
+						else if(f.getActivityOptions().containsKey("B019213A")) {
+							a.setCapacity((double) (200 + random.nextInt(601)));
 						}
 							
 						//theater, orchestra, circus, etc.: arbitrary set to vary between 100 and 1400
 							
-						else if(this.facilityActivities.containsKey("B019231A") || this.facilityActivities.containsKey("B019231B") || this.facilityActivities.containsKey("B019234D")) {
-							a.setCapacity((double) (100 + random.nextInt(1300)));
+						else if(f.getActivityOptions().containsKey("B019231A") || f.getActivityOptions().containsKey("B019231B") || f.getActivityOptions().containsKey("B019234D")) {
+							a.setCapacity((double) (100 + random.nextInt(1301)));
 						}
 							
 						//libraries: arbitrary set to vary between 20 and 200
 							
-						else if(this.facilityActivities.containsKey("B019251A")) {
-							a.setCapacity((double) (20 + random.nextInt(180)));
+						else if(f.getActivityOptions().containsKey("B019251A")) {
+							a.setCapacity((double) (20 + random.nextInt(181)));
 						}
 							
 						//museum: arbitrary set to vary between 50 and 700
 							
-						else if(this.facilityActivities.containsKey("B019252A")) {
-							a.setCapacity((double) (50 + random.nextInt(650)));
+						else if(f.getActivityOptions().containsKey("B019252A")) {
+							a.setCapacity((double) (50 + random.nextInt(651)));
 						}
 							
 						//zoo, gardens, natural parks: arbitrary set to vary between 50 and 1000
 							
-						else if(this.facilityActivities.containsKey("B019253A")) {
-							a.setCapacity((double) (50 + random.nextInt(950)));
+						else if(f.getActivityOptions().containsKey("B019253A")) {
+							a.setCapacity((double) (50 + random.nextInt(951)));
 						}
 													
 					}

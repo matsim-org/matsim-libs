@@ -20,29 +20,29 @@
 
 package input;
 
-import java.util.List;
+//import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import org.matsim.api.core.v01.BasicLocation;
+//import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Coord;
+//import org.matsim.api.core.v01.Coord;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+//import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+//import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.gbl.Gbl;
+//import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -59,29 +59,32 @@ import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
  */
 public class AddOpentimes extends AbstractFacilityAlgorithm {
 
-	private final ScenarioImpl scenario;
-	private final ActivityFacilitiesImpl shopsOf2005;
+	private ScenarioImpl scenario;
+	private ActivityFacilitiesImpl shopsOf2005;
 	private final String shopsOf2005Filename = "input/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 	//private TreeMap<Id, shopsOf2005> shops = new TreeMap<Id, shopsOf2005>();
 	private QuadTree<ActivityFacility> shoppingQuadTree;
 
 
-	public AddOpentimes(final ScenarioImpl scenario) {
+	public AddOpentimes() {
 		super();
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.shopsOf2005 = scenario.getActivityFacilities();
-		this.shopsOf2005.setName("shopsOf2005");
-		TreeMap<Id,ActivityFacility> shoppingFacilities = this.shopsOf2005.getFacilitiesForActivityType("shop");
-		this.shoppingQuadTree = this.buildShopsQuadTree(shoppingFacilities);
-		log.info(" shoppingQuadTree size: " +this.shoppingQuadTree.size());
+		
 	}
 
 	public void init() {
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading shops Of 2005 xml file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.scenario);
 		facilities_reader.readFile(this.shopsOf2005Filename);
 		log.info("Reading shops Of 2005 xml file...done.");
+		this.shopsOf2005 = scenario.getActivityFacilities();
+		this.shopsOf2005.setName("shopsOf2005");
+		log.info("shopsOf2005 size: " +shopsOf2005.getFacilities().size());
+		TreeMap<Id,ActivityFacility> shoppingFacilities = this.shopsOf2005.getFacilitiesForActivityType("shop");
+		this.shoppingQuadTree = this.buildShopsQuadTree(shoppingFacilities);
+		log.info(" shoppingQuadTree size: " +this.shoppingQuadTree.size());
+		
 	}
 	
 	private QuadTree<ActivityFacility> buildShopsQuadTree(TreeMap<Id,ActivityFacility> shoppingFacilities) {
@@ -132,18 +135,22 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		
 		Map<String, ? extends ActivityOption> activities = facility.getActivityOptions();
 
+		//for (String key: activities.keySet()){
+			//log.info(key);
+		//}
 		
-		if (activities.containsKey(FacilitiesProduction.ACT_TYPE_SHOP_RETAIL)) {
+		if (activities.containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET1000) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET400) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET100) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_LT100)) {
 			Double x = facility.getCoord().getX();
 			Double y = facility.getCoord().getY();
 			ActivityFacility closestShop = this.shoppingQuadTree.get(x,y);
-			closestShopOpentimes.put(DayType.mon, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon));
-			closestShopOpentimes.put(DayType.tue, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.tue));
-			closestShopOpentimes.put(DayType.wed, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.wed));
-			closestShopOpentimes.put(DayType.thu,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.thu));
-			closestShopOpentimes.put(DayType.fri, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.fri));
-			closestShopOpentimes.put(DayType.sat,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sat));
-			closestShopOpentimes.put(DayType.sun,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sun));
+			//log.info("closestShop size: "+ closestShop.getActivityOptions().size());
+			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon)!=null) {closestShopOpentimes.put(DayType.mon, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon));}
+			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.tue)!=null) {closestShopOpentimes.put(DayType.tue, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.tue));}
+			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.wed)!=null) {closestShopOpentimes.put(DayType.wed, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.wed));}
+			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.thu)!=null) {closestShopOpentimes.put(DayType.thu,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.thu));}
+			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.fri)!=null) {closestShopOpentimes.put(DayType.fri, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.fri));}
+			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sat)!=null) {closestShopOpentimes.put(DayType.sat,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sat));}
+			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sun)!=null) {closestShopOpentimes.put(DayType.sun,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sun));}
 		}
 		
 		//List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
@@ -309,7 +316,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 								startTime = 9.0 * 3600;
 								endTime = 20.0 * 3600;
 							}
-							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
+							activities.get(FacilitiesProduction.SPORTS_FUN).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -336,20 +343,28 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 									day.equals(DayType.sat)) {
 								startTime = 0.0 * 3600;
 								endTime = 3.0 * 3600;								
-								activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
+								activities.get(FacilitiesProduction.SPORTS_FUN).addOpeningTime(new OpeningTimeImpl(
 								DayType.sat,
+								16.0 * 3600,
+								24.0 * 3600));
+								activities.get(FacilitiesProduction.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
+								DayType.sun,
 								16.0 * 3600,
 								24.0 * 3600));
 							} else if (
 									day.equals(DayType.sun)) {
 								startTime = 0.0 * 3600;
 								endTime = 04.0 * 3600;								
-								activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
+								activities.get(FacilitiesProduction.SPORTS_FUN).addOpeningTime(new OpeningTimeImpl(
+								DayType.sun,
+								16.0 * 3600,
+								24.0 * 3600));
+								activities.get(FacilitiesProduction.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 								DayType.sun,
 								16.0 * 3600,
 								24.0 * 3600));
 							}
-							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
+							activities.get(FacilitiesProduction.SPORTS_FUN).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -366,7 +381,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 						for (DayType day : days) {
 							startTime = 9.0 * 3600;
 							endTime = 24.0 * 3600;
-							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
+							activities.get(FacilitiesProduction.GASTRO_CULTURE).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -383,7 +398,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 						for (DayType day : days) {
 							startTime = 14.0 * 3600;
 							endTime = 24.0 * 3600;
-							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
+							activities.get(FacilitiesProduction.GASTRO_CULTURE).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -412,7 +427,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 								endTime = 16.0 * 3600;
 							}
 							
-							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
+							activities.get(FacilitiesProduction.GASTRO_CULTURE).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -440,7 +455,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 								startTime = 10.0 * 3600;
 								endTime = 16.0 * 3600;
 							}
-							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
+							activities.get(FacilitiesProduction.GASTRO_CULTURE).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));

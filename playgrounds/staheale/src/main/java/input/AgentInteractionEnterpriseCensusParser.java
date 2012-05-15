@@ -28,7 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
 
-//extends EnterpriseCensusParser of Meister
+//extends EnterpriseCensusParser of meisterk
 
 public class AgentInteractionEnterpriseCensusParser {
 	
