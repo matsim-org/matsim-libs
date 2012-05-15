@@ -20,9 +20,11 @@
 package playground.anhorni.surprice.preprocess.rwscenario;
 
 import java.io.File;
+import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -62,6 +64,7 @@ public class CreateScenario {
 	private TreeMap<Id, PersonHomeWork> personHWFacilities = new TreeMap<Id, PersonHomeWork>();
 	private Random random = new Random(102830259L);
 	private TreeMap<Id, PersonWeeks> personWeeksMZ = new TreeMap<Id, PersonWeeks>();
+	private Config config;
 		
 	private final static Logger log = Logger.getLogger(ConvertThurgau2Plans.class);
 		
@@ -75,7 +78,7 @@ public class CreateScenario {
 	}
 	
 	public void run(String configFile) {
-		Config config = ConfigUtils.loadConfig(configFile);	
+		this.config = ConfigUtils.loadConfig(configFile);	
 		
 		// handle MZ ...........................................................
 		this.readMZ(config.getModule("plans").getValue("inputPlansFile"), 
@@ -187,6 +190,26 @@ public class CreateScenario {
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);
+		
+		this.sample();
+	}
+	
+	private void sample() {
+		
+		double share = Double.parseDouble(config.getModule("surprice_preprocess").getValue("sample"));
+		
+		List<Person> persons = new Vector<Person>();
+		
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			if (this.random.nextDouble() > (1.0 - share)) {
+				persons.add(person);
+			}
+		}
+		this.scenario.getPopulation().getPersons().clear();
+		
+		for (Person person : persons) {
+			this.scenario.getPopulation().addPerson(person);
+		}
 	}
 	
 	private void storeHomeAndWork() {
@@ -335,7 +358,7 @@ public class CreateScenario {
 			if (sCount > 0) sDur = Math.max(3.0 * 60.0, sDur / sCount);
 			if (lCount > 0) lDur = Math.max(5.0 * 60.0, lDur / lCount);
 			if (eCount > 0) eDur = Math.max(5.0 * 60.0, eDur / eCount);
-			if (oCount > 0) oDur = Math.max(1.0 * 30.0, oDur / oCount);
+			if (oCount > 0) oDur = Math.max(61.0, oDur / oCount);
 			double hDur = Math.max(10.0, 24.0 * 3600.0 - wDur - sDur - lDur - eDur - oDur) / hCount;	
 			
 			if (wDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("work", wDur);
@@ -393,7 +416,7 @@ public class CreateScenario {
 		for (PersonWeeks personWeeks : map.values()) {
 			double score = personWeeks.getPweight();
 			sumScore += (score / this.getTotalScore(map));				
-			mapNormalized.put(sumScore , personWeeks);	
+			mapNormalized.put(sumScore, personWeeks);	
 		}
 	}	
 }

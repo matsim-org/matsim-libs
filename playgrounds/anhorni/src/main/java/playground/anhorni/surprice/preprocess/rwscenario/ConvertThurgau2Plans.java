@@ -166,9 +166,9 @@ public class ConvertThurgau2Plans {
 			ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 			from_act.setEndTime(departure);
 			LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
-			leg.setDepartureTime(departure);
-			leg.setTravelTime(arrival-departure);
-			leg.setArrivalTime(arrival);
+			//leg.setDepartureTime(departure);
+			//leg.setTravelTime(arrival-departure);
+			//leg.setArrivalTime(arrival);
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);			
 		}
@@ -176,9 +176,9 @@ public class ConvertThurgau2Plans {
 			ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME);
 			homeAct.setEndTime(departure);
 			LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
-			leg.setDepartureTime(departure);
-			leg.setTravelTime(arrival-departure);
-			leg.setArrivalTime(arrival);
+			//leg.setDepartureTime(departure);
+			//leg.setTravelTime(arrival-departure);
+			//leg.setArrivalTime(arrival);
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);
 		}
