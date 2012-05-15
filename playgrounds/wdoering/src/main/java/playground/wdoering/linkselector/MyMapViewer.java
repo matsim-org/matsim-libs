@@ -37,6 +37,8 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
@@ -71,7 +73,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	private Thread thread;
 
-	private HashMap<Id, Coord[]> links;
+	private HashMap<Id[], Coord[]> links;
 
 	private GeotoolsTransformation ct;
 	
@@ -302,12 +304,27 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 				}
 				
-				for (Coord[] fromTo : links.values())
-				{
+				
+//				for (Coord[] fromTo : links.values())
+//				{
+				
+			    Iterator it = links.entrySet().iterator();
+			    
+			    while (it.hasNext())
+			    {
+			    	
+			        Map.Entry pairs = (Map.Entry)it.next();
+			        Id[] fromToIds = (Id[]) pairs.getKey();
+			        Coord[] fromToCoords = (Coord[]) pairs.getValue();
+			        
+//			        it.remove(); // avoids a ConcurrentModificationException
+				
+				
+				
 //					System.out.println("from: " + fromTo[0] + "| to: " + fromTo[1]);
 					
-					Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(fromTo[0].getY(),fromTo[0].getX()), this.getZoom());
-					Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(fromTo[1].getY(), fromTo[1].getX()), this.getZoom());
+					Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(fromToCoords[0].getY(),fromToCoords[0].getX()), this.getZoom());
+					Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(fromToCoords[1].getY(), fromToCoords[1].getX()), this.getZoom());
 					
 //					System.out.println("from2d before b: " + from2D.getX() + ", " + from2D.getY());
 					
@@ -322,14 +339,14 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 					if (wPoint!=null)
 					{
-//						int mouseX = currentMousePosition.x;
-//						int mouseY = currentMousePosition.y;
-//						
-//						int maxX = Math.max(x2,x1);
-//						int maxY = Math.max(y2,y1);
-//						
-//						int minX = Math.min(x2,x1);
-//						int minY = Math.min(y2,y1);
+						int mouseX = currentMousePosition.x;
+						int mouseY = currentMousePosition.y;
+						
+						int maxX = Math.max(x2,x1);
+						int maxY = Math.max(y2,y1);
+						
+						int minX = Math.min(x2,x1);
+						int minY = Math.min(y2,y1);
 						
 						int x =(x2-x1);
 						int y =(y2-y1);
@@ -337,16 +354,27 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						CoordImpl wCoord = new CoordImpl(wPoint.getLongitude(), wPoint.getLatitude());
 						Collection<Node> nodes = this.snapper.getNearestNodes(wCoord);
 						
-						for (Node node : nodes)
-						{
-							System.out.println("_:_:_:_:_:_" + node.getId());
-						}
+//						for (Node node : nodes)
+//						{
+////							System.out.println("_:_:_:_:_:_" + node.getId());
+//						}
 						
 //						if ( (y2-y1)*x3 + (-(x2-x1) * y3 ) == (y2-y1)*x2 + (-(x2-x1)*y2))
-//						if ((mouseX <= maxX) && (mouseX >= minX) && (mouseY <= maxY) && (mouseY >= minY))
+						if ((mouseX <= maxX) && (mouseX >= minX) && (mouseY <= maxY) && (mouseY >= minY))
 						{
-							g2D.setStroke(new BasicStroke(8F));
-							g.setColor(Color.blue);
+//							( MX - AX ) / BX = R
+//							( MY - AY ) / BY = R
+							
+//							float r1 = ((float)mouseX - (float)minX) / (float)maxX;
+//							float r2 = ((float)mouseY - (float)minY) / (float)maxY;
+							float r1 = ((float)mouseX - (float)x1) / (float)x;
+							float r2 = ((float)mouseY - (float)y1) / (float)y;
+							
+							if ((r1 - .3f < r2) && (r1 + .3f > r2))
+							{
+								g2D.setStroke(new BasicStroke(8F));
+								g.setColor(Color.blue);
+							}
 						
 						}
 						

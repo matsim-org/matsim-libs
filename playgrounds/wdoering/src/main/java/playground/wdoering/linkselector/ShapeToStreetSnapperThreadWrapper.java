@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.algorithms.PolygonalCircleApproximation;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
@@ -233,28 +234,33 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	
 	
 
-	public HashMap<Id, Coord[]> getNetworkLinks()
+	public HashMap<Id[], Coord[]> getNetworkLinks()
 	{
 		
 		if (this.sc!=null)
 		{
 			GeotoolsTransformation ct = new GeotoolsTransformation(sc.getConfig().global().getCoordinateSystem(),"EPSG:4326");
-			HashMap<Id, Coord[]> links = new HashMap<Id, Coord[]>();
+			HashMap<Id[], Coord[]> links = new HashMap<Id[], Coord[]>();
 			
 //			Map<Id, ? extends org.matsim.api.core.v01.network.Node> networkNodes = sc.getNetwork().getNodes();
 			Map<Id, ? extends org.matsim.api.core.v01.network.Link> networkLinks = sc.getNetwork().getLinks();
 			
-			Coord coord = null;
+//			Coord coord = null;
 			
 //			LinkImpl x = ((NetworkImpl)sc.getNetwork()).getNearestLink(coord);
 			
 			for (Link link: networkLinks.values())
 			{
-				Coord[] fromTo =  {ct.transform(link.getFromNode().getCoord()), ct.transform(link.getToNode().getCoord())};
+				Coord[] fromToCoord =  {ct.transform(link.getFromNode().getCoord()), ct.transform(link.getToNode().getCoord())};
 				
 //				System.out.println("from: " + fromTo[0] + "| to: " + fromTo[1]);
 				
-				links.put(link.getId(),fromTo);
+				Id fromID = link.getFromNode().getId();
+				Id toID = link.getToNode().getId();
+				
+				Id[] ids = {fromID , toID};
+				
+				links.put(ids, fromToCoord);
 				
 			}
 
