@@ -99,16 +99,16 @@ public class JointHerbieControler extends JointControler {
 
 		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
 		// if some parts of the code use this method, everything should be consistent.
-		setTransitRouterFactory(
-				new HerbieTransitRouterFactory( 
-					getScenario().getTransitSchedule(),
-					new TransitRouterConfig(
-						config.planCalcScore(),
-						config.plansCalcRoute(),
-						config.transitRouter(),
-						config.vspExperimental()),
-					herbieConfigGroup,
-					new TravelScoringFunction( params, herbieConfigGroup ) ) );
+		//setTransitRouterFactory(
+		//		new HerbieTransitRouterFactory( 
+		//			getScenario().getTransitSchedule(),
+		//			new TransitRouterConfig(
+		//				config.planCalcScore(),
+		//				config.plansCalcRoute(),
+		//				config.transitRouter(),
+		//				config.vspExperimental()),
+		//			herbieConfigGroup,
+		//			new TravelScoringFunction( params, herbieConfigGroup ) ) );
 	}
 	
 	
