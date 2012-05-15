@@ -28,6 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLane;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
@@ -142,7 +143,7 @@ public class QLaneTest extends MatsimTestCase {
 		
 		this.initNetwork(scenario.getNetwork());
 		
-		QSim queueSim = QSim.createQSimAndAddAgentSource(scenario, null);
+		QSim queueSim = (QSim) new QSimFactory().createMobsim(scenario, null);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		QLinkImpl ql = (QLinkImpl) queueNetwork.getNetsimLink(id1);
 
@@ -158,7 +159,7 @@ public class QLaneTest extends MatsimTestCase {
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 1);
 		
-		QSim queueSim = QSim.createQSimAndAddAgentSource(scenario, null);
+		QSim queueSim = (QSim) new QSimFactory().createMobsim(scenario, null);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(id1);
 
@@ -192,7 +193,7 @@ public class QLaneTest extends MatsimTestCase {
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 2);
 		
-		QSim queueSim = QSim.createQSimAndAddAgentSource(scenario, null);
+		QSim queueSim = (QSim) new QSimFactory().createMobsim(scenario, null);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(id1);
 
@@ -226,7 +227,7 @@ public class QLaneTest extends MatsimTestCase {
 		this.initNetwork(scenario.getNetwork());
 		this.createLanes(scenario);
 		
-		QSim queueSim = QSim.createQSimAndAddAgentSource(scenario, null);
+		QSim queueSim = (QSim) new QSimFactory().createMobsim(scenario, null);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(id1);
 

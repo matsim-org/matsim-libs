@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -109,7 +110,7 @@ public class TravelTimeFourWaysTest {
 		
 		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
 		
-		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		eventsXmlWriter.closeFile();
@@ -130,7 +131,7 @@ public class TravelTimeFourWaysTest {
 		
 		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
 		
-		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		eventsXmlWriter.closeFile();

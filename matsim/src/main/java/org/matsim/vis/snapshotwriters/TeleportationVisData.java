@@ -29,9 +29,6 @@ import org.matsim.api.core.v01.network.Link;
  */
 public class TeleportationVisData implements AgentSnapshotInfo {
 
-	//	private static final Logger log = Logger.getLogger(TeleportationVisData.class);
-
-	private static final long serialVersionUID = 4626450928014698099L;
 	private double stepsize;
 	private double startX;
 	private double startY;
@@ -46,14 +43,11 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private double colorval;
 	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE ;
 
-//	public TeleportationVisData(double now, PersonAgent agent, Link fromLink, Link toLink) {
 	public TeleportationVisData(double now, Id personId, Link fromLink, Link toLink, double travelTime ) {
 		this.starttime = now;
-//		this.agentId = agent.getPerson().getId();
 		this.agentId = personId ;
 		this.startX = fromLink.getToNode().getCoord().getX();
 		this.startY = fromLink.getToNode().getCoord().getY();
-//		double traveltime = agent.getCurrentLeg().getTravelTime();
 		double endX = toLink.getToNode().getCoord().getX();
 		double endY = toLink.getToNode().getCoord().getY();
 		double dX = endX - startX;
@@ -64,15 +58,6 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		this.normalY = dY / length;
 		this.currentX = startX;
 		this.currentY = startY;
-		//		log.error("offset north: "  + OTFServerQuad.offsetNorth);
-		//		log.error("startX " + startX);
-		//		log.error("startY " + startY);
-		//		log.error("endX " + endX);
-		//		log.error("endY " + endY);
-		//		log.error("length " + length);
-		//		log.error("stepsize " + stepsize);
-		//		log.error("currentX " + currentX);
-		//		log.error("currentY " + currentY);
 	}
 
 	@Override
@@ -90,16 +75,10 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		return this.agentId;
 	}
 
-	//	public double getLength(){
-	//		return this.length;
-	//	}
-
 	public void calculatePosition(double time) {
-		//		log.error("calc pos time: " + time);
 		double step = (time - starttime) * this.stepsize;
 		this.currentX = this.startX + (step * this.normalX);
 		this.currentY = this.startY  + (step * this.normalY);
-		//		log.error("currentx: " + this.currentX + " currenty: "+ this.currentY);
 	}
 
 	@Override

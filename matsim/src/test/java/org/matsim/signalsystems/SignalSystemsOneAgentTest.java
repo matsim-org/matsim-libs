@@ -37,6 +37,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
@@ -123,7 +124,7 @@ public class SignalSystemsOneAgentTest implements
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		
-		QSim qsim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		qsim.run();
 	}
@@ -160,7 +161,7 @@ public class SignalSystemsOneAgentTest implements
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		
-		QSim qsim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		qsim.run();
 	}
@@ -197,7 +198,7 @@ public class SignalSystemsOneAgentTest implements
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		
-		QSim qsim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		Exception ex = null;
 		try{

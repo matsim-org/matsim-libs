@@ -38,6 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -113,7 +114,7 @@ public class OccupancyAnalyzerTest {
 		OccupancyAnalyzer oa = new OccupancyAnalyzer(3600, 12*3600);
 		eventsManager.addHandler(oa);
 
-		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, eventsManager);
+		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
 		sim.run();
 
 		Set<Id> enterStops = oa.getBoardStopIds();

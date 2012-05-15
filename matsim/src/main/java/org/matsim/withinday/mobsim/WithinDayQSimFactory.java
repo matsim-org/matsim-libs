@@ -25,12 +25,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
 /*
@@ -52,7 +56,16 @@ public class WithinDayQSimFactory implements MobsimFactory {
     }
 
     public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events, QNetsimEngineFactory factory) {
-        QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, factory);
+        QSim qSim1 = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim1.addMobsimEngine(activityEngine);
+		qSim1.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = factory.createQSimEngine(qSim1, MatsimRandom.getRandom());
+		qSim1.addMobsimEngine(netsimEngine);
+		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim1.addMobsimEngine(teleportationEngine);
+		QSim qSim = qSim1;
         ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
         qSim.addAgentSource(agentSource);

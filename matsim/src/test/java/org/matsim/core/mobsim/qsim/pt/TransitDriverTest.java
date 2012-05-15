@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -158,7 +159,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		QSim tqsim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
+		QSim tqsim = (QSim) new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
@@ -202,7 +203,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, EventsUtils.createEventsManager());
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
@@ -273,7 +274,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, EventsUtils.createEventsManager());
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine) ;
 
@@ -332,7 +333,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, EventsUtils.createEventsManager());
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
@@ -380,7 +381,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, EventsUtils.createEventsManager());
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
@@ -427,7 +428,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, EventsUtils.createEventsManager());
+		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, EventsUtils.createEventsManager());
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));

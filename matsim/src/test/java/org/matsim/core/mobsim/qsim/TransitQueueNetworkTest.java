@@ -41,6 +41,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -1044,10 +1045,18 @@ public class TransitQueueNetworkTest extends TestCase {
             }
             TransitRoute tRoute = builder.createTransitRoute(id1, netRoute, stops, TransportMode.pt);
             Departure dep = builder.createDeparture(id1, 100);
+			QSim qSim1 = new QSim(scenario, EventsUtils.createEventsManager());
+			ActivityEngine activityEngine = new ActivityEngine();
+			qSim1.addMobsimEngine(activityEngine);
+			qSim1.addActivityHandler(activityEngine);
+			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1, MatsimRandom.getRandom());
+			qSim1.addMobsimEngine(netsimEngine);
+			qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			qSim1.addMobsimEngine(teleportationEngine);
 
             // setup: simulation
-            QSim qSim = QSim.createQSimWithDefaultEngines(scenario, EventsUtils.createEventsManager(),
-					new DefaultQSimEngineFactory());
+            QSim qSim = qSim1;
             AgentFactory agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setUseUmlaeufe(true);

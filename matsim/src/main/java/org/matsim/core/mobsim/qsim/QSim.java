@@ -34,18 +34,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListenerManager;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -53,13 +47,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.UmlaufDriver;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -163,52 +154,14 @@ public final class QSim implements VisMobsim, Netsim {
 
 	};
 
-	// everything above this line is private and should remain private. pls
-	// contact me if this is in your way. kai, oct'10
-	// ============================================================================================================================
-	// initialization:
-
-
-	public static QSim createQSimAndAddAgentSource(final Scenario sc, final EventsManager events, final QNetsimEngineFactory netsimEngFactory) {
-		QSim qSim = createQSimWithDefaultEngines(sc, events, netsimEngFactory);
-		AgentFactory agentFactory;
-		if (sc.getConfig().scenario().isUseTransit()) {
-			agentFactory = new TransitAgentFactory(qSim);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setUseUmlaeufe(true);
-			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			qSim.addDepartureHandler(transitEngine);
-			qSim.addAgentSource(transitEngine);
-			qSim.addMobsimEngine(transitEngine);
-		} else {
-			agentFactory = new DefaultAgentFactory(qSim);
-		}
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
-		}
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
-	}
-
-	public static QSim createQSimAndAddAgentSource(final Scenario scenario, final EventsManager events) {
-		return createQSimAndAddAgentSource(scenario, events, new DefaultQSimEngineFactory());
-	}
-
-
-	public static QSim createQSimWithDefaultEngines(Scenario sc, EventsManager events, QNetsimEngineFactory netsimEngFactory) {
-		QSim qSim = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim.addMobsimEngine(teleportationEngine);
-		return qSim;
-	}
-
+	/**
+	 * Constructs an instance of this simulation which does not do anything by itself, but accepts handlers for Activities and Legs.
+	 * Use this constructor if you want to plug together your very own simulation, i.e. you are writing some of the simulation
+	 * logic yourself.
+	 * 
+	 * If you wish to use QSim as a product and run a simulation based on a Config file, rather use QSimFactory as your entry point.
+	 * 
+	 */
 	public QSim(final Scenario sc, final EventsManager events) {
 		this.scenario = sc;
 		this.events = events;

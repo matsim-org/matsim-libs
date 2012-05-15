@@ -35,6 +35,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
@@ -130,7 +131,7 @@ public class TravelTimeOneWayTest {
 			SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 			SignalEngine signalEngine = new QSimSignalEngine(manager);
 			//run the qsim
-			QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+			QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 			sim.addQueueSimulationListeners(signalEngine);
 			sim.run();
 			log.debug("circulationTime: " + circulationTime);
@@ -167,7 +168,7 @@ public class TravelTimeOneWayTest {
 
 		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
 		
-		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+		QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		MeasurementPoint qSimMeasurementPoint = eventHandler.beginningOfLink2;
@@ -177,7 +178,7 @@ public class TravelTimeOneWayTest {
 		events = EventsUtils.createEventsManager();
 		eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
-		QSim.createQSimAndAddAgentSource(scenario, events).run();
+		((QSim) new QSimFactory().createMobsim(scenario, events)).run();
 		if (eventHandler.beginningOfLink2 != null) {
 			log.debug("tF = 60s, " + eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure
 					+ ", " + eventHandler.beginningOfLink2.numberOfVehPassed + ", "

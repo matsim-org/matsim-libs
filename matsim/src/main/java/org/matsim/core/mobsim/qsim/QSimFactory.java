@@ -25,23 +25,29 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
 /**
- * The MobsimFactory is necessary so that something can be passed to the controler which instantiates this.
- * Can (presumably) be something much more minimalistic than QSimI.  kai, jun'10
- *
- * @author dgrether
+ * Constructs an instance of the modular QSim based on the required features as per the Config file.
+ * Used by the Controler.
+ * You can get an instance of this factory and use it to create a QSim if you are running a "complete"
+ * simulation based on a config file. For test cases or specific experiments, it may be better to
+ * plug together your QSim instance from your own code.
+ * It is not recommended to mix, i.e. to construct a QSim with this code and then add further modules to
+ * your own code.
  *
  */
 public class QSimFactory implements MobsimFactory {
@@ -66,9 +72,17 @@ public class QSimFactory implements MobsimFactory {
         } else {
             netsimEngFactory = new DefaultQSimEngineFactory();
         }
-        QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
-        AgentFactory agentFactory;
+		QSim qSim = new QSim(sc, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine(teleportationEngine);
         
+		AgentFactory agentFactory;
         if (sc.getConfig().scenario().isUseTransit()) {
             agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
@@ -80,7 +94,9 @@ public class QSimFactory implements MobsimFactory {
         } else {
             agentFactory = new DefaultAgentFactory(qSim);
         }
-        
+        if (sc.getConfig().network().isTimeVariantNetwork()) {
+			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+		}
         PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
         qSim.addAgentSource(agentSource);
         return qSim;

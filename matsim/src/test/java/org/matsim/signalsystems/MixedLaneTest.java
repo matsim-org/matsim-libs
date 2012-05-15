@@ -45,6 +45,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -241,7 +242,7 @@ public class MixedLaneTest extends TestCase {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
 		events.addHandler(handler);
 
-		QSim qsim = QSim.createQSimAndAddAgentSource(this.sc, events);
+		QSim qsim = (QSim) new QSimFactory().createMobsim(this.sc, events);
 		qsim.run();
 
 		assertTrue(handler.hasCollectedLink2Event);
@@ -256,7 +257,7 @@ public class MixedLaneTest extends TestCase {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
 		events.addHandler(handler);
 
-		QSim qsim = QSim.createQSimAndAddAgentSource(this.sc, events);
+		QSim qsim = (QSim) new QSimFactory().createMobsim(this.sc, events);
 		qsim.run();
 
 		assertTrue(handler.hasCollectedLink2Event);

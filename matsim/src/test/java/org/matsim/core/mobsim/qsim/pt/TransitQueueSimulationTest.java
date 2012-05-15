@@ -65,9 +65,13 @@ import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
@@ -81,6 +85,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -226,7 +231,7 @@ public class TransitQueueSimulationTest {
         scenario.getConfig().getQSimConfigGroup().setEndTime(1.0*3600); // prevent running the actual simulation
         // (the previous line was not there when I found this. kai, dec'11)
         
-        QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
+        QSim sim = (QSim) new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
         sim.run();
         List<MobsimAgent> agents = new ArrayList<MobsimAgent>(sim.getAgents());
         Collections.sort(agents, new Comparator<MobsimAgent>() {
@@ -298,7 +303,16 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-        QSim qSim = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
+		QSim qSim1 = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim1.addMobsimEngine(activityEngine);
+		qSim1.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1, MatsimRandom.getRandom());
+		qSim1.addMobsimEngine(netsimEngine);
+		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim1.addMobsimEngine(teleportationEngine);
+        QSim qSim = qSim1;
         AgentFactory agentFactory = new TransitAgentFactory(qSim);
         TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
         transitEngine.setUseUmlaeufe(true);
@@ -376,7 +390,7 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-        QSim simulation = QSim.createQSimAndAddAgentSource(scenario, events);
+        QSim simulation = (QSim) new QSimFactory().createMobsim(scenario, events);
         simulation.run();
     }
 
@@ -556,7 +570,16 @@ public class TransitQueueSimulationTest {
             this.line = line;
             this.route = route;
             this.departure = departure;
-            QSim qSim1 = QSim.createQSimWithDefaultEngines(scenario, events, new DefaultQSimEngineFactory());
+			QSim qSim2 = new QSim(scenario, events);
+			ActivityEngine activityEngine = new ActivityEngine();
+			qSim2.addMobsimEngine(activityEngine);
+			qSim2.addActivityHandler(activityEngine);
+			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim2, MatsimRandom.getRandom());
+			qSim2.addMobsimEngine(netsimEngine);
+			qSim2.addDepartureHandler(netsimEngine.getDepartureHandler());
+			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			qSim2.addMobsimEngine(teleportationEngine);
+            QSim qSim1 = qSim2;
             AgentFactory agentFactory = new TransitAgentFactory(qSim1);
             final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim1);
             transitEngine.setUseUmlaeufe(true);
@@ -698,7 +721,7 @@ public class TransitQueueSimulationTest {
         events.addHandler(collector);
 
         // first test without special settings
-        QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
+        QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
         sim.run();
         assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -707,7 +730,7 @@ public class TransitQueueSimulationTest {
         // second test with special start/end times
         config.getQSimConfigGroup().setStartTime(depTime + 20.0);
         config.getQSimConfigGroup().setEndTime(depTime + 90.0);
-        sim = QSim.createQSimAndAddAgentSource(scenario, events);
+        sim = (QSim) new QSimFactory().createMobsim(scenario, events);
         sim.run();
         assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -822,7 +845,7 @@ public class TransitQueueSimulationTest {
         EventsManager events = EventsUtils.createEventsManager();
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
-        QSim.createQSimAndAddAgentSource(scenario, events).run();
+        ((QSim) new QSimFactory().createMobsim(scenario, events)).run();
         List<Event> allEvents = collector.getEvents();
 
         for (Event event : allEvents) {

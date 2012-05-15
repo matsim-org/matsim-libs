@@ -68,13 +68,18 @@ import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkImpl;
@@ -118,11 +123,38 @@ public class QSimTest {
 	}
 
 	private QSim createQSim(ScenarioImpl scenario, EventsManager events) {
-		return QSim.createQSimAndAddAgentSource(scenario, events, netsimEngFactory);
+		QSim qSim1 = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim1.addMobsimEngine(activityEngine);
+		qSim1.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1, MatsimRandom.getRandom());
+		qSim1.addMobsimEngine(netsimEngine);
+		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim1.addMobsimEngine(teleportationEngine);
+		QSim qSim = qSim1;
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+		qSim.addAgentSource(agentSource);
+		return qSim;
 	}
 
 	private QSim createQSim(Fixture f, EventsManager events) {
-		return QSim.createQSimAndAddAgentSource(f.scenario, events, netsimEngFactory);
+		Scenario sc = f.scenario;
+		QSim qSim1 = new QSim(sc, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim1.addMobsimEngine(activityEngine);
+		qSim1.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1, MatsimRandom.getRandom());
+		qSim1.addMobsimEngine(netsimEngine);
+		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim1.addMobsimEngine(teleportationEngine);
+		QSim qSim = qSim1;
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		qSim.addAgentSource(agentSource);
+		return qSim;
 	}
 
 	/**

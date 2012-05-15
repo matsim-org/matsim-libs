@@ -37,6 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -89,7 +90,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
+		QSim sim = (QSim) new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
 		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
@@ -128,7 +129,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
+		QSim sim = (QSim) new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
 		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
