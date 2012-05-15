@@ -31,6 +31,8 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.utils.misc.RouteUtils;
 
+import playground.thibautd.jointtrips.population.JointActingTypes;
+
 /**
  * @author thibautd
  */
@@ -72,7 +74,7 @@ public class CarPoolingLegScoringFunction extends LegScoringFunction {
 		 */
 		double dist = 0.0; // distance in meters
 
-		if (TransportMode.car.equals(leg.getMode())) {
+		if (TransportMode.car.equals(leg.getMode()) || JointActingTypes.DRIVER.equals( leg.getMode() )) {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				NetworkRoute route = null;
 				boolean isValidRoute = true;
@@ -111,6 +113,11 @@ public class CarPoolingLegScoringFunction extends LegScoringFunction {
 				}
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
+			tmpScore += this.params.constantCar ;
+		}
+		else if (JointActingTypes.PASSENGER.equals( leg.getMode() )) {
+			// same as car, without mariginal utility of distance (interpreted as monetary cost)
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
 			tmpScore += this.params.constantCar ;
 		}
 		else if (TransportMode.pt.equals(leg.getMode())) {

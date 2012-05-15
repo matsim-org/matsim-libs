@@ -19,7 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.herbie.run;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+
+import herbie.running.config.HerbieConfigGroup;
 
 import playground.thibautd.analysis.listeners.CliqueScoreStats;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
@@ -37,6 +41,9 @@ public class Run {
 	public static void main(String[] args) {
 		String configFile = args[0];
 
+		Config conf = ConfigUtils.createConfig();
+		conf.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
+		JointControlerUtils.loadConfig( conf , configFile );
 		ScenarioWithCliques sc = JointControlerUtils.createScenario(configFile); 
 		Controler controler = new JointHerbieControler( sc );
 		controler.addControlerListener(new CliqueScoreStats(

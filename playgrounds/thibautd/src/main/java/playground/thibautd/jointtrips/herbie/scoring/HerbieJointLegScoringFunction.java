@@ -82,7 +82,9 @@ public class HerbieJointLegScoringFunction extends LegScoringFunction {
 		}
 		else if (TransportMode.pt.equals(leg.getMode())) {
 			
-			double distance = DistanceCalculations.getLegDistance(leg.getRoute(), network);
+			double distance = //DistanceCalculations.getLegDistance(leg.getRoute(), network);
+					 DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
+								* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			
 			double distanceCost = 0.0;
 			TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
