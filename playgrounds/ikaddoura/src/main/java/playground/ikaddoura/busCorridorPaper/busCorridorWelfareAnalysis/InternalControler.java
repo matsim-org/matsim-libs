@@ -57,9 +57,11 @@ public class InternalControler {
 	private final double TRAVEL_PT_ACCESS = -0.0;
 	private final double TRAVEL_PT_EGRESS = -2.34;
 	
-	private final double CONSTANT_PT = 0.0;	//-2.08
-	private final double TRAVEL_PT = 0.0; // not needed because of the following differentiation:
+	private final double CONSTANT_PT = 0.0;	// estimated parameter: -2.08
+	private final double TRAVEL_PT = 0.0;
+//	private final double TRAVEL_PT = -20.0; // only needed for the ptRouter to avoid waiting at bus stops, not used for scoring because of the following differentiation:
 	private final double TRAVEL_PT_IN_VEHICLE = -0.18;
+//	private final double TRAVEL_PT_WAITING = -20.;
 	private final double TRAVEL_PT_WAITING = -0.096;
 	private final double MONETARY_DISTANCE_COST_RATE_PT = 0.0;
 
@@ -86,21 +88,6 @@ public class InternalControler {
 		controler.addControlerListener(new PtControlerListener(this.fare, this.ptLegHandler));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
-		controlerConfGroup.setFirstIteration(0);
-		int lastInternalIteration = this.scenario.getConfig().controler().getLastIteration();
-		controlerConfGroup.setLastIteration(lastInternalIteration);
-		
-//		int writeInterval = 0;
-//		if (lastInternalIteration == 0){
-//			writeInterval = 1;
-//		}
-//		else {
-//			writeInterval = lastInternalIteration;
-//		}
-//		controlerConfGroup.setWriteEventsInterval(writeInterval);
-//		controlerConfGroup.setWritePlansInterval(writeInterval);
-//		controlerConfGroup.setWriteSnapshotsInterval(writeInterval);
-		
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt + "/internalIterations");
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
@@ -125,7 +112,7 @@ public class InternalControler {
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE, TRAVEL_PT_ACCESS, TRAVEL_PT_EGRESS);
 		controler.setScoringFunctionFactory(scoringfactory);
 
-		// the schedule and vehicles to appear in the outputConfig
+		// just for information so that schedule and vehicles appear in the output_config:
 		TransitConfigGroup transit = controler.getConfig().transit();
 		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
