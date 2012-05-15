@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -91,8 +90,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private static int countTimeBin = 3600;
 	private Network network = null;
 	private double minStdDev, varianceScale;
-
-	private CalcLinkStats linkStats;
 
 	// private final boolean writeQGISFile = true;
 
@@ -238,7 +235,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 					Volume vol = count.getVolume(hour);
 
-					double[] avgVols = linkStats.getAvgLinkVolumes(linkId);
+					double[] avgVols = volumes.getVolumesPerHourForLink(linkId);
 					if (avgVols == null) {
 						avgVols = new double[24];
 					}
@@ -288,35 +285,35 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
-		if (calibrator.getInitialStepSize() != 0d) {
+		// if (calibrator.getInitialStepSize() != 0d) {
 
-			StringBuffer sb = new StringBuffer(Integer.toString(iter));
+		StringBuffer sb = new StringBuffer(Integer.toString(iter));
 
-			for (int i = 0; i < paramNames.length; i++) {
+		for (int i = 0; i < paramNames.length; i++) {
 
-				double value;
-				// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
-				// AGAIN!!!***
-				String valStr = scoringCfg.getParams().get(paramNames[i]);
+			double value;
+			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
+			// AGAIN!!!***
+			String valStr = scoringCfg.getParams().get(paramNames[i]);
+			if (valStr == null) {
+				valStr = config
+						.findParam(BSE_CONFIG_MODULE_NAME, paramNames[i]);
 				if (valStr == null) {
-					valStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-							paramNames[i]);
-					if (valStr == null) {
-						throw new RuntimeException(
-								"The calibrated parameter can NOT be found");
-					}
+					throw new RuntimeException(
+							"The calibrated parameter can NOT be found");
 				}
-				value = Double.parseDouble(valStr);
-
-				// text output
-				paramArrays[i][iter - firstIter] = value;
-				sb.append("\t");
-				sb.append(value);
 			}
+			value = Double.parseDouble(valStr);
 
-			writer.writeln(sb);
-			writer.flush();
+			// text output
+			paramArrays[i][iter - firstIter] = value;
+			sb.append("\t");
+			sb.append(value);
 		}
+
+		writer.writeln(sb);
+		writer.flush();
+		// }
 	}
 
 	@Override
@@ -606,8 +603,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 		// set up volumes analyzer
 		volumes = ctl.getVolumes();
-
-		linkStats = ctl.getLinkStats();
 	}
 
 	@Override

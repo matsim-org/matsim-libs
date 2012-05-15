@@ -849,6 +849,19 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 								+ ChoiceParameterCalibrator4.DEFAULT_USE_HESSIAN);
 			}
 		}
+		// SETTING debug mode
+		{
+			String debugModeStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+					"debugMode");
+			if (debugModeStr != null) {
+				boolean debugMode = Boolean.parseBoolean(debugModeStr);
+				calibrator.setDebugMode(debugMode);
+				System.out.println("BSE:\tsetDebugMode\t=" + debugMode);
+			} else {
+				System.out.println("BSE:\tsetDebugMode\t= default value\t"
+						+ Calibrator.DEFAULT_DEBUG_MODE);
+			}
+		}
 	}
 
 	private void setInitialParametersInCalibrator(Config config) {
