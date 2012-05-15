@@ -64,12 +64,12 @@ public class HerbieTransitRouterFactory implements TransitRouterFactory {
 
 	@Override
 	public TransitRouter createTransitRouter() {
-		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
-		//HerbieTransitTravelTimeAndDisutility ttCalculator =
-		//	new HerbieTransitTravelTimeAndDisutility(
-		//			herbieConfig,
-		//			config,
-		//			travelScoring);
+		//TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
+		HerbieTransitTravelTimeAndDisutility ttCalculator =
+			new HerbieTransitTravelTimeAndDisutility(
+					herbieConfig,
+					config,
+					travelScoring);
 		return new HerbieTransitRouter(
 				this.config,
 				this.routerNetwork,

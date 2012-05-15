@@ -44,6 +44,8 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 				new TimeAllocationMutatorModule(
 					controler,
 					new BlackList( (MultiLegRoutingControler) controler ) ) );
+
+		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 
 	@Override

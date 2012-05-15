@@ -82,16 +82,31 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 			// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
 			// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
 			// be the same as the marginal opprotunity cost of time).  kai, nov'11
-			return -distanceScoring.getWalkScore(link.getLength(), walktime)
+			double cost =  -distanceScoring.getWalkScore(link.getLength(), walktime > 0 ? walktime : 0 )
 			       -waittime * config.getMarginalUtiltityOfWaiting_utl_s()
 			       - config.getUtilityOfLineSwitch_utl();
+
+			if (cost < 0) {
+				throw new RuntimeException( "got a negative cost! "
+						+(-distanceScoring.getWalkScore(link.getLength(), walktime > 0 ? walktime : 0 ))
+						+" + "+(-waittime * config.getMarginalUtiltityOfWaiting_utl_s())
+						+" + "+(- config.getUtilityOfLineSwitch_utl()) );
+			}
+
+			return cost;
 		}
 
 		// this is fine as long as the scores are additives
-		return -distanceScoring.getInVehiclePtScore(
+		double cost = -distanceScoring.getInVehiclePtScore(
 				link.getLength(),
 				getLinkTravelTime( link , time ),
 				distanceCost);
+
+		if (cost < 0) {
+			throw new RuntimeException( "negative cost! "+cost );
+		}
+
+		return cost;
 	}
 	
 	@Override

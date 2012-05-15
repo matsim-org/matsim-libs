@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParkAndRideModeStrategy.java
+ * ParkAndRideReRouteStrategy.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,17 +28,14 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
-
 /**
  * @author thibautd
  */
-public class ParkAndRideModeStrategy implements PlanStrategy {
+public class ParkAndRideReRouteStrategy implements PlanStrategy {
 	private final PlanStrategy delegate;
 
-	public ParkAndRideModeStrategy(final Controler controler) {
+	public ParkAndRideReRouteStrategy(final Controler controler) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
-		addStrategyModule( new ParkAndRideModule((MultiLegRoutingControler) controler) );
 		addStrategyModule( new ReRoute( controler ) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
@@ -78,4 +75,3 @@ public class ParkAndRideModeStrategy implements PlanStrategy {
 		return delegate.getPlanSelector();
 	}
 }
-
