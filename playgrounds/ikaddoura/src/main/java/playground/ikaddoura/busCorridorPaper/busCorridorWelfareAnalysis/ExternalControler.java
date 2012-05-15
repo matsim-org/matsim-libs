@@ -54,28 +54,28 @@ class ExternalControler {
 	int numberOfBuses;
 	
 	public static void main(final String[] args) throws IOException {
-		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/paper_initialCarPtDemand";
-		lastExternalIteration = 0;
-		
+//		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
+//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/fare_timeChoice";
+//		lastExternalIteration = 0;
+//		
 //		op = OptimizationParameter.FARE;
 //		op = OptimizationParameter.CAPACITY;
-		op = OptimizationParameter.NUMBER_OF_BUSES;
+//		op = OptimizationParameter.NUMBER_OF_BUSES;
 		
-//		configFile = args[0];
-//		outputExternalIterationDirPath = args[1];
-//		lastExternalIteration = Integer.parseInt(args[2]);
-//		String opString = args[3];
-//		
-//		if(opString.equals(OptimizationParameter.FARE.toString())){
-//			op = OptimizationParameter.FARE;
-//		} else if(opString.equals(OptimizationParameter.CAPACITY.toString())){
-//			op = OptimizationParameter.CAPACITY;
-//		} else if(opString.equals(OptimizationParameter.NUMBER_OF_BUSES.toString())){
-//			op = OptimizationParameter.NUMBER_OF_BUSES;
-//		} else {
-//			throw new RuntimeException("Optimization parameter " + opString + " is unknown. Aborting... ");
-//		}
+		configFile = args[0];
+		outputExternalIterationDirPath = args[1];
+		lastExternalIteration = Integer.parseInt(args[2]);
+		String opString = args[3];
+		
+		if(opString.equals(OptimizationParameter.FARE.toString())){
+			op = OptimizationParameter.FARE;
+		} else if(opString.equals(OptimizationParameter.CAPACITY.toString())){
+			op = OptimizationParameter.CAPACITY;
+		} else if(opString.equals(OptimizationParameter.NUMBER_OF_BUSES.toString())){
+			op = OptimizationParameter.NUMBER_OF_BUSES;
+		} else {
+			throw new RuntimeException("Optimization parameter " + opString + " is unknown. Aborting... ");
+		}
 		
 		log.info("Analyzing optimization parameter " + op);
 		ExternalControler externalControler = new ExternalControler();
@@ -101,13 +101,20 @@ class ExternalControler {
 			new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
 			new MatsimPopulationReader(sc).readFile(sc.getConfig().plans().getInputFile());
 			
-			log.info(sc.getNetwork().getLinks().toString());
-			
 			VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, sc.getNetwork(), directoryExtIt);
 			vsw.writeTransitVehiclesAndSchedule();
 			
 			InternalControler internalControler = new InternalControler(sc, directoryExtIt, this.fare);
 			internalControler.run();
+			
+//			new TransitScheduleReaderV1(sc).readFile(directoryExtIt + "/scheduleFile.xml");
+//			new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(directoryExtIt + "/vehiclesFile.xml");
+//			Controler controler = new Controler(sc);
+//			controler.setOverwriteFiles(true);
+//			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+//			ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
+//			controlerConfGroup.setOutputDirectory(directoryExtIt + "/internalIterations");
+//			controler.run();
 
 			operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
 			users.setParametersForExtIteration(sc);
@@ -136,7 +143,6 @@ class ExternalControler {
 			chartWriter.write(this.extIt2information);
 			
 			// settings for next external iteration
-			// TODO: adjust the steps
 			if (extIt < lastExternalIteration){
 				if(op.equals(OptimizationParameter.FARE)) this.fare = this.fare - 1.0;
 				if(op.equals(OptimizationParameter.CAPACITY)) this.capacity = this.capacity + 4;
@@ -153,7 +159,7 @@ class ExternalControler {
 			this.numberOfBuses = 5;
 		} else if (op.equals(OptimizationParameter.CAPACITY)){
 			this.fare = -2.;
-			this.capacity = 20; // standing room + seats (realistic values between 19 and 101!)
+			this.capacity = 20; // standing room + seats (realistic values between 19 and 101)
 			this.numberOfBuses = 5;
 		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
 			this.fare = -2.;
