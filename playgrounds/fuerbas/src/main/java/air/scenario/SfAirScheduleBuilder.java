@@ -61,18 +61,17 @@ public class SfAirScheduleBuilder {
 	public static final String CITY_PAIRS_OUTPUT_FILENAME = "city_pairs.txt";
 	
 	public static final String UTC_OFFSET_FILE = "utc_offsets.txt";
-
+	
+	private static final boolean use_STAR_MUC = false;	//set true if STAR are in use at MUC
 	protected Map<String, Coord> airports = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
 	protected Map<String, Double> routes = new HashMap<String, Double>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	private Map<String, Double> utcOffset = new HashMap<String, Double>();
-
 	
 	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory, String utcOffsetInputfile) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
 		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null, utcOffsetInputfile);
 	}
-
 	
 	@SuppressWarnings("rawtypes")
 	public void filter(String inputAirportListFile, String inputOagFile, String outputDirectory,
@@ -88,7 +87,6 @@ public class SfAirScheduleBuilder {
 			String yCoord = entries[2];
 			this.airports.put(airportCode, new CoordImpl(xCoord,yCoord));
 		}
-		
 		brAirports.close();
 		
 		BufferedReader brUtc = new BufferedReader(new FileReader(new File(utcOffsetInputfile)));
@@ -99,17 +97,9 @@ public class SfAirScheduleBuilder {
 			double offset = Double.parseDouble(entries[1]);
 			this.utcOffset.put(airportCode, offset);
 		}
-		
 		brUtc.close();
 		
 		int counter = 0;
-		
-		int opscount = 0;
-		
-//		new UTC Offset functionality, work in progress!
-		
-//		Möglichkeit ohne UTC File abbauen
-		
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFile)));
 		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(outputOagFile)));
 
@@ -157,7 +147,6 @@ public class SfAirScheduleBuilder {
 //						Getting UTC Offset from separate file which need to be created with SfUtcOffset
 						double utcOffset = this.utcOffset.get(originAirport);
 						departureInSec = departureInSec - utcOffset;
-//						System.out.println("Airport: "+originAirport+" UTC offset was calculated as: "+utcOffset);
 
 						if (departureInSec < 0)
 							departureInSec += 86400.0; // shifting flights with departure on previous day in UTC time +24 hours
@@ -183,11 +172,11 @@ public class SfAirScheduleBuilder {
 //								&& destinationAirport.equalsIgnoreCase("MUC")
 //								&& originAirport.equalsIgnoreCase("MUC")
 //								)
-//						use this line to filter desired airports: currently all flights to/from MUC
+//						use these lines to filter desired airports: currently all flights to/from MUC
 //						for fixed city pairs use: originAirport.equalsIgnoreCase("FRA") && destinationAirport.equalsIgnoreCase("MUC") and vice versa
 								) {
 							
-//							if (destinationAirport.equalsIgnoreCase("MUC")) duration = duration-(17.4*60);	//17.4 minutes duration for MUC STAR arrivals
+							if (use_STAR_MUC && destinationAirport.equalsIgnoreCase("MUC")) duration = duration-(17.4*60);	//17.4 minutes duration for MUC STAR arrivals
 
 							if (!this.routes.containsKey(route)) {
 								this.routes.put(route, duration);
@@ -225,12 +214,9 @@ public class SfAirScheduleBuilder {
 		// produce some more output
 
 		String outputAirportFile = outputDirectory + AIRPORTS_OUTPUT_FILE;
-//		String outputMissingAirportsFile = outputDirectory + missingAirportsOutputFilename;
 		String cityPairsFile = outputDirectory + CITY_PAIRS_OUTPUT_FILENAME;
 
 		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputAirportFile)));
-//		BufferedWriter bwMissing = new BufferedWriter(new FileWriter(
-//				new File(outputMissingAirportsFile)));
 		BufferedWriter bwcityPairs = new BufferedWriter(new FileWriter(new File(cityPairsFile)));
 
 		Iterator it = this.airportsInOag.entrySet().iterator();
@@ -240,13 +226,6 @@ public class SfAirScheduleBuilder {
 					+ "\t" + this.airportsInOag.get(pairs.getKey()).getY());
 			bwOsm.newLine();
 		}
-//
-//		Iterator it2 = this.missingAirports.entrySet().iterator();
-//		while (it2.hasNext()) {
-//			Map.Entry pairs = (Map.Entry) it2.next();
-//			bwMissing.write(pairs.getKey().toString());
-//			bwMissing.newLine();
-//		}
 
 		Iterator it3 = this.routes.entrySet().iterator();
 		while (it3.hasNext()) {
@@ -263,12 +242,9 @@ public class SfAirScheduleBuilder {
 
 		bwOsm.flush();
 		bwOsm.close();
-//		bwMissing.flush();
-//		bwMissing.close();
 		bwcityPairs.flush();
 		bwcityPairs.close();
 		br.close();
-
 	}
 	
 	private static boolean checkOriginCountry(String originCountry, String[] countries) {
