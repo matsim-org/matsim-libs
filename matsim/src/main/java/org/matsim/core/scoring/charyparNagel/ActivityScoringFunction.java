@@ -46,7 +46,8 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	private static final double INITIAL_SCORE = 0.0;
 
 	private static int firstLastActWarning = 0;
-
+	private static short firstLastActOpeningTimesWarning = 0;
+	
 	private final CharyparNagelScoringParameters params;
 	private Activity currentActivity;
 	private boolean firstAct = true;
@@ -235,8 +236,20 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	private void handleOvernightActivity(Activity lastActivity) {
 		assert firstActivity != null;
 		assert lastActivity != null;
+		
+				
 		if (lastActivity.getType().equals(this.firstActivity.getType())) {
 			// the first Act and the last Act have the same type
+			if (firstLastActOpeningTimesWarning <= 10) {
+				double[] openInterval = this.getOpeningInterval(lastActivity);
+				if (openInterval[0] >= 0 || openInterval[1] >= 0){
+					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
+				}
+				firstLastActOpeningTimesWarning++;
+				if (firstLastActOpeningTimesWarning == 10) {
+					log.warn("Additional warnings of this type are suppressed.");
+				}
+			}
 			this.score += calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity); // SCENARIO_DURATION
 		} else {
 			if (this.params.scoreActs) {
