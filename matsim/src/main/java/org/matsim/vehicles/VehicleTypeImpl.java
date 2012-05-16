@@ -33,7 +33,7 @@ public class VehicleTypeImpl implements VehicleType {
 	private EngineInformation engineInformation;
 	private String description;
 	private VehicleCapacity capacity;
-
+	
 	/**
 	 * default from xml schema
 	 */

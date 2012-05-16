@@ -51,5 +51,7 @@ public interface VehicleSchemaV1Names {
 	public static final String EGRESSTIME = "egressTime";
 	public static final String DOOROPERATION = "doorOperation";
 	public static final String MODE = "mode";
+	public static final String PASSENGERCAREQUIVALENTS = "passengerCarEquivalents";
+	public static final String PCE = "pce";
 	
 }

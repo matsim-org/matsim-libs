@@ -114,7 +114,9 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
       atts.clear();
       atts.add(this.createTuple(VehicleSchemaV1Names.MODE, vt.getDoorOperationMode().toString()));
       this.writeStartTag(VehicleSchemaV1Names.DOOROPERATION, atts, true);
-      
+      atts.clear();
+      atts.add(this.createTuple(VehicleSchemaV1Names.PCE, vt.getPcuEquivalents()));
+      this.writeStartTag(VehicleSchemaV1Names.PASSENGERCAREQUIVALENTS, atts, true);
 			this.writeEndTag(VehicleSchemaV1Names.VEHICLETYPE);
 		}
 	}

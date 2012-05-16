@@ -159,6 +159,9 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 		else if (VehicleSchemaV1Names.DOOROPERATION.equalsIgnoreCase(name)){
 			this.currentVehType.setDoorOperationMode(this.parseDoorOperationMode(atts.getValue(VehicleSchemaV1Names.MODE)));
 		}
+		else if (VehicleSchemaV1Names.PASSENGERCAREQUIVALENTS.equalsIgnoreCase(name)){
+			this.currentVehType.setPcuEquivalents(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.PCE)));
+		}
 	}
 
 }

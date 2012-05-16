@@ -93,6 +93,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertEquals(23.23, vehType.getAccessTime(), EPSILON);
 		assertEquals(42.42, vehType.getEgressTime(), EPSILON);
 		assertEquals(DoorOperationMode.parallel, vehType.getDoorOperationMode());
+		assertEquals(2.0, vehType.getPcuEquivalents());
 		
 		vehType = vehicleTypes.get(new IdImpl("defaultValue>Car"));
 		assertNotNull(vehType);
@@ -101,6 +102,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertTrue(Double.isInfinite(vehType.getMaximumVelocity()));
 		assertNull(vehType.getCapacity());
 		assertEquals(DoorOperationMode.serial, vehType.getDoorOperationMode());
+		assertEquals(1.0, vehType.getPcuEquivalents());
 		
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());

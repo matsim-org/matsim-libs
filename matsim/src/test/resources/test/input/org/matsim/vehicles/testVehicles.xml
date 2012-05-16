@@ -24,6 +24,7 @@
   <accessTime secondsPerPerson="23.23" />
   <egressTime secondsPerPerson="42.42" />
   <doorOperation mode="parallel" />
+  <passengerCarEquivalents pce="2.0" />
 </vehicleType>
 
 <vehicleType id="defaultValue&gt;Car">
