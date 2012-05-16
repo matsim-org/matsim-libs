@@ -22,6 +22,7 @@ package playground.thibautd.jointtrips.population.jointtrippossibilities;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +38,9 @@ import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTri
 public class JointTripPossibilities {
 	private String description;
 	private final Map<Id, Map<Od, List<Possibility>>> driverPossibilities =
-		new HashMap<Id, Map<Od, List<Possibility>>>();
+		new ConcurrentHashMap<Id, Map<Od, List<Possibility>>>();
 	private final Map<Id, Map<Od, List<Possibility>>> passengerPossibilities =
-		new HashMap<Id, Map<Od, List<Possibility>> >();
+		new ConcurrentHashMap<Id, Map<Od, List<Possibility>> >();
 	private final List<Possibility> possibilities = new ArrayList<Possibility>();
 
 	public JointTripPossibilities() {
@@ -51,33 +52,57 @@ public class JointTripPossibilities {
 	}
 
 	public Collection<Possibility> getDriverPossibilities(final Id agent) {
-		return flatten( get( agent , driverPossibilities ).values());
+		Map<Od, List<Possibility>> poss = driverPossibilities.get( agent );
+
+		if (poss == null) {
+			poss = createAndGet( agent , driverPossibilities );
+		}
+
+		return flatten( poss.values());
 	}
 
 	public Collection<Possibility> getPassengerPossibilities(final Id agent) {
-		return flatten( get( agent , passengerPossibilities ).values()  );
+		Map<Od, List<Possibility>> poss = passengerPossibilities.get( agent );
+
+		if (poss == null) {
+			poss = createAndGet( agent , passengerPossibilities );
+		}
+
+		return flatten( poss.values());
 	}
 
 	public Collection<Possibility> getDriverPossibilities(
 			final Id agent,
 			final Od od) {
-		return get( agent , driverPossibilities ).get( od );
+		Map<Od, List<Possibility>> poss = driverPossibilities.get( agent );
+
+		if (poss == null) {
+			poss = createAndGet( agent , driverPossibilities );
+		}
+
+		return poss.get( od );
 	}
 
 	public Collection<Possibility> getPassengerPossibilities(
 			final Id agent,
 			final Od od) {
-		return get( agent , passengerPossibilities ).get( od );
+		Map<Od, List<Possibility>> poss = passengerPossibilities.get( agent );
+
+		if (poss == null) {
+			poss = createAndGet( agent , passengerPossibilities );
+		}
+
+		return poss.get( od );
 	}
 
-	public void add(final Possibility p) {
+	public synchronized void add(final Possibility p) {
 		possibilities.add( p );
-		get(
+		createAndGet(
 			p.getDriverOd(),
-			get( p.getDriver() , driverPossibilities ) ).add( p );
-		get(
+			createAndGet( p.getDriver() , driverPossibilities ) ).add( p );
+		createAndGet(
 			p.getPassengerOd(),
-			get( p.getPassenger() , passengerPossibilities )  ).add( p );
+			createAndGet( p.getPassenger() , passengerPossibilities )  ).add( p );
 	}
 
 	public Collection<Possibility> getAll() {
@@ -95,20 +120,20 @@ public class JointTripPossibilities {
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
-	private static Map<Od, List<Possibility>> get(
+	private synchronized Map<Od, List<Possibility>> createAndGet(
 			final Id key,
 			final Map<Id, Map<Od, List<Possibility>>> m) {
 		Map<Od, List<Possibility>> map = m.get( key );
 
 		if (map == null) {
-			map = new HashMap<Od, List<Possibility>>();
+			map = new ConcurrentHashMap<Od, List<Possibility>>();
 			m.put( key , map );
 		}
 
 		return map;
 	}
 
-	private static List<Possibility> get(
+	private synchronized List<Possibility> createAndGet(
 			final Od key,
 			final Map<Od, List<Possibility>> m) {
 		List<Possibility> list = m.get( key );
