@@ -25,11 +25,10 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.grips.algorithms.FeatureTransformer;
 import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.events.InfoEvent;
 import org.matsim.contrib.grips.io.GripsConfigDeserializer;
@@ -42,7 +41,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,11 +57,9 @@ import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -110,7 +106,7 @@ public class ScenarioGenerator {
 			GripsConfigModule gcm = new GripsConfigModule("grips");
 			this.c.addModule("grips", gcm);
 			
-			this.c.global().setCoordinateSystem("EPSG:32633");
+			this.c.global().setCoordinateSystem("EPSG:3395");
 			
 			GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
 			parser.readFile(this.configFile);
@@ -272,7 +268,7 @@ public class ScenarioGenerator {
 		Feature ft = null;
 		try {
 			ft = (Feature) fs.getFeatures().iterator().next();
-			transform(ft,fs.getSchema().getDefaultGeometry().getCoordinateSystem());
+			FeatureTransformer.transform(ft,fs.getSchema().getDefaultGeometry().getCoordinateSystem(),this.c);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-2);
@@ -300,22 +296,13 @@ public class ScenarioGenerator {
 		new EvacuationNetworkGenerator(sc, p,this.safeLinkId).run();
 
 		String networkOutputFile = gcm.getOutputDir()+"/network.xml.gz";
-		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
-		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
+//		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
+//		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
 		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
 		sc.getConfig().network().setInputFile(networkOutputFile);
 	}
 
-	private void transform(Feature ft,
-			CoordinateReferenceSystem coordinateSystem) throws FactoryException, MismatchedDimensionException, TransformException, IllegalAttributeException {
-		CoordinateReferenceSystem target = CRS.decode(this.c.global().getCoordinateSystem(),true);
 
-		MathTransform transform = CRS.findMathTransform(coordinateSystem, target,true);
-		Geometry geo = ft.getDefaultGeometry();
-
-		ft.setDefaultGeometry(JTS.transform(geo, transform));
-
-	}
 
 	public GripsConfigModule getGripsConfig() {
 		Module m = this.c.getModule("grips");

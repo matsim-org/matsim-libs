@@ -26,6 +26,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,11 +36,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.grips.algorithms.FeatureTransformer;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -65,11 +71,23 @@ public class PopulationFromESRIShapeFileGenerator {
 	public void run() {
 		log.info("Generating population from ESRI shape file.");
 		FeatureSource fs = ShapeFileReader.readDataFile(this.populationShapeFile);
+		CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry().getCoordinateSystem();
 		try {
 			@SuppressWarnings("unchecked")
 			Iterator<Feature> it = fs.getFeatures().iterator();
 			while (it.hasNext()) {
 				Feature ft = it.next();
+				try {
+					FeatureTransformer.transform(ft, crs, this.scenario.getConfig());
+				} catch (MismatchedDimensionException e) {
+					throw new RuntimeException(e);
+				} catch (FactoryException e) {
+					throw new RuntimeException(e);
+				} catch (TransformException e) {
+					throw new RuntimeException(e);
+				} catch (IllegalAttributeException e) {
+					throw new RuntimeException(e);
+				} 
 				createPersons(ft);
 			}
 		} catch (IOException e) {
@@ -113,7 +131,7 @@ public class PopulationFromESRIShapeFileGenerator {
 			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
 			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
 			p = MGC.xy2Point(x, y);
-		} while (ft.getDefaultGeometry().contains(p));
+		} while (!ft.getDefaultGeometry().contains(p));
 		return MGC.point2Coord(p);
 	}
 
