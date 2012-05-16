@@ -62,6 +62,11 @@ xml:lang="en">
       <xs:complexType>
         <xs:attribute name="mode" type="doorOperationModeType" default="serial"/>
       </xs:complexType>
+    </xs:element>
+    <xs:element name="passengerCarEquivalents">
+    	<xs:complexType>
+    		<xs:attribute name="pce" type="xs:decimal" default="1.0 "/>
+    	</xs:complexType>
     </xs:element>    
   </xs:sequence>
     </xs:extension>
