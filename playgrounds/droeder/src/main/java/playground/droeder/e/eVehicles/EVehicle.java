@@ -82,6 +82,7 @@ public class EVehicle {
 	 * @param time
 	 */
 	public void charge(double time, double newSoC) {
+		this.storeSoC(this.getChargingStart(), this.currentSoC, 0.);
 		this.currentSoC = newSoC;
 		this.storeSoC(time, this.currentSoC, this.lengthOfLastLink);
 	}
@@ -91,13 +92,19 @@ public class EVehicle {
 	}
 	
 	public double getChargingEnd(double time){
-		double plannedDuration = vPlan.getEnd() - this.vPlan.getStart();
-		double maxDuration = time - this.getChargingStart();
-		if(maxDuration < plannedDuration){
-			return this.getChargingStart() + maxDuration;
+		double plannedDuration = this.vPlan.getEnd() - this.vPlan.getStart();
+		if(this.getChargingStart() + plannedDuration > time){
+			return time;
 		}else{
 			return this.getChargingStart() + plannedDuration;
 		}
+//		double maxDuration = time - this.getChargingStart();
+//		if(maxDuration < plannedDuration){
+//			return this.getChargingStart() + maxDuration;
+//		}else{
+//			return this.vPlan.getEnd();
+////			return this.getChargingStart() + plannedDuration;
+//		}
 //		if(vPlan.getEnd() < time){
 //			return this.vPlan.getEnd();
 //		}else{
