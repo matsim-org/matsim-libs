@@ -73,16 +73,17 @@ public class JointQSimFactory implements MobsimFactory {
 		// assumptions of the order in which function calls are made
 		QNetsimEngineFactory netsimEngFactory;
 		netsimEngFactory = new DefaultQSimEngineFactory();
-		QSim qSim1 = new QSim(sc, new DriverArtifactsSwallower( eventsManager ));
+
+		// default initialisation
+		QSim qSim = new QSim(sc, new DriverArtifactsSwallower( eventsManager ));
 		ActivityEngine activityEngine = new ActivityEngine();
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1, MatsimRandom.getRandom());
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim1.addMobsimEngine(teleportationEngine);
-        QSim qSim = qSim1;
+		qSim.addMobsimEngine(teleportationEngine);
 
 		// set specific engine
 		JointTripsEngine jointEngine = new JointTripsEngine( qSim );
