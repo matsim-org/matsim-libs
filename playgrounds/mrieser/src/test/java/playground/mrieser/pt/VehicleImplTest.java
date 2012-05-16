@@ -42,7 +42,7 @@ public class VehicleImplTest extends MatsimTestCase {
 		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(new IdImpl(10), vehicleType), 5);
+		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(new IdImpl(10), vehicleType));
 
 		vehicle.addPassenger(passenger1);
 		assertEquals("there should be 1 passenger in vehicle.", 1, vehicle.getPassengers().size());
@@ -64,7 +64,7 @@ public class VehicleImplTest extends MatsimTestCase {
 		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(new IdImpl(55), vehicleType), 5);
+		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(new IdImpl(55), vehicleType));
 
 		vehicle.addPassenger(passenger1);
 		vehicle.addPassenger(passenger2);
