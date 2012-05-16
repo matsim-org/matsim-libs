@@ -141,6 +141,7 @@ public class ScenarioGenerator {
 		this.em.processEvent(e);
 
 
+		this.c.otfVis().setMapOverlayMode(true);
 
 		this.c.controler().setLastIteration(10);
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
