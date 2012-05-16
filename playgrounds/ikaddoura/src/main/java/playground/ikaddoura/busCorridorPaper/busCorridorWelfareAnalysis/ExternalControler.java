@@ -155,7 +155,7 @@ class ExternalControler {
 	private void setDefaultParameters() {
 		if(op.equals(OptimizationParameter.FARE)){
 			this.fare = -0.;
-			this.capacity = 30;
+			this.capacity = 50;
 			this.numberOfBuses = 4;
 		} else if (op.equals(OptimizationParameter.CAPACITY)){
 			this.fare = -3.;
@@ -163,7 +163,7 @@ class ExternalControler {
 			this.numberOfBuses = 4;
 		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
 			this.fare = -3.;
-			this.capacity = 30;
+			this.capacity = 50;
 			this.numberOfBuses = 1;
 		}
 	}
