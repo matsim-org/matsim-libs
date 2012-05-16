@@ -11,7 +11,10 @@ Changes:
   -
   
 - New Features:
-  - 
+  - VehicleType now has size in passenger car equivalents (pce), and QSim honors
+    this attribute as well as the maximum vehicle speed. This is important,
+    if you use transit, please check your vehicles.xml for possibly
+    incorrect default settings.
 
 - Feature Improvements:
   - Loading Plans is now faster thanks to multithreading (r18639)
