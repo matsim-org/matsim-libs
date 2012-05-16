@@ -48,8 +48,8 @@ public class EmobEnergyProfileReader {
 		DisChargingProfiles p = new DisChargingProfiles();
 		Set<String[]> values = DaFileReader.readFileContent(file, "\t", true);
 		
-		log.warn("currently a factor is used for the discharging-Profiles, because the given values are to low...");
-		Double f = 100.;
+		Double f = 500.;
+		log.warn("currently a factor of " + f + " is used for the discharging-Profiles, because the given values are to low...");
 		for(String[] s: values){
 			p.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), f * Double.parseDouble(s[3]));
 		}

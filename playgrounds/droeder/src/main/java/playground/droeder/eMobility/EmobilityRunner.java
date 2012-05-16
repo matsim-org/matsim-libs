@@ -55,7 +55,7 @@ public class EmobilityRunner {
 	private static final String DIR = "D:/VSP/svn/shared/volkswagen_internal/";
 //	private static final String DIR = "/home/dgrether/shared-svn/projects/volkswagen_internal/";
 
-	private static final String CONFIGFILE = DIR + "scenario/config_empty_scenario.xml";
+	private static final String CONFIGFILE = DIR + "scenario/config_congested_scenario.xml";
 	private static final String ENERGYAGENTS = DIR + "scenario/input/testPlans.xml";
 	private static final String APPOINTMENTS = DIR + "scenario/input/testAppointments.txt";
 	private static final String CHARGINGFILE = DIR + "Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";
@@ -84,8 +84,8 @@ public class EmobilityRunner {
 		
 		SoCEventHandler soc = new SoCEventHandler(scenario.getSc().getNetwork());
 		TrafficStateControlerListener trafficState = new TrafficStateControlerListener();
-		c.addControlerListener(new MyListener(fleetHandler, populationHandler, soc));
 		c.addControlerListener(trafficState);
+		c.addControlerListener(new MyListener(fleetHandler, populationHandler, soc));
 		
 		c.setDumpDataAtEnd(true);
 		c.setOverwriteFiles(true);

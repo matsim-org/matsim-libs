@@ -68,6 +68,13 @@ public class EVehicle {
 	public void update(EventsManager manager, double time) {
 		if(this.hasChanged ){
 			this.hasChanged = false;
+			if(!(this.finishCharging == null)){
+				manager.processEvent(createSoCEvent(this.finishCharging));
+				this.finishCharging = null;
+			}else{
+				manager.processEvent(createSoCEvent(time));
+			}
+		}else if(this.startCharging == time){
 			manager.processEvent(createSoCEvent(time));
 		}
 	}
@@ -118,12 +125,18 @@ public class EVehicle {
 	public void finishDriving(double time, DisChargingProfiles discharging, boolean charge) {
 		if(this.currentActivity == null){
 			this.charge = false;
+			this.startCharging = Double.NaN;
 		}else{
 			double disChargePerKmInJoule = discharging.getJoulePerKm(currentActivity.getDischargingId(), this.linkLength / (time - linkEnterTime), 0.0);
 			double discharge = disChargePerKmInJoule * this.linkLength / 1000. * 2.778 * Math.pow(10, -7);
 			this.setSoC(this.soc - discharge);
 			this.setLinkEnterTime(time);
 			this.charge = charge;
+			if(currentActivity.plannedStart() < this.linkEnterTime){
+				startCharging = this.linkEnterTime;
+			}else{
+				startCharging = currentActivity.plannedStart();
+			}
 		}
 	}
 	
@@ -135,6 +148,9 @@ public class EVehicle {
 	}
 	
 	private boolean charge = false;
+	
+	private Double startCharging = Double.NaN;
+	private Double finishCharging = null;
 
 	/**
 	 * @param time
@@ -142,18 +158,15 @@ public class EVehicle {
 	 */
 	public boolean finishCharging(double time, ChargingProfiles charging) {
 		if(this.charge){
-			double duration, start;
-			if(currentActivity.plannedStart() < this.linkEnterTime){
-				start = this.linkEnterTime;
-			}else{
-				start = currentActivity.plannedStart();
-			}
-			if((time - start) < currentActivity.plannedDuration()){
-				duration = time - start;
+			double duration;
+			
+			if((time - startCharging) < currentActivity.plannedDuration()){
+				duration = time - startCharging;
 			}else{
 				duration = currentActivity.plannedDuration();
 			}
 			this.setSoC(charging.getNewState(currentActivity.getChargingId(), duration, this.soc));
+			this.finishCharging = this.startCharging + duration;
 		}
 		this.setLinkEnterTime(time);
 		if(this.chargingActs.hasNext()){
@@ -163,6 +176,7 @@ public class EVehicle {
 		}
 		return this.charge;
 	}
+	
 	
 
 }
