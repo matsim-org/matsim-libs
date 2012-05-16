@@ -297,64 +297,63 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 			// *******should after Scoring Listener!!!*******
 
-			if (calibrator.getInitialStepSize() != 0d) {
+			// if (calibrator.getInitialStepSize() != 0d) {
 
-				StringBuffer sb = new StringBuffer(Integer.toString(iter));
+			StringBuffer sb = new StringBuffer(Integer.toString(iter));
 
-				for (int i = 0; i < paramNames.length; i++) {
-					int paramNameIndex = Events2Score4AttrRecorder.attrNameList
-							.indexOf(paramNames[i]/*
-												 * pos. of param in Parameters
-												 * in Cadyts
-												 */);
+			for (int i = 0; i < paramNames.length; i++) {
+				int paramNameIndex = Events2Score4AttrRecorder.attrNameList
+						.indexOf(paramNames[i]/*
+											 * pos. of param in Parameters in
+											 * Cadyts
+											 */);
 
-					// double paramScaleFactor =
-					// Events2Score4PC_mnl_mnl.paramScaleFactorList
-					// .get(paramNameIndex);
+				// double paramScaleFactor =
+				// Events2Score4PC_mnl_mnl.paramScaleFactorList
+				// .get(paramNameIndex);
 
-					double value = avgParams.get(i);
-					// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
-					// AGAIN!!!***
-					if (config.planCalcScore().getParams()
-							.containsKey(paramNames[i])) {
-						// if
-						// (scoringCfg.getParams().containsKey(paramNames[i])) {
-						// scoringCfg.addParam(paramNames[i],
-						// Double.toString(value
-						// // / paramScaleFactor
-						// ));
-						ScoringConfigGetSetValues
-								.setValue(paramNames[i], value);
-					} else/* bse */{
-						config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
-								Double.toString(value
-								// / paramScaleFactor
-								));
-					}
-					// *****************************************************
-					// ****SET CALIBRATED PARAMETERS IN MNL*****************
-					mnl.setParameter(paramNameIndex, value);
-
-					// text output
-					paramArrays[i][iter - firstIter] = value
-					// / paramScaleFactor
-					;
-					sb.append("\t");
-					sb.append(value
-					// /paramScaleFactor
-					);
+				double value = avgParams.get(i);
+				// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
+				// AGAIN!!!***
+				if (config.planCalcScore().getParams()
+						.containsKey(paramNames[i])) {
+					// if
+					// (scoringCfg.getParams().containsKey(paramNames[i])) {
+					// scoringCfg.addParam(paramNames[i],
+					// Double.toString(value
+					// // / paramScaleFactor
+					// ));
+					ScoringConfigGetSetValues.setValue(paramNames[i], value);
+				} else/* bse */{
+					config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
+							Double.toString(value
+							// / paramScaleFactor
+							));
 				}
+				// *****************************************************
+				// ****SET CALIBRATED PARAMETERS IN MNL*****************
+				mnl.setParameter(paramNameIndex, value);
 
-				// ********calibrator.getParameters() JUST FOR ANALYSIS********
-				Vector params = calibrator.getParameters();
-				for (int i = 0; i < paramNames.length; i++) {
-					sb.append("\t");
-					sb.append(params.get(i));
-				}
-
-				writer.writeln(sb);
-				writer.flush();
+				// text output
+				paramArrays[i][iter - firstIter] = value
+				// / paramScaleFactor
+				;
+				sb.append("\t");
+				sb.append(value
+				// /paramScaleFactor
+				);
 			}
+
+			// ********calibrator.getParameters() JUST FOR ANALYSIS********
+			Vector params = calibrator.getParameters();
+			for (int i = 0; i < paramNames.length; i++) {
+				sb.append("\t");
+				sb.append(params.get(i));
+			}
+
+			writer.writeln(sb);
+			writer.flush();
+			// }
 			/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
 			((Events2Score4PC) chooser).setMultinomialLogit(mnl);
