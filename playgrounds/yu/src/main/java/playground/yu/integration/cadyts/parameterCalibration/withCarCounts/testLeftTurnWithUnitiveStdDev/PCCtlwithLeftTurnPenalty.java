@@ -29,19 +29,23 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection.BseParamCalibrationControler;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.PlansScoringWithLeftTurnPenalty4PC;
+import playground.yu.scoring.PlansScoringI;
+import playground.yu.scoring.withAttrRecorder.ControlerWithAttrRecorderI;
+import playground.yu.scoring.withAttrRecorder.ScorAttrWriteTrigger;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
 
 /**
  * @author yu
  * 
  */
-public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler {
+public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler
+		implements ControlerWithAttrRecorderI {
 
 	public PCCtlwithLeftTurnPenalty(Config config) {
 		super(config);
 		extension = new PCCtlListener();
 		addControlerListener(extension);
-		// addControlerListener(new ScorAttrWriteTrigger());
+		addControlerListener(new ScorAttrWriteTrigger());
 	}
 
 	/**
@@ -82,5 +86,16 @@ public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler {
 		StrategyManagerConfigLoader.load(this, manager);
 
 		return manager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see playground.yu.scoring.withAttrRecorder.ControlerWithAttrRecorderI#
+	 * getPlansScoring4AttrRecorder()
+	 */
+	@Override
+	public PlansScoringI getPlansScoring4AttrRecorder() {
+		return plansScoring4PC;
 	}
 }

@@ -93,7 +93,7 @@ public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 			// distanceCar attr
 			distanceAttrCar += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-					+ params.monetaryDistanceCostRateCar * distanceAttrCar
+					+ params.monetaryDistanceCostRateCar * dist
 					+ params.constantCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
@@ -107,7 +107,7 @@ public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 			// distancePt attr
 			distanceAttrPt += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTravelingPT_s
-					+ params.monetaryDistanceCostRatePt * distanceAttrPt
+					+ params.monetaryDistanceCostRatePt * dist
 					+ params.constantPt;
 			// travelingPt attr
 			travTimeAttrPt += travelTime / 3600d;
@@ -140,7 +140,7 @@ public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 
 			// use the same values as for "car"
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-					+ params.monetaryDistanceCostRateCar * distanceAttrCar
+					+ params.monetaryDistanceCostRateCar * dist
 					+ params.constantCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
@@ -196,7 +196,7 @@ public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 		carLegNo = 0;
 		ptLegNo = 0;
 		walkLegNo = 0;
-		distanceAttrCar = 0;
+		distanceAttrCar = 0d;
 		distanceAttrPt = 0d;
 		distanceAttrWalk = 0d;
 	}
