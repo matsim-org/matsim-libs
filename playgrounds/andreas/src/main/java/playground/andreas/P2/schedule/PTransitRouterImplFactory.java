@@ -49,7 +49,6 @@ import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.stats.GexfPStat;
 import playground.andreas.P2.stats.PCoopLogger;
 import playground.andreas.P2.stats.PStats;
-import playground.andreas.osmBB.extended.TransitScheduleImpl;
 
 /**
  * Hook to register paratransit black box with MATSim
@@ -142,7 +141,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 
 	private TransitSchedule addPTransitScheduleToOriginalOne(PTransitSchedule baseSchedule, TransitSchedule pSchedule) {
 		
-		TransitSchedule schedule = new TransitScheduleImpl(baseSchedule.getFactory());
+		TransitSchedule schedule = new PTransitScheduleImpl(baseSchedule.getFactory());
 		
 		if(pSchedule == null){
 			log.info("pSchedule does not exist, returning non modified one");

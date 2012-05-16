@@ -57,9 +57,9 @@ import playground.andreas.P2.plan.deprecated.SimpleBackAndForthScheduleProvider;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
+import playground.andreas.P2.schedule.PTransitScheduleImpl;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
-import playground.andreas.osmBB.extended.TransitScheduleImpl;
 
 /**
  * Black box for paratransit
@@ -107,7 +107,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		event.getControler().getEvents().addHandler(this.scorePlansHandler);
 		
 		// init possible paratransit stops
-		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(event.getControler().getNetwork(), this.pConfig);
+		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
 		// init route provider
 		this.routeProvider = this.initRouteProvider(event.getControler().getNetwork(), this.pConfig, this.pStopsOnly);
@@ -121,7 +121,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}
 		
 		// collect the transit schedules from all cooperatives
-		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
+		this.pTransitSchedule = new PTransitScheduleImpl(this.pStopsOnly.getFactory());
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
@@ -146,7 +146,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}
 		
 		// Collect current lines offered
-		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
+		this.pTransitSchedule = new PTransitScheduleImpl(this.pStopsOnly.getFactory());
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
@@ -165,7 +165,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 			cooperative.score(driverId2ScoreMap);
 		}
 		
-		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
+		this.pTransitSchedule = new PTransitScheduleImpl(this.pStopsOnly.getFactory());
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
@@ -183,7 +183,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
 			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, 0);
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(ComplexCircleScheduleProvider.NAME)){
-			return new ComplexCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, 0);
+			return new ComplexCircleScheduleProvider(pStopsOnly, network, 0);
 		} else {
 			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
 			return null;

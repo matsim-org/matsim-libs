@@ -21,6 +21,7 @@ package playground.andreas.P2.plan;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,17 +57,26 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	private final static Logger log = Logger.getLogger(ComplexCircleScheduleProvider.class);
 	public final static String NAME = "ComplexCircleScheduleProvider";
 	
-	private String pIdentifier;
 	private Network net;
 	private LeastCostPathCalculator routingAlgo;
 	private TransitSchedule scheduleWithStopsOnly;
+	private HashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
 	
-	public ComplexCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, int iteration) {
-		this.pIdentifier = pIdentifier;
+	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, int iteration) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
 		this.routingAlgo = new Dijkstra(this.net, tC, tC);
+		
+		// register all stops by their corresponding link id
+		this.linkId2StopFacilityMap = new HashMap<Id, TransitStopFacility>();
+		for (TransitStopFacility stop : this.scheduleWithStopsOnly.getFacilities().values()) {
+			if (stop.getLinkId() == null) {
+				log.warn("There is a potential paratransit stop without a corresponding link id. Shouldn't be possible. Check stop " + stop.getId());
+			} else {
+				this.linkId2StopFacilityMap.put(stop.getLinkId(), stop);
+			}
+		}
 	}
 
 	@Override
@@ -145,10 +155,10 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		// additional stops
 		for (Link link : links) {
 			runningTime += link.getLength() / link.getFreespeed();
-			if(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl(this.pIdentifier + link.getId())) == null){
+			if(this.linkId2StopFacilityMap.get(link.getId()) == null){
 				continue;
 			}
-			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl(this.pIdentifier + link.getId())), runningTime, runningTime);
+			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.linkId2StopFacilityMap.get(link.getId()), runningTime, runningTime);
 			stops.add(routeStop);
 		}
 		
