@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -37,9 +36,9 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.dgrether.energy.validation.ValidationInfoWriter;
 import playground.dgrether.energy.validation.ValidationInformation;
+import playground.droeder.e.energy.ChargingProfiles;
+import playground.droeder.e.energy.DisChargingProfiles;
 import playground.droeder.e.poi.PoiList;
-import playground.droeder.eMobility.energy.ChargingProfiles;
-import playground.droeder.eMobility.energy.DisChargingProfiles;
 
 /**
  * @author droeder
