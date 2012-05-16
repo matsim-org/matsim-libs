@@ -63,9 +63,9 @@ xml:lang="en">
         <xs:attribute name="mode" type="doorOperationModeType" default="serial"/>
       </xs:complexType>
     </xs:element>
-    <xs:element name="passengerCarEquivalents">
+    <xs:element name="passengerCarEquivalents" minOccurs="0" maxOccurs="1">
     	<xs:complexType>
-    		<xs:attribute name="pce" type="xs:decimal" default="1.0 "/>
+    		<xs:attribute name="pce" type="xs:decimal" default="1.0"/>
     	</xs:complexType>
     </xs:element>    
   </xs:sequence>
