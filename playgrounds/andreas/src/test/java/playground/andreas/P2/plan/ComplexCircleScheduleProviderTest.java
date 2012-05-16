@@ -52,7 +52,7 @@ public class ComplexCircleScheduleProviderTest {
 		
 		TransitSchedule tS = CreateStopsForAllCarLinks.createStopsForAllCarLinks(scenario.getNetwork(), pC);
 		
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(pC.getPIdentifier(), tS, scenario.getNetwork(), 10);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(tS, scenario.getNetwork(), 10);
 		
 		Id lineId = new IdImpl("line1");
 		double startTime = 7.0 * 3600.0;
@@ -109,7 +109,7 @@ public class ComplexCircleScheduleProviderTest {
 		
 		TransitSchedule tS = CreateStopsForAllCarLinks.createStopsForAllCarLinks(scenario.getNetwork(), pC);
 		
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(pC.getPIdentifier(), tS, scenario.getNetwork(), 10);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(tS, scenario.getNetwork(), 10);
 		
 		Id lineId = new IdImpl("line1");
 		double startTime = 7.0 * 3600.0;
