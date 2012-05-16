@@ -329,12 +329,16 @@ public class QLinkTest extends MatsimTestCase {
 		PersonImpl p = new PersonImpl(new IdImpl(5));
 		p.addPlan(new PlanImpl());
 
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QVehicle veh1 = new QVehicle(new VehicleImpl(new IdImpl(1), vehType));
+		VehicleType defaultVehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		VehicleType mediumVehType = new VehicleTypeImpl(new IdImpl("mediumVehicleType"));
+		mediumVehType.setPcuEquivalents(2.5);
+		VehicleType largeVehType = new VehicleTypeImpl(new IdImpl("largeVehicleType"));
+		largeVehType.setPcuEquivalents(5);
+		QVehicle veh1 = new QVehicle(new VehicleImpl(new IdImpl(1), defaultVehType));
 		veh1.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
-		QVehicle veh25 = new QVehicle(new VehicleImpl(new IdImpl(2), vehType), 2.5);
+		QVehicle veh25 = new QVehicle(new VehicleImpl(new IdImpl(2), mediumVehType));
 		veh25.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
-		QVehicle veh5 = new QVehicle(new VehicleImpl(new IdImpl(3), vehType), 5);
+		QVehicle veh5 = new QVehicle(new VehicleImpl(new IdImpl(3), largeVehType));
 		veh5.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);

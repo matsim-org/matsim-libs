@@ -229,7 +229,7 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	public void createAndParkVehicleOnLink(Vehicle vehicle, Id linkId) {
-		QVehicle veh = new QVehicle(vehicle, vehicle.getType().getPcuEquivalents());
+		QVehicle veh = new QVehicle(vehicle);
 		netEngine.addParkedVehicle(veh, linkId);
 	}
 

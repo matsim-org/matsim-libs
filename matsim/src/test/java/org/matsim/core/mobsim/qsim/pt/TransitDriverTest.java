@@ -169,7 +169,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
-		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
+		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -214,7 +214,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
-		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
+		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
@@ -286,7 +286,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
-		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
+		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
@@ -344,7 +344,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
-		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
+		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
@@ -392,7 +392,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
-		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
+		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
@@ -438,7 +438,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
-		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
+		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 

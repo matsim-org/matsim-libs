@@ -46,16 +46,10 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	private DriverAgent driver = null;
 	private Id id;
 	private Link currentLink = null;
-	private double sizeInEquivalents;
 	private Vehicle basicVehicle;
 	
 	public QVehicle(final Vehicle basicVehicle) {
-		this(basicVehicle, 1.0);
-	}
-
-	public QVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
-		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;
 	}
 
@@ -130,7 +124,7 @@ public class QVehicle extends QItem implements MobsimVehicle {
 
 	@Override
 	public double getSizeInEquivalents() {
-		return this.sizeInEquivalents;
+		return basicVehicle.getType().getPcuEquivalents();
 	}
 
 	@Override

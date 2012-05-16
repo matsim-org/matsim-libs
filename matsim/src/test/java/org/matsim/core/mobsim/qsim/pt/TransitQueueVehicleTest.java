@@ -38,18 +38,22 @@ public class TransitQueueVehicleTest extends AbstractTransitVehicleTest {
 
 	@Override
 	protected TransitVehicle createTransitVehicle(final Vehicle vehicle) {
-		return new TransitQVehicle(vehicle, 1);
+		return new TransitQVehicle(vehicle);
 	}
 
 	public void testSizeInEquivalents() {
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType carType = new VehicleTypeImpl(new IdImpl("carType"));
+		VehicleType busType = new VehicleTypeImpl(new IdImpl("busType"));
+		busType.setPcuEquivalents(2.5);
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
-		TransitQVehicle veh = new TransitQVehicle(vehicle, 1.0);
+		carType.setCapacity(capacity);
+		busType.setCapacity(capacity);
+		Vehicle car = new VehicleImpl(new IdImpl(1976), carType);
+		Vehicle bus = new VehicleImpl(new IdImpl(1976), busType);
+		TransitQVehicle veh = new TransitQVehicle(car);
 		assertEquals(1.0, veh.getSizeInEquivalents(), MatsimTestCase.EPSILON);
-		veh = new TransitQVehicle(vehicle, 2.5);
+		veh = new TransitQVehicle(bus);
 		assertEquals(2.5, veh.getSizeInEquivalents(), MatsimTestCase.EPSILON);
 	}
 }

@@ -36,8 +36,8 @@ public class TransitQVehicle extends QVehicle implements TransitVehicle {
 	private final List<PassengerAgent> passengers = new LinkedList<PassengerAgent>();
 	private TransitStopHandler stopHandler;
 
-	public TransitQVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
-		super(basicVehicle, sizeInEquivalents);
+	public TransitQVehicle(final Vehicle basicVehicle) {
+		super(basicVehicle);
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
 		if (capacity == null) {
 			throw new NullPointerException("No capacity set in vehicle type.");
