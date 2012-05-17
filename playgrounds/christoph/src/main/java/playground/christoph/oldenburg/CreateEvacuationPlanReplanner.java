@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -99,7 +98,7 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 		 */
 		if (withinDayAgent instanceof PersonDriverAgentImpl) {	
 			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
-			((QSim) ((PersonDriverAgentImpl) withinDayAgent).getMobsim()).rescheduleActivityEnd(withinDayAgent);
+			this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 			return true;
 		}
 		else {

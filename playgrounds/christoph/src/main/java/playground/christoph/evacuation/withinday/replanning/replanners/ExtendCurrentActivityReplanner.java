@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -103,7 +102,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		if (withinDayPersonAgent instanceof PersonDriverAgentImpl) {
 			withinDayPersonAgent.calculateAndSetDepartureTime(currentActivity);
-			((QSim) withinDayPersonAgent.getMobsim()).rescheduleActivityEnd(withinDayAgent);
+			this.internalInterface.rescheduleActivityEnd(withinDayPersonAgent);
 			return true;
 		}
 		else {
