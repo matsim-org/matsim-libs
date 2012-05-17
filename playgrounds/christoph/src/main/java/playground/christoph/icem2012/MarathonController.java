@@ -21,6 +21,7 @@
 package playground.christoph.icem2012;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
@@ -33,6 +34,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -46,6 +48,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.evacuation.api.core.v01.Coord3d;
+import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.gregor.sim2d_v3.events.XYDataWriter;
 import playground.gregor.sim2d_v3.router.Walk2DLegRouter;
@@ -71,7 +74,6 @@ public class MarathonController extends Controler implements StartupListener, Mo
 		super(sc);
 		setOverwriteFiles(true);
 		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
-//		this.addMobsimFactory("hybridQ2D", factory);
 		
 		// explicit set the mobsim factory
 		this.setMobsimFactory(factory);
@@ -91,10 +93,27 @@ public class MarathonController extends Controler implements StartupListener, Mo
 		zCoordinateAdder.addZCoordinatesToNetwork();
 		zCoordinateAdder.checkSteepness();
 		
-		new NetworkCleaner().run(scenarioData.getNetwork());
+		/*
+		 * Fixing height coordinates of nodes that have been added and that
+		 * are not included in the height shp files.
+		 */
 		for (Node node : scenarioData.getNetwork().getNodes().values()) {
-			log.info(node.getId().toString() + ((Coord3d) node.getCoord()).getZ());
+			String idString = node.getId().toString(); 
+			if (idString.contains("_shifted")) {
+				idString = idString.replace("_shifted", "");
+				Node node2 = scenarioData.getNetwork().getNodes().get(scenarioData.createId(idString));
+				Coord3d coord2 = (Coord3d) node2.getCoord();
+				
+				Coord coord = node.getCoord();
+				Coord3d coord3d = new Coord3dImpl(coord.getX(), coord.getY(), coord2.getZ());
+				((NodeImpl) node).setCoord(coord3d);
+			}
 		}
+		
+//		new NetworkCleaner().run(scenarioData.getNetwork());
+//		for (Node node : scenarioData.getNetwork().getNodes().values()) {
+//			log.info(node.getId().toString() + " " + ((Coord3d) node.getCoord()).getZ());
+//		}
 		
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenarioData);
 		loader.load2DScenario();

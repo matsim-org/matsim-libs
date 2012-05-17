@@ -48,6 +48,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -73,19 +74,34 @@ public class CreateMarathonPopulation {
 	private final String startLink = "106474";
 	private final String endLink = "106473";
 	
+//	// unshifted
+//	private final String[] trackNodes = new String[]{	
+//			"2952", "2759", "2951", "2531", "2530", "2529", "4263", "4268", "4468", "3496",
+//			"2530", "2531", "2951", "4508", "4507", "4505", "4504", "4505", "4503", "4506",
+//			"4508", "2951", "2759", "2758", "2952", "2759", "2951", "2531", "2530", "2529",
+//			"2528", "2527", "2526", "2525", "2524", "2523", "2522", "2521", "4239", "2522", 
+//			"2523", "2524", "2525", "2526", "2527", "2528", "2529", "2530", "2531", "2951", 
+//			"4508", "4507", "4505", "4504", "4505", "4503", "4506", "4508", "2951", "2759",
+//			"2952"};
+
+	// shifted
 	private final String[] trackNodes = new String[]{	
 			"2952", "2759", "2951", "2531", "2530", "2529", "4263", "4268", "4468", "3496",
-			"2530", "2531", "2951", "4508", "4507", "4505", "4504", "4505", "4503", "4506",
-			"4508", "2951", "2759", "2758", "2952", "2759", "2951", "2531", "2530", "2529",
-			"2528", "2527", "2526", "2525", "2524", "2523", "2522", "2521", "4239", "2522", 
-			"2523", "2524", "2525", "2526", "2527", "2528", "2529", "2530", "2531", "2951", 
-			"4508", "4507", "4505", "4504", "4505", "4503", "4506", "4508", "2951", "2759",
-			"2952"};
+			"2530_shifted", "2531_shifted", "2951_shifted", "4508_shifted", "4507_shifted", 
+			"4505_shifted", "4504_shifted", "4504", "4505", "4503", "4506", "4508", 
+			"2951_shifted_shifted", "2759_shifted", "2758", "2952", "2759", "2951", "2531", 
+			"2530", "2529", "2528", "2527", "2526", "2525", "2524", "2523", "2522", "2521", 
+			"4239", "2522_shifted", "2523_shifted", "2524_shifted", "2525_shifted", 
+			"2526_shifted", "2527_shifted", "2528_shifted", "2529_shifted", "2530_shifted",
+			"2531_shifted", "2951_shifted", "4508_shifted", "4507_shifted", "4505_shifted", 
+			"4504_shifted", "4504", "4505", "4503", "4506", "4508", "2951_shifted_shifted", 
+			"2759_shifted", "2952"};
 	
 	private NetworkRoute route;
 	
 	private String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/"; 
 	private String trackShapeOutFile = basePath + "input/track.shp";
+	private String barriersShapeOutFile = basePath + "input/barriers.shp";
 	private String networkInFile = basePath + "input_zh/network_ivtch.xml.gz";
 	private String networkOutFile = basePath + "input/network_ivtch.xml.gz";
 	private String populationOutFile = basePath + "input/plans.xml";
@@ -100,13 +116,19 @@ public class CreateMarathonPopulation {
 		config.network().setInputFile(networkInFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		addLinksToNetwork(scenario);
+		addNodesToNetwork(scenario);
 		
+		moveLinksToShiftedNodes(scenario);
+		
+		addLinksToNetwork(scenario);
+
 		createRoute(scenario);
 		
 		prepareNetwork(scenario);
 		
 		writeTrack(scenario);
+		
+		writeBarriers(scenario);
 		
 		createPopulation(scenario);
 	}
@@ -141,6 +163,147 @@ public class CreateMarathonPopulation {
 	}
 	
 	/*
+	 * Add some nodes to the network which are required for the track.
+	 */
+	private void addNodesToNetwork(Scenario scenario) {
+		createShiftedNode(scenario, "4504", 3.0, 0.0);
+		createShiftedNode(scenario, "4505", 3.0, 0.0);
+		createShiftedNode(scenario, "4507", 3.0, 0.0);
+		createShiftedNode(scenario, "4508", 3.0, 0.0);
+		createShiftedNode(scenario, "2951", 3.0, 5.0);
+		createShiftedNode(scenario, "2951_shifted", -6.0, -5.0);
+		createShiftedNode(scenario, "2531", 3.0, 5.0);
+		createShiftedNode(scenario, "2530", 3.0, 3.0);
+		createShiftedNode(scenario, "2529", 3.0, 0.0);
+		createShiftedNode(scenario, "2528", 3.0, 0.0);
+		createShiftedNode(scenario, "2527", 3.0, 0.0);
+		createShiftedNode(scenario, "2526", 3.0, 0.0);
+		createShiftedNode(scenario, "2525", 3.0, 0.0);
+		createShiftedNode(scenario, "2524", 3.0, 0.0);
+		createShiftedNode(scenario, "2523", 3.0, 0.0);
+		createShiftedNode(scenario, "2522", 3.0, 0.0);
+		createShiftedNode(scenario, "2759", -1.0, 3.0);
+		
+		
+		connectedShiftedNodes(scenario, "4504");
+		connectedShiftedNodes(scenario, "4505");
+		connectedShiftedNodes(scenario, "4507");
+		connectedShiftedNodes(scenario, "4508");
+		connectedShiftedNodes(scenario, "2951");
+		connectedShiftedNodes(scenario, "2951_shifted");
+		connectedShiftedNodes(scenario, "2531");
+		connectedShiftedNodes(scenario, "2530");
+		connectedShiftedNodes(scenario, "2529");
+		connectedShiftedNodes(scenario, "2528");
+		connectedShiftedNodes(scenario, "2527");
+		connectedShiftedNodes(scenario, "2526");
+		connectedShiftedNodes(scenario, "2525");
+		connectedShiftedNodes(scenario, "2524");
+		connectedShiftedNodes(scenario, "2523");
+		connectedShiftedNodes(scenario, "2522");
+		connectedShiftedNodes(scenario, "2759");
+	}
+	
+	private void createShiftedNode(Scenario scenario, String nodeId, double dx, double dy) {
+		Node node = scenario.getNetwork().getNodes().get(scenario.createId(nodeId));
+		Coord coord = scenario.createCoord(node.getCoord().getX() + dx, node.getCoord().getY() + dy);
+		Id id = scenario.createId(nodeId + "_shifted");
+		Node shiftedNode = scenario.getNetwork().getFactory().createNode(id, coord);
+		scenario.getNetwork().addNode(shiftedNode);
+	}
+	
+	private void moveLinksToShiftedNodes(Scenario scenario) {
+		
+		moveLink(scenario, "4239", "2522", "4239", "2522_shifted");
+		moveLink(scenario, "2522", "2523", "2522_shifted", "2523_shifted");
+		moveLink(scenario, "2523", "2524", "2523_shifted", "2524_shifted");
+		moveLink(scenario, "2524", "2525", "2524_shifted", "2525_shifted");
+		moveLink(scenario, "2525", "2526", "2525_shifted", "2526_shifted");
+		moveLink(scenario, "2526", "2527", "2526_shifted", "2527_shifted");
+		moveLink(scenario, "2527", "2528", "2527_shifted", "2528_shifted");
+		moveLink(scenario, "2528", "2529", "2528_shifted", "2529_shifted");
+		moveLink(scenario, "2529", "2530", "2529_shifted", "2530_shifted");
+		moveLink(scenario, "3496", "2530", "3496", "2530_shifted");
+		moveLink(scenario, "2530", "2531", "2530_shifted", "2531_shifted");
+		moveLink(scenario, "2531", "2951", "2531_shifted", "2951_shifted");
+		moveLink(scenario, "2951", "4508", "2951_shifted", "4508_shifted");
+		moveLink(scenario, "4508", "4507", "4508_shifted", "4507_shifted");
+		moveLink(scenario, "4507", "4505", "4507_shifted", "4505_shifted");
+		moveLink(scenario, "4505", "4504", "4505_shifted", "4504_shifted");
+		moveLink(scenario, "4508", "2951", "4508", "2951_shifted_shifted");
+		moveLink(scenario, "2951", "2759", "2951_shifted_shifted", "2759_shifted");
+		moveLink(scenario, "2759", "2952", "2759_shifted", "2952");
+		moveLink(scenario, "2759", "2758", "2759_shifted", "2758");
+		
+//		moveLink(scenario, "", "", "_shifted", "_shifted");
+	}
+	
+	private void moveLink(Scenario scenario, String oldFrom, String oldTo, String newFrom, String newTo) {
+		Id oldFromId = scenario.createId(oldFrom);
+		Id oldToId = scenario.createId(oldTo);
+		Id newFromId = scenario.createId(newFrom);
+		Id newToId = scenario.createId(newTo);
+		
+		Node from = scenario.getNetwork().getNodes().get(oldFromId);
+		Node to = scenario.getNetwork().getNodes().get(oldToId);
+		for (Link link : from.getOutLinks().values()) {
+			if (link.getToNode().getId().equals(oldToId)) {
+				
+				// remove link from old nodes
+				((NodeImpl) from).removeOutLink(link);
+				((NodeImpl) to).removeInLink(link);
+				
+				from = scenario.getNetwork().getNodes().get(newFromId);
+				to = scenario.getNetwork().getNodes().get(newToId);
+
+				// add link to shifted nodes
+				((NodeImpl) from).addOutLink(link);
+				((NodeImpl) to).addInLink(link);
+				link.setFromNode(from);
+				link.setToNode(to);
+				
+				break;
+			}
+		}
+	}
+	
+	private void connectedShiftedNodes(Scenario scenario, String node) {
+		Set<String> modes = CollectionUtils.stringToSet("walk2d");
+		
+		String node1 = node;
+		String node2 = node + "_shifted";
+		Node n1 = scenario.getNetwork().getNodes().get(scenario.createId(node1));
+		Node n2 = scenario.getNetwork().getNodes().get(scenario.createId(node2));
+		Id linkId;
+		Link link;
+		double width;
+		double cap;
+		double lanes;
+		
+		linkId = scenario.createId(node1 + "_" + node2);
+		link = scenario.getNetwork().getFactory().createLink(linkId, n1, n2);
+		link.setLength(CoordUtils.calcDistance(n1.getCoord(), n2.getCoord()));
+		width = 4;
+		cap = width * 1.33;
+		lanes = 5.4 * 0.26 * width;
+		link.setNumberOfLanes(lanes);
+		link.setCapacity(cap);
+		link.setAllowedModes(modes);
+		scenario.getNetwork().addLink(link);
+		
+		linkId = scenario.createId(node2 + "_" + node1);
+		link = scenario.getNetwork().getFactory().createLink(linkId, n2, n1);
+		link.setLength(CoordUtils.calcDistance(n1.getCoord(), n2.getCoord()));
+		width = 4;
+		cap = width * 1.33;
+		lanes = 5.4 * 0.26 * width;
+		link.setNumberOfLanes(lanes);
+		link.setCapacity(cap);
+		link.setAllowedModes(modes);
+		scenario.getNetwork().addLink(link);
+	}
+	
+	/*
 	 * Add some links to the network which are required for the track.
 	 */
 	private void addLinksToNetwork(Scenario scenario) {
@@ -157,7 +320,7 @@ public class CreateMarathonPopulation {
 		link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 		double width = 8;
 		double cap = width * 1.33;
-		double lanes = 5.4*0.26 * width;
+		double lanes = 5.4 * 0.26 * width;
 		link.setNumberOfLanes(lanes);
 		link.setCapacity(cap);
 		link.setAllowedModes(modes);
@@ -183,12 +346,91 @@ public class CreateMarathonPopulation {
 			link.setAllowedModes(modes);
 		}
 		
-		Set<Id> linksToRemove = new HashSet<Id>(scenario.getNetwork().getLinks().keySet());
-		linksToRemove.removeAll(linksToAdapt);
-		for (Id id : linksToRemove) scenario.getNetwork().removeLink(id);
+//		Set<Id> linksToRemove = new HashSet<Id>(scenario.getNetwork().getLinks().keySet());
+//		linksToRemove.removeAll(linksToAdapt);
+//		for (Id id : linksToRemove) scenario.getNetwork().removeLink(id);
 		
 //		new NetworkCleaner().run(scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(networkOutFile);
+	}
+	
+	private void writeBarriers(Scenario scenario) {
+		try {
+			log.info("writing barriers to shp file...");
+			GeometryFactory geofac = new GeometryFactory();
+			List<LineString> barriers = new ArrayList<LineString>();
+			
+			Coordinate[] barrier;
+			Coord c1;
+			Coord c2;
+
+			// barrier between 4504 and 4505
+			barrier = new Coordinate[2];
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("4504")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("4504_shifted")).getCoord();
+			barrier[0] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 0.3, (c1.getY() + c2.getY()) * 0.5 - 1.0);			
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("4505")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("4505_shifted")).getCoord();
+			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 0.3, (c1.getY() + c2.getY()) * 0.5 + 1.0);
+			barriers.add(geofac.createLineString(barrier));
+
+			// barrier between 4508 and 2951
+			barrier = new Coordinate[2];
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("4508")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("4508_shifted")).getCoord();
+			barrier[0] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 0.3, (c1.getY() + c2.getY()) * 0.5 - 1.0);
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2951_shifted")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2951_shifted_shifted")).getCoord();
+			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 0.3, (c1.getY() + c2.getY()) * 0.5 + 1.0);
+			barriers.add(geofac.createLineString(barrier));
+
+			// barrier between 2951 and 2531
+			barrier = new Coordinate[2];
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2951")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2951_shifted")).getCoord();
+			barrier[0] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 1.0, (c1.getY() + c2.getY()) * 0.5 + 0.3);
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2531")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2531_shifted")).getCoord();
+			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 3.0, (c1.getY() + c2.getY()) * 0.5 - 0.9);
+			barriers.add(geofac.createLineString(barrier));
+
+			// barrier between 2531 and 2530
+			barrier = new Coordinate[2];
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2531")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2531_shifted")).getCoord();
+			barrier[0] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 1.0, (c1.getY() + c2.getY()) * 0.5 - 2.0);
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2530")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2530_shifted")).getCoord();
+			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 0.5, (c1.getY() + c2.getY()) * 0.5 + 1.0);
+			barriers.add(geofac.createLineString(barrier));
+
+			// barrier left and right the start/end link (2759 to 2952)
+			barrier = new Coordinate[2];
+			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2759")).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2952")).getCoord();
+			barrier[0] = new Coordinate(c1.getX() - 5.0, c1.getY() - 5.0);
+			barrier[1] = new Coordinate(c2.getX() - 5.0, c2.getY() + 100.0);
+			barriers.add(geofac.createLineString(barrier));
+			barrier = new Coordinate[2];
+			barrier[0] = new Coordinate(c1.getX() + 5.0, c1.getY() - 5.0);
+			barrier[1] = new Coordinate(c2.getX() + 5.0, c2.getY() + 100.0);
+			barriers.add(geofac.createLineString(barrier));
+			
+			CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 4326");
+			AttributeType l = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, targetCRS);
+			AttributeType z = AttributeTypeFactory.newAttributeType("dblAvgZ", Double.class);
+			AttributeType t = AttributeTypeFactory.newAttributeType("name", String.class);
+			FeatureType ftLine = FeatureTypeBuilder.newFeatureType(new AttributeType[] {l, z, t}, "Line");
+			
+			Collection<Feature> fts = new ArrayList<Feature>();
+			for (LineString ls : barriers) {
+				fts.add(ftLine.create(new Object[] {ls, 0, "barrier"}));				
+			}
+			ShapeFileWriter.writeGeometries(fts, barriersShapeOutFile);
+			log.info("done");
+		} catch (Exception e) {
+			Gbl.errorMsg(e);
+		}
 	}
 	
 	private void writeTrack(Scenario scenario) {
@@ -293,7 +535,7 @@ public class CreateMarathonPopulation {
 				dColumn = 8. / (rowRunners - 1);
 			}
 			
-			System.out.println(person.getId().toString() + "\t" + x + "\t" + y);
+//			System.out.println(person.getId().toString() + "\t" + x + "\t" + y);
 			
 			Coord coord = scenario.createCoord(x, y);
 			activity = (ActivityImpl) populationFactory.createActivityFromLinkId("preRun", startLinkId);

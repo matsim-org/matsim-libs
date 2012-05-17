@@ -80,9 +80,9 @@ public class MarathonVelocityCalculator implements VelocityCalculator {
 		int seed = person.getId().hashCode() + link.getId().hashCode();
 		double noiseFactor = 1 + (rng.hashCodeToRandomDouble(seed) - 0.5) / 5;
 		
-		if (slopeFactor != 1.0) {
-			log.info("different slope factor: " + slopeFactor);
-		}
+//		if (slopeFactor != 1.0) {
+//			log.info("different slope factor: " + slopeFactor);
+//		}
 		
 		return delegateVelocity * runFactor * slopeFactor * noiseFactor;
 	}
@@ -133,15 +133,16 @@ public class MarathonVelocityCalculator implements VelocityCalculator {
 				log.warn(text);
 			}
 			slope = 80.0;
-		} else if (slope < -40) {
+		} else if (slope < -40.0) {
 			String text = "Slope is out of expected range (-40% .. -80%). Found slope of " + slope + ". Use 80.0 instead.";
 			if (warnCount == 10) {
 				log.warn(text + " No further warnings from this type will be given!");
 			} else if (warnCount < 10) {
 				log.warn(text);
 			}
+			slope = -40.0;
 		}
-		slopeFactor = slopeFactors[-(int)Math.round(slope) + 80];			
+		slopeFactor = slopeFactors[-(int)Math.round(slope) + 80];
 		return slopeFactor;
 	}
 }
