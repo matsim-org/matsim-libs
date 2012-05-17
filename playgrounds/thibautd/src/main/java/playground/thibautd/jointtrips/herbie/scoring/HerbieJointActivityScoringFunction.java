@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
@@ -111,6 +110,9 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		else if(act.getType().startsWith("pt interaction")){
 			lineSwitchPenalty = true;
 		}
+		else if (isPuDo( act.getType() )) {
+			// do nothin
+		}
 		
 		///////////////////////////////////////////////////////////////////
 		// the time between arrival and departure is either spent
@@ -122,25 +124,13 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			SortedSet<OpeningTime> openTimes = DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
 			// assume facility is always open
-			ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId());
-			ActivityOption actOpt = null;
-			
-			// this allows not to set facilities for pick-up and drop-offs
-			if (facility != null) {
-				actOpt = facility.getActivityOptions().get(act.getType());
-			}
-
-			if ( isPuDo( act.getType() ) ) {
-				openTimes = null;
-			}
-
+			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
 			if (actOpt != null) {
 				openTimes = actOpt.getOpeningTimes(DEFAULT_DAY);
 				if (openTimes == null) {
 					openTimes = DEFAULT_OPENING_TIME;
 				}
-			}
-			else {
+			} else {
 				logger.error("Agent wants to perform an activity whose type is not available in the planned facility.");
 				logger.error("facility id: " + act.getFacilityId());
 				logger.error("activity type: " + act.getType());
