@@ -20,41 +20,59 @@
 
 package scoring;
 
+import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeMap;
 import occupancy.FacilityOccupancy;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.scoring.ActivityUtilityParameters;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
+import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import facilities.CreateFacilityAttributes;
+import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /*
  * Scoring function taking agent interaction into account
  */
-public class AgentInteractionScoringFunction extends CharyparNagelOpenTimesScoringFunction {
+public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 	//private final TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private CharyparNagelScoringParameters params;
-	private FacilityOccupancy occupancies;
-	private CreateFacilityAttributes attributes;
+	private TreeMap<Id, FacilityOccupancy> occupancies;
+	private ObjectAttributes attributes;
 	private ActivityOption facility;
+	private final ActivityFacilities facilities;
+	private final Plan plan;
+	double scaleNumberOfPersons = 1; 
 	
 
-	public AgentInteractionScoringFunction(final Plan plan, final CharyparNagelScoringParameters params, final TreeMap<Id, FacilityOccupancy> facilityOccupancies, final ActivityFacilities facilities, final TreeMap<Id, CreateFacilityAttributes> facilityAttributes) {
-		super(plan, params, facilities);
+	public AgentInteractionScoringFunction(final Plan plan,
+			final CharyparNagelScoringParameters params,
+			final TreeMap<Id, FacilityOccupancy> facilityOccupancies,
+			final ActivityFacilities facilities,
+			final ObjectAttributes attributes, double scaleNumberOfPersons) {
+		super(params);
 		this.params = params;
+		this.facilities = facilities;
+		this.plan = plan;
+		this.attributes = attributes;
+		this.occupancies = facilityOccupancies;
+		this.scaleNumberOfPersons = scaleNumberOfPersons;
 	}
 	
 	@Override
-	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
+	protected double calcActScore(final double arrivalTime,
+			final double departureTime, final Activity act) {
 
-		ActivityUtilityParameters params = this.params.utilParams.get(act.getType());
-		if (params == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
-		}
 		double tmpScore = 0.0;
 
 		double[] openingInterval = this.getOpeningInterval(act);
@@ -78,19 +96,16 @@ public class AgentInteractionScoringFunction extends CharyparNagelOpenTimesScori
 		double duration = activityEnd - activityStart;
 
 		// utility of performing an action, duration is >= 1, thus log is no problem ----------------
-		double typicalDuration = params.getTypicalDuration();
+		double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(act.getType());
 
 		if (duration > 0) {
+			double zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0));
 			double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
-
-
-
+					* Math.log((duration / 3600.0) / zeroUtilityDuration);
 			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-
 		} else {
-			tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
+			tmpScore += 2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(duration);
 		}
 
 
@@ -102,16 +117,16 @@ public class AgentInteractionScoringFunction extends CharyparNagelOpenTimesScori
 		}
 
 		// disutility if too late
-		double latestStartTime = params.getLatestStartTime();
+		double latestStartTime = closingTime;
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
 		}
 
 		// disutility if stopping too early
-		double earliestEndTime = params.getEarliestEndTime();
-		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
-		}
+//		double earliestEndTime = params.getEarliestEndTime();
+//		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
+//			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
+//		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
@@ -119,34 +134,87 @@ public class AgentInteractionScoringFunction extends CharyparNagelOpenTimesScori
 		}
 
 		// disutility if duration was too short
-		double minimalDuration = params.getMinimalDuration();
+		double minimalDuration = typicalDuration / 3.0;
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
 		}
 				
-		// ------------disutilities of agent interaction----------- 
-		double capacity = facility.getCapacity();
-		double occupancy = occupancies.getOccupancyPerHour(activityStart);
-		double load = occupancy/capacity;
+		// ------------disutilities of agent interaction-----------
+		if (act.getType().startsWith("s")|| act.getType().startsWith("g")) {
+			double capacity = facility.getCapacity();
+			double occupancy = this.occupancies.get(facility.getFacilityId()).getOccupancyPerHour(activityStart);
+			double load = (occupancy*this.scaleNumberOfPersons)/capacity;
 		
-		// disutility of agent interaction underarousal
-		String thresholdUnderArousal = attributes.getLowerBound();
-		double lowerBound = Double.parseDouble(thresholdUnderArousal);
-		String lowerMUtility = attributes.getLowerMarginalUtility();
-		double lowerMarginalUtility = Double.parseDouble(lowerMUtility);
-		if ((load < lowerBound) && load>0) {
-			tmpScore += lowerMarginalUtility/load * (minimalDuration - duration);
-		}
+			// disutility of agent interaction underarousal
+			double lowerBound = (Double) this.attributes.getAttribute(facility.getFacilityId().toString(), "LowerThreshold");
+			double lowerMarginalUtility = (Double) this.attributes.getAttribute(facility.getFacilityId().toString(), "MarginalUtilityOfUnderArousal");
+			if ((load < lowerBound) && load>0) {
+				tmpScore += lowerMarginalUtility/load * (minimalDuration - duration);
+			}
 		
-		// disutility of agent interaction overarousal
-		String thresholdOverArousal = attributes.getUpperBound();
-		double upperBound = Double.parseDouble(thresholdOverArousal);
-		String upperMUtility = attributes.getUpperMarginalUtility();
-		double upperMarginalUtility = Double.parseDouble(upperMUtility);
-		if ((load > upperBound)) {
-			tmpScore += upperMarginalUtility*load * (minimalDuration - duration);
+			// disutility of agent interaction overarousal
+			double upperBound = (Double) this.attributes.getAttribute(facility.getFacilityId().toString(), "UpperThreshold");
+			double upperMarginalUtility = (Double) this.attributes.getAttribute(facility.getFacilityId().toString(), "MarginalUtilityOfOverArousal");
+			if ((load > upperBound)) {
+				tmpScore += upperMarginalUtility*load * (minimalDuration - duration);
+			}
 		}
 		
 		return tmpScore;
 	}
+	@Override
+	protected double[] getOpeningInterval(Activity act) {
+
+		// openInterval has two values
+		// openInterval[0] will be the opening time
+		// openInterval[1] will be the closing time
+		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+
+		boolean foundAct = false;
+
+		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
+		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
+		String facilityActType = null;
+		Set<OpeningTime> opentimes = null;
+
+		while (facilityActTypeIterator.hasNext() && !foundAct) {
+
+			facilityActType = facilityActTypeIterator.next();
+			if (act.getType().substring(0, 1).equals(facilityActType.substring(0, 1))) {
+				foundAct = true;
+
+				// choose appropriate opentime:
+				// either wed or wkday
+				// if none is given, use undefined opentimes
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wed);
+				if (opentimes == null) {
+					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wkday);
+				}
+				if (opentimes != null) {
+					// ignoring lunch breaks with the following procedure:
+					// if there is only one wed/wkday open time interval, use it
+					// if there are two or more, use the earliest start time and the latest end time
+					openInterval[0] = Double.MAX_VALUE;
+					openInterval[1] = Double.MIN_VALUE;
+
+					for (OpeningTime opentime : opentimes) {
+
+						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
+						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+					}
+
+				}
+
+			}
+
+		}
+
+		if (!foundAct) {
+			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+		}
+
+		return openInterval;
+
+	}
+
 }

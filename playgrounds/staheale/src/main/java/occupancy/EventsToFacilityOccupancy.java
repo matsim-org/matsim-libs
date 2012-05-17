@@ -21,7 +21,6 @@
 package occupancy;
 
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -51,5 +50,8 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 	@Override
 	public void reset(final int iteration) {
 			}
-
+	
+	public TreeMap<Id, FacilityOccupancy> getFacilityOccupancies() {
+		return facilityOccupancies;
+	}
 }
