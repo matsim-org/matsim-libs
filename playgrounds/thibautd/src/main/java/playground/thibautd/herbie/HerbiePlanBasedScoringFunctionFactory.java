@@ -20,7 +20,6 @@
 package playground.thibautd.herbie;
 
 import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.ActivityScoringFunction;
 
 import java.util.TreeMap;
 
@@ -37,8 +36,7 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
-import herbie.running.scoring.LegScoringFunction;
-
+import playground.thibautd.jointtrips.herbie.scoring.HerbieJointActivityScoringFunction;
 import playground.thibautd.jointtrips.herbie.scoring.HerbieJointLegScoringFunction;
 
 /**
@@ -71,7 +69,9 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		scoringFunctionAccumulator.addScoringFunction(
-				new ActivityScoringFunction(
+				// if no pick-up or drop off, behaviour the one of the "base" herbie
+				// scoring.
+				new HerbieJointActivityScoringFunction(
 					plan, 
 					params,
 					this.facilityPenalties,
