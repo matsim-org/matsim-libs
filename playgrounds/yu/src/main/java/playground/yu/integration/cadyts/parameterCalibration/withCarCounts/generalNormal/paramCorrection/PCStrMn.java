@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PCStrMn.java
+ * StrMninclLT.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -47,7 +47,7 @@ import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 
 public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		BseStrategyManager {
-	// private final static Logger log = Logger.getLogger(PCStrMn.class);
+	// private final static Logger log = Logger.getLogger(StrMninclLT.class);
 	// private double delta;
 	private final Config config;
 	private Plan oldSelected = null;
@@ -233,7 +233,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					 * System.out.println(); } } }
 					 *
 					 * List<Integer> attrIndices = new ArrayList<Integer>(); for
-					 * (String paramName : PCCtlListener.paramNames) {
+					 * (String paramName : CtlListenerinclLT.paramNames) {
 					 * attrIndices.add(Events2Score4PC_mnl.attrNameList
 					 * .indexOf(paramName)); }
 					 *

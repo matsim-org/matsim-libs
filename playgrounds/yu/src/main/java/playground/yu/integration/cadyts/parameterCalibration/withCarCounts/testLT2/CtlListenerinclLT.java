@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurnWithUnitiveStdDev;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLT2;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,8 +26,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -54,12 +55,9 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLi
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.Events2ScoreWithLeftTurnPenalty4PC;
-import playground.yu.integration.cadyts.utils.SampleVarianceReader;
+import playground.yu.parameterSearch.ParametersSetter;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
-import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
@@ -69,13 +67,7 @@ import cadyts.calibrators.analytical.ChoiceParameterCalibrator4;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
-/**
- * sets the standard deviation of all the counts with a unitive minStddev.
- * 
- * @author yu
- * 
- */
-public class PCCtlListener extends BseParamCalibrationControlerListener
+public class CtlListenerinclLT extends BseParamCalibrationControlerListener
 		implements StartupListener, ShutdownListener, IterationEndsListener {
 	private int caliStartTime, caliEndTime;
 	private int avgLlhOverIters = 0, writeLlhInterval = 0;
@@ -99,7 +91,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private boolean writeQGISFile = true;
 
 	private void initializeCalibrator(Controler ctl) {
-		org.matsim.core.config.Config config = ctl.getConfig();
+		Config config = ctl.getConfig();
 		ControlerIO ctlIO = ctl.getControlerIO();
 
 		// SETTING "parameter calibration" parameters
@@ -242,7 +234,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			delta = Double.parseDouble(deltaStr);
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
-		((PCStrMn) ctl.getStrategyManager())
+		((StrMninclLT) ctl.getStrategyManager())
 				.init(calibrator, ctl.getTravelTimeCalculator(),
 						(MultinomialLogitChoice) chooser);
 	}
@@ -255,13 +247,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		PCCtlwithLeftTurnPenalty ctl = (PCCtlwithLeftTurnPenalty) event
-				.getControler();
+		PCCtlinclLT ctl = (PCCtlinclLT) event.getControler();
 		Config config = ctl.getConfig();
 		int iter = event.getIteration();
 		int firstIter = ctl.getFirstIteration();
 		// this.chooser.finish();-->called in notifyScoring()
-		PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
+		StrMninclLT strategyManager = (StrMninclLT) ctl.getStrategyManager();
 
 		// if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
 		ControlerIO io = ctl.getControlerIO();
@@ -301,7 +292,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		writerCV.flush();
 
 		// ###################################################
-		utilities.math.Vector avgParams = calibrator.getAvgParameters();
+		Vector avgParams = calibrator.getAvgParameters();
 		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 		// ScoringConfigGetSetValues.setConfig(config);
@@ -312,13 +303,19 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		// cycleIdx == 0) {
 		MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
 				.getMultinomialLogit();
-		System.out.println(">>>>>mnl old coefficients:\t"
-				+ mnl.getCoeff().toString());
+
 		// *******should after Scoring Listener!!!*******
-		// if (calibrator.getInitialStepSize() != 0d) {//deprecated
+
+		// if (calibrator.getInitialStepSize() != 0d) {
 
 		StringBuffer sb = new StringBuffer(Integer.toString(iter));
-
+		// TESTING ----------------------------------------------
+		Map<String, Double> nameParams = new TreeMap<String, Double>();
+		for (int i = 0; i < paramNames.length; i++) {
+			nameParams.put(paramNames[i], avgParams.get(i));
+		}
+		ParametersSetter.setParameters(ctl, nameParams);
+		// TESTING ||||||||||||||||||||||||||||||||||||||||||||||
 		for (int i = 0; i < paramNames.length; i++) {
 			int paramNameIndex = Events2Score4AttrRecorder.attrNameList
 					.indexOf(paramNames[i]/*
@@ -332,18 +329,18 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			double value = avgParams.get(i);
 			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
 			// AGAIN!!!***
-			if (scoringCfg.getParams().containsKey(paramNames[i])) {
-				scoringCfg.addParam(paramNames[i], Double.toString(value
-				// / paramScaleFactor
-						));
-				// ScoringConfigGetSetValues
-				// .setValue(paramNames[i], value);
-			} else/* bse */{
-				config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
-						Double.toString(value
-						// / paramScaleFactor
-						));
-			}
+			// if (scoringCfg.getParams().containsKey(paramNames[i])) {
+			// scoringCfg.addParam(paramNames[i], Double.toString(value
+			// // / paramScaleFactor
+			// ));
+			// // ScoringConfigGetSetValues
+			// // .setValue(paramNames[i], value);
+			// } else/* bse */{
+			// config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
+			// Double.toString(value
+			// // / paramScaleFactor
+			// ));
+			// }
 			// *****************************************************
 			// ****SET CALIBRATED PARAMETERS IN MNL*****************
 			mnl.setParameter(paramNameIndex, value);
@@ -353,11 +350,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			sb.append("\t");
 			sb.append(value);
 		}
-		System.out.println(">>>>>mnl new coefficients:\t"
-				+ mnl.getCoeff().toString());
+
 		// ********calibrator.getParameters() JUST FOR
 		// ANALYSIS********
-		utilities.math.Vector params = calibrator.getParameters();
+		Vector params = calibrator.getParameters();
 		for (int i1 = 0; i1 < paramNames.length; i1++) {
 			sb.append("\t");
 			sb.append(params.get(i1));
@@ -368,13 +364,18 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		// }
 		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
-		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setMultinomialLogit(mnl);
+		// ((Events2Score4PCinclLT) chooser).setMultinomialLogit(mnl);
 
-		CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory = new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				config, ctl.getNetwork());
-		ctl.setScoringFunctionFactory(sfFactory);
-		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setSfFactory(sfFactory);
+		// TESTING --------------------------------------------
+		// CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory =
+		// new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
+		// config, ctl.getNetwork());
+		// ctl.setScoringFunctionFactory(sfFactory);
+		// TESTING||||||||||||||||||||||||||||||||||||||||||||||||||||<
 
+		// ((Events2Score4PCinclLT) chooser).setSfFactory(sfFactory);
+		chooser = new Events2Score4PCinclLT(ctl.getConfig(),
+				ctl.getScoringFunctionFactory(), ctl.getScenario());
 		strategyManager.setChooser(chooser);
 
 		// }
@@ -481,8 +482,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		final PCCtlwithLeftTurnPenalty ctl = (PCCtlwithLeftTurnPenalty) event
-				.getControler();
+		final PCCtlinclLT ctl = (PCCtlinclLT) event.getControler();
 		Config config = ctl.getConfig();
 
 		setMatsimParameters(ctl);
@@ -589,26 +589,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
 				"endTime"));
 
-		Map<String/* countId */, Map<Integer/* timeStep */, Double/* sample variance */>> countsSampleVariances = null;
-		String countsSampleVarianceFilename = config.findParam(
-				BSE_CONFIG_MODULE_NAME, "countsSampleVarianceFile");
-		if (countsSampleVarianceFilename != null) {
-			SampleVarianceReader svReader = new SampleVarianceReader(
-					countsSampleVarianceFilename);
-			svReader.read();
-			countsSampleVariances = svReader.getCountsSampleVariances();
-		} else {
-			Logger.getLogger(this.getClass().getName())
-					.warning(
-							"BSE:\tThere is not countsSampleVarianceFilename set in configfile, this means, the variance for each count will be replaced with the count value by using poisson distribution in substitution for gauss distribution.");
-		}
 		Map<Id, Count> countsMap = counts.getCounts();
 		for (Id countId : countsMap.keySet()) {
 			Link link = network.getLinks().get(countId);
 			if (link == null) {
 				System.err.println("could not find link " + countId.toString());
 			} else if (isInRange(countId, network)) {
-
 				// for ...2QGIS
 				links.add(network.getLinks().get(countId));
 				linkIds.add(countId);
@@ -620,14 +606,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						int start_s = (hour - 1) * 3600;
 						int end_s = hour * 3600 - 1;
 						double val_veh_h = volume.getValue();
-						// -------------------------------------------------
-						// calibrator.addMeasurement(link, start_s, end_s,
-						// val_veh_h, TYPE.FLOW_VEH_H);
-						final double stddev = calibrator
-								.getMinStddev(TYPE.FLOW_VEH_H);
 						calibrator.addMeasurement(link, start_s, end_s,
-								val_veh_h, stddev, TYPE.FLOW_VEH_H);
-						// -------------------------------------------------
+								val_veh_h, TYPE.FLOW_VEH_H);
 					}
 				}
 			}
@@ -774,109 +754,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				System.out
 						.println("BSE:\tparameterUpdateInterval\t= default value\t"
 								+ ChoiceParameterCalibrator4.DEFAULT_PARAMETER_UPDATE_INTERVAL);
-			}
-		}
-		/*
-		 * finiteDifferenceEps – maxTrustregionIterations –
-		 * maxParameterNormChange – allowIncreasedInitialTrustregion –
-		 * trustregionTerminationGradientNorm
-		 */
-		// SETTING finiteDifferenceEps
-		{
-			String finiteDifferenceEpsStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "finiteDifferenceEps");
-			if (finiteDifferenceEpsStr != null) {
-				double finiteDifferenceEps = Double
-						.parseDouble(finiteDifferenceEpsStr);
-				calibrator.setFiniteDifferenceEps(finiteDifferenceEps);
-				System.out.println("BSE:\tfiniteDifferenceEps\t="
-						+ finiteDifferenceEps);
-			} else {
-				System.out
-						.println("BSE:\tfiniteDifferenceEps\t= default value\t"
-								+ ChoiceParameterCalibrator4.DEFAULT_FINITE_DIFFERENCE_EPS);
-			}
-		}
-		// SETTING maxTrustregionIterations
-		{
-			String maxTrustregionIterationsStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "maxTrustregionIterations");
-			if (maxTrustregionIterationsStr != null) {
-				int maxTrustregionIterations = Integer
-						.parseInt(maxTrustregionIterationsStr);
-				calibrator
-						.setMaxTrustregionIterations(maxTrustregionIterations);
-				System.out.println("BSE:\tmaxTrustregionIterations\t="
-						+ maxTrustregionIterations);
-			} else {
-				System.out
-						.println("BSE:\tmaxTrustregionIterations\t= default value\t"
-								+ ChoiceParameterCalibrator4.DEFAULT_MAX_TRUSTREGION_ITERATIONS);
-			}
-		}
-		// SETTING maxParameterNormChange
-		{
-			String maxParameterNormChangeStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "maxParameterNormChange");
-			if (maxParameterNormChangeStr != null) {
-				double maxParameterNormChange = Double
-						.parseDouble(maxParameterNormChangeStr);
-				calibrator.setMaxParameterNormChange(maxParameterNormChange);
-				System.out.println("BSE:\tmaxParameterNormChange\t="
-						+ maxParameterNormChange);
-			} else {
-				System.out
-						.println("BSE:\tmaxParameterNormChange\t= default value\t"
-								+ ChoiceParameterCalibrator4.DEFAULT_MAX_PARAMETER_NORM_CHANGE);
-			}
-		}
-		// SETTING allowIncreasedInitialTrustregion
-		{
-			String allowIncreasedInitialTrustregionStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME, "allowIncreasedInitialTrustregion");
-			if (allowIncreasedInitialTrustregionStr != null) {
-				boolean allowIncreasedInitialTrustregion = Boolean
-						.parseBoolean(allowIncreasedInitialTrustregionStr);
-				calibrator
-						.setAllowIncreasedInitialTrustregion(allowIncreasedInitialTrustregion);
-				System.out.println("BSE:\tallowIncreasedInitialTrustregion\t="
-						+ allowIncreasedInitialTrustregion);
-			} else {
-				System.out
-						.println("BSE:\tallowIncreasedInitialTrustregion\t= default value\t"
-								+ ChoiceParameterCalibrator4.DEFAULT_ALLOW_INCREASED_INITIAL_TRUSTREGION);
-			}
-		}
-		// SETTING trustregionTerminationGradientNorm
-		{
-			String trustregionTerminationGradientNormStr = config.findParam(
-					BSE_CONFIG_MODULE_NAME,
-					"trustregionTerminationGradientNorm");
-			if (trustregionTerminationGradientNormStr != null) {
-				double trustregionTerminationGradientNorm = Double
-						.parseDouble(trustregionTerminationGradientNormStr);
-				calibrator
-						.setTrustregionTerminationGradientNorm(trustregionTerminationGradientNorm);
-				System.out
-						.println("BSE:\ttrustregionTerminationGradientNorm\t="
-								+ trustregionTerminationGradientNorm);
-			} else {
-				System.out
-						.println("BSE:\ttrustregionTerminationGradientNorm\t= default value\t"
-								+ ChoiceParameterCalibrator4.DEFAULT_TRUSTREGION_TERMINATION_GRADIENT_NORM);
-			}
-		}
-		// SETTING debug mode
-		{
-			String debugModeStr = config.findParam(BSE_CONFIG_MODULE_NAME,
-					"debugMode");
-			if (debugModeStr != null) {
-				boolean debugMode = Boolean.parseBoolean(debugModeStr);
-				calibrator.setDebugMode(debugMode);
-				System.out.println("BSE:\tsetDebugMode\t=" + debugMode);
-			} else {
-				System.out.println("BSE:\tsetDebugMode\t= default value\t"
-						+ Calibrator.DEFAULT_DEBUG_MODE);
 			}
 		}
 	}

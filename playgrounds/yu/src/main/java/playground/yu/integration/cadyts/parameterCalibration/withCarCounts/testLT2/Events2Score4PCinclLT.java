@@ -21,9 +21,10 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLT2;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,6 +39,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -46,6 +48,8 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseSt
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
+import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
+import playground.yu.scoring.withAttrRecorder.leftTurn.ScoringFunctionAccumulatorWithLeftTurnPenalty;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.BasicStatistics;
 import utilities.math.MultinomialLogit;
@@ -55,37 +59,23 @@ import utilities.math.Vector;
  * @author yu
  * 
  */
-public class Events2Score4PC extends Events2Score4AttrRecorder implements
+public class Events2Score4PCinclLT extends Events2Score4AttrRecorder implements
 		MultinomialLogitChoice, CadytsChoice {
-	// public final static List<String> attrNameList = new ArrayList<String>();
-	// public final static List<Double> paramScaleFactorList = new
-	// ArrayList<Double>();
 
-	// private static final String PARAM_SCALE_FACTOR_INDEX =
-	// "paramScaleFactor_";
-
-	// protected final Config config;
-	// protected Population pop = null;
-	// protected ScoringFunctionFactory sfFactory = null;
-	// protected PlanCalcScoreConfigGroup scoring;
-	// // protected boolean setPersonScore = true;
-	// protected int maxPlansPerAgent;
-	// protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers =
-	// new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
-	// protected final TreeMap<Id, Integer> agentPlanElementIndex = new
-	// TreeMap<Id, Integer>();
-
-	private final static Logger log = Logger.getLogger(Events2Score4PC.class);
+	private final static Logger log = Logger
+			.getLogger(Events2Score4PCinclLT.class);
 
 	private MultinomialLogit mnl;
 	// private boolean outputCalcDetail = false;
 	private SimpleWriter writer = null;
 	boolean setUCinMNL = false, addUCtoScore = true;
 
-	public Events2Score4PC(Config config, ScoringFunctionFactory sfFactory,
-			Scenario scenario) {
+	public Events2Score4PCinclLT(Config config,
+			ScoringFunctionFactory sfFactory, Scenario scenario) {
 		super(config, sfFactory, scenario);
-
+		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+		attrNameList.add(CalibrationConfig.CONSTANT_LEFT_TURN);
+		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		mnl = createMultinomialLogit(config);
 
 		String setUCinMNLStr = config.findParam(
@@ -194,6 +184,13 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 
 		attrNameIndex = attrNameList.indexOf("constantWalk");
 		mnl.setCoefficient(attrNameIndex, scoring.getConstantWalk());
+
+		attrNameIndex = attrNameList
+				.indexOf(CalibrationConfig.CONSTANT_LEFT_TURN);
+		mnl.setCoefficient(
+				attrNameIndex,
+				((CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty) sfFactory)
+						.getAdditionalParams().constantLeftTurn);
 
 		return mnl;
 	}
@@ -389,5 +386,70 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 			mnl.setASC(choiceIdx, uc != null ? (Double) uc : 0d);
 		}
 
+	}
+
+	@Override
+	public void finish() {
+		for (Tuple<Plan, ScoringFunction> plansScorFunction : agentScorers
+				.values()) {
+
+			Plan plan = plansScorFunction.getFirst();
+			Map<String, Object> attrs = plan.getCustomAttributes();
+
+			ScoringFunction sf = plansScorFunction.getSecond();
+			sf.finish();
+			double score = sf.getScore();
+			// **********************codes from {@code EventsToScore}
+			// save attributes as custom attritubes.
+			// #########################################
+			ScoringFunctionAccumulatorWithLeftTurnPenalty sfa = (ScoringFunctionAccumulatorWithLeftTurnPenalty) sf;
+
+			// legTravTimeCar
+			attrs.put("traveling", sfa.getTravTimeAttrCar());
+
+			// legTravTimePt
+			attrs.put("travelingPt", sfa.getTravTimeAttrPt());
+
+			// legTravTimeWalk
+			attrs.put("travelingWalk", sfa.getTravTimeAttrWalk());
+
+			// actDuration
+			attrs.put("performing", sfa.getPerfAttr());
+
+			// stuckAttrs
+			attrs.put("stuck", sfa.getStuckAttr());
+
+			// distancesCar
+			attrs.put("monetaryDistanceCostRateCar", sfa.getDistanceCar());
+
+			// distancesPt
+			attrs.put("monetaryDistanceCostRatePt", sfa.getDistancePt());
+
+			// distancesWalk
+			attrs.put("marginalUtlOfDistanceWalk", sfa.getDistanceWalk());
+
+			// carLegNo
+			attrs.put("constantCar", sfa.getCarLegNo());
+
+			// ptLegNo
+			attrs.put("constantPt", sfa.getPtLegNo());
+
+			// walkLegNo
+			attrs.put("constantWalk", sfa.getWalkLegNo());
+
+			// leftTurn
+			attrs.put(CalibrationConfig.CONSTANT_LEFT_TURN,
+					sfa.getNbOfLeftTurnAttrCar());
+
+			// *********************codes from {@code EventsToScore}
+			Double oldScore = plan.getScore();
+			if (oldScore == null) {
+				plan.setScore(score);
+			} else {
+				double learningRate = scoring.getLearningRate();
+				plan.setScore(learningRate * score + (1 - learningRate)
+						* oldScore);
+			}
+		}
 	}
 }

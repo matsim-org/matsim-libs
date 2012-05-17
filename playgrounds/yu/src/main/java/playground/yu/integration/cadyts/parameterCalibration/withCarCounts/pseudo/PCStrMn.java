@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PCStrMn.java
+ * StrMninclLT.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -48,7 +48,7 @@ import cadyts.calibrators.Calibrator;
 
 public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		BseStrategyManager {
-	// private final static Logger log = Logger.getLogger(PCStrMn.class);
+	// private final static Logger log = Logger.getLogger(StrMninclLT.class);
 	// private double delta;
 	private final Config config;
 	// private Plan oldSelected = null;

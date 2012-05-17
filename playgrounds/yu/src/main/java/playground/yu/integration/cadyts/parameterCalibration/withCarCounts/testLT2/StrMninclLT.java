@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLT2;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,7 +34,6 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.MultinomialLogitCreator;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
@@ -42,8 +41,8 @@ import utilities.math.BasicStatistics;
 import utilities.math.MultinomialLogit;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 
-public class PCStrMn extends BseParamCalibrationStrategyManager implements
-BseStrategyManager {
+public class StrMninclLT extends BseParamCalibrationStrategyManager implements
+		BseStrategyManager {
 	// private final static Logger log = Logger.getLogger(StrMninclLT.class);
 	// private double delta;
 	private final Config config;
@@ -52,8 +51,8 @@ BseStrategyManager {
 
 	private BasicStatistics betaTravelingPtStats = null;
 
-	public PCStrMn(Network net, int firstIteration, Config config
-			// ,int paramDimension
+	public StrMninclLT(Network net, int firstIteration, Config config
+	// ,int paramDimension
 	) {
 		super(firstIteration);
 		this.net = net;
@@ -74,10 +73,10 @@ BseStrategyManager {
 		statistics = new double[] { betaTravelingPtStats.getAvg(),
 				betaTravelingPtStats.getVar() };
 		System.out.println("BSE_Statistics\tavg.\t" + statistics[0]/*
-		 * betaTravelingPtAttr
-		 * .
-		 */
-		                                                         + "\tvar.\t" + statistics[1]/* betaTravelingPtAttr. */);
+																	 * betaTravelingPtAttr
+																	 * .
+																	 */
+				+ "\tvar.\t" + statistics[1]/* betaTravelingPtAttr. */);
 	}
 
 	@Override
@@ -121,7 +120,7 @@ BseStrategyManager {
 						.indexOf(person.getSelectedPlan())/* selectedIdx */,
 						getPlanChoiceSet((PersonImpl) person),
 						((MultinomialLogitChoice) chooser)
-						.getMultinomialLogit()/* MNL */);
+								.getMultinomialLogit()/* MNL */);
 				// ***************************************************
 			}
 			// }
@@ -137,7 +136,7 @@ BseStrategyManager {
 		// cadyts class - create new BasicStatistics Objects
 		betaTravelingPtStats = new BasicStatistics();
 
-		((Events2Score4PC) chooser).createWriter();
+		((Events2Score4PCinclLT) chooser).createWriter();
 
 		for (Person person : population.getPersons().values()) {
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
@@ -154,7 +153,7 @@ BseStrategyManager {
 			chooser.setPersonScore(person);
 		}
 
-		((Events2Score4PC) chooser).closeWriter();
+		((Events2Score4PCinclLT) chooser).closeWriter();
 	}
 
 	@Override
@@ -185,8 +184,8 @@ BseStrategyManager {
 				 */
 			} else {// with planInnovation
 				singleMnl = new MultinomialLogitCreator().createSingle(config);
-				((Events2Score4PC) chooser).setSinglePlanAttrs(oldSelected,
-						singleMnl);
+				((Events2Score4PCinclLT) chooser).setSinglePlanAttrs(
+						oldSelected, singleMnl);
 			}
 		} else { // strategy==null
 			Gbl.errorMsg("No strategy found!");
@@ -197,7 +196,7 @@ BseStrategyManager {
 		planConverter.convert((PlanImpl) plan);
 		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
 		double scoreCorrection = calibrator.getUtilityCorrection(planSteps)
-		/ config.planCalcScore().getBrainExpBeta();
+				/ config.planCalcScore().getBrainExpBeta();
 		// #######SAVE "utilityCorrection" 4 MNL.ASC#########
 		plan.getCustomAttributes().put(UTILITY_CORRECTION, scoreCorrection);
 		// ##################################################
@@ -219,7 +218,7 @@ BseStrategyManager {
 
 	public void init(MATSimChoiceParameterCalibrator<Link> calibrator,
 			TravelTime travelTimeCalculator, MultinomialLogitChoice chooser
-			// ,double delta
+	// ,double delta
 	) {
 		// init(calibrator, travelTimeCalculator);
 		this.calibrator = calibrator;
