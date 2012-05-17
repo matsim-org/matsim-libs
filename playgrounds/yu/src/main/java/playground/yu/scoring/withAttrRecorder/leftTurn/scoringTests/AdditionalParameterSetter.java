@@ -61,6 +61,7 @@ public class AdditionalParameterSetter implements StartupListener {
 	public static void main(String[] args) {
 		Config cfg = ConfigUtils.loadConfig(args[0]);
 		LeftTurnPenaltyControler ctl = new LeftTurnPenaltyControler(cfg);
+		ctl.addControlerListener(new AdditionalParameterSetter());
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
 		ctl.run();
