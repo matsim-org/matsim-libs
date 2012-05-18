@@ -23,6 +23,7 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -38,6 +39,7 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
  *
  */
 public class InternalControler {
+	private final static Logger log = Logger.getLogger(InternalControler.class);
 
 	PtLegHandler ptLegHandler;
 	
@@ -57,7 +59,7 @@ public class InternalControler {
 	private final double TRAVEL_PT_ACCESS = -0.0;
 	private final double TRAVEL_PT_EGRESS = -2.34;
 	
-	private double CONSTANT_PT = 0.0;	// estimated parameter: -2.08
+	private double CONSTANT_PT = 0.0;
 	private final double TRAVEL_PT = 0.0;
 //	private final double TRAVEL_PT = -20.0; // only needed for the ptRouter to avoid waiting at bus stops, not used for scoring because of the following differentiation:
 	private final double TRAVEL_PT_IN_VEHICLE = -0.18;
@@ -76,7 +78,8 @@ public class InternalControler {
 		this.fare = fare;
 		this.ptLegHandler = new PtLegHandler();
 		
-		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt();
+		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt(); // estimated parameter -2.08; is being adjusted via config
+		log.warn("Setting constant for PT to " + this.CONSTANT_PT);
 	}
 	
 	public void run() {
