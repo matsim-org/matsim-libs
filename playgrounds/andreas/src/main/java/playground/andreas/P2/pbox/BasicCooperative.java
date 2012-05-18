@@ -130,7 +130,12 @@ public class BasicCooperative implements Cooperative{
 			// insufficient, sell vehicles
 			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) Math.floor(this.budget / this.costPerVehicleSell));
 			
-			if(this.bestPlan.getNVehicles() - numberOfVehiclesToSell < 1){
+			double numberOfVehicles = 0.0;			
+			for (PPlan plan : this.getAllPlans()) {
+				numberOfVehicles += plan.getNVehicles();
+			}
+			
+			if(numberOfVehicles - numberOfVehiclesToSell < 1){
 				// can not balance the budget by selling vehicles, bankrupt
 				this.coopState = CoopState.BANKRUPT;
 			}
