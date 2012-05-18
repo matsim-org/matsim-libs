@@ -12,7 +12,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 
-		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation, qsim, jdeqsim, multimodalQSim -->
+		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation qsim JDEQSim multimodalQSim  -->
 		<param name="mobsim" value="null" />
 		<param name="outputDirectory" value="./test/output/org/matsim/contrib/grips/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/output" />
 
@@ -165,7 +165,7 @@
 		<!-- The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts rather ungracefully, or displays no agents at all. -->
 		<param name="agentSize" value="120.0" />
 
-		<!-- coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg'' -->
+		<!-- coloring scheme for otfvis.  Currently (2012) allowed values:null standard bvg bvg2 byId -->
 		<param name="coloringScheme" value="standard" />
 		<param name="leftMouseFunc" value="Zoom" />
 
@@ -176,7 +176,7 @@
 		<param name="linkwidthIsProportionalTo" value="numberOfLanes" />
 
 		<!-- Render everything on top of OpenStreetMap tiles. -->
-		<param name="mapOverlayMode" value="false" />
+		<param name="mapOverlayMode" value="true" />
 		<param name="middleMouseFunc" value="Pan" />
 
 		<!-- Shortens a link's start and end point in the visualization.  -->
@@ -214,6 +214,7 @@
 
 		<!-- [utils] alternative-specific constant for car.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
 		<param name="constantCar" value="0.0" />
+		<param name="constantOther" value="0.0" />
 
 		<!-- [utils] alternative-specific constant for pt.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
 		<param name="constantPt" value="0.0" />
@@ -232,6 +233,7 @@
 
 		<!-- [utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils -->
 		<param name="marginalUtilityOfMoney" value="1.0" />
+		<param name="marginalUtlOfDistanceOther" value="0.0" />
 
 		<!-- DISCOURAGED! [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility.  It is discouraged to use this but in some cases it may make sense. -->
 		<param name="marginalUtlOfDistanceWalk" value="0.0" />
@@ -248,6 +250,7 @@
 		<!-- [utils/hr] additional marginal utility of traveling by car.  normally negative.  this comes on top of the opportunity cost of time -->
 		<param name="traveling" value="-6.0" />
 		<param name="travelingBike" value="-6.0" />
+		<param name="travelingOther" value="-6.0" />
 
 		<!-- [utils/hr] additional marginal utility offset of traveling by pt.  normally negative.  this comes on top of the opportunity cost of time -->
 		<param name="travelingPt" value="-6.0" />

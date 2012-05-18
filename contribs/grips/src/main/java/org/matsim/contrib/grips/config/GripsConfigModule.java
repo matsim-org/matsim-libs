@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
 import org.matsim.core.config.Module;
 
 /**
@@ -162,5 +163,14 @@ public class GripsConfigModule extends Module {
 	@Deprecated
 	public void setSampleSize(String sampleSize) {
 		this.sampleSize = Double.parseDouble(sampleSize);
+	}
+
+	//from here things only work for the xsd based config
+	private DepartureTimeDistributionType distribution;
+	public void setDepartureTimeDistribution(DepartureTimeDistributionType departureTimeDistributionType) {
+		this.distribution = departureTimeDistributionType;
+	}
+	public DepartureTimeDistributionType getDepartureTimeDistribution() {
+		return this.distribution;
 	}
 }

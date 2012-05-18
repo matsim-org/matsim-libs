@@ -37,6 +37,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.grips.algorithms.FeatureTransformer;
+import org.matsim.contrib.grips.config.GripsConfigModule;
+import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
+import org.matsim.contrib.grips.io.jaxb.gripsconfig.DistributionType;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -61,11 +64,14 @@ public class PopulationFromESRIShapeFileGenerator {
 	protected final Random rnd = MatsimRandom.getRandom();
 	protected final Id safeLinkId;
 
+	private final GripsConfigModule gcm;
+
 	public PopulationFromESRIShapeFileGenerator(Scenario sc, String populationFile, Id safeLinkId) {
 		log.warn("This implementation is a only a proof of concept!");
 		this.scenario = sc;
 		this.populationShapeFile = populationFile;
 		this.safeLinkId = safeLinkId;
+		this.gcm = (GripsConfigModule) sc.getConfig().getModule("grips");
 	}
 
 	public void run() {
@@ -112,7 +118,8 @@ public class PopulationFromESRIShapeFileGenerator {
 			NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
 			LinkImpl l = net.getNearestLink(c);
 			Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
-			act.setEndTime(0);
+			double departureTime = getDepartureTime();
+			act.setEndTime(departureTime);
 			plan.addActivity(act);
 			Leg leg = pb.createLeg("car");
 			plan.addLeg(leg);
@@ -122,6 +129,28 @@ public class PopulationFromESRIShapeFileGenerator {
 			plan.setScore(0.);
 			pers.addPlan(plan);
 		}
+	}
+
+	private double getDepartureTime() {
+		DepartureTimeDistributionType depTimeDistr = this.gcm.getDepartureTimeDistribution();
+		if (depTimeDistr == null) {
+			log.warn("No departure time distribution is given! So, we let start all evacuees at once !");
+			return 0;
+		}
+		
+		if (depTimeDistr.getDistribution() == DistributionType.LOG_NORMAL) {
+			double mu = depTimeDistr.getMu();
+			double sigma = depTimeDistr.getSigma();
+			double r = MatsimRandom.getRandom().nextGaussian();
+			return 3600*Math.exp(mu + sigma*r);
+		} else if(depTimeDistr.getDistribution() == DistributionType.NORMAL) {
+			double mu = depTimeDistr.getMu();
+			double sigma = depTimeDistr.getSigma();
+			double r = MatsimRandom.getRandom().nextGaussian();
+			return 3600*mu+sigma*r;
+		}
+		
+		throw new RuntimeException("unknown distribution type:" + depTimeDistr.getDistribution());
 	}
 
 	protected Coord getRandomCoordInsideFeature(Random rnd, Feature ft) {

@@ -91,18 +91,8 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 		this.gcm.setOutputDir(gct.getOutputDir().getInputFile());
 		this.gcm.setPopulationFileName(gct.getPopulationFile().getInputFile());
 		this.gcm.setSampleSize(gct.getSampleSize()+"");
-	}
-
-	public static void main(String [] args) {
-		log.warn("this main method exist for debugging only, meaning it will (hopefully) removed soon[gl 03/2012]");
-		String input = "/Users/laemmel/tmp/gripsConfig.xml";
-		GripsConfigModule gcm = new GripsConfigModule("grips");
-		new GripsConfigDeserializer(gcm).readFile(input);
+		this.gcm.setDepartureTimeDistribution(gct.getDepartureTimeDistribution());
 		
-//		GripsConfigModule gcm = new GripsConfigDeserializer().deserialize(input);
-		System.out.println(gcm.getOutputDir());
-		new GripsConfigSerializer(gcm).write(input);
 	}
-
 
 }

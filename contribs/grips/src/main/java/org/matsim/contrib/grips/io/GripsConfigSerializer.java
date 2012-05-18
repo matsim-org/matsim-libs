@@ -31,6 +31,7 @@ import javax.xml.bind.PropertyException;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.grips.config.GripsConfigModule;
+import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.FileType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.GripsConfigType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.ObjectFactory;
@@ -42,6 +43,7 @@ public class GripsConfigSerializer extends MatsimJaxbXmlWriter {
 private static final Logger log = Logger.getLogger(GripsConfigSerializer.class);
 	
 	public static final String SCHEMA = "http://matsim.org/files/dtd/grips_config_v0.1.xsd";
+//	public static final String SCHEMA = "http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas/grips_config_v0.1.xsd";
 	private final GripsConfigModule gcm;
 
 	public GripsConfigSerializer(GripsConfigModule gcm) {
@@ -81,11 +83,14 @@ private static final Logger log = Logger.getLogger(GripsConfigSerializer.class);
 		pop.setInputFile(this.gcm.getPopulationFileName());
 		FileType outDir = fac.createFileType();
 		outDir.setInputFile(this.gcm.getOutputDir());
-
+		DepartureTimeDistributionType depTimeDistr = this.gcm.getDepartureTimeDistribution();
+		
+		
 		gct.setEvacuationAreaFile(evacArea);
 		gct.setNetworkFile(net);
 		gct.setOutputDir(outDir);
 		gct.setPopulationFile(pop);
+		gct.setDepartureTimeDistribution(depTimeDistr);
 		
 		gct.setSampleSize(this.gcm.getSampleSize());
 		
@@ -154,8 +159,8 @@ private static final Logger log = Logger.getLogger(GripsConfigSerializer.class);
 		gct.setNetworkFile(net);
 		gct.setOutputDir(outDir);
 		gct.setPopulationFile(pop);
-		
-		gct.setSampleSize(12);
+		gct.setDepartureTimeDistribution(this.gcm.getDepartureTimeDistribution());
+		gct.setSampleSize(this.gcm.getSampleSize());
 		
 		
 		
