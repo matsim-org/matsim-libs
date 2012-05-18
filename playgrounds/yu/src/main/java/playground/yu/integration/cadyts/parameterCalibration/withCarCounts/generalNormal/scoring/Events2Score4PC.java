@@ -269,14 +269,14 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 					throw new RuntimeException();
 				}
 
-				System.out.println(">>>>>plan customAttr.\t"
-						+ plan.getCustomAttributes().toString());
+				// System.out.println(">>>>>plan customAttr.\t"
+				// + plan.getCustomAttributes().toString());
 				// set attributes to MultinomialLogit
 				for (String attrName : attrNameList) {
 					setAttr2MNL(choiceIdx, attrName, plan);
 				}
-				System.out.println(">>>>>MNL Attr.\t"
-						+ mnl.getAttributesView().toString());
+				// System.out.println(">>>>>MNL Attr.\t"
+				// + mnl.getAttributesView().toString());
 				// ##########################################################
 				/*
 				 * ASC (utilityCorrection, ASC for "stay home" Plan in the

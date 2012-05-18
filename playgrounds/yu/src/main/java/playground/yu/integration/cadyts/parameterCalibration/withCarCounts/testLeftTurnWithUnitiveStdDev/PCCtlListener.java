@@ -312,8 +312,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		// cycleIdx == 0) {
 		MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
 				.getMultinomialLogit();
-		System.out.println(">>>>>mnl old coefficients:\t"
-				+ mnl.getCoeff().toString());
+		// System.out.println(">>>>>mnl old coefficients:\t"
+		// + mnl.getCoeff().toString());
 		// *******should after Scoring Listener!!!*******
 		// if (calibrator.getInitialStepSize() != 0d) {//deprecated
 
@@ -353,8 +353,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			sb.append("\t");
 			sb.append(value);
 		}
-		System.out.println(">>>>>mnl new coefficients:\t"
-				+ mnl.getCoeff().toString());
+		// System.out.println(">>>>>mnl new coefficients:\t"
+		// + mnl.getCoeff().toString());
 		// ********calibrator.getParameters() JUST FOR
 		// ANALYSIS********
 		utilities.math.Vector params = calibrator.getParameters();
