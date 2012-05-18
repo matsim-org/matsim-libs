@@ -48,7 +48,7 @@ public class InternalControler {
 	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
 	private final double PERFORMING = 0.96;
 
-	private final double CONSTANT_CAR = -0.65;
+	private final double CONSTANT_CAR = 0.0;
 	private final double TRAVEL_CAR = 0.0;
 	private final double MONETARY_DISTANCE_COST_RATE_CAR = -0.00040;
 
@@ -57,7 +57,7 @@ public class InternalControler {
 	private final double TRAVEL_PT_ACCESS = -0.0;
 	private final double TRAVEL_PT_EGRESS = -2.34;
 	
-	private final double CONSTANT_PT = 0.0;	// estimated parameter: -2.08
+	private double CONSTANT_PT = 0.0;	// estimated parameter: -2.08
 	private final double TRAVEL_PT = 0.0;
 //	private final double TRAVEL_PT = -20.0; // only needed for the ptRouter to avoid waiting at bus stops, not used for scoring because of the following differentiation:
 	private final double TRAVEL_PT_IN_VEHICLE = -0.18;
@@ -75,6 +75,8 @@ public class InternalControler {
 		this.directoryExtIt = directoryExtIt;
 		this.fare = fare;
 		this.ptLegHandler = new PtLegHandler();
+		
+		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt();
 	}
 	
 	public void run() {
