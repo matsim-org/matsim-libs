@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: matsim
+ * MentalLinkSwitcher.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sim2d_v3.simulation.floor.forces.deliberative;
 
 import java.util.ArrayList;
@@ -35,7 +55,6 @@ public class MentalLinkSwitcher implements LinkSwitcher {
 
 	GeometryFactory geofac = new GeometryFactory();
 
-
 	private static final double COS_LEFT = Math.cos(Math.PI / 2);
 	private static final double SIN_LEFT = Math.sin(Math.PI / 2);
 	private static final double COS_RIGHT = Math.cos(-Math.PI / 2);
@@ -44,8 +63,6 @@ public class MentalLinkSwitcher implements LinkSwitcher {
 	private final Scenario sc;
 	private final Map<Id,LinkFinishLines> finishLines = new HashMap<Id,LinkFinishLines>();
 	private ArrayList<Geometry> geos;
-
-
 
 	public MentalLinkSwitcher(Scenario sc) {
 		this.sc = sc;
@@ -59,6 +76,10 @@ public class MentalLinkSwitcher implements LinkSwitcher {
 		for (Link link : this.sc.getNetwork().getLinks().values()) {
 			LinkFinishLines lines = new LinkFinishLines();
 			for (Link next : link.getToNode().getOutLinks().values()) {
+				
+				// ignore non-walk2d links
+				if (!next.getAllowedModes().contains("walk2d")) continue;
+				
 				Tuple<Coordinate,Coordinate> ls = null;
 				if (next.getToNode() == link.getFromNode()) {
 					ls = getPerpendicularLine(link);
@@ -70,14 +91,9 @@ public class MentalLinkSwitcher implements LinkSwitcher {
 
 			calcBorderLines(link,lines);
 
-
-
 			this.finishLines.put(link.getId(), lines);
-
 		}
-
 	}
-
 
 	private void calcBorderLines(Link link, LinkFinishLines lines) {
 
@@ -92,7 +108,6 @@ public class MentalLinkSwitcher implements LinkSwitcher {
 		Coordinate r0 = new Coordinate(c0.x+dy,c0.y-dx);
 		Coordinate r1 = new Coordinate(c1.x+dy,c1.y-dx);
 
-
 		lines.rightBorder = new Tuple<Coordinate,Coordinate>(r0,r1);
 
 		Coordinate l0 = new Coordinate(c0.x-dy,c0.y+dx);
@@ -104,7 +119,7 @@ public class MentalLinkSwitcher implements LinkSwitcher {
 	}
 
 	private double getMinWidth(Link l) {
-
+		
 		LineString link = this.geofac.createLineString(new Coordinate[]{MGC.coord2Coordinate(l.getFromNode().getCoord()),MGC.coord2Coordinate(l.getToNode().getCoord())});
 		Coord coord = l.getCoord();
 		QuadTree<Coordinate> q = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree();
@@ -135,14 +150,43 @@ public class MentalLinkSwitcher implements LinkSwitcher {
 		Coordinate cTo = MGC.coord2Coordinate(link.getToNode().getCoord());
 		Coordinate cNextTo = MGC.coord2Coordinate(next.getToNode().getCoord());
 
+		/*
+		 * Limit the visible line calculation to the last 100.0 meters of a link.
+		 * Otherwise a mental link switch could happen when an agent is far away
+		 * from its next link which would result in problems in the PathForceModule
+		 * where a force is calculated link Math.exp(distance to mental link).
+		 */
+		double maxLength = 100.0;	// TODO: which values makes sense here?
+		double length = link.getLength();
+		if (length > maxLength) {
+			double dx = cTo.x - cFrom.x;
+			double dy = cTo.y - cFrom.y;
+			double dxy = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+			dx = dx * maxLength/dxy; 
+			dy = dy * maxLength/dxy;
+			cFrom = new Coordinate(cTo.x - dx, cTo.y - dy);
+		}
+
 		double dx = (cTo.x - cFrom.x)/10;
 		double dy = (cTo.y - cFrom.y)/10;
 
+			
 		for (int i = 1; i <= 10; i++) {
 			Coordinate tmp = new Coordinate(cFrom.x + dx*i,cFrom.y + dy*i);
-			if (!intersectsEnv(cNextTo,tmp)){
+			if (!intersectsEnv(cNextTo,tmp)) {
+				
+				// barrier between 4504 and 4505
+				Coordinate[] barrier = new Coordinate[2];
+				barrier[0] = tmp;			
+				barrier[1] = cNextTo;
+				
+				LineString ls = geofac.createLineString(barrier);
+				Point p = geofac.createPoint(cTo);
+				double distance = ls.distance(p);
+				if (distance > 5) continue;
+				
 				if (Algorithms.isLeftOfLine(cFrom, cNextTo, tmp) <= 0) {
-
+					
 					return new Tuple<Coordinate,Coordinate>(cNextTo,tmp);
 				} else {
 					return new Tuple<Coordinate,Coordinate>(tmp,cNextTo);
