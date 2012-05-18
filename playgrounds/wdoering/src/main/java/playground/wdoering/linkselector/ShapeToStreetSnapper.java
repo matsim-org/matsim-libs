@@ -69,7 +69,6 @@ public class ShapeToStreetSnapper {
 
 	public ShapeToStreetSnapper(Scenario sc) {
 		this.sc = sc;
-		fixOneWayStreets();
 		buildQuadTree();
 	}
 
@@ -173,33 +172,6 @@ public class ShapeToStreetSnapper {
 	
 
 
-	private void fixOneWayStreets() {
-
-		List<Link> rev = new ArrayList<Link>();
-		for (Link link : this.sc.getNetwork().getLinks().values()) {
-			
-			boolean oneWay = true;
-			for (Link l : link.getToNode().getOutLinks().values()) {
-				if (l.getToNode().equals(link.getFromNode())) {
-					oneWay = false;
-					break;
-				}
-			}
-			if (oneWay) {
-				Link reverse = this.sc.getNetwork().getFactory().createLink(new IdImpl(link.getId().toString()+"reverse"), link.getToNode(), link.getFromNode());
-				reverse.setFreespeed(link.getFreespeed());
-				reverse.setLength(link.getLength());
-				reverse.setNumberOfLanes(link.getNumberOfLanes());
-				reverse.setCapacity(link.getCapacity());
-				rev.add(reverse);
-			}
-			
-		}
-		for (Link reverse : rev) {
-			this.sc.getNetwork().addLink(reverse);
-		}
-		
-	}
 
 	private List<Node> getBoundaryNodes(Polygon p) {
 		

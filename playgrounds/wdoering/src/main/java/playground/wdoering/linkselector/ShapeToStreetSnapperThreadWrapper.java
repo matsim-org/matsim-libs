@@ -258,7 +258,9 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 				Id fromID = link.getFromNode().getId();
 				Id toID = link.getToNode().getId();
 				
-				Id[] ids = {fromID , toID};
+//				System.out.println(fromID.toString());
+				
+				Id[] ids = {fromID , toID, link.getId()};
 				
 				links.put(ids, fromToCoord);
 				

@@ -21,6 +21,7 @@
 package playground.wdoering.linkselector;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -28,11 +29,16 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
@@ -42,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
+import org.matsim.api.core.v01.Id;
 
 
 
@@ -54,7 +61,13 @@ public class EvacuationAreaSelector implements ActionListener{
 	private MyMapViewer jMapViewer;
 	private JButton saveButton;
 	private JButton openBtn;
-	private JTextField blockField;
+	private JTextField blockFieldLink1;
+	
+	private HashMap<Id, String> roadClosures;
+	private Id currentLinkId1 = null;
+	private Id currentLinkId2 = null;
+	
+	private int activeLink = 0;
 
 	private ShapeToStreetSnapperThreadWrapper snapper;
 
@@ -62,7 +75,20 @@ public class EvacuationAreaSelector implements ActionListener{
 
 	private JLabel blockLabel;
 
-	private JButton blockButton;
+	private JButton blockButtonOK;
+
+	private JCheckBox cbLink1;
+
+	private JCheckBox cbLink2;
+
+	private JTextField blockFieldLink2;
+
+	private JPanel panelLink1;
+
+	private JPanel panelLink2;
+	
+	private boolean saveLink1 = false;
+	private boolean saveLink2 = false;
 
 	/**
 	 * Launch the application.
@@ -88,6 +114,9 @@ public class EvacuationAreaSelector implements ActionListener{
 	 * @param config 
 	 */
 	public EvacuationAreaSelector(){
+		
+		roadClosures = new HashMap<Id, String>();
+		
 		initialize();
 //		loadMapView(osmFile);
 
@@ -106,33 +135,116 @@ public class EvacuationAreaSelector implements ActionListener{
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize()
+	{
 		this.frame = new JFrame();
-		this.frame.setBounds(100, 100, 800, 800);
+		this.frame.setBounds(100, 100, 1000, 800);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		this.frame.setResizable(false);
+		this.frame.setResizable(true);
 		
 		JPanel panel = new JPanel();
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
-		blockPanel = new JPanel(new GridLayout(22, 1));
+		blockPanel = new JPanel(new GridLayout(18, 2));
 		
-		JPanel innerBlockPanel = new JPanel(new BorderLayout());
+		
 		
 		blockLabel = new JLabel(" Gesperrt ab ");
-		blockField = new JTextField("12:00");
-		blockButton = new JButton("ok");
+		blockFieldLink1 = new JTextField("--:--");
+		blockFieldLink2 = new JTextField("--:--");
+		blockButtonOK = new JButton("ok");
 		
-		blockPanel.setSize(new Dimension(80, 200));
+		blockPanel.setSize(new Dimension(200, 200));
 		
-		blockPanel.add(blockLabel);
-		blockPanel.add(blockField);
-		blockPanel.add(blockButton);
 		
-		innerBlockPanel.add(blockPanel, BorderLayout.CENTER);
+		cbLink1 = new JCheckBox("link 1");
+		cbLink2 = new JCheckBox("link 2");
 		
-		this.frame.getContentPane().add(innerBlockPanel, BorderLayout.EAST);
+//		JRadioButton rbLink3 = new JRadioButton("link 3");
+//		JRadioButton rbLink4 = new JRadioButton("link 4");
+		
+		blockButtonOK.addActionListener(new ActionListener()
+		{
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				updateRoadClosure();
+				
+			}
+		});
+		
+		cbLink1.addActionListener(new ActionListener()
+		{
+			
+
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				saveLink1 = !saveLink1;
+				
+				if (saveLink1)
+					blockFieldLink1.setEnabled(true);
+				else
+					blockFieldLink1.setEnabled(false);
+			}
+		});
+		
+		cbLink2.addActionListener(new ActionListener()
+		{
+			
+
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				saveLink2= !saveLink2;
+				if (saveLink2)
+					blockFieldLink2.setEnabled(true);
+				else
+					blockFieldLink2.setEnabled(false);
+				
+				
+			}
+		});
+		
+		cbLink1.setBackground(Color.red);
+		cbLink2.setBackground(Color.green);
+//		rbLink3.setBackground(Color.blue);
+//		rbLink4.setBackground(Color.orange);
+//		rbLink3.setForeground(Color.white);
+		
+		
+		cbLink1.setSelected(false);
+		cbLink2.setSelected(false);
+//		rbLink3.setSelected(false);
+//		rbLink4.setSelected(false);
+		
+		
+		panelLink1 = new JPanel(new GridLayout(1, 2));
+		panelLink2 = new JPanel(new GridLayout(1, 2));
+		panelLink1.add(cbLink1);
+		panelLink1.add(blockFieldLink1);
+		panelLink2.add(cbLink2);
+		panelLink2.add(blockFieldLink2);
+		
+		blockPanel.add(panelLink1);
+		blockPanel.add(panelLink2);
+		blockPanel.add(blockButtonOK);		
+		
+		blockPanel.setPreferredSize(new Dimension(200,300));
+		
+		
+		cbLink1.setEnabled(false);
+		cbLink2.setEnabled(false);
+		blockFieldLink1.setEnabled(false);
+		blockFieldLink2.setEnabled(false);
+		blockButtonOK.setEnabled(false);
+		
+		blockFieldLink1.setSelectedTextColor(Color.red);
+		blockFieldLink2.setSelectedTextColor(Color.green);
+		
+		this.frame.getContentPane().add(blockPanel, BorderLayout.EAST);
 		
 		this.openBtn = new JButton("Open");
 		panel.add(this.openBtn);
@@ -153,7 +265,7 @@ public class EvacuationAreaSelector implements ActionListener{
 	
 	public void addMapViewer(TileFactory tf) {
 		this.compositePanel.setLayout(null);
-		this.jMapViewer = new MyMapViewer();
+		this.jMapViewer = new MyMapViewer(this);
 		this.jMapViewer.setBounds(0, 0, 800, 800);
 		this.jMapViewer.setTileFactory(tf);
 		this.jMapViewer.setPanEnabled(true);
@@ -233,4 +345,93 @@ public class EvacuationAreaSelector implements ActionListener{
 	public void setSaveButtonEnabled(boolean enabled) {
 		this.saveButton.setEnabled(enabled);
 	}
+
+	public void setEditMode(boolean b)
+	{
+		if (b)
+		{
+			cbLink1.setEnabled(true);
+			cbLink2.setEnabled(true);
+			blockButtonOK.setEnabled(true);
+		}
+		else
+		{
+			cbLink1.setEnabled(false);
+			cbLink2.setEnabled(false);
+			blockButtonOK.setEnabled(false);
+			blockFieldLink1.setText("--.--");
+			blockFieldLink2.setText("--.--");
+			
+		}
+			
+		
+	}
+	
+	public void setLink1Id(Id id)
+	{
+		if (id!=null)
+		{
+			this.cbLink1.setText(id.toString());
+			this.currentLinkId1 = id;
+			
+			if(roadClosures.containsKey(id))	
+				blockFieldLink1.setText(roadClosures.get(id));
+		}
+		else
+		{
+			blockFieldLink1.setText("--.--");
+			blockFieldLink1.setEnabled(false);
+			cbLink1.setEnabled(false);
+
+		}
+		
+		
+		
+		
+	}
+	
+	public void setLink2Id(Id id)
+	{
+		if (id!=null)
+		{
+			this.cbLink2.setText(id.toString());
+			this.currentLinkId2 = id;
+			
+			if(roadClosures.containsKey(id))	
+				blockFieldLink2.setText(roadClosures.get(id));
+		}
+		else
+		{
+			blockFieldLink2.setText("--.--");
+			blockFieldLink2.setEnabled(false);
+			cbLink2.setEnabled(false);
+		}
+		
+	}
+	
+	public void updateRoadClosure()
+	{
+		if ((currentLinkId1!=null) && (cbLink1.isSelected()))
+			roadClosures.put(currentLinkId1, blockFieldLink1.getText());
+		
+		if ((currentLinkId2!=null) && (cbLink2.isSelected()))
+			roadClosures.put(currentLinkId2, blockFieldLink2.getText());
+		
+		if (roadClosures.size()>0)
+		{
+			Iterator it = roadClosures.entrySet().iterator();
+			
+		    while (it.hasNext())
+		    {
+		        Map.Entry pairs = (Map.Entry)it.next();
+		        System.out.println(pairs.getKey() + " = " + pairs.getValue());
+		        it.remove(); // avoids a ConcurrentModificationException
+		    }
+		}
+
+		
+	}
+	
+	
+	
 }
