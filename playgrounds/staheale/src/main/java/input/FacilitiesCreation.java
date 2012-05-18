@@ -186,8 +186,8 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 
 					// create temporary facilities, set minimum FTEs
 					for (int i=0; i < numFacilities; i++) {
-
-						tempFacilityId = this.createTemporaryFacilityID(facilityCnt++, attributeId);
+//-------------TODO: setting id offset-----------------
+						tempFacilityId = this.createTemporaryFacilityID(100000+facilityCnt++, attributeId);
 //						System.out.println("Creating temporary " + tempFacilityId + "...");
 						tempFacilities.put(tempFacilityId, minFTEs);
 						numSectorFTE -= minFTEs;
