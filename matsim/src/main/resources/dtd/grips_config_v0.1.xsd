@@ -20,10 +20,28 @@
 			<xs:element name="sampleSize" type="sampleSizeType"
 				minOccurs="1" maxOccurs="1">
 			</xs:element>
-
+			<xs:element name="departureTimeDistribution" type="departureTimeDistributionType"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
 		</xs:sequence>
 
 	</xs:complexType>
+
+	<xs:complexType name="departureTimeDistributionType">
+		<xs:sequence>
+			<xs:element name="distribution" type="distributionType"></xs:element>
+			<xs:element name="sigma" type="xs:double"></xs:element>
+			<xs:element name="mu" type="xs:double"></xs:element>
+		</xs:sequence>
+
+	</xs:complexType>
+
+	<xs:simpleType name="distributionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="normal"></xs:enumeration>
+			<xs:enumeration value="log-normal"></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
 
 	<xs:simpleType name="sampleSizeType">
 		<xs:restriction base="xs:double">
