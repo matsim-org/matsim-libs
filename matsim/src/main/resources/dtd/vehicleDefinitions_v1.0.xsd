@@ -44,7 +44,7 @@ xml:lang="en">
     </xs:element>
     <xs:element name="maximumVelocity" minOccurs="0" maxOccurs="1">
       <xs:complexType>
-      <xs:attribute name="meterPerSecond" type="xs:decimal" use="optional" default="INF"/>
+      <xs:attribute name="meterPerSecond" type="xs:double" use="optional" default="INF"/>
       </xs:complexType>
     </xs:element>
     <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />
