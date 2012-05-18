@@ -73,6 +73,7 @@ public class CreateMarathonPopulation {
 	
 	private final String startLink = "106474";
 	private final String endLink = "106473";
+//	private final String endLink = "106473_2759_shifted_2952";
 	
 //	// unshifted
 //	private final String[] trackNodes = new String[]{	
@@ -118,10 +119,12 @@ public class CreateMarathonPopulation {
 		
 		addNodesToNetwork(scenario);
 		
+//		copyLinksToShiftedNodes(scenario);
+		
 		moveLinksToShiftedNodes(scenario);
 		
 		addLinksToNetwork(scenario);
-
+		
 		createRoute(scenario);
 		
 		prepareNetwork(scenario);
@@ -161,7 +164,7 @@ public class CreateMarathonPopulation {
 		route = (NetworkRoute) routeFactory.createRoute(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
 	}
-	
+		
 	/*
 	 * Add some nodes to the network which are required for the track.
 	 */
@@ -183,7 +186,6 @@ public class CreateMarathonPopulation {
 		createShiftedNode(scenario, "2523", 3.0, 0.0);
 		createShiftedNode(scenario, "2522", 3.0, 0.0);
 		createShiftedNode(scenario, "2759", -1.0, 3.0);
-		
 		
 		connectedShiftedNodes(scenario, "4504");
 		connectedShiftedNodes(scenario, "4505");
@@ -236,6 +238,70 @@ public class CreateMarathonPopulation {
 		moveLink(scenario, "2759", "2758", "2759_shifted", "2758");
 		
 //		moveLink(scenario, "", "", "_shifted", "_shifted");
+	}
+	
+	private void copyLinksToShiftedNodes(Scenario scenario) {
+		
+		copyLinks(scenario, "4239", "2522", "4239", "2522_shifted");
+		copyLinks(scenario, "2522", "2523", "2522_shifted", "2523_shifted");
+		copyLinks(scenario, "2523", "2524", "2523_shifted", "2524_shifted");
+		copyLinks(scenario, "2524", "2525", "2524_shifted", "2525_shifted");
+		copyLinks(scenario, "2525", "2526", "2525_shifted", "2526_shifted");
+		copyLinks(scenario, "2526", "2527", "2526_shifted", "2527_shifted");
+		copyLinks(scenario, "2527", "2528", "2527_shifted", "2528_shifted");
+		copyLinks(scenario, "2528", "2529", "2528_shifted", "2529_shifted");
+		copyLinks(scenario, "2529", "2530", "2529_shifted", "2530_shifted");
+		copyLinks(scenario, "3496", "2530", "3496", "2530_shifted");
+		copyLinks(scenario, "2530", "2531", "2530_shifted", "2531_shifted");
+		copyLinks(scenario, "2531", "2951", "2531_shifted", "2951_shifted");
+		copyLinks(scenario, "2951", "4508", "2951_shifted", "4508_shifted");
+		copyLinks(scenario, "4508", "4507", "4508_shifted", "4507_shifted");
+		copyLinks(scenario, "4507", "4505", "4507_shifted", "4505_shifted");
+		copyLinks(scenario, "4505", "4504", "4505_shifted", "4504_shifted");
+		copyLinks(scenario, "4508", "2951", "4508", "2951_shifted_shifted");
+		copyLinks(scenario, "2951", "2759", "2951_shifted_shifted", "2759_shifted");
+		copyLinks(scenario, "2759", "2952", "2759_shifted", "2952");
+		copyLinks(scenario, "2759", "2758", "2759_shifted", "2758");
+	}
+	
+	private void copyLinks(Scenario scenario, String oldFrom, String oldTo, String newFrom, String newTo) {
+		Id oldFromId = scenario.createId(oldFrom);
+		Id oldToId = scenario.createId(oldTo);
+		Id newFromId = scenario.createId(newFrom);
+		Id newToId = scenario.createId(newTo);
+		
+		Node from = scenario.getNetwork().getNodes().get(oldFromId);
+		Node to = scenario.getNetwork().getNodes().get(oldToId);
+		
+		for (Link link : from.getOutLinks().values()) {
+			if (link.getToNode().getId().equals(oldToId)) {
+				
+				Node fromNode = scenario.getNetwork().getNodes().get(newFromId);
+				Node toNode = scenario.getNetwork().getNodes().get(newToId);
+				Id id = scenario.createId(link.getId().toString() + "_" + newFrom + "_" + newTo);
+				
+				Link copy = scenario.getNetwork().getFactory().createLink(id, fromNode, toNode);
+				copy.setLength(link.getLength());
+				copy.setAllowedModes(link.getAllowedModes());
+				
+				scenario.getNetwork().addLink(copy);
+			}
+		}
+		
+		for (Link link : from.getInLinks().values()) {
+			if (link.getFromNode().getId().equals(oldToId)) {
+				
+				Node fromNode = scenario.getNetwork().getNodes().get(newFromId);
+				Node toNode = scenario.getNetwork().getNodes().get(newToId);
+				Id id = scenario.createId(link.getId().toString() + "_" + newTo + "_" + newFrom);
+				
+				Link copy = scenario.getNetwork().getFactory().createLink(id, fromNode, toNode);
+				copy.setLength(link.getLength());
+				copy.setAllowedModes(link.getAllowedModes());
+				
+				scenario.getNetwork().addLink(copy);
+			}
+		}
 	}
 	
 	private void moveLink(Scenario scenario, String oldFrom, String oldTo, String newFrom, String newTo) {
@@ -344,6 +410,7 @@ public class CreateMarathonPopulation {
 			link.setNumberOfLanes(lanes);
 			link.setCapacity(cap);
 			link.setAllowedModes(modes);
+			link.setFreespeed(10.0);
 		}
 		
 //		Set<Id> linksToRemove = new HashSet<Id>(scenario.getNetwork().getLinks().keySet());
