@@ -57,6 +57,7 @@ public class PConfigGroup extends Module{
 	private static final String MAX_Y = "maxY";
 	private static final String NUMBER_OF_COOPERATIVES = "numberOfCooperatives";
 	private static final String PAX_PER_VEHICLE = "paxPerVehicle";
+	private static final String PCE = "passengerCarEquivalents";
 	private static final String NUMBER_OF_ITERATIONS_FOR_PROSPECTING = "numberOfIterationsForProspecting";
 	private static final String INITIAL_BUDGET = "initialBudget";
 	private static final String COST_PER_VEHICLE_AND_DAY = "costPerVehicleAndDay";
@@ -86,6 +87,7 @@ public class PConfigGroup extends Module{
 	private double maxY = Double.MAX_VALUE;
 	private int numberOfCooperatives = 1;
 	private int paxPerVehicle = 10;
+	private double passengerCarEquivalents = 1.0;
 	private int numberOfIterationsForProspecting = 0;
 	private double initialBudget = 0.0;
 	private double costPerVehicleAndDay = 0.0;
@@ -135,6 +137,8 @@ public class PConfigGroup extends Module{
 			this.initialBudget = Double.parseDouble(value);
 		} else if (PAX_PER_VEHICLE.equals(key)) {
 			this.paxPerVehicle = Integer.parseInt(value);
+		} else if (PCE.equals(key)) {
+			this.passengerCarEquivalents = Double.parseDouble(value);
 		} else if (COST_PER_VEHICLE_AND_DAY.equals(key)){
 			this.costPerVehicleAndDay = Double.parseDouble(value);
 		} else if (COST_PER_KILOMETER.equals(key)){
@@ -190,6 +194,7 @@ public class PConfigGroup extends Module{
 		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, Integer.toString(this.numberOfIterationsForProspecting));
 		map.put(INITIAL_BUDGET, Double.toString(this.initialBudget));
 		map.put(PAX_PER_VEHICLE, Integer.toString(this.paxPerVehicle));
+		map.put(PCE, Double.toString(this.passengerCarEquivalents));
 		map.put(COST_PER_VEHICLE_AND_DAY, Double.toString(this.costPerVehicleAndDay));
 		map.put(COST_PER_KILOMETER, Double.toString(this.costPerKilometer));
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, Double.toString(this.earningsPerKilometerAndPassenger));
@@ -227,6 +232,7 @@ public class PConfigGroup extends Module{
 		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, "number of iterations an cooperative will survive with a negative scoring");
 		map.put(INITIAL_BUDGET, "The budget a new cooperative is initialized with");
 		map.put(PAX_PER_VEHICLE, "number of passengers per vehicle");
+		map.put(PCE, "Passenger car equilvalents of one paratransit vehicle");
 		map.put(COST_PER_VEHICLE_AND_DAY, "cost per vehicle and day - will prevent companies from operating only short periods of a day");
 		map.put(COST_PER_KILOMETER, "cost per vehicle and kilometer travelled");
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, "earnings per passenger kilometer");
@@ -285,6 +291,10 @@ public class PConfigGroup extends Module{
 	
 	public int getPaxPerVehicle() {
 		return this.paxPerVehicle;
+	}
+	
+	public double getPassengerCarEquivalents() {
+		return this.passengerCarEquivalents;
 	}
 	
 	public double getCostPerVehicleAndDay() {

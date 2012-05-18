@@ -274,6 +274,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		capacity.setSeats(Integer.valueOf(this.pConfig.getPaxPerVehicle() + 1)); // july 2011 the driver takes one seat
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehType.setCapacity(capacity);
+		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
 		vehType.setAccessTime(2.0);
 		vehType.setEgressTime(1.0);
 		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
