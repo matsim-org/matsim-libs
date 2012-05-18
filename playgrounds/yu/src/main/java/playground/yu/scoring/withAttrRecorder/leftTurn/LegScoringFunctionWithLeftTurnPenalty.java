@@ -56,7 +56,7 @@ public class LegScoringFunctionWithLeftTurnPenalty extends
 		nbOfLeftTurnAttrCar += nbOfLeftTurn;
 		double originalScore = super.calcLegScore(departureTime, arrivalTime,
 				leg);
-		double score = originalScore + additionalParams.constantLeftTurn * // nbOfLeftTurnAttrCar
+		double tmpScore = originalScore + additionalParams.constantLeftTurn * // nbOfLeftTurnAttrCar
 				nbOfLeftTurn;
 		// 这里用nbOfLeftTurnAttrCar还是LeftTurnIdentifier.getNumberOfLeftTurnsFromALeg(leg,
 		// network.getLinks())？即，刚刚的+=对结果的影响？此处应该仅仅是此处的leftturn被计入分数，oder？
@@ -67,7 +67,7 @@ public class LegScoringFunctionWithLeftTurnPenalty extends
 		// + additionalParams.constantLeftTurn
 		// + "\t*\tnbOfLeftTurnAttrCar:\t" + nbOfLeftTurnAttrCar
 		// + "\toriginalScore:\t" + originalScore + "\tsum:\t" + score);
-		return score;
+		return tmpScore;
 	}
 
 	public int getNbOfLeftTurnAttrCar() {

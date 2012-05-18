@@ -62,11 +62,12 @@ public class Events2Score4AttrRecorder extends Events2Score implements
 
 	protected final Config config;
 	protected Population pop = null;
-	protected ScoringFunctionFactory sfFactory = null;
+	// protected ScoringFunctionFactory sfFactory = null;
 	protected PlanCalcScoreConfigGroup scoring;
 
 	protected int maxPlansPerAgent;
-	protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
+	// protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers =
+	// new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
 	protected final TreeMap<Id, Integer> agentPlanElementIndex = new TreeMap<Id, Integer>();
 
 	protected int iteration = -1;

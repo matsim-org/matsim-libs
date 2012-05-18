@@ -43,15 +43,14 @@ import playground.yu.scoring.withAttrRecorder.leftTurn.LeftTurnPenaltyControler;
  * 
  */
 public class AdditionalParameterSetter implements StartupListener {
-	private static String CONSTANT_LEFT_TURN = "constantLeftTurn";
-
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler ctl = event.getControler();
 		Map<String, Double> nameParams = new TreeMap<String, Double>();
 		double constLT = Double.parseDouble(ctl.getConfig().findParam(
-				CalibrationConfig.BSE_CONFIG_MODULE_NAME, CONSTANT_LEFT_TURN));
-		nameParams.put(CONSTANT_LEFT_TURN, constLT);
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
+				CalibrationConfig.CONSTANT_LEFT_TURN));
+		nameParams.put(CalibrationConfig.CONSTANT_LEFT_TURN, constLT);
 		ParametersSetter.setParameters(ctl, nameParams);
 	}
 

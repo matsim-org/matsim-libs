@@ -67,8 +67,8 @@ public class Events2Score implements AgentArrivalEventHandler,
 		TravelEventHandler {
 
 	private Scenario scenario = null;
-	private ScoringFunctionFactory sfFactory = null;
-	private final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
+	protected ScoringFunctionFactory sfFactory = null;
+	protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private final double learningRate;
