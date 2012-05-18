@@ -142,7 +142,7 @@ public class PopulationFromESRIShapeFileGenerator {
 			double mu = depTimeDistr.getMu();
 			double sigma = depTimeDistr.getSigma();
 			double r = MatsimRandom.getRandom().nextGaussian();
-			return 3600*Math.exp(mu + sigma*r);
+			return Math.min(3600*Math.exp(mu + sigma*r),4*3600);
 		} else if(depTimeDistr.getDistribution() == DistributionType.NORMAL) {
 			double mu = depTimeDistr.getMu();
 			double sigma = depTimeDistr.getSigma();
