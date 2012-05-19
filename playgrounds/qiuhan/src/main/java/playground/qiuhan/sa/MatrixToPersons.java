@@ -53,6 +53,10 @@ public class MatrixToPersons {
 	private static String DUMMY = "dummy";
 	private Random random;
 
+	/**
+	 * @param m a Matrix in one time interval (e.g. hour)
+	 * @param zoneIdCoords
+	 */
 	public MatrixToPersons(Matrix m, Map<Id, Coord> zoneIdCoords) {
 		this.m = m;
 		this.persons = new HashMap<Id, Person>();

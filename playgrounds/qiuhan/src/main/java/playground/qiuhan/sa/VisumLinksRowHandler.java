@@ -75,13 +75,13 @@ public class VisumLinksRowHandler implements VisumNetworkRowHandler {
 		String mode = null;
 		for (String vsys : vsyss) {
 			if (vsys.equals("B")) {
-				mode = "bus";
+				mode = "Bus";
 
 			} else if (vsys.equals("F")) {
 				mode = TransportMode.walk;
 
 			} else if (vsys.equals("K")) {
-				mode = "K";
+				mode = "Kurzstrecke";
 
 			} else if (vsys.equals("L")) {
 				mode = "LKW";
@@ -102,10 +102,10 @@ public class VisumLinksRowHandler implements VisumNetworkRowHandler {
 				mode = "S-Bahn";
 
 			} else if (vsys.equals("W")) {
-				mode = "W";
+				mode = "Bus (Umland)";
 
 			} else if (vsys.equals("Z")) {
-				mode = "Z";// TODO
+				mode = "Regionalzuege";// TODO
 
 			}
 			modes.add(mode);

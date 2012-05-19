@@ -29,12 +29,12 @@ import org.matsim.visum.VisumMatrixReader;
  * @author Qiuhan
  * 
  */
-public class MatrixReaderTest {
+public class MatrixReader {
 	public static void main(String[] args) {
 		Matrix m = new Matrix("5oev_o",
-				"from QZ-Matrix 5 oev_o_format.mtx of Sonja's DA");
+				"from QZ-Matrix 5 oev_00.mtx of Sonja's DA");
 		new VisumMatrixReader(m)
-				.readFile("C:/Users/Chen/Documents/Studien/QiuhanSA/QZ-Matrix 5 oev_o_format.mtx");
+				.readFile("input/OEV_O_Matrix/QZ-Matrix 5 oev_00.mtx");
 		System.out
 				.println(m.getEntry(new IdImpl("11713"), new IdImpl("11614")));
 	}

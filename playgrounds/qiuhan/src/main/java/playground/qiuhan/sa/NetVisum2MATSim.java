@@ -35,7 +35,13 @@ public class NetVisum2MATSim {
 		System.out.println(">>>>>Visum network reading ended!");
 	}
 
-	public void convertNetwork(String inputFilename) {
+	/**
+	 * @param inputFilename
+	 *            visum network filename
+	 * @param outputZoneFile
+	 *            in which the zone information can be saved
+	 */
+	public void convertNetwork(String inputFilename, String outputZoneFile) {
 		System.out.println(">>>>>Network converting began!");
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
@@ -49,10 +55,16 @@ public class NetVisum2MATSim {
 				(NetworkImpl) this.network, visumNet);
 		streamingVisumNetworkReader.addRowHandler("STRECKE", linkRowHandler);
 
+		// extract zone informationes
+		VisumZonesRowHandler zoneRowHandler = new VisumZonesRowHandler(
+				outputZoneFile);
+		streamingVisumNetworkReader.addRowHandler("BEZIRK", zoneRowHandler);
+
 		streamingVisumNetworkReader.read(inputFilename);
 
 		((NetworkImpl) network).setCapacityPeriod(24d * 3600d);
 
+		zoneRowHandler.finish();
 		System.out.println(">>>>>Network converting ended!");
 	}
 
@@ -73,13 +85,14 @@ public class NetVisum2MATSim {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputMATSimNetworkFile = "output/matsimNetwork/testNetwork.xml";
+		String outputMATSimNetworkFile = "output/matsimNetwork/networkBerlin.xml";
 		String inputVisumNetFile = "input/visumNet/testNet.net";
+		String outputZoneFile = "output/matsimNetwork/testZone.log";
 
 		NetVisum2MATSim n2m = new NetVisum2MATSim();
 
 		n2m.readVisumNets(inputVisumNetFile);
-		n2m.convertNetwork(inputVisumNetFile);
+		n2m.convertNetwork(inputVisumNetFile, outputZoneFile);
 		// n2m.cleanNetwork();
 		n2m.writeMATSimNetwork(outputMATSimNetworkFile);
 	}

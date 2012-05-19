@@ -29,6 +29,7 @@ import java.util.Map;
 import org.matsim.core.utils.charts.XYScatterChart;
 
 import playground.yu.utils.container.Collection2Array;
+import playground.yu.utils.container.CollectionMax;
 
 /**
  * saves information about daily traffic load curve
@@ -53,6 +54,15 @@ public class DailyTrafficLoadCurve {
 
 	public Map<Integer, Double> getTrafficLoad() {
 		return this.data;
+	}
+
+	/**
+	 * @return a threshold, with which the zero traffic in each hour in spite of
+	 *         the positive value of traffic volume in a day can be avoided.
+	 */
+	public double getThreshold() {
+		double max = CollectionMax.getDoubleMax(this.data.values()) / 100d;
+		return 0.5 / max;
 	}
 
 	public void writeTrafficLoadCurveChart(String chartFilename) {

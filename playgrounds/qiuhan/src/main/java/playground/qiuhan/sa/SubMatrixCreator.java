@@ -20,46 +20,117 @@
 
 package playground.qiuhan.sa;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+import org.matsim.visum.VisumMatrixReader;
+import org.matsim.visum.VisumMatrixWriter;
 
 public class SubMatrixCreator {
 	private Matrix m;
-	private DailyTrafficLoadCurve d;
+	private Map<String, Matrix> ms;
+	private Map<String, DailyTrafficLoadCurve> ds;
+	private Map<String, Integer> zoneIdTypes;
 
-	public SubMatrixCreator(final Matrix m, final DailyTrafficLoadCurve d) {
+	public SubMatrixCreator(final Matrix m,
+			final Map<String, DailyTrafficLoadCurve> ds,
+			Map<String, Integer> zoneIdTypes) {
 		this.m = m;
-		this.d = d;
+		this.ds = ds;
+		this.zoneIdTypes = zoneIdTypes;
+		this.ms = new TreeMap<String, Matrix>();
 	}
 
-	public Map<String, Matrix> createMatrixes() {
-		Map<String, Matrix> map = new HashMap<String, Matrix>();
-		for (Integer i : this.d.getTrafficLoad().keySet()) {
+	public void createMatrixes() {
+		for (int i = 1; i <= 24; i++) {
 
-			String time = i.toString();
-			Double share = this.d.getTrafficShare(i);
+			String time = Integer.toString(i);
 
-			Matrix smallMatrix = this.createMatrix(time, share);
+			Matrix smallMatrix = this.createMatrix(time);
 
-			map.put(time, smallMatrix);
+			ms.put(time, smallMatrix);
 		}
-
-		return map;
-
 	}
 
-	public Matrix createMatrix(String time, Double share) {
-		Matrix matrix = new Matrix(time, "with traffic share " + share);
+	public Matrix createMatrix(String time) {
+		Matrix matrix = new Matrix(time, "from " + (Integer.parseInt(time) - 1)
+				+ " to " + time);
 		for (Id from : this.m.getFromLocations().keySet()) {
 			for (Entry entry : this.m.getFromLocEntries(from)) {
-				matrix.createEntry(from, entry.getToLocation(),
-						entry.getValue() * share / 100.0);
+				matrix.createEntry(from/* O */, entry.getToLocation()/* D */,
+						entry.getValue() * getShare(from.toString(), time)
+								/ 100d);
 			}
 		}
 		return matrix;
+	}
+
+	private double getShare(String fromLocId, String time) {
+		int typeNb = this.zoneIdTypes.get(fromLocId);
+		if (typeNb < 5) {
+			return this.ds.get("inside")
+					.getTrafficShare(Integer.parseInt(time));
+		} else {
+			DailyTrafficLoadCurve outside = this.ds.get("outside");
+			return outside.getTrafficShare(Integer.parseInt(time));
+		}
+	}
+
+	public void writeMatrices(String path) {
+		for (String time : this.ms.keySet()) {
+			new VisumMatrixWriter(ms.get(time)).writeFile(path + time + ".mtx");
+		}
+	}
+
+	public static void main(String[] args) {
+		String matrixFilename = "input/OEV_O_Matrix/QZ-Matrix 5 oev_00.mtx"//
+		, dailyTrafficLoadCurveFilename = "input/tagsganglinie/tagsganglinien.txt"//
+		, dailyTrafficLoadCurveFilename2 = "input/tagsganglinie/tagsganglinien_ausserhalb.txt"//
+		, zoneFilename = "output/matsimNetwork/testZone.log"//
+		, outputPath = "output/matrices/"//
+		;
+
+		// read matrix
+		Matrix m = new Matrix("5oev_o",
+				"from QZ-Matrix 5 oev_00.mtx of Sonja's DA");
+		new VisumMatrixReaderWithIntrazonalTraffic(m).readFile(matrixFilename);
+//		System.out.println("--------------------------");
+//		System.out.println("entry from 10011 to 10010:\t"
+//				+ m.getEntry(new IdImpl(10011), new IdImpl(10010)));
+//		System.out.println("entry from 10011 to 10011:\t"
+//				+ m.getEntry(new IdImpl(10011), new IdImpl(10011)));
+//		System.out.println("entry from 10011 to 10012:\t"
+//				+ m.getEntry(new IdImpl(10011), new IdImpl(10012)));
+//		System.out.println("entry from 10013 to 10013:\t"
+//				+ m.getEntry(new IdImpl(10013), new IdImpl(10013)));
+//		System.out.println("entry from 10011 to 1001x:\t"
+//				+ m.getEntry(new IdImpl(10011), new IdImpl("1001x")));
+//		
+//		System.out.println("--------------------------");
+		// read daily traffic load curves
+		DailyTrafficLoadCurve inside = new DailyTrafficLoadCurve();
+		new DailyTrafficLoadCurveReader(inside)
+				.readFile(dailyTrafficLoadCurveFilename);
+
+		DailyTrafficLoadCurve outside = new DailyTrafficLoadCurve();
+		new DailyTrafficLoadCurveReader(outside)
+				.readFile(dailyTrafficLoadCurveFilename2);
+
+		Map<String, DailyTrafficLoadCurve> ds = new TreeMap<String, DailyTrafficLoadCurve>();
+		ds.put("inside", inside);
+		ds.put("outside", outside);
+
+		// read zonefile
+		ZoneReader zones = new ZoneReader();
+		zones.readFile(zoneFilename);
+		Map<String, Integer> zoneIdTypes = zones.getZoneIdTypes();
+
+		SubMatrixCreator creator = new SubMatrixCreator(m, ds, zoneIdTypes);
+		creator.createMatrixes();
+		creator.writeMatrices(outputPath);
 	}
 }
