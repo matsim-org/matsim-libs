@@ -56,14 +56,14 @@ public class DailyTrafficLoadCurve {
 		return this.data;
 	}
 
-	/**
-	 * @return a threshold, with which the zero traffic in each hour in spite of
-	 *         the positive value of traffic volume in a day can be avoided.
-	 */
-	public double getThreshold() {
-		double max = CollectionMax.getDoubleMax(this.data.values()) / 100d;
-		return 0.5 / max;
-	}
+//	/**
+//	 * @return a threshold, with which the zero traffic in each hour in spite of
+//	 *         the positive value of traffic volume in a day can be avoided.
+//	 */
+//	public double getThreshold() {
+//		double max = CollectionMax.getDoubleMax(this.data.values()) / 100d;
+//		return 0.5 / max;
+//	}
 
 	public void writeTrafficLoadCurveChart(String chartFilename) {
 		XYScatterChart chart = new XYScatterChart(
