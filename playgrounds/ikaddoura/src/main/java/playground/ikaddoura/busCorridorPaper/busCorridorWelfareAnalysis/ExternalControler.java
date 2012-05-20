@@ -58,8 +58,8 @@ class ExternalControler {
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/fare_timeChoice";
 //		lastExternalIteration = 0;
 //		
-//		op = OptimizationParameter.FARE;
-//		op = OptimizationParameter.CAPACITY;
+////		op = OptimizationParameter.FARE;
+////		op = OptimizationParameter.CAPACITY;
 //		op = OptimizationParameter.NUMBER_OF_BUSES;
 		
 		configFile = args[0];
@@ -90,6 +90,7 @@ class ExternalControler {
 		Operator operator = new Operator();
 		Users users = new Users();
 
+
 		for (int extIt = 0; extIt <= lastExternalIteration ; extIt++){
 			log.info("************* EXTERNAL ITERATION " + extIt + " BEGINS *************");
 			
@@ -100,7 +101,7 @@ class ExternalControler {
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 			new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
 			new MatsimPopulationReader(sc).readFile(sc.getConfig().plans().getInputFile());
-			
+
 			VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, sc.getNetwork(), directoryExtIt);
 			vsw.writeTransitVehiclesAndSchedule();
 			
@@ -144,7 +145,7 @@ class ExternalControler {
 			
 			// settings for next external iteration
 			if (extIt < lastExternalIteration){
-				if(op.equals(OptimizationParameter.FARE)) this.fare = this.fare - 1.0;
+				if(op.equals(OptimizationParameter.FARE)) this.fare = this.fare - 0.25;
 				if(op.equals(OptimizationParameter.CAPACITY)) this.capacity = this.capacity + 4;
 				if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)) this.numberOfBuses = this.numberOfBuses + 1;
 			}
@@ -156,11 +157,11 @@ class ExternalControler {
 		if(op.equals(OptimizationParameter.FARE)){
 			this.fare = -0.;
 			this.capacity = 50;
-			this.numberOfBuses = 4;
+			this.numberOfBuses = 8;
 		} else if (op.equals(OptimizationParameter.CAPACITY)){
 			this.fare = -2.;
 			this.capacity = 20; // standing room + seats (realistic values between 19 and 101)
-			this.numberOfBuses = 4;
+			this.numberOfBuses = 8;
 		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
 			this.fare = -2.;
 			this.capacity = 50;
