@@ -66,6 +66,7 @@ public class PConfigGroup extends Module{
 	private static final String EARNINGS_PER_KILOMETER_AND_PASSENGER = "earningsPerKilometerAndPassenger";
 	private static final String PRICE_PER_VEHICLE_BOUGHT = "pricePerVehicleBought";
 	private static final String PRICE_PER_VEHICLE_SOLD = "pricePerVehicleSold";
+	private static final String START_WITH_24_HOURS = "startWith24Hours";
 	private static final String MIN_OPERATION_TIME = "minOperationTime";
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS_INTERVAL = "writeStatsInterval";
@@ -93,6 +94,7 @@ public class PConfigGroup extends Module{
 	private double initialBudget = 0.0;
 	private double costPerVehicleAndDay = 0.0;
 	private double costPerKilometer = 0.30;
+	private boolean startWith24Hours = false;
 	private double minOperationTime = 6 * 3600;
 	private double earningsPerBoardingPassenger = 0.0;
 	private double earningsPerKilometerAndPassenger = 0.50;
@@ -153,6 +155,8 @@ public class PConfigGroup extends Module{
 			this.pricePerVehicleBought = Double.parseDouble(value);
 		} else if (PRICE_PER_VEHICLE_SOLD.equals(key)){
 			this.pricePerVehicleSold = Double.parseDouble(value);
+		} else if (START_WITH_24_HOURS.equals(key)){
+			this.startWith24Hours = Boolean.parseBoolean(value);
 		} else if (MIN_OPERATION_TIME.equals(key)){
 			this.minOperationTime = Double.parseDouble(value);
 		} else if (USEFRANCHISE.equals(key)){
@@ -205,6 +209,7 @@ public class PConfigGroup extends Module{
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, Double.toString(this.earningsPerKilometerAndPassenger));
 		map.put(PRICE_PER_VEHICLE_BOUGHT, Double.toString(this.pricePerVehicleBought));
 		map.put(PRICE_PER_VEHICLE_SOLD, Double.toString(this.pricePerVehicleSold));
+		map.put(START_WITH_24_HOURS, Boolean.toString(this.startWith24Hours));
 		map.put(MIN_OPERATION_TIME, Double.toString(this.minOperationTime));
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS_INTERVAL, Integer.toString(this.writeStatsInterval));
@@ -244,6 +249,7 @@ public class PConfigGroup extends Module{
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, "earnings per passenger kilometer");
 		map.put(PRICE_PER_VEHICLE_BOUGHT, "price of one vehicle bought");
 		map.put(PRICE_PER_VEHICLE_SOLD, "price of one vehicle sold");
+		map.put(START_WITH_24_HOURS, "Initial plan will start operating 0-24 hours");
 		map.put(MIN_OPERATION_TIME, "min time of operation of each cooperative in seconds");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS_INTERVAL, "number of iterations statistics will be plotted. Set to zero to turn this feature off. Set to infinity to turn off the plots, but write the statistics file anyway");
@@ -329,6 +335,10 @@ public class PConfigGroup extends Module{
 
 	public double getMinOperationTime() {
 		return this.minOperationTime;
+	}
+	
+	public boolean getStartWith24Hours() {
+		return this.startWith24Hours;
 	}
 
 	public boolean getUseFranchise() {

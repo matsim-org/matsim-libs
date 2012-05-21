@@ -54,7 +54,9 @@ import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
 import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
 import playground.andreas.P2.plan.deprecated.SimpleBackAndForthScheduleProvider;
+import playground.andreas.P2.replanning.CreateNew24hPlan;
 import playground.andreas.P2.replanning.CreateNewPlan;
+import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
@@ -85,14 +87,18 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private final ScorePlansHandler scorePlansHandler;
 	private PStrategyManager strategyManager;
 	private PRouteProvider routeProvider;
-	private CreateNewPlan initialStrategy;
+	private PPlanStrategy initialStrategy;
 	
 	public PBox(PConfigGroup pConfig) {
 		this.pConfig = pConfig;		
 		this.scorePlansHandler = new ScorePlansHandler(this.pConfig);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager(this.pConfig);
-		this.initialStrategy = new CreateNewPlan(new ArrayList<String>());
+		if (this.pConfig.getStartWith24Hours()) {
+			this.initialStrategy = new CreateNew24hPlan(new ArrayList<String>());
+		} else {
+			this.initialStrategy = new CreateNewPlan(new ArrayList<String>());
+		}
 	}
 
 	@Override
