@@ -199,7 +199,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private void initInitialCooperatives(int iteration, int numberOfCooperatives) {
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
-			Cooperative cooperative = new BasicCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
+			Cooperative cooperative = this.createNewCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
 			cooperatives.add(cooperative);
 		}		
 	}
@@ -250,14 +250,14 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 			
 		// recreate all other
 		for (int i = 0; i < numberOfNewCoopertives; i++) {
-			BasicCooperative cooperative = new BasicCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
+			Cooperative cooperative = this.createNewCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
 			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
 			this.cooperatives.add(cooperative);
 		}
 			
 		// too few cooperatives in play, increase to the minimum specified in the config
 		for (int i = this.cooperatives.size(); i < this.pConfig.getNumberOfCooperatives(); i++) {
-			BasicCooperative cooperative = new BasicCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
+			Cooperative cooperative = this.createNewCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
 			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
 			this.cooperatives.add(cooperative);
 		}
@@ -330,6 +330,17 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private Id createNewIdForCooperative(int iteration){
 		this.counter++;
 		return new IdImpl(this.pConfig.getPIdentifier() + iteration + "_" + this.counter);
+	}
+	
+	private Cooperative createNewCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
+		if(pConfig.getCoopType().equalsIgnoreCase(BasicCooperative.COOP_NAME)){
+			return new BasicCooperative(id, pConfig, franchise);
+		} else if(pConfig.getCoopType().equalsIgnoreCase(InitCooperative.COOP_NAME)){
+			return new InitCooperative(id, pConfig, franchise);
+		} else {
+			log.error("There is no coop type specified. " + pConfig.getCoopType() + " unknown");
+			return null;
+		}
 	}
 	
 }

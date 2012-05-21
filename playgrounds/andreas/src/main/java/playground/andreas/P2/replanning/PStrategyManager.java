@@ -52,12 +52,16 @@ public class PStrategyManager {
 	
 	private final static Logger log = Logger.getLogger(PStrategyManager.class);
 	
+	private EventsManager eventsManager;
+	
 	private final ArrayList<PPlanStrategy> strategies = new ArrayList<PPlanStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	
 	private String pIdentifier;
-	private TimeReduceDemand timeReduceDemand = null;	
+	private ReduceTimeServed reduceTimeServed = null;
+	private ReduceStopsToBeServed reduceStopsToBeServed = null;
+
 	
 	public PStrategyManager(PConfigGroup pConfig){
 		this.pIdentifier = pConfig.getPIdentifier();
@@ -78,6 +82,7 @@ public class PStrategyManager {
 	}
 
 	private PPlanStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager) {
+		this.eventsManager = eventsManager;
 		PPlanStrategy strategy = null;
 		
 		if (name.equals(RemoveAllVehiclesButOne.STRATEGY_NAME)) {
@@ -109,24 +114,23 @@ public class PStrategyManager {
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-			this.timeReduceDemand = strat;
 		}else if (name.equals(ReduceTimeServed.STRATEGY_NAME)) {
 			ReduceTimeServed strat = new ReduceTimeServed(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-//			this.timeReduceDemand = strat;
+			this.reduceTimeServed = strat;
 		} else if (name.equals(StopReduceDemand.STRATEGY_NAME)) {
 			StopReduceDemand strat = new StopReduceDemand(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-//			this.timeReduceDemand = strat;
 		} else if (name.equals(ReduceStopsToBeServed.STRATEGY_NAME)) {
 			ReduceStopsToBeServed strat = new ReduceStopsToBeServed(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
+			this.reduceStopsToBeServed = strat;
 		}
 		
 		if (strategy == null) {
@@ -167,7 +171,30 @@ public class PStrategyManager {
 		return strBuffer.toString();
 	}
 
-	public TimeReduceDemand getTimeReduceDemand() {
-		return this.timeReduceDemand;
+	public ReduceTimeServed getReduceTimeServed() {
+		if (this.reduceTimeServed == null) {
+			log.warn(ReduceTimeServed.STRATEGY_NAME + " not configuried in config file. Adding my own version of it with parameters: 1.0, 700");
+			ArrayList<String> param = new ArrayList<String>();
+			param.add("1.0");
+			param.add("700");
+			ReduceTimeServed strat = new ReduceTimeServed(param);
+			strat.setPIdentifier(this.pIdentifier);
+			this.eventsManager.addHandler(strat);
+			this.reduceTimeServed = strat;
+		}
+		return this.reduceTimeServed;
+	}
+	
+	public ReduceStopsToBeServed getReduceStopsToBeServed() {
+		if (this.reduceStopsToBeServed == null) {
+			log.warn(ReduceStopsToBeServed.STRATEGY_NAME + " not configuried in config file. Adding my own version of it with parameters: 1.0");
+			ArrayList<String> param = new ArrayList<String>();
+			param.add("1.0");
+			ReduceStopsToBeServed strat = new ReduceStopsToBeServed(param);
+			strat.setPIdentifier(this.pIdentifier);
+			this.eventsManager.addHandler(strat);
+			this.reduceStopsToBeServed = strat;
+		}
+		return this.reduceStopsToBeServed;
 	}	
 }

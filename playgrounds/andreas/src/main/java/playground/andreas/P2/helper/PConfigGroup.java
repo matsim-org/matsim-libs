@@ -32,6 +32,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.StringUtils;
 
+import playground.andreas.P2.pbox.BasicCooperative;
+
 /**
  * Config group to configure p
  * 
@@ -55,6 +57,7 @@ public class PConfigGroup extends Module{
 	private static final String MIN_Y = "minY";
 	private static final String MAX_X = "maxX";
 	private static final String MAX_Y = "maxY";
+	private static final String COOP_TYPE = "coopType";
 	private static final String NUMBER_OF_COOPERATIVES = "numberOfCooperatives";
 	private static final String PAX_PER_VEHICLE = "paxPerVehicle";
 	private static final String PCE = "passengerCarEquivalents";
@@ -87,6 +90,7 @@ public class PConfigGroup extends Module{
 	private double minY = Double.MIN_VALUE;	
 	private double maxX = Double.MAX_VALUE;
 	private double maxY = Double.MAX_VALUE;
+	private String coopType = BasicCooperative.COOP_NAME;
 	private int numberOfCooperatives = 1;
 	private int paxPerVehicle = 10;
 	private double passengerCarEquivalents = 1.0;
@@ -133,6 +137,8 @@ public class PConfigGroup extends Module{
 			this.maxX = Double.parseDouble(value);
 		} else if (MAX_Y.equals(key)) {
 			this.maxY = Double.parseDouble(value);
+		} else if (COOP_TYPE.equals(key)){
+			this.coopType = value;
 		} else if (NUMBER_OF_COOPERATIVES.equals(key)) {
 			this.numberOfCooperatives = Integer.parseInt(value);
 		} else if (NUMBER_OF_ITERATIONS_FOR_PROSPECTING.equals(key)) {
@@ -198,6 +204,7 @@ public class PConfigGroup extends Module{
 		map.put(MIN_Y, Double.toString(this.minY));
 		map.put(MAX_X, Double.toString(this.maxX));
 		map.put(MAX_Y, Double.toString(this.maxY));
+		map.put(COOP_TYPE, this.coopType);
 		map.put(NUMBER_OF_COOPERATIVES, Integer.toString(this.numberOfCooperatives));
 		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, Integer.toString(this.numberOfIterationsForProspecting));
 		map.put(INITIAL_BUDGET, Double.toString(this.initialBudget));
@@ -238,6 +245,7 @@ public class PConfigGroup extends Module{
 		map.put(MIN_Y, "min y coordinate for service area");
 		map.put(MAX_X, "max x coordinate for service area");
 		map.put(MAX_Y, "max y coordinate for service area");
+		map.put(COOP_TYPE, "Type of cooperative to be used");
 		map.put(NUMBER_OF_COOPERATIVES, "number of cooperatives operating");
 		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, "number of iterations an cooperative will survive with a negative scoring");
 		map.put(INITIAL_BUDGET, "The budget a new cooperative is initialized with");
@@ -289,6 +297,10 @@ public class PConfigGroup extends Module{
 		return this.maxY;
 	}
 
+	public String getCoopType() {
+		return this.coopType;
+	}
+	
 	public int getNumberOfCooperatives() {
 		return this.numberOfCooperatives;
 	}

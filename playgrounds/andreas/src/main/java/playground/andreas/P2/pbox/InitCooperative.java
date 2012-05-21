@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -37,11 +37,15 @@ import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicl
  * @author aneumann
  *
  */
-public class BasicCooperative extends AbstractCooperative{
+public class InitCooperative extends AbstractCooperative{
 	
-	public static final String COOP_NAME = "BasicCooperative"; 
+	public static final String COOP_NAME = "InitCooperative"; 
+	
+	boolean firstIteration = true;
+	boolean needToReduceRoute = true;
+	boolean needToReduceTime = true;
 
-	public BasicCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public InitCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
 	}
 
@@ -77,17 +81,38 @@ public class BasicCooperative extends AbstractCooperative{
 			this.budget += this.costPerVehicleSell * numberOfVehiclesToSell;
 //			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
 		}
-
-		// First buy vehicles
-		PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
-		this.testPlan = strategy.run(this);
 		
-		// Second replan, if testplan null
-		if (this.testPlan == null) {
-			strategy = pStrategyManager.chooseStrategy();
+		if (firstIteration) {
+			PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
+			this.testPlan = strategy.run(this);
+			this.firstIteration = false;
+		} else if (this.needToReduceRoute) {
+			PPlanStrategy strategy = pStrategyManager.getReduceStopsToBeServed();
 			this.testPlan = strategy.run(this);
 			if (this.testPlan != null) {
 				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+			}
+			this.needToReduceRoute = false;
+		} else if (this.needToReduceTime) {
+			PPlanStrategy strategy = pStrategyManager.getReduceTimeServed();
+			this.testPlan = strategy.run(this);
+			if (this.testPlan != null) {
+				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+			}
+			this.needToReduceTime = false;
+		} else {
+		
+			// First buy vehicles
+			PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
+			this.testPlan = strategy.run(this);
+
+			// Second replan, if testplan null
+			if (this.testPlan == null) {
+				strategy = pStrategyManager.chooseStrategy();
+				this.testPlan = strategy.run(this);
+				if (this.testPlan != null) {
+					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+				}
 			}
 		}
 		
