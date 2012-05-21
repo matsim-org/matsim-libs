@@ -20,12 +20,12 @@
 
 package occupancy;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+//import java.io.BufferedWriter;
+//import java.io.IOException;
 import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+//import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+//import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -34,10 +34,10 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
+//import org.matsim.core.facilities.ActivityOption;
+//import org.matsim.core.gbl.Gbl;
+//import org.matsim.core.utils.io.IOUtils;
+//import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
