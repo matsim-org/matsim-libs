@@ -54,12 +54,14 @@ class ExternalControler {
 	int numberOfBuses;
 	
 	public static void main(final String[] args) throws IOException {
+////		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
+////		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/fare_noTimeChoice";
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/fare_timeChoice";
-//		lastExternalIteration = 0;
+//		lastExternalIteration = 1;
 //		
-////		op = OptimizationParameter.FARE;
-////		op = OptimizationParameter.CAPACITY;
+//		op = OptimizationParameter.FARE;
+//		op = OptimizationParameter.CAPACITY;
 //		op = OptimizationParameter.NUMBER_OF_BUSES;
 		
 		configFile = args[0];
@@ -157,13 +159,13 @@ class ExternalControler {
 		if(op.equals(OptimizationParameter.FARE)){
 			this.fare = -0.;
 			this.capacity = 50;
-			this.numberOfBuses = 8;
+			this.numberOfBuses = 7;
 		} else if (op.equals(OptimizationParameter.CAPACITY)){
-			this.fare = -2.;
+			this.fare = -3.;
 			this.capacity = 20; // standing room + seats (realistic values between 19 and 101)
-			this.numberOfBuses = 8;
+			this.numberOfBuses = 7;
 		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
-			this.fare = -2.;
+			this.fare = -3.;
 			this.capacity = 50;
 			this.numberOfBuses = 1;
 		}
