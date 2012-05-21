@@ -83,13 +83,20 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		if (nextPlan != null && nextPlan.getStartTime() <= timeSeconds) {
 			this.activePlan = nextPlan;
 			this.planQueue.poll();
-			this.nextActivePlanCheckTime = Math.min(this.activePlan.getEndTime(), this.planQueue.peek().getStartTime());
+			if (this.planQueue.peek() != null){
+				this.nextActivePlanCheckTime = Math.min(this.activePlan.getEndTime(), this.planQueue.peek().getStartTime());
+			}
+			else {
+				this.nextActivePlanCheckTime = this.activePlan.getEndTime();
+			}
 		}
 		else if (this.activePlan != null &&  timeSeconds >= this.activePlan.getEndTime()) {
 			this.activePlan = null;
-			this.signalSystem.switchOff(timeSeconds);
-			if (nextPlan != null){
+			if (nextPlan != null && nextPlan.getStartTime() <= (timeSeconds + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
 				this.nextActivePlanCheckTime = nextPlan.getStartTime();
+			}
+			else {
+				this.signalSystem.switchOff(timeSeconds);
 			}
 		}
 	}

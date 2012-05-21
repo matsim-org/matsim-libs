@@ -38,6 +38,8 @@ import org.matsim.core.events.SignalGroupStateChangedEventImpl;
 public class SignalSystemImpl implements SignalSystem {
 
 	private static final Logger log = Logger.getLogger(SignalSystemImpl.class);
+
+	/*package*/ static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
 	
 	private SignalController controller;
 	private Map<Id, SignalGroup> signalGroups = new HashMap<Id, SignalGroup>();
@@ -48,6 +50,7 @@ public class SignalSystemImpl implements SignalSystem {
 	private PriorityQueue<SignalGroupStateChangeRequest> sortedRequests = new PriorityQueue<SignalGroupStateChangeRequest>();
 	private Id id;
 	private Map<Id, Signal> signals = new HashMap<Id, Signal>();
+	
 	
 	public SignalSystemImpl(Id id) {
 		this.id = id;
@@ -104,7 +107,7 @@ public class SignalSystemImpl implements SignalSystem {
 		Set<SignalGroupStateChangeRequest> req = new HashSet<SignalGroupStateChangeRequest>();
 		for (SignalGroup sg : this.getSignalGroups().values()){
 			req.add(new SignalGroupStateChangeRequestImpl(sg.getId(), SignalGroupState.YELLOW, timeSeconds));
-			req.add(new SignalGroupStateChangeRequestImpl(sg.getId(), SignalGroupState.OFF, timeSeconds + 5.0));
+			req.add(new SignalGroupStateChangeRequestImpl(sg.getId(), SignalGroupState.OFF, timeSeconds + SWITCH_OFF_SEQUENCE_LENGTH));
 		}
 		this.sortedRequests.addAll(req);
 	}
