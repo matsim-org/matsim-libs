@@ -20,23 +20,16 @@
 package playground.andreas.P2.pbox;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.plan.PPlan;
-import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
-import playground.andreas.P2.scoring.ScoreContainer;
 
 /**
  * Manages one paratransit line
@@ -44,102 +37,10 @@ import playground.andreas.P2.scoring.ScoreContainer;
  * @author aneumann
  *
  */
-public class BasicCooperative implements Cooperative{
-	
-	private final static Logger log = Logger.getLogger(BasicCooperative.class);
-	
-	private final Id id;
-	
-	private PFranchise franchise;
-	private final double costPerVehicleBuy;
-	private final double costPerVehicleSell;
-	private final double minOperationTime;
-	
-	private CoopState coopState;
-
-	private PPlan bestPlan;
-	private PPlan testPlan;
-
-	private TransitLine currentTransitLine;
-	private int numberOfIterationsForProspecting;
-	
-	private double budget;
-	private double budgetLastIteration;
-	private double score;
-	private double scoreLastIteration;
-	
-	private PRouteProvider routeProvider;
-	private int currentIteration;
+public class BasicCooperative extends AbstractCooperative{
 
 	public BasicCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
-		this.id = id;
-		this.numberOfIterationsForProspecting = pConfig.getNumberOfIterationsForProspecting();
-		this.costPerVehicleBuy = pConfig.getPricePerVehicleBought();
-		this.costPerVehicleSell = pConfig.getPricePerVehicleSold();
-		this.minOperationTime = pConfig.getMinOperationTime();
-		this.franchise = franchise;
-	}
-
-	public void init(PRouteProvider pRouteProvider, PPlanStrategy initialStrategy, int iteration, double initialBudget) {
-		this.coopState = CoopState.PROSPECTING;
-		this.budget = initialBudget;
-		this.currentIteration = iteration;
-		this.routeProvider = pRouteProvider;
-		this.bestPlan = initialStrategy.run(this);
-		
-//		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
-//		for (TransitRoute route : this.bestPlan.getLine().getRoutes().values()) {
-//			this.currentTransitLine.addRoute(route);
-//		}
-		this.testPlan = null;
-	}
-
-	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
-		this.scoreLastIteration = this.score;
-		this.budgetLastIteration = this.budget;
-		
-		this.score = 0;
-		
-		for (PPlan plan : this.getAllPlans()) {
-			scorePlan(driverId2ScoreMap, plan);
-			this.score += plan.getScore();
-			for (TransitRoute route : plan.getLine().getRoutes().values()) {
-				route.setDescription(plan.toString(this.budget + this.score));
-			}
-		}
-		
-		if (this.score > 0.0) {
-			this.coopState = CoopState.INBUSINESS;
-		}
-		
-		if (this.coopState.equals(CoopState.PROSPECTING)) {
-			if(this.numberOfIterationsForProspecting == 0){
-				if (this.score < 0.0) {
-					// no iterations for prospecting left and score still negative - terminate
-					this.coopState = CoopState.BANKRUPT;
-				}
-			}
-			this.numberOfIterationsForProspecting--;
-		}
-
-		this.budget += this.score;
-		
-		
-		// check, if bankrupt
-		if(this.budget < 0){
-			// insufficient, sell vehicles
-			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) Math.floor(this.budget / this.costPerVehicleSell));
-			
-			double numberOfVehicles = 0.0;			
-			for (PPlan plan : this.getAllPlans()) {
-				numberOfVehicles += plan.getNVehicles();
-			}
-			
-			if(numberOfVehicles - numberOfVehiclesToSell < 1){
-				// can not balance the budget by selling vehicles, bankrupt
-				this.coopState = CoopState.BANKRUPT;
-			}
-		}
+		super(id, pConfig, franchise);
 	}
 
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
@@ -175,53 +76,18 @@ public class BasicCooperative implements Cooperative{
 //			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
 		}
 
-//		if(this.budget > this.costPerVehicleBuy * 1.5){
-//			while (this.budget > this.costPerVehicleBuy * 1.5) {
-				// budget ok, buy one
-//				this.budget -= this.costPerVehicleBuy * 1;
-//				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
-//			}					
-//		} else {
-			// replan
-//			if(this.numberOfIterationsForProspecting > 0){
-//				PPlanStrategy strategy = pStrategyManager.getTimeReduceDemand();
-//				this.testPlan = strategy.run(this);
-//				if (this.testPlan != null) {
-//					this.bestPlan = this.testPlan;
-//					this.testPlan = null;
-//				}			
-//			} else {
-				
-				// First buy vehicles
-				PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
-				this.testPlan = strategy.run(this);
-				
-				// Second replan, if testplan null
-				if (this.testPlan == null) {
-					strategy = pStrategyManager.chooseStrategy();
-					this.testPlan = strategy.run(this);
-					if (this.testPlan != null) {
-						this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
-					}
-				
-//				if(this.bestPlan.getNVehicles() > 1){
-					// can afford to use one vehicle for testing, get a new testPlan
-//					PPlanStrategy strategy = pStrategyManager.chooseStrategy();
-//					this.testPlan = strategy.run(this);
-//					if (this.testPlan == null) {
-//						strategy = pStrategyManager.chooseStrategy();
-//						this.testPlan = strategy.run(this);
-//					}
-//					if (this.testPlan == null) {
-//						strategy = pStrategyManager.chooseStrategy();
-//						this.testPlan = strategy.run(this);
-//					}
-//					if(this.testPlan != null){
-//						this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
-//					}
-				}
-//			}
-//		}
+		// First buy vehicles
+		PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
+		this.testPlan = strategy.run(this);
+		
+		// Second replan, if testplan null
+		if (this.testPlan == null) {
+			strategy = pStrategyManager.chooseStrategy();
+			this.testPlan = strategy.run(this);
+			if (this.testPlan != null) {
+				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+			}
+		}
 		
 		// reinitialize the plan
 		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStopsToBeServed(), this.bestPlan.getId()));
@@ -234,77 +100,4 @@ public class BasicCooperative implements Cooperative{
 		}
 	}
 	
-	public Id getId() {
-		return this.id;
-	}
-	
-	public PFranchise getFranchise(){
-		return this.franchise;
-	}
-
-	@Override
-	public double getMinOperationTime() {
-		return this.minOperationTime;
-	}
-
-	public TransitLine getCurrentTransitLine() {		
-		return this.currentTransitLine;		
-	}	
-
-	public PPlan getBestPlan() {
-		return this.bestPlan;
-	}
-
-	public List<PPlan> getAllPlans(){
-		List<PPlan> plans = new LinkedList<PPlan>();
-		if(this.bestPlan != null){
-			plans.add(this.bestPlan);
-		}
-		if(this.testPlan != null){
-			plans.add(this.testPlan);
-		}		
-		return plans;
-	}
-	
-	public double getBudget(){
-		return this.budget;
-	}
-
-	public int getCurrentIteration() {
-		return this.currentIteration;
-	}
-
-	public PRouteProvider getRouteProvider() {
-		return this.routeProvider;
-	}
-
-	public double getCostPerVehicleBuy() {
-		return costPerVehicleBuy;
-	}
-
-	public double getCostPerVehicleSell() {
-		return costPerVehicleSell;
-	}
-
-	@Override
-	public CoopState getCoopState() {
-		return this.coopState;
-	}
-
-	public void setBudget(double budget) {
-		this.budget = budget;
-	}
-
-	private void scorePlan(TreeMap<Id, ScoreContainer> driverId2ScoreMap, PPlan plan) {
-		double totalLineScore = 0.0;
-		int totalTripsServed = 0;
-		
-		for (Id vehId : plan.getVehicleIds()) {
-			totalLineScore += driverId2ScoreMap.get(vehId).getTotalRevenue();
-			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();
-		}
-		
-		plan.setScore(totalLineScore);
-		plan.setTripsServed(totalTripsServed);
-	}
 }
