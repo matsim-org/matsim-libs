@@ -45,6 +45,7 @@ public class Run {
 
 	public static void main(final String[] args) {
 		String configFile = args[0];
+		double personalizedCostAtCenter = args.length > 1 ? Double.parseDouble( args[ 1 ] ) : costPerSecondAtCenter;
 
 		Config config = ConfigUtils.createConfig();
 		ParkAndRideUtils.setConfigGroup( config );
@@ -57,7 +58,7 @@ public class Run {
 			new CenteredTimeProportionalPenaltyFactory(
 					center,
 					CoordUtils.calcDistance( center , boundaryPoint ),
-					costPerSecondAtCenter * config.planCalcScore().getMarginalUtilityOfMoney());
+					personalizedCostAtCenter * config.planCalcScore().getMarginalUtilityOfMoney());
 
 		UglyHerbieMultilegControler controler = new UglyHerbieMultilegControler( scenario );
 		controler.setParkingPenaltyFactory( penalty );
