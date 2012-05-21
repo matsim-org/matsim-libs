@@ -40,6 +40,7 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="normal"></xs:enumeration>
 			<xs:enumeration value="log-normal"></xs:enumeration>
+			<xs:enumeration value="dirac-delta"></xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 
