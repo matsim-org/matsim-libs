@@ -114,6 +114,7 @@
 		<module>yu</module>
 		<module>fuerbas</module>
 		<module>ucsb</module>
+		<module>vsptelematics</module>
 	</modules>
 	<repositories>
 		<repository>
