@@ -187,7 +187,7 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 					// create temporary facilities, set minimum FTEs
 					for (int i=0; i < numFacilities; i++) {
 //-------------TODO: setting id offset-----------------
-						tempFacilityId = this.createTemporaryFacilityID(100000+facilityCnt++, attributeId);
+						tempFacilityId = this.createTemporaryFacilityID(10000000+facilityCnt++, attributeId);
 //						System.out.println("Creating temporary " + tempFacilityId + "...");
 						tempFacilities.put(tempFacilityId, minFTEs);
 						numSectorFTE -= minFTEs;
@@ -324,38 +324,32 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 							a.setCapacity((double) Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(20 + random.nextInt(11)))));
 						}
 						
-						//operation of sport facilities: arbitrary set to vary between 20 and 20'000
+						//operation of sport facilities: 
 						
 						else if(f.getActivityOptions().containsKey("B019261A")) {
-							int m = random.nextInt(20);
-							if (m<1){
-								a.setCapacity((double) (800 + random.nextInt(29201)));
-							}
-							else {
-								a.setCapacity((double) (20 + random.nextInt(780)));
-							}
-							log.info("setting capacity for sport facilities");
+							a.setCapacity((double)Math.round(30+(0.7*(tempFacilities.get(tempFacilityId)))*(0.7*(tempFacilities.get(tempFacilityId)))));
+						//	log.info("setting capacity for sport facilities");
 
 						}
 						
-						//sport clubs: arbitrary set to vary between 10 and 50
+						//sport clubs:
 							
 						else if(f.getActivityOptions().containsKey("B019262A")) {
-							a.setCapacity((double) (10 + random.nextInt(41)));
-							log.info("setting capacity for sport club");
+							a.setCapacity((double) Math.round(20+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(1))));
+						//	log.info("setting capacity for sport club");
 						}
 							
-						//sauna, solarium, gym, thermal bath, etc.: arbitrary set to vary between 10 and 100
+						//sauna, solarium, gym, thermal bath, etc.:
 							
 						else if(f.getActivityOptions().containsKey("B019304A")|| f.getActivityOptions().containsKey("B019304B") || f.getActivityOptions().containsKey("B019304C")) {
-							a.setCapacity((double) (10 + random.nextInt(91)));
-							log.info("setting capacity for sauna, solarium, gym, etc.");
+							a.setCapacity((double) Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(2 + random.nextInt(9)))));
+						//	log.info("setting capacity for sauna, solarium, gym, etc.");
 						}
 							
-						//amusement parks: arbitrary set to vary between 100 and 1000
+						//amusement parks:
 							
 						else if(f.getActivityOptions().containsKey("B019233A")) {
-							a.setCapacity((double) (100 + random.nextInt(991)));
+							a.setCapacity((double) Math.round(100+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(25))));
 						}
 							
 						//-------------------------gastro & culture capacity definition
@@ -363,37 +357,37 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 						//restaurant, canteen: arbitrary set to vary between 25 and 200
 				
 						else if(f.getActivityOptions().containsKey("B015530A") || f.getActivityOptions().containsKey("B015551A")) {
-							a.setCapacity((double) (25 + random.nextInt(176)));
+							a.setCapacity((double) Math.max(1,Math.min(1000,Math.round((tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(11))))));
 						}
 							
-						//cinema: arbitrary set to vary between 200 and 800
+						//cinema:
 							
 						else if(f.getActivityOptions().containsKey("B019213A")) {
-							a.setCapacity((double) (200 + random.nextInt(601)));
+							a.setCapacity((double) Math.max(1,Math.min(800,Math.round(200+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))))));
 						}
 							
-						//theater, orchestra, circus, etc.: arbitrary set to vary between 100 and 1400
+						//theater, orchestra, circus, etc.:
 							
 						else if(f.getActivityOptions().containsKey("B019231A") || f.getActivityOptions().containsKey("B019231B") || f.getActivityOptions().containsKey("B019234D")) {
-							a.setCapacity((double) (100 + random.nextInt(1301)));
+							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))));
 						}
 							
-						//libraries: arbitrary set to vary between 20 and 200
+						//libraries:
 							
 						else if(f.getActivityOptions().containsKey("B019251A")) {
-							a.setCapacity((double) (20 + random.nextInt(181)));
+							a.setCapacity((double) Math.round(20+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(5))));
 						}
 							
-						//museum: arbitrary set to vary between 50 and 700
+						//museum:
 							
 						else if(f.getActivityOptions().containsKey("B019252A")) {
-							a.setCapacity((double) (50 + random.nextInt(651)));
+							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))));
 						}
 							
 						//zoo, gardens, natural parks: arbitrary set to vary between 50 and 1000
 							
 						else if(f.getActivityOptions().containsKey("B019253A")) {
-							a.setCapacity((double) (50 + random.nextInt(951)));
+							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(15))));
 						}
 													
 					}

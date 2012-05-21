@@ -376,7 +376,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 					} 
 					//restaurant (+natural parks...)
 					else if (
-							activityType == "B015530A" || activityType == "B015551A"|| activityType == "B019253A"
+							activityType == "B015530A" || activityType == "B015551A"
 							) {
 						for (DayType day : days) {
 							startTime = 9.0 * 3600;
@@ -437,6 +437,40 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 									endTime));
 						}
 					} 
+					//zoo
+					else if (
+							activityType == "B019253A"
+							) {
+						for (DayType day : days) {
+							startTime = 09.0 * 3600;
+							endTime = 18.0 * 3600;
+							activities.get(FacilitiesProduction.GASTRO_CULTURE).addOpeningTime(new OpeningTimeImpl(
+									day,
+									startTime,
+									endTime));
+							activities.get(FacilitiesProduction.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
+									day,
+									startTime,
+									endTime));
+						}
+					}
+					//amusement park
+					else if (
+							activityType == "B019233A"
+							) {
+						for (DayType day : days) {
+							startTime = 09.0 * 3600;
+							endTime = 18.0 * 3600;
+							activities.get(FacilitiesProduction.SPORTS_FUN).addOpeningTime(new OpeningTimeImpl(
+									day,
+									startTime,
+									endTime));
+							activities.get(FacilitiesProduction.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
+									day,
+									startTime,
+									endTime));
+						}
+					}
 					//museum
 					else if (
 							activityType == "B019252A"
