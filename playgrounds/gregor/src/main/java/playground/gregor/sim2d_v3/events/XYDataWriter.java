@@ -22,11 +22,8 @@ package playground.gregor.sim2d_v3.events;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -49,27 +46,13 @@ public class XYDataWriter implements XYVxVyEventsHandler, MobsimInitializedListe
 	private static final String newLine = "\n";
 	private static final String separator = "\t";
 	private static final String fileName = "events.xy.gz";
-	
-	private final double dTolerance = 0.50;	// absolute distance
-	private final double vTolerance = 1.25;	// relative speed
-	private final double tTolerance = 5.0;	// time
-	
+
 	private BufferedWriter bw;
 	private String iterationFileName;
-	
-	private long processedEvents;
-	private long skippedEvents;
-	private Map<Id, XYVxVyEvent> recentEvents;
 	
 	@Override
 	public void handleEvent(XYVxVyEvent event) {
 
-		if(!writeEvent(event)) {
-			skippedEvents++;
-			return;
-		}
-		
-		processedEvents++;
 		try {
 			bw.write(String.valueOf(event.getTime()));
 			bw.write(separator);
@@ -86,50 +69,14 @@ public class XYDataWriter implements XYVxVyEventsHandler, MobsimInitializedListe
 			bw.write(String.valueOf(Math.sqrt(Math.pow(event.getVX(), 2) + Math.pow(event.getVY(), 2))));
 			bw.write(newLine);
 			
-			this.recentEvents.put(event.getPersonId(), event);
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
 	}
-
-	private boolean writeEvent(XYVxVyEvent event) {
-		
-		XYVxVyEvent recentEvent = recentEvents.get(event.getPersonId());
-		if (recentEvent != null) {
-			
-			// check time tolerance
-			if (event.getTime() > recentEvent.getTime() + tTolerance) return true;
-			
-			// check position tolerance
-			double x = event.getX();
-			double y = event.getY();
-			double xRecent = recentEvent.getX();
-			double yRecent = recentEvent.getY();
-			
-			if (Math.abs(x - xRecent) > dTolerance) return true;
-			else if (Math.abs(y - yRecent) > dTolerance) return true;
-			
-//			// check speed tolerance
-//			double vx = event.getVX();
-//			double vy = event.getVY();
-//			double vxRecent = recentEvent.getVX();
-//			double vyRecent = recentEvent.getVY();
-//						
-//			if (vx > vxRecent * vTolerance) return true;
-//			else if (vx < vxRecent / vTolerance) return true;
-//			else if (vy > vyRecent * vTolerance) return true;
-//			else if (vy < vyRecent / vTolerance) return true;			
-
-			return false;
-		} else return true;
-		
-	}
 	
 	@Override
 	public void reset(int iteration) {
-		recentEvents = new HashMap<Id, XYVxVyEvent>();
-		processedEvents = 0;
-		skippedEvents = 0;
+		// nothing to do here
 	}
 
 	private void writeHeader() {
@@ -155,13 +102,8 @@ public class XYDataWriter implements XYVxVyEventsHandler, MobsimInitializedListe
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		initialize();
-	}
-
-	public void initialize() {
 		bw = IOUtils.getBufferedWriter(iterationFileName);
 		writeHeader();
-		reset(0);
 	}
 	
 	@Override
@@ -171,18 +113,11 @@ public class XYDataWriter implements XYVxVyEventsHandler, MobsimInitializedListe
 	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		afterMobsim();
-	}
-	
-	public void afterMobsim() {
 		try {
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		log.info("Processed events: " + processedEvents);
-		log.info("Skipped events: " + skippedEvents);
-	}
-	
+	}	
 }

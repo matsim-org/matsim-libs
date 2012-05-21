@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CollisionPredictionEnvironmentForceModule.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sim2d_v3.simulation.floor.forces.deliberative;
 
 import java.util.Collection;
@@ -10,6 +30,7 @@ import playground.gregor.sim2d_v3.scenario.MyDataContainer;
 import playground.gregor.sim2d_v3.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v3.simulation.floor.Floor;
 import playground.gregor.sim2d_v3.simulation.floor.forces.ForceModule;
+import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -17,7 +38,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 public class CollisionPredictionEnvironmentForceModule implements ForceModule {
-
 
 	private final Scenario sc;
 
@@ -114,11 +134,13 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 		DistanceOp op =  new DistanceOp(ls, this.geofac.createPoint(agent.getPosition()));
 		double ti = op.closestPoints()[0].distance(c);
 		double tanPhi = op.distance()/ti;
-		double phi = Math.atan(tanPhi);
+//		double phi = Math.atan(tanPhi);
+		double phi = Algorithms.lookupAtan(tanPhi);
+		
 		if (phi > Math.PI) {
 			phi = Math.PI*2 - phi;
 		}
-
+		
 		if (phi > Math.PI/4){
 			return Double.POSITIVE_INFINITY;
 		}

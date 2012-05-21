@@ -46,7 +46,7 @@ public class PhantomFloor extends PhysicalFloor {
 	//	private final double deltaT;
 
 	public PhantomFloor(PhantomEvents phantomEvents, Id calibrationAgentId, Collection<? extends Link> collection, Scenario scenario, LLCalculator llCalc, EventsManager em) {
-		super(scenario,em,true,null,null);
+		super(scenario,em,true,true,null,null);
 		this.calibrationAgentId = calibrationAgentId;
 
 		this.times = phantomEvents.getTimesArray();

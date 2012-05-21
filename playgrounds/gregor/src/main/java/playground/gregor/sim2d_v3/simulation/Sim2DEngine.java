@@ -182,7 +182,8 @@ public class Sim2DEngine implements MobsimEngine {
 	public void onPrepareSim() {
 
 		boolean emitEvents = true;
-		this.floor = new PhysicalFloor(this.scenario, this.sim.getEventsManager(), emitEvents, this.signals, this.internalInterface);
+		boolean filterEvents = true;
+		this.floor = new PhysicalFloor(this.scenario, this.sim.getEventsManager(), emitEvents, filterEvents, this.signals, this.internalInterface);
 		this.floor.init();
 		
 		// infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already

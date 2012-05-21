@@ -29,6 +29,7 @@ import playground.gregor.sim2d_v3.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v3.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v3.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v3.simulation.floor.forces.DynamicForceModule;
+import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -122,12 +123,12 @@ public class CollisionPredictionAgentInteractionModule implements DynamicForceMo
 			ls = this.geofac.createLineString(new Coordinate[]{agent.getPosition(),new Coordinate(agent.getPosition().x-agent.getVx()*1000,agent.getPosition().y-agent.getVy()*1000)});
 			op =  new DistanceOp(ls, this.geofac.createPoint(other.getPosition()));
 			double sinPhi = Math.min(1, op.distance()/dist);
-			phi = Math.PI - Math.asin(sinPhi);
-
+//			phi = Math.PI - Math.asin(sinPhi);
+			phi = Math.PI - Algorithms.lookupAsin(sinPhi);
 		} else {
 			double sinPhi = op.distance()/dist;
-			phi = Math.asin(sinPhi);
-
+//			phi = Math.asin(sinPhi);
+			phi = Algorithms.lookupAsin(sinPhi);
 		}
 
 		return phi;
@@ -178,7 +179,8 @@ public class CollisionPredictionAgentInteractionModule implements DynamicForceMo
 
 
 		double tanTheta = op.distance()/ti;
-		double theta = Math.atan(tanTheta);
+//		double theta = Math.atan(tanTheta);
+		double theta = Algorithms.lookupAtan(tanTheta);
 
 		if (theta > Math.PI/4){
 			return Double.POSITIVE_INFINITY;

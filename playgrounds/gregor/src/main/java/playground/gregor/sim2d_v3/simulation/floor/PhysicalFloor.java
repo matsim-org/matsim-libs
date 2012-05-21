@@ -55,6 +55,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v3.controller.PedestrianSignal;
+import playground.gregor.sim2d_v3.events.XYDataFilter;
 import playground.gregor.sim2d_v3.events.XYVxVyEvent;
 import playground.gregor.sim2d_v3.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v3.simulation.floor.forces.Force;
@@ -92,7 +93,8 @@ public class PhysicalFloor implements Floor {
 	private final Random random;
 	private final AgentsMover agentsMover;
 	
-	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents, Map<Id, PedestrianSignal> signals, InternalInterface internalInterface) {
+	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents, boolean filterEvents, 
+			Map<Id, PedestrianSignal> signals, InternalInterface internalInterface) {
 		this.signals = signals;
 		this.scenario = scenario;
 		this.sim2DConfig = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d"));
@@ -101,8 +103,12 @@ public class PhysicalFloor implements Floor {
 		
 		int numOfThreads = this.scenario.getConfig().getQSimConfigGroup().getNumberOfThreads();
 		if (numOfThreads > 1) {
-			this.agentsMover = new ParallelAgentsMover(scenario, em, emitEvents, internalInterface, new ConcurrentSkipListSet<Agent2D>(new Agent2DComparator()));			
-		} else this.agentsMover = new AgentsMover(scenario, em, emitEvents, internalInterface, new ConcurrentSkipListSet<Agent2D>(new Agent2DComparator()));
+			this.agentsMover = new ParallelAgentsMover(scenario, em, emitEvents, filterEvents, 
+					internalInterface, new ConcurrentSkipListSet<Agent2D>(new Agent2DComparator()));			
+		} else {
+			this.agentsMover = new AgentsMover(scenario, em, emitEvents, filterEvents, 
+					internalInterface, new ConcurrentSkipListSet<Agent2D>(new Agent2DComparator()));
+		}
 		
 		this.forceUpdater = new ForceUpdaterImpl(this.agentsMover.getAgents(), numOfThreads);
 		this.random = MatsimRandom.getLocalInstance();
@@ -269,6 +275,9 @@ public class PhysicalFloor implements Floor {
 		return this.links;
 	}
 
+	/*
+	 * For backwards compatibility. Only used by PhantomFloor.
+	 */
 	protected EventsManager getEventsManager() {
 		return this.em;
 	}
@@ -310,24 +319,29 @@ public class PhysicalFloor implements Floor {
 	
 	public static class AgentsMover {
 		
+		private final XYDataFilter xyDataFilter;
 		private final Set<Agent2D> agents;
 		private final EventsManager em;
 		private final Sim2DConfigGroup sim2DConfig;
 		private final double sim2DTimeStepSize;
+		private final boolean filterEvents;
 		private final boolean emitXYZAzimuthEvents;
 		private final InternalInterface internalInterface;
 
 		protected double time;
 		protected FinishLineCrossedChecker finishLineCrossChecker;
 		
-		public AgentsMover(Scenario scenario, EventsManager em, boolean emitEvents, InternalInterface internalInterface, Set<Agent2D> agents) {
+		public AgentsMover(Scenario scenario, EventsManager em, boolean emitEvents, boolean filterEvents, InternalInterface internalInterface, Set<Agent2D> agents) {
 			this.em = em;
 			this.sim2DConfig = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d"));
 			this.sim2DTimeStepSize = this.sim2DConfig.getTimeStepSize();
 			this.emitXYZAzimuthEvents = emitEvents;
+			this.filterEvents = filterEvents;
 			this.internalInterface = internalInterface;
 			
 			this.agents = agents;
+			
+			this.xyDataFilter = new XYDataFilter();
 		}
 		
 		public void addAgent(Agent2D agent) {
@@ -351,7 +365,9 @@ public class PhysicalFloor implements Floor {
 		}
 
 		public void afterSim() {
-			// only for parallel execution
+			
+			// print filter events statistics
+			if (filterEvents) this.xyDataFilter.afterSim();
 		}
 		
 		protected void moveAgents(double time) {
@@ -399,9 +415,14 @@ public class PhysicalFloor implements Floor {
 
 			agent.translate(dx, dy, vx, vy);
 
+			// if events should be emitted
 			if (this.emitXYZAzimuthEvents) {
 				XYVxVyEvent e = new XYVxVyEventImpl(agent.getDelegate().getId(), agent.getPosition().x, agent.getPosition().y, agent.getVx(), agent.getVy(), time);
-				this.em.processEvent(e);
+				
+				// if events are not filtered or the filter decides to process the event
+				if (!this.filterEvents || this.xyDataFilter.processXYVxVyEvent(e)) {
+					this.em.processEvent(e);					
+				}
 			}
 			//			if (Sim2DConfig.DEBUG) {
 			//				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + vx , agent.getPosition().y + vy , 0), 0.0f, 1.f, 1.f, 9);
@@ -464,14 +485,15 @@ public class PhysicalFloor implements Floor {
 		 * those which are moved by the current thread. When a handled agent reaches
 		 * its destination, it has to be remove from both sets!
 		 */
-		public AgentsMoverRunner(Scenario scenario, EventsManager em, boolean emitEvents, InternalInterface internalInterface,
-				Set<Agent2D> agentsToHandle, Set<Agent2D> allAgents) {
-			super(scenario, em, emitEvents, internalInterface, agentsToHandle);
+		public AgentsMoverRunner(Scenario scenario, EventsManager em, boolean emitEvents, boolean filterEvents, 
+				InternalInterface internalInterface, Set<Agent2D> agentsToHandle, Set<Agent2D> allAgents) {
+			super(scenario, em, emitEvents, filterEvents, internalInterface, agentsToHandle);
 			this.allAgents = allAgents;
 		}
 		
 		public void afterSim() {
 			this.simulationRunning = false;
+			super.afterSim();
 		}
 		
 		public void setStartBarrier(CyclicBarrier startBarrier) {
@@ -543,10 +565,10 @@ public class PhysicalFloor implements Floor {
 		private CyclicBarrier endBarrier;
 		
 		public ParallelAgentsMover(Scenario scenario, EventsManager em, boolean emitEvents, 
-				InternalInterface internalInterface, Set<Agent2D> agents) {
-			super(scenario, em, emitEvents, internalInterface, agents);
+				boolean filterEvents, InternalInterface internalInterface, Set<Agent2D> agents) {
+			super(scenario, em, emitEvents, filterEvents, internalInterface, agents);
 			numOfThreads = scenario.getConfig().getQSimConfigGroup().getNumberOfThreads();
-			initParallelAgentMovers(scenario, em, emitEvents, internalInterface);
+			initParallelAgentMovers(scenario, em, emitEvents, filterEvents, internalInterface);
 		}
 		
 		@Override
@@ -579,7 +601,8 @@ public class PhysicalFloor implements Floor {
 			}
 		}
 		
-		private void initParallelAgentMovers(Scenario scenario, EventsManager em, boolean emitEvents, InternalInterface internalInterface) {
+		private void initParallelAgentMovers(Scenario scenario, EventsManager em, boolean emitEvents, 
+				boolean filterEvents, InternalInterface internalInterface) {
 						
 			this.threads = new Thread[numOfThreads];
 			this.runners = new AgentsMoverRunner[numOfThreads];
@@ -594,7 +617,8 @@ public class PhysicalFloor implements Floor {
 				Set<Agent2D> agentsToHandle = new LinkedHashSet<Agent2D>();
 				this.agents[i] = agentsToHandle;
 				
-				AgentsMoverRunner mover = new AgentsMoverRunner(scenario, em, emitEvents, internalInterface, agentsToHandle, this.getAgents());
+				AgentsMoverRunner mover = new AgentsMoverRunner(scenario, em, emitEvents, filterEvents, 
+						internalInterface, agentsToHandle, this.getAgents());
 				mover.setStartBarrier(startBarrier);
 				mover.setEndBarrier(endBarrier);
 				

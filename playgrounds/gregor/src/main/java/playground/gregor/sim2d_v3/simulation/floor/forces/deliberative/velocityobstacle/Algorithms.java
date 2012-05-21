@@ -1,20 +1,79 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PTTravelTimeKTIFactory.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.TreeMap;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.collections.Tuple;
 
+import com.vividsolutions.jts.geom.Coordinate;
 
 //this class provides basic implementations of geometric algorithms
 public abstract class Algorithms {
 
 	private final static double epsilon = 0.00001;
 
-	private static final TreeMap<Double,Double> atans = new TreeMap<Double,Double>();
+	private static boolean arrayLookup = true;
+	
+	private static final TreeMap<Double, Double> atans = new TreeMap<Double, Double>();
 	private static final double ATANS_LOOKUP_TABLE_RES = Math.PI/100.;
+	
+	/*
+	 * Atan is very steep between -1 and 1, therefore we use a high resolution in that area
+	 * and a lower in the remaining range.
+	 */
+	private static final int atanLimit = 100;
+	private static final int atanResoluationFine = 100000;
+//	private static final double atanStepWidthFine = 1.0 / atanResoluationFine;
+	private static final int atanResoluationCoarse = 1000;
+	private static final double[] atansArrayFine = new double[atanResoluationFine];	// 0..1
+	private static final double[] atansArrayCoarse = new double[atanLimit*atanResoluationCoarse + 1];	// 1..atanLimit
 
+	private static final int asinResoluation = 10000000;
+	private static final double[] asinArray = new double[asinResoluation + 1]; 
+	
+	static {
+		for (int i = 0; i < asinResoluation; i++) {
+			asinArray[i] = Math.asin(Double.valueOf(i) / asinResoluation);
+		}
+		asinArray[asinArray.length - 1] = 0.5 * Math.PI;
+		
+		for (int i = 0; i < atanResoluationFine; i++) {
+			atansArrayFine[i] = Math.atan(((double) i)/atanResoluationFine);
+		}
+		
+		for (int i = 0; i < atanLimit; i++) {
+			for (int j = 0; j < atanResoluationCoarse; j++) {
+				atansArrayCoarse[i * atanResoluationCoarse + j] = Math.atan(i + ((double) j)/atanResoluationCoarse);
+			}
+		}
+		atansArrayCoarse[atansArrayCoarse.length - 1] = Math.atan(atanLimit);
+	}
+	
 	/**
 	 * Computes both tangents of a circle running through a given point. Computation uses Thales' theorem.
 	 * Note the point has to be outside the circle. This requirement, however, will not be checked!
@@ -45,7 +104,7 @@ public abstract class Algorithms {
 		double xi = x2 + rx;
 		double yi = y2 + ry;
 		double xiPrime = x2 - rx;
-		double yiPrime = y2 -ry;
+		double yiPrime = y2 - ry;
 		
 		ret[0] = new Coordinate(point);
 		ret[1] = new Coordinate(xi,yi);
@@ -75,7 +134,7 @@ public abstract class Algorithms {
 		double xi = x2 + rx;
 		double yi = y2 + ry;
 		double xiPrime = x2 - rx;
-		double yiPrime = y2 -ry;
+		double yiPrime = y2 - ry;
 		
 		ret[0] = new Coordinate(xi,yi);
 		ret[1] = new Coordinate(xiPrime, yiPrime);
@@ -140,12 +199,11 @@ public abstract class Algorithms {
 
 		double ret;
 		if (x > 0) {
-
-			ret = lazyLookupAtan(y/x);
+			ret = lookupAtan(y/x);
 		} else if (y >= 0 && x < 0) {
-			ret = lazyLookupAtan(y/x) + Math.PI;
-		} else if (y < 0 && x <0) {
-			ret =  lazyLookupAtan(y/x) - Math.PI;
+			ret = lookupAtan(y/x) + Math.PI;
+		} else if (y < 0 && x < 0) {
+			ret =  lookupAtan(y/x) - Math.PI;
 		} else if (y > 0 && x == 0) {
 			ret =  Math.PI/2;
 		} else if (y < 0 && x == 0) {
@@ -158,11 +216,16 @@ public abstract class Algorithms {
 		}
 		return ret;
 	}
-
+	
+	public static double lookupAtan(double d) {
+		if (arrayLookup) return arrayLookupAtan(d);
+		else return lazyLookupAtan(d);
+	}
+	
 	private static double lazyLookupAtan(double d) {
 		Entry<Double, Double> c = atans.ceilingEntry(d);
 		double ret;
-		if (c == null){
+		if (c == null) {
 			ret = Math.atan(d);
 			atans.put(d, ret);
 			return ret;
@@ -175,17 +238,117 @@ public abstract class Algorithms {
 			return ret;
 		}
 
-		if (Math.abs(c.getValue()-f.getValue()) > ATANS_LOOKUP_TABLE_RES) {
+		if (Math.abs(c.getValue() - f.getValue()) > ATANS_LOOKUP_TABLE_RES) {
 			ret = Math.atan(d);
 			atans.put(d, ret);
 			return ret;
 		}
 
-
-
-		return (c.getValue()+f.getValue())/2;
+		return (c.getValue() + f.getValue()) / 2;
+	}
+	
+	private static double arrayLookupAtan(double d) {
+		double sign = Math.signum(d);
+		double abs = Math.abs(d);
+		
+		if (abs > atanLimit) return sign * atansArrayCoarse[atansArrayCoarse.length - 1];
+		else if (abs < 1.0) {
+			/*
+			 * Still use Math.atan for very small values.
+			 */
+			if (abs < 0.001) return Math.atan(d);
+			
+			int arrayPosition = (int) (abs * atanResoluationFine);
+			return sign * atansArrayFine[arrayPosition];
+		} else {
+			int floored = (int) abs;
+			double decimal = abs - floored;	// value = 0..1
+			int arrayPosition = floored * atanResoluationCoarse + (int) (decimal * atanResoluationCoarse);
+			return sign * atansArrayCoarse[arrayPosition];
+		}
 	}
 
+	public static double lookupAsin(double d) {
+		double sign = Math.signum(d);
+		double abs = Math.abs(d);
+		
+//		int arrayPosition = (int) (abs * asinResoluation);
+		int arrayPosition = (int) Math.round(abs * asinResoluation);
+		
+		return sign * asinArray[arrayPosition];
+	}
+	
+	public static void main(String[] args) {
+		
+		Random random = MatsimRandom.getLocalInstance();
+		
+		List<Double> c = new ArrayList<Double>();
+		for (int i = 0; i < 10000000; i++) c.add((random.nextDouble() * 2) - 1);
+		
+		Gbl.startMeasurement();
+		for (double d : c) Algorithms.lookupAsin(d);
+		Gbl.printElapsedTime();
+		
+		Gbl.startMeasurement();
+		for (double d : c) Math.asin(d);
+		Gbl.printElapsedTime();
+		
+//		for (double i = -1.0; i < 1.0; i += 0.05) {
+//			System.out.println(i + " " + Algorithms.lookupAsin(i));
+//		}
+		
+		int i = 0;
+		for (double d : c) {
+			double a =  Algorithms.lookupAsin(d);
+			double b = Math.asin(d);
+					
+			double err = Math.abs((b - a) / b);
+			if (err > 0.1) {
+				System.out.println(i++ + " " + d + " " + err);
+			}
+		}
+		
+//		List<Tuple<Double, Double>> c = new ArrayList<Tuple<Double, Double>>();
+//		for (int i = 0; i < 10000000; i++) {
+//			c.add(new Tuple<Double, Double>((random.nextDouble()-0.5)*2, (random.nextDouble()-0.5)*2));
+//		}
+//
+//		Algorithms.arrayLookup = true;
+//		Gbl.startMeasurement();
+//		for (Tuple<Double, Double> t : c) Algorithms.getPolarAngle(t.getFirst(), t.getSecond());
+//		Gbl.printElapsedTime();
+//		
+//		Algorithms.arrayLookup = false;
+//		Gbl.startMeasurement();
+//		for (Tuple<Double, Double> t : c) Algorithms.getPolarAngle(t.getFirst(), t.getSecond());
+//		Gbl.printElapsedTime();
+//
+//		Gbl.startMeasurement();
+//		for (Tuple<Double, Double> t : c) Algorithms.getPolarAngle(t.getFirst(), t.getSecond());
+//		Gbl.printElapsedTime();
+//		
+//		Algorithms.arrayLookup = true;
+//		for (int i = 0; i < 100; i++) {
+//			Gbl.startMeasurement();
+//			for (Tuple<Double, Double> t : c) Algorithms.getPolarAngle(t.getFirst(), t.getSecond());
+//			Gbl.printElapsedTime();
+//		}
+		
+//		for (Tuple<Double, Double> t : c) {
+//			Algorithms.arrayLookup = true;
+//			double a = Algorithms.getPolarAngle(t.getFirst(), t.getSecond());
+//			Algorithms.arrayLookup = false;
+//			double b = Algorithms.getPolarAngle(t.getFirst(), t.getSecond());
+//			
+//			double d = t.getSecond() / t.getFirst();
+//			
+//			double err = Math.abs((b - a) / b);
+//			if (err > 0.01) {
+//				System.out.println(d + " " + err);
+//			}
+//		}
+	}
+	
 	/**
 	 * translates all coordinates in the array by dx, dy
 	 * @param dx
@@ -199,7 +362,7 @@ public abstract class Algorithms {
 			coords[i].x += dx;
 			coords[i].y += dy;
 		}
-		if (coords[0] != coords[last]){
+		if (coords[0] != coords[last]) {
 			coords[last].x += dx;
 			coords[last].y += dy;
 		}
@@ -425,8 +588,6 @@ public abstract class Algorithms {
 
 	public static boolean computeLineIntersection(Coordinate a0, Coordinate a1, Coordinate b0, Coordinate b1, Coordinate intersectionCoordinate) {
 
-
-
 		double a = (b1.x - b0.x) * (a0.y - b0.y) - (b1.y - b0.y) * (a0.x - b0.x);
 		double b = (a1.x - a0.x) * (a0.y - b0.y) - (a1.y - a0.y) * (a0.x - b0.x);
 		double denom = (b1.y - b0.y) * (a1.x - a0.x) - (b1.x - b0.x) * (a1.y - a0.y);
@@ -484,7 +645,5 @@ public abstract class Algorithms {
 			}
 		}
 		return false;
-	}
-
-	
+	}	
 }
