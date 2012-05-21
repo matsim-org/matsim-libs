@@ -88,13 +88,6 @@ public class DatabasedSignalPlan implements SignalPlan {
 		}
 	}
 	
-//	private void initSecond(double sec){
-//		double sec_in_plan = sec % this.cylce;
-//		for (int i = 0; i <= sec_in_plan; i++){
-//			this.secondInPlanDroppingsMap.get(i);
-//		}
-//	}
-//	
 
 	@Override
 	public List<Id> getDroppings(double timeSeconds) {
