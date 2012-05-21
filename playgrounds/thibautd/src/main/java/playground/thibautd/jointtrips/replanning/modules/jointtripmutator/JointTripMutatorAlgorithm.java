@@ -96,12 +96,20 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 
 		if (cliquePossibilities.size() == 0) return;
 
-		Possibility toMutate = cliquePossibilities.get( random.nextInt( cliquePossibilities.size() ) );
-
-		mutate( plan , toMutate );
+		while ( true ) {
+			if (cliquePossibilities.size() > 0) {
+				Possibility toMutate = cliquePossibilities.remove( random.nextInt( cliquePossibilities.size() ) );
+				if (mutate( plan , toMutate )) {
+					break;
+				}
+			}
+			else {
+				break;
+			}
+		}
 	}
 
-	private void mutate(
+	private boolean mutate(
 			final JointPlan plan,
 			final Possibility toMutate) {
 		Iterator<PlanElement> passengerElements = plan.getIndividualPlanElements().get( toMutate.getPassenger() ).iterator();
@@ -145,10 +153,13 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 		}
 
 		if (performedJointTrips.size() == 0) {
-			insert( plan , toMutate );
+			// FIXME: the insertion is buggy
+			//insert( plan , toMutate );
+			return false;
 		}
 		else {
 			individualise( toMutate , performedJointTrips , plan);
+			return true;
 		}
 	}
 
@@ -213,7 +224,6 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 	}
 
 	private void insert(final JointPlan plan, final Possibility toMutate) {
-		// XXX: trip chaining is to fix before execution
 		// plans structures
 		List<PlanElement> driverElements =
 			plan.getIndividualPlanElements().get( toMutate.getDriver() );

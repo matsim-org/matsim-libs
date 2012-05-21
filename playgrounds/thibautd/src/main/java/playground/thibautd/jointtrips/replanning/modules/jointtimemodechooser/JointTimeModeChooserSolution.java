@@ -415,6 +415,8 @@ public class JointTimeModeChooserSolution implements Solution {
 			final Id destination,
 			final Id driver,
 			final Id passenger) {
+		// FIXME: invalid if several joint trips with the same OD (the
+		// tt for the first driver trip will always be considered)
 		for (PlanElement pe : plan.getIndividualPlanElements().get( driver )) {
 			if (pe instanceof Leg) {
 				Route r = ((Leg) pe).getRoute();
@@ -427,7 +429,31 @@ public class JointTimeModeChooserSolution implements Solution {
 				}
 			}
 		}
+
+		throwDriverNotFoundException( plan , origin, destination, driver, passenger );
 		return Time.UNDEFINED_TIME;
+	}
+
+	private static synchronized void throwDriverNotFoundException(
+			final JointPlan plan,
+			final Id origin,
+			final Id destination,
+			final Id driver,
+			final Id passenger) {
+		log.error( " COULD NOT FIND A VALID DRIVER TRIP FOR CLIQUE "+plan.getClique().getId()+"! " );
+		log.error( "passenger: "+passenger+", with OD "+origin+" -> "+destination );
+		log.error( "with plan:" );
+		int i=1;
+		for (PlanElement pe : plan.getIndividualPlanElements().get( passenger )) {
+			log.error( (i++)+": "+pe );
+		}
+		log.error( "driver: "+driver);
+		log.error( "with plan:" );
+		i=1;
+		for (PlanElement pe : plan.getIndividualPlanElements().get( driver )) {
+			log.error( (i++)+": "+pe );
+		}
+		throw new RuntimeException( "could not find a valid driver trip!" );
 	}
 
 	private static List<List<PlanElement>> analyseSubtours(
