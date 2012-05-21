@@ -81,7 +81,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 			log.info("enabled");
 			this.pCoopLoggerWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pCoopLogger.txt"));
 			try {
-				this.pCoopLoggerWriter.write("iter\tcoop\tveh\tpax\tscore\tbudget\tstart\tend\tfrom\tto\tlinks\t\n");
+				this.pCoopLoggerWriter.write("iter\tcoop\tstatus\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -129,7 +129,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				}
 				
 				try {
-					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + (int) coopVeh + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" + startTime + "\t" + endTime 
+					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getCoopState() + "\t" + (int) coopVeh + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" + startTime + "\t" + endTime 
 							+ "\t" + stopsServed + "\t" + linksServed + "\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
