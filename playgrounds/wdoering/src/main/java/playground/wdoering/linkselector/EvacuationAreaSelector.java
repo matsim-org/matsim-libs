@@ -28,6 +28,12 @@ import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,6 +45,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
@@ -62,6 +69,7 @@ public class EvacuationAreaSelector implements ActionListener{
 	private JButton saveButton;
 	private JButton openBtn;
 	private JTextField blockFieldLink1;
+	private JTextField blockFieldLink2;
 	
 	private HashMap<Id, String> roadClosures;
 	private Id currentLinkId1 = null;
@@ -81,7 +89,6 @@ public class EvacuationAreaSelector implements ActionListener{
 
 	private JCheckBox cbLink2;
 
-	private JTextField blockFieldLink2;
 
 	private JPanel panelLink1;
 
@@ -157,6 +164,169 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 		blockPanel.setSize(new Dimension(200, 200));
 		
+		blockFieldLink1.addFocusListener(new FocusListener()
+		{
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				String text = blockFieldLink1.getText();
+				if (!text.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]"))
+					blockFieldLink1.setText("--:--");
+			}
+			@Override
+			public void focusGained(FocusEvent e) {}
+		});
+		blockFieldLink1.addMouseListener(new MouseListener()
+		{
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				int cursorPos =blockFieldLink1.getCaretPosition();
+				if (cursorPos>2)
+				{
+					blockFieldLink1.setCaretPosition(3);					
+					blockFieldLink1.setSelectionStart(3);
+					blockFieldLink1.setSelectionEnd(5);
+				}				
+				if ((cursorPos<=2))
+				{
+					blockFieldLink1.setSelectionStart(0);
+					blockFieldLink1.setSelectionEnd(2);
+				}	
+				
+			}
+		});
+		
+		blockFieldLink1.addActionListener(new ActionListener()
+		{
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+			}
+		});
+		blockFieldLink1.addKeyListener(new KeyListener()
+		{
+			
+			@Override
+			public void keyTyped(KeyEvent e)
+			{
+				if (!Character.toString(e.getKeyChar()).matches("[1-9]"))
+					e.consume();
+			}
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				if ((blockFieldLink1.getCaretPosition()==2))
+				{
+					blockFieldLink1.setSelectionStart(3);
+					blockFieldLink1.setSelectionEnd(5);
+				}
+				if (blockFieldLink1.getText().length()>5)
+				{
+					blockFieldLink1.setText(blockFieldLink1.getText().substring(0, 5));
+					blockFieldLink1.setSelectionStart(0);
+					blockFieldLink1.setSelectionEnd(2);
+				}
+			}
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		blockFieldLink2.addFocusListener(new FocusListener()
+		{
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				String text = blockFieldLink2.getText();
+				if (!text.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]"))
+					blockFieldLink2.setText("--:--");
+			}
+			@Override
+			public void focusGained(FocusEvent e) {}
+		});
+		blockFieldLink2.addMouseListener(new MouseListener()
+		{
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				int cursorPos =blockFieldLink2.getCaretPosition();
+				if (cursorPos>2)
+				{
+					blockFieldLink2.setCaretPosition(3);					
+					blockFieldLink2.setSelectionStart(3);
+					blockFieldLink2.setSelectionEnd(5);
+				}				
+				if ((cursorPos<=2))
+				{
+					blockFieldLink2.setSelectionStart(0);
+					blockFieldLink2.setSelectionEnd(2);
+				}	
+				
+			}
+		});
+		
+		blockFieldLink2.addActionListener(new ActionListener()
+		{
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+			}
+		});
+		blockFieldLink2.addKeyListener(new KeyListener()
+		{
+			
+			@Override
+			public void keyTyped(KeyEvent e)
+			{
+				if (!Character.toString(e.getKeyChar()).matches("[1-9]"))
+					e.consume();
+			}
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				if ((blockFieldLink2.getCaretPosition()==2))
+				{
+					blockFieldLink2.setSelectionStart(3);
+					blockFieldLink2.setSelectionEnd(5);
+				}
+				if (blockFieldLink2.getText().length()>5)
+				{
+					blockFieldLink2.setText(blockFieldLink2.getText().substring(0, 5));
+					blockFieldLink2.setSelectionStart(0);
+					blockFieldLink2.setSelectionEnd(2);
+				}
+			}
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+				
 		
 		cbLink1 = new JCheckBox("link 1");
 		cbLink2 = new JCheckBox("link 2");
@@ -296,16 +466,19 @@ public class EvacuationAreaSelector implements ActionListener{
 	{
 		if (e.getActionCommand() == "Save")
 		{
-			final JFileChooser fc = new JFileChooser();
-			int retVal = fc.showSaveDialog(this.frame);
-			if (retVal == JFileChooser.APPROVE_OPTION)
+			if (roadClosures.size()>0)
 			{
-				File f = fc.getSelectedFile();
-	            log.info("Saving file to: " + f.getAbsolutePath() + ".");
-				this.snapper.savePolygon(f.getAbsolutePath());
-				
-			} else {
-				 log.info("Save command cancelled by user.");
+				final JFileChooser fc = new JFileChooser();
+				int retVal = fc.showSaveDialog(this.frame);
+				if (retVal == JFileChooser.APPROVE_OPTION)
+				{
+					File f = fc.getSelectedFile();
+		            log.info("Saving file to: " + f.getAbsolutePath() + ".");
+					this.snapper.saveRoadClosures(f.getAbsolutePath(), roadClosures);
+					
+				} else {
+					 log.info("Save command cancelled by user.");
+				}
 			}
 		}
 		
@@ -332,6 +505,7 @@ public class EvacuationAreaSelector implements ActionListener{
 			 int returnVal = fc.showOpenDialog(this.frame);
 		        if (returnVal == JFileChooser.APPROVE_OPTION) {
 		        	this.openBtn.setEnabled(false);
+		        	this.saveButton.setEnabled(true);
 		        	File file = fc.getSelectedFile();
 		            log.info("Opening: " + file.getAbsolutePath() + ".");
 		            loadMapView(file.getAbsolutePath());
@@ -359,8 +533,17 @@ public class EvacuationAreaSelector implements ActionListener{
 			cbLink1.setEnabled(false);
 			cbLink2.setEnabled(false);
 			blockButtonOK.setEnabled(false);
-			blockFieldLink1.setText("--.--");
-			blockFieldLink2.setText("--.--");
+			blockFieldLink1.setText("--:--");
+			blockFieldLink2.setText("--:--");
+			blockFieldLink1.setEnabled(false);
+			blockFieldLink2.setEnabled(false);
+			cbLink1.setSelected(false);
+			cbLink2.setSelected(false);
+			cbLink1.setText("-");
+			cbLink2.setText("-");
+			saveLink1 = false;
+			saveLink2 = false;
+			
 			
 		}
 			
@@ -373,13 +556,17 @@ public class EvacuationAreaSelector implements ActionListener{
 		{
 			this.cbLink1.setText(id.toString());
 			this.currentLinkId1 = id;
-			
+
 			if(roadClosures.containsKey(id))	
+			{
+				cbLink1.setSelected(true);
+				blockFieldLink1.setEnabled(true);
 				blockFieldLink1.setText(roadClosures.get(id));
+			}
 		}
 		else
 		{
-			blockFieldLink1.setText("--.--");
+			blockFieldLink1.setText("--:--");
 			blockFieldLink1.setEnabled(false);
 			cbLink1.setEnabled(false);
 
@@ -398,11 +585,15 @@ public class EvacuationAreaSelector implements ActionListener{
 			this.currentLinkId2 = id;
 			
 			if(roadClosures.containsKey(id))	
+			{
+				cbLink2.setSelected(true);
+				blockFieldLink2.setEnabled(true);
 				blockFieldLink2.setText(roadClosures.get(id));
+			}
 		}
 		else
 		{
-			blockFieldLink2.setText("--.--");
+			blockFieldLink2.setText("--:--");
 			blockFieldLink2.setEnabled(false);
 			cbLink2.setEnabled(false);
 		}
@@ -425,13 +616,16 @@ public class EvacuationAreaSelector implements ActionListener{
 		    {
 		        Map.Entry pairs = (Map.Entry)it.next();
 		        System.out.println(pairs.getKey() + " = " + pairs.getValue());
-		        it.remove(); // avoids a ConcurrentModificationException
 		    }
 		}
 
 		
 	}
 	
+	public synchronized HashMap<Id, String> getRoadClosures()
+	{
+		return roadClosures;
+	}
 	
 	
 }

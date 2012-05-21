@@ -189,6 +189,36 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			}
 		}
 		
+		//TODO FIXME 
+//		updateTable();
+		
+	}
+
+	private void updateTable()
+	{
+		HashMap<Id, String> roadClosures = evacSel.getRoadClosures();
+		
+		if (roadClosures!=null)
+		{
+			String[] columnNames = {"ID", "time"};
+			Object[][] data = new Object[roadClosures.size()][2];
+			
+			Iterator it = roadClosures.entrySet().iterator();
+			int i = 0;
+		    while (it.hasNext())
+		    {
+		        Map.Entry pairs = (Map.Entry)it.next();
+		        
+		        data[i][0] = (String)pairs.getKey().toString();
+		        data[i][1] = (String)pairs.getValue();
+		        
+		        System.out.println("i:" + i + " ; " + pairs.getKey().toString());
+		        i++;
+		    }
+			
+//		    Tab
+			
+		}
 		
 	}
 

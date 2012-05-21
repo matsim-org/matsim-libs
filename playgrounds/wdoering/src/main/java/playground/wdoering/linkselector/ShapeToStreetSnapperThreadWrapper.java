@@ -23,7 +23,9 @@ package playground.wdoering.linkselector;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.xerces.dom.NodeImpl;
 import org.geotools.factory.FactoryRegistryException;
@@ -48,6 +50,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkChangeEventFactory;
+import org.matsim.core.network.NetworkChangeEventFactoryImpl;
+import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -57,6 +64,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -84,7 +92,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	private final String net;
 	private final EvacuationAreaSelector evacuationAreaSelector;
 	private HashMap<Integer, DataPoint> networkNodes;
-	private HashMap<Integer, int[]> networkLinks;
+	private Map<Id, ? extends org.matsim.api.core.v01.network.Link>  networkLinks;
 
 	public ShapeToStreetSnapperThreadWrapper(String osm, EvacuationAreaSelector evacuationAreaSelector) {
 		this.net = osm;
@@ -200,31 +208,69 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		
 	}
 	
-	public synchronized void savePolygon(String dest) {
-		if (!dest.endsWith("shp")) {
-			dest = dest +".shp";
+	public synchronized void saveRoadClosures(String fileName, HashMap<Id, String> roadClosures)
+	{
+		if (roadClosures.size()>0)
+		{
+			
+			//check if network links are set
+			if (networkLinks==null)
+				networkLinks = sc.getNetwork().getLinks();
+
+			//create change event
+			Collection<NetworkChangeEvent> evs = new ArrayList<NetworkChangeEvent>();
+			NetworkChangeEventFactory fac = new NetworkChangeEventFactoryImpl();
+			
+			Iterator it = roadClosures.entrySet().iterator();
+		    while (it.hasNext())
+		    {
+		        Map.Entry pairs = (Map.Entry)it.next();
+		        
+		        Id currentId = (Id)pairs.getKey();
+		        String timeString = (String)pairs.getValue();
+		        
+		        double time = Time.parseTime(timeString);
+		        NetworkChangeEvent ev = fac.createNetworkChangeEvent(time);
+		        ev.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
+		        
+		        ev.addLink((Link)networkLinks.get(currentId));
+		        evs.add(ev);
+		        
+		    }
+		    
+		    
+		    NetworkChangeEventsWriter writer = new NetworkChangeEventsWriter();
+		    writer.write(fileName + ".xml", evs);		
 		}
 		
-		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:4326");
-		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
-		AttributeType t = AttributeTypeFactory.newAttributeType(
-				"name", String.class);
-		try {
-			FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");
-			MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{this.p});
-			Feature f = ft.create(new Object[]{mp,"EvacuationArea"});
-			Collection<Feature> fts = new ArrayList<Feature>();
-			fts.add(f);
-			ShapeFileWriter.writeGeometries(fts, dest);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
+		
 	}
+	
+//	public synchronized void savePolygon(String dest) {
+//		if (!dest.endsWith("shp")) {
+//			dest = dest +".shp";
+//		}
+//		
+//		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:4326");
+//		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
+//				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
+//		AttributeType t = AttributeTypeFactory.newAttributeType(
+//				"name", String.class);
+//		try {
+//			FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");
+//			MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{this.p});
+//			Feature f = ft.create(new Object[]{mp,"EvacuationArea"});
+//			Collection<Feature> fts = new ArrayList<Feature>();
+//			fts.add(f);
+//			ShapeFileWriter.writeGeometries(fts, dest);
+//		} catch (FactoryRegistryException e) {
+//			e.printStackTrace();
+//		} catch (SchemaException e) {
+//			e.printStackTrace();
+//		} catch (IllegalAttributeException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	public Collection<Node> getNearestNodes(Coord coord)
 	{
@@ -243,7 +289,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 			HashMap<Id[], Coord[]> links = new HashMap<Id[], Coord[]>();
 			
 //			Map<Id, ? extends org.matsim.api.core.v01.network.Node> networkNodes = sc.getNetwork().getNodes();
-			Map<Id, ? extends org.matsim.api.core.v01.network.Link> networkLinks = sc.getNetwork().getLinks();
+			networkLinks = sc.getNetwork().getLinks();
 			
 //			Coord coord = null;
 			
@@ -271,4 +317,6 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		}
 		return null;
 	}
+
+	
 }
