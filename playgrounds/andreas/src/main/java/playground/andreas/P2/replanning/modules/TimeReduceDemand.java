@@ -129,7 +129,7 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Transi
 				String lineId = event.getVehicleId().toString().split("-")[0];
 
 				if(this.lineId2BoardingDemand.get(lineId) == null){
-					this.lineId2BoardingDemand.put(lineId, new int[24*4+1]);
+					this.lineId2BoardingDemand.put(lineId, new int[24*3600/this.timeBinSize+1]);
 				}
 
 				int slot = ((int) this.vehId2DepartureTime.get(event.getVehicleId()).doubleValue() / this.timeBinSize);
@@ -153,7 +153,7 @@ public class TimeReduceDemand extends PStrategy implements PPlanStrategy, Transi
 				String lineId = event.getVehicleId().toString().split("-")[0];
 
 				if(this.lineId2AlightingDemand.get(lineId) == null){
-					this.lineId2AlightingDemand.put(lineId, new int[24*4+1]);
+					this.lineId2AlightingDemand.put(lineId, new int[24*3600/this.timeBinSize+1]);
 				}
 
 //				int slot = ((int) event.getTime() / this.timeBinSize);
