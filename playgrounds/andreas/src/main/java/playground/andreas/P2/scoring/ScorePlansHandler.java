@@ -47,6 +47,7 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
 	
 	private final String pIdentifier;
+	private double earningsPerBoardingPassenger;
 	private final double earningsPerMeterAndPassenger;
 	private final double expensesPerMeter;
 	private final double costPerVehicleAndDay;
@@ -56,8 +57,10 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 	TreeMap<Id, Id> driverId2VehIdMap = new TreeMap<Id, Id>();
 	TreeMap<Id, ScoreContainer> vehicleId2ScoreMap = new TreeMap<Id, ScoreContainer>();
 
+
 	public ScorePlansHandler(PConfigGroup pConfig){
 		this.pIdentifier = pConfig.getPIdentifier();
+		this.earningsPerBoardingPassenger = pConfig.getEarningsPerBoardingPassenger();
 		this.earningsPerMeterAndPassenger = pConfig.getEarningsPerKilometerAndPassenger() / 1000.0;
 		this.expensesPerMeter = pConfig.getCostPerKilometer() / 1000.0;
 		this.costPerVehicleAndDay = pConfig.getCostPerVehicleAndDay();
@@ -77,7 +80,7 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 			this.driverId2VehIdMap.put(event.getDriverId(), event.getVehicleId());
 		}
 		if(this.vehicleId2ScoreMap.get(event.getVehicleId()) == null){
-			this.vehicleId2ScoreMap.put(event.getVehicleId(), new ScoreContainer(event.getVehicleId(), this.earningsPerMeterAndPassenger, this.expensesPerMeter, this.costPerVehicleAndDay));
+			this.vehicleId2ScoreMap.put(event.getVehicleId(), new ScoreContainer(event.getVehicleId(), this.earningsPerBoardingPassenger, this.earningsPerMeterAndPassenger, this.expensesPerMeter, this.costPerVehicleAndDay));
 		}		
 	}
 

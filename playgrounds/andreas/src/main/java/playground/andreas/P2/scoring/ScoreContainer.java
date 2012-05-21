@@ -35,6 +35,7 @@ public class ScoreContainer {
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);
 
 	private final Id vehicleId;
+	private double earningsPerBoardingPassenger;
 	private final double earningsPerMeterAndPassenger;
 	private final double expensesPerMeter;
 	
@@ -43,9 +44,11 @@ public class ScoreContainer {
 	private double earnings = 0;
 		
 	int passengersCurrentlyInVeh = 0;
+
 	
-	public ScoreContainer(Id vehicleId, double earningsPerMeterAndPassenger, double expensesPerMeter, double costPerVehicleAndDay){
+	public ScoreContainer(Id vehicleId, double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger, double expensesPerMeter, double costPerVehicleAndDay){
 		this.vehicleId = vehicleId;
+		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
 		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
 		this.expensesPerMeter = expensesPerMeter;
 		this.costs += costPerVehicleAndDay;
@@ -53,6 +56,7 @@ public class ScoreContainer {
 	
 	public void addPassenger(){
 		this.passengersCurrentlyInVeh++;
+		this.earnings += this.earningsPerBoardingPassenger;
 	}
 	
 	public void removePassenger(){
