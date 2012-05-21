@@ -38,6 +38,7 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
  */
 public class CountPCoopHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler{
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CountPCoopHandler.class);
 	
 	private String pIdentifier;

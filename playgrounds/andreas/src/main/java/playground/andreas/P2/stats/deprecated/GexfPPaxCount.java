@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats;
+package playground.andreas.P2.stats.deprecated;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -46,6 +45,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.stats.CountPPaxHandler;
 import playground.andreas.gexf.ObjectFactory;
 import playground.andreas.gexf.XMLAttributeContent;
 import playground.andreas.gexf.XMLAttributesContent;
@@ -71,26 +71,26 @@ import playground.andreas.gexf.viz.PositionContent;
  * @author aneumann
  *
  */
-public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
+public class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
 	
-	private static final Logger log = Logger.getLogger(GexfPCoopCount.class);
+	private static final Logger log = Logger.getLogger(GexfPPaxCount.class);
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
-	private final static String FILENAME = "pCoopCount.gexf.gz";
+	private final static String FILENAME = "pPaxCount.gexf.gz";
 
 	private ObjectFactory gexfFactory;
 	private XMLGexfContent gexfContainer;
 
-	private CountPCoopHandler eventsHandler;
+	private CountPPaxHandler eventsHandler;
 	private String pIdentifier;
 	private int getWriteGexfStatsInterval;
 
 	private HashMap<Id,XMLEdgeContent> edgeMap;
 	private HashMap<Id,XMLAttvaluesContent> attValueContentMap;
 
-	private HashMap<Id, Set<Id>> linkId2CoopIdsFromLastIteration;
+	private HashMap<Id, Integer> linkId2CountsFromLastIteration;
 
-	public GexfPCoopCount(PConfigGroup pConfig){
+	public GexfPPaxCount(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.pIdentifier = pConfig.getPIdentifier();
 		
@@ -113,16 +113,8 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 			
 			XMLAttributeContent attContent = new XMLAttributeContent();
 			attContent.setId("weight");
-			attContent.setTitle("Number of cooperatives per iteration");
+			attContent.setTitle("Number of paratransit passengers per iteration");
 			attContent.setType(XMLAttrtypeType.FLOAT);
-			
-			attsContent.getAttribute().add(attContent);		
-			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(attsContent);
-			
-			attContent = new XMLAttributeContent();
-			attContent.setId("coopIds");
-			attContent.setTitle("Ids of the cooperatives iteration");
-			attContent.setType(XMLAttrtypeType.STRING);
 			
 			attsContent.getAttribute().add(attContent);		
 			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(attsContent);
@@ -134,9 +126,9 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addNetworkAsLayer(event.getControler().getNetwork(), 0);
 			this.createAttValues();
-			this.eventsHandler = new CountPCoopHandler(this.pIdentifier);
+			this.eventsHandler = new CountPPaxHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.eventsHandler);
-			this.linkId2CoopIdsFromLastIteration = new HashMap<Id, Set<Id>>();
+			this.linkId2CountsFromLastIteration = new HashMap<Id, Integer>();
 		}
 	}
 
@@ -145,7 +137,7 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration(), this.eventsHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPCoopCount.FILENAME));
+				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPPaxCount.FILENAME));
 			}			
 		}		
 	}
@@ -153,7 +145,7 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPCoopCount.FILENAME));
+			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPPaxCount.FILENAME));
 		}		
 	}
 
@@ -167,41 +159,27 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 		}		
 	}
 
-	private void addValuesToGexf(int iteration, CountPCoopHandler handler) {
+	private void addValuesToGexf(int iteration, CountPPaxHandler handler) {
 		for (Entry<Id, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
 			
-			Set<Id> coopsForLink = handler.getCoopsForLinkId(entry.getKey());
+			int countForLink = handler.getPaxCountForLinkId(entry.getKey());
 			
-			// Test, if something changed
-			if (this.linkId2CoopIdsFromLastIteration.get(entry.getKey()) != null){
+			if (this.linkId2CountsFromLastIteration.get(entry.getKey()) != null){
 				// There is already an entry
-				if (this.linkId2CoopIdsFromLastIteration.get(entry.getKey()).equals(coopsForLink)) {
+				if (this.linkId2CountsFromLastIteration.get(entry.getKey()).intValue() == countForLink) {
 					// same as last iteration - ignore
 					continue;
 				}
 			}
 			
-			// completely new or not the same
-			XMLAttvalue coopIdValue = new XMLAttvalue();
-			XMLAttvalue coopCountValue = new XMLAttvalue();
-			
-			coopIdValue.setFor("coopIds");
-			coopCountValue.setFor("weight");
-			
-			if (coopsForLink == null) {
-				coopIdValue.setValue("");
-				coopCountValue.setValue("0");
-			} else {
-				coopIdValue.setValue(coopsForLink.toString());
-				coopCountValue.setValue(Integer.toString(coopsForLink.size()));
-			}
-			
-			coopIdValue.setStart(Double.toString(iteration));
-			coopCountValue.setStart(Double.toString(iteration));			
+			XMLAttvalue attValue = new XMLAttvalue();
+			attValue.setFor("weight");
+//			attValue.setValue(Integer.toString(Math.max(1, countForLink)));
+			attValue.setValue(Integer.toString(countForLink));
+			attValue.setStart(Double.toString(iteration));
 
-			entry.getValue().getAttvalue().add(coopIdValue);
-			entry.getValue().getAttvalue().add(coopCountValue);
-			this.linkId2CoopIdsFromLastIteration.put(entry.getKey(), coopsForLink);
+			entry.getValue().getAttvalue().add(attValue);
+			this.linkId2CountsFromLastIteration.put(entry.getKey(), countForLink);
 		}
 	}
 
@@ -210,7 +188,7 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 		try {
 			jc = JAXBContext.newInstance(playground.andreas.gexf.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(GexfPCoopCount.XSD_PATH, m);
+			super.setMarshallerProperties(GexfPPaxCount.XSD_PATH, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(this.gexfContainer, bufout);
 			bufout.close();

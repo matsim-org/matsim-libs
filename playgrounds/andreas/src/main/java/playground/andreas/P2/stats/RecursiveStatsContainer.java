@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
  */
 public class RecursiveStatsContainer {
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(RecursiveStatsContainer.class);
 	static final String toStringHeader = "# mean Coops; std dev Coops; mean Pax; std dev Pax; mean Veh, std dev Veh"; 
 
