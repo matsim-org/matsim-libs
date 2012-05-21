@@ -148,6 +148,8 @@ public class PopulationFromESRIShapeFileGenerator {
 			double sigma = depTimeDistr.getSigma();
 			double r = MatsimRandom.getRandom().nextGaussian();
 			return 3600*mu+sigma*r;
+		} else if (depTimeDistr.getDistribution() == DistributionType.DIRAC_DELTA) {
+			return 0;
 		}
 		
 		throw new RuntimeException("unknown distribution type:" + depTimeDistr.getDistribution());

@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="normal"/>
  *     &lt;enumeration value="log-normal"/>
+ *     &lt;enumeration value="dirac-delta"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -35,15 +36,17 @@ public enum DistributionType {
     @XmlEnumValue("normal")
     NORMAL("normal"),
     @XmlEnumValue("log-normal")
-    LOG_NORMAL("log-normal");
+    LOG_NORMAL("log-normal"),
+    @XmlEnumValue("dirac-delta")
+    DIRAC_DELTA("dirac-delta");
     private final String value;
 
     DistributionType(String v) {
-        value = v;
+        this.value = v;
     }
 
     public String value() {
-        return value;
+        return this.value;
     }
 
     public static DistributionType fromValue(String v) {

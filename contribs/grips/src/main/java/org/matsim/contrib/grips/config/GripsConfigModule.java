@@ -47,8 +47,6 @@ public class GripsConfigModule extends Module {
 
 	public static final String OUTPUT_DIR = "outputDir";
 
-	//Do we really want to define it in the GripsConfigModule?
-	@Deprecated
 	public static final String SAMPLE_SIZE = "sampleSize";
 
 	private String networkFileName;
@@ -59,8 +57,6 @@ public class GripsConfigModule extends Module {
 
 	private String outputDir;
 
-	//Do we really want to define it in the GripsConfigModule?
-	@Deprecated
 	private double sampleSize = 1;
 
 
@@ -153,14 +149,10 @@ public class GripsConfigModule extends Module {
 		this.populationFileName = populationFileName;
 	}
 
-	//Do we really want to define it in the GripsConfigModule?
-	@Deprecated
 	public double getSampleSize() {
 		return this.sampleSize;
 	}
 
-	//Do we really want to define it in the GripsConfigModule?
-	@Deprecated
 	public void setSampleSize(String sampleSize) {
 		this.sampleSize = Double.parseDouble(sampleSize);
 	}

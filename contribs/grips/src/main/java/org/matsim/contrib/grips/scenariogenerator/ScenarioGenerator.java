@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.grips.scenariogenerator;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -123,6 +124,13 @@ public class ScenarioGenerator {
 		this.sc = ScenarioUtils.createScenario(this.c);
 		this.safeLinkId = this.sc.createId("el1");
 
+		GripsConfigModule gcm = getGripsConfig(this.sc.getConfig());
+		String outputDir = gcm.getOutputDir();
+		File outputDirFile = new File(outputDir);
+		if (!outputDirFile.exists()) {
+			outputDirFile.mkdirs();
+		}
+		
 		log.info("generating network file");
 		e = new InfoEvent(System.currentTimeMillis(), "generating network file");
 		this.em.processEvent(e);
