@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.network.Network;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,6 +34,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -61,17 +63,27 @@ public static void main(String[] args) throws IOException {
 
 public void run() {
 	this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	
+    log.info("Reading network xml file...");
+    MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
+	NetworkReader.readFile("./input/network.xml");
+	Network network = scenario.getNetwork();
+    log.info("Reading network xml file...done.");
+    log.info("Number of nodes: " +network.getNodes().size());
+    log.info("Number of links: " +network.getLinks().size());
+	
 	MatsimPopulationReader PlansReader = new MatsimPopulationReader(scenario); 
-	PlansReader.readFile("./input/plans.xml.gz");
+	PlansReader.readFile("./input/plansShort.xml");
 	
 	MatsimFacilitiesReader FacReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);  
 	System.out.println("Reading facilities xml file... ");
-	FacReader.readFile("./input/facilities.xml");
+	FacReader.readFile("./input/adjustedFacilities.xml");
 	System.out.println("Reading facilities xml file...done.");
 	ActivityFacilitiesImpl facilities = ((ScenarioImpl) scenario).getActivityFacilities();
     log.info("Number of facilities: " +facilities.getFacilities().size());
 
-	
+
+    
 	Random random = new Random(4711);
 
 	for (Person p : scenario.getPopulation().getPersons().values()) {
