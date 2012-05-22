@@ -159,11 +159,11 @@ class ExternalControler {
 		if(op.equals(OptimizationParameter.FARE)){
 			this.fare = -0.;
 			this.capacity = 50;
-			this.numberOfBuses = 7;
+			this.numberOfBuses = 6;
 		} else if (op.equals(OptimizationParameter.CAPACITY)){
 			this.fare = -3.;
 			this.capacity = 20; // standing room + seats (realistic values between 19 and 101)
-			this.numberOfBuses = 7;
+			this.numberOfBuses = 6;
 		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
 			this.fare = -3.;
 			this.capacity = 50;
