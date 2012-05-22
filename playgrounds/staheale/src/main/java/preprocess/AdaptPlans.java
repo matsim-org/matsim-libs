@@ -73,11 +73,11 @@ public void run() {
     log.info("Number of links: " +network.getLinks().size());
 	
 	MatsimPopulationReader PlansReader = new MatsimPopulationReader(scenario); 
-	PlansReader.readFile("./input/plansShort.xml");
+	PlansReader.readFile("./input/plans.xml.gz");
 	
 	MatsimFacilitiesReader FacReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);  
 	System.out.println("Reading facilities xml file... ");
-	FacReader.readFile("./input/adjustedFacilities.xml");
+	FacReader.readFile("./input/facilities.xml.gz");
 	System.out.println("Reading facilities xml file...done.");
 	ActivityFacilitiesImpl facilities = ((ScenarioImpl) scenario).getActivityFacilities();
     log.info("Number of facilities: " +facilities.getFacilities().size());
