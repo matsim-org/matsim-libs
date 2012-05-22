@@ -210,6 +210,7 @@ public class CreateScenario {
 		for (Person person : persons) {
 			this.scenario.getPopulation().addPerson(person);
 		}
+		log.info("Scenario size: " + this.scenario.getPopulation().getPersons().size());
 	}
 	
 	private void storeHomeAndWork() {
