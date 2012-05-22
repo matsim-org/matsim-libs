@@ -48,16 +48,19 @@ public static void main(String[] args) throws IOException {
 
 	MatsimFacilitiesReader workFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioWork);  
 	System.out.println("Reading work facilities xml file... ");
-	workFacReader.readFile("/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/staha/input/workFacilities.xml.gz");
+	workFacReader.readFile("./input/adjustedFacilities.xml");
 	System.out.println("Reading work facilities xml file...done.");
 	ActivityFacilitiesImpl workFacilities = ((ScenarioImpl) scenarioWork).getActivityFacilities();
     log.info("Number of work facilities: " +workFacilities.getFacilities().size());
     
-	final ScenarioImpl scenarioHome = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    
+    //---------------------read home facilities xml file---------
+    
+    final ScenarioImpl scenarioHome = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     
 	MatsimFacilitiesReader homeFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioHome);  
 	System.out.println("Reading home facilities xml file... ");
-	homeFacReader.readFile("/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/staha/input/homeFacilities.xml.gz");
+	homeFacReader.readFile("./input/TestHomeFacilities.xml");
 	System.out.println("Reading home facilities xml file...done.");
 	ActivityFacilitiesImpl homeFacilities = ((ScenarioImpl) scenarioHome).getActivityFacilities();
     log.info("Number of home facilities: " +homeFacilities.getFacilities().size());
@@ -93,6 +96,6 @@ public static void main(String[] args) throws IOException {
     	}
     log.info("Number of work facilities: " +workFacilities.getFacilities().size());
     
-	new FacilitiesWriter(workFacilities).write("./output/facilities.xml.gz");
+	new FacilitiesWriter(workFacilities).write("./output/facilitiesTest.xml");
 	}
 }

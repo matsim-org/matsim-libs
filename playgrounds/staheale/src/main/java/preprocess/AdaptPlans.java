@@ -51,6 +51,8 @@ public class AdaptPlans {
 	private QuadTree<ActivityFacility> workQuadTree;
 	private QuadTree<ActivityFacility> gastroCultureQuadTree;
 	private QuadTree<ActivityFacility> educationQuadTree;
+	private QuadTree<ActivityFacility> shopRetailQuadTree;
+	private QuadTree<ActivityFacility> shopServiceQuadTree;
 
 public AdaptPlans() {
 	super();		
@@ -150,24 +152,59 @@ public void run() {
 
 	//---------------------adapt activity facility to newly generated facilities
 	
+	TreeMap<Id,ActivityFacility> shopRetailFacilities = facilities.getFacilitiesForActivityType("shop_retail");
+	log.info("Shop retail facilities: " +shopRetailFacilities.size());
+	TreeMap<Id,ActivityFacility> shopServiceFacilities = facilities.getFacilitiesForActivityType("shop_service");
+	log.info("Shop service facilities: " +shopServiceFacilities.size());
 	TreeMap<Id,ActivityFacility> sportsFunFacilities = facilities.getFacilitiesForActivityType("sports_fun");
 	log.info("Sports & fun facilities: " +sportsFunFacilities.size());
+	TreeMap<Id,ActivityFacility> workFacilities = facilities.getFacilitiesForActivityType("work_sector2");
+	TreeMap<Id,ActivityFacility> work3Facilities = facilities.getFacilitiesForActivityType("work_sector3");
+	for (ActivityFacility f : work3Facilities.values()){
+		workFacilities.put(f.getId(), f);
+	}
+	log.info("Work facilities: " +workFacilities.size());
+	TreeMap<Id,ActivityFacility> gastroCultureFacilities = facilities.getFacilitiesForActivityType("gastro_culture");
+	log.info("Gastro & culture facilities: " +gastroCultureFacilities.size());
+	TreeMap<Id,ActivityFacility> educationFacilities = facilities.getFacilitiesForActivityType("education");
+	log.info("Education facilities: " +educationFacilities.size());
+
+	shopRetailQuadTree = this.buildShopRetailQuadTree(shopRetailFacilities);
+	log.info(" shopRetailQuadTree size: " +this.shopRetailQuadTree.size());
+	
+	shopServiceQuadTree = this.buildShopServiceQuadTree(shopServiceFacilities);
+	log.info(" shopServiceQuadTree size: " +this.shopServiceQuadTree.size());
+
 	sportsFunQuadTree = this.buildSportsFunQuadTree(sportsFunFacilities);
 	log.info(" sportsFunQuadTree size: " +this.sportsFunQuadTree.size());
 
-	TreeMap<Id,ActivityFacility> workFacilities = facilities.getFacilitiesForActivityType("work");
 	workQuadTree = this.buildWorkQuadTree(workFacilities);
-
-	TreeMap<Id,ActivityFacility> gastroCultureFacilities = facilities.getFacilitiesForActivityType("gastro_culture");
+	log.info(" workQuadTree size: " +this.workQuadTree.size());
+	
 	gastroCultureQuadTree = this.buildGastroCultureQuadTree(gastroCultureFacilities);
-	
-	TreeMap<Id,ActivityFacility> educationFacilities = facilities.getFacilitiesForActivityType("education");
+	log.info(" gastroCultureQuadTree size: " +this.gastroCultureQuadTree.size());
+
 	educationQuadTree = this.buildEducationQuadTree(educationFacilities);
-	
+	log.info(" educationQuadTree size: " +this.educationQuadTree.size());
+
 	for (Person p : scenario.getPopulation().getPersons().values()) {
 		for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
 			if (pe instanceof Activity) {
-                ActivityImpl act = (ActivityImpl)pe;                         
+                ActivityImpl act = (ActivityImpl)pe; 
+                if (act.getType().startsWith("shop_re")) {
+        			Double x = act.getCoord().getX();
+        			Double y = act.getCoord().getY();
+        			ActivityFacility closestShopRetail = shopRetailQuadTree.get(x,y);
+        			act.setFacilityId(closestShopRetail.getId());
+        			act.setCoord(closestShopRetail.getCoord()); 
+                }
+                if (act.getType().startsWith("shop_ser")) {
+        			Double x = act.getCoord().getX();
+        			Double y = act.getCoord().getY();
+        			ActivityFacility closestShopService = shopServiceQuadTree.get(x,y);
+        			act.setFacilityId(closestShopService.getId());
+        			act.setCoord(closestShopService.getCoord()); 
+                }
                 if (act.getType().startsWith("sports")) {
         			Double x = act.getCoord().getX();
         			Double y = act.getCoord().getY();
@@ -175,7 +212,7 @@ public void run() {
         			act.setFacilityId(closestSportsFun.getId());
         			act.setCoord(closestSportsFun.getCoord()); 
                 }
-                if (act.getType().startsWith("work")) {
+                if (act.getType().startsWith("wor")) {
         			Double x = act.getCoord().getX();
         			Double y = act.getCoord().getY();
         			ActivityFacility closestWork = workQuadTree.get(x,y);
@@ -189,7 +226,7 @@ public void run() {
         			act.setFacilityId(closestGastroCulture.getId());
         			act.setCoord(closestGastroCulture.getCoord()); 
                 }
-                if (act.getType().startsWith("education")) {
+                if (act.getType().startsWith("edu")) {
         			Double x = act.getCoord().getX();
         			Double y = act.getCoord().getY();
         			ActivityFacility closestEducation = educationQuadTree.get(x,y);
@@ -298,6 +335,54 @@ private QuadTree<ActivityFacility> buildEducationQuadTree(TreeMap<Id,ActivityFac
 
 	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 	for (final ActivityFacility f : educationFacilities.values()) {
+		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
+		}
+	return quadtree;
+	}
+private QuadTree<ActivityFacility> buildShopRetailQuadTree(TreeMap<Id,ActivityFacility> shopRetailFacilities) {
+	double minx = Double.POSITIVE_INFINITY;
+	double miny = Double.POSITIVE_INFINITY;
+	double maxx = Double.NEGATIVE_INFINITY;
+	double maxy = Double.NEGATIVE_INFINITY;
+	
+	for (final ActivityFacility f : shopRetailFacilities.values()) {
+		if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+		if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+		if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+		if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
+	}
+	minx -= 1.0;
+	miny -= 1.0;
+	maxx += 1.0;
+	maxy += 1.0;
+	log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+
+	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+	for (final ActivityFacility f : shopRetailFacilities.values()) {
+		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
+		}
+	return quadtree;
+	}
+private QuadTree<ActivityFacility> buildShopServiceQuadTree(TreeMap<Id,ActivityFacility> shopServiceFacilities) {
+	double minx = Double.POSITIVE_INFINITY;
+	double miny = Double.POSITIVE_INFINITY;
+	double maxx = Double.NEGATIVE_INFINITY;
+	double maxy = Double.NEGATIVE_INFINITY;
+	
+	for (final ActivityFacility f : shopServiceFacilities.values()) {
+		if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+		if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+		if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+		if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
+	}
+	minx -= 1.0;
+	miny -= 1.0;
+	maxx += 1.0;
+	maxy += 1.0;
+	log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+
+	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+	for (final ActivityFacility f : shopServiceFacilities.values()) {
 		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
 		}
 	return quadtree;
