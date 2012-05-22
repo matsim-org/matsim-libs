@@ -139,7 +139,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				shipment.setDeliveryServiceTime(getDouble(deliveryServiceTime));
 			}
 			currentShipments.put(atts.getValue(ID), shipment);
-			CarrierUtils.createAndAddContract(currentCarrier, shipment, new CarrierOffer());
+			currentCarrier.getContracts().add(CarrierUtils.createContract(shipment));
 		}
 	
 		if(name.equals(VEHICLES)){
