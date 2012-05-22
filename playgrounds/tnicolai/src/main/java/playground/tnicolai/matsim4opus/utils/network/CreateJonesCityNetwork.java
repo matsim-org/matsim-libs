@@ -33,11 +33,14 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
@@ -54,8 +57,8 @@ import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
 public class CreateJonesCityNetwork {
 	
 	private static final String filename = "/Users/thomas/Development/opus_home/data/jonescity_zone/data/received_from_jonathan/tabels20120504/zones4network.csv";
-	private static final String networkname = "/Users/thomas/Development/opus_home/data/jonescity_zone/testNetwork.xml";
-	private static final String shapefilename = "/Users/thomas/Development/opus_home/data/jonescity_zone/testNetwork.shp";
+	private static final String networkname = "/Users/thomas/Development/opus_home/data/jonescity_zone/jonesCityNetwork.xml";
+	private static final String shapefilename = "/Users/thomas/Development/opus_home/data/jonescity_zone/jonesCityNetwork.shp";
 	
 	private static final double stepSize = 1.41421356237310;
 	
@@ -64,7 +67,7 @@ public class CreateJonesCityNetwork {
 	private static double lanes = -1.;
 	private static double capacity = -1;
 	
-	private static String defaultCRS = "DHDN_GK4";
+	private static String defaultCRS = "EPSG:31300"; // CRS for Belgium = EPSG:31300
 	private static final String separator = ",";
 
 	/**
@@ -74,8 +77,8 @@ public class CreateJonesCityNetwork {
 		
 		freeSpeed 	= 50. * (1000./3600.); // 50kmh in meter/sec
 		length 		= 1000 * stepSize;	   // should be 1,41km
-		capacity 	= 1000.;
-		lanes		= 2.;		
+		capacity 	= 500.;
+		lanes		= 1.;
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem(defaultCRS);
@@ -104,11 +107,11 @@ public class CreateJonesCityNetwork {
 			concistencyCheck(network);
 			
 			new NetworkWriter(network).write(networkname);
-			
+						
 			// write shape file
 			FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, defaultCRS);
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
-			builder.setWidthCoefficient(0.5);
+			builder.setWidthCoefficient(1.0);
 			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 			builder.setCoordinateReferenceSystem(MGC.getCRS(defaultCRS));
 			new Links2ESRIShape(network,shapefilename, builder).write();
@@ -158,10 +161,15 @@ public class CreateJonesCityNetwork {
 			int zoneIdAsInt = Integer.parseInt(parts[indexZoneID]);
 			zoneID = new IdImpl(zoneIdAsInt);
 			// get the coordinates of that parcel
-			coord = new CoordImpl(parts[indexXCoodinate], parts[indexYCoodinate]);
+			double x = 1000. * Double.parseDouble( parts[indexXCoodinate] );
+			double y = 1000. * Double.parseDouble( parts[indexYCoodinate] );
+			
+			coord = new CoordImpl(x, y);
 
 			// create a new node
-			network.createAndAddNode(zoneID, coord);
+			NodeImpl node = (NodeImpl)network.createAndAddNode(zoneID, coord);
+			node.setOrigId(zoneID.toString());
+			node.setType("unknownType");		
 		}
 		return network.getNodes().values().iterator();
 	}
@@ -173,20 +181,21 @@ public class CreateJonesCityNetwork {
 		
 		int zones = network.getNodes().size();
 		int steps = (int)Math.sqrt(zones)-1;
-		double maxValue = steps * stepSize;
+		double length = stepSize * 1000.; // tnicolai: replace the 1000 when the new zones data set is delivered. With this setting the network is created correctley but dosen't match with the home and work locations
+		double maxValue = steps * length;
 		double minValue = 0.;
 		long linkID = 0;
 		
-		for(double x = minValue; x < maxValue; x = x+stepSize ){
+		for(double x = minValue; x < maxValue; x = x+length ){
 			System.out.println("X-Coord:" + x);
-			for(double y = minValue; y < maxValue; y = y+stepSize){
+			for(double y = minValue; y < maxValue; y = y+length){
 				System.out.println("Y-Coord:" + y);
 				
 				Node currentNode = network.getNearestNode(new CoordImpl(x,y));
 				// add link to above neighbor
-				linkID = addLink(network, maxValue, linkID, currentNode, new CoordImpl(x, y + stepSize));
+				linkID = addLink(network, maxValue, linkID, currentNode, new CoordImpl(x, y + length ));
 				// add link to left neighbor
-				linkID = addLink(network, maxValue, linkID, currentNode, new CoordImpl(x+ stepSize, y));
+				linkID = addLink(network, maxValue, linkID, currentNode, new CoordImpl(x + length, y));
 			}
 		}
 	}
