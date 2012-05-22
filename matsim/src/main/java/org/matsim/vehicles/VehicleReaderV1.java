@@ -21,6 +21,7 @@ package org.matsim.vehicles;
 
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -34,6 +35,8 @@ import org.xml.sax.Attributes;
  */
 public class VehicleReaderV1 extends MatsimXmlParser {
 
+	private final static Logger log = Logger.getLogger(VehicleReaderV1.class);
+	
 	private final Vehicles vehicles;
 	private final VehiclesFactory builder;
 	private VehicleType currentVehType = null;
@@ -122,7 +125,11 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 			this.currentVehType.setWidth(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.METER)));
 		}
 		else if (VehicleSchemaV1Names.MAXIMUMVELOCITY.equalsIgnoreCase(name)) {
-			this.currentVehType.setMaximumVelocity(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.METERPERSECOND)));
+			double val = Double.parseDouble(atts.getValue(VehicleSchemaV1Names.METERPERSECOND));
+			if (val == 1.0) {
+				log.warn("The vehicle type's maximum velocity is set to 1.0 meter per second, is this really intended? vehicletype = " + this.currentVehType.getId().toString());
+			}
+			this.currentVehType.setMaximumVelocity(val);
 		}
 		else if (VehicleSchemaV1Names.CAPACITY.equalsIgnoreCase(name)) {
 			this.currentCapacity = this.builder.createVehicleCapacity();
