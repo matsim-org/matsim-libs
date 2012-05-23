@@ -32,6 +32,8 @@
 			<xs:element name="distribution" type="distributionType"></xs:element>
 			<xs:element name="sigma" type="xs:double"></xs:element>
 			<xs:element name="mu" type="xs:double"></xs:element>
+			<xs:element name="earliest" type="xs:double"></xs:element>
+			<xs:element name="latest" type="xs:double"></xs:element>
 		</xs:sequence>
 
 	</xs:complexType>
