@@ -10,7 +10,7 @@
 		<!-- Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (','). -->
 		<param name="eventsFileFormat" value="xml" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="500" />
 
 		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation qsim JDEQSim multimodalQSim  -->
 		<param name="mobsim" value="null" />
@@ -389,7 +389,7 @@
 		<param name="flowCapacityFactor" value="1.0" />
 
 		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
-		<param name="removeStuckVehicles" value="true" />
+		<param name="removeStuckVehicles" value="false" />
 
 		<!-- snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) -->
 		<param name="snapshotStyle" value="equiDist" />
@@ -411,7 +411,7 @@
 		<param name="ExternalExeTmpFileRootDir" value="null" />
 
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
-		<param name="ModuleDisableAfterIteration_1" value="null" />
+		<param name="ModuleDisableAfterIteration_1" value="250" />
 
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_2" value="null" />
@@ -488,8 +488,8 @@
 		<param name="travelTimeAggregator" value="optimistic" />
 
 		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
-		<param name="travelTimeBinSize" value="900" />
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
+		<param name="travelTimeBinSize" value="120" />
+		<param name="travelTimeCalculator" value="TravelTimeCalculatorHashMap" />
 
 		<!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
 		<param name="travelTimeGetter" value="average" />

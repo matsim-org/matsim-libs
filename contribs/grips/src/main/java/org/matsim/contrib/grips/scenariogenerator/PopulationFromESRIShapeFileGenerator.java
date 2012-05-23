@@ -20,7 +20,10 @@
 package org.matsim.contrib.grips.scenariogenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -58,6 +61,8 @@ public class PopulationFromESRIShapeFileGenerator {
 
 	private static final Logger log = Logger.getLogger(PopulationFromESRIShapeFileGenerator.class);
 
+	private static final int RAND_SAMPLES = 1000;
+
 	private final String populationShapeFile;
 	protected final Scenario scenario;
 	protected int id = 0;
@@ -65,6 +70,8 @@ public class PopulationFromESRIShapeFileGenerator {
 	protected final Id safeLinkId;
 
 	private final GripsConfigModule gcm;
+
+	private List<Double> depTimeLookup;
 
 	public PopulationFromESRIShapeFileGenerator(Scenario sc, String populationFile, Id safeLinkId) {
 		log.warn("This implementation is a only a proof of concept!");
@@ -75,6 +82,9 @@ public class PopulationFromESRIShapeFileGenerator {
 	}
 
 	public void run() {
+		log.info("Generating departure time lookup");
+		genDepTimeLookup();
+		
 		log.info("Generating population from ESRI shape file.");
 		FeatureSource fs = ShapeFileReader.readDataFile(this.populationShapeFile);
 		CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry().getCoordinateSystem();
@@ -106,6 +116,53 @@ public class PopulationFromESRIShapeFileGenerator {
 
 	}
 
+	private void genDepTimeLookup() {
+		DepartureTimeDistributionType depTimeDistr = this.gcm.getDepartureTimeDistribution();
+		if (depTimeDistr == null) {
+			log.warn("No departure time distribution is given! So, we let start all evacuees at once !");
+			this.depTimeLookup = new ArrayList<Double>();
+			this.depTimeLookup.add(0.);
+			return;
+		}
+		
+		List<Double> randVariables = new ArrayList<Double>();
+
+		if (depTimeDistr.getDistribution() == DistributionType.LOG_NORMAL) {
+			double mu = depTimeDistr.getMu();
+			double sigma = depTimeDistr.getSigma();
+			for (int i = 0; i < RAND_SAMPLES; i ++) {
+				double r = MatsimRandom.getRandom().nextGaussian();
+				randVariables.add(Math.exp(mu + sigma*r));
+			}
+		} else if(depTimeDistr.getDistribution() == DistributionType.NORMAL) {
+			double mu = depTimeDistr.getMu();
+			double sigma = depTimeDistr.getSigma();
+			for (int i = 0; i < RAND_SAMPLES; i ++) {
+				double r = MatsimRandom.getRandom().nextGaussian();
+				randVariables.add(mu + sigma*r);
+			}
+		} else if (depTimeDistr.getDistribution() == DistributionType.DIRAC_DELTA) {
+			this.depTimeLookup = new ArrayList<Double>();
+			this.depTimeLookup.add(0.);
+			return;
+		} else {
+			throw new RuntimeException("unknown distribution type:" + depTimeDistr.getDistribution());
+		}
+		
+		double latest = depTimeDistr.getLatest();
+		double earliest = depTimeDistr.getEarliest();
+		Collections.sort(randVariables);
+		this.depTimeLookup = randVariables;
+		double coef = (latest-earliest)/(this.depTimeLookup.get(this.depTimeLookup.size()-1)-this.depTimeLookup.get(0));
+		double offset = this.depTimeLookup.get(0);
+		for (int i = 0; i < this.depTimeLookup.size(); i++) {
+			double rand = this.depTimeLookup.get(i)-offset;
+			double depTime = rand * coef + earliest;
+			this.depTimeLookup.set(i, depTime);
+		}
+		Collections.shuffle(this.depTimeLookup);
+	}
+
 	protected void createPersons(Feature ft) {
 		Population pop = this.scenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
@@ -132,32 +189,7 @@ public class PopulationFromESRIShapeFileGenerator {
 	}
 
 	private double getDepartureTime() {
-		DepartureTimeDistributionType depTimeDistr = this.gcm.getDepartureTimeDistribution();
-		if (depTimeDistr == null) {
-			log.warn("No departure time distribution is given! So, we let start all evacuees at once !");
-			return 0;
-		}
-		
-
-		if (depTimeDistr.getDistribution() == DistributionType.LOG_NORMAL) {
-			double latest = depTimeDistr.getLatest();
-			double earliest = depTimeDistr.getEarliest();
-			double mu = depTimeDistr.getMu();
-			double sigma = depTimeDistr.getSigma();
-			double r = MatsimRandom.getRandom().nextGaussian();
-			return Math.max(earliest, Math.min(3600*Math.exp(mu + sigma*r),latest));
-		} else if(depTimeDistr.getDistribution() == DistributionType.NORMAL) {
-			double latest = depTimeDistr.getLatest();
-			double earliest = depTimeDistr.getEarliest();
-			double mu = depTimeDistr.getMu();
-			double sigma = depTimeDistr.getSigma();
-			double r = MatsimRandom.getRandom().nextGaussian();
-			return Math.max(earliest, Math.min(3600*mu+sigma*r,latest));
-		} else if (depTimeDistr.getDistribution() == DistributionType.DIRAC_DELTA) {
-			return 0;
-		}
-		
-		throw new RuntimeException("unknown distribution type:" + depTimeDistr.getDistribution());
+		return this.depTimeLookup.get((this.id-1)%this.depTimeLookup.size());
 	}
 
 	protected Coord getRandomCoordInsideFeature(Random rnd, Feature ft) {

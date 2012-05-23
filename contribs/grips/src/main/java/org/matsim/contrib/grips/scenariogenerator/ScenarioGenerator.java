@@ -151,17 +151,23 @@ public class ScenarioGenerator {
 
 		this.c.otfVis().setMapOverlayMode(true);
 
-		this.c.controler().setLastIteration(10);
+		this.c.controler().setLastIteration(500);
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
 
 		this.c.strategy().setMaxAgentPlanMemorySize(3);
 
+		this.c.strategy().addParam("ModuleDisableAfterIteration_1", "250");
 		this.c.strategy().addParam("maxAgentPlanMemorySize", "3");
 		this.c.strategy().addParam("Module_1", "ReRoute");
 		this.c.strategy().addParam("ModuleProbability_1", "0.1");
 		this.c.strategy().addParam("Module_2", "ChangeExpBeta");
 		this.c.strategy().addParam("ModuleProbability_2", "0.9");
 
+		this.c.simulation().setRemoveStuckVehicles(false);
+		
+		this.c.travelTimeCalculator().setTraveltimeBinSize(120);
+		this.c.travelTimeCalculator().setTravelTimeCalculatorType("TravelTimeCalculatorHashMap");
+		
 		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir() + "/config.xml";
 
 		new ConfigWriter(this.c).write(this.matsimConfigFile);
