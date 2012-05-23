@@ -69,8 +69,7 @@ public class SfAirNetworkBuilder {
 			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), network.getNodes().get(originRunway), network.getNodes().get(destinationRunway));
 			originToDestination.setAllowedModes(allowedModes);
 			
-//			WARNUNG HINZUFÜGEN, CAP*5
-			originToDestination.setCapacity(1.0*CAP_PERIOD*5.);
+			originToDestination.setCapacity(1.0*CAP_PERIOD);
 			originToDestination.setFreespeed(groundSpeed);
 			originToDestination.setLength(length);
 			network.addLink(originToDestination);

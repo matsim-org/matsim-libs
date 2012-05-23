@@ -108,13 +108,13 @@ public class SfMatsimAirport {
 		
 //		WARNING HINZUFÜGEN, CAP*5 NEHMEN
 		
-		linkApron.setCapacity(1.*network.getCapacityPeriod()*5.);
-		linkTaxiIn.setCapacity((1./60)*network.getCapacityPeriod()*5.);
-		linkTaxiIn.setNumberOfLanes(0.015*5.);	
-		linkTaxiOut.setCapacity((1./60)*network.getCapacityPeriod()*5.);
-		linkRunwayIn.setCapacity(1.*network.getCapacityPeriod()*5.);
-		linkRunwayOut.setCapacity(1.*network.getCapacityPeriod()*5.);
-		linkRunwayOut.setNumberOfLanes(0.005*5.);
+		linkApron.setCapacity(1.*network.getCapacityPeriod());
+		linkTaxiIn.setCapacity((1./60)*network.getCapacityPeriod());
+		linkTaxiIn.setNumberOfLanes(0.015);	
+		linkTaxiOut.setCapacity((1./60)*network.getCapacityPeriod());
+		linkRunwayIn.setCapacity(1.*network.getCapacityPeriod());
+		linkRunwayOut.setCapacity(1.*network.getCapacityPeriod());
+		linkRunwayOut.setNumberOfLanes(0.005);
 		
 		linkApron.setLength(taxiwayLength);
 		linkTaxiIn.setLength(taxiwayLength);

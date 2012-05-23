@@ -45,7 +45,7 @@ public class SfFlightDelayAnalysis {
 	private Map<Integer, Integer> delayAcc;
 	
 	private static final int MIN_MAX_DELAY = 60;	//set desired min./max. delay
-	private static final int DELAY_OUTPUT_INTERVAL = 5;
+	private static final int DELAY_OUTPUT_INTERVAL = 5;		//set interval for delay accumulation
 	
 	private static String actualTimes = "Z:\\WinHome\\munich_output\\ITERS\\it.0\\0.statistic.csv";
 	private static String scheduledTimes= "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\oag_flights.txt";
@@ -61,13 +61,12 @@ public class SfFlightDelayAnalysis {
 	
 	public static void main(String[] args) {
 
-		SfFlightDelayAnalysis ana = new SfFlightDelayAnalysis();
+		SfFlightDelayAnalysis ana = new SfFlightDelayAnalysis();	
 		try {
 			ana.analyzeDelays();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 	private void analyzeDelays() throws Exception {
@@ -172,10 +171,8 @@ public class SfFlightDelayAnalysis {
 				}
 			}
 		}
-		
 		brScheduled.close();
 		bwDelaySingleFlights.close();
-		
 		bwDelay.write("Delay in minutes \t Number of Delays");
 		bwDelay.newLine();
 		bwDelayAcc.write("Delay in minutes \t Number of Delays");
@@ -194,13 +191,10 @@ public class SfFlightDelayAnalysis {
 	        bwDelayAcc.write(pairs.getKey().toString()+"\t"+pairs.getValue());
 	        bwDelayAcc.newLine();
 	    }
-	    
 	    bwDelay.flush();
 	    bwDelay.close();
-	    
 	    bwDelayAcc.flush();
 	    bwDelayAcc.close();
-		
 	}
 
 }
