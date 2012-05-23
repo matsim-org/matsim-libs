@@ -58,7 +58,7 @@ public class Analyzer {
 					}
 				}
 			}			
-			avgNumberOfActs += ((person.getSelectedPlan().getPlanElements().size() - 1) / 2.0);
+			avgNumberOfActs += ((person.getSelectedPlan().getPlanElements().size() + 1) / 2.0);
 		}
 		avgHome /= population.getPersons().size();
 		avgWork /= population.getPersons().size();
