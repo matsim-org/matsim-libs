@@ -21,23 +21,13 @@
 package playground.christoph.evacuation.controler;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
@@ -54,7 +44,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -84,11 +73,8 @@ import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
-import org.matsim.matrices.Matrix;
 //import org.matsim.utils.eventsfilecomparison.OnlineEventsComparator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -106,9 +92,7 @@ import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.balmermi.world.Layer;
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
@@ -118,6 +102,7 @@ import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
@@ -125,6 +110,7 @@ import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIEvacuationFactory;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIFactory;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
@@ -145,14 +131,8 @@ import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabili
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 import playground.meisterk.kti.config.KtiConfigGroup;
-import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
-import playground.meisterk.kti.router.SwissHaltestelle;
-import playground.meisterk.kti.router.SwissHaltestellen;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 public class EvacuationControler extends WithinDayController implements MobsimInitializedListener, 
 		MobsimAfterSimStepListener, IterationStartsListener, StartupListener, AfterMobsimListener {
@@ -204,6 +184,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
 	protected AssignVehiclesToPlans assignVehiclesToPlans;
 	
+	protected PopulationAdministration popAdmin;
 	protected InformedHouseholdsTracker informedHouseholdsTracker;
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
@@ -327,7 +308,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		 */
 		this.walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
 		this.bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
-		this.ptTravelTimeFactory = new PTTravelTimeKTIFactory(this.scenarioData, 
+		this.ptTravelTimeFactory = new PTTravelTimeKTIEvacuationFactory(this.scenarioData, 
 				new PTTravelTimeFactory(this.config.plansCalcRoute(), travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
 		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
@@ -359,6 +340,11 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
 		
+		this.popAdmin = new PopulationAdministration(this.scenarioData);
+		this.popAdmin.selectPanicPeople(EvacuationConfig.panicShare);
+		this.popAdmin.selectParticipatingHouseholds(EvacuationConfig.householdParticipationShare);
+		this.addControlerListener(this.popAdmin);
+		
 		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds(), 
 				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents());
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
@@ -374,9 +360,11 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
 		
 		/*
-		 * Update PT Travel time Matrices (requires CoordAnalyzer)
+		 * Update PT Travel time Matrices for evacuation routes (requires CoordAnalyzer)
 		 */
-		initKTIPTRouter();
+		String stopsFile = this.getControlerIO().getOutputFilename("pt_evacuation_stops.shp");
+		String travelTimesFile = this.getControlerIO().getOutputFilename("pt_evacuation_times.shp");
+		((PTTravelTimeKTIEvacuationFactory) this.ptTravelTimeFactory).prepareMatrixForEvacuation(this.coordAnalyzer, stopsFile, travelTimesFile);
 		
 		/*
 		 * Read household-vehicles-assignment files.
@@ -480,121 +468,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 //			comparator.run();			
 //		}
 	}
-	
-	/*
-	 * Update PT Travel time Matrices
-	 */
-	private void initKTIPTRouter() {
-		PlansCalcRouteKtiInfo pcrKTIi = ((PTTravelTimeKTIFactory) this.ptTravelTimeFactory).getPlansCalcRouteKtiInfo();
-		/*
-		 * Identify affected stops and zones. A zone is affected if one of its
-		 * stops is affected.
-		 */
-		SwissHaltestellen swissHaltestellen = pcrKTIi.getHaltestellen();
-		Layer municipalities = pcrKTIi.getLocalWorld().getLayer("municipality");
-		Set<Id> affectedMunicipalities = new LinkedHashSet<Id>();
-		for (SwissHaltestelle swissHaltestelle : swissHaltestellen.getHaltestellenMap().values()) {
-			Coord coord = swissHaltestelle.getCoord();
-			boolean isAffected = this.coordAnalyzer.isCoordAffected(coord);
-			
-			if (isAffected) {
-				for (BasicLocation location : municipalities.getNearestLocations(coord)) {
-					affectedMunicipalities.add(location.getId());
-				}
-			}
-		}
-		/*
-		 * Also check the municipalities themselves. Some of them have no stops assigned and
-		 * therefore would not be identified.
-		 */
-		for (BasicLocation location : municipalities.getLocations().values()) {
-			Coord coord = location.getCoord();
-			boolean isAffected = this.coordAnalyzer.isCoordAffected(coord);
-			if (isAffected) affectedMunicipalities.add(location.getId());
-		}
-		log.info("total municipalities: " + municipalities.getLocations().size());
-		log.info("affected municipalities: " + affectedMunicipalities.size());
 		
-		/*
-		 * Create exit/rescue entry in the municipalities and haltestellen data structures
-		 */
-		log.info("creating additional entries in the PT travel time matrix...");
-		Id rescueFacilityId = scenarioData.createId("rescueFacility");
-		Id rescueLinkId = scenarioData.getActivityFacilities().getFacilities().get(rescueFacilityId).getLinkId();
-		Link rescueLink = scenarioData.getNetwork().getLinks().get(rescueLinkId);
-		municipalities.getLocations().put(rescueLinkId, rescueLink);
-		swissHaltestellen.addHaltestelle(scenarioData.createId("rescueHaltestelle"), 
-				EvacuationConfig.getRescueCoord().getX(), EvacuationConfig.getRescueCoord().getY());
-		
-		/*
-		 * Create entries in the travel time matrix
-		 * 
-		 * If the municipality is affected, calculate the minimal travel time
-		 * to the next non-affected municipality. Otherwise use a travel time of 1.0.
-		 */
-		Matrix ptMatrix = pcrKTIi.getPtTravelTimes();
-		for (Id fromId : municipalities.getLocations().keySet()) {
-			if (affectedMunicipalities.contains(fromId)) {
-				
-				double minTT = Double.MAX_VALUE;
-				for (Id id : municipalities.getLocations().keySet()) {
-					if (affectedMunicipalities.contains(id)) continue;
-					else if (id.equals(rescueLinkId)) continue;
-					else if (id.equals(fromId)) continue;
-					double tt = ptMatrix.getEntry(fromId, id).getValue();
-					if (tt < minTT) minTT = tt;
-				}
-				ptMatrix.createEntry(fromId, rescueLinkId, minTT);
-			} else {
-				ptMatrix.createEntry(fromId, rescueLinkId, 1.0);
-			}
-		}		
-		log.info("done.");
-		
-		try {
-			log.info("writing evacuation pt times to shp file...");
-			GeometryFactory geofac = new GeometryFactory();
-			Collection<Feature> fts;
-			
-			CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 4326");
-			AttributeType po = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, targetCRS);
-			AttributeType zone = AttributeTypeFactory.newAttributeType("zone", String.class);
-			AttributeType stop = AttributeTypeFactory.newAttributeType("stop", String.class);
-			AttributeType time = AttributeTypeFactory.newAttributeType("time", Double.class);
-			AttributeType affected = AttributeTypeFactory.newAttributeType("affected", Boolean.class);
-			FeatureType ftPoint;
-
-			// create and write affected stops
-			fts = new ArrayList<Feature>();
-			ftPoint = FeatureTypeBuilder.newFeatureType(new AttributeType[] {po, stop, zone, affected}, "Point");
-			for (SwissHaltestelle swissHaltestelle : swissHaltestellen.getHaltestellenMap().values()) {
-				Coord coord = swissHaltestelle.getCoord();
-				boolean isAffected = this.coordAnalyzer.isCoordAffected(coord);
-				final List<? extends BasicLocation> froms = municipalities.getNearestLocations(coord);
-				BasicLocation fromMunicipality = froms.get(0);
-				
-				fts.add(ftPoint.create(new Object[] {geofac.createPoint(new Coordinate(coord.getX(), coord.getY())), 
-						swissHaltestelle.getId().toString(), fromMunicipality.getId().toString(), isAffected}));
-			}
-			ShapeFileWriter.writeGeometries(fts, this.getControlerIO().getOutputFilename("pt_evacuation_stops.shp"));
-				
-			// create and write evacuation travel times
-			fts = new ArrayList<Feature>();
-			ftPoint = FeatureTypeBuilder.newFeatureType(new AttributeType[] {po, zone, time, affected}, "Point");
-			for (Id fromId : municipalities.getLocations().keySet()) {
-				double tt = ptMatrix.getEntry(fromId, rescueLinkId).getValue();
-				boolean isAffected = affectedMunicipalities.contains(fromId);
-				Coord coord = municipalities.getLocation(fromId).getCoord();
-				fts.add(ftPoint.create(new Object[] {geofac.createPoint(new Coordinate(coord.getX(), coord.getY())), fromId.toString(), tt, isAffected}));
-			}
-			ShapeFileWriter.writeGeometries(fts, this.getControlerIO().getOutputFilename("pt_evacuation_times.shp"));
-			
-			log.info("done.");
-		} catch (Exception e) {
-			Gbl.errorMsg(e);
-		}
-	}
-	
 	/*
 	 * Initialize tool to select household meeting points.
 	 * We don't add any fuzzy values or additional disutility to travel time and costs

@@ -32,7 +32,7 @@ import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
 public class PTTravelTimeKTIFactory implements PersonalizableTravelTimeFactory {
 	
-	private final Scenario scenario;
+	/*package*/ final Scenario scenario;
 	private final PersonalizableTravelTimeFactory ptTravelTimeFactory;
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	private final Map<Id, Double> agentSpeedMap;
