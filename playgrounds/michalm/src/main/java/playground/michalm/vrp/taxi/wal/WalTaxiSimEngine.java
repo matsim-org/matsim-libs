@@ -29,10 +29,10 @@ import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
+import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizerFactory;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.jdbc.JdbcWriter;
-import playground.michalm.vrp.data.model.DynVehicle;
 import playground.michalm.vrp.data.network.MatsimVrpGraph;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
 import playground.michalm.vrp.taxi.wal.Command.CommandType;
@@ -41,13 +41,23 @@ import playground.michalm.vrp.taxi.wal.Command.CommandType;
 public class WalTaxiSimEngine
     extends TaxiSimEngine
 {
+    enum RealTimeMode
+    {
+        BEFORE, IN, AFTER;
+    }
+
+
     private JdbcWriter jdbcWriter;
     private String dbFileName;
+
     private MServer mServer;
+    private RealTimeMode realTimeMode = null;
+
     private int startTime;
     private int endTime;
+    private long timeOffset;
 
-    private boolean dbInitialized = false;
+    private Vehicle realVehicle;
 
     private volatile boolean keepListening;
     private BlockingQueue<Command> commandQueue;
@@ -88,45 +98,38 @@ public class WalTaxiSimEngine
         endTime = command.getParam(1);
         int realVehicleCount = command.getParam(2);
 
+        if (realVehicleCount != 1) {
+            throw new IllegalArgumentException();
+        }
+
         List<Vehicle> vehicles = vrpData.getVehicles();
         List<Depot> depots = vrpData.getDepots();
 
-        for (int i = 0; i < realVehicleCount; i++) {
-            // <-- VEHICLE $vehId$ $linkId$
-            command = mServer.readCommand();
-            assertCommandType(command, CommandType.VEHICLE);
+        // <-- VEHICLE $vehId$ $linkId$
+        command = mServer.readCommand();
+        assertCommandType(command, CommandType.VEHICLE);
 
-            int realVehId = command.getParam(0);
-            int linkId = command.getParam(1);
+        int realVehId = command.getParam(0);
+        int linkId = command.getParam(1);
 
-            System.err.println("Creating a new depot...");
-            int depotId = depots.size();
-            Depot depot = new DepotImpl(depotId, "D_" + depotId, vrpGraph.getVertex(scenario
-                    .createId(linkId + "")));
-            depots.add(depot);
+        System.err.println("Creating a new depot...");
+        int depotId = depots.size();
+        Depot depot = new DepotImpl(depotId, "D_" + depotId, vrpGraph.getVertex(scenario
+                .createId(linkId + "")));
+        depots.add(depot);
 
-            System.err.println("Creating a vehicle with the default params...");
-            int vehId = vehicles.size();
-            // Vehicle vehicle = new VehicleImpl(vehId, "real_" + realVehId, depot, 1, 0, startTime,
-            // endTime, endTime - startTime);
-            Vehicle vehicle = new VehicleImpl(vehId, "real_" + realVehId, depot, 1, 0, 0,
-                    24 * 60 * 60, 24 * 60 * 60);
-            vehicles.add(vehicle);
-        }
+        System.err.println("Creating a vehicle with the default params...");
+        int vehId = vehicles.size();
+        realVehicle = new VehicleImpl(vehId, "real_" + realVehId, depot, 1, 0, startTime, endTime,
+                endTime - startTime);
+        vehicles.add(realVehicle);
 
         super.onPrepareSim();
 
         // update JDBC
         jdbcWriter = new JdbcWriter(data, dbFileName);
         jdbcWriter.simulationInitialized();
-        dbInitialized = true;
-
-        // --> STARTED
-        System.err.println("Not synchronized with $startTime$");
-        startListening();
-        mServer.writeCommand(new Command(CommandType.STARTED));
-
-        System.err.println("SERVER initialization DONE!");
+        realTimeMode = RealTimeMode.BEFORE;
     }
 
 
@@ -143,74 +146,80 @@ public class WalTaxiSimEngine
     {
         super.doSimStep(time);
 
-        // listen to new Commands
-        while (commandQueue.peek() != null) {
-            // TASK_ENDED $taskId$ [$time$ -- dla symulacji w real-time - pole niepotrzebne]
-            Command command = commandQueue.poll();
-            assertCommandType(command, CommandType.TASK_ENDED);
-
-            int taskId = command.getParam(0);
-
-            System.err.println("No procesing for TASK_ENDED " + taskId);
-            // update
-            // reoptimize
-            // nextTask
+        if (realTimeMode == RealTimeMode.AFTER) {
+            return;
         }
 
-        // instead of TASK_ENDED processing
-        for (Vehicle v : vrpData.getVehicles()) {
-            if (! (v instanceof DynVehicle)) {
-                Schedule sched = v.getSchedule();
+        if (realTimeMode == RealTimeMode.BEFORE) {
+            if (time < startTime) {
+                return;// BEFORE real time
+            }
+            else if (time == startTime) {
+                // --> STARTED
+                startListening();
+                mServer.writeCommand(new Command(CommandType.STARTED));
 
-                switch (sched.getStatus()) {
-                    case PLANNED:
-                        realVehicleLogicSimulation(sched, time, sched.getBeginTime());
-                        break;
+                realTimeMode = RealTimeMode.IN;
 
-                    case STARTED:
-                        realVehicleLogicSimulation(sched, time, sched.getCurrentTask().getEndTime());
-                        break;
-
-                    case UNPLANNED:
-                    case COMPLETED:
-                        continue;
-
-                    default:
-                        throw new RuntimeException();
-                }
+                timeOffset = System.currentTimeMillis();
+                System.err.println("SERVER initialization DONE!");
+            }
+            else {
+                throw new IllegalStateException();
             }
         }
 
-        // try {
-        // long realTime = (System.currentTimeMillis()) % (24 * 60 * 60 * 1000);
-        // long simTime = (long) (time * 1000);
-        // long simAheadOfReal = simTime - realTime;
-        //
-        // if (simAheadOfReal > 0) {
-        // Thread.sleep(simAheadOfReal);
-        // }
-        // }
-        // catch (InterruptedException e) {
-        // throw new RuntimeException(e);
-        // }
+        //no waiting, trigger the 1st task
+        if (realVehicle.getSchedule().getStatus() == ScheduleStatus.PLANNED) { 
+            realVehicle.getSchedule().nextTask();
+            nextTask(realVehicle);
+        }
+
+        // listen to new Commands
+        while (commandQueue.peek() != null) {
+            // TASK_ENDED $taskId$
+            Command command = commandQueue.poll();
+            assertCommandType(command, CommandType.TASK_ENDED);
+            realVehicleTaskEnded(command.getParam(0), time);
+        }
+
+
+        if (time >= endTime) {
+            ScheduleStatus schedStatus = realVehicle.getSchedule().getStatus();// refresh!!
+
+            if (schedStatus == ScheduleStatus.UNPLANNED || schedStatus == ScheduleStatus.COMPLETED) {
+                realTimeMode = RealTimeMode.AFTER;
+                return;// AFTER real time
+            }
+        }
+
+        try {
+            long realTime = System.currentTimeMillis() - timeOffset;
+            long simTime = (long) ( (time - startTime) * 1000);
+            long simAheadOfReal = simTime - realTime;
+
+            if (simAheadOfReal > 0) {
+                Thread.sleep(simAheadOfReal);
+            }
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
-    private void realVehicleLogicSimulation(Schedule schedule, double now, int nextTaskTime)
+    private void realVehicleTaskEnded(int taskId, double now)
     {
-        int simTime = (int)now;
+        Task task = JdbcWriter.findTask(taskId, data.getVrpData().getVehicles());
 
-        if (simTime > nextTaskTime) {
-            throw new RuntimeException("Shouldn't happen");
+        if (task.getStatus() != TaskStatus.STARTED) {
+            throw new IllegalStateException();
         }
-        else if (simTime == nextTaskTime) {
-            if (schedule.getStatus() == ScheduleStatus.STARTED) {
-                updateAndOptimizeBeforeNextTask(schedule.getVehicle(), now);
-            }
 
-            schedule.nextTask();
-            nextTask(schedule.getVehicle());
-        }
+        Schedule schedule = task.getSchedule();
+        updateAndOptimizeBeforeNextTask(schedule.getVehicle(), now);
+        schedule.nextTask();
+        nextTask(schedule.getVehicle());
     }
 
 
@@ -219,9 +228,9 @@ public class WalTaxiSimEngine
     {
         super.optimize(now);
 
-        if (dbInitialized) {
+        if (realTimeMode != null) {
             jdbcWriter.schedulesReoptimized();
-            mServer.writeCommand(new Command(CommandType.SCHEDULES_REOPTIMIZED));
+            writeCommandInRealTimeMode(new Command(CommandType.SCHEDULES_REOPTIMIZED));
         }
     }
 
@@ -231,7 +240,7 @@ public class WalTaxiSimEngine
     {
         if (super.update(vrpVehicle)) {
             jdbcWriter.scheduleUpdated(vrpVehicle.getSchedule());
-            mServer.writeCommand(new Command(CommandType.SCHEDULE_UPDATED, vrpVehicle.getId()));
+            writeCommandInRealTimeMode(new Command(CommandType.SCHEDULE_UPDATED, vrpVehicle.getId()));
             return true;
         }
         else {
@@ -249,10 +258,10 @@ public class WalTaxiSimEngine
         // for each new Request a new Customer is created
         Customer customer = request.getCustomer();
         jdbcWriter.newCustomer(customer);
-        mServer.writeCommand(new Command(CommandType.CUSTOMER, customer.getId()));
+        writeCommandInRealTimeMode(new Command(CommandType.CUSTOMER, customer.getId()));
 
         jdbcWriter.newRequest(request);
-        mServer.writeCommand(new Command(CommandType.REQUEST, request.getId()));
+        writeCommandInRealTimeMode(new Command(CommandType.REQUEST, request.getId()));
 
         super.taxiRequestSubmitted(request, now);
     }
@@ -261,22 +270,22 @@ public class WalTaxiSimEngine
     public void nextTask(Vehicle vrpVehicle)
     {
         jdbcWriter.nextTask(vrpVehicle.getSchedule());
-        mServer.writeCommand(new Command(CommandType.NEXT_TASK, vrpVehicle.getId()));
+        writeCommandInRealTimeMode(new Command(CommandType.NEXT_TASK, vrpVehicle.getId()));
     }
 
 
     public void notifyMoveOverNode(Vehicle vrpVehicle, Id oldLinkId, Id newLinkId)
     {
         jdbcWriter.nextLink(vrpVehicle, newLinkId);
-        mServer.writeCommand(new Command(CommandType.NEXT_LINK, vrpVehicle.getId()));
+        writeCommandInRealTimeMode(new Command(CommandType.NEXT_LINK, vrpVehicle.getId()));
     }
 
 
-    @Override
-    public void afterSim()
+    private void writeCommandInRealTimeMode(Command command)
     {
-        // TODO Auto-generated method stub
-        super.afterSim();
+        if (realTimeMode == RealTimeMode.IN) {
+            mServer.writeCommand(command);
+        }
     }
 
 

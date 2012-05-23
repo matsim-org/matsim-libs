@@ -301,7 +301,7 @@ public class JdbcWriter
                             throw new RuntimeException("Unsupported TaskType: " + t.getType());
                     }
 
-                    int taskId = createTaskId(t);
+                    int taskId = calcTaskId(t);
                     taskInsert.setInt(1, taskId);
                     taskInsert.setInt(2, t.getTaskIdx());
                     taskInsert.setInt(3, v.getId());
@@ -453,7 +453,7 @@ public class JdbcWriter
                             throw new RuntimeException("Unsupported TaskType: " + t.getType());
                     }
 
-                    taskInsert.setInt(1, createTaskId(t));
+                    taskInsert.setInt(1, calcTaskId(t));
                     taskInsert.setInt(2, t.getTaskIdx());
                     taskInsert.setInt(3, v.getId());
                     taskInsert.setString(4, t.getStatus().name());
@@ -517,9 +517,18 @@ public class JdbcWriter
     }
 
 
-    private int createTaskId(Task task)
+    private static final int FACTOR = 10000;
+
+
+    public static int calcTaskId(Task task)
     {
-        return task.getSchedule().getVehicle().getId() * 10000 + task.getTaskIdx();
+        return task.getSchedule().getVehicle().getId() * FACTOR + task.getTaskIdx();
+    }
+
+
+    public static Task findTask(int taskId, List<Vehicle> vehicles)
+    {
+        return vehicles.get(taskId / FACTOR).getSchedule().getTasks().get(taskId % FACTOR);
     }
 
 
@@ -593,7 +602,7 @@ public class JdbcWriter
                 taskStatusUpdate.setInt(3, newTask.getTaskIdx());
                 taskStatusUpdate.executeUpdate();
 
-                scheduleCurrentTaskUpdate.setInt(1, createTaskId(newTask));
+                scheduleCurrentTaskUpdate.setInt(1, calcTaskId(newTask));
                 scheduleCurrentTaskUpdate.setInt(2, scheduleId);
                 scheduleCurrentTaskUpdate.executeUpdate();
             }

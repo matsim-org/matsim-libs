@@ -31,12 +31,9 @@ import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.agents.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.Dijkstra;
@@ -95,30 +92,18 @@ public class SingleIterOnlineDvrpLauncher
 
     private void processArgs(String... args)
     {
-        if (args.length == 1) {
-            dirName = args[0];
-        }
-        else {
-            dirName = "D:\\PP-rad\\taxi\\mielec\\";
-            // dirName = "D:\\PP-rad\\taxi\\poznan\\";
-        }
-
-        if (!dirName.endsWith("\\")) {
-            dirName += "\\";
-        }
-
         if (args.length == 1) {// Wal - do not change the following block
+            dirName = args[0] + "\\";
             netFileName = dirName + "network.xml";
-            plansFileName = dirName + "plans.xml";
+            plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
 
             depotsFileName = dirName + "depots.xml";
             reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
-            taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
+            taxiCustomersFileName = dirName + "taxiCustomers_5_pc.txt";
 
             dbFileName = dirName + "system_state.mdb";
 
-            // eventsFileName = dirName + "output\\std\\ITERS\\it.10\\10.events.xml.gz";
             eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
 
             algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
@@ -129,28 +114,50 @@ public class SingleIterOnlineDvrpLauncher
             vrpOutDirName = dirName + "vrp_output";
 
             wal = true;
+        }
+        else if (args.length == 2 && args[1] == "KAI") { // demo version for Kai
+            dirName = args[0] + "\\";
+            netFileName = dirName + "network.xml";
+            plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
 
+            reqIdToVehIdFileName = dirName + "reqIdToVehId";
+
+            depotsFileName = dirName + "depots-5_taxis-15.xml";
+            taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
+
+            eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
+
+            algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
+
+            otfVis = true;
+
+            vrpOutFiles = !true;
+            vrpOutDirName = dirName + "vrp_output";
+
+            wal = false;
         }
         else {
+            dirName = "D:\\PP-rad\\taxi\\mielec\\";
             netFileName = dirName + "network.xml";
 
             // plansFileName = dirName + "plans.xml";
-            plansFileName = dirName + "output\\std\\ITERS\\it.20\\20.plans.xml.gz";
+            plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
+
+            depotsFileName = dirName + "depots.xml";
 
             // depotsFileName = dirName + "depots-5_taxis-10.xml";
-            depotsFileName = dirName + "depots-5_taxis-15.xml";
-            taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
+            // depotsFileName = dirName + "depots-5_taxis-15.xml";
+            // taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
 
             // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
             // depotsFileName = dirName + "depots-5_taxis-150.xml";
 
-            taxiCustomersFileName = dirName + "taxiCustomers_20_pc.txt";
-            depotsFileName = dirName + "depots-5_taxis-500.xml";
+            // taxiCustomersFileName = dirName + "taxiCustomers_20_pc.txt";
+            // depotsFileName = dirName + "depots-5_taxis-500.xml";
 
             // reqIdToVehIdFileName = dirName + "reqIdToVehId";
-            // dbFileName = dirName + "system_state.mdb";
 
-            eventsFileName = dirName + "output\\std\\ITERS\\it.20\\20.events.xml.gz";
+            eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
 
             // algorithmConfig = AlgorithmConfig.NOS_STRAIGHT_LINE;
             // algorithmConfig = AlgorithmConfig.NOS_TRAVEL_DISTANCE;
@@ -176,7 +183,6 @@ public class SingleIterOnlineDvrpLauncher
             vrpOutDirName = dirName + "vrp_output";
 
             wal = false;
-
         }
 
         if (vrpOutFiles) {
@@ -303,25 +309,24 @@ public class SingleIterOnlineDvrpLauncher
         scenario.getConfig().addQSimConfigGroup(qSimConfig);
 
         EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim, MatsimRandom.getRandom());
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim.addMobsimEngine(teleportationEngine);
+        QSim qSim = new QSim(scenario, events);
+        ActivityEngine activityEngine = new ActivityEngine();
+        qSim.addMobsimEngine(activityEngine);
+        qSim.addActivityHandler(activityEngine);
+        QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim,
+                MatsimRandom.getRandom());
+        qSim.addMobsimEngine(netsimEngine);
+        qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+        TeleportationEngine teleportationEngine = new TeleportationEngine();
+        qSim.addMobsimEngine(teleportationEngine);
 
-        QSim sim = qSim;
-
-        TaxiSimEngine taxiSimEngine = wal ? new WalTaxiSimEngine(sim, data, optimizerFactory,
-                dbFileName) : new TaxiSimEngine(sim, data, optimizerFactory);
-        sim.addMobsimEngine(taxiSimEngine);
-        sim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
-                new DefaultAgentFactory(sim), sim));
-        sim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
-        sim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
+        TaxiSimEngine taxiSimEngine = wal ? new WalTaxiSimEngine(qSim, data, optimizerFactory,
+                dbFileName) : new TaxiSimEngine(qSim, data, optimizerFactory);
+        qSim.addMobsimEngine(taxiSimEngine);
+        qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
+                new DefaultAgentFactory(qSim), qSim));
+        qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
+        qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
 
         if (vrpOutFiles) {
             taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
@@ -343,11 +348,11 @@ public class SingleIterOnlineDvrpLauncher
 
         if (otfVis) { // OFTVis visualization
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
-                    scenario, sim.getEventsManager(), sim);
+                    scenario, qSim.getEventsManager(), qSim);
             VrpOTFClientLive.run(scenario.getConfig(), server);
         }
 
-        sim.run();
+        qSim.run();
     }
 
 

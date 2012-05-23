@@ -32,7 +32,6 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizerFactory;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy.OptimizerAction;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
@@ -45,12 +44,12 @@ public class TaxiSimEngine
     private final Netsim netsim;
     private final VrpOptimizerFactory optimizerFactory;
 
-    //////////// begin: TO BE MOVED TO TAXI_OPTIMIZER?
+    // ////////// begin: TO BE MOVED TO TAXI_OPTIMIZER?
     private TaxiOptimizer optimizer;
     private final TaxiOptimizationPolicy optimizePolicy;
     private final TaxiEvaluator taxiEvaluator = new TaxiEvaluator();
     private final List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
-    //////////// end:   TO BE MOVED TO TAXI_OPTIMIZER?
+    // ////////// end: TO BE MOVED TO TAXI_OPTIMIZER?
 
     private final List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
 
@@ -140,25 +139,10 @@ public class TaxiSimEngine
 
     public void updateAndOptimizeBeforeNextTask(Vehicle vrpVehicle, double now)
     {
-        OptimizerAction action = optimizePolicy.calculateAction(vrpVehicle.getSchedule());
+        boolean scheduleChanged = update(vrpVehicle);
 
-        switch (action) {
-            case NO:
-                throw new UnsupportedOperationException();// TODO CURRENTLY UNSUPPORTED!!!!!!
-
-            case UPDATE:
-                update(vrpVehicle);
-                break;
-
-            case REOPTIMIZE:
-                if (update(vrpVehicle)) {
-                    optimize(now);
-                }
-
-                break;
-
-            default:
-                throw new IllegalArgumentException();
+        if (scheduleChanged && optimizePolicy.shouldOptimize(vrpVehicle.getSchedule())) {
+            optimize(now);
         }
     }
 
