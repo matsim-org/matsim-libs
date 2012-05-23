@@ -84,24 +84,22 @@ public class SubMatrixCreator {
 							if (shareSum > rnd) {
 								Matrix smallM = this.ms.get(Integer
 										.toString(time));
-								smallM.setEntry(
-										from,
-										to,
-										smallM.getEntry(from, to).getValue() + 1);
+								smallM.setEntry(from, to, ((int) smallM
+										.getEntry(from, to).getValue()) + 1);
 								break;
 							}
 						}
 					}
 				} else if (diff < 0) {// to reduce, auction: use the absolute
 										// value of diff
-					for (int diffIdx = 0; diffIdx < diff; diffIdx++) {
+					for (int diffIdx = 0; diffIdx < -diff; diffIdx++) {
 						double shareSum = 0;
 						double rnd = r.nextDouble();
 
 						double shareSumDenominator = 0d;
 						Set<Integer> times = new HashSet<Integer>();
 						for (int time = 1; time <= 24; time++) {
-							Matrix smallM = this.ms.get(time);
+							Matrix smallM = this.ms.get(Integer.toString(time));
 							int value = (int) smallM.getEntry(from, to)
 									.getValue();
 							if (value != 0) {
@@ -114,7 +112,8 @@ public class SubMatrixCreator {
 							shareSum += d.getTrafficShare(time)
 									/ shareSumDenominator;
 							if (shareSum > rnd) {
-								Matrix smallM = this.ms.get(time);
+								Matrix smallM = this.ms.get(Integer
+										.toString(time));
 								smallM.setEntry(
 										from,
 										to,
@@ -122,6 +121,23 @@ public class SubMatrixCreator {
 								break;
 							}
 						}
+					}
+				}
+				if (diff != 0) {
+					// TODO check the consistancy of small matrices
+					// Matrix sumMatrix = new Matrix("new sum",
+					// "to check if the small matrices were well calculated");
+					int sum = 0;
+					for (int time = 1; time <= 24; time++) {
+						Matrix smallMatrix = ms.get(Integer.toString(time));
+						sum += smallMatrix.getEntry(from, to).getValue();
+					}
+					if (origVal != sum) {
+						System.err.println("There is something wrong on from\t"
+								+ from + "\tto\t" + to + "\torginal value =\t"
+								+ origVal + ", and the new sum =\t" + sum
+								+ ", and the diff =\t" + diff
+								+ ", and the rounded value =\t" + roundedVal);
 					}
 				}
 			}

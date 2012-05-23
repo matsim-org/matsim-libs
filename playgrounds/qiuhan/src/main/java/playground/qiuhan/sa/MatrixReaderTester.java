@@ -29,7 +29,7 @@ import org.matsim.visum.VisumMatrixReader;
  * @author Qiuhan
  * 
  */
-public class MatrixReader {
+public class MatrixReaderTester {
 	public static void main(String[] args) {
 		Matrix m = new Matrix("5oev_o",
 				"from QZ-Matrix 5 oev_00.mtx of Sonja's DA");
