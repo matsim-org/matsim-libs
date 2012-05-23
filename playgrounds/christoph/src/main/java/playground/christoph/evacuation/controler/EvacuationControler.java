@@ -29,9 +29,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -40,10 +38,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -57,8 +51,6 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTra
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -73,7 +65,6 @@ import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
 //import org.matsim.utils.eventsfilecomparison.OnlineEventsComparator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -104,8 +95,8 @@ import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
-import playground.christoph.evacuation.network.AddExitLinksToNetwork;
-import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
+import playground.christoph.evacuation.router.LeastCostPathCalculatorSelectorFactory;
+import playground.christoph.evacuation.router.RandomCompassRouterFactory;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
@@ -175,7 +166,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	
 	protected double duringLegRerouteShare = 0.10;
 	
-	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected ObjectAttributes householdObjectAttributes;
 //	protected HouseholdsUtils householdsUtils;
 	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
@@ -270,29 +260,19 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		legModeChecker.run(this.scenarioData.getPopulation());
 		legModeChecker.printStatistics();
 		
-		// connect facilities to links
-		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
-
-		// Add Rescue Links to Network
-		new AddExitLinksToNetwork(this.scenarioData).createExitLinks();
-
-		// Add secure Facilities to secure Links.
-//		new AddSecureFacilitiesToNetwork(this.scenarioData).createSecureFacilities();
-		
-		// Add pickup facilities to Links.
-		addPickupFacilities();
+		/*
+		 * Prepare the scenario:
+		 * 	- connect facilities to network
+		 * 	- add exit links to network
+		 * 	- add pickup facilities
+		 *  - add z Coordinates to network
+		 */
+		new PrepareEvacuationScenario().prepareScenario(this.scenarioData);
 		
 		// load household object attributes
 		this.householdObjectAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
 		
-		/*
-		 * Adding z-coordinates to the network
-		 */
-		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, EvacuationConfig.dhm25File, EvacuationConfig.srtmFile);
-		zCoordinateAdder.addZCoordinatesToNetwork();
-		zCoordinateAdder.checkSteepness();
-
 		/*
 		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
 		 * factory but returns always the same travel time object, which is possible since
@@ -439,10 +419,11 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 			this.events.addHandler(evacuationTimePicture);	
 		}
 		
-		 // Create and add an AgentsInEvacuationAreaCounter.
+		// Create and add an AgentsInEvacuationAreaCounter.
 		if (EvacuationConfig.countAgentsInEvacuationArea) {
 			double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
-			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer.createInstance(), scaleFactor);
+			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer.createInstance(), 
+					this.popAdmin, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
 			this.events.addHandler(agentsInEvacuationAreaCounter);	
@@ -487,7 +468,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, timeFactory, 
 				this.householdsTracker, this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.affectedArea, 
-				this.modeAvailabilityChecker.createInstance(), this.informedHouseholdsTracker);
+				this.modeAvailabilityChecker.createInstance(), this.informedHouseholdsTracker, this.popAdmin);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 	
@@ -583,7 +564,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
 				this.coordAnalyzer.createInstance(), this.vehiclesTracker, this.householdsTracker, this.informedHouseholdsTracker,
-				this.modeAvailabilityChecker.createInstance());
+				this.modeAvailabilityChecker.createInstance(), this.popAdmin);
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
@@ -638,7 +619,10 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, penaltyCalculator);
 		
-		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+		LeastCostPathCalculatorFactory nonPanicFactory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+		LeastCostPathCalculatorFactory panicFactory = new RandomCompassRouterFactory(EvacuationConfig.tabuSearch, EvacuationConfig.compassProbability);
+		
+		LeastCostPathCalculatorFactory factory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, this.popAdmin);
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, penaltyCostFactory, timeFactory, factory, routeFactory);
 		
 		/*
@@ -678,21 +662,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.initialReplannerFactories.add(this.currentLegToMeetingPointReplannerFactory);
 	}
 
-	private void addPickupFacilities() {
-		for (Link link : scenarioData.getNetwork().getLinks().values()) {
-			/*
-			 * Create and add the pickup facility and add activity option ("pickup")
-			 */
-			String idString = link.getId().toString() + "_pickup";
-			ActivityFacility secureFacility = scenarioData.getActivityFacilities().createFacility(scenarioData.createId(idString), link.getCoord());
-			((ActivityFacilityImpl)secureFacility).setLinkId(((LinkImpl)link).getId());
-			
-			ActivityOption activityOption = ((ActivityFacilityImpl)secureFacility).createActivityOption("pickup");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
-			activityOption.setCapacity(Double.MAX_VALUE);
-		}
-	}
-	
 	/*
 	 * The LinkReplanningMap calculates the earliest link exit time for each agent.
 	 * To do so, a MultiModalTravelTime object is required which calculates these

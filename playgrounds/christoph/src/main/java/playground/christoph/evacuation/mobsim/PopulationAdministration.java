@@ -92,10 +92,9 @@ public class PopulationAdministration implements BeforeMobsimListener, AfterMobs
 		return panicPeople.contains(personId);
 	}
 	
-	public void writeFiles() {
-		
+	public boolean isHouseholdParticipating(Id householdId) {
+		return participatingHouseholds.contains(householdId);
 	}
-	
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {

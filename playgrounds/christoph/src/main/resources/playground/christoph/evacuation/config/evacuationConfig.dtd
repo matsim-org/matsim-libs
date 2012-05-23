@@ -4,7 +4,7 @@
 
 <!-- Author: Christoph Dobler -->
 
-<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt)>
+<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation)>
 
 <!ELEMENT evacuationTime	EMPTY>
 <!ATTLIST evacuationTime
@@ -43,6 +43,17 @@
 <!ATTLIST analysis
 			createEvacuationTimePicture	CDATA	#REQUIRED
 			countAgentsInEvacuationArea	CDATA	#REQUIRED>
+
 <!ELEMENT pt			EMPTY>
 <!ATTLIST pt
 			travelTimePenaltyFactor		CDATA	#REQUIRED>
+
+<!ELEMENT panic			EMPTY>			
+<!ATTLIST panic
+			share				CDATA	#REQUIRED
+			compassProbability	CDATA	#REQUIRED
+			tabuSearch			CDATA	#REQUIRED>
+
+<!ELEMENT participation	EMPTY>
+<!ATTLIST participation
+			share				CDATA	#REQUIRED>

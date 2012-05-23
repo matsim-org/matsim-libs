@@ -52,6 +52,7 @@ import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.utils.DeterministicRNG;
@@ -81,6 +82,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final VehiclesTracker vehiclesTracker;
 	private final HouseholdsTracker householdsTracker;
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
+	private final PopulationAdministration popAdmin;
 	
 	private final DeterministicRNG rng;
 	private final Map<Id, HouseholdDeparture> householdDepartures;
@@ -97,7 +99,8 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	
 	public JoinedHouseholdsIdentifier(Scenario scenario, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
 			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
-			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker) {
+			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker,
+			PopulationAdministration popAdmin) {
 		this.households = ((ScenarioImpl) scenario).getHouseholds();
 		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
@@ -106,6 +109,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		this.householdsTracker = householdsTracker;
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.popAdmin = popAdmin;
 		
 		this.rng = new DeterministicRNG();
 		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
@@ -263,14 +267,14 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 					if (householdPosition.getPositionId().equals(householdPosition.getMeetingPointFacilityId())) {
 						
 						/*
-						 * If the meeting point is not secure, schedule a departure.
-						 * Otherwise ignore the household since it current location
-						 * is already secure.
+						 * If the meeting point is not secure and the household is willing 
+						 * to evacuate, schedule a departure. Otherwise ignore the household.
 						 */
 						Id facilityId = householdPosition.getPositionId();
 						ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 						boolean facilityIsSecure = !this.coordAnalyzer.isFacilityAffected(facility);
-						if (!facilityIsSecure) {
+						boolean householdParticipates = this.popAdmin.isHouseholdParticipating(householdId);
+						if (!facilityIsSecure && householdParticipates) {
 							HouseholdDeparture householdDeparture = createHouseholdDeparture(time, householdId, householdPosition.getPositionId());
 							this.householdDepartures.put(householdId, householdDeparture);
 							
@@ -287,14 +291,14 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	
 	private void updateHouseholds(Set<Id> householdsToUpdate, double time) {
 		
-		for (Id id : householdsToUpdate) {			
+		for (Id householdId : householdsToUpdate) {			
 			/*
 			 * Ignore households which are not informed so far.
 			 */
-			if (!informedHouseholdsTracker.isHouseholdInformed(id)) continue;
+			if (!informedHouseholdsTracker.isHouseholdInformed(householdId)) continue;
 			
-			HouseholdPosition householdPosition = householdsTracker.getHouseholdPosition(id);
-			HouseholdDeparture householdDeparture = this.householdDepartures.get(id);
+			HouseholdPosition householdPosition = householdsTracker.getHouseholdPosition(householdId);
+			HouseholdDeparture householdDeparture = this.householdDepartures.get(householdId);
 			
 			/*
 			 * Check whether the household is joined.
@@ -317,16 +321,18 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 						
 						/*
 						 * The household is at its meeting point. If no departure has
-						 * been scheduled so far and the facility is not secure, schedule one.
+						 * been scheduled so far, the household evacuates and the 
+						 * facility is not secure, schedule one.
 						 */
 						if (householdDeparture == null) {
 							
 							ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 							boolean facilityIsSecure = !this.coordAnalyzer.isFacilityAffected(facility);
-							if (!facilityIsSecure) {
+							boolean householdParticipates = this.popAdmin.isHouseholdParticipating(householdId);
+							if (!facilityIsSecure && householdParticipates) {
 								// ... and schedule the household's departure.
-								householdDeparture = createHouseholdDeparture(time, id, meetingPointId);
-								this.householdDepartures.put(id, householdDeparture);
+								householdDeparture = createHouseholdDeparture(time, householdId, meetingPointId);
+								this.householdDepartures.put(householdId, householdDeparture);
 							}
 						}
 					} 
@@ -339,9 +345,9 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 					 * TODO: check whether this could be a valid state.
 					 */
 					else {
-						this.householdDepartures.remove(id);
+						this.householdDepartures.remove(householdId);
 						if (time > EvacuationConfig.evacuationTime && !facilityId.toString().contains("pickup")) {
-							log.warn("Household is joined at a facility which is not its meeting facility. Id: " + id);							
+							log.warn("Household is joined at a facility which is not its meeting facility. Id: " + householdId);							
 						}
 					}
 				}
@@ -351,7 +357,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				 * that there is no departure scheduled.
 				 */
 				else {				
-					this.householdDepartures.remove(id);
+					this.householdDepartures.remove(householdId);
 				}
 			}
 			
@@ -360,14 +366,14 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 			 * scheduled for for that household.
 			 */
 			else {
-				this.householdDepartures.remove(id);
+				this.householdDepartures.remove(householdId);
 				
 				/*
 				 * If the household was joined and the evacuation has already started.
 				 * We do not expect to find a departure before it was scheduled.
 				 */
 				if (wasJoined && time < householdDeparture.departureTime) {
-					log.warn("Household has left its meeting point before scheduled departure. Id " + id);
+					log.warn("Household has left its meeting point before scheduled departure. Id " + householdId);
 				}
 			}
 		}

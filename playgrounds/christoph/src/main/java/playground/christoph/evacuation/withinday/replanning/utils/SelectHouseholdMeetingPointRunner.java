@@ -59,6 +59,7 @@ import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
@@ -71,6 +72,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final VehiclesTracker vehiclesTracker;
 	private final CoordAnalyzer coordAnalyzer;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
+	private final PopulationAdministration popAdmin;
 	private final PlanAlgorithm toHomeFacilityPlanAlgo;
 	private final PlanAlgorithm evacuationPlanAlgo;
 	
@@ -84,12 +86,13 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	public SelectHouseholdMeetingPointRunner(Scenario scenario, ReplanningModule toHomeFacilityRouter, 
 			ReplanningModule fromHomeFacilityRouter, HouseholdsTracker householdsTracker, 
 			VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, ModeAvailabilityChecker modeAvailabilityChecker,
-			CyclicBarrier startBarrier, CyclicBarrier endBarrier, AtomicBoolean allMeetingsPointsSelected) {
+			PopulationAdministration popAdmin, CyclicBarrier startBarrier, CyclicBarrier endBarrier, AtomicBoolean allMeetingsPointsSelected) {
 		this.scenario = scenario;
 		this.householdsTracker = householdsTracker;
 		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.popAdmin = popAdmin;
 		this.startBarrier = startBarrier;
 		this.endBarrier = endBarrier;
 		this.allMeetingsPointsSelected = allMeetingsPointsSelected;
@@ -130,6 +133,14 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 					Id homeFacilityId = hdd.homeFacilityId;
 					ActivityFacility homeFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(homeFacilityId);
 					hdd.homeFacilityIsAffected = this.coordAnalyzer.isFacilityAffected(homeFacility);
+					
+					/*
+					 * If the household does not evacuate, set its meeting point to its home facility.
+					 */
+					if (!popAdmin.isHouseholdParticipating(household.getId())) {
+						hdd.householdPosition.setMeetingPointFacilityId(hdd.householdPosition.getHomeFacilityId());
+						continue;
+					}
 					
 					/*
 					 * So far we assume that all households outside the affected area follow

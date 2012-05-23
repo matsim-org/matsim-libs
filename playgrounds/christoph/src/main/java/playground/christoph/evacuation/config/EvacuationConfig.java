@@ -30,11 +30,11 @@ public class EvacuationConfig {
 
 	public static double ptTravelTimePenaltyFactor = Double.MAX_VALUE;
 	
+	public static double panicShare = 0.00;
 	public static double compassProbability = 0.667;
 	public static boolean tabuSearch = true;
 
-	public static double panicShare = 0.10;
-	public static double householdParticipationShare = 0.10;
+	public static double householdParticipationShare = 1.00;
 	
 	/*
 	 * Analysis modules

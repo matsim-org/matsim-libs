@@ -57,8 +57,10 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.households.Household;
 
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.PopulationAdministration;
 
 /**
  * Counts the number of agents within an evacuated area.
@@ -83,8 +85,9 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	protected final Scenario scenario;
 	protected final Set<String> transportModes;
 	protected final CoordAnalyzer coordAnalyzer;
+	protected final PopulationAdministration popAdmin;
 	protected final double scaleFactor;
-	
+		
 	protected Set<Id> activityAgentsInEvacuationArea;
 	protected Map<String, Set<Id>> legAgentsInEvacuationArea;
 	protected Map<Id, String> currentTransportMode;
@@ -96,11 +99,13 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	protected Map<String, int[]> legBins;
 	protected int[] activityBins;
 
-	public AgentsInEvacuationAreaCounter(Scenario scenario, Set<String> transportModes, CoordAnalyzer coordAnalyzer, double scaleFactor) {
+	public AgentsInEvacuationAreaCounter(Scenario scenario, Set<String> transportModes, CoordAnalyzer coordAnalyzer,
+			PopulationAdministration popAdmin, double scaleFactor) {
 		this.scenario = scenario;
 		this.transportModes = transportModes;
 		this.coordAnalyzer = coordAnalyzer;
 		this.scaleFactor = scaleFactor;
+		this.popAdmin = popAdmin;
 		
 		init();
 	}
@@ -320,9 +325,16 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+
 		// debug
+		Map<Id, Id> personHouseholdMap = new HashMap<Id, Id>();
+		for (Household household : ((ScenarioImpl) this.scenario).getHouseholds().getHouseholds().values()) {
+			for (Id id : household.getMemberIds()) personHouseholdMap.put(household.getId(), id);
+		}
 		for (Id id : activityAgentsInEvacuationArea) {
-			 log.info(id.toString());
+			if (this.popAdmin.isHouseholdParticipating(personHouseholdMap.get(id))) {
+				log.warn("Person " + id.toString() + " is still inside the evacuation area but should have left.");				
+			}
 		}
 
 		// ensure, that the last bin is written

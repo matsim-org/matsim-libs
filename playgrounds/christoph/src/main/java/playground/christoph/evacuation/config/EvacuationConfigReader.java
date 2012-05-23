@@ -42,6 +42,8 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String ANALYSIS = "analysis";
 	public static String FILE = "file";
 	public static String PT = "pt";
+	public static String PANIC = "panic";
+	public static String PARTICIPATION = "participation";
 	
 	public static String TIME = "time";
 	public static String X = "x";
@@ -55,6 +57,9 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String CREATEEVACUATIONTIMEPICTURE = "createEvacuationTimePicture";
 	public static String COUNTAGENTSINEVACUATIONAREA = "countAgentsInEvacuationArea";
 	public static String TRAVELTIMEPENALTYFACTOR = "travelTimePenaltyFactor";
+	public static String SHARE = "share";
+	public static String COMPASSPROBABILITY = "compassProbability";
+	public static String TABUSEARCH = "tabuSearch";
 	
 	private String path = "";
 	private boolean readVehicleFleet = false;
@@ -103,7 +108,26 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			EvacuationConfig.countAgentsInEvacuationArea = Boolean.valueOf(atts.getValue(COUNTAGENTSINEVACUATIONAREA));
 		} else if (PT.equalsIgnoreCase(name)) {
 			EvacuationConfig.ptTravelTimePenaltyFactor = Double.valueOf(atts.getValue(TRAVELTIMEPENALTYFACTOR));
-		}else {
+		} else if (PANIC.equalsIgnoreCase(name)) {
+			double value;
+			
+			value = Double.valueOf(atts.getValue(SHARE));
+			if (value < 0.0) value = 0.0;
+			else if (value > 1.0) value = 1.0;
+			EvacuationConfig.panicShare = value;
+			
+			value = Double.valueOf(atts.getValue(COMPASSPROBABILITY));
+			if (value < 0.0) value = 0.0;
+			else if (value > 1.0) value = 1.0;
+			EvacuationConfig.compassProbability = value;
+			
+			EvacuationConfig.tabuSearch = Boolean.valueOf(atts.getValue(TABUSEARCH));
+		} else if (PARTICIPATION.equalsIgnoreCase(name)) {
+			double value = Double.valueOf(atts.getValue(SHARE));
+			if (value < 0.0) value = 0.0;
+			else if (value > 1.0) value = 1.0;
+			EvacuationConfig.householdParticipationShare = value;
+		} else {
 			log.warn("Ignoring startTag: " + name);
 		}
 	}
@@ -125,6 +149,8 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		} else if (FILE.equalsIgnoreCase(name)) {
 		} else if(ANALYSIS.equalsIgnoreCase(name)) {
 		} else if(PT.equalsIgnoreCase(name)) {
+		} else if(PANIC.equalsIgnoreCase(name)) {
+		} else if(PARTICIPATION.equalsIgnoreCase(name)) {
 		} else log.warn("Ignoring endTag: " + name);
 	}
 	

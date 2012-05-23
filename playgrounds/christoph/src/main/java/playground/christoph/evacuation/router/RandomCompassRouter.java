@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
@@ -44,7 +45,7 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 	protected final Random random;
 	protected final boolean tabuSearch;	
 	protected final double compassProbability;
-	protected final int maxLinks = 10000; // maximum number of links in a created leg 
+	protected final int maxLinks = 20000; // maximum number of links in a created leg 
 	
 	protected Set<String> modeRestrictions;
 	
@@ -72,31 +73,68 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 				
 		nodes.add(fromNode);
 		
+		
+		/*
+		 * If the toNode is a rescue node, we have to exchange it with another node because
+		 * it has no real coordinate and therefore the compass algorithm would produce
+		 * wrong results. 
+		 */
+		boolean toRescueNode = toNode.getId().toString().contains("rescueNode");
+		Node orgToNode = null;
+		Link toRescueNodeLink = null;
+		if (toRescueNode) {
+			orgToNode = toNode;
+			Collection<? extends Link> inLinks = toNode.getInLinks().values();
+			
+			double distance = Double.MAX_VALUE;
+			for (Link link : inLinks) {
+				double d = CoordUtils.calcDistance(link.getFromNode().getCoord(), fromNode.getCoord());
+				if (d < distance) {
+					distance = d;
+					toRescueNodeLink = link;
+				}
+			}
+			toNode = toRescueNodeLink.getFromNode();
+		}
+		
 		while(!currentNode.equals(toNode)) {
 
 			// stop searching if to many links in the generated Route...
 			if (nodes.size() > maxLinks) {
-				log.warn("Route has reached the maximum allowed length - aborting!");
+//				log.warn("Route has reached the maximum allowed length - aborting!");
 				break;
 			}
 			
 			List<Link> outLinks = new ArrayList<Link>(currentNode.getOutLinks().values());
+			Iterator<Link> iter;
 			
-			// remove links which do not offer a compatible mode
-			Iterator<Link> iter = outLinks.iterator();
+			// if it is not a route to a rescue node, remove all rescue links
+			iter = outLinks.iterator();
 			while (iter.hasNext()) {
 				Link link = iter.next();
-				
+				if (link.getId().toString().contains("rescueLink")) iter.remove();
+			}
+			
+			// remove links which do not offer a compatible mode
+			iter = outLinks.iterator();
+			while (iter.hasNext()) {
+				Link link = iter.next();
+								
 				// if no restrictions are set
 				if (this.modeRestrictions == null) break;
 				
+				// if the link offers at least one required mode
+				boolean keepLink = false;
 				Set<String> allowedModes = link.getAllowedModes();
 				for (String mode : this.modeRestrictions) {
-					if (allowedModes.contains(mode)) break;
+					if (allowedModes.contains(mode)) {
+						keepLink = true;
+						break;
+					}
 				}
 				
 				// no compatible mode was found, therefore remove link from list
-				iter.remove();
+				if (!keepLink) iter.remove();
 			}
 			
 			// if a route should not return to the previous node from the step before
@@ -115,7 +153,7 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 				
 				double newAngle = calcAngle(fromNode, toNode, link.getToNode());
 				
-				//if the new direction is better than the existing one
+				// if the new direction is better than the existing one
 				if (newAngle <= angle) {
 					angle = newAngle;
 					nextLink = link;
@@ -139,9 +177,7 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 				// choose Link
 				nextLink = outLinks.get(random.nextInt(outLinks.size()));
 			}
-			//nextLink = links[i];
-			
-			
+		
 			// make the chosen link to the current link
 			if(nextLink != null) {
 				currentLink = nextLink;
@@ -149,8 +185,7 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 				currentNode = currentLink.getToNode();
 				routeLength = routeLength + currentLink.getLength();
 			} else {
-				log.error("Number of Links " + outLinks.size());
-				log.error("Return object was not from type Link! Class " + nextLink + " was returned!");
+				log.error("nextLink was null. aborting.");
 				break;
 			}
 			
@@ -158,6 +193,15 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 			links.add(currentLink);
 		}	// while(!currentNode.equals(toNode))
 
+		/*
+		 * If the toNode is a rescue node, we re-add it to the route
+		 */
+		if (toRescueNode) {
+			routeLength = routeLength + toRescueNodeLink.getLength();
+			nodes.add(orgToNode);
+			links.add(toRescueNodeLink);
+		}
+		
 		Path path = new Path(nodes, links, 0, 0);
 
 		if (maxLinks == path.links.size()) {
@@ -193,8 +237,8 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 		/* 
 		 * If the angle is exactly 180 degrees return a value that is slightly smaller.
 		 * Reason: if there are only links that return to the current node and links
-		 * with an angle of 180� a loop could be generated.
-		 * Solution: slightly reduce angles of 180� so one of them is chosen. 
+		 * with an angle of 180 degrees a loop could be generated.
+		 * Solution: slightly reduce angles of 180 degrees so one of them is chosen. 
 		 */
 		if(phi == Math.PI) phi = Math.PI - Double.MIN_VALUE;
 		

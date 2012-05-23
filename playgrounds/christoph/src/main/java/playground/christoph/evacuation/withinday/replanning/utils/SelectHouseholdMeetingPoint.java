@@ -65,6 +65,7 @@ import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedHouseholdsTracker;
@@ -92,6 +93,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private final Geometry affectedArea;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
+	private final PopulationAdministration popAdmin;
 	private final int numOfThreads;
 
 	private ReplanningModule toHomeFacilityRouter;
@@ -114,7 +116,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	
 	public SelectHouseholdMeetingPoint(Scenario scenario, MultiModalTravelTimeFactory timeFactory,
 			HouseholdsTracker householdsTracker, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer,
-			Geometry affectedArea, ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker) {
+			Geometry affectedArea, ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker,
+			PopulationAdministration popAdmin) {
 		this.scenario = scenario;
 		this.timeFactory = timeFactory;
 		this.householdsTracker = householdsTracker;
@@ -123,6 +126,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		this.affectedArea = affectedArea;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
+		this.popAdmin = popAdmin;
 		
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
 		this.allMeetingsPointsSelected = new AtomicBoolean(false);
@@ -331,9 +335,18 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	 * Instead, multiple *real* rescue facilities could be defined. 
 	 */
 	public Id selectNextMeetingPoint(Id householdId) {
-		Id rescueMeetingPointId = scenario.createId("rescueFacility");
-		this.householdsTracker.getHouseholdPosition(householdId).setMeetingPointFacilityId(rescueMeetingPointId);
-		return rescueMeetingPointId;
+//		Id rescueMeetingPointId = scenario.createId("rescueFacility");
+//		this.householdsTracker.getHouseholdPosition(householdId).setMeetingPointFacilityId(rescueMeetingPointId);
+//		return rescueMeetingPointId;
+		
+		// if the household evacuates, select rescue facilty as meeting point
+		if (popAdmin.isHouseholdParticipating(householdId)) {
+			Id rescueMeetingPointId = scenario.createId("rescueFacility");
+			this.householdsTracker.getHouseholdPosition(householdId).setMeetingPointFacilityId(rescueMeetingPointId);
+			return rescueMeetingPointId;
+		}
+		// otherwise meet and stay at home
+		else return this.householdsTracker.getHouseholdPosition(householdId).getHomeFacilityId();
 	}
 
 	public Id getMeetingPoint(Id householdId) {
@@ -442,7 +455,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 			
 			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, toHomeFacilityRouter, 
 					fromHomeFacilityRouter, householdsTracker, vehiclesTracker, coordAnalyzer.createInstance(), 
-					modeAvailabilityChecker.createInstance(), startBarrier, endBarrier, allMeetingsPointsSelected);
+					modeAvailabilityChecker.createInstance(), this.popAdmin, startBarrier, endBarrier, allMeetingsPointsSelected);
 			runner.setTime(time);
 			runnables[i] = runner; 
 					

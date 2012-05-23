@@ -34,7 +34,7 @@ public class LeastCostPathCalculatorSelectorFactory implements LeastCostPathCalc
 	private final LeastCostPathCalculatorFactory panicRouterFactory;
 	private final LeastCostPathCalculatorFactory nonPanicRouterFactory;
 	
-	LeastCostPathCalculatorSelectorFactory(LeastCostPathCalculatorFactory nonPanicRouterFactory,
+	public LeastCostPathCalculatorSelectorFactory(LeastCostPathCalculatorFactory nonPanicRouterFactory,
 			 LeastCostPathCalculatorFactory panicRouterFactory, PopulationAdministration popAdmin) {
 		this.nonPanicRouterFactory = nonPanicRouterFactory;
 		this.panicRouterFactory = panicRouterFactory;
