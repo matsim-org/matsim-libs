@@ -25,6 +25,7 @@ import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DistributionType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.ObjectFactory;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.testcases.MatsimTestCase;
 
 public class SerializerDeserializerTest extends MatsimTestCase {
@@ -42,6 +43,8 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			double sigma = .25;
 			double sampleSize = 0.787;
 
+			double earliest = MatsimRandom.getRandom().nextDouble();
+			double latest = MatsimRandom.getRandom().nextDouble()+1;
 			
 			GripsConfigModule gcm = new GripsConfigModule("grips");
 			gcm.setEvacuationAreaFileName(evacuationAreaFile);
@@ -56,6 +59,8 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			departureTimeDistribution.setDistribution(distrType );
 			departureTimeDistribution.setMu(mu);
 			departureTimeDistribution.setSigma(sigma);
+			departureTimeDistribution.setEarliest(earliest);
+			departureTimeDistribution.setLatest(latest);
 			
 			gcm.setDepartureTimeDistribution(departureTimeDistribution );
 			
@@ -74,7 +79,8 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			assertEquals(distrType.value(), gcm2.getDepartureTimeDistribution().getDistribution().value());
 			assertEquals(sigma, gcm2.getDepartureTimeDistribution().getSigma());
 			assertEquals(mu, gcm2.getDepartureTimeDistribution().getMu());
-			
+			assertEquals(earliest, gcm2.getDepartureTimeDistribution().getEarliest());
+			assertEquals(latest, gcm2.getDepartureTimeDistribution().getLatest());
 		}
 
 }

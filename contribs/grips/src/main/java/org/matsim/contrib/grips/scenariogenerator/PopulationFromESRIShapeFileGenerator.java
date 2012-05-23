@@ -138,16 +138,21 @@ public class PopulationFromESRIShapeFileGenerator {
 			return 0;
 		}
 		
+
 		if (depTimeDistr.getDistribution() == DistributionType.LOG_NORMAL) {
+			double latest = depTimeDistr.getLatest();
+			double earliest = depTimeDistr.getEarliest();
 			double mu = depTimeDistr.getMu();
 			double sigma = depTimeDistr.getSigma();
 			double r = MatsimRandom.getRandom().nextGaussian();
-			return Math.min(3600*Math.exp(mu + sigma*r),4*3600);
+			return Math.max(earliest, Math.min(3600*Math.exp(mu + sigma*r),latest));
 		} else if(depTimeDistr.getDistribution() == DistributionType.NORMAL) {
+			double latest = depTimeDistr.getLatest();
+			double earliest = depTimeDistr.getEarliest();
 			double mu = depTimeDistr.getMu();
 			double sigma = depTimeDistr.getSigma();
 			double r = MatsimRandom.getRandom().nextGaussian();
-			return 3600*mu+sigma*r;
+			return Math.max(earliest, Math.min(3600*mu+sigma*r,latest));
 		} else if (depTimeDistr.getDistribution() == DistributionType.DIRAC_DELTA) {
 			return 0;
 		}

@@ -8,6 +8,7 @@
 
 package org.matsim.contrib.grips.io.jaxb.gripsconfig;
 
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -27,6 +28,8 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="distribution" type="{}distributionType"/>
  *         &lt;element name="sigma" type="{http://www.w3.org/2001/XMLSchema}double"/>
  *         &lt;element name="mu" type="{http://www.w3.org/2001/XMLSchema}double"/>
+ *         &lt;element name="earliest" type="{http://www.w3.org/2001/XMLSchema}double"/>
+ *         &lt;element name="latest" type="{http://www.w3.org/2001/XMLSchema}double"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -39,7 +42,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "departureTimeDistributionType", propOrder = {
     "distribution",
     "sigma",
-    "mu"
+    "mu",
+    "earliest",
+    "latest"
 })
 public class DepartureTimeDistributionType {
 
@@ -47,6 +52,8 @@ public class DepartureTimeDistributionType {
     protected DistributionType distribution;
     protected double sigma;
     protected double mu;
+    protected double earliest;
+    protected double latest;
 
     /**
      * Gets the value of the distribution property.
@@ -57,7 +64,7 @@ public class DepartureTimeDistributionType {
      *     
      */
     public DistributionType getDistribution() {
-        return distribution;
+        return this.distribution;
     }
 
     /**
@@ -77,7 +84,7 @@ public class DepartureTimeDistributionType {
      * 
      */
     public double getSigma() {
-        return sigma;
+        return this.sigma;
     }
 
     /**
@@ -93,7 +100,7 @@ public class DepartureTimeDistributionType {
      * 
      */
     public double getMu() {
-        return mu;
+        return this.mu;
     }
 
     /**
@@ -102,6 +109,38 @@ public class DepartureTimeDistributionType {
      */
     public void setMu(double value) {
         this.mu = value;
+    }
+
+    /**
+     * Gets the value of the earliest property.
+     * 
+     */
+    public double getEarliest() {
+        return this.earliest;
+    }
+
+    /**
+     * Sets the value of the earliest property.
+     * 
+     */
+    public void setEarliest(double value) {
+        this.earliest = value;
+    }
+
+    /**
+     * Gets the value of the latest property.
+     * 
+     */
+    public double getLatest() {
+        return this.latest;
+    }
+
+    /**
+     * Sets the value of the latest property.
+     * 
+     */
+    public void setLatest(double value) {
+        this.latest = value;
     }
 
 }
