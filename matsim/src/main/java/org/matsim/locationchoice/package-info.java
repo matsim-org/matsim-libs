@@ -7,12 +7,20 @@
  * </ul>
  * 
  * <h2>Parameters:<a name="locationchoice_parameters"></a></h2>
- * Two basic versions of the destination choice module exist, one (v0) based on local search and Haegerstrand's time geography and the other (v1) based on best response including error terms.
+ * Two basic versions of the destination choice module exist, one (v0) based on either global random search or local search and Haegerstrand's time geography and the other (v1) based on best response including error terms. v0 includes <i>localSearchRecursive, localSearchSingleAct</i> and global <i>random</i> search to be specified by the <strong><font color="black">algorithm</font></strong> attribute. v1 includes <i>bestResponse</i> also to be specified by the <strong><font color="black">algorithm</font></strong> attribute. 
  * Parameters required for v0 are given in <strong><font color="blue">blue</font></strong>, the ones used in v1 are given in <strong><font color="red">red</font></strong> and parameters applied in both versions are given in <strong>black</strong>.
  * <br/>
- * [[<i>How do I select if I use v0 or v1?  kai, mar'12</i>]]
  * <h3>General Parameters</h3>
  * <ul>
+ *  <li><strong><font color="black">algorithm</font></strong><br>
+ * 		Type and range: String (localSearchRecursive, localSearchSingleAct, random, bestResponse)<br>
+ * 		Default: null<br>
+ * 		Description: Specifies which version of destination choice module should be applied. <br>
+ * 		localSearchRecursive = time geography <br>
+ * 		localSearchSingleAct = the same as simple_tg <br>
+ * 		random = random mutation <br>
+ * 		bestResponse = best response (recommended) destination choice module <br>
+ *  </li>
  * 	<li><strong><font color="black">flexible_types</font></strong><br>
  * 		Type and range: String <br>
  * 		Default: null <br>
@@ -23,15 +31,7 @@
  * 		Default: SelectExpBeta <br>
  * 		Description: Specifies which plan should be replanned.
  *  </li>
- *  <li><strong><font color="black">algorithm</font></strong><br>
- * 		Type and range: String (random, bestResponse, localSearchRecursive, localSearchSingleAct)<br>
- * 		Default: null<br>
- * 		Description: Specifies which version of destination choice module should be applied. <br>
- * 		localSearchRecursive = time geography <br>
- * 		localSearchSingleAct = the same as simple_tg <br>
- * 		random = random mutation <br>
- * 		bestResponse = best response (recommended) destination choice module <br>
- *  </li>
+ * 
  *  <li><strong><font color="red">randomSeed</font></strong><br>
  * 		Type and range: long <br>
  * 		Default: 221177 <br>
