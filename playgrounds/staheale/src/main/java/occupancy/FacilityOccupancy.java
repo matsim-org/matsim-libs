@@ -20,6 +20,7 @@
 
 package occupancy;
 
+
 public class FacilityOccupancy {
 		
 	private int [] arrivals = null;

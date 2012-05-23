@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DecisionModelCreator.java
+ * AgentInteraction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,36 +20,10 @@
 
 package miniscenario;
 
-import org.matsim.core.population.PersonImpl;
-
-import preprocess.AgentMemory;
-import preprocess.DecisionModel;
-
-public class DecisionModelCreator {
+public class AgentInteraction {
 	
-	public DecisionModel createDecisionModelForAgent(PersonImpl person, AgentMemory memory) {
-		DecisionModel model = new DecisionModel();
-		model.setMemory(memory);
-		
-		model.setFrequency("work", "mon-fri", 1);
-		model.setFrequency("shop_retail", "mon-fri", 0.4);
-		model.setFrequency("shop_service", "mon-fri", 0.02);
-		model.setFrequency("sports_fun", "mon-fri", 0.3);
-		model.setFrequency("gastro_culture", "mon-fri", 0.3);
+	public static double scaleNumberOfPersons =1.0;
+	public static int numberOfTimeBins = 96; //24*3600/900
 
-		
-		model.setFrequency("work", "sat", 0);
-		model.setFrequency("shop_retail", "sat", 1);
-		model.setFrequency("shop_service", "sat", 0.5);
-		model.setFrequency("sports_fun", "sat", 0.5);
-		model.setFrequency("gastro_culture", "sat", 0.5);
-		
-		model.setFrequency("work", "sun", 0);
-		model.setFrequency("shop_retail", "sun", 0);
-		model.setFrequency("shop_service", "sun", 0);
-		model.setFrequency("sports_fun", "sun", 1);
-		model.setFrequency("gastro_culture", "sun", 1);
-		
-		return model;
-	}
+
 }

@@ -23,6 +23,7 @@ package miniscenario;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -74,6 +75,7 @@ public class CreateNetwork {
 		int stepsPerSide = (int)(sideLength / spacing);
 		
 		for (int i = 0; i <= stepsPerSide ; i++) {
+			
 			for (int j = 0; j <= stepsPerSide; j++) {
 				Id fromNodeId = new IdImpl(Integer.toString(i * (stepsPerSide + 1) + j));
 				Node fromNode = this.scenario.getNetwork().getNodes().get(fromNodeId);
@@ -89,7 +91,6 @@ public class CreateNetwork {
 					l0.setLength(((CoordImpl)fromNode.getCoord()).calcDistance(toNode.getCoord()));
 					this.scenario.getNetwork().addLink(l0);
 					linkCnt++;
-					
 					this.addFacility(l0, facilityCnt);
 					facilityCnt++;						
 					
@@ -128,18 +129,35 @@ public class CreateNetwork {
 		}
 		log.info("Created " + linkCnt + " links");
 		log.info("Created " + facilityCnt + " facilities");
+		log.info("number of shop retail facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("shop_retail").size());
+		log.info("number of shop service facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("shop_service").size());
+		log.info("number of sports & fun facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("sports_fun").size());
+		log.info("number of gastro & culture facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("gastro_culture").size());
+
 	}
 	
-	private void addFacility(Link l, int facilityId) {				
+	private void addFacility(Link l, int facilityId) {
+		int idnumber = facilityId;
 		IdImpl id = new IdImpl(Integer.toString(facilityId));
 		this.scenario.getActivityFacilities().createFacility(id, l.getCoord());
+
+		Random random = new Random(4711+idnumber);
 		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));
 		facility.createActivityOption("home");
 		facility.createActivityOption("work");
-		facility.createActivityOption("shop_retail");
-		facility.createActivityOption("shop_service");
-		facility.createActivityOption("sports_fun");
-		facility.createActivityOption("gastro_culture");
+		if (random.nextDouble()<0.029){
+    		facility.createActivityOption("shop_retail");
+    		}
+    	if (random.nextDouble()<0.008){
+    		facility.createActivityOption("shop_service");
+    		//log.info("created shop service facility");
+    		}
+    	if (random.nextDouble()<0.004){
+    		facility.createActivityOption("sports_fun");
+    		}
+    	if (random.nextDouble()<0.012){
+    		facility.createActivityOption("gastro_culture");
+    		}
 								
 		ActivityOptionImpl actOptionHome = (ActivityOptionImpl)facility.getActivityOptions().get("home");
 		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
@@ -149,22 +167,35 @@ public class CreateNetwork {
 		OpeningTimeImpl opentimeWork = new OpeningTimeImpl(DayType.wk, 6.0 * 3600.0, 20.0 * 3600);
 		actOptionWork.addOpeningTime(opentimeWork);
 		
-		ActivityOptionImpl actOptionShopRetail = (ActivityOptionImpl)facility.getActivityOptions().get("shop_retail");
-		OpeningTimeImpl opentimeShopRetail = new OpeningTimeImpl(DayType.wk, 7.5 * 3600.0, 18.5 * 3600);
-		actOptionShopRetail.addOpeningTime(opentimeShopRetail);
-		
-		ActivityOptionImpl actOptionShopService = (ActivityOptionImpl)facility.getActivityOptions().get("shop_service");
-		OpeningTimeImpl opentimeShopService = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600);
-		actOptionShopService.addOpeningTime(opentimeShopService);
-		
-		ActivityOptionImpl actOptionSportsFun = (ActivityOptionImpl)facility.getActivityOptions().get("sports_fun");
-		OpeningTimeImpl opentimeSportsFun = new OpeningTimeImpl(DayType.wk, 7.0 * 3600.0, 24.0 * 3600);
-		actOptionSportsFun.addOpeningTime(opentimeSportsFun);
-		
-		ActivityOptionImpl actOptionGastroCulture = (ActivityOptionImpl)facility.getActivityOptions().get("gastro_culture");
-		OpeningTimeImpl opentimeGastroCulture = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 24.0 * 3600);
-		actOptionGastroCulture.addOpeningTime(opentimeGastroCulture);
-		
+		if (facility.getActivityOptions().containsKey("shop_retail")){
+			ActivityOptionImpl actOptionShopRetail = (ActivityOptionImpl)facility.getActivityOptions().get("shop_retail");
+			OpeningTimeImpl opentimeShopRetail = new OpeningTimeImpl(DayType.wk, 7.5 * 3600.0, 18.5 * 3600);
+			actOptionShopRetail.addOpeningTime(opentimeShopRetail);
+			double cap = 2+random.nextInt(34);
+			actOptionShopRetail.setCapacity(cap);
+		}
+		if (facility.getActivityOptions().containsKey("shop_service")){
+			ActivityOptionImpl actOptionShopService = (ActivityOptionImpl)facility.getActivityOptions().get("shop_service");
+			OpeningTimeImpl opentimeShopService = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600);
+			actOptionShopService.addOpeningTime(opentimeShopService);
+			double cap = 2+random.nextInt(8);
+			actOptionShopService.setCapacity(cap);
+			//log.info("shop service opentimes added");
+		}
+		if (facility.getActivityOptions().containsKey("sports_fun")){
+			ActivityOptionImpl actOptionSportsFun = (ActivityOptionImpl)facility.getActivityOptions().get("sports_fun");
+			OpeningTimeImpl opentimeSportsFun = new OpeningTimeImpl(DayType.wk, 7.0 * 3600.0, 24.0 * 3600);
+			actOptionSportsFun.addOpeningTime(opentimeSportsFun);
+			double cap = 2+random.nextInt(6);
+			actOptionSportsFun.setCapacity(cap);
+		}
+		if (facility.getActivityOptions().containsKey("gastro_culture")){
+			ActivityOptionImpl actOptionGastroCulture = (ActivityOptionImpl)facility.getActivityOptions().get("gastro_culture");
+			OpeningTimeImpl opentimeGastroCulture = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 24.0 * 3600);
+			actOptionGastroCulture.addOpeningTime(opentimeGastroCulture);
+			double cap = 2+random.nextInt(9);
+			actOptionGastroCulture.setCapacity(cap);
+		}
 		facility.setLinkId(l.getId());
 	}
 			

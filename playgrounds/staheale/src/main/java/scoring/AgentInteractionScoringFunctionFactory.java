@@ -32,11 +32,12 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class AgentInteractionScoringFunctionFactory implements ScoringFunctionFactory {
+public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoringFunctionFactory {
 
 	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private ObjectAttributes attributes;
@@ -46,7 +47,8 @@ public class AgentInteractionScoringFunctionFactory implements ScoringFunctionFa
     private double scaleNumberOfPersons;
 
     public AgentInteractionScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final ActivityFacilities facilities, Network network, double scaleNumberOfPersons) {
-		this.params = new CharyparNagelScoringParameters(config);
+		super(config, network);
+    	this.params = new CharyparNagelScoringParameters(config);
 		this.facilities = facilities;
         this.network = network;
         this.scaleNumberOfPersons = scaleNumberOfPersons;
@@ -58,7 +60,7 @@ public class AgentInteractionScoringFunctionFactory implements ScoringFunctionFa
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new AgentInteractionScoringFunction(plan, params, facilityOccupancies, this.facilities, attributes, this.scaleNumberOfPersons));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
+		//scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 		return scoringFunctionAccumulator;
 	}

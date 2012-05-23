@@ -22,8 +22,6 @@ package preprocess;
 
 //import input.FacilitiesCreation;
 
-import preprocess.FacilitiesProduction;
-
 import java.io.IOException;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -50,21 +48,21 @@ public class CreateFacilityAttributes {
 		ObjectAttributes facilityAttributes = new ObjectAttributes();
 		
 		for (ActivityFacility f : scenario.getActivityFacilities().getFacilities().values()) {
-			if (f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500) || f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET1000) || f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET400) || f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET100) || f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_LT100) || f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER)) {
+			if (f.getActivityOptions().containsKey("shop_retail")) {
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.1);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,0.75);
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-12);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-12);
 				//log.info("parameters for shop retail facility created");
 			}
-			else if (f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_SERVICE)){
+			else if (f.getActivityOptions().containsKey("shop_service")){
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.1);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,0.9);
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-12);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-6);
 				//log.info("parameters for shop service facility created");
 			}
-			else if (f.getActivityOptions().containsKey(FacilitiesProduction.SPORTS_FUN)){
+			else if (f.getActivityOptions().containsKey("sports_fun")){
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.2);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,1.0);
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-12);
@@ -72,7 +70,7 @@ public class CreateFacilityAttributes {
 				//log.info("parameters for sports & fun facility created");
 
 			}
-			else if (f.getActivityOptions().containsKey(FacilitiesProduction.GASTRO_CULTURE)){
+			else if (f.getActivityOptions().containsKey("gastro_culture")){
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.1);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,0.9);
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-12);
@@ -80,7 +78,7 @@ public class CreateFacilityAttributes {
 				//log.info("parameters for gastro & culture facility created");
 			}
 		}
-		new ObjectAttributesXmlWriter(facilityAttributes).writeFile("./input/facilityAttributes.xml");
+		new ObjectAttributesXmlWriter(facilityAttributes).writeFile("./input/miniScenarioFacilityAttributes.xml");
 	}
 	
 

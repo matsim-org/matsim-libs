@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import occupancy.FacilityOccupancy;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,7 +33,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 //import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
@@ -41,19 +42,20 @@ import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+
 /*
  * Scoring function taking agent interaction into account
  */
 public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 	//private final TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private CharyparNagelScoringParameters params;
-	private TreeMap<Id, FacilityOccupancy> occupancies;
+	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private ObjectAttributes attributes;
-	private ActivityOption facility;
 	private final ActivityFacilities facilities;
 	private final Plan plan;
 	double scaleNumberOfPersons = 1; 
-	
+	private static Logger log = Logger.getLogger(AgentInteractionScoringFunction.class);
+
 
 	public AgentInteractionScoringFunction(final Plan plan,
 			final CharyparNagelScoringParameters params,
@@ -65,7 +67,7 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		this.facilities = facilities;
 		this.plan = plan;
 		this.attributes = attributes;
-		this.occupancies = facilityOccupancies;
+		this.facilityOccupancies = facilityOccupancies;
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 	}
 	
@@ -80,6 +82,7 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		double closingTime = openingInterval[1];
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
+		double arrivalHour = activityStart/3600;
 
 		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
@@ -141,20 +144,21 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 				
 		// ------------disutilities of agent interaction-----------
 		if (act.getType().startsWith("s")|| act.getType().startsWith("g")) {
-			double capacity = facility.getCapacity();
-			double occupancy = this.occupancies.get(facility.getFacilityId()).getOccupancyPerHour(activityStart);
+			ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
+			double capacity = facility.getActivityOptions().get(act.getType()).getCapacity();
+			double occupancy = this.facilityOccupancies.get(facility.getId()).getOccupancyPerHour(arrivalHour);
 			double load = (occupancy*this.scaleNumberOfPersons)/capacity;
 		
 			// disutility of agent interaction underarousal
-			double lowerBound = (Double) this.attributes.getAttribute(facility.getFacilityId().toString(), "LowerThreshold");
-			double lowerMarginalUtility = (Double) this.attributes.getAttribute(facility.getFacilityId().toString(), "MarginalUtilityOfUnderArousal");
+			double lowerBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "LowerThreshold");
+			double lowerMarginalUtility = (Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal");
 			if ((load < lowerBound) && load>0) {
 				tmpScore += lowerMarginalUtility/load * (minimalDuration - duration);
 			}
 		
 			// disutility of agent interaction overarousal
-			double upperBound = (Double) this.attributes.getAttribute(facility.getFacilityId().toString(), "UpperThreshold");
-			double upperMarginalUtility = (Double) this.attributes.getAttribute(facility.getFacilityId().toString(), "MarginalUtilityOfOverArousal");
+			double upperBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "UpperThreshold");
+			double upperMarginalUtility = (Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal");
 			if ((load > upperBound)) {
 				tmpScore += upperMarginalUtility*load * (minimalDuration - duration);
 			}
@@ -180,7 +184,7 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 
 			facilityActType = facilityActTypeIterator.next();
-			if (act.getType().substring(0, 1).equals(facilityActType.substring(0, 1))) {
+			if (act.getType().equals(facilityActType)) {
 				foundAct = true;
 
 				// choose appropriate opentime:
@@ -210,7 +214,11 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		}
 
 		if (!foundAct) {
+			log.info("Plan activity type: " +act.getType());
+			log.info("Facility activity type: " +facilityActType);
+			log.info("FacilityId: " +facility.getId());
 			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+
 		}
 
 		return openInterval;

@@ -44,16 +44,22 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 	private EventsToFacilityOccupancy eventsToFacilityOccupancy = null;
 	final TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 
+	int numberOfTimeBins;
+	double scaleNumberOfPersons;
+	
 	//--------------------------------------------------------------------------------------------------
 
-	public FacilitiesOccupancyCalculator(TreeMap<Id, FacilityOccupancy> facilityOccupancies) {
+	public FacilitiesOccupancyCalculator(TreeMap<Id, FacilityOccupancy> facilityOccupancies, int numberOfTimeBins, double scaleNumberOfPersons) {
 		this.facilityOccupancies = facilityOccupancies;
+		this.numberOfTimeBins = numberOfTimeBins;
+		this.scaleNumberOfPersons = scaleNumberOfPersons;
 	}
 
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		this.eventsToFacilityOccupancy = new EventsToFacilityOccupancy();
+		this.eventsToFacilityOccupancy = new EventsToFacilityOccupancy(event.getControler().getFacilities(), this.numberOfTimeBins, this.scaleNumberOfPersons,
+				facilityOccupancies, event.getControler().getConfig().locationchoice());
 		event.getControler().getEvents().addHandler(this.eventsToFacilityOccupancy);
 	}
 

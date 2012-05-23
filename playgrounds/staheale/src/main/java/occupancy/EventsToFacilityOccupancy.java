@@ -20,16 +20,48 @@
 
 package occupancy;
 
+import java.util.Iterator;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.locationchoice.facilityload.EventsToFacilityLoad;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 public class EventsToFacilityOccupancy implements ActivityStartEventHandler, ActivityEndEventHandler {
 	
 	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
+	private final static Logger log = Logger.getLogger(EventsToFacilityOccupancy.class);
+
+	
+	public EventsToFacilityOccupancy(final ActivityFacilities facilities, int numberOfTimeBins, double scaleNumberOfPersons,
+			TreeMap<Id, FacilityOccupancy> facilityOccupancies, LocationChoiceConfigGroup config) {
+		super();
+
+		this.facilityOccupancies = facilityOccupancies;
+
+		log.info("facilities size: " + facilities.getFacilities().values().size());
+				
+		int counter = 0;
+		int nextMsg = 1;
+		for (ActivityFacility f : facilities.getFacilities().values()) {
+			counter++;
+			if (counter % nextMsg == 0) {
+				nextMsg *= 2;
+				log.info(" facility # " + counter);
+			}
+			this.facilityOccupancies.put(f.getId(), new FacilityOccupancy(numberOfTimeBins, scaleNumberOfPersons));
+		}
+		log.info("finished init");
+	}
 	
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {

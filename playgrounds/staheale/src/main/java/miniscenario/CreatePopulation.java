@@ -39,8 +39,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import preprocess.AgentMemories;
 import preprocess.AgentMemory;
@@ -81,6 +79,14 @@ public class CreatePopulation {
 				Plan plan = this.memories.getMemory(person.getId()).getRandomPlanAndRemove(day, this.random);
 				((PersonImpl)person).addPlan(plan);
 				((PersonImpl)person).setSelectedPlan(plan);
+				((PersonImpl)person).createDesires("desired activity durations");
+            	((PersonImpl)person).getDesires().putActivityDuration("work", 8);
+            	((PersonImpl)person).getDesires().putActivityDuration("home", 8);
+            	((PersonImpl)person).getDesires().putActivityDuration("shop_retail", 1);
+            	((PersonImpl)person).getDesires().putActivityDuration("shop_service", 2);
+            	((PersonImpl)person).getDesires().putActivityDuration("sports_fun", 2);
+            	((PersonImpl)person).getDesires().putActivityDuration("gastro_culture", 2);
+
 			}
 			String outPath = config.findParam(CreateNetwork.AGENT_INTERACTION_PREPROCESS, "outPath") + day;
 			new File(outPath).mkdirs();
@@ -204,9 +210,10 @@ public class CreatePopulation {
 			
 			// TODO: choose randomly???
 			plan.addLeg(new LegImpl("car"));
-			ActivityFacility facility = this.memories.getMemory(person.getId()).getHomeZone().getRandomLocationInZone(random);
+			TreeMap<Id, ActivityFacility> facilitiesShopRetail = this.scenario.getActivityFacilities().getFacilitiesForActivityType("shop_retail");
+			ActivityFacility facility = (ActivityFacility) facilitiesShopRetail.values().toArray()[random.nextInt(facilitiesShopRetail.size())];
 			ActivityImpl act = new ActivityImpl("shop_retail", facility.getCoord());
-			endTime += Math.max(0.1 * 3600.0, this.random.nextGaussian() * 1.5 * 3600.0 + 1.0 * 3600.0);
+			endTime += Math.max(0.1 * 3600.0, this.random.nextGaussian() * 2.0 * 3600.0 + 3.0 * 3600.0);
 			act.setEndTime(endTime);
 			act.setFacilityId(facility.getId());
 			plan.addActivity(act);
