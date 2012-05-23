@@ -191,6 +191,8 @@ public class CreateScenario {
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);
 		
+		log.info("Reading population, size: " + this.scenario.getPopulation().getPersons().size());
+		
 		this.sample();
 	}
 	

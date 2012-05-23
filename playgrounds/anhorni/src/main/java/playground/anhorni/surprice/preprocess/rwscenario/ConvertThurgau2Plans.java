@@ -345,6 +345,7 @@ public class ConvertThurgau2Plans {
 	
 	private void write() {
 		log.info("Writing population with plans ...");
+		log.info("Number of persons: " + this.scenario.getPopulation().getPersons().size());
 		new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(this.outputfile);
 	}
 	
