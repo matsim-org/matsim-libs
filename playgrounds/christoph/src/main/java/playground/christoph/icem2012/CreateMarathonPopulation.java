@@ -37,16 +37,31 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -54,14 +69,24 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.FastDijkstra;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.Counter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
+import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
+
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -71,6 +96,7 @@ public class CreateMarathonPopulation {
 	
 	private final int runners = 10;
 	
+	private final String trackModes = "walk2d,walk,bike";
 	private final String startLink = "106474";
 	private final String endLink = "106473";
 //	private final String endLink = "106473_2759_shifted_2952";
@@ -105,7 +131,13 @@ public class CreateMarathonPopulation {
 	private String barriersShapeOutFile = basePath + "input/barriers.shp";
 	private String networkInFile = basePath + "input_zh/network_ivtch.xml.gz";
 	private String networkOutFile = basePath + "input/network_ivtch.xml.gz";
-	private String populationOutFile = basePath + "input/plans.xml";
+	private String facilitiesInFile = basePath + "input_zh/facilities.xml.gz";
+	private String populationInFile = basePath + "input_zh/plans_25pct.xml.gz";
+	private String populationOutFile = basePath + "input/plans_25pct.xml.gz";
+	private String affectedAreaFile = basePath + "input/affectedArea.shp";
+	
+	private Geometry affectedArea;
+	private CoordAnalyzer coordAnalyzer;
 	
 	public static void main(String[] args) {
 		new CreateMarathonPopulation();
@@ -114,8 +146,13 @@ public class CreateMarathonPopulation {
 	public CreateMarathonPopulation() {
 
 		Config config = ConfigUtils.createConfig();
+		config.global().setNumberOfThreads(2);
 		config.network().setInputFile(networkInFile);
+		config.facilities().setInputFile(facilitiesInFile);
+		config.plans().setInputFile(populationInFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		readAffectedArea();
 		
 		addNodesToNetwork(scenario);
 		
@@ -132,8 +169,21 @@ public class CreateMarathonPopulation {
 		writeTrack(scenario);
 		
 		writeBarriers(scenario);
+
+		adaptBackgroundPopulation(scenario);
 		
 		createPopulation(scenario);
+		
+		writePopulation(scenario);
+	}
+	
+	private void readAffectedArea() {
+		SHPFileUtil util = new SHPFileUtil();
+		Set<Feature> features = new HashSet<Feature>();
+		features.addAll(util.readFile(affectedAreaFile));		
+		this.affectedArea = util.mergeGeomgetries(features);
+		
+		this.coordAnalyzer = new CoordAnalyzer(this.affectedArea); 
 	}
 	
 	private void createRoute(Scenario scenario) {
@@ -394,10 +444,19 @@ public class CreateMarathonPopulation {
 	}
 	
 	private void prepareNetwork(Scenario scenario) {
-
-		Set<String> modes = CollectionUtils.stringToSet("walk2d");
 		
-		// adapt links that are used for the track
+		// convert zurich network to multi-modal network
+		Config config = scenario.getConfig();
+		config.multiModal().setCreateMultiModalNetwork(true);
+		config.multiModal().setCutoffValueForNonCarModes(80/3.6);
+		config.multiModal().setSimulatedModes("car,walk2d,walk,ride,bike,pt");
+		new MultiModalNetworkCreator(config.multiModal()).run(scenario.getNetwork());
+		
+		/*
+		 * Adapt links that are used for the track.
+		 * Ensure that links on the track are only used by runners, walkers and bikers.
+		 */
+		Set<String> modes = CollectionUtils.stringToSet(trackModes);
 		double width = 8;
 		double cap = width * 1.33;
 		double lanes = 5.4*0.26 * width;
@@ -409,8 +468,8 @@ public class CreateMarathonPopulation {
 			Link link = scenario.getNetwork().getLinks().get(id);			
 			link.setNumberOfLanes(lanes);
 			link.setCapacity(cap);
-			link.setAllowedModes(modes);
 			link.setFreespeed(10.0);
+			link.setAllowedModes(modes);
 		}
 		
 //		Set<Id> linksToRemove = new HashSet<Id>(scenario.getNetwork().getLinks().keySet());
@@ -531,6 +590,136 @@ public class CreateMarathonPopulation {
 		}
 	}
 	
+	private void adaptBackgroundPopulation(Scenario scenario) {
+		
+		/*
+		 * Temporary set modes on track only to walk2d. As a result,
+		 * the router will not send other agents over track links.
+		 */
+		Network network = scenario.getNetwork();
+		Set<Id> trackLinks = new HashSet<Id>();
+		trackLinks.add(route.getStartLinkId());
+		trackLinks.addAll(route.getLinkIds());
+		trackLinks.add(route.getEndLinkId());
+		Set<String> modes = CollectionUtils.stringToSet("walk2d");
+		for (Id linkId : trackLinks) {
+			network.getLinks().get(linkId).setAllowedModes(modes);		
+		}
+		
+		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
+		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
+				new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(new FreeSpeedTravelTimeCalculatorFactory(), 
+				new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
+				new FreeSpeedTravelTimeCalculatorFactory(), new WalkTravelTimeFactory(configGroup)));
+
+		MultiModalTravelTimeWrapper wrapper = multiModalTravelTimeFactory.createTravelTime();
+		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(wrapper, scenario.getConfig().planCalcScore());
+		Dijkstra dijkstra = new FastDijkstra(network, cost, wrapper);
+		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), wrapper, dijkstra);
+		
+		Counter counterRemove = new Counter("persons to remove ");
+		Counter counterAdapt = new Counter("legs to adapt ");
+		
+		Set<Id> personsToRemove = new HashSet<Id>();
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			
+			for (int index = 0; index < plan.getPlanElements().size(); index++) {
+				PlanElement planElement = plan.getPlanElements().get(index);
+				
+				if (planElement instanceof Activity) {
+					Activity activity = (Activity) planElement;
+					
+					String type = activity.getType();
+					if (type.startsWith("w")) {		
+						activity.setType("work");
+					} else if (type.startsWith("h")) {
+						activity.setType("home");
+					} else if (type.startsWith("s")) {
+						activity.setType("shop");
+					} else if (type.startsWith("l")) {
+						activity.setType("leisure");
+					} else if (type.startsWith("e")) {
+						activity.setType("education");
+					} else if (type.startsWith("t")) {
+						activity.setType("tta");
+					}
+					else log.warn("Unknown activity type: " + type);
+					
+					boolean isOnTrack = trackLinks.contains(activity.getLinkId());
+					if (isOnTrack) {
+						personsToRemove.add(person.getId());
+						counterRemove.incCounter();
+						break;
+					}
+				} else if (planElement instanceof Leg) {
+					Leg leg = (Leg) planElement;
+					Route route = leg.getRoute();
+					
+					if (trackLinks.contains(route.getStartLinkId())) {
+						personsToRemove.add(person.getId());
+						counterRemove.incCounter();
+						break;						
+					} else if (trackLinks.contains(route.getEndLinkId())) {
+						personsToRemove.add(person.getId());
+						counterRemove.incCounter();
+						break;
+					} else {
+						boolean needsRerouting = false;
+						if (route instanceof NetworkRoute) {
+							NetworkRoute networkRoute = (NetworkRoute) route;
+							
+							for (Id linkId : networkRoute.getLinkIds()) {
+								if (trackLinks.contains(linkId)) {
+									needsRerouting = true;
+									break;
+								}
+							}	
+						} else needsRerouting = true;
+						
+						if (needsRerouting) {
+							leg.setRoute(null);
+							counterAdapt.incCounter();
+							
+							Activity fromAct = (Activity) plan.getPlanElements().get(index-1);
+							Activity toAct = (Activity) plan.getPlanElements().get(index+1);
+							try {
+								legRouter.routeLeg(person, leg, fromAct, toAct, leg.getDepartureTime());							
+							}
+							/*
+							 * If no route is found, a RuntimeException is thrown.
+							 * We catch it and remove the agent from the population.
+							 */
+							catch (RuntimeException e) {
+								personsToRemove.add(person.getId());
+								counterRemove.incCounter();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		counterAdapt.printCounter();
+		counterRemove.printCounter();
+		
+		for (Id personId : personsToRemove) {
+			scenario.getPopulation().getPersons().remove(personId);
+		}
+		
+		/*
+		 * Restore original track modes.
+		 */
+		modes = CollectionUtils.stringToSet(this.trackModes);
+		for (Id linkId : trackLinks) {
+			network.getLinks().get(linkId).setAllowedModes(modes);		
+		}
+	}
+	
 	private void createPopulation(Scenario scenario) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
@@ -619,8 +808,10 @@ public class CreateMarathonPopulation {
 			plan.addActivity(activity);
 			
 			scenario.getPopulation().addPerson(person);
-		}
-		
+		}	
+	}
+
+	private void writePopulation(Scenario scenario) {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(populationOutFile);
 	}
 }
