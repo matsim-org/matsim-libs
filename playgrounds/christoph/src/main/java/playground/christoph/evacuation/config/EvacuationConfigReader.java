@@ -44,6 +44,9 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String PT = "pt";
 	public static String PANIC = "panic";
 	public static String PARTICIPATION = "participation";
+	public static String DURINGLEGREROUTING = "duringlegrerouting";
+	public static String PICKUPAGENTS = "pickupagents";
+	public static String FUZZYTRAVELTIMES = "fuzzytraveltimes";
 	
 	public static String TIME = "time";
 	public static String X = "x";
@@ -60,6 +63,8 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String SHARE = "share";
 	public static String COMPASSPROBABILITY = "compassProbability";
 	public static String TABUSEARCH = "tabuSearch";
+	public static String BEHAVIOUR = "behaviour";
+	public static String ENABLED = "enabled";
 	
 	private String path = "";
 	private boolean readVehicleFleet = false;
@@ -107,7 +112,10 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			EvacuationConfig.createEvacuationTimePicture = Boolean.valueOf(atts.getValue(CREATEEVACUATIONTIMEPICTURE));
 			EvacuationConfig.countAgentsInEvacuationArea = Boolean.valueOf(atts.getValue(COUNTAGENTSINEVACUATIONAREA));
 		} else if (PT.equalsIgnoreCase(name)) {
-			EvacuationConfig.ptTravelTimePenaltyFactor = Double.valueOf(atts.getValue(TRAVELTIMEPENALTYFACTOR));
+			double value = Double.valueOf(atts.getValue(TRAVELTIMEPENALTYFACTOR));
+			if (value < 1.0) log.warn("PT travel time penalty factor is < 1.0, which means that the calculated travel times " +
+					"will be shorter than without penalty!");
+			EvacuationConfig.ptTravelTimePenaltyFactor = value;
 		} else if (PANIC.equalsIgnoreCase(name)) {
 			double value;
 			
@@ -127,6 +135,24 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			if (value < 0.0) value = 0.0;
 			else if (value > 1.0) value = 1.0;
 			EvacuationConfig.householdParticipationShare = value;
+		} else if (DURINGLEGREROUTING.equalsIgnoreCase(name)) {
+			double value = Double.valueOf(atts.getValue(SHARE));
+			if (value < 0.0) value = 0.0;
+			else if (value > 1.0) value = 1.0;
+			EvacuationConfig.duringLegReroutingShare = value;
+		} else if (PICKUPAGENTS.equalsIgnoreCase(name)) {
+			String behaviour = atts.getValue(BEHAVIOUR);
+			if (EvacuationConfig.PickupAgentBehaviour.ALWAYS.toString().equalsIgnoreCase(behaviour)) {
+				EvacuationConfig.pickupAgents = EvacuationConfig.PickupAgentBehaviour.ALWAYS;
+			} else if (EvacuationConfig.PickupAgentBehaviour.NEVER.toString().equalsIgnoreCase(behaviour)) {
+				EvacuationConfig.pickupAgents = EvacuationConfig.PickupAgentBehaviour.NEVER;
+			} else if (EvacuationConfig.PickupAgentBehaviour.MODEL.toString().equalsIgnoreCase(behaviour)) {
+				EvacuationConfig.pickupAgents = EvacuationConfig.PickupAgentBehaviour.MODEL;
+			} else {
+				throw new RuntimeException("Unknown value for pickup agents behaviour found: " + behaviour);
+			}
+		} else if (FUZZYTRAVELTIMES.equalsIgnoreCase(name)) {
+			EvacuationConfig.useFuzzyTravelTimes = Boolean.valueOf(atts.getValue(ENABLED));
 		} else {
 			log.warn("Ignoring startTag: " + name);
 		}
@@ -151,6 +177,9 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		} else if(PT.equalsIgnoreCase(name)) {
 		} else if(PANIC.equalsIgnoreCase(name)) {
 		} else if(PARTICIPATION.equalsIgnoreCase(name)) {
+		} else if(DURINGLEGREROUTING.equalsIgnoreCase(name)) {
+		} else if(PICKUPAGENTS.equalsIgnoreCase(name)) {
+		} else if(FUZZYTRAVELTIMES.equalsIgnoreCase(name)) {
 		} else log.warn("Ignoring endTag: " + name);
 	}
 	

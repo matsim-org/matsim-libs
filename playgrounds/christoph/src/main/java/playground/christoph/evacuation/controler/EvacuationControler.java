@@ -163,9 +163,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	 * after all agents have been informed and have adapted their plans.
 	 */
 	protected List<WithinDayReplannerFactory<?>> initialReplannerFactories;
-	
-	protected double duringLegRerouteShare = 0.10;
-	
+		
 	protected ObjectAttributes householdObjectAttributes;
 //	protected HouseholdsUtils householdsUtils;
 	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
@@ -209,6 +207,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.ktiConfigGroup = new KtiConfigGroup();
 		
 		new EvacuationConfigReader().readFile(args[1]);
+		EvacuationConfig.printConfig();
 		
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
@@ -590,7 +589,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.duringLegRerouteIdentifier = duringLegFactory.createIdentifier();
-
 		
 		duringActivityFactory = null;
 		duringLegFactory = null;
@@ -604,16 +602,23 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		
-		// use fuzzyTravelTimes
-		FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.travelTimeCollectorWrapperFactory, this.householdsTracker, this.vehiclesTracker);
-			
+		PersonalizableTravelTimeFactory carTravelTimeFactory = null;
+		
+		// if fuzzy travel times should be used
+		if (EvacuationConfig.useFuzzyTravelTimes) {
+			FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.travelTimeCollectorWrapperFactory, this.householdsTracker, this.vehiclesTracker);
+			carTravelTimeFactory = fuzzyTravelTimeEstimatorFactory;
+		} else {
+			carTravelTimeFactory = this.travelTimeCollectorWrapperFactory;
+		}
+				
 		// create a copy of the MultiModalTravelTimeWrapperFactory...
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
 		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
 			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());			
 		}
 		// ... and set the TravelTimeCollector for car mode
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, fuzzyTravelTimeEstimatorFactory);
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, carTravelTimeFactory);
 
 		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
@@ -649,9 +654,9 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, duringLegRerouteShare);
+		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, EvacuationConfig.duringLegReroutingShare);
 		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-//		this.getReplanningManager().addTimedDuringLegReplanner(this.duringLegRerouteReplanner, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		
 		/*

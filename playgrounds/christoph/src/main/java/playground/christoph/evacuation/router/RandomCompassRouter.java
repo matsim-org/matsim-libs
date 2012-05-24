@@ -70,9 +70,12 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
-				
+		
 		nodes.add(fromNode);
 		
+		if (fromNode.getId().equals(toNode.getId())) {
+			return new Path(nodes, links, 0, 0);
+		}
 		
 		/*
 		 * If the toNode is a rescue node, we have to exchange it with another node because
