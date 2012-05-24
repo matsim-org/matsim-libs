@@ -54,6 +54,7 @@ import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
 import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
 import playground.andreas.P2.plan.deprecated.SimpleBackAndForthScheduleProvider;
+import playground.andreas.P2.replanning.CreateCooperativeFromSchedule;
 import playground.andreas.P2.replanning.CreateNew24hPlan;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
@@ -78,6 +79,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	
 	private final PConfigGroup pConfig;
 	private PFranchise franchise;
+	private CooperativeFactory cooperativeFactory;
 
 	TransitSchedule pStopsOnly;
 	TransitSchedule pTransitSchedule;
@@ -88,12 +90,14 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private PStrategyManager strategyManager;
 	private PRouteProvider routeProvider;
 	private PPlanStrategy initialStrategy;
+
 	
 	public PBox(PConfigGroup pConfig) {
 		this.pConfig = pConfig;		
 		this.scorePlansHandler = new ScorePlansHandler(this.pConfig);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager(this.pConfig);
+		this.cooperativeFactory = new CooperativeFactory(this.pConfig, this.franchise);
 		if (this.pConfig.getStartWith24Hours()) {
 			this.initialStrategy = new CreateNew24hPlan(new ArrayList<String>());
 		} else {
@@ -122,9 +126,13 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.initInitialCooperatives(event.getControler().getFirstIteration(), this.pConfig.getNumberOfCooperatives());
 		
 		for (Cooperative cooperative : this.cooperatives) {
-			cooperative.init(this.routeProvider, this.initialStrategy, event.getControler().getFirstIteration(), pConfig.getInitialBudget());
+			cooperative.init(this.routeProvider, this.initialStrategy, event.getControler().getFirstIteration(), this.pConfig.getInitialBudget());
 			cooperative.replan(this.strategyManager, event.getControler().getFirstIteration());
 		}
+		
+		// init additional cooperatives from a given transit schedule file
+		LinkedList<Cooperative> coopsFromSchedule = new CreateCooperativeFromSchedule(this.cooperativeFactory, this.routeProvider, this.pConfig).run();
+		this.cooperatives.addAll(coopsFromSchedule);	
 		
 		// collect the transit schedules from all cooperatives
 		this.pTransitSchedule = new PTransitScheduleImpl(this.pStopsOnly.getFactory());
@@ -199,7 +207,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private void initInitialCooperatives(int iteration, int numberOfCooperatives) {
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
-			Cooperative cooperative = this.createNewCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
+			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
 			cooperatives.add(cooperative);
 		}		
 	}
@@ -250,14 +258,14 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 			
 		// recreate all other
 		for (int i = 0; i < numberOfNewCoopertives; i++) {
-			Cooperative cooperative = this.createNewCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
+			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
 			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
 			this.cooperatives.add(cooperative);
 		}
 			
 		// too few cooperatives in play, increase to the minimum specified in the config
 		for (int i = this.cooperatives.size(); i < this.pConfig.getNumberOfCooperatives(); i++) {
-			Cooperative cooperative = this.createNewCooperative(this.createNewIdForCooperative(iteration), this.pConfig, this.franchise);
+			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
 			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
 			this.cooperatives.add(cooperative);
 		}
@@ -332,15 +340,14 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		return new IdImpl(this.pConfig.getPIdentifier() + iteration + "_" + this.counter);
 	}
 	
-	private Cooperative createNewCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
-		if(pConfig.getCoopType().equalsIgnoreCase(BasicCooperative.COOP_NAME)){
-			return new BasicCooperative(id, pConfig, franchise);
-		} else if(pConfig.getCoopType().equalsIgnoreCase(InitCooperative.COOP_NAME)){
-			return new InitCooperative(id, pConfig, franchise);
-		} else {
-			log.error("There is no coop type specified. " + pConfig.getCoopType() + " unknown");
-			return null;
-		}
-	}
-	
+//	private Cooperative createNewCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
+//		if(pConfig.getCoopType().equalsIgnoreCase(BasicCooperative.COOP_NAME)){
+//			return new BasicCooperative(id, pConfig, franchise);
+//		} else if(pConfig.getCoopType().equalsIgnoreCase(InitCooperative.COOP_NAME)){
+//			return new InitCooperative(id, pConfig, franchise);
+//		} else {
+//			log.error("There is no coop type specified. " + pConfig.getCoopType() + " unknown");
+//			return null;
+//		}
+//	}
 }

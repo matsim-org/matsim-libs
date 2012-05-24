@@ -1,0 +1,184 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.andreas.P2.replanning;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.pbox.Cooperative;
+import playground.andreas.P2.pbox.CooperativeFactory;
+import playground.andreas.P2.plan.PPlan;
+import playground.andreas.P2.plan.PRouteProvider;
+
+/**
+ * 
+ * Creates cooperatives from a given transit schedule
+ * 
+ * @author aneumann
+ *
+ */
+public class CreateCooperativeFromSchedule implements PPlanStrategy{
+	
+	private final static Logger log = Logger.getLogger(CreateCooperativeFromSchedule.class);
+	public static final String STRATEGY_NAME = "CreateCooperativeFromSchedule";
+
+	private CooperativeFactory cooperativeFactory;
+	private PRouteProvider routeProvider;
+	private PConfigGroup pConfig;
+	
+	private HashMap<Id, PPlan> lineId2PlanMap = new HashMap<Id, PPlan>();
+
+	public CreateCooperativeFromSchedule(CooperativeFactory cooperativeFactory, PRouteProvider routeProvider, PConfigGroup pConfig) {
+		this.cooperativeFactory = cooperativeFactory;
+		this.routeProvider = routeProvider;
+		this.pConfig = pConfig;
+	}
+
+	public LinkedList<Cooperative> run() {
+		LinkedList<Cooperative> coopsToReturn = new LinkedList<Cooperative>();
+		
+		if (pConfig.getTransitScheduleToStartWith() != null) {
+			TransitSchedule tS = readTransitSchedule(pConfig.getTransitScheduleToStartWith());
+
+			for (Entry<Id, TransitLine> lineEntry : tS.getTransitLines().entrySet()) {
+				Cooperative coop = this.cooperativeFactory.createNewCooperative(new IdImpl(this.pConfig.getPIdentifier() + lineEntry.getKey()));
+
+				PPlan plan = createPlan(lineEntry.getValue());
+				this.lineId2PlanMap.put(coop.getId(), plan);			
+
+				double initialBudget = this.pConfig.getInitialBudget() % pConfig.getPricePerVehicleBought();			
+				coop.init(this.routeProvider, this, 0, initialBudget);
+				coopsToReturn.add(coop);
+			}
+		}
+		
+		this.lineId2PlanMap = null;
+		log.info("Returning " + coopsToReturn.size() + " cooperative created from transit schedule file " + pConfig.getTransitScheduleToStartWith());
+		return coopsToReturn;
+	}
+
+	private PPlan createPlan(TransitLine line) {
+		Id id = new IdImpl(0);
+		List<TransitRouteStop> stopsOfLongestRouteH = new LinkedList<TransitRouteStop>();
+		List<TransitRouteStop> stopsOfLongestRouteR = new LinkedList<TransitRouteStop>();
+		
+		double startTime = Double.MAX_VALUE;
+		double endTime = Double.MIN_VALUE;
+		Set<Id> vehicleIds = new TreeSet<Id>();
+		
+		for (TransitRoute route : line.getRoutes().values()) {
+			if(route.getId().toString().endsWith(".H")){
+				if (stopsOfLongestRouteH.size() < route.getStops().size()) {
+					stopsOfLongestRouteH = route.getStops();
+				}				
+			} else if (route.getId().toString().endsWith(".R")) {
+				if (stopsOfLongestRouteR.size() < route.getStops().size()) {
+					stopsOfLongestRouteR = route.getStops();
+				}
+			}			
+			
+			for (Departure departure : route.getDepartures().values()) {
+				if (startTime > departure.getDepartureTime()) {
+					startTime = departure.getDepartureTime();
+				}
+				
+				if (endTime < departure.getDepartureTime()) {
+					endTime = departure.getDepartureTime();
+				}
+				
+				vehicleIds.add(departure.getVehicleId());
+			}
+		}
+		
+		startTime = Math.max(startTime, 0.0);
+		endTime = Math.min(endTime, 24 * 3600.0);
+		
+		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
+		for (TransitRouteStop routeStop : stopsOfLongestRouteH) {
+			if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
+				stopsToBeServed.add(routeStop.getStopFacility());
+			}
+		}
+		for (TransitRouteStop routeStop : stopsOfLongestRouteR) {
+			if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
+				stopsToBeServed.add(routeStop.getStopFacility());
+			}
+		}
+		
+		PPlan plan = new PPlan(id, stopsToBeServed, startTime, endTime);
+		plan.setNVehicles(vehicleIds.size());
+		return plan;
+	}
+
+
+	private TransitSchedule readTransitSchedule(String transitScheduleToStartWith) {
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().scenario().setUseVehicles(true);
+		log.info("Reading " + transitScheduleToStartWith);
+		new TransitScheduleReaderV1(sc).readFile(transitScheduleToStartWith);
+		return sc.getTransitSchedule();
+	}
+
+	private boolean checkStopInServiceArea(TransitStopFacility stop, PConfigGroup pC){
+		boolean isInServiceArea = true;
+		
+		if(stop.getCoord().getX() < pC.getMinX()){isInServiceArea = false;}
+		if(stop.getCoord().getX() > pC.getMaxX()){isInServiceArea = false;}
+		
+		if(stop.getCoord().getY() < pC.getMinY()){isInServiceArea = false;}
+		if(stop.getCoord().getY() > pC.getMaxY()){isInServiceArea = false;}
+		
+		return isInServiceArea;
+	}
+
+
+	@Override
+	public PPlan run(Cooperative cooperative) {
+		PPlan newPlan = this.lineId2PlanMap.get(cooperative.getId());		
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(new IdImpl(cooperative.getId().toString() + "-init"), newPlan.getStartTime(), newPlan.getEndTime(), newPlan.getNVehicles(), newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration() + "-init")));
+		return newPlan;
+	}
+
+	@Override
+	public String getName() {
+		return CreateCooperativeFromSchedule.STRATEGY_NAME;
+	}
+}
