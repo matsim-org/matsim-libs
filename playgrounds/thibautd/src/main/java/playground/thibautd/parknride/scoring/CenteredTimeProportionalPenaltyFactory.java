@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.scoring;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Plan;
 
@@ -26,6 +28,9 @@ import org.matsim.api.core.v01.population.Plan;
  * @author thibautd
  */
 public class CenteredTimeProportionalPenaltyFactory implements ParkingPenaltyFactory {
+	private static final Logger log =
+		Logger.getLogger(CenteredTimeProportionalPenaltyFactory.class);
+
 	private final Coord zoneCenter;
 	private final double zoneRadius;
 	private final double maxCostPerSecond;
@@ -40,6 +45,7 @@ public class CenteredTimeProportionalPenaltyFactory implements ParkingPenaltyFac
 			final Coord zoneCenter,
 			final double zoneRadius,
 			final double maxCostPerSecond) {
+		log.info( "maximum cost per second: "+maxCostPerSecond );
 		this.zoneCenter = zoneCenter;
 		this.zoneRadius = zoneRadius;
 		this.maxCostPerSecond = maxCostPerSecond;
