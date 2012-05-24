@@ -1,14 +1,41 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package freight.offermaker;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.vrp.basics.Locations;
-
-import playground.mzilske.freight.OfferMaker;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierCostFunction;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanBuilder;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.vrp.basics.Locations;
+
+import playground.mzilske.freight.OfferMaker;
 
 public class RuinAndRecreateMarginalCostOM implements OfferMaker{
 
@@ -69,7 +96,7 @@ public class RuinAndRecreateMarginalCostOM implements OfferMaker{
 			scoreWithoutRequestedShipment = plan.getScore();
 		}
 
-		carrierContracts.add(CarrierUtils.createContract(requestedShipment, new CarrierOffer()));
+		carrierContracts.add(CarrierUtils.createContract(requestedShipment));
 		CarrierPlan newPlan = carrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrierContracts);
 		double scoreWithRequestedShipment = newPlan.getScore();
 		double marginalCostInMeters;

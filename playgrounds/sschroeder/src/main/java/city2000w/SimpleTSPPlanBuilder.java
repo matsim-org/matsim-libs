@@ -1,25 +1,54 @@
-package city2000w;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
-import freight.offermaker.OfferSelectorImpl;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Offer;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
-import org.matsim.contrib.freight.trade.Service;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.gbl.MatsimRandom;
-import playground.mzilske.freight.*;
-import playground.mzilske.freight.TransportChain.ChainTriple;
-import playground.mzilske.freight.events.OfferUtils;
+package city2000w;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.Offer;
+import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
+import org.matsim.contrib.freight.trade.Service;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.MatsimRandom;
+
+import playground.mzilske.freight.TSPAgentTracker;
+import playground.mzilske.freight.TSPCapabilities;
+import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TSPPlan;
+import playground.mzilske.freight.TSPShipment;
+import playground.mzilske.freight.TransportChain;
+import playground.mzilske.freight.TransportChain.ChainTriple;
+import playground.mzilske.freight.TransportChainBuilder;
+import playground.mzilske.freight.events.OfferUtils;
+import freight.offermaker.OfferSelectorImpl;
 
 public class SimpleTSPPlanBuilder {
 	
@@ -74,7 +103,7 @@ public class SimpleTSPPlanBuilder {
 			if(transshipmentCentre != null){
 				TimeWindow deliveryTWOfFirstLeg = getTW(firstPickupTW.getStart(),firstPickupTW.getStart() + TRANSHIPMENT_TIMESPAN);
 				CarrierOffer offer = getBestOffer(c,lastPickupLocation,transshipmentCentre,s.getSize(),firstPickupTW,deliveryTWOfFirstLeg,legIndex);
-				CarrierShipment shipment = CarrierUtils.createShipment(lastPickupLocation, transshipmentCentre, s.getSize(), firstPickupTW, deliveryTWOfFirstLeg);
+				CarrierShipment shipment = CarrierUtils.createShipment(lastPickupLocation, transshipmentCentre, s.getSize(), firstPickupTW.getStart(), firstPickupTW.getEnd(), deliveryTWOfFirstLeg.getStart(), deliveryTWOfFirstLeg.getEnd());
 				CarrierContract contract = new CarrierContract(tspId,offer.getId(),shipment,offer);
 				chainBuilder.scheduleLeg(contract);
 //				eventsManager.processEvent(new )
@@ -87,7 +116,7 @@ public class SimpleTSPPlanBuilder {
 			}
 			TimeWindow lastDeliveryTW = getTW(lastPickupTW.getStart(),firstPickupTW.getStart() + 24*3600);
 			CarrierOffer offer = getBestOffer(c,lastPickupLocation,s.getTo(),s.getSize(),lastPickupTW, lastDeliveryTW,legIndex);
-			CarrierShipment shipment = CarrierUtils.createShipment(lastPickupLocation, transshipmentCentre, s.getSize(), lastPickupTW, lastDeliveryTW);
+			CarrierShipment shipment = CarrierUtils.createShipment(lastPickupLocation, transshipmentCentre, s.getSize(), lastPickupTW.getStart(), lastPickupTW.getEnd(), lastDeliveryTW.getStart(), lastDeliveryTW.getEnd());
 			CarrierContract contract = new CarrierContract(tspId,offer.getId(),shipment,offer);
 			chainBuilder.scheduleLeg(contract);
 //			chainBuilder.scheduleLeg(offer);
