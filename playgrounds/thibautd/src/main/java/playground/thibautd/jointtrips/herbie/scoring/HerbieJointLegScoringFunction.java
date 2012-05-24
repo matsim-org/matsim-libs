@@ -28,9 +28,11 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.pt.DistanceCalculations;
@@ -81,9 +83,11 @@ public class HerbieJointLegScoringFunction extends LegScoringFunction {
 			tmpScore += travelScoring.getCarScore(0, travelTime);
 		}
 		else if (TransportMode.pt.equals(leg.getMode())) {
-			
-			double distance = //DistanceCalculations.getLegDistance(leg.getRoute(), network);
-					 DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
+			Route route = leg.getRoute();
+
+			double distance = route instanceof ExperimentalTransitRoute ?
+					DistanceCalculations.getLegDistance((ExperimentalTransitRoute) route , network) :
+					DistanceCalculations.getWalkDistance((GenericRoute) route , network)
 								* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			
 			double distanceCost = 0.0;
