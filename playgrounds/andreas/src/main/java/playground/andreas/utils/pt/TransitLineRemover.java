@@ -37,6 +37,7 @@ public class TransitLineRemover {
 		final String SCHEDULEFILE = "e:/_shared-svn/andreas/paratransit/input/txl/remove/transitSchedule_orig.xml.gz";
 		final String NETWORKFILE  = "e:/_shared-svn/andreas/paratransit/input/txl/remove/network.final.xml.gz";
 		final String FILTERED_SCHEDULE_FILE = "e:/_shared-svn/andreas/paratransit/input/txl/remove/transitSchedule.xml.gz";
+		final String DELETED_LINES = "e:/_shared-svn/andreas/paratransit/input/txl/remove/transitSchedule_deleted.xml.gz";
 		
 		Coord minCoord = new CoordImpl(4587744.0, 5824664.0);
 		Coord maxCoord = new CoordImpl(4588400.0, 5825400.0);
@@ -54,6 +55,13 @@ public class TransitLineRemover {
 		
 		TransitSchedule filteredTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(transitSchedule, linesToRemove);
 		new TransitScheduleWriterV1(filteredTransitSchedule).write(FILTERED_SCHEDULE_FILE);
+		
+		Set<Id> linesToKeep = new TreeSet<Id>();
+		for (Id lineId : filteredTransitSchedule.getTransitLines().keySet()) {
+			linesToKeep.add(lineId);
+		}
+		TransitSchedule removedTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(transitSchedule, linesToKeep);
+		new TransitScheduleWriterV1(removedTransitSchedule).write(DELETED_LINES);
 	}
 	
 	public static Set<Id> getLinesServingTheseStops(TransitSchedule transitSchedule, Set<Id> stopIds){
