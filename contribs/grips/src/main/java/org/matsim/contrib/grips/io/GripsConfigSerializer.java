@@ -42,8 +42,8 @@ public class GripsConfigSerializer extends MatsimJaxbXmlWriter {
 	
 private static final Logger log = Logger.getLogger(GripsConfigSerializer.class);
 	
-//	public static final String SCHEMA = "http://matsim.org/files/dtd/grips_config_v0.1.xsd";
-	public static final String SCHEMA = "http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas/grips_config_v0.1.xsd";
+	public static final String SCHEMA = "http://matsim.org/files/dtd/grips_config_v0.1.xsd";
+//	public static final String SCHEMA = "http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas/grips_config_v0.1.xsd";
 	private final GripsConfigModule gcm;
 
 	public GripsConfigSerializer(GripsConfigModule gcm) {

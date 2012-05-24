@@ -62,6 +62,7 @@ public class PopulationFromESRIShapeFileGenerator {
 	private static final Logger log = Logger.getLogger(PopulationFromESRIShapeFileGenerator.class);
 
 	private static final int RAND_SAMPLES = 1000;
+	private static final double CUTOFF = 5.;
 
 	private final String populationShapeFile;
 	protected final Scenario scenario;
@@ -84,7 +85,7 @@ public class PopulationFromESRIShapeFileGenerator {
 	public void run() {
 		log.info("Generating departure time lookup");
 		genDepTimeLookup();
-		
+
 		log.info("Generating population from ESRI shape file.");
 		FeatureSource fs = ShapeFileReader.readDataFile(this.populationShapeFile);
 		CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry().getCoordinateSystem();
@@ -124,15 +125,19 @@ public class PopulationFromESRIShapeFileGenerator {
 			this.depTimeLookup.add(0.);
 			return;
 		}
-		
+
 		List<Double> randVariables = new ArrayList<Double>();
 
 		if (depTimeDistr.getDistribution() == DistributionType.LOG_NORMAL) {
 			double mu = depTimeDistr.getMu();
 			double sigma = depTimeDistr.getSigma();
 			for (int i = 0; i < RAND_SAMPLES; i ++) {
-				double r = MatsimRandom.getRandom().nextGaussian();
-				randVariables.add(Math.exp(mu + sigma*r));
+				double val;
+				do {
+					double r = MatsimRandom.getRandom().nextGaussian();
+					val = Math.exp(mu + sigma*r);
+				} while(val > CUTOFF);
+				randVariables.add(val);
 			}
 		} else if(depTimeDistr.getDistribution() == DistributionType.NORMAL) {
 			double mu = depTimeDistr.getMu();
@@ -148,12 +153,12 @@ public class PopulationFromESRIShapeFileGenerator {
 		} else {
 			throw new RuntimeException("unknown distribution type:" + depTimeDistr.getDistribution());
 		}
-		
+
 		double latest = depTimeDistr.getLatest();
 		double earliest = depTimeDistr.getEarliest();
 		Collections.sort(randVariables);
 		this.depTimeLookup = randVariables;
-		double coef = (latest-earliest)/(this.depTimeLookup.get(this.depTimeLookup.size()-1)-this.depTimeLookup.get(0));
+		double coef = (latest-earliest)/CUTOFF;
 		double offset = this.depTimeLookup.get(0);
 		for (int i = 0; i < this.depTimeLookup.size(); i++) {
 			double rand = this.depTimeLookup.get(i)-offset;
