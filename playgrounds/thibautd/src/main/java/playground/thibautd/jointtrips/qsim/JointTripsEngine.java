@@ -82,6 +82,9 @@ public class JointTripsEngine implements DepartureHandler, MobsimEngine {
 				// we are sure we take into account the right
 				// driver's arrival
 				arrivalHandler.addPassengerToDriver( agent.getId() , getAgent( p ) );
+				qsim.getEventsManager().processEvent(
+						new PassengerDepartsWithDriverEvent(
+							now, agent.getId() , p , linkId ) );
 			}
 			driver.anounceDriverMode();
 			driver.notifyJointDeparture( linkId );
