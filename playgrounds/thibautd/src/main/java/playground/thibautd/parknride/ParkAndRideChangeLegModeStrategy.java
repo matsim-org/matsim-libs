@@ -31,8 +31,6 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.thibautd.router.CompositeStageActivityTypes;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.replanning.TripsToLegModule;
 import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.StageActivityTypesImpl;
@@ -44,13 +42,9 @@ public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 	private final PlanStrategy strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
 	public ParkAndRideChangeLegModeStrategy(final Controler controler) {
-		StageActivityTypes baseList = ((MultiLegRoutingControler) controler).getTripRouterFactory().createTripRouter().getStageActivityTypes();
 		StageActivityTypes pnrList = new StageActivityTypesImpl( Arrays.asList( ParkAndRideConstants.PARKING_ACT ) );
-		CompositeStageActivityTypes fullList = new CompositeStageActivityTypes();
-		fullList.addActivityTypes( baseList );
-		fullList.addActivityTypes( pnrList );
 
-		addStrategyModule( new TripsToLegModule( controler , fullList ) );
+		addStrategyModule( new TripsToLegModule( controler , pnrList ) );
 		addStrategyModule( new ChangeLegMode( controler.getConfig() ) );
 		addStrategyModule( new ReRoute( controler ) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );

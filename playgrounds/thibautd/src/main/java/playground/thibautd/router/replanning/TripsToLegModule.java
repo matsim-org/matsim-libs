@@ -23,31 +23,41 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.thibautd.router.CompositeStageActivityTypes;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.StageActivityTypes;
+import playground.thibautd.router.TripRouter;
 
 /**
  * @author thibautd
  */
 public class TripsToLegModule extends AbstractMultithreadedModule {
 	private final MultiLegRoutingControler controler;
-	private final StageActivityTypes blackList;
+	private final StageActivityTypes additionalBlackList;
 
 	public TripsToLegModule(final Controler controler) {
 		this( controler , null );
 	}
 
-	public TripsToLegModule(final Controler controler, final StageActivityTypes blackList) {
+	public TripsToLegModule(final Controler controler, final StageActivityTypes additionalBlackList) {
 		super( controler.getConfig().global() );
 		this.controler = (MultiLegRoutingControler) controler;
-		this.blackList = blackList;
+		this.additionalBlackList = additionalBlackList;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return blackList == null ?
-			new TripsToLegsAlgorithm( controler.getTripRouterFactory().createTripRouter() ) :
-			new TripsToLegsAlgorithm( controler.getTripRouterFactory().createTripRouter() , blackList );
+		TripRouter router = controler.getTripRouterFactory().createTripRouter();
+		StageActivityTypes blackListToUse = router.getStageActivityTypes();
+
+		if (additionalBlackList != null) {
+			CompositeStageActivityTypes composite = new CompositeStageActivityTypes();
+			composite.addActivityTypes( blackListToUse );
+			composite.addActivityTypes( additionalBlackList );
+			blackListToUse = composite;
+		}
+
+		return new TripsToLegsAlgorithm( router , blackListToUse );
 	}
 }
 
