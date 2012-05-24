@@ -114,7 +114,7 @@ public class SpatialAveragingForLinkEmissions {
 	static double yMax = 5345696.81;
 
 	// define all relevant parameters
-	final int noOfTimeBins = 6; //was 60
+	final int noOfTimeBins = 60; //was 60
 	final int noOfXbins = 160; //was 160
 	final int noOfYbins = 120; //was 120
 	final int minimumNoOfLinksInCell = 0;
@@ -245,14 +245,14 @@ public class SpatialAveragingForLinkEmissions {
 				}
 			}	
 
-			String outputPathForR = new String(outPathStub + ".Routput"+endOfTimeInterval+".txt");
+			String outputPathForR = new String(outPathStub + ".Routput"+pollutant2analyze.toString()+"."+endOfTimeInterval+".txt");
 			writeRoutput(sumOfweightedValuesForCell, outputPathForR);
 			
 		}
 
 		//TODO momentan fuer jedes Zeitintervall, passende Ifabfrage o ae
-		String outputPathForR = new String(outPathStub + ".Routput.txt");
-		writeRoutput(sumOfweightedValuesForCell, outputPathForR);
+//		String outputPathForR = new String(outPathStub + ".Routput.txt");
+//		writeRoutput(sumOfweightedValuesForCell, outputPathForR);
 //		writer.close();
 //		logger.info("Finished writing output to " + outPathStub + "." + pollutant2analyze + ".smoothed.txt");
 
@@ -269,41 +269,7 @@ public class SpatialAveragingForLinkEmissions {
 			String outputPathForR) {
 		
 		try {
-//			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
-//			String valueString = new String();
-//			valueString="\t";
-//			
-//			//step size between coordinates
-//			double xDist=(xMax-xMin)/noOfXbins;
-//			double yDist=(yMax-yMin)/noOfYbins;
-//			
-//			//first line containing coordinates
-//			for(int i=0; i<sumOfweightedValuesForCell.length;i++){
-//				valueString+=Double.toString(xMin+i*xDist)+"\t";
-//			}
-//			buffW.write(valueString);
-//			buffW.newLine();
-//			valueString="";
-//			
-//			for(int i = 0; i< sumOfweightedValuesForCell[0].length; i++){
-//				//coordinates as header
-//				valueString+=Double.toString(yMin+i*yDist)+"\t";
-//				
-//				//table contents
-//				for(int j = 0; j<sumOfweightedValuesForCell.length; j++){
-//					try {
-//						valueString+=Double.toString(sumOfweightedValuesForCell[i][j])+"\t"; 
-//					} catch (Exception e) {
-//						//if the array wasnt initialized at [i][j] use 0.0
-//						valueString+="0.0"+"\t";
-//					}
-//				}
-//				//write line + line break
-//				buffW.write(valueString);
-//				buffW.newLine();
-//				valueString="";
-//			}
-//		buffW.close();	
+
 			
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
 			String valueString = new String();
