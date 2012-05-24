@@ -24,21 +24,30 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.controler.MultiLegRoutingControler;
+import playground.thibautd.router.StageActivityTypes;
 
 /**
  * @author thibautd
  */
 public class TripsToLegModule extends AbstractMultithreadedModule {
-	private MultiLegRoutingControler controler;
+	private final MultiLegRoutingControler controler;
+	private final StageActivityTypes blackList;
 
 	public TripsToLegModule(final Controler controler) {
+		this( controler , null );
+	}
+
+	public TripsToLegModule(final Controler controler, final StageActivityTypes blackList) {
 		super( controler.getConfig().global() );
 		this.controler = (MultiLegRoutingControler) controler;
+		this.blackList = blackList;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new TripsToLegsAlgorithm( controler.getTripRouterFactory().createTripRouter() );
+		return blackList == null ?
+			new TripsToLegsAlgorithm( controler.getTripRouterFactory().createTripRouter() ) :
+			new TripsToLegsAlgorithm( controler.getTripRouterFactory().createTripRouter() , blackList );
 	}
 }
 
