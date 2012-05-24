@@ -230,8 +230,8 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 		List<PlanElement> passengerElements =
 			plan.getIndividualPlanElements().get( toMutate.getPassenger() );
 
-		List<PlanElement> driverStructure = TripRouter.tripsToLegs( driverElements , checker );
-		List<PlanElement> passengerStructure = TripRouter.tripsToLegs( passengerElements , checker);
+		List<PlanElement> driverStructure = tripRouter.tripsToLegs( driverElements , checker );
+		List<PlanElement> passengerStructure = tripRouter.tripsToLegs( passengerElements , checker);
 
 		// trip generation
 		Leg access = new LegImpl( TransportMode.car );
