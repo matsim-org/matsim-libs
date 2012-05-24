@@ -53,6 +53,7 @@ public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 		addStrategyModule( new TripsToLegModule( controler , fullList ) );
 		addStrategyModule( new ChangeLegMode( controler.getConfig() ) );
 		addStrategyModule( new ReRoute( controler ) );
+		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 
 	@Override
