@@ -107,6 +107,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		if(this.agentsStuckHandler != null){
 			event.getControler().getEvents().addHandler(this.agentsStuckHandler);
 		}
+		this.dumpTransitScheduleAndVehicles(event.getControler(), event.getControler().getFirstIteration());
 	}
 
 	@Override
@@ -130,7 +131,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 					}
 				});
 			}
-			this.dumpTransitScheduleAndVehicles(event);
+			this.dumpTransitScheduleAndVehicles(event.getControler(), event.getIteration());
 		}
 	}
 	
@@ -179,12 +180,12 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		return vehicles;
 	}
 	
-	private void dumpTransitScheduleAndVehicles(IterationStartsEvent event){
+	private void dumpTransitScheduleAndVehicles(Controler controler, int iteration){
 		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
-		writer.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitSchedule.xml.gz"));
+		writer.write(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
 		
-		VehicleWriterV1 writer2 = new VehicleWriterV1(event.getControler().getScenario().getVehicles());
-		writer2.writeFile(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "vehicles.xml.gz"));
+		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getVehicles());
+		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
 	}
 
 }
