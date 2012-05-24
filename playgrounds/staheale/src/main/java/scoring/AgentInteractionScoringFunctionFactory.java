@@ -21,6 +21,8 @@
 package scoring;
 
 import java.util.TreeMap;
+
+import occupancy.FacilitiesOccupancyCalculator;
 import occupancy.FacilityOccupancy;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -46,19 +48,21 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
     private Network network;
     private double scaleNumberOfPersons;
 
-    public AgentInteractionScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final ActivityFacilities facilities, Network network, double scaleNumberOfPersons) {
+    public AgentInteractionScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final ActivityFacilities facilities, Network network, double scaleNumberOfPersons,TreeMap<Id, FacilityOccupancy> facilityOccupancies, ObjectAttributes attributes) {
 		super(config, network);
     	this.params = new CharyparNagelScoringParameters(config);
 		this.facilities = facilities;
         this.network = network;
         this.scaleNumberOfPersons = scaleNumberOfPersons;
+        this.facilityOccupancies = facilityOccupancies;
+        this.attributes = attributes;
 	}
 	
 	@Override
 	public ScoringFunction createNewScoringFunction(final Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new AgentInteractionScoringFunction(plan, params, facilityOccupancies, this.facilities, attributes, this.scaleNumberOfPersons));
+		scoringFunctionAccumulator.addScoringFunction(new AgentInteractionScoringFunction(plan, params, facilityOccupancies, this.facilities, this.attributes, this.scaleNumberOfPersons));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
 		//scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));

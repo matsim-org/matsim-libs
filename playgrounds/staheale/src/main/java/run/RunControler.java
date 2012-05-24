@@ -19,6 +19,7 @@ import scoring.AgentInteractionScoringFunctionFactory;
 public class RunControler extends Controler {
 	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 
+
 	public RunControler(Config config) {
 		super(config);
 	}
@@ -45,8 +46,9 @@ public class RunControler extends Controler {
 		ActivityFacilities facilities = this.getFacilities();
 		Network network = this.getNetwork();
 
+
 		// create the AgentInteractionScoringFunctionFactory
-		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(planCalcScoreConfigGroup, facilities, network, Double.parseDouble(this.getConfig().locationchoice().getScaleFactor()));
+		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(planCalcScoreConfigGroup, facilities, network, Double.parseDouble(this.getConfig().locationchoice().getScaleFactor()), facilityOccupancies, attributes);
 
 		// set the AgentInteractionScoringFunctionFactory as default in the controler 
 		this.setScoringFunctionFactory(factory);

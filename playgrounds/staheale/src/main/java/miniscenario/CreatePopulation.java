@@ -80,12 +80,12 @@ public class CreatePopulation {
 				((PersonImpl)person).addPlan(plan);
 				((PersonImpl)person).setSelectedPlan(plan);
 				((PersonImpl)person).createDesires("desired activity durations");
-            	((PersonImpl)person).getDesires().putActivityDuration("work", 8);
-            	((PersonImpl)person).getDesires().putActivityDuration("home", 8);
-            	((PersonImpl)person).getDesires().putActivityDuration("shop_retail", 1);
-            	((PersonImpl)person).getDesires().putActivityDuration("shop_service", 2);
-            	((PersonImpl)person).getDesires().putActivityDuration("sports_fun", 2);
-            	((PersonImpl)person).getDesires().putActivityDuration("gastro_culture", 2);
+            	((PersonImpl)person).getDesires().putActivityDuration("work", 8*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("home", 8*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("shop_retail", 1*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("shop_service", 2*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("sports_fun", 2*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("gastro_culture", 2*3600);
 
 			}
 			String outPath = config.findParam(CreateNetwork.AGENT_INTERACTION_PREPROCESS, "outPath") + day;

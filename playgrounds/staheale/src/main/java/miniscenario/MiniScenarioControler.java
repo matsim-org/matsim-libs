@@ -29,7 +29,6 @@ import miniscenario.AgentInteraction;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -37,7 +36,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import scoring.AgentInteractionScoringFunctionFactory;
 
 public class MiniScenarioControler extends Controler {
-	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
+	private TreeMap<Id, FacilityOccupancy> facilityOccupancies = new TreeMap<Id, FacilityOccupancy>();;
 	
 
 	public MiniScenarioControler(final String[] args) {
@@ -48,7 +47,6 @@ public class MiniScenarioControler extends Controler {
 	public static void main(String[] args) {
 		MiniScenarioControler controler = new MiniScenarioControler( args ) ;	
 		controler.run();
-
 	}
 	
 	protected void setUp() {
@@ -67,13 +65,12 @@ public class MiniScenarioControler extends Controler {
 		Network network = this.getNetwork();
 
 		// create the AgentInteractionScoringFunctionFactory
-		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(planCalcScoreConfigGroup, facilities, network, Double.parseDouble(this.getConfig().locationchoice().getScaleFactor()));
+		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(planCalcScoreConfigGroup, facilities, network, Double.parseDouble(this.getConfig().locationchoice().getScaleFactor()), facilityOccupancies, attributes);
 
 		// set the AgentInteractionScoringFunctionFactory as default in the controler 
 		this.setScoringFunctionFactory(factory);
 	    super.setUp();	
-		this.facilityOccupancies = new TreeMap<Id, FacilityOccupancy>(); 
-			
+		
 		addControlerListener(new FacilitiesOccupancyCalculator(this.facilityOccupancies, AgentInteraction.numberOfTimeBins, AgentInteraction.scaleNumberOfPersons));		    
 	}
 }

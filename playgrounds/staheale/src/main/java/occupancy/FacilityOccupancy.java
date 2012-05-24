@@ -51,6 +51,11 @@ public class FacilityOccupancy {
 			this.departures[i] = 0;
 			this.occupancy[i] = 0;
 		}
+		
+//		for (int i = 0; i < numberOfTimeBins; i++){
+//			this.occupancy[i] += this.arrivals[i]-this.departures[i];
+//		}
+		
 	}
 	
 	private void calculateFacilityOccupancy24() {
@@ -87,6 +92,12 @@ public class FacilityOccupancy {
 		int timeBinIndex = this.timeBinIndex(time);
 		this.departures[timeBinIndex]+=1;
 		//log.info("departure at: " + time + " bin: " + timeBinIndex);
+	}
+	
+	public double getCurrentOccupancy (double time) {
+		int timeBinIndex = this.timeBinIndex(time);
+		double CurrentOccupancy = this.occupancy[timeBinIndex];
+		return CurrentOccupancy;		
 	}
 	
 	public void addToAllVisitors(double scaleNumberOfPersons) {

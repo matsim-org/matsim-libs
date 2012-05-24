@@ -23,6 +23,8 @@ package scoring;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
+
+import miniscenario.AgentInteraction;
 import occupancy.FacilityOccupancy;
 
 import org.apache.log4j.Logger;
@@ -47,15 +49,14 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * Scoring function taking agent interaction into account
  */
 public class AgentInteractionScoringFunction extends ActivityScoringFunction {
-	//private final TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private CharyparNagelScoringParameters params;
 	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private ObjectAttributes attributes;
 	private final ActivityFacilities facilities;
 	private final Plan plan;
-	double scaleNumberOfPersons = 1; 
+	double scaleNumberOfPersons = AgentInteraction.scaleNumberOfPersons; 
+	int numberOfTimeBins = AgentInteraction.numberOfTimeBins;
 	private static Logger log = Logger.getLogger(AgentInteractionScoringFunction.class);
-
 
 	public AgentInteractionScoringFunction(final Plan plan,
 			final CharyparNagelScoringParameters params,
@@ -76,13 +77,13 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 			final double departureTime, final Activity act) {
 
 		double tmpScore = 0.0;
-
+		
 		double[] openingInterval = this.getOpeningInterval(act);
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
-		double arrivalHour = activityStart/3600;
+		
 
 		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
@@ -146,21 +147,21 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		if (act.getType().startsWith("s")|| act.getType().startsWith("g")) {
 			ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
 			double capacity = facility.getActivityOptions().get(act.getType()).getCapacity();
-			double occupancy = this.facilityOccupancies.get(facility.getId()).getOccupancyPerHour(arrivalHour);
+			double occupancy = this.facilityOccupancies.get(facility.getId()).getCurrentOccupancy(activityStart);
 			double load = (occupancy*this.scaleNumberOfPersons)/capacity;
 		
 			// disutility of agent interaction underarousal
 			double lowerBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "LowerThreshold");
-			double lowerMarginalUtility = (Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal");
+			int lowerMarginalUtility = (Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal");
 			if ((load < lowerBound) && load>0) {
-				tmpScore += lowerMarginalUtility/load * (minimalDuration - duration);
+				tmpScore += lowerMarginalUtility/load * duration;
 			}
 		
 			// disutility of agent interaction overarousal
 			double upperBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "UpperThreshold");
-			double upperMarginalUtility = (Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal");
+			int upperMarginalUtility = (Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal");
 			if ((load > upperBound)) {
-				tmpScore += upperMarginalUtility*load * (minimalDuration - duration);
+				tmpScore += upperMarginalUtility*load * duration;
 			}
 		}
 		
