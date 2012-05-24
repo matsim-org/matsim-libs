@@ -21,12 +21,11 @@ package playground.andreas.P2.pbox;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
-import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
@@ -39,6 +38,7 @@ import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicl
  */
 public class InitCooperative extends AbstractCooperative{
 	
+	private final static Logger log = Logger.getLogger(InitCooperative.class);
 	public static final String COOP_NAME = "InitCooperative"; 
 	
 	boolean firstIteration = true;
@@ -119,12 +119,7 @@ public class InitCooperative extends AbstractCooperative{
 		// reinitialize the plan
 		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStopsToBeServed(), this.bestPlan.getId()));
 		
-		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
-		for (PPlan plan : this.getAllPlans()) {
-			for (TransitRoute route : plan.getLine().getRoutes().values()) {
-				this.currentTransitLine.addRoute(route);
-			}
-		}
+		this.updateCurrentTransitLine();
 	}
 	
 }

@@ -114,7 +114,6 @@ public abstract class AbstractCooperative implements Cooperative{
 
 		this.budget += this.score;
 		
-		
 		// check, if bankrupt
 		if(this.budget < 0){
 			// insufficient, sell vehicles
@@ -147,7 +146,10 @@ public abstract class AbstractCooperative implements Cooperative{
 		return this.minOperationTime;
 	}
 
-	public TransitLine getCurrentTransitLine() {		
+	public TransitLine getCurrentTransitLine() {
+		if (this.currentTransitLine == null) {
+			this.updateCurrentTransitLine();
+		}
 		return this.currentTransitLine;		
 	}	
 
@@ -193,6 +195,15 @@ public abstract class AbstractCooperative implements Cooperative{
 
 	public void setBudget(double budget) {
 		this.budget = budget;
+	}
+	
+	protected void updateCurrentTransitLine(){
+		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
+		for (PPlan plan : this.getAllPlans()) {
+			for (TransitRoute route : plan.getLine().getRoutes().values()) {
+				this.currentTransitLine.addRoute(route);
+			}
+		}
 	}
 
 	private void scorePlan(TreeMap<Id, ScoreContainer> driverId2ScoreMap, PPlan plan) {
