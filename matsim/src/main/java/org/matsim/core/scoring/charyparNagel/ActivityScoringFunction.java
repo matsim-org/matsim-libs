@@ -244,8 +244,8 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 				double[] openInterval = this.getOpeningInterval(lastActivity);
 				if (openInterval[0] >= 0 || openInterval[1] >= 0){
 					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
+					firstLastActOpeningTimesWarning++;
 				}
-				firstLastActOpeningTimesWarning++;
 				if (firstLastActOpeningTimesWarning == 10) {
 					log.warn("Additional warnings of this type are suppressed.");
 				}
