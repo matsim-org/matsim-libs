@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -32,15 +32,15 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 /**
  * @author thibautd
  */
-public class TimeAllocationMutatorStrategy implements PlanStrategy {
+public class SubtourModeChoiceStrategy implements PlanStrategy {
 	private final PlanStrategy strategy;
 
-	public TimeAllocationMutatorStrategy(final Controler controler) {
+	public SubtourModeChoiceStrategy(final Controler controler) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-		//addStrategyModule( new TripsToLegModule( controler ) );
-		addStrategyModule( new TimeAllocationMutator( controler.getConfig() ) );
-		//addStrategyModule( new ReRoute( controler ) );
+		addStrategyModule( new TripsToLegModule( controler ) );
+		addStrategyModule( new SubtourModeChoice( controler.getConfig() ) );
+		addStrategyModule( new ReRoute( controler ) );
 	}
 
 	@Override

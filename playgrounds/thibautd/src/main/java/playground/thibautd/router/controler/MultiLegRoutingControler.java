@@ -47,7 +47,7 @@ import playground.thibautd.router.TripRouterFactory;
  * @author thibautd
  */
 public class MultiLegRoutingControler extends Controler {
-	private final Map<String, RoutingModuleFactory> userDefinedRoutingModuleFactories =
+	protected final Map<String, RoutingModuleFactory> userDefinedRoutingModuleFactories =
 		new HashMap<String, RoutingModuleFactory>();
 
 	public MultiLegRoutingControler(final Config config) {

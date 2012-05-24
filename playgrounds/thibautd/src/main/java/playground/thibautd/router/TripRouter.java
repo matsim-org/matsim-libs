@@ -111,7 +111,11 @@ public class TripRouter {
 		return tripsToLegs( plan , checker );
 	}
 
-	public static List<PlanElement> tripsToLegs(final List<PlanElement> plan, final StageActivityTypes checker) {
+	public List<PlanElement> tripsToLegs(final Plan plan, final StageActivityTypes checker) {
+		return tripsToLegs( plan.getPlanElements() , checker );
+	}
+
+	public List<PlanElement> tripsToLegs(final List<PlanElement> plan, final StageActivityTypes checker) {
 		List<PlanElement> simplifiedPlan = new ArrayList<PlanElement>();
 		List<PlanElement> currentTrip = new ArrayList<PlanElement>();
 
@@ -119,10 +123,10 @@ public class TripRouter {
 		double startOfTrip = Time.UNDEFINED_TIME;
 		for (PlanElement currentElement : plan) {
 			if (currentElement instanceof Activity) {
-				now = updateNow( now , currentElement );
 				Activity act = (Activity) currentElement;
 
 				if (checker.isStageActivity( act.getType() )) {
+					now = calcEndOfPlanElement( now , currentElement );
 					currentTrip.add( act );
 				}
 				else {
@@ -136,14 +140,13 @@ public class TripRouter {
 						simplifiedPlan.add( newLeg );
 						currentTrip.clear();
 					}
-					else {
-						startOfTrip = now;
-					}
+					now = calcEndOfPlanElement( now , currentElement );
+					startOfTrip = now;
 					simplifiedPlan.add( act );
 				}
 			}
 			else if (currentElement instanceof Leg) {
-				now = updateNow( now , currentElement );
+				now = calcEndOfPlanElement( now , currentElement );
 				currentTrip.add( currentElement );
 			}
 			else {
@@ -186,7 +189,13 @@ public class TripRouter {
 		throw new UnknownModeException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
 	}
 
-	private static String identifyMainMode(final List<PlanElement> trip) {
+	/**
+	 * This is the method responsible for identifying the "main mode"
+	 * of the trip, that is, the mode to which is attached the routing module to use.
+	 *
+	 * Override to add new modes.
+	 */
+	protected String identifyMainMode(final List<PlanElement> trip) {
 		String mode = ((Leg) trip.get( 0 )).getMode();
 		return mode.equals( TransportMode.transit_walk ) ? TransportMode.pt : mode;
 	}
@@ -198,11 +207,20 @@ public class TripRouter {
 		}
 	}
 
-	private static double updateNow(
+	// /////////////////////////////////////////////////////////////////////////
+	// public static convenience methods.
+	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * Helper method, that can be used to compute start time of legs.
+	 * (it is also used internally).
+	 * It is provided here, because such an operation is mainly useful for routing,
+	 * but it may be externalized in a "util" class...
+	 */
+	public static double calcEndOfPlanElement(
 			final double now,
 			final PlanElement pe) {
 		if (now == Time.UNDEFINED_TIME) {
-			throw new RuntimeException("got wrong now to update with plan element" + pe);
+			throw new RuntimeException("got undefined now to update with plan element" + pe);
 		}
 
 		if (pe instanceof Activity) {
@@ -229,15 +247,13 @@ public class TripRouter {
 		else {
 			Route route = ((Leg) pe).getRoute();
 
-			double travelTime = route != null ? route.getTravelTime() : ((Leg) pe).getTravelTime();
+			double travelTime = route != null ? route.getTravelTime() : Time.UNDEFINED_TIME;
+			travelTime = travelTime == Time.UNDEFINED_TIME ? ((Leg) pe).getTravelTime() : travelTime;
 
 			return now + (travelTime != Time.UNDEFINED_TIME ? travelTime : 0);
 		}
 	}	
 
-	// /////////////////////////////////////////////////////////////////////////
-	// public static convenience methods.
-	// /////////////////////////////////////////////////////////////////////////
 	/**
 	 * Inserts a trip between two activities in the sequence of plan elements
 	 * returned by the {@link Plan#getPlanElements()} method of a plan. Note

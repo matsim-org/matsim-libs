@@ -122,7 +122,7 @@ public class TripRouterFactory implements MatsimFactory {
 	 * @return a fully initialised {@link TripRouter}.
 	 */
 	public TripRouter createTripRouter() {
-		TripRouter tripRouter = new TripRouter();
+		TripRouter tripRouter = initRouter();
 
 		for (Map.Entry<String, RoutingModuleFactory> entry : routingModulesFactories.entrySet()) {
 			tripRouter.setRoutingModule(
@@ -133,6 +133,16 @@ public class TripRouterFactory implements MatsimFactory {
 		}
 
 		return tripRouter;
+	}
+
+	/**
+	 * This method is provided so that custom TripRouter
+	 * implementations can be used.
+	 * This should only be used to change the way the "main mode"
+	 * is detected.
+	 */
+	protected TripRouter initRouter() {
+		return new TripRouter();
 	}
 }
 

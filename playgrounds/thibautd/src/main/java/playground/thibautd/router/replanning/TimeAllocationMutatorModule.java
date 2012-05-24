@@ -94,8 +94,8 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TimeAllocationMutator mutator =
-			new TimeAllocationMutator(
+		BlackListedTimeAllocationMutator mutator =
+			new BlackListedTimeAllocationMutator(
 					blackList != null ? blackList : controler.getTripRouterFactory().createTripRouter().getStageActivityTypes(),
 					this.mutationRange,
 					MatsimRandom.getLocalInstance());
