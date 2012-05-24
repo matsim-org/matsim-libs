@@ -58,6 +58,10 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 	private ArrayList<Id> agentsPerformingPtInteraction = new ArrayList<Id>();
 	private TreeMap<Id, Id> agentStartingLinkId = new TreeMap<Id, Id>();
 	
+	private boolean timeWindowIsSet = false;
+	private double startTime;
+	private double endTime;
+	
 
 	public CalcLegTimesKTI(Population pop, PrintStream out) {
 		super(out);
@@ -108,7 +112,7 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 					frequency = this.frequencies.get(mode);
 					rawData = this.rawData.get(mode);
 				}
-				if(travelTime >= 0.0){
+				if(travelTime >= 0.0 && eventIsInTimeWindow(event.getTime())){
 					frequency.addValue(travelTime);
 					rawData.addElement(travelTime);
 				}
@@ -171,7 +175,7 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 					rawData = this.rawData.get(mode);
 				}
 				
-				if(this.ptPerformingTime.get(personId) >= 0.0){
+				if(this.ptPerformingTime.get(personId) >= 0.0 && eventIsInTimeWindow(event.getTime())){
 					frequency.addValue(this.ptPerformingTime.get(personId));
 					rawData.addElement(this.ptPerformingTime.get(personId));
 				}
@@ -181,5 +185,21 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 				this.ptPerformingTime.remove(personId);
 			}
 		}
+	}
+
+	private boolean eventIsInTimeWindow(double time) {
+		
+		if(!timeWindowIsSet) return true;
+		
+		if(time > startTime && time < endTime) return true;
+		
+		else return false;
+	}
+	
+	public void setTimeWindow(double startTime, double endTime){
+		
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.timeWindowIsSet = true;
 	}
 }
