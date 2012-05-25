@@ -20,11 +20,19 @@
 
 package playground.christoph.icem2012;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -35,7 +43,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
@@ -47,9 +54,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import com.vividsolutions.jts.geom.Geometry;
+
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.api.core.v01.Coord3d;
 import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
+import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.gregor.sim2d_v3.events.XYDataWriter;
 import playground.gregor.sim2d_v3.router.Walk2DLegRouter;
 import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
@@ -64,12 +75,33 @@ public class MarathonController extends Controler implements StartupListener, Mo
 	
 	public static String dhm25File = "D:/Users/Christoph/workspace/matsim/mysimulations/networks/GIS/nodes_3d_ivtch_dhm25.shp";
 	public static String srtmFile = "D:/Users/Christoph/workspace/matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
+	public static String affectedAreaFile = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/input/affectedArea.shp";
+	
+	/*
+	 * innerBuffer ... minimum distance between affected area and an exit node
+	 * outerBuffer ... maximum distance between affected area and an exit node
+	 */
+	private double innerBuffer = 2000.0;
+	private double outerBuffer = 4000.0;
+	
+	private Geometry affectedArea;
+	private CoordAnalyzer coordAnalyzer;
+	private Set<Id> affectedNodes;
+	private Set<Id> affectedLinks;
+	private Set<Id> affectedFacilities;
 	
 	public MarathonController(String[] args) {
 		super(args[0]);
 		setOverwriteFiles(true);
 	}
 
+	/*
+	 * TODO: 
+	 * - add exit nodes and links 
+	 * - add within-day replanners
+	 * - allow walk and bike mode on track after evacuation has started
+	 * - switch all affected walk agents to walk2d
+	 */
 	public MarathonController(Scenario sc) {
 		super(sc);
 		setOverwriteFiles(true);
@@ -80,7 +112,7 @@ public class MarathonController extends Controler implements StartupListener, Mo
 		this.addCoreControlerListener(this);
 		this.getQueueSimulationListener().add(this);
 	}
-
+	
 	@Override
 	protected void loadData() {
 		super.loadData();
@@ -109,11 +141,6 @@ public class MarathonController extends Controler implements StartupListener, Mo
 				((NodeImpl) node).setCoord(coord3d);
 			}
 		}
-		
-//		new NetworkCleaner().run(scenarioData.getNetwork());
-//		for (Node node : scenarioData.getNetwork().getNodes().values()) {
-//			log.info(node.getId().toString() + " " + ((Coord3d) node.getCoord()).getZ());
-//		}
 		
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenarioData);
 		loader.load2DScenario();
@@ -159,6 +186,12 @@ public class MarathonController extends Controler implements StartupListener, Mo
 		this.getEvents().addHandler(xyDataWriter);
 		this.addControlerListener(xyDataWriter);
 		this.getQueueSimulationListener().add(xyDataWriter);
+		
+		readAffectedArea();
+		
+		identifyAffectedInfrastructure();
+		
+		createExitLinks();
 	}
 
 	@Override
@@ -172,5 +205,46 @@ public class MarathonController extends Controler implements StartupListener, Mo
 					new DefaultVelocityCalculator(this.config.plansCalcRoute())); 
 			sim2DEngine.setVelocityCalculator(velocityCalculator);
 		}
+	}
+	
+	private void readAffectedArea() {
+		SHPFileUtil util = new SHPFileUtil();
+		Set<Feature> features = new HashSet<Feature>();
+		features.addAll(util.readFile(affectedAreaFile));		
+		this.affectedArea = util.mergeGeomgetries(features);
+		
+		this.coordAnalyzer = new CoordAnalyzer(this.affectedArea);
+	}
+	
+	private void identifyAffectedInfrastructure() {
+		affectedNodes = new HashSet<Id>();
+		affectedLinks = new HashSet<Id>();
+		affectedFacilities = new HashSet<Id>();
+		
+		for (Node node : scenarioData.getNetwork().getNodes().values()) {
+			if (coordAnalyzer.isNodeAffected(node)) affectedNodes.add(node.getId());
+		}
+		for (Link link : scenarioData.getNetwork().getLinks().values()) {
+			if (coordAnalyzer.isLinkAffected(link)) affectedLinks.add(link.getId());
+		}
+		for (Facility facility : scenarioData.getActivityFacilities().getFacilities().values()) {
+			if (coordAnalyzer.isFacilityAffected(facility)) affectedFacilities.add(facility.getId());
+		}
+	}
+	
+	private void createExitLinks() {
+		Geometry innerBuffer = affectedArea.buffer(this.innerBuffer);
+		Geometry outerBuffer = affectedArea.buffer(this.outerBuffer);
+		
+		CoordAnalyzer innerAnalyzer = new CoordAnalyzer(innerBuffer);
+		CoordAnalyzer outerAnalyzer = new CoordAnalyzer(outerBuffer);
+		
+		Set<Node> exitNodes = new LinkedHashSet<Node>();
+		for (Node node : scenarioData.getNetwork().getNodes().values()) {
+			if (outerAnalyzer.isNodeAffected(node) && !innerAnalyzer.isNodeAffected(node)) {
+				exitNodes.add(node);
+			}
+		}
+		log.info("Found " + exitNodes.size() + " exit nodes");
 	}
 }

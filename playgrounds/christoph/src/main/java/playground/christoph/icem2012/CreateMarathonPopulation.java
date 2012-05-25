@@ -64,7 +64,6 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -80,13 +79,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -99,18 +95,7 @@ public class CreateMarathonPopulation {
 	private final String trackModes = "walk2d,walk,bike";
 	private final String startLink = "106474";
 	private final String endLink = "106473";
-//	private final String endLink = "106473_2759_shifted_2952";
 	
-//	// unshifted
-//	private final String[] trackNodes = new String[]{	
-//			"2952", "2759", "2951", "2531", "2530", "2529", "4263", "4268", "4468", "3496",
-//			"2530", "2531", "2951", "4508", "4507", "4505", "4504", "4505", "4503", "4506",
-//			"4508", "2951", "2759", "2758", "2952", "2759", "2951", "2531", "2530", "2529",
-//			"2528", "2527", "2526", "2525", "2524", "2523", "2522", "2521", "4239", "2522", 
-//			"2523", "2524", "2525", "2526", "2527", "2528", "2529", "2530", "2531", "2951", 
-//			"4508", "4507", "4505", "4504", "4505", "4503", "4506", "4508", "2951", "2759",
-//			"2952"};
-
 	// shifted
 	private final String[] trackNodes = new String[]{	
 			"2952", "2759", "2951", "2531", "2530", "2529", "4263", "4268", "4468", "3496",
@@ -124,39 +109,56 @@ public class CreateMarathonPopulation {
 			"4504_shifted", "4504", "4505", "4503", "4506", "4508", "2951_shifted_shifted", 
 			"2759_shifted", "2952"};
 	
+	// track related links
+	private final String[] trackRelatedLinks = new String[]{
+			"110604", "108031", "111637", "108032", "111638", "111639", "111640", "111645",
+			"111646", "111647", "111648", "111649", "111650", "111651", "111652", "111677",
+			"111678", "2521_4239", "2522_2522_shifted", "2522_shifted_2522", "2523_2523_shifted", 
+			"110445", "2523_shifted_2523", "110446", "2524_2524_shifted", "2524_shifted_2524",
+			"106069", "2525_2525_shifted", "106070", "2525_shifted_2525", "2526_2526_shifted",
+			"2526_shifted_2526", "2527_2527_shifted", "2527_shifted_2527", "2528_2528_shifted",
+			"2528_shifted_2528", "2529_2529_shifted", "2529_shifted_2529", "2530_2530_shifted",
+			"2530_shifted_2530", "2531_2531_shifted", "2531_shifted_2531", "2759_2759_shifted",
+			"2759_shifted_2759", "2951_2951_shifted", "2951_shifted_2951",
+			"2951_shifted_2951_shifted_shifted", "111499", "2951_shifted_shifted_2951_shifted",
+			"111500", "4504_4504_shifted", "4504_shifted_4504", "4505_4505_shifted", "111503",
+			"4505_shifted_4505", "111504", "4507_4507_shifted", "4507_shifted_4507", 
+			"4508_4508_shifted", "4508_shifted_4508", "110547", "110548", "110555", "110556",
+			"105673", "105674", "105675", "105676", "105677", "105678", "105679", "105680",
+			"105681", "105682", "105683", "105685", "105686", "105687", "105688", "105689", 
+			"105690", "105691", "106469", "105692", "106470", "106471", "106472", "106473",
+			"106474", "111635", "111636", "105684", "110603"};
+	
 	private NetworkRoute route;
 	
 	private String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/"; 
 	private String trackShapeOutFile = basePath + "input/track.shp";
+	private String trackRelatedShapeOutFile = basePath + "input/trackRelated.shp";
 	private String barriersShapeOutFile = basePath + "input/barriers.shp";
 	private String networkInFile = basePath + "input_zh/network_ivtch.xml.gz";
 	private String networkOutFile = basePath + "input/network_ivtch.xml.gz";
+	private String networkSHPFile = basePath + "input/network_ivtch.shp";
 	private String facilitiesInFile = basePath + "input_zh/facilities.xml.gz";
 	private String populationInFile = basePath + "input_zh/plans_25pct.xml.gz";
 	private String populationOutFile = basePath + "input/plans_25pct.xml.gz";
-	private String affectedAreaFile = basePath + "input/affectedArea.shp";
-	
-	private Geometry affectedArea;
-	private CoordAnalyzer coordAnalyzer;
 	
 	public static void main(String[] args) {
 		new CreateMarathonPopulation();
 	}
 	
+	/*
+	 * TODO: create audiance population
+	 */
 	public CreateMarathonPopulation() {
 
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(2);
 		config.network().setInputFile(networkInFile);
 		config.facilities().setInputFile(facilitiesInFile);
-		config.plans().setInputFile(populationInFile);
+//		config.plans().setInputFile(populationInFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		readAffectedArea();
 		
 		addNodesToNetwork(scenario);
-		
-//		copyLinksToShiftedNodes(scenario);
 		
 		moveLinksToShiftedNodes(scenario);
 		
@@ -168,23 +170,25 @@ public class CreateMarathonPopulation {
 		
 		writeTrack(scenario);
 		
+		writeTrackRelated(scenario);
+		
 		writeBarriers(scenario);
 
-		adaptBackgroundPopulation(scenario);
+//		adaptBackgroundPopulation(scenario);
 		
-		createPopulation(scenario);
+//		createPopulation(scenario);
 		
-		writePopulation(scenario);
+//		writePopulation(scenario);
 	}
 	
-	private void readAffectedArea() {
-		SHPFileUtil util = new SHPFileUtil();
-		Set<Feature> features = new HashSet<Feature>();
-		features.addAll(util.readFile(affectedAreaFile));		
-		this.affectedArea = util.mergeGeomgetries(features);
-		
-		this.coordAnalyzer = new CoordAnalyzer(this.affectedArea); 
-	}
+//	private void readAffectedArea() {
+//		SHPFileUtil util = new SHPFileUtil();
+//		Set<Feature> features = new HashSet<Feature>();
+//		features.addAll(util.readFile(affectedAreaFile));		
+//		this.affectedArea = util.mergeGeomgetries(features);
+//		
+//		this.coordAnalyzer = new CoordAnalyzer(this.affectedArea); 
+//	}
 	
 	private void createRoute(Scenario scenario) {
 		
@@ -290,70 +294,6 @@ public class CreateMarathonPopulation {
 //		moveLink(scenario, "", "", "_shifted", "_shifted");
 	}
 	
-	private void copyLinksToShiftedNodes(Scenario scenario) {
-		
-		copyLinks(scenario, "4239", "2522", "4239", "2522_shifted");
-		copyLinks(scenario, "2522", "2523", "2522_shifted", "2523_shifted");
-		copyLinks(scenario, "2523", "2524", "2523_shifted", "2524_shifted");
-		copyLinks(scenario, "2524", "2525", "2524_shifted", "2525_shifted");
-		copyLinks(scenario, "2525", "2526", "2525_shifted", "2526_shifted");
-		copyLinks(scenario, "2526", "2527", "2526_shifted", "2527_shifted");
-		copyLinks(scenario, "2527", "2528", "2527_shifted", "2528_shifted");
-		copyLinks(scenario, "2528", "2529", "2528_shifted", "2529_shifted");
-		copyLinks(scenario, "2529", "2530", "2529_shifted", "2530_shifted");
-		copyLinks(scenario, "3496", "2530", "3496", "2530_shifted");
-		copyLinks(scenario, "2530", "2531", "2530_shifted", "2531_shifted");
-		copyLinks(scenario, "2531", "2951", "2531_shifted", "2951_shifted");
-		copyLinks(scenario, "2951", "4508", "2951_shifted", "4508_shifted");
-		copyLinks(scenario, "4508", "4507", "4508_shifted", "4507_shifted");
-		copyLinks(scenario, "4507", "4505", "4507_shifted", "4505_shifted");
-		copyLinks(scenario, "4505", "4504", "4505_shifted", "4504_shifted");
-		copyLinks(scenario, "4508", "2951", "4508", "2951_shifted_shifted");
-		copyLinks(scenario, "2951", "2759", "2951_shifted_shifted", "2759_shifted");
-		copyLinks(scenario, "2759", "2952", "2759_shifted", "2952");
-		copyLinks(scenario, "2759", "2758", "2759_shifted", "2758");
-	}
-	
-	private void copyLinks(Scenario scenario, String oldFrom, String oldTo, String newFrom, String newTo) {
-		Id oldFromId = scenario.createId(oldFrom);
-		Id oldToId = scenario.createId(oldTo);
-		Id newFromId = scenario.createId(newFrom);
-		Id newToId = scenario.createId(newTo);
-		
-		Node from = scenario.getNetwork().getNodes().get(oldFromId);
-		Node to = scenario.getNetwork().getNodes().get(oldToId);
-		
-		for (Link link : from.getOutLinks().values()) {
-			if (link.getToNode().getId().equals(oldToId)) {
-				
-				Node fromNode = scenario.getNetwork().getNodes().get(newFromId);
-				Node toNode = scenario.getNetwork().getNodes().get(newToId);
-				Id id = scenario.createId(link.getId().toString() + "_" + newFrom + "_" + newTo);
-				
-				Link copy = scenario.getNetwork().getFactory().createLink(id, fromNode, toNode);
-				copy.setLength(link.getLength());
-				copy.setAllowedModes(link.getAllowedModes());
-				
-				scenario.getNetwork().addLink(copy);
-			}
-		}
-		
-		for (Link link : from.getInLinks().values()) {
-			if (link.getFromNode().getId().equals(oldToId)) {
-				
-				Node fromNode = scenario.getNetwork().getNodes().get(newFromId);
-				Node toNode = scenario.getNetwork().getNodes().get(newToId);
-				Id id = scenario.createId(link.getId().toString() + "_" + newTo + "_" + newFrom);
-				
-				Link copy = scenario.getNetwork().getFactory().createLink(id, fromNode, toNode);
-				copy.setLength(link.getLength());
-				copy.setAllowedModes(link.getAllowedModes());
-				
-				scenario.getNetwork().addLink(copy);
-			}
-		}
-	}
-	
 	private void moveLink(Scenario scenario, String oldFrom, String oldTo, String newFrom, String newTo) {
 		Id oldFromId = scenario.createId(oldFrom);
 		Id oldToId = scenario.createId(oldTo);
@@ -449,7 +389,7 @@ public class CreateMarathonPopulation {
 		Config config = scenario.getConfig();
 		config.multiModal().setCreateMultiModalNetwork(true);
 		config.multiModal().setCutoffValueForNonCarModes(80/3.6);
-		config.multiModal().setSimulatedModes("car,walk2d,walk,ride,bike,pt");
+		config.multiModal().setSimulatedModes("walk,ride,bike,pt");
 		new MultiModalNetworkCreator(config.multiModal()).run(scenario.getNetwork());
 		
 		/*
@@ -471,13 +411,21 @@ public class CreateMarathonPopulation {
 			link.setFreespeed(10.0);
 			link.setAllowedModes(modes);
 		}
+
+		/*
+		 * Add walk2d as valid mode to all links which allow walk.
+		 */
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			if (link.getAllowedModes().contains(TransportMode.walk)) {
+				Set<String> newModes = new HashSet<String>(link.getAllowedModes());
+				newModes.add("walk2d");
+				link.setAllowedModes(newModes);
+			}
+		}
 		
-//		Set<Id> linksToRemove = new HashSet<Id>(scenario.getNetwork().getLinks().keySet());
-//		linksToRemove.removeAll(linksToAdapt);
-//		for (Id id : linksToRemove) scenario.getNetwork().removeLink(id);
-		
-//		new NetworkCleaner().run(scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(networkOutFile);
+		
+		new Links2ESRIShape(scenario.getNetwork(), networkSHPFile, "EPSG:4326").write();
 	}
 	
 	private void writeBarriers(Scenario scenario) {
@@ -590,6 +538,36 @@ public class CreateMarathonPopulation {
 		}
 	}
 	
+	private void writeTrackRelated(Scenario scenario) {
+		try {
+			log.info("writing track related links to shp file...");
+					
+			GeometryFactory geofac = new GeometryFactory();
+			Collection<Feature> fts = new  ArrayList<Feature>();
+			
+			CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 4326");
+			AttributeType l = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, targetCRS);
+			AttributeType z = AttributeTypeFactory.newAttributeType("dblAvgZ", Double.class);
+			AttributeType t = AttributeTypeFactory.newAttributeType("name", String.class);
+			FeatureType ftLine = FeatureTypeBuilder.newFeatureType(new AttributeType[] {l, z, t}, "Line");
+			
+			for (String linkId : trackRelatedLinks) {
+				Id id = scenario.createId(linkId);
+				Link link = scenario.getNetwork().getLinks().get(id);
+				Coordinate[] line = new Coordinate[2];
+				line[0] = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+				line[1] = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+				LineString ls = geofac.createLineString(line);
+				fts.add(ftLine.create(new Object[] {ls, 0, linkId}));
+			}
+
+			ShapeFileWriter.writeGeometries(fts, trackRelatedShapeOutFile);
+			log.info("done");
+		} catch (Exception e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
 	private void adaptBackgroundPopulation(Scenario scenario) {
 		
 		/*
@@ -597,26 +575,19 @@ public class CreateMarathonPopulation {
 		 * the router will not send other agents over track links.
 		 */
 		Network network = scenario.getNetwork();
-		Set<Id> trackLinks = new HashSet<Id>();
-		trackLinks.add(route.getStartLinkId());
-		trackLinks.addAll(route.getLinkIds());
-		trackLinks.add(route.getEndLinkId());
-
+//		Set<Id> trackLinks = new HashSet<Id>();
+//		trackLinks.add(route.getStartLinkId());
+//		trackLinks.addAll(route.getLinkIds());
+//		trackLinks.add(route.getEndLinkId());
+		
 		// includes track links and their counter links
 		Set<Id> trackRelatedLinks = new HashSet<Id>();
-		trackRelatedLinks.addAll(trackLinks);
-		for (Id trackLinkId : trackLinks) {
-			Link link = network.getLinks().get(trackLinkId);
-			Node fromNode = link.getFromNode();
-			Node toNode = link.getFromNode();
-			for (Link outLink : toNode.getOutLinks().values()) {
-				// if it is a counter link
-				if (outLink.getToNode().getId().equals(fromNode.getId())) {
-					trackRelatedLinks.add(outLink.getId());
-				}
-			}
+		for (String linkId : this.trackRelatedLinks) {
+			Id id = scenario.createId(linkId);
+			trackRelatedLinks.add(id);
 		}
 		
+		// allow only walk2d legs until the background populations is created
 		Set<String> modes = CollectionUtils.stringToSet("walk2d");
 		for (Id linkId : trackRelatedLinks) {
 			network.getLinks().get(linkId).setAllowedModes(modes);		
