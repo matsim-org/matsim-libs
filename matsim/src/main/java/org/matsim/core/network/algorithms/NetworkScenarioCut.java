@@ -20,8 +20,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -48,30 +48,25 @@ public class NetworkScenarioCut implements NetworkRunnable {
 
 	@Override
 	public void run(final Network network) {
-		log.info("running module...");
-
-		TreeSet<Node> n_set = new TreeSet<Node>();
-		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
-		while (n_it.hasNext()) {
-			Node n = n_it.next();
+		Set<Node> nodesToRemove = new HashSet<Node>();
+		for (Node n : network.getNodes().values()) {
 			Coord coord = n.getCoord();
 			double x = coord.getX();
 			double y = coord.getY();
 			if (!((x < this.maxX) && (this.minX < x) && (y < this.maxY) && (this.minY < y))) {
-				n_set.add(n);
+				nodesToRemove.add(n);
 			}
 		}
 
-		log.info("  Number of nodes to be cut out = " + n_set.size() + "...");
-		n_it = n_set.iterator();
-		int l_cnt = 0;
-		while (n_it.hasNext()) {
-			Node n = n_it.next();
-			l_cnt += n.getInLinks().size() + n.getOutLinks().size();
+		int nofLinksRemoved = 0;
+		for (Node n : nodesToRemove) {
+			nofLinksRemoved += n.getInLinks().size() + n.getOutLinks().size();
 			network.removeNode(n.getId());
 		}
-		log.info("  Number of links cut out = " + l_cnt + ".");
-
-		log.info("done.");
+		
+		log.info("number of nodes removed: "+nodesToRemove.size());
+		log.info("number of links removed: "+nofLinksRemoved);
+		log.info("number of nodes remaining: "+network.getNodes().size());
+		log.info("number of links remaining: "+network.getLinks().size());
 	}
 }

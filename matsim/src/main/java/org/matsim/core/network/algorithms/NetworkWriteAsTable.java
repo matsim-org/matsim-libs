@@ -23,6 +23,7 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -41,6 +42,8 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
+
+	private final static Logger log = Logger.getLogger(NetworkWriteAsTable.class);
 
 	private final String outdir;
 	private final double offset;
@@ -76,11 +79,9 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 
 	@Override
 	public void run(Network network) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-
 		double capperiod = network.getCapacityPeriod();
 		capperiod = capperiod / 3600;
-		System.out.println("      capperiod = " + capperiod);
+		log.info("capperiod = " + capperiod);
 
 		try {
 			BufferedWriter out_n = IOUtils.getBufferedWriter(this.outdir + "/nodes.txt.gz");
@@ -132,7 +133,5 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-
-		System.out.println("    done.");
 	}
 }
