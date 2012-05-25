@@ -20,22 +20,22 @@
 
 package occupancy;
 
-
 public class FacilityOccupancy {
 		
 	private int [] arrivals = null;
 	private int [] departures = null;
 	private int [] occupancy = null;
 	
-	private int numberOfTimeBins = 0;
+	private int numberOfTimeBins = 96;
 	
 	// visitors which are included in the penalty calculation (arrival before 24:00)
 	private double numberOfVisitorsPerDay = 0.0;
 	
 	// including also visitors which arrive after 24:00
 	private double allVisitors = 0.0;
-	
+		
 	private double scaleNumberOfPersons = 1.0;
+
 	
 	// ----------------------------------------------------------------------
 		
@@ -46,27 +46,23 @@ public class FacilityOccupancy {
 		this.occupancy = new int [numberOfTimeBins];
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 
+
 		for (int i = 0; i < numberOfTimeBins; i++){
 			this.arrivals[i] = 0;
 			this.departures[i] = 0;
 			this.occupancy[i] = 0;
 		}
-		
-//		for (int i = 0; i < numberOfTimeBins; i++){
-//			this.occupancy[i] += this.arrivals[i]-this.departures[i];
-//		}
-		
 	}
 	
-	private void calculateFacilityOccupancy24() {
-		//log.info("calculateFacilityLoad24");
-		int numberOfVisitors = 0;
-		for (int i = 0; i < this.numberOfTimeBins; i++) {
-			numberOfVisitors += this.arrivals[i];
-			this.occupancy[i] = (int) (numberOfVisitors * this.scaleNumberOfPersons);
-			numberOfVisitors -= this.departures[i];			
-		}
-	}
+//	private void calculateFacilityOccupancy24() {
+//		//log.info("calculateFacilityLoad24");
+//		int numberOfVisitors = 0;
+//		for (int i = 0; i < this.numberOfTimeBins; i++) {
+//			numberOfVisitors += this.arrivals[i];
+//			this.occupancy[i] = (int) (numberOfVisitors * this.scaleNumberOfPersons);
+//			numberOfVisitors -= this.departures[i];			
+//		}
+//	}
 	
 	public void addArrival(double time) {		
 		this.addToAllVisitors(this.scaleNumberOfPersons);
@@ -94,11 +90,13 @@ public class FacilityOccupancy {
 		//log.info("departure at: " + time + " bin: " + timeBinIndex);
 	}
 	
-	public double getCurrentOccupancy (double time) {
-		int timeBinIndex = this.timeBinIndex(time);
-		double CurrentOccupancy = this.occupancy[timeBinIndex];
-		return CurrentOccupancy;		
-	}
+//	public double getCurrentOccupancy (double time) {
+//		int timeBinIndex = this.timeBinIndex(time);
+//		this.occupancy[timeBinIndex] += this.arrivals[timeBinIndex];
+//		this.occupancy[timeBinIndex] -= this.departures[timeBinIndex];
+//		double CurrentOccupancy = this.occupancy[timeBinIndex];
+//		return CurrentOccupancy;		
+//	}
 	
 	public void addToAllVisitors(double scaleNumberOfPersons) {
 		this.allVisitors += scaleNumberOfPersons;
@@ -129,11 +127,26 @@ public class FacilityOccupancy {
 	public double getAllVisitors() {
 		return this.allVisitors;
 	}
+	
+	public double getCurrentOccupancy(double time) {
+		int t = this.timeBinIndex(time);
+		double sumArrivals = 0;
+		double sumDepartures = 0;
+		double currentOccupancy = 0;
 
-	public void finish() {
-		//log.info("FacilityLoad finished");
-		this.calculateFacilityOccupancy24();
+		for (int i = 0; i < (t+1); i++){
+			sumArrivals += this.arrivals[i];
+			sumDepartures += this.departures[i];
+			this.occupancy[i] = 0;
+		}
+		currentOccupancy = sumArrivals-sumDepartures;
+		return currentOccupancy;
 	}
+
+//	public void finish() {
+//		//log.info("FacilityLoad finished");
+//		this.calculateFacilityOccupancy24();
+//	}
 	
 	public void reset() {
 		for (int i=0; i<this.numberOfTimeBins; i++) {

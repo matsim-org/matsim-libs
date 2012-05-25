@@ -148,6 +148,7 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 			ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
 			double capacity = facility.getActivityOptions().get(act.getType()).getCapacity();
 			double occupancy = this.facilityOccupancies.get(facility.getId()).getCurrentOccupancy(activityStart);
+			log.info("for facility " +facility.getId()+ " and agent " +plan.getPerson().getId()+ " current occupancy is: " +occupancy+ " while performing " +act.getType()+ " activity");
 			double load = (occupancy*this.scaleNumberOfPersons)/capacity;
 		
 			// disutility of agent interaction underarousal
@@ -155,6 +156,8 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 			int lowerMarginalUtility = (Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal");
 			if ((load < lowerBound) && load>0) {
 				tmpScore += lowerMarginalUtility/load * duration;
+				double penalty = lowerMarginalUtility/load * duration;
+				log.info("an underarousal penalty of " +penalty+ " is given due to load " +load);
 			}
 		
 			// disutility of agent interaction overarousal
@@ -162,6 +165,8 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 			int upperMarginalUtility = (Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal");
 			if ((load > upperBound)) {
 				tmpScore += upperMarginalUtility*load * duration;
+				double penalty = upperMarginalUtility*load * duration;
+				log.info("an overarousal penalty of " +penalty+ " is given due to load " +load);
 			}
 		}
 		

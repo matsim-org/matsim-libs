@@ -51,7 +51,7 @@ public class MiniScenarioControler extends Controler {
 	
 	protected void setUp() {
 
-		this.setCreateGraphs(false);
+		this.setCreateGraphs(true);
 		this.setDumpDataAtEnd(false);
 		this.setWriteEventsInterval(0);
 		

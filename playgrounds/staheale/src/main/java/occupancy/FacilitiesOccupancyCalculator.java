@@ -112,7 +112,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 		Controler controler = event.getControler();
 		ActivityFacilities facilities = controler.getFacilities();
 		
-		if (event.getIteration() % 10 == 0) {
+		if (event.getIteration() % 1 == 0) {
 			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getControler().getIterationNumber()), event.getIteration(),
 					facilityOccupancies);
 		}
@@ -125,7 +125,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 			TreeMap<Id, FacilityOccupancy> facilityOccupancies) {
 
 		try {
-				final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tAllVisitors\tOccupancy\tis shopping retail facility\tis shopping service facility\tis sports fun facility\tis gastro culture facility";
+				final String header="Facility_id\tx\ty\tVisitorsPerDay\tAllVisitors\tis shopping retail facility\tis shopping service facility\tis sports fun facility\tis gastro culture facility";
 				final BufferedWriter out =
 					IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
 				final BufferedWriter out_summary =
@@ -134,57 +134,100 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 				out.write(header);
 				out.newLine();
 
-				double occupancyPerHourSum[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+//				double occupancyPerHourSum[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 				for (ActivityFacility facility : facilities.getFacilities().values()) {
-					FacilityOccupancy facilityOccupancy = facilityOccupancies.get(facility.getId());
-					out.write(facility.getId().toString() + "\t"+
+					if (facility.getActivityOptions().containsKey("shop_retail") || facility.getActivityOptions().containsKey("shop_service")
+							 || facility.getActivityOptions().containsKey("sports_fun") || facility.getActivityOptions().containsKey("gastro_culture")) {
+						FacilityOccupancy facilityOccupancy = facilityOccupancies.get(facility.getId());
+						out.write(facility.getId().toString() + "\t"+
 							facility.getCoord().getX() + "\t"+
 							facility.getCoord().getY() + "\t"+
 							facilityOccupancy.getNumberOfVisitorsPerDay() + "\t" +
-							facilityOccupancy.getAllVisitors() + "\t" +
-							facilityOccupancy.getOccupancy() + "\t");
-					if (facility.getActivityOptions().containsKey("shop_retail")) {
-						out.write("shop_retail");
-					}
-					else {
-						out.write("-");
-					}
-					if (facility.getActivityOptions().containsKey("shop_service")) {
-						out.write("shop_service");
-					}
-					else {
-						out.write("-");
-					}
-					if (facility.getActivityOptions().containsKey("sports_fun")) {
-						out.write("sports_fun");
-					}
-					else {
-						out.write("-");
-					}
-					if (facility.getActivityOptions().containsKey("gastro_culture")) {
-						out.write("gastro_culture");
-					}
-					else {
-						out.write("-");
-					}
+							facilityOccupancy.getAllVisitors()
+							+ "\t");
+						if (facility.getActivityOptions().containsKey("shop_retail")) {
+							out.write("shop_retail");
+						}
+						else {
+							out.write("-");
+						}
+						if (facility.getActivityOptions().containsKey("shop_service")) {
+							out.write("shop_service");
+						}
+						else {
+							out.write("-");
+						}
+						if (facility.getActivityOptions().containsKey("sports_fun")) {
+							out.write("sports_fun");
+						}
+						else {
+							out.write("-");
+						}
+						if (facility.getActivityOptions().containsKey("gastro_culture")) {
+							out.write("gastro_culture");
+						}
+						else {
+							out.write("-");
+						}
 
-					out.newLine();
+						out.newLine();
 
-					for (int i = 0; i < 24; i++) {
-						occupancyPerHourSum[i] += facilityOccupancy.getOccupancyPerHour(i);
+//						for (int i = 0; i < 24; i++) {
+//						occupancyPerHourSum[i] += facilityOccupancy.getOccupancyPerHour(i);
+//						
+//						}
 					}
 				}
 				out.flush();
 				out.close();
 
-				out_summary.write("Hour\tOccupancy");
+				out_summary.write("Facility_id\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\t11\t12\t13\t14\t15\t16\t17\t18\t19\t20\t21\t22\t23");
 				out_summary.newLine();
-				for (int i = 0; i<24; i++) {
-					out_summary.write(i + "\t" + occupancyPerHourSum[i]);
-					out_summary.newLine();
-					out_summary.flush();
+				for (ActivityFacility facility : facilities.getFacilities().values()) {
+					if (facility.getActivityOptions().containsKey("shop_retail") || facility.getActivityOptions().containsKey("shop_service")
+							 || facility.getActivityOptions().containsKey("sports_fun") || facility.getActivityOptions().containsKey("gastro_culture")) {
+						FacilityOccupancy facilityOccupancy = facilityOccupancies.get(facility.getId());
+						double capacity = 1.0;
+						if (facility.getActivityOptions().get("shop_retail")!=null) {capacity = facility.getActivityOptions().get("shop_retail").getCapacity();}
+						if (facility.getActivityOptions().get("shop_service")!=null) {capacity = facility.getActivityOptions().get("shop_service").getCapacity();}
+						if (facility.getActivityOptions().get("sports_fun")!=null) {capacity= facility.getActivityOptions().get("sports_fun").getCapacity();}
+						if (facility.getActivityOptions().get("gastro_culture")!=null) {capacity= facility.getActivityOptions().get("gastro_culture").getCapacity();}
+
+							out_summary.write(facility.getId().toString() + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(0.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(1.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(2.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(3.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(4.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(5.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(6.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(7.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(8.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(9.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(10.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(11.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(12.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(13.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(14.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(15.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(16.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(17.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(18.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(19.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(20.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(21.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(22.5*3600)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(23.5*3600)/capacity*1000)/1000 + "\t"
+								+ "\t");
+						out_summary.newLine();
+					}
 				}
+				
+//				for (int i = 0; i<24; i++) {
+//					out_summary.write(i + "\t" + occupancyPerHourSum[i]);
+					out_summary.flush();
+//				}
 				out_summary.close();
 			} catch (final IOException e) {
 				Gbl.errorMsg(e);
