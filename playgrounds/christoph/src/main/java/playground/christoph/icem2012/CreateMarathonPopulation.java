@@ -601,8 +601,24 @@ public class CreateMarathonPopulation {
 		trackLinks.add(route.getStartLinkId());
 		trackLinks.addAll(route.getLinkIds());
 		trackLinks.add(route.getEndLinkId());
+
+		// includes track links and their counter links
+		Set<Id> trackRelatedLinks = new HashSet<Id>();
+		trackRelatedLinks.addAll(trackLinks);
+		for (Id trackLinkId : trackLinks) {
+			Link link = network.getLinks().get(trackLinkId);
+			Node fromNode = link.getFromNode();
+			Node toNode = link.getFromNode();
+			for (Link outLink : toNode.getOutLinks().values()) {
+				// if it is a counter link
+				if (outLink.getToNode().getId().equals(fromNode.getId())) {
+					trackRelatedLinks.add(outLink.getId());
+				}
+			}
+		}
+		
 		Set<String> modes = CollectionUtils.stringToSet("walk2d");
-		for (Id linkId : trackLinks) {
+		for (Id linkId : trackRelatedLinks) {
 			network.getLinks().get(linkId).setAllowedModes(modes);		
 		}
 		
@@ -650,7 +666,7 @@ public class CreateMarathonPopulation {
 					}
 					else log.warn("Unknown activity type: " + type);
 					
-					boolean isOnTrack = trackLinks.contains(activity.getLinkId());
+					boolean isOnTrack = trackRelatedLinks.contains(activity.getLinkId());
 					if (isOnTrack) {
 						personsToRemove.add(person.getId());
 						counterRemove.incCounter();
@@ -660,11 +676,18 @@ public class CreateMarathonPopulation {
 					Leg leg = (Leg) planElement;
 					Route route = leg.getRoute();
 					
-					if (trackLinks.contains(route.getStartLinkId())) {
+					// if its a walk2d agent from the PED 2012 population remove it
+					if (leg.getMode().equals("walk2d")) {
+						personsToRemove.add(person.getId());
+						counterRemove.incCounter();
+						break;
+					}
+					
+					if (trackRelatedLinks.contains(route.getStartLinkId())) {
 						personsToRemove.add(person.getId());
 						counterRemove.incCounter();
 						break;						
-					} else if (trackLinks.contains(route.getEndLinkId())) {
+					} else if (trackRelatedLinks.contains(route.getEndLinkId())) {
 						personsToRemove.add(person.getId());
 						counterRemove.incCounter();
 						break;
@@ -674,7 +697,7 @@ public class CreateMarathonPopulation {
 							NetworkRoute networkRoute = (NetworkRoute) route;
 							
 							for (Id linkId : networkRoute.getLinkIds()) {
-								if (trackLinks.contains(linkId)) {
+								if (trackRelatedLinks.contains(linkId)) {
 									needsRerouting = true;
 									break;
 								}
@@ -715,7 +738,7 @@ public class CreateMarathonPopulation {
 		 * Restore original track modes.
 		 */
 		modes = CollectionUtils.stringToSet(this.trackModes);
-		for (Id linkId : trackLinks) {
+		for (Id linkId : trackRelatedLinks) {
 			network.getLinks().get(linkId).setAllowedModes(modes);		
 		}
 	}
