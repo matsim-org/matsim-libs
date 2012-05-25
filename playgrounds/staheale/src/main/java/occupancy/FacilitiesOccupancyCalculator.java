@@ -195,30 +195,30 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 						if (facility.getActivityOptions().get("gastro_culture")!=null) {capacity= facility.getActivityOptions().get("gastro_culture").getCapacity();}
 
 							out_summary.write(facility.getId().toString() + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(0.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(1.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(2.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(3.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(4.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(5.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(6.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(7.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(8.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(9.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(10.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(11.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(12.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(13.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(14.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(15.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(16.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(17.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(18.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(19.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(20.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(21.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(22.5*3600)/capacity*1000)/1000 + "\t"+
-								(double)Math.round(facilityOccupancy.getCurrentOccupancy(23.5*3600)/capacity*1000)/1000 + "\t"
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(0)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(4)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(8)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(12)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(16)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(20)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(24)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(28)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(32)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(36)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(40)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(44)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(48)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(52)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(56)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(60)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(64)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(68)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(72)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(76)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(80)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(84)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(88)/capacity*1000)/1000 + "\t"+
+								(double)Math.round(facilityOccupancy.getCurrentOccupancy(92)/capacity*1000)/1000 + "\t"
 								+ "\t");
 						out_summary.newLine();
 					}

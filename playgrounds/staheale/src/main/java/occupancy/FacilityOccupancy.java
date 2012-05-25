@@ -128,16 +128,15 @@ public class FacilityOccupancy {
 		return this.allVisitors;
 	}
 	
-	public double getCurrentOccupancy(double time) {
-		int t = this.timeBinIndex(time);
-		double sumArrivals = 0;
-		double sumDepartures = 0;
-		double currentOccupancy = 0;
+	public double getCurrentOccupancy(int timeBinIndex) {
+		int t = timeBinIndex;
+		int sumArrivals = 0;
+		int sumDepartures = 0;
+		int currentOccupancy = 0;
 
-		for (int i = 0; i < (t+1); i++){
-			sumArrivals += this.arrivals[i];
-			sumDepartures += this.departures[i];
-			this.occupancy[i] = 0;
+		for (int j = 0; j < t; j++){
+			sumArrivals += this.arrivals[j];
+			sumDepartures += this.departures[j];
 		}
 		currentOccupancy = sumArrivals-sumDepartures;
 		return currentOccupancy;
