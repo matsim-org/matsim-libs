@@ -22,7 +22,6 @@ package playground.andreas.P2.replanning;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -96,8 +95,8 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 
 	private PPlan createPlan(TransitLine line) {
 		Id id = new IdImpl(0);
-		List<TransitRouteStop> stopsOfLongestRouteH = new LinkedList<TransitRouteStop>();
-		List<TransitRouteStop> stopsOfLongestRouteR = new LinkedList<TransitRouteStop>();
+		TransitRoute longestRouteH = null;
+		TransitRoute longestRouteR = null;
 		
 		double startTime = Double.MAX_VALUE;
 		double endTime = Double.MIN_VALUE;
@@ -105,12 +104,16 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 		
 		for (TransitRoute route : line.getRoutes().values()) {
 			if(route.getId().toString().endsWith(".H")){
-				if (stopsOfLongestRouteH.size() < route.getStops().size()) {
-					stopsOfLongestRouteH = route.getStops();
+				if (longestRouteH == null) {
+					longestRouteH = route;
+				} else if (longestRouteH.getStops().size() < route.getStops().size()) {
+					longestRouteH = route;
 				}				
 			} else if (route.getId().toString().endsWith(".R")) {
-				if (stopsOfLongestRouteR.size() < route.getStops().size()) {
-					stopsOfLongestRouteR = route.getStops();
+				if (longestRouteR == null) {
+					longestRouteR = route;
+				} else if (longestRouteR.getStops().size() < route.getStops().size()) {
+					longestRouteR = route;
 				}
 			}			
 			
@@ -127,23 +130,31 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 			}
 		}
 		
+		// limit parameters to reasonable ones		
 		startTime = Math.max(startTime, 0.0);
 		endTime = Math.min(endTime, 24 * 3600.0);
 		
+		// current planned headway in case number of vehicles is not changed
+		int headway = (int) (longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset() + (longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset())) / vehicleIds.size(); 
+		// set headway to a minimum of 1min
+		headway = Math.max(60, headway);
+		// resulting number of vehicles with the new headway
+		int nVehicles = (int) (longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset() + (longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset())) / headway;
+		
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
-		for (TransitRouteStop routeStop : stopsOfLongestRouteH) {
+		for (TransitRouteStop routeStop : longestRouteH.getStops()) {
 			if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
 				stopsToBeServed.add(routeStop.getStopFacility());
 			}
 		}
-		for (TransitRouteStop routeStop : stopsOfLongestRouteR) {
+		for (TransitRouteStop routeStop : longestRouteR.getStops()) {
 			if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
 				stopsToBeServed.add(routeStop.getStopFacility());
 			}
 		}
 		
 		PPlan plan = new PPlan(id, stopsToBeServed, startTime, endTime);
-		plan.setNVehicles(vehicleIds.size());
+		plan.setNVehicles(nVehicles);
 		return plan;
 	}
 
