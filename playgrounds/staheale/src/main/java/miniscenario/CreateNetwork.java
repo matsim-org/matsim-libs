@@ -145,7 +145,7 @@ public class CreateNetwork {
 		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));
 		facility.createActivityOption("home");
 		facility.createActivityOption("work");
-		if (random.nextDouble()<0.029){
+		if (random.nextDouble()<0.0065){
     		facility.createActivityOption("shop_retail");
     		}
     	if (random.nextDouble()<0.008){
