@@ -115,8 +115,13 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 					* Math.log((duration / 3600.0) / zeroUtilityDuration);
 			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+//			log.info("for person 101 utility of performing an action is: " +Math.max(0, Math.max(utilPerf, utilWait)));
+			
+			
 		} else {
 			tmpScore += 2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(duration);
+//			log.info("for person 101 utility of late arrival is: " +(2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(duration)));
+			
 		}
 
 
@@ -125,12 +130,16 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
 			tmpScore += this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime);
+//			log.info("for person 101 utility of early arrival is: " +(this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime)));
+			
 		}
 
 		// disutility if too late
 		double latestStartTime = closingTime;
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
+//			log.info("for person 101 utility of late arrival is: " +(this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime)));
+			
 		}
 
 		// disutility if stopping too early
@@ -142,12 +151,16 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
 			tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
+//			log.info("for person 101 utility of going away too late is: " +(this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd)));
+			
 		}
 
 		// disutility if duration was too short
 		double minimalDuration = typicalDuration / 3.0;
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
+//			log.info("for person " +this.plan.getPerson().getId()+ " utility of going away too soon is: " +(this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration)));
+			
 		}
 				
 		// ------------disutilities of agent interaction-----------
@@ -203,6 +216,8 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 				}
 			}
 		}
+				
+//		log.info("for person " +this.plan.getPerson().getId()+ " total activity score is: " +tmpScore);
 		
 		return tmpScore;
 	}

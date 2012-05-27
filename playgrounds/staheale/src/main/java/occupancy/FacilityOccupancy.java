@@ -72,8 +72,13 @@ public class FacilityOccupancy {
 		if (time > 24.0*3600.0) {		
 			return;
 		}
-		int timeBinIndex = this.timeBinIndex(time);		
-		this.arrivals[timeBinIndex-1] += 1;
+		int timeBinIndex = this.timeBinIndex(time);	
+		if (timeBinIndex==0){
+			this.arrivals[timeBinIndex] += 1;
+		}
+		else {
+			this.arrivals[timeBinIndex-1] += 1;
+		}
 		//log.info("arrival at: " + time + " bin: " + timeBinIndex);
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
 	}
