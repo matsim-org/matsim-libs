@@ -169,16 +169,17 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 			double capacity = facility.getActivityOptions().get(act.getType()).getCapacity();
 			double lowerBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "LowerThreshold");
 			//log.info("lower bound is " +lowerBound);
-			int lowerMarginalUtility = (Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal");
+			int lowerMarginalUtility = ((Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal"))/3600;
 			double upperBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "UpperThreshold");
 			//log.info("upper bound is " +upperBound);
-			int upperMarginalUtility = (Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal");
+			int upperMarginalUtility = ((Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal"))/3600;
 			
 			int timeBinStart = timeBinIndex(activityStart);
 			int timeBinEnd = timeBinIndex(activityEnd);
 			//log.info("timeBinStart ("+activityStart+") is " +timeBinStart+ " and timeBinEnd ("+activityEnd+") is " +timeBinEnd+ ", therefore numberOfTimeBins is " +(timeBinEnd-timeBinStart));
 			double offsetStart = ((timeBinStart+1)*900)-activityStart;
 			double offsetEnd = 900+(timeBinEnd*900)-activityEnd;
+						
 			for (int i = 0; i < (timeBinEnd-timeBinStart); i++){
 				double occupancy = this.facilityOccupancies.get(facility.getId()).getCurrentOccupancy((timeBinStart+i));
 				//log.info("for facility " +facility.getId()+ " and agent " +plan.getPerson().getId()+ " current occupancy is: " +occupancy+ " while performing " +act.getType()+ " activity at "+(activityStart+i*900)/3600);
@@ -199,20 +200,33 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 					dur = offsetEnd;
 					//log.info("lastTimeBin, duration is: " +dur);
 				}
-				// disutility of agent interaction underarousal
+				// -----------------------disutility of agent interaction underarousal
 				if ((load < lowerBound)) {
-					tmpScore += lowerMarginalUtility/load * dur;
-					if (load < 0.01){
-						load = 0.01;
+					if (load < 0.02){
+						load = 0.02;
 					}
-					//double penalty = lowerMarginalUtility/load * dur;
+					double penaltyUnderarousal = (lowerMarginalUtility/load * dur);
+					tmpScore += penaltyUnderarousal;
 					//log.info("an underarousal penalty of " +penalty+ " is given due to load " +load);
 				}
-				// disutility of agent interaction overarousal
+				// -----------------------disutility of agent interaction overarousal
 				if ((load > upperBound)) {
-					tmpScore += upperMarginalUtility*load * dur;
-					//double penalty = upperMarginalUtility*load * dur;
-					//log.info("an overarousal penalty of " +penalty+ " is given due to load " +load);
+					//load values between upperBound and 1 are treated as underarousal loads
+					if (load < 1){
+						double loadTemp = 1-load;
+						if (loadTemp < 0.02){
+							loadTemp = 0.02;
+						}
+						double penaltyUpperarousal = (upperMarginalUtility/loadTemp * dur);
+						tmpScore += penaltyUpperarousal;
+					}
+					// load values higher than 1 are penalized with a fixed part and a part dependent on the load
+					else {
+						double penaltyStart = (upperMarginalUtility/0.02 * dur);
+						double penaltyUpperarousal = penaltyStart + (upperMarginalUtility * load * dur);
+						tmpScore += penaltyUpperarousal;
+						//log.info("an overarousal penalty of " +penalty+ " is given due to load " +load);
+					}
 				}
 			}
 		}
