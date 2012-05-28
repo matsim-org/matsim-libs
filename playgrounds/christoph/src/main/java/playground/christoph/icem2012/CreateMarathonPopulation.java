@@ -47,7 +47,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -66,6 +65,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -79,6 +79,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
+import org.matsim.households.HouseholdsFactory;
+import org.matsim.households.HouseholdsImpl;
+import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -90,14 +95,16 @@ public class CreateMarathonPopulation {
 	
 	private static Logger log = Logger.getLogger(CreateMarathonPopulation.class);
 	
-	private final int runners = 10;
+	private final int runners = 100;
 	
 	private final String trackModes = "walk2d,walk,bike";
-	private final String startLink = "106474";
-	private final String endLink = "106473";
+	public static final String startLink = "106474";
+	public static final String endLink = "106473";
+	private final double populationFraction = 0.04;	// 0.04 from 25% -> total 1% 
+//	private final double populationFraction = 1.00;
 	
 	// shifted
-	private final String[] trackNodes = new String[]{	
+	public static final String[] trackNodes = new String[]{	
 			"2952", "2759", "2951", "2531", "2530", "2529", "4263", "4268", "4468", "3496",
 			"2530_shifted", "2531_shifted", "2951_shifted", "4508_shifted", "4507_shifted", 
 			"4505_shifted", "4504_shifted", "4504", "4505", "4503", "4506", "4508", 
@@ -110,7 +117,7 @@ public class CreateMarathonPopulation {
 			"2759_shifted", "2952"};
 	
 	// track related links
-	private final String[] trackRelatedLinks = new String[]{
+	public static final String[] trackRelatedLinks = new String[]{
 			"110604", "108031", "111637", "108032", "111638", "111639", "111640", "111645",
 			"111646", "111647", "111648", "111649", "111650", "111651", "111652", "111677",
 			"111678", "2521_4239", "2522_2522_shifted", "2522_shifted_2522", "2523_2523_shifted", 
@@ -130,6 +137,7 @@ public class CreateMarathonPopulation {
 			"106474", "111635", "111636", "105684", "110603"};
 	
 	private NetworkRoute route;
+	private Households households;
 	
 	private String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/"; 
 	private String trackShapeOutFile = basePath + "input/track.shp";
@@ -141,13 +149,14 @@ public class CreateMarathonPopulation {
 	private String facilitiesInFile = basePath + "input_zh/facilities.xml.gz";
 	private String populationInFile = basePath + "input_zh/plans_25pct.xml.gz";
 	private String populationOutFile = basePath + "input/plans_25pct.xml.gz";
+	private String householdsHoutFile = basePath + "input/households_25pct.xml.gz";
 	
 	public static void main(String[] args) {
 		new CreateMarathonPopulation();
 	}
 	
 	/*
-	 * TODO: create audiance population
+	 * TODO: create audience population
 	 */
 	public CreateMarathonPopulation() {
 
@@ -155,7 +164,7 @@ public class CreateMarathonPopulation {
 		config.global().setNumberOfThreads(2);
 		config.network().setInputFile(networkInFile);
 		config.facilities().setInputFile(facilitiesInFile);
-//		config.plans().setInputFile(populationInFile);
+		config.plans().setInputFile(populationInFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		addNodesToNetwork(scenario);
@@ -174,11 +183,15 @@ public class CreateMarathonPopulation {
 		
 		writeBarriers(scenario);
 
-//		adaptBackgroundPopulation(scenario);
+		adaptBackgroundPopulation(scenario);
 		
-//		createPopulation(scenario);
+		createPopulation(scenario);
 		
-//		writePopulation(scenario);
+		writePopulation(scenario);
+		
+//		createHouseholds(scenario);
+//		
+//		writeHouseholds(scenario);
 	}
 	
 //	private void readAffectedArea() {
@@ -582,7 +595,7 @@ public class CreateMarathonPopulation {
 		
 		// includes track links and their counter links
 		Set<Id> trackRelatedLinks = new HashSet<Id>();
-		for (String linkId : this.trackRelatedLinks) {
+		for (String linkId : CreateMarathonPopulation.trackRelatedLinks) {
 			Id id = scenario.createId(linkId);
 			trackRelatedLinks.add(id);
 		}
@@ -789,6 +802,7 @@ public class CreateMarathonPopulation {
 			
 			Coord coord = scenario.createCoord(x, y);
 			activity = (ActivityImpl) populationFactory.createActivityFromLinkId("preRun", startLinkId);
+			activity.setFacilityId(scenario.createId("preRunFacility"));
 			activity.setEndTime(9*3600);
 			activity.setCoord(coord);
 			plan.addActivity(activity);
@@ -798,6 +812,7 @@ public class CreateMarathonPopulation {
 			plan.addLeg(leg);
 			
 			activity = (ActivityImpl) populationFactory.createActivityFromLinkId("postRun", endLinkId);
+			activity.setFacilityId(scenario.createId("postRunFacility"));
 			activity.setCoord(coord);
 			plan.addActivity(activity);
 			
@@ -806,6 +821,27 @@ public class CreateMarathonPopulation {
 	}
 
 	private void writePopulation(Scenario scenario) {
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(populationOutFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), this.populationFraction).writeFileV5(populationOutFile);
+	}
+	
+	/*
+	 * Some parts of the evacuation code is based on household to make
+	 * decisions on household level. To be able to use this code we create
+	 * dummy households where each agent is part of a single person household.
+	 */
+	private void createHouseholds(Scenario scenario) {
+		
+		households = new HouseholdsImpl();
+		HouseholdsFactory factory = households.getFactory();
+		
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Household household = factory.createHousehold(person.getId());
+			household.getMemberIds().add(person.getId());
+			households.getHouseholds().put(household.getId(), household);
+		}
+	}
+	
+	private void writeHouseholds(Scenario scenario) {
+		new HouseholdsWriterV10(households).writeFile(this.householdsHoutFile);
 	}
 }

@@ -28,6 +28,10 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
 public class InformedAgentsFilter implements AgentFilter {
 
+	/*
+	 * InitialReplanning ... only agents which need an initial replanning are kept
+	 * NotInitialReplanning ... only agents which do not need an initial replanning are kept
+	 */
 	public static enum FilterType {
 		InitialReplanning, NotInitialReplanning
 	}

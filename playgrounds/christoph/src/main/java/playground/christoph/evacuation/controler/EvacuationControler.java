@@ -60,11 +60,10 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.households.Household;
 //import org.matsim.utils.eventsfilecomparison.OnlineEventsComparator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -547,8 +546,8 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		/*
 		 * Initialize AgentFilters
 		 */
-		InformedAgentsFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory((this.informedHouseholdsTracker), FilterType.InitialReplanning);
-		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory((this.informedHouseholdsTracker), FilterType.NotInitialReplanning);
+		InformedAgentsFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, FilterType.InitialReplanning);
+		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, FilterType.NotInitialReplanning);
 		
 		
 		DuringActivityIdentifierFactory duringActivityFactory;
@@ -683,20 +682,12 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		}
 
 		// replace modes
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, new FreeSpeedTravelTimeFactory());
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new FreeSpeedTravelTimeFactory());
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new FreeSpeedTravelTimeFactory());
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, new FreeSpeedTravelTimeCalculatorFactory());
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new FreeSpeedTravelTimeCalculatorFactory());
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new FreeSpeedTravelTimeCalculatorFactory());
 
 		// return travel time object
 		return timeFactory.createTravelTime();
-	}
-	
-	private static class FreeSpeedTravelTimeFactory implements PersonalizableTravelTimeFactory {
-
-		@Override
-		public PersonalizableTravelTime createTravelTime() {
-			return new FreeSpeedTravelTimeCalculator();
-		}
 	}
 	
 	/*
