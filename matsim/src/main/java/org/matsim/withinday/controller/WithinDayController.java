@@ -23,6 +23,7 @@ package org.matsim.withinday.controller;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
@@ -71,6 +72,13 @@ public class WithinDayController extends Controler {
 	
 		init();
 	}
+
+	public WithinDayController(Scenario scenario) {
+		super(scenario);
+		
+		init();
+	}
+
 	
 	/*
 	 * ===================================================================

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -82,13 +83,17 @@ public class WithinDayQSimFactory implements MobsimFactory {
 
 		QSim sim;
 		if (numOfThreads > 1) {
-			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-			sim = createWithinDayQSim(sc, em, new ParallelQNetsimEngineFactory());
+			/*
+			 * A SimStepParallelEventsManagerImpl can handle concurrent events,
+			 * therefore we do not need a SynchronizedEventsManagerImpl wrapper.
+			 */
+        	if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
+        		eventsManager = new SynchronizedEventsManagerImpl(eventsManager);        		
+        	}
+			sim = createWithinDayQSim(sc, eventsManager, new ParallelQNetsimEngineFactory());
 			  			  
 			// Get number of parallel Threads
 			log.info("Using parallel QSim with " + numOfThreads + " parallel Threads.");
-			  
-			return sim;
 		}
 		else {
 			sim = createWithinDayQSim(sc, eventsManager);
