@@ -291,20 +291,17 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 //			Map<Id, ? extends org.matsim.api.core.v01.network.Node> networkNodes = sc.getNetwork().getNodes();
 			networkLinks = sc.getNetwork().getLinks();
 			
-//			Coord coord = null;
+//			sc.getNetwork().getNodes();
 			
+//			Coord coord = null;
 //			LinkImpl x = ((NetworkImpl)sc.getNetwork()).getNearestLink(coord);
 			
 			for (Link link: networkLinks.values())
 			{
 				Coord[] fromToCoord =  {ct.transform(link.getFromNode().getCoord()), ct.transform(link.getToNode().getCoord())};
 				
-//				System.out.println("from: " + fromTo[0] + "| to: " + fromTo[1]);
-				
 				Id fromID = link.getFromNode().getId();
 				Id toID = link.getToNode().getId();
-				
-//				System.out.println(fromID.toString());
 				
 				Id[] ids = {fromID , toID, link.getId()};
 				

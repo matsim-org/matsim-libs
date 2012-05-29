@@ -348,8 +348,9 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			{
 				m.mouseDragged(arg0);
 			}
-			
-		} else {
+		}
+		else
+		{
 //			Point p = arg0.getPoint();
 //			Rectangle b = this.getViewportBounds();
 //			Point wldPoint = new Point(p.x+b.x,p.y+b.y);
@@ -381,22 +382,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	public void paint(Graphics g)
 	{
 		super.paint(g);
-//		if (this.c0 != null && this.c1 != null)
 		{
 			Rectangle b = this.getViewportBounds();
-//			Point2D wldPoint0 = this.getTileFactory().geoToPixel(this.c0, this.getZoom());
-//			Point2D wldPoint1 = this.getTileFactory().geoToPixel(this.c1, this.getZoom());
-			
-//			Point sc0 = new Point((int)(wldPoint0.getX() - b.x), (int)(wldPoint0.getY() - b.y));
-//			Point sc1 = new Point((int)(wldPoint1.getX() - b.x), (int)(wldPoint1.getY() - b.y));
 			
 			g.setColor(Color.black);
 			Graphics2D g2D = (Graphics2D) g;     
 		    g2D.setStroke(new BasicStroke(5F));
-			
-		    
-
-			
 			Polygon p = this.snapper.getPolygon();
 			
 			if (links==null)
@@ -423,9 +414,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				}
 				
 				
-//				for (Coord[] fromTo : links.values())
-//				{
-				
 			    Iterator it = links.entrySet().iterator();
 			    
 			    
@@ -436,28 +424,23 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			        Id[] fromToIds = (Id[]) pairs.getKey();
 			        Coord[] fromToCoords = (Coord[]) pairs.getValue();
 			        
-//			        it.remove(); // avoids a ConcurrentModificationException
-				
-				
-				
-//					System.out.println("from: " + fromTo[0] + "| to: " + fromTo[1]);
-					
 					Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(fromToCoords[0].getY(),fromToCoords[0].getX()), this.getZoom());
 					Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(fromToCoords[1].getY(), fromToCoords[1].getX()), this.getZoom());
-					
-//					System.out.println("from2d before b: " + from2D.getX() + ", " + from2D.getY());
 					
 					int x1 = (int) (from2D.getX()-b.x);
 					int y1 = (int) (from2D.getY()-b.y);
 					int x2 = (int) (to2D.getX()-b.x);
 					int y2 = (int) (to2D.getY()-b.y);
 					
-					
 					g2D.setStroke(new BasicStroke(5F));
-					g.setColor(Color.yellow);
 					
-					int x =(x2-x1);
-					int y =(y2-y1);
+					if (evacSel.hasLink(fromToIds[2]))
+						g.setColor(Color.blue);
+					else
+						g.setColor(new Color(255,255,0,100));
+					
+					int x = (x2-x1);
+					int y = (y2-y1);
 					
 					if (wPoint!=null)
 					{
@@ -470,9 +453,9 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						int minX = Math.min(x2,x1);
 						int minY = Math.min(y2,y1);
 						
-						
 						CoordImpl wCoord = new CoordImpl(wPoint.getLongitude(), wPoint.getLatitude());
-//						Collection<Node> nodes = this.snapper.getNearestNodes(wCoord);
+
+						//Collection<Node> nodes = this.snapper.getNearestNodes(wCoord);
 						
 //						for (Node node : nodes)
 //						{
@@ -480,6 +463,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 //						}
 						
 //						if ( (y2-y1)*x3 + (-(x2-x1) * y3 ) == (y2-y1)*x2 + (-(x2-x1)*y2))
+
 						if ((mouseX <= maxX) && (mouseX >= minX) && (mouseY <= maxY) && (mouseY >= minY))
 						{
 //							( MX - AX ) / BX = R
@@ -591,10 +575,18 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							int x =(x2-x1);
 							int y =(y2-y1);
 							
-							int maxVal = Math.max(Math.abs(x), Math.abs(y));
+//							int maxVal = Math.max(Math.abs(x), Math.abs(y));
+//							
+//							float xN = (float)x/(float)maxVal;
+//							float yN = (float)y/(float)maxVal;
 							
-							float xN = (float)x/(float)maxVal;
-							float yN = (float)y/(float)maxVal;
+							double xD = fromToCoords[0].getX()-fromToCoords[1].getX();
+							double yD = fromToCoords[1].getY()-fromToCoords[0].getY();
+							
+							double maxVal = Math.max(Math.abs(xD), Math.abs(yD));
+							
+							float xN = (float)xD/(float)maxVal;
+							float yN = (float)yD/(float)maxVal;
 							
 							int pivotX = (x1+x2)/2;
 							int pivotY = (y1+y2)/2;
