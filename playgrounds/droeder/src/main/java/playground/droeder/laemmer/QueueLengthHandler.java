@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -38,27 +39,33 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.utils.io.IOUtils;
-
-import ucar.ma2.ForbiddenConversionException;
 
 /**
  * @author droeder
  *
  */
 public class QueueLengthHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
-										//PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
+											PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 											MobsimAfterSimStepListener, IterationStartsListener, IterationEndsListener,
 											StartupListener{
 	
+	private static final Logger log = Logger
+			.getLogger(QueueLengthHandler.class);
 
 	private SortedMap<Id, LinkInfo> linkInfo;
+	private Map<Id, Id> vehicleToLink;
 	private BufferedWriter queueWriter;
 	private BufferedWriter vehicleOnLinkWriter;
 
 	public QueueLengthHandler(Network net){
+		this.vehicleToLink = new HashMap<Id, Id>();
 		this.linkInfo = new TreeMap<Id, LinkInfo>();
 		for(Link l: net.getLinks().values()){
 			this.linkInfo.put(l.getId(), new LinkInfo(l));
@@ -75,27 +82,37 @@ public class QueueLengthHandler implements LinkEnterEventHandler, LinkLeaveEvent
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+//		log.error("leave");
 		this.linkInfo.get(event.getLinkId()).unregisterVehicle(event.getVehicleId());
+		this.vehicleToLink.remove(event.getVehicleId());
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+//		log.error("enter");
 		this.linkInfo.get(event.getLinkId()).registerLinkEnter(event.getVehicleId(), event.getTime());
+		this.vehicleToLink.put(event.getVehicleId(), event.getLinkId());
 	}
 
-//	@Override
-//	public void handleEvent(PersonEntersVehicleEvent event) {
-//		this.linkInfo.get(event.getLinkId()).unregisterVehicle(event.getVehicleId());		
-//	}
-//	
-//	@Override
-//	public void handleEvent(PersonLeavesVehicleEvent event) {
-//		
-//	}
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if(this.vehicleToLink.containsKey(event.getVehicleId())){
+			Id link = this.vehicleToLink.get(event.getVehicleId());
+			this.linkInfo.get(link).unregisterVehicle(event.getVehicleId());		
+		}
+	}
+	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		if(this.vehicleToLink.containsKey(event.getVehicleId())){
+			Id link = this.vehicleToLink.get(event.getVehicleId());
+			this.linkInfo.get(link).unregisterVehicle(event.getVehicleId());
+		}
+	}
 	
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
-		System.out.println("test");
+//		System.out.println("afterSimStep");
 		try {
 			this.queueWriter.write(event.getSimulationTime() + ";");
 			this.vehicleOnLinkWriter.write(event.getSimulationTime() + ";");
@@ -156,9 +173,9 @@ public class QueueLengthHandler implements LinkEnterEventHandler, LinkLeaveEvent
 			this.carsOnLink.put(id, new CarInfo(id, time + this.time2pass));
 		}
 		
-//		public void registerPersonEntersVehicle(Id id, double time){
-//			this.carsOnLink.put(id, new CarInfo(id, time));
-//		}
+		public void registerPersonEntersVehicle(Id id, double time){
+			this.carsOnLink.put(id, new CarInfo(id, time));
+		}
 		
 		public void unregisterVehicle(Id id){
 			this.carsOnLink.remove(id);
@@ -205,5 +222,7 @@ public class QueueLengthHandler implements LinkEnterEventHandler, LinkLeaveEvent
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		event.getControler().getEvents().addHandler(this);
+		event.getControler().getQueueSimulationListener().add(this);
+//		event.getControler().getScenario().getConfig().getQSimConfigGroup().setFlowCapFactor(0.09);
 	}
 }

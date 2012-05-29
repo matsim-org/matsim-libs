@@ -52,7 +52,7 @@ public class LRunner {
 		c.setDumpDataAtEnd(true);
 		c.setOverwriteFiles(true);
 		QueueLengthHandler h = new QueueLengthHandler(sc.getNetwork());
-		c.addControlerListener(h);		
+		c.addControlerListener(h);
 		c.run();
 	}
 	
