@@ -45,6 +45,7 @@ public abstract class TransformationFactory {
 	public final static String WGS84_UTM29N = "WGS84_UTM29N"; // coimbra/portugal
 	public final static String CH1903_LV03_GT = "CH1903_LV03_GT"; //use geotools also for swiss coordinate system
 	public final static String WGS84_SVY21 = "WGS84_SVY21"; //Singapore2
+	public final static String NAD83_UTM17N = "NAD83_UTM17N"; //Toronto, Canada
 
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
