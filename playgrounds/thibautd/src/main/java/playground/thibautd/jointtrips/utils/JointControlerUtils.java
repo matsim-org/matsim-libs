@@ -118,8 +118,9 @@ public class JointControlerUtils {
 	}
 
 	private static JointTripPossibilities readPossibilities(final Config config) {
-		String file = ((JointTripPossibilitiesConfigGroup)
-					config.getModule( JointTripPossibilitiesConfigGroup.GROUP_NAME )).getPossibilitiesFile();
+		JointTripPossibilitiesConfigGroup group = (JointTripPossibilitiesConfigGroup)
+			 config.getModule( JointTripPossibilitiesConfigGroup.GROUP_NAME );
+		String file = group != null ? group.getPossibilitiesFile() : null;
 
 		if (file != null) {
 			JointTripPossibilitiesXMLReader reader = new JointTripPossibilitiesXMLReader();
