@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -68,8 +69,10 @@ public class EvacuationAreaSelector implements ActionListener{
 	private MyMapViewer jMapViewer;
 	private JButton saveButton;
 	private JButton openBtn;
-	private JTextField blockFieldLink1;
-	private JTextField blockFieldLink2;
+	private JTextField blockFieldLink1hh;
+	private JTextField blockFieldLink1mm;
+	private JTextField blockFieldLink2hh;
+	private JTextField blockFieldLink2mm;
 	
 	private HashMap<Id, String> roadClosures;
 	private Id currentLinkId1 = null;
@@ -96,6 +99,8 @@ public class EvacuationAreaSelector implements ActionListener{
 	
 	private boolean saveLink1 = false;
 	private boolean saveLink2 = false;
+
+	private JPanel panelDescriptions;
 
 	/**
 	 * Launch the application.
@@ -158,174 +163,187 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 		
 		blockLabel = new JLabel(" Gesperrt ab ");
-		blockFieldLink1 = new JTextField("--:--");
-		blockFieldLink2 = new JTextField("--:--");
+		blockFieldLink1hh = new JTextField("--");
+		blockFieldLink1mm = new JTextField("--");
+		blockFieldLink2hh = new JTextField("--");
+		blockFieldLink2mm = new JTextField("--");
 		blockButtonOK = new JButton("ok");
 		
 		blockPanel.setSize(new Dimension(200, 200));
 		
-		blockFieldLink1.addFocusListener(new FocusListener()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				String text = blockFieldLink1.getText();
-				if (!text.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]"))
-					blockFieldLink1.setText("--:--");
-			}
-			@Override
-			public void focusGained(FocusEvent e) {}
-		});
-		blockFieldLink1.addMouseListener(new MouseListener()
-		{
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {}
-			@Override
-			public void mousePressed(MouseEvent e) {}
-			@Override
-			public void mouseExited(MouseEvent e) {}
-			@Override
-			public void mouseEntered(MouseEvent e) {}
-			
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				int cursorPos =blockFieldLink1.getCaretPosition();
-				if (cursorPos>2)
-				{
-					blockFieldLink1.setCaretPosition(3);					
-					blockFieldLink1.setSelectionStart(3);
-					blockFieldLink1.setSelectionEnd(5);
-				}				
-				if ((cursorPos<=2))
-				{
-					blockFieldLink1.setSelectionStart(0);
-					blockFieldLink1.setSelectionEnd(2);
-				}	
-				
-			}
-		});
+		//add hour / minute input check listeners
+		blockFieldLink1hh.addKeyListener(new TypeHour());
+		blockFieldLink1mm.addKeyListener(new TypeMinute());
+		blockFieldLink2hh.addKeyListener(new TypeHour());
+		blockFieldLink2mm.addKeyListener(new TypeMinute());
+		blockFieldLink1hh.addFocusListener(new CheckHour());
+		blockFieldLink1mm.addFocusListener(new CheckMinute());
+		blockFieldLink2hh.addFocusListener(new CheckHour());
+		blockFieldLink2mm.addFocusListener(new CheckMinute());
 		
-		blockFieldLink1.addActionListener(new ActionListener()
-		{
-			
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-			}
-		});
-		blockFieldLink1.addKeyListener(new KeyListener()
-		{
-			
-			@Override
-			public void keyTyped(KeyEvent e)
-			{
-				if (!Character.toString(e.getKeyChar()).matches("[1-9]"))
-					e.consume();
-			}
-			@Override
-			public void keyReleased(KeyEvent e)
-			{
-				if ((blockFieldLink1.getCaretPosition()==2))
-				{
-					blockFieldLink1.setSelectionStart(3);
-					blockFieldLink1.setSelectionEnd(5);
-				}
-				if (blockFieldLink1.getText().length()>5)
-				{
-					blockFieldLink1.setText(blockFieldLink1.getText().substring(0, 5));
-					blockFieldLink1.setSelectionStart(0);
-					blockFieldLink1.setSelectionEnd(2);
-				}
-			}
-			@Override
-			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		blockFieldLink2.addFocusListener(new FocusListener()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				String text = blockFieldLink2.getText();
-				if (!text.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]"))
-					blockFieldLink2.setText("--:--");
-			}
-			@Override
-			public void focusGained(FocusEvent e) {}
-		});
-		blockFieldLink2.addMouseListener(new MouseListener()
-		{
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {}
-			@Override
-			public void mousePressed(MouseEvent e) {}
-			@Override
-			public void mouseExited(MouseEvent e) {}
-			@Override
-			public void mouseEntered(MouseEvent e) {}
-			
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				int cursorPos =blockFieldLink2.getCaretPosition();
-				if (cursorPos>2)
-				{
-					blockFieldLink2.setCaretPosition(3);					
-					blockFieldLink2.setSelectionStart(3);
-					blockFieldLink2.setSelectionEnd(5);
-				}				
-				if ((cursorPos<=2))
-				{
-					blockFieldLink2.setSelectionStart(0);
-					blockFieldLink2.setSelectionEnd(2);
-				}	
-				
-			}
-		});
+//		blockFieldLink1hh.addFocusListener(new FocusListener()
+//		{
+//			@Override
+//			public void focusLost(FocusEvent e)
+//			{
+//				String text = blockFieldLink1hh.getText();
+//				if (!text.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]"))
+//					blockFieldLink1hh.setText("--:--");
+//			}
+//			@Override
+//			public void focusGained(FocusEvent e) {}
+//		});
+//		blockFieldLink1hh.addMouseListener(new MouseListener()
+//		{
+//			
+//			@Override
+//			public void mouseReleased(MouseEvent e) {}
+//			@Override
+//			public void mousePressed(MouseEvent e) {}
+//			@Override
+//			public void mouseExited(MouseEvent e) {}
+//			@Override
+//			public void mouseEntered(MouseEvent e) {}
+//			
+//			@Override
+//			public void mouseClicked(MouseEvent e)
+//			{
+//				int cursorPos =blockFieldLink1hh.getCaretPosition();
+//				if (cursorPos>2)
+//				{
+//					blockFieldLink1hh.setCaretPosition(3);					
+//					blockFieldLink1hh.setSelectionStart(3);
+//					blockFieldLink1hh.setSelectionEnd(5);
+//				}				
+//				if ((cursorPos<=2))
+//				{
+//					blockFieldLink1hh.setSelectionStart(0);
+//					blockFieldLink1hh.setSelectionEnd(2);
+//				}	
+//				
+//			}
+//		});
+//		
+//		blockFieldLink1hh.addActionListener(new ActionListener()
+//		{
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e)
+//			{
+//			}
+//		});
+//		blockFieldLink1hh.addKeyListener(new KeyListener()
+//		{
+//			
+//			@Override
+//			public void keyTyped(KeyEvent e)
+//			{
+//				if (!Character.toString(e.getKeyChar()).matches("[1-9]"))
+//					e.consume();
+//			}
+//			@Override
+//			public void keyReleased(KeyEvent e)
+//			{
+//				if ((blockFieldLink1hh.getCaretPosition()==2))
+//				{
+//					blockFieldLink1hh.setSelectionStart(3);
+//					blockFieldLink1hh.setSelectionEnd(5);
+//				}
+//				if (blockFieldLink1hh.getText().length()>5)
+//				{
+//					blockFieldLink1hh.setText(blockFieldLink1hh.getText().substring(0, 5));
+//					blockFieldLink1hh.setSelectionStart(0);
+//					blockFieldLink1hh.setSelectionEnd(2);
+//				}
+//			}
+//			@Override
+//			public void keyPressed(KeyEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
+//		blockFieldLink1mm.addFocusListener(new FocusListener()
+//		{
+//			@Override
+//			public void focusLost(FocusEvent e)
+//			{
+//				String text = blockFieldLink1mm.getText();
+//				if (!text.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]"))
+//					blockFieldLink1mm.setText("--:--");
+//			}
+//			@Override
+//			public void focusGained(FocusEvent e) {}
+//		});
+//		blockFieldLink1mm.addMouseListener(new MouseListener()
+//		{
+//			
+//			@Override
+//			public void mouseReleased(MouseEvent e) {}
+//			@Override
+//			public void mousePressed(MouseEvent e) {}
+//			@Override
+//			public void mouseExited(MouseEvent e) {}
+//			@Override
+//			public void mouseEntered(MouseEvent e) {}
+//			
+//			@Override
+//			public void mouseClicked(MouseEvent e)
+//			{
+//				int cursorPos =blockFieldLink1mm.getCaretPosition();
+//				if (cursorPos>2)
+//				{
+//					blockFieldLink1mm.setCaretPosition(3);					
+//					blockFieldLink1mm.setSelectionStart(3);
+//					blockFieldLink1mm.setSelectionEnd(5);
+//				}				
+//				if ((cursorPos<=2))
+//				{
+//					blockFieldLink1mm.setSelectionStart(0);
+//					blockFieldLink1mm.setSelectionEnd(2);
+//				}	
+//				
+//			}
+//		});
+//		
+//		blockFieldLink1mm.addActionListener(new ActionListener()
+//		{
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e)
+//			{
+//			}
+//		});
 		
-		blockFieldLink2.addActionListener(new ActionListener()
-		{
-			
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-			}
-		});
-		blockFieldLink2.addKeyListener(new KeyListener()
-		{
-			
-			@Override
-			public void keyTyped(KeyEvent e)
-			{
-				if (!Character.toString(e.getKeyChar()).matches("[1-9]"))
-					e.consume();
-			}
-			@Override
-			public void keyReleased(KeyEvent e)
-			{
-				if ((blockFieldLink2.getCaretPosition()==2))
-				{
-					blockFieldLink2.setSelectionStart(3);
-					blockFieldLink2.setSelectionEnd(5);
-				}
-				if (blockFieldLink2.getText().length()>5)
-				{
-					blockFieldLink2.setText(blockFieldLink2.getText().substring(0, 5));
-					blockFieldLink2.setSelectionStart(0);
-					blockFieldLink2.setSelectionEnd(2);
-				}
-			}
-			@Override
-			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+//		blockFieldLink1mm.addKeyListener(new KeyListener()
+//		{
+//			
+//			@Override
+//			public void keyTyped(KeyEvent e)
+//			{
+//				if (!Character.toString(e.getKeyChar()).matches("[1-9]"))
+//					e.consume();
+//			}
+//			@Override
+//			public void keyReleased(KeyEvent e)
+//			{
+//				if ((blockFieldLink1mm.getCaretPosition()==2))
+//				{
+//					blockFieldLink1mm.setSelectionStart(3);
+//					blockFieldLink1mm.setSelectionEnd(5);
+//				}
+//				if (blockFieldLink1mm.getText().length()>5)
+//				{
+//					blockFieldLink1mm.setText(blockFieldLink1mm.getText().substring(0, 5));
+//					blockFieldLink1mm.setSelectionStart(0);
+//					blockFieldLink1mm.setSelectionEnd(2);
+//				}
+//			}
+//			@Override
+//			public void keyPressed(KeyEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
 				
 		
 		cbLink1 = new JCheckBox("link 1");
@@ -347,32 +365,44 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 		cbLink1.addActionListener(new ActionListener()
 		{
-			
-
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				saveLink1 = !saveLink1;
 				
 				if (saveLink1)
-					blockFieldLink1.setEnabled(true);
+				{
+					blockFieldLink1hh.setEnabled(true);
+					blockFieldLink1mm.setEnabled(true);
+					
+				}
 				else
-					blockFieldLink1.setEnabled(false);
+				{
+					blockFieldLink1hh.setEnabled(false);
+					blockFieldLink1mm.setEnabled(false);
+				}
 			}
 		});
 		
 		cbLink2.addActionListener(new ActionListener()
 		{
-			
-
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				saveLink2= !saveLink2;
+				saveLink2 = !saveLink2;
+				
 				if (saveLink2)
-					blockFieldLink2.setEnabled(true);
+				{
+					blockFieldLink2hh.setEnabled(true);
+					blockFieldLink2mm.setEnabled(true);
+					
+				}
 				else
-					blockFieldLink2.setEnabled(false);
+				{
+					blockFieldLink2hh.setEnabled(false);
+					blockFieldLink2mm.setEnabled(false);
+				}
+
 				
 				
 			}
@@ -380,39 +410,46 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 		cbLink1.setBackground(Color.red);
 		cbLink2.setBackground(Color.green);
-//		rbLink3.setBackground(Color.blue);
-//		rbLink4.setBackground(Color.orange);
-//		rbLink3.setForeground(Color.white);
-		
 		
 		cbLink1.setSelected(false);
 		cbLink2.setSelected(false);
-//		rbLink3.setSelected(false);
-//		rbLink4.setSelected(false);
 		
 		
-		panelLink1 = new JPanel(new GridLayout(1, 2));
-		panelLink2 = new JPanel(new GridLayout(1, 2));
+		panelDescriptions = new JPanel(new GridLayout(1, 3));
+		panelLink1 = new JPanel(new GridLayout(1, 3));
+		panelLink2 = new JPanel(new GridLayout(1, 3));
+		
+		panelDescriptions.add(new JLabel("Road ID"));
+		panelDescriptions.add(new JLabel("HH"));
+		panelDescriptions.add(new JLabel("MM"));
+		
 		panelLink1.add(cbLink1);
-		panelLink1.add(blockFieldLink1);
-		panelLink2.add(cbLink2);
-		panelLink2.add(blockFieldLink2);
+		panelLink1.add(blockFieldLink1hh);
+		panelLink1.add(blockFieldLink1mm);
 		
+		panelLink2.add(cbLink2);
+		panelLink2.add(blockFieldLink2hh);
+		panelLink2.add(blockFieldLink2mm);
+		
+		blockPanel.add(panelDescriptions);
 		blockPanel.add(panelLink1);
 		blockPanel.add(panelLink2);
 		blockPanel.add(blockButtonOK);		
 		
 		blockPanel.setPreferredSize(new Dimension(200,300));
 		
+		blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		
-		cbLink1.setEnabled(false);
-		cbLink2.setEnabled(false);
-		blockFieldLink1.setEnabled(false);
-		blockFieldLink2.setEnabled(false);
+		
+		cbLink1.setEnabled(false); cbLink2.setEnabled(false);
+		
+		blockFieldLink1hh.setEnabled(false); blockFieldLink1mm.setEnabled(false);
+		blockFieldLink2hh.setEnabled(false); blockFieldLink2mm.setEnabled(false);
+		
 		blockButtonOK.setEnabled(false);
 		
-		blockFieldLink1.setSelectedTextColor(Color.red);
-		blockFieldLink2.setSelectedTextColor(Color.green);
+		blockFieldLink1hh.setSelectedTextColor(Color.red);
+		blockFieldLink1mm.setSelectedTextColor(Color.green);
 		
 		this.frame.getContentPane().add(blockPanel, BorderLayout.EAST);
 		
@@ -533,10 +570,17 @@ public class EvacuationAreaSelector implements ActionListener{
 			cbLink1.setEnabled(false);
 			cbLink2.setEnabled(false);
 			blockButtonOK.setEnabled(false);
-			blockFieldLink1.setText("--:--");
-			blockFieldLink2.setText("--:--");
-			blockFieldLink1.setEnabled(false);
-			blockFieldLink2.setEnabled(false);
+			
+			blockFieldLink1hh.setText("--");
+			blockFieldLink1mm.setText("--");
+			blockFieldLink1hh.setEnabled(false);
+			blockFieldLink1mm.setEnabled(false);
+			
+			blockFieldLink2hh.setText("--");
+			blockFieldLink2mm.setText("--");
+			blockFieldLink2hh.setEnabled(false);
+			blockFieldLink2mm.setEnabled(false);
+			
 			cbLink1.setSelected(false);
 			cbLink2.setSelected(false);
 			cbLink1.setText("-");
@@ -560,14 +604,18 @@ public class EvacuationAreaSelector implements ActionListener{
 			if(roadClosures.containsKey(id))	
 			{
 				cbLink1.setSelected(true);
-				blockFieldLink1.setEnabled(true);
-				blockFieldLink1.setText(roadClosures.get(id));
+				blockFieldLink1hh.setEnabled(true); blockFieldLink1mm.setEnabled(true);
+				
+				blockFieldLink1hh.setText(roadClosures.get(id).substring(0,2));
+				blockFieldLink1mm.setText(roadClosures.get(id).substring(3,5));
+				
+				saveLink1 = true;
 			}
 		}
 		else
 		{
-			blockFieldLink1.setText("--:--");
-			blockFieldLink1.setEnabled(false);
+			blockFieldLink1hh.setText("--"); blockFieldLink1mm.setText("--");
+			blockFieldLink1hh.setEnabled(false); blockFieldLink2hh.setEnabled(false);
 			cbLink1.setEnabled(false);
 
 		}
@@ -587,14 +635,18 @@ public class EvacuationAreaSelector implements ActionListener{
 			if(roadClosures.containsKey(id))	
 			{
 				cbLink2.setSelected(true);
-				blockFieldLink2.setEnabled(true);
-				blockFieldLink2.setText(roadClosures.get(id));
+				blockFieldLink2hh.setEnabled(true); blockFieldLink2mm.setEnabled(true);
+				
+				blockFieldLink2hh.setText(roadClosures.get(id).substring(0,2));
+				blockFieldLink2mm.setText(roadClosures.get(id).substring(3,5));
+				
+				saveLink2 = true;
 			}
 		}
 		else
 		{
-			blockFieldLink2.setText("--:--");
-			blockFieldLink2.setEnabled(false);
+			blockFieldLink2hh.setText("--"); blockFieldLink2mm.setText("--");
+			blockFieldLink2hh.setEnabled(false); blockFieldLink2mm.setEnabled(false);
 			cbLink2.setEnabled(false);
 		}
 		
@@ -602,11 +654,22 @@ public class EvacuationAreaSelector implements ActionListener{
 	
 	public void updateRoadClosure()
 	{
-		if ((currentLinkId1!=null) && (cbLink1.isSelected()))
-			roadClosures.put(currentLinkId1, blockFieldLink1.getText());
+		if ((currentLinkId1!=null))
+		{
+			if (cbLink1.isSelected())
+				roadClosures.put(currentLinkId1, blockFieldLink1hh.getText() + ":" + blockFieldLink1mm.getText());
+			else
+				roadClosures.remove(currentLinkId1);
+			
+		}
 		
-		if ((currentLinkId2!=null) && (cbLink2.isSelected()))
-			roadClosures.put(currentLinkId2, blockFieldLink2.getText());
+		if ((currentLinkId2!=null))
+		{
+			if (cbLink2.isSelected())
+				roadClosures.put(currentLinkId2, blockFieldLink2hh.getText() + ":" + blockFieldLink2mm.getText());
+			else
+				roadClosures.remove(currentLinkId2);
+		}
 		
 		if (roadClosures.size()>0)
 		{
@@ -626,6 +689,122 @@ public class EvacuationAreaSelector implements ActionListener{
 	{
 		return roadClosures;
 	}
+	
+	class TypeHour implements KeyListener 
+	{
+		
+		@Override
+		public void keyTyped(KeyEvent e)
+		{
+			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
+				e.consume();
+		}
+		@Override
+		public void keyReleased(KeyEvent e)
+		{
+			
+			JTextField src = (JTextField)e.getSource();
+			
+			String text = src.getText();
+			
+			
+			if (!text.matches("([01]?[0-9]|2[0-3])"))
+					src.setText("00");
+//			else if (text.matches("[0-9]"))
+//					src.setText("0"+src.getText());
+
+			
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+	}	
+	
+	class CheckHour implements FocusListener
+	{
+
+		@Override
+		public void focusGained(FocusEvent e)
+		{
+			JTextField src = (JTextField)e.getSource();
+			src.setSelectionStart(0);
+			src.setSelectionEnd(src.getText().length());			
+			
+		}
+
+		@Override
+		public void focusLost(FocusEvent e)
+		{
+			JTextField src = (JTextField)e.getSource();
+			String text = src.getText();
+			
+			if (!text.matches("([01]?[0-9]|2[0-3])"))
+				src.setText("00");
+			else if (text.matches("[0-9]"))
+				src.setText("0"+text);
+			
+		}
+		
+	}
+
+	class CheckMinute implements FocusListener
+	{
+
+		@Override
+		public void focusGained(FocusEvent e)
+		{
+			JTextField src = (JTextField)e.getSource();
+			src.setSelectionStart(0);
+			src.setSelectionEnd(src.getText().length());			
+			
+		}
+
+		@Override
+		public void focusLost(FocusEvent e)
+		{
+			JTextField src = (JTextField)e.getSource();
+			
+			String text = src.getText();
+			
+			if ((!text.matches("[0-5][0-9]")) && (!text.matches("[0-9]")))
+				src.setText("00");
+			else if (text.matches("[0-9]"))
+				src.setText("0" + text);
+
+
+			
+		}
+		
+	}
+	
+	
+	class TypeMinute implements KeyListener 
+	{
+		
+		@Override
+		public void keyTyped(KeyEvent e)
+		{
+			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
+				e.consume();
+		}
+		@Override
+		public void keyReleased(KeyEvent e)
+		{
+			
+			JTextField src = (JTextField)e.getSource();
+			
+			String text = src.getText();
+			
+
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+	}	
 	
 	
 }
