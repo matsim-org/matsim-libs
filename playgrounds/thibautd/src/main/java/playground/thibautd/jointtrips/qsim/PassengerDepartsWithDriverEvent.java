@@ -20,10 +20,8 @@
 package playground.thibautd.jointtrips.qsim;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.LinkEventImpl;
 
@@ -31,6 +29,10 @@ import org.matsim.core.events.LinkEventImpl;
  * @author thibautd
  */
 public class PassengerDepartsWithDriverEvent extends EventImpl {
+	public static final String EVENT_TYPE = "passengerdepartswithdriver";
+	public static final String ATTRIBUTE_DRIVER = "driverId";
+	public static final String ATTRIBUTE_PASSENGER = "passengerId";
+
 	private final Id driver;
 	private final Id passenger;
 	private final Id link;
@@ -79,15 +81,15 @@ public class PassengerDepartsWithDriverEvent extends EventImpl {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> atts = super.getAttributes();
-		atts.put( "driverId" , ""+driver );
-		atts.put( "passengerId" , ""+passenger );
+		atts.put( ATTRIBUTE_DRIVER , ""+driver );
+		atts.put( ATTRIBUTE_PASSENGER , ""+passenger );
 		atts.put( LinkEventImpl.ATTRIBUTE_LINK , ""+link );
 		return atts;
 	}
 
 	@Override
 	public String getEventType() {
-		return "passengerdepartswithdriver";
+		return EVENT_TYPE;
 	}
 }
 
