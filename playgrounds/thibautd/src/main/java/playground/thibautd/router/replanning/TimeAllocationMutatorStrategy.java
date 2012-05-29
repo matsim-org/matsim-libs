@@ -38,9 +38,9 @@ public class TimeAllocationMutatorStrategy implements PlanStrategy {
 	public TimeAllocationMutatorStrategy(final Controler controler) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-		//addStrategyModule( new TripsToLegModule( controler ) );
+		addStrategyModule( new TripsToLegModule( controler ) );
 		addStrategyModule( new TimeAllocationMutator( controler.getConfig() ) );
-		//addStrategyModule( new ReRoute( controler ) );
+		addStrategyModule( new ReRoute( controler ) );
 	}
 
 	@Override
