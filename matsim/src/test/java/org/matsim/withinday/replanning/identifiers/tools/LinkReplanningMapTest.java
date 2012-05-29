@@ -54,7 +54,9 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 
 		Controler controler = new Controler(config);
-		controler.setMobsimFactory(new WithinDayQSimFactory(new ReplanningManager()));
+		ReplanningManager replanningManager = new ReplanningManager();
+		replanningManager.initializeReplanningModules(2);
+		controler.setMobsimFactory(new WithinDayQSimFactory(replanningManager));
 		ControlerListenerForTests listener = new ControlerListenerForTests();
 		controler.addControlerListener(listener);
 		controler.run();
