@@ -59,14 +59,15 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		double defaultBikeSpeed = 6.01;
 		scenario.getConfig().plansCalcRoute().setBikeSpeed(defaultBikeSpeed);
 		
-		BikeTravelTime bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute());
-		bikeTravelTime.setPerson(person);
-		
+		BikeTravelTime bikeTravelTime;
+				
 		double speed;
 		double expectedTravelTime;
 		double calculatedTravelTime;
 		
 		// reference speed * person factor * slope factor
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute());
+		bikeTravelTime.setPerson(person);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0);
@@ -75,6 +76,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		
 		// increase age
 		person.setAge(80);
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute());
 		bikeTravelTime.setPerson(person);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;
@@ -84,6 +86,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		
 		// change gender
 		person.setSex("f");
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute());
 		bikeTravelTime.setPerson(person);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;

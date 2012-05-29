@@ -70,6 +70,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 
 		// increase age
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute());
 		person.setAge(80);
 		walkTravelTime.setPerson(person);
 		speed = defaultWalkSpeed * walkTravelTime.personFactor * 1.0;
@@ -79,6 +80,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 				
 		// change gender
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute());
 		person.setSex("f");
 		walkTravelTime.setPerson(person);
 		speed = defaultWalkSpeed * walkTravelTime.personFactor * 1.0;
