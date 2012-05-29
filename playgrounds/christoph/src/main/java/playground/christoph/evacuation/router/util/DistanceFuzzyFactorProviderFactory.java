@@ -93,7 +93,7 @@ public class DistanceFuzzyFactorProviderFactory {
 	 */
 	private void fillLookupMap(Scenario scenario) {
 		
-		log.info("Initializing LinkFuzzyFactor lookup map...");
+		log.info("Initializing LinkFuzzyFactor lookup map using " + scenario.getConfig().global().getNumberOfThreads() + " threads ...");
 		
 		int numThreads = scenario.getConfig().global().getNumberOfThreads();
 		Thread[] threads = new Thread[numThreads];
@@ -165,20 +165,28 @@ public class DistanceFuzzyFactorProviderFactory {
 		 */
 		@Override
 		public void run() {
+			
+			// iterating over an array should be faster than over a set
+			Id[] observedLinksArray = new Id[observedLinks.size()];
+			observedLinksArray = observedLinks.toArray(observedLinksArray);
+			
 			for (Id fromLinkId : links) {
 				Link fromLink = network.getLinks().get(fromLinkId);
 				
 				Map<Id, Double> fuzzyFactors = distanceFuzzyFactors.get(fromLink.getId());
-				for (Id toLinkId : observedLinks) {
+//				for (Id toLinkId : observedLinks) {
+				for (Id toLinkId : observedLinksArray) {
+					
+					// only store one value for each Id pair
+					int cmp = fromLinkId.compareTo(toLinkId);
+					if (cmp > 0) continue;
+					
 					Link toLink = network.getLinks().get(toLinkId);
 					
 					// if both links are located outside the main observation area, ignore them
-					if (!observedLinks.contains(fromLink.getId()) && !observedLinks.contains(toLink.getId())) continue;
-					
-					// only store one value for each Id pair
-					int cmp = fromLink.getId().compareTo(toLink.getId());
-					if (cmp > 0) continue;
-					
+					// cdobler: both links are taken from the observed links list, therefore we can skip this. may'12
+//					if (!observedLinks.contains(fromLink.getId()) && !observedLinks.contains(toLink.getId())) continue;
+										
 					double distance = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
 					
 					double factor = 1 / (1 + Math.exp((-distance/1000.0) + 4.0));
