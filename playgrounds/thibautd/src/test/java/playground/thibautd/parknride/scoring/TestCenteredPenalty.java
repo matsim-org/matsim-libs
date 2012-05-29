@@ -43,6 +43,9 @@ public class TestCenteredPenalty {
 		penalty = new CenteredTimeProportionalPenalty( center , radius , maxPenalty );
 	}
 
+	// ///////////////////////////////////////////////////////////////////
+	// check costs
+	// ///////////////////////////////////////////////////////////////////
 	@Test
 	public void testPenaltyAtCenter() throws Exception {
 		penalty.park( 0 , center );
@@ -77,7 +80,7 @@ public class TestCenteredPenalty {
 	}
 
 	@Test
-	public void testCost() throws Exception {
+	public void testCostAtCenter() throws Exception {
 		double start = 25;
 		double duration = 10;
 		penalty.park( start , center );
@@ -88,6 +91,38 @@ public class TestCenteredPenalty {
 		Assert.assertEquals(
 				"unexpected parking cost",
 				-duration * maxPenalty,
+				penalty.getPenalty(),
+				MatsimTestUtils.EPSILON);
+	}
+
+	@Test
+	public void testCostAtMiddle() throws Exception {
+		double start = 25;
+		double duration = 10;
+		penalty.park( start , middleZone );
+		penalty.unPark( start + duration );
+		
+		penalty.finish();
+
+		Assert.assertEquals(
+				"unexpected parking cost",
+				-duration * (maxPenalty / 2d),
+				penalty.getPenalty(),
+				MatsimTestUtils.EPSILON);
+	}
+
+	@Test
+	public void testCostOutside() throws Exception {
+		double start = 25;
+		double duration = 10;
+		penalty.park( start , somewhereOutside );
+		penalty.unPark( start + duration );
+		
+		penalty.finish();
+
+		Assert.assertEquals(
+				"unexpected parking cost",
+				0,
 				penalty.getPenalty(),
 				MatsimTestUtils.EPSILON);
 	}

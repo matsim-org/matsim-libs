@@ -54,7 +54,6 @@ import playground.thibautd.router.controler.MultiLegRoutingControler;
  * @author thibautd
  */
 @RunWith(Parameterized.class)
-	@Ignore
 public class BackwardCompatibilityTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -67,7 +66,8 @@ public class BackwardCompatibilityTest {
 	// the new object
 	private TripRouter tripRouter;
 	// the "compatibility" PlansCalcRoute-subClass
-	private PlanRouterWrapper wrapper;
+	//private PlanRouterWrapper wrapper;
+	private PlanRouter planRouter;
 
 	// we want to test backward compatibility for different settings.
 	// for this, we use the parameterized approach to initialise the testcase
@@ -98,7 +98,7 @@ public class BackwardCompatibilityTest {
 
 		plansCalcRoute = (PlansCalcRoute) oldControler.createRoutingAlgorithm();
 		tripRouter = controler.getTripRouterFactory().createTripRouter();
-		wrapper= (PlanRouterWrapper) controler.createRoutingAlgorithm();
+		planRouter = (PlanRouter) controler.createRoutingAlgorithm();
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -146,95 +146,97 @@ public class BackwardCompatibilityTest {
 	}
 
 	@Test
+	@Ignore
 	public void testWrappedTravelTime() {
-		for (Person person : controler.getPopulation().getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
+		//for (Person person : controler.getPopulation().getPersons().values()) {
+		//	for (Plan plan : person.getPlans()) {
+		//		Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
 
-				Activity origin = (Activity) iterator.next();
+		//		Activity origin = (Activity) iterator.next();
 
-				double now = 0;
-				while (iterator.hasNext()) {
-					Leg leg = (Leg) iterator.next();
-					Activity destination = (Activity) iterator.next();
+		//		double now = 0;
+		//		while (iterator.hasNext()) {
+		//			Leg leg = (Leg) iterator.next();
+		//			Activity destination = (Activity) iterator.next();
 
-					now = updateNow( now , origin );
+		//			now = updateNow( now , origin );
 
-					double timePcr = plansCalcRoute.handleLeg(
-							person,
-							leg,
-							origin,
-							destination,
-							now);
+		//			double timePcr = plansCalcRoute.handleLeg(
+		//					person,
+		//					leg,
+		//					origin,
+		//					destination,
+		//					now);
 
-					double timeWrapper = wrapper.handleLeg(
-							person,
-							leg,
-							origin,
-							destination,
-							now);
+		//			double timeWrapper = wrapper.handleLeg(
+		//					person,
+		//					leg,
+		//					origin,
+		//					destination,
+		//					now);
 
-					Assert.assertEquals(
-							"trip durations do not match for mode "+leg.getMode(),
-							timePcr,
-							timeWrapper,
-							MatsimTestUtils.EPSILON);
+		//			Assert.assertEquals(
+		//					"trip durations do not match for mode "+leg.getMode(),
+		//					timePcr,
+		//					timeWrapper,
+		//					MatsimTestUtils.EPSILON);
 
-					origin = destination;
-				}
-			}
-		}
+		//			origin = destination;
+		//		}
+		//	}
+		//}
 	}
 
 	@Test
+	@Ignore
 	public void testWrappedMode() {
-		for (Person person : controler.getPopulation().getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
+		//for (Person person : controler.getPopulation().getPersons().values()) {
+		//	for (Plan plan : person.getPlans()) {
+		//		Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
 
-				Activity origin = (Activity) iterator.next();
+		//		Activity origin = (Activity) iterator.next();
 
-				double now = 0;
-				while (iterator.hasNext()) {
-					Leg leg = (Leg) iterator.next();
-					Activity destination = (Activity) iterator.next();
+		//		double now = 0;
+		//		while (iterator.hasNext()) {
+		//			Leg leg = (Leg) iterator.next();
+		//			Activity destination = (Activity) iterator.next();
 
-					double endTime = origin.getEndTime();
-					double startTime = origin.getStartTime();
-					double dur = (origin instanceof ActivityImpl ? ((ActivityImpl) origin).getMaximumDuration() : Time.UNDEFINED_TIME);
-					if (endTime != Time.UNDEFINED_TIME) {
-						// use fromAct.endTime as time for routing
-						now = endTime;
-					}
-					else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-						// use fromAct.startTime + fromAct.duration as time for routing
-						now = startTime + dur;
-					}
-					else if (dur != Time.UNDEFINED_TIME) {
-						// use last used time + fromAct.duration as time for routing
-						now += dur;
-					}
-					else {
-						throw new RuntimeException("activity of plan of person " + plan.getPerson().getId() + " has neither end-time nor duration." + origin);
-					}
+		//			double endTime = origin.getEndTime();
+		//			double startTime = origin.getStartTime();
+		//			double dur = (origin instanceof ActivityImpl ? ((ActivityImpl) origin).getMaximumDuration() : Time.UNDEFINED_TIME);
+		//			if (endTime != Time.UNDEFINED_TIME) {
+		//				// use fromAct.endTime as time for routing
+		//				now = endTime;
+		//			}
+		//			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+		//				// use fromAct.startTime + fromAct.duration as time for routing
+		//				now = startTime + dur;
+		//			}
+		//			else if (dur != Time.UNDEFINED_TIME) {
+		//				// use last used time + fromAct.duration as time for routing
+		//				now += dur;
+		//			}
+		//			else {
+		//				throw new RuntimeException("activity of plan of person " + plan.getPerson().getId() + " has neither end-time nor duration." + origin);
+		//			}
 
-					String mode = leg.getMode();
-					double timePcr = wrapper.handleLeg(
-							person,
-							leg,
-							origin,
-							destination,
-							now);
+		//			String mode = leg.getMode();
+		//			double timePcr = wrapper.handleLeg(
+		//					person,
+		//					leg,
+		//					origin,
+		//					destination,
+		//					now);
 
-					Assert.assertEquals(
-							"unexpected mode after wrapped routing",
-							mode,
-							leg.getMode());
+		//			Assert.assertEquals(
+		//					"unexpected mode after wrapped routing",
+		//					mode,
+		//					leg.getMode());
 
-					origin = destination;
-				}
-			}
-		}
+		//			origin = destination;
+		//		}
+		//	}
+		//}
 	}
 
 	@Test
@@ -298,30 +300,31 @@ public class BackwardCompatibilityTest {
 	private static double updateNow(
 			final double now,
 			final PlanElement pe) {
-		if (pe instanceof Activity) {
-			Activity act = (Activity) pe;
-			double endTime = act.getEndTime();
-			double startTime = act.getStartTime();
-			double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
-			if (endTime != Time.UNDEFINED_TIME) {
-				// use fromAct.endTime as time for routing
-				return endTime;
-			}
-			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime + dur;
-			}
-			else if (dur != Time.UNDEFINED_TIME) {
-				// use last used time + fromAct.duration as time for routing
-				return now + dur;
-			}
-			else {
-				throw new RuntimeException("activity has neither end-time nor duration." + act);
-			}
-		}
-		else {
-			return now + ((Leg) pe).getTravelTime();
-		}
+		//if (pe instanceof Activity) {
+		//	Activity act = (Activity) pe;
+		//	double endTime = act.getEndTime();
+		//	double startTime = act.getStartTime();
+		//	double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
+		//	if (endTime != Time.UNDEFINED_TIME) {
+		//		// use fromAct.endTime as time for routing
+		//		return endTime;
+		//	}
+		//	else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+		//		// use fromAct.startTime + fromAct.duration as time for routing
+		//		return startTime + dur;
+		//	}
+		//	else if (dur != Time.UNDEFINED_TIME) {
+		//		// use last used time + fromAct.duration as time for routing
+		//		return now + dur;
+		//	}
+		//	else {
+		//		throw new RuntimeException("activity has neither end-time nor duration." + act);
+		//	}
+		//}
+		//else {
+		//	return now + ((Leg) pe).getTravelTime();
+		//}
+		return TripRouter.calcEndOfPlanElement( now , pe );
 	}	
 
 	private static void comparePlans(
