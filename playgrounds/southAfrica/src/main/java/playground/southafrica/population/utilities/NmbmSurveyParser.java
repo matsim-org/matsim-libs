@@ -21,8 +21,10 @@
 package playground.southafrica.population.utilities;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -30,42 +32,41 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.households.HouseholdsFactory;
-import org.matsim.households.HouseholdsFactoryImpl;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
-import org.matsim.households.IncomeImpl;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.containers.MyZone;
+import playground.southafrica.utilities.gis.MyMultizoneReader;
 
 public class NmbmSurveyParser {
 	private final static Logger LOG = Logger.getLogger(NmbmSurveyParser.class);
 	private Scenario sc;
 	private Households households;
+	private MyMultizoneReader zones;
 	private ObjectAttributes householdAttributes;
 	private ObjectAttributes personAttributes;
+	private Map<Id, Integer> locationlessPersons;
+	private Map<String, Integer> locationlessType;
+	private boolean removeNullLocationPersons = true;
 
 	/**
 	 * Creates a MATSim population from the 2004 travel survey done for Nelson 
@@ -81,16 +82,20 @@ public class NmbmSurveyParser {
 		Header.printHeader(NmbmSurveyParser.class.toString(), args);
 		
 		NmbmSurveyParser nsp = new NmbmSurveyParser();
-		nsp.parseHousehold(args[0]);
-		nsp.writeHouseholds(args[2]);
-		nsp.parseIndividual(args[1]);
-		nsp.writePopulation(args[2]);
+		nsp.parseZones(args[0]);
+		nsp.parseHousehold(args[1]);
+		nsp.parseIndividual(args[2]);
+
+		nsp.writeHouseholds(args[3]);
+		nsp.writePopulation(args[3]);
 		
 		Header.printFooter();
 	}
 
 	public NmbmSurveyParser() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.locationlessPersons = new HashMap<Id, Integer>();
+		this.locationlessType = new HashMap<String, Integer>();
 	}
 	
 	
@@ -179,11 +184,9 @@ public class NmbmSurveyParser {
 	 * @param filename
 	 */
 	public void parseIndividual(String filename){
-		long idCount = 0;
 		Population population = this.sc.getPopulation();
 		population.setName("Nelson Mandela 2004 travel survey population");
 		this.personAttributes = new ObjectAttributes();
-		Counter counter = new Counter("  persons # ");
 		
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		PersonImpl person = null;
@@ -195,10 +198,10 @@ public class NmbmSurveyParser {
 				String enu = sa[0];
 				String hhn = sa[1];
 				String hhPerson = sa[2];
-				String gender = sa[3];
+				String gender = sa[3].equalsIgnoreCase("Male") ? "m" : "f";
 				int age = Integer.parseInt(sa[4]);
 				boolean isEmployed = this.isEmployed(Integer.parseInt(sa[5]));
-				String hasCar = sa[6];
+				String hasCar = sa[6].equalsIgnoreCase("Yes") ? "always" : "never";
 				int legNumber = Integer.parseInt(sa[7]);
 				String activityTypeOrigin = getActivityTypeFromCode(Integer.parseInt(sa[8]));
 				String activityTypeDestination = getActivityTypeFromCode(Integer.parseInt(sa[9]));
@@ -238,7 +241,22 @@ public class NmbmSurveyParser {
 						plan = (PlanImpl) population.getFactory().createPlan();
 						
 						/* Add the first activity. */
-						Activity act = population.getFactory().createActivityFromCoord(activityTypeOrigin, getCoord(zoneFrom));
+						Coord coord = getCoord(zoneFrom);
+						if(coord == null){
+							if(locationlessPersons.containsKey(personId)){
+								Integer oldValue = locationlessPersons.get(personId);
+								locationlessPersons.put(personId, oldValue + 1);
+							} else{
+								locationlessPersons.put(personId, new Integer(1));
+							}
+							if(locationlessType.containsKey(activityTypeOrigin)){
+								Integer oldValue = locationlessType.get(activityTypeOrigin);
+								locationlessType.put(activityTypeOrigin, oldValue + 1);
+							} else{
+								locationlessType.put(activityTypeOrigin, new Integer(1));
+							}
+						}
+						Activity act = population.getFactory().createActivityFromCoord(activityTypeOrigin, getLocalScrambledCoord(coord));
 						act.setEndTime(startTime);
 						plan.addActivity(act);
 						person.addPlan(plan);
@@ -256,8 +274,27 @@ public class NmbmSurveyParser {
 					leg.setDepartureTime(startTime);
 					leg.setTravelTime(endTime - startTime);
 					plan.addLeg(leg);
-					
-					Activity act = population.getFactory().createActivityFromCoord(activityTypeDestination, getCoord(zoneTo));
+					Coord coord = getCoord(zoneTo);
+					if(coord == null){
+						Coord formerCoord = ( (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-2) ).getCoord();
+						if(formerCoord != null){
+							coord = getScrambledCoord(formerCoord);
+						} else{
+							if(locationlessPersons.containsKey(personId)){
+								Integer oldValue = locationlessPersons.get(personId);
+								locationlessPersons.put(personId, oldValue + 1);
+							} else{
+								locationlessPersons.put(personId, new Integer(1));
+							}
+							if(locationlessType.containsKey(activityTypeDestination)){
+								Integer oldValue = locationlessType.get(activityTypeDestination);
+								locationlessType.put(activityTypeDestination, oldValue + 1);
+							} else{
+								locationlessType.put(activityTypeDestination, new Integer(1));
+							}							
+						}
+					}
+					Activity act = population.getFactory().createActivityFromCoord(activityTypeDestination, getLocalScrambledCoord(coord));
 					act.setStartTime(endTime);
 					plan.addActivity(act);
 				}
@@ -271,8 +308,76 @@ public class NmbmSurveyParser {
 				throw new RuntimeException("Could not close BufferedReader for " + filename);
 			}
 		}
+		
+		LOG.info("People with location-less activities: " + locationlessPersons.size());
+		for(Id id : locationlessPersons.keySet()){
+			LOG.info("   " + id.toString() + ": " + locationlessPersons.get(id));
+		}
+		for(String s : locationlessType.keySet()){
+			LOG.info("   " + s + ": " + locationlessType.get(s));
+		}
+		
+		LOG.info("Removing persons with location-less activities from population and households...");
+		LOG.info("  original population size: " + population.getPersons().size());
+		int cleaned = 0;
+		for(Id id : locationlessPersons.keySet()){
+			/* Clean population. */
+			population.getPersons().remove(id);
+			cleaned++;
+			
+			/* Clean population attributes. */
+			this.personAttributes.removeAllAttributes(id.toString());
+			
+			/* Clean households. */
+			for(Id hhid : this.households.getHouseholds().keySet()){
+				List<Id> memberIds = this.households.getHouseholds().get(hhid).getMemberIds();
+				if(memberIds.contains(id)){
+					memberIds.remove(id);
+				}
+			}
+		}
+		LOG.info("  new population size: " + population.getPersons().size() + " (" + cleaned + " removed)");
 	}
 	
+	
+	/**
+	 * Selects a random point inside a 5km radius around the previous activity 
+	 * in the plan. 
+	 * @param coord
+	 * @return
+	 */
+	private Coord getScrambledCoord(Coord coord){
+		if(coord == null){
+			return null;
+		}
+		double randomRadius = 5000;
+		double angle = Math.random()*2*Math.PI;
+		double radius = Math.random()*randomRadius;
+		double newX = coord.getX() + radius*Math.cos(angle);
+		double newY = coord.getY() + radius*Math.sin(angle);
+		
+		return new CoordImpl(newX, newY);
+	}
+	
+	/**
+	 * Selects a random point inside a 500m radius around the previous activity 
+	 * in the plan. 
+	 * @param coord
+	 * @return
+	 */
+	private Coord getLocalScrambledCoord(Coord coord){
+		if(coord == null){
+			return null;
+		}
+		double randomRadius = 1000;
+		double angle = Math.random()*2*Math.PI;
+		double radius = Math.random()*randomRadius;
+		double newX = coord.getX() + radius*Math.cos(angle);
+		double newY = coord.getY() + radius*Math.sin(angle);
+		
+		return new CoordImpl(newX, newY);
+	}
+
 
 
 
@@ -455,9 +560,24 @@ public class NmbmSurveyParser {
 	
 	private Coord getCoord(String zone){
 		//FIXME Must fix this once we have coordinates for the zones.
-		return new CoordImpl(0.0, 0.0);
+		MyZone mz = this.zones.getZone(new IdImpl(zone));
+		if(mz == null){
+			return null;
+		}
+		double x = mz.getInteriorPoint().getX();
+		double y = mz.getInteriorPoint().getY();
+		return new CoordImpl(x, y);
 	}
 
+	
+	private void parseZones(String filename){
+		this.zones = new MyMultizoneReader();
+		try {
+			this.zones.readMultizoneShapefile(filename, 1);
+		} catch (IOException e) {
+			Gbl.errorMsg("Could not parse shapefile.");
+		}
+	}
 	
 }
 
