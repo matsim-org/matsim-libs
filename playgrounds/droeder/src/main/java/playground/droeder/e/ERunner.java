@@ -43,7 +43,7 @@ public class ERunner {
 	private static final String DIR = "D:/VSP/svn/shared/volkswagen_internal/";
 //	private static final String DIR = "/home/dgrether/shared-svn/projects/volkswagen_internal/";
 	
-	private static final String CONFIG = DIR + "scenario/config_congested_scenario.xml";
+	private static final String CONFIG = DIR + "scenario/config_empty_scenario.xml";
 //	private static final String CONFIG = DIR + "scenario/config_empty_scenario.xml";
 	private static final String ADDPLANS = DIR + "scenario/input/testPlans.xml";
 	

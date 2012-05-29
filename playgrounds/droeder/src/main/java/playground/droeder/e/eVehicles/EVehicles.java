@@ -142,17 +142,17 @@ public class EVehicles {
 		}
 		log.info("start writing Vehicle-Energy-Data...");
 		for(EVehicle v: this.vehicles.values()){
-			w = IOUtils.getBufferedWriter(outdir + v.getId() + ".csv");
+			w = IOUtils.getBufferedWriter(outdir + v.getId().toString().replace("_", "") + ".dat");
 			try {
-				w.write("SoC;time;dist;\n");
+				w.write("#SoC;time;dist;\n");
 				Double[] time, dist, soc;
 				time = v.getSoCChangeTimes();
 				dist = v.getTravelledDistances();
 				soc = v.getSoCs();
 				for(int i = 0; i < time.length; i++){
-					w.write(String.valueOf(soc[i]) + ";");
-					w.write(String.valueOf(time[i]) + ";");
-					w.write(String.valueOf(dist[i]) + ";\n");
+					w.write(String.valueOf(soc[i]) + "\t");	
+					w.write(String.valueOf(time[i]) + "\t");
+					w.write(String.valueOf(dist[i]) + "\t\n");
 				}
 				w.flush();
 				w.close();

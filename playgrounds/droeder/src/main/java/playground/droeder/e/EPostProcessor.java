@@ -61,7 +61,7 @@ public class EPostProcessor implements LinkEnterEventHandler, LinkLeaveEventHand
 	private final static String POIINFO = DIR + "scenario/input/poiInfo.xml";
 	private final static String VEHICLEPLANS = DIR + "scenario/input/testAppointments.txt";
 
-	private final static String OUTDIR = DIR + "matsimOutput/congestion/ITERS/it.0/energy/";
+	private final static String OUTDIR = DIR + "matsimOutput/onlyEvehicles/ITERS/it.0/energy/";
 
 	private EVehicles vehicles;
 

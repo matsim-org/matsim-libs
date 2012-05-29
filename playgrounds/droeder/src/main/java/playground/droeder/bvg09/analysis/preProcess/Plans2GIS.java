@@ -43,10 +43,19 @@ import playground.droeder.gis.DaShapeWriter;
  */
 public class Plans2GIS {
 	
+	private static final String DIR = "D:/VSP/svn/shared/volkswagen_internal/";
+	private static final String NET = DIR + "scenario/input/network-base_ext.xml.gz";
+	private static final String POPULATION = DIR + "matsimOutput/congestion/selectedPlansCar.xml.gz";
+	private static final String OUTPUTSHP = DIR + "matsimOutput/congestion/selectedPlansCar.shp";
+
+//	private static final String NET = DRPaths.VSP + "BVG09_Auswertung/input/network.final.xml.gz";
+//	private static final String POPULATION = DRPaths.VSP + "BVG09_Auswertung/testPopulation1.xml";
+//	private static final String OUTPUTSHP = DRPaths.VSP + "BVG09_Auswertung/trips.shp";
+	
 	public static void main(String[] args){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(sc).parse(DRPaths.VSP + "BVG09_Auswertung/input/network.final.xml.gz");
-		new MatsimPopulationReader(sc).parse(DRPaths.VSP + "BVG09_Auswertung/testPopulation1.xml");
+		new NetworkReaderMatsimV1(sc).parse(NET);
+		new MatsimPopulationReader(sc).parse(POPULATION);
 		
 		Map<String, SortedMap<Integer, Coord>> lineStrings = new HashMap<String, SortedMap<Integer, Coord>>();
 		
@@ -67,7 +76,7 @@ public class Plans2GIS {
 			}
 		}
 		
-		DaShapeWriter.writeDefaultLineString2Shape(DRPaths.VSP + "BVG09_Auswertung/trips.shp", "BerlinTrips", lineStrings, null);
+		DaShapeWriter.writeDefaultLineString2Shape(OUTPUTSHP, "SlectedPlans", lineStrings, null);
 	}
 
 }
