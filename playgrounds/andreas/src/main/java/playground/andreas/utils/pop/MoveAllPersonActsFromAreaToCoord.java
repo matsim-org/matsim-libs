@@ -132,6 +132,10 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 		dp.run(inPop);
 		System.out.println(dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
 		
+		System.out.println("Min: " + dp.minSourceCoord);
+		System.out.println("Max: " + dp.maxSourceCoord);
+		System.out.println("Target: " + dp.targetCoord);
+		
 		System.out.println("Source nActs:");
 		for (Entry<String, Integer> entry : dp.actSourceArea.entrySet()) {
 			System.out.println(entry.getKey() + " " + entry.getValue());
@@ -160,13 +164,14 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 		String outputDir = "f:/p_runs/txl/";
 		String networkFile = outputDir + "network.final.xml.gz";
 		String inPlansFile = "e:/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.plans.selected.xml.gz";
-		String outPlansFile = "bvg.run189.10pct.100.plans.selected_moved.xml.gz";
+		String outPlansFile = "bvg.run189.10pct.100.plans.selected_movedToTXL.xml.gz";
 		
-		Coord targetCoord = new CoordImpl(4587780.0, 5825320.0);
+		Coord targetCoord = new CoordImpl(4587780.0, 5825320.0); // TXL
+//		Coord targetCoord = new CoordImpl(4603511.0, 5807250.0); // SXF
 //		Coord minSourceCoord = new CoordImpl(4586900.000, 5824500.000);
 //		Coord maxSourceCoord = new CoordImpl(4588800.000, 5826300.000);
-		Coord minSourceCoord = new CoordImpl(4586000.000, 5824700.000);
-		Coord maxSourceCoord = new CoordImpl(4588900.000, 5825900.000);
+		Coord minSourceCoord = new CoordImpl(4586000.000, 5824700.000); // TXL bounding box
+		Coord maxSourceCoord = new CoordImpl(4588900.000, 5825900.000); // TXL bounding box
 				
 		// Move all acts from area to the given coordinates
 		MoveAllPersonActsFromAreaToCoord.filterPersonActs(networkFile, inPlansFile, outputDir + outPlansFile, minSourceCoord, maxSourceCoord, targetCoord, outputDir, "movedActs.kmz");		
