@@ -52,13 +52,16 @@ public class PickUpDropOffFilter {
 	private static final String DEPARTURE = "passenger_departure";
 	private static final String ARRIVAL = "passenger_arrival";
 
+	private boolean useTimes;
 	private List<Event> events = new ArrayList<Event>();
 
 	private EventWriterXML writer = null;
 
 	public void process(
 			final String inputFile,
-			final String outputFile) {
+			final String outputFile,
+			final boolean useTime) {
+		this.useTimes = useTime;
 		this.writer = new EventWriterXML(outputFile);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager(); 
@@ -89,13 +92,13 @@ public class PickUpDropOffFilter {
 
 				if ( departure.getLegMode().equals( JointActingTypes.PASSENGER ) ) {
 					events.add( new ActivityStartEventImpl(
-								departure.getTime(),
+								useTimes ? departure.getTime() : 0,
 								fakeId,
 								departure.getLinkId(),
 								null , // facility
 								DEPARTURE) );
 					events.add( new ActivityEndEventImpl(
-								departure.getTime() + MINIMAL_DURATION,
+								useTimes ? departure.getTime() + MINIMAL_DURATION : 1000,
 								fakeId,
 								departure.getLinkId(),
 								null , // facility
@@ -109,13 +112,13 @@ public class PickUpDropOffFilter {
 
 				if ( arrival.getLegMode().equals( JointActingTypes.PASSENGER ) ) {
 					events.add( new ActivityStartEventImpl(
-								arrival.getTime(),
+								useTimes ? arrival.getTime() : 500,
 								fakeId,
 								arrival.getLinkId(),
 								null , // facility
 								ARRIVAL) );
 					events.add( new ActivityEndEventImpl(
-								arrival.getTime() + MINIMAL_DURATION,
+								useTimes ? arrival.getTime() + MINIMAL_DURATION : 1500,
 								fakeId,
 								arrival.getLinkId(),
 								null , // facility
@@ -143,7 +146,13 @@ public class PickUpDropOffFilter {
 	
 	public static void main(final String[] args) {
 		PickUpDropOffFilter filter = new PickUpDropOffFilter();
-		filter.process(args[0], args[1]);
+		int shift = 0;
+		boolean useTime = true;
+		if ("--no-time".equals( args[ 0 ] )) {
+			useTime = false;
+			shift = 1;
+		}
+		filter.process(args[0+shift], args[1+shift], useTime);
 	}
 }
 
