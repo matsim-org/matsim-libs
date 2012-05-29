@@ -139,7 +139,7 @@ public class CreateMarathonPopulation {
 	private NetworkRoute route;
 	private Households households;
 	
-	private String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/"; 
+	private String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/";
 	private String trackShapeOutFile = basePath + "input/track.shp";
 	private String trackRelatedShapeOutFile = basePath + "input/trackRelated.shp";
 	private String barriersShapeOutFile = basePath + "input/barriers.shp";

@@ -101,11 +101,13 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerF
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.api.core.v01.Coord3d;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
+import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
@@ -120,6 +122,7 @@ import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLe
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
+import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v3.events.XYDataWriter;
 import playground.gregor.sim2d_v3.router.Walk2DLegRouter;
 import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
@@ -134,9 +137,10 @@ public class MarathonController extends WithinDayController implements StartupLi
 
 	private final static Logger log = Logger.getLogger(MarathonController.class);
 	
-	public static String dhm25File = "D:/Users/Christoph/workspace/matsim/mysimulations/networks/GIS/nodes_3d_ivtch_dhm25.shp";
-	public static String srtmFile = "D:/Users/Christoph/workspace/matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
-	public static String affectedAreaFile = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/input/affectedArea.shp";
+	public static String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/";
+	public static String dhm25File = basePath + "networks/GIS/nodes_3d_ivtch_dhm25.shp";
+	public static String srtmFile = basePath + "networks/GIS/nodes_3d_srtm.shp";
+	public static String affectedAreaFile = basePath + "icem2012/input/affectedArea.shp";
 	
 	/*
 	 * innerBuffer ... minimum distance between affected area and an exit node
@@ -147,6 +151,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 	
 	private Geometry affectedArea;
 	private CoordAnalyzer coordAnalyzer;
+	private CoordAnalyzer bufferedCoordAnalyzer;
 	private Set<Id> affectedNodes;
 	private Set<Id> affectedLinks;
 	private Set<Id> affectedFacilities;
@@ -154,6 +159,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 	private AgentsTracker agentsTracker;
 	private InformedHouseholdsTracker informedHouseholdsTracker;
 	private VehiclesTracker vehiclesTracker;
+	private PopulationAdministration popAdmin;
 	private KtiConfigGroup ktiConfigGroup;
 	
 	/*
@@ -170,6 +176,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 	private WithinDayDuringActivityReplannerFactory extendCurrentActivityReplannerFactory;
 	private WithinDayDuringActivityReplannerFactory endActivityAndEvacuateReplannerFactory;
 	private WithinDayDuringLegReplannerFactory currentLegInitialReplannerFactory;
+	private WithinDayDuringLegReplannerFactory switchWalkModeReplannerFactory;
 	private WithinDayDuringLegReplannerFactory duringLegRerouteReplannerFactory;
 
 	/*
@@ -182,6 +189,8 @@ public class MarathonController extends WithinDayController implements StartupLi
 	private PersonalizableTravelTimeFactory bikeTravelTimeFactory;
 	private PersonalizableTravelTimeFactory ptTravelTimeFactory;
 	private PersonalizableTravelTimeFactory travelTimeCollectorWrapperFactory;
+	
+	private AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
 	
 	public static void main(String[] args) {
 
@@ -203,13 +212,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		Controler controller = new MarathonController(sc);
 		controller.run();
 	}
-	
-	/*
-	 * TODO: 
-	 * - add within-day replanners
-	 * - allow walk and bike mode on track after evacuation has started
-	 * - switch all affected walk agents to walk2d
-	 */
+
 	public MarathonController(Scenario sc) {
 		super(sc);
 		setOverwriteFiles(true);
@@ -223,7 +226,9 @@ public class MarathonController extends WithinDayController implements StartupLi
 		 * Set evacuation parameter.
 		 */
 		EvacuationConfig.evacuationTime = 9.5 * 3600;
-		EvacuationConfig.duringLegReroutingShare = 0.10;
+		EvacuationConfig.duringLegReroutingShare = 0.25;
+		EvacuationConfig.panicShare = 0.0;
+		EvacuationConfig.householdParticipationShare = 1.0;
 		
 //		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 //		
@@ -370,6 +375,28 @@ public class MarathonController extends WithinDayController implements StartupLi
 //		this.getEvents().addHandler(vehiclesTracker);
 //		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
+		this.popAdmin = new PopulationAdministration(this.scenarioData);
+		this.popAdmin.selectPanicPeople(EvacuationConfig.panicShare);
+		this.popAdmin.selectParticipatingHouseholds(EvacuationConfig.householdParticipationShare);
+		this.addControlerListener(this.popAdmin);
+
+		// Create the set of analyzed modes.
+		Set<String> transportModes = new HashSet<String>();
+		transportModes.add(TransportMode.bike);
+		transportModes.add(TransportMode.car);
+		transportModes.add(TransportMode.pt);
+		transportModes.add(TransportMode.ride);
+		transportModes.add(TransportMode.walk);
+		transportModes.add("walk2d");
+		
+		// Create and add an AgentsInEvacuationAreaCounter
+		double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
+		agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer.createInstance(), 
+				this.popAdmin, scaleFactor);
+		this.addControlerListener(agentsInEvacuationAreaCounter);
+		this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
+		this.events.addHandler(agentsInEvacuationAreaCounter);	
+			
 		/*
 		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
 		 * factory but returns always the same travel time object, which is possible since
@@ -504,8 +531,17 @@ public class MarathonController extends WithinDayController implements StartupLi
 		Geometry innerBuffer = affectedArea.buffer(this.innerBuffer);
 		Geometry outerBuffer = affectedArea.buffer(this.outerBuffer);
 		
+		GisDebugger.setCRSString("EPSG: 21781");
+		
 		CoordAnalyzer innerAnalyzer = new CoordAnalyzer(innerBuffer);
+		GisDebugger.addGeometry(innerBuffer, "inner Buffer");
+		GisDebugger.dump(this.getControlerIO().getOutputPath() + "/affectedAreaInnerBuffer.shp");
+		
 		CoordAnalyzer outerAnalyzer = new CoordAnalyzer(outerBuffer);
+		GisDebugger.addGeometry(outerBuffer, "outer Buffer");
+		GisDebugger.dump(this.getControlerIO().getOutputPath() + "/affectedAreaOuterBuffer.shp");
+		
+		this.bufferedCoordAnalyzer = new CoordAnalyzer(affectedArea);
 		
 		Set<Node> exitNodes = new LinkedHashSet<Node>();
 		for (Node node : scenarioData.getNetwork().getNodes().values()) {
@@ -596,6 +632,22 @@ public class MarathonController extends WithinDayController implements StartupLi
 				}
 			}
 		}
+		
+		/*
+		 * Create and add mode switch facilities to all affected links
+		 */
+		for (Id affectedLinkId : this.affectedLinks) {
+			
+			Link link = this.scenarioData.getNetwork().getLinks().get(affectedLinkId);
+			Id facilityId = scenarioData.createId("switchWalkModeFacility" + affectedLinkId.toString());
+			ActivityFacility facility = (scenarioData).getActivityFacilities().createFacility(facilityId, link.getToNode().getCoord());
+			((ActivityFacilityImpl) facility).setLinkId(link.getId());
+			
+			activityOption = ((ActivityFacilityImpl) facility).createActivityOption("switchWalkMode");
+			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			activityOption.setCapacity(Double.MAX_VALUE);
+
+		}
 	}
 	
 	/*
@@ -623,10 +675,17 @@ public class MarathonController extends WithinDayController implements StartupLi
 		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory((this.informedHouseholdsTracker),
 				InformedAgentsFilter.FilterType.NotInitialReplanning);
 		
+		// use affected area
+//		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.agentsTracker,
+//				this.vehiclesTracker, this.coordAnalyzer, AffectedAgentsFilter.FilterType.Affected);
+//		AffectedAgentsFilterFactory notAffectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.agentsTracker,
+//				this.vehiclesTracker, this.coordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
+
+		// use buffered affected area
 		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.agentsTracker,
-				this.vehiclesTracker, this.coordAnalyzer, AffectedAgentsFilter.FilterType.Affected);
+				this.vehiclesTracker, this.bufferedCoordAnalyzer, AffectedAgentsFilter.FilterType.Affected);
 		AffectedAgentsFilterFactory notAffectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.agentsTracker,
-				this.vehiclesTracker, this.coordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
+				this.vehiclesTracker, this.bufferedCoordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
 		
 		DuringActivityIdentifierFactory duringActivityFactory;
 		DuringLegIdentifierFactory duringLegFactory;
@@ -680,10 +739,10 @@ public class MarathonController extends WithinDayController implements StartupLi
 
 //		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-//		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, penaltyCalculator);
-		
+		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, coordAnalyzer);
+
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, penaltyCostFactory, timeFactory, factory, routeFactory);
 		
 		/*
 		 * During Activity Replanners
@@ -703,14 +762,14 @@ public class MarathonController extends WithinDayController implements StartupLi
 		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, coordAnalyzer);
 		this.currentLegInitialReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-
-//		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, householdsTracker);
-//		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
-//		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-//		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, EvacuationConfig.duringLegReroutingShare);
-//		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-//		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.switchWalkModeReplannerFactory = new SwitchToWalk2DLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.coordAnalyzer);
+		this.switchWalkModeReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
+		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.switchWalkModeReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+
+		this.duringLegRerouteReplannerFactory = new MarathonCurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, EvacuationConfig.duringLegReroutingShare);
+		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
+		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		/*
 		 * Collect Replanners that can be disabled after all agents have been informed.

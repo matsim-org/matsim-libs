@@ -104,8 +104,8 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			((ActivityImpl) nextActivity).setLinkId(endLinkId);
 			
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
-
+//			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
+			currentLeg.setRoute(route.getSubRoute(route.getStartLinkId(), endLinkId));
 			
 			// Finally reset the cached Values of the PersonAgent - they may have changed!
 			withinDayAgent.resetCaches();

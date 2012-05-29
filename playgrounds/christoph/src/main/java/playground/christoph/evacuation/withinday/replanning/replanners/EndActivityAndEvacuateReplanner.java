@@ -121,6 +121,16 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// calculate route for the leg to the rescue facility
 		new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
 
+		/*
+		 * Identify the last non-rescue link and relocate rescue activity to it.
+		 */
+		NetworkRoute route = (NetworkRoute) legToRescue.getRoute();
+		Id endLinkId = route.getLinkIds().get(route.getLinkIds().size() - 2);
+		((ActivityImpl) rescueActivity).setFacilityId(scenario.createId("rescueFacility" + endLinkId.toString()));
+		((ActivityImpl) rescueActivity).setLinkId(endLinkId);
+		NetworkRoute subRoute2 = route.getSubRoute(route.getStartLinkId(), endLinkId);
+		legToRescue.setRoute(subRoute2);
+		
 		// if the person has to walk, we additionally try pt
 		if (transportMode.equals(TransportMode.walk)) {
 			double travelTimePT = ptTravelTime.calcSwissPtTravelTime(currentActivity, rescueActivity, this.time);
