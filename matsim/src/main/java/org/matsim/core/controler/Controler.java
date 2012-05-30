@@ -1216,7 +1216,12 @@ public class Controler {
 	 * ===================================================================
 	 */
 
-	/**
+	/**Design comments:<ul>
+	 * <li> yyyy It seems to me that one would need a factory at <i>this</i> level. kai, may'12
+	 * <li> An issue is that the TravelTime(Calculator) object needs to be passed into the factory.  I don't think that
+	 * this is a large problem, but it needs to be dealt with. kai, may'12
+	 * </ul>
+	 * 
 	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
 	 *         of plans with the default (= the current from the last or current
 	 *         iteration) travel costs and travel times. Only to be used by a
