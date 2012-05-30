@@ -64,7 +64,7 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 	public RectangleHullRouteExtension(ArrayList<String> parameter) {
 		super(parameter);
 		if(parameter.size() != 1){
-			log.error("no parameters allowed for this strategy...");
+			log.error("only exact one parameter allowed for this strategy...");
 		}
 		this.height = Double.parseDouble(parameter.get(0));
 	}
@@ -248,7 +248,7 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 		TransitStopFacility first = stops2serve.get(0);
 		TransitStopFacility temp;
 		Integer index = null;
-		double maxDist = Double.MIN_VALUE, currentDist;
+		double maxDist = -1., currentDist;
 		
 		for(int i = 1; i < stops2serve.size(); i++ ){
 			temp = stops2serve.get(i);

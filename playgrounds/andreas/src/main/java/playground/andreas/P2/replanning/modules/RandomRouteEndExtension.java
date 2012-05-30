@@ -165,7 +165,7 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 		TransitStopFacility first = stops2serve.get(0);
 		TransitStopFacility temp;
 		Integer index = null;
-		double maxDist = Double.MIN_VALUE, currentDist;
+		double maxDist = -1., currentDist;
 		
 		for(int i = 1; i < stops2serve.size(); i++ ){
 			temp = stops2serve.get(i);
@@ -174,6 +174,12 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 				maxDist =  currentDist;
 				index = i;
 			}
+		}
+		if(index == null){
+			log.error("this should never happen, stops2Serve should consist of at least 2 stops...");
+//			for(TransitStopFacility f: stops2serve){
+//				log.error(f.getId().toString() + "\t" + f.getCoord().toString());
+//			}
 		}
 		return index;
 	}

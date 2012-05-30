@@ -162,7 +162,7 @@ public class RandomRouteStartExtension extends PStrategy implements PPlanStrateg
 		TransitStopFacility first = stops2serve.get(0);
 		TransitStopFacility temp;
 		Integer index = null;
-		double maxDist = Double.MIN_VALUE, currentDist;
+		double maxDist = -1., currentDist;
 		
 		for(int i = 1; i < stops2serve.size(); i++ ){
 			temp = stops2serve.get(i);
@@ -171,6 +171,21 @@ public class RandomRouteStartExtension extends PStrategy implements PPlanStrateg
 				maxDist =  currentDist;
 				index = i;
 			}
+		}
+		/*
+		 * what may be NULL here? 
+		 * 
+		 * could be "index", but even if it is a circle-line and the stops2serve consists of the same stop twice,
+		 * index is set once, because 0 > Double.MIN_VALUE
+		 * 
+		 * is stops2serve.size() ==  1 possible? then index may be NULL
+		 */
+		if(index == null){
+			log.error("this should never happen, stops2Serve should consist of at least 2 stops...");
+//			for(TransitStopFacility f: stops2serve){
+//				log.error(f.getId().toString() + "\t" + f.getCoord().toString());
+//			}
+			return null;
 		}
 		return stops2serve.get(index);
 	}

@@ -37,11 +37,11 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class CreateGridNetwork {
 
-	private static final String OUTDIR = "D:/VSP/net/ils/roeder/7x4Grid/";
+	private static final String OUTDIR = "D:/VSP/net/ils/roeder/6x11/";
 	
 	public static void main(String[] args){
 		
-		CreateGridNetwork.createTestGridNetwork(4, 7, 1000., OUTDIR + "network.xml.gz");
+		CreateGridNetwork.createTestGridNetwork(6, 11, 1000., OUTDIR + "network.xml");
 	}
 	
 	public static void createTestGridNetwork(int rows, int columns, double distanceFromNodeToNode, String outfile ) {
@@ -54,26 +54,26 @@ public class CreateGridNetwork {
 		// creates nodes
 		for(int row = 1; row < (rows + 1); row++){
 			for(int column = 1; column < (columns + 1); column++){
-				n = nf.createNode(scenario.createId(String.valueOf(column)+String.valueOf(row)), 
+				n = nf.createNode(scenario.createId(String.valueOf(column) + "." + String.valueOf(row)), 
 						scenario.createCoord(column * distanceFromNodeToNode, row * distanceFromNodeToNode));
 				network.addNode(n);
 			}
 		}
 		
 		// create links
-		Node from = null, to;
+		Node from = null, to;	
 		Link l;
 		//create rows
 		for(int row = 1; row <(rows + 1); row++){
 			from = null;
 			for(int col = 1; col < (columns + 1); col++){
 				if(from == null){
-					from = network.getNodes().get(scenario.createId(String.valueOf(col)+String.valueOf(row)));
+					from = network.getNodes().get(scenario.createId(String.valueOf(col) + "." + String.valueOf(row)));
 				}else{
-					to = network.getNodes().get(scenario.createId(String.valueOf(col)+String.valueOf(row)));
-					l = nf.createLink(scenario.createId(from.getId().toString()+to.getId().toString()), from, to);
+					to = network.getNodes().get(scenario.createId(String.valueOf(col) + "." + String.valueOf(row)));
+					l = nf.createLink(scenario.createId(from.getId().toString() + "_" + to.getId().toString()), from, to);
 					network.addLink(l);
-					l = nf.createLink(scenario.createId(to.getId().toString()+from.getId().toString()), to, from);
+					l = nf.createLink(scenario.createId(to.getId().toString() + "_" + from.getId().toString()), to, from);
 					network.addLink(l);
 					from = to;
 				}
@@ -85,12 +85,12 @@ public class CreateGridNetwork {
 			from = null;
 			for(int row = 1; row <(rows + 1); row++){
 				if(from == null){
-					from = network.getNodes().get(scenario.createId(String.valueOf(col)+String.valueOf(row)));
+					from = network.getNodes().get(scenario.createId(String.valueOf(col) + "." + String.valueOf(row)));
 				}else{
-					to = network.getNodes().get(scenario.createId(String.valueOf(col)+String.valueOf(row)));
-					l = nf.createLink(scenario.createId(from.getId().toString()+to.getId().toString()), from, to);
+					to = network.getNodes().get(scenario.createId(String.valueOf(col) + "." + String.valueOf(row)));
+					l = nf.createLink(scenario.createId(from.getId().toString() + "_" + to.getId().toString()), from, to);
 					network.addLink(l);
-					l = nf.createLink(scenario.createId(to.getId().toString()+from.getId().toString()), to, from);
+					l = nf.createLink(scenario.createId(to.getId().toString() + "_" + from.getId().toString()), to, from);
 					network.addLink(l);
 					from = to;
 				}
