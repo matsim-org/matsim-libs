@@ -148,21 +148,27 @@ public class CreateNetwork {
 		facility.createActivityOption("work");
 		if (random.nextDouble()<0.0085){
     		facility.createActivityOption("shop_retail");
+    		facility.getActivityOptions().remove("home");
     		}
     	if (random.nextDouble()<0.008){
     		facility.createActivityOption("shop_service");
+    		facility.getActivityOptions().remove("home");
     		//log.info("created shop service facility");
     		}
     	if (random.nextDouble()<0.004){
     		facility.createActivityOption("sports_fun");
+    		facility.getActivityOptions().remove("home");
     		}
     	if (random.nextDouble()<0.012){
     		facility.createActivityOption("gastro_culture");
+    		facility.getActivityOptions().remove("home");
     		}
-								
-		ActivityOptionImpl actOptionHome = (ActivityOptionImpl)facility.getActivityOptions().get("home");
-		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
-		actOptionHome.addOpeningTime(opentimeHome);
+//		
+//    	if (facility.getActivityOptions().containsKey("home")){
+//    		ActivityOptionImpl actOptionHome = (ActivityOptionImpl)facility.getActivityOptions().get("home");
+//    		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
+//    		actOptionHome.addOpeningTime(opentimeHome);
+//    	}
 		
 		ActivityOptionImpl actOptionWork = (ActivityOptionImpl)facility.getActivityOptions().get("work");
 		OpeningTimeImpl opentimeWork = new OpeningTimeImpl(DayType.wk, 6.0 * 3600.0, 20.0 * 3600);

@@ -219,6 +219,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 								(double)Math.round(facilityOccupancy.getCurrentOccupancy(84)/capacity*1000)/1000 + "\t"+
 								(double)Math.round(facilityOccupancy.getCurrentOccupancy(88)/capacity*1000)/1000 + "\t"+
 								(double)Math.round(facilityOccupancy.getCurrentOccupancy(92)/capacity*1000)/1000 + "\t"
+
 								+ "\t");
 						out_summary.newLine();
 					}

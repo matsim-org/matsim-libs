@@ -82,9 +82,9 @@ public class CreatePopulation {
 				((PersonImpl)person).createDesires("desired activity durations");
             	((PersonImpl)person).getDesires().putActivityDuration("work", 8*3600);
             	((PersonImpl)person).getDesires().putActivityDuration("home", 8*3600);
-            	((PersonImpl)person).getDesires().putActivityDuration("shop_retail", 1*3600);
-            	((PersonImpl)person).getDesires().putActivityDuration("shop_service", 2*3600);
-            	((PersonImpl)person).getDesires().putActivityDuration("sports_fun", 2*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("shop_retail", 0.5*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("shop_service", 1*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("sports_fun", 1*3600);
             	((PersonImpl)person).getDesires().putActivityDuration("gastro_culture", 2*3600);
 
 			}
@@ -110,16 +110,16 @@ public class CreatePopulation {
 	
 	private void createPersons() {
 		double sideLength = Double.parseDouble(config.findParam(CreateNetwork.AGENT_INTERACTION_PREPROCESS, "sideLength"));
-		Zone centerZone = new Zone("centerZone", (Coord) new CoordImpl(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 1000.0, 1000.0);	
+		Zone centerZone = new Zone("centerZone", (Coord) new CoordImpl(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 2000.0, 2000.0);	
 		this.initZone(centerZone);
 		
-		Zone topLeftZone =  new Zone("topLeftZone", (Coord) new CoordImpl(0.0, sideLength), 1000.0, 1000.0); 
+		Zone topLeftZone =  new Zone("topLeftZone", (Coord) new CoordImpl(0.0, sideLength), 2000.0, 2000.0); 
 		this.initZone(topLeftZone);
-		Zone bottomLeftZone =  new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, 2000.0), 1000.0, 1000.0); 
+		Zone bottomLeftZone =  new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, 2000.0), 2000.0, 2000.0); 
 		this.initZone(bottomLeftZone);
-		Zone bottomRightZone =  new Zone("bottomRightZone", (Coord) new CoordImpl(sideLength - 1000.0, 1000.0), 1000.0, 1000.0);
+		Zone bottomRightZone =  new Zone("bottomRightZone", (Coord) new CoordImpl(sideLength - 2000.0, 2000.0), 2000.0, 2000.0);
 		this.initZone(bottomRightZone);		
-		Zone topRightZone = new Zone("topRightZone", (Coord) new CoordImpl(sideLength - 1000.0, sideLength), 1000.0, 1000.0);
+		Zone topRightZone = new Zone("topRightZone", (Coord) new CoordImpl(sideLength - 2000.0, sideLength), 2000.0, 2000.0);
 		this.initZone(topRightZone);
 //		Zone bottomRightLargeZone = new Zone("bottomRightLargeZone", (Coord) new CoordImpl(sideLength - 2000.0, 2000.0), 2000.0, 2000.0);
 //		this.initZone(bottomRightLargeZone);
@@ -140,7 +140,11 @@ public class CreatePopulation {
 			PersonImpl p = new PersonImpl(new IdImpl(personCnt + offset));			
 			personCnt++;
 			this.scenario.getPopulation().addPerson(p);	
+			//TreeMap<Id, ActivityFacility> facilitiesHome = this.scenario.getActivityFacilities().getFacilitiesForActivityType("home");
 			ActivityFacility home = origin.getRandomLocationInZone(this.random);
+			while (!home.getActivityOptions().containsKey("home")){//||home.getActivityOptions().equals("shop_service")||home.getActivityOptions().equals("sports_fun")||home.getActivityOptions().equals("gastro_culture")||home.getActivityOptions().equals("work")){
+				home = origin.getRandomLocationInZone(this.random);
+			}
 			this.homeLocations.put(p.getId(), home);
 						
 			ActivityFacility work = destination.getRandomLocationInZone(this.random);

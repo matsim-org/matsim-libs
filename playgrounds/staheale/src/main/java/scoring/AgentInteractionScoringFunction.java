@@ -72,6 +72,10 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 	}
 	
+	/* 
+	 * All values >= 100800s (4h) are merged into the last time bin
+	 */
+	
 	public int timeBinIndex(double time) {
 		int lastBinIndex = this.numberOfTimeBins-1;
 		int numberOfBinsPerHour = this.numberOfTimeBins/24;
@@ -164,72 +168,97 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		}
 				
 		// ------------disutilities of agent interaction-----------
-		if (act.getType().startsWith("s")|| act.getType().startsWith("g")) {
-			ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
-			double capacity = facility.getActivityOptions().get(act.getType()).getCapacity();
-			double lowerBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "LowerThreshold");
-			//log.info("lower bound is " +lowerBound);
-			int lowerMarginalUtility = ((Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal"))/3600;
-			double upperBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "UpperThreshold");
-			//log.info("upper bound is " +upperBound);
-			int upperMarginalUtility = ((Integer) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal"))/3600;
-			
-			int timeBinStart = timeBinIndex(activityStart);
-			int timeBinEnd = timeBinIndex(activityEnd);
-			//log.info("timeBinStart ("+activityStart+") is " +timeBinStart+ " and timeBinEnd ("+activityEnd+") is " +timeBinEnd+ ", therefore numberOfTimeBins is " +(timeBinEnd-timeBinStart));
-			double offsetStart = ((timeBinStart+1)*900)-activityStart;
-			double offsetEnd = 900+(timeBinEnd*900)-activityEnd;
-						
-			for (int i = 0; i < (timeBinEnd-timeBinStart); i++){
-				double occupancy = this.facilityOccupancies.get(facility.getId()).getCurrentOccupancy((timeBinStart+i));
-				//log.info("for facility " +facility.getId()+ " and agent " +plan.getPerson().getId()+ " current occupancy is: " +occupancy+ " while performing " +act.getType()+ " activity at "+(activityStart+i*900)/3600);
-				double load = (occupancy*this.scaleNumberOfPersons)/capacity;
-				//log.info("load is " +load);
-				double dur = 900;
-				if (i == 0){
-					if (timeBinEnd==timeBinStart){
-						dur = duration;
-						//log.info("firstTimeBin, duration is: " +dur);
-					}
-					else{
-					dur = offsetStart;
-					//log.info("firstTimeBin, duration is: " +dur);
-					}
-				}
-				if (i+1 == (timeBinEnd-timeBinStart)){
-					dur = offsetEnd;
-					//log.info("lastTimeBin, duration is: " +dur);
-				}
-				// -----------------------disutility of agent interaction underarousal
-				if ((load < lowerBound)) {
-					if (load < 0.02){
-						load = 0.02;
-					}
-					double penaltyUnderarousal = (lowerMarginalUtility/load * dur);
-					tmpScore += penaltyUnderarousal;
-					//log.info("an underarousal penalty of " +penalty+ " is given due to load " +load);
-				}
-				// -----------------------disutility of agent interaction overarousal
-				if ((load > upperBound)) {
-					//load values between upperBound and 1 are treated as underarousal loads
-					if (load < 1){
-						double loadTemp = 1-load;
-						if (loadTemp < 0.02){
-							loadTemp = 0.02;
-						}
-						double penaltyUpperarousal = (upperMarginalUtility/loadTemp * dur);
-						tmpScore += penaltyUpperarousal;
-					}
-					// load values higher than 1 are penalized with a fixed part and a part dependent on the load
-					else {
-						double penaltyStart = (upperMarginalUtility/0.02 * dur);
-						double penaltyUpperarousal = penaltyStart + (upperMarginalUtility * load * dur);
-						tmpScore += penaltyUpperarousal;
-						//log.info("an overarousal penalty of " +penalty+ " is given due to load " +load);
-					}
-				}
-			}
-		}
+//		//TODO: how to handle activities that last longer than 24 hours...
+//		if (act.getType().startsWith("s")|| act.getType().startsWith("g")) {
+//			ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
+//			double capacity = facility.getActivityOptions().get(act.getType()).getCapacity();
+//			double lowerBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "LowerThreshold");
+//			//log.info("lower bound is " +lowerBound);
+//			double lowerMarginalUtility = ((Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal"))/3600;
+//
+//			double upperBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "UpperThreshold");
+//			//log.info("upper bound is " +upperBound);
+//			double upperMarginalUtility = ((Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal"))/3600;
+//
+//			
+//			int timeBinStart = timeBinIndex(activityStart);
+//			int timeBinEnd = timeBinIndex(activityEnd);
+//			//log.info("timeBinStart ("+activityStart+") is " +timeBinStart+ " and timeBinEnd ("+activityEnd+") is " +timeBinEnd+ ", therefore numberOfTimeBins is " +(timeBinEnd-timeBinStart));
+//			double offsetStart = ((timeBinStart+1)*900)-activityStart;
+//			double offsetEnd = 1;
+//			if ((activityEnd/900)>95){
+//				offsetEnd = 900; //activityEnd-(95*900);
+//			}
+//			else {
+//			offsetEnd = 900+(timeBinEnd*900)-activityEnd;
+//			}
+//						
+//			for (int i = 0; i < (timeBinEnd-timeBinStart); i++){
+//				double occupancy = this.facilityOccupancies.get(facility.getId()).getCurrentOccupancy((timeBinStart+i));
+//				//log.info("for facility " +facility.getId()+ " and agent " +plan.getPerson().getId()+ " current occupancy is: " +occupancy+ " while performing " +act.getType()+ " activity at "+(activityStart+i*900)/3600);
+//				double load = (occupancy*this.scaleNumberOfPersons)/capacity;
+//				//log.info("load is " +load);
+//				double dur = 900;
+//				if (i == 0){
+//					if (timeBinEnd==timeBinStart){
+//						dur = duration;
+//						//log.info("firstTimeBin, duration is: " +dur);
+//					}
+//					else{
+//					dur = offsetStart;
+//					//log.info("firstTimeBin, duration is: " +dur);
+//					}
+//				}
+//				if (i+1 == (timeBinEnd-timeBinStart)){
+//					dur = offsetEnd;
+//					//log.info("lastTimeBin, duration is: " +dur);
+//				}
+//				// -----------------------disutility of agent interaction underarousal
+//				if ((load < lowerBound)) {
+//					if (load < 0.02){
+//						load = 0.02;
+//					}
+//					double penaltyUnderarousal = (lowerMarginalUtility/load * dur);
+//					if (penaltyUnderarousal>0){
+//						log.info("positive penaltyUnderarousal of " +penaltyUnderarousal+ ", load = " +load+ ", dur = "+dur+" beta = "+lowerMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
+//						Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
+//					}
+//					tmpScore += penaltyUnderarousal;
+//				//	log.info("lowerMarginalUtility is " +lowerMarginalUtility);
+//				//	log.info("an underarousal penalty of " +penaltyUnderarousal+ " is given due to load " +load);
+//				}
+//				// -----------------------disutility of agent interaction overarousal
+//				if ((load > upperBound)) {
+//					//load values between upperBound and 1 are treated as underarousal loads
+//					if (load < 1){
+//						double loadTemp = 1-load;
+//						if (loadTemp < 0.02){
+//							loadTemp = 0.02;
+//						}
+//						double penaltyUpperarousal = (upperMarginalUtility/loadTemp * dur);
+//						if (penaltyUpperarousal>0){
+//							log.info("positive penaltyUpperarousal of " +penaltyUpperarousal+ ", load = " +loadTemp+ ", dur = "+dur+" beta = "+upperMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
+//							Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
+//
+//						}
+//						tmpScore += penaltyUpperarousal;
+//					//	log.info("upperMarginalUtility is " +upperMarginalUtility);
+//					//	log.info("an overarousal penalty of " +penaltyUpperarousal+ " is given due to load " +load);
+//					}
+//					// load values higher than 1 are penalized with a fixed part and a part dependent on the load
+//					else {
+//						double penaltyStart = (upperMarginalUtility/0.02);
+//						double penaltyUpperarousal = ((penaltyStart + upperMarginalUtility) * load * dur);
+//						if (penaltyUpperarousal>0){
+//							log.info("positive penaltyUpperarousal of " +penaltyUpperarousal+ ", load = " +load+ ", dur = "+dur+" beta = "+upperMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
+//							Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
+//						}
+//						tmpScore += penaltyUpperarousal;
+//					//	log.info("an overarousal penalty of " +penaltyUpperarousal+ " is given due to load " +load);
+//					}
+//				}
+//			}
+//		}
 				
 //		log.info("for person " +this.plan.getPerson().getId()+ " total activity score is: " +tmpScore);
 		
@@ -243,52 +272,64 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		// openInterval[1] will be the closing time
 		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
 
-		boolean foundAct = false;
+//		boolean foundAct = false;
 
 		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
-		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
-		String facilityActType = null;
 		Set<OpeningTime> opentimes = null;
+		if (!act.equals("home")) {
+			if (!facility.getActivityOptions().containsKey("home")){
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wk);
+				for (OpeningTime opentime : opentimes) {
 
-		while (facilityActTypeIterator.hasNext() && !foundAct) {
-
-			facilityActType = facilityActTypeIterator.next();
-			if (act.getType().equals(facilityActType)) {
-				foundAct = true;
-
-				// choose appropriate opentime:
-				// either wed or wkday
-				// if none is given, use undefined opentimes
-				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wed);
-				if (opentimes == null) {
-					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wkday);
+					openInterval[0] = opentime.getStartTime();
+					openInterval[1] = opentime.getEndTime();
 				}
-				if (opentimes != null) {
-					// ignoring lunch breaks with the following procedure:
-					// if there is only one wed/wkday open time interval, use it
-					// if there are two or more, use the earliest start time and the latest end time
-					openInterval[0] = Double.MAX_VALUE;
-					openInterval[1] = Double.MIN_VALUE;
-
-					for (OpeningTime opentime : opentimes) {
-
-						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
-						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
-					}
-
-				}
-
 			}
-
 		}
+		
+//		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
+//		String facilityActType = null;
+//		Set<OpeningTime> opentimes = null;
 
-		if (!foundAct) {
-			log.info("Plan activity type: " +act.getType());
-			log.info("Facility activity type: " +facilityActType);
-			log.info("FacilityId: " +facility.getId());
-			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
-
-		}
+//		while (facilityActTypeIterator.hasNext() && !foundAct) {
+//
+//			facilityActType = facilityActTypeIterator.next();
+//			if (act.getType().equals(facilityActType)) {
+//				foundAct = true;
+//
+//				// choose appropriate opentime:
+//				// either wed or wkday
+//				// if none is given, use undefined opentimes
+//				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wed);
+//				if (opentimes == null) {
+//					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wkday);
+//				}
+//				if (opentimes != null) {
+//					// ignoring lunch breaks with the following procedure:
+//					// if there is only one wed/wkday open time interval, use it
+//					// if there are two or more, use the earliest start time and the latest end time
+//					openInterval[0] = Double.MAX_VALUE;
+//					openInterval[1] = Double.MIN_VALUE;
+//
+//					for (OpeningTime opentime : opentimes) {
+//
+//						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
+//						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+//					}
+//
+//				}
+//
+//			}
+//
+//		}
+//
+//		if (!foundAct) {
+//			log.info("Plan activity type: " +act.getType());
+//			log.info("Facility activity type: " +facilityActType);
+//			log.info("FacilityId: " +facility.getId());
+//			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+//
+//		}
 
 		return openInterval;
 

@@ -41,13 +41,13 @@ public class FacilityOccupancy {
 		
 	FacilityOccupancy(int numberOfTimeBins, double scaleNumberOfPersons) {
 		this.numberOfTimeBins = numberOfTimeBins;
-		this.arrivals = new int [numberOfTimeBins];
-		this.departures = new int [numberOfTimeBins];
-		this.occupancy = new int [numberOfTimeBins];
+		this.arrivals = new int [(numberOfTimeBins+16)];
+		this.departures = new int [(numberOfTimeBins+16)];
+		this.occupancy = new int [(numberOfTimeBins+16)];
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 
 
-		for (int i = 0; i < numberOfTimeBins; i++){
+		for (int i = 0; i < (numberOfTimeBins+16); i++){
 			this.arrivals[i] = 0;
 			this.departures[i] = 0;
 			this.occupancy[i] = 0;
@@ -73,11 +73,11 @@ public class FacilityOccupancy {
 			return;
 		}
 		int timeBinIndex = this.timeBinIndex(time);	
-		if (timeBinIndex==0){
-			this.arrivals[timeBinIndex] += 1;
+		if (timeBinIndex<1){
+			this.arrivals[0] += 1;
 		}
 		else {
-			this.arrivals[timeBinIndex-1] += 1;
+			this.arrivals[(timeBinIndex-1)] += 1;
 		}
 		//log.info("arrival at: " + time + " bin: " + timeBinIndex);
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
@@ -91,7 +91,12 @@ public class FacilityOccupancy {
 			return;
 		}
 		int timeBinIndex = this.timeBinIndex(time);
-		this.departures[timeBinIndex-1]+=1;
+		if (timeBinIndex<1){
+			this.departures[0]+=1;
+		}
+		else {
+			this.departures[(timeBinIndex-1)]+=1;
+		}
 		//log.info("departure at: " + time + " bin: " + timeBinIndex);
 	}
 	
@@ -163,7 +168,7 @@ public class FacilityOccupancy {
 	}
 	
 	/* 
-	 * All values >= 86400s (24h) are merged into the last time bin
+	 * All values >= 86400 (24h) are merged into the last time bin
 	 */
 	public int timeBinIndex(double time) {
 		int lastBinIndex = this.numberOfTimeBins-1;
