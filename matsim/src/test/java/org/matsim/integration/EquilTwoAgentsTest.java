@@ -33,7 +33,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scoring.ActivityUtilityParameters;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -42,13 +45,19 @@ import org.matsim.testcases.MatsimTestCase;
  * to check the calculation of scores and traveltimes in the framework.
  * The scores and traveltimes calculated by MATSim are compared
  * with values analytically computed by hand.
+ * 
+ * Note: This used to be a "white box" test, where intermediate results were pulled
+ * from the scoring function. However, this is an undefined state of the scoring
+ * function -- the contract says you have to call finish on the scoring function
+ * before it delivers a meaningful result. -- michaz 2012
+ * 
  * @author dgrether
  */
 public class EquilTwoAgentsTest extends MatsimTestCase {
 
 	/*package*/ final static Logger log = Logger.getLogger(EquilTwoAgentsTest.class);
 
-	protected EventsToScore planScorer = null;
+	private EventsToScore planScorer = null;
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
@@ -59,6 +68,8 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 	/*package*/ final static Id id22 = new IdImpl("22");
 	/*package*/ final static Id id23 = new IdImpl("23");
 
+	private TestSingleIterationEventHandler handler;
+
 	@Override
 	protected void tearDown() throws Exception {
 		this.planScorer = null;
@@ -66,28 +77,37 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 	}
 
 	public void testSingleIterationPlansV4() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
+		final Config config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
 		String netFileName = "test/scenarios/equil/network.xml";
 		config.network().setInputFile(netFileName);
 		config.plans().setInputFile(this.getClassInputDirectory() + "plans2.xml");
-
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
-
 		controler.addControlerListener(new StartupListener() {
-
-			public void notifyStartup(final StartupEvent event) {
+			public void notifyStartup(final StartupEvent event) {	
 				double agent1LeaveHomeTime = ((PlanImpl) controler.getPopulation().getPersons().get(id1).getPlans().get(0)).getFirstActivity().getEndTime();
 				double agent2LeaveHomeTime = ((PlanImpl) controler.getPopulation().getPersons().get(id2).getPlans().get(0)).getFirstActivity().getEndTime();
-				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-
-				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getScenario(), controler.getScoringFunctionFactory());
+				handler = new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime);
+				controler.getEvents().addHandler(handler);
+				
+				// Construct a scoring function which does not score the home activity. Because the analytical calculations against which 
+				// we are testing here are based on that.
+				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
+				ActivityUtilityParameters activityUtilityParameters = new ActivityUtilityParameters("h", 1.0, 123456789.0);
+				activityUtilityParameters.setScoreAtAll(false);
+				params.utilParams.put("h", activityUtilityParameters);
+				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getScenario(), new CharyparNagelScoringFunctionFactory(params, controler.getScenario().getNetwork()));
+				
 				controler.getEvents().addHandler(EquilTwoAgentsTest.this.planScorer);
 			}
 		});
 
 		controler.run();
+		this.planScorer.finish();
+
+		assertEquals(handler.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(id1), EPSILON);
+		assertEquals(handler.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(id2), EPSILON);
 	}
 
 
@@ -138,7 +158,6 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 		public void handleEvent(final ActivityStartEvent e) {
 			log.debug("Start Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.getPersonId().toString());
-			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()));
 			if (e.getPersonId().equals(id1)) {
 				if (e.getActType().equalsIgnoreCase("w")) {
 					//test the time
@@ -147,17 +166,14 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					log.debug("Car tt to work is: " + (this.agentOneTime - this.agent1LeaveHomeTime));
 					assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 
-					//test the score
 					//0.25 h = 15 min = 900 s fstt of agent 1 (car)
 					this.agentOneScore = 0.25 * -6.0;
-					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()), EPSILON);
 				}
 				else { // it is home
 					//test the time
 					this.agentOneTime = this.agentOneTime + 359.0;
 					assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 
-					//test the score
 					//must be negative score for traveling to work (i.e. value of agentOneScore)
 					//plus activity score 8 h work typical = 8h, beta_perf = 6
 					double deltaScore = (6.0*8.0*Math.log(8.0 / (8.0*Math.exp(-10.0/8.0))));
@@ -165,7 +181,6 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					this.agentOneScore = this.agentOneScore + deltaScore;
 					//plus negative score for traveling home 39 minutes
 					this.agentOneScore = this.agentOneScore + (39.0/60.0 * -6.0);
-					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()), EPSILON);
 				}
 			}
 			else if (e.getPersonId().equals(id2)) {
@@ -176,10 +191,8 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					this.agentTwoTime = this.agentTwoTime + 1797.0; // 30.0 * 60.0 - 3.0
 					assertEquals(this.agentTwoTime, e.getTime(), EPSILON);
 
-					//test the score
 					//1097s free speed travel time of agent 2 (non-car)
 					this.agentTwoScore = 1797.0/3600.0 * -3.0;
-					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()), EPSILON);
 				}
 				else {
 					//test the time
@@ -188,7 +201,6 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					this.agentTwoTime = this.agentTwoTime + 4677.0; // 78.0 * 60.0 - 3.0
 					assertEquals(this.agentTwoTime, e.getTime(), EPSILON);
 
-					//test the score
 					//must be negative score for traveling to work (i.e. value of agentTwoScore)
 					//plus activity score 8 h work typical = 8h, beta_perf = 6
 					this.agentTwoScore = this.agentTwoScore + (6.0*8.0*Math.log(8.0 / (8.0*Math.exp(-10.0/8.0))));
@@ -196,18 +208,13 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					this.agentTwoScore = this.agentTwoScore + (this.agent2LeaveHomeTime + 1797.0 - 7.0*3600) * (-18.0 / 3600.0);
 					//plus negative score for traveling home 4677.0 seconds by non-car mode (should be 78 min but is less!)
 					this.agentTwoScore = this.agentTwoScore + (4677.0/3600.0 * -3.0);
-					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()), EPSILON);
 
-					EquilTwoAgentsTest.this.planScorer.finish();
-					log.debug("Score 1: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(id1));
-					log.debug("Score 2: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()));
 				}
 			}
 		}
 
 		public void handleEvent(final ActivityEndEvent e) {
 			log.debug("End Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.getPersonId().toString());
-			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()));
 
 			if (e.getPersonId().equals(id1)) {
 				if (e.getActType().equalsIgnoreCase("w")) {

@@ -39,6 +39,7 @@ public class ActivityUtilityParameters implements MatsimParameters {
 	private double closingTime = -1;
 	private double latestStartTime = -1;
 	private double earliestEndTime = -1;
+	private boolean scoreAtAll=true;
 
 	public ActivityUtilityParameters(final String type, final double priority, final double typicalDuration) {
 		//if typical duration is <=48 seconds (and priority=1) then zeroUtilityDuration becomes 0.0 because of the double precision. This means it is not possible
@@ -109,6 +110,14 @@ public class ActivityUtilityParameters implements MatsimParameters {
 
 	public final double getEarliestEndTime() {
 		return this.earliestEndTime;
+	}
+
+	public boolean isScoreAtAll() {
+		return scoreAtAll;
+	}
+
+	public void setScoreAtAll(boolean scoreAtAll) {
+		this.scoreAtAll = scoreAtAll;
 	}
 
 }

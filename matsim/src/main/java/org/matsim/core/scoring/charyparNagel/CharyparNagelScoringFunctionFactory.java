@@ -49,6 +49,12 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
         this.network = network;
 	}
 
+	public CharyparNagelScoringFunctionFactory(CharyparNagelScoringParameters params, Network network) {
+		this.params = params;
+		this.network = network;
+	}
+
+
 	/**
 	 * puts the scoring functions together, which form the
 	 * CharyparScoringFunction
