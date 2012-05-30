@@ -191,6 +191,8 @@ public class CreatePopulation {
 	}
 	
 	private double addOtherActs(PlanImpl plan, PersonImpl person, String day, double endTime) {
+		int offset = this.random.nextInt();
+		Random rand = new Random(4711+offset);
 		DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
 //		boolean checkShopping = false;
 //		boolean checkLeisure = false;
@@ -208,7 +210,7 @@ public class CreatePopulation {
 //			checkShopping = true;
 //		}
 				
-		if (decisionModel.doesAct("shop_retail", day) //&& checkShopping
+		if (rand.nextDouble()<0.4 //&& checkShopping
 				) {
 //		if (checkShopping) {
 			
@@ -222,7 +224,7 @@ public class CreatePopulation {
 			plan.addActivity(act);
 		}
 		// check leisure
-		if (decisionModel.doesAct("shop_service", day) //&& checkLeisure
+		if (rand.nextDouble()<0.05 //&& checkLeisure
 				) {
 //		if (checkLeisure) {
 			plan.addLeg(new LegImpl("car"));
@@ -234,7 +236,7 @@ public class CreatePopulation {
 			act.setFacilityId(facility.getId());
 			plan.addActivity(act);
 		}
-		if (decisionModel.doesAct("sports_fun", day) //&& checkLeisure
+		if (rand.nextDouble()<0.3 //&& checkLeisure
 				) {
 			plan.addLeg(new LegImpl("car"));
 			TreeMap<Id, ActivityFacility> facilitiesSportsFun = this.scenario.getActivityFacilities().getFacilitiesForActivityType("sports_fun");
@@ -245,7 +247,7 @@ public class CreatePopulation {
 			act.setFacilityId(facility.getId());
 			plan.addActivity(act);
 		}
-		if (decisionModel.doesAct("gastro_culture", day) //&& checkLeisure
+		if (rand.nextDouble()<0.3 //&& checkLeisure
 				) {
 			plan.addLeg(new LegImpl("car"));
 			TreeMap<Id, ActivityFacility> facilitiesGastroCulture = this.scenario.getActivityFacilities().getFacilitiesForActivityType("gastro_culture");

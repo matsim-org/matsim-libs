@@ -182,7 +182,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 				out.flush();
 				out.close();
 
-				out_summary.write("Facility_id\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\t11\t12\t13\t14\t15\t16\t17\t18\t19\t20\t21\t22\t23");
+				out_summary.write("Facility_id\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\t11\t12\t13\t14\t15\t16\t17\t18\t19\t20\t21\t22\t23\tshop_retail\tshop_service\tsports_fun\tgastro_culture");
 				out_summary.newLine();
 				for (ActivityFacility facility : facilities.getFacilities().values()) {
 					if (facility.getActivityOptions().containsKey("shop_retail") || facility.getActivityOptions().containsKey("shop_service")
@@ -219,8 +219,32 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 								(double)Math.round(facilityOccupancy.getCurrentOccupancy(84)/capacity*1000)/1000 + "\t"+
 								(double)Math.round(facilityOccupancy.getCurrentOccupancy(88)/capacity*1000)/1000 + "\t"+
 								(double)Math.round(facilityOccupancy.getCurrentOccupancy(92)/capacity*1000)/1000 + "\t"
-
 								+ "\t");
+							
+							if (facility.getActivityOptions().containsKey("shop_retail")) {
+								out_summary.write("1");
+							}
+							else {
+								out_summary.write("0");
+							}
+							if (facility.getActivityOptions().containsKey("shop_service")) {
+								out_summary.write("1");
+							}
+							else {
+								out_summary.write("0");
+							}
+							if (facility.getActivityOptions().containsKey("sports_fun")) {
+								out_summary.write("1");
+							}
+							else {
+								out_summary.write("0");
+							}
+							if (facility.getActivityOptions().containsKey("gastro_culture")) {
+								out_summary.write("1");
+							}
+							else {
+								out_summary.write("0");
+							}
 						out_summary.newLine();
 					}
 				}

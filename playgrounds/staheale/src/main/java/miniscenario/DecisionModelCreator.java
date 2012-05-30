@@ -33,9 +33,9 @@ public class DecisionModelCreator {
 		
 		model.setFrequency("work", "mon-fri", 1);
 		model.setFrequency("shop_retail", "mon-fri", 0.4);
-		model.setFrequency("shop_service", "mon-fri", 0.02);
-		model.setFrequency("sports_fun", "mon-fri", 0.3);
-		model.setFrequency("gastro_culture", "mon-fri", 0.3);
+		model.setFrequency("shop_service", "mon-fri", 0.1);
+		model.setFrequency("sports_fun", "mon-fri", 0.1);
+		model.setFrequency("gastro_culture", "mon-fri", 0.1);
 
 		
 		model.setFrequency("work", "sat", 0);
