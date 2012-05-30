@@ -28,7 +28,6 @@ import java.lang.Thread.UncaughtExceptionHandler;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -196,11 +195,15 @@ public class KnSimplifiedController {
 		this.events.addHandler(new CalcLegTimes());
 
 		this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.getNetwork() );
+		Logger.getLogger(this.getClass()).fatal("in the original controler, this is passed into some functionality via " +
+				"controler.getScoringFunctionFactory().  Aborting ...") ;
+		System.exit(-1) ;
 
 		this.strategyManager = new StrategyManager() ;
 
 		StrategyManagerConfigLoader.load(this.dummyCtrl,strategyManager) ;
-		throw new RuntimeException("this will not work with the above line.  aborting ...") ;
+		Logger.getLogger(this.getClass()).fatal("this will not work with the above line.  aborting ...") ;
+		System.exit(-1) ;
 		
 	}
 	private void loadCoreListeners() {
