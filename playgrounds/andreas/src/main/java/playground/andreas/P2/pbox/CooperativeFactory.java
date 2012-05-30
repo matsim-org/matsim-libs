@@ -46,6 +46,8 @@ public class CooperativeFactory {
 			return new BasicCooperative(id, this.pConfig, this.franchise);
 		} else if(this.pConfig.getCoopType().equalsIgnoreCase(InitCooperative.COOP_NAME)){
 			return new InitCooperative(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getCoopType().equalsIgnoreCase(ExtendAndReduceCooperative.COOP_NAME)){
+			return new ExtendAndReduceCooperative(id, this.pConfig, this.franchise);
 		} else {
 			log.error("There is no coop type specified. " + this.pConfig.getCoopType() + " unknown");
 			return null;
