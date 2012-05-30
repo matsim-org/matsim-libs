@@ -285,5 +285,11 @@ public class StrategyManager implements MatsimManager {
 		return Collections.unmodifiableList(this.strategies);
 	}
 
+	/**
+	 * @return the weights of the strategies, in the same order as the strategies returned by {@link #getStrategies()}
+	 */
+	public final List<Double> getWeights() {
+		return Collections.unmodifiableList(this.weights);
+	}
 
 }
