@@ -3,6 +3,7 @@ package org.matsim.core.scoring;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -22,6 +23,7 @@ public class PlanElementsToScore implements ActivityHandler, LegHandler{
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	
+	private static Logger logger = Logger.getLogger(PlanElementsToScore.class);
 
 	public PlanElementsToScore(Scenario scenario, ScoringFunctionFactory scoringFunctionFactory, double learningRate) {
 		this.scenario = scenario;
@@ -81,6 +83,7 @@ public class PlanElementsToScore implements ActivityHandler, LegHandler{
 	public void finish() {
 		for (Map.Entry<Id, Tuple<Plan, ScoringFunction>> entry : this.agentScorers.entrySet()) {
 			Plan plan = entry.getValue().getFirst();
+			logger.trace("Now scoring agent " + plan.getPerson().getId());
 			ScoringFunction sf = entry.getValue().getSecond();
 			sf.finish();
 			double score = sf.getScore();

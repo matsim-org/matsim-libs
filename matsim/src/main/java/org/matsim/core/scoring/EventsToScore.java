@@ -64,6 +64,7 @@ LinkEnterEventHandler, TravelEventHandler {
 	private Scenario scenario;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private double learningRate;
+	private boolean finished = false;
 
 	/**
 	 * Initializes EventsToScore with a learningRate of 1.0.
@@ -150,6 +151,7 @@ LinkEnterEventHandler, TravelEventHandler {
 	public void finish() {
 		eventsToActivities.finish();
 		handler.finish();
+		finished = true;
 	}
 
 	/**
@@ -160,6 +162,9 @@ LinkEnterEventHandler, TravelEventHandler {
 	 *         (learningrate)
 	 */
 	public double getAveragePlanPerformance() {
+		if (!finished) {
+			throw new IllegalStateException("Must call finish first.");
+		}
 		return handler.getAveragePlanPerformance();
 	}
 
@@ -172,6 +177,9 @@ LinkEnterEventHandler, TravelEventHandler {
 	 * @return The score of the specified agent.
 	 */
 	public Double getAgentScore(final Id agentId) {
+		if (!finished) {
+			throw new IllegalStateException("Must call finish first.");
+		}
 		ScoringFunction scoringFunction = getScoringFunctionForAgent(agentId);
 		if (scoringFunction == null)
 			return null;
@@ -183,6 +191,7 @@ LinkEnterEventHandler, TravelEventHandler {
 		this.eventsToActivities.reset(iteration);
 		this.eventsToLegs.reset(iteration);
 		initHandlers(scenario, scoringFunctionFactory, learningRate);
+		finished = false;
 	}
 
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
