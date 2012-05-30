@@ -73,7 +73,9 @@ public class RblMerger {
 		String eventsFromTransitScheduleOutFilename = "F:/bvg4/output/eventsFromTransitScheduleOut.xml";
 		
 		Set<String> onlyTakeDeparturesFromTheseRblDates = new TreeSet<String>();
-		onlyTakeDeparturesFromTheseRblDates.add("4811");		
+		onlyTakeDeparturesFromTheseRblDates.add("4811");
+		
+		double timeBinSize = Double.MAX_VALUE;
 		
 		String[] fahrtDataFilenames = new String[]{
 				"F:/bvg4/input/IST_und_SOLL_03-05-Januar2012/fahrt_ist_187_478847894790csv.lst",
@@ -114,16 +116,16 @@ public class RblMerger {
 //		rblMerger.dumpFilteredTransitSchedule(filteredTransitScheduleDumpFile, fahrtEvents);
 		
 		fahrzeitEvents = rblMerger.substituteStopNames(stopNamesMapFilename, fahrzeitEvents, false);
-		Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap = rblMerger.accumulateData(fahrzeitEvents);
+		HashMap<Id,Map<Id,Map<Id,Map<Id,StopStatsContainer>>>> line2route2stop2StatsMap = rblMerger.accumulateData(fahrzeitEvents, timeBinSize);
 		rblMerger.writeStats(line2route2stop2StatsMap, statsOutFilename);
 		
 		TransitSchedule newTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		rblMerger.addStopsToSchedule(newTransitSchedule, line2route2stop2StatsMap);
 		
-		HashMap<Id, HashMap<Id, List<TransitRouteStop>>> line2route2TransitRouteStopsList = rblMerger.createTransitRouteStops(newTransitSchedule, line2route2stop2StatsMap, fahrzeitEvents);
-		HashMap<Id, HashMap<Id, NetworkRoute>> line2route2networkRouteMap = rblMerger.createNetworkRoutes(line2route2TransitRouteStopsList);
-		rblMerger.createLinesAndRoutes(newTransitSchedule, line2route2stop2StatsMap, line2route2TransitRouteStopsList, line2route2networkRouteMap);
-		rblMerger.addDepartures(newTransitSchedule, fahrtEvents, onlyTakeDeparturesFromTheseRblDates);
+		HashMap<Id,HashMap<Id,HashMap<Id,List<TransitRouteStop>>>> line2route2timeBin2TransitRouteStopsList = rblMerger.createTransitRouteStops(newTransitSchedule, line2route2stop2StatsMap, fahrzeitEvents, timeBinSize);
+		HashMap<Id,HashMap<Id,HashMap<Id,NetworkRoute>>> line2route2timeBin2networkRouteMap = rblMerger.createNetworkRoutes(line2route2timeBin2TransitRouteStopsList);
+		rblMerger.createLinesAndRoutes(newTransitSchedule, line2route2stop2StatsMap, line2route2timeBin2TransitRouteStopsList, line2route2timeBin2networkRouteMap);
+		rblMerger.addDepartures(newTransitSchedule, fahrtEvents, onlyTakeDeparturesFromTheseRblDates, timeBinSize);
 		
 		newTransitSchedule = rblMerger.cleanUpSchedule(newTransitSchedule);
 		rblMerger.writeTransitSchedule(newTransitSchedule, transitScheduleOutFilename, vehiclesOutFilename);		
@@ -303,13 +305,13 @@ public class RblMerger {
 
 
 	/**
-	 * Accumulate arrival and departure offsets for all lines 2 routes 2 stops
+	 * Accumulate arrival and departure offsets for all lines 2 routes 2 time bins 2 stops
 	 * 
 	 * @param fahrzeitEvents
 	 * @return
 	 */
-	private Map<Id, Map<Id, Map<Id, StopStatsContainer>>> accumulateData(List<FahrzeitEvent> fahrzeitEvents) {
-		Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap = new HashMap<Id, Map<Id,Map<Id,StopStatsContainer>>>();
+	private HashMap<Id,Map<Id,Map<Id,Map<Id,StopStatsContainer>>>> accumulateData(List<FahrzeitEvent> fahrzeitEvents, double timeBinSize) {
+		HashMap<Id,Map<Id,Map<Id,Map<Id,StopStatsContainer>>>> line2route2timeBin2stop2StatsMap = new HashMap<Id, Map<Id, Map<Id, Map<Id,StopStatsContainer>>>>();
 		int fahrzeitEventsDropped = 0;
 		
 		for (FahrzeitEvent event : fahrzeitEvents) {
@@ -321,17 +323,22 @@ public class RblMerger {
 			Id lineId = event.getFahrtEvent().getLineId();
 			Id routeId = event.getFahrtEvent().getRouteId();
 			Id stopId = event.getStopId();
+			int firstStopDepartureTimeBin = (int) (event.getDepartureTimeIst() / timeBinSize);
 			
-			if (line2route2stop2StatsMap.get(lineId) == null) {
-				line2route2stop2StatsMap.put(lineId, new HashMap<Id, Map<Id,StopStatsContainer>>());
+			if (line2route2timeBin2stop2StatsMap.get(lineId) == null) {
+				line2route2timeBin2stop2StatsMap.put(lineId, new HashMap<Id, Map<Id, Map<Id,StopStatsContainer>>>());
 			}
 			
-			if (line2route2stop2StatsMap.get(lineId).get(routeId) == null) {
-				line2route2stop2StatsMap.get(lineId).put(routeId, new HashMap<Id, StopStatsContainer>());
+			if (line2route2timeBin2stop2StatsMap.get(lineId).get(routeId) == null) {
+				line2route2timeBin2stop2StatsMap.get(lineId).put(routeId, new HashMap<Id, Map<Id, StopStatsContainer>>());
 			}
 			
-			if (line2route2stop2StatsMap.get(lineId).get(routeId).get(stopId) == null) {
-				line2route2stop2StatsMap.get(lineId).get(routeId).put(stopId, new StopStatsContainer(stopId));
+			if (line2route2timeBin2stop2StatsMap.get(lineId).get(routeId).get(new IdImpl(firstStopDepartureTimeBin)) == null) {
+				line2route2timeBin2stop2StatsMap.get(lineId).get(routeId).put(new IdImpl(firstStopDepartureTimeBin), new HashMap<Id, StopStatsContainer>());
+			}
+			
+			if (line2route2timeBin2stop2StatsMap.get(lineId).get(routeId).get(new IdImpl(firstStopDepartureTimeBin)).get(stopId) == null) {
+				line2route2timeBin2stop2StatsMap.get(lineId).get(routeId).get(new IdImpl(firstStopDepartureTimeBin)).put(stopId, new StopStatsContainer(stopId));
 			}
 			
 			double arrivalOffset = event.getArrivalTimeIstAtStop() - event.getDepartureTimeIst();
@@ -347,13 +354,13 @@ public class RblMerger {
 				departureOffset += 86400.0;
 			}
 			
-			line2route2stop2StatsMap.get(lineId).get(routeId).get(event.getStopId()).addArrival(arrivalOffset);
-			line2route2stop2StatsMap.get(lineId).get(routeId).get(event.getStopId()).addDeparture(departureOffset);
+			line2route2timeBin2stop2StatsMap.get(lineId).get(routeId).get(new IdImpl(firstStopDepartureTimeBin)).get(event.getStopId()).addArrival(arrivalOffset);
+			line2route2timeBin2stop2StatsMap.get(lineId).get(routeId).get(new IdImpl(firstStopDepartureTimeBin)).get(event.getStopId()).addDeparture(departureOffset);
 		}
 		
 		log.info("Finished accumulating arrival and departure times...");
 		log.info("Dropped " + fahrzeitEventsDropped + " entries, since they are not linked to a fahrt");
-		return line2route2stop2StatsMap;	
+		return line2route2timeBin2stop2StatsMap;	
 	}
 	
 	/**
@@ -363,26 +370,29 @@ public class RblMerger {
 	 * @param line2route2stop2StatsMap
 	 * @return
 	 */
-	private Set<Id> addStopsToSchedule(TransitSchedule newTransitSchedule,	Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap) {
+	private Set<Id> addStopsToSchedule(TransitSchedule newTransitSchedule,	HashMap<Id,Map<Id,Map<Id,Map<Id,StopStatsContainer>>>> line2route2stop2StatsMap) {
 		
 		Set<Id> stopIdsNotFound = new TreeSet<Id>();
 		int stopFacilitiesNotFound = 0;
 		
-		for (Map<Id, Map<Id, StopStatsContainer>> route2stop2StatsMap : line2route2stop2StatsMap.values()) {
+		for (Map<Id, Map<Id, Map<Id, StopStatsContainer>>> route2timeBin2stop2StatsMap : line2route2stop2StatsMap.values()) {
 			
-			for (Map<Id, StopStatsContainer> stop2StatsMap : route2stop2StatsMap.values()) {
+			for (Map<Id, Map<Id, StopStatsContainer>> timeBin2stop2StatsMap : route2timeBin2stop2StatsMap.values()) {
 
-				for (Id stopId : stop2StatsMap.keySet()) {
-					// get the transit schedule from the reference file and add it to the new transit schedule file
-					TransitStopFacility transitStopFacility = scenario.getTransitSchedule().getFacilities().get(stopId);
-					if(transitStopFacility == null){
-						stopIdsNotFound.add(stopId);
-						stopFacilitiesNotFound++;
-						log.error("Stop facility " + stopId + " not found");
-					} else {
-						if(!newTransitSchedule.getFacilities().containsKey(transitStopFacility.getId())){
-							newTransitSchedule.addStopFacility(transitStopFacility);
-						}						
+				for (Map<Id, StopStatsContainer> stop2StatsMap : timeBin2stop2StatsMap.values()) {
+
+					for (Id stopId : stop2StatsMap.keySet()) {
+						// get the transit schedule from the reference file and add it to the new transit schedule file
+						TransitStopFacility transitStopFacility = scenario.getTransitSchedule().getFacilities().get(stopId);
+						if(transitStopFacility == null){
+							stopIdsNotFound.add(stopId);
+							stopFacilitiesNotFound++;
+							log.error("Stop facility " + stopId + " not found");
+						} else {
+							if(!newTransitSchedule.getFacilities().containsKey(transitStopFacility.getId())){
+								newTransitSchedule.addStopFacility(transitStopFacility);
+							}
+						}
 					}
 				}
 			}
@@ -398,17 +408,21 @@ public class RblMerger {
 	 * @param newTransitSchedule
 	 * @param line2route2stop2StatsMap
 	 * @param fahrzeitEvents
+	 * @param timeBinSize 
 	 * @return
 	 */
-	private HashMap<Id,HashMap<Id,List<TransitRouteStop>>> createTransitRouteStops(TransitSchedule newTransitSchedule, Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap,	List<FahrzeitEvent> fahrzeitEvents) {
-		HashMap<Id, HashMap<Id, List<TransitRouteStop>>> line2route2TransitRouteStopsList = new HashMap<Id, HashMap<Id, List<TransitRouteStop>>>();
+	private HashMap<Id,HashMap<Id,HashMap<Id,List<TransitRouteStop>>>> createTransitRouteStops(TransitSchedule newTransitSchedule, HashMap<Id, Map<Id, Map<Id, Map<Id, StopStatsContainer>>>> line2route2stop2StatsMap,	List<FahrzeitEvent> fahrzeitEvents, double timeBinSize) {
+		HashMap<Id,HashMap<Id,HashMap<Id,List<TransitRouteStop>>>> line2route2timeBin2TransitRouteStopsList = new HashMap<Id, HashMap<Id, HashMap<Id, List<TransitRouteStop>>>>();
 		
 		Id lastLineId = null;
 		Id lastRouteId = null;
+		Id lastTimeBin = null;
 		List<TransitRouteStop> lastTransitRouteStops = null;
 		
 		// for each event
 		for (FahrzeitEvent fahrzeitEvent : fahrzeitEvents) {
+			
+			Id currentTimeBinOfFirstStop = new IdImpl((int) (fahrzeitEvent.getDepartureTimeIst() / timeBinSize));
 			
 			// check, if we have a complete fahrzeit event
 			if (fahrzeitEvent.getFahrtEvent() == null) {
@@ -417,36 +431,43 @@ public class RblMerger {
 			}			
 			
 			// check, if we need to process this event
-			if(line2route2TransitRouteStopsList.get(fahrzeitEvent.getFahrtEvent().getLineId()) != null){
-				if(line2route2TransitRouteStopsList.get(fahrzeitEvent.getFahrtEvent().getLineId()).get(fahrzeitEvent.getFahrtEvent().getRouteId()) != null){
-					// this route of this line was porcessed - skip this event
-					continue;
+			if(line2route2timeBin2TransitRouteStopsList.get(fahrzeitEvent.getFahrtEvent().getLineId()) != null){
+				if(line2route2timeBin2TransitRouteStopsList.get(fahrzeitEvent.getFahrtEvent().getLineId()).get(fahrzeitEvent.getFahrtEvent().getRouteId()) != null){
+					if(line2route2timeBin2TransitRouteStopsList.get(fahrzeitEvent.getFahrtEvent().getLineId()).get(fahrzeitEvent.getFahrtEvent().getRouteId()).get(currentTimeBinOfFirstStop) != null){
+						// this route of this line was porcessed - skip this event
+						continue;
+					}
 				}
 			}
 			
 			// we need to process this event			
 			
-			if(fahrzeitEvent.getFahrtEvent().getLineId() != lastLineId || fahrzeitEvent.getFahrtEvent().getRouteId() != lastRouteId){
+			if(fahrzeitEvent.getFahrtEvent().getLineId() != lastLineId || fahrzeitEvent.getFahrtEvent().getRouteId() != lastRouteId || !currentTimeBinOfFirstStop.equals(lastTimeBin)){
 				// different line or route - save the old one first
 				
 				if (lastLineId != null) {
-					if(line2route2TransitRouteStopsList.get(lastLineId) == null){
-						line2route2TransitRouteStopsList.put(lastLineId, new HashMap<Id, List<TransitRouteStop>>());
+					if(line2route2timeBin2TransitRouteStopsList.get(lastLineId) == null){
+						line2route2timeBin2TransitRouteStopsList.put(lastLineId, new HashMap<Id, HashMap<Id, List<TransitRouteStop>>>());
 					}
 					
-					if(line2route2TransitRouteStopsList.get(lastLineId).get(lastRouteId) == null && lastRouteId != null){
-						line2route2TransitRouteStopsList.get(lastLineId).put(lastRouteId, lastTransitRouteStops);
+					if(line2route2timeBin2TransitRouteStopsList.get(lastLineId).get(lastRouteId) == null && lastRouteId != null){
+						line2route2timeBin2TransitRouteStopsList.get(lastLineId).put(lastRouteId, new HashMap<Id, List<TransitRouteStop>>());
+					}
+					
+					if(line2route2timeBin2TransitRouteStopsList.get(lastLineId).get(lastRouteId).get(lastTimeBin) == null && lastTimeBin != null){
+						line2route2timeBin2TransitRouteStopsList.get(lastLineId).get(lastRouteId).put(lastTimeBin, lastTransitRouteStops);
 					}
 				}				
 				
 				lastTransitRouteStops = new LinkedList<TransitRouteStop>();
 				lastLineId = fahrzeitEvent.getFahrtEvent().getLineId();
 				lastRouteId = fahrzeitEvent.getFahrtEvent().getRouteId();
+				lastTimeBin = currentTimeBinOfFirstStop;
 			}				
 			
 			// same line and route - ok add the current stop to the route
 			TransitStopFacility stopFacility = newTransitSchedule.getFacilities().get(fahrzeitEvent.getStopId());
-			StopStatsContainer stopStats = line2route2stop2StatsMap.get(lastLineId).get(lastRouteId).get(fahrzeitEvent.getStopId());
+			StopStatsContainer stopStats = line2route2stop2StatsMap.get(lastLineId).get(lastRouteId).get(currentTimeBinOfFirstStop).get(fahrzeitEvent.getStopId());
 			double arrivalDelay = stopStats.getArithmeticMeanArrival();
 			double departureDelay = stopStats.getArithmeticMeanDeparture();
 			lastTransitRouteStops.add(newTransitSchedule.getFactory().createTransitRouteStop(stopFacility, arrivalDelay, departureDelay));
@@ -461,71 +482,81 @@ public class RblMerger {
 				
 		log.info("Finished creating transit route stops...");
 		log.warn("WARNING: If the very last fahrzeit event belongs to a new line and route, it is not processed. In reality, this should not happen.");
-		return line2route2TransitRouteStopsList;
+		return line2route2timeBin2TransitRouteStopsList;
 	}
 
 	/**
 	 * Creates a {@link NetworkRoute} for each line and route of the list
 	 * 
-	 * @param line2route2TransitRouteStopsList
+	 * @param line2route2timeBin2TransitRouteStopsList
 	 * @return
 	 */
-	private HashMap<Id, HashMap<Id, NetworkRoute>> createNetworkRoutes(HashMap<Id, HashMap<Id, List<TransitRouteStop>>> line2route2TransitRouteStopsList){
-		HashMap<Id, HashMap<Id, NetworkRoute>> line2route2networkRouteMap = new HashMap<Id, HashMap<Id,NetworkRoute>>();
+	private HashMap<Id,HashMap<Id,HashMap<Id,NetworkRoute>>> createNetworkRoutes(HashMap<Id,HashMap<Id,HashMap<Id,List<TransitRouteStop>>>> line2route2timeBin2TransitRouteStopsList){
+		HashMap<Id,HashMap<Id,HashMap<Id,NetworkRoute>>> line2route2timeBin2networkRouteMap = new HashMap<Id, HashMap<Id, HashMap<Id, NetworkRoute>>>();
 		
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, scenario.getConfig().planCalcScore());
 		LeastCostPathCalculator routeAlgo = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCostCalculator, travelTimeCalculator);
 		
 		// for all lines
-		for (Entry<Id, HashMap<Id, List<TransitRouteStop>>> line2route2TransitRouteStopsListEntry : line2route2TransitRouteStopsList.entrySet()) {
-			if(line2route2networkRouteMap.get(line2route2TransitRouteStopsListEntry.getKey()) == null){
-				line2route2networkRouteMap.put(line2route2TransitRouteStopsListEntry.getKey(), new HashMap<Id, NetworkRoute>());
+		for (Entry<Id, HashMap<Id, HashMap<Id, List<TransitRouteStop>>>> line2route2timeBin2TransitRouteStopsListEntry : line2route2timeBin2TransitRouteStopsList.entrySet()) {
+			if(line2route2timeBin2networkRouteMap.get(line2route2timeBin2TransitRouteStopsListEntry.getKey()) == null){
+				line2route2timeBin2networkRouteMap.put(line2route2timeBin2TransitRouteStopsListEntry.getKey(), new HashMap<Id, HashMap<Id, NetworkRoute>>());
 			}
 			
 			// for all routes
-			for (Entry<Id, List<TransitRouteStop>> route2TransitRouteStopsListEntry : line2route2TransitRouteStopsListEntry.getValue().entrySet()) {
+			for (Entry<Id, HashMap<Id, List<TransitRouteStop>>> route2timeBin2TransitRouteStopsListEntry : line2route2timeBin2TransitRouteStopsListEntry.getValue().entrySet()) {
 				
-				Id startLinkId = null;
-				Id lastLinkId = null;
+				if(line2route2timeBin2networkRouteMap.get(line2route2timeBin2TransitRouteStopsListEntry.getKey()).get(route2timeBin2TransitRouteStopsListEntry.getKey()) == null){
+					line2route2timeBin2networkRouteMap.get(line2route2timeBin2TransitRouteStopsListEntry.getKey()).put(route2timeBin2TransitRouteStopsListEntry.getKey(), new HashMap<Id, NetworkRoute>());
+				}
 				
-				List<Id> links = new LinkedList<Id>();				
-				
-				// for each stop
-				for (TransitRouteStop stop : route2TransitRouteStopsListEntry.getValue()) {
-					if(startLinkId == null){
-						startLinkId = stop.getStopFacility().getLinkId();
-					}
+				for (Entry<Id, List<TransitRouteStop>> timeBin2TransitRouteStopsListEntry : route2timeBin2TransitRouteStopsListEntry.getValue().entrySet()) {
+					Id startLinkId = null;
+					Id lastLinkId = null;
 					
-					if(lastLinkId != null){
-						links.add(lastLinkId);
-						Path path = routeAlgo.calcLeastCostPath(scenario.getNetwork().getLinks().get(lastLinkId).getToNode(), scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getFromNode(), 0.0, null, null);
-						for (Link link : path.links) {
-							links.add(link.getId());
+					List<Id> links = new LinkedList<Id>();
+					
+					// for each stop
+					for (TransitRouteStop stop : timeBin2TransitRouteStopsListEntry.getValue()) {
+						if(startLinkId == null){
+							startLinkId = stop.getStopFacility().getLinkId();
 						}
+						
+						if(lastLinkId != null){
+							links.add(lastLinkId);
+							Path path = routeAlgo.calcLeastCostPath(scenario.getNetwork().getLinks().get(lastLinkId).getToNode(), scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getFromNode(), 0.0, null, null);
+							for (Link link : path.links) {
+								links.add(link.getId());
+							}
+						}
+						
+						lastLinkId = stop.getStopFacility().getLinkId();
 					}
 					
-					lastLinkId = stop.getStopFacility().getLinkId();
-				}
-
-				if(links.size() != 0){
-					links.remove(0);
+					if(links.size() != 0){
+						links.remove(0);
+					}
+					
+					LinkNetworkRouteImpl networkRoute = new LinkNetworkRouteImpl(startLinkId, lastLinkId);
+					networkRoute.setLinkIds(startLinkId, links, lastLinkId);
+					
+					line2route2timeBin2networkRouteMap.get(line2route2timeBin2TransitRouteStopsListEntry.getKey()).get(route2timeBin2TransitRouteStopsListEntry.getKey()).put(timeBin2TransitRouteStopsListEntry.getKey(), networkRoute);				
+					
 				}
 				
-				LinkNetworkRouteImpl networkRoute = new LinkNetworkRouteImpl(startLinkId, lastLinkId);
-				networkRoute.setLinkIds(startLinkId, links, lastLinkId);
-	
-				line2route2networkRouteMap.get(line2route2TransitRouteStopsListEntry.getKey()).put(route2TransitRouteStopsListEntry.getKey(), networkRoute);				
 			}			
 		}
 		
 		int nOfRouteCreated = 0;
-		for (HashMap<Id, NetworkRoute> route2networkRouteMap : line2route2networkRouteMap.values()) {
-			nOfRouteCreated += route2networkRouteMap.size();
+		for (HashMap<Id, HashMap<Id, NetworkRoute>> route2timeBin2networkRouteMap : line2route2timeBin2networkRouteMap.values()) {
+			for (HashMap<Id, NetworkRoute> timeBin2networkRouteMap : route2timeBin2networkRouteMap.values()) {
+				nOfRouteCreated += timeBin2networkRouteMap.size();
+			}
 		}
 		
 		log.info("Finished creating " + nOfRouteCreated + " network routes...");		
-		return line2route2networkRouteMap;
+		return line2route2timeBin2networkRouteMap;
 	}
 
 	/**
@@ -533,28 +564,42 @@ public class RblMerger {
 	 * 
 	 * @param newTransitSchedule
 	 * @param line2route2stop2StatsMap
-	 * @param line2route2TransitRouteStopsList
-	 * @param line2route2networkRouteMap
+	 * @param line2route2timeBin2TransitRouteStopsList
+	 * @param line2route2timeBin2networkRouteMap
 	 */
-	private void createLinesAndRoutes(TransitSchedule newTransitSchedule, Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap, HashMap<Id,HashMap<Id,List<TransitRouteStop>>> line2route2TransitRouteStopsList, HashMap<Id,HashMap<Id,NetworkRoute>> line2route2networkRouteMap) {
+	private void createLinesAndRoutes(TransitSchedule newTransitSchedule, HashMap<Id,Map<Id,Map<Id,Map<Id,StopStatsContainer>>>> line2route2timeBin2stop2StatsMap, HashMap<Id,HashMap<Id,HashMap<Id,List<TransitRouteStop>>>> line2route2timeBin2TransitRouteStopsList, HashMap<Id,HashMap<Id,HashMap<Id,NetworkRoute>>> line2route2timeBin2networkRouteMap) {
 		
-		for (Entry<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMapEntry : line2route2stop2StatsMap.entrySet()) {
-			Id lineId = line2route2stop2StatsMapEntry.getKey();
+		int routesDropped = 0;
+		
+		for (Entry<Id, Map<Id, Map<Id, Map<Id, StopStatsContainer>>>> line2route2timeBin2stop2StatsMapEntry : line2route2timeBin2stop2StatsMap.entrySet()) {
+			Id lineId = line2route2timeBin2stop2StatsMapEntry.getKey();
 			if (newTransitSchedule.getTransitLines().get(lineId) == null) {
 				// new line - create one
 				newTransitSchedule.addTransitLine(newTransitSchedule.getFactory().createTransitLine(lineId));
 			}
 			
-			for (Entry<Id, Map<Id, StopStatsContainer>> route2stop2StatsMapEntry : line2route2stop2StatsMapEntry.getValue().entrySet()) {
-				Id routeId = route2stop2StatsMapEntry.getKey();
-				if (newTransitSchedule.getTransitLines().get(lineId).getRoutes().get(routeId) == null) {
-					// new route - create one
-					NetworkRoute route = line2route2networkRouteMap.get(lineId).get(routeId);
-					List<TransitRouteStop> stops = line2route2TransitRouteStopsList.get(lineId).get(routeId);
-					newTransitSchedule.getTransitLines().get(lineId).addRoute(newTransitSchedule.getFactory().createTransitRoute(routeId, route, stops, TransportMode.pt));
+			for (Entry<Id, Map<Id, Map<Id, StopStatsContainer>>> route2timeBin2stop2StatsMapEntry : line2route2timeBin2stop2StatsMapEntry.getValue().entrySet()) {
+				
+				for (Entry<Id, Map<Id, StopStatsContainer>> timeBin2stop2StatsMapEntry : route2timeBin2stop2StatsMapEntry.getValue().entrySet()) {
+				
+					Id routeId = route2timeBin2stop2StatsMapEntry.getKey();
+					if (newTransitSchedule.getTransitLines().get(lineId).getRoutes().get(routeId) == null) {
+						// new route - create one
+						NetworkRoute route = line2route2timeBin2networkRouteMap.get(lineId).get(routeId).get(timeBin2stop2StatsMapEntry.getKey());
+						List<TransitRouteStop> stops = line2route2timeBin2TransitRouteStopsList.get(lineId).get(routeId).get(timeBin2stop2StatsMapEntry.getKey());
+						if (route != null && stops != null) {
+							// can happen, if there is only one departure at a one stop route, e.g. from depot to service
+							newTransitSchedule.getTransitLines().get(lineId).addRoute(newTransitSchedule.getFactory().createTransitRoute(new IdImpl(route2timeBin2stop2StatsMapEntry.getKey().toString() + "-" + timeBin2stop2StatsMapEntry.getKey().toString()), route, stops, TransportMode.pt));
+						} else {
+							routesDropped++;
+						}
+						
+					}
 				}
 			}
 		}
+		
+		log.info("Dropped " + routesDropped + " routes, due to missing stops and/or route");
 	}
 	
 	/**
@@ -564,13 +609,14 @@ public class RblMerger {
 	 * @param fahrtEvents
 	 * @param rblDates Only departures of rbl dates specified in the set will be added.
 	 */
-	private void addDepartures(TransitSchedule newTransitSchedule, List<FahrtEvent> fahrtEvents, Set<String> rblDates) {
+	private void addDepartures(TransitSchedule newTransitSchedule, List<FahrtEvent> fahrtEvents, Set<String> rblDates, double timeBinSize) {
 		int nOfDeparture = 0;
 		for (FahrtEvent fahrtEvent : fahrtEvents) {
 			if(rblDates.contains(String.valueOf(fahrtEvent.getRblDate()))){
 				TransitLine line = newTransitSchedule.getTransitLines().get(fahrtEvent.getLineId());
 				if (line != null) {
-					TransitRoute route = line.getRoutes().get(fahrtEvent.getRouteId());
+					Id routeId = new IdImpl(fahrtEvent.getRouteId().toString() + "-" + ((int) (fahrtEvent.getDepartureTimeIst() / timeBinSize)));
+					TransitRoute route = line.getRoutes().get(routeId);
 					if(route != null){
 						nOfDeparture++;
 						Departure departure = newTransitSchedule.getFactory().createDeparture(new IdImpl(nOfDeparture), fahrtEvent.getDepartureTimeIst());
@@ -677,19 +723,21 @@ public class RblMerger {
 		log.info(events.size() + " events written to " + eventsFromTransitScheduleOutFile);
 	}
 
-	private void writeStats(Map<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMap,	String statsOutFilename) {
+	private void writeStats(HashMap<Id,Map<Id,Map<Id,Map<Id,StopStatsContainer>>>> line2route2stop2StatsMap, String statsOutFilename) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(statsOutFilename)));
-			writer.write("# line id; route id; stop id; " + StopStatsContainer.toStringHeader); writer.newLine();
+			writer.write("# line id; route id; time bin; stop id; " + StopStatsContainer.toStringHeader); writer.newLine();
 			
-			for (Entry<Id, Map<Id, Map<Id, StopStatsContainer>>> line2route2stop2StatsMapEntry : line2route2stop2StatsMap.entrySet()) {
-				Id lineId = line2route2stop2StatsMapEntry.getKey();
-				for (Entry<Id, Map<Id, StopStatsContainer>> route2stop2StatsMapEntry : line2route2stop2StatsMapEntry.getValue().entrySet()) {
-					Id routeId = route2stop2StatsMapEntry.getKey();
-					for (Entry<Id, StopStatsContainer> stop2StatsMapEntry : route2stop2StatsMapEntry.getValue().entrySet()) {
-						Id stopId = stop2StatsMapEntry.getKey();
-						writer.write(lineId + "; " + routeId + "; " + stopId + "; " + stop2StatsMapEntry.getValue().toString());
-						writer.newLine();
+			for (Entry<Id, Map<Id, Map<Id, Map<Id, StopStatsContainer>>>> line2route2timeBin2stop2StatsMapEntry : line2route2stop2StatsMap.entrySet()) {
+				Id lineId = line2route2timeBin2stop2StatsMapEntry.getKey();
+				for (Entry<Id, Map<Id, Map<Id, StopStatsContainer>>> route2timeBin2stop2StatsMapEntry : line2route2timeBin2stop2StatsMapEntry.getValue().entrySet()) {
+					Id routeId = route2timeBin2stop2StatsMapEntry.getKey();
+					for (Entry<Id, Map<Id, StopStatsContainer>> timeBin2stop2StatsMapEntry : route2timeBin2stop2StatsMapEntry.getValue().entrySet()) {
+						for (Entry<Id, StopStatsContainer> stop2StatsMapEntry : timeBin2stop2StatsMapEntry.getValue().entrySet()) {
+							Id stopId = stop2StatsMapEntry.getKey();
+							writer.write(lineId + "; " + routeId + "; " + timeBin2stop2StatsMapEntry.getKey() + "; " + stopId + "; " + stop2StatsMapEntry.getValue().toString());
+							writer.newLine();
+						}
 					}
 				}
 			}			
