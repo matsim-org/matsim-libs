@@ -25,6 +25,11 @@ import org.matsim.api.core.v01.population.Plan;
 
 /**
  * A module which modifies a single plan.
+ * <br/>
+ * Comments:<ul>
+ * <li> yyyy Should be renamed, since a strategy module is something else in the config file.  A suggestion would be
+ * ReplanningModule.  kai, may'12
+ * </ul> 
  * 
  * @author mrieser
  */

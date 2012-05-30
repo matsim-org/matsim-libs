@@ -23,10 +23,21 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
+/**
+ * Comments:<ul>
+ * <li> yyyy In my view, should be re-named into StrategyModule in order to be consistent with the config file.  kai, may'12
+ * </ul>
+ *
+ */
 public interface PlanStrategy {
 
 	/**
 	 * Adds a strategy module to this strategy.
+	 * <br/>
+	 * Comments:<ul>
+	 * <li> yyyy In my view, should be re-named into addReplanningModule or addReplanner since module is used for 
+	 * something else (the ``whole thing'') in the config file.  kai, may'12
+	 * </ul>
 	 *
 	 * @param module
 	 */
