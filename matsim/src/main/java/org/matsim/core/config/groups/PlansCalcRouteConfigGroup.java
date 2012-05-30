@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -115,6 +116,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 	private void clearDefaults() {
 		if (!defaultsCleared) {
+			Logger.getLogger(this.getClass()).warn("setting any of the teleported mode speed parameters clears ALL default values; " +
+					"make sure this is what you want.") ;
 			teleportedModeSpeeds.clear();
 			teleportedModeFreespeedFactors.clear();
 			defaultsCleared = true;
