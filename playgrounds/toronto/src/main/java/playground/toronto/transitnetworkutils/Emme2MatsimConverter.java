@@ -1,7 +1,6 @@
 package playground.toronto.transitnetworkutils;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,14 +9,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.LinkImplTest;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
