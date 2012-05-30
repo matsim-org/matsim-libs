@@ -51,8 +51,10 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -133,7 +135,8 @@ import playground.gregor.sim2d_v3.simulation.floor.DefaultVelocityCalculator;
 import playground.gregor.sim2d_v3.simulation.floor.VelocityCalculator;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
-public class MarathonController extends WithinDayController implements StartupListener, MobsimInitializedListener, MobsimBeforeSimStepListener {
+public class MarathonController extends WithinDayController implements StartupListener, 
+	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
 	private final static Logger log = Logger.getLogger(MarathonController.class);
 	
@@ -459,6 +462,25 @@ public class MarathonController extends WithinDayController implements StartupLi
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		if (EvacuationConfig.evacuationTime == e.getSimulationTime()) {
 			this.updateTrackModes();
+		}
+	}
+	
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+		if (this.informedHouseholdsTracker.allAgentsInformed()) {
+			if (this.initialReplannerFactories != null) {
+				
+				for (WithinDayReplannerFactory<?> factory : this.initialReplannerFactories) {
+					if (factory instanceof WithinDayDuringActivityReplannerFactory) {
+						this.getReplanningManager().removeDuringActivityReplannerFactory((WithinDayDuringActivityReplannerFactory) factory);
+					} else if(factory instanceof WithinDayDuringLegReplannerFactory) {
+						this.getReplanningManager().removeDuringLegReplannerFactory((WithinDayDuringLegReplannerFactory) factory);
+					} 
+				}
+				log.info("Disabled initial within-day replanners");
+				
+				this.initialReplannerFactories = null;
+			}
 		}
 	}
 	
