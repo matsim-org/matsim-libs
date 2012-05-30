@@ -232,9 +232,9 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 		c[1] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(-1*height, normal)));
 		c[2] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(height, normal)));
 		c[3] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(-1*height, normal)));
-		for(Coordinate cc: c){
-			log.error(cc);
-		}
+//		for(Coordinate cc: c){
+//			log.error(cc);
+//		}
 		
 		GeometryFactory f = new GeometryFactory();
 		return f.createMultiPoint(c).convexHull();
