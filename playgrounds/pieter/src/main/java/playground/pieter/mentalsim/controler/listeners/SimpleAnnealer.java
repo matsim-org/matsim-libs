@@ -25,14 +25,17 @@ public class SimpleAnnealer implements IterationStartsListener,
 	final static String END_PROPORTION = "endProportion";
 	final static String ANNEAL_TYPE = "annealType";
 	final static String GEOMETRIC_FACTOR = "geometricFactor";
+	final static String HALF_LIFE = "halfLife";
 	final static String modName = "SimpleAnnealer";
 	static double startProportion = -1;
-	static double endProportion = -1;
+	static double endProportion = 0.001;
 	static double currentProportion = -1;
 	static double geoFactor = 0.9;
+	static int halfLife = 50;
 	static double slope = -1;
 	static int currentIter = 0;
 	static boolean isGeometric = false;
+	static boolean isExponential;
 	static boolean annealSwitch = true;
 	Logger log = Logger.getLogger(getClass());
 	Controler controler;
@@ -51,27 +54,60 @@ public class SimpleAnnealer implements IterationStartsListener,
 		if (startProportion < 0) {
 			String sp = config.getParam(modName, START_PROPORTION);
 			String ep = config.getParam(modName, END_PROPORTION);
-			if (ep != null && sp != null) {
+			if (sp != null) {
 				startProportion = Double.parseDouble(sp);
-				endProportion = Double.parseDouble(ep);
 			} else {
-				log.error("No start/endProportion set for Annealer, "
+				log.error("No startProportion set for Annealer, "
 						+ "so no simulated annealing of replanning.");
+				annealSwitch = false;
 				return;
 			}
+			if (ep != null) {
+				endProportion = Double.parseDouble(ep);
+			}
+
 			if (config.getParam(modName, ANNEAL_TYPE).equals("geometric")) {
 				isGeometric = true;
-				log.warn("Using geometric annealing, so endProportion parameter not used");
+				if (ep != null)
+					log.warn("Using geometric annealing, so endProportion parameter not used");
 				String gf = config.getParam(modName, GEOMETRIC_FACTOR);
 				if (gf != null && Double.parseDouble(gf) > 0
 						&& Double.parseDouble(gf) <= 1) {
 					geoFactor = Double.parseDouble(gf);
+				} else {
+					log.error("No geometric factor set for geometric simulated Annealer, "
+							+ "so using default of 0.9.");
+
 				}
-			}
-			if (!isGeometric)
+			} else if (config.getParam(modName, ANNEAL_TYPE).equals(
+					"exponential")) {
+				isExponential = true;
+				if (ep != null)
+					log.warn("Using geometric annealing, so " + END_PROPORTION
+							+ " parameter not used");
+				String ef = config.getParam(modName, HALF_LIFE);
+				if (ef != null && Integer.parseInt(ef) > 0) {
+					halfLife = Integer.parseInt(ef);
+				} else {
+					log.error("Invalid " + HALF_LIFE
+							+ " for simulated Annealer, "
+							+ "so using default of " + halfLife + " iters.");
+
+				}
+			} else if (config.getParam(modName, ANNEAL_TYPE).equals("linear")) {
+				if (ep == null)
+					log.warn("No " + END_PROPORTION
+							+ " set, so using default of " + endProportion);
 				slope = (startProportion - endProportion)
 						/ (controler.getFirstIteration() - controler
 								.getLastIteration());
+			} else {
+				log.error("Incorrect anneal type \""
+						+ config.getParam(modName, ANNEAL_TYPE)
+						+ "\". Turning off simulated annealing)");
+				annealSwitch = false;
+				return;
+			}
 		}
 		// re-planning only starts in the first iteration
 		currentIter = event.getIteration() - controler.getFirstIteration();
@@ -80,6 +116,9 @@ public class SimpleAnnealer implements IterationStartsListener,
 		else {
 			if (isGeometric)
 				currentProportion *= geoFactor;
+			else if (isExponential)
+				currentProportion = startProportion
+						/ (Math.pow(2, (double) currentIter / halfLife));
 			else
 				currentProportion = currentIter * slope + startProportion;
 		}
