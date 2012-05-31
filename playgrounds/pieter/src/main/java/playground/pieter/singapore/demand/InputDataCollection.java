@@ -1,0 +1,636 @@
+package playground.pieter.singapore.demand;
+
+import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.management.timer.Timer;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Time;
+
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+
+import playground.pieter.singapore.utils.FacilitiesToSQL;
+import playground.pieter.singapore.utils.Sample;
+
+public class InputDataCollection implements Serializable {
+	transient DataBaseAdmin dba;
+	transient Properties diverseScriptProperties;
+	transient MatsimFacilitiesReader facilitiesReader;
+	public static final double EARLIEST_START_TIME = Time.parseTime("00:10:00");
+	public static final double DEFAULT_START_TIME = Time.parseTime("07:30:00");
+	public static final double LATEST_END_TIME = Time.parseTime("23:50:00");
+	public static final double DEFAULT_END_TIME = Time.parseTime("19:00:00");
+	HashMap<String, String> facilityIdDescLookup = new HashMap<String, String>();
+	HashMap<String, String> landUseToHITSTypeLookup = new HashMap<String, String>();
+	HashMap<String, HashMap<String, Double>> workLandUseSecondaryActCapacities = new HashMap<String, HashMap<String, Double>>();
+	HashMap<Integer, HouseholdSG> households;
+	HashMap<String, HashMap<String, Double>> landUseGivenOccupation = new HashMap<String, HashMap<String, Double>>();
+	HashSet<String> landUseTypes = new HashSet<String>();
+	HashMap<String, LocationSampler> locationSamplers = new HashMap<String, LocationSampler>();
+	HashSet<String> mainActivityTypes = new HashSet<String>();
+	HashMap<String, ArrayList<PaxSG>> mainActPaxCollection = new HashMap<String, ArrayList<PaxSG>>();
+	HashSet<String> occupationTypes = new HashSet<String>();
+	HashMap<Integer, PaxSG> persons;
+
+	HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> bizActFrequencies = new HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>>();
+	HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> leisureActFrequencies = new HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>>();
+
+	transient ScenarioImpl scenario;
+	transient Logger inputLog;
+
+	public InputDataCollection(DataBaseAdmin dba,
+			Properties diverseScriptProperties, ScenarioImpl scenario,
+			boolean facilitiesAllInOneXML) throws SQLException,
+			NoConnectionException {
+		inputLog = Logger.getLogger("InputData");
+		this.dba = dba;
+		this.diverseScriptProperties = diverseScriptProperties;
+		this.scenario = scenario;
+		facilitiesReader = new MatsimFacilitiesReader(this.scenario);
+		readSecondaryActFrequencies();
+		loadLandUsetoHITSType();
+		loadWorkLandUseSecondaryActCapacities();
+		loadData(facilitiesAllInOneXML);
+		getMainActivityTypes();
+		getOccupationAndLandUseTypes();
+		createLocationSamplers();
+		createMainActPaxCollections();
+		createFacilityIdtoDescriptionLookup();
+	}
+
+	private void readSecondaryActFrequencies() {
+		inputLog.info("Loading secondary act frequencies");
+		String secondaryActFrequenciesTable = diverseScriptProperties
+				.getProperty("secondaryActFrequenciesTable");
+		String bizActs = "\'biz\', \'errand\', \'medi\'";
+		String leisureActs = "\'eat\',\'rec\',\'shop\',\'social\',\'sport\',\'fun\'";
+		String[] activityGroups = { bizActs, leisureActs };
+		for (String activityGroup : activityGroups) {
+
+			try {
+				HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> relevantMap;
+				if (activityGroup.equals(bizActs))
+					relevantMap = this.bizActFrequencies;
+				else
+					relevantMap = this.leisureActFrequencies;
+				// start with income_hh
+				ResultSet rs_income = dba
+						.executeQuery(String
+								.format("SELECT distinct income_hh FROM %s where t6_purpose in(%s)",
+										secondaryActFrequenciesTable,
+										activityGroup));
+				while (rs_income.next()) {
+					int income = rs_income.getInt("income_hh");
+					HashMap<Integer, HashMap<String, HashMap<String, Double>>> incomeMap = new HashMap<Integer, HashMap<String, HashMap<String, Double>>>();
+					relevantMap.put(income, incomeMap);
+					ResultSet rs_age = dba
+							.executeQuery(String
+									.format("SELECT distinct age FROM %s where t6_purpose in(%s)",
+											secondaryActFrequenciesTable,
+											activityGroup));
+					while (rs_age.next()) {
+						int age = rs_age.getInt("age");
+						HashMap<String, HashMap<String, Double>> ageMap = new HashMap<String, HashMap<String, Double>>();
+						incomeMap.put(age, ageMap);
+						ResultSet rs_occup = dba
+								.executeQuery(String
+										.format("SELECT distinct occup FROM %s where t6_purpose in(%s)",
+												secondaryActFrequenciesTable,
+												activityGroup));
+						while (rs_occup.next()) {
+							String occup = rs_occup.getString("occup");
+							HashMap<String, Double> occupMap = new HashMap<String, Double>();
+							ageMap.put(occup, occupMap);
+							ResultSet rs_purpose = dba
+									.executeQuery(String
+											.format("SELECT distinct t6_purpose FROM %s where t6_purpose in(%s)",
+													secondaryActFrequenciesTable,
+													activityGroup));
+							while (rs_purpose.next()) {
+								String purpose = rs_purpose
+										.getString("t6_purpose");
+								double weight = 0.0001;
+								ResultSet rs_weight = dba
+										.executeQuery(String
+												.format("SELECT hipf10sum FROM %s where t6_purpose=\'%s\' and occup=\'%s\' and age=%d and income_hh=%d",
+														secondaryActFrequenciesTable,
+														purpose, occup, age,
+														income));
+								while (rs_weight.next()) {
+									weight = rs_weight.getDouble("hipf10sum");
+								}
+								occupMap.put(purpose, weight);
+							}
+						}
+					}
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (NoConnectionException e) {
+				e.printStackTrace();
+			}
+		}
+		inputLog.info("DONE: Loading secondary act frequencies");
+	}
+
+	private void loadWorkLandUseSecondaryActCapacities() {
+		inputLog.info("Loading masterplan land use types to HITS activity type frequencies.");
+		String masterplanSecondaryActCapacitiesTable = diverseScriptProperties
+				.getProperty("masterplanSecondaryActCapacities");
+		try {
+			ResultSet rs = dba.executeQuery(String.format(
+					"select distinct description from %s",
+					masterplanSecondaryActCapacitiesTable));
+			while (rs.next()) {
+				String currenttype = rs.getString("description");
+				HashMap<String, Double> activityCaps = new HashMap<String, Double>();
+				workLandUseSecondaryActCapacities
+						.put(currenttype, activityCaps);
+				ResultSet rs2 = dba.executeQuery(String.format(
+						"select * from %s where description = \'%s\'",
+						masterplanSecondaryActCapacitiesTable, currenttype));
+				while (rs2.next()) {
+
+					activityCaps.put(rs2.getString("act"),
+							rs2.getDouble("activitycap"));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+		inputLog.info("DONE: Loading masterplan land use types to HITS activity type frequencies.");
+	}
+
+	private void addSecondaryActivityTypes() {
+		for (Entry<Id, ActivityFacility> facilityset : this.scenario
+				.getActivityFacilities().getFacilities().entrySet()) {
+			// get the land use for each facility
+			ActivityFacilityImpl facility = (ActivityFacilityImpl) facilityset
+					.getValue();
+			String description = facility.getDesc();
+			HashMap<String, Double> secondaryCapacities = this.workLandUseSecondaryActCapacities
+					.get(description);
+			// check if this facility type actually has other activity types
+			if (secondaryCapacities != null) {
+				if (facility.getId().toString().startsWith("home")) {
+					for (String activityType : secondaryCapacities.keySet()) {
+						double startCap = facility.getActivityOptions()
+								.get("home").getCapacity();
+						ActivityOptionImpl option = facility
+								.createActivityOption(activityType);
+						option.addOpeningTime(new OpeningTimeImpl(
+								DayType.wkday, Time.parseTime("10:00:00"), Time
+										.parseTime("19:00:00")));
+						option.setCapacity(secondaryCapacities
+								.get(activityType) * startCap);
+					}
+
+				} else {
+
+					for (String activityType : secondaryCapacities.keySet()) {
+						ActivityOptionImpl option = facility
+								.createActivityOption(activityType);
+						option.addOpeningTime(new OpeningTimeImpl(
+								DayType.wkday, Time.parseTime("10:00:00"), Time
+										.parseTime("19:00:00")));
+						option.setCapacity(secondaryCapacities
+								.get(activityType));
+					}
+				}
+			}
+		}
+	}
+
+	private void createFacilityIdtoDescriptionLookup() {
+		inputLog.info("Creating facility ID to land use type or description lookup table.");
+		Iterator<ActivityFacility> it = this.scenario.getActivityFacilities()
+				.getFacilities().values().iterator();
+		while (it.hasNext()) {
+			ActivityFacilityImpl f = (ActivityFacilityImpl) it.next();
+			this.facilityIdDescLookup.put(f.getId().toString(), f.getDesc());
+		}
+	}
+
+	private void createLocationSamplers() {
+		inputLog.info("Creating weighted samplers for each activity type,\n indexing the relevant facility ids and their capacity for the particular activity.");
+		for (String activityType : this.mainActivityTypes) {
+			TreeMap<Id, ActivityFacility> facilities = this.scenario
+					.getActivityFacilities().getFacilitiesForActivityType(
+							activityType);
+			Iterator<Entry<Id, ActivityFacility>> fi = facilities.entrySet()
+					.iterator();
+			String[] ids = new String[facilities.entrySet().size()];
+			double[] caps = new double[facilities.entrySet().size()];
+			int i = 0;
+			while (fi.hasNext()) {
+				Entry<Id, ActivityFacility> e = fi.next();
+				ids[i] = e.getKey().toString();
+				caps[i] = e.getValue().getActivityOptions().get(activityType)
+						.getCapacity();
+
+				i++;
+			}
+			this.locationSamplers.put(activityType, new LocationSampler(
+					activityType, ids, caps));
+		}
+		inputLog.info("DONE: Creating weighted samplers for each activity type.");
+	}
+
+	private void createMainActPaxCollections() {
+		inputLog.info("Creating collections of people participating in each major activity type.");
+		for (String activityType : this.mainActivityTypes) {
+			this.mainActPaxCollection.put(activityType, new ArrayList<PaxSG>());
+		}
+		for (PaxSG p : this.getPersons().values()) {
+			if (p.mainActType.equals("NA"))
+				continue;
+			mainActPaxCollection.get(p.mainActType).add(p);
+		}
+		inputLog.info("DONE: Creating collections of people participating in each major activity type.");
+	}
+
+	public void dumpFacilitiesToSQL() throws SQLException,
+			NoConnectionException {
+		FacilitiesToSQL fc2sql = new FacilitiesToSQL(this.dba, this.scenario);
+		fc2sql.createCompleteFacilityAndActivityTable("matsim2.full_facility_list");
+
+	}
+
+	private void dumpFacilitiesToXML() {
+		FacilitiesWriter fcw = new FacilitiesWriter(
+				this.scenario.getActivityFacilities());
+		String completeFacilitiesXMLFile = this.diverseScriptProperties
+				.getProperty("completeFacilitiesXMLFile");
+		fcw.write(completeFacilitiesXMLFile);
+	}
+
+	public HashMap<Integer, HouseholdSG> getHouseholds() {
+		return households;
+	}
+
+	private void getMainActivityTypes() {
+		inputLog.info("Listing the main activity types in the scenario.");
+		Iterator<ActivityFacility> fi = this.scenario.getActivityFacilities()
+				.getFacilities().values().iterator();
+		while (fi.hasNext()) {
+			ActivityFacilityImpl f = (ActivityFacilityImpl) fi.next();
+			Set<String> actops = f.getActivityOptions().keySet();
+			this.mainActivityTypes.addAll(actops);
+
+		}
+	}
+
+	private void getOccupationAndLandUseTypes() {
+		this.landUseTypes.addAll(this.landUseGivenOccupation.keySet());
+		this.occupationTypes.addAll(this.landUseGivenOccupation.values()
+				.iterator().next().keySet());
+	}
+
+	public HashMap<Integer, PaxSG> getPersons() {
+		return persons;
+	}
+
+	public void loadData(boolean facilitiesAllInOneXML) throws SQLException,
+			NoConnectionException {
+		loadHouseholdsAndPersons();
+		loadFacilities(facilitiesAllInOneXML);
+		// dumpFacilitiesToSQL();
+		loadOccupationLandUseProbabilities();
+	}
+
+	private void loadFacilitiesFromSQL() {
+		String secondaryFacilitiesTable = diverseScriptProperties
+				.getProperty("secondaryFacilitiesTable");
+		try {
+			ResultSet rs = dba.executeQuery(String.format(
+					"SELECT * FROM %s where latitude>0 and longitude>0",
+					secondaryFacilitiesTable));
+			int counter = 1;
+			while (rs.next()) {
+				CoordImpl coord = new CoordImpl(rs.getDouble("longitude"),
+						rs.getDouble("latitude"));
+				ActivityFacilityImpl facility = scenario
+						.getActivityFacilities()
+						.createFacility(
+								new IdImpl(new String("leisure_" + counter)),
+								TransformationFactory
+										.getCoordinateTransformation(
+												TransformationFactory.WGS84,
+												TransformationFactory.WGS84_UTM48N)
+										.transform(coord));
+				facility.setDesc(rs.getString("type"));
+				counter++;
+			}
+
+			String homeFacilitiesTable = diverseScriptProperties
+					.getProperty("homeFacilitiesTable");
+			rs = dba.executeQuery(String.format("SELECT * FROM %s",
+					homeFacilitiesTable));
+
+			while (rs.next()) {
+				ActivityFacilityImpl facility = scenario
+						.getActivityFacilities().createFacility(
+								new IdImpl(new String("home_"
+										+ rs.getInt("id_res_facility"))),
+								new CoordImpl(rs.getDouble("x_utm48n"), rs
+										.getDouble("y_utm48n")));
+				facility.setDesc(rs.getString("property_type"));
+				ActivityOptionImpl actOption = facility
+						.createActivityOption("home");
+				actOption.setCapacity((double) rs.getInt("units"));
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	void loadFacilities(boolean completeFile) {
+		if (completeFile) {
+			facilitiesReader.readFile(diverseScriptProperties
+					.getProperty("completeFacilitiesXMLFile"));
+		} else {
+			facilitiesReader.readFile(diverseScriptProperties
+					.getProperty("workFacilitiesXMLFile"));
+			facilitiesReader.readFile(diverseScriptProperties
+					.getProperty("eduFacilitiesXMLFile"));
+			loadFacilitiesFromSQL();
+			addSecondaryActivityTypes();
+			dumpFacilitiesToXML();
+		}
+	}
+
+	private void loadHouseholdsAndPersons() {
+		inputLog.info("Loading persons and households");
+		households = new HashMap<Integer, HouseholdSG>();
+		persons = new HashMap<Integer, PaxSG>();
+		String synthHouseholdIdField = diverseScriptProperties
+				.getProperty("synthHouseholdId");
+		String carAvailabilityField = diverseScriptProperties
+				.getProperty("carAvailability");
+		String homeFacilityIdField = diverseScriptProperties
+				.getProperty("homeFacilityId");
+		String householdTableNameField = diverseScriptProperties
+				.getProperty("householdTableName");
+
+		String personTableNameField = diverseScriptProperties
+				.getProperty("personTableName");
+		String paxIdField = diverseScriptProperties.getProperty("paxId");
+		String foreignerField = diverseScriptProperties
+				.getProperty("foreigner");
+		String carLicenseHolderField = diverseScriptProperties
+				.getProperty("carLicenseHolder");
+		String ageField = diverseScriptProperties.getProperty("age");
+		String sexField = diverseScriptProperties.getProperty("sex");
+		String incomePaxField = diverseScriptProperties
+				.getProperty("incomePax");
+		String modeSuggestionField = diverseScriptProperties
+				.getProperty("modeSuggestion");
+		String incomeHouseholdField = diverseScriptProperties
+				.getProperty("incomeHousehold");
+		String occupField = diverseScriptProperties.getProperty("occup");
+		String chainField = diverseScriptProperties.getProperty("chain");
+		String chainTypeField = diverseScriptProperties
+				.getProperty("chainType");
+		String mainActStartField = diverseScriptProperties
+				.getProperty("mainActStart");
+		String mainActDurField = diverseScriptProperties
+				.getProperty("mainActDur");
+		String mainActTypeField = diverseScriptProperties
+				.getProperty("mainActType");
+
+		int householdLoadLimitField = Integer.parseInt(diverseScriptProperties
+				.getProperty("householdLoadLimit"));
+		Date startDate = new Date();
+
+		int counter = 0;
+		ResultSet rs;
+		try {
+			// sample random household ids without replacement
+			rs = dba.executeQuery(String.format("SELECT max(%s) FROM %s;",
+					synthHouseholdIdField, householdTableNameField));
+			rs.next();
+			int[] hhids = Sample.sampleMfromN(householdLoadLimitField,
+					rs.getInt(1));
+			//
+			if (householdLoadLimitField > 1000000) {
+				rs = dba.executeQuery(String.format(
+						"SELECT DISTINCT %s, %s, %s FROM %s LIMIT %d;",
+						synthHouseholdIdField, homeFacilityIdField,
+						carAvailabilityField, householdTableNameField,
+						householdLoadLimitField));
+			} else {
+				String hhidsToLoad = "" + hhids[0];
+				for (int i = 1; i < hhids.length; i++) {
+					hhidsToLoad = hhidsToLoad + "," + hhids[i];
+				}
+
+				rs = dba.executeQuery(String.format(
+						"SELECT DISTINCT %s, %s, %s FROM %s WHERE %s IN(%s);",
+						synthHouseholdIdField, homeFacilityIdField,
+						carAvailabilityField, householdTableNameField,
+						synthHouseholdIdField, hhidsToLoad));
+			}
+			while (rs.next()) {
+				int synthHouseholdId = rs.getInt(synthHouseholdIdField);
+				int carAvailability = rs.getInt(carAvailabilityField);
+				String homeFacilityId = new String("home_"
+						+ rs.getInt(homeFacilityIdField));
+				HouseholdSG currentHousehold = new HouseholdSG(
+						synthHouseholdId, carAvailability, homeFacilityId);
+				households.put(synthHouseholdId, currentHousehold);
+				ResultSet rspax = dba.executeQuery(String.format(
+						"SELECT * FROM %s WHERE %s = %d", personTableNameField,
+						synthHouseholdIdField, synthHouseholdId));
+				while (rspax.next()) {
+					int paxId = rspax.getInt(paxIdField);
+					String foreigner = rspax.getString(foreignerField);
+					boolean carLicenseHolder = rspax
+							.getInt(carLicenseHolderField) > 0 ? true : false;
+					String chain = rspax.getString(chainField);
+					String chainType = rspax.getString(chainTypeField);
+					int age = 0;
+					if (rspax.getString(ageField).equals("age65_up"))
+						age = 70;
+					else
+						age = Integer.parseInt(new StringBuilder(rspax
+								.getString(ageField)).substring(3, 5));
+					String sex = rspax.getString(sexField);
+					String occup = rspax.getString(occupField);
+					int income = Integer.parseInt(rspax
+							.getString(incomePaxField));
+					int incomeHousehold = rspax.getInt(incomeHouseholdField);
+					String mainActType = rspax.getString(mainActTypeField);
+					String modeSuggestion = rspax
+							.getString(modeSuggestionField);
+					double mainActStart = Math.max(
+							rspax.getDouble(mainActStartField), 0);
+					double mainActDur = rspax.getDouble(mainActDurField);
+					//skip if this guy is not meant to be realised
+					if ((modeSuggestion.equals("not_assigned") || modeSuggestion
+							.equals("notravel")))
+						continue;
+					// generate half mixed mode users
+					if (modeSuggestion.equals("ptmix") && Math.random() > 0.5)
+						continue;
+					PaxSG newPax = new PaxSG(paxId, foreigner,
+							currentHousehold, carLicenseHolder, age, sex,
+							income, occup, chain, chainType, mainActStart,
+							mainActDur, mainActType, modeSuggestion);
+					newPax.household.incomeHousehold = incomeHousehold;
+					newPax.bizActFrequencies = assignSecondaryActFrequencies(
+							"b", newPax);
+					newPax.leisureActFrequencies = assignSecondaryActFrequencies(
+							"l", newPax);
+					currentHousehold.pax.add(newPax);
+					this.persons.put(paxId, newPax);
+					// timer info
+
+				}
+				if ((counter % 1000) == 0) {
+
+					Date currDate = new Date();
+					long timePastLong = currDate.getTime()
+							- startDate.getTime();
+					double timePastSec = (double) timePastLong
+							/ (double) Timer.ONE_SECOND;
+					int agentsToGo = householdLoadLimitField - counter;
+					double agentsPerSecond = (double) counter / timePastSec;
+					long timeToGo = (long) ((double) agentsToGo / agentsPerSecond);
+					inputLog.info(String
+							.format("%6d of %8d households done in %.3f seconds at %.3f hhs/sec, %s sec to go.",
+									counter, householdLoadLimitField,
+									timePastSec, agentsPerSecond, timeToGo));
+				}
+				counter++;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+		inputLog.info("DONE: Loading persons and households");
+	}
+
+	private Tuple<String[], double[]> assignSecondaryActFrequencies(
+			String activityGroup, PaxSG pax) {
+		HashMap<String, Double> paxFreqs;
+		if (activityGroup.equals("l")) {
+			paxFreqs = leisureActFrequencies.get(pax.household.incomeHousehold)
+					.get(pax.age).get(pax.occup);
+		} else {
+			paxFreqs = bizActFrequencies.get(pax.household.incomeHousehold)
+					.get(pax.age).get(pax.occup);
+		}
+		String[] activityTypes = new String[paxFreqs.size()];
+		double[] activityFrequencies = new double[paxFreqs.size()];
+		Iterator<Entry<String, Double>> it = paxFreqs.entrySet().iterator();
+		int i = 0;
+		while (it.hasNext()) {
+			Entry<String, Double> e = it.next();
+			activityTypes[i] = e.getKey();
+			activityFrequencies[i] = e.getValue();
+			i++;
+		}
+		return new Tuple<String[], double[]>(activityTypes, activityFrequencies);
+	}
+
+	private void loadLandUsetoHITSType() {
+		inputLog.info("Loading masterplan land use to HITS place type lookup.");
+		String masterplan2hitstypefield = diverseScriptProperties
+				.getProperty("masterplan2hitstype");
+		try {
+			ResultSet rs = dba.executeQuery(String.format("SELECT * FROM %s",
+					masterplan2hitstypefield));
+			while (rs.next()) {
+				this.landUseToHITSTypeLookup.put(rs.getString("description"),
+						rs.getString("hits_type"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+		inputLog.info("DONE: Loading masterplan land use to HITS place type lookup.");
+	}
+
+	private void loadOccupationLandUseProbabilities() {
+		inputLog.info("Loading occupation vs masterplan landuse type frequencies");
+		String occupXlandUseTable = this.diverseScriptProperties
+				.getProperty("occupXlandUseTable");
+		try {
+			ResultSet rs = dba.executeQuery(String.format(
+					"SELECT DISTINCT occup FROM %s", occupXlandUseTable));
+			// initialize and populate the hashmaps
+			while (rs.next()) {
+				String currentOccupation = rs.getString("occup");
+				HashMap<String, Double> occupMap = new HashMap<String, Double>();
+				this.landUseGivenOccupation.put(currentOccupation, occupMap);
+				ResultSet rs2 = dba.executeQuery(String.format(
+						"SELECT * FROM %s WHERE occup = \'%s\'",
+						occupXlandUseTable, currentOccupation));
+				while (rs2.next()) {
+					occupMap.put(rs2.getString("lu_type"),
+							rs2.getDouble("problandusegivenoccup"));
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+		inputLog.info("DONE: Loading occupation vs masterplan landuse type frequencies");
+	}
+
+	public void restoreIfDeserialized(ScenarioImpl scenario, DataBaseAdmin dba,
+			Properties p) {
+		this.setScenario(scenario);
+		this.setDiverseScriptProperties(p);
+		this.setDba(dba);
+		inputLog = Logger.getLogger("InputData");
+	}
+
+	public void setDba(DataBaseAdmin dba) {
+		this.dba = dba;
+	}
+
+	public void setDiverseScriptProperties(Properties diverseScriptProperties) {
+		this.diverseScriptProperties = diverseScriptProperties;
+	}
+
+	public void setScenario(ScenarioImpl scenario) {
+		this.scenario = scenario;
+	}
+
+}
