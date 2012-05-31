@@ -33,33 +33,33 @@ public class MobSimSwitcher implements ControlerListener,
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		PersonalizableTravelTime ttcalc = event.getControler()
 				.getTravelTimeCalculator();
-//
-//		int numberOfIterations = Integer.parseInt(event.getControler()
-//				.getConfig().getParam("MobSimSwitcher", EXPENSIVE_SIM_ITERS));
-//
-//		int iterationsFromStart = event.getIteration()
-//				- event.getControler().getFirstIteration();
-//
-//		if (iterationsFromStart % numberOfIterations == 0) {
-//			String mobsim = event.getControler().getConfig().controler()
-//					.getMobsim();
-//
-//			if (mobsim != null) {
-//				if (mobsim.equals("qsim")) {
-//					event.getControler().setMobsimFactory(new QSimFactory());
-//				} else if (mobsim.equals("jdeqsim")) {
-//					event.getControler().setMobsimFactory(
-//							new JDEQSimulationFactory());
-//				}
-//			} else {
-////				event.getControler().setMobsimFactory(
-////						new QueueSimulationFactory());
+
+		int numberOfIterations = Integer.parseInt(event.getControler()
+				.getConfig().getParam("MobSimSwitcher", EXPENSIVE_SIM_ITERS));
+
+		int iterationsFromStart = event.getIteration()
+				- event.getControler().getFirstIteration();
+
+		if (iterationsFromStart % numberOfIterations == 0) {
+			String mobsim = event.getControler().getConfig().controler()
+					.getMobsim();
+
+			if (mobsim != null) {
+				if (mobsim.equals("qsim")) {
+					event.getControler().setMobsimFactory(new QSimFactory());
+				} else if (mobsim.equals("jdeqsim")) {
+					event.getControler().setMobsimFactory(
+							new JDEQSimulationFactory());
+				}
+			} else {
+				event.getControler().setMobsimFactory(
+						new QueueSimulationFactory());
 //				event.getControler().setMobsimFactory(
 //						new FakeSimFactory(ttcalc));
-//			}
-//		} else {
+			}
+		} else {
 			event.getControler().setMobsimFactory(new FakeSimFactory(ttcalc));
-//		}
+		}
 	}
 
 }

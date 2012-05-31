@@ -44,6 +44,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 		config = controler.getConfig();
 
 		if (!annealSwitch) {
+			log.error("No simulated annealing of replanning.");
 			return;
 		}
 		// initialize params
