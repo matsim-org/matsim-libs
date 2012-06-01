@@ -546,16 +546,17 @@ public class EvacuationAreaSelector implements ActionListener{
 				roadClosures.remove(currentLinkId2);
 		}
 		
-		if (roadClosures.size()>0)
-		{
-			Iterator it = roadClosures.entrySet().iterator();
-			
-		    while (it.hasNext())
-		    {
-		        Map.Entry pairs = (Map.Entry)it.next();
-		        System.out.println(pairs.getKey() + " = " + pairs.getValue());
-		    }
-		}
+		
+//		if (roadClosures.size()>0)
+//		{
+//			Iterator it = roadClosures.entrySet().iterator();
+//			
+//		    while (it.hasNext())
+//		    {
+//		        Map.Entry pairs = (Map.Entry)it.next();
+////		        System.out.println(pairs.getKey() + " = " + pairs.getValue());
+//		    }
+//		}
 
 		
 	}
