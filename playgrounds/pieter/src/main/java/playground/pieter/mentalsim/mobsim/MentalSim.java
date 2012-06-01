@@ -91,9 +91,9 @@ public class MentalSim implements Mobsim {
 
 				plans.add(p.getSelectedPlan());
 			}
-				Logger.getLogger(this.getClass()).error("Executing "+plans.size()+" plans in mental simulation.");
 			
 		}
+		Logger.getLogger(this.getClass()).error("Executing "+plans.size()+" plans in mental simulation.");
 
 		Network network = sc.getNetwork();
 
