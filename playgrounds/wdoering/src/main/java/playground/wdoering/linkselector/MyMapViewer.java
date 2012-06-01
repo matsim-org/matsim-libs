@@ -125,7 +125,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-//		System.out.println("klick!" + " e.getButton():" + e.getButton());
 		
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
@@ -150,22 +149,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							evacSel.setLink2Id(currentHoverLinkIds.get(1)[2]);
 							
 							
-//							for (int i = 0; i<currentHoverLinkIds.size(); i++)
-//							{
-//								Coord[] fromToCoords = links.get(currentHoverLinkIds.get(i));
-//								
-//								Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(fromToCoords[0].getY(),fromToCoords[0].getX()), this.getZoom());
-//								Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(fromToCoords[1].getY(), fromToCoords[1].getX()), this.getZoom());
-//								
-//								int x1 = (int) (from2D.getX()-b.x);
-//								int y1 = (int) (from2D.getY()-b.y);
-//								int x2 = (int) (to2D.getX()-b.x);
-//								int y2 = (int) (to2D.getY()-b.y);
-//								
-//								if (i==0)
-//									
-//								
-//							}
 						}
 						else
 						{
@@ -194,33 +177,33 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		
 	}
 
-	private void updateTable()
-	{
-		HashMap<Id, String> roadClosures = evacSel.getRoadClosures();
-		
-		if (roadClosures!=null)
-		{
-			String[] columnNames = {"ID", "time"};
-			Object[][] data = new Object[roadClosures.size()][2];
-			
-			Iterator it = roadClosures.entrySet().iterator();
-			int i = 0;
-		    while (it.hasNext())
-		    {
-		        Map.Entry pairs = (Map.Entry)it.next();
-		        
-		        data[i][0] = (String)pairs.getKey().toString();
-		        data[i][1] = (String)pairs.getValue();
-		        
-		        System.out.println("i:" + i + " ; " + pairs.getKey().toString());
-		        i++;
-		    }
-			
-//		    Tab
-			
-		}
-		
-	}
+//	private void updateTable()
+//	{
+//		
+//		
+//		HashMap<Id, String> roadClosures = evacSel.getRoadClosures();
+//		
+//		if (roadClosures!=null)
+//		{
+//			String[] columnNames = {"ID", "time"};
+//			Object[][] data = new Object[roadClosures.size()][2];
+//			
+//			Iterator it = roadClosures.entrySet().iterator();
+//			int i = 0;
+//		    while (it.hasNext())
+//		    {
+//		        Map.Entry pairs = (Map.Entry)it.next();
+//		        
+//		        data[i][0] = (String)pairs.getKey().toString();
+//		        data[i][1] = (String)pairs.getValue();
+//		        
+//		        System.out.println("i:" + i + " ; " + pairs.getKey().toString());
+//		        i++;
+//		    }
+//			
+//		}
+//		
+//	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
@@ -245,23 +228,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	@Override
 	public void mousePressed(MouseEvent e) {
 		
-		if (e.getButton() == MouseEvent.BUTTON1)
-		{
-//			this.editMode = true;
-//			if (this.thread != null)
-//			{
-////				System.out.println("interrupt");
-//				this.thread.stop();
-//			}
-//			
-//			this.snapper.reset();
-//			
-//			Rectangle b = this.getViewportBounds();
-//			Point p0 = e.getPoint();
-//			Point wldPoint = new Point(p0.x+b.x,p0.y+b.y);
-//			
-//			this.c0 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
-		}
 		
 		if (!this.editMode) {
 			for (MouseListener m : this.m) {
@@ -285,19 +251,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		
 		
 		if (e.getButton() == MouseEvent.BUTTON1)
-		{
-//			this.editMode = false;
-//			Point p1 = e.getPoint();
-//			Rectangle b = this.getViewportBounds();
-//			Point wldPoint = new Point(p1.x+b.x,p1.y+b.y);
-//			
-//			this.c1 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
-//			this.snapper.setCoordinates(this.c0,this.c1);
-////			this.thread.interrupt();
-//			this.thread = new Thread(this.snapper);
-//			this.thread.start();
 			repaint();
-		}
 		
 	}
 
@@ -350,13 +304,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			}
 		}
 		else
-		{
-//			Point p = arg0.getPoint();
-//			Rectangle b = this.getViewportBounds();
-//			Point wldPoint = new Point(p.x+b.x,p.y+b.y);
-//			this.c1 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
 			repaint();
-		}
 		
 	}
 
@@ -406,17 +354,16 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				
 				wPoint = null;
 			
+				//get geo mouseposition
 				if (currentMousePosition!=null)
 				{
 					Point wldPoint = new Point(currentMousePosition.x+b.x,currentMousePosition.y+b.y);
 					wPoint = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
-					
 				}
 				
 				
+				//go through all links, draw them and check if the mouse cursor is nearby (for highlighting)
 			    Iterator it = links.entrySet().iterator();
-			    
-			    
 			    while (it.hasNext())
 			    {
 			    	
@@ -455,34 +402,15 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						
 						CoordImpl wCoord = new CoordImpl(wPoint.getLongitude(), wPoint.getLatitude());
 
-						//Collection<Node> nodes = this.snapper.getNearestNodes(wCoord);
 						
-//						for (Node node : nodes)
-//						{
-////							System.out.println("_:_:_:_:_:_" + node.getId());
-//						}
-						
-//						if ( (y2-y1)*x3 + (-(x2-x1) * y3 ) == (y2-y1)*x2 + (-(x2-x1)*y2))
-
 						if ((mouseX <= maxX) && (mouseX >= minX) && (mouseY <= maxY) && (mouseY >= minY))
 						{
-//							( MX - AX ) / BX = R
-//							( MY - AY ) / BY = R
-							
-//							float r1 = ((float)mouseX - (float)minX) / (float)maxX;
-//							float r2 = ((float)mouseY - (float)minY) / (float)maxY;
 							float r1 = ((float)mouseX - (float)x1) / (float)x;
 							float r2 = ((float)mouseY - (float)y1) / (float)y;
 							
+							//if cursor is nearby, draw roads in another color
 							if ((r1 - .3f < r2) && (r1 + .3f > r2))
 							{
-																	
-										
-//								if (currentHoverLinkIds.size()>0)
-//								{
-//									Id[] tempFromToIds;
-//								}	
-								
 								if ((!freezeMode) && (currentHoverLinkIds.size()<2))
 										currentHoverLinkIds.add(fromToIds);
 								
@@ -497,50 +425,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 					if ((freezeMode)&&(currentHoverLinkIds.contains(fromToIds)))
 					{
-//						g.drawLine(x1,y1,x2,y2);
-//						
-//						if (currentMultipleLink==0)
-//							g.setColor(new Color(255,0,0,250));
-//						else if (currentMultipleLink==1)
-//							g.setColor(new Color(0,255,0,250));
-//						else
-//							g.setColor(new Color(0,0,255,50));
-//						
-//						
-//						x1+=(-y)/8;
-//						y1+=x/8;
-//						x2+=(-y)/8;
-//						y2+=x/8;
-//						
-////						if (currentMultipleLink==0)
-////						{
-////						}
-////						if (currentMultipleLink==1)
-////						{
-////							x1-=(-y)/8;
-////							y1-=x/8;
-////							x2-=(-y)/8;
-////							y2-=x/8;
-//////							x1-=Math.max(Math.abs(y)/8,20);
-//////							y1-=Math.max(Math.abs(x)/8,20);
-//////							x2-=Math.max(Math.abs(y)/8,20);
-//////							y2-=Math.max(Math.abs(x)/8,20);
-////						}
-//						
-//						int leftArrowX = x1 + (-y)/5 + x/5;
-//						int leftArrowY = y1 + x/5  + y/5;
-//						int rightArrowX = x1 - (-y)/5 +  x/5;
-//						int rightArrowY = y1 - x/5  + y/5;
-//						
-//						g.drawLine(x1,y1,leftArrowX,leftArrowY);
-//						g.drawLine(x1,y1,rightArrowX,rightArrowY);
-//						g.drawLine(x1,y1,x2,y2);
-//						
-//						currentMultipleLink++;
-						
-//						int length = (int)Math.sqrt(Math.abs(x1-x2)*Math.abs(x1-x2) + Math.abs(y1-y2)*Math.abs(y1-y2));
-//						g.fillOval((x1+x2)/2 - length/2, (y1+y2)/2 - length/2, length, length);
-						
+
 						
 					}
 					else
