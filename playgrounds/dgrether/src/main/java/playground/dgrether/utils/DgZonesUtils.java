@@ -33,6 +33,7 @@ import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
@@ -41,6 +42,9 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
 
@@ -68,7 +72,7 @@ public class DgZonesUtils {
 	public static Map<DgZone, Link> createZoneCenter2LinkMapping(List<DgZone> zones, NetworkImpl network){
 		Map<DgZone, Link> map = new HashMap<DgZone, Link>();
 		for (DgZone zone : zones){
-			Coord coord = MGC.coordinate2Coord(zone.getCenter());
+			Coord coord = MGC.coordinate2Coord(zone.getCoordinate());
 			LinkImpl link = network.getNearestLink(coord);
 			map.put(zone, link);
 		}
@@ -91,7 +95,7 @@ public class DgZonesUtils {
 				List<Object> attributes = new ArrayList<Object> ();
 				Polygon p = cell.getPolygon();
 				attributes.add(p);
-				for (Entry<DgZone, Integer> entry : cell.getToRelationships().entrySet()){
+				for (Entry<DgZone, Integer> entry : cell.getToZoneRelations().entrySet()){
 					log.info("  to cell " + entry.getKey().getId() + " # trips: " + entry.getValue());
 					attributes.add( entry.getKey().getId());
 					attributes.add( entry.getValue());
@@ -107,6 +111,44 @@ public class DgZonesUtils {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		} 
+	}
+
+
+	public static void writeLineStringOdPairsFromZones2Shapefile(List<DgZone> cells,
+			CoordinateReferenceSystem crs, String shapeFilename) {
+		List<Feature> featureCollection = new ArrayList<Feature>();
+		AttributeType [] attribs = new AttributeType[2];
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, crs);
+		attribs[1] = AttributeTypeFactory.newAttributeType("no trips", Integer.class);
+		try {
+			FeatureType featureType = FeatureTypeBuilder.newFeatureType(attribs, "ls_od_pair");
+			GeometryFactory geoFac = new GeometryFactory();
+			
+			for (DgZone zone : cells){
+				for (DgDestination destination : zone.getDestinations() ){
+					addLineStringFeature(featureType, featureCollection, geoFac, zone, destination);
+				}
+				for (DgZoneFromLink fromLink : zone.getFromLinks().values()){
+					for (DgDestination destination : fromLink.getDestinations() ){
+						addLineStringFeature(featureType, featureCollection, geoFac, fromLink, destination);
+					}
+				}
+			}
+			ShapeFileWriter.writeGeometries(featureCollection, shapeFilename);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private static void addLineStringFeature(FeatureType featureType, List<Feature> featureCollection, GeometryFactory geoFac, DgOrigin origin, DgDestination destination) throws IllegalAttributeException{
+		Coordinate startCoordinate = origin.getCoordinate();
+		Coordinate endCoordinate = destination.getCoordinate();
+		Coordinate[] coordinates = {startCoordinate, endCoordinate};
+		LineString lineString = geoFac.createLineString(coordinates);
+		Object[] atts = {lineString, destination.getNumberOfTrips()};
+		Feature feature = featureType.create(atts);
+		featureCollection.add(feature);
 	}
 	
 

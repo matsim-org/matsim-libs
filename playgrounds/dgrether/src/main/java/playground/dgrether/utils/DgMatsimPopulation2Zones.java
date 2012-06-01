@@ -134,14 +134,44 @@ public class DgMatsimPopulation2Zones {
 	}
 
 	
-	private void addFromToRelationshipToGrid(Coordinate startCoordinate, Coordinate endCoordinate){
+	private void addFromZoneToZoneRelationshipToGrid(Coordinate startCoordinate, Coordinate endCoordinate){
 		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
 		DgZone startCell = this.searchGridCell(startCoordinate);
 		DgZone endCell = this.searchGridCell(endCoordinate);
 		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
-		startCell.addToRelationship(endCell);
+		startCell.addToZoneRelation(endCell);
 	}
 
+	private void addFromLinkToLinkRelationshipToGrid(Link startLink, Link endLink){
+		Coordinate startCoordinate = MGC.coord2Coordinate(startLink.getCoord());
+		DgZone startCell = this.searchGridCell(startCoordinate);
+		Coordinate endCoordinate = MGC.coord2Coordinate(endLink.getCoord());
+		DgZone endCell = this.searchGridCell(endCoordinate);
+		startCell.getFromLink(startLink).addToLinkRelation(endLink);
+		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
+		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+	}
+
+	private void addFromZoneToLinkRelationshipToGrid(Coordinate startCoordinate, Link endLink){
+		DgZone startCell = this.searchGridCell(startCoordinate);
+		Coordinate endCoordinate = MGC.coord2Coordinate(endLink.getCoord());
+		DgZone endCell = this.searchGridCell(endCoordinate);
+		startCell.addToLinkRelation(endLink);
+		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
+		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+	}
+
+	private void addFromLinkToZoneRelationshipToGrid(Link startLink, Coordinate endCoordinate){
+		Coordinate startCoordinate = MGC.coord2Coordinate(startLink.getCoord());
+		DgZone startCell = this.searchGridCell(startCoordinate);
+		DgZone endCell = this.searchGridCell(endCoordinate);
+		startCell.getFromLink(startLink).addToZoneRelation(endCell);
+		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
+		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+
+	}
+
+	
 	private DgZone searchGridCell(Coordinate coordinate){
 		Point p = this.geoFac.createPoint(coordinate);
 		for (DgZone cell : this.cells){
@@ -159,19 +189,54 @@ public class DgMatsimPopulation2Zones {
 		Coordinate startCoordinate = MGC.coord2Coordinate(startAct.getCoord());
 		Coordinate endCoordinate = MGC.coord2Coordinate(targetAct.getCoord());
 		log.info("Processing leg from: " + startCoordinate + " to " + endCoordinate);
-		if (networkBoundingBox.contains(startCoordinate)
-				&& networkBoundingBox.contains(endCoordinate)) {
+		boolean netContainsStartCoordinate  = networkBoundingBox.contains(startCoordinate);
+		boolean netContainsEndCoordinate = networkBoundingBox.contains(endCoordinate);
+		if (netContainsStartCoordinate
+				&& netContainsEndCoordinate) {
 			log.info("  coordinates in grid...");
-			this.addFromToRelationshipToGrid(startCoordinate, endCoordinate);
+			this.addFromZoneToZoneRelationshipToGrid(startCoordinate, endCoordinate);
+		}
+		else if (netContainsStartCoordinate && ! netContainsEndCoordinate){
+			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
+			List<Link> route = this.createFullRoute(network, networkRoute);
+			Link lastLink = null;
+			Coordinate coordinate = null;
+			for (Link link : route){
+				coordinate = MGC.coord2Coordinate(link.getCoord());
+				if (! networkBoundingBox.contains(coordinate)) {
+					break;
+				}
+				lastLink = link;
+			}
+			if (lastLink != null) {
+				this.addFromZoneToLinkRelationshipToGrid(startCoordinate, lastLink);
+			}
+		}
+		else if (! netContainsStartCoordinate &&  netContainsEndCoordinate){
+			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
+			List<Link> route = this.createFullRoute(network, networkRoute);
+			Link firstLink = null;
+			Coordinate coordinate = null;
+			for (Link link : route){
+				coordinate = MGC.coord2Coordinate(link.getCoord());
+				if (networkBoundingBox.contains(coordinate)) {
+					firstLink = link;
+					break;
+				}
+			}
+			if (firstLink != null){
+				this.addFromLinkToZoneRelationshipToGrid(firstLink, endCoordinate);
+			}
 		}
 		else {
-			NetworkRoute route = (NetworkRoute) leg.getRoute();
-			List<Coordinate> coordinateSequence = this.createCoordinateSequenceFromRoute(network, route);
+			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
+			List<Link> route = this.createFullRoute(network, networkRoute);
+//			List<Coordinate> coordinateSequence = this.createCoordinateSequenceFromRoute(network, networkRoute);
 			boolean isRouteInGrid = false;
-			while (! coordinateSequence.isEmpty()){
-				Tuple<Coordinate, Coordinate> nextFromTo = this.getNextFromToOfRoute(network, coordinateSequence, networkBoundingBox);
+			while (! route.isEmpty()){
+				Tuple<Link, Link> nextFromTo = this.getNextFromToOfRoute(network, route, networkBoundingBox);
 				if (nextFromTo != null){
-					this.addFromToRelationshipToGrid(nextFromTo.getFirst(), nextFromTo.getSecond());
+					this.addFromLinkToLinkRelationshipToGrid(nextFromTo.getFirst(), nextFromTo.getSecond());
 					isRouteInGrid = true;
 				}
 			}
@@ -181,45 +246,48 @@ public class DgMatsimPopulation2Zones {
 		}
 	}
 
-	private List<Coordinate> createCoordinateSequenceFromRoute(Network network, NetworkRoute route){
+	private List<Link> createFullRoute(Network network, NetworkRoute route) {
 		List<Id> linkIds = new ArrayList<Id>();
 		linkIds.add(route.getStartLinkId());
 		linkIds.addAll(route.getLinkIds());
 		linkIds.add(route.getEndLinkId());
-		List<Coordinate> coordinates = new ArrayList<Coordinate>();
+		List<Link> links = new ArrayList<Link>();
 		for (Id linkId : linkIds){
 			Link currentLink = network.getLinks().get(linkId);
-			Coordinate currentCoordinate = MGC.coord2Coordinate(currentLink.getCoord());
-			coordinates.add(currentCoordinate);
+			links.add(currentLink);
 		}
-		return coordinates;
+		return links;
 	}
+
 	
-	private Tuple<Coordinate, Coordinate> getNextFromToOfRoute(Network network, List<Coordinate> coordinateSequence,
+	private Tuple<Link, Link> getNextFromToOfRoute(Network network, List<Link> route,
 			Envelope networkBoundingBox) {
-		Coordinate routeStartCoordinate = null;
-		Coordinate routeEndCoordinate = null;
+		Link routeStartLink = null;
+		Link routeEndLink = null;
+		Link currentLink = null;
 		Coordinate currentCoordinate = null;
 		//search next start coordinate within grid on route
-		while (! coordinateSequence.isEmpty()){
-			currentCoordinate = coordinateSequence.remove(0);
+		while (! route.isEmpty()){
+			currentLink = route.remove(0);
+			currentCoordinate = MGC.coord2Coordinate(currentLink.getCoord());
 			if (networkBoundingBox.contains(currentCoordinate)){
-				routeStartCoordinate = currentCoordinate;
+				routeStartLink = currentLink;
 				break;
 			}
 		}
 		//search last link that is contained in grid
-		while (! coordinateSequence.isEmpty()){
-			currentCoordinate = coordinateSequence.remove(0);
+		while (! route.isEmpty()){
+			currentLink = route.remove(0);
+			currentCoordinate = MGC.coord2Coordinate(currentLink.getCoord());
 			if (networkBoundingBox.contains(currentCoordinate)){
-				routeEndCoordinate = currentCoordinate;
+				routeEndLink = currentLink;
 			}
 			else {
 				break;
 			}
 		}
-		if (routeStartCoordinate != null && routeEndCoordinate != null){
-			return new Tuple<Coordinate, Coordinate>(routeStartCoordinate, routeEndCoordinate);
+		if (routeStartLink != null && routeEndLink != null){
+			return new Tuple<Link, Link>(routeStartLink, routeEndLink);
 		}
 		return null;
 	}

@@ -72,7 +72,7 @@ public class DgCottbusSmallNetworkGenerator {
 
 	private Network shrinkedNetwork;
 	
-	public Network createSmallNetwork(String networkFile, String signalSystemsFile){
+	public Network createSmallNetwork(String networkFile, String signalSystemsFile, double offset){
 		Config c1 = ConfigUtils.createConfig();
 		c1.network().setInputFile(networkFile);
 		c1.scenario().setUseSignalSystems(true);
@@ -93,12 +93,10 @@ public class DgCottbusSmallNetworkGenerator {
 		for (Set<Id> set : signalizedLinkIdsBySystemIdMap.values()){
 			signalizedLinkIds.addAll(set);
 		}
-		Feature boundingboxFeature = calcBoundingBox(net, signalizedLinkIds);
-		
+		Feature boundingboxFeature = calcBoundingBox(net, signalizedLinkIds, offset);
 
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
 		filterManager.addLinkFilter(new FeatureNetworkLinkFilter(networkSrs, boundingboxFeature, networkSrs));
-		
 		Network newNetwork = filterManager.applyFilters();
 		
 		String output = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/network";
@@ -128,7 +126,7 @@ public class DgCottbusSmallNetworkGenerator {
 		return this.boundingBox;
 	}
 	
-	private Feature calcBoundingBox(Network net, Set<Id> signalizedLinkIds) {
+	private Feature calcBoundingBox(Network net, Set<Id> signalizedLinkIds, double offset) {
 		Link l = null;
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
@@ -160,7 +158,7 @@ public class DgCottbusSmallNetworkGenerator {
 		log.info("Found bounding box: "  + minX + " " + minY + " " + maxX + " " + maxY);
 		
 		this.boundingBox = new Envelope(coordinates[0], coordinates[2]);
-		
+		this.boundingBox.expandBy(offset, offset);
 		LinearRing linearRing = geoFac.createLinearRing(coordinates);
 		Polygon polygon = geoFac.createPolygon(linearRing, null);
 		FeatureType featureType = null;
@@ -177,7 +175,7 @@ public class DgCottbusSmallNetworkGenerator {
 
 
 	public static void main(String[] args){
-		new DgCottbusSmallNetworkGenerator().createSmallNetwork(args[0], args[1]);
+		new DgCottbusSmallNetworkGenerator().createSmallNetwork(args[0], args[1], Double.valueOf(args[2]));
 	}
 	
 }

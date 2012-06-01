@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GridCell
+ * DgOrigin
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,73 +19,27 @@
  * *********************************************************************** */
 package playground.dgrether.utils;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Polygon;
+
 
 /**
  * @author dgrether
+ *
  */
-public class DgZone extends DgOriginImpl implements DgOrigin{
+public interface DgOrigin {
 
-	private Polygon polygon;
-	private String id;
-	private Map<Id, DgZoneFromLink> fromLinks = new HashMap<Id, DgZoneFromLink>();
-	
-	public DgZone(String id, Polygon p) {
-		this.id = id;
-		polygon = p;
-	}
-	
-	public String getId(){
-		return this.id;
-	}
+	public void addToZoneRelation(DgZone toZone);
 
-	public Envelope getEnvelope() {
-		return this.polygon.getEnvelope().getEnvelopeInternal();
-	}
-
+	public void addToLinkRelation(Link endLink);
 	
-	public Polygon getPolygon() {
-		return this.polygon;
-	}
+	public Coordinate getCoordinate();
 	
-	@Override
-	public Coordinate getCoordinate(){
-		return this.getEnvelope().centre();
-	}
-
-	public Map<Id, DgZoneFromLink> getFromLinks(){
-		return this.fromLinks;
-	}
+	public Map<DgZone, Integer> getToZoneRelations();
 	
-	public DgZoneFromLink getFromLink(Link startLink) {
-		if (! fromLinks.containsKey(startLink.getId())){
-			fromLinks.put(startLink.getId(), new DgZoneFromLink(startLink));
-		}
-		return fromLinks.get(startLink.getId());
-	}
-	
-}
-
-class DgZoneFromLink extends DgOriginImpl implements DgOrigin {
-
-	private Link link;
-	
-	public DgZoneFromLink(Link startLink) {
-		this.link = startLink;
-	}
-
-	@Override
-	public Coordinate getCoordinate() {
-		return MGC.coord2Coordinate(this.link.getCoord());
-	}
+	public Map<Link, Integer> getToLinkRelations();
 	
 }

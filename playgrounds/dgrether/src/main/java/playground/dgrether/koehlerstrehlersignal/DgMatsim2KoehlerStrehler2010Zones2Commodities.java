@@ -49,12 +49,12 @@ public class DgMatsim2KoehlerStrehler2010Zones2Commodities implements
 		DgCommodities coms = new DgCommodities();
 		for (DgZone fromZone : this.zones2LinkMap.keySet()){
 			Link fromZoneLink = this.zones2LinkMap.get(fromZone);
-			for (DgZone toZone : fromZone.getToRelationships().keySet()){
+			for (DgZone toZone : fromZone.getToZoneRelations().keySet()){
 				DgCommodity com = new DgCommodity(new IdImpl(fromZone.getId() + "_" + toZone.getId()));
 					coms.addCommodity(com);
 				Link toZoneLink = this.zones2LinkMap.get(toZone);
 				//TODO check translation of demand again (ids and flow)
-				com.addSourceNode(fromZoneLink.getToNode().getId(), fromZone.getToRelationships().get(toZone).doubleValue());
+				com.addSourceNode(fromZoneLink.getToNode().getId(), fromZone.getToZoneRelations().get(toZone).doubleValue());
 				com.addDrainNode(toZoneLink.getToNode().getId());
 			}
 		}

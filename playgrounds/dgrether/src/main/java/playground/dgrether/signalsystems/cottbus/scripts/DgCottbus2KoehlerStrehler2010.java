@@ -35,12 +35,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.koehlerstrehlersignal.DgKoehlerStrehler2010ModelWriter;
-import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010DemandConverter;
-import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010NetworkConverter;
-import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010Zones2Commodities;
-import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
-import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
 import playground.dgrether.utils.DgGrid;
 import playground.dgrether.utils.DgGridUtils;
@@ -58,8 +52,8 @@ public class DgCottbus2KoehlerStrehler2010 {
 	public static final Logger log = Logger.getLogger(DgCottbus2KoehlerStrehler2010.class);
 	
 	private static String smallNet = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/network_small.xml.gz";
-//	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
-	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
+	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
+//	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 	private static String modelOutfile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/koehler_strehler_model.xml";
 	
 	private static String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
@@ -67,30 +61,30 @@ public class DgCottbus2KoehlerStrehler2010 {
 
 	
 	public static void main(String[] args) {
-		int cellsX = 10;
-		int cellsY = 10;
-
-		DgCottbusSmallNetworkGenerator netShrinker = shrinkAndWriteNetwork(netFile, signalSystems, smallNet);
+		int cellsX = 5;
+		int cellsY = 5;
+		double boundingBoxOffset = 100.0;
+		DgCottbusSmallNetworkGenerator netShrinker = shrinkAndWriteNetwork(netFile, signalSystems, smallNet, boundingBoxOffset);
 		DgGrid grid = createAndWriteGrid(netShrinker.getBoundingBox(), netShrinker.getCrs(), cellsX, cellsY, DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/grid.shp");
 
 		Scenario scenario = loadScenario(DgCottbusScenarioPaths.NETWORK_FILENAME, populationFile);
 		
 		List<DgZone> cells = DgZonesUtils.createZonesFromGrid(grid);
-		//TODO add code that allows multiple sources for incomming links
 		DgMatsimPopulation2Zones scenarioConverter = new DgMatsimPopulation2Zones();
 		cells = scenarioConverter.convert2Zones(scenario, cells, netShrinker.getBoundingBox());
 		DgZonesUtils.writePolygonZones2Shapefile(cells, netShrinker.getCrs(), DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/grid_cells.shp");
+		DgZonesUtils.writeLineStringOdPairsFromZones2Shapefile(cells, netShrinker.getCrs(), DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/grid_od_pairs.shp");
 		Map<DgZone, Link> zones2LinkMap = DgZonesUtils.createZoneCenter2LinkMapping(cells, (NetworkImpl) netShrinker.getShrinkedNetwork());
 
 
 		//create koehler strehler network
 		//TODO check parameters for flow and commodities
-		Scenario sc = loadNetworkLanesSignals();
-		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter();
-		DgKSNetwork dgNet = netConverter.convertNetworkLanesAndSignals(sc);
-		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap);
-		DgCommodities commodities = demandConverter.convert(sc, dgNet);
-		new DgKoehlerStrehler2010ModelWriter().write(sc, dgNet, commodities, modelOutfile);
+//		Scenario sc = loadNetworkLanesSignals();
+//		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter();
+//		DgKSNetwork dgNet = netConverter.convertNetworkLanesAndSignals(sc);
+//		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap);
+//		DgCommodities commodities = demandConverter.convert(sc, dgNet);
+//		new DgKoehlerStrehler2010ModelWriter().write(sc, dgNet, commodities, modelOutfile);
 	}
 	
 	public static Scenario loadNetworkLanesSignals(){
@@ -128,9 +122,9 @@ public class DgCottbus2KoehlerStrehler2010 {
 	}
 	
 	
-	public static DgCottbusSmallNetworkGenerator shrinkAndWriteNetwork(String networkFile, String signalSystemsFile, String shrinkedNetOutfile){
+	public static DgCottbusSmallNetworkGenerator shrinkAndWriteNetwork(String networkFile, String signalSystemsFile, String shrinkedNetOutfile, double offset){
 		DgCottbusSmallNetworkGenerator netShrinker = new DgCottbusSmallNetworkGenerator();
-		netShrinker.createSmallNetwork(networkFile, signalSystemsFile);
+		netShrinker.createSmallNetwork(networkFile, signalSystemsFile, offset);
 		Network smallNetwork = netShrinker.getShrinkedNetwork();
 		NetworkWriter netWriter = new NetworkWriter(smallNetwork);
 		netWriter.write(shrinkedNetOutfile);
