@@ -73,7 +73,6 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 			umlaeufe = new HashMap<Id,Umlauf>();
 			createEmptyUmlaeufe();
 			createUmlaufStuecke();
-			log.info("Generating Umlaeufe; if this is extremely slow, try more memory:") ;
 			int cnt = 0 ;
 			for (UmlaufStueck umlaufStueck : umlaufStuecke) {
 				Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
