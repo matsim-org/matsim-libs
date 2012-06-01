@@ -45,7 +45,7 @@ import playground.pieter.mentalsim.util.CollectionUtils;
  * @author fouriep
  * 
  */
-public class FakeSim implements Mobsim {
+public class MentalSim implements Mobsim {
 
 	Scenario sc;
 	EventsManager eventManager;
@@ -61,7 +61,7 @@ public class FakeSim implements Mobsim {
 	private final ExecutorService executor;
 	private TravelTimeCalculator linkTravelTimes;
 
-	public FakeSim(Scenario sc, EventsManager eventsManager) {
+	public MentalSim(Scenario sc, EventsManager eventsManager) {
 		this.sc = sc;
 		this.eventManager = eventsManager;
 		int numThreads = Integer.parseInt(sc.getConfig().getParam("global",
@@ -75,7 +75,7 @@ public class FakeSim implements Mobsim {
 		futures = new Future[numThreads];
 	}
 
-	public FakeSim(Scenario sc2, EventsManager eventsManager,
+	public MentalSim(Scenario sc2, EventsManager eventsManager,
 			PersonalizableTravelTime ttcalc) {
 		this(sc2, eventsManager);
 		this.linkTravelTimes = (TravelTimeCalculator) ttcalc;

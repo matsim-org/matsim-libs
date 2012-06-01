@@ -13,16 +13,16 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
  * @author fouriep
  *
  */
-public class FakeSimFactory implements MobsimFactory {
+public class MentalSimFactory implements MobsimFactory {
 	PersonalizableTravelTime ttcalc;
-	public FakeSimFactory(PersonalizableTravelTime ttcalc) {
+	public MentalSimFactory(PersonalizableTravelTime ttcalc) {
 		this.ttcalc = ttcalc;
 	}
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
-		return new FakeSim(sc, eventsManager, ttcalc);
+		return new MentalSim(sc, eventsManager, ttcalc);
 	}
 
 

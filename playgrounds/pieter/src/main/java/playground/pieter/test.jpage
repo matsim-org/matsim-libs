@@ -1,0 +1,3 @@
+int i=10;
+int j=3;
+double v = (double) i/j; System.out.print(v);

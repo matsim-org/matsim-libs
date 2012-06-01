@@ -9,7 +9,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.pieter.mentalsim.mobsim.FakeSimFactory;
+import playground.pieter.mentalsim.mobsim.MentalSimFactory;
 
 /**
  * @author fouriep
@@ -25,10 +25,6 @@ public class MobSimSwitcher implements ControlerListener,
 		IterationStartsListener {
 
 	final static String EXPENSIVE_SIM_ITERS = "expensiveSimIters";
-	final static String START_PROPORTION = "startProportion";
-	final static String END_PROPORTION = "endProportion";
-	final static String ANNEAL_TYPE = "annealType";
-
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		PersonalizableTravelTime ttcalc = event.getControler()
@@ -58,7 +54,7 @@ public class MobSimSwitcher implements ControlerListener,
 //						new FakeSimFactory(ttcalc));
 			}
 		} else {
-			event.getControler().setMobsimFactory(new FakeSimFactory(ttcalc));
+			event.getControler().setMobsimFactory(new MentalSimFactory(ttcalc));
 		}
 	}
 

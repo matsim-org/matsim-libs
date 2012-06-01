@@ -29,7 +29,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 	final static String modName = "SimpleAnnealer";
 	static double startProportion = -1;
 	static double endProportion = 0.001;
-	static double currentProportion = -1;
+	static double currentProportion = 0.1;
 	static double geoFactor = 0.9;
 	static int halfLife = 50;
 	static double slope = -1;
@@ -83,7 +83,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 					"exponential")) {
 				isExponential = true;
 				if (ep != null)
-					log.warn("Using geometric annealing, so " + END_PROPORTION
+					log.warn("Using exponential annealing, so " + END_PROPORTION
 							+ " parameter not used");
 				String ef = config.getParam(modName, HALF_LIFE);
 				if (ef != null && Integer.parseInt(ef) > 0) {
@@ -122,7 +122,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			else
 				currentProportion = currentIter * slope + startProportion;
 		}
-		anneal(event);
+		anneal(event, currentProportion);
 	}
 
 	/**
@@ -132,8 +132,8 @@ public class SimpleAnnealer implements IterationStartsListener,
 	 *            re-planning in total.
 	 * @throws InterruptedException
 	 */
-	private void anneal(IterationStartsEvent event) {
-		StrategyManager stratMan = controler.getStrategyManager();
+	public static void anneal(IterationStartsEvent event, double proportion) {
+		StrategyManager stratMan = event.getControler().getStrategyManager();
 		List<PlanStrategy> strategies = stratMan.getStrategies();
 		double totalWeights = 0.0;
 		double totalSelectorWeights = 0.0;
@@ -152,12 +152,12 @@ public class SimpleAnnealer implements IterationStartsListener,
 			totalWeights += weight;
 		}
 
-		double selectorFactor = (1 - currentProportion)
+		double selectorFactor = (1 - proportion)
 				/ (totalSelectorWeights / totalWeights);
-		double nonSelectorFactor = currentProportion
+		double nonSelectorFactor = proportion
 				/ ((totalWeights - totalSelectorWeights) / totalWeights);
 		String outputToWrite = "\t" + event.getIteration() + "\t" + currentIter
-				+ "\t" + currentProportion;
+				+ "\t" + proportion;
 		for (PlanStrategy strategy : strategies) {
 			// first read off the weights of the strategies and classify them
 			String strategyName = strategy.toString().toLowerCase();
@@ -180,7 +180,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			outputToWrite += "\t" + strategy + "\t" + weight + "\t" + newWeight;
 			stratMan.changeWeightOfStrategy(strategy, newWeight);
 		}
-		log.error(outputToWrite);
+		Logger.getLogger("ANNEAL").error(outputToWrite);
 
 	}
 }
