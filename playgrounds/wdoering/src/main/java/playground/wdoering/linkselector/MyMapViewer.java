@@ -126,39 +126,41 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	public void mouseClicked(MouseEvent e)
 	{
 		
+		//if left mouse button was clicked
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
+			//if edit mode is off
 			if (!this.editMode)
 			{
+				//if there was no prior selection
 				if (!freezeMode)
 				{
+					//activate edition mode (in gui)
 					evacSel.setEditMode(true);
 					
 					if ((currentHoverLinkIds!=null) && (currentHoverLinkIds.size()>0))
 					{
+						//links are being selected. Freeze the selection
 						freezeMode = true;
 						
+						//give gui the id of the first selected link
 						evacSel.setLink1Id(currentHoverLinkIds.get(0)[2]);
 						
-						Rectangle b = this.getViewportBounds();
-						
+						//if there are more then just one link in hover
 						if (currentHoverLinkIds.size()>1)
 						{
+							//give gui the second selection link
 							displayMultipleLinks = true;
-							
 							evacSel.setLink2Id(currentHoverLinkIds.get(1)[2]);
-							
-							
 						}
 						else
-						{
-							evacSel.setLink2Id(null);
-						}
-
+							//make sure the second link is null then
+							evacSel.setLink2Id(null); 
 						
 					}
 					else
 					{
+						//if nothing is selected, set them null
 						evacSel.setLink1Id(null);
 						evacSel.setLink2Id(null);						
 					}
@@ -172,7 +174,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			}
 		}
 		
-		//TODO FIXME 
+		//TODO FIXME // list of all selected links
 //		updateTable();
 		
 	}
@@ -329,14 +331,15 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	@Override
 	public void paint(Graphics g)
 	{
+		//paint map and links
 		super.paint(g);
 		{
+			//get viewport offset
 			Rectangle b = this.getViewportBounds();
 			
 			g.setColor(Color.black);
 			Graphics2D g2D = (Graphics2D) g;     
 		    g2D.setStroke(new BasicStroke(5F));
-			Polygon p = this.snapper.getPolygon();
 			
 			if (links==null)
 			{
@@ -366,7 +369,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			    Iterator it = links.entrySet().iterator();
 			    while (it.hasNext())
 			    {
-			    	
+			    	//get links (from & to nodes), transform to pixel coordinates and display them 
 			        Map.Entry pairs = (Map.Entry)it.next();
 			        Id[] fromToIds = (Id[]) pairs.getKey();
 			        Coord[] fromToCoords = (Coord[]) pairs.getValue();
@@ -381,6 +384,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 					g2D.setStroke(new BasicStroke(5F));
 					
+					//if there is already data available for the current link (road)
 					if (evacSel.hasLink(fromToIds[2]))
 						g.setColor(Color.blue);
 					else
@@ -389,6 +393,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					int x = (x2-x1);
 					int y = (y2-y1);
 					
+					//check for nearby links (mouse cursor) 
 					if (wPoint!=null)
 					{
 						int mouseX = currentMousePosition.x;
@@ -422,33 +427,29 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						
 					}
 					
-					
-					if ((freezeMode)&&(currentHoverLinkIds.contains(fromToIds)))
-					{
-
-						
-					}
-					else
+					//draw link/road if its not a selected one 
+					if ((!freezeMode)||(!currentHoverLinkIds.contains(fromToIds)))
 						g.drawLine(x1,y1,x2,y2);
 					
 					g.setColor(Color.CYAN);
 				}
 			    
+			    //display selected roads (with arrows)
 			    if ((freezeMode)&&(currentHoverLinkIds.size()>0))
 			    {
 					g2D.setStroke(new BasicStroke(5F));
-
-					int currentMultipleLink = 0;
+					int currentMultipleLinks = 0;
 					
+					//for each hover link
 			    	for (int i = 0; i<currentHoverLinkIds.size();i++)
 			    	{
-			    		
+			    		//get the from & to nodes
 			    		Coord[] fromToCoords = links.get(currentHoverLinkIds.get(i));
-			    		
 			    		
 			    		if (fromToCoords!=null)
 			    		{
-				    		
+
+			    			//tranform to pixel coordinates
 							Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(fromToCoords[0].getY(),fromToCoords[0].getX()), this.getZoom());
 							Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(fromToCoords[1].getY(), fromToCoords[1].getX()), this.getZoom());
 							
@@ -457,14 +458,11 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							int x2 = (int) (to2D.getX()-b.x);
 							int y2 = (int) (to2D.getY()-b.y);
 							
+							//length
 							int x =(x2-x1);
 							int y =(y2-y1);
 							
-//							int maxVal = Math.max(Math.abs(x), Math.abs(y));
-//							
-//							float xN = (float)x/(float)maxVal;
-//							float yN = (float)y/(float)maxVal;
-							
+							//get normalized orientation vector 
 							double xD = fromToCoords[0].getX()-fromToCoords[1].getX();
 							double yD = fromToCoords[1].getY()-fromToCoords[0].getY();
 							
@@ -478,33 +476,32 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							
 							
 				    		
-							
-							if (currentMultipleLink==0)
+							//give each selected link a different color
+							if (currentMultipleLinks==0)
 								g.setColor(new Color(255,0,0,90));
-							else if (currentMultipleLink==1)
+							else if (currentMultipleLinks==1)
 								g.setColor(new Color(0,255,0,90));
-							else if (currentMultipleLink==2)
+							else if (currentMultipleLinks==2)
 								g.setColor(new Color(0,0,255,90));
 							else
 								g.setColor(new Color(127,255,0,90));
 							
 							g.drawLine(x1,y1,x2,y2);
 							
-							if (currentMultipleLink==0)
+							//give each selected link a different arrow position
+							if (currentMultipleLinks==0)
 							{
 								g.setColor(new Color(255,0,0));
 								pivotX+=(int)(xN*15);
 								pivotY+=(int)(yN*15);
-//								System.out.println(pivotX+"|" + pivotY + " - mode:" + currentMultipleLink);
 							}
-							else if (currentMultipleLink==1)
+							else if (currentMultipleLinks==1)
 							{
 								g.setColor(new Color(0,255,0));
-								pivotX-=(int)(xN*15);
-								pivotY-=(int)(yN*15);
-//								System.out.println(pivotX+"|" + pivotY + " - mode:" + currentMultipleLink);
+								pivotX-=(int)(yN*15);
+								pivotY-=(int)(xN*15);
 							}
-							else if (currentMultipleLink==2)
+							else if (currentMultipleLinks==2)
 							{
 								g.setColor(new Color(0,0,255));
 							}
@@ -513,18 +510,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 								g.setColor(new Color(255,128,0));
 							}
 							
+							//update coordinates
 							x1+=(-y)/8;
 							y1+=x/8;
 							x2+=(-y)/8;
 							y2+=x/8;
 							
-//							int length = (int)Math.sqrt(Math.abs(x)*Math.abs(x) + Math.abs(y)*Math.abs(y));
-//							if (length<10)
-//							{
-//								x*=10;
-//								y*=10;
-//							}
-							
+							//draw arrows´
 							int arrowX1 = pivotX - (int)(50*xN);
 							int arrowY1 = pivotY - (int)(50*yN);
 							int arrowX2 = pivotX + (int)(50*xN);
@@ -532,69 +524,25 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							
 							x = (int)(20*xN);
 							y = (int)(20*yN);
-								
 							
 							int leftArrowX = arrowX2 - (-y) - x;
 							int leftArrowY = arrowY2 - x  - y;
 							int rightArrowX = arrowX2 + (-y) -  x;
 							int rightArrowY = arrowY2 + x  - y;
-//							int leftArrowX = x2 - (-y)/5 - x/5;
-//							int leftArrowY = y2 - x/5  - y/5;
-//							int rightArrowX = x2 + (-y)/5 -  x/5;
-//							int rightArrowY = y2 + x/5  - y/5;
 							
 							g.drawLine(arrowX2,arrowY2,leftArrowX,leftArrowY);
 							g.drawLine(arrowX2,arrowY2,rightArrowX,rightArrowY);
-//							g.drawLine(x2,y2,leftArrowX,leftArrowY);
-//							g.drawLine(x2,y2,rightArrowX,rightArrowY);
 							g.drawLine(arrowX1,arrowY1,arrowX2,arrowY2);
 							
-							currentMultipleLink++;
+							currentMultipleLinks++;
 			    		}
 			    	}
 					
 					
-//					g.fillOval((x1+x2)/2 - length/2, (y1+y2)/2 - length/2, length, length);
-					
 					
 				}			    	
-			    
-			    
-//			    for (int i = 0; i <currentHoverLinkIds.size(); i++)
-//			    {
-//			    	
-////					if(tempFromToIds[0] == currentHoverLinkIds.get(i)[0])
-//					System.out.println("elem " + i + ": " + currentHoverLinkIds.get(i)[0].toString() + "-" + currentHoverLinkIds.get(i)[1].toString() );
-//			    }
-			    
+
 			
-			
-			
-			if (p != null)
-			{
-				int [] x = new int[p.getExteriorRing().getNumPoints()];
-				int [] y = new int[p.getExteriorRing().getNumPoints()];
-				for (int i = 0; i < p.getExteriorRing().getNumPoints(); i++) {
-					Coordinate c = p.getExteriorRing().getCoordinateN(i);
-					Point2D wldPoint = this.getTileFactory().geoToPixel(new GeoPosition(c.y,c.x), this.getZoom());
-					x[i] = (int) (wldPoint.getX()-b.x);
-					y[i] = (int) (wldPoint.getY()-b.y);
-					if (i > 0) {
-						g.drawLine(x[i-1], y[i-1], x[i], y[i]);
-					}
-				}
-				g.setColor(new Color(255,0,255,128));
-				g.fillPolygon(x, y, p.getExteriorRing().getNumPoints());
-				
-				
-			}
-			else
-			{
-//				int r = (int) (Math.sqrt(Math.pow(sc0.x-sc1.x, 2)+Math.pow(sc0.y-sc1.y, 2))+0.5);
-//				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
-//				g.setColor(new Color(255,0,0,128));
-//				g.fillOval(sc0.x-r+1, sc0.y-r+1, 2*r-2, 2*r-2);
-			}
 		}
 	}
 

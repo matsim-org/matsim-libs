@@ -355,6 +355,10 @@ public class EvacuationAreaSelector implements ActionListener{
 		return tf;
 	}
 
+	/**
+	 * save and open events
+	 * 
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
@@ -414,6 +418,11 @@ public class EvacuationAreaSelector implements ActionListener{
 		this.saveButton.setEnabled(enabled);
 	}
 
+	/**
+	 * set edit. basically dis-/enabling text fields
+	 * and setting labels. 
+	 * @param b
+	 */
 	public void setEditMode(boolean b)
 	{
 		if (b)
@@ -451,6 +460,12 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 	}
 	
+	/**
+	 * set id #1 of the first selected link (in gui and object data)
+	 * checks if there is any data for the link prior to this selection 
+	 * 
+	 * @param id
+	 */	
 	public void setLink1Id(Id id)
 	{
 		if (id!=null)
@@ -479,6 +494,12 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 	}
 	
+	/**
+	 * set id #2 of the second selected link (in gui and object data)
+	 * checks if there is any data for the link prior to this selection 
+	 * 
+	 * @param id
+	 */
 	public void setLink2Id(Id id)
 	{
 		if (id!=null)
