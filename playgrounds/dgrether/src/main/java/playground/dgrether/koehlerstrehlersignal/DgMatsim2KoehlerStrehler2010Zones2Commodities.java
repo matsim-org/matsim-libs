@@ -21,13 +21,13 @@ package playground.dgrether.koehlerstrehlersignal;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
-import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.utils.DgZone;
 
 
@@ -45,7 +45,7 @@ public class DgMatsim2KoehlerStrehler2010Zones2Commodities implements
 	}
 
 	@Override
-	public DgCommodities convert(ScenarioImpl sc, DgNetwork dgNetwork) {
+	public DgCommodities convert(Scenario sc, DgKSNetwork dgNetwork) {
 		DgCommodities coms = new DgCommodities();
 		for (DgZone fromZone : this.zones2LinkMap.keySet()){
 			Link fromZoneLink = this.zones2LinkMap.get(fromZone);

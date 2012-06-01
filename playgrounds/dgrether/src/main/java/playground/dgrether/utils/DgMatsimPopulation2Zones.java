@@ -208,7 +208,7 @@ public class DgMatsimPopulation2Zones {
 				break;
 			}
 		}
-		//search last link that lies in grid
+		//search last link that is contained in grid
 		while (! coordinateSequence.isEmpty()){
 			currentCoordinate = coordinateSequence.remove(0);
 			if (networkBoundingBox.contains(currentCoordinate)){

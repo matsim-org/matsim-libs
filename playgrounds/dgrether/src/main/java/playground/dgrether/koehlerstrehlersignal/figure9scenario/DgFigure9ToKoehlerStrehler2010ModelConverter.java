@@ -32,7 +32,7 @@ import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010Dem
 import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010NetworkConverter;
 import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010SimpleDemandConverter;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
-import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 
 
 public class DgFigure9ToKoehlerStrehler2010ModelConverter {
@@ -46,7 +46,7 @@ public class DgFigure9ToKoehlerStrehler2010ModelConverter {
 	public static void main(String[] args) throws SAXException, TransformerConfigurationException, IOException {
 		ScenarioImpl sc = new DgFigure9ScenarioGenerator().loadScenario();
 		DgMatsim2KoehlerStrehler2010NetworkConverter converter = new DgMatsim2KoehlerStrehler2010NetworkConverter();
-		DgNetwork net = converter.convertNetworkLanesAndSignals(sc);
+		DgKSNetwork net = converter.convertNetworkLanesAndSignals(sc);
 		
 		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010SimpleDemandConverter();
 		DgCommodities coms = demandConverter.convert(sc, net);

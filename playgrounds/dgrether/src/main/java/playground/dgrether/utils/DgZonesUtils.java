@@ -41,8 +41,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.signalsystems.cottbus.scripts.DgCottbus2KoehlerStrehler2010;
-
 import com.vividsolutions.jts.geom.Polygon;
 
 
@@ -89,12 +87,12 @@ public class DgZonesUtils {
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, "grid_cell");
 			for (DgZone cell : cells){
-				DgCottbus2KoehlerStrehler2010.log.info("writing cell: " + cell.getId());
+				log.info("writing cell: " + cell.getId());
 				List<Object> attributes = new ArrayList<Object> ();
 				Polygon p = cell.getPolygon();
 				attributes.add(p);
 				for (Entry<DgZone, Integer> entry : cell.getToRelationships().entrySet()){
-					DgCottbus2KoehlerStrehler2010.log.info("  to cell " + entry.getKey().getId() + " # trips: " + entry.getValue());
+					log.info("  to cell " + entry.getKey().getId() + " # trips: " + entry.getValue());
 					attributes.add( entry.getKey().getId());
 					attributes.add( entry.getValue());
 					Object[] atts = attributes.toArray();

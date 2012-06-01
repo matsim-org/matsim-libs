@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,7 +44,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -69,14 +69,14 @@ public class DgCottbusSmallNetworkGenerator {
 	private CoordinateReferenceSystem networkSrs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 
 	private Envelope boundingBox;
+
+	private Network shrinkedNetwork;
 	
-	public Network createSmallNetwork(){
-		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network.xml.gz";
-		String signalsSystems = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
+	public Network createSmallNetwork(String networkFile, String signalSystemsFile){
 		Config c1 = ConfigUtils.createConfig();
-		c1.network().setInputFile(netFile);
+		c1.network().setInputFile(networkFile);
 		c1.scenario().setUseSignalSystems(true);
-		c1.signalSystems().setSignalSystemFile(signalsSystems);
+		c1.signalSystems().setSignalSystemFile(signalSystemsFile);
 		Scenario scenario = ScenarioUtils.loadScenario(c1);
 		SignalsData signalsdata = scenario.getScenarioElement(SignalsData.class);
 		Network net = scenario.getNetwork();
@@ -112,7 +112,12 @@ public class DgCottbusSmallNetworkGenerator {
 		NetworkCleaner netCleaner = new NetworkCleaner();
 		netCleaner.run(newNetwork);
 		
+		this.shrinkedNetwork = newNetwork;
 		return newNetwork;
+	}
+	
+	public Network getShrinkedNetwork(){
+		return this.shrinkedNetwork;
 	}
 	
 	public CoordinateReferenceSystem getCrs(){
@@ -172,7 +177,7 @@ public class DgCottbusSmallNetworkGenerator {
 
 
 	public static void main(String[] args){
-		new DgCottbusSmallNetworkGenerator().createSmallNetwork();
+		new DgCottbusSmallNetworkGenerator().createSmallNetwork(args[0], args[1]);
 	}
 	
 }

@@ -27,11 +27,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -48,7 +48,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
-import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
@@ -71,7 +71,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	private int cycle = 60;
 	private Id programId = new IdImpl("1");
 
-	private DgNetwork dgNetwork;
+	private DgKSNetwork dgNetwork;
 
 	
 	private Id convertLinkId2FromCrossingNodeId(Id linkId){
@@ -89,7 +89,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		return new IdImpl(fromLinkId.toString() + "66" + fromLaneId.toString() + "55" + toLinkId.toString());
 	}
 
-	public DgNetwork convertNetworkLanesAndSignals(ScenarioImpl sc) {
+	public DgKSNetwork convertNetworkLanesAndSignals(Scenario sc) {
 		this.dgNetwork = this.createNetwork(sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class), sc.getScenarioElement(SignalsData.class));
 		return this.dgNetwork ;
 	}
@@ -98,9 +98,9 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	 * codierung:
 	 *   fromLink -> toLink zwei nodes + 1 light
 	 */
-	private DgNetwork createNetwork(Network net, LaneDefinitions20 lanes, SignalsData signalsData) {
+	private DgKSNetwork createNetwork(Network net, LaneDefinitions20 lanes, SignalsData signalsData) {
 		
-		DgNetwork dgnet = new DgNetwork();
+		DgKSNetwork dgnet = new DgKSNetwork();
 		
 		/* create a crossing for each node, same id
 		 */
@@ -137,7 +137,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	}
 
 	
-	private void convertNodes2Crossings(DgNetwork dgnet, Network net){
+	private void convertNodes2Crossings(DgKSNetwork dgnet, Network net){
 		for (Node node : net.getNodes().values()){
 			DgCrossing crossing = new DgCrossing(node.getId());
 			dgnet.addCrossing(crossing);
@@ -147,7 +147,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		}
 	}
 	
-	private void convertLinks2Streets(DgNetwork dgnet, Network net){
+	private void convertLinks2Streets(DgKSNetwork dgnet, Network net){
 		for (Link link : net.getLinks().values()){
 			DgCrossing fromNodeCrossing = dgnet.getCrossings().get(link.getFromNode().getId());
 			DgCrossingNode fromNode = new DgCrossingNode(this.convertLinkId2FromCrossingNodeId(link.getId()));

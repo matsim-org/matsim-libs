@@ -31,6 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkImpl;
@@ -44,7 +45,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
-import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 
@@ -88,12 +89,12 @@ public class DgKoehlerStrehler2010ModelWriter {
 	private static final String DRAINS = "drains";
 
 	
-	public void write(ScenarioImpl sc, DgNetwork network, String outFile) {
+	public void write(ScenarioImpl sc, DgKSNetwork network, String outFile) {
 		this.write(sc, network, null, outFile);
 	}
 
 	
-	public void write(ScenarioImpl sc, DgNetwork network, DgCommodities coms, String outFile) {
+	public void write(Scenario sc, DgKSNetwork network, DgCommodities coms, String outFile) {
 		Writer writer;
 		try {
 			writer = IOUtils.getBufferedWriter(outFile);
@@ -115,7 +116,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 		}
 	}
 
-	private void writeDocumentStart(TransformerHandler hd, ScenarioImpl sc) throws SAXException {
+	private void writeDocumentStart(TransformerHandler hd, Scenario sc) throws SAXException {
 		hd.startDocument();
 		AttributesImpl atts = new AttributesImpl();
 		atts.addAttribute("", "", EXPANDED, CDATA, "false");
@@ -135,7 +136,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 		hd.endElement("", "", DESCRIPTION);
 	}
 
-	private void writeCrossings(DgNetwork net, TransformerHandler hd) throws SAXException {
+	private void writeCrossings(DgKSNetwork net, TransformerHandler hd) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		hd.startElement("", "", CROSSINGS, atts);
 		for (DgCrossing crossing : net.getCrossings().values()) {
@@ -222,7 +223,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 		hd.endElement("", "", COMMODITIES);
 	}
 
-	private void writeStreets(DgNetwork network, Network matsimNet, TransformerHandler hd)
+	private void writeStreets(DgKSNetwork network, Network matsimNet, TransformerHandler hd)
 			throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		hd.startElement("", "", STREETS, atts);

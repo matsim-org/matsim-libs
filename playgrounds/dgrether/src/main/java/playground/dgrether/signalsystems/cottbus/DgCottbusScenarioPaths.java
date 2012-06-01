@@ -28,7 +28,7 @@ import playground.dgrether.DgPaths;
  */
 public interface DgCottbusScenarioPaths {
 
-	public static final String NETWORK_FILENAME = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network.xml.gz";
+	public static final String NETWORK_FILENAME = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 	public static final String LANES_FILENAME = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/lanes.xml";
 	public static final String SIGNALS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
 	public static final String SIGNAL_GROUPS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups.xml";

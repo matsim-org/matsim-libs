@@ -23,18 +23,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
-import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 
 /**
@@ -46,12 +46,12 @@ public class DgMatsim2KoehlerStrehler2010SimpleDemandConverter implements DgMats
 	private DgCommodities commodities;
 
 	@Override
-	public DgCommodities convert(ScenarioImpl sc,  DgNetwork dgNetwork) {
+	public DgCommodities convert(Scenario sc,  DgKSNetwork dgNetwork) {
 		this.commodities = this.createCommodities(dgNetwork, sc.getPopulation());
 		return this.commodities;
 	}
 
-	private DgCommodities createCommodities(DgNetwork net, Population population){
+	private DgCommodities createCommodities(DgKSNetwork net, Population population){
 		DgCommodities coms = new DgCommodities();
 
 		Map<Tuple<Id, Id>, Double> fromNodeToNodeCountMap = new HashMap<Tuple<Id, Id>, Double>();

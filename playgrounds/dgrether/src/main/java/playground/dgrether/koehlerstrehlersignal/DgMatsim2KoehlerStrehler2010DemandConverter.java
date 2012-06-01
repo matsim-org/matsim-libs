@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal;
 
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
-import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 
 
 /**
@@ -31,6 +31,6 @@ import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
  */
 public interface DgMatsim2KoehlerStrehler2010DemandConverter {
 
-	DgCommodities convert(ScenarioImpl sc,  DgNetwork dgNetwork);
+	DgCommodities convert(Scenario sc,  DgKSNetwork dgNetwork);
 
 }

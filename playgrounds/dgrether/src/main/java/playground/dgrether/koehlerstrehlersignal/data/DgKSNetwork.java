@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-public class DgNetwork {
+public class DgKSNetwork {
 
 	private Map<Id, DgCrossing> crossings = new HashMap<Id, DgCrossing>();
 	private Map<Id, DgStreet> streets = new HashMap<Id, DgStreet>();
