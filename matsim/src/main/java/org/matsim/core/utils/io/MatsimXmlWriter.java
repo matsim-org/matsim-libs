@@ -181,15 +181,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 		}
 			this.writer.write("<" + tagname);
 			if (attributes != null) {
-				int length = 0;
 				for (Tuple<String, String> t : attributes){
-					if (doPrettyPrint) {
-						length = length + t.getFirst().length() + t.getSecond().length();
-						if (length > 80) {
-							this.writer.write(NL);
-							length = 0;
-						}
-					}
 					this.writer.write(" " + t.getFirst() + "=\"" + encodeAttributeValue(t.getSecond()) + "\"");
 				}
 			}
@@ -259,7 +251,10 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @return String with some characters replaced by their xml-encoding.
 	 */
 	protected String encodeAttributeValue(final String attributeValue) {
-		return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
+		if (attributeValue.contains("&") || attributeValue.contains("\"") || attributeValue.contains("<") || attributeValue.contains(">")) {
+			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
+		}
+		return attributeValue;
 	}
 
 }
