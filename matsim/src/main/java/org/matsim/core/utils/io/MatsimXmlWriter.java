@@ -210,7 +210,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 					indent();
 				}
 			}
-				writer.write(content);
+			writer.write(encodeContent(content));
 			if (!this.noWhitespaces) {
 				this.indentationLevel--;
 			}
@@ -255,6 +255,13 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 		}
 		return attributeValue;
+	}
+
+	protected String encodeContent(final String content) {
+		if (content.contains("&") || content.contains("<") || content.contains(">")) {
+			return content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+		}
+		return content;
 	}
 
 }
