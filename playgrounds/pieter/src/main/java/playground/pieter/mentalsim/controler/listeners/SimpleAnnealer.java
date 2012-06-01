@@ -69,7 +69,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			if (config.getParam(modName, ANNEAL_TYPE).equals("geometric")) {
 				isGeometric = true;
 				if (ep != null)
-					log.warn("Using geometric annealing, so endProportion parameter not used");
+					log.warn("Using geometric annealing, so endProportion parameter becomes a minimum");
 				String gf = config.getParam(modName, GEOMETRIC_FACTOR);
 				if (gf != null && Double.parseDouble(gf) > 0
 						&& Double.parseDouble(gf) <= 1) {
@@ -84,7 +84,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 				isExponential = true;
 				if (ep != null)
 					log.warn("Using exponential annealing, so " + END_PROPORTION
-							+ " parameter not used");
+							+ " parameter becomes a minimum");
 				String ef = config.getParam(modName, HALF_LIFE);
 				if (ef != null && Integer.parseInt(ef) > 0) {
 					halfLife = Integer.parseInt(ef);
@@ -122,7 +122,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			else
 				currentProportion = currentIter * slope + startProportion;
 		}
-		anneal(event, currentProportion);
+		anneal(event, Math.max(currentProportion,endProportion));
 	}
 
 	/**
