@@ -180,7 +180,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			outputToWrite += "\t" + strategy + "\t" + weight + "\t" + newWeight;
 			stratMan.changeWeightOfStrategy(strategy, newWeight);
 		}
-		Logger.getLogger("ANNEAL").error(outputToWrite);
+		Logger.getLogger("ANNEAL").info(outputToWrite);
 
 	}
 }

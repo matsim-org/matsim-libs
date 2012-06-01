@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.strategy;
+package playground.pieter.mentalsim.replanning;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -8,7 +8,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.pieter.mentalsim.strategy.MyDoNothinPlanStrategyModule;
+import playground.pieter.mentalsim.replanning.MyDoNothinPlanStrategyModule;
 
 public class MyDoNothinPlanStrategy implements PlanStrategy {
 	PlanStrategy planStrategyDelegate = null;

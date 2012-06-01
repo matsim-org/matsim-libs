@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
@@ -98,7 +97,6 @@ public class MentalSimControler extends Controler {
 	public MentalSimControler(String[] args) {
 		super(args);
 		// TODO Auto-generated constructor stub
-
 	}
 
 }

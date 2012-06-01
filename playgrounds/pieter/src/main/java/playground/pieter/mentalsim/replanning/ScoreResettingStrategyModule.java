@@ -1,16 +1,9 @@
-package playground.pieter.mentalsim.strategy;
+package playground.pieter.mentalsim.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
 
-public class MyDoNothinPlanStrategyModule implements PlanStrategyModule {
-
-
-
-	public MyDoNothinPlanStrategyModule(Controler controler) {
-		// TODO Auto-generated constructor stub
-	}
+public class ScoreResettingStrategyModule implements PlanStrategyModule {
 
 	@Override
 	public void prepareReplanning() {
@@ -21,7 +14,7 @@ public class MyDoNothinPlanStrategyModule implements PlanStrategyModule {
 	@Override
 	public void handlePlan(Plan plan) {
 		// TODO Auto-generated method stub
-		
+		plan.setScore(0.0);
 	}
 
 	@Override

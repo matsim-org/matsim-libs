@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -85,8 +86,13 @@ public class MentalSim implements Mobsim {
 
 		Collection<Plan> plans = new LinkedHashSet<Plan>();
 		for (Person p : sc.getPopulation().getPersons().values()) {
-//			if (Math.random() < 0.1)
+			// if (Math.random() < 0.1)
+			if (p.getSelectedPlan().getScore() == 0.0) {
+
 				plans.add(p.getSelectedPlan());
+			}
+				Logger.getLogger(this.getClass()).error("Executing "+plans.size()+" plans in mental simulation.");
+			
 		}
 
 		Network network = sc.getNetwork();
