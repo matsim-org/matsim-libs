@@ -1,12 +1,12 @@
 package playground.toronto.transitnetworkutils;
 
 
-import java.io.BufferedWriter;
 import java.io.File;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import GTFS2PTSchedule.GTFS2MATSimTransitSchedule;
@@ -14,8 +14,11 @@ import GTFS2PTSchedule.GTFS2MATSimTransitSchedule;
 public class GTFSController {
 
 	public static void main(final String[] args){
+			
+		if(args.length != 2) return;
 		
-		final String GTFSCONFIGNAME = "C:/Users/Peter Work/Desktop/NETWORK DATA/MATSIM NETWORK/gtfsconfig.xml";
+		final String GTFSCONFIGNAME = args[0];
+		final String SCHEDULEOUTPUTNAME = args[1];
 		
 		Config config = ConfigUtils.loadConfig(GTFSCONFIGNAME);
 		String[] rts = config.getParam("gtfs", "roots").split(",");
@@ -31,9 +34,9 @@ public class GTFSController {
 		
 		TransitSchedule output = gtfsTTC.getTransitSchedule();
 		
+		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(output);
+		writer.write(SCHEDULEOUTPUTNAME);
 		
-		
-		System.out.print("GTFS conversion done.");
 		
 	}
 	
