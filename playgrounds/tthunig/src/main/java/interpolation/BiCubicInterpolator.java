@@ -21,7 +21,8 @@ class BiCubicInterpolator {
 	private SpatialGrid sg = null;
 	
 	/**
-	 * constructor
+	 * prepares bicubic spline interpolation:
+	 * generates interpolation function with BicubicSplineInterpolator from apache (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html)
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 */

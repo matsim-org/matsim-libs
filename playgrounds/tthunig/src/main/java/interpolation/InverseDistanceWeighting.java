@@ -3,14 +3,19 @@ package interpolation;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
- * implements inverse distance weighting for interpolation
+ * implements inverse distance weighting for interpolation. own implementation (no suitable implementation found).
+ * requires values on a SpatialGrid
  * 
- * z(u_0)= Sum((1/d_i)*z(u_i)) / Sum (1/d_i)
+ * please not use (experimental version)!
+ * not useful for accessibility interpolation because peaks and valleys occur.
+ * for more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
+ * or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (german)
  * 
  * @author tthunig
  *
  */
-public class MyInverseDistanceWeighting {
+@Deprecated
+class InverseDistanceWeighting {
 
 	/**
 	 * interpolates a value at the given point (xCoord, yCoord) with the standard inverse distance weighting
@@ -22,8 +27,8 @@ public class MyInverseDistanceWeighting {
 	 * @param yCoord
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
-	public static double myAllValuesIDW(SpatialGrid sg, double xCoord, double yCoord){
-		return myAllValuesIDW(sg, xCoord, yCoord, 1);
+	static double allValuesIDW(SpatialGrid sg, double xCoord, double yCoord){
+		return allValuesIDW(sg, xCoord, yCoord, 1);
 	}
 	
 	/**
@@ -36,8 +41,8 @@ public class MyInverseDistanceWeighting {
 	 * @param yCoord
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
-	public static double myAllValuesIDWSquare(SpatialGrid sg, double xCoord, double yCoord){
-		return myAllValuesIDW(sg, xCoord, yCoord, 2);
+	static double allValuesIDWSquare(SpatialGrid sg, double xCoord, double yCoord){
+		return allValuesIDW(sg, xCoord, yCoord, 2);
 	}
 	
 	/**
@@ -50,7 +55,7 @@ public class MyInverseDistanceWeighting {
 	 * @param exp the exponent for the weights
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
-	public static double myAllValuesIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
+	static double allValuesIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
 		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
 		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
 		if (xDif==0){
@@ -84,8 +89,8 @@ public class MyInverseDistanceWeighting {
 	 * @param yCoord
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
-	public static double my4NeighborsIDW(SpatialGrid sg, double xCoord, double yCoord){
-		return my4NeighborsIDW(sg, xCoord, yCoord, 1);
+	static double fourNeighborsIDW(SpatialGrid sg, double xCoord, double yCoord){
+		return fourNeighborsIDW(sg, xCoord, yCoord, 1);
 	}
 	
 	/**
@@ -98,8 +103,8 @@ public class MyInverseDistanceWeighting {
 	 * @param yCoord
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
-	public static double my4NeighborsIDWSquare(SpatialGrid sg, double xCoord, double yCoord){
-		return my4NeighborsIDW(sg, xCoord, yCoord, 2);
+	static double fourNeighborsIDWSquare(SpatialGrid sg, double xCoord, double yCoord){
+		return fourNeighborsIDW(sg, xCoord, yCoord, 2);
 	}
 	
 	/**
@@ -112,7 +117,7 @@ public class MyInverseDistanceWeighting {
 	 * @param exp the exponent for the weights
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
-	public static double my4NeighborsIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
+	static double fourNeighborsIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
 		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
 		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
 		if (xDif==0){
