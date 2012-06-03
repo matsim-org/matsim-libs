@@ -31,7 +31,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 	static double endProportion = 0.001;
 	static double currentProportion = 0.1;
 	static double geoFactor = 0.9;
-	static int halfLife = 50;
+	static int halfLife = 100;
 	static double slope = -1;
 	static int currentIter = 0;
 	static boolean isGeometric = false;
