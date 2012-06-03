@@ -78,6 +78,11 @@ public class PlansCalcRouteConfigGroup extends Module {
 		teleportedModeSpeeds.put(TransportMode.walk, 3.0 / 3.6); // 3.0 km/h --> m/s
 		// I'm not sure if anyone needs the "undefined" mode. In particular, it doesn't do anything for modes which are
 		// really unknown, it is just a mode called "undefined". michaz 02-2012
+		//
+		// The original design idea was that some upstream module would figure out expected travel times and travel distances
+		// for any modes, and the simulation would teleport all those modes it does not know anything about.
+		// With the travel times and travel distances given by the mode.  In practice, it seems that people can live better
+		// with the concept that mobsim figures it out by itself.  Although it is a much less flexible design.  kai, jun'2012
 		teleportedModeSpeeds.put(UNDEFINED, 50.0 / 3.6); 
 		teleportedModeFreespeedFactors.put(TransportMode.pt, 2.0);
 	}
