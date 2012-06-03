@@ -146,7 +146,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(PT_SPEED_MODE, "Allowed values: freespeed, beeline. Determines if travel times for non-simulated pt legs are estimated by ptSpeedFactor * <freespeed car travel time> (\"freespeed\")" +
+		map.put(PT_SPEED_MODE, "Allowed values: freespeed, beeline. Determines if travel times for non-simulated pt legs are " +
+				"estimated by ptSpeedFactor * <freespeed car travel time> (\"freespeed\")" +
 				" or by (<beeline distance> * beelineDistanceFactor) / ptSpeed (\"beeline\")");
 		map.put(PT_SPEED_FACTOR, "factor with which times from the car freespeed travel time " +
 				"calculation are multiplied in order to obtain the pt travel times.  Default is something like 2") ;
@@ -154,10 +155,13 @@ public class PlansCalcRouteConfigGroup extends Module {
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
 		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) { 
-			map.put(TELEPORTED_MODE_SPEEDS + entry.getKey(), "Speed for a teleported mode based on beeline-distance: (<beeline distance> * beelineDistanceFactor) / speed. Insert a line like this for every such mode.");
+			map.put(TELEPORTED_MODE_SPEEDS + entry.getKey(), "Speed for a teleported mode based on beeline-distance: " +
+					"(<beeline distance> * beelineDistanceFactor) / speed. Insert a line like this for every such mode.");
 		}
 		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) { 
-			map.put(TELEPORTED_MODE_FREESPEED_FACTORS + entry.getKey(), "Free-speed factor for a teleported mode based on freespeed: freespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode.");
+			map.put(TELEPORTED_MODE_FREESPEED_FACTORS + entry.getKey(), "Free-speed factor for a teleported mode based on " +
+					"freespeed: freespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
+					"freespeedFactor wins over teleportedModeSpeed, if both are set (says michaz).");
 		}
 		return map;
 	}
