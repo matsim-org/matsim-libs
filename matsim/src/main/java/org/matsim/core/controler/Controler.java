@@ -856,8 +856,8 @@ public class Controler {
 		 */
 
 		// the default handling of plans
-		this.plansScoring = new PlansScoring();
-		this.addCoreControlerListener(this.plansScoring);
+		this.plansScoring = new PlansScoring( this.scenarioData, this.events, this.scoringFunctionFactory );
+		this.addControlerListener(this.plansScoring);
 
 		// load road pricing, if requested
 		if (this.config.scenario().isUseRoadpricing()) {

@@ -49,8 +49,13 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -165,10 +170,10 @@ public class KnSimplifiedController {
 
 	}
 	void run() {
-		setUpOutputDir();
-		initEvents();
-		initLogging();
-		setUp();
+		setUpOutputDir(); // output dir needs to be before logging
+		initEvents(); // yy I do not understand why events need to be before logging
+		initLogging(); // logging needs to be early
+		setUp(); // setup needs to be after events since most things need events
 		loadCoreListeners();
 
 		this.controlerListenerManager.fireControlerStartupEvent();
@@ -200,12 +205,39 @@ public class KnSimplifiedController {
 		System.exit(-1) ;
 
 		this.strategyManager = new StrategyManager() ;
+		{
+			this.strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
+		}
+		{
+			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
+			this.strategyManager.addStrategy(strategy, 0.9) ;
+		}
+		{
+			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
+//			PlanStrategyModule module = new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, 
+//					new FreespeedTravelTimeAndDisutility(config.planCalcScore()), routeFactory);
+//			strategy.addStrategyModule(module);
+			this.strategyManager.addStrategy(strategy, 0.1) ;
+		}
 
 		StrategyManagerConfigLoader.load(this.dummyCtrl,strategyManager) ;
 		Logger.getLogger(this.getClass()).fatal("this will not work with the above line.  aborting ...") ;
 		System.exit(-1) ;
 		
 	}
+	/**
+	 * Design thoughts:<ul>
+	 * <li> Something like PlanScoring will have a notifyIterationStarts(controlerEvent) method, and will from there pull,
+	 * via controlerEvent.getControler(), all the controler information.  What can we do from here?<ul>
+	 * <li> Extract interface from Controler, and then be able to build other SimplifiedControler with same interface.
+	 * I don't think that this is my preferred method, since (1) it makes a lot of stuff public that does not need to be public,
+	 * and (2) it completely hides which information those methods are pulling.
+	 * <li> An alternative would be to modify the core methods in a way that all information is passed via the constructor,
+	 * and the "controlerEvent" is effectively ignored.
+	 * <li> Finally, we could try to reduce the public methods that controler offers.  This looks, however, like hard work.  
+	 * </ul>
+	 * </ul>
+	 */
 	private void loadCoreListeners() {
 
 		/*
@@ -219,7 +251,8 @@ public class KnSimplifiedController {
 		 * are added to the list.
 		 */
 
-		this.controlerListenerManager.addCoreControlerListener(new PlansScoring());
+		this.controlerListenerManager.addControlerListener(new PlansScoring( this.scenarioData, this.events, 
+				this.scoringFunctionFactory ));
 
 		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning());
 		this.controlerListenerManager.addCoreControlerListener(new PlansDumping());
