@@ -122,12 +122,17 @@ public final class StrategyManagerConfigLoader {
 				planSelector = new RandomPlanSelector() ;
 			} else if ( name.equals("SelectExpBeta") ) {
 				planSelector = new ExpBetaPlanSelector(config.planCalcScore() ) ;
+				// yyyy this will select _good_ plans for removal--?
 			} else if ( name.equals("ChangeExpBeta") ) {
 				planSelector = new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()) ;
+				// yyyy this will select _good_ plans for removal--?
+				// yyyy might just use -beta as parameter??
 			} else if ( name.equals("BestPlanSelector") ) {
 				planSelector = new BestPlanSelector() ;
+				// yyyy this will select _good_ plans for removal--?
 			} else if ( name.equals("PathSizeLogitSelector") ) {
 				planSelector = new PathSizeLogitSelector(controler.getNetwork(), config.planCalcScore() ) ;
+				// yyyy this will select good? bad? plans for removal--?
 			} else {
 				planSelector = tryToLoadPlanSelectorByName(controler, name);
 			}

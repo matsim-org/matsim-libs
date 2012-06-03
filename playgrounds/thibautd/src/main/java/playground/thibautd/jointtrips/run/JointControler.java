@@ -152,7 +152,10 @@ public class JointControler extends MultiLegRoutingControler {
 
 		// the default handling of plans
 		// this.plansScoring = new JointPlansScoring();
-		this.plansScoring = new PlansScoring();
+
+//		this.plansScoring = new PlansScoring();
+		this.plansScoring = new PlansScoring(this.scenarioData, this.events, this.scoringFunctionFactory ) ;
+
 		//this.plansScoring = new PlansScoring();
 		this.addCoreControlerListener(this.plansScoring);
 

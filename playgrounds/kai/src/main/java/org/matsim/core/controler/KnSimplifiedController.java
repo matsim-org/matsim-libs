@@ -128,6 +128,91 @@ public class KnSimplifiedController {
 	
 	private StrategyManager strategyManager;
 	
+	private void run() {
+		setUpOutputDir(); // output dir needs to be before logging
+		initEvents(); // yy I do not understand why events need to be before logging
+		initLogging(); // logging needs to be early
+		setUp(); // setup needs to be after events since most things need events
+		loadCoreListeners();
+
+		this.controlerListenerManager.fireControlerStartupEvent();
+		
+		this.checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
+
+//		doIterations();
+		log.error("yyyyyy iterations not yet implemented.  Skipping ...") ;
+
+		shutdown(false);
+	}
+	/**
+	 * Initializes the Controler with the parameters from the configuration.
+	 * This method is called after the configuration is loaded, and after the
+	 * scenario data (network, population) is read.
+	 */
+	private void setUp() {
+		
+		// add a couple of important event handlers:
+		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		this.events.addHandler(travelTime);
+
+		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
+		this.events.addHandler(new CalcLegTimes());
+
+		// set up StrategyManager:
+		this.strategyManager = new StrategyManager() ;
+		{
+			this.strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
+		}
+		{
+			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
+			this.strategyManager.addStrategy(strategy, 0.9) ;
+		}
+		{
+			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
+			strategy.addStrategyModule(createRouter(travelTime)) ;
+			this.strategyManager.addStrategy(strategy, 0.1) ;
+		}
+
+	}
+	/**
+	 * The order how the listeners are added is very important! As
+	 * dependencies between different listeners exist or listeners may read
+	 * and write to common variables, the order is important. Example: The
+	 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
+	 * turn is used by the PlansScoring-Listener.
+	 * <br/>
+	 * IMPORTANT: The execution order is reverse to the order the listeners
+	 * are added to the list.
+	 * <br/>
+	 * Design thoughts:<ul>
+	 * <li> Something like PlanScoring will have a notifyIterationStarts(controlerEvent) method, and will from there pull,
+	 * via controlerEvent.getControler(), all the controler information.  What can we do from here?<ul>
+	 * <li> Extract interface from Controler, and then be able to build other SimplifiedControler with same interface.
+	 * I don't think that this is my preferred method, since (1) it makes a lot of stuff public that does not need to be public,
+	 * and (2) it completely hides which information those methods are pulling.
+	 * <li> An alternative would be to modify the core methods in a way that all information is passed via the constructor,
+	 * and the "controlerEvent" is effectively ignored.
+	 * <li> Finally, we could try to reduce the public methods that controler offers.  This looks, however, like hard work.  
+	 * </ul>
+	 * </ul>
+	 */
+	private void loadCoreListeners() {
+
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
+		this.controlerListenerManager.addControlerListener(new PlansScoring( this.scenarioData, this.events, scoringFunctionFactory ));
+
+		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning());
+		this.controlerListenerManager.addCoreControlerListener(new PlansDumping());
+
+		this.controlerListenerManager.addCoreControlerListener(new EventsHandling((EventsManagerImpl) this.events)); 
+		// must be last being added (=first being executed)
+	}
+
+	// ############################################################################################################################
+	// ############################################################################################################################
+	//	everything below here is probably not critical 	
+	
 	public static void main(String[] args) {
 		KnSimplifiedController gautengOwnController = new KnSimplifiedController() ;
 		gautengOwnController.run() ;
@@ -166,105 +251,32 @@ public class KnSimplifiedController {
 		// (yy why here?  why not earlier when runtime system infrastructure is constructed? kai, mar'12)
 
 	}
-	void run() {
-		setUpOutputDir(); // output dir needs to be before logging
-		initEvents(); // yy I do not understand why events need to be before logging
-		initLogging(); // logging needs to be early
-		setUp(); // setup needs to be after events since most things need events
-		loadCoreListeners();
+	private AbstractMultithreadedModule createRouter(
+			final TravelTimeCalculator travelTime) {
+		// factory to generate routes:
+		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
-		this.controlerListenerManager.fireControlerStartupEvent();
+		// travel disutility (generalized cost)
+		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
 		
-		this.checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
-
-//		doIterations();
-		log.error("yyyyyy iterations not yet implemented.  Skipping ...") ;
-
-		shutdown(false);
-	}
-	/**
-	 * Initializes the Controler with the parameters from the configuration.
-	 * This method is called after the configuration is loaded, and after the
-	 * scenario data (network, population) is read.
-	 */
-	private void setUp() {
-		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.events.addHandler(travelTime);
-
-		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
-		this.events.addHandler(new CalcLegTimes());
-
-		this.strategyManager = new StrategyManager() ;
-		{
-			this.strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
-		}
-		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
-			this.strategyManager.addStrategy(strategy, 0.9) ;
-		}
-		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
-			this.strategyManager.addStrategy(strategy, 0.1) ;
-			
-			strategy.addStrategyModule(new AbstractMultithreadedModule(this.config.global().getNumberOfThreads()) {
-				@Override
-				public PlanAlgorithm getPlanAlgoInstance() {
-					ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (KnSimplifiedController.this.population.getFactory())).getModeRouteFactory();
-					
-					final TravelDisutility travelDisutility = 
-						new TravelTimeAndDistanceBasedTravelDisutility(travelTime, KnSimplifiedController.this.config.planCalcScore());
-					
-					final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
-					
-					PlansCalcRoute plansCalcRoute = new PlansCalcRoute(KnSimplifiedController.this.config.plansCalcRoute(),KnSimplifiedController.this.network, travelDisutility, 
-							travelTime, leastCostPathFactory, routeFactory);
-					
-					return plansCalcRoute;
-				}
-			}) ;
-			
-		}
-
-	}
-	/**
-	 * Design thoughts:<ul>
-	 * <li> Something like PlanScoring will have a notifyIterationStarts(controlerEvent) method, and will from there pull,
-	 * via controlerEvent.getControler(), all the controler information.  What can we do from here?<ul>
-	 * <li> Extract interface from Controler, and then be able to build other SimplifiedControler with same interface.
-	 * I don't think that this is my preferred method, since (1) it makes a lot of stuff public that does not need to be public,
-	 * and (2) it completely hides which information those methods are pulling.
-	 * <li> An alternative would be to modify the core methods in a way that all information is passed via the constructor,
-	 * and the "controlerEvent" is effectively ignored.
-	 * <li> Finally, we could try to reduce the public methods that controler offers.  This looks, however, like hard work.  
-	 * </ul>
-	 * </ul>
-	 */
-	private void loadCoreListeners() {
-
-		/*
-		 * The order how the listeners are added is very important! As
-		 * dependencies between different listeners exist or listeners may read
-		 * and write to common variables, the order is important. Example: The
-		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
-		 * turn is used by the PlansScoring-Listener.
-		 * 
-		 * IMPORTANT: The execution order is reverse to the order the listeners
-		 * are added to the list.
-		 */
-
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
-		this.controlerListenerManager.addControlerListener(new PlansScoring( this.scenarioData, this.events, scoringFunctionFactory ));
-
-		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning());
-		this.controlerListenerManager.addCoreControlerListener(new PlansDumping());
-
-		this.controlerListenerManager.addCoreControlerListener(new EventsHandling((EventsManagerImpl) this.events)); 
-		// must be last being added (=first being executed)
+		// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
+		// times (e.g. for car router, pt router, ...)
+		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
+		
+		// plug it together
+		final PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelDisutility, 
+				travelTime, leastCostPathFactory, routeFactory);
+		
+		// wrap it into the AbstractMultithreadedModule:
+		final AbstractMultithreadedModule router = new AbstractMultithreadedModule(this.config.global().getNumberOfThreads()) {
+			@Override
+			public PlanAlgorithm getPlanAlgoInstance() {
+				return plansCalcRoute;
+			}
+		};
+		return router;
 	}
 
-	// ############################################################################################################################
-	//	everything below here is probably not critical 	
 	
 	/**
 	 * in particular select if single cpu handler to use or parallel
