@@ -47,8 +47,8 @@ public class NetworkAddPRMain {
 	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/input/vehiclesFile.xml";
 	
 	// output
-	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/input/prFacilities.txt";
-	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/input/prNetwork.xml";
+	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/input/parkAndRideFacilities.txt";
+	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/input/parkAndRideNetwork.xml";
 	
 	private double extensionRadius = 100;
 	private int maxSearchSteps = 50;

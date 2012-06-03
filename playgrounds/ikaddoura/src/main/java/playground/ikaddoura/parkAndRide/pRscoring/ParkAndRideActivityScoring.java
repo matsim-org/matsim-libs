@@ -22,6 +22,7 @@ package playground.ikaddoura.parkAndRide.pRscoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -33,6 +34,7 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
 
 /**
  * modified normal ActivityScoringFunction to ignore "pt interaction" and "parkAndRide"
+ * and adding a transfer penalty if Park'n'Ride-Activity is performed
  * @author Ihab
  */
 public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring {
@@ -52,11 +54,13 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 	private boolean firstAct = true;
 
 	private Activity firstActivity;
+	private PlanCalcScoreConfigGroup config;
 
 	private static final Logger log = Logger.getLogger(ParkAndRideActivityScoring.class);
 
-	public ParkAndRideActivityScoring(final CharyparNagelScoringParameters params) {
+	public ParkAndRideActivityScoring(final CharyparNagelScoringParameters params, PlanCalcScoreConfigGroup config) {
 		this.params = params;
+		this.config = config;
 		this.reset();
 	}
 
@@ -111,6 +115,15 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		double tmpScore = 0.0;
+		
+		if (act.getType().toString().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
+			
+//			double penalty = -200;
+			
+			double penalty = this.config.getUtilityOfLineSwitch() * 3.0;
+			System.out.println("******************************* Park'n'Ride penalty: " + penalty);
+			tmpScore += penalty;
+		}
 
 		if (act.getType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) || act.getType().toString().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
 					
@@ -120,35 +133,6 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 				throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
 						"(module name=\"planCalcScore\" in the config file).");
 			}
-		
-			/* Calculate the times the agent actually performs the
-			 * activity.  The facility must be open for the agent to
-			 * perform the activity.  If it's closed, but the agent is
-			 * there, the agent must wait instead of performing the
-			 * activity (until it opens).
-			 *
-			 *                                             Interval during which
-			 * Relationship between times:                 activity is performed:
-			 *
-			 *      O________C A~~D  ( 0 <= C <= A <= D )   D...D (not performed)
-			 * A~~D O________C       ( A <= D <= O <= C )   D...D (not performed)
-			 *      O__A+++++C~~D    ( O <= A <= C <= D )   A...C
-			 *      O__A++D__C       ( O <= A <= D <= C )   A...D
-			 *   A~~O++++++++C~~D    ( A <= O <= C <= D )   O...C
-			 *   A~~O+++++D__C       ( A <= O <= D <= C )   O...D
-			 *
-			 * Legend:
-			 *  A = arrivalTime    (when agent gets to the facility)
-			 *  D = departureTime  (when agent leaves the facility)
-			 *  O = openingTime    (when facility opens)
-			 *  C = closingTime    (when facility closes)
-			 *  + = agent performs activity
-			 *  ~ = agent waits (agent at facility, but not performing activity)
-			 *  _ = facility open, but agent not there
-			 *
-			 * assume O <= C
-			 * assume A <= D
-			 */
 	
 			double[] openingInterval = this.getOpeningInterval(act);
 			double openingTime = openingInterval[0];
@@ -157,7 +141,7 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 			double activityStart = arrivalTime;
 			double activityEnd = departureTime;
 	
-			if ((openingTime >=  0) && (arrivalTime < openingTime)) {
+			if ((openingTime >= 0) && (arrivalTime < openingTime)) {
 				activityStart = openingTime;
 			}
 			if ((closingTime >= 0) && (closingTime < departureTime)) {
