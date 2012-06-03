@@ -32,6 +32,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -53,10 +54,13 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -122,14 +126,7 @@ public class KnSimplifiedController {
 	// to the plugins.  And that seems much more access than we want to provide here. ????  kai, may'12 
 
 	
-	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-
-	private TravelTimeCalculator travelTime;
-	
-	private ScoringFunctionFactory scoringFunctionFactory;
-
 	private StrategyManager strategyManager;
-
 	
 	public static void main(String[] args) {
 		KnSimplifiedController gautengOwnController = new KnSimplifiedController() ;
@@ -191,18 +188,12 @@ public class KnSimplifiedController {
 	 * scenario data (network, population) is read.
 	 */
 	private void setUp() {
-		this.travelTime = this.travelTimeCalculatorFactory
-			.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-
-		this.events.addHandler(this.travelTime);
+		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		this.events.addHandler(travelTime);
 
 		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.events.addHandler(new CalcLegTimes());
-
-		this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.getNetwork() );
-		Logger.getLogger(this.getClass()).fatal("in the original controler, this is passed into some functionality via " +
-				"controler.getScoringFunctionFactory().  Aborting ...") ;
-		System.exit(-1) ;
 
 		this.strategyManager = new StrategyManager() ;
 		{
@@ -214,16 +205,27 @@ public class KnSimplifiedController {
 		}
 		{
 			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
-//			PlanStrategyModule module = new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, 
-//					new FreespeedTravelTimeAndDisutility(config.planCalcScore()), routeFactory);
-//			strategy.addStrategyModule(module);
 			this.strategyManager.addStrategy(strategy, 0.1) ;
+			
+			strategy.addStrategyModule(new AbstractMultithreadedModule(this.config.global().getNumberOfThreads()) {
+				@Override
+				public PlanAlgorithm getPlanAlgoInstance() {
+					ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (KnSimplifiedController.this.population.getFactory())).getModeRouteFactory();
+					
+					final TravelDisutility travelDisutility = 
+						new TravelTimeAndDistanceBasedTravelDisutility(travelTime, KnSimplifiedController.this.config.planCalcScore());
+					
+					final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
+					
+					PlansCalcRoute plansCalcRoute = new PlansCalcRoute(KnSimplifiedController.this.config.plansCalcRoute(),KnSimplifiedController.this.network, travelDisutility, 
+							travelTime, leastCostPathFactory, routeFactory);
+					
+					return plansCalcRoute;
+				}
+			}) ;
+			
 		}
 
-		StrategyManagerConfigLoader.load(this.dummyCtrl,strategyManager) ;
-		Logger.getLogger(this.getClass()).fatal("this will not work with the above line.  aborting ...") ;
-		System.exit(-1) ;
-		
 	}
 	/**
 	 * Design thoughts:<ul>
@@ -251,38 +253,14 @@ public class KnSimplifiedController {
 		 * are added to the list.
 		 */
 
-		this.controlerListenerManager.addControlerListener(new PlansScoring( this.scenarioData, this.events, 
-				this.scoringFunctionFactory ));
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
+		this.controlerListenerManager.addControlerListener(new PlansScoring( this.scenarioData, this.events, scoringFunctionFactory ));
 
 		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning());
 		this.controlerListenerManager.addCoreControlerListener(new PlansDumping());
 
 		this.controlerListenerManager.addCoreControlerListener(new EventsHandling((EventsManagerImpl) this.events)); 
 		// must be last being added (=first being executed)
-	}
-
-	/**Design comments:<ul>
-	 * <li> yyyy It seems to me that one would need a factory at <i>this</i> level. kai, may'12
-	 * <li> An issue is that the TravelTime(Calculator) object needs to be passed into the factory.  I don't think that
-	 * this is a large problem, but it needs to be dealt with. kai, may'12
-	 * </ul>
-	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
-	 *         of plans with the default (= the current from the last or current
-	 *         iteration) travel costs and travel times. Only to be used by a
-	 *         single thread, use multiple instances for multiple threads!
-	 */
-	public PlanAlgorithm createRoutingAlgorithm() {
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
-		
-		final TravelDisutility travelDisutility = 
-			new TravelTimeAndDistanceBasedTravelDisutility(this.travelTime, this.config.planCalcScore());
-		
-		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
-		
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(),this.network, travelDisutility, 
-				this.travelTime, leastCostPathFactory, routeFactory);
-
-		return plansCalcRoute;
 	}
 
 	// ############################################################################################################################
