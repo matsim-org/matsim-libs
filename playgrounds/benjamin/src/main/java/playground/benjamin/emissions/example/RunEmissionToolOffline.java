@@ -55,13 +55,12 @@ public class RunEmissionToolOffline {
 //	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
 //	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
 	
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase/";
-//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/";
-//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing/";
+//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase_ctd/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/";
 	static String configFile = runDirectory + "output_config.xml.gz";
 	static String netFile =  runDirectory + "output_network.xml.gz";
-//	final static  Integer lastIteration = getLastIteration(configFile);
-	final static  Integer lastIteration = 500;
+	final static  Integer lastIteration = getLastIteration(configFile);
+//	final static  Integer lastIteration = 500;
 	
 	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + lastIteration;
 	static String eventsFile = eventsPath + ".events.xml.gz";

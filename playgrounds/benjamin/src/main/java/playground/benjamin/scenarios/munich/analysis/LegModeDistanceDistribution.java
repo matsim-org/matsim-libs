@@ -55,8 +55,8 @@ public class LegModeDistanceDistribution {
 	private static final Logger logger = Logger.getLogger(LegModeDistanceDistribution.class);
 
 //	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase_ctd/";
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing_x10/";
-//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/";
+//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing_x10/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/";
 	
 	private static String initialIterationNo = "1000";
 	private static String finalIterationNo = null;
