@@ -86,8 +86,8 @@ public class NetVisum2MATSim {
 	 */
 	public static void main(String[] args) {
 		String outputMATSimNetworkFile = "output/matsimNetwork/networkBerlin.xml";
-		String inputVisumNetFile = "input/visumNet/testNet.net";
-		String outputZoneFile = "output/matsimNetwork/testZone.log";
+		String inputVisumNetFile = "input/visumNet/netall.net";
+		String outputZoneFile = "output/matsimNetwork/Zone.log";
 
 		NetVisum2MATSim n2m = new NetVisum2MATSim();
 

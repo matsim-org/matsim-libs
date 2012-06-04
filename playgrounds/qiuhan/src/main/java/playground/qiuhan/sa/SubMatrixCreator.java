@@ -190,7 +190,7 @@ public class SubMatrixCreator {
 		String matrixFilename = "input/OEV_O_Matrix/QZ-Matrix 5 oev_00.mtx"//
 		, dailyTrafficLoadCurveFilename = "input/tagsganglinie/tagsganglinien.txt"//
 		, dailyTrafficLoadCurveFilename2 = "input/tagsganglinie/tagsganglinien_ausserhalb.txt"//
-		, zoneFilename = "output/matsimNetwork/testZone.log"//
+		, zoneFilename = "output/matsimNetwork/Zone.log"//
 		, outputPath = "output/matrices/"//
 		;
 

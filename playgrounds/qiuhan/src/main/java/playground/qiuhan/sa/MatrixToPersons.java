@@ -41,27 +41,24 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 
 public class MatrixToPersons {
-	// private Scenario s;
-	//
-	// public MatrixToPersons(Scenario s) {
-	// this.s = s;
-	// }
 
 	private Matrix m;
 	private Map<Id, Person> persons;
-	private Map<Id, Coord> zoneIdCoords;
+	private Map<String, Coord> zoneIdCoords;
 	private static String DUMMY = "dummy";
 	private Random random;
 
 	/**
-	 * @param m a Matrix in one time interval (e.g. hour)
+	 * @param m
+	 *            a Matrix in one time interval (e.g. hour)
 	 * @param zoneIdCoords
 	 */
-	public MatrixToPersons(Matrix m, Map<Id, Coord> zoneIdCoords) {
+	public MatrixToPersons(Matrix m, Map<String, Coord> zoneIdCoords) {
 		this.m = m;
 		this.persons = new HashMap<Id, Person>();
 		this.zoneIdCoords = zoneIdCoords;
 		this.random = MatsimRandom.getRandom();
+		this.createPersons();
 	}
 
 	public Map<Id, Person> getPersons() {
@@ -70,16 +67,17 @@ public class MatrixToPersons {
 
 	private void createPersons() {
 		for (Id from : this.m.getFromLocations().keySet()) {
-			Coord fromZone = this.zoneIdCoords.get(from);
+			Coord fromZone = this.zoneIdCoords.get(from.toString());
 
 			for (Entry entry : this.m.getFromLocEntries(from)) {
 				Id toZoneId = entry.getToLocation();
-				Coord toZone = this.zoneIdCoords.get(toZoneId);
+				Coord toZone = this.zoneIdCoords.get(toZoneId.toString());
 
-				int numberPersons = (int) (entry.getValue() + 0.5);
+				int numberPersons = (int) (entry.getValue());
 
 				for (int i = 0; i < numberPersons; i++) {
-					Id personId = new IdImpl(from + "-" + toZoneId + "-" + i);
+					Id personId = new IdImpl(this.m.getId() + "-" + from + "-"
+							+ toZoneId + "-" + i);
 					createPerson(personId, fromZone, toZone);
 				}
 			}
