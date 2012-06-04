@@ -19,6 +19,9 @@
 
 package playground.andreas.P2.schedule;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -65,8 +68,11 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	private TransitSchedule schedule;
 	private Vehicles vehicles;
 	
-	private TransitRouterConfig config;
-	private TransitRouterNetwork routerNetwork;
+	private TransitRouterConfig config = null;
+	private boolean needToUpdateRouter = true;
+	private TransitRouterNetwork routerNetwork = null;
+	private TransitRouterFactory routerFactory = null;
+	private String ptEnabler = null;
 	
 	private AgentsStuckHandlerImpl agentsStuckHandler;
 	private PBox pBox;
@@ -74,6 +80,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	public PTransitRouterImplFactory(Controler controler) {
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
+		this.ptEnabler = pConfig.getPtEnabler();
 		if(pConfig.getReRouteAgentsStuck()){
 			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
 		}
@@ -84,17 +91,53 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 
 	@Override
 	public TransitRouter createTransitRouter() {
-		if(this.routerNetwork == null){
-			this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
-		}		
-		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
-		return new TransitRouterImpl(this.config, this.routerNetwork, ttCalculator, ttCalculator);
+		if(needToUpdateRouter) {
+			// okay update all routers
+			this.routerFactory = createSpeedyRouter();
+			if(this.routerFactory == null) {
+				log.warn("Could not create speedy router, fall back to normal one.");
+				this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+			}
+			needToUpdateRouter = false;
+		}
+		
+		if (this.routerFactory == null) {
+			// no speedy router available - return old one
+			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
+			return new TransitRouterImpl(this.config, routerNetwork, ttCalculator, ttCalculator);
+		} else {
+			return this.routerFactory.createTransitRouter();
+		}
 	}
+	
+	private TransitRouterFactory createSpeedyRouter() {
+		try {
+			Class<?> cls = Class.forName("com.senozon.matsim.pt.speedyrouter.SpeedyTransitRouterFactory");
+			Constructor<?> ct = cls.getConstructor(new Class[] {TransitSchedule.class, TransitRouterConfig.class, String.class});
+			return (TransitRouterFactory) ct.newInstance(new Object[] {this.schedule, this.config, this.ptEnabler});
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.pBox.notifyStartup(event);
-		this.routerNetwork = null;
+		this.needToUpdateRouter = true;
 		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
 		this.baseVehicles = event.getControler().getScenario().getVehicles();
 		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
@@ -117,7 +160,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
 			this.pBox.notifyIterationStarts(event);
-			this.routerNetwork = null;
+			this.needToUpdateRouter = true;
 			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
 			((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
 			this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pBox.getVehicles());

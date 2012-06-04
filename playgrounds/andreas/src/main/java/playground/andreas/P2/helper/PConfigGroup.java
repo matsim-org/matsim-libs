@@ -80,6 +80,7 @@ public class PConfigGroup extends Module{
 	private static final String SHARE_OF_COOPERATIVES_WITH_PROFIT = "shareOfCooperativesWithProfit";
 	private static final String REROUTE_AGENTS_STUCK = "reRouteAgentsStuck";
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
+	private static final String PT_ENABLER = "ptEnabler";
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
@@ -114,6 +115,7 @@ public class PConfigGroup extends Module{
 	private double shareOfCooperativesWithProfit = 0.50;
 	private boolean reRouteAgentsStuck = false;
 	private String transitScheduleToStartWith = null;
+	private String ptEnabler = null;
 
 	// Strategies
 	private final LinkedHashMap<Id, PStrategySettings> strategies = new LinkedHashMap<Id, PStrategySettings>();
@@ -185,6 +187,8 @@ public class PConfigGroup extends Module{
 			this.reRouteAgentsStuck = Boolean.parseBoolean(value);
 		} else if (TRANSIT_SCHEDULE_TO_START_WITH.equals(key)){
 			this.transitScheduleToStartWith = value;
+		} else if (PT_ENABLER.equals(key)){
+			this.ptEnabler = value;
 		} else if (key != null && key.startsWith(PMODULE)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE.length())), true);
 			settings.setModuleName(value);
@@ -393,6 +397,10 @@ public class PConfigGroup extends Module{
 	
 	public String getTransitScheduleToStartWith() {
 		return this.transitScheduleToStartWith;
+	}
+	
+	public String getPtEnabler() {
+		return this.ptEnabler;
 	}
 
 	public Collection<PStrategySettings> getStrategySettings() {
