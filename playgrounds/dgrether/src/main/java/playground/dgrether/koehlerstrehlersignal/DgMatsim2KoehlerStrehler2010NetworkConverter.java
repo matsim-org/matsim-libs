@@ -90,7 +90,9 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	}
 
 	public DgKSNetwork convertNetworkLanesAndSignals(Scenario sc) {
-		this.dgNetwork = this.createNetwork(sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class), sc.getScenarioElement(SignalsData.class));
+		log.info("Converting network ...");
+		this.dgNetwork = this.convertNetwork(sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class), sc.getScenarioElement(SignalsData.class));
+		log.info("Network converted.");
 		return this.dgNetwork ;
 	}
 
@@ -98,10 +100,8 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	 * codierung:
 	 *   fromLink -> toLink zwei nodes + 1 light
 	 */
-	private DgKSNetwork createNetwork(Network net, LaneDefinitions20 lanes, SignalsData signalsData) {
-		
+	private DgKSNetwork convertNetwork(Network net, LaneDefinitions20 lanes, SignalsData signalsData) {
 		DgKSNetwork dgnet = new DgKSNetwork();
-		
 		/* create a crossing for each node, same id
 		 */
 		this.convertNodes2Crossings(dgnet, net);
@@ -187,9 +187,16 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 			return null; //do nothing if it is the backlink
 		}
 		Id lightId = this.convertFromLinkIdToLinkId2LightId(fromLinkId, fromLaneId, outLinkId);
-		DgCrossingNode outLinkFromNode = crossing.getNodes().get(this.convertLinkId2FromCrossingNodeId(outLinkId));
-		DgStreet light = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
-		crossing.addLight(light);
+		log.debug("    light id: " + lightId);
+		Id convertedOutLinkId = this.convertLinkId2FromCrossingNodeId(outLinkId);
+		log.debug("    outLinkId : " + outLinkId + " converted id: " + convertedOutLinkId);
+		DgCrossingNode outLinkFromNode = crossing.getNodes().get(convertedOutLinkId);
+		if (outLinkFromNode == null){
+			log.error("Crossing " + crossing.getId() + " has no node with id " + convertedOutLinkId);
+			throw new IllegalStateException("outLinkFromNode not found.");
+		}
+		DgStreet street = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
+		crossing.addLight(street);
 		return lightId;
 	}
 	

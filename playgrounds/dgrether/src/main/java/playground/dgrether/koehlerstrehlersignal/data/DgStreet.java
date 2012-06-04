@@ -33,6 +33,15 @@ public class DgStreet {
 	private Id id;
 
 	public DgStreet(Id id, DgCrossingNode fromNode, DgCrossingNode toNode) {
+		if (id == null){
+			throw new IllegalStateException("Id null not permitted!");
+		}
+		if (fromNode == null){
+			throw new IllegalStateException("fromNode null not permitted!");
+		}
+		if (toNode == null){
+			throw new IllegalStateException("toNode null not permitted! (id: " + id + ")");
+		}
 		this.toNode = toNode;
 		this.fromNode = fromNode;
 		this.id = id;

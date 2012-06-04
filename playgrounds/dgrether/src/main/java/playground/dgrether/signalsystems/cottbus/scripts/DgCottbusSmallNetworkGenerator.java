@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -48,7 +47,7 @@ import org.matsim.signalsystems.data.SignalsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.analysis.FeatureNetworkLinkFilter;
+import playground.dgrether.analysis.FeatureNetworkLinkStartEndCoordFilter;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 import playground.dgrether.utils.DgNet2Shape;
@@ -96,8 +95,11 @@ public class DgCottbusSmallNetworkGenerator {
 		Feature boundingboxFeature = calcBoundingBox(net, signalizedLinkIds, offset);
 
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
-		filterManager.addLinkFilter(new FeatureNetworkLinkFilter(networkSrs, boundingboxFeature, networkSrs));
+		filterManager.addLinkFilter(new FeatureNetworkLinkStartEndCoordFilter(networkSrs, boundingboxFeature, networkSrs));
 		Network newNetwork = filterManager.applyFilters();
+
+//		NetworkCleaner netCleaner = new NetworkCleaner();
+//		netCleaner.run(newNetwork);
 		
 		String output = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/network";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
@@ -107,8 +109,6 @@ public class DgCottbusSmallNetworkGenerator {
 		boundingBoxCollection.add(boundingboxFeature);
 		ShapeFileWriter.writeGeometries(boundingBoxCollection, DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/bounding_box.shp");
 
-		NetworkCleaner netCleaner = new NetworkCleaner();
-		netCleaner.run(newNetwork);
 		
 		this.shrinkedNetwork = newNetwork;
 		return newNetwork;
@@ -147,6 +147,14 @@ public class DgCottbusSmallNetworkGenerator {
 				minY = l.getCoord().getY();
 			}
 		}
+
+		log.info("Found bounding box: "  + minX + " " + minY + " " + maxX + " " + maxY);
+		
+		minX = minX - offset;
+		minY = minY - offset;
+		maxX = maxX + offset;
+		maxY = maxY + offset;
+		log.info("Found bounding box: "  + minX + " " + minY + " " + maxX + " " + maxY + " offset used: " + offset);
 		
 		Coordinate[] coordinates = new Coordinate[5];
 		coordinates[0] = new Coordinate(minX, minY);
@@ -155,7 +163,6 @@ public class DgCottbusSmallNetworkGenerator {
 		coordinates[3] = new Coordinate(maxX, minY);
 		coordinates[4] = coordinates[0];
 		
-		log.info("Found bounding box: "  + minX + " " + minY + " " + maxX + " " + maxY);
 		
 		this.boundingBox = new Envelope(coordinates[0], coordinates[2]);
 		this.boundingBox.expandBy(offset, offset);

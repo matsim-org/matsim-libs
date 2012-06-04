@@ -253,7 +253,7 @@ public class SimSimTrafficAnalyser {
 		log.info("Nr links in original network: " + network.getLinks().size());
 		NetworkFilterManager netFilter = new NetworkFilterManager(network);
 		Tuple<CoordinateReferenceSystem, Feature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature("/media/data/work/repos/shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
-		FeatureNetworkLinkFilter filter = new FeatureNetworkLinkFilter(networkSrs, cottbusFeatureTuple.getSecond(), cottbusFeatureTuple.getFirst());
+		FeatureNetworkLinkCenterCoordFilter filter = new FeatureNetworkLinkCenterCoordFilter(networkSrs, cottbusFeatureTuple.getSecond(), cottbusFeatureTuple.getFirst());
 		netFilter.addLinkFilter(filter);
 		Network fn = netFilter.applyFilters();
 		log.info("Nr of links in filtered network: " + fn.getLinks().size());

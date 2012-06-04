@@ -39,14 +39,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author dgrether
  *
  */
-public class FeatureNetworkLinkFilter implements NetworkLinkFilter {
+public class FeatureNetworkLinkStartEndCoordFilter implements NetworkLinkFilter {
 
 	private MathTransform transform;
 	private Feature feature;
 	
-	public FeatureNetworkLinkFilter(CoordinateReferenceSystem networkSrs,
+	public FeatureNetworkLinkStartEndCoordFilter(CoordinateReferenceSystem networkSrs,
 			Feature feature, CoordinateReferenceSystem featureSrs) {
-		
 		this.feature = feature;
 		try {
 			this.transform = CRS.findMathTransform(networkSrs, featureSrs, true);
@@ -58,11 +57,13 @@ public class FeatureNetworkLinkFilter implements NetworkLinkFilter {
 
 	@Override
 	public boolean judgeLink(Link l) {
-		Coord linkCoord = l.getCoord();
-		Geometry linkPoint = null;
+		Coord linkStartCoord = l.getFromNode().getCoord();
+		Coord linkEndCoord = l.getToNode().getCoord();
+		Geometry linkStartPoint, linkEndPoint = null;
 		try {
-			linkPoint = JTS.transform(MGC.coord2Point(linkCoord), this.transform);
-			if (this.feature.getDefaultGeometry().contains(linkPoint)) {
+			linkStartPoint = JTS.transform(MGC.coord2Point(linkStartCoord), this.transform);
+			linkEndPoint = JTS.transform(MGC.coord2Point(linkEndCoord), this.transform);
+			if (this.feature.getDefaultGeometry().contains(linkStartPoint) || this.feature.getDefaultGeometry().contains(linkEndPoint)) {
 				return true;
 			}
 		} catch (MismatchedDimensionException e) {
