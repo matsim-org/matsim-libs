@@ -23,9 +23,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,11 +32,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -52,11 +47,9 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
-import playground.andreas.P2.stats.GexfPStat;
 import playground.andreas.gexf.ObjectFactory;
 import playground.andreas.gexf.XMLAttributeContent;
 import playground.andreas.gexf.XMLAttributesContent;
@@ -75,7 +68,6 @@ import playground.andreas.gexf.XMLNodeContent;
 import playground.andreas.gexf.XMLNodesContent;
 import playground.andreas.gexf.XMLTimeformatType;
 import playground.andreas.gexf.viz.PositionContent;
-import playground.andreas.utils.pop.SetPersonCoordsToBoundingBox;
 
 /**
  * 
@@ -88,6 +80,7 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
 	private final double gridSize;
+	private final Set<String> restrictToTheseLegModes;
 	
 	private ObjectFactory gexfFactory;
 	private XMLGexfContent gexfContainer;
@@ -99,12 +92,39 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 	private XMLAttributesContent edgeContentContainer;
 	private XMLAttributesContent nodeContentContainer;
 
-	public Plans2Gexf(double gridSize){
+	public static void main(String[] args) {
+		
+		Gbl.startMeasurement();
+	
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	
+		String networkFile = "f:/p_runs/txl/network.final.xml.gz";
+		String inPlansFile = "f:/p_runs/txl/run25/it.380/run25.380.plans.xml.gz";
+		String outFilename = "f:/p_runs/txl/run25/it.380/popAna.gexf.gz";
+		Set<String> restrictToTheseLegModes = new TreeSet<String>();
+		restrictToTheseLegModes.add(TransportMode.pt);
+		
+		new MatsimNetworkReader(sc).readFile(networkFile);
+	
+		Population inPop = sc.getPopulation();
+		PopulationReader popReader = new MatsimPopulationReader(sc);
+		popReader.readFile(inPlansFile);
+		
+		Plans2Gexf p2g = new Plans2Gexf(restrictToTheseLegModes, 500.0);
+		p2g.init();
+		p2g.parsePopulation(inPop);
+		p2g.createNodes();
+		p2g.createEdges();
+		p2g.write(outFilename);
+		
+		Gbl.printElapsedTime();
+	}
+
+	public Plans2Gexf(Set<String> restrictToTheseLegModes, double gridSize){
+		this.restrictToTheseLegModes = restrictToTheseLegModes;
 		this.gridSize = gridSize;
 		this.gexfFactory = new ObjectFactory();
 		this.gexfContainer = this.gexfFactory.createXMLGexfContent();
-		
-		
 	}
 	
 	private void init(){
@@ -141,37 +161,105 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 		edgeContentContainer.getAttribute().add(edgeContent);
 		
 		this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(edgeContentContainer);
-		
-
-		
 	}
 	
+	private void parsePopulation(Population pop) {
+		for (Person person : pop.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			
+			GridNode lastNode = null;
+			Leg lastLeg = null;
+			
+			for (PlanElement pE : plan.getPlanElements()) {
+				
+				if (pE instanceof Activity) {
+					Activity act = (Activity) pE;
+					this.actTypes.add(act.getType());
+					
+					if (lastNode == null) {
+						lastNode = getNodeFromAct(act);
+						lastNode.addActivity(act);
+					} else{
+						GridNode currentNode = getNodeFromAct(act);
+						currentNode.addActivity(act);
+						
+						if (this.fromNode2toNode2EdgeMap.get(lastNode) == null) {
+							this.fromNode2toNode2EdgeMap.put(lastNode, new HashMap<GridNode, GridEdge>());
+						}
+						
+						if (this.fromNode2toNode2EdgeMap.get(lastNode).get(currentNode) == null) {
+							this.fromNode2toNode2EdgeMap.get(lastNode).put(currentNode, new GridEdge(lastNode, currentNode));
+						}
+						
+						if (restrictToTheseLegModes.contains(lastLeg.getMode())) {
+							this.fromNode2toNode2EdgeMap.get(lastNode).get(currentNode).addLeg(lastLeg);
+						}
+					}
+				}
+				
+				if (pE instanceof Leg) {
+					lastLeg = (Leg) pE;
+					if (restrictToTheseLegModes.contains(lastLeg.getMode())) {
+						this.transportModes.add(lastLeg.getMode());
+					}
+				}
+			}
+		}
+	}
+
+	private void createNodes() {
+		// add additional attributes
+		for (String actType : this.actTypes) {
+			XMLAttributeContent nodeContent = new XMLAttributeContent();
+			nodeContent.setId(actType);
+			nodeContent.setTitle(actType);
+			nodeContent.setType(XMLAttrtypeType.FLOAT);
+			this.nodeContentContainer.getAttribute().add(nodeContent);
+		}
+		
+		List<Object> attr = this.gexfContainer.getGraph().getAttributesOrNodesOrEdges();
+		XMLNodesContent nodes = this.gexfFactory.createXMLNodesContent();
+		attr.add(nodes);
+		List<XMLNodeContent> nodeList = nodes.getNode();
+		
+		for (GridNode node : this.gridNodeId2GridNode.values()) {
+			XMLNodeContent n = this.gexfFactory.createXMLNodeContent();
+			n.setId(node.getId().toString());
+			n.setLabel(node.toString());
+			
+			playground.andreas.gexf.viz.ObjectFactory vizFac = new playground.andreas.gexf.viz.ObjectFactory();
+			PositionContent pos = vizFac.createPositionContent();
+			pos.setX((float) node.getX());
+			pos.setY((float) node.getY());
+			pos.setZ((float) 0.0);
 	
-	public static void main(String[] args) {
-		
-		Gbl.startMeasurement();
-
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		String networkFile = "f:/p/network_real.xml";
-		String inPlansFile = "f:/p/all2all_25min/ITERS/it.30/all2all_25min.30.plans.xml.gz";
-		String outFilename = "f:/p/popTest.gexf.gz";
-
-//		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(networkFile);
-
-		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
-		popReader.readFile(inPlansFile);
-		
-		Plans2Gexf p2g = new Plans2Gexf(3000.0);
-		p2g.init();
-		p2g.parsePopulation(inPop);
-		p2g.createNodes();
-		p2g.createEdges();
-		p2g.write(outFilename);
-		
-		Gbl.printElapsedTime();
+			n.getAttvaluesOrSpellsOrNodes().add(pos);
+			
+			// add values to attributes
+			XMLAttvaluesContent attContent = new XMLAttvaluesContent();
+			n.getAttvaluesOrSpellsOrNodes().add(attContent);
+			
+			int nActs = 0;
+			for (String actType : this.actTypes) {
+				XMLAttvalue attValue = new XMLAttvalue();
+				attValue.setFor(actType);
+				attValue.setValue(String.valueOf(node.getCountForAct(actType)));
+				attValue.setStart(Double.toString(0));
+	
+				attContent.getAttvalue().add(attValue);
+				
+				nActs += node.getCountForAct(actType);
+			}			
+			
+			XMLAttvalue attValue = new XMLAttvalue();
+			attValue.setFor("weight");
+			attValue.setValue(String.valueOf(nActs));
+			attValue.setStart(Double.toString(0));
+	
+			attContent.getAttvalue().add(attValue);
+	
+			nodeList.add(n);
+		}
 	}
 
 	private void createEdges() {
@@ -203,8 +291,6 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 					e.setSource(edge.getFromNode().getId().toString());
 					e.setTarget(edge.getToNode().getId().toString());
 					e.setWeight((float) edge.getnEntries());
-
-					edgeList.add(e);
 					
 					XMLAttvaluesContent attContent = new XMLAttvaluesContent();
 					e.getAttvaluesOrSpellsOrColor().add(attContent);
@@ -227,107 +313,15 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 					attValue.setStart(Double.toString(0));
 
 					attContent.getAttvalue().add(attValue);
-				}
-				
-			}
-		}
-	}
-
-	private void createNodes() {
-		// add additional attributes
-		for (String actType : this.actTypes) {
-			XMLAttributeContent nodeContent = new XMLAttributeContent();
-			nodeContent.setId(actType);
-			nodeContent.setTitle(actType);
-			nodeContent.setType(XMLAttrtypeType.FLOAT);
-			this.nodeContentContainer.getAttribute().add(nodeContent);
-		}
-		
-		List<Object> attr = this.gexfContainer.getGraph().getAttributesOrNodesOrEdges();
-		XMLNodesContent nodes = this.gexfFactory.createXMLNodesContent();
-		attr.add(nodes);
-		List<XMLNodeContent> nodeList = nodes.getNode();
-		
-		for (GridNode node : this.gridNodeId2GridNode.values()) {
-			XMLNodeContent n = this.gexfFactory.createXMLNodeContent();
-			n.setId(node.getId().toString());
-			n.setLabel(node.toString());
-			
-			playground.andreas.gexf.viz.ObjectFactory vizFac = new playground.andreas.gexf.viz.ObjectFactory();
-			PositionContent pos = vizFac.createPositionContent();
-			pos.setX((float) node.getX());
-			pos.setY((float) node.getY());
-			pos.setZ((float) 0.0);
-
-			n.getAttvaluesOrSpellsOrNodes().add(pos);
-			
-			// add values to attributes
-			XMLAttvaluesContent attContent = new XMLAttvaluesContent();
-			n.getAttvaluesOrSpellsOrNodes().add(attContent);
-			
-			int nActs = 0;
-			for (String actType : this.actTypes) {
-				XMLAttvalue attValue = new XMLAttvalue();
-				attValue.setFor(actType);
-				attValue.setValue(String.valueOf(node.getCountForAct(actType)));
-				attValue.setStart(Double.toString(0));
-
-				attContent.getAttvalue().add(attValue);
-				
-				nActs += node.getCountForAct(actType);
-			}			
-			
-			XMLAttvalue attValue = new XMLAttvalue();
-			attValue.setFor("weight");
-			attValue.setValue(String.valueOf(nActs));
-			attValue.setStart(Double.toString(0));
-
-			attContent.getAttvalue().add(attValue);
-
-			nodeList.add(n);
-		}
-	}
-
-	private void parsePopulation(Population pop) {
-		for (Person person : pop.getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			
-			GridNode lastNode = null;
-			Leg lastLeg = null;
-			
-			for (PlanElement pE : plan.getPlanElements()) {
-				
-				if (pE instanceof Activity) {
-					Activity act = (Activity) pE;
-					this.actTypes.add(act.getType());
 					
-					if (lastNode == null) {
-						lastNode = getNodeFromAct(act);
-						lastNode.addActivity(act);
-					} else{
-						GridNode currentNode = getNodeFromAct(act);
-						currentNode.addActivity(act);
-						
-						if (this.fromNode2toNode2EdgeMap.get(lastNode) == null) {
-							this.fromNode2toNode2EdgeMap.put(lastNode, new HashMap<GridNode, GridEdge>());
-						}
-						
-						if (this.fromNode2toNode2EdgeMap.get(lastNode).get(currentNode) == null) {
-							this.fromNode2toNode2EdgeMap.get(lastNode).put(currentNode, new GridEdge(lastNode, currentNode));
-						}
-						
-						this.fromNode2toNode2EdgeMap.get(lastNode).get(currentNode).addLeg(lastLeg);						
+					if (nLegs > 0) {
+						edgeList.add(e);
 					}
 				}
-				
-				if (pE instanceof Leg) {
-					lastLeg = (Leg) pE;
-					this.transportModes.add(lastLeg.getMode());
-				}
 			}
 		}
 	}
-	
+
 	public void write(String filename) {
 		JAXBContext jc;
 		try {
@@ -363,5 +357,4 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 	private int getSpaceSlotForCoord(double coord){
 		return (int) (coord / this.gridSize);
 	}
-
 }

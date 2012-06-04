@@ -35,6 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class GridNode {
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(GridNode.class);
 	private Id id;
 	private double xMean;
@@ -42,7 +43,6 @@ public class GridNode {
 	private double nEntries = 0;
 	
 	private HashMap<String, Integer> actType2countMap = new HashMap<String, Integer>();
-	
 
 	public GridNode(Id id){
 		this.id = id;
@@ -73,8 +73,6 @@ public class GridNode {
 		return id;
 	}
 	
-	
-	
 	public double getX() {
 		return xMean;
 	}
@@ -86,8 +84,6 @@ public class GridNode {
 	public static Id createGridNodeId(int x, int y){
 		return new IdImpl(x + "_" + y);
 	}
-	
-	
 	
 	public int getCountForAct(String act) {
 		if (this.actType2countMap.get(act) == null) {
@@ -106,7 +102,4 @@ public class GridNode {
 		}
 		return strB.toString();
 	}
-	
-	
-
 }

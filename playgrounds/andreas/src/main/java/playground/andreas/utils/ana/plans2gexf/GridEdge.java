@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -36,11 +35,11 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class GridEdge {
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(GridEdge.class);
 	private Id id;
 	private GridNode fromNode;
 	private GridNode toNode;
-	private String mode;
 	
 	private int nEntries = 0;
 	private HashMap<String, Integer> legMode2countMap = new HashMap<String, Integer>();
@@ -96,5 +95,4 @@ public class GridEdge {
 		}
 		return strB.toString();
 	}
-	
 }
