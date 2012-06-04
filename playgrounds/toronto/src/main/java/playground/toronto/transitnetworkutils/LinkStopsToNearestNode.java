@@ -126,7 +126,11 @@ public class LinkStopsToNearestNode {
 					l.setAllowedModes(modes);
 				}*/
 
-				network.addLink(l);
+				try {
+					network.addLink(l);
+				} catch (IllegalArgumentException e) {
+					
+				}
 				loopedNodes.add(N.getId());
 			}
 
