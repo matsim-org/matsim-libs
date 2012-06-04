@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.ActivityEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -35,6 +36,8 @@ import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
@@ -165,11 +168,29 @@ public class MentalSim implements Mobsim {
 						 * exist a leg before.
 						 */
 						Leg prevLeg = (Leg) elements.get(idx - 1);
-						NetworkRoute route = (NetworkRoute) prevLeg.getRoute();
-						double travelTime = calcRouteTravelTime(route,
-								prevEndTime, linkTravelTimes, network);
-						if (prevLeg.getMode().equals("pt"))
-							travelTime *= 2.06;
+						double travelTime=0.0;
+						
+						if(prevLeg.getMode().equals(TransportMode.car)){
+							try{
+								NetworkRoute croute = (NetworkRoute) prevLeg.getRoute();
+								travelTime = calcRouteTravelTime(croute,
+										prevEndTime, linkTravelTimes, network);						
+								
+							}catch(NullPointerException ne){
+								Logger.getLogger(this.getClass()).error("No route for car plan. Continuing with next plan");
+								continue;
+							}
+						}else{
+							try {
+								GenericRoute route = (GenericRoute) prevLeg.getRoute();
+								 travelTime = route.getTravelTime();
+							} catch (NullPointerException e) {
+								Logger.getLogger(this.getClass()).error("No route for pt plan. Continuing with next plan");
+								continue;
+							}
+						}
+						
+
 						travelTime = Math.max(MIN_LEG_DURATION, travelTime);
 						double arrivalTime = travelTime + prevEndTime;
 						/*
