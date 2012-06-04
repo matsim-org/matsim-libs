@@ -94,7 +94,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		int n = 0;
 		int headway = (int) (transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset()) / numberOfVehicles;
 		for (int i = 0; i < numberOfVehicles; i++) {
-			for (double j = startTime + i * headway; j < endTime; ) {
+			for (double j = startTime + i * headway; j <= endTime; ) {
 				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(new IdImpl(n), j);
 				departure.setVehicleId(new IdImpl(transitRoute.getId().toString() + "-" + i));
 				transitRoute.addDeparture(departure);
