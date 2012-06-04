@@ -150,14 +150,9 @@ public class JointControler extends MultiLegRoutingControler {
 		 */
 
 
-		// the default handling of plans
-		// this.plansScoring = new JointPlansScoring();
-
-//		this.plansScoring = new PlansScoring();
 		this.plansScoring = new PlansScoring(this.scenarioData, this.events, this.scoringFunctionFactory ) ;
 
-		//this.plansScoring = new PlansScoring();
-		this.addCoreControlerListener(this.plansScoring);
+		this.addControlerListener(this.plansScoring);
 
 		// load road pricing, if requested
 		if (this.config.scenario().isUseRoadpricing()) {
@@ -172,6 +167,11 @@ public class JointControler extends MultiLegRoutingControler {
 		this.addCoreControlerListener(new PlansDumping());
 
 		this.addCoreControlerListener(new EventsHandling(this.events));
+	}
+
+	@Override
+	public PlansScoring getPlansScoring() {
+		return plansScoring;
 	}
 
 	@Override
