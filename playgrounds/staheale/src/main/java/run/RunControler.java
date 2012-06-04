@@ -17,35 +17,33 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import scoring.AgentInteractionScoringFunctionFactory;
 
 public class RunControler extends Controler {
-	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
+private TreeMap<Id, FacilityOccupancy> facilityOccupancies = new TreeMap<Id, FacilityOccupancy>();;
+	
 
-
-	public RunControler(Config config) {
-		super(config);
+	public RunControler(final String[] args) {
+		super(args);
+		super.setOverwriteFiles(true) ;
 	}
 
 	public static void main(String[] args) {
-		String configFile = args[0] ;
-		Controler controler = new Controler( configFile ) ;	
+		RunControler controler = new RunControler( args ) ;	
 		controler.run();
 	}
 	
 	protected void setUp() {
 
-		this.setOverwriteFiles(false) ;
-		this.setCreateGraphs(false);
+		this.setCreateGraphs(true);
 		this.setDumpDataAtEnd(false);
 		this.setWriteEventsInterval(0);
 		
 	    ObjectAttributes attributes = new ObjectAttributes();
 	    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(attributes);
-		attributesReader.parse("./input/facilityAttributes.xml.gz");
+		attributesReader.parse("./input/facilityAttributes.xml");
 		
 		// get objects that are required as parameter for the AgentInteractionScoringFunctionFactory 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.getConfig().planCalcScore();
 		ActivityFacilities facilities = this.getFacilities();
 		Network network = this.getNetwork();
-
 
 		// create the AgentInteractionScoringFunctionFactory
 		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(planCalcScoreConfigGroup, facilities, network, Double.parseDouble(this.getConfig().locationchoice().getScaleFactor()), facilityOccupancies, attributes);
@@ -53,7 +51,7 @@ public class RunControler extends Controler {
 		// set the AgentInteractionScoringFunctionFactory as default in the controler 
 		this.setScoringFunctionFactory(factory);
 	    super.setUp();	
-		this.facilityOccupancies = new TreeMap<Id, FacilityOccupancy>(); 
+		
 		addControlerListener(new FacilitiesOccupancyCalculator(this.facilityOccupancies, AgentInteraction.numberOfTimeBins, AgentInteraction.scaleNumberOfPersons));		    
 	}
 }

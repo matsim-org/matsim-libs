@@ -63,7 +63,10 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 	
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
-		if (!(event.getActType().startsWith("h")|| event.getActType().startsWith("w") || event.getActType().startsWith("tta"))) {
+		if (!(event.getActType().startsWith("h")||
+				event.getActType().startsWith("w") ||
+				event.getActType().startsWith("tta") ||
+				event.getActType().startsWith("e"))) {
 			Id facilityId = event.getFacilityId();
 			this.facilityOccupancies.get(facilityId).addArrival(event.getTime());
 		}
@@ -71,7 +74,10 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 	
 	@Override
 	public void handleEvent(final ActivityEndEvent event) {
-		if (!(event.getActType().startsWith("h")|| event.getActType().startsWith("w") || event.getActType().startsWith("tta"))) {
+		if (!(event.getActType().startsWith("h")||
+				event.getActType().startsWith("w") ||
+				event.getActType().startsWith("tta") ||
+				event.getActType().startsWith("e"))) {
 			Id facilityId = event.getFacilityId();
 			this.facilityOccupancies.get(facilityId).addDeparture(event.getTime());
 		}

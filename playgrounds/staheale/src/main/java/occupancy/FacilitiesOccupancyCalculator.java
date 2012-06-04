@@ -152,6 +152,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 						else {
 							out.write("-");
 						}
+						
 						if (facility.getActivityOptions().containsKey("shop_service")) {
 							out.write("shop_service");
 						}
@@ -222,28 +223,28 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 								+ "\t");
 							
 							if (facility.getActivityOptions().containsKey("shop_retail")) {
-								out_summary.write("1");
+								out_summary.write("1\t");
 							}
 							else {
-								out_summary.write("0");
+								out_summary.write("0\t");
 							}
 							if (facility.getActivityOptions().containsKey("shop_service")) {
-								out_summary.write("1");
+								out_summary.write("1\t");
 							}
 							else {
-								out_summary.write("0");
+								out_summary.write("0\t");
 							}
 							if (facility.getActivityOptions().containsKey("sports_fun")) {
-								out_summary.write("1");
+								out_summary.write("1\t");
 							}
 							else {
-								out_summary.write("0");
+								out_summary.write("0\t");
 							}
 							if (facility.getActivityOptions().containsKey("gastro_culture")) {
-								out_summary.write("1");
+								out_summary.write("1\t");
 							}
 							else {
-								out_summary.write("0");
+								out_summary.write("0\t");
 							}
 						out_summary.newLine();
 					}

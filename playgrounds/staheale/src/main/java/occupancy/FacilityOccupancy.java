@@ -20,6 +20,8 @@
 
 package occupancy;
 
+import miniscenario.AgentInteraction;
+
 public class FacilityOccupancy {
 		
 	private int [] arrivals = null;
@@ -34,7 +36,7 @@ public class FacilityOccupancy {
 	// including also visitors which arrive after 24:00
 	private double allVisitors = 0.0;
 		
-	private double scaleNumberOfPersons = 1.0;
+	private double scaleNumberOfPersons = AgentInteraction.scaleNumberOfPersons;
 
 	
 	// ----------------------------------------------------------------------

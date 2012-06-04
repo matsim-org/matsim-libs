@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -76,7 +77,16 @@ public void run() {
 	PlansReader.readFile("./input/run0.500.plans.xml.gz");
 	System.out.println("Reading plans xml file...done.");
 	
-
+//	log.info("number of nodes: " +scenarioPlans.getNetwork().getNodes().size());
+//	log.info("number of links: " +scenarioPlans.getNetwork().getLinks().size());
+//	
+//	log.info("number of home facilities: " +scenarioPlans.getActivityFacilities().getFacilitiesForActivityType("home").size());
+//	log.info("number of work facilities: " +scenarioPlans.getActivityFacilities().getFacilitiesForActivityType("work").size());
+//	log.info("number of education facilities: " +scenarioPlans.getActivityFacilities().getFacilitiesForActivityType("education").size());
+//	log.info("number of shop retail facilities: " +scenarioPlans.getActivityFacilities().getFacilitiesForActivityType("shop_retail").size());
+//	log.info("number of shop service facilities: " +scenarioPlans.getActivityFacilities().getFacilitiesForActivityType("shop_service").size());
+//	log.info("number of sports & fun facilities: " +scenarioPlans.getActivityFacilities().getFacilitiesForActivityType("sports_fun").size());
+//	log.info("number of gastro & culture facilities: " +scenarioPlans.getActivityFacilities().getFacilitiesForActivityType("gastro_culture").size());
 
 	for (Person p : scenarioPlans.getPopulation().getPersons().values()) {
 		for (PlanElement pe : p.getSelectedPlan().getPlanElements()){

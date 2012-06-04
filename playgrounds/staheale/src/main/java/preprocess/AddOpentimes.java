@@ -340,25 +340,10 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 								startTime = 9.0 * 3600;
 								endTime = 24.0 * 3600;
 							} else if (
-									day.equals(DayType.sat)) {
-								startTime = 0.0 * 3600;
-								endTime = 3.0 * 3600;								
-								activities.get(FacilitiesProduction.SPORTS_FUN).addOpeningTime(new OpeningTimeImpl(
-								DayType.sat,
-								16.0 * 3600,
-								24.0 * 3600));
-								activities.get(FacilitiesProduction.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-								DayType.sun,
-								16.0 * 3600,
-								24.0 * 3600));
-							} else if (
+									day.equals(DayType.sat)||
 									day.equals(DayType.sun)) {
-								startTime = 0.0 * 3600;
-								endTime = 04.0 * 3600;								
-								activities.get(FacilitiesProduction.SPORTS_FUN).addOpeningTime(new OpeningTimeImpl(
-								DayType.sun,
-								16.0 * 3600,
-								24.0 * 3600));
+								startTime = 16.0 * 3600;
+								endTime = 24.0 * 3600;;
 								activities.get(FacilitiesProduction.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 								DayType.sun,
 								16.0 * 3600,
