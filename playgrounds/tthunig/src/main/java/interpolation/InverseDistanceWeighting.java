@@ -6,7 +6,7 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
  * implements inverse distance weighting for interpolation. own implementation (no suitable implementation found).
  * requires values on a SpatialGrid
  * 
- * please not use (experimental version)!
+ * please do not use (experimental version)!
  * not useful for accessibility interpolation because peaks and valleys occur.
  * for more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
  * or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (german)

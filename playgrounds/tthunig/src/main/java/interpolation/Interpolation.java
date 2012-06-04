@@ -18,11 +18,11 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
  * 	wave effect occurs.
  * 
  * inverse distance weighting:
- * 	please not use (experimental version)!
+ * 	please do not use (experimental version)!
  *  uses inverse distance weighting for the 4 nearest known values. own implementation.
  *  not useful for accessibility interpolation because peaks and valleys occur.
  *  for more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
- *  or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (german)
+ *  or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (in german)
  * 
  * @author tthunig
  *
@@ -33,7 +33,7 @@ public class Interpolation {
 	
 	public static final int BILINEAR = 0;
 	public static final int BICUBIC = 1;
-	/** please not use (experimental version) **/
+	/** please do not use (experimental version) **/
 	public static final int INVERSE_DISTANCE_WEIGHTING_EXPERIMENTAL = 2;
 	
 	private SpatialGrid sg = null;
@@ -74,11 +74,11 @@ public class Interpolation {
 			this.biLinearInterpolator = new BiLinearInterpolator(this.sg);
 		}
 		if(this.interpolationMethod == BICUBIC){
-			log.info("Creating object for bicubic interpolation ...");
+			log.info("Preparing bicubic interpolation ...");
 			this.biCubicInterpolator = new BiCubicInterpolator(this.sg);
 		}
 		if(this.interpolationMethod == INVERSE_DISTANCE_WEIGHTING_EXPERIMENTAL){
-			log.warn("Please not use IDW (experimental version)!");
+			log.warn("Please do not use IDW (experimental version)!");
 			log.warn("IDW interpolation not useful for accessibility interpolation.");
 		}
 	}
