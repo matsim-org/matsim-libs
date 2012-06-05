@@ -116,7 +116,8 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 										
 					final Activity actPost = (Activity)actslegs.get(actlegIndex + 2);					
 					double distanceDirect = ((CoordImpl)actPre.getCoord()).calcDistance(actPost.getCoord());
-					double distanceFromEpsilon = this.getMaximumDistanceFromEpsilon((PersonImpl)plan.getPerson(), actToMove.getType());
+					double distanceFromEpsilon = this.getMaximumDistanceFromEpsilon((PersonImpl)plan.getPerson(), 
+							this.actTypeConverter.convertType(actToMove.getType()));
 					double maxRadius = (distanceDirect +  distanceFromEpsilon) / 2.0;
 					
 					double x = (actPre.getCoord().getX() + actPost.getCoord().getX()) / 2.0;
