@@ -17,7 +17,7 @@ import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
 public class MyTravelTimeCalculator extends TravelTimeCalculator {
 	public MyTravelTimeCalculator(Network network,
 			TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		super(network, ttconfigGroup);
+		super(network,ttconfigGroup.getTraveltimeBinSize(),50*3600, ttconfigGroup);
 	}
 	
 
