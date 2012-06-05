@@ -34,6 +34,7 @@ import playground.thibautd.tsplanoptimizer.framework.EvolutionPlotter;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
+import playground.thibautd.tsplanoptimizer.framework.SolutionTabuList;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
 import playground.thibautd.tsplanoptimizer.timemodechooser.AllPossibleModesMovesGenerator;
 import playground.thibautd.tsplanoptimizer.timemodechooser.DirectionTabuList;
@@ -44,6 +45,7 @@ import playground.thibautd.tsplanoptimizer.timemodechooser.ModeMovesTabuList;
  * @author thibautd
  */
 public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
+	// the mode optimisation is inconsistent...
 	private static final int N_ITER = 1000;
 	private static final List<Integer> RESTRICTED_STEPS = Arrays.asList( 60 , 300 , 1500 );
 
@@ -147,7 +149,7 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 					false));
 		if (!penalizeUnsynchro) {
 			// if synchro, just durations are optimized
-			generator.add( new AllPossibleModesMovesGenerator(
+			generator.add( new SubtourAndParentsModeMoveGenerator(
 						initialSolution,
 						config.getModes()) );
 		}
@@ -156,7 +158,7 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 		CompositeTabuChecker tabuChecker = new CompositeTabuChecker();
 		tabuChecker.add( new DirectionTabuList( nTabu ) );
 		tabuChecker.add( new JointInvalidValueChecker() );
-		tabuChecker.add( new ModeMovesTabuList( nTabu ) );
+		tabuChecker.add( new SolutionTabuList( nTabu ) );
 		configuration.setTabuChecker( tabuChecker );
 
 		if (outputDir != null) {

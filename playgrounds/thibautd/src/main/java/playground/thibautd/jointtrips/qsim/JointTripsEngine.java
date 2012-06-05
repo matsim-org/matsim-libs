@@ -105,7 +105,12 @@ public class JointTripsEngine implements DepartureHandler, MobsimEngine {
 		JointTravelerAgent passenger = (JointTravelerAgent) agent;
 		JointTravelerAgent driver = getAgent( passenger.getDriverId() );
 		
-		driver.notifyPassengerArrivedAtLink(now, passenger.getId(), linkId);
+		try {
+			driver.notifyPassengerArrivedAtLink(now, passenger.getId(), linkId);
+		}
+		catch (NullPointerException e) {
+			throw new RuntimeException( "driver "+driver+" with id "+passenger.getDriverId()+" passenger "+passenger.getId()+" link "+linkId );
+		}
 		handleDriverDeparture( now , driver , linkId );
 	}
 

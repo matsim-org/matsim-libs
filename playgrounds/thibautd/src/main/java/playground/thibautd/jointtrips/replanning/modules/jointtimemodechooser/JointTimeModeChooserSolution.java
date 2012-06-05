@@ -20,7 +20,10 @@
 package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +65,7 @@ public class JointTimeModeChooserSolution implements Solution {
 
 	private static enum SharedStatus { driver , passenger , alone }
 
+	private final static Collection<String> chainBasedModes = Arrays.asList( TransportMode.car , TransportMode.bike );
 	private final static double SCENARIO_DUR = 24 * 3600;
 	private final JointPlan plan;
 	private final JointPlanRouter planRouter;
@@ -127,10 +131,26 @@ public class JointTimeModeChooserSolution implements Solution {
 				Value val = values.next();
 				PlanElement pe = pes.next();
 
-				if (pe instanceof Subtour &&
-						!((Subtour) pe).isCarAllowed() &&
+				if (pe instanceof Subtour) {
+					if ( !((Subtour) pe).isCarAllowed() &&
 						TransportMode.car.equals( val.getValue() )) {
-					return false;
+						return false;
+					}
+					if ( ((Subtour) pe).getModeRestriction() != null &&
+							!((Subtour) pe).getModeRestriction().equals( val.getValue() ) ) {
+						return false;
+					}
+					if (chainBasedModes.contains( val.getValue() )) {
+						int parent = ((SubtourValue) val).getParentSubtourValueIndex();
+						List<? extends Value> representation = getRepresentation();
+						while (parent >= 0) {
+							SubtourValue parVal = (SubtourValue) representation.get( parent );
+							if ( !parVal.getValue().equals( val.getValue() ) ) {
+								return false;
+							}
+							parent = parVal.getParentSubtourValueIndex();
+						}
+					}
 				}
 			}
 		}
@@ -230,6 +250,7 @@ public class JointTimeModeChooserSolution implements Solution {
 		List<List<PlanElement>> groupCodedPlanElements = new ArrayList<List<PlanElement>>();
 		List<Tuple<Plan , List<PlanElement>>> planStructures = new ArrayList<Tuple<Plan , List<PlanElement>>>();
 		
+		int currentValueIndex = 0;
 		for (Plan individualPlan : plan.getIndividualPlans().values()) {
 			boolean isCarAvailable = !"never".equals( ((PersonImpl) individualPlan.getPerson()).getCarAvail() );
 
@@ -255,6 +276,7 @@ public class JointTimeModeChooserSolution implements Solution {
 						// enforce the values to be consistent (ie end time do not produce negative durations)
 						int value = (int) (now - lastNow);
 						values.add( new ValueImpl<Integer>( value ) );
+						currentValueIndex++;
 						codedPlanElements.add( pe );
 						lastNow = now;
 					}
@@ -266,30 +288,17 @@ public class JointTimeModeChooserSolution implements Solution {
 				}
 			}
 
-			for (List<PlanElement> subtour : analyseSubtours( planStructure )) {
-				SharedStatus status = isSharedSubtour( subtour );
-				Subtour subtourElement = new Subtour( isCarAvailable , subtour );
-
-				switch (status) {
-					case driver:
-						break;
-					case passenger:
-						List<PlanElement> npl = getNonPassengerLegs( subtour );
-						if (npl.size() > 0) {
-							// if no non-passenger leg, do not add anything
-							subtourElement = new Subtour( false , npl );
-							codedPlanElements.add( subtourElement );
-							values.add( new ValueImpl<String>( subtourElement.getMode() ) );
-						}
-						break;
-					case alone:
-						subtourElement = new Subtour( isCarAvailable , subtour );
-						codedPlanElements.add( subtourElement );
-						values.add( new ValueImpl<String>( subtourElement.getMode() ) );
-						break;
-					default:
-						throw new RuntimeException( "Unknown: "+status );
-				}
+			List<Subtour> subtours = analyseSubtours( isCarAvailable , planStructure );
+			int[] subtourIndicesInValues = new int[ subtours.size() ];
+			for (Subtour subtour : subtours) {
+				codedPlanElements.add( subtour );
+				subtourIndicesInValues[ subtour.getSubtourNumber() ] = currentValueIndex;
+				currentValueIndex++;
+			}
+			for (Subtour subtour : subtours) {
+				int parent = subtour.getParentSubtourNumber();
+				int parentIndex = parent > 0 ? subtourIndicesInValues[ parent ] : -1;
+				values.add( new SubtourValue( parentIndex , subtour.getMode() ) );
 			}
 
 			groupCodedPlanElements.add( Collections.unmodifiableList( codedPlanElements ) );
@@ -456,7 +465,8 @@ public class JointTimeModeChooserSolution implements Solution {
 		throw new RuntimeException( "could not find a valid driver trip!" );
 	}
 
-	private static List<List<PlanElement>> analyseSubtours(
+	private static List<Subtour> analyseSubtours(
+			final boolean isCarAvailable,
 			final List<PlanElement> planStructure) {
 		PlanAnalyzeSubtours analyzer = new PlanAnalyzeSubtours();
 		analyzer.setTripStructureAnalysisLayer( TripStructureAnalysisLayerOption.link );
@@ -466,33 +476,90 @@ public class JointTimeModeChooserSolution implements Solution {
 		fakePlan.getPlanElements().addAll( planStructure );
 		analyzer.run( fakePlan );
 
-		return analyzer.getSubtours();
+		Map<Integer, List<Leg>> subtours = new HashMap<Integer, List<Leg>>();
+
+		int[] subtourIndexation = analyzer.getSubtourIndexation();
+		for (int i=0; i<subtourIndexation.length; i++) {
+			Leg l = (Leg) planStructure.get( i*2 + 1 );
+			List<Leg> s = subtours.get( subtourIndexation[ i ] );
+
+			if (s == null) {
+				s = new ArrayList<Leg>();
+				subtours.put( subtourIndexation[ i ] , s );
+			}
+
+			s.add( l );
+		}
+
+		List<Subtour> out = new ArrayList<Subtour>();
+		List<Integer> parentSubtours = analyzer.getParentTours();
+		for (Map.Entry<Integer, List<Leg>> entry : subtours.entrySet()) {
+			final int subtourIndex = entry.getKey();
+			final Integer parentSubtourIndex = parentSubtours.get( subtourIndex );
+			final List<Leg> subtour = entry.getValue();
+			SharedStatus status = isSharedSubtour( subtour );
+			Subtour subtourElement;
+
+			switch (status) {
+				case driver:
+					List<Leg> njl = getNonJointLegs( subtour );
+					subtourElement = new Subtour(
+							subtourIndex,
+							parentSubtourIndex == null ? -1 : parentSubtourIndex,
+							isCarAvailable,
+							TransportMode.car,
+							njl );
+					break;
+				case passenger:
+					List<Leg> npl = getNonJointLegs( subtour );
+					subtourElement = new Subtour(
+							subtourIndex,
+							parentSubtourIndex == null ? -1 : parentSubtourIndex,
+							false ,
+							null,
+							npl );
+					break;
+				case alone:
+					subtourElement = new Subtour(
+							subtourIndex,
+							parentSubtourIndex == null ? -1 : parentSubtourIndex,
+							isCarAvailable,
+							null,
+							subtour );
+					break;
+				default:
+					throw new RuntimeException( "Unknown: "+status );
+			}
+
+			out.add( subtourElement );
+		}
+
+		return out;
 	}
 
-	private static SharedStatus isSharedSubtour(final List<PlanElement> subtour) {
-		boolean hasPickUp = false;
-		boolean passenger = false;
-		for (PlanElement pe : subtour) {
-			if (pe instanceof Activity && ((Activity) pe).getType().equals( JointActingTypes.PICK_UP ) ) {
-				hasPickUp = true;
+	private static SharedStatus isSharedSubtour(final List<Leg> subtour) {
+		for (Leg l : subtour) {
+			final String mode = l.getMode();
+			// assume there is no subtour with both driver and passenger legs.
+			// This is ok, as we use the subtours without sub-subtours (so that
+			// having passenger and driver in the same subtour would be inconsistent)
+			if ( mode.equals( JointActingTypes.PASSENGER ) ) {
+				return SharedStatus.passenger;
 			}
-			if (pe instanceof Leg && ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
-				passenger = true;
-			}
-			if (pe instanceof Activity && ((Activity) pe).getType().equals( JointActingTypes.DROP_OFF ) ) {
-				if (hasPickUp) return passenger ? SharedStatus.passenger : SharedStatus.driver;
+			else if ( mode.equals( JointActingTypes.DRIVER ) ) {
+				return SharedStatus.driver;
 			}
 		}
 		return SharedStatus.alone;
 	}
 
-	private static List<PlanElement> getNonPassengerLegs(final List<PlanElement> pes) {
-		List<PlanElement> out = new ArrayList<PlanElement>();
+	private static List<Leg> getNonJointLegs(final List<Leg> legs) {
+		List<Leg> out = new ArrayList<Leg>();
 
-		for (PlanElement pe : pes) {
-			if ( pe instanceof Leg &&
-					!((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
-				out.add( pe );
+		for (Leg leg : legs) {
+			if (!leg.getMode().equals( JointActingTypes.PASSENGER ) &&
+				!leg.getMode().equals( JointActingTypes.DRIVER )	) {
+				out.add( leg );
 			}
 		}
 
@@ -506,14 +573,21 @@ public class JointTimeModeChooserSolution implements Solution {
 	private static class Subtour implements PlanElement {
 		private final List<Leg> legs = new ArrayList<Leg>();
 		private final boolean isCarAvailable;
+		private final String modeRestriction;
+		private final int subtourNumber;
+		private final int parentSubtourNumber;
 
-		public Subtour(final boolean isCarAvailable, final List<PlanElement> elements) {
+		public Subtour(
+				final int subtourNumber,
+				final int parentSubtourNumber,
+				final boolean isCarAvailable,
+				final String modeRestriction,
+				final List<Leg> legs) {
 			this.isCarAvailable = isCarAvailable;
-			for (PlanElement pe : elements) {
-				if (pe instanceof Leg) {
-					legs.add( (Leg) pe );
-				}
-			}
+			this.legs.addAll( legs );
+			this.subtourNumber = subtourNumber;
+			this.parentSubtourNumber = parentSubtourNumber;
+			this.modeRestriction = modeRestriction;
 		}
 
 		public void setMode(final String mode) {
@@ -523,11 +597,68 @@ public class JointTimeModeChooserSolution implements Solution {
 		}
 
 		public String getMode() {
-			return legs.get(0).getMode();
+			String mode = "undefined";
+			Iterator<Leg> i = legs.iterator();
+			boolean toContinue = i.hasNext();
+
+			while (toContinue) {
+				mode = i.next().getMode();
+
+				toContinue = i.hasNext() &&
+					(mode.equals( JointActingTypes.DRIVER ) ||
+					mode.equals( JointActingTypes.PASSENGER )); 
+			}
+
+			return mode;
+		}
+
+		public String getModeRestriction() {
+			return modeRestriction;
 		}
 
 		public boolean isCarAllowed() {
 			return isCarAvailable;
+		}
+
+		public int getSubtourNumber() {
+			return subtourNumber;
+		}
+
+		public int getParentSubtourNumber() {
+			return parentSubtourNumber;
+		}
+	}
+
+	public static class SubtourValue implements Value<String> {
+		private final int parentSubtourValueIndex;
+		private String value;
+
+		private SubtourValue(
+				final int p,
+				final String v) {
+			this.parentSubtourValueIndex = p;
+			this.value = v;
+		}
+
+		public int getParentSubtourValueIndex() {
+			return parentSubtourValueIndex;
+		}
+
+		@Override
+		public String getValue() {
+			return value;
+		}
+
+		@Override
+		public String setValue(final String newValue) {
+			String old = value;
+			value = newValue;
+			return old;
+		}
+
+		@Override
+		public Value<String> createClone() {
+			return new SubtourValue( parentSubtourValueIndex , value );
 		}
 	}
 

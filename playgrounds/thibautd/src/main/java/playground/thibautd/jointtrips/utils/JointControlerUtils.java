@@ -37,6 +37,7 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 import playground.thibautd.jointtrips.config.CliquesConfigGroup;
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
+import playground.thibautd.jointtrips.config.JointTripInsertorConfigGroup;
 import playground.thibautd.jointtrips.config.JointTripPossibilitiesConfigGroup;
 import playground.thibautd.jointtrips.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.jointtrips.population.CliquesXmlReader;
@@ -166,20 +167,27 @@ public class JointControlerUtils {
 	}
 
 	public static void loadConfig(final Config config, final String configFile) {
-		JointReplanningConfigGroup jointConfigGroup = new JointReplanningConfigGroup();
-		CliquesConfigGroup cliquesConfigGroup = new CliquesConfigGroup();
-		JointTripsMutatorConfigGroup mutatorConfigGroup = new JointTripsMutatorConfigGroup();
-		JointTimeModeChooserConfigGroup tmcConfigGroup = new JointTimeModeChooserConfigGroup();
-		JointTripPossibilitiesConfigGroup possibilitiesConfigGroup = new JointTripPossibilitiesConfigGroup();
-
 		// /////////////////////////////////////////////////////////////////////
 		// initialize the config before passing it to the controler
 		config.addCoreModules();
-		config.addModule(JointReplanningConfigGroup.GROUP_NAME, jointConfigGroup);
-		config.addModule(CliquesConfigGroup.GROUP_NAME, cliquesConfigGroup);
-		config.addModule(JointTripsMutatorConfigGroup.GROUP_NAME, mutatorConfigGroup);
-		config.addModule(JointTimeModeChooserConfigGroup.GROUP_NAME, tmcConfigGroup);
-		config.addModule(JointTripPossibilitiesConfigGroup.GROUP_NAME, possibilitiesConfigGroup);
+		config.addModule(
+				JointReplanningConfigGroup.GROUP_NAME,
+				new JointReplanningConfigGroup());
+		config.addModule(
+				CliquesConfigGroup.GROUP_NAME,
+				new CliquesConfigGroup());
+		config.addModule(
+				JointTripsMutatorConfigGroup.GROUP_NAME,
+				new JointTripsMutatorConfigGroup());
+		config.addModule(
+				JointTimeModeChooserConfigGroup.GROUP_NAME,
+				new JointTimeModeChooserConfigGroup());
+		config.addModule(
+				JointTripPossibilitiesConfigGroup.GROUP_NAME,
+				new JointTripPossibilitiesConfigGroup());
+		config.addModule(
+				JointTripInsertorConfigGroup.GROUP_NAME,
+				new JointTripInsertorConfigGroup());
 
 		//read the config file
 		ConfigUtils.loadConfig(config, configFile);
