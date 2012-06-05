@@ -49,7 +49,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-
+// events werden während sim step geschmissen, aftermobsimstep kommt nachher.
 public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler,
 		MobsimInitializedListener, MobsimAfterSimStepListener {
 
