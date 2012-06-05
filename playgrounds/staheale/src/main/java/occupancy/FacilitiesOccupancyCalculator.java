@@ -125,7 +125,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 			TreeMap<Id, FacilityOccupancy> facilityOccupancies) {
 
 		try {
-				final String header="Facility_id\tx\ty\tVisitorsPerDay\tAllVisitors\tis shopping retail facility\tis shopping service facility\tis sports fun facility\tis gastro culture facility";
+				final String header="Facility_id\tx\ty\tVisitorsPerDay\tAllVisitors\tis shopping retail facility\tis shopping service facility\tis leisure_sports fun facility\tis leisure_gastro culture facility";
 				final BufferedWriter out =
 					IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
 				final BufferedWriter out_summary =
@@ -138,7 +138,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 
 				for (ActivityFacility facility : facilities.getFacilities().values()) {
 					if (facility.getActivityOptions().containsKey("shop_retail") || facility.getActivityOptions().containsKey("shop_service")
-							 || facility.getActivityOptions().containsKey("sports_fun") || facility.getActivityOptions().containsKey("gastro_culture")) {
+							 || facility.getActivityOptions().containsKey("leisure_sports_fun") || facility.getActivityOptions().containsKey("leisure_gastro_culture")) {
 						FacilityOccupancy facilityOccupancy = facilityOccupancies.get(facility.getId());
 						out.write(facility.getId().toString() + "\t"+
 							facility.getCoord().getX() + "\t"+
@@ -159,14 +159,14 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 						else {
 							out.write("-");
 						}
-						if (facility.getActivityOptions().containsKey("sports_fun")) {
-							out.write("sports_fun");
+						if (facility.getActivityOptions().containsKey("leisure_sports_fun")) {
+							out.write("leisure_sports_fun");
 						}
 						else {
 							out.write("-");
 						}
-						if (facility.getActivityOptions().containsKey("gastro_culture")) {
-							out.write("gastro_culture");
+						if (facility.getActivityOptions().containsKey("leisure_gastro_culture")) {
+							out.write("leisure_gastro_culture");
 						}
 						else {
 							out.write("-");
@@ -183,17 +183,17 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 				out.flush();
 				out.close();
 
-				out_summary.write("Facility_id\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\t11\t12\t13\t14\t15\t16\t17\t18\t19\t20\t21\t22\t23\tshop_retail\tshop_service\tsports_fun\tgastro_culture");
+				out_summary.write("Facility_id\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\t11\t12\t13\t14\t15\t16\t17\t18\t19\t20\t21\t22\t23\tshop_retail\tshop_service\tleisure_sports_fun\tleisure_gastro_culture");
 				out_summary.newLine();
 				for (ActivityFacility facility : facilities.getFacilities().values()) {
 					if (facility.getActivityOptions().containsKey("shop_retail") || facility.getActivityOptions().containsKey("shop_service")
-							 || facility.getActivityOptions().containsKey("sports_fun") || facility.getActivityOptions().containsKey("gastro_culture")) {
+							 || facility.getActivityOptions().containsKey("leisure_sports_fun") || facility.getActivityOptions().containsKey("leisure_gastro_culture")) {
 						FacilityOccupancy facilityOccupancy = facilityOccupancies.get(facility.getId());
 						double capacity = 1.0;
 						if (facility.getActivityOptions().get("shop_retail")!=null) {capacity = facility.getActivityOptions().get("shop_retail").getCapacity();}
 						if (facility.getActivityOptions().get("shop_service")!=null) {capacity = facility.getActivityOptions().get("shop_service").getCapacity();}
-						if (facility.getActivityOptions().get("sports_fun")!=null) {capacity= facility.getActivityOptions().get("sports_fun").getCapacity();}
-						if (facility.getActivityOptions().get("gastro_culture")!=null) {capacity= facility.getActivityOptions().get("gastro_culture").getCapacity();}
+						if (facility.getActivityOptions().get("leisure_sports_fun")!=null) {capacity= facility.getActivityOptions().get("leisure_sports_fun").getCapacity();}
+						if (facility.getActivityOptions().get("leisure_gastro_culture")!=null) {capacity= facility.getActivityOptions().get("leisure_gastro_culture").getCapacity();}
 
 							out_summary.write(facility.getId().toString() + "\t"+
 								(double)Math.round(facilityOccupancy.getCurrentOccupancy(0)/capacity*1000)/1000 + "\t"+
@@ -234,13 +234,13 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 							else {
 								out_summary.write("0\t");
 							}
-							if (facility.getActivityOptions().containsKey("sports_fun")) {
+							if (facility.getActivityOptions().containsKey("leisure_sports_fun")) {
 								out_summary.write("1\t");
 							}
 							else {
 								out_summary.write("0\t");
 							}
-							if (facility.getActivityOptions().containsKey("gastro_culture")) {
+							if (facility.getActivityOptions().containsKey("leisure_gastro_culture")) {
 								out_summary.write("1\t");
 							}
 							else {

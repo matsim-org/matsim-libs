@@ -132,8 +132,8 @@ public class CreateNetwork {
 		log.info("number of work facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("work").size());
 		log.info("number of shop retail facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("shop_retail").size());
 		log.info("number of shop service facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("shop_service").size());
-		log.info("number of sports & fun facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("sports_fun").size());
-		log.info("number of gastro & culture facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("gastro_culture").size());
+		log.info("number of leisure_sports & fun facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("leisure_sports_fun").size());
+		log.info("number of leisure_gastro & culture facilities: " +scenario.getActivityFacilities().getFacilitiesForActivityType("leisure_gastro_culture").size());
 
 	}
 	
@@ -146,21 +146,21 @@ public class CreateNetwork {
 		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));
 		facility.createActivityOption("home");
 		facility.createActivityOption("work");
-		if (random.nextDouble()<0.0085){
+		if (random.nextDouble()<0.0003){
     		facility.createActivityOption("shop_retail");
     		facility.getActivityOptions().remove("home");
     		}
-    	if (random.nextDouble()<0.008){
+    	if (random.nextDouble()<0.001){
     		facility.createActivityOption("shop_service");
     		facility.getActivityOptions().remove("home");
     		//log.info("created shop service facility");
     		}
     	if (random.nextDouble()<0.004){
-    		facility.createActivityOption("sports_fun");
+    		facility.createActivityOption("leisure_sports_fun");
     		facility.getActivityOptions().remove("home");
     		}
-    	if (random.nextDouble()<0.012){
-    		facility.createActivityOption("gastro_culture");
+    	if (random.nextDouble()<0.004){
+    		facility.createActivityOption("leisure_gastro_culture");
     		facility.getActivityOptions().remove("home");
     		}
 //		
@@ -189,15 +189,15 @@ public class CreateNetwork {
 			actOptionShopService.setCapacity(cap);
 			//log.info("shop service opentimes added");
 		}
-		if (facility.getActivityOptions().containsKey("sports_fun")){
-			ActivityOptionImpl actOptionSportsFun = (ActivityOptionImpl)facility.getActivityOptions().get("sports_fun");
+		if (facility.getActivityOptions().containsKey("leisure_sports_fun")){
+			ActivityOptionImpl actOptionSportsFun = (ActivityOptionImpl)facility.getActivityOptions().get("leisure_sports_fun");
 			OpeningTimeImpl opentimeSportsFun = new OpeningTimeImpl(DayType.wk, 9.0 * 3600.0, 24.0 * 3600);
 			actOptionSportsFun.addOpeningTime(opentimeSportsFun);
 			double cap = 2+random.nextInt(44);
 			actOptionSportsFun.setCapacity(cap);
 		}
-		if (facility.getActivityOptions().containsKey("gastro_culture")){
-			ActivityOptionImpl actOptionGastroCulture = (ActivityOptionImpl)facility.getActivityOptions().get("gastro_culture");
+		if (facility.getActivityOptions().containsKey("leisure_gastro_culture")){
+			ActivityOptionImpl actOptionGastroCulture = (ActivityOptionImpl)facility.getActivityOptions().get("leisure_gastro_culture");
 			OpeningTimeImpl opentimeGastroCulture = new OpeningTimeImpl(DayType.wk, 9.0 * 3600.0, 24.0 * 3600);
 			actOptionGastroCulture.addOpeningTime(opentimeGastroCulture);
 			double cap = 2+random.nextInt(61);

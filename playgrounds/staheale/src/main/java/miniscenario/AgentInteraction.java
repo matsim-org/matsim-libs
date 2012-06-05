@@ -22,7 +22,7 @@ package miniscenario;
 
 public class AgentInteraction {
 	
-	public static double scaleNumberOfPersons =1.0;
+	public static double scaleNumberOfPersons =10.0;
 	public static int numberOfTimeBins = 96; //24*3600/900
 
 

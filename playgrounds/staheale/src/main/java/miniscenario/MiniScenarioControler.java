@@ -57,7 +57,7 @@ public class MiniScenarioControler extends Controler {
 		
 	    ObjectAttributes attributes = new ObjectAttributes();
 	    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(attributes);
-		attributesReader.parse("./input/miniScenarioFacilityAttributes.xml");
+		attributesReader.parse("./input/testMiniScenario/testMiniScenarioFacilityAttributes.xml");
 		
 		// get objects that are required as parameter for the AgentInteractionScoringFunctionFactory 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.getConfig().planCalcScore();

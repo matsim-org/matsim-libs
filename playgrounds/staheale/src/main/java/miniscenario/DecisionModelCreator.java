@@ -34,21 +34,21 @@ public class DecisionModelCreator {
 		model.setFrequency("work", "mon-fri", 1);
 		model.setFrequency("shop_retail", "mon-fri", 0.4);
 		model.setFrequency("shop_service", "mon-fri", 0.1);
-		model.setFrequency("sports_fun", "mon-fri", 0.1);
-		model.setFrequency("gastro_culture", "mon-fri", 0.1);
+		model.setFrequency("leisure_sports_fun", "mon-fri", 0.1);
+		model.setFrequency("leisure_gastro_culture", "mon-fri", 0.1);
 
 		
 		model.setFrequency("work", "sat", 0);
 		model.setFrequency("shop_retail", "sat", 1);
 		model.setFrequency("shop_service", "sat", 0.5);
-		model.setFrequency("sports_fun", "sat", 0.5);
-		model.setFrequency("gastro_culture", "sat", 0.5);
+		model.setFrequency("leisure_sports_fun", "sat", 0.5);
+		model.setFrequency("leisure_gastro_culture", "sat", 0.5);
 		
 		model.setFrequency("work", "sun", 0);
 		model.setFrequency("shop_retail", "sun", 0);
 		model.setFrequency("shop_service", "sun", 0);
-		model.setFrequency("sports_fun", "sun", 1);
-		model.setFrequency("gastro_culture", "sun", 1);
+		model.setFrequency("leisure_sports_fun", "sun", 1);
+		model.setFrequency("leisure_gastro_culture", "sun", 1);
 		
 		return model;
 	}

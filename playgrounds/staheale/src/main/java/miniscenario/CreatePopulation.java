@@ -84,8 +84,8 @@ public class CreatePopulation {
             	((PersonImpl)person).getDesires().putActivityDuration("home", 8*3600);
             	((PersonImpl)person).getDesires().putActivityDuration("shop_retail", 0.5*3600);
             	((PersonImpl)person).getDesires().putActivityDuration("shop_service", 1*3600);
-            	((PersonImpl)person).getDesires().putActivityDuration("sports_fun", 1*3600);
-            	((PersonImpl)person).getDesires().putActivityDuration("gastro_culture", 2*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("leisure_sports_fun", 1*3600);
+            	((PersonImpl)person).getDesires().putActivityDuration("leisure_gastro_culture", 2*3600);
 
 			}
 			String outPath = config.findParam(CreateNetwork.AGENT_INTERACTION_PREPROCESS, "outPath") + day;
@@ -142,7 +142,7 @@ public class CreatePopulation {
 			this.scenario.getPopulation().addPerson(p);	
 			//TreeMap<Id, ActivityFacility> facilitiesHome = this.scenario.getActivityFacilities().getFacilitiesForActivityType("home");
 			ActivityFacility home = origin.getRandomLocationInZone(this.random);
-			while (!home.getActivityOptions().containsKey("home")){//||home.getActivityOptions().equals("shop_service")||home.getActivityOptions().equals("sports_fun")||home.getActivityOptions().equals("gastro_culture")||home.getActivityOptions().equals("work")){
+			while (!home.getActivityOptions().containsKey("home")){//||home.getActivityOptions().equals("shop_service")||home.getActivityOptions().equals("leisure_sports_fun")||home.getActivityOptions().equals("leisure_gastro_culture")||home.getActivityOptions().equals("work")){
 				home = origin.getRandomLocationInZone(this.random);
 			}
 			this.homeLocations.put(p.getId(), home);
@@ -239,9 +239,9 @@ public class CreatePopulation {
 		if (rand.nextDouble()<0.3 //&& checkLeisure
 				) {
 			plan.addLeg(new LegImpl("car"));
-			TreeMap<Id, ActivityFacility> facilitiesSportsFun = this.scenario.getActivityFacilities().getFacilitiesForActivityType("sports_fun");
+			TreeMap<Id, ActivityFacility> facilitiesSportsFun = this.scenario.getActivityFacilities().getFacilitiesForActivityType("leisure_sports_fun");
 			ActivityFacility facility = (ActivityFacility) facilitiesSportsFun.values().toArray()[random.nextInt(facilitiesSportsFun.size())];
-			ActivityImpl act = new ActivityImpl("sports_fun", facility.getCoord());
+			ActivityImpl act = new ActivityImpl("leisure_sports_fun", facility.getCoord());
 			endTime += Math.max(0.1 * 3600.0, this.random.nextGaussian() * 2.0 * 3600.0 + 3.0 * 3600.0);
 			act.setEndTime(endTime);
 			act.setFacilityId(facility.getId());
@@ -250,9 +250,9 @@ public class CreatePopulation {
 		if (rand.nextDouble()<0.3 //&& checkLeisure
 				) {
 			plan.addLeg(new LegImpl("car"));
-			TreeMap<Id, ActivityFacility> facilitiesGastroCulture = this.scenario.getActivityFacilities().getFacilitiesForActivityType("gastro_culture");
+			TreeMap<Id, ActivityFacility> facilitiesGastroCulture = this.scenario.getActivityFacilities().getFacilitiesForActivityType("leisure_gastro_culture");
 			ActivityFacility facility = (ActivityFacility) facilitiesGastroCulture.values().toArray()[random.nextInt(facilitiesGastroCulture.size())];
-			ActivityImpl act = new ActivityImpl("gastro_culture", facility.getCoord());
+			ActivityImpl act = new ActivityImpl("leisure_gastro_culture", facility.getCoord());
 			endTime += Math.max(0.1 * 3600.0, this.random.nextGaussian() * 2.0 * 3600.0 + 3.0 * 3600.0);
 			act.setEndTime(endTime);
 			act.setFacilityId(facility.getId());

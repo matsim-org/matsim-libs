@@ -50,30 +50,30 @@ public class CreateFacilityAttributes {
 			if (f.getActivityOptions().containsKey("shop_retail")) {
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.1);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,0.75);
-				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-1.2);
-				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-1.2);
+				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-3.6);
+				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-3.6);
 				//log.info("parameters for shop retail facility created");
 			}
 			else if (f.getActivityOptions().containsKey("shop_service")){
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.1);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,0.9);
-				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-1.2);
-				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-0.6);
+				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-3.6);
+				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-1.8);
 				//log.info("parameters for shop service facility created");
 			}
-			else if (f.getActivityOptions().containsKey("sports_fun")){
+			else if (f.getActivityOptions().containsKey("leisure_sports_fun")){
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.2);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,1.0);
-				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-1.2);
-				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-1.8);
+				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-3.6);
+				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-5.4);
 				//log.info("parameters for sports & fun facility created");
 
 			}
-			else if (f.getActivityOptions().containsKey("gastro_culture")){
+			else if (f.getActivityOptions().containsKey("leisure_gastro_culture")){
 				facilityAttributes.putAttribute(f.getId().toString(),LOWERBOUND,0.1);
 				facilityAttributes.putAttribute(f.getId().toString(),UPPERBOUND,0.9);
-				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-1.2);
-				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-1.2);
+				facilityAttributes.putAttribute(f.getId().toString(),LOWERMARGINALUTILITY,-3.6);
+				facilityAttributes.putAttribute(f.getId().toString(),UPPERMARGINALUTILITY,-3.6);
 				//log.info("parameters for gastro & culture facility created");
 			}
 		}

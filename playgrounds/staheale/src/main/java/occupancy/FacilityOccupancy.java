@@ -76,10 +76,10 @@ public class FacilityOccupancy {
 		}
 		int timeBinIndex = this.timeBinIndex(time);	
 		if (timeBinIndex<1){
-			this.arrivals[0] += 1;
+			this.arrivals[0] += this.scaleNumberOfPersons;
 		}
 		else {
-			this.arrivals[(timeBinIndex-1)] += 1;
+			this.arrivals[(timeBinIndex-1)] += this.scaleNumberOfPersons;
 		}
 		//log.info("arrival at: " + time + " bin: " + timeBinIndex);
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
@@ -94,10 +94,10 @@ public class FacilityOccupancy {
 		}
 		int timeBinIndex = this.timeBinIndex(time);
 		if (timeBinIndex<1){
-			this.departures[0]+=1;
+			this.departures[0]+=this.scaleNumberOfPersons;
 		}
 		else {
-			this.departures[(timeBinIndex-1)]+=1;
+			this.departures[(timeBinIndex-1)]+=this.scaleNumberOfPersons;
 		}
 		//log.info("departure at: " + time + " bin: " + timeBinIndex);
 	}
