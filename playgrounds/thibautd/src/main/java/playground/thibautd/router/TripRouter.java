@@ -130,7 +130,10 @@ public class TripRouter {
 					currentTrip.add( act );
 				}
 				else {
-					if (currentTrip.size() > 0) {
+					if (currentTrip.size() == 1) {
+						simplifiedPlan.addAll( currentTrip );
+					}
+					else if (currentTrip.size() > 1) {
 						Leg newLeg = new LegImpl( identifyMainMode( currentTrip ) );
 
 						// set the time
@@ -138,8 +141,8 @@ public class TripRouter {
 						newLeg.setTravelTime( now - startOfTrip );
 
 						simplifiedPlan.add( newLeg );
-						currentTrip.clear();
 					}
+					currentTrip.clear();
 					now = calcEndOfPlanElement( now , currentElement );
 					startOfTrip = now;
 					simplifiedPlan.add( act );
