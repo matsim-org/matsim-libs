@@ -169,9 +169,11 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 				
 		// ------------disutilities of agent interaction-----------
 		//TODO: how to handle activities that last longer than 24 hours...
-		if (act.getType().startsWith("s")|| act.getType().startsWith("g")) {
+		if (act.getType().startsWith("s")|| act.getType().startsWith("l")) {
 			ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
+			log.info("facility id: "+facility.getId()+", activity type: "+act.getType());
 			double capacity = facility.getActivityOptions().get(act.getType()).getCapacity();
+			log.info("capacity for "+facility.getId()+" is: "+capacity);
 			double lowerBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "LowerThreshold");
 			//log.info("lower bound is " +lowerBound);
 			double lowerMarginalUtility = ((Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal"))/3600;
@@ -283,8 +285,10 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		
 			Set<OpeningTime> opentimes = null;
 			if (!act.getType().startsWith("h") && !act.getType().endsWith("a")) {
-				//	if (!(facility.getActivityOptions().containsKey("home"))){
-				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wed);
+				if (!(facility.getActivityOptions().containsKey("home"))){
+				
+					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wed);
+					
 					if (opentimes == null) {
 						opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wkday);
 					}
@@ -314,7 +318,7 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 				}
 			}
 				
-			
+			}
 			return openInterval;
 		
 	}
