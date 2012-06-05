@@ -24,7 +24,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name= "writeEventsInterval" value="10" />
-		<param name= "mobsim" value="multimodalQSim" />
+		<param name= "mobsim" value="QSim" />
 	</module>
 
 	<module name="multimodal" >
