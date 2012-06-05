@@ -31,6 +31,9 @@ public class DgStreet {
 	private DgCrossingNode toNode;
 	private DgCrossingNode fromNode;
 	private Id id;
+	private long cost;
+	private double capacity;
+	
 
 	public DgStreet(Id id, DgCrossingNode fromNode, DgCrossingNode toNode) {
 		if (id == null){
@@ -57,6 +60,26 @@ public class DgStreet {
 
 	public Id getId() {
 		return this.id;
+	}
+
+	
+	public long getCost() {
+		return cost;
+	}
+
+	
+	public void setCost(long cost) {
+		this.cost = cost;
+	}
+
+	
+	public double getCapacity() {
+		return capacity;
+	}
+
+	
+	public void setCapacity(double capacity) {
+		this.capacity = capacity;
 	}
 
 }

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils;
+package playground.dgrether.utils.zones;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,34 +38,34 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public abstract class DgOriginImpl implements DgOrigin {
 
-	private Map<DgZone, Integer> toZoneRelations = new HashMap<DgZone, Integer>();
-	private Map<Link, Integer> toLinkRelations = new HashMap<Link, Integer>();
+	private Map<DgZone, Double> toZoneRelations = new HashMap<DgZone, Double>();
+	private Map<Link, Double> toLinkRelations = new HashMap<Link, Double>();
 
 
 	@Override
 	public void addToZoneRelation(DgZone toZone) {
 		if (! toZoneRelations.containsKey(toZone)){
-			this.toZoneRelations.put(toZone, 0);
+			this.toZoneRelations.put(toZone, 0.0);
 		}
-		Integer count = this.toZoneRelations.get(toZone);
+		Double count = this.toZoneRelations.get(toZone);
 		this.toZoneRelations.put(toZone, (count + 1));
 	}
 	
 	@Override
 	public void addToLinkRelation(Link endLink) {
 		if (! toLinkRelations.containsKey(endLink)){
-			this.toLinkRelations.put(endLink, 0);
+			this.toLinkRelations.put(endLink, 0.0);
 		}
-		Integer count = this.toLinkRelations.get(endLink);
+		Double count = this.toLinkRelations.get(endLink);
 		this.toLinkRelations.put(endLink, (count + 1));
 	}
 	
 	public Collection<DgDestination> getDestinations(){
 		List<DgDestination> dests = new ArrayList<DgDestination>();
-		for (Entry<DgZone, Integer> entry : this.toZoneRelations.entrySet()){
+		for (Entry<DgZone, Double> entry : this.toZoneRelations.entrySet()){
 			dests.add(new DgDestinationImpl(entry.getKey().getCoordinate(), entry.getValue()));
 		}
-		for (Entry<Link, Integer> entry : this.toLinkRelations.entrySet()){
+		for (Entry<Link, Double> entry : this.toLinkRelations.entrySet()){
 			Coordinate c = MGC.coord2Coordinate(entry.getKey().getCoord());
 			dests.add(new DgDestinationImpl(c, entry.getValue()));
 		}
@@ -73,12 +73,12 @@ public abstract class DgOriginImpl implements DgOrigin {
 	}
 	
 	@Override
-	public Map<DgZone, Integer> getToZoneRelations(){
+	public Map<DgZone, Double> getToZoneRelations(){
 		return this.toZoneRelations;
 	}
 
 	@Override
-	public Map<Link, Integer> getToLinkRelations(){
+	public Map<Link, Double> getToLinkRelations(){
 		return this.toLinkRelations;
 	}
 	
@@ -87,9 +87,9 @@ public abstract class DgOriginImpl implements DgOrigin {
 class DgDestinationImpl implements DgDestination{
 
 	private Coordinate coordinate;
-	private Integer noTrips;
+	private Double noTrips;
 
-	public DgDestinationImpl(Coordinate c, Integer noTrips){
+	public DgDestinationImpl(Coordinate c, Double noTrips){
 		this.coordinate = c;
 		this.noTrips = noTrips;
 	}
@@ -100,7 +100,7 @@ class DgDestinationImpl implements DgDestination{
 	}
 
 	@Override
-	public Integer getNumberOfTrips() {
+	public Double getNumberOfTrips() {
 		return this.noTrips;
 	}
 }

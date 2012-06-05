@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils;
+package playground.dgrether.utils.zones;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +42,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.dgrether.utils.DgGrid;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -57,7 +59,7 @@ public class DgZonesUtils {
 	private static final Logger log = Logger.getLogger(DgZonesUtils.class);
 	
 	public static List<DgZone> createZonesFromGrid(DgGrid grid){
-		int id = 0;
+		int id = 1000;
 		List<DgZone> cells = new ArrayList<DgZone>();
 		for (Polygon p : grid){
 			id++;
@@ -86,7 +88,7 @@ public class DgZonesUtils {
 		AttributeType [] attribs = new AttributeType[3];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon", Polygon.class, true, null, null, crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("to_cell_id", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("trips", Integer.class);
+		attribs[2] = AttributeTypeFactory.newAttributeType("trips", Double.class);
 			
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, "grid_cell");
@@ -95,7 +97,7 @@ public class DgZonesUtils {
 				List<Object> attributes = new ArrayList<Object> ();
 				Polygon p = cell.getPolygon();
 				attributes.add(p);
-				for (Entry<DgZone, Integer> entry : cell.getToZoneRelations().entrySet()){
+				for (Entry<DgZone, Double> entry : cell.getToZoneRelations().entrySet()){
 					log.info("  to cell " + entry.getKey().getId() + " # trips: " + entry.getValue());
 					attributes.add( entry.getKey().getId());
 					attributes.add( entry.getValue());
@@ -119,7 +121,7 @@ public class DgZonesUtils {
 		List<Feature> featureCollection = new ArrayList<Feature>();
 		AttributeType [] attribs = new AttributeType[2];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, crs);
-		attribs[1] = AttributeTypeFactory.newAttributeType("no trips", Integer.class);
+		attribs[1] = AttributeTypeFactory.newAttributeType("no trips", Double.class);
 		try {
 			FeatureType featureType = FeatureTypeBuilder.newFeatureType(attribs, "ls_od_pair");
 			GeometryFactory geoFac = new GeometryFactory();

@@ -17,14 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils;
+package playground.dgrether.utils.zones;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.geotools.MGC;
+
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -71,21 +71,6 @@ public class DgZone extends DgOriginImpl implements DgOrigin{
 			fromLinks.put(startLink.getId(), new DgZoneFromLink(startLink));
 		}
 		return fromLinks.get(startLink.getId());
-	}
-	
-}
-
-class DgZoneFromLink extends DgOriginImpl implements DgOrigin {
-
-	private Link link;
-	
-	public DgZoneFromLink(Link startLink) {
-		this.link = startLink;
-	}
-
-	@Override
-	public Coordinate getCoordinate() {
-		return MGC.coord2Coordinate(this.link.getCoord());
 	}
 	
 }

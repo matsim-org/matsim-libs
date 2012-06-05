@@ -61,37 +61,33 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	
 	private static final Logger log = Logger.getLogger(DgMatsim2KoehlerStrehler2010NetworkConverter.class);
 
-//	public static final String CROSSING_TO_NODE_SUFFIX = "_to";
-//	public static final String CROSSING_FROM_NODE_SUFFIX = "_from";
-
-	public static final String CROSSING_TO_NODE_SUFFIX = "99";
-	public static final String CROSSING_FROM_NODE_SUFFIX = "11";
-
-	
-	private int cycle = 60;
-	private Id programId = new IdImpl("1");
-
-	private DgKSNetwork dgNetwork;
-
-	
-	private Id convertLinkId2FromCrossingNodeId(Id linkId){
-		return new IdImpl(linkId.toString() + CROSSING_FROM_NODE_SUFFIX);
+	public static Id convertLinkId2FromCrossingNodeId(Id linkId){
+		return new IdImpl(linkId.toString() + "11");
 	}
 	
-	private Id convertLinkId2ToCrossingNodeId(Id linkId){
-		return new IdImpl(linkId.toString() + CROSSING_TO_NODE_SUFFIX);
+	public static Id convertLinkId2ToCrossingNodeId(Id linkId){
+		return new IdImpl(linkId.toString() + "99");
 	}
 	
-	private Id convertFromLinkIdToLinkId2LightId(Id fromLinkId, Id fromLaneId, Id toLinkId){
+	public static Id convertFromLinkIdToLinkId2LightId(Id fromLinkId, Id fromLaneId, Id toLinkId){
 		if (fromLaneId == null){
 			return new IdImpl(fromLinkId.toString()  + "55" + toLinkId.toString());
 		}
 		return new IdImpl(fromLinkId.toString() + "66" + fromLaneId.toString() + "55" + toLinkId.toString());
 	}
 
-	public DgKSNetwork convertNetworkLanesAndSignals(Scenario sc) {
+	
+	private int cycle = 60;
+	private Id programId = new IdImpl("1");
+
+	private DgKSNetwork dgNetwork;
+	private double timeInterval;
+
+	public DgKSNetwork convertNetworkLanesAndSignals(Scenario sc, double startTime, double endTime) {
 		log.info("Converting network ...");
-		this.dgNetwork = this.convertNetwork(sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class), sc.getScenarioElement(SignalsData.class));
+		Network net = sc.getNetwork();
+		this.timeInterval = endTime - startTime;
+		this.dgNetwork = this.convertNetwork(net, sc.getScenarioElement(LaneDefinitions20.class), sc.getScenarioElement(SignalsData.class));
 		log.info("Network converted.");
 		return this.dgNetwork ;
 	}
@@ -101,26 +97,26 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	 *   fromLink -> toLink zwei nodes + 1 light
 	 */
 	private DgKSNetwork convertNetwork(Network net, LaneDefinitions20 lanes, SignalsData signalsData) {
-		DgKSNetwork dgnet = new DgKSNetwork();
+		DgKSNetwork ksnet = new DgKSNetwork();
 		/* create a crossing for each node, same id
 		 */
-		this.convertNodes2Crossings(dgnet, net);
+		this.convertNodes2Crossings(ksnet, net);
 		/*
 		 * convert all links to streets (same id) and create the from and to 
 		 * nodes (ids generated from link id) for the already created corresponding 
 		 * crossing 
 		 */
-		this.convertLinks2Streets(dgnet, net);
+		this.convertLinks2Streets(ksnet, net);
 
 		//collect all ids of links that are signalized
 		Set<Id> signalizedLinks = this.getSigalizedLinkIds(signalsData.getSignalSystemsData());
 		//loop over links and create layout of crossing
 		for (Link link : net.getLinks().values()){
 			//prepare some objects/data
-			DgCrossing crossing = dgnet.getCrossings().get(link.getToNode().getId()); //The node id of the matsim network is the crossing id
+			DgCrossing crossing = ksnet.getCrossings().get(link.getToNode().getId()); //The node id of the matsim network is the crossing id
 			Link backLink = this.getBackLink(link);
 			Id backLinkId = (backLink == null) ?  null : backLink.getId();
-			DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(link.getId()));
+			DgCrossingNode inLinkToNode = crossing.getNodes().get(convertLinkId2ToCrossingNodeId(link.getId()));
 			LanesToLinkAssignment20 l2l = lanes.getLanesToLinkAssignments().get(link.getId());
 			//create crossing layout
 			if (signalizedLinks.contains(link.getId())){
@@ -133,7 +129,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 				this.createCrossing4NotSignalizedLink(crossing, link, inLinkToNode, backLinkId, l2l);
 			}
 		}
-		return dgnet;
+		return ksnet;
 	}
 
 	
@@ -147,16 +143,20 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		}
 	}
 	
-	private void convertLinks2Streets(DgKSNetwork dgnet, Network net){
+	private void convertLinks2Streets(DgKSNetwork ksnet, Network net){
 		for (Link link : net.getLinks().values()){
-			DgCrossing fromNodeCrossing = dgnet.getCrossings().get(link.getFromNode().getId());
-			DgCrossingNode fromNode = new DgCrossingNode(this.convertLinkId2FromCrossingNodeId(link.getId()));
+			DgCrossing fromNodeCrossing = ksnet.getCrossings().get(link.getFromNode().getId());
+			DgCrossingNode fromNode = new DgCrossingNode(convertLinkId2FromCrossingNodeId(link.getId()));
 			fromNodeCrossing.addNode(fromNode);
-			DgCrossing toNodeCrossing = dgnet.getCrossings().get(link.getToNode().getId());
-			DgCrossingNode toNode = new DgCrossingNode(this.convertLinkId2ToCrossingNodeId(link.getId()));
+			DgCrossing toNodeCrossing = ksnet.getCrossings().get(link.getToNode().getId());
+			DgCrossingNode toNode = new DgCrossingNode(convertLinkId2ToCrossingNodeId(link.getId()));
 			toNodeCrossing.addNode(toNode);
 			DgStreet street = new DgStreet(link.getId(), fromNode, toNode);
-			dgnet.addStreet(street);
+			long fs = Math.round((link.getLength() / link.getFreespeed()));
+			street.setCost(fs);
+			double capacity = link.getCapacity() / net.getCapacityPeriod() * this.timeInterval;
+			street.setCapacity(capacity);
+			ksnet.addStreet(street);
 		}
 	}
 	
@@ -186,9 +186,9 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		if (backLinkId != null && backLinkId.equals(outLinkId)){
 			return null; //do nothing if it is the backlink
 		}
-		Id lightId = this.convertFromLinkIdToLinkId2LightId(fromLinkId, fromLaneId, outLinkId);
+		Id lightId = convertFromLinkIdToLinkId2LightId(fromLinkId, fromLaneId, outLinkId);
 		log.debug("    light id: " + lightId);
-		Id convertedOutLinkId = this.convertLinkId2FromCrossingNodeId(outLinkId);
+		Id convertedOutLinkId = convertLinkId2FromCrossingNodeId(outLinkId);
 		log.debug("    outLinkId : " + outLinkId + " converted id: " + convertedOutLinkId);
 		DgCrossingNode outLinkFromNode = crossing.getNodes().get(convertedOutLinkId);
 		if (outLinkFromNode == null){

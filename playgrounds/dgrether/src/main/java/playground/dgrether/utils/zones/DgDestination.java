@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOrigin
+ * DgDestination
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,11 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils;
-
-import java.util.Map;
-
-import org.matsim.api.core.v01.network.Link;
+package playground.dgrether.utils.zones;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -30,16 +26,9 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author dgrether
  *
  */
-public interface DgOrigin {
-
-	public void addToZoneRelation(DgZone toZone);
-
-	public void addToLinkRelation(Link endLink);
+public interface DgDestination {
 	
 	public Coordinate getCoordinate();
 	
-	public Map<DgZone, Integer> getToZoneRelations();
-	
-	public Map<Link, Integer> getToLinkRelations();
-	
+	public Double getNumberOfTrips();
 }

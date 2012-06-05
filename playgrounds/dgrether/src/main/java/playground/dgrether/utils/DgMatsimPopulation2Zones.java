@@ -45,6 +45,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.utils.zones.DgZone;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -69,10 +70,10 @@ public class DgMatsimPopulation2Zones {
 	private FeatureType featureType;
 
 	//FIXME remove shape file writer
-	public List<DgZone> convert2Zones(Scenario scenario, List<DgZone> cells, Envelope networkBoundingBox) {
+	public List<DgZone> convert2Zones(Scenario scenario, List<DgZone> cells, Envelope networkBoundingBox, double startTime, double endTime) {
 		this.cells = cells;
 		this.initShapeFileWriter();
-		this.convertPopulation2OD(scenario, networkBoundingBox);
+		this.convertPopulation2OD(scenario, networkBoundingBox, startTime, endTime);
 		this.writeShape();
 		return cells;
 	}
@@ -95,7 +96,7 @@ public class DgMatsimPopulation2Zones {
 	}
 
 	
-	private void convertPopulation2OD(Scenario scenario, Envelope networkBoundingBox) {
+	private void convertPopulation2OD(Scenario scenario, Envelope networkBoundingBox, double startTime, double endTime) {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			Activity startAct = null;
@@ -108,7 +109,9 @@ public class DgMatsimPopulation2Zones {
 					}
 					else if (targetAct == null) {
 						targetAct = (Activity) pe;
-						processLeg(scenario.getNetwork(), startAct, leg, targetAct, networkBoundingBox);
+						if (startTime <= startAct.getEndTime() && startAct.getEndTime() <= endTime) {
+							processLeg(scenario.getNetwork(), startAct, leg, targetAct, networkBoundingBox);
+						}
 						startAct = targetAct;
 						targetAct = null;
 					}
@@ -138,7 +141,7 @@ public class DgMatsimPopulation2Zones {
 		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
 		DgZone startCell = this.searchGridCell(startCoordinate);
 		DgZone endCell = this.searchGridCell(endCoordinate);
-		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+//		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
 		startCell.addToZoneRelation(endCell);
 	}
 
@@ -149,7 +152,7 @@ public class DgMatsimPopulation2Zones {
 		DgZone endCell = this.searchGridCell(endCoordinate);
 		startCell.getFromLink(startLink).addToLinkRelation(endLink);
 		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
-		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+//		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
 	}
 
 	private void addFromZoneToLinkRelationshipToGrid(Coordinate startCoordinate, Link endLink){
@@ -158,7 +161,7 @@ public class DgMatsimPopulation2Zones {
 		DgZone endCell = this.searchGridCell(endCoordinate);
 		startCell.addToLinkRelation(endLink);
 		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
-		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+//		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
 	}
 
 	private void addFromLinkToZoneRelationshipToGrid(Link startLink, Coordinate endCoordinate){
@@ -167,7 +170,7 @@ public class DgMatsimPopulation2Zones {
 		DgZone endCell = this.searchGridCell(endCoordinate);
 		startCell.getFromLink(startLink).addToZoneRelation(endCell);
 		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
-		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+//		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
 
 	}
 
@@ -176,7 +179,7 @@ public class DgMatsimPopulation2Zones {
 		Point p = this.geoFac.createPoint(coordinate);
 		for (DgZone cell : this.cells){
 			if (cell.getPolygon().covers(p)){
-				log.info("  found cell " + cell.getId() + " for Coordinate: " + coordinate);
+//				log.debug("  found cell " + cell.getId() + " for Coordinate: " + coordinate);
 				return cell;
 			}
 		}
@@ -188,12 +191,12 @@ public class DgMatsimPopulation2Zones {
 			Envelope networkBoundingBox) {
 		Coordinate startCoordinate = MGC.coord2Coordinate(startAct.getCoord());
 		Coordinate endCoordinate = MGC.coord2Coordinate(targetAct.getCoord());
-		log.info("Processing leg from: " + startCoordinate + " to " + endCoordinate);
+//		log.debug("Processing leg from: " + startCoordinate + " to " + endCoordinate);
 		boolean netContainsStartCoordinate  = networkBoundingBox.contains(startCoordinate);
 		boolean netContainsEndCoordinate = networkBoundingBox.contains(endCoordinate);
 		if (netContainsStartCoordinate
 				&& netContainsEndCoordinate) {
-			log.info("  coordinates in grid...");
+//			log.debug("  coordinates in grid...");
 			this.addFromZoneToZoneRelationshipToGrid(startCoordinate, endCoordinate);
 		}
 		else if (netContainsStartCoordinate && ! netContainsEndCoordinate){
@@ -241,7 +244,7 @@ public class DgMatsimPopulation2Zones {
 				}
 			}
 			if (! isRouteInGrid){
-				log.info("  Route is not in area of interest");
+				log.debug("  Route is not in area of interest");
 			}
 		}
 	}

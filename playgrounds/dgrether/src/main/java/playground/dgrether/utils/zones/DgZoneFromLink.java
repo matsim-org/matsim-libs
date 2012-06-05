@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgDestination
+ * DgZoneFromLink
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils;
+package playground.dgrether.utils.zones;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+public class DgZoneFromLink extends DgOriginImpl implements DgOrigin {
 
-/**
- * @author dgrether
- *
- */
-public interface DgDestination {
+	private Link link;
 	
-	public Coordinate getCoordinate();
+	public DgZoneFromLink(Link startLink) {
+		this.link = startLink;
+	}
 	
-	public Integer getNumberOfTrips();
+	public Link getLink(){
+		return this.link;
+	}
+
+	@Override
+	public Coordinate getCoordinate() {
+		return MGC.coord2Coordinate(this.link.getCoord());
+	}
+	
 }

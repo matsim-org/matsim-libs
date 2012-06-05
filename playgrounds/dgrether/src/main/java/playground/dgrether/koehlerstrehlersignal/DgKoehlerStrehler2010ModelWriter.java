@@ -158,11 +158,11 @@ public class DgKoehlerStrehler2010ModelWriter {
 			hd.startElement("", "", LIGHTS, atts);
 			for (DgStreet light : crossing.getLights().values()) {
 				atts.clear();
-				log.debug("writing light:  " + light.getId());
+//				log.debug("writing light:  " + light.getId());
 				atts.addAttribute("", "", ID, CDATA, light.getId().toString());
 				atts.addAttribute("", "", FROM, CDATA, light.getFromNode().getId().toString());
-				log.error("  toCrossing: "  + light.getToNode());
-				log.error("  toCrossingId: "  + light.getToNode().getId());
+//				log.error("  toCrossing: "  + light.getToNode());
+//				log.error("  toCrossingId: "  + light.getToNode().getId());
 				
 				atts.addAttribute("", "", TO, CDATA, light.getToNode().getId().toString());
 				hd.startElement("", "", LIGHT, atts);
@@ -233,11 +233,10 @@ public class DgKoehlerStrehler2010ModelWriter {
 		for (Link link : matsimNet.getLinks().values()) {
 			atts.clear();
 			atts.addAttribute("", "", ID, CDATA, link.getId().toString());
-			long fs = Math.round((link.getLength() / link.getFreespeed()));
-			atts.addAttribute("", "", COST, CDATA, Long.toString(fs));
-			atts.addAttribute("", "", CAPACITY, CDATA,
-					Double.toString(link.getCapacity() / matsimNet.getCapacityPeriod() * 3600.0));
 			DgStreet street = network.getStreets().get(link.getId());
+			atts.addAttribute("", "", COST, CDATA, Long.toString(street.getCost()));
+			atts.addAttribute("", "", CAPACITY, CDATA,
+					Double.toString(street.getCapacity()));
 			atts.addAttribute("", "", FROM, CDATA, street.getFromNode().getId().toString());
 			atts.addAttribute("", "", TO, CDATA, street.getToNode().getId().toString());
 			hd.startElement("", "", STREET, atts);

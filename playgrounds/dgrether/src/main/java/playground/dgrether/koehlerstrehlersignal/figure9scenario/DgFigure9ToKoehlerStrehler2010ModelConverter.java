@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import javax.xml.transform.TransformerConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.xml.sax.SAXException;
 
@@ -37,6 +38,9 @@ import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 
 public class DgFigure9ToKoehlerStrehler2010ModelConverter {
 	
+	private static final Logger log = Logger
+			.getLogger(DgFigure9ToKoehlerStrehler2010ModelConverter.class);
+	
 	/**
 	 * @param args
 	 * @throws SAXException 
@@ -46,7 +50,8 @@ public class DgFigure9ToKoehlerStrehler2010ModelConverter {
 	public static void main(String[] args) throws SAXException, TransformerConfigurationException, IOException {
 		ScenarioImpl sc = new DgFigure9ScenarioGenerator().loadScenario();
 		DgMatsim2KoehlerStrehler2010NetworkConverter converter = new DgMatsim2KoehlerStrehler2010NetworkConverter();
-		DgKSNetwork net = converter.convertNetworkLanesAndSignals(sc);
+		log.warn("Check times of demand!");
+		DgKSNetwork net = converter.convertNetworkLanesAndSignals(sc, 0.0, 3600.0);
 		
 		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010SimpleDemandConverter();
 		DgCommodities coms = demandConverter.convert(sc, net);

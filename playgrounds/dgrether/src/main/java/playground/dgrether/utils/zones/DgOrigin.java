@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgCottbusNet2KoehlerStrehler2010Net
+ * DgOrigin
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus.scripts;
+package playground.dgrether.utils.zones;
 
-import org.matsim.core.scenario.ScenarioImpl;
+import java.util.Map;
 
-import playground.dgrether.DgPaths;
-import playground.dgrether.koehlerstrehlersignal.DgKoehlerStrehler2010ModelWriter;
-import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010NetworkConverter;
-import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
-import playground.dgrether.signalsystems.cottbus.CottbusUtils;
+import org.matsim.api.core.v01.network.Link;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgCottbusNet2KoehlerStrehler2010Net {
+public interface DgOrigin {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String outputNetwork = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_koehler_strehler_format.xml";
-		
-		ScenarioImpl sc = CottbusUtils.loadCottbusScenrio(true);
-		
-		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter();
-		DgKSNetwork dgNet = netConverter.convertNetworkLanesAndSignals(sc, 0.0, 3600.0);
-		new DgKoehlerStrehler2010ModelWriter().write(sc, dgNet, outputNetwork);
+	public void addToZoneRelation(DgZone toZone);
 
-	}
-
+	public void addToLinkRelation(Link endLink);
+	
+	public Coordinate getCoordinate();
+	
+	public Map<DgZone, Double> getToZoneRelations();
+	
+	public Map<Link, Double> getToLinkRelations();
+	
 }
