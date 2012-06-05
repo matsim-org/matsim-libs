@@ -19,7 +19,7 @@ public class Main {
 		Controler c = new MentalSimControler(args);
 //		Controler c = new Controler(args);
 		c.setOverwriteFiles(true);
-//		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
+		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
 //		execution order of these iteration start listeners is in reverse order of adding them to the controler
 //		c.addControlerListener(new MentalSimInit());
 		c.addControlerListener(new MobSimSwitcher());

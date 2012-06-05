@@ -33,7 +33,7 @@ public class MobSimSwitcher implements ControlerListener,
 
 		int expensiveSimIters = Integer.parseInt(event.getControler()
 				.getConfig().getParam("MobSimSwitcher", EXPENSIVE_SIM_ITERS));
-		this.expensiveSimIters = expensiveSimIters;
+		MobSimSwitcher.expensiveSimIters = expensiveSimIters;
 
 		int iterationsFromStart = event.getIteration()
 				- event.getControler().getFirstIteration();
