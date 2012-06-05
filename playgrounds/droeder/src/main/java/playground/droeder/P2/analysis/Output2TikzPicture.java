@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,6 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.droeder.DaFileReader;
@@ -47,8 +49,8 @@ import playground.droeder.DaFileReader;
  */
 public class Output2TikzPicture {
 	
-	private final static String BEGIN = "\\tikzstyle{node} = [circle, draw, fill=white]" + "\n" +
-		"\\begin{tikzpicture}[node distance=2.0cm, bend right=7, >=stealth, scale=0.9, transform shape]" + "\n";
+	private final static String BEGIN = "\\tikzstyle{node} = [draw=black, fill=white, circle, inner sep = 3pt]" + "\n" +
+		"\\begin{tikzpicture}[bend right=7, >=stealth, scale=0.9, transform shape]" + "\n";
 	private final static String END = "\\end{tikzpicture}";
 	
 	
@@ -76,16 +78,22 @@ public class Output2TikzPicture {
 		}
 		
 		for(Link l: net.getLinks().values()){
-			b.append("\t\\draw [->] (" + 
-					l.getFromNode().getId().toString().replace(".", "")  + 
-					") to (" + 
-					l.getToNode().getId().toString().replace(".", "") + ");\n");
+			if(!l.getToNode().getId().equals(l.getFromNode().getId())){
+				b.append("\t\\draw [->] " + getLinkSequence(l));
+			}
 		}
 		
 //		b.append(END);
 		return b.toString();
 	}
 	
+	/**
+	 * works only for the test-gridnetwork
+	 * @param net
+	 * @param coopLoggerFile
+	 * @param outDir
+	 * @param iterations
+	 */
 	public static void coopLogger2tik(Network net, String coopLoggerFile, String outDir, List<Integer> iterations){
 		Set<String[]> lines = DaFileReader.readFileContent(coopLoggerFile, "\t", true);
 		BufferedWriter w ;
@@ -98,7 +106,7 @@ public class Output2TikzPicture {
 //		read and sort by iteration
 		for(String[] l : lines){
 			iteration = Integer.parseInt(l[0]);
-			if(!iterations.contains(iteration)) continue;
+			if(!iterations.contains(iteration) && !(iterations == null)) continue;
 			if(!iteration2line.containsKey(iteration)){
 				temp = new HashSet<String[]>();
 			}else{
@@ -118,6 +126,7 @@ public class Output2TikzPicture {
 			Link l;
 			for(String[] s : e.getValue()){
 				StringBuffer b = new StringBuffer();
+				// add additional information as comment
 				b.append("%status: " + s[2] + "\n");
 				b.append("%#veh: " + s[3] + "\n");
 				b.append("%#pax: " + s[4] + "\n");
@@ -125,24 +134,27 @@ public class Output2TikzPicture {
 				b.append("%budget: " + s[6] + "\n");
 				b.append("%from: " + s[7] + "\n");
 				b.append("%to: " + s[8] + "\n");
-				b.append("%stops2BeServed: " + s[9] + "\n");
+				b.append("%stopsToBeServed: " + s[9] + "\n");
 				b.append(BEGIN);
 				b.append(getNet2Tik(net));
 				links = s[10].replace("[", "").replace("]", "").split(", ");
+				// double arrow for first link
 				l = net.getLinks().get(new IdImpl(links[0]));
-				b.append("\t\\draw [->>, red, thick] (" + 
-						l.getFromNode().getId().toString().replace(".", "")  + 
-						") to (" + 
-						l.getToNode().getId().toString().replace(".", "") + ");\n");
+				b.append("\t\\draw [->>, red, thick] " + getLinkSequence(l)); 
+				// single arrow for other links
 				for(int i = 1; i< links.length; i++){
 					l = net.getLinks().get(new IdImpl(links[i]));
-					b.append("\t\\draw [->, red, thick] (" + 
-							l.getFromNode().getId().toString().replace(".", "")  + 
-							") to (" + 
-							l.getToNode().getId().toString().replace(".", "") + ");\n");
+					b.append("\t\\draw [->, red, thick] " + getLinkSequence(l)); 
 				}
+				// add stopsToBeServed
+				links = s[9].replace("[", "").replace("]", "").split(", ");
+				for(int i = 0; i< links.length; i++){
+					l = net.getLinks().get(new IdImpl(links[i].replace("para_", "")));
+					b.append(getStop2BeServed(links[i], l));
+				}
+				
 				b.append(END);
-				w = IOUtils.getBufferedWriter(dir + s[1].replace("_", "-") + ".tex");
+				w = IOUtils.getBufferedWriter(dir + e.getKey() + "." + s[1].replace("_", "-") + ".tex");
 				try {
 					w.write(b.toString());
 					w.flush();
@@ -152,8 +164,38 @@ public class Output2TikzPicture {
 					e1.printStackTrace();
 				}
 			}
-			
 		}
+	}
+	
+	/**
+	 * @param l
+	 * @return
+	 */
+	private static String getStop2BeServed(String stopId, Link l) {
+		return "\t\\fill[red,opacity=0.75] " + getStopPosition(l) + " circle (0.075);\n";
+	}
+	
+	private static String getStopPosition(Link l){
+		Coord c = CoordUtils.scalarMult(0.001, l.getToNode().getCoord());
+		if((l.getToNode().getCoord().getX() > l.getFromNode().getCoord().getX())){
+			return " (" + (c.getX()-0.3) + ", " + (c.getY()-0.15) + ") ";
+		}else if((l.getToNode().getCoord().getX() < l.getFromNode().getCoord().getX())){
+			return " (" + (c.getX()+0.3) + ", " + (c.getY()+0.15) + ") ";
+		}else if (l.getToNode().getCoord().getY() > l.getFromNode().getCoord().getY()){
+			return " (" + (c.getX()+0.15) + ", " + (c.getY()-0.3) + ") ";
+		}else if (l.getToNode().getCoord().getY() < l.getFromNode().getCoord().getY()){
+			return " (" + (c.getX()+0.15) + ", " + (c.getY()+0.3) + ") ";
+		}else{
+			return " (" + (c.getX()) + ", " + (c.getY()) + ") ";
+		}
+			
+	}
+
+	private static String getLinkSequence(Link l){
+		return "(" + 
+				l.getFromNode().getId().toString().replace(".", "")  + 
+				") to (" + 
+				l.getToNode().getId().toString().replace(".", "") + ");\n";
 	}
 
 	
