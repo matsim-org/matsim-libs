@@ -45,13 +45,13 @@ import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
  * Class method without any changes.
  * Override the doReplanning() method to implement the replanning functionality.
  */
-public abstract class ReplanningThread extends Thread {
+public abstract class ReplanningRunnable implements Runnable {
 
-	private final static Logger log = Logger.getLogger(ReplanningThread.class);
+	private final static Logger log = Logger.getLogger(ReplanningRunnable.class);
 	
-	protected Counter counter;
-	protected double time = 0.0;
-	protected boolean simulationRunning = true;
+	private Counter counter;
+	private double time = 0.0;
+	private volatile boolean simulationRunning = true;
 	
 	/*
 	 *  The original WithinDayReplanners are initialized and assigned
@@ -76,7 +76,7 @@ public abstract class ReplanningThread extends Thread {
 	protected CyclicBarrier betweenReplannerBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 	
-	public ReplanningThread(String counterText) {
+	public ReplanningRunnable(String counterText) {
 		counter = new Counter(counterText);
 	}
 	
@@ -87,11 +87,7 @@ public abstract class ReplanningThread extends Thread {
 	public final void setTime(double time) {
 		this.time = time;
 	}
-	
-	public final void setSimulationRunning(boolean simulationRunning) {
-		this.simulationRunning = simulationRunning;
-	}
-	
+		
 	public final void setCyclicTimeStepStartBarrier(CyclicBarrier barrier) {
 		this.timeStepStartBarrier = barrier;
 	}
@@ -120,9 +116,14 @@ public abstract class ReplanningThread extends Thread {
 	}
 	
 	public final void resetReplanners() {
+		this.counter.reset();
 		for (WithinDayReplanner<? extends Identifier> withinDayReplanner : this.withinDayReplanners.values()) {
 			withinDayReplanner.reset();
 		}
+	}
+	
+	public void afterSim() {
+		this.simulationRunning = false;
 	}
 	
 	/*
@@ -207,6 +208,11 @@ public abstract class ReplanningThread extends Thread {
 					
 				timeStepStartBarrier.await();
 
+				if (!simulationRunning) {
+					Gbl.printCurrentThreadCpuTime();
+					return;
+				}
+				
 				doReplanning();
 			} catch (InterruptedException e) {
 				Gbl.errorMsg(e);
@@ -215,7 +221,7 @@ public abstract class ReplanningThread extends Thread {
             }
 
 		}	// while Simulation Running
-		
+
 	}	// run()
 	
 }

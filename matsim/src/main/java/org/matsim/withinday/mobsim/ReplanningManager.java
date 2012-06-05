@@ -85,13 +85,9 @@ public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListe
 		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numOfThreads);
 
 		log.info("Initialize Replanning Modules");
-		initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
-		duringActivityReplanningModule = new DuringActivityReplanningModule(parallelDuringActivityReplanner);
-		duringLegReplanningModule = new DuringLegReplanningModule(parallelDuringLegReplanner);
-
-		this.setInitialReplanningModule(initialReplanningModule);
-		this.setDuringActivityReplanningModule(duringActivityReplanningModule);
-		this.setDuringLegReplanningModule(duringLegReplanningModule);
+		this.initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
+		this.duringActivityReplanningModule = new DuringActivityReplanningModule(parallelDuringActivityReplanner);
+		this.duringLegReplanningModule = new DuringLegReplanningModule(parallelDuringLegReplanner);
 	}
 	
 	public void setEventsManager(EventsManager eventsManager) {
@@ -108,14 +104,6 @@ public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListe
 		return initialReplanning;
 	}
 
-	public void setInitialReplanningModule(InitialReplanningModule module) {
-		this.initialReplanningModule = module;
-	}
-
-	public InitialReplanningModule getInitialReplanningModule() {
-		return this.initialReplanningModule;
-	}
-
 	public void doDuringActivityReplanning(boolean value) {
 		duringActivityReplanning = value;
 	}
@@ -124,28 +112,12 @@ public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListe
 		return duringActivityReplanning;
 	}
 
-	public void setDuringActivityReplanningModule(DuringActivityReplanningModule module) {
-		this.duringActivityReplanningModule = module;
-	}
-
-	public DuringActivityReplanningModule getDuringActivityReplanningModule() {
-		return this.duringActivityReplanningModule;
-	}
-
 	public void doDuringLegReplanning(boolean value) {
 		duringLegReplanning = value;
 	}
 
 	public boolean isDuringLegReplanning() {
 		return duringLegReplanning;
-	}
-
-	public void setDuringLegReplanningModule(DuringLegReplanningModule module) {
-		this.duringLegReplanningModule = module;
-	}
-
-	public DuringLegReplanningModule getDuringLegReplanningModule() {
-		return this.duringLegReplanningModule;
 	}
 
 	public void addIntialReplannerFactory(WithinDayInitialReplannerFactory factory) {
@@ -212,6 +184,10 @@ public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListe
 
 	@Override
 	public void onPrepareSim() {
+		this.parallelInitialReplanner.onPrepareSim();
+		this.parallelDuringActivityReplanner.onPrepareSim();
+		this.parallelDuringLegReplanner.onPrepareSim();
+		
 		if (isInitialReplanning()) {
 			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
 		}
@@ -224,7 +200,9 @@ public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListe
 
 	@Override
 	public void afterSim() {
-		// TODO Auto-generated method stub	
+		this.parallelInitialReplanner.afterSim();
+		this.parallelDuringActivityReplanner.afterSim();
+		this.parallelDuringLegReplanner.afterSim();
 	}
 
 	@Override

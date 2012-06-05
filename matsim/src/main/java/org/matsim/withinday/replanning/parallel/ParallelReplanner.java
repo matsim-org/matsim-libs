@@ -48,7 +48,8 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 
 	protected int numOfThreads = 1;	// use by default only one thread
 	protected Set<T> replannerFactories = new LinkedHashSet<T>();
-	protected ReplanningThread[] replanningThreads;
+	protected ReplanningRunnable[] replanningRunnables;
+	protected String replannerName;
 	protected int roundRobin = 0;
 	private int lastRoundRobin = 0;
 	protected EventsManager eventsManager;
@@ -61,37 +62,50 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	}
 
 	public final void setEventsManager(EventsManager eventsManager) {
-		for (ReplanningThread replanningThread : replanningThreads) replanningThread.setEventsManager(eventsManager);
+		for (ReplanningRunnable replanningThread : replanningRunnables) replanningThread.setEventsManager(eventsManager);
 	}
 	
 	public final void init(String replannerName) {
-		replanningThreads = new InternalReplanningThread[numOfThreads];
-
-		// Do initial Setup of the Threads
-		for (int i = 0; i < numOfThreads; i++) {
-			ReplanningThread replanningThread = new InternalReplanningThread(replannerName + " Thread" + i + " replanned plans: ");
-			replanningThread.setName(replannerName + i);
-			replanningThreads[i] = replanningThread;
-		}
 		
+		this.replannerName = replannerName;
+		
+		replanningRunnables = new InternalReplanningRunnable[numOfThreads];
+
 		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.betweenReplannerBarrier = new CyclicBarrier(numOfThreads);
 		this.timeStepEndBarrier = new CyclicBarrier(numOfThreads + 1);
 
-		// finalize Thread Setup
+		// Do initial Setup of the Runnables
 		for (int i = 0; i < numOfThreads; i++) {
-			ReplanningThread replanningThread = replanningThreads[i];
+			ReplanningRunnable replanningRunnable = new InternalReplanningRunnable(replannerName + " Thread" + i + " replanned plans: ");
+			replanningRunnable.setCyclicTimeStepStartBarrier(this.timeStepStartBarrier);
+			replanningRunnable.setBetweenReplannerBarrier(betweenReplannerBarrier);
+			replanningRunnable.setCyclicTimeStepEndBarrier(this.timeStepEndBarrier);
 
-			replanningThread.setCyclicTimeStepStartBarrier(this.timeStepStartBarrier);
-			replanningThread.setBetweenReplannerBarrier(betweenReplannerBarrier);
-			replanningThread.setCyclicTimeStepEndBarrier(this.timeStepEndBarrier);
+			replanningRunnables[i] = replanningRunnable;
+		}
+	}
+
+	public final void onPrepareSim() {
+		
+		Thread[] replanningThreads = new Thread[numOfThreads];
+		
+		// initialize threads
+		for (int i = 0; i < numOfThreads; i++) {
+			Thread replanningThread = new Thread(replanningRunnables[i]);
+			replanningThread.setName(replannerName + i);
+			replanningThreads[i] = replanningThread;
+		}
+		
+		// finalize thread setup and start them
+		for (int i = 0; i < numOfThreads; i++) {
+			Thread replanningThread = replanningThreads[i];
 			replanningThread.setDaemon(true);
-
 			replanningThread.start();
 		}
 
 		/*
-		 * After initialization the Threads are waiting at the
+		 * After initialization the threads are waiting at the
 		 * TimeStepEndBarrier. We trigger this Barrier once so
 		 * they wait at the TimeStepStartBarrier what has to be
 		 * their state if the run() method is called.
@@ -104,7 +118,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 			Gbl.errorMsg(e);
 		}
 	}
-
+	
 	/*
 	 * Typical Implementations should be able to use this Method
 	 * "as it is"...
@@ -116,7 +130,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 
 		try {
 			// set current time
-			for (ReplanningThread replannerThread : replanningThreads) {
+			for (ReplanningRunnable replannerThread : replanningRunnables) {
 				replannerThread.setTime(time);
 			}
 
@@ -131,10 +145,38 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 		}
 	}
 
+	public final void afterSim() {
+
+		// reset counters
+		roundRobin = 0;
+		lastRoundRobin = 0;
+		
+		/*
+		 * Calling the afterSim Method of the QSimEngineThreads
+		 * will set their simulationRunning flag to false.
+		 */
+		for (ReplanningRunnable runnable : this.replanningRunnables) {
+			runnable.afterSim();
+		}
+
+		/*
+		 * Triggering the startBarrier of the QSimEngineThreads.
+		 * They will check whether the Simulation is still running.
+		 * It is not, so the Threads will stop running.
+		 */
+		try {
+			this.timeStepStartBarrier.await();
+		} catch (InterruptedException e) {
+			Gbl.errorMsg(e);
+		} catch (BrokenBarrierException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
 	public final void addWithinDayReplannerFactory(T factory) {
 		this.replannerFactories.add(factory);
 
-		for (ReplanningThread replanningThread : this.replanningThreads) {
+		for (ReplanningRunnable replanningThread : this.replanningRunnables) {
 			WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
 			replanningThread.addWithinDayReplanner(newInstance);
 		}
@@ -143,13 +185,13 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	public final void removeWithinDayReplannerFactory(T factory) {
 		this.replannerFactories.remove(factory);
 		
-		for (ReplanningThread replanningThread : this.replanningThreads) {
+		for (ReplanningRunnable replanningThread : this.replanningRunnables) {
 			replanningThread.removeWithinDayReplanner(factory.getId());
 		}
 	}
 	
 	public final void resetReplanners() {
-		for (ReplanningThread replanningThread : this.replanningThreads) {
+		for (ReplanningRunnable replanningThread : this.replanningRunnables) {
 			replanningThread.resetReplanners();
 		}
 	}
@@ -159,7 +201,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	}
 
 	public final void addReplanningTask(ReplanningTask replanningTask) {
-		this.replanningThreads[this.roundRobin % this.numOfThreads].addReplanningTask(replanningTask);
+		this.replanningRunnables[this.roundRobin % this.numOfThreads].addReplanningTask(replanningTask);
 		this.roundRobin++;
 	}
 
@@ -180,9 +222,9 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	/*
 	 * The thread class that really handles the replanning.
 	 */
-	/*package*/ static final class InternalReplanningThread extends ReplanningThread {		
+	/*package*/ static final class InternalReplanningRunnable extends ReplanningRunnable {		
 		
-		public InternalReplanningThread(String counterText) {
+		public InternalReplanningRunnable(String counterText) {
 			super(counterText);
 		}
 				
