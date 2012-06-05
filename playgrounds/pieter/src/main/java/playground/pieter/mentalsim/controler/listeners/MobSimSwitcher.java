@@ -25,18 +25,20 @@ public class MobSimSwitcher implements ControlerListener,
 		IterationStartsListener {
 
 	final static String EXPENSIVE_SIM_ITERS = "expensiveSimIters";
+	public static int expensiveSimIters = 1;
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		PersonalizableTravelTime ttcalc = event.getControler()
 				.getTravelTimeCalculator();
 
-		int numberOfIterations = Integer.parseInt(event.getControler()
+		int expensiveSimIters = Integer.parseInt(event.getControler()
 				.getConfig().getParam("MobSimSwitcher", EXPENSIVE_SIM_ITERS));
+		this.expensiveSimIters = expensiveSimIters;
 
 		int iterationsFromStart = event.getIteration()
 				- event.getControler().getFirstIteration();
 
-		if (iterationsFromStart % numberOfIterations == 0) {
+		if (iterationsFromStart % expensiveSimIters == 0) {
 			String mobsim = event.getControler().getConfig().controler()
 					.getMobsim();
 
