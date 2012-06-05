@@ -117,7 +117,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// add new activity
 		int position = executedPlan.getActLegIndex(currentActivity) + 1;
 		executedPlan.insertLegAct(position, legToRescue, rescueActivity);
-			
+		
 		// calculate route for the leg to the rescue facility
 		new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
 
@@ -125,7 +125,15 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		 * Identify the last non-rescue link and relocate rescue activity to it.
 		 */
 		NetworkRoute route = (NetworkRoute) legToRescue.getRoute();
-		Id endLinkId = route.getLinkIds().get(route.getLinkIds().size() - 2);
+		
+		/*
+		 * If the route is like LinkXY-RescueLinkXY-RescueLink the the activity coordinate seems to be
+		 * affected but the link itself is not. Therefore end the route at the same link.
+		 */
+		Id endLinkId = null;
+		if (route.getLinkIds().size() > 1) {
+			endLinkId = route.getLinkIds().get(route.getLinkIds().size() - 2);			
+		} else endLinkId = route.getStartLinkId();
 		((ActivityImpl) rescueActivity).setFacilityId(scenario.createId("rescueFacility" + endLinkId.toString()));
 		((ActivityImpl) rescueActivity).setLinkId(endLinkId);
 		NetworkRoute subRoute2 = route.getSubRoute(route.getStartLinkId(), endLinkId);

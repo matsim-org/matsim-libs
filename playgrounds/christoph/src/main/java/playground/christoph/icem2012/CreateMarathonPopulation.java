@@ -95,13 +95,13 @@ public class CreateMarathonPopulation {
 	
 	private static Logger log = Logger.getLogger(CreateMarathonPopulation.class);
 	
-	private final int runners = 100;
+	private final int runners = 1000;
 	
 	private final String trackModes = "walk2d,walk,bike";
 	public static final String startLink = "106474";
 	public static final String endLink = "106473";
-	private final double populationFraction = 0.04;	// 0.04 from 25% -> total 1% 
-//	private final double populationFraction = 1.00;
+//	private final double populationFraction = 0.04;	// 0.04 from 25% -> total 1% 
+	private final double populationFraction = 1.00;
 	
 	// shifted
 	public static final String[] trackNodes = new String[]{	
@@ -139,7 +139,8 @@ public class CreateMarathonPopulation {
 	private NetworkRoute route;
 	private Households households;
 	
-	private String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/";
+//	private String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/icem2012/";
+	private String basePath = "/home/cdobler/workspace/matsim/mysimulations/icem2012/";
 	private String trackShapeOutFile = basePath + "input/track.shp";
 	private String trackRelatedShapeOutFile = basePath + "input/trackRelated.shp";
 	private String barriersShapeOutFile = basePath + "input/barriers.shp";

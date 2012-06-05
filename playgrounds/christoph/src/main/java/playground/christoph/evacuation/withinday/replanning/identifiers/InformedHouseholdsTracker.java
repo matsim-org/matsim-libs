@@ -53,15 +53,15 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 	/*package*/ final Queue<Id> informedHouseholdsInCurrentTimeStep;
 	/*package*/ final PriorityBlockingQueue<Tuple<Id, Double>> informationTime;
 
-	/*package*/
-	
+	/*package*/ final double sigma;
 	private boolean allHouseholdsInformed = false;
 	
-	public InformedHouseholdsTracker(Households households, Set<Id> agentIds, EventsManager eventsManager) {
+	public InformedHouseholdsTracker(Households households, Set<Id> agentIds, EventsManager eventsManager, double sigma) {
 		super(agentIds);
 		
 		this.eventsManager = eventsManager;
 		this.households = households;
+		this.sigma = sigma;
 		this.informedHouseholdsInCurrentTimeStep = new ConcurrentLinkedQueue<Id>();
 
 		this.rng = new DeterministicRNG();
@@ -118,7 +118,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 	 * So far use a Rayleigh Distribution with a sigma of 300. After 353s ~ 50%
 	 * of all households have been informed.
 	 */
-	private final double sigma = 300;
+//	private final double sigma = 300;
 	private final double upperLimit = 0.999999;
 
 	private double calculateInformationDelay(Id householdId) {

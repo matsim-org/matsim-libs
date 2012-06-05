@@ -395,6 +395,12 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					
 					Queue<Id> informedHouseholds = informedHouseholdsTracker.getInformedHouseholdsInCurrentTimeStep();
 					
+					// If no household was informed in the current time step, we don't have to trigger the runners.
+					if (informedHouseholds.size() == 0) {
+//						log.info("No households informed in the current timestep.");
+						return;
+					}
+					
 					// assign households to threads
 					int roundRobin = 0;
 					

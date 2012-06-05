@@ -67,8 +67,8 @@ public class MarathonVelocityCalculator implements VelocityCalculator {
 		// Get person's walk velocity.
 		double delegateVelocity = delegate.getVelocity(person, link);
 		
-		// We assume a person runs 2.5 times faster than the person would walk.
-		double runFactor = 2.5;
+		// We assume a person runs 2.0 times faster than the person would walk.
+		double runFactor = 2.0;
 		
 		/*
 		 * Add link steepness factor which is not included so far in the

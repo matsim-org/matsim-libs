@@ -20,8 +20,12 @@
 
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.Facility;
@@ -90,14 +94,26 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			((ActivityImpl) nextActivity).setFacilityId(scenario.createId("rescueFacility"));
 			((ActivityImpl) nextActivity).setLinkId(scenario.createId("rescueLink"));
 			
+			// for walk2d legs: switch mode to walk for routing
+			Leg currentLeg = withinDayAgent.getCurrentLeg();
+			boolean isWalk2d = currentLeg.getMode().equals("walk2d");
+			
+			// switch to walk mode for routing
+			if (isWalk2d) {
+				currentLeg.setMode(TransportMode.walk);
+			}
+
 			// new Route for current Leg
 			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
 			
+			// switch back to walk2d
+			if (isWalk2d) {
+				currentLeg.setMode("walk2d");
+			}
 			/*
 			 * Identify the last non-rescue link
-			 */
+			 */			
 			nextActivity.setType("rescue");
-			Leg currentLeg = (Leg) executedPlan.getPlanElements().get(currentLegIndex);
 			NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
 			Id endLinkId = route.getLinkIds().get(route.getLinkIds().size() - 2);
 			((ActivityImpl) nextActivity).setFacilityId(scenario.createId("rescueFacility" + endLinkId.toString()));
@@ -105,7 +121,8 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			
 			// new Route for current Leg
 //			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
-			currentLeg.setRoute(route.getSubRoute(route.getStartLinkId(), endLinkId));
+			List<Id> newLinkIds = new ArrayList<Id>(route.getLinkIds().subList(0, route.getLinkIds().size() - 2));
+			route.setLinkIds(route.getStartLinkId(), newLinkIds, endLinkId);
 			
 			// Finally reset the cached Values of the PersonAgent - they may have changed!
 			withinDayAgent.resetCaches();

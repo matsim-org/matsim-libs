@@ -4,7 +4,7 @@
 
 <!-- Author: Christoph Dobler -->
 
-<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation, duringLegRerouting, pickupAgents, fuzzyTravelTimes)>
+<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation, duringLegRerouting, pickupAgents, fuzzyTravelTimes, informAgents)>
 
 <!ELEMENT evacuationTime	EMPTY>
 <!ATTLIST evacuationTime
@@ -69,3 +69,7 @@
 <!ELEMENT fuzzyTravelTimes	EMPTY>
 <!ATTLIST fuzzyTravelTimes
 			enabled				CDATA	#REQUIRED>
+			
+<!ELEMENT informAgents	EMPTY>
+<!ATTLIST informAgents
+			rayleighSigma		CDATA	#REQUIRED>

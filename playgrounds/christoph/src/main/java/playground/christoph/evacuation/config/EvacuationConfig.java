@@ -46,6 +46,8 @@ public class EvacuationConfig {
 	
 	public static boolean useFuzzyTravelTimes = true;
 	
+	public static double informAgentsRayleighSigma = 300.0;
+	
 	/*
 	 * Analysis modules
 	 */
@@ -85,5 +87,6 @@ public class EvacuationConfig {
 		log.info("use fuzzy travel times:\t" + useFuzzyTravelTimes);
 		log.info("create evacuation time picture:\t" + createEvacuationTimePicture);
 		log.info("count agents in evacuation are:\t" + countAgentsInEvacuationArea);
+		log.info("sigma for inform-agents Rayleigh function:\t" + informAgentsRayleighSigma);
 	}
 }

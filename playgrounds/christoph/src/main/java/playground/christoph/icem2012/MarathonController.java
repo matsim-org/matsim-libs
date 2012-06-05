@@ -140,7 +140,8 @@ public class MarathonController extends WithinDayController implements StartupLi
 
 	private final static Logger log = Logger.getLogger(MarathonController.class);
 	
-	public static String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/";
+//	public static String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/";
+	public static String basePath = "/home/cdobler/workspace/matsim/mysimulations/";
 	public static String dhm25File = basePath + "networks/GIS/nodes_3d_ivtch_dhm25.shp";
 	public static String srtmFile = basePath + "networks/GIS/nodes_3d_srtm.shp";
 	public static String affectedAreaFile = basePath + "icem2012/input/affectedArea.shp";
@@ -149,8 +150,8 @@ public class MarathonController extends WithinDayController implements StartupLi
 	 * innerBuffer ... minimum distance between affected area and an exit node
 	 * outerBuffer ... maximum distance between affected area and an exit node
 	 */
-	private double innerBuffer = 2000.0;
-	private double outerBuffer = 4000.0;
+	private double innerBuffer = 1000.0;
+	private double outerBuffer = 3000.0;
 	
 	private Geometry affectedArea;
 	private CoordAnalyzer coordAnalyzer;
@@ -177,7 +178,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 	 * ReplannerFactories
 	 */
 	private WithinDayDuringActivityReplannerFactory extendCurrentActivityReplannerFactory;
-	private WithinDayDuringActivityReplannerFactory endActivityAndEvacuateReplannerFactory;
+	private WithinDayDuringActivityReplannerFactory marathonEndActivityAndEvacuateReplannerFactory;
 	private WithinDayDuringLegReplannerFactory currentLegInitialReplannerFactory;
 	private WithinDayDuringLegReplannerFactory switchWalkModeReplannerFactory;
 	private WithinDayDuringLegReplannerFactory duringLegRerouteReplannerFactory;
@@ -232,6 +233,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		EvacuationConfig.duringLegReroutingShare = 0.25;
 		EvacuationConfig.panicShare = 0.0;
 		EvacuationConfig.householdParticipationShare = 1.0;
+		EvacuationConfig.informAgentsRayleighSigma = 600.0;
 		
 //		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 //		
@@ -366,7 +368,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		createExitLinks();
 		
 		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds(), 
-				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents());
+				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents(), EvacuationConfig.informAgentsRayleighSigma);
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
 		this.agentsTracker = new AgentsTracker();
@@ -540,7 +542,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		ActivityOption activityOption = ((ActivityFacilityImpl) preRunFacility).createActivityOption("preRun");
 		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 		activityOption.setCapacity(Double.MAX_VALUE);
-		
+				
 		Id postRunFacilityId = scenarioData.createId("postRunFacility");
 		ActivityFacility postRunFacility = (scenarioData).getActivityFacilities().createFacility(postRunFacilityId, endLink.getCoord());
 		((ActivityFacilityImpl) postRunFacility).setLinkId(startLinkId);
@@ -563,12 +565,21 @@ public class MarathonController extends WithinDayController implements StartupLi
 		GisDebugger.addGeometry(outerBuffer, "outer Buffer");
 		GisDebugger.dump(this.getControlerIO().getOutputPath() + "/affectedAreaOuterBuffer.shp");
 		
-		this.bufferedCoordAnalyzer = new CoordAnalyzer(affectedArea);
+		this.bufferedCoordAnalyzer = new CoordAnalyzer(innerBuffer);
 		
 		Set<Node> exitNodes = new LinkedHashSet<Node>();
 		for (Node node : scenarioData.getNetwork().getNodes().values()) {
 			if (outerAnalyzer.isNodeAffected(node) && !innerAnalyzer.isNodeAffected(node)) {
-				exitNodes.add(node);
+				
+				// if the from node of an in-link is inside the affected area, we ignore the node
+				boolean ignoreNode = false;
+				for (Link inLink : node.getInLinks().values()) {
+					if (coordAnalyzer.isNodeAffected(inLink.getFromNode())) {
+						ignoreNode = true;
+						break;
+					}
+				}
+				if (!ignoreNode) exitNodes.add(node);
 			}
 		}
 		log.info("Found " + exitNodes.size() + " exit nodes.");
@@ -769,10 +780,13 @@ public class MarathonController extends WithinDayController implements StartupLi
 		/*
 		 * During Activity Replanners
 		 */
-		this.endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, 
+		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, 
 				(PTTravelTimeKTIFactory) this.ptTravelTimeFactory);
-		this.endActivityAndEvacuateReplannerFactory.addIdentifier(this.affectedActivityPerformingIdentifier);
-		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.endActivityAndEvacuateReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, 
+				endActivityAndEvacuateReplannerFactory);
+		this.marathonEndActivityAndEvacuateReplannerFactory.addIdentifier(this.affectedActivityPerformingIdentifier);
+		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.marathonEndActivityAndEvacuateReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
 		
 		this.extendCurrentActivityReplannerFactory = new ExtendCurrentActivityReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
 		this.extendCurrentActivityReplannerFactory.addIdentifier(this.notAffectedActivityPerformingIdentifier);
@@ -781,7 +795,13 @@ public class MarathonController extends WithinDayController implements StartupLi
 		/*
 		 * During Leg Replanners
 		 */
-		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, coordAnalyzer);
+		// use affected area
+//		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, coordAnalyzer);
+//		this.currentLegInitialReplannerFactory.addIdentifier(this.legPerformingIdentifier);
+//		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		// use buffered affected area
+		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.bufferedCoordAnalyzer);
 		this.currentLegInitialReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
@@ -797,7 +817,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		 * Collect Replanners that can be disabled after all agents have been informed.
 		 */
 		this.initialReplannerFactories = new ArrayList<WithinDayReplannerFactory<?>>();
-		this.initialReplannerFactories.add(this.endActivityAndEvacuateReplannerFactory);
+		this.initialReplannerFactories.add(this.marathonEndActivityAndEvacuateReplannerFactory);
 		this.initialReplannerFactories.add(this.extendCurrentActivityReplannerFactory);
 		this.initialReplannerFactories.add(this.currentLegInitialReplannerFactory);
 	}

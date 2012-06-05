@@ -47,6 +47,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String DURINGLEGREROUTING = "duringlegrerouting";
 	public static String PICKUPAGENTS = "pickupagents";
 	public static String FUZZYTRAVELTIMES = "fuzzytraveltimes";
+	public static String INFORMAGENTS = "informagents";
 	
 	public static String TIME = "time";
 	public static String X = "x";
@@ -65,6 +66,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String TABUSEARCH = "tabuSearch";
 	public static String BEHAVIOUR = "behaviour";
 	public static String ENABLED = "enabled";
+	public static String RAYLEIGHSIGMA = "rayleighSigma";
 	
 	private String path = "";
 	private boolean readVehicleFleet = false;
@@ -153,6 +155,10 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			}
 		} else if (FUZZYTRAVELTIMES.equalsIgnoreCase(name)) {
 			EvacuationConfig.useFuzzyTravelTimes = Boolean.valueOf(atts.getValue(ENABLED));
+		}  else if (INFORMAGENTS.equalsIgnoreCase(name)) {
+			double value = Double.valueOf(atts.getValue(RAYLEIGHSIGMA));
+			if (value < 0.1) value = 0.1;
+			EvacuationConfig.informAgentsRayleighSigma = value;
 		} else {
 			log.warn("Ignoring startTag: " + name);
 		}
@@ -180,6 +186,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		} else if(DURINGLEGREROUTING.equalsIgnoreCase(name)) {
 		} else if(PICKUPAGENTS.equalsIgnoreCase(name)) {
 		} else if(FUZZYTRAVELTIMES.equalsIgnoreCase(name)) {
+		} else if(INFORMAGENTS.equalsIgnoreCase(name)) {
 		} else log.warn("Ignoring endTag: " + name);
 	}
 	
