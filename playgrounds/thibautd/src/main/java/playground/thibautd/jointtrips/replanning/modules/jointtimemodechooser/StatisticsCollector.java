@@ -56,7 +56,18 @@ class StatisticsCollector {
 
 	public void dumpStatistics(final String fileName) {
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter( fileName );
+			BufferedWriter writer = IOUtils.getAppendingBufferedWriter( fileName );
+
+			writer.newLine();
+			writer.write( "###################################################################" );
+			writer.newLine();
+			writer.write( "stack trace:");
+			writer.newLine();
+			for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
+				writer.write( "\t"+s.toString() );
+				writer.newLine();
+			}
+			writer.newLine();
 
 			writer.write( "class of the routing modules used for travel time estimation:" );
 			for (Map.Entry<String, Set<String>> entry : routingModuleFactoryClasses.entrySet()) {
@@ -67,6 +78,7 @@ class StatisticsCollector {
 					writer.write( "\t\t->"+c );
 				}
 			}
+			writer.newLine();
 
 			writer.close();
 		}
