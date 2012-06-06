@@ -36,7 +36,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author benjamin after Ihab
+ * @author benjamin and Ihab
  *
  */
 
@@ -45,129 +45,184 @@ class ExternalControler {
 	
 	static String configFile;
 	static String outputExternalIterationDirPath;
-	static int lastExternalIteration;
-	static OptimizationParameter op;
+	static int lastExternalIterationParam1;
+	static int lastExternalIterationParam2;
+	static OptimizationParameter1 op1;
+	static OptimizationParameter2 op2;
+	static int incrBusNumber;
+	static double incrFare;
+	static int incrCapacity;
 	
 	SortedMap<Integer, ExtItInformation> extIt2information = new TreeMap<Integer, ExtItInformation>();
+	SortedMap<Integer, ExtItInformation> it2information = new TreeMap<Integer, ExtItInformation>();
 	double fare;
 	int capacity;
 	int numberOfBuses;
-	
+		
 	public static void main(final String[] args) throws IOException {
-////		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
-////		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/fare_noTimeChoice";
-//		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/fare_timeChoice";
-//		lastExternalIteration = 1;
+		
+//		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
+//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
+		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_timeChoice";
+		
+//		op1 = OptimizationParameter1.FARE;
+//		op1 = OptimizationParameter1.CAPACITY;
+		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
+		
+//		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
+		op2 = OptimizationParameter2.FARE;
+		
+		lastExternalIterationParam1 = 20;
+		lastExternalIterationParam2 = 20;
+				
+		incrBusNumber = 1;
+		incrFare = -0.25;
+		incrCapacity = 4;
+		
+//		ToDo: adjust arguments for cluster runs		
+//		configFile = args[0];
+//		outputExternalIterationDirPath = args[1];
+//		lastExternalIteration = Integer.parseInt(args[2]);
+//		String opString = args[3];
 //		
-//		op = OptimizationParameter.FARE;
-//		op = OptimizationParameter.CAPACITY;
-//		op = OptimizationParameter.NUMBER_OF_BUSES;
+//		if(opString.equals(OptimizationParameter1.FARE.toString())){
+//			op1 = OptimizationParameter1.FARE;
+//		} else if(opString.equals(OptimizationParameter1.CAPACITY.toString())){
+//			op1 = OptimizationParameter1.CAPACITY;
+//		} else if(opString.equals(OptimizationParameter1.NUMBER_OF_BUSES.toString())){
+//			op1 = OptimizationParameter1.NUMBER_OF_BUSES;
+//		} else {
+//			throw new RuntimeException("Optimization parameter " + opString + " is unknown. Aborting... ");
+//		}
 		
-		configFile = args[0];
-		outputExternalIterationDirPath = args[1];
-		lastExternalIteration = Integer.parseInt(args[2]);
-		String opString = args[3];
-		
-		if(opString.equals(OptimizationParameter.FARE.toString())){
-			op = OptimizationParameter.FARE;
-		} else if(opString.equals(OptimizationParameter.CAPACITY.toString())){
-			op = OptimizationParameter.CAPACITY;
-		} else if(opString.equals(OptimizationParameter.NUMBER_OF_BUSES.toString())){
-			op = OptimizationParameter.NUMBER_OF_BUSES;
-		} else {
-			throw new RuntimeException("Optimization parameter " + opString + " is unknown. Aborting... ");
-		}
-		
-		log.info("Analyzing optimization parameter " + op);
 		ExternalControler externalControler = new ExternalControler();
 		externalControler.run();
 	}
 
 	private void run() throws IOException {
-		ChartFileWriter chartWriter = new ChartFileWriter(outputExternalIterationDirPath);
-		TextFileWriter textWriter = new TextFileWriter(outputExternalIterationDirPath);
+		ChartFileWriter chartWriter = new ChartFileWriter();
+		TextFileWriter textWriter = new TextFileWriter();
 		
 		setDefaultParameters();
 		Operator operator = new Operator();
 		Users users = new Users();
 
+		int iterationCounter = 0;
+		
+		for (int extItParam2 = 0; extItParam2 <= lastExternalIterationParam2 ; extItParam2++){
+			log.info("************* EXTERNAL ITERATION (2) " + extItParam2 + " BEGINS *************");
+			String directoryExtItParam2 = outputExternalIterationDirPath + "/extIt" + extItParam2;
+			
+			for (int extItParam1 = 0; extItParam1 <= lastExternalIterationParam1 ; extItParam1++){
+				log.info("************* EXTERNAL ITERATION (1) " + extItParam1 + " BEGINS *************");
 
-		for (int extIt = 0; extIt <= lastExternalIteration ; extIt++){
-			log.info("************* EXTERNAL ITERATION " + extIt + " BEGINS *************");
-			
-			String directoryExtIt = outputExternalIterationDirPath + "/extITERS/extIt." + extIt;
-			File directory = new File(directoryExtIt);
-			directory.mkdirs();
-
-			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
-			new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
-			new MatsimPopulationReader(sc).readFile(sc.getConfig().plans().getInputFile());
-
-			VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, sc.getNetwork(), directoryExtIt);
-			vsw.writeTransitVehiclesAndSchedule();
-			
-			InternalControler internalControler = new InternalControler(sc, directoryExtIt, this.fare);
-			internalControler.run();
-			
-//			new TransitScheduleReaderV1(sc).readFile(directoryExtIt + "/scheduleFile.xml");
-//			new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(directoryExtIt + "/vehiclesFile.xml");
-//			Controler controler = new Controler(sc);
-//			controler.setOverwriteFiles(true);
-//			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-//			ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
-//			controlerConfGroup.setOutputDirectory(directoryExtIt + "/internalIterations");
-//			controler.run();
-
-			operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
-			users.setParametersForExtIteration(sc);
-			
-			OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), directoryExtIt, sc.getConfig().controler().getLastIteration());
-			analysis.readEvents();
-			
-			operator.calculateCosts(analysis);
-			users.calculateLogsum();
-
-			ExtItInformation info = new ExtItInformation();
-			info.setFare(this.fare);
-			info.setCapacity(this.capacity);
-			info.setNumberOfBuses(this.numberOfBuses);
-			info.setOperatorCosts(operator.getCosts());
-			info.setOperatorRevenue(analysis.getRevenue());
-			info.setUsersLogSum(users.getLogSum());
-			info.setNumberOfCarLegs(analysis.getSumOfCarLegs());
-			info.setNumberOfPtLegs(analysis.getSumOfPtLegs());
-			info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
-			info.setSumOfWaitingTimes(internalControler.getSumOfWaitingTimes());
-			
-			extIt2information.put(extIt, info);
-			
-			textWriter.write(this.extIt2information);
-			chartWriter.write(this.extIt2information);
-			
-			// settings for next external iteration
-			if (extIt < lastExternalIteration){
-				if(op.equals(OptimizationParameter.FARE)) this.fare = this.fare - 0.25;
-				if(op.equals(OptimizationParameter.CAPACITY)) this.capacity = this.capacity + 4;
-				if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)) this.numberOfBuses = this.numberOfBuses + 1;
+				String directoryExtItParam2Param1 = directoryExtItParam2 + "/extITERS/extIt " + extItParam2 + "." + extItParam1;
+				File directory = new File(directoryExtItParam2Param1);
+				directory.mkdirs();
+	
+				Scenario sc = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
+				new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
+				new MatsimPopulationReader(sc).readFile(sc.getConfig().plans().getInputFile());
+	
+				VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, sc.getNetwork(), directoryExtItParam2Param1);
+				vsw.writeTransitVehiclesAndSchedule();
+				
+				InternalControler internalControler = new InternalControler(sc, directoryExtItParam2Param1, this.fare);
+				internalControler.run();
+	
+				operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
+				users.setParametersForExtIteration(sc);
+				
+				OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), directoryExtItParam2Param1, sc.getConfig().controler().getLastIteration());
+				analysis.readEvents();
+				
+				operator.calculateCosts(analysis);
+				users.calculateLogsum();
+	
+				ExtItInformation info = new ExtItInformation();
+				info.setFare(this.fare);
+				info.setCapacity(this.capacity);
+				info.setNumberOfBuses(this.numberOfBuses);
+				info.setOperatorCosts(operator.getCosts());
+				info.setOperatorRevenue(analysis.getRevenue());
+				info.setUsersLogSum(users.getLogSum());
+				info.setNumberOfCarLegs(analysis.getSumOfCarLegs());
+				info.setNumberOfPtLegs(analysis.getSumOfPtLegs());
+				info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
+				info.setSumOfWaitingTimes(internalControler.getSumOfWaitingTimes());
+				
+				this.extIt2information.put(extItParam1, info);
+				
+				textWriter.write(directoryExtItParam2, this.extIt2information);
+				chartWriter.write(directoryExtItParam2, this.extIt2information);
+				
+				// settings for next external iteration (optimization parameter 1)
+				if (extItParam1 < lastExternalIterationParam1){
+					if(op1.equals(OptimizationParameter1.FARE)) this.fare = this.fare + incrFare;
+					if(op1.equals(OptimizationParameter1.CAPACITY)) this.capacity = this.capacity + incrCapacity;
+					if(op1.equals(OptimizationParameter1.NUMBER_OF_BUSES)) this.numberOfBuses = this.numberOfBuses + incrBusNumber;
+				}
+				log.info("************* EXTERNAL ITERATION (1) " + extItParam1 + " ENDS *************");
+				iterationCounter++;
+				this.it2information.put(iterationCounter, info);		
+				textWriter.write(outputExternalIterationDirPath, this.it2information);
 			}
-			log.info("************* EXTERNAL ITERATION " + extIt + " ENDS *************");
+			
+			// settings for next external iteration (optimization parameter 2)
+			if (extItParam2 < lastExternalIterationParam2){
+				if(op2.equals(OptimizationParameter2.FARE)){
+					this.fare = this.fare + incrFare;
+					this.numberOfBuses = 1;
+				}
+				if(op2.equals(OptimizationParameter2.NUMBER_OF_BUSES)){
+					this.fare = -0.;
+					this.numberOfBuses = this.numberOfBuses + incrBusNumber;
+				}
+				
+			}
+			log.info("************* EXTERNAL ITERATION (2) " + extItParam2 + " ENDS *************");
 		}
 	}
 
 	private void setDefaultParameters() {
-		if(op.equals(OptimizationParameter.FARE)){
-			this.fare = -0.;
-			this.capacity = 50;
-			this.numberOfBuses = 5;
-		} else if (op.equals(OptimizationParameter.CAPACITY)){
-			this.fare = -3.;
-			this.capacity = 20; // standing room + seats (realistic values between 19 and 101)
-			this.numberOfBuses = 5;
-		} else if(op.equals(OptimizationParameter.NUMBER_OF_BUSES)){
-			this.fare = -3.;
-			this.capacity = 50;
-			this.numberOfBuses = 1;
+		if (op1 != null && op2 == null){
+			if (lastExternalIterationParam2 != 0) {
+				log.warn("Analyzing only one parameter. lastExternalIterationParam2 set to 0.");
+				lastExternalIterationParam2 = 0;
+			}
+			log.info("Analyzing optimization parameter " + op1);
+			if (op1.equals(OptimizationParameter1.FARE)){
+				this.fare = -0.;
+				this.capacity = 50;
+				this.numberOfBuses = 5;
+			} else if (op1.equals(OptimizationParameter1.CAPACITY)){
+				this.fare = -3.;
+				this.capacity = 20; // standing room + seats (realistic values between 19 and 101)
+				this.numberOfBuses = 5;
+			} else if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES)){
+				this.fare = -3.;
+				this.capacity = 50;
+				this.numberOfBuses = 1;
+			}
+		}
+		
+		else if (op1 != null && op2 != null) {
+			log.info("Analyzing combined optimization parameters " + op1 + " and " + op2);
+			if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES) && op2.equals(OptimizationParameter2.FARE)){
+				this.fare = -0.;
+				this.capacity = 50;
+				this.numberOfBuses = 1;
+			} else if (op1.equals(OptimizationParameter1.FARE) && op2.equals(OptimizationParameter2.NUMBER_OF_BUSES)){
+				this.fare = -0.;
+				this.capacity = 50;
+				this.numberOfBuses = 1;
+			} else {
+				throw new RuntimeException("Undefined default parameters for combined optimization parameters op1 = " + op1 + " and op2 = " + op2 + ". Aborting...");
+			}
+			
+		} else {
+			throw new RuntimeException("Undefined default parameters for combined optimization parameters op1 = " + op1 + " and op2 = " + op2 + ". Aborting...");
 		}
 	}
 }

@@ -11,10 +11,6 @@ public class ChartFileWriter {
 	private final static Logger log = Logger.getLogger(ChartFileWriter.class);
 	private String outputExternalIterationDirPath;
 	
-	public ChartFileWriter(String outputExternalIterationDirPath) {
-		this.outputExternalIterationDirPath = outputExternalIterationDirPath;
-	}
-
 	public void writeMapToChart(Map<Integer, Double> key2value, String title, String x, String y, String fileName) {
 		
 		String[] xValues = new String[key2value.size()];
@@ -105,7 +101,9 @@ public class ChartFileWriter {
 		log.info("OperatorScores written to "+outputFile);
 	}
 
-	public void write(SortedMap<Integer, ExtItInformation> extIt2information) {
+	public void write(String directoryExtItParam2, SortedMap<Integer, ExtItInformation> extIt2information) {
+		
+		this.outputExternalIterationDirPath = directoryExtItParam2;
 		
 		SortedMap<Integer, Double> iteration2operatorProfit = new TreeMap<Integer, Double>();
 		SortedMap<Integer, Double> iteration2operatorCosts = new TreeMap<Integer, Double>();

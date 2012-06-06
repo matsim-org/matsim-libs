@@ -20,11 +20,11 @@
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 /**
- * @author benjamin
+ * @author Ihab
  *
  */
-public enum OptimizationParameter {
+public enum OptimizationParameter2 {
 	
-	NUMBER_OF_BUSES, FARE, CAPACITY
+	NUMBER_OF_BUSES, FARE
 
 }
