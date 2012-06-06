@@ -20,6 +20,8 @@
 
 package playground.wrashid.parkingSearch.withindayFW;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -49,8 +51,11 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import playground.wrashid.parkingSearch.mobsim.ParkingQSimFactory;
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
+import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchReplannerFactory;
+import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 
 public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener, BeforeMobsimListener {
 
@@ -59,8 +64,8 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 */
 	protected int numReplanningThreads = 8;
 
-	protected RandomSearchIdentifier randomSearchIdentifier;
-	protected RandomSearchReplannerFactory randomSearchReplannerFactory;
+	//protected RandomSearchIdentifier randomSearchIdentifier;
+	//protected RandomSearchReplannerFactory randomSearchReplannerFactory;
 
 	protected LegModeChecker legModeChecker;
 	protected ParkingAgentsTracker parkingAgentsTracker;
@@ -74,16 +79,65 @@ public class WithinDayParkingController extends WithinDayController implements S
 		super.addControlerListener(this);
 	}
 
+	protected void initParkingStrategyFactories(){
+		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW=new ParkingStrategyActivityMapperFW();
+		Collection<ParkingStrategy> parkingStrategies=new LinkedList<ParkingStrategy>();
+		ParkingStrategyManager parkingStrategyManager=new ParkingStrategyManager(parkingStrategyActivityMapperFW, parkingStrategies);
+		
+		
+		
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
+
+		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
+		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
+		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
+		}
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, super.getTravelTimeCollectorFactory());
+		
+		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
+	
+		// adding first random factory
+		RandomSearchReplannerFactory randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getReplanningManager(), router, 1.0, this.scenarioData, parkingAgentsTracker);
+		RandomSearchIdentifier randomSearchIdentifier = new RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure); 
+		this.getFixedOrderSimulationListener().addSimulationListener(randomSearchIdentifier);
+		randomSearchReplannerFactory.addIdentifier(randomSearchIdentifier);
+		ParkingStrategy parkingStrategy = new ParkingStrategy(randomSearchIdentifier);
+		parkingStrategies.add(parkingStrategy);
+		this.getReplanningManager().addDuringLegReplannerFactory(randomSearchReplannerFactory);
+		parkingStrategyActivityMapperFW.addSearchStrategy(null,"home", parkingStrategy);
+		parkingStrategyActivityMapperFW.addSearchStrategy(null,"work", parkingStrategy);
+		
+		// adding first random factory
+		randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getReplanningManager(), router, 1.0, this.scenarioData, parkingAgentsTracker);
+		randomSearchIdentifier = new RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure); 
+		this.getFixedOrderSimulationListener().addSimulationListener(randomSearchIdentifier);
+		randomSearchReplannerFactory.addIdentifier(randomSearchIdentifier);		
+		parkingStrategy = new ParkingStrategy(randomSearchIdentifier);
+		parkingStrategies.add(parkingStrategy);
+		this.getReplanningManager().addDuringLegReplannerFactory(randomSearchReplannerFactory);
+		parkingStrategyActivityMapperFW.addSearchStrategy(null,"work", parkingStrategy);
+		parkingStrategyActivityMapperFW.addSearchStrategy(null,"shopping", parkingStrategy);
+		
+		this.addControlerListener(parkingStrategyManager);
+		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
+		
+	}
+	/*
 	protected void initIdentifiers() {
 
 		this.randomSearchIdentifier = new RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure); 
 		this.getFixedOrderSimulationListener().addSimulationListener(this.randomSearchIdentifier);
-	}
+	}*/
 	
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
+	/*
 	protected void initReplanners() {
 
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
@@ -100,11 +154,13 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
 	
+		
+		
 		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getReplanningManager(), router, 1.0, this.scenarioData, parkingAgentsTracker);
 		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
 		this.getReplanningManager().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
 	}
-	
+	*/
 	/*
 	 * When the Controller Startup Event is created, the EventsManager
 	 * has already been initialized. Therefore we can initialize now
@@ -138,8 +194,9 @@ public class WithinDayParkingController extends WithinDayController implements S
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure);
 		this.setMobsimFactory(mobsimFactory);
 		
-		this.initIdentifiers();
-		this.initReplanners();
+		//this.initIdentifiers();
+		//this.initReplanners();
+		initParkingStrategyFactories();
 	}
 
 	@Override
@@ -169,6 +226,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		}
 		final WithinDayParkingController controller = new WithinDayParkingController(args);
 		controller.setOverwriteFiles(true);
+		
 		
 		
 		controller.run();
