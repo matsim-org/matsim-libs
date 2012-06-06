@@ -44,7 +44,7 @@ import playground.wrashid.parkingSearch.withindayFW.ParkingAgentsTracker;
 
 /**
  * 
- * @author cdobler
+ * @author cdobler, wrashid
  */
 public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 
