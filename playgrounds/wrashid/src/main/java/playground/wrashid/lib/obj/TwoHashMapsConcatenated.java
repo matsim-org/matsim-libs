@@ -32,5 +32,11 @@ public class TwoHashMapsConcatenated<ClassKey1,ClassKey2,ClassValue> {
 		return hashMap.keySet();
 	}
 	
+	public void removeValue(ClassKey1 key1, ClassKey2 key2){
+		checkHashMapAndInitializeIfNeeded(key1);
+		
+		hashMap.get(key1).remove(key2);
+	}
+	
 	
 }
