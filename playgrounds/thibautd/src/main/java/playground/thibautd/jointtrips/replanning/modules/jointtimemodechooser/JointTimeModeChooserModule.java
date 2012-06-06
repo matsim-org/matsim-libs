@@ -30,8 +30,10 @@ import playground.thibautd.router.controler.MultiLegRoutingControler;
  * @author thibautd
  */
 public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
+	private static final boolean DUMP_STATS = true;
 	private final MultiLegRoutingControler controler;
 	private final DepartureDelayAverageCalculator delay;
+	private StatisticsCollector statsCollector = null;
 
 	public JointTimeModeChooserModule(final Controler controler) {
 		super( controler.getConfig().global() );
@@ -43,6 +45,25 @@ public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new JointTimeModeChooserAlgorithm( controler , delay );
+		return new JointTimeModeChooserAlgorithm( statsCollector , controler , delay );
+	}
+
+	@Override
+	public void prepareReplanning() {
+		statsCollector = DUMP_STATS ?
+			new StatisticsCollector() :
+			null;
+		super.prepareReplanning();
+	}
+
+	@Override
+	public void finishReplanning() {
+		super.finishReplanning();
+		if (statsCollector != null) {
+			statsCollector.dumpStatistics(
+					controler.getControlerIO().getIterationFilename(
+						controler.getIterationNumber(),
+						getClass().getSimpleName()+"Stats.dat" ));
+		}
 	}
 }

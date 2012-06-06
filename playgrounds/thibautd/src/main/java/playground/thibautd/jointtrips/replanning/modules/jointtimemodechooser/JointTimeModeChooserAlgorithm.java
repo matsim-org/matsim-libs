@@ -43,10 +43,13 @@ import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.
 public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 	private final MultiLegRoutingControler controler;
 	private final DepartureDelayAverageCalculator delay;
+	private final StatisticsCollector statsCollector;
 
-	public JointTimeModeChooserAlgorithm(
+	JointTimeModeChooserAlgorithm(
+			final StatisticsCollector statsCollector,
 			final Controler controler,
 			final DepartureDelayAverageCalculator delay ) {
+		this.statsCollector = statsCollector;
 		this.controler = (MultiLegRoutingControler) controler;
 		this.delay = delay;
 	}
@@ -60,6 +63,10 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 					plan,
 					delay,
 					controler );
+
+		if (statsCollector != null) {
+			statsCollector.notifyTripRouterFactory( tripRouterFactory );
+		}
 
 		ScoringFunctionFactory scoringFunctionFactory = controler.getScoringFunctionFactory();
 		JointTimeModeChooserConfigGroup config = (JointTimeModeChooserConfigGroup)
