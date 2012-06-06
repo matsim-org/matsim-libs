@@ -41,8 +41,10 @@ import playground.thibautd.jointtrips.qsim.JointQSimFactory;
 import playground.thibautd.jointtrips.replanning.JointPlansReplanning;
 import playground.thibautd.jointtrips.replanning.JointStrategyManager;
 import playground.thibautd.jointtrips.router.DriverRoutingModule;
+import playground.thibautd.jointtrips.router.DriverRoutingModuleFactory;
 import playground.thibautd.jointtrips.router.JointPlanRouter;
 import playground.thibautd.jointtrips.router.PassengerRoutingModule;
+import playground.thibautd.jointtrips.router.PassengerRoutingModuleFactory;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.RoutingModuleFactory;
 import playground.thibautd.router.TripRouterFactory;
@@ -187,32 +189,10 @@ public class JointControler extends MultiLegRoutingControler {
 
 		routerFactory.setRoutingModuleFactory(
 				JointActingTypes.PASSENGER,
-				new RoutingModuleFactory() {
-					@Override
-					public RoutingModule createModule(
-							final String mainMode,
-							final TripRouterFactory factory) {
-						return new PassengerRoutingModule(
-							mainMode,
-							getPopulation().getFactory(),
-							factory.getModeRouteFactory());
-					}
-				});
+				new PassengerRoutingModuleFactory( getPopulation().getFactory() ));
 		routerFactory.setRoutingModuleFactory(
 				JointActingTypes.DRIVER,
-				new RoutingModuleFactory() {
-					@Override
-					public RoutingModule createModule(
-							final String mainMode,
-							final TripRouterFactory factory) {
-						return new DriverRoutingModule(
-							mainMode,
-							getPopulation().getFactory(),
-							factory.getRoutingModuleFactories().get( TransportMode.car ).createModule(
-								TransportMode.car,
-								factory));
-					}
-				});
+				new DriverRoutingModuleFactory( getPopulation().getFactory() ));
 
 		return routerFactory;
 	}
