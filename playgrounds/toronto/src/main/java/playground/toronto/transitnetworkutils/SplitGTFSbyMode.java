@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class SplitGTFSbyMode {
 
 	/**
-	 * Splits the routes.txt, trips.txt, and stop_times.txt by mode.
+	 * Splits the routes.txt, trips.txt, and stop_times.txt by mode. Also restricts by service level
 	 * 
 	 * @param args - Space-separated array of arguments:
 	 * 		[0] - Folder location of the base files
@@ -20,22 +20,26 @@ public class SplitGTFSbyMode {
 	 * 		[2] - Folder location to store SUBWAY/METRO output
 	 * 		[3] - Folder location to store TRAIN output
 	 * 		[4] - Folder location to store BUS output
+	 * 		[5] - Service Id to extract.
+	 * 
 	 */
 	public static void main(final String[] args) throws IOException, ParseException{
 		
-		if (args.length != 5){
-			System.out.println("Usage: splitFilesByMode baseFolder tramFolder metroFolder trainFolder busFolder\n" +
+		if (args.length != 6){
+			System.out.println("Usage: splitFilesByMode baseFolder tramFolder metroFolder trainFolder busFolder serviceId\n" +
 					"	baseFolder = Folder location of base files\n" +
 					"	tramFolder = Folder location to save STREETCAR/TRAM output\n" +
 					"	metroFolder = Folder location to save SUBWAY/METRO output\n" +
 					"	trainFolder = Folder location to save TRAIN output\n" +
-					"	busFolder = Folder location to save BUS output");
+					"	busFolder = Folder location to save BUS output\n" + 
+					"   serviceId = The service schedule to extract");
 			System.exit(-1);
 		}
 		
 		String routesFile = args[0].replace("\\", "/") + "/routes.txt";
 		String tripsFiles = args[0].replace("\\", "/") + "/trips.txt";
 		String stoptimesFile = args[0].replace("\\", "/") + "/stop_times.txt";
+		String service = args[5];
 		
 		HashMap<String, Integer> routeIdModeMap = new HashMap<String, Integer>();
 		
@@ -69,8 +73,10 @@ public class SplitGTFSbyMode {
 		header = reader.readLine();
 		int rtCol = Arrays.asList(header.split(",")).indexOf("route_id");
 		int tpCol = Arrays.asList(header.split(",")).indexOf("trip_id");
+		int svCol = Arrays.asList(header.split(",")).indexOf("service_id");
 		
 		HashMap<String, Integer> tripIdModeMap = new HashMap<String, Integer>();
+		HashMap<String, Boolean> skippedTrips = new HashMap<String, Boolean>(); 
 		
 		writers = new HashMap<Integer, BufferedWriter>();
 		writers.put(0, new BufferedWriter(new FileWriter(args[1].replace("\\", "/") + "/trips.txt"))); writers.get(0).write(header);
@@ -80,8 +86,15 @@ public class SplitGTFSbyMode {
 		
 		while ((line = reader.readLine()) != null){
 			String[] cells = line.split(",");
+			String sv = cells[svCol];
 			String tpId = cells[tpCol];
 			String rtId = cells[rtCol];
+			if (!sv.equals(service)){
+				skippedTrips.put(tpId, true);
+				continue; //skips trips that aren't in the speicifed service schedule.
+			}
+			skippedTrips.put(tpId, false);
+
 			Integer currentMode = routeIdModeMap.get(rtId);
 			if(currentMode == null){
 				System.err.println("Could not find mode for route " + rtId);
@@ -99,6 +112,8 @@ public class SplitGTFSbyMode {
 		reader = new BufferedReader(new FileReader(stoptimesFile));
 		header = reader.readLine();
 		tpCol = Arrays.asList(header.split(",")).indexOf("trip_id");
+		long counter = 0;
+		System.out.print("Reading " + stoptimesFile + "...");
 		
 		writers = new HashMap<Integer, BufferedWriter>();
 		writers.put(0, new BufferedWriter(new FileWriter(args[1].replace("\\", "/") + "/stop_times.txt"))); writers.get(0).write(header);
@@ -109,9 +124,12 @@ public class SplitGTFSbyMode {
 		while ((line = reader.readLine()) != null){
 			String[] cells = line.split(",");
 			String tpId = cells[tpCol];
+			if (++counter % 5000 == 0) System.out.print("\n" + counter + ": " + tpId);
+			if (skippedTrips.get(tpId)) continue;			
 			Integer currentMode = tripIdModeMap.get(tpId);
 			if(currentMode == null){
-				System.err.println("Could not find mode for trip " + tpId);
+				//if(!skippedTrips.contains(tpId)) 
+					System.err.println("Could not find mode for trip " + tpId);
 				continue;
 			}
 			
