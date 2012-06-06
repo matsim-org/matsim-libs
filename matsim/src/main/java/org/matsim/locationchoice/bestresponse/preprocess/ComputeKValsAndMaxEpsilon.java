@@ -19,6 +19,8 @@
 
 package org.matsim.locationchoice.bestresponse.preprocess;
 
+import java.util.HashSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -47,14 +49,17 @@ public class ComputeKValsAndMaxEpsilon {
 	
 	private DestinationSampler sampler;
 	
+	private HashSet<String> flexibleTypes;
+	
 	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config, 
-			ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter) {
+			ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes) {
 		rnd = new RandomFromVarDistr();
 		rnd.setSeed(seed);
 		this.scenario = scenario;
 		this.config = config;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
+		this.flexibleTypes = flexibleTypes;
 	}
 	
 	public void assignKValues() {				
@@ -101,10 +106,12 @@ public class ComputeKValsAndMaxEpsilon {
 	
 	private void writeMaxEps() {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			double maxShop = Double.parseDouble(((PersonImpl)person).getDesires().getDesc().split("_")[0]);
-			double maxLeisure = Double.parseDouble(((PersonImpl)person).getDesires().getDesc().split("_")[1]);
-			this.personsMaxEpsUnscaled.putAttribute(person.getId().toString(), "s", maxShop);
-			this.personsMaxEpsUnscaled.putAttribute(person.getId().toString(), "l", maxLeisure);
+			int i = 0;
+			for (String flexibleType : this.flexibleTypes) {
+				double maxType = Double.parseDouble(((PersonImpl)person).getDesires().getDesc().split("_")[i]);
+				this.personsMaxEpsUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
+				i++;
+			}	
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxEpsUnscaled);
 		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + "personsMaxEpsUnscaled.xml");

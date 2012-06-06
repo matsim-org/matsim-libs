@@ -54,7 +54,7 @@ public class MixedControler extends Controler {
   		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
            
   		MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon, actTypeConverter);
+			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		//this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));

@@ -19,6 +19,8 @@
 
 package org.matsim.locationchoice.bestresponse.scoring;
 
+import java.util.HashSet;
+
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -40,14 +42,17 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	private Config config;
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
+	private HashSet<String> flexibleTypes;
 
 	public MixedScoringFunctionFactory(Config config, Controler controler, ScaleEpsilon scaleEpsilon,
-			ActTypeConverter actTypeConverter) {
+			ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes) {
 		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
 		this.config = config;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
+		
+		this.flexibleTypes = flexibleTypes;
 		
 		this.createObjectAttributes(Long.parseLong(config.locationchoice().getRandomSeed()));
 	}
@@ -86,11 +91,9 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, this.controler.getScenario(), this.config, this.scaleEpsilon, this.actTypeConverter);
+				seed, this.controler.getScenario(), this.config, this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
 		computer.assignKValues();
-		
-		
-		
+				
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
 	}

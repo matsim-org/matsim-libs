@@ -148,7 +148,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
 				seed, this.controler.getScenario(), this.controler.getConfig(), 
-				this.scaleEpsilon, this.actTypeConverter);
+				this.scaleEpsilon, this.actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
 		computer.run();
 		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
 		this.personsKValues = computer.getPersonsKValues();
