@@ -326,4 +326,12 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		 return JointActingTypes.PICK_UP.equals( actType ) ||
 				JointActingTypes.DROP_OFF.equals( actType ) ;
 	}
+
+	@Override
+	protected double[] getOpeningInterval(final Activity act) {
+		// this is not used here, but for some reason a check using it
+		// was introduced in the core.
+		// XXX: this is just a quick and dirty dangerous fix!
+		return new double[]{-1,-1};
+	}
 }
