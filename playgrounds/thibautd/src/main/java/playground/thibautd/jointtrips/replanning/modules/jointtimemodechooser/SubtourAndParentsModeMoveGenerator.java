@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser.JointTimeModeChooserSolution.SubtourValue;
 import playground.thibautd.tsplanoptimizer.framework.Move;
@@ -35,10 +36,15 @@ import playground.thibautd.tsplanoptimizer.framework.Value;
  */
 public class SubtourAndParentsModeMoveGenerator implements MoveGenerator {
 	private final List<Move> moves;
+	private final int nMoves;
+	private final Random random;
 
 	public SubtourAndParentsModeMoveGenerator(
+			final Random random,
 			final Solution initialSolution,
-			final Collection<String> modes) {
+			final Collection<String> modes,
+			final double fraction) {
+		this.random = random;
 		List<Move> moves = new ArrayList<Move>();
 
 		int i=0;
@@ -52,11 +58,33 @@ public class SubtourAndParentsModeMoveGenerator implements MoveGenerator {
 		}
 
 		this.moves = Collections.unmodifiableList( moves );
+
+		if (fraction < 0) {
+			nMoves = 0;
+		}
+		else if (fraction > 1) {
+			nMoves = 1;
+		}
+		else {
+			nMoves = (int) Math.ceil( fraction * moves.size() );
+		}
 	}
 
 	@Override
 	public Collection<Move> generateMoves() {
-		return moves;
+		if (nMoves == moves.size()) {
+			return moves;
+		}
+		else {
+			List<Move> possibleMoves = new ArrayList<Move>( moves );
+			List<Move> out = new ArrayList<Move>();
+
+			while (out.size() != nMoves) {
+				out.add( possibleMoves.remove( random.nextInt( possibleMoves.size() ) ) );
+			}
+
+			return out;
+		}
 	}
 }
 

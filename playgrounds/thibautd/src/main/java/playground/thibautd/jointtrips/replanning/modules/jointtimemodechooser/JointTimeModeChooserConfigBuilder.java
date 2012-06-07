@@ -21,6 +21,7 @@ package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -52,6 +53,7 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 	private final TripRouterFactory tripRouterFactory;
 	private final String outputDir;
 	private final JointTimeModeChooserConfigGroup config;
+	private final Random random;
 
 	private boolean penalizeUnsynchro = false;
 	private JointTimeModeChooserSolution internalInitialSolution = null;
@@ -63,19 +65,22 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 	 * @param tripRouterFactory
 	 */
 	public JointTimeModeChooserConfigBuilder(
+			final Random random,
 			final JointPlan plan,
 			final JointTimeModeChooserConfigGroup config,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final TripRouterFactory tripRouterFactory) {
-		this( plan , config , scoringFunctionFactory , tripRouterFactory , null );
+		this( random , plan , config , scoringFunctionFactory , tripRouterFactory , null );
 	}
 
 	public JointTimeModeChooserConfigBuilder(
+			final Random random,
 			final JointPlan plan,
 			final JointTimeModeChooserConfigGroup config,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final TripRouterFactory tripRouterFactory,
 			final String analysisOutputDir) {
+		this.random = random;
 		this.plan = plan;
 		this.config = config;
 		this.scoringFunctionFactory = scoringFunctionFactory;
@@ -148,8 +153,10 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 		if (!penalizeUnsynchro) {
 			// if synchro, just durations are optimized
 			generator.add( new SubtourAndParentsModeMoveGenerator(
+						random,
 						initialSolution,
-						config.getModes()) );
+						config.getModes(),
+						1 / 3d) );
 		}
 		configuration.setMoveGenerator( generator );
 

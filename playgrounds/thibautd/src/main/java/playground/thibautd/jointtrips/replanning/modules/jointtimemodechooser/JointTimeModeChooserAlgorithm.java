@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
@@ -44,11 +46,14 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 	private final MultiLegRoutingControler controler;
 	private final DepartureDelayAverageCalculator delay;
 	private final StatisticsCollector statsCollector;
+	private final Random random;
 
 	JointTimeModeChooserAlgorithm(
+			final Random random,
 			final StatisticsCollector statsCollector,
 			final Controler controler,
 			final DepartureDelayAverageCalculator delay ) {
+		this.random = random;
 		this.statsCollector = statsCollector;
 		this.controler = (MultiLegRoutingControler) controler;
 		this.delay = delay;
@@ -73,6 +78,7 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 			controler.getConfig().getModule( JointTimeModeChooserConfigGroup.GROUP_NAME );
 		JointTimeModeChooserConfigBuilder builder =
 			new JointTimeModeChooserConfigBuilder(
+					random,
 					jointPlan,
 					config,
 					scoringFunctionFactory,

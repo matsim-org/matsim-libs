@@ -20,6 +20,7 @@
 package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -45,7 +46,11 @@ public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new JointTimeModeChooserAlgorithm( statsCollector , controler , delay );
+		return new JointTimeModeChooserAlgorithm(
+				MatsimRandom.getLocalInstance(),
+				statsCollector,
+				controler,
+				delay );
 	}
 
 	@Override
