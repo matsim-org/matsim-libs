@@ -66,7 +66,8 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 						LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
 
 						if (leg.getMode().equals(TransportMode.car)) {
-							ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i + 1);
+							//+1/2 would be parking act/walk leg
+							ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i + 3);
 
 							startNewRandomStrategy(agent, i, activity);
 						}
@@ -85,11 +86,12 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 					if (selectedPlan.getPlanElements().get(i) instanceof LegImpl) {
 
 						LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
-						ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i + 1);
+
 
 						if (leg.getMode().equals(TransportMode.car)) {
+							ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i + 3);
 							if (!legModeActivityTypes.get(agent.getId(), i).equals(leg.getMode())
-									|| !legModeActivityTypes.get(agent.getId(), i + i).equals(activity.getType())) {
+									|| !legModeActivityTypes.get(agent.getId(), i + 3).equals(activity.getType())) {
 
 								if (legModeActivityTypes.get(agent.getId(), i).equals(TransportMode.car)) {
 									// as we changed the activity type, we must
@@ -165,7 +167,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 	private void tidyUpUnusedStrategyScores(ExperimentalBasicWithindayAgent agent, int i) {
 		Collection<ParkingStrategy> parkingStrategiesUsedInLastIteration = strategyActivityMapper.getParkingStrategies(
-				agent.getId(), legModeActivityTypes.get(agent.getId(), i + 1));
+				agent.getId(), legModeActivityTypes.get(agent.getId(), i + 3));
 
 		for (ParkingStrategy parkingStrategy : parkingStrategiesUsedInLastIteration) {
 			parkingStrategy.removeScore(agent.getId(), i);

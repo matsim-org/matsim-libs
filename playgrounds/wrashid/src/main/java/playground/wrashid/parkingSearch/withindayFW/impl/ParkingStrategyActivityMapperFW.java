@@ -31,26 +31,27 @@ import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.Parking
 
 public class ParkingStrategyActivityMapperFW implements ParkingStrategyActivityMapper {
 
-	HashMap<Id, LinkedListValueHashMap<String, ParkingStrategy>> mapping;
+	//HashMap<Id, LinkedListValueHashMap<String, ParkingStrategy>> mapping;
+	LinkedListValueHashMap<String, ParkingStrategy> mapping;
 
 	public ParkingStrategyActivityMapperFW() {
-		mapping = new HashMap<Id, LinkedListValueHashMap<String, ParkingStrategy>>();
+		mapping = new LinkedListValueHashMap<String, ParkingStrategy>();
 	}
 
 	@Override
 	public Collection<ParkingStrategy> getParkingStrategies(Id agentId, String activityType) {
-		return mapping.get(agentId).get(activityType);
+		return mapping.get(activityType);
 	}
 
 	@Override
 	public void addSearchStrategy(Id agentId, String activityType, ParkingStrategy parkingStrategy) {
-		if (!mapping.containsKey(agentId)) {
-			mapping.put(agentId, new LinkedListValueHashMap<String, ParkingStrategy>());
-		}
+//		if (!mapping.containsKey(agentId)) {
+//			mapping.put(agentId, new LinkedListValueHashMap<String, ParkingStrategy>());
+//		}
 
-		LinkedListValueHashMap<String, ParkingStrategy> linkedListValueHashMap = mapping.get(agentId);
+		//LinkedListValueHashMap<String, ParkingStrategy> linkedListValueHashMap = mapping.get(activityType);
 
-		linkedListValueHashMap.put(activityType, parkingStrategy);
+		mapping.put(activityType, parkingStrategy);
 	}
 
 }
