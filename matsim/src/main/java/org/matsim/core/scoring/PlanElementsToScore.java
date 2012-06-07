@@ -83,7 +83,9 @@ public class PlanElementsToScore implements ActivityHandler, LegHandler{
 	public void finish() {
 		for (Map.Entry<Id, Tuple<Plan, ScoringFunction>> entry : this.agentScorers.entrySet()) {
 			Plan plan = entry.getValue().getFirst();
-			logger.trace("Now scoring agent " + plan.getPerson().getId());
+			if (logger.isTraceEnabled()) {
+				logger.trace("Now scoring agent " + plan.getPerson().getId());
+			}
 			ScoringFunction sf = entry.getValue().getSecond();
 			sf.finish();
 			double score = sf.getScore();

@@ -103,7 +103,9 @@ public class ScoringFunctionAccumulator extends ScoringFunctionAdapter {
 		double score = 0.0;
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
             double contribution = basicScoringFunction.getScore();
-			log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
+			if (log.isTraceEnabled()) {
+				log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
+			}
             score += contribution;
 		}
 		return score;
