@@ -71,7 +71,7 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 				Id linkId = agent.getCurrentLinkId();
 				Id facilityId = parkingInfrastructure.getFreeParkingFacilityOnLink(linkId,null);
 				if (facilityId != null) {
-					parkingInfrastructure.reserveParking(facilityId);
+					parkingInfrastructure.parkVehicle(facilityId);
 					parkingAgentsTracker.setSelectedParking(agentId, facilityId);
 				}
 				

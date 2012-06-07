@@ -59,6 +59,7 @@ import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIReplannerFactory;
+import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchIdentifier;
@@ -215,10 +216,10 @@ public class WithinDayParkingController extends WithinDayController implements S
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
 
-		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,parkingTypes);
+		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
 		this.getEvents().addHandler(this.parkingInfrastructure);
 
-		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 2000.0);
+		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 2000.0, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 

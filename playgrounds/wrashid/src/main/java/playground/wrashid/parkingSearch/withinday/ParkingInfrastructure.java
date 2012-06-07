@@ -40,6 +40,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 
 public class ParkingInfrastructure implements ActivityStartEventHandler, ActivityEndEventHandler {
 
@@ -49,8 +50,10 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 	private final IntegerValueHashMap<Id> reservedCapcities;	// number of reserved parkings
 	private final IntegerValueHashMap<Id> facilityCapacities;	// remaining capacity
 	private final HashMap<String, HashSet<Id>> parkingTypes;
+	private final ParkingCostCalculator parkingCostCalculator;
 	
-	public ParkingInfrastructure(Scenario scenario, HashMap<String, HashSet<Id>> parkingTypes) {
+	public ParkingInfrastructure(Scenario scenario, HashMap<String, HashSet<Id>> parkingTypes, ParkingCostCalculator parkingCostCalculator) {
+		this.parkingCostCalculator = parkingCostCalculator;
 		facilityCapacities = new IntegerValueHashMap<Id>();
 		reservedCapcities = new IntegerValueHashMap<Id>();
 		facilityToLinkMapping = new HashMap<Id, Id>();
@@ -99,17 +102,21 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		/*
 		if (event.getActType().equals("parking")) {
 			reservedCapcities.decrement(event.getFacilityId());
 			facilityCapacities.increment(event.getFacilityId());
 		}
+		*/
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		/*
 		if (event.getActType().equals("parking")) {
 			facilityCapacities.increment(event.getFacilityId());
 		}
+		*/
 	}
 	
 	public int getFreeCapacity(Id facilityId) {
@@ -117,20 +124,14 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 	}
 
 	public void parkVehicle(Id facilityId) {
-		facilityCapacities.decrement(facilityId);
-	}
-
-	public void unParkVehicle(Id facilityId) {
-		facilityCapacities.increment(facilityId);
-	}
-	
-	public void reserveParking(Id facilityId) {
 		reservedCapcities.decrement(facilityId);
 	}
 
-	public void unreserveParking(Id facilityId) {
+	public void unParkVehicle(Id facilityId) {
 		reservedCapcities.increment(facilityId);
 	}
+	
+
 
 	public List<Id> getParkingsOnLink(Id linkId) {
 		return parkingFacilitiesOnLinkMapping.get(linkId);
@@ -194,6 +195,10 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 			facilityCapacities.set(facilityId, 1000);
 			reservedCapcities.set(facilityId, 0);
 		}
+	}
+
+	public ParkingCostCalculator getParkingCostCalculator() {
+		return parkingCostCalculator;
 	}
 
 }

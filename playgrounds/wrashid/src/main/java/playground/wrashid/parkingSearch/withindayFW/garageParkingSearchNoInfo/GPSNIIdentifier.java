@@ -74,7 +74,7 @@ public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitia
 				Id linkId = agent.getCurrentLinkId();
 				Id facilityId = parkingInfrastructure.getFreeParkingFacilityOnLink(linkId,"garageParking");
 				if (facilityId != null) {
-					parkingInfrastructure.reserveParking(facilityId);
+					parkingInfrastructure.parkVehicle(facilityId);
 					parkingAgentsTracker.setSelectedParking(agentId, facilityId);
 				}
 				

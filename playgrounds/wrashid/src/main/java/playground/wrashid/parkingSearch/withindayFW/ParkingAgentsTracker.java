@@ -33,9 +33,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -50,8 +52,10 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
+
 public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler,
-		MobsimInitializedListener, MobsimAfterSimStepListener {
+		MobsimInitializedListener, MobsimAfterSimStepListener, ActivityEndEventHandler {
 
 	private final Scenario scenario;
 	private final double distance;
@@ -63,6 +67,9 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 	private final Map<Id, ActivityFacility> nextActivityFacilityMap;
 	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
 	private final Map<Id, Id> selectedParkingsMap;
+	private final Map<Id, Activity> nextNonParkingActivity;
+	private final ParkingInfrastructure parkingInfrastructure;
+	private Map<Id, Id> lastParkingFacilityId;
 
 	/**
 	 * Tracks agents' car legs and check whether they have to start their
@@ -72,10 +79,12 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 	 * @param distance
 	 *            defines in which distance to the destination of a car trip an
 	 *            agent starts its parking search
+	 * @param parkingInfrastructure 
 	 */
-	public ParkingAgentsTracker(Scenario scenario, double distance) {
+	public ParkingAgentsTracker(Scenario scenario, double distance, ParkingInfrastructure parkingInfrastructure) {
 		this.scenario = scenario;
 		this.distance = distance;
+		this.parkingInfrastructure = parkingInfrastructure;
 
 		this.carLegAgents = new HashSet<Id>();
 		this.linkEnteredAgents = new HashSet<Id>();
@@ -86,6 +95,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		this.searchingAgents = new HashSet<Id>();
 		this.nextActivityFacilityMap = new HashMap<Id, ActivityFacility>();
 		this.agents = new HashMap<Id, ExperimentalBasicWithindayAgent>();
+		this.nextNonParkingActivity=new HashMap<Id, Activity>();
 	}
 
 	public Set<Id> getSearchingAgents() {
@@ -121,6 +131,9 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
+			
+			parkingInfrastructure.unParkVehicle(lastParkingFacilityId.get(event.getPersonId()));
+			
 			this.carLegAgents.add(event.getPersonId());
 
 			ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
@@ -134,6 +147,8 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 			 * activity.
 			 */
 			Activity nextNonParkingActivity = (Activity) executedPlan.getPlanElements().get(planElementIndex + 3);
+			this.getNextNonParkingActivity().put(agent.getId(), nextNonParkingActivity);
+			
 			ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities()
 					.get(nextNonParkingActivity.getFacilityId());
 			nextActivityFacilityMap.put(event.getPersonId(), facility);
@@ -204,6 +219,17 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		selectedParkingsMap.clear();
 		nextActivityFacilityMap.clear();
 		lastTimeStepsLinkEnteredAgents.clear();
+	}
+
+	public Map<Id, Activity> getNextNonParkingActivity() {
+		return nextNonParkingActivity;
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (event.getActType().equalsIgnoreCase("parking")){
+			lastParkingFacilityId.put(event.getPersonId(), event.getFacilityId());
+		}
 	}
 
 }
