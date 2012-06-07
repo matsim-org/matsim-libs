@@ -181,6 +181,10 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 		Collection<ParkingStrategy> parkingStrategies = strategyActivityMapper.getParkingStrategies(agent.getId(),
 				activity.getType());
 
+		if (parkingStrategies.size()==0){
+			System.out.println();
+		}
+		
 		int nextInt = MatsimRandom.getRandom().nextInt(parkingStrategies.size());
 
 		ParkingStrategy selectedParkingStrategy = null;

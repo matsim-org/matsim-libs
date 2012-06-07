@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.withinday;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class ParkingInfrastructure implements ActivityStartEventHandler, ActivityEndEventHandler {
 
@@ -46,8 +48,9 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 	private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
 	private final IntegerValueHashMap<Id> reservedCapcities;	// number of reserved parkings
 	private final IntegerValueHashMap<Id> facilityCapacities;	// remaining capacity
-
-	public ParkingInfrastructure(Scenario scenario) {
+	private final HashMap<String, HashSet<Id>> parkingTypes;
+	
+	public ParkingInfrastructure(Scenario scenario, HashMap<String, HashSet<Id>> parkingTypes) {
 		facilityCapacities = new IntegerValueHashMap<Id>();
 		reservedCapcities = new IntegerValueHashMap<Id>();
 		facilityToLinkMapping = new HashMap<Id, Id>();
@@ -90,6 +93,8 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 				facilityToLinkMapping.put(facility.getId(), facility.getLinkId());
 			}
 		}
+		
+		this.parkingTypes=parkingTypes;
 	}
 
 	@Override
@@ -131,13 +136,22 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		return parkingFacilitiesOnLinkMapping.get(linkId);
 	}
 
-	public Id getFreeParkingFacilityOnLink(Id linkId) {
+	public Id getFreeParkingFacilityOnLink(Id linkId, String parkingType) {
+		HashSet<Id> parkings=null;
+		if (parkingTypes!=null){
+			parkings = parkingTypes.get(parkingType);
+		}
+		
 		List<Id> list = getParkingsOnLink(linkId);
 		if (list == null) return null;
 		else {
 			int maxCapacity = 0;
 			Id facilityId = null;
 			for (Id id : list) {
+				if (parkings!=null && !parkings.contains(id)){
+					continue;
+				}
+				
 				int capacity = facilityCapacities.get(id);
 				int reserved = reservedCapcities.get(id);
 				if ((capacity - reserved) > maxCapacity) facilityId = id;

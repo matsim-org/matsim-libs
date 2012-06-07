@@ -18,19 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withinday.t1;
+package playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
-public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
+import playground.wrashid.parkingSearch.withindayFW.ParkingAgentsTracker;
+
+public class GPSNIReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	
-	public RandomSearchReplannerFactory(ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
+	public GPSNIReplannerFactory(ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
 			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		
@@ -39,8 +41,8 @@ public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFac
 	}
 
 	@Override
-	public RandomSearchReplanner createReplanner() {
-		RandomSearchReplanner replanner = new RandomSearchReplanner(super.getId(), scenario, 
+	public GPSNIReplanner createReplanner() {
+		GPSNIReplanner replanner = new GPSNIReplanner(super.getId(), scenario, 
 				this.getReplanningManager().getInternalInterface(), parkingAgentsTracker);
 		super.initNewInstance(replanner);
 		return replanner;

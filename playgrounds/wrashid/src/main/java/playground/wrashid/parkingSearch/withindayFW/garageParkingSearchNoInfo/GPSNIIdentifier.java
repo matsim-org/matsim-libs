@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withinday.t1;
+package playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,13 +34,16 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
-public class RandomSearchIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
+import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.ParkingAgentsTracker;
+
+public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
 	
 	private final ParkingAgentsTracker parkingAgentsTracker;
-	private final ParkingInfrastructureT1 parkingInfrastructure;
+	private final ParkingInfrastructure parkingInfrastructure;
 	private final Map<Id, PlanBasedWithinDayAgent> agents;
 	
-	public RandomSearchIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureT1 parkingInfrastructure) {
+	public GPSNIIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
 		this.parkingInfrastructure = parkingInfrastructure;
 		
@@ -69,7 +72,7 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 			 */
 			if (requiresReplanning(agent)) {
 				Id linkId = agent.getCurrentLinkId();
-				Id facilityId = parkingInfrastructure.getFreeParkingFacilityOnLink(linkId);
+				Id facilityId = parkingInfrastructure.getFreeParkingFacilityOnLink(linkId,"garageParking");
 				if (facilityId != null) {
 					parkingInfrastructure.reserveParking(facilityId);
 					parkingAgentsTracker.setSelectedParking(agentId, facilityId);

@@ -29,11 +29,15 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
+import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyManager;
+
 public class ParkingAgentsTrackerFW implements MobsimInitializedListener {
 
 	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
+	private final ParkingStrategyManager parkingStrategyManager;
 	
-	public ParkingAgentsTrackerFW() {
+	public ParkingAgentsTrackerFW(ParkingStrategyManager parkingStrategyManager) {
+		this.parkingStrategyManager = parkingStrategyManager;
 		this.agents = new HashMap<Id, ExperimentalBasicWithindayAgent>();
 	}
 	

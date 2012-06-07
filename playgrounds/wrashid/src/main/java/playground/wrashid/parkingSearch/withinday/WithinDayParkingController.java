@@ -120,7 +120,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
 		
-		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData);
+		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,null);
 		this.getEvents().addHandler(this.parkingInfrastructure);
 		
 		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 2000.0);

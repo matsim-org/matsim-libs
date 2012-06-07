@@ -31,6 +31,9 @@ import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.Parking
 
 public class ParkingStrategyActivityMapperFW implements ParkingStrategyActivityMapper {
 
+	// TODO: in this mapping, for all people the same strategy is applied for the same kind
+	// of activity. We need to make a scond class also, which makes individual mappings
+	
 	//HashMap<Id, LinkedListValueHashMap<String, ParkingStrategy>> mapping;
 	LinkedListValueHashMap<String, ParkingStrategy> mapping;
 
