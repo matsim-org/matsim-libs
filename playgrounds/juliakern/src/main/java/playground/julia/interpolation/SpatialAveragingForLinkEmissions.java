@@ -114,7 +114,7 @@ public class SpatialAveragingForLinkEmissions {
 	static double yMax = 5345696.81;
 
 	// define all relevant parameters
-	final int noOfTimeBins = 60; //was 60
+	final int noOfTimeBins = 15; //was 60 corresponds to 30 min
 	final int noOfXbins = 160; //was 160
 	final int noOfYbins = 120; //was 120
 	final int minimumNoOfLinksInCell = 0;
@@ -280,24 +280,28 @@ public class SpatialAveragingForLinkEmissions {
 			double yDist=(yMax-yMin)/noOfYbins;
 			
 			//first line containing coordinates
-			for(int i=0; i<sumOfweightedValuesForCell[0].length;i++){
+			for(int i=0; i<sumOfweightedValuesForCell.length;i++){
 				valueString+=Double.toString(yMin+i*yDist)+"\t";
 			}
 			buffW.write(valueString);
 			buffW.newLine();
 			valueString="";
 			
-			for(int i = 0; i< sumOfweightedValuesForCell.length; i++){
+			//array[160][120]
+			//outputdatei mit 160 zeilen
+			for(int i = 0; i< sumOfweightedValuesForCell[0].length; i++){
 				//coordinates as header
 				valueString+=Double.toString(xMin+i*xDist)+"\t";
 				
 				//table contents
-				for(int j = 0; j<sumOfweightedValuesForCell[0].length; j++){
+				for(int j=0; j<sumOfweightedValuesForCell.length; j++){ 
 					try {
 						valueString+=Double.toString(sumOfweightedValuesForCell[j][i])+"\t"; 
 					} catch (Exception e) {
-						//if the array wasnt initialized at [i][j] use 0.0
+						//if the array was not initialized at [i][j] use 0.0
 						valueString+="0.0"+"\t";
+						//alternative, TODO check if R handles this correctly
+						//valueString+="NA"+"\t";
 					}
 				}
 				//write line + line break
@@ -594,14 +598,12 @@ public class SpatialAveragingForLinkEmissions {
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		System.out.println(configFile);
 		configReader.readFile(configFile);
 		Integer lastIteration = config.controler().getLastIteration();
 		return lastIteration;
 	}
 
 	public static void main(String[] args) throws IOException{
-		System.out.println(lastIteration1+"  "+lastIteration2);
 		new SpatialAveragingForLinkEmissions().run();
 	}
 }
