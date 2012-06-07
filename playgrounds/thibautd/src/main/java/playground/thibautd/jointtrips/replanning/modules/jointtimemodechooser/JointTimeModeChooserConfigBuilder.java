@@ -33,13 +33,11 @@ import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.EvolutionPlotter;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
+import playground.thibautd.tsplanoptimizer.framework.NullMoveChecker;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.SolutionTabuList;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
-import playground.thibautd.tsplanoptimizer.timemodechooser.AllPossibleModesMovesGenerator;
 import playground.thibautd.tsplanoptimizer.timemodechooser.DirectionTabuList;
 import playground.thibautd.tsplanoptimizer.timemodechooser.FixedStepsIntegerMovesGenerator;
-import playground.thibautd.tsplanoptimizer.timemodechooser.ModeMovesTabuList;
 
 /**
  * @author thibautd
@@ -158,7 +156,8 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 		CompositeTabuChecker tabuChecker = new CompositeTabuChecker();
 		tabuChecker.add( new DirectionTabuList( nTabu ) );
 		tabuChecker.add( new JointInvalidValueChecker() );
-		tabuChecker.add( new SolutionTabuList( nTabu ) );
+		tabuChecker.add( new ModeChainTabuList( nTabu ) );
+		tabuChecker.add( new NullMoveChecker() );
 		configuration.setTabuChecker( tabuChecker );
 
 		if (outputDir != null) {
