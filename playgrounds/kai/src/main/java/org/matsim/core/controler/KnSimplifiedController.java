@@ -123,7 +123,34 @@ public class KnSimplifiedController extends AbstractController {
 		this.events.addHandler(legTimes);
 
 	}
-	
+	/**
+	 * The order how the listeners are added is very important! As
+	 * dependencies between different listeners exist or listeners may read
+	 * and write to common variables, the order is important. Example: The
+	 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
+	 * turn is used by the PlansScoring-Listener.
+	 * <br/>
+	 * IMPORTANT: The execution order is reverse to the order the listeners
+	 * are added to the list.
+	 */
+	private void loadCoreListeners() {
+
+		this.controlerListenerManager.addControlerListener(buildPlansScoring());
+		
+		StrategyManager strategyManager = buildStrategyManager() ;
+		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
+
+		final PlansDumping plansDumping = new PlansDumping( this.scenarioData, this.config.controler().getFirstIteration(), 
+				this.config.controler().getWritePlansInterval(), this.stopwatch, this.controlerIO );
+		this.controlerListenerManager.addCoreControlerListener(plansDumping);
+
+		final EventsHandling eventsHandling = new EventsHandling(this.events,
+				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
+				this.controlerIO, this.legTimes );
+		this.controlerListenerManager.addCoreControlerListener(eventsHandling); 
+		// must be last being added (=first being executed)
+	}
+
 	private void doIterations() {
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
@@ -179,34 +206,10 @@ public class KnSimplifiedController extends AbstractController {
 	// ############################################################################################################################
 	//	stuff that is related to the configuration of matsim  	
 	
-	/**
-	 * The order how the listeners are added is very important! As
-	 * dependencies between different listeners exist or listeners may read
-	 * and write to common variables, the order is important. Example: The
-	 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
-	 * turn is used by the PlansScoring-Listener.
-	 * <br/>
-	 * IMPORTANT: The execution order is reverse to the order the listeners
-	 * are added to the list.
-	 */
-	private void loadCoreListeners() {
-
+	private PlansScoring buildPlansScoring() {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
 		final PlansScoring plansScoring = new PlansScoring( this.scenarioData, this.events, scoringFunctionFactory );
-		this.controlerListenerManager.addControlerListener(plansScoring);
-		
-		StrategyManager strategyManager = buildStrategyManager() ;
-		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
-
-		final PlansDumping plansDumping = new PlansDumping( this.scenarioData, this.config.controler().getFirstIteration(), 
-				this.config.controler().getWritePlansInterval(), this.stopwatch, this.controlerIO );
-		this.controlerListenerManager.addCoreControlerListener(plansDumping);
-
-		final EventsHandling eventsHandling = new EventsHandling(this.events,
-				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
-				this.controlerIO, this.legTimes );
-		this.controlerListenerManager.addCoreControlerListener(eventsHandling); 
-		// must be last being added (=first being executed)
+		return plansScoring;
 	}
 
 	private StrategyManager buildStrategyManager() {
