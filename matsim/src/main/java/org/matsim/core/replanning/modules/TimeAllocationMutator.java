@@ -21,7 +21,6 @@
 package org.matsim.core.replanning.modules;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -64,7 +63,9 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 //		}
 
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
-		Assert.assertNotNull(this.mutationRange) ;
+		if ( this.mutationRange==null ) {
+			throw new RuntimeException("found mutationRange==null; don't know what that means; throwing exception ...") ;
+		}
 
 		if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
 			useActivityDurations = true ;
