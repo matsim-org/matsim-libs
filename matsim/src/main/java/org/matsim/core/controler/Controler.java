@@ -21,24 +21,18 @@
 package org.matsim.core.controler;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.Loader;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
@@ -58,13 +52,13 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
@@ -74,8 +68,6 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
@@ -170,7 +162,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
  * 
  * @author mrieser
  */
-public class Controler {
+public class Controler extends AbstractController {
 
 	public static final String DIRECTORY_ITERS = "ITERS";
 	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
@@ -203,7 +195,6 @@ public class Controler {
 	private final String configFileName;
 	private final String dtdFileName;
 
-	protected EventsManagerImpl events = null;
 	protected Network network = null;
 	protected Population population = null;
 	private Counts counts = null;
@@ -230,17 +221,11 @@ public class Controler {
 	private boolean dumpDataAtEnd = true;
 
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
-	final protected ScenarioImpl scenarioData;
 	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
-	/**
-	 * This variable is used to store the log4j output before it can be written
-	 * to a file. This is needed to set the output directory before logging.
-	 */
-	private CollectLogMessagesAppender collectLogMessagesAppender = null;
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 	/**
@@ -254,16 +239,7 @@ public class Controler {
 	private final ControlerListenerManager controlerListenerManager = new ControlerListenerManager(
 			this);
 
-	private static final Logger log = Logger.getLogger(Controler.class);
-
 	private final List<MobsimListener> simulationListener = new ArrayList<MobsimListener>();
-
-	private Thread shutdownHook = new Thread() {
-		@Override
-		public void run() {
-			shutdown(true);
-		}
-	};
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 	private MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
@@ -280,27 +256,6 @@ public class Controler {
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 	// for tests
-
-	/** initializes Log4J */
-	static {
-		final String logProperties = "log4j.xml";
-		URL url = Loader.getResource(logProperties);
-		if (url != null) {
-			PropertyConfigurator.configure(url);
-		} else {
-			Logger root = Logger.getRootLogger();
-			root.setLevel(Level.INFO);
-			ConsoleAppender consoleAppender = new ConsoleAppender(DEFAULTLOG4JLAYOUT, "System.out");
-			consoleAppender.setName("A1");
-			root.addAppender(consoleAppender);
-			consoleAppender.setLayout(DEFAULTLOG4JLAYOUT);
-			log.error("");
-			log.error("Could not find configuration file " + logProperties + " for Log4j in the classpath.");
-			log.error("A default configuration is used, setting log level to INFO with a ConsoleAppender.");
-			log.error("");
-			log.error("");
-		}
-	}
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
@@ -329,26 +284,10 @@ public class Controler {
 	}
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config, final Scenario scenario) {
-		// catch logs before doing something
-		this.collectLogMessagesAppender = new CollectLogMessagesAppender();
-		Logger.getRootLogger().addAppender(this.collectLogMessagesAppender);
-		Gbl.printSystemInfo();
-		Gbl.printBuildInfo();
-		log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
+		super() ;
+
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
-
-		// make sure we know about any exceptions that lead to abortion of the
-		// program
-		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-
-			@Override
-			public void uncaughtException(Thread t, Throwable e) {
-				log.warn("Getting uncaught Exception in Thread " + t.getName(), e);
-				Controler.this.uncaughtException = e;
-			}
-
-		});
 
 		// now do other stuff
 		if (scenario != null) {
@@ -374,7 +313,6 @@ public class Controler {
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
 		
-		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 	}
 
 	/**
@@ -442,30 +380,6 @@ public class Controler {
 		// transit-enabled mobsim. kai, nov'11
 	}
 
-	/**
-	 * select if single cpu handler to use or parallel
-	 */
-	private void initEvents() {
-		final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
-		final String NUMBER_OF_THREADS = "numberOfThreads";
-		final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
-		String numberOfThreads = this.config.findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
-		String estimatedNumberOfEvents = this.config.findParam(PARALLEL_EVENT_HANDLING, ESTIMATED_NUMBER_OF_EVENTS);
-
-		if (numberOfThreads != null) {
-			int numOfThreads = Integer.parseInt(numberOfThreads);
-			// the user wants to user parallel events handling
-			if (estimatedNumberOfEvents != null) {
-				int estNumberOfEvents = Integer.parseInt(estimatedNumberOfEvents);
-				this.events = new ParallelEventsManagerImpl(numOfThreads, estNumberOfEvents);
-			} else {
-				this.events = new ParallelEventsManagerImpl(numOfThreads);
-			}
-		} else {
-			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
-		}
-	}
-
 	private void doIterations() {
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
@@ -517,6 +431,7 @@ public class Controler {
 		this.iteration = null;
 	}
 
+	@Override
 	protected void shutdown(final boolean unexpected) {
 		ControlerState oldState = this.state;
 		this.state = ControlerState.Shutdown;
@@ -675,22 +590,6 @@ public class Controler {
 	 * private methods
 	 * ===================================================================
 	 */
-
-	/**
-	 * Initializes log4j to write log output to files in output directory.
-	 */
-	private void initLogging() {
-		Logger.getRootLogger().removeAppender(this.collectLogMessagesAppender);
-		try {
-			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), 
-					this.collectLogMessagesAppender.getLogEvents(), this.config.controler().getRunId());
-			this.collectLogMessagesAppender.close();
-			this.collectLogMessagesAppender = null;
-		} catch (IOException e) {
-			log.error("Cannot create logfiles: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Loads the configuration object with the correct settings.
