@@ -23,6 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -57,7 +58,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
-	public PersonPrepareForSim(final PlanAlgorithm router, final ScenarioImpl scenario) {
+	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
 		super();
 		this.router = router;
 		this.network = scenario.getNetwork();
@@ -70,7 +71,13 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
 		}
-		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
+		if ( scenario instanceof ScenarioImpl ) {
+			// yy not great.  but I found it such that it would always a ScenarioImpl, which is unnecessary since XY2Links can
+			// handle activity facilities being a null reference.  kai, jun'12
+			this.xy2links = new XY2Links(net, ((ScenarioImpl)scenario).getActivityFacilities());
+		} else {
+			this.xy2links = new XY2Links(net, null );
+		}
 	}
 	
 	@Deprecated
