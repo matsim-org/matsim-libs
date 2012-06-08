@@ -20,9 +20,6 @@
 
 package org.matsim.core.controler;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -46,7 +43,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -65,9 +61,6 @@ import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -92,12 +85,7 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.EnsureActivityReach
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.NonCarRouteDropper;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.StrategyManager;
@@ -123,13 +111,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
-import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.knowledges.Knowledges;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.VspPlansCleaner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -171,19 +154,14 @@ public class Controler extends AbstractController {
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
 
-	private enum ControlerState {
+	enum ControlerState {
 		Init, Running, Shutdown, Finished
 	}
-
-	private ControlerState state = ControlerState.Init;
-
-	private String outputPath = null;
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	private boolean overwriteFiles = false;
-	private Integer iteration = null;
+	Integer iteration = null;
 
 	/** The Config instance the Controler uses. */
 	protected final Config config;
@@ -213,8 +191,6 @@ public class Controler extends AbstractController {
 	/* package */VolumesAnalyzer volumes = null;
 
 	private boolean createGraphs = true;
-	private boolean dumpDataAtEnd = true;
-
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
 	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
@@ -227,21 +203,12 @@ public class Controler extends AbstractController {
 	 * Attribute for the routing factory
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	/**
-	 * This instance encapsulates all behavior concerning the
-	 * ControlerEvents/Listeners
-	 */
-	private final ControlerListenerManager controlerListenerManager = new ControlerListenerManager(
-			this);
-
 	private final List<MobsimListener> simulationListener = new ArrayList<MobsimListener>();
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 	private MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
 
 	private TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
-	private ControlerIO controlerIO;
-
 	private MobsimFactory mobsimFactory = null;
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
@@ -280,6 +247,8 @@ public class Controler extends AbstractController {
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config, final Scenario scenario) {
 		super() ;
+		
+		this.controlerListenerManager = new ControlerListenerManager(this) ;
 
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
@@ -398,7 +367,7 @@ public class Controler extends AbstractController {
 			this.stopwatch.setCurrentIteration(this.iteration);
 			this.stopwatch.beginOperation("iteration");
 			makeIterationPath(this.iteration);
-			resetRandomNumbers();
+			resetRandomNumbers(this.iteration);
 
 			this.controlerListenerManager
 			.fireControlerIterationStartsEvent(this.iteration);
@@ -409,7 +378,7 @@ public class Controler extends AbstractController {
 			}
 			this.controlerListenerManager.fireControlerBeforeMobsimEvent(this.iteration);
 			this.stopwatch.beginOperation("mobsim");
-			resetRandomNumbers();
+			resetRandomNumbers(this.iteration);
 			runMobSim();
 			this.stopwatch.endOperation("mobsim");
 			log.info(marker + "ITERATION " + this.iteration + " fires after mobsim event");
@@ -424,76 +393,6 @@ public class Controler extends AbstractController {
 			log.info(divider);
 		}
 		this.iteration = null;
-	}
-
-	@Override
-	protected void shutdown(final boolean unexpected) {
-		ControlerState oldState = this.state;
-		this.state = ControlerState.Shutdown;
-		if (oldState == ControlerState.Running) {
-			if (unexpected) {
-				log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
-			} else {
-				log.info("S H U T D O W N   ---   start regular shutdown.");
-			}
-			if (this.uncaughtException != null) {
-				log.warn(
-						"Shutdown probably caused by the following Exception.", this.uncaughtException);
-			}
-			this.controlerListenerManager
-			.fireControlerShutdownEvent(unexpected);
-			if (this.dumpDataAtEnd) {
-				// dump plans
-				Knowledges kk ;
-				if ( this.config.scenario().isUseKnowledges()) {
-					kk = (this.getScenario()).getKnowledges();
-				} else {
-					kk = this.getScenario().retrieveNotEnabledKnowledges() ;
-				}
-				new PopulationWriter(this.population, this.network, kk).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
-				// dump network
-				new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
-				// dump config
-				new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(FILENAME_CONFIG));
-				// dump facilities
-				ActivityFacilities facilities = this.getFacilities();
-				if (facilities != null) {
-					new FacilitiesWriter((ActivityFacilitiesImpl) facilities)
-					.write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
-				}
-				if (((NetworkFactoryImpl) this.network.getFactory()).isTimeVariant()) {
-					new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"),
-							((NetworkImpl) this.network).getNetworkChangeEvents());
-				}
-				if (this.config.scenario().isUseHouseholds()) {
-					new HouseholdsWriterV10(this.scenarioData.getHouseholds())
-					.writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
-				}
-				if (this.config.scenario().isUseLanes()) {
-					new LaneDefinitionsWriter20(
-							this.scenarioData.getScenarioElement(LaneDefinitions20.class)).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
-				}
-				if (!unexpected	&& this.getConfig().vspExperimental().isWritingOutputEvents()) {
-					File toFile = new File(	this.controlerIO.getOutputFilename("output_events.xml.gz"));
-					File fromFile = new File(this.controlerIO.getIterationFilename(this.getLastIteration(), "events.xml.gz"));
-					IOUtils.copyFile(fromFile, toFile);
-				}
-			}
-			if (unexpected) {
-				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
-			} else {
-				log.info("S H U T D O W N   ---   regular shutdown completed.");
-			}
-			try {
-				Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
-			} catch (IllegalStateException e) {
-				log.info("Cannot remove shutdown hook. " + e.getMessage());
-			}
-			this.shutdownHook = null; // important for test cases to free the
-			// memory
-			this.collectLogMessagesAppender = null;
-			IOUtils.closeOutputDirLogging();
-		}
 	}
 
 	/**
@@ -611,86 +510,6 @@ public class Controler extends AbstractController {
 		if (this.writePlansInterval == -1) {
 			this.writePlansInterval = this.config.controler()
 					.getWritePlansInterval();
-		}
-	}
-
-	/**
-	 * Design decisions:
-	 * <ul>
-	 * <li>I extracted this method since it is now called <i>twice</i>: once
-	 * directly after reading, and once before the iterations start. The second
-	 * call seems more important, but I wanted to leave the first one there in
-	 * case the program fails before that config dump. Might be put into the
-	 * "unexpected shutdown hook" instead. kai, dec'10
-	 * </ul>
-	 * 
-	 * @param message
-	 *            the message that is written just before the config dump
-	 */
-	private void checkConfigConsistencyAndWriteToLog(final String message) {
-		log.info(message);
-		String newline = System.getProperty("line.separator");// use native line endings for logfile
-		StringWriter writer = new StringWriter();
-		new ConfigWriter(this.config).writeStream(new PrintWriter(writer), newline);
-		log.info(newline + newline + writer.getBuffer().toString());
-		log.info("Complete config dump done.");
-		log.info("Checking consistency of config...");
-		this.config.checkConsistency();
-		log.info("Checking consistency of config done.");
-	}
-
-	private final void setUpOutputDir() {
-		this.outputPath = this.config.controler().getOutputDirectory();
-		if (this.outputPath.endsWith("/")) {
-			this.outputPath = this.outputPath.substring(0, this.outputPath.length() - 1);
-		}
-		if (this.config.controler().getRunId() != null) {
-			this.controlerIO = new ControlerIO(this.outputPath, this.scenarioData.createId(this.config.controler().getRunId()));
-		} else {
-			this.controlerIO = new ControlerIO(this.outputPath);
-		}
-
-		// make the tmp directory
-		File outputDir = new File(this.outputPath);
-		if (outputDir.exists()) {
-			if (outputDir.isFile()) {
-				throw new RuntimeException("Cannot create output directory. "
-						+ this.outputPath + " is a file and cannot be replaced by a directory.");
-			}
-			if (outputDir.list().length > 0) {
-				if (this.overwriteFiles) {
-					System.out.flush();
-					log.warn("###########################################################");
-					log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
-					log.warn("### " + this.outputPath);
-					log.warn("###########################################################");
-					System.err.flush();
-				} else {
-					// the directory is not empty, we do not overwrite any
-					// files!
-					throw new RuntimeException(
-							"The output directory " + this.outputPath
-							+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
-				}
-			}
-		} else {
-			if (!outputDir.mkdirs()) {
-				throw new RuntimeException(
-						"The output directory path " + this.outputPath
-						+ " could not be created. Check pathname and permissions!");
-			}
-		}
-
-		File tmpDir = new File(this.controlerIO.getTempPath());
-		if (!tmpDir.mkdir() && !tmpDir.exists()) {
-			throw new RuntimeException("The tmp directory "
-					+ this.controlerIO.getTempPath() + " could not be created.");
-		}
-		File itersDir = new File(this.outputPath + "/" + DIRECTORY_ITERS);
-		if (!itersDir.mkdir() && !itersDir.exists()) {
-			throw new RuntimeException("The iterations directory "
-					+ (this.outputPath + "/" + DIRECTORY_ITERS)
-					+ " could not be created.");
 		}
 	}
 
@@ -818,41 +637,6 @@ public class Controler extends AbstractController {
 		}
 
 	}
-
-	/**
-	 * Creates the path where all iteration-related data should be stored.
-	 * 
-	 * @param iteration
-	 */
-	private void makeIterationPath(final int iteration) {
-		File dir = new File(this.controlerIO.getIterationPath(iteration));
-		if (!dir.mkdir()) {
-			if (this.overwriteFiles && dir.exists()) {
-				log.info("Iteration directory "
-						+ this.controlerIO.getIterationPath(iteration)
-						+ " exists already.");
-			} else {
-				log.warn("Could not create iteration directory "
-						+ this.controlerIO.getIterationPath(iteration) + ".");
-			}
-		}
-	}
-
-	private void resetRandomNumbers() {
-		MatsimRandom.reset(this.config.global().getRandomSeed()
-				+ this.iteration);
-		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
-		// "not-randomness" is the first
-		// draw...
-		// Fixme [kn] this should really be ten thousand draws instead of just
-		// one
-	}
-
-	/*
-	 * ===================================================================
-	 * protected methods for overwriting
-	 * ===================================================================
-	 */
 
 	/* package */Mobsim getNewMobsim() {
 		if (this.mobsimFactory != null) {
