@@ -52,11 +52,11 @@ public class WithinDayQSimFactory implements MobsimFactory {
 		this.replanningManager = replanningManager;
 	}
 	
-    public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events) {
+    private static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events) {
         return createWithinDayQSim(scenario, events, new DefaultQSimEngineFactory());
     }
 
-    public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events, QNetsimEngineFactory factory) {
+    private static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events, QNetsimEngineFactory factory) {
         QSim qSim1 = new QSim(scenario, events);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim1.addMobsimEngine(activityEngine);

@@ -135,7 +135,8 @@ class MyWithinDayControler extends Controler {
 		createHandlersAndListeners();
 		// initializes "replanningManager"
 
-		sim = WithinDayQSimFactory.createWithinDayQSim(this.scenarioData, this.events);
+		sim = new WithinDayQSimFactory(replanningManager).createMobsim(this.scenarioData, this.events);
+		
 		// a QSim with two differences:
 		// (1) uses WithinDayAgentFactory instead of the regular agent factory
 		// (2) offers "rescheduleActivityEnd" although I am not sure that this is still needed (after some modifications
