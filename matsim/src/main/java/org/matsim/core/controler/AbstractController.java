@@ -193,7 +193,9 @@ public abstract class AbstractController {
 		}
 	}
 
-	protected final void shutdown(final boolean unexpected) {
+	public final void shutdown(final boolean unexpected) {
+		// yyyy needs to be public since some people are using it from the outside (???).  kai, jun'12
+		
 		ControlerState oldState = this.state;
 		this.state = ControlerState.Shutdown;
 		if (oldState == ControlerState.Running) {

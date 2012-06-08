@@ -63,11 +63,13 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(0);
 
 		// test smaller value than default
-		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "900");
+//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "900");
+		config.timeAllocationMutator().setMutationRange( 900. ) ;
 		runMutationRangeTest(new TimeAllocationMutator(config), 900);
 
 		// test bigger value than default
-		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
+//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
+		config.timeAllocationMutator().setMutationRange(2700.) ;
 		runMutationRangeTest(new TimeAllocationMutator(config), 2700);
 	}
 
@@ -84,7 +86,12 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		runMutationRangeTest(new TimeAllocationMutator(config, 750), 750);
 
 		// test bigger value than default
-		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
+
+		// I found the following line.  presumably, it deliberately sets the config to a different value
+		// than what is used in the constructor.  ???  kai, jun'12
+//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
+		config.timeAllocationMutator().setMutationRange(2700.) ;
+		
 		runMutationRangeTest(new TimeAllocationMutator(config, 7200), 7200);
 	}
 

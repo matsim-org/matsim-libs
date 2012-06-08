@@ -39,11 +39,15 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
-	private final int mutationRange;
+	private final Double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations;
 
 	public PlanMutateTimeAllocation(final int mutationRange, final Random random) {
+		this.mutationRange = new Double(mutationRange);
+		this.random = random;
+	}
+	public PlanMutateTimeAllocation(final Double mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
 		this.random = random;
 	}

@@ -21,6 +21,7 @@
 package org.matsim.core.replanning.modules;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -38,12 +39,12 @@ import org.matsim.population.algorithms.PlanMutateTimeAllocation;
  */
 public class TimeAllocationMutator extends AbstractMultithreadedModule {
 
-	public final static String CONFIG_GROUP = "TimeAllocationMutator";
-	public final static String CONFIG_MUTATION_RANGE = "mutationRange";
+//	public final static String CONFIG_GROUP = "TimeAllocationMutator";
+//	public final static String CONFIG_MUTATION_RANGE = "mutationRange";
 
 	private final static Logger log = Logger.getLogger(TimeAllocationMutator.class);
 
-	private int mutationRange = 1800;
+	private Double mutationRange = null;
 	private boolean useActivityDurations = true;
 
 	/**
@@ -54,13 +55,17 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	 */
 	public TimeAllocationMutator(Config config) {
 		super(config.global());
-		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
-		if (range == null) {
-			log.info("No mutation range defined in the config file. Using default of " + mutationRange + " sec.");
-		} else {
-			this.mutationRange = Integer.parseInt(range);
-			log.info("mutation range = " + this.mutationRange);
-		}
+//		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
+//		if (range == null) {
+//			log.info("No mutation range defined in the config file. Using default of " + mutationRange + " sec.");
+//		} else {
+//			this.mutationRange = Integer.parseInt(range);
+//			log.info("mutation range = " + this.mutationRange);
+//		}
+
+		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
+		Assert.assertNotNull(this.mutationRange) ;
+
 		if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
 			useActivityDurations = true ;
 		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
@@ -78,6 +83,10 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	 * @param mutationRange
 	 */
 	public TimeAllocationMutator(Config config, final int mutationRange) {
+		super(config.global());
+		this.mutationRange = new Double(mutationRange);
+	}
+	public TimeAllocationMutator(Config config, final Double mutationRange) {
 		super(config.global());
 		this.mutationRange = mutationRange;
 	}

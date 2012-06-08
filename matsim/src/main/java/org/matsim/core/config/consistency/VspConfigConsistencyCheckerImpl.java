@@ -73,7 +73,14 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			log.warn("did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
 		
+		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
+//			problem = true ;
+			log.warn("timeAllocationMutator mutationRange < 7200; vsp defaults is 7200.  This will be more strictly" +
+					" enforced in the future.") ;
+		}
+		
 		// pseudo-pt über Distanz, nicht ptSpeedFactor
+		// todo
 		
 		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 

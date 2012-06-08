@@ -48,6 +48,7 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.pt.config.PtCountsConfigGroup;
@@ -97,6 +98,7 @@ public class Config {
 	private TransitRouterConfigGroup transitRouter = null;
 	private LinkStatsConfigGroup linkStats = null;
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
+	private TimeAllocationMutatorConfigGroup timeAllocationMutator = null ;
 
 	// config groups that are elsewhere:
 	private OTFVisConfigGroup otfVis = null;
@@ -104,6 +106,7 @@ public class Config {
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
+
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
@@ -172,6 +175,9 @@ public class Config {
 
 		this.plansCalcRoute = new PlansCalcRouteConfigGroup();
 		this.modules.put(PlansCalcRouteConfigGroup.GROUP_NAME, this.plansCalcRoute);
+		
+		this.timeAllocationMutator = new TimeAllocationMutatorConfigGroup() ;
+		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, this.timeAllocationMutator ) ;
 
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
@@ -488,6 +494,10 @@ public class Config {
 	
 	public LinkStatsConfigGroup linkStats() {
 		return this.linkStats;
+	}
+	
+	public TimeAllocationMutatorConfigGroup timeAllocationMutator(){
+		return this.timeAllocationMutator ;
 	}
 
 	// typed adders:

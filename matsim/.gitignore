@@ -5,3 +5,4 @@ bin
 .settings
 bin
 target
+/test
