@@ -94,6 +94,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		Collection<ParkingStrategy> parkingStrategies = new LinkedList<ParkingStrategy>();
 		ParkingStrategyManager parkingStrategyManager = new ParkingStrategyManager(parkingStrategyActivityMapperFW,
 				parkingStrategies);
+		parkingAgentsTracker.setParkingStrategyManager(parkingStrategyManager);
 
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(
 				this.config.planCalcScore()));

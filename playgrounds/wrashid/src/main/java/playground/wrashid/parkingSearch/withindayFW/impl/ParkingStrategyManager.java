@@ -127,7 +127,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 											}
 										}
 
-										currentlySelectedParkingStrategies.put(agent.getId(), i, selectedParkingStrategy);
+										getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
 								}
 							}
 						} else {
@@ -162,7 +162,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			}
 		}
 
-		currentlySelectedParkingStrategies.put(agent.getId(), i, selectedParkingStrategy);
+		getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
 	}
 
 	private void tidyUpUnusedStrategyScores(ExperimentalBasicWithindayAgent agent, int i) {
@@ -174,7 +174,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 		}
 
-		currentlySelectedParkingStrategies.removeValue(agent.getId(), i);
+		getCurrentlySelectedParkingStrategies().removeValue(agent.getId(), i);
 	}
 
 	private void startNewRandomStrategy(ExperimentalBasicWithindayAgent agent, int i, ActivityImpl activity) {
@@ -196,7 +196,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			}
 		}
 
-		currentlySelectedParkingStrategies.put(agent.getId(), i, selectedParkingStrategy);
+		getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
 	}
 
 	// we only handle the cases here, which do not make any sense anymore
@@ -222,6 +222,10 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		this.iteration = event.getIteration();
+	}
+
+	public TwoHashMapsConcatenated<Id, Integer, ParkingStrategy> getCurrentlySelectedParkingStrategies() {
+		return currentlySelectedParkingStrategies;
 	}
 
 }

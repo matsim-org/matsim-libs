@@ -122,7 +122,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		// initialize routes
 		new PersonPrepareForSim(plansAlgorithm, (ScenarioImpl) sc).run(sc.getPopulation());
 
-		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc);
+		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc,null,null);
 		InsertParkingActivities insertParkingActivities = new InsertParkingActivities(sc, plansAlgorithm, parkingInfrastructure);
 		
 		ExperimentalBasicWithindayAgent agent = ExperimentalBasicWithindayAgent

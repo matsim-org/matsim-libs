@@ -31,6 +31,10 @@ public class ParkingStrategy {
 	public void removeScore(Id agentId, int legPlanElementIndex){
 		this.score.get(agentId).remove(legPlanElementIndex);
 	}
+
+	public DuringLegIdentifier getIdentifier() {
+		return identifier;
+	}
 	
 	
 }

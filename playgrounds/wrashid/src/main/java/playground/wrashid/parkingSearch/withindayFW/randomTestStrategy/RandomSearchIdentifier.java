@@ -36,6 +36,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 
 import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 
 public class RandomSearchIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
 	
@@ -56,16 +57,20 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 	 */
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-
 		/*
 		 * Get all agents that are searching and have entered a new link in the last
 		 * time step.
 		 */
-		Set<Id> linkEnteredAgents = this.parkingAgentsTracker.getLinkEnteredAgents();		
+		//Set<Id> linkEnteredAgents = this.parkingAgentsTracker.getLinkEnteredAgents();
+		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(this);
 		Set<PlanBasedWithinDayAgent> identifiedAgents = new HashSet<PlanBasedWithinDayAgent>();
 		
-		for (Id agentId : linkEnteredAgents) {
+		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
 			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
+			
+			if (isAgentAssignedToThisIdentifierCurrently(agent.getId(),agent.getCurrentPlanElementIndex())){
+				
+			}
 			
 			/*
 			 * If the agent has not selected a parking facility yet.
@@ -76,6 +81,15 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 				if (facilityId != null) {
 					parkingInfrastructure.parkVehicle(facilityId);
 					parkingAgentsTracker.setSelectedParking(agentId, facilityId);
+					
+					//TODO: calc score - this score should be 
+					// this could be done in handler, when the parking is released + for last parking
+					// separate.
+					
+					// this score also needs to be set on the strategy (for the specific leg).
+					
+					
+					//calcScore();
 				}
 				
 				identifiedAgents.add(agent);
@@ -85,6 +99,13 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 		return identifiedAgents;
 	}
 	
+	private boolean isAgentAssignedToThisIdentifierCurrently(Id agentId, int currentPlanElementIndex) {
+		ParkingStrategy parkingStrategy = parkingAgentsTracker.getParkingStrategyManager().getCurrentlySelectedParkingStrategies().get(agentId,currentPlanElementIndex);
+		
+		return parkingStrategy.getIdentifier()==this;
+	}
+
+
 	/*
 	 * If no parking is selected for the current agent, the agent requires
 	 * a replanning.
