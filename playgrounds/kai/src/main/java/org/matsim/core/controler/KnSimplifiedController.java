@@ -126,8 +126,6 @@ public class KnSimplifiedController {
 	// to the plugins.  And that seems much more access than we want to provide here. ????  kai, may'12 
 
 	
-	private StrategyManager strategyManager;
-	
 	private void run() {
 		setUpOutputDir(); // output dir needs to be before logging
 		initEvents(); // yy I do not understand why events need to be before logging
@@ -152,29 +150,11 @@ public class KnSimplifiedController {
 	private void setUp() {
 		
 		// add a couple of important event handlers:
-		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.events.addHandler(travelTime);
-
 		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.events.addHandler(new CalcLegTimes());
 
-		// set up StrategyManager:
-		this.strategyManager = new StrategyManager() ;
-		{
-			this.strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
-		}
-		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
-			this.strategyManager.addStrategy(strategy, 0.9) ;
-		}
-		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
-			strategy.addStrategyModule(createRouter(travelTime)) ;
-			this.strategyManager.addStrategy(strategy, 0.1) ;
-		}
-
 	}
+	
 	/**
 	 * The order how the listeners are added is very important! As
 	 * dependencies between different listeners exist or listeners may read
@@ -201,8 +181,10 @@ public class KnSimplifiedController {
 
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
 		this.controlerListenerManager.addControlerListener(new PlansScoring( this.scenarioData, this.events, scoringFunctionFactory ));
-
+		
+		StrategyManager strategyManager = buildStrategyManager() ;
 		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning());
+
 		this.controlerListenerManager.addCoreControlerListener(new PlansDumping());
 
 		this.controlerListenerManager.addCoreControlerListener(new EventsHandling((EventsManagerImpl) this.events)); 
@@ -251,10 +233,30 @@ public class KnSimplifiedController {
 		// (yy why here?  why not earlier when runtime system infrastructure is constructed? kai, mar'12)
 
 	}
-	private AbstractMultithreadedModule createRouter(
-			final TravelTimeCalculator travelTime) {
+	private StrategyManager buildStrategyManager() {
+		StrategyManager strategyManager = new StrategyManager() ;
+		{
+			strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
+		}
+		{
+			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
+			strategyManager.addStrategy(strategy, 0.9) ;
+		}
+		{
+			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
+			strategy.addStrategyModule(buildRouter()) ;
+			strategyManager.addStrategy(strategy, 0.1) ;
+		}
+		return strategyManager ;
+	}
+	private AbstractMultithreadedModule buildRouter() {
 		// factory to generate routes:
 		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
+
+		// travel time:
+		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		this.events.addHandler(travelTime);
 
 		// travel disutility (generalized cost)
 		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());

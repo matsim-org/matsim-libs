@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.SimplifiedIterationEndsEvent;
-import org.matsim.core.controler.events.SimplifiedIterationStartsEvent;
-import org.matsim.core.controler.events.SimplifiedScoringEvent;
-import org.matsim.core.controler.listener.SimplifiedIterationEndsListener;
-import org.matsim.core.controler.listener.SimplifiedIterationStartsListener;
-import org.matsim.core.controler.listener.SimplifiedScoringListener;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -42,7 +42,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  *
  * @author mrieser, michaz
  */
-public class PlansScoring implements SimplifiedScoringListener, SimplifiedIterationStartsListener, SimplifiedIterationEndsListener {
+public class PlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(PlansScoring.class);
 
@@ -61,7 +61,7 @@ public class PlansScoring implements SimplifiedScoringListener, SimplifiedIterat
 	}
 
 	@Override
-	public void notifyIterationStarts(final SimplifiedIterationStartsEvent event) {
+	public void notifyIterationStarts(final IterationStartsEvent event) {
 //		this.eventsToScore = new EventsToScore(event.getControler().getScenario(), event.getControler().getScoringFunctionFactory(), 
 //				event.getControler().getConfig().planCalcScore().getLearningRate());
 //		event.getControler().getEvents().addHandler(this.eventsToScore);
@@ -71,12 +71,12 @@ public class PlansScoring implements SimplifiedScoringListener, SimplifiedIterat
 	}
 
 	@Override
-	public void notifyIterationEnds(final SimplifiedIterationEndsEvent event) {
+	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.events.removeHandler(this.eventsToScore);
 	}
 
 	@Override
-	public void notifyScoring(final SimplifiedScoringEvent event) {
+	public void notifyScoring(final ScoringEvent event) {
 		this.eventsToScore.finish();
 	}
 

@@ -21,8 +21,10 @@
 package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.PopulationWriter;
@@ -41,26 +43,38 @@ import org.matsim.knowledges.Knowledges;
 public class PlansDumping implements BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumping.class);
+	private Scenario sc ;
+	private int writePlansInterval, firstIteration ; 
+	private IterationStopWatch stopwatch ;
+	private ControlerIO controlerIO;
+	public PlansDumping(Scenario sc, int firstIteration, int writePlansInterval, IterationStopWatch stopwatch, 
+			ControlerIO controlerIO ) {
+		this.sc = sc ;
+		this.firstIteration = firstIteration ;
+		this.writePlansInterval = writePlansInterval ;
+		this.stopwatch = stopwatch ;
+		this.controlerIO = controlerIO ;
+	}
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		Controler controler = event.getControler();
-		if ((controler.getWritePlansInterval() > 0) && ((event.getIteration() % controler.getWritePlansInterval() == 0)
-				|| (event.getIteration() == (controler.getFirstIteration() + 1)))) {
-			controler.stopwatch.beginOperation("dump all plans");
+//		Controler controler = event.getControler();
+		if ((writePlansInterval > 0) && ((event.getIteration() % writePlansInterval== 0)
+				|| (event.getIteration() == (firstIteration + 1)))) {
+			stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
 			Knowledges k = null ;
-			if ( controler.getConfig().scenario().isUseKnowledges() ) {
-				k = ((ScenarioImpl) controler.getScenario()).getKnowledges();
+			if ( sc.getConfig().scenario().isUseKnowledges() ) {
+				k = ((ScenarioImpl) sc).getKnowledges();
 			} else {
-				k = ((ScenarioImpl) controler.getScenario()).retrieveNotEnabledKnowledges();
+				k = ((ScenarioImpl) sc).retrieveNotEnabledKnowledges();
 				// seems that this call is there for some backwards compatibility ... reading knowledges into the 
 				// population even when knowledges is not enabled.  kai, mar'12
 			}
-			new PopulationWriter(controler.getPopulation(), controler.getNetwork(), k)
-				.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "plans.xml.gz"));
+			new PopulationWriter(sc.getPopulation(), sc.getNetwork(), k)
+				.write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
 			log.info("finished plans dump.");
-			controler.stopwatch.endOperation("dump all plans");
+			stopwatch.endOperation("dump all plans");
 		}
 	}
 
