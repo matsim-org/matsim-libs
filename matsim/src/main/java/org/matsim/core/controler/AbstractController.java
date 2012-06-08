@@ -172,7 +172,7 @@ public abstract class AbstractController {
 	/**
 	 * select if single cpu handler to use or parallel
 	 */
-	protected void initEvents() {
+	protected final void initEvents() {
 		final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
 		final String NUMBER_OF_THREADS = "numberOfThreads";
 		final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
@@ -193,7 +193,7 @@ public abstract class AbstractController {
 		}
 	}
 
-	protected void shutdown(final boolean unexpected) {
+	protected final void shutdown(final boolean unexpected) {
 		ControlerState oldState = this.state;
 		this.state = ControlerState.Shutdown;
 		if (oldState == ControlerState.Running) {
@@ -261,7 +261,7 @@ public abstract class AbstractController {
 		}
 	}
 
-	protected AbstractMultithreadedModule wrapPlanAlgo(final PlanAlgorithm planAlgo) {
+	protected final AbstractMultithreadedModule wrapPlanAlgo(final PlanAlgorithm planAlgo) {
 		// wrap it into the AbstractMultithreadedModule:
 		final AbstractMultithreadedModule router = new AbstractMultithreadedModule(this.scenarioData.getConfig().global().getNumberOfThreads()) {
 			@Override
@@ -285,7 +285,7 @@ public abstract class AbstractController {
 	 * @param message
 	 *            the message that is written just before the config dump
 	 */
-	protected void checkConfigConsistencyAndWriteToLog(final String message) {
+	protected final void checkConfigConsistencyAndWriteToLog(final String message) {
 		log.info(message);
 		String newline = System.getProperty("line.separator");// use native line endings for logfile
 		StringWriter writer = new StringWriter();
@@ -302,7 +302,7 @@ public abstract class AbstractController {
 	 * 
 	 * @param iteration
 	 */
-	protected void makeIterationPath(final int iteration) {
+	protected final void makeIterationPath(final int iteration) {
 		File dir = new File(this.controlerIO.getIterationPath(iteration));
 		if (!dir.mkdir()) {
 			if (this.overwriteFiles && dir.exists()) {
