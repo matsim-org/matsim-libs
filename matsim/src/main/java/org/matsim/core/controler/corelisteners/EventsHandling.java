@@ -22,10 +22,13 @@ package org.matsim.core.controler.corelisteners;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.CalcLegTimes;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -46,33 +49,70 @@ public class EventsHandling implements BeforeMobsimListener,
 	final static private Logger log = Logger.getLogger(EventsHandling.class);
 	
 	private final EventsManagerImpl eventsManager;
-	private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
+	private List<EventWriter> eventWriters = new LinkedList<EventWriter>();
+
+	private int writeEventsInterval;
+    Set<EventsFileFormat> eventsFileFormats ;
 	
-	public EventsHandling(EventsManagerImpl eventsManager) {
-		this.eventsManager = eventsManager;
+	ControlerIO controlerIO ;
+	
+	CalcLegTimes legTimes ;
+	
+	boolean calledViaOldConstructor = false ;
+	
+	/**
+	 * @param eventsManager
+	 * @param writeEventsInterval
+	 * @param eventsFileFormats
+	 * @param controlerIO
+	 * @param legTimes -- yyyy does not belong here; is here for historic reasons since legTimes, as an events handler,
+	 * does not know when an iteration is over. kai, jun'12
+	 */
+	public EventsHandling(EventsManagerImpl eventsManager, int writeEventsInterval, Set<EventsFileFormat> eventsFileFormats,
+			ControlerIO controlerIO, CalcLegTimes legTimes ) {
+		this.eventsManager = eventsManager ;
+		this.writeEventsInterval = writeEventsInterval ;
+		this.eventsFileFormats = eventsFileFormats ;
+		this.controlerIO = controlerIO ;
+		this.legTimes = legTimes ;
+	}
+	
+	@Deprecated // use other constructor instead; do not assume that material can be retrieved from the Controler object.  
+	// kai, jun'12
+	public EventsHandling( EventsManagerImpl eventsManager ) {
+		this.eventsManager = eventsManager ;
+		this.calledViaOldConstructor = true ;
 	}
 	
 	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {	
-		Controler controler = event.getControler();
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		if ( calledViaOldConstructor ) {
+			this.writeEventsInterval = event.getControler().getWriteEventsInterval() ;
+			this.eventsFileFormats = event.getControler().getConfig().controler().getEventsFileFormats() ;
+			this.controlerIO = event.getControler().getControlerIO() ;
+			this.legTimes = event.getControler().getLegTimes() ;
+		}
+		
 		eventsManager.resetHandlers(event.getIteration());
 		eventsManager.resetCounter();
 
-		if ((controler.getWriteEventsInterval() > 0) && (event.getIteration() % controler.getWriteEventsInterval() == 0)) {
-			for (EventsFileFormat format : controler.getConfig().controler().getEventsFileFormats()) {
+		if ((this.writeEventsInterval > 0) && (event.getIteration() % writeEventsInterval == 0)) {
+			for (EventsFileFormat format : eventsFileFormats) {
 				switch (format) {
 				case txt:
-					this.eventWriters.add(new EventWriterTXT(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), Controler.FILENAME_EVENTS_TXT)));
+					this.eventWriters.add(new EventWriterTXT(controlerIO.getIterationFilename(event.getIteration(), 
+							Controler.FILENAME_EVENTS_TXT)));
 					break;
 				case xml:
-					this.eventWriters.add(new EventWriterXML(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), Controler.FILENAME_EVENTS_XML)));
+					this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(), 
+							Controler.FILENAME_EVENTS_XML)));
 					break;
 				default:
 					log.warn("Unknown events file format specified: " + format.toString() + ".");
 				}
 			}
 			for (EventWriter writer : this.eventWriters) {
-				controler.getEvents().addHandler(writer);
+				eventsManager.addHandler(writer);
 			}
 		}
 
@@ -83,7 +123,6 @@ public class EventsHandling implements BeforeMobsimListener,
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		
-		Controler controler = event.getControler();
 		int iteration = event.getIteration();
 		/*
 		 * cdobler, nov'10
@@ -97,11 +136,11 @@ public class EventsHandling implements BeforeMobsimListener,
 		 */
 		eventsManager.finishProcessing();
 
-		if (controler.getLegTimes() != null) {
-			controler.getLegTimes().writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "tripdurations.txt"));
+		if (legTimes != null) {
+			legTimes.writeStats(controlerIO.getIterationFilename(iteration, "tripdurations.txt"));
 			// - print averages in log
-			log.info("[" + iteration + "] average trip (probably: leg) duration is: " + (int) controler.getLegTimes().getAverageTripDuration()
-					+ " seconds = " + Time.writeTime(controler.getLegTimes().getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
+			log.info("[" + iteration + "] average trip (probably: leg) duration is: " + (int) legTimes.getAverageTripDuration()
+					+ " seconds = " + Time.writeTime(legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
 			// trips are from "true" activity to "true" activity.  legs may also go
 			// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
 			// kai, jul'11
@@ -117,7 +156,7 @@ public class EventsHandling implements BeforeMobsimListener,
 		 */
 		for (EventWriter writer : this.eventWriters) {
 			writer.closeFile();
-			event.getControler().getEvents().removeHandler(writer);
+			this.eventsManager.removeHandler(writer);
 		}
 		this.eventWriters.clear();
 	}

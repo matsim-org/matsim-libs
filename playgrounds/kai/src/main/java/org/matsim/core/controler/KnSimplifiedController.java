@@ -28,12 +28,14 @@ import java.lang.Thread.UncaughtExceptionHandler;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -46,21 +48,17 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -73,6 +71,9 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -81,19 +82,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class KnSimplifiedController {
 	
-	public static final String DIRECTORY_ITERS = "ITERS";
-	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
-	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
-	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
-	public static final String FILENAME_SCORESTATS = "scorestats";
-	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
-	public static final String FILENAME_POPULATION = "output_plans.xml.gz";
-	public static final String FILENAME_NETWORK = "output_network.xml.gz";
-	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
-	public static final String FILENAME_LANES = "output_lanes.xml.gz";
-	public static final String FILENAME_CONFIG = "output_config.xml.gz";
-	// (yy could use the above from the official Controler ... but want to live without
-	// the import statement for the time being.  kai, mar'12)
+	public final IterationStopWatch stopwatch = new IterationStopWatch();
 
 	private static final Logger log = Logger.getLogger(KnSimplifiedController.class);
 
@@ -120,10 +109,9 @@ public class KnSimplifiedController {
 	private boolean dumpDataAtEnd;
 	private EventsManager events;
 	
-	Controler dummyCtrl = new Controler(scenarioData) ;
-	private final ControlerListenerManager controlerListenerManager = new ControlerListenerManager(dummyCtrl);
-	// these cannot be used, since the controler events assume that the controler including all of its interface is passed
-	// to the plugins.  And that seems much more access than we want to provide here. ????  kai, may'12 
+	private final ControlerListenerManager controlerListenerManager = new ControlerListenerManager(null); 
+
+	private CalcLegTimes legTimes;
 
 	
 	private void run() {
@@ -149,9 +137,11 @@ public class KnSimplifiedController {
 	 */
 	private void setUp() {
 		
-		// add a couple of important event handlers:
+		// add a couple of useful event handlers:
 		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
-		this.events.addHandler(new CalcLegTimes());
+
+		this.legTimes = new CalcLegTimes();
+		this.events.addHandler(legTimes);
 
 	}
 	
@@ -164,41 +154,122 @@ public class KnSimplifiedController {
 	 * <br/>
 	 * IMPORTANT: The execution order is reverse to the order the listeners
 	 * are added to the list.
-	 * <br/>
-	 * Design thoughts:<ul>
-	 * <li> Something like PlanScoring will have a notifyIterationStarts(controlerEvent) method, and will from there pull,
-	 * via controlerEvent.getControler(), all the controler information.  What can we do from here?<ul>
-	 * <li> Extract interface from Controler, and then be able to build other SimplifiedControler with same interface.
-	 * I don't think that this is my preferred method, since (1) it makes a lot of stuff public that does not need to be public,
-	 * and (2) it completely hides which information those methods are pulling.
-	 * <li> An alternative would be to modify the core methods in a way that all information is passed via the constructor,
-	 * and the "controlerEvent" is effectively ignored.
-	 * <li> Finally, we could try to reduce the public methods that controler offers.  This looks, however, like hard work.  
-	 * </ul>
-	 * </ul>
 	 */
 	private void loadCoreListeners() {
 
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
-		this.controlerListenerManager.addControlerListener(new PlansScoring( this.scenarioData, this.events, scoringFunctionFactory ));
+		final PlansScoring plansScoring = new PlansScoring( this.scenarioData, this.events, scoringFunctionFactory );
+		this.controlerListenerManager.addControlerListener(plansScoring);
 		
 		StrategyManager strategyManager = buildStrategyManager() ;
-		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning());
+		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
-		this.controlerListenerManager.addCoreControlerListener(new PlansDumping());
+		final PlansDumping plansDumping = new PlansDumping( this.scenarioData, this.config.controler().getFirstIteration(), 
+				this.config.controler().getWritePlansInterval(), this.stopwatch, this.controlerIO );
+		this.controlerListenerManager.addCoreControlerListener(plansDumping);
 
-		this.controlerListenerManager.addCoreControlerListener(new EventsHandling((EventsManagerImpl) this.events)); 
+		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) this.events,
+				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
+				this.controlerIO, this.legTimes );
+		this.controlerListenerManager.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
 	}
 
-	// ############################################################################################################################
-	// ############################################################################################################################
-	//	everything below here is probably not critical 	
-	
-	public static void main(String[] args) {
-		KnSimplifiedController gautengOwnController = new KnSimplifiedController() ;
-		gautengOwnController.run() ;
+	private void doIterations() {
+		// make sure all routes are calculated.
+		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@Override
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				return new PersonPrepareForSim(createRoutingAlgorithm(), KnSimplifiedController.this.scenarioData);
+			}
+		});
+
+		int firstIteration = this.config.controler().getFirstIteration();
+		int lastIteration = this.config.controler().getLastIteration();
+		String divider = "###################################################";
+		String marker = "### ";
+
+		for (int iteration = firstIteration; iteration <= lastIteration; iteration++ ) {
+			this.stopwatch.setCurrentIteration(iteration) ;
+			
+			log.info(divider);
+			log.info(marker + "ITERATION " + iteration + " BEGINS");
+			this.stopwatch.setCurrentIteration(iteration);
+			this.stopwatch.beginOperation("iteration");
+			makeIterationPath(iteration);
+			resetRandomNumbers(iteration);
+
+			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
+			if (iteration > firstIteration) {
+				this.stopwatch.beginOperation("replanning");
+				this.controlerListenerManager.fireControlerReplanningEvent(iteration);
+				this.stopwatch.endOperation("replanning");
+			}
+			this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
+			this.stopwatch.beginOperation("mobsim");
+			resetRandomNumbers(iteration);
+//			runMobSim();
+			log.error("will not work without mobsim; aborting ...") ; System.exit(-1) ;
+			this.stopwatch.endOperation("mobsim");
+			log.info(marker + "ITERATION " + iteration + " fires after mobsim event");
+			this.controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
+			log.info(marker + "ITERATION " + iteration + " fires scoring event");
+			this.controlerListenerManager.fireControlerScoringEvent(iteration);
+			log.info(marker + "ITERATION " + iteration + " fires iteration end event");
+			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
+			this.stopwatch.endOperation("iteration");
+			this.stopwatch.write(this.controlerIO.getOutputFilename("stopwatch.txt"));
+			log.info(marker + "ITERATION " + iteration + " ENDS");
+			log.info(divider);
+		}
 	}
+	
+	// ############################################################################################################################
+	// ############################################################################################################################
+	//	stuff that is related to the configuration of matsim  	
+	
+	private StrategyManager buildStrategyManager() {
+		StrategyManager strategyManager = new StrategyManager() ;
+		{
+			strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
+		}
+		{
+			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
+			strategyManager.addStrategy(strategy, 0.9) ;
+		}
+		{
+			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
+			strategy.addStrategyModule(wrapPlanAlgo( this.createRoutingAlgorithm() )) ;
+			strategyManager.addStrategy(strategy, 0.1) ;
+		}
+		return strategyManager ;
+	}
+	private PlansCalcRoute createRoutingAlgorithm() {
+		// factory to generate routes:
+		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
+
+		// travel time:
+		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		this.events.addHandler(travelTime);
+
+		// travel disutility (generalized cost)
+		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
+		
+		// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
+		// times (e.g. for car router, pt router, ...)
+		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
+		
+		// plug it together
+		final PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelDisutility, 
+				travelTime, leastCostPathFactory, routeFactory);
+		return plansCalcRoute;
+	}
+	
+	// ############################################################################################################################
+	// ############################################################################################################################
+	//	controler infrastructure (should be hidden somehow)  	
 	KnSimplifiedController() {
 		// catch logs before doing something
 		this.collectLogMessagesAppender = new CollectLogMessagesAppender();
@@ -233,53 +304,47 @@ public class KnSimplifiedController {
 		// (yy why here?  why not earlier when runtime system infrastructure is constructed? kai, mar'12)
 
 	}
-	private StrategyManager buildStrategyManager() {
-		StrategyManager strategyManager = new StrategyManager() ;
-		{
-			strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
-		}
-		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
-			strategyManager.addStrategy(strategy, 0.9) ;
-		}
-		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
-			strategy.addStrategyModule(buildRouter()) ;
-			strategyManager.addStrategy(strategy, 0.1) ;
-		}
-		return strategyManager ;
+
+	private void resetRandomNumbers(int iteration) {
+		MatsimRandom.reset(this.config.global().getRandomSeed()
+				+ iteration);
+		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
+		// "not-randomness" is the first
+		// draw...
+		// Fixme [kn] this should really be ten thousand draws instead of just
+		// one
 	}
-	private AbstractMultithreadedModule buildRouter() {
-		// factory to generate routes:
-		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
-		// travel time:
-		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.events.addHandler(travelTime);
-
-		// travel disutility (generalized cost)
-		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
-		
-		// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
-		// times (e.g. for car router, pt router, ...)
-		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
-		
-		// plug it together
-		final PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelDisutility, 
-				travelTime, leastCostPathFactory, routeFactory);
-		
+	private AbstractMultithreadedModule wrapPlanAlgo( final PlanAlgorithm planAlgo ) {
 		// wrap it into the AbstractMultithreadedModule:
 		final AbstractMultithreadedModule router = new AbstractMultithreadedModule(this.config.global().getNumberOfThreads()) {
 			@Override
 			public PlanAlgorithm getPlanAlgoInstance() {
-				return plansCalcRoute;
+				return planAlgo ;
 			}
 		};
 		return router;
 	}
 
-	
+	/**
+	 * Creates the path where all iteration-related data should be stored.
+	 * 
+	 * @param iteration
+	 */
+	private void makeIterationPath(final int iteration) {
+		File dir = new File(this.controlerIO.getIterationPath(iteration));
+		if (!dir.mkdir()) {
+			if (this.overwriteFiles && dir.exists()) {
+				log.info("Iteration directory "
+						+ this.controlerIO.getIterationPath(iteration)
+						+ " exists already.");
+			} else {
+				log.warn("Could not create iteration directory "
+						+ this.controlerIO.getIterationPath(iteration) + ".");
+			}
+		}
+	}
+
 	/**
 	 * in particular select if single cpu handler to use or parallel
 	 */
@@ -335,15 +400,15 @@ public class KnSimplifiedController {
 
 		if (this.dumpDataAtEnd) {
 			// dump plans
-			new PopulationWriter(this.population, this.network).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
+			new PopulationWriter(this.population, this.network).write(this.controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 			// dump network
-			new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
+			new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 			// dump config
-			new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(FILENAME_CONFIG));
+			new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
 
-			if (!unexpected	&& this.getConfig().vspExperimental().isWritingOutputEvents()) {
+			if (!unexpected	&& this.config.vspExperimental().isWritingOutputEvents()) {
 				File toFile = new File(	this.controlerIO.getOutputFilename("output_events.xml.gz"));
-				File fromFile = new File(this.controlerIO.getIterationFilename(this.getLastIteration(), "events.xml.gz"));
+				File fromFile = new File(this.controlerIO.getIterationFilename(this.config.controler().getLastIteration(), "events.xml.gz"));
 				IOUtils.copyFile(fromFile, toFile);
 			}
 		}
@@ -422,31 +487,13 @@ public class KnSimplifiedController {
 			throw new RuntimeException("The tmp directory "
 					+ this.controlerIO.getTempPath() + " could not be created.");
 		}
-		File itersDir = new File(this.outputPath + "/" + DIRECTORY_ITERS);
+		File itersDir = new File(this.outputPath + "/" + Controler.DIRECTORY_ITERS);
 		if (!itersDir.mkdir() && !itersDir.exists()) {
 			throw new RuntimeException("The iterations directory "
-					+ (this.outputPath + "/" + DIRECTORY_ITERS)
+					+ (this.outputPath + "/" + Controler.DIRECTORY_ITERS)
 					+ " could not be created.");
 		}
 	}
-
-	public Config getConfig() {
-		return config;
-	}
-	public Scenario getScenario() {
-		return scenarioData;
-	}
-	public Network getNetwork() {
-		return network;
-	}
-	public Population getPopulation() {
-		return population;
-	}
-	public final int getLastIteration() {
-		return this.config.controler().getLastIteration();
-	}
-
-
 
 
 }

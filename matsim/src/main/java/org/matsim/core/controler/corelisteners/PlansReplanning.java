@@ -20,9 +20,10 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.replanning.StrategyManager;
 
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
@@ -33,11 +34,32 @@ import org.matsim.core.controler.listener.ReplanningListener;
  * @author mrieser
  */
 public class PlansReplanning implements ReplanningListener {
+	
+	private Population population ;
+	private StrategyManager strategyManager ;
+	
+	private boolean calledViaOldConstructor = false ;
+	
+	public PlansReplanning( StrategyManager strategyManager, Population pop ) {
+		this.population = pop ;
+		this.strategyManager = strategyManager ;
+	}
+	
+	@Deprecated // use other constructor; do not assume that Controler object is accessible from here.  kai, jun'12
+	public PlansReplanning() {
+		this.calledViaOldConstructor = true ;
+	}
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		Controler controler = event.getControler();
-		controler.getStrategyManager().run(controler.getPopulation(), event.getIteration());
+//		Controler controler = event.getControler();
+//		controler.getStrategyManager().run(controler.getPopulation(), event.getIteration());
+		if ( this.calledViaOldConstructor ) {
+			this.population = event.getControler().getPopulation() ;
+			this.strategyManager = event.getControler().getStrategyManager() ;
+		}
+		
+		strategyManager.run(population, event.getIteration());
 	}
 
 }

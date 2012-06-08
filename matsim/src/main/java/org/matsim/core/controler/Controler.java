@@ -865,11 +865,13 @@ public class Controler {
 			this.addCoreControlerListener(this.roadPricing);
 		}
 
-		this.addCoreControlerListener(new PlansReplanning());
+		this.addCoreControlerListener(new PlansReplanning( this.strategyManager, this.population ));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
 				this.stopwatch, this.controlerIO ));
 
-		this.addCoreControlerListener(new EventsHandling(this.events)); // must be last being added (=first being executed)
+		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(), 
+				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO(), this.getLegTimes() )); 
+		// must be last being added (=first being executed)
 	}
 
 	/**

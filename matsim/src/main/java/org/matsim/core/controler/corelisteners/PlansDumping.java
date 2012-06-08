@@ -47,6 +47,9 @@ public class PlansDumping implements BeforeMobsimListener {
 	private int writePlansInterval, firstIteration ; 
 	private IterationStopWatch stopwatch ;
 	private ControlerIO controlerIO;
+	
+	boolean calledViaOldConstructor = false ;
+	
 	public PlansDumping(Scenario sc, int firstIteration, int writePlansInterval, IterationStopWatch stopwatch, 
 			ControlerIO controlerIO ) {
 		this.sc = sc ;
@@ -55,10 +58,22 @@ public class PlansDumping implements BeforeMobsimListener {
 		this.stopwatch = stopwatch ;
 		this.controlerIO = controlerIO ;
 	}
+	
+	@Deprecated // use other contructor; do not assume that Controler object is accessible from here.  kai, jun'12
+	public PlansDumping() {
+		calledViaOldConstructor = true ;
+	}
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 //		Controler controler = event.getControler();
+		if ( calledViaOldConstructor ) {
+			this.sc = event.getControler().getScenario() ;
+			this.firstIteration = event.getControler().getFirstIteration() ;
+			this.writePlansInterval = event.getControler().getWritePlansInterval() ;
+			this.stopwatch = event.getControler().stopwatch ;
+			this.controlerIO = event.getControler().getControlerIO() ;
+		}
 		if ((writePlansInterval > 0) && ((event.getIteration() % writePlansInterval== 0)
 				|| (event.getIteration() == (firstIteration + 1)))) {
 			stopwatch.beginOperation("dump all plans");
