@@ -135,9 +135,10 @@ public class KnSimplifiedController extends AbstractController {
 	 */
 	private void loadCoreListeners() {
 
-		this.controlerListenerManager.addControlerListener(buildPlansScoring());
+		final PlansScoring plansScoring = buildPlansScoring();
+		this.controlerListenerManager.addControlerListener(plansScoring);
 		
-		StrategyManager strategyManager = buildStrategyManager() ;
+		final StrategyManager strategyManager = buildStrategyManager() ;
 		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
 		final PlansDumping plansDumping = new PlansDumping( this.scenarioData, this.config.controler().getFirstIteration(), 
