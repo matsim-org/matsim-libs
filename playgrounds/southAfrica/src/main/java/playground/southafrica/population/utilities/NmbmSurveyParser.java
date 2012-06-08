@@ -453,12 +453,12 @@ public class NmbmSurveyParser {
 		case 1:
 			mode = "walk"; break;
 		case 2:
-			mode = "bicycle"; break;
+			mode = "cycle"; break;
 		case 3:
 		case 4:
 			mode = "car"; break;
 		case 5:
-			mode = "passenger"; break;
+			mode = "ride"; break;
 		case 6:
 		case 7:
 		case 8:
@@ -466,13 +466,13 @@ public class NmbmSurveyParser {
 		case 10:
 			mode = "taxi"; break;
 		case 11:
-			mode = "bus"; break;
+			mode = "pt1"; break;
 		case 12:
-			mode = "train"; break;
+			mode = "pt2"; break;
 		case 0:
 		case 13:
 		case 14:
-			mode = "other"; break;
+			mode = "unknown"; break;
 		default:
 			break;
 		}
