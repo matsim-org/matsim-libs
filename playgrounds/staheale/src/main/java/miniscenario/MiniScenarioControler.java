@@ -31,6 +31,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.locationchoice.analysis.DistanceStats;
+import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.locationchoice.utils.ActTypeConverter;
+import org.matsim.locationchoice.utils.ActivitiesHandler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import scoring.AgentInteractionScoringFunctionFactory;
@@ -57,7 +61,18 @@ public class MiniScenarioControler extends Controler {
 		
 	    ObjectAttributes attributes = new ObjectAttributes();
 	    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(attributes);
-		attributesReader.parse("./input/testMiniScenario/testMiniScenarioFacilityAttributes.xml");
+		attributesReader.parse("./input/miniScenarioFacilityAttributes.xml");
+		
+		//---------------location choice module---------------------
+
+		this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
+			    	  
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.config.locationchoice());
+		//ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
+			  		
+		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
+			
+		//---------------location choice module end-------------------
 		
 		// get objects that are required as parameter for the AgentInteractionScoringFunctionFactory 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.getConfig().planCalcScore();
@@ -71,6 +86,9 @@ public class MiniScenarioControler extends Controler {
 		this.setScoringFunctionFactory(factory);
 	    super.setUp();	
 		
-		addControlerListener(new FacilitiesOccupancyCalculator(this.facilityOccupancies, AgentInteraction.numberOfTimeBins, AgentInteraction.scaleNumberOfPersons));		    
+		addControlerListener(new FacilitiesOccupancyCalculator(this.facilityOccupancies, AgentInteraction.numberOfTimeBins, AgentInteraction.scaleNumberOfPersons));
+		
+		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter));
+		this.addControlerListener(new DistanceStats(this.config, "best", "l", actTypeConverter));
 	}
 }
