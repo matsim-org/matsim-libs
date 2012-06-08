@@ -97,9 +97,10 @@ public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler
 		return manager;
 	}
 
-	@Override
-	public void shutdown(boolean unexpected) {
-		super.shutdown(unexpected);
-	}
+//	@Override
+//	public void shutdown(boolean unexpected) {
+//		super.shutdown(unexpected);
+//	}
+	// can't override this any more.  not overriding it will call the super method, which is fine.  kai, jun'12
 
 }
