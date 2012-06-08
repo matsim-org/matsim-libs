@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
@@ -37,6 +38,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  *
  */
 public class MultiAnalyzerWriter {
+	private static final Logger logger = Logger.getLogger(MultiAnalyzerWriter.class);
 
 	String outputPath;
 	String runName;
@@ -81,77 +83,98 @@ public class MultiAnalyzerWriter {
 		}
 	}
 
-	protected String getRunName() {
-		return runName;
-	}
-
-	protected void setRunName(String runName) {
-		this.runName = runName;
-	}
-
-	public void writeCarDistanceInformation(Map<Id, Double> personId2CarDistance) {
-		File file = new File(this.outputPath + "carDistanceInformation_" + runName + ".txt");
+	public void writeCarDistanceInformation(Map<Id, Double> personId2CarDistance, Map<UserGroup, Double> userGroup2carTrips) {
+		String fileName = this.outputPath + "carDistanceInformation_" + runName + ".txt";
+		File file = new File(fileName);
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-			bw.write("\t car users \t total car distance [km] \t avg car distance [km]");
+			bw.write("\t car users \t # of car departures \t total car distance [km] \t avg car distance per car user [km] \t avg car distance per car departure [km]");
 			bw.newLine();
 
 			for(UserGroup userGroup : UserGroup.values()){
-				double sumOfCarDistancesInGroup = 0.0;
+				double totalCarDistanceInGroup_km = 0.0;
 				int groupSize = 0;
 				for(Id personId : personId2CarDistance.keySet()){
 					if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
-						sumOfCarDistancesInGroup += personId2CarDistance.get(personId);
+						totalCarDistanceInGroup_km += (personId2CarDistance.get(personId)) / 1000.;
 						groupSize++;
 					}
 				}
-				double avgCarDistance = sumOfCarDistancesInGroup / groupSize ;
-				String row = userGroup.toString() + "\t" + groupSize + "\t" + (sumOfCarDistancesInGroup / 1000.) + "\t" + (avgCarDistance / 1000.);
+				double avgCarDistancePerCarUser_km = totalCarDistanceInGroup_km / groupSize;
+				double noOfCarTripsInGroup = userGroup2carTrips.get(userGroup);
+				double avgCarDistancePerTrip_km = totalCarDistanceInGroup_km / noOfCarTripsInGroup;
+				String row = userGroup.toString() + "\t" + groupSize + "\t" + noOfCarTripsInGroup + "\t" + totalCarDistanceInGroup_km + "\t" + avgCarDistancePerCarUser_km + "\t" + avgCarDistancePerTrip_km;
 				bw.write(row);
 				bw.newLine();
 			}
 			bw.close();
+			logger.info("Finished writing output to " + fileName);
 		} catch (IOException e) {
 
 		}
 	}
 
-	public void writeavgTTInformation(Map<String, Map<Id, Double>> mode2personId2TravelTime) {
-		File file = new File(this.outputPath + "avgTTInformation_" + runName + ".txt");
+	public void writeAvgTTInformation(Map<String, Map<Id, Double>> mode2personId2TravelTime, Map<UserGroup, Map<String, Double>> userGroup2mode2noOfTrips) {
+		String fileName = this.outputPath + "avgTTInformation_" + runName + ".txt";
+		File file = new File(fileName);
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-			bw.write("\t mode \t users \t avg travelTime [min]");
+			bw.write("\t mode \t users \t # of departures \t total travelTime [min] \t avg travelTime per user [min] \t avg travelTime per departure [min]");
 			bw.newLine();
 
 			for(UserGroup userGroup : UserGroup.values()){
-				bw.write(userGroup.toString());
 				for(String mode : mode2personId2TravelTime.keySet()){
+
+					if(userGroup2mode2noOfTrips.get(userGroup).get(mode) == null){
+						// do nothing
+					} else {
+						bw.write(userGroup.toString());
+					}
+					
 					Map<Id, Double> personId2TravelTime = mode2personId2TravelTime.get(mode);
 
 					double sumOfTravelTimes = 0.0;
 					int groupSize = 0;
-
 					for(Id personId : personId2TravelTime.keySet()){
 						if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
 							sumOfTravelTimes += personId2TravelTime.get(personId);
 							groupSize++;
 						}
 					}
-					double avgTravelTimeOfMode_mins = (sumOfTravelTimes / groupSize) / 60.;
+					double sumOfTravelTimes_min = sumOfTravelTimes / 60.;
+					double avgTravelTimeOfModePerUser_mins = sumOfTravelTimes_min / groupSize;
+					
+					Double avgTravelTimeOfModePerTrip_mins = null;
+					Double noOfModeTripsInGroup = null;
+					if(userGroup2mode2noOfTrips.get(userGroup).get(mode) == null){
+						// do nothing
+					} else {
+						noOfModeTripsInGroup = userGroup2mode2noOfTrips.get(userGroup).get(mode);
+						avgTravelTimeOfModePerTrip_mins = sumOfTravelTimes_min / noOfModeTripsInGroup;
+					}
 					if(groupSize != 0){
-						String modeInfo = "\t" + mode + "\t" + groupSize + "\t" + avgTravelTimeOfMode_mins;
+						String modeInfo = "\t" + mode + "\t" + groupSize + "\t" + noOfModeTripsInGroup + "\t" + sumOfTravelTimes_min + "\t" + avgTravelTimeOfModePerUser_mins + "\t" + avgTravelTimeOfModePerTrip_mins;
 						bw.write(modeInfo);
 						bw.newLine();
 					}
 				}
 			}
 			bw.close();
+			logger.info("Finished writing output to " + fileName);
 		} catch (IOException e) {
 
 		}
+	}
+	
+	protected String getRunName() {
+		return runName;
+	}
+
+	protected void setRunName(String runName) {
+		this.runName = runName;
 	}
 }

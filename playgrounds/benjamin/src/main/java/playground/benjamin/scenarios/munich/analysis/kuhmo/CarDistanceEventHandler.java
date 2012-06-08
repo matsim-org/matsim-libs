@@ -24,29 +24,52 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+
+import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author benjamin
  *
  */
-public class CarDistanceEventHandler implements LinkLeaveEventHandler{
+public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler{
 	private final static Logger logger = Logger.getLogger(CarDistanceEventHandler.class);
 
 	private Map<Id, Double> personId2CarDistance;
+	private Map<UserGroup, Double> userGroup2carTrips;
 	private final Network network;
+	private final PersonFilter personFilter;
+	
+	private Map<Id, Id> personId2departureLinkId;
+	private Map<Id, Double> depArrOnSameLinkCnt;
 	
 	public CarDistanceEventHandler(Network network) {
 		this.personId2CarDistance = new HashMap<Id, Double>();
+		this.userGroup2carTrips = new HashMap<UserGroup, Double>();
 		this.network = network;
+		this.personFilter = new PersonFilter();
+		
+		this.personId2departureLinkId = new HashMap<Id, Id>();
+		this.depArrOnSameLinkCnt = new HashMap<Id, Double>();
 	}
 
 	@Override
 	public void reset(int iteration) {
 		this.personId2CarDistance = new HashMap<Id, Double>();
+		this.userGroup2carTrips = new HashMap<UserGroup, Double>();;
 		logger.info("resetting personId2CarDistance to " + this.personId2CarDistance + " ...");
+		logger.info("resetting userGroup2carTrips to " + this.userGroup2carTrips + " ...");
+		
+		this.personId2departureLinkId = new HashMap<Id, Id>();
+		this.depArrOnSameLinkCnt = new HashMap<Id, Double>();
 	}
 
 	@Override
@@ -63,9 +86,66 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler{
 			this.personId2CarDistance.put(personId, distanceAfterEvent);
 		}
 	}
+	
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {		
+		personId2departureLinkId.put(event.getPersonId(), event.getLinkId());
 
-	public Map<Id, Double> getPersonId2CarDistance() {
-		return this.personId2CarDistance;
+		if(event.getLegMode().equals(TransportMode.car)){
+			Id personId = event.getPersonId();
+			for(UserGroup userGroup : UserGroup.values()){
+				if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
+					if(userGroup2carTrips.get(userGroup) == null){
+						userGroup2carTrips.put(userGroup, 1.0);
+					} else {
+						double carTripsSoFar = userGroup2carTrips.get(userGroup);
+						double carTripsAfter = carTripsSoFar + 1.0;
+						userGroup2carTrips.put(userGroup, carTripsAfter);
+					}
+				}
+			}
+			
+			// in order to get the number of car users right...
+			if(this.personId2CarDistance.get(personId) == null){
+				this.personId2CarDistance.put(personId, 0.0);
+			} else {
+				// do nothing
+			}
+		}
+	}
+	
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		Id personId = event.getPersonId();
+		Id linkId = event.getLinkId();
+
+		if(personId2departureLinkId.get(personId) == null){
+			logger.warn("Person " + personId + " is arriving on link " + linkId + " without having departed anywhere before...");
+		} else {
+			Id departureLinkId = personId2departureLinkId.get(personId);
+			if(event.getLegMode().equals(TransportMode.car)){
+				if(departureLinkId.equals(linkId)){
+					if(depArrOnSameLinkCnt.get(personId) == null){
+						depArrOnSameLinkCnt.put(personId, 1.0);
+					} else {
+						double cntSoFar = depArrOnSameLinkCnt.get(personId);
+						double cntAfter = cntSoFar + 1.0;
+						depArrOnSameLinkCnt.put(personId, cntAfter);
+					}
+				}
+			}
+		}
 	}
 
+	protected Map<Id, Double> getDepArrOnSameLinkCnt() {
+		return depArrOnSameLinkCnt;
+	}
+
+	protected Map<Id, Double> getPersonId2CarDistance() {
+		return this.personId2CarDistance;
+	}
+	
+	protected Map<UserGroup, Double> getUserGroup2carTrips() {
+		return this.userGroup2carTrips;
+	}
 }

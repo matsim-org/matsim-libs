@@ -25,6 +25,7 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -52,28 +53,28 @@ import playground.benjamin.utils.BkNumberUtils;
 public class MultiAnalyzer {
 	private static final Logger logger = Logger.getLogger(MultiAnalyzer.class);
 
-	//	private static String initialIterationNo = "1000";
+//	private static String initialIterationNo = "1000";
 	private static String finalIterationNo = "1500";
 
 	private static String baseCaseName = "ctd";
-//	private static String policyCaseName = "zone30";
-//		private static String policyCaseName = "pricing";
-//		private static String policyCaseName = "pricing_x5";
-		private static String policyCaseName = "pricing_x10";
+	private static String policyCaseName = "zone30";
+//	private static String policyCaseName = "pricing";
+//	private static String policyCaseName = "pricing_x5";
+//	private static String policyCaseName = "pricing_x10";
 
 	private static String runDirectory1 = "../../runs-svn/detEval/kuhmo/output/output_baseCase_" + baseCaseName + "/";
 	private static String runDirectory2 = "../../runs-svn/detEval/kuhmo/output/output_policyCase_" + policyCaseName + "/";
 	private static String netFile = runDirectory1 + "output_network.xml.gz";
 	private static String configFile = runDirectory1 + "output_config.xml.gz";
 
-	private static String initialPlansFile = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
-	private static String finalPlansFile = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
+	private static String plansFile1 = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
+	private static String plansFile2 = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
 
-	private static String initialEventsFile = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
-	private static String finalEventsFile = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
+	private static String eventsFile1 = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
+	private static String eventsFile2 = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
 
-	private static String initialEmissionEventsFile = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
-	private static String finalEmissionEventsFile = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
+	private static String emissionEventsFile1 = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
+	private static String emissionEventsFile2 = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
 
 	private final PersonFilter personFilter;
 	private final int decimalPlace;
@@ -87,10 +88,12 @@ public class MultiAnalyzer {
 	}
 
 	private void run() {
-		calculateUserWelfareChangeAndTollRevenueByUserGroup(netFile, configFile, initialPlansFile, finalPlansFile, finalEventsFile);
-		//		calculateAverageCarDistanceTraveledByUserGroup(netFile, initialEventsFile, finalEventsFile);
-		//		calculateAverageTravelTimePerModeByUserGroup(initialEventsFile, finalEventsFile);
-		//		calculateEmissionChangesByUserGroup(initialEmissionEventsFile, finalEmissionEventsFile);
+//		calculateUserWelfareChangeAndTollRevenueByUserGroup(netFile, configFile, plansFile1, plansFile2, eventsFile2);
+		
+		calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile1, baseCaseName);
+		calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile2, policyCaseName);
+		
+//		calculateEmissionChangesByUserGroup(emissionEventsFile1, emissionEventsFile2);
 	}
 
 	private void calculateUserWelfareChangeAndTollRevenueByUserGroup(String netFile, String configFile, String initialPlansFile, String finalPlansFile, String finalEventsFile) {
@@ -247,116 +250,44 @@ public class MultiAnalyzer {
 		}
 	}
 
-	private void calculateAverageCarDistanceTraveledByUserGroup(String netFile, String initialEventsFile, String finalEventsFile) {
+	private void calculateDistanceTimeStatisticsByUserGroup(String netFile, String eventsFile, String runName) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc).readFile(netFile);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
+		
 		CarDistanceEventHandler carDistanceEventHandler = new CarDistanceEventHandler(sc.getNetwork());
-		eventsManager.addHandler(carDistanceEventHandler);
-
-		eventsReader.parse(initialEventsFile);
-		Map<Id, Double> personId2InitialCarDistance = carDistanceEventHandler.getPersonId2CarDistance();
-
-		writer.setRunName(baseCaseName);
-		writer.writeCarDistanceInformation(personId2InitialCarDistance);
-
-		carDistanceEventHandler.reset(0);
-		eventsReader.parse(finalEventsFile);
-		Map<Id, Double> personId2FinalCarDistance = carDistanceEventHandler.getPersonId2CarDistance();
-
-		writer.setRunName(policyCaseName);
-		writer.writeCarDistanceInformation(personId2FinalCarDistance);
-
-		System.out.println("\n*******************************************************************");
-		for(UserGroup userGroup : UserGroup.values()){
-			double initialSumOfCarDistancesInGroup = 0.0;
-			int initialGroupSize = 0;
-			double finalSumOfCarDistancesInGroup = 0.0;
-			int finalGroupSize = 0;
-
-			for(Id personId : personId2InitialCarDistance.keySet()){
-				if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
-					initialSumOfCarDistancesInGroup += personId2InitialCarDistance.get(personId);
-					initialGroupSize++;
-				}
-			}
-			for(Id personId : personId2FinalCarDistance.keySet()){
-				if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
-					finalSumOfCarDistancesInGroup += personId2FinalCarDistance.get(personId);
-					finalGroupSize++;
-				}
-			}
-			double initialAvgCarDistance = (initialSumOfCarDistancesInGroup / initialGroupSize) / 1000. ;
-			double finalAvgCarDistance = (finalSumOfCarDistancesInGroup / finalGroupSize) / 1000. ;
-			System.out.println("Initial car distance traveled for ``" + userGroup + "'' (" + initialGroupSize + " car users):\t" + 
-					BkNumberUtils.roundDouble(initialSumOfCarDistancesInGroup / 1000, decimalPlace) + " km or " + BkNumberUtils.roundDouble(initialAvgCarDistance, decimalPlace) + " km in average.");
-			System.out.println("Final car distance traveled for ``" + userGroup + "'' (" + finalGroupSize + " car users):\t" + 
-					BkNumberUtils.roundDouble(finalSumOfCarDistancesInGroup / 1000. , decimalPlace) + " km or " + BkNumberUtils.roundDouble(finalAvgCarDistance, decimalPlace) + " km in average.");
-		}
-		// TODO: checksum?
-		System.out.println("*******************************************************************\n");
-	}
-
-	private void calculateAverageTravelTimePerModeByUserGroup(String initialEventsFile, String finalEventsFile) {
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
 		TravelTimePerModeEventHandler ttHandler = new TravelTimePerModeEventHandler();
+
+		eventsManager.addHandler(carDistanceEventHandler);
 		eventsManager.addHandler(ttHandler);
 
-		eventsReader.parse(initialEventsFile);
-		Map<String, Map<Id, Double>> initialMode2personId2TravelTime = ttHandler.getMode2personId2TravelTime();
-
-		writer.setRunName(baseCaseName);
-		writer.writeavgTTInformation(initialMode2personId2TravelTime);
-
-		ttHandler.reset(0);
-		eventsReader.parse(finalEventsFile);
-		Map<String, Map<Id, Double>> finalMode2personId2TravelTime = ttHandler.getMode2personId2TravelTime();
-
-		writer.setRunName(policyCaseName);
-		writer.writeavgTTInformation(finalMode2personId2TravelTime);
-
-		for(UserGroup userGroup : UserGroup.values()){
-			System.out.println("\n*******************************************************************");
-			System.out.println("VALUES FOR " + userGroup);
-			System.out.println("*******************************************************************");
-			for(String mode : initialMode2personId2TravelTime.keySet()){
-				Map<Id, Double> initialPersonId2TravelTime = initialMode2personId2TravelTime.get(mode);
-				Map<Id, Double> finalPersonId2TravelTime = finalMode2personId2TravelTime.get(mode);
-
-				double initialSumOfTravelTimes = 0.0;
-				int initialGroupSize = 0;
-				double finalSumOfTravelTimes = 0.0;
-				int finalGroupSize = 0;
-
-				for(Id personId : initialPersonId2TravelTime.keySet()){
-					if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
-						initialSumOfTravelTimes += initialPersonId2TravelTime.get(personId);
-						initialGroupSize++;
-						//						if(mode.equals("pt") && personId.toString().startsWith("gv")){
-						//							System.out.println(personId);
-						//						}
-					}
-				}
-				for(Id personId : finalPersonId2TravelTime.keySet()){
-					if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
-						finalSumOfTravelTimes += finalPersonId2TravelTime.get(personId);
-						finalGroupSize++;
-					}
-				}
-				double initialAverageTravelTimeOfMode_mins = (initialSumOfTravelTimes / initialGroupSize) / 60.;
-				double finalAverageTravelTimeOfMode_mins = (finalSumOfTravelTimes / finalGroupSize) / 60.;
-
-				if(initialGroupSize != 0 || finalGroupSize != 0){
-					System.out.println("Initial average travel time with transport mode " + mode + " (" + initialGroupSize + " users): " + BkNumberUtils.roundDouble(initialAverageTravelTimeOfMode_mins, this.decimalPlace));
-					System.out.println("Final average travel time with transport mode " + mode + " (" + finalGroupSize + " users): " + BkNumberUtils.roundDouble(finalAverageTravelTimeOfMode_mins, this.decimalPlace));
-				}
-			}
-		}
-		// TODO: checksum?
-		System.out.println("*******************************************************************\n");
+		eventsReader.parse(eventsFile);
+		
+		Map<Id, Double> personId2carDistance = carDistanceEventHandler.getPersonId2CarDistance();
+		Map<UserGroup, Double> userGroup2carTrips = carDistanceEventHandler.getUserGroup2carTrips();
+		Map<String, Map<Id, Double>> mode2personId2TravelTime = ttHandler.getMode2personId2TravelTime();
+		Map<UserGroup, Map<String, Double>> userGroup2mode2noOfTrips = ttHandler.getUserGroup2mode2noOfTrips();
+		
+		logger.warn("number of car users in distance map (users with departure events): " + personId2carDistance.size());
+//		int depArrOnSameLinkCnt = carDistanceEventHandler.getDepArrOnSameLinkCnt().size();
+//		logger.warn("number of car users with two activities followed one by another on the same link: +" + depArrOnSameLinkCnt);
+//		int personIsDrivingADistance = 0;
+//		for(Id personId : carDistanceEventHandler.getDepArrOnSameLinkCnt().keySet()){
+//			if(personId2carDistance.get(personId) == null){
+//				// do nothing
+//			} else {
+//				personIsDrivingADistance ++;
+//			}
+//		}
+//		logger.warn("number of car users with two activities followed one by another on the same link BUT driving to other acts: -" + personIsDrivingADistance);
+		logger.warn("number of car users in traveltime map (users with departure and arrival events): " + mode2personId2TravelTime.get(TransportMode.car).size());
+		
+		
+		writer.setRunName(runName);
+		writer.writeCarDistanceInformation(personId2carDistance, userGroup2carTrips);
+		writer.writeAvgTTInformation(mode2personId2TravelTime, userGroup2mode2noOfTrips);
 	}
 
 	private Scenario loadScenario(String netFile, String plansFile) {
