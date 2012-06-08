@@ -247,7 +247,7 @@ public class Controler extends AbstractController {
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
 
-	/* package */volatile Throwable uncaughtException = null; // package-private
+//	/* package */volatile Throwable uncaughtException = null; // package-private
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 	// for tests

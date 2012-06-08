@@ -54,7 +54,7 @@ public abstract class AbstractController {
 	/** The Config instance the Controler uses. */
 	protected ScenarioImpl scenarioData = null ;
 	protected EventsManagerImpl events = null ;
-	protected Throwable uncaughtException;
+	protected volatile Throwable uncaughtException;
 	protected Thread shutdownHook = new Thread() {
 		@Override
 		public void run() {
