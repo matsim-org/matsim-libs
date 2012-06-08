@@ -37,9 +37,16 @@ public abstract class ControlerEvent {
 		this.controler = controler;
 	}
 
-	/**
+	/**Design decision (jun'12):<ul>
+	 * <li> The ControlerListeners should not get access to the Controler via the ControlerEvents.  Reason:
+	 * The Controler is a much too powerful object, and it thus inhibits use of the ControlerListeners from objects which are
+	 * not as powerful.
+	 * <li> If you need access to internals of the controler inside the ControlerListener, put it into the constructor
+	 * of the ControlerListener.  This will also clarify much more what you need.
+	 * </ul>
 	 * @return the Controler instance which fired the event
 	 */
+	@Deprecated // jun'12.  See above  
 	public Controler getControler() {
 		return this.controler;
 	}
