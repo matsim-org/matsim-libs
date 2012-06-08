@@ -40,7 +40,7 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 
 	private final static Logger log = Logger.getLogger(TimeAllocationMutator.class);
 
-	private int mutationRange = 1800;
+	private Double mutationRange = 1800.;
 	private boolean useActivityDurations = true;
 
 	/**
@@ -51,13 +51,14 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 	 */
 	public TransitTimeAllocationMutator(Config config) {
 		super(config.global());
-		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
-		if (range == null) {
-			log.info("No mutation range defined in the config file. Using default of " + this.mutationRange + " sec.");
-		} else {
-			this.mutationRange = Integer.parseInt(range);
-			log.info("mutation range = " + this.mutationRange);
-		}
+//		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
+//		if (range == null) {
+//			log.info("No mutation range defined in the config file. Using default of " + this.mutationRange + " sec.");
+//		} else {
+//			this.mutationRange = Integer.parseInt(range);
+//			log.info("mutation range = " + this.mutationRange);
+//		}
+		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
 		if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
 			useActivityDurations = true ;
 		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
@@ -76,7 +77,11 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 	 */
 	public TransitTimeAllocationMutator(Config config, final int mutationRange) {
 		super(config.global());
-		this.mutationRange = mutationRange;
+		this.mutationRange = new Double(mutationRange);
+	}
+	public TransitTimeAllocationMutator(Config config, final Double mutationRange) {
+		super(config.global());
+		this.mutationRange = mutationRange ;
 	}
 
 	@Override

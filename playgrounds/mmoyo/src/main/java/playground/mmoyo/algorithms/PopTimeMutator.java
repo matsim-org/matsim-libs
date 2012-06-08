@@ -17,9 +17,9 @@ import playground.mmoyo.utils.DataLoader;
 
 /**Applies time mutation to plans*/
 public class PopTimeMutator {
-	final int mutationRange;
+	final Double mutationRange;
 	
-	public PopTimeMutator(final int mutationRange){
+	public PopTimeMutator(final Double mutationRange){
 		this.mutationRange = mutationRange;
 	}
 	
@@ -45,18 +45,18 @@ public class PopTimeMutator {
 	public static void main(String[] args) {
 		String netFilePath;
 		String popFilePath;
-		int mutationRange; 
+		Double mutationRange; 
 		String output;
 			
 		if (args.length>0){
 			netFilePath = args[0];
 			popFilePath = args[1];
-			mutationRange = Integer.valueOf(args[2]);
+			mutationRange = Double.valueOf(args[2]);
 			output = args[3];
 		}else{
 			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 			popFilePath = "../../input/bestValues_plans.xml.gz";
-			mutationRange = 7200;
+			mutationRange = 7200.;
 			output = "../mmoyo/output/timeMutation/testMutation/bestValues_plansMutated.xml";
 		}
 			

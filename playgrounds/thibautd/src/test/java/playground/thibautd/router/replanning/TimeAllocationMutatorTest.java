@@ -52,7 +52,7 @@ import playground.thibautd.router.TripRouter;
  * @author thibautd
  */
 public class TimeAllocationMutatorTest {
-	private static final int MUTATION_RANGE = 7200;
+	private static final Double MUTATION_RANGE = 7200.;
 	private static final int SEED = 1230534;
 
 	@Rule

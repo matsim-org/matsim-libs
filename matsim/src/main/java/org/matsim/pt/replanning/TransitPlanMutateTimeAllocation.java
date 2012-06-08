@@ -40,11 +40,11 @@ import org.matsim.pt.PtConstants;
  */
 public class TransitPlanMutateTimeAllocation implements PlanAlgorithm {
 
-	private final int mutationRange;
+	private final Double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations;
 
-	public TransitPlanMutateTimeAllocation(final int mutationRange, final Random random) {
+	public TransitPlanMutateTimeAllocation(final Double mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
 		this.random = random;
 	}

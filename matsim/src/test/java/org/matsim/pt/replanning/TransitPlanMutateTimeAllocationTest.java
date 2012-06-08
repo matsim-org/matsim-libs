@@ -61,7 +61,7 @@ public class TransitPlanMutateTimeAllocationTest {
 		plan.createAndAddLeg(TransportMode.transit_walk);
 		plan.createAndAddActivity("work", new CoordImpl(0, 500));
 
-		TransitPlanMutateTimeAllocation mutator = new TransitPlanMutateTimeAllocation(3600, new Random(2011));
+		TransitPlanMutateTimeAllocation mutator = new TransitPlanMutateTimeAllocation(3600., new Random(2011));
 		mutator.run(plan);
 
 		Assert.assertEquals(0.0, ptAct1.getMaximumDuration(), 1e-8);

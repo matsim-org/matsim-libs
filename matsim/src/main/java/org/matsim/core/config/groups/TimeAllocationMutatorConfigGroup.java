@@ -23,6 +23,7 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class TimeAllocationMutatorConfigGroup extends Module {
@@ -41,7 +42,15 @@ public class TimeAllocationMutatorConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
-		throw new RuntimeException("getValue access disabled; use typed getter instead") ;
+		if (MUTATION_RANGE.equals(key)) {
+			Logger.getLogger(this.getClass()).warn("Please replace the getValue access to the time mutator range in your code" +
+					"by the typed access (config.timeAllocationMutator().getMutationRange()).") ;
+			Logger.getLogger(this.getClass()).warn("When I see this in 2013 or later, I will disable getValue access to the time " +
+					"mutation range without warning. kai, jun'12") ;
+			return this.getMutationRange().toString() ;
+		} else {
+			throw new IllegalArgumentException(key);
+		}
 	}
 
 	@Override
