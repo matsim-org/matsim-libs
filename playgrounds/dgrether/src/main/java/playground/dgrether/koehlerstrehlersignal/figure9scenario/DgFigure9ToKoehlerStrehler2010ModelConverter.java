@@ -57,7 +57,7 @@ public class DgFigure9ToKoehlerStrehler2010ModelConverter {
 		DgCommodities coms = demandConverter.convert(sc, net);
 		
 		DgKoehlerStrehler2010ModelWriter writer = new DgKoehlerStrehler2010ModelWriter();
-		writer.write(sc, net, coms, DgPaths.STUDIESDG + "koehlerStrehler2010/cplex_scenario_population_800_agents.xml");
+		writer.write(net, coms, "Figure9Scenario", "", DgPaths.STUDIESDG + "koehlerStrehler2010/cplex_scenario_population_800_agents.xml");
 
 		
 	}

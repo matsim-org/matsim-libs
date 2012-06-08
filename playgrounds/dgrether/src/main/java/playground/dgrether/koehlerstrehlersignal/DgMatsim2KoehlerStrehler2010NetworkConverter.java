@@ -75,15 +75,30 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		}
 		return new IdImpl(fromLinkId.toString() + "66" + fromLaneId.toString() + "55" + toLinkId.toString());
 	}
-
 	
-	private int cycle = 60;
-	private Id programId = new IdImpl("1");
+	public static Id convertNodeId2CrossingId(Id nodeId){
+		String idString = nodeId.toString();
+		idString = idString.replaceAll("\\D", "77");
+		return new IdImpl(idString);
+	}
+	
+	public static Id convertLinkId2StreetId(Id linkId){
+		String idString = linkId.toString();
+		idString = idString.replaceAll("\\D", "77");
+		return new IdImpl(idString);
+	}
+	
+	
+	private Integer cycle = null;
+	private Id defaultProgramId = new IdImpl("4711");
 
 	private DgKSNetwork dgNetwork;
 	private double timeInterval;
 
 	public DgKSNetwork convertNetworkLanesAndSignals(Scenario sc, double startTime, double endTime) {
+		log.info("Checking cycle time...");
+		this.cycle = readCycle(sc.getScenarioElement(SignalsData.class));
+		log.info("cycle set to " + this.cycle);
 		log.info("Converting network ...");
 		Network net = sc.getNetwork();
 		this.timeInterval = endTime - startTime;
@@ -92,6 +107,21 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		return this.dgNetwork ;
 	}
 
+	private int readCycle(SignalsData signalsData){
+		Integer c = null;
+		for (SignalSystemControllerData ssc :  signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().values()) {
+			for (SignalPlanData plan : ssc.getSignalPlanData().values()){
+				if (c == null){
+					c = plan.getCycleTime();
+				}
+				else if (c != plan.getCycleTime()){
+					throw new IllegalStateException("Signal plans must have a common cycle time!");
+				}
+			}
+		}
+		return c;
+	}
+	
 	/*
 	 * codierung:
 	 *   fromLink -> toLink zwei nodes + 1 light
@@ -113,7 +143,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		//loop over links and create layout of crossing
 		for (Link link : net.getLinks().values()){
 			//prepare some objects/data
-			DgCrossing crossing = ksnet.getCrossings().get(link.getToNode().getId()); //The node id of the matsim network is the crossing id
+			DgCrossing crossing = ksnet.getCrossings().get(convertNodeId2CrossingId(link.getToNode().getId())); //The node id of the matsim network is the crossing id
 			Link backLink = this.getBackLink(link);
 			Id backLinkId = (backLink == null) ?  null : backLink.getId();
 			DgCrossingNode inLinkToNode = crossing.getNodes().get(convertLinkId2ToCrossingNodeId(link.getId()));
@@ -135,23 +165,20 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	
 	private void convertNodes2Crossings(DgKSNetwork dgnet, Network net){
 		for (Node node : net.getNodes().values()){
-			DgCrossing crossing = new DgCrossing(node.getId());
+			DgCrossing crossing = new DgCrossing(convertNodeId2CrossingId(node.getId()));
 			dgnet.addCrossing(crossing);
-			DgProgram program = new DgProgram(this.programId);
-			crossing.addProgram(program);
-			program.setCycle(this.cycle);
 		}
 	}
 	
 	private void convertLinks2Streets(DgKSNetwork ksnet, Network net){
 		for (Link link : net.getLinks().values()){
-			DgCrossing fromNodeCrossing = ksnet.getCrossings().get(link.getFromNode().getId());
+			DgCrossing fromNodeCrossing = ksnet.getCrossings().get(convertNodeId2CrossingId(link.getFromNode().getId()));
 			DgCrossingNode fromNode = new DgCrossingNode(convertLinkId2FromCrossingNodeId(link.getId()));
 			fromNodeCrossing.addNode(fromNode);
-			DgCrossing toNodeCrossing = ksnet.getCrossings().get(link.getToNode().getId());
+			DgCrossing toNodeCrossing = ksnet.getCrossings().get(convertNodeId2CrossingId(link.getToNode().getId()));
 			DgCrossingNode toNode = new DgCrossingNode(convertLinkId2ToCrossingNodeId(link.getId()));
 			toNodeCrossing.addNode(toNode);
-			DgStreet street = new DgStreet(link.getId(), fromNode, toNode);
+			DgStreet street = new DgStreet(convertLinkId2StreetId(link.getId()), fromNode, toNode);
 			long fs = Math.round((link.getLength() / link.getFreespeed()));
 			street.setCost(fs);
 			double capacity = link.getCapacity() / net.getCapacityPeriod() * this.timeInterval;
@@ -212,9 +239,20 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	 * the input data:  thus the programs/plans for the signal might be ambiguous, an exception is thrown.
 	 * 
 	 */
-	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment20 l2l, SignalSystemData system, SignalsData signalsData) {
+	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, 
+			LanesToLinkAssignment20 l2l, SignalSystemData system, SignalsData signalsData) {
+		//create program if not existing...
+		DgProgram program = null;
+		if (! crossing.getPrograms().containsKey(system.getId())){
+			program = new DgProgram(system.getId());
+			program.setCycle(this.cycle);
+			crossing.addProgram(program);
+		}
+		else {
+			program = crossing.getPrograms().get(system.getId());
+		}
+		
 		List<SignalData> signals4Link = this.getSignals4LinkId(system, link.getId());
-		DgProgram program = crossing.getPrograms().get(this.programId);
 		//first get the outlinks that are controlled by the signal
 		for (SignalData signal : signals4Link){
 			log.debug("    signal: " + signal.getId() + " system: " + system.getId());
@@ -278,7 +316,15 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
 			DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment20 l2l) {
-		DgProgram program = crossing.getPrograms().get(this.programId);
+		DgProgram program = null;
+		if (! crossing.getPrograms().containsKey(this.defaultProgramId)){
+			program = new DgProgram(this.defaultProgramId);
+			program.setCycle(this.cycle);
+			crossing.addProgram(program);
+		}
+		else {
+			program = crossing.getPrograms().get(this.defaultProgramId);
+		}
 		if (l2l == null){
 			List<Id> toLinks = this.getTurningMoves4LinkWoLanes(link);
 			for (Id outLinkId : toLinks){

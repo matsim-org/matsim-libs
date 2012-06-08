@@ -31,11 +31,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -89,19 +84,20 @@ public class DgKoehlerStrehler2010ModelWriter {
 	private static final String DRAINS = "drains";
 
 	
-	public void write(ScenarioImpl sc, DgKSNetwork network, String outFile) {
-		this.write(sc, network, null, outFile);
+	public void write(DgKSNetwork network, String outFile) {
+		this.write(network, null, "", "", outFile);
 	}
 
 	
-	public void write(Scenario sc, DgKSNetwork network, DgCommodities coms, String outFile) {
+	public void write(DgKSNetwork network, DgCommodities coms, String name, String description, String outFile) {
 		Writer writer;
+		log.info("start writing KS Model to " + outFile);
 		try {
 			writer = IOUtils.getBufferedWriter(outFile);
 			TransformerHandler hd = this.createContentHandler(writer);
-			this.writeDocumentStart(hd, sc);
+			this.writeDocumentStart(hd, name, description);
 			this.writeCrossings(network, hd);
-			this.writeStreets(network, sc.getNetwork(), hd);
+			this.writeStreets(network, hd);
 			if (coms != null){
 				this.writeCommodities(coms, hd);
 			}
@@ -109,30 +105,33 @@ public class DgKoehlerStrehler2010ModelWriter {
 			hd.endDocument();
 			writer.flush();
 			writer.close();
-			log.info("done");
+			log.info("finished model writing.");
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void writeDocumentStart(TransformerHandler hd, Scenario sc) throws SAXException {
+	private void writeDocumentStart(TransformerHandler hd, String name, String desc) throws SAXException {
 		hd.startDocument();
 		AttributesImpl atts = new AttributesImpl();
 		atts.addAttribute("", "", EXPANDED, CDATA, "false");
 		hd.startElement("", "", NETWORK, atts);
 		atts.clear();
 		hd.startElement("", "", NAME, atts);
-		String name = ((NetworkImpl) sc.getNetwork()).getName();
-		if (name == null) {
-			name = "noname";
+		if (name == null){
+			name = "";
+		}
+		if (desc == null) {
+			desc = "";
 		}
 		char[] nameArray = name.toCharArray();
 		hd.characters(nameArray, 0, nameArray.length);
 		hd.endElement("", "", NAME);
 		atts.clear();
 		hd.startElement("", "", DESCRIPTION, atts);
-		hd.characters(nameArray, 0, nameArray.length);
+		char[] descArray = desc.toCharArray();
+		hd.characters(descArray, 0, descArray.length);
 		hd.endElement("", "", DESCRIPTION);
 	}
 
@@ -226,14 +225,14 @@ public class DgKoehlerStrehler2010ModelWriter {
 		hd.endElement("", "", COMMODITIES);
 	}
 
-	private void writeStreets(DgKSNetwork network, Network matsimNet, TransformerHandler hd)
+	private void writeStreets(DgKSNetwork network, TransformerHandler hd)
 			throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		hd.startElement("", "", STREETS, atts);
-		for (Link link : matsimNet.getLinks().values()) {
+		for (DgStreet street : network.getStreets().values()) {
 			atts.clear();
-			atts.addAttribute("", "", ID, CDATA, link.getId().toString());
-			DgStreet street = network.getStreets().get(link.getId());
+			atts.addAttribute("", "", ID, CDATA, street.getId().toString());
+//			DgStreet street = network.getStreets().get(link.getId());
 			atts.addAttribute("", "", COST, CDATA, Long.toString(street.getCost()));
 			atts.addAttribute("", "", CAPACITY, CDATA,
 					Double.toString(street.getCapacity()));

@@ -44,7 +44,7 @@ public class DgCottbusNet2KoehlerStrehler2010Net {
 		
 		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter();
 		DgKSNetwork dgNet = netConverter.convertNetworkLanesAndSignals(sc, 0.0, 3600.0);
-		new DgKoehlerStrehler2010ModelWriter().write(sc, dgNet, outputNetwork);
+		new DgKoehlerStrehler2010ModelWriter().write(dgNet, outputNetwork);
 
 	}
 

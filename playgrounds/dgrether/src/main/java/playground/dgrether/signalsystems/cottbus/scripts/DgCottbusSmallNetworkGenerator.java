@@ -165,7 +165,7 @@ public class DgCottbusSmallNetworkGenerator {
 		
 		
 		this.boundingBox = new Envelope(coordinates[0], coordinates[2]);
-		this.boundingBox.expandBy(offset, offset);
+//		this.boundingBox.expandBy(offset, offset);
 		LinearRing linearRing = geoFac.createLinearRing(coordinates);
 		Polygon polygon = geoFac.createPolygon(linearRing, null);
 		FeatureType featureType = null;
