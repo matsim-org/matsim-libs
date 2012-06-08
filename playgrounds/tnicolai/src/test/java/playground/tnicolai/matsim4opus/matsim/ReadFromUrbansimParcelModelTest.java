@@ -42,7 +42,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel.PopulationCounter;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
@@ -85,14 +85,14 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		
 		// preparing input test file
 		int dummyYear = 2000;
-		String testFileDirectory = Constants.MATSIM_4_OPUS_TEMP;
+		String testFileDirectory = InternalConstants.MATSIM_4_OPUS_TEMP;
 		String testFileName = null;
 		
 		switch (testNr) {
 		case 1:
 			log.info("Testing computation of UrbanSim zones");
 			// create parcel table
-			testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
+			testFileName = InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + InternalConstants.FILE_TYPE_TAB;
 			createParcelInputTestFile(testFileDirectory, testFileName);
 			// running ReadFromUrbansimParcelModel generating zones and facilities
 			ActivityFacilitiesImpl zones = testRunPracels( dummyYear );
@@ -104,10 +104,10 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		case 2:
 			log.info("Testing construction of MATSim agents based on UrbanSim output");
 			// create parcel table
-			testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
+			testFileName = InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + InternalConstants.FILE_TYPE_TAB;
 			createParcelInputTestFile(testFileDirectory, testFileName);
 			// create person table
-			testFileName = Constants.URBANSIM_PERSON_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
+			testFileName = InternalConstants.URBANSIM_PERSON_DATASET_TABLE + dummyYear + InternalConstants.FILE_TYPE_TAB;
 			createPersonInputTestFile(testFileDirectory, testFileName);
 			// running ReadFromUrbansimParcelModel generating population
 			result = testRunPopulation( dummyYear, false );
@@ -217,142 +217,142 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		StringBuffer testFileContent = new StringBuffer();
 		
 		// create header line
-		testFileContent.append( Constants.PERSON_ID + Constants.TAB + 
-								Constants.PARCEL_ID_HOME + Constants.TAB + 
-								Constants.PARCEL_ID_WORK + Constants.NEW_LINE);
+		testFileContent.append( InternalConstants.PERSON_ID + InternalConstants.TAB + 
+								InternalConstants.PARCEL_ID_HOME + InternalConstants.TAB + 
+								InternalConstants.PARCEL_ID_WORK + InternalConstants.NEW_LINE);
 		
 		// build person table >> person_id	parcel_id_home	parcel_id_work
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		home_ID++;
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID++ + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
-		testFileContent.append( personID + Constants.TAB + home_ID + Constants.TAB + getNextWorkID(work_ID++) + Constants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID++ + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
+		testFileContent.append( personID + InternalConstants.TAB + home_ID + InternalConstants.TAB + getNextWorkID(work_ID++) + InternalConstants.NEW_LINE);
 		
 		this.popSize = personID;
 		
@@ -394,29 +394,29 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		StringBuffer testFileContent = new StringBuffer();
 		
 		// create header line
-		testFileContent.append( Constants.PARCEL_ID + Constants.TAB + 
-								Constants.X_COORDINATE_SP + Constants.TAB + 
-								Constants.Y_COORDINATE_SP + Constants.TAB + 
-								Constants.ZONE_ID + Constants.NEW_LINE);
+		testFileContent.append( InternalConstants.PARCEL_ID + InternalConstants.TAB + 
+								InternalConstants.X_COORDINATE_SP + InternalConstants.TAB + 
+								InternalConstants.Y_COORDINATE_SP + InternalConstants.TAB + 
+								InternalConstants.ZONE_ID + InternalConstants.NEW_LINE);
 		
 		// put in zone 1 >> pracel_id	x_coordinate	y_coordinate	zone_id
-		testFileContent.append( "1" + Constants.TAB + "0" + Constants.TAB + "200" + Constants.TAB + "1" + Constants.NEW_LINE);
-		testFileContent.append( "2" + Constants.TAB + "100" + Constants.TAB + "200" + Constants.TAB + "1" + Constants.NEW_LINE);
-		testFileContent.append( "3" + Constants.TAB + "0" + Constants.TAB + "100" + Constants.TAB + "1" + Constants.NEW_LINE);
-		testFileContent.append( "4" + Constants.TAB + "100" + Constants.TAB + "100" + Constants.TAB + "1" + Constants.NEW_LINE);
+		testFileContent.append( "1" + InternalConstants.TAB + "0" + InternalConstants.TAB + "200" + InternalConstants.TAB + "1" + InternalConstants.NEW_LINE);
+		testFileContent.append( "2" + InternalConstants.TAB + "100" + InternalConstants.TAB + "200" + InternalConstants.TAB + "1" + InternalConstants.NEW_LINE);
+		testFileContent.append( "3" + InternalConstants.TAB + "0" + InternalConstants.TAB + "100" + InternalConstants.TAB + "1" + InternalConstants.NEW_LINE);
+		testFileContent.append( "4" + InternalConstants.TAB + "100" + InternalConstants.TAB + "100" + InternalConstants.TAB + "1" + InternalConstants.NEW_LINE);
 		
 		// put in zone 2 >> pracel_id	x_coordinate	y_coordinate	zone_id
-		testFileContent.append( "5" + Constants.TAB + "200" + Constants.TAB + "200" + Constants.TAB + "2" + Constants.NEW_LINE);
-		testFileContent.append( "6" + Constants.TAB + "100" + Constants.TAB + "100" + Constants.TAB + "2" + Constants.NEW_LINE);
+		testFileContent.append( "5" + InternalConstants.TAB + "200" + InternalConstants.TAB + "200" + InternalConstants.TAB + "2" + InternalConstants.NEW_LINE);
+		testFileContent.append( "6" + InternalConstants.TAB + "100" + InternalConstants.TAB + "100" + InternalConstants.TAB + "2" + InternalConstants.NEW_LINE);
 	
 		// put in zone 3 >> pracel_id	x_coordinate	y_coordinate	zone_id
-		testFileContent.append( "7" + Constants.TAB + "50" + Constants.TAB + "100" + Constants.TAB + "3" + Constants.NEW_LINE);
-		testFileContent.append( "8" + Constants.TAB + "100" + Constants.TAB + "50" + Constants.TAB + "3" + Constants.NEW_LINE);
-		testFileContent.append( "9" + Constants.TAB + "50" + Constants.TAB + "0" + Constants.TAB + "3" + Constants.NEW_LINE);
-		testFileContent.append( "10" + Constants.TAB + "0" + Constants.TAB + "50" + Constants.TAB + "3" + Constants.NEW_LINE);
+		testFileContent.append( "7" + InternalConstants.TAB + "50" + InternalConstants.TAB + "100" + InternalConstants.TAB + "3" + InternalConstants.NEW_LINE);
+		testFileContent.append( "8" + InternalConstants.TAB + "100" + InternalConstants.TAB + "50" + InternalConstants.TAB + "3" + InternalConstants.NEW_LINE);
+		testFileContent.append( "9" + InternalConstants.TAB + "50" + InternalConstants.TAB + "0" + InternalConstants.TAB + "3" + InternalConstants.NEW_LINE);
+		testFileContent.append( "10" + InternalConstants.TAB + "0" + InternalConstants.TAB + "50" + InternalConstants.TAB + "3" + InternalConstants.NEW_LINE);
 		
 		// put in zone 4 >> pracel_id	x_coordinate	y_coordinate	zone_id
-		testFileContent.append( "11" + Constants.TAB + "150" + Constants.TAB + "50" + Constants.TAB + "4" + Constants.NEW_LINE);
+		testFileContent.append( "11" + InternalConstants.TAB + "150" + InternalConstants.TAB + "50" + InternalConstants.TAB + "4" + InternalConstants.NEW_LINE);
 		
 		return testFileWiter(directory, fileName, testFileContent);
 	}
@@ -438,7 +438,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 			bufferedOutput = new BufferedWriter(fileStream);
 			
 			log.info("Created test input file:");
-			log.info( Constants.NEW_LINE + testFileContent.toString() );
+			log.info( InternalConstants.NEW_LINE + testFileContent.toString() );
 			
 			bufferedOutput.write( testFileContent.toString() );
 			bufferedOutput.flush();

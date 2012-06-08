@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.tnicolai.matsim4opus.config.JAXBUnmaschal;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverter;
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
 import playground.tnicolai.matsim4opus.matsim4urbansim.ZoneBasedAccessibilityControlerListener;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
@@ -115,7 +115,7 @@ public class MATSim4UrbanSim {
 		cleanNetwork(network);
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
+		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( Integer.parseInt( scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.YEAR) ) );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -137,7 +137,7 @@ public class MATSim4UrbanSim {
 
 		runControler(zones, parcels, numberOfWorkplacesPerZone, readFromUrbansim);
 		
-		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){
+		if( scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){
 			// saving results from current run
 			saveRunOutputs();			
 			cleanUrbanSimOutput();
@@ -146,7 +146,7 @@ public class MATSim4UrbanSim {
 	}
 	
 	void isTestTun(){
-		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
+		if( scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.IS_TEST_RUN).equalsIgnoreCase(InternalConstants.TRUE)){
 			log.info("TestRun was successful...");
 			return;
 		}
@@ -176,10 +176,10 @@ public class MATSim4UrbanSim {
 		Population oldPopulation = null;
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
 			
-			String mode = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE);
-			if(mode.equals(Constants.HOT_START))
+			String mode = scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.MATSIM_MODE);
+			if(mode.equals(InternalConstants.HOT_START))
 				log.info("MATSim is running in HOT start mode, i.e. MATSim starts with pop file from previous run: " + scenario.getConfig().plans().getInputFile());
-			else if(mode.equals(Constants.WARM_START))
+			else if(mode.equals(InternalConstants.WARM_START))
 				log.info("MATSim is running in WARM start mode, i.e. MATSim starts with pre-existing pop file:" + scenario.getConfig().plans().getInputFile());
 			
 			log.info("Persons not found in pop file are added; persons no longer in urbansim persons file are removed." ) ;
@@ -195,7 +195,7 @@ public class MATSim4UrbanSim {
 		}
 
 		// read urbansim persons.  Generates hwh acts as side effect
-		Population newPopulation = readFromUrbansim.readPersonsParcel( oldPopulation, parcels, network, Double.parseDouble( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.SAMPLING_RATE)) ) ;
+		Population newPopulation = readFromUrbansim.readPersonsParcel( oldPopulation, parcels, network, Double.parseDouble( scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.SAMPLING_RATE)) ) ;
 		
 		// clean
 		oldPopulation=null;
@@ -290,7 +290,7 @@ public class MATSim4UrbanSim {
 		if( (matsimConfig = unmarschal.unmaschalMATSimConfig()) == null){
 			
 			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
-			System.exit(Constants.UNMARSCHALLING_FAILED);
+			System.exit(InternalConstants.UNMARSCHALLING_FAILED);
 		}
 		return matsimConfig;
 	}
@@ -301,26 +301,26 @@ public class MATSim4UrbanSim {
 	void saveRunOutputs() {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 		
-		String saveDirectory = "run" + scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) + "-" + DateUtil.now();
-		String savePath = Paths.checkPathEnding( Constants.MATSIM_4_OPUS_BACKUP + saveDirectory );
-		FileCopy.copyTree(Constants.MATSIM_4_OPUS_TEMP, savePath);
+		String saveDirectory = "run" + scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.YEAR) + "-" + DateUtil.now();
+		String savePath = Paths.checkPathEnding( InternalConstants.MATSIM_4_OPUS_BACKUP + saveDirectory );
+		FileCopy.copyTree(InternalConstants.MATSIM_4_OPUS_TEMP, savePath);
 		
-		String newPlansFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME;
-		String scorestatFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.SCORESTATS_FILE_NAME;
-		String traveldistances = Constants.MATSIM_4_OPUS_OUTPUT + Constants.TRAVELDISTANCESSTAT_FILE_NAME;
+		String newPlansFile = InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.GENERATED_PLANS_FILE_NAME;
+		String scorestatFile = InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.SCORESTATS_FILE_NAME;
+		String traveldistances = InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.TRAVELDISTANCESSTAT_FILE_NAME;
 		
 		// get population / plans file
 		try {
-			FileCopy.fileCopy( new File(newPlansFile) , new File(savePath + Constants.GENERATED_PLANS_FILE_NAME) );
-			FileCopy.fileCopy( new File(scorestatFile) , new File(savePath + Constants.SCORESTATS_FILE_NAME) );
-			FileCopy.fileCopy( new File(traveldistances) , new File(savePath + Constants.TRAVELDISTANCESSTAT_FILE_NAME) );
+			FileCopy.fileCopy( new File(newPlansFile) , new File(savePath + InternalConstants.GENERATED_PLANS_FILE_NAME) );
+			FileCopy.fileCopy( new File(scorestatFile) , new File(savePath + InternalConstants.SCORESTATS_FILE_NAME) );
+			FileCopy.fileCopy( new File(traveldistances) , new File(savePath + InternalConstants.TRAVELDISTANCESSTAT_FILE_NAME) );
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		log.info("Saving UrbanSim and MATSim outputs done!");
 		
-		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
+		String targetLocationHotStartFile = scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.TARGET_LOCATION_HOT_START_PLANS_FILE);
 		if(!targetLocationHotStartFile.equals("")){
 			
 			log.info("Preparing hot start for next MATSim run ...");
@@ -339,9 +339,9 @@ public class MATSim4UrbanSim {
 	 */
 	void cleanUrbanSimOutput(){
 		
-		log.info("Cleaning MATSim4Opus temp directory (" + Constants.MATSIM_4_OPUS_TEMP + ") from UrbanSim output." );
+		log.info("Cleaning MATSim4Opus temp directory (" + InternalConstants.MATSIM_4_OPUS_TEMP + ") from UrbanSim output." );
 		
-		ArrayList<File> fileNames = FileCopy.listAllFiles(new File(Constants.MATSIM_4_OPUS_TEMP), Boolean.FALSE);
+		ArrayList<File> fileNames = FileCopy.listAllFiles(new File(InternalConstants.MATSIM_4_OPUS_TEMP), Boolean.FALSE);
 		Iterator<File> fileNameIterator = fileNames.iterator();
 		while(fileNameIterator.hasNext()){
 			File f = fileNameIterator.next();

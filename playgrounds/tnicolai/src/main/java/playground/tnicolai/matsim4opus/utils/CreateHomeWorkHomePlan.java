@@ -7,7 +7,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 public class CreateHomeWorkHomePlan {
 	
@@ -23,7 +23,7 @@ public class CreateHomeWorkHomePlan {
 	 * @author nagel
 	 */
 	public static void makeHomePlan( PlanImpl plan, Coord homeCoord, ActivityFacility homeLocation) {
-		ActivityImpl act = plan.createAndAddActivity( Constants.ACT_HOME, homeCoord) ;
+		ActivityImpl act = plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord) ;
 		act.setFacilityId( homeLocation.getId() );	// tnicolai: added facility id to compute zone2zone trips
 	}
 
@@ -49,7 +49,7 @@ public class CreateHomeWorkHomePlan {
 		plan.createAndAddLeg(TransportMode.car);
 		
 		// set second activity (work)
-		act = plan.createAndAddActivity( Constants.ACT_WORK, workCoord );
+		act = plan.createAndAddActivity( InternalConstants.ACT_WORK, workCoord );
 		act.setFacilityId( jobLocation.getId() );
 		act.setMaximumDuration( 8.*3600. ) ; // tnicolai: make configurable: actType1.setTypicalDuration(8*60*60);
 		
@@ -57,7 +57,7 @@ public class CreateHomeWorkHomePlan {
 		plan.createAndAddLeg(TransportMode.car) ;
 		
 		// set last activity (=first activity) and complete home-work-home plan.
-		plan.createAndAddActivity( Constants.ACT_HOME, homeCoord );
+		plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord );
 		act = (ActivityImpl)plan.getLastActivity();
 		act.setFacilityId( homeId );
 	}

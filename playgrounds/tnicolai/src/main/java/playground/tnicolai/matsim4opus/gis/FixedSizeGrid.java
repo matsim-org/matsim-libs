@@ -32,7 +32,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 
 public class FixedSizeGrid {
@@ -134,7 +134,7 @@ public class FixedSizeGrid {
 		logger.info("The matrix has a relolution of " + currResolution + " meter.");
 		
 		try{
-			BufferedWriter ttWriter = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + currResolution + Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + Constants.FILE_TYPE_TXT);
+			BufferedWriter ttWriter = IOUtils.getBufferedWriter(InternalConstants.MATSIM_4_OPUS_TEMP + currResolution + InternalConstants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + InternalConstants.FILE_TYPE_TXT);
 			
 			// writing x coordinates (header)
 			for(int col = 0; (col < colPoints); col++ ){

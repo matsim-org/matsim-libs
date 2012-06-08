@@ -32,7 +32,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 
 
@@ -59,7 +59,7 @@ public class MATSimProperties extends Properties{
 	 */
 	private MATSimProperties(){	
 		
-		String matsimProperiesFile = Constants.MATSIM_4_OPUS_CONFIG + Constants.MATSIM_PROPERTIES_FILE;
+		String matsimProperiesFile = InternalConstants.MATSIM_4_OPUS_CONFIG + InternalConstants.MATSIM_PROPERTIES_FILE;
 		File propertiesFile = new File(matsimProperiesFile);
 		
 		try{
@@ -71,12 +71,12 @@ public class MATSimProperties extends Properties{
 		}
 		catch(FileNotFoundException fnf){
 			log.error("Properties file " + matsimProperiesFile + " not found! SHUTDOWN MATSim !!!");
-			System.exit(Constants.MATSIM_PROPERTIES_FILE_NOT_FOUND);
+			System.exit(InternalConstants.MATSIM_PROPERTIES_FILE_NOT_FOUND);
 		}
 		catch (IOException io) {
 			io.printStackTrace();
 			log.error("SHUTDOWN MATSim !!!");
-			System.exit(Constants.EXCEPTION_OCCURED);
+			System.exit(InternalConstants.EXCEPTION_OCCURED);
 		}
 	}
 	
@@ -86,7 +86,7 @@ public class MATSimProperties extends Properties{
 	public void saveMATSimState(){
 		
 		try{
-			this.store(new FileOutputStream(Constants.MATSIM_4_OPUS_CONFIG + "/matsim.properties", false), "MATSim state file");
+			this.store(new FileOutputStream(InternalConstants.MATSIM_4_OPUS_CONFIG + "/matsim.properties", false), "MATSim state file");
 		}
 		catch(IOException io){
 			io.printStackTrace();

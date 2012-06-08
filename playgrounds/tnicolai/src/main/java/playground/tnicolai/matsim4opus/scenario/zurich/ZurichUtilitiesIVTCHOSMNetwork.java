@@ -8,10 +8,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
 
-public class ZurichUtilitiesIVTCHNetwork extends ZurichUtilities{
+public class ZurichUtilitiesIVTCHOSMNetwork extends ZurichUtilities{
 	
 	/** logger */
-	private static final Logger log = Logger.getLogger(ZurichUtilitiesIVTCHNetwork.class);
+	private static final Logger log = Logger.getLogger(ZurichUtilitiesIVTCHOSMNetwork.class);
 	
 	/**
 	 * This modifies the MATSim network according to the given test parameter in
@@ -40,6 +40,8 @@ public class ZurichUtilitiesIVTCHNetwork extends ZurichUtilities{
 		
 		linksToRemove.add(new IdImpl(103727));
 		linksToRemove.add(new IdImpl(103728));
+		linksToRemove.add(new IdImpl(101895));
+		linksToRemove.add(new IdImpl(101896));
 
 		// remove links from network
 		applyScenario(network);

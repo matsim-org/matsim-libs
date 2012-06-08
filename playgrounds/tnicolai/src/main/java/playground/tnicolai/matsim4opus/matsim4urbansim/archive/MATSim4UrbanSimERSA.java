@@ -37,7 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
@@ -309,7 +309,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		// writeSpatialGridTables(myListener);
 		
 		// dumping benchmark results
-		benchmark.dumpResults(Constants.MATSIM_4_OPUS_TEMP + "matsim4ersa_benchmark.txt");
+		benchmark.dumpResults(InternalConstants.MATSIM_4_OPUS_TEMP + "matsim4ersa_benchmark.txt");
 	}
 
 //	/**
@@ -451,8 +451,8 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		logger.info("Extracting boundary of the shape file ...");
 		Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
 		// boundary.setSRID( Constants.SRID_WASHINGTON_NORTH );
-		boundary.setSRID( Constants.SRID_SWITZERLAND );
-		logger.warn("Using SRID of Switzerland: " + Constants.SRID_SWITZERLAND);
+		boundary.setSRID( InternalConstants.SRID_SWITZERLAND );
+		logger.warn("Using SRID of Switzerland: " + InternalConstants.SRID_SWITZERLAND);
 		logger.info("Done extracting boundary ...");
 		
 		return boundary;
@@ -497,7 +497,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 					// Linear Ring defines an artificial zone
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
-					polygon.setSRID( Constants.SRID_WASHINGTON_NORTH ); 
+					polygon.setSRID( InternalConstants.SRID_WASHINGTON_NORTH ); 
 					
 					Zone<CounterObject> zone = new Zone<CounterObject>(polygon);
 					zone.setAttribute( new CounterObject( setPoints ) );

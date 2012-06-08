@@ -41,7 +41,7 @@ import playground.tnicolai.matsim4opus.config.AccessibilityParameterConfigModule
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV2;
 import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
@@ -283,7 +283,7 @@ public class MATSim4UrbanSimParcel {
 	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler) {
 		
 		// set spatial reference id (not necessary but needed to match the outcomes with google maps)
-		int srid = Constants.SRID_SWITZERLAND; // Constants.SRID_WASHINGTON_NORTH
+		int srid = InternalConstants.SRID_SWITZERLAND; // Constants.SRID_WASHINGTON_NORTH
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)

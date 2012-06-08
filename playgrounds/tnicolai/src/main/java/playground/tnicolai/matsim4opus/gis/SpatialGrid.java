@@ -62,18 +62,15 @@ public class SpatialGrid{
 		int numXBins = (int)Math.ceil((maxX - minX) / resolution) + 1;
 		int numYBins = (int)Math.ceil((maxY - minY) / resolution) + 1;
 		matrix = new double[numYBins][numXBins];
+		
+		// init matrix
+		for(int x = 0; x < numXBins; x++)
+			for(int y = 0; y < numYBins; y++)
+				matrix[y][x] = Double.NaN;
 	}
 	
 	public SpatialGrid(double [] boundingBox, double resolution) {
-		assert(boundingBox != null);
-		minX = boundingBox[0];
-		minY = boundingBox[1];
-		maxX = boundingBox[2];
-		maxY = boundingBox[3];
-		this.resolution = resolution;
-		int numXBins = (int)Math.ceil((maxX - minX) / resolution) + 1;
-		int numYBins = (int)Math.ceil((maxY - minY) / resolution) + 1;
-		matrix = new double[numYBins][numXBins];
+		this(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], resolution);
 	}
 	
 	public SpatialGrid(SpatialGrid grid) {

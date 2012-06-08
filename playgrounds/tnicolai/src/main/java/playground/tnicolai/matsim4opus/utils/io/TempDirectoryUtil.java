@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 
 /**
@@ -154,21 +154,21 @@ public class TempDirectoryUtil {
 		log.info("Creating temp directories");
 		
 		// set temp directory as opus_home
-		Constants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
+		InternalConstants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
 
-		File tempFile = new File(Constants.OPUS_HOME);
+		File tempFile = new File(InternalConstants.OPUS_HOME);
 		tempFile.mkdirs();
 		
-		tempFile = new File(Constants.MATSIM_4_OPUS);
+		tempFile = new File(InternalConstants.MATSIM_4_OPUS);
 		tempFile.mkdirs();
 		
-		tempFile = new File(Constants.MATSIM_4_OPUS_OUTPUT);
+		tempFile = new File(InternalConstants.MATSIM_4_OPUS_OUTPUT);
 		tempFile.mkdirs();
 		
-		tempFile = new File(Constants.MATSIM_4_OPUS_TEMP);
+		tempFile = new File(InternalConstants.MATSIM_4_OPUS_TEMP);
 		tempFile.mkdirs();
 		
-		tempFile = new File(Constants.MATSIM_4_OPUS_CONFIG);
+		tempFile = new File(InternalConstants.MATSIM_4_OPUS_CONFIG);
 		tempFile.mkdirs();
 		log.info("Finished creating temp directories");
 	}
@@ -180,19 +180,19 @@ public class TempDirectoryUtil {
 	public static void cleaningUpOPUSDirectories(){
 		log.info("Removing temp directories");
 
-		File tempFile = new File(Constants.OPUS_HOME);
+		File tempFile = new File(InternalConstants.OPUS_HOME);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(Constants.MATSIM_4_OPUS);
+		tempFile = new File(InternalConstants.MATSIM_4_OPUS);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(Constants.MATSIM_4_OPUS_OUTPUT);
+		tempFile = new File(InternalConstants.MATSIM_4_OPUS_OUTPUT);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(Constants.MATSIM_4_OPUS_TEMP);
+		tempFile = new File(InternalConstants.MATSIM_4_OPUS_TEMP);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(Constants.MATSIM_4_OPUS_CONFIG);
+		tempFile = new File(InternalConstants.MATSIM_4_OPUS_CONFIG);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);	
 		log.info("Finished removing temp directories");

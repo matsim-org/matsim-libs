@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 
@@ -24,18 +24,18 @@ public class AnalysisCellBasedAccessibilityCSVWriter {
 	public AnalysisCellBasedAccessibilityCSVWriter(String fileExtension){
 		try{
 			log.info("Initializing GridBasedAccessibilityCSVWriter ...");
-			accessibilityDataWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + fileExtension +"_accessibility_indicators_ersa.csv" );
+			accessibilityDataWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + fileExtension +"_accessibility_indicators_ersa.csv" );
 			
 			// create header
-			accessibilityDataWriter.write( Constants.ZONE_ID + "," +
-										   Constants.X_COORDINATE + "," +
-										   Constants.Y_COORDINATE + "," + 
-										   Constants.NEARESTNODE_ID + "," +
-										   Constants.NEARESTNODE_X_COORD + "," +
-										   Constants.NEARESTNODE_Y_COORD + "," + 
-										   Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
-										   Constants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
-										   Constants.WALK_TRAVEL_TIME_ACCESSIBILITY);
+			accessibilityDataWriter.write( InternalConstants.ZONE_ID + "," +
+										   InternalConstants.X_COORDINATE + "," +
+										   InternalConstants.Y_COORDINATE + "," + 
+										   InternalConstants.NEARESTNODE_ID + "," +
+										   InternalConstants.NEARESTNODE_X_COORD + "," +
+										   InternalConstants.NEARESTNODE_Y_COORD + "," + 
+										   InternalConstants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
+										   InternalConstants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
+										   InternalConstants.WALK_TRAVEL_TIME_ACCESSIBILITY);
 			accessibilityDataWriter.newLine();
 			
 			log.info("... done!");

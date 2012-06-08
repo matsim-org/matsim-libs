@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 
@@ -26,14 +26,14 @@ public class AnalysisPopulationCSVWriter {
 		
 		try{
 			log.info("Initializing AnalysisPopulationCSVWriter ...");
-			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
-			log.info("Writing (population) data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
+			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing (population) data into " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
-			bwPopulation.write(Constants.PERSON_ID +","+ 
-								 Constants.PARCEL_ID +","+ 
-								 Constants.X_COORDINATE +","+ 
-								 Constants.Y_COORDINATE);
+			bwPopulation.write(InternalConstants.PERSON_ID +","+ 
+								 InternalConstants.PARCEL_ID +","+ 
+								 InternalConstants.X_COORDINATE +","+ 
+								 InternalConstants.Y_COORDINATE);
 			bwPopulation.newLine();
 			
 			Iterator<PersonAndJobsObject> personIterator = personLocations.values().iterator();
@@ -70,11 +70,11 @@ public class AnalysisPopulationCSVWriter {
 			BufferedWriter bwAggregatedPopulation = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			bwAggregatedPopulation.write(Constants.PARCEL_ID +","+ 
-					 		   Constants.NEARESTNODE_ID +","+
-					 		   Constants.NEARESTNODE_X_COORD +","+ 
-					 		   Constants.NEARESTNODE_Y_COORD +","+
-					 		   Constants.PERSONS_COUNT);
+			bwAggregatedPopulation.write(InternalConstants.PARCEL_ID +","+ 
+					 		   InternalConstants.NEARESTNODE_ID +","+
+					 		   InternalConstants.NEARESTNODE_X_COORD +","+ 
+					 		   InternalConstants.NEARESTNODE_Y_COORD +","+
+					 		   InternalConstants.PERSONS_COUNT);
 			bwAggregatedPopulation.newLine();
 			
 			Iterator<AggregateObject2NearestNode> personIterator = personClusterMap.values().iterator();

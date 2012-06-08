@@ -39,7 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.CreateHomeWorkHomePlan;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
@@ -92,7 +92,7 @@ public class ReadFromUrbanSimModel {
 	 */
 	public void readFacilitiesZones(final ActivityFacilitiesImpl zones) {
 		// (these are simply defined as those entities that have x/y coordinates in UrbanSim)
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_ZONE_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_ZONE_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read urbansim zones table from " + filename );
 
@@ -103,10 +103,10 @@ public class ReadFromUrbanSimModel {
 			String line = reader.readLine();
 
 			// get and initialize the column number of each header element
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexXCoodinate 	= idxFromKey.get( Constants.X_COORDINATE );
-			final int indexYCoodinate 	= idxFromKey.get( Constants.Y_COORDINATE );
-			final int indexZoneID 		= idxFromKey.get( Constants.ZONE_ID );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB_SEPERATOR );
+			final int indexXCoodinate 	= idxFromKey.get( InternalConstants.X_COORDINATE );
+			final int indexYCoodinate 	= idxFromKey.get( InternalConstants.Y_COORDINATE );
+			final int indexZoneID 		= idxFromKey.get( InternalConstants.ZONE_ID );
 
 			// temporary variables, needed to construct parcels and zones
 			ZoneId zone_ID;
@@ -114,7 +114,7 @@ public class ReadFromUrbanSimModel {
 			String[] parts;
 
 			while ( (line = reader.readLine()) != null ) {
-				parts = line.split(Constants.TAB_SEPERATOR);
+				parts = line.split(InternalConstants.TAB_SEPERATOR);
 
 				// get zone ID, UrbanSim sometimes writes IDs as floats!
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
@@ -125,18 +125,18 @@ public class ReadFromUrbanSimModel {
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = zones.createFacility(zone_ID,coord);
-				facility.setDesc( Constants.FACILITY_DESCRIPTION ) ;
+				facility.setDesc( InternalConstants.FACILITY_DESCRIPTION ) ;
 
 				// set custom attributes, these are needed to compute zone2zone trips
 				Map<String, Object> customFacilityAttributes = facility.getCustomAttributes();
-				customFacilityAttributes.put(Constants.ZONE_ID, zone_ID);
+				customFacilityAttributes.put(InternalConstants.ZONE_ID, zone_ID);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			System.exit( Constants.EXCEPTION_OCCURED );
+			System.exit( InternalConstants.EXCEPTION_OCCURED );
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.exit( Constants.EXCEPTION_OCCURED );
+			System.exit( InternalConstants.EXCEPTION_OCCURED );
 		}
 		
 		log.info("Done reading urbansim parcels. Found " + zones.getFacilities().size() + " zones.");
@@ -150,7 +150,7 @@ public class ReadFromUrbanSimModel {
 	 */
 	public void readFacilitiesParcel(final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones) {
 		// (these are simply defined as those entities that have x/y coordinates in UrbanSim)
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PARCEL_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read urbansim parcels table from " + filename );
 
@@ -165,11 +165,11 @@ public class ReadFromUrbanSimModel {
 			String line = reader.readLine();
 
 			// get and initialize the column number of each header element
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexParcelID 	= idxFromKey.get( Constants.PARCEL_ID );
-			final int indexXCoodinate 	= idxFromKey.get( Constants.X_COORDINATE_SP );
-			final int indexYCoodinate 	= idxFromKey.get( Constants.Y_COORDINATE_SP );
-			final int indexZoneID 		= idxFromKey.get( Constants.ZONE_ID );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB_SEPERATOR );
+			final int indexParcelID 	= idxFromKey.get( InternalConstants.PARCEL_ID );
+			final int indexXCoodinate 	= idxFromKey.get( InternalConstants.X_COORDINATE_SP );
+			final int indexYCoodinate 	= idxFromKey.get( InternalConstants.Y_COORDINATE_SP );
+			final int indexZoneID 		= idxFromKey.get( InternalConstants.ZONE_ID );
 
 			// temporary variables, needed to construct parcels and zones
 			Id parcel_ID;
@@ -180,7 +180,7 @@ public class ReadFromUrbanSimModel {
 
 			//
 			while ( (line = reader.readLine()) != null ) {
-				parts = line.split(Constants.TAB_SEPERATOR);
+				parts = line.split(InternalConstants.TAB_SEPERATOR);
 
 				// urbansim sometimes writes IDs as floats!
 				long parcelIdAsLong = (long) Double.parseDouble( parts[ indexParcelID ] );
@@ -191,7 +191,7 @@ public class ReadFromUrbanSimModel {
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = parcels.createFacility(parcel_ID,coord);
-				facility.setDesc( Constants.FACILITY_DESCRIPTION ) ;
+				facility.setDesc( InternalConstants.FACILITY_DESCRIPTION ) ;
 				
 				// get zone ID
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
@@ -199,8 +199,8 @@ public class ReadFromUrbanSimModel {
 
 				// set custom attributes, these are needed to compute zone2zone trips
 				Map<String, Object> customFacilityAttributes = facility.getCustomAttributes();
-				customFacilityAttributes.put(Constants.ZONE_ID, zone_ID);
-				customFacilityAttributes.put(Constants.PARCEL_ID, parcel_ID);
+				customFacilityAttributes.put(InternalConstants.ZONE_ID, zone_ID);
+				customFacilityAttributes.put(InternalConstants.PARCEL_ID, parcel_ID);
 
 				// the pseudoZones (HashMap) is a temporary data structure to create zones.
 				// this intermediate step is needed to make sure that every zone id just exists once.
@@ -221,10 +221,10 @@ public class ReadFromUrbanSimModel {
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			System.exit( Constants.EXCEPTION_OCCURED );
+			System.exit( InternalConstants.EXCEPTION_OCCURED );
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.exit( Constants.EXCEPTION_OCCURED );
+			System.exit( InternalConstants.EXCEPTION_OCCURED );
 		}
 		
 		log.info("Done reading urbansim parcels. Found " + parcels.getFacilities().size() + " parcels.");
@@ -291,7 +291,7 @@ public class ReadFromUrbanSimModel {
 		
 		boolean compensationFlag = false;
 
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read persons table from " + filename );
 
@@ -300,10 +300,10 @@ public class ReadFromUrbanSimModel {
 
 			String line = reader.readLine();
 			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexZoneID_HOME 	   = idxFromKey.get( Constants.ZONE_ID_HOME );
-			final int indexZoneID_WORK 	   = idxFromKey.get( Constants.ZONE_ID_WORK );
-			final int indexPersonID		   = idxFromKey.get( Constants.PERSON_ID );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB_SEPERATOR );
+			final int indexZoneID_HOME 	   = idxFromKey.get( InternalConstants.ZONE_ID_HOME );
+			final int indexZoneID_WORK 	   = idxFromKey.get( InternalConstants.ZONE_ID_WORK );
+			final int indexPersonID		   = idxFromKey.get( InternalConstants.PERSON_ID );
 
 			// We consider two cases:
 			// (1) We have an old population.  Then we look for those people who have the same id.
@@ -312,7 +312,7 @@ public class ReadFromUrbanSimModel {
 
 			while ( (line=reader.readLine()) != null ) {
 				cnt.numberOfUrbanSimPersons++;
-				String[] parts = line.split( Constants.TAB_SEPERATOR );
+				String[] parts = line.split( InternalConstants.TAB_SEPERATOR );
 
 				// create new person
 				Id personId = new IdImpl( parts[ indexPersonID ] );
@@ -407,7 +407,7 @@ public class ReadFromUrbanSimModel {
 		
 		boolean compensationFlag = false;
 
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read persons table from " + filename );
 
@@ -416,10 +416,10 @@ public class ReadFromUrbanSimModel {
 
 			String line = reader.readLine();
 			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
-			final int indexParcelID_WORK 	= idxFromKey.get( Constants.PARCEL_ID_WORK );
-			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB_SEPERATOR );
+			final int indexParcelID_HOME 	= idxFromKey.get( InternalConstants.PARCEL_ID_HOME );
+			final int indexParcelID_WORK 	= idxFromKey.get( InternalConstants.PARCEL_ID_WORK );
+			final int indexPersonID			= idxFromKey.get( InternalConstants.PERSON_ID );
 
 			// We consider two cases:
 			// (1) We have an old population.  Then we look for those people who have the same id.
@@ -428,7 +428,7 @@ public class ReadFromUrbanSimModel {
 
 			while ( (line=reader.readLine()) != null ) {
 				cnt.numberOfUrbanSimPersons++;
-				String[] parts = line.split( Constants.TAB_SEPERATOR );
+				String[] parts = line.split( InternalConstants.TAB_SEPERATOR );
 
 				// create new person
 				Id personId = new IdImpl( parts[ indexPersonID ] );
@@ -672,7 +672,7 @@ public class ReadFromUrbanSimModel {
 	@Deprecated
 	public Map<Id,CounterObject> readZoneBasedWorkplaces(){
 		
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read jobs table from " + filename );
 
@@ -684,14 +684,14 @@ public class ReadFromUrbanSimModel {
 			// reading header
 			String line = reader.readLine();
 			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB );
-			final int indexZoneID_WORK	   = idxFromKey.get( Constants.ZONE_ID_WORK );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB );
+			final int indexZoneID_WORK	   = idxFromKey.get( InternalConstants.ZONE_ID_WORK );
 			
 			ZoneId zone_ID;
 			CounterObject workObj;
 			
 			while ( (line=reader.readLine()) != null ) {
-				String[] parts = line.split( Constants.TAB );
+				String[] parts = line.split( InternalConstants.TAB );
 				
 				// get zone ID
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID_WORK ] );
@@ -770,7 +770,7 @@ public class ReadFromUrbanSimModel {
 		
 		// Since the aggregated workplaces in jobClusterArray does contain coordinates of their nearest node 
 		// this result is dumped out here    tnicolai dec'12
-		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
+		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
 		
 		log.info("Aggregating workplaces with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> jobClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
@@ -825,7 +825,7 @@ public class ReadFromUrbanSimModel {
 		List<PersonAndJobsObject> backupList = new ArrayList<PersonAndJobsObject>();
 		
 		
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		if(parcelsOrZones != null){
 			
@@ -839,12 +839,12 @@ public class ReadFromUrbanSimModel {
 				// reading header
 				String line = reader.readLine();
 				// get columns for job, parcel and zone id
-				Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB );
-				int indexJobID = idxFromKey.get( Constants.JOB_ID );
+				Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB );
+				int indexJobID = idxFromKey.get( InternalConstants.JOB_ID );
 				int indexParcelID = -1; // see below
-				int indexZoneID = idxFromKey.get( Constants.ZONE_ID_WORK );
+				int indexZoneID = idxFromKey.get( InternalConstants.ZONE_ID_WORK );
 				if(isParcel)
-					indexParcelID = idxFromKey.get( Constants.PARCEL_ID_WORK );
+					indexParcelID = idxFromKey.get( InternalConstants.PARCEL_ID_WORK );
 
 				boolean isBackup = false;
 				
@@ -855,7 +855,7 @@ public class ReadFromUrbanSimModel {
 					if(MatsimRandom.getRandom().nextDouble() > jobSample)
 						isBackup = true;
 					
-					String[] parts = line.split( Constants.TAB );
+					String[] parts = line.split( InternalConstants.TAB );
 					
 					if(isParcel) 	// parcel based approach
 						createJobParcel(cnt, jobSampleList, backupList,
@@ -1055,7 +1055,7 @@ public class ReadFromUrbanSimModel {
 	 */
 	public void readAndDumpPersons2CSV(final ActivityFacilitiesImpl parcels, final Network network){
 		
-		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		log.info( "Starting to read persons table from " + filename );
 		
 		Map<Id, PersonAndJobsObject> personLocations = new HashMap<Id, PersonAndJobsObject>();
@@ -1066,13 +1066,13 @@ public class ReadFromUrbanSimModel {
 
 			String line = reader.readLine();
 			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
-			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB_SEPERATOR );
+			final int indexParcelID_HOME 	= idxFromKey.get( InternalConstants.PARCEL_ID_HOME );
+			final int indexPersonID			= idxFromKey.get( InternalConstants.PERSON_ID );
 			
 			while ( (line=reader.readLine()) != null ) {
 				
-				String[] parts = line.split( Constants.TAB_SEPERATOR );
+				String[] parts = line.split( InternalConstants.TAB_SEPERATOR );
 				
 				// check if home location is available
 				if( Integer.parseInt(parts[ indexParcelID_HOME ]) >=  0){
@@ -1108,7 +1108,7 @@ public class ReadFromUrbanSimModel {
 			// dump population data
 			AnalysisPopulationCSVWriter.writePopulationData2CSV( personLocations);
 			// dump aggregated population data
-			AnalysisPopulationCSVWriter.writeAggregatedPopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
+			AnalysisPopulationCSVWriter.writeAggregatedPopulationData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
 			
 		} catch (Exception e) {e.printStackTrace();}
 	}

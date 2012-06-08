@@ -40,7 +40,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig2.MatsimConfigType;
@@ -116,7 +116,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		// binding the parameter from the MATSim Config into the JAXB data structure
 		if( (matsimConfig = unmarschal.unmaschalMATSimConfig()) == null){
 			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
-			System.exit(Constants.UNMARSCHALLING_FAILED);
+			System.exit(InternalConstants.UNMARSCHALLING_FAILED);
 		}
 		return matsimConfig;
 	}
@@ -231,24 +231,24 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		module.setTestRun(isTestRun);	
 		
 		// setting paths into constants structure
-		Constants.OPUS_HOME = module.getOpusHome();
-		Constants.OPUS_DATA_PATH = module.getOpusDataPath();
-		Constants.MATSIM_4_OPUS = module.getMATSim4Opus();
-		Constants.MATSIM_4_OPUS_CONFIG = module.getMATSim4OpusConfig();
-		Constants.MATSIM_4_OPUS_OUTPUT = module.getMATSim4OpusOutput();
-		Constants.MATSIM_4_OPUS_TEMP = module.getMATSim4OpusTemp();
-		Constants.MATSIM_4_OPUS_BACKUP = module.getMATSim4OpusBackup();
+		InternalConstants.OPUS_HOME = module.getOpusHome();
+		InternalConstants.OPUS_DATA_PATH = module.getOpusDataPath();
+		InternalConstants.MATSIM_4_OPUS = module.getMATSim4Opus();
+		InternalConstants.MATSIM_4_OPUS_CONFIG = module.getMATSim4OpusConfig();
+		InternalConstants.MATSIM_4_OPUS_OUTPUT = module.getMATSim4OpusOutput();
+		InternalConstants.MATSIM_4_OPUS_TEMP = module.getMATSim4OpusTemp();
+		InternalConstants.MATSIM_4_OPUS_BACKUP = module.getMATSim4OpusBackup();
 		
 		log.info("UrbanSimParameter settings:");
 		log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
 		log.info("Year: " + module.getYear() ); 
-		log.info("OPUS_HOME: " + Constants.OPUS_HOME );
-		log.info("OPUS_DATA_PATH: " + Constants.OPUS_DATA_PATH );
-		log.info("MATSIM_4_OPUS: " + Constants.MATSIM_4_OPUS );
-		log.info("MATSIM_4_OPUS_CONIG: " + Constants.MATSIM_4_OPUS_CONFIG );
-		log.info("MATSIM_4_OPUS_OUTPUT: " + Constants.MATSIM_4_OPUS_OUTPUT );
-		log.info("MATSIM_4_OPUS_TEMP: " + Constants.MATSIM_4_OPUS_TEMP ); 
-		log.info("MATSIM_4_OPUS_BACKUP: " + Constants.MATSIM_4_OPUS_BACKUP );
+		log.info("OPUS_HOME: " + InternalConstants.OPUS_HOME );
+		log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
+		log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
+		log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );
+		log.info("MATSIM_4_OPUS_OUTPUT: " + InternalConstants.MATSIM_4_OPUS_OUTPUT );
+		log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
+		log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
 		log.info("(Custom) Test Parameter: " + module.getTestParameter() );
 		log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getRandomLocationDistributionRadiusForUrbanSimZone());
 		log.info("Backing Up Run Data: " + module.isBackup() );
@@ -466,7 +466,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 			networkCG.setInputFile( networkFile );
 		else if (networkCG.getInputFile().isEmpty()){
 			log.error("Missing MATSim network! The network must be be specified either directly in the MATSim4UrbanSim configuration or in an external MATSim configuration.");
-			System.exit( Constants.NO_MATSIM_NETWORK );
+			System.exit( InternalConstants.NO_MATSIM_NETWORK );
 		}
 			
 		log.info("NetworkConfigGroup settings:");
@@ -541,7 +541,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		// set values
 		controlerCG.setFirstIteration( firstIteration );
 		controlerCG.setLastIteration( lastIteration);
-		controlerCG.setOutputDirectory( Constants.MATSIM_4_OPUS_OUTPUT );
+		controlerCG.setOutputDirectory( InternalConstants.MATSIM_4_OPUS_OUTPUT );
 		
 //		HashSet<String> hs = new HashSet<String>();
 //		hs.add("otfvis");
@@ -549,10 +549,14 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		controlerCG.setSnapshotFormat(Arrays.asList("otfvis")); // otfvis dosn't work ???
 		controlerCG.setWriteSnapshotsInterval( 0 ); // disabling snapshots
 		
+		// set JDEQSim
+		// controlerCG.setMobsim("jdeqsim");
+		
 		log.info("ControlerConfigGroup settings:");
 		log.info("FirstIteration: " + controlerCG.getFirstIteration());
 		log.info("LastIteration: " + controlerCG.getLastIteration());
 		log.info("MATSim output directory: " +  controlerCG.getOutputDirectory());
+		// log.info("Mobsim: JDEQSim");
 		log.info("... done!");
 	}
 	

@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 public class AnalysisZoneCSVWriter {
 
@@ -24,14 +24,14 @@ public class AnalysisZoneCSVWriter {
 			zoneCSVWriter = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			zoneCSVWriter.write( Constants.ZONE_ID + "," +
-								 Constants.ZONE_CENTROID_X_COORD + "," +
-								 Constants.ZONE_CENTROID_Y_COORD + "," +
-								 Constants.NEARESTNODE_X_COORD + "," +
-								 Constants.NEARESTNODE_Y_COORD + "," +
-								 Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
-								 Constants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
-								 Constants.WALK_TRAVEL_TIME_ACCESSIBILITY);
+			zoneCSVWriter.write( InternalConstants.ZONE_ID + "," +
+								 InternalConstants.ZONE_CENTROID_X_COORD + "," +
+								 InternalConstants.ZONE_CENTROID_Y_COORD + "," +
+								 InternalConstants.NEARESTNODE_X_COORD + "," +
+								 InternalConstants.NEARESTNODE_Y_COORD + "," +
+								 InternalConstants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
+								 InternalConstants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
+								 InternalConstants.WALK_TRAVEL_TIME_ACCESSIBILITY);
 			zoneCSVWriter.newLine();
 			
 			log.info("... done!");

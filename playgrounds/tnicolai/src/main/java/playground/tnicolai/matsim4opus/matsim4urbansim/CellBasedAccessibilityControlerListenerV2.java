@@ -14,13 +14,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
@@ -41,49 +42,54 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * improvements sep'11:
  * 
- * Code improvements since last version (deadline ersa paper):
- * - Aggregated Workplaces: 
- * 	Workplaces with same parcel_id are aggregated to a weighted job (see JobClusterObject)
- * 	This means much less iteration cycles
- * - Less time consuming look-ups: 
- * 	All workplaces are assigned to their nearest node in an pre-proscess step
- * 	(see addNearestNodeToJobClusterArray) instead to do nearest node look-ups in each 
- * 	iteration cycle
- * - Distance based accessibility added: 
- * 	like the travel time accessibility computation now also distances are computed
- * 	with LeastCostPathTree (tnicolai feb'12 distances are replaced by walking times 
- *  which is also linear and corresponds to distances)
+ * Code improvements since last version (deadline ersa paper): - Aggregated
+ * Workplaces: Workplaces with same parcel_id are aggregated to a weighted job
+ * (see JobClusterObject) This means much less iteration cycles - Less time
+ * consuming look-ups: All workplaces are assigned to their nearest node in an
+ * pre-proscess step (see addNearestNodeToJobClusterArray) instead to do nearest
+ * node look-ups in each iteration cycle - Distance based accessibility added:
+ * like the travel time accessibility computation now also distances are
+ * computed with LeastCostPathTree (tnicolai feb'12 distances are replaced by
+ * walking times which is also linear and corresponds to distances)
  * 
  * improvements jan'12:
  * 
- * - Better readability:
- * 	Removed unused methods such as "addNearestNodeToJobClusterArray" (this is done while gathering/processing
- * 	workplaces). Also all results are now dumped directly from this class. Before, the SpatialGrid 
- * 	tables were transfered to another class to dump out the results. This also improves readability
- * - Workplace data dump:
- * 	Dumping out the used workplace data was simplified, since the simulation now already uses aggregated data.
- * 	Corresponding subroutines aggregating the data are not needed any more (see dumpWorkplaceData()).
- * 	But coordinates of the origin workplaces could not dumped out, this is now done in ReadFromUrbansimParcelModel
- *  during processing the UrbnAism job data
- *  
- *  improvements feb'12
- *  - distance between square centroid and nearest node on road network is considered in the accessibility computation
- *  as walk time of the euclidian distance between both (centroid and nearest node). This walk time is added as an offset 
- *  to each measured travel times
- *  - using walk travel times instead of travel distances. This is because of the betas that are utils/time unit. The walk time
- *  corresponds to distances since this is also linear.
+ * - Better readability: Removed unused methods such as
+ * "addNearestNodeToJobClusterArray" (this is done while gathering/processing
+ * workplaces). Also all results are now dumped directly from this class.
+ * Before, the SpatialGrid tables were transfered to another class to dump out
+ * the results. This also improves readability - Workplace data dump: Dumping
+ * out the used workplace data was simplified, since the simulation now already
+ * uses aggregated data. Corresponding subroutines aggregating the data are not
+ * needed any more (see dumpWorkplaceData()). But coordinates of the origin
+ * workplaces could not dumped out, this is now done in
+ * ReadFromUrbansimParcelModel during processing the UrbnAism job data
  * 
- *  improvements march'12
- *  - revised distance measure from centroid to network:
- *  	using orthogonal distance from centroid to nearest network link!
- *  - merged CellBasedAccessibilityNetworkControlerListener and CellBasedAccessibilityShapefileControlerListener
- *  
- *  improvements april'12
- *  - accessibility calculation uses configurable betas (coming from UrbanSim) for car/walk travel times, -distances and -costs
- *  - replaced "SpatialGrid<Double>" by "SpatialGrid" using double instead of Double-objects
- *  
- *  improvements may'12
- *  - including interpolated (spatial grid) feedback for each parcel 
+ * improvements feb'12 - distance between square centroid and nearest node on
+ * road network is considered in the accessibility computation as walk time of
+ * the euclidian distance between both (centroid and nearest node). This walk
+ * time is added as an offset to each measured travel times - using walk travel
+ * times instead of travel distances. This is because of the betas that are
+ * utils/time unit. The walk time corresponds to distances since this is also
+ * linear.
+ * 
+ * improvements march'12 - revised distance measure from centroid to network:
+ * using orthogonal distance from centroid to nearest network link! - merged
+ * CellBasedAccessibilityNetworkControlerListener and
+ * CellBasedAccessibilityShapefileControlerListener
+ * 
+ * improvements april'12 - accessibility calculation uses configurable betas
+ * (coming from UrbanSim) for car/walk travel times, -distances and -costs -
+ * replaced "SpatialGrid<Double>" by "SpatialGrid" using double instead of
+ * Double-objects
+ * 
+ * improvements may'12 - including interpolated (spatial grid) feedback for each
+ * parcel
+ * 
+ * improvements / changes june'12 
+ * - the walk distance (measuring point -> nearest node) for accessibilities by 
+ * car has changed: Now only the orthoganal distance (measuring point -> nearest 
+ * link) is measured.
  * 
  * @author thomas
  * 
@@ -176,11 +182,15 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
+				LinkImpl nearestLink = network.getNearestLink(coordFromZone);
 				// captures the distance (as walk time) between a zone centroid and its nearest node
-				double offsetDistance2NearestNode_meter = NetworkUtil.getDistance2Node(network.getNearestLink(coordFromZone), 
+				double walkOffsetDistance2NearestNode_meter = NetworkUtil.getDistance2Node(nearestLink, 
 																					   point, 
 																					   fromNode);
-				double offsetWalkTime2NearestNode_h		= offsetDistance2NearestNode_meter / this.walkSpeedMeterPerHour;
+				double walkOffsetWalkTime2NearestNode_h		= walkOffsetDistance2NearestNode_meter / this.walkSpeedMeterPerHour;
+				
+				double carOffsetWalkTime2NearestLink_meter 	= NetworkUtil.getOrthogonalDistance2NearestLink(nearestLink, point);
+				double carOffsetWalkTime2NearestLink_h 		= carOffsetWalkTime2NearestLink_meter / this.walkSpeedMeterPerHour;
 				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
 				// Euclidean Distance (measuring point 2 nearest node):
 				// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
@@ -211,13 +221,13 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					double congestedCarTravelTime_h = (arrivalTime - depatureTime) / 3600.;
 					
 					// for debugging car accessibility
-					carTT = getAsUtilCar(betaCarTT, congestedCarTravelTime_h, betaWalkTT, offsetWalkTime2NearestNode_h);
-					carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, offsetWalkTime2NearestNode_h * offsetWalkTime2NearestNode_h);
-					carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2NearestNode_h));
+					carTT = getAsUtilCar(betaCarTT, congestedCarTravelTime_h, betaWalkTT, carOffsetWalkTime2NearestLink_h);
+					carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, carOffsetWalkTime2NearestLink_h * carOffsetWalkTime2NearestLink_h);
+					carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(carOffsetWalkTime2NearestLink_h));
 					
-					carTD = getAsUtilCar(betaCarTD, travelDistance_meter, betaWalkTD, offsetDistance2NearestNode_meter);
-					carTDPower = getAsUtilCar(betaCarTDPower, travelDistance_meter * travelDistance_meter, betaWalkTDPower, offsetDistance2NearestNode_meter * offsetDistance2NearestNode_meter);
-					carLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter), betaWalkLnTD, Math.log(offsetDistance2NearestNode_meter));
+					carTD = getAsUtilCar(betaCarTD, travelDistance_meter, betaWalkTD, carOffsetWalkTime2NearestLink_meter);
+					carTDPower = getAsUtilCar(betaCarTDPower, travelDistance_meter * travelDistance_meter, betaWalkTDPower, carOffsetWalkTime2NearestLink_meter * carOffsetWalkTime2NearestLink_meter);
+					carLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter), betaWalkLnTD, Math.log(carOffsetWalkTime2NearestLink_meter));
 					
 					carTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
 					carTCPower 	= 0.;	// since MATSim doesn't gives monetary costs jet 
@@ -237,13 +247,13 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 									   carLnTC ));
 					
 					// for debugging walk accessibility
-					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + offsetWalkTime2NearestNode_h);
-					walkTTPower = getAsUtilWalk(betaWalkTTPower, Math.pow( walkTravelTime_h+offsetWalkTime2NearestNode_h, 2));
-					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + offsetWalkTime2NearestNode_h ));
+					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + walkOffsetWalkTime2NearestNode_h);
+					walkTTPower = getAsUtilWalk(betaWalkTTPower, Math.pow( walkTravelTime_h+walkOffsetWalkTime2NearestNode_h, 2));
+					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + walkOffsetWalkTime2NearestNode_h ));
 					
-					walkTD = getAsUtilWalk(betaWalkTD, travelDistance_meter + offsetDistance2NearestNode_meter);
-					walkTDPower = getAsUtilWalk(betaWalkTDPower, Math.pow( travelDistance_meter + offsetDistance2NearestNode_meter, 2));
-					walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + offsetDistance2NearestNode_meter));
+					walkTD = getAsUtilWalk(betaWalkTD, travelDistance_meter + walkOffsetDistance2NearestNode_meter);
+					walkTDPower = getAsUtilWalk(betaWalkTDPower, Math.pow( travelDistance_meter + walkOffsetDistance2NearestNode_meter, 2));
+					walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + walkOffsetDistance2NearestNode_meter));
 					
 					walkTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
 					walkTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
@@ -317,33 +327,33 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		
 		log.info("Writing plotting files ...");
 		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(carGrid, Constants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
+		GridUtils.writeSpatialGridTable(carGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
 				+ "carAccessibility_cellsize_" + carGrid.getResolution()
 				+ CellBasedAccessibilityControlerListenerV2.fileExtension
-				+ Constants.FILE_TYPE_TXT);
+				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(walkGrid, Constants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
+		GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
 				+ "walkAccessibility_cellsize_" + walkGrid.getResolution()
 				+ CellBasedAccessibilityControlerListenerV2.fileExtension
-				+ Constants.FILE_TYPE_TXT);
+				+ InternalConstants.FILE_TYPE_TXT);
 
 		// tnicolai: google earth outputs can be left in final release since
 		// this can be used for a quick analysis without any further scripts or
 		// so...
 		GridUtils.writeKMZFiles(measuringPoints,								// car results for google earth
 								carGrid,
-								Constants.MATSIM_4_OPUS_TEMP
+								InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "carAccessibility_cellsize_"
 										+ carGrid.getResolution()
 										+ CellBasedAccessibilityControlerListenerV2.fileExtension
-										+ Constants.FILE_TYPE_KMZ);
+										+ InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(measuringPoints,								// walk results for google earth
 								walkGrid,
-								Constants.MATSIM_4_OPUS_TEMP
+								InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "walkAccessibility_cellsize_"
 										+ walkGrid.getResolution()
 										+ CellBasedAccessibilityControlerListenerV2.fileExtension
-										+ Constants.FILE_TYPE_KMZ);
+										+ InternalConstants.FILE_TYPE_KMZ);
 		log.info("Writing plotting files done!");
 	}
 	

@@ -43,11 +43,11 @@ public class OrthogonalDistance {
 		// the method getOrthogonalDistance assumes that a link has unlimited length -> it gives just the distance between a point and a line
 		// the method getDistance2Node also considers the distance between the intersection of the projection from a point to a line to the network node 
 		
-		double distance1 = NetworkUtil.getOrthogonalDistance(link1, new CoordImpl(10., 0.23456789));
+		double distance1 = NetworkUtil.getOrthogonalDistance2NearestLink(link1, new CoordImpl(10., 0.23456789));
 		Assert.assertEquals(10.0, distance1);
 		System.out.println(distance1 + " distance1");
 		
-		double distance1_1 = NetworkUtil.getOrthogonalDistance(link1, new CoordImpl(10., -10.));
+		double distance1_1 = NetworkUtil.getOrthogonalDistance2NearestLink(link1, new CoordImpl(10., -10.));
 		Assert.assertEquals(10.0, distance1_1);
 		System.out.println(distance1_1 + " distance1_1");
 		
@@ -59,7 +59,7 @@ public class OrthogonalDistance {
 		System.out.println(distance1_3 + " distance1_3");
 		Assert.assertEquals(distance1_2, distance1_3);
 		
-		double distance2 = NetworkUtil.getOrthogonalDistance(link2, new CoordImpl(1500, 0));
+		double distance2 = NetworkUtil.getOrthogonalDistance2NearestLink(link2, new CoordImpl(1500, 0));
 		System.out.println(distance2);
 		
 		double distance2_1 = NetworkUtil.getDistance2Node(link2, new CoordImpl(1500, 0), link2.getToNode());
@@ -68,10 +68,10 @@ public class OrthogonalDistance {
 		System.out.println(distance2_2 + " distance2_2");
 		Assert.assertEquals(distance2_1, distance2_2);
 		
-		double distance3 = NetworkUtil.getOrthogonalDistance(link3,new CoordImpl(1111, 2222));
+		double distance3 = NetworkUtil.getOrthogonalDistance2NearestLink(link3,new CoordImpl(1111, 2222));
 		Assert.assertEquals(222.0, distance3);
 		System.out.println(distance3 + " distance3");
-		double distance4 = NetworkUtil.getOrthogonalDistance(link3, new CoordImpl(9000, 2222));
+		double distance4 = NetworkUtil.getOrthogonalDistance2NearestLink(link3, new CoordImpl(9000, 2222));
 		Assert.assertEquals(222.0, distance4);
 		System.out.println(distance4 + " distance4");
 		Assert.assertEquals(distance3, distance4);

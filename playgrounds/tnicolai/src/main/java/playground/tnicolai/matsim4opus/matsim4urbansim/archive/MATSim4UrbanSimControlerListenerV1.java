@@ -48,7 +48,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 
 /**
@@ -74,8 +74,8 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 		this.zones = zones;
 		this.facilities = facilities;
 		this.numberOfWorkplacesPerZone = numberOfWorkplacesPerZone;
-		this.travelDataPath = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_TEMP_PARAM) + "travel_data.csv";
-		this.zonesPath = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_TEMP_PARAM) + "zones.csv";
+		this.travelDataPath = scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.MATSIM_4_OPUS_TEMP_PARAM) + "travel_data.csv";
+		this.zonesPath = scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.MATSIM_4_OPUS_TEMP_PARAM) + "zones.csv";
 	}
 	
 	/**
@@ -341,7 +341,7 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 					ActivityFacility fac = allFacilities.get(id);
 					if(fac == null)
 						continue;
-					String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString() ;
+					String zone_ID = ((Id) fac.getCustomAttributes().get(InternalConstants.ZONE_ID)).toString() ;
 					
 					
 //					Map<Id, ActivityFacility> allFacilities = ((ScenarioImpl)sc).getActivityFacilities().getFacilities();

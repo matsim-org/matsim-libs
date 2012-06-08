@@ -2,7 +2,7 @@ package playground.tnicolai.matsim4opus.matsimTestData;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.FileCopy;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
@@ -42,9 +42,9 @@ public class GenerateOPUSTestEnvironment {
 		String matsimNetwork = Paths.getWarmStartNetwork( GenerateOPUSTestEnvironment.class );
 
 		// copy UrbanSim data to temp dir
-		copyTestData(urbanSimOutputDir, Constants.MATSIM_4_OPUS_TEMP);
+		copyTestData(urbanSimOutputDir, InternalConstants.MATSIM_4_OPUS_TEMP);
 		// copy MATSim network to temp dir
-		copyTestData(matsimNetwork, Constants.MATSIM_4_OPUS_TEMP);
+		copyTestData(matsimNetwork, InternalConstants.MATSIM_4_OPUS_TEMP);
 		
 		return generateMATSimConfig ( matsimNetwork, "", MATSimRunMode.coldStart );
 	}
@@ -63,11 +63,11 @@ public class GenerateOPUSTestEnvironment {
 		String matsimNetwork = Paths.getWarmStartNetwork( GenerateOPUSTestEnvironment.class );
 
 		// copy UrbanSim data to temp dir
-		copyTestData(urbanSimOutputDir, Constants.MATSIM_4_OPUS_TEMP);
+		copyTestData(urbanSimOutputDir, InternalConstants.MATSIM_4_OPUS_TEMP);
 		// copy plans files to temp dir
-		copyTestData(plansFileDir, Constants.MATSIM_4_OPUS_TEMP);
+		copyTestData(plansFileDir, InternalConstants.MATSIM_4_OPUS_TEMP);
 		// copy MATSim network to temp dir
-		copyTestData(matsimNetwork, Constants.MATSIM_4_OPUS_TEMP);
+		copyTestData(matsimNetwork, InternalConstants.MATSIM_4_OPUS_TEMP);
 		
 		return generateMATSimConfig ( matsimNetwork, plansFileDir + warmStartPlansFile, runMode);
 	}

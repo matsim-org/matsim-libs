@@ -38,16 +38,14 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
 
 /**
@@ -56,7 +54,7 @@ import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
  */
 public class CreateJonesCityNetwork {
 	
-	private static final String filename = "/Users/thomas/Development/opus_home/data/jonescity_zone/data/received_from_jonathan/tabels20120504/zones4network.csv";
+	private static final String filename = "/Users/thomas/Development/opus_home/data/jonescity_zone/data/received_from_jonathan/tables20120522/zones.csv";
 	private static final String networkname = "/Users/thomas/Development/opus_home/data/jonescity_zone/jonesCityNetwork.xml";
 	private static final String shapefilename = "/Users/thomas/Development/opus_home/data/jonescity_zone/jonesCityNetwork.shp";
 	
@@ -94,9 +92,9 @@ public class CreateJonesCityNetwork {
 
 			// get and initialize the column number of each header element
 			Map<String, Integer> idxFromKey = HeaderParser.createIdxFromKey(line, separator);
-			final int indexXCoodinate = idxFromKey.get(Constants.X_COORDINATE);
-			final int indexYCoodinate = idxFromKey.get(Constants.Y_COORDINATE);
-			final int indexZoneID = idxFromKey.get(Constants.ZONE_ID);
+			final int indexXCoodinate = idxFromKey.get(InternalConstants.X_COORDINATE);
+			final int indexYCoodinate = idxFromKey.get(InternalConstants.Y_COORDINATE);
+			final int indexZoneID = idxFromKey.get(InternalConstants.ZONE_ID);
 
 			addNodes2Network(network, reader, indexXCoodinate, indexYCoodinate, indexZoneID);
 			addLinks2Network(network);
@@ -161,8 +159,9 @@ public class CreateJonesCityNetwork {
 			int zoneIdAsInt = Integer.parseInt(parts[indexZoneID]);
 			zoneID = new IdImpl(zoneIdAsInt);
 			// get the coordinates of that parcel
-			double x = 1000. * Double.parseDouble( parts[indexXCoodinate] );
-			double y = 1000. * Double.parseDouble( parts[indexYCoodinate] );
+			// tnicolai remove the 1000.
+			double x = Double.parseDouble( parts[indexXCoodinate] );
+			double y = Double.parseDouble( parts[indexYCoodinate] );
 			
 			coord = new CoordImpl(x, y);
 
@@ -181,7 +180,7 @@ public class CreateJonesCityNetwork {
 		
 		int zones = network.getNodes().size();
 		int steps = (int)Math.sqrt(zones)-1;
-		double length = stepSize * 1000.; // tnicolai: replace the 1000 when the new zones data set is delivered. With this setting the network is created correctley but dosen't match with the home and work locations
+		double length = stepSize * 1000; // tnicolai: replace the 1000 when the new zones data set is delivered. With this setting the network is created correctley but dosen't match with the home and work locations
 		double maxValue = steps * length;
 		double minValue = 0.;
 		long linkID = 0;

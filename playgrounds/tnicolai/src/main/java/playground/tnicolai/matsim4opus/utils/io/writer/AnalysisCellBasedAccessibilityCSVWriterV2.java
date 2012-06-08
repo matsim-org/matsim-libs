@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 
@@ -24,17 +24,17 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	public AnalysisCellBasedAccessibilityCSVWriterV2(String fileExtension){
 		try{
 			log.info("Initializing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
-			accessibilityDataWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + fileExtension + FILE_NAME );
+			accessibilityDataWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + fileExtension + FILE_NAME );
 			
 			// create header
-			accessibilityDataWriter.write( Constants.ZONE_ID + "," +
-										   Constants.X_COORDINATE + "," +
-										   Constants.Y_COORDINATE + "," + 
-										   Constants.NEARESTNODE_ID + "," +
-										   Constants.NEARESTNODE_X_COORD + "," +
-										   Constants.NEARESTNODE_Y_COORD + "," + 
-										   Constants.ACCESSIBILITY_BY_CAR + "," +
-										   Constants.ACCESSIBILITY_BY_WALK);
+			accessibilityDataWriter.write( InternalConstants.ZONE_ID + "," +
+										   InternalConstants.X_COORDINATE + "," +
+										   InternalConstants.Y_COORDINATE + "," + 
+										   InternalConstants.NEARESTNODE_ID + "," +
+										   InternalConstants.NEARESTNODE_X_COORD + "," +
+										   InternalConstants.NEARESTNODE_Y_COORD + "," + 
+										   InternalConstants.ACCESSIBILITY_BY_CAR + "," +
+										   InternalConstants.ACCESSIBILITY_BY_WALK);
 			accessibilityDataWriter.newLine();
 			
 			log.info("... done!");

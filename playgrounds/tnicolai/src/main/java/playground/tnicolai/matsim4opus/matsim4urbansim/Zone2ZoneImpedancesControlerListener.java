@@ -46,7 +46,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
@@ -76,7 +76,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels) {
 		this.zones = zones;
 		this.parcels = parcels;
-		this.travelDataPath = Constants.MATSIM_4_OPUS_TEMP + Constants.TRAVEL_DATA_FILE_CSV;
+		this.travelDataPath = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.TRAVEL_DATA_FILE_CSV;
 	}
 	
 	/**
@@ -151,8 +151,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 						travelCost_util = 1.2;
 					// get walk travel time (link lengths in meter)
 					double walkTravelTime_min = lcptWalkTime.getTree().get( toNode.getId() ).getCost() / 60.;
-					if(walkTravelTime_min < 1.2)
-						walkTravelTime_min = 1.2;
+					if(walkTravelTime_min < 12.)
+						walkTravelTime_min = 12.;
 					
 					// query trips in OD Matrix
 					double trips = 0.0;
@@ -246,7 +246,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					ActivityFacility fac = allFacilities.get(id);
 					if(fac == null)
 						continue;
-					String zone_ID = ((Id) fac.getCustomAttributes().get(Constants.ZONE_ID)).toString();
+					String zone_ID = ((Id) fac.getCustomAttributes().get(InternalConstants.ZONE_ID)).toString();
 
 					if (isFirstPlanActivity)
 						isFirstPlanActivity = false; 

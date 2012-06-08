@@ -30,10 +30,10 @@ import org.apache.log4j.Logger;
  * @author thomas
  *
  */
-public class Constants {
+public class InternalConstants {
 	
 	// logger
-	private static final Logger log = Logger.getLogger(Constants.class);
+	private static final Logger log = Logger.getLogger(InternalConstants.class);
 	
 	/** important system environments */
 	public static String OPUS_HOME;
@@ -138,12 +138,6 @@ public class Constants {
 	public static final String ACT_WORK = "work";
 	
 	/** UrbanSim and/or MATSim output file header items */
-	// public static final String ERSA_ZONE_ID = "zone_id";
-	// public static final String ERSA_PARCEL_ID = "parcel_id";
-	// public static final String ERSA_PERSON_ID = "person_id";
-	// public static final String ERSA_JOB_ID = "job_id";
-	// public static final String ERSA_X_COORDNIATE = "x_coordinate";
-	// public static final String ERSA_Y_COORDINATE = "y_coordinate";
 	public static final String ACCESSIBILITY_BY_CAR = "car_accessibility";
 	public static final String ACCESSIBILITY_BY_WALK = "walk_accessibility";
 	public static final String TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";

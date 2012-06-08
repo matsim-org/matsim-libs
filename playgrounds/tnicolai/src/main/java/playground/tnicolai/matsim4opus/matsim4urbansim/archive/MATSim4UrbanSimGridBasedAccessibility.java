@@ -5,7 +5,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
@@ -32,7 +32,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 	
 	private void initResolutionAndJobSample(){
 		try{
-			String params[] = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.TEST_PARAMETER_PARAM).split(",");
+			String params[] = scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.TEST_PARAMETER_PARAM).split(",");
 			
 			for(int i = 0; i < params.length; i++){
 				
@@ -40,7 +40,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 					String s[] = params[i].split("=");
 					MATSim4UrbanSimGridBasedAccessibility.resolutionMeter = Integer.parseInt(s[1]);
 					log.info("Detected resolution in meter: " + MATSim4UrbanSimGridBasedAccessibility.resolutionMeter);
-					MATSim4UrbanSimGridBasedAccessibility.resolutionFeet = (int)(MATSim4UrbanSimGridBasedAccessibility.resolutionMeter * Constants.METER_IN_FEET_CONVERSION_FACTOR);
+					MATSim4UrbanSimGridBasedAccessibility.resolutionFeet = (int)(MATSim4UrbanSimGridBasedAccessibility.resolutionMeter * InternalConstants.METER_IN_FEET_CONVERSION_FACTOR);
 					log.info("Converted resolution into feet (used for goolge maps output): " + MATSim4UrbanSimGridBasedAccessibility.resolutionFeet);
 				}
 				else if(params[i].startsWith("jobsample")){
@@ -64,7 +64,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		modifyNetwork(network);
 		cleanNetwork(network);
 		
-		ReadFromUrbanSimModel readUrbanSimData = new ReadFromUrbanSimModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
+		ReadFromUrbanSimModel readUrbanSimData = new ReadFromUrbanSimModel( Integer.parseInt( scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.YEAR) ) );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -89,7 +89,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		controler.run();
 		// Controller done!
 		
-		if( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){ // tnicolai: Experimental, comment out for MATSim4UrbanSim release
+		if( scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){ // tnicolai: Experimental, comment out for MATSim4UrbanSim release
 			// saving results from current run
 			saveRunOutputs();			
 			cleanUrbanSimOutput();
@@ -98,7 +98,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		this.benchmark.stoppMeasurement(benchmarkID);
 		log.info("MATSim4UrbanSimInteroplation Run took " + this.benchmark.getDurationInSeconds(benchmarkID) + "seconds ("+ this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes)");
 		// dumping benchmark results
-		benchmark.dumpResults(Constants.MATSIM_4_OPUS_TEMP + "matsim4ersa_benchmark.txt");
+		benchmark.dumpResults(InternalConstants.MATSIM_4_OPUS_TEMP + "matsim4ersa_benchmark.txt");
 	}
 	
 	/**

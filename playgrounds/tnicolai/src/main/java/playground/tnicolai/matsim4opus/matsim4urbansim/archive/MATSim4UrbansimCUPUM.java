@@ -34,7 +34,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 
@@ -67,7 +67,7 @@ class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 
 		// checking for if this is only a test run
 		// a test run only validates the xml config file by initializing the xml config via the xsd.
-		if(scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
+		if(scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.IS_TEST_RUN).equalsIgnoreCase(InternalConstants.TRUE)){
 			log.info("TestRun was successful...");
 			return;
 		}
@@ -81,7 +81,7 @@ class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 			modifyLinks(network, testParam);
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( Integer.parseInt( scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.YEAR) ) );
+		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( Integer.parseInt( scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.YEAR) ) );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");

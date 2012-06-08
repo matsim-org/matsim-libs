@@ -13,7 +13,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
@@ -143,7 +143,7 @@ public class FixedSizeGrid {
 			SquareLayer[][] sl = gridIterator.next();
 			
 			String fileName = "/Users/thomas/Desktop/test/";
-			BufferedWriter layer1 = IOUtils.getBufferedWriter(fileName + "_Centroid" + counter++ + Constants.FILE_TYPE_TXT);
+			BufferedWriter layer1 = IOUtils.getBufferedWriter(fileName + "_Centroid" + counter++ + InternalConstants.FILE_TYPE_TXT);
 			
 			int numXBins = sl.length;
 			int numYBins = sl[0].length;

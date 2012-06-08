@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 public class UrbanSimPersonCSVWriter {
 	
@@ -20,11 +20,11 @@ public class UrbanSimPersonCSVWriter {
 	public static void initUrbanSimPersonWriter(){
 		try{
 			log.info("Initializing UrbanSimZoneCSVWriter ...");
-			personWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
-			log.info("Writing data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
+			personWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing data into " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
-			personWriter.write( Constants.PERSON_ID + "," +
+			personWriter.write( InternalConstants.PERSON_ID + "," +
 							    "home2work_travel_time_min," +
 								"home2work_distance_meter," + 
 								"work2home_travel_time_min," +

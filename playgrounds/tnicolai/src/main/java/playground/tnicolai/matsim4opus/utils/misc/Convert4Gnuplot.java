@@ -34,7 +34,7 @@ import java.util.Map;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
 import playground.tnicolai.matsim4opus.utils.io.filter.TabFilter;
 
@@ -242,7 +242,7 @@ public class Convert4Gnuplot {
 			
 			// read header
 			line = br.readLine();
-			parts = line.split(Constants.TAB);
+			parts = line.split(InternalConstants.TAB);
 			
 			ho1 = initHeaderObject(line);
 			
@@ -268,7 +268,7 @@ public class Convert4Gnuplot {
 						// for JFreeChart
 						yAxis[i-1] = Double.parseDouble(parts[ho1.getIndexOf(i)]);
 						// for gnuplot
-						content.append( ((int)xAxis[i-1]) + Constants.TAB + yAxis[i-1] + Constants.NEW_LINE);
+						content.append( ((int)xAxis[i-1]) + InternalConstants.TAB + yAxis[i-1] + InternalConstants.NEW_LINE);
 					}
 					break;
 				}
@@ -329,8 +329,8 @@ public class Convert4Gnuplot {
 			if(!lineSource1.equalsIgnoreCase(lineSource2))
 				System.err.println("Different headers in " + source1 + " and " + source2);
 			
-			parts1 = lineSource1.split(Constants.TAB);
-			parts2 = lineSource2.split(Constants.TAB);
+			parts1 = lineSource1.split(InternalConstants.TAB);
+			parts2 = lineSource2.split(InternalConstants.TAB);
 			
 			ho1 = initHeaderObject(lineSource1);
 			ho2 = initHeaderObject(lineSource2);
@@ -359,8 +359,8 @@ public class Convert4Gnuplot {
 					break;
 				}
 				
-				parts1 = lineSource1.split(Constants.TAB);
-				parts2 = lineSource2.split(Constants.TAB);
+				parts1 = lineSource1.split(InternalConstants.TAB);
+				parts2 = lineSource2.split(InternalConstants.TAB);
 				
 				if(parts1.length != parts2.length)
 					System.err.println("Number of columns differ in " + source1 + " and " + source2 + ".");
@@ -376,7 +376,7 @@ public class Convert4Gnuplot {
 						// for JFreeChart
 						yAxis1[j-1] = Double.parseDouble(parts1[ho1.getIndexOf(j)]);
 						// for gnuplot
-						content1.append( ((int)xAxis1[j-1]) + Constants.TAB + yAxis1[j-1] + Constants.NEW_LINE);
+						content1.append( ((int)xAxis1[j-1]) + InternalConstants.TAB + yAxis1[j-1] + InternalConstants.NEW_LINE);
 					}
 					foundZoneID1 = true;
 				}
@@ -388,7 +388,7 @@ public class Convert4Gnuplot {
 						// for JFreeChart
 						yAxis2[j-1] = Double.parseDouble(parts2[ho2.getIndexOf(j)]);
 						// for gnuplot
-						content2.append( ((int)xAxis2[j-1]) + Constants.TAB + yAxis2[j-1] + Constants.NEW_LINE);
+						content2.append( ((int)xAxis2[j-1]) + InternalConstants.TAB + yAxis2[j-1] + InternalConstants.NEW_LINE);
 					}
 					foundZoneID2 = true;
 				}
@@ -487,7 +487,7 @@ public class Convert4Gnuplot {
 	 */
 	private static HeaderObject initHeaderObject(String line){
 		
-		String parts[] = line.split( Constants.TAB );
+		String parts[] = line.split( InternalConstants.TAB );
 
 		int unsortedHeaderArray[] = new int[parts.length];
 		int sortedHeaderArray[] = new int[parts.length];

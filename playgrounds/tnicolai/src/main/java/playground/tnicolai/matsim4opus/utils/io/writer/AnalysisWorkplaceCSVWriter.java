@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 
@@ -25,16 +25,16 @@ public class AnalysisWorkplaceCSVWriter {
 		
 		try{
 			log.info("Initializing AnalysisWorkplaceCSVWriter ...");
-			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
-			log.info("Writing (aggregated workplace) data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
+			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing (aggregated workplace) data into " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
-			bwAggregatedWP.write(Constants.ZONE_ID +","+ 
-								 Constants.PARCEL_ID +","+ 
-								 Constants.NEARESTNODE_ID +","+
-								 Constants.NEARESTNODE_X_COORD +","+ 
-								 Constants.NEARESTNODE_Y_COORD +","+
-								 Constants.WORKPLACES_COUNT);
+			bwAggregatedWP.write(InternalConstants.ZONE_ID +","+ 
+								 InternalConstants.PARCEL_ID +","+ 
+								 InternalConstants.NEARESTNODE_ID +","+
+								 InternalConstants.NEARESTNODE_X_COORD +","+ 
+								 InternalConstants.NEARESTNODE_Y_COORD +","+
+								 InternalConstants.WORKPLACES_COUNT);
 			bwAggregatedWP.newLine();
 			
 			for(int i = 0; i < jobClusterArray.length; i++){
@@ -68,11 +68,11 @@ public class AnalysisWorkplaceCSVWriter {
 			BufferedWriter bwWorkplaces = IOUtils.getBufferedWriter( file );
 			
 			// create header
-			bwWorkplaces.write(Constants.JOB_ID +","+ 
-								 Constants.PARCEL_ID +","+ 
-								 Constants.ZONE_ID +","+
-								 Constants.X_COORDINATE +","+ 
-								 Constants.Y_COORDINATE);
+			bwWorkplaces.write(InternalConstants.JOB_ID +","+ 
+								 InternalConstants.PARCEL_ID +","+ 
+								 InternalConstants.ZONE_ID +","+
+								 InternalConstants.X_COORDINATE +","+ 
+								 InternalConstants.Y_COORDINATE);
 			bwWorkplaces.newLine();
 			
 			Iterator<PersonAndJobsObject> jobIterator = jobSampleList.iterator();

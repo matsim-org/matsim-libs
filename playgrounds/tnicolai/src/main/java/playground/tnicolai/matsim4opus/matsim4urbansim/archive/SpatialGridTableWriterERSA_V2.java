@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
 public class SpatialGridTableWriterERSA_V2 {
@@ -45,20 +45,20 @@ public class SpatialGridTableWriterERSA_V2 {
 			// Travel Time Accessibility Table
 			log.info("Writing Travel Time Accessibility Measures ...");
 			writeTable(travelTimeAccessibilityGrid,
-					Constants.MATSIM_4_OPUS_TEMP
-							+ Constants.TRAVEL_TIME_ACCESSIBILITY
+					InternalConstants.MATSIM_4_OPUS_TEMP
+							+ InternalConstants.TRAVEL_TIME_ACCESSIBILITY
 							+ "_GridSize_" + resolutionMeter);
 			// Travel Distance Accessibility Table
 			log.info("Writing Travel Distance Accessibility Measures ...");
 			writeTable(travelDistanceAccessibilityGrid,
-					Constants.MATSIM_4_OPUS_TEMP
-							+ Constants.TRAVEL_DISTANCE_ACCESSIBILITY
+					InternalConstants.MATSIM_4_OPUS_TEMP
+							+ InternalConstants.TRAVEL_DISTANCE_ACCESSIBILITY
 							+ "_GridSize_" + resolutionMeter);
 			// Travel Cost Accessibility Table
 			log.info("Writing Travel Cost Accessibility Measures ...");
 			writeTable(travelCostAccessibilityGrid,
-					Constants.MATSIM_4_OPUS_TEMP
-							+ Constants.TRAVEL_COST_ACCESSIBILITY
+					InternalConstants.MATSIM_4_OPUS_TEMP
+							+ InternalConstants.TRAVEL_COST_ACCESSIBILITY
 							+ "_GridSize_" + resolutionMeter);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -87,9 +87,9 @@ public class SpatialGridTableWriterERSA_V2 {
 
 		try{
 			BufferedWriter csvWriter = IOUtils
-					.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + type
+					.getBufferedWriter(InternalConstants.MATSIM_4_OPUS_TEMP + type
 							+ "_square_accessibility_indicators_v2"
-							+ Constants.FILE_TYPE_CSV);
+							+ InternalConstants.FILE_TYPE_CSV);
 			// create header
 			csvWriter.write(CENTROID_ACCESSIBILITY + ","
 							+ MEAN_ACCESSIBILITY + ","
@@ -138,9 +138,9 @@ public class SpatialGridTableWriterERSA_V2 {
 
 	private static void writeTable(final SpatialGridOld<SquareLayer> grid, final String fileName) throws IOException {
 
-		BufferedWriter layer1 = IOUtils.getBufferedWriter(fileName + "_Centroid" + Constants.FILE_TYPE_TXT);
-		BufferedWriter layer2 = IOUtils.getBufferedWriter(fileName + "_Interpolated" + Constants.FILE_TYPE_TXT);
-		BufferedWriter layer3 = IOUtils.getBufferedWriter(fileName + "_Derivation" + Constants.FILE_TYPE_TXT);
+		BufferedWriter layer1 = IOUtils.getBufferedWriter(fileName + "_Centroid" + InternalConstants.FILE_TYPE_TXT);
+		BufferedWriter layer2 = IOUtils.getBufferedWriter(fileName + "_Interpolated" + InternalConstants.FILE_TYPE_TXT);
+		BufferedWriter layer3 = IOUtils.getBufferedWriter(fileName + "_Derivation" + InternalConstants.FILE_TYPE_TXT);
 
 		for(int j = 0; j < grid.getNumCols(0); j++) {
 			layer1.write("\t");

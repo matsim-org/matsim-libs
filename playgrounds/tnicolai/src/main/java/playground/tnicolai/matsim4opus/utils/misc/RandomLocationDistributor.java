@@ -47,7 +47,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 
@@ -185,8 +185,8 @@ public class RandomLocationDistributor {
 		boolean isShapefileApproach = false;
 		
 		try{
-			Constants.MATSIM_4_OPUS_TEMP = "/Users/thomas/Development/opus_home/matsim4opus/tmp/";
-			BufferedWriter writer = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + "shootTest.csv");
+			InternalConstants.MATSIM_4_OPUS_TEMP = "/Users/thomas/Development/opus_home/matsim4opus/tmp/";
+			BufferedWriter writer = IOUtils.getBufferedWriter(InternalConstants.MATSIM_4_OPUS_TEMP + "shootTest.csv");
 			writer.write("zone_id, x, y, counter");
 			writer.newLine();
 			

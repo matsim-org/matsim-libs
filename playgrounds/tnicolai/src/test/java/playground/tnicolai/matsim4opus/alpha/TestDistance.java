@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.CRSUtils;
 import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
 
@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Point;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
 import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 public class TestDistance {
 	
@@ -79,7 +79,7 @@ public class TestDistance {
 		Set<Feature> featureSet = FeatureSHP.readFeatures(psrcSHPFile);
 		logger.info("Extracting boundary of the shape file ...");
 		Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
-		boundary.setSRID( Constants.SRID_WASHINGTON_NORTH ); // tnicolai: check if this is the correct id
+		boundary.setSRID( InternalConstants.SRID_WASHINGTON_NORTH ); // tnicolai: check if this is the correct id
 		logger.info("Done extracting boundary ...");
 		
 		return boundary;

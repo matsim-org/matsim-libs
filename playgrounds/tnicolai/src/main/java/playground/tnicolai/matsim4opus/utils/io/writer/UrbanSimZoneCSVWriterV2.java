@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 /**
  * This writer produces an UrbanSim input data for the zones dataset 
@@ -28,13 +28,13 @@ public class UrbanSimZoneCSVWriterV2 {
 	public static void initUrbanSimZoneWriter(){
 		try{
 			log.info("Initializing UrbanSimZoneCSVWriterV2 ...");
-			zoneWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
-			log.info("Writing data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
+			zoneWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing data into " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
-			zoneWriter.write( Constants.ZONE_ID + "," +
-							  Constants.ACCESSIBILITY_BY_CAR + "," +
-							  Constants.ACCESSIBILITY_BY_WALK);
+			zoneWriter.write( InternalConstants.ZONE_ID + "," +
+							  InternalConstants.ACCESSIBILITY_BY_CAR + "," +
+							  InternalConstants.ACCESSIBILITY_BY_WALK);
 			zoneWriter.newLine();
 			
 			log.info("... done!");

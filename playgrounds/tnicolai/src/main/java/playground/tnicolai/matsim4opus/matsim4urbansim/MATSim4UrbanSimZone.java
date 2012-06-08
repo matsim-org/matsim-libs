@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
@@ -181,7 +181,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, Controler controler) {
 		
-		int srid = Constants.SRID_BELGIUM;
+		int srid = InternalConstants.SRID_BELGIUM;
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)

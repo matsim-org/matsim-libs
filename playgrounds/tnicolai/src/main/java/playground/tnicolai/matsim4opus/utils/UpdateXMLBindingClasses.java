@@ -28,7 +28,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.LoadFile;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
 import playground.tnicolai.matsim4opus.utils.securityManager.ExitException;
@@ -136,7 +136,7 @@ public class UpdateXMLBindingClasses {
 			log.warn("XSD location not given (optional)...");
 			String tmpDir = TempDirectoryUtil.createCustomTempDirectory("xsd");
 			// set default location			
-			LoadFile loadFile = new LoadFile(Constants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tmpDir, Constants.CURRENT_XSD_FILE_NAME);
+			LoadFile loadFile = new LoadFile(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tmpDir, InternalConstants.CURRENT_XSD_FILE_NAME);
 			xsdLocation = loadFile.loadMATSim4UrbanSimXSDString();
 			
 			log.warn("Set xsd default location to: " + xsdLocation);
@@ -144,7 +144,7 @@ public class UpdateXMLBindingClasses {
 		if(outputDirectory == null){
 			log.warn("Destination not given (optional)...");
 			// set default location
-			outputDirectory = Constants.MATSIM_WORKING_DIRECTORY + "/src/main/java/";
+			outputDirectory = InternalConstants.MATSIM_WORKING_DIRECTORY + "/src/main/java/";
 			TempDirectoryUtil.createDirectory( outputDirectory );
 			log.warn("Set default destination to: " + outputDirectory);
 		}
@@ -170,7 +170,7 @@ public class UpdateXMLBindingClasses {
 		Package pack = c.getPackage();
 		String name = pack.getName();
 		int dot = name.lastIndexOf(".");
-		name = name.substring(0, dot+1) + Constants.JAXB_PARSER_PACKAGE_NAME;
+		name = name.substring(0, dot+1) + InternalConstants.JAXB_PARSER_PACKAGE_NAME;
 		
 		return name;
 	}

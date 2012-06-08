@@ -42,7 +42,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
@@ -306,50 +306,50 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		// finish and close writing
 		GridUtils.writeSpatialGridTable(
 				congestedTravelTimeAccessibilityGrid,
-				Constants.MATSIM_4_OPUS_TEMP
-						+ Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY
+				InternalConstants.MATSIM_4_OPUS_TEMP
+						+ InternalConstants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY
 						+ "_cellsize_"
 						+ congestedTravelTimeAccessibilityGrid.getResolution()
-						+ fileExtension + Constants.FILE_TYPE_TXT);
+						+ fileExtension + InternalConstants.FILE_TYPE_TXT);
 		GridUtils.writeSpatialGridTable(
 				freespeedTravelTimeAccessibilityGrid,
-				Constants.MATSIM_4_OPUS_TEMP
-						+ Constants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY
+				InternalConstants.MATSIM_4_OPUS_TEMP
+						+ InternalConstants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY
 						+ "_cellsize_"
 						+ freespeedTravelTimeAccessibilityGrid.getResolution()
-						+ fileExtension + Constants.FILE_TYPE_TXT);
+						+ fileExtension + InternalConstants.FILE_TYPE_TXT);
 		GridUtils.writeSpatialGridTable(
 				walkTravelTimeAccessibilityGrid,
-				Constants.MATSIM_4_OPUS_TEMP
-						+ Constants.WALK_TRAVEL_TIME_ACCESSIBILITY
+				InternalConstants.MATSIM_4_OPUS_TEMP
+						+ InternalConstants.WALK_TRAVEL_TIME_ACCESSIBILITY
 						+ "_cellsize_"
 						+ walkTravelTimeAccessibilityGrid.getResolution()
-						+ fileExtension + Constants.FILE_TYPE_TXT);
+						+ fileExtension + InternalConstants.FILE_TYPE_TXT);
 		
 		GridUtils.writeKMZFiles(
 				startZones, 
 				congestedTravelTimeAccessibilityGrid, 
-				Constants.MATSIM_4_OPUS_TEMP
-				+ Constants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY
+				InternalConstants.MATSIM_4_OPUS_TEMP
+				+ InternalConstants.CONGESTED_TRAVEL_TIME_ACCESSIBILITY
 				+ "_cellsize_"
 				+ congestedTravelTimeAccessibilityGrid.getResolution()
-				+ fileExtension + Constants.FILE_TYPE_KMZ);
+				+ fileExtension + InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(
 				startZones, 
 				freespeedTravelTimeAccessibilityGrid, 
-				Constants.MATSIM_4_OPUS_TEMP
-				+ Constants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY
+				InternalConstants.MATSIM_4_OPUS_TEMP
+				+ InternalConstants.FREESPEED_TRAVEL_TIME_ACCESSIBILITY
 				+ "_cellsize_"
 				+ freespeedTravelTimeAccessibilityGrid.getResolution()
-				+ fileExtension + Constants.FILE_TYPE_KMZ);
+				+ fileExtension + InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(
 				startZones, 
 				walkTravelTimeAccessibilityGrid, 
-				Constants.MATSIM_4_OPUS_TEMP
-				+ Constants.WALK_TRAVEL_TIME_ACCESSIBILITY
+				InternalConstants.MATSIM_4_OPUS_TEMP
+				+ InternalConstants.WALK_TRAVEL_TIME_ACCESSIBILITY
 				+ "_cellsize_"
 				+ walkTravelTimeAccessibilityGrid.getResolution()
-				+ fileExtension + Constants.FILE_TYPE_KMZ);
+				+ fileExtension + InternalConstants.FILE_TYPE_KMZ);
 		log.info("Writing files done!");
 	}
 	

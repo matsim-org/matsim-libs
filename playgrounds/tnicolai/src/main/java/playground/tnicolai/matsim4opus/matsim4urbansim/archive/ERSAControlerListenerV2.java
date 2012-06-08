@@ -38,7 +38,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
@@ -242,7 +242,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 			}
 		}
 
-		log.warn("Spatial Reference ID (SRID) is set for WASHINGTON_NORTH: " + Constants.SRID_WASHINGTON_NORTH);
+		log.warn("Spatial Reference ID (SRID) is set for WASHINGTON_NORTH: " + InternalConstants.SRID_WASHINGTON_NORTH);
 		// determine square + square centroid + nearest node
 		for(double x = xmin; x <= xmax; x += this.resolutionFeet){
 			for(double y = ymin; y <= ymax; y += this.resolutionFeet){
@@ -259,7 +259,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 				// Linear Ring defines an artificial zone
 				LinearRing linearRing = factory.createLinearRing(coords);
 				Polygon polygon = factory.createPolygon(linearRing, null);
-				polygon.setSRID( Constants.SRID_WASHINGTON_NORTH );
+				polygon.setSRID( InternalConstants.SRID_WASHINGTON_NORTH );
 
 				// centroid determines the center of a square
 				Coord squareCentroid = new CoordImpl(x + (this.resolutionFeet/2), y + (this.resolutionFeet/2));

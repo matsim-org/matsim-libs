@@ -17,7 +17,7 @@ import javax.xml.validation.SchemaFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ConfigType;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ControlerType;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.InputPlansFileType;
@@ -46,7 +46,7 @@ public class GenerateMATSimConfig {
 	 * @param warmStartPlansFile
 	 */
 	public GenerateMATSimConfig(boolean isTestRun, String network, String warmStartPlansFile){
-		this.destination = Constants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
+		this.destination = InternalConstants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
 		this.isTestRun = isTestRun;
 		this.network = network;
 		this.warmStartPlansFile = warmStartPlansFile;
@@ -61,7 +61,7 @@ public class GenerateMATSimConfig {
 	 * @param hotStartPlansFile
 	 */
 	public GenerateMATSimConfig(boolean isTestRun, String network, String warmStartPlansFile, String hotStartPlansFile){
-		this.destination = Constants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
+		this.destination = InternalConstants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
 		this.isTestRun = isTestRun;
 		this.network = network;
 		this.warmStartPlansFile = warmStartPlansFile;
@@ -88,7 +88,7 @@ public class GenerateMATSimConfig {
 	 * @param network
 	 */
 	public GenerateMATSimConfig(boolean isTestRun, String network){
-		this.destination = Constants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
+		this.destination = InternalConstants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
 		this.isTestRun = isTestRun;
 		this.network = network;
 		this.warmStartPlansFile = "";
@@ -127,12 +127,12 @@ public class GenerateMATSimConfig {
 		// Create "Matsim4UrbanSimType"
 		UrbansimParameterType urbansimParameterType = of.createUrbansimParameterType();
 		urbansimParameterType.setYear(new BigInteger("2001"));
-		urbansimParameterType.setOpusHome( Constants.OPUS_HOME );
-		urbansimParameterType.setOpusDataPath( Constants.OPUS_DATA_PATH );
-		urbansimParameterType.setMatsim4Opus( Constants.MATSIM_4_OPUS );
-		urbansimParameterType.setMatsim4OpusConfig( Constants.MATSIM_4_OPUS_CONFIG );
-		urbansimParameterType.setMatsim4OpusOutput( Constants.MATSIM_4_OPUS_OUTPUT );
-		urbansimParameterType.setMatsim4OpusTemp( Constants.MATSIM_4_OPUS_TEMP );
+		urbansimParameterType.setOpusHome( InternalConstants.OPUS_HOME );
+		urbansimParameterType.setOpusDataPath( InternalConstants.OPUS_DATA_PATH );
+		urbansimParameterType.setMatsim4Opus( InternalConstants.MATSIM_4_OPUS );
+		urbansimParameterType.setMatsim4OpusConfig( InternalConstants.MATSIM_4_OPUS_CONFIG );
+		urbansimParameterType.setMatsim4OpusOutput( InternalConstants.MATSIM_4_OPUS_OUTPUT );
+		urbansimParameterType.setMatsim4OpusTemp( InternalConstants.MATSIM_4_OPUS_TEMP );
 		urbansimParameterType.setSamplingRate( 0.01 );		// just 1% random sample for testing ...
 		urbansimParameterType.setIsTestRun( this.isTestRun );
 		urbansimParameterType.setTestParameter("");
@@ -149,7 +149,7 @@ public class GenerateMATSimConfig {
 		try {
 			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
-			LoadFile loadFile = new LoadFile(Constants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tempDir , Constants.CURRENT_XSD_FILE_NAME);
+			LoadFile loadFile = new LoadFile(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tempDir , InternalConstants.CURRENT_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			if(file2XSD == null || !file2XSD.exists()){
 				System.err.println("Did not find xml schema!");

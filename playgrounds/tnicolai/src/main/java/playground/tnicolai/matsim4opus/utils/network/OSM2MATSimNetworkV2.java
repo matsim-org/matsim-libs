@@ -40,35 +40,49 @@ public class OSM2MATSimNetworkV2 {
 //		new NetworkCleaner().run(net);
 //		new NetworkWriter(net).write("/Users/thomas/Downloads/merged-network.xml");
 
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		// creating an empty matsim network
 		Network network = sc.getNetwork();
-		// get transformation for Belgium (EPSG:31300)
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:31300");
+		// using the Belge Lambert 72 projection for the matsim network
+		CoordinateTransformation ct = TransformationFactory
+				.getCoordinateTransformation(TransformationFactory.WGS84,
+						"EPSG:31300");
 		OsmNetworkReader osmReader = new OsmNetworkReader(network, ct);
 
 		osmReader.setKeepPaths(false);
 		osmReader.setScaleMaxSpeed(true);
 
-		osmReader.setHierarchyLayer(51.671, 2.177, 49.402, 6.764, 2); //belgium and bordering areas
-		osmReader.setHierarchyLayer(51.328, 3.639, 50.645, 4.888, 4); //greater brussel area
-		osmReader.setHierarchyLayer(50.9515, 4.1748, 50.7312, 4.5909, 5); //city of brussel
-		
+		// this layer covers the whole area, Belgium and bordering areas
+		// including OSM motorways and trunks
+		osmReader.setHierarchyLayer(51.671, 2.177, 49.402, 6.764, 2);
+		// this layer covers the greater Brussels area including
+		// OSM secondary roads or greater
+		osmReader.setHierarchyLayer(51.328, 3.639, 50.645, 4.888, 4);
+		// this layer covers the city of Brussels including OSM 
+		// tertiary roads or greater
+		osmReader.setHierarchyLayer(50.9515, 4.1748, 50.7312, 4.5909, 5);
+
+		// converting the merged OSM network into matsim format
 		osmReader.parse(INFILE);
 		new NetworkWriter(network).write(OUTFILE);
-		// reads "OUTFILE", cleans it and writes it out as "OUTFILE_clean.xml.gz"
-		new NetworkCleaner().run(OUTFILE, OUTFILE.split(".xml")[0] + "_clean.xml.gz");
-		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(OUTFILE.split(".xml")[0] + "_clean.xml.gz");
+		// writing out a cleaned matsim network and loading it 
+		// into the scenario
+		new NetworkCleaner().run(OUTFILE, OUTFILE.split(".xml")[0]
+				+ "_clean.xml.gz");
+		Scenario scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).readFile(OUTFILE.split(".xml")[0]
+				+ "_clean.xml.gz");
 		network = (NetworkImpl) scenario.getNetwork();
-		
-		// network contains "OUTFILE_clean.xml.gz" from above, its simplified and written out as "OUTFILE__clean_simple.xml.gz
-		NetworkSimplifier simpl = new NetworkSimplifier();
+
+		// simplifying the cleaned network
+		NetworkSimplifier simplifier = new NetworkSimplifier();
 		Set<Integer> nodeTypess2merge = new HashSet<Integer>();
 		nodeTypess2merge.add(new Integer(4));
 		nodeTypess2merge.add(new Integer(5));
-		simpl.setNodesToMerge(nodeTypess2merge);
-		simpl.run(network);
-		new NetworkWriter(network).write(OUTFILE.split(".xml")[0] + "_clean_simple.xml.gz");
+		simplifier.setNodesToMerge(nodeTypess2merge);
+		simplifier.run(network);
+		new NetworkWriter(network).write(OUTFILE.split(".xml")[0]
+				+ "_clean_simple.xml.gz");
 	}
 }

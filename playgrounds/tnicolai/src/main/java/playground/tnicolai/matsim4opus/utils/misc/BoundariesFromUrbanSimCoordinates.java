@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
 
 public class BoundariesFromUrbanSimCoordinates {
@@ -38,15 +38,15 @@ public class BoundariesFromUrbanSimCoordinates {
 			String line = reader.readLine();
 		
 			// get and initialize the column number of each header element
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
-			final int indexXCoodinate 	= idxFromKey.get( Constants.X_COORDINATE );
-			final int indexYCoodinate 	= idxFromKey.get( Constants.Y_COORDINATE );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB_SEPERATOR );
+			final int indexXCoodinate 	= idxFromKey.get( InternalConstants.X_COORDINATE );
+			final int indexYCoodinate 	= idxFromKey.get( InternalConstants.Y_COORDINATE );
 			
 			String[] parts;
 			
 			//
 			while ( (line = reader.readLine()) != null ) {
-				parts = line.split(Constants.TAB_SEPERATOR);
+				parts = line.split(InternalConstants.TAB_SEPERATOR);
 				
 				double x = Double.parseDouble( parts[indexXCoodinate] );
 				double y = Double.parseDouble( parts[indexYCoodinate] );

@@ -36,7 +36,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.tnicolai.matsim4opus.config.JAXBUnmaschal;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverter;
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
 import playground.tnicolai.matsim4opus.matsimTestData.MATSimRunMode;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
@@ -146,7 +146,7 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 		ScenarioUtils.loadScenario(scenario);
 		
 		// save detected MATSim run Mode
-		this.currentMode = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_MODE);
+		this.currentMode = scenario.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.MATSIM_MODE);
 		
 		// init class ReadFromUrbansimParcelModel
 		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel( 2001 );
@@ -229,7 +229,7 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 					result.employmentChangedCnt == 1 && 
 					result.jobLocationIdNullCnt == 1 &&
 					result.populationMergeTotal == 9 &&
-					this.currentMode.equals(Constants.WARM_START));
+					this.currentMode.equals(InternalConstants.WARM_START));
 			
 		}
 		if(runMode == MATSimRunMode.hotStart && samplingRate == 1.){
@@ -242,7 +242,7 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 					result.employmentChangedCnt == 1 && 
 					result.jobLocationIdNullCnt == 1 &&
 					result.populationMergeTotal == 9 &&
-					this.currentMode.equals(Constants.HOT_START));
+					this.currentMode.equals(InternalConstants.HOT_START));
 		}
 		else if(runMode == MATSimRunMode.warmStart && samplingRate < 1.){
 			assertTrue(result.populationMergeTotal == (10 * samplingRate) );
@@ -251,7 +251,7 @@ public class ColdWarmHotStartTest extends MatsimTestCase{
 			assertTrue(result.identifiedCnt == 0 &&
 					result.numberOfUrbanSimPersons == 10 &&
 					result.populationMergeTotal == 9 &&
-					this.currentMode.equals(Constants.COLD_START));
+					this.currentMode.equals(InternalConstants.COLD_START));
 	}
 
 }

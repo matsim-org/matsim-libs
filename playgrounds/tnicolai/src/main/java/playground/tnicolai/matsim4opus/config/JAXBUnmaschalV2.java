@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig2.MatsimConfigType;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig2.ObjectFactory;
 import playground.tnicolai.matsim4opus.utils.io.LoadFile;
@@ -88,7 +88,7 @@ public class JAXBUnmaschalV2{
 
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
 			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
-			LoadFile loadFile = new LoadFile(Constants.V2_MATSIM_4_URBANSIM_XSD_MATSIMORG , tempDir , Constants.V2_XSD_FILE_NAME);
+			LoadFile loadFile = new LoadFile(InternalConstants.V2_MATSIM_4_URBANSIM_XSD_MATSIMORG , tempDir , InternalConstants.V2_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			// tnicolai: debugging
 			//file2XSD = new File("/Users/thomas/Development/workspace/matsim/src/main/resources/dtd/matsim4urbansim_v2.xsd");

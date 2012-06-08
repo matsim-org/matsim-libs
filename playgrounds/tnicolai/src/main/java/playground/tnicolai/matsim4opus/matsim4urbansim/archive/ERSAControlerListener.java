@@ -45,7 +45,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
@@ -230,10 +230,10 @@ public class ERSAControlerListener implements ShutdownListener{
 		
 		log.info("Dumping workplace information as csv ...");
 
-		BufferedWriter bwWeightedWP = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + "weighted_workplaces.csv" );
-		BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv" );
+		BufferedWriter bwWeightedWP = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + "weighted_workplaces.csv" );
+		BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv" );
 		
-		log.info("Dumping workplace data used for this simulation: " + Constants.MATSIM_4_OPUS_TEMP + "weighted_workplaces.csv");
+		log.info("Dumping workplace data used for this simulation: " + InternalConstants.MATSIM_4_OPUS_TEMP + "weighted_workplaces.csv");
 		
 		// dumping out data from jobClusterArray
 		bwWeightedWP.write("zone_ID,x_coord,y_coord,job_count,nearest_node_ID,nearest_node_x_coord,nearest_node_y_coord");
@@ -253,7 +253,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		
 		log.info("... done!");
 		
-		log.info("Aggregating workplaces to their nearest network node and dumping results as csv: " + Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv");
+		log.info("Aggregating workplaces to their nearest network node and dumping results as csv: " + InternalConstants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv");
 		
 		// aggregate number of workplaces to their nearest network node and dump out the results
 		Map<Id,CounterObject> aggregatedWorkplaces = new HashMap<Id,CounterObject>();
@@ -389,17 +389,17 @@ public class ERSAControlerListener implements ShutdownListener{
 	 */
 	private BufferedWriter initCSVWriter(Scenario sc)
 			throws FileNotFoundException, IOException {
-		String filename = sc.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.MATSIM_4_OPUS_TEMP_PARAM) + "accessibility_indicators_ersa.csv";
+		String filename = sc.getConfig().getParam(InternalConstants.URBANSIM_PARAMETER, InternalConstants.MATSIM_4_OPUS_TEMP_PARAM) + "accessibility_indicators_ersa.csv";
 		csvID = benchmark.addMeasure("Writing CSV File (Accessibility Measures)", filename, false);
 		
 		BufferedWriter accessibilityIndicatorWriter = IOUtils.getBufferedWriter( filename );
 		// create header
-		accessibilityIndicatorWriter.write( Constants.ZONE_ID + "," +
-											Constants.X_COORDINATE + "," +
-											Constants.Y_COORDINATE + "," + 
-											Constants.TRAVEL_TIME_ACCESSIBILITY + "," +
-											Constants.TRAVEL_COST_ACCESSIBILITY + "," + 
-											Constants.TRAVEL_DISTANCE_ACCESSIBILITY);
+		accessibilityIndicatorWriter.write( InternalConstants.ZONE_ID + "," +
+											InternalConstants.X_COORDINATE + "," +
+											InternalConstants.Y_COORDINATE + "," + 
+											InternalConstants.TRAVEL_TIME_ACCESSIBILITY + "," +
+											InternalConstants.TRAVEL_COST_ACCESSIBILITY + "," + 
+											InternalConstants.TRAVEL_DISTANCE_ACCESSIBILITY);
 		accessibilityIndicatorWriter.newLine();
 		return accessibilityIndicatorWriter;
 	}	

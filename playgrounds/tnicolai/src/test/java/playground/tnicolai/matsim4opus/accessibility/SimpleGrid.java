@@ -12,7 +12,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
@@ -106,9 +106,9 @@ public class SimpleGrid {
 	private static void dumpResults(SquareLayer[][] mySimpleGrid){
 		
 		String fileName = "/Users/thomas/Desktop/test/";
-		BufferedWriter layer1 = IOUtils.getBufferedWriter(fileName + "_Centroid" + Constants.FILE_TYPE_TXT);
-		BufferedWriter layer2 = IOUtils.getBufferedWriter(fileName + "_Mean" + Constants.FILE_TYPE_TXT);
-		BufferedWriter layer3 = IOUtils.getBufferedWriter(fileName + "_Derivation" + Constants.FILE_TYPE_TXT);
+		BufferedWriter layer1 = IOUtils.getBufferedWriter(fileName + "_Centroid" + InternalConstants.FILE_TYPE_TXT);
+		BufferedWriter layer2 = IOUtils.getBufferedWriter(fileName + "_Mean" + InternalConstants.FILE_TYPE_TXT);
+		BufferedWriter layer3 = IOUtils.getBufferedWriter(fileName + "_Derivation" + InternalConstants.FILE_TYPE_TXT);
 		
 		int numXBins = mySimpleGrid.length;
 		int numYBins = mySimpleGrid[0].length;

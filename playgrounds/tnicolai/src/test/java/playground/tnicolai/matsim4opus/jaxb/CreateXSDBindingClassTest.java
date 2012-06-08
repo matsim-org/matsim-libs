@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.jaxb.test.MatsimConfigType;
 import playground.tnicolai.matsim4opus.jaxb.test.ObjectFactory;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
@@ -103,7 +103,7 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 		String matsimConfigPath = gote.createOPUSTestEnvironment();
 		
 		// define were to store the jaxb binding classes ...
-		String destination = Constants.MATSIM_WORKING_DIRECTORY + "/src/test/java/";
+		String destination = InternalConstants.MATSIM_WORKING_DIRECTORY + "/src/test/java/";
 		String packageName = new CreateXSDBindingClassTest().getClass().getPackage().getName() + ".test";
 		String[] args = {"--destination="+destination,
 						 "--package="+packageName};
@@ -139,7 +139,7 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
 
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
-			LoadFile loadFile = new LoadFile(Constants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tempDir , Constants.CURRENT_XSD_FILE_NAME);
+			LoadFile loadFile = new LoadFile(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tempDir , InternalConstants.CURRENT_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			
 			if(file2XSD == null || !file2XSD.exists()){

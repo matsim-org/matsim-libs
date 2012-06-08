@@ -19,15 +19,21 @@ public class NetworkUtil {
 	/**
 	 * returns the orthogonal distance between a point and a network link (a straight line)
 	 * @param link
-	 * @param point
+	 * @param coord
 	 * @return
 	 */
-	public static double getOrthogonalDistance(Link link, Coord point){
+	public static double getOrthogonalDistance2NearestLink(Link link, Coord point){
 		
 		return getOrthogonalDistance(link, point.getX(), point.getY());
 	}
 	
-	public static double getOrthogonalDistance(Link link, Point point){
+	/**
+	 * returns the orthogonal distance between a point and a network link (a straight line)
+	 * @param link
+	 * @param point
+	 * @return
+	 */
+	public static double getOrthogonalDistance2NearestLink(Link link, Point point){
 		
 		return getOrthogonalDistance(link, point.getX(), point.getY());
 	}
@@ -80,6 +86,19 @@ public class NetworkUtil {
 		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
 	}
 	
+	/**
+	 * in accessibility computation travel costs are calculated between a start and an end node.
+	 * the distance to a start node is calculated as follows:
+	 * 1) the orthogonal distance between a start point and the nearest network link is calculated than ...
+	 * 2) the distance between the intersection (of the projection of the start point) on the network link to the "start" node is taken.
+	 * than it returns the distances of (1) + (2)
+	 * 
+	 * @param link
+	 * @param pointx (x coordinate)
+	 * @param pointy (y coordinate)
+	 * @param destinationNode
+	 * @return
+	 */
 	private static double getDistance2Node(LinkImpl link, double pointx, double pointy, Node destinationNode){
 		
 		double ax = link.getFromNode().getCoord().getX();

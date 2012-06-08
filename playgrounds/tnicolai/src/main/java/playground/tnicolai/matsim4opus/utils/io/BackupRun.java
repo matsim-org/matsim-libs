@@ -11,7 +11,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.tnicolai.matsim4opus.config.ConfigurationModule;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
 import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.misc.DateUtil;
 
 public class BackupRun {
@@ -44,27 +44,27 @@ public class BackupRun {
 		int lastIteration = scenario.getConfig().controler().getLastIteration();
 		
 		String saveDirectory = "run" + currentYear + "-" + DateUtil.now();
-		String savePath = Paths.checkPathEnding( Constants.MATSIM_4_OPUS_BACKUP + saveDirectory );
+		String savePath = Paths.checkPathEnding( InternalConstants.MATSIM_4_OPUS_BACKUP + saveDirectory );
 		// copy all files from matsim4opus/tmp to matsim4opus/backup
-		FileCopy.copyTree(Constants.MATSIM_4_OPUS_TEMP, savePath);
+		FileCopy.copyTree(InternalConstants.MATSIM_4_OPUS_TEMP, savePath);
 		// copy all files from matsim4opus/output/ITERS/it.XX to matsim4opus/backup
-		FileCopy.copyTree(Constants.MATSIM_4_OPUS_OUTPUT + "ITERS/it." + lastIteration + "/" , savePath);
+		FileCopy.copyTree(InternalConstants.MATSIM_4_OPUS_OUTPUT + "ITERS/it." + lastIteration + "/" , savePath);
 		
 		// backup files from matsim output
 		try {
 			// backup plans files
-			FileCopy.fileCopy( new File(Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME) , new File(savePath + Constants.GENERATED_PLANS_FILE_NAME) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.GENERATED_PLANS_FILE_NAME) , new File(savePath + InternalConstants.GENERATED_PLANS_FILE_NAME) );
 			// backup score stats file
-			FileCopy.fileCopy( new File(Constants.MATSIM_4_OPUS_OUTPUT + Constants.SCORESTATS_FILE_NAME) , new File(savePath + Constants.SCORESTATS_FILE_NAME) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.SCORESTATS_FILE_NAME) , new File(savePath + InternalConstants.SCORESTATS_FILE_NAME) );
 			// backup travel distance stats files
-			FileCopy.fileCopy( new File(Constants.MATSIM_4_OPUS_OUTPUT + Constants.TRAVELDISTANCESSTAT_FILE_NAME) , new File(savePath + Constants.TRAVELDISTANCESSTAT_FILE_NAME) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.TRAVELDISTANCESSTAT_FILE_NAME) , new File(savePath + InternalConstants.TRAVELDISTANCESSTAT_FILE_NAME) );
 			// backup logfiles
-			FileCopy.fileCopy( new File(Constants.MATSIM_4_OPUS_OUTPUT + Constants.LOG_FILE_NAME) , new File(savePath + Constants.LOG_FILE_NAME) );
-			FileCopy.fileCopy( new File(Constants.MATSIM_4_OPUS_OUTPUT + Constants.LOG_FILE_WARNINGS_ERRORS_NAME) , new File(savePath + Constants.LOG_FILE_WARNINGS_ERRORS_NAME) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.LOG_FILE_NAME) , new File(savePath + InternalConstants.LOG_FILE_NAME) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.LOG_FILE_WARNINGS_ERRORS_NAME) , new File(savePath + InternalConstants.LOG_FILE_WARNINGS_ERRORS_NAME) );
 			// backup matsim config file
-			FileCopy.fileCopy( new File(Constants.MATSIM_4_OPUS_OUTPUT + Constants.OUTPUT_CONFIG_FILE_NAME) , new File(savePath + Constants.OUTPUT_CONFIG_FILE_NAME) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_CONFIG_FILE_NAME) , new File(savePath + InternalConstants.OUTPUT_CONFIG_FILE_NAME) );
 			// backup matsim network
-			FileCopy.fileCopy( new File(Constants.MATSIM_4_OPUS_OUTPUT + Constants.OUTPUT_NETWORK_FILE_NAME) , new File(savePath + Constants.OUTPUT_NETWORK_FILE_NAME) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_NETWORK_FILE_NAME) , new File(savePath + InternalConstants.OUTPUT_NETWORK_FILE_NAME) );
 			// backup matsim 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -83,7 +83,7 @@ public class BackupRun {
 		
 		if(!module.getHotStartTargetLocation().equals("")){
 			
-			String plansFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME;
+			String plansFile = InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.GENERATED_PLANS_FILE_NAME;
 			
 			log.info("Preparing hot start for next MATSim run ...");
 			boolean success = FileCopy.moveFileOrDirectory(plansFile, module.getHotStartTargetLocation());
@@ -101,9 +101,9 @@ public class BackupRun {
 	 */
 	private static void cleanUrbanSimOutput(ScenarioImpl scenario){
 		
-		log.info("Cleaning MATSim4Opus temp directory (" + Constants.MATSIM_4_OPUS_TEMP + ") from UrbanSim output." );
+		log.info("Cleaning MATSim4Opus temp directory (" + InternalConstants.MATSIM_4_OPUS_TEMP + ") from UrbanSim output." );
 		
-		ArrayList<File> fileNames = FileCopy.listAllFiles(new File(Constants.MATSIM_4_OPUS_TEMP), Boolean.FALSE);
+		ArrayList<File> fileNames = FileCopy.listAllFiles(new File(InternalConstants.MATSIM_4_OPUS_TEMP), Boolean.FALSE);
 		Iterator<File> fileNameIterator = fileNames.iterator();
 		while(fileNameIterator.hasNext()){
 			File f = fileNameIterator.next();

@@ -48,7 +48,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -260,7 +260,7 @@ public class PotsdamPopTemplate implements Runnable {
 
 			plan.createAndAddLeg(TransportMode.car) ;				// home
 			plan.createAndAddActivity(
-			Constants.ACT_HOME, homeCoord );
+			InternalConstants.ACT_HOME, homeCoord );
 	}
 
 	/**

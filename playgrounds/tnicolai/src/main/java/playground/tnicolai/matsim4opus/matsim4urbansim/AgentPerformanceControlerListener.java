@@ -17,7 +17,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimPersonCSVWriter;
 
@@ -83,7 +83,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 				if ( pe instanceof Activity ) {
 					Activity activity = (Activity) pe;
 					
-					if(activity.getType().endsWith(Constants.ACT_HOME))
+					if(activity.getType().endsWith(InternalConstants.ACT_HOME))
 						isHomeActivity = true;
 					else
 						isHomeActivity = false;

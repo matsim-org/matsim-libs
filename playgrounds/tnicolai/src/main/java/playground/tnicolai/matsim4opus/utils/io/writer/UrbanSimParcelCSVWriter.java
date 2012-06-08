@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 /**
  * @author thomas
@@ -47,13 +47,13 @@ public class UrbanSimParcelCSVWriter {
 	public static void initUrbanSimZoneWriter(){
 		try{
 			log.info("Initializing UrbanSimParcelCSVWriter ...");
-			parcelWriter = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + FILE_NAME );
-			log.info("Writing data into " + Constants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
+			parcelWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
+			log.info("Writing data into " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
 			
 			// create header
-			parcelWriter.write( Constants.PARCEL_ID + "," +
-								Constants.ACCESSIBILITY_BY_CAR + "," +
-								Constants.ACCESSIBILITY_BY_WALK);
+			parcelWriter.write( InternalConstants.PARCEL_ID + "," +
+								InternalConstants.ACCESSIBILITY_BY_CAR + "," +
+								InternalConstants.ACCESSIBILITY_BY_WALK);
 			parcelWriter.newLine();
 			
 			log.info("... done!");

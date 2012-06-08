@@ -14,7 +14,7 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
@@ -72,12 +72,12 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
-		UrbanSimZoneCSVWriter.initUrbanSimZoneWriter(Constants.MATSIM_4_OPUS_TEMP +
+		UrbanSimZoneCSVWriter.initUrbanSimZoneWriter(InternalConstants.MATSIM_4_OPUS_TEMP +
 													 UrbanSimZoneCSVWriter.FILE_NAME);
 		// in contrast to the file above this contains all information about
 		// zones but is not dedicated as input for UrbanSim, use for analysis
-		AnalysisZoneCSVWriter.initAccessiblityWriter(Constants.MATSIM_4_OPUS_TEMP + 
-											 		 Constants.ZONES_COMPLETE_FILE_CSV);
+		AnalysisZoneCSVWriter.initAccessiblityWriter(InternalConstants.MATSIM_4_OPUS_TEMP + 
+											 		 InternalConstants.ZONES_COMPLETE_FILE_CSV);
 		
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListener!");
 	}

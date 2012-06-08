@@ -31,7 +31,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
 import playground.tnicolai.matsim4opus.scenario.zurich.ZurichUtilities;
-import playground.tnicolai.matsim4opus.scenario.zurich.ZurichUtilitiesZurichBigRoads;
+import playground.tnicolai.matsim4opus.scenario.zurich.ZurichUtilitiesIVTCHOSMNetwork;
 
 /**
  * This class extends MATSim4UrbanSimV2 including two extra accessibility measurements
@@ -77,8 +77,8 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 		}
 		else{
 			String scenarioArray[] = testParameter.split(",");
-//			ZurichUtilitiesIVTCHNetwork.modifyNetwork(network, scenarioArray);
-			ZurichUtilitiesZurichBigRoads.modifyNetwork(network, scenarioArray);
+			ZurichUtilitiesIVTCHOSMNetwork.modifyNetwork(network, scenarioArray);
+//			ZurichUtilitiesZurichBigRoads.modifyNetwork(network, scenarioArray);
 			log.info("Done modifying network.");
 			log.info("");
 		}

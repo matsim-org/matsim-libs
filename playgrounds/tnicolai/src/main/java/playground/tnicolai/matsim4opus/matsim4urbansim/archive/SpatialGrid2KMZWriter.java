@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.MyColorizer;
 import playground.tnicolai.matsim4opus.gis.io.FeatureKMLWriter;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
@@ -50,12 +50,12 @@ public class SpatialGrid2KMZWriter {
 		assert (travelDistanceAccessibilityGrid != null);
 		assert (travelCostAccessibilityGrid != null);
 
-		log.info("Writing " + Constants.TRAVEL_TIME_ACCESSIBILITY + " ...");
-		write(travelTimeAccessibilityGrid, Constants.TRAVEL_TIME_ACCESSIBILITY);
-		log.info("Writing " + Constants.TRAVEL_DISTANCE_ACCESSIBILITY + " ...");
-		write(travelDistanceAccessibilityGrid, Constants.TRAVEL_DISTANCE_ACCESSIBILITY);
-		log.info("Writing " + Constants.TRAVEL_COST_ACCESSIBILITY + " ...");
-		write(travelCostAccessibilityGrid, Constants.TRAVEL_COST_ACCESSIBILITY);
+		log.info("Writing " + InternalConstants.TRAVEL_TIME_ACCESSIBILITY + " ...");
+		write(travelTimeAccessibilityGrid, InternalConstants.TRAVEL_TIME_ACCESSIBILITY);
+		log.info("Writing " + InternalConstants.TRAVEL_DISTANCE_ACCESSIBILITY + " ...");
+		write(travelDistanceAccessibilityGrid, InternalConstants.TRAVEL_DISTANCE_ACCESSIBILITY);
+		log.info("Writing " + InternalConstants.TRAVEL_COST_ACCESSIBILITY + " ...");
+		write(travelCostAccessibilityGrid, InternalConstants.TRAVEL_COST_ACCESSIBILITY);
 
 		log.info("Done with writing Google Erath files ...");
 	}
@@ -99,15 +99,15 @@ public class SpatialGrid2KMZWriter {
 		// writing centroid values
 		log.info("Writing centroid values ...");
 		writerCentroid.setColorizable(new MyColorizer( centroidValues ));
-		writerCentroid.write(geometries, Constants.MATSIM_4_OPUS_TEMP + CENTROID + type + Constants.FILE_TYPE_CSV);
+		writerCentroid.write(geometries, InternalConstants.MATSIM_4_OPUS_TEMP + CENTROID + type + InternalConstants.FILE_TYPE_CSV);
 		// writing mean values
 		log.info("writing mean values ...");
 		writerMean.setColorizable(new MyColorizer( meanValues ));
-		writerMean.write(geometries, Constants.MATSIM_4_OPUS_TEMP + MEAN + type + Constants.FILE_TYPE_CSV);
+		writerMean.write(geometries, InternalConstants.MATSIM_4_OPUS_TEMP + MEAN + type + InternalConstants.FILE_TYPE_CSV);
 		// writing derivation values
 		log.info("writing derivation values ...");
 		writerDerivation.setColorizable(new MyColorizer( derivationValues ));
-		writerDerivation.write(geometries, Constants.MATSIM_4_OPUS_TEMP + DERIVATION + type + Constants.FILE_TYPE_CSV);
+		writerDerivation.write(geometries, InternalConstants.MATSIM_4_OPUS_TEMP + DERIVATION + type + InternalConstants.FILE_TYPE_CSV);
 
 		log.info("... done!");
 	}

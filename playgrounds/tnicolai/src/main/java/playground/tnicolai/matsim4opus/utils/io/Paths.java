@@ -5,7 +5,7 @@ import java.net.URL;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 
 public class Paths {
 	
@@ -20,7 +20,7 @@ public class Paths {
 		// test the path to matsim config xml
 		if( matsimConfiFile==null || matsimConfiFile.length() <= 0 || !pathExsits( matsimConfiFile ) ){
 			log.error(matsimConfiFile + " is not a valid path to a MATSim configuration file. SHUTDOWN MATSim!");
-			System.exit(Constants.NOT_VALID_PATH);
+			System.exit(InternalConstants.NOT_VALID_PATH);
 		}
 	}
 	
@@ -116,7 +116,7 @@ public class Paths {
 	 */
 	@SuppressWarnings("all")
 	public static String getWarmStartUrbanSimInputData(Class<?>  classObj){		
-		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + Constants.MATSIM_TEST_DATA_WARM_START_URBANSIM_OUTPUT );
+		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + InternalConstants.MATSIM_TEST_DATA_WARM_START_URBANSIM_OUTPUT );
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public class Paths {
 	 */
 	@SuppressWarnings("all")
 	public static String getWarmStartInputPlansFile(Class<?>  classObj){		
-		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + Constants.MATSIM_TEST_DATA_WARM_START_INPUT_PLANS);
+		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + InternalConstants.MATSIM_TEST_DATA_WARM_START_INPUT_PLANS);
 	}
 	
 	/**
@@ -134,7 +134,7 @@ public class Paths {
 	 */
 	@SuppressWarnings("all")
 	public static String getWarmStartNetwork(Class<?>  classObj){		
-		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + Constants.MATSIM_TEST_DATA_WARM_START_NETWORK );
+		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + InternalConstants.MATSIM_TEST_DATA_WARM_START_NETWORK );
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class Paths {
 	 */
 	@SuppressWarnings("all")
 	public static String getTestUrbanSimInputDataDir(Class<?>  classObj){
-		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + Constants.MATSIM_TEST_DATA_DEFAULT_URBANSIM_OUTPUT );
+		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + InternalConstants.MATSIM_TEST_DATA_DEFAULT_URBANSIM_OUTPUT );
 	}
 
 }
