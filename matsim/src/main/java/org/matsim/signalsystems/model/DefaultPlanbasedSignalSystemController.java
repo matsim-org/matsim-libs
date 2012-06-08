@@ -80,19 +80,37 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	
 	private void checkActivePlan(double timeSeconds){
 		SignalPlan nextPlan = this.planQueue.peek();
-		if (nextPlan != null && nextPlan.getStartTime() <= timeSeconds) {
+		if (nextPlan != null && nextPlan.getStartTime() != null 
+				&& nextPlan.getStartTime() <= timeSeconds) {
 			this.activePlan = nextPlan;
 			this.planQueue.poll();
-			if (this.planQueue.peek() != null){
-				this.nextActivePlanCheckTime = Math.min(this.activePlan.getEndTime(), this.planQueue.peek().getStartTime());
+			
+			//determine next check of active plan
+			nextPlan = this.planQueue.peek();
+			if (nextPlan != null){
+				if (this.activePlan.getEndTime() == null && nextPlan.getStartTime() != null) {
+					this.nextActivePlanCheckTime = nextPlan.getStartTime();
+				}
+				else if (this.activePlan.getEndTime() != null  && nextPlan.getStartTime() == null){
+					this.nextActivePlanCheckTime = this.activePlan.getEndTime();
+				}
+				else {
+					this.nextActivePlanCheckTime = Math.min(this.activePlan.getEndTime(), this.planQueue.peek().getStartTime());
+				}
 			}
-			else {
+			//no next plan
+			else if (this.activePlan.getEndTime() != null){
 				this.nextActivePlanCheckTime = this.activePlan.getEndTime();
 			}
+			else {
+				this.nextActivePlanCheckTime = Double.POSITIVE_INFINITY;
+			}
 		}
-		else if (this.activePlan != null &&  timeSeconds >= this.activePlan.getEndTime()) {
+		else if (this.activePlan != null && this.activePlan.getEndTime() != null 
+				&&  timeSeconds >= this.activePlan.getEndTime()) {
 			this.activePlan = null;
-			if (nextPlan != null && nextPlan.getStartTime() <= (timeSeconds + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
+			if (nextPlan != null && nextPlan.getStartTime() != null 
+					&& nextPlan.getStartTime() <= (timeSeconds + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
 				this.nextActivePlanCheckTime = nextPlan.getStartTime();
 			}
 			else {
