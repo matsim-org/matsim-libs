@@ -421,8 +421,14 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					 */
 					this.startBarrier.await();
 					
+					this.endBarrier.await();
+										
 					/*
 					 * Calculate statistics
+					 * 
+					 * Previously this was executed between startBarrier.await() and endBarrier.await().
+					 * However, this seems to be not thread-safe. Therefore I moved it below the 
+					 * endBarrier.await() line. cdobler, jun'12.
 					 */
 					for (Id householdId : informedHouseholds) {
 						
@@ -439,8 +445,6 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 						if (this.coordAnalyzer.isFacilityAffected(meetingFacility)) meetInsecure++;
 						else meetSecure++;
 					}
-					
-					this.endBarrier.await();
 				}			
 			} catch (InterruptedException ex) {
 				Gbl.errorMsg(ex);

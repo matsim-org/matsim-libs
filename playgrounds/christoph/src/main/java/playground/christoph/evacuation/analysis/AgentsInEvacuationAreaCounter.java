@@ -57,7 +57,6 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.households.Household;
 
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.PopulationAdministration;
@@ -96,8 +95,12 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	protected Map<Id, Id> driverVehicleMap;
 	protected Map<Id, List<Id>> vehiclePassengersMap;	// the driver is not included!
 	
-	protected Map<String, int[]> legBins;
 	protected int[] activityBins;
+	protected int[] activityBinsParticipating;
+	protected int[] activityBinsNotParticipating;
+	protected Map<String, int[]> legBins;
+	protected Map<String, int[]> legBinsParticipating;
+	protected Map<String, int[]> legBinsNotParticipating;
 
 	public AgentsInEvacuationAreaCounter(Scenario scenario, Set<String> transportModes, CoordAnalyzer coordAnalyzer,
 			PopulationAdministration popAdmin, double scaleFactor) {
@@ -118,11 +121,17 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		driverVehicleMap = new HashMap<Id, Id>();
 		vehiclePassengersMap = new HashMap<Id, List<Id>>();
 		activityBins = new int[nofBins];
+		activityBinsParticipating = new int[nofBins];
+		activityBinsNotParticipating = new int[nofBins];
 		legBins = new TreeMap<String, int[]>();
+		legBinsParticipating = new TreeMap<String, int[]>();
+		legBinsNotParticipating = new TreeMap<String, int[]>();
 
 		for (String string : transportModes) {
 			legAgentsInEvacuationArea.put(string, new HashSet<Id>());
 			legBins.put(string, new int[nofBins]);
+			legBinsParticipating.put(string, new int[nofBins]);
+			legBinsNotParticipating.put(string, new int[nofBins]);
 		}
 	}
 
@@ -327,12 +336,8 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
 		// debug
-		Map<Id, Id> personHouseholdMap = new HashMap<Id, Id>();
-		for (Household household : ((ScenarioImpl) this.scenario).getHouseholds().getHouseholds().values()) {
-			for (Id id : household.getMemberIds()) personHouseholdMap.put(household.getId(), id);
-		}
 		for (Id id : activityAgentsInEvacuationArea) {
-			if (this.popAdmin.isHouseholdParticipating(personHouseholdMap.get(id))) {
+			if (this.popAdmin.isAgentParticipating(id)) {
 				log.warn("Person " + id.toString() + " is still inside the evacuation area but should have left.");				
 			}
 		}
@@ -344,20 +349,48 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 		AgentsInEvacuationAreaWriter writer = new AgentsInEvacuationAreaWriter(this.binSize, event.getIteration());
 
+		/*
+		 * write text files
+		 */
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea.txt");
 		writer.write(fileName, activityBins, legBins);
 
-		// write activity performing graph
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationAreaParticipating.txt");
+		writer.write(fileName, activityBinsParticipating, legBinsParticipating);
+		
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationAreaNotParticipating.txt");
+		writer.write(fileName, activityBinsNotParticipating, legBinsNotParticipating);
+		
+		/*
+		 * write activity performing graphs
+		 */
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_activity.png");
 		writer.writeGraphic(fileName, "activity", activityBins);
 
-		// write leg performing graphs
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_activity_participating.png");
+		writer.writeGraphic(fileName, "activity", activityBinsParticipating);
+		
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_activity_not_participating.png");
+		writer.writeGraphic(fileName, "activity", activityBinsNotParticipating);
+		
+		/*
+		 * write leg performing graphs
+		 */
 		for (String legMode : transportModes) {
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_" + legMode + ".png");
 			writer.writeGraphic(fileName, legMode, legBins.get(legMode));
+			
+			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_" + legMode + "_participating.png");
+			writer.writeGraphic(fileName, legMode, legBinsParticipating.get(legMode));
+			
+			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_" + legMode + "_not_participating.png");
+			writer.writeGraphic(fileName, legMode, legBinsNotParticipating.get(legMode));
+
 		}
 
-		// write all agents into a graph
+		/*
+		 * write all agents into a graph
+		 */
 		int[] allAgents = activityBins.clone();
 		for (String legMode : transportModes) {
 			int[] leg = legBins.get(legMode);
@@ -367,8 +400,30 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_allAgents.png");
 			writer.writeGraphic(fileName, "all agents", allAgents);
 		}
-
-		// write single graph with all agents
+		
+		int[] allParticipatingAgents = activityBinsParticipating.clone();
+		for (String legMode : transportModes) {
+			int[] leg = legBinsParticipating.get(legMode);
+			for (int i = 0; i < allParticipatingAgents.length; i++) {
+				allParticipatingAgents[i] = allParticipatingAgents[i] + leg[i];
+			}
+			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_allParticipatingAgents.png");
+			writer.writeGraphic(fileName, "participating agents", allParticipatingAgents);
+		}
+		
+		int[] allNotParticipatingAgents = activityBinsNotParticipating.clone();
+		for (String legMode : transportModes) {
+			int[] leg = legBinsNotParticipating.get(legMode);
+			for (int i = 0; i < allNotParticipatingAgents.length; i++) {
+				allNotParticipatingAgents[i] = allNotParticipatingAgents[i] + leg[i];
+			}
+			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_allNotParticipatingAgents.png");
+			writer.writeGraphic(fileName, "not participating agents", allNotParticipatingAgents);
+		}
+		
+		/*
+		 * write single graph with all agents
+		 */
 		String[] names = new String[transportModes.size() + 2];
 		int[][] data = new int[transportModes.size() + 2][];
 		names[0] = "all";
@@ -382,6 +437,32 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			i++;
 		}
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_comparison.png");
+		writer.writeGraphic(fileName, names, data);
+
+		names[0] = "participating";
+		data[0] = allParticipatingAgents;
+		names[1] = "activity";
+		data[1] = activityBinsParticipating;
+		i = 2;
+		for (String legMode : transportModes) {
+			data[i] = legBinsParticipating.get(legMode);
+			names[i] = legMode;
+			i++;
+		}
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_comparison_participating.png");
+		writer.writeGraphic(fileName, names, data);
+		
+		names[0] = "not participating";
+		data[0] = allNotParticipatingAgents;
+		names[1] = "activity";
+		data[1] = activityBinsNotParticipating;
+		i = 2;
+		for (String legMode : transportModes) {
+			data[i] = legBinsNotParticipating.get(legMode);
+			names[i] = legMode;
+			i++;
+		}
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_comparison_not_participating.png");
 		writer.writeGraphic(fileName, names, data);
 	}
 
@@ -401,11 +482,31 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		int binIndex = getBinIndex(time);
 		if (binIndex > currentBin) {
 
+			int participatingActivityAgents = 0;
+			Map<String, Integer> participatingLegAgents = new HashMap<String, Integer>();
+			for (Id activityAgentId : activityAgentsInEvacuationArea) {
+				if (this.popAdmin.isAgentParticipating(activityAgentId)) participatingActivityAgents++;
+			}
+			for (String string : transportModes) {
+				int participatingAgents = 0;
+				for (Id legAgentId : legAgentsInEvacuationArea.get(string)) {
+					if (this.popAdmin.isAgentParticipating(legAgentId)) participatingAgents++;
+				}
+				participatingLegAgents.put(string, participatingAgents);
+			}
+			
 			// for all not processed past bins
 			for (int index = currentBin; index < binIndex; index++) {
 				activityBins[index] = (int) Math.round(activityAgentsInEvacuationArea.size() * scaleFactor);
+				activityBinsParticipating[index] = (int) Math.round(participatingActivityAgents * scaleFactor);
+				activityBinsNotParticipating[index] = 
+					(int) Math.round((activityAgentsInEvacuationArea.size() - participatingActivityAgents) * scaleFactor);
+				
 				for (String string : transportModes) {
 					legBins.get(string)[index] = (int) Math.round(legAgentsInEvacuationArea.get(string).size() * scaleFactor);
+					legBinsParticipating.get(string)[index] = (int) Math.round(participatingLegAgents.get(string) * scaleFactor);
+					legBinsNotParticipating.get(string)[index] =  
+						(int) Math.round((legAgentsInEvacuationArea.get(string).size() - participatingLegAgents.get(string)) * scaleFactor);
 				}
 			}
 

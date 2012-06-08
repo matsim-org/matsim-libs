@@ -36,6 +36,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.households.Household;
 
 /*
  * Administrates a population and defines which agents are in panic
@@ -53,6 +54,7 @@ public class PopulationAdministration implements BeforeMobsimListener, AfterMobs
 	private final Scenario scenario;
 	private final Set<Id> panicPeople;
 	private final Set<Id> participatingHouseholds;
+	private final Set<Id> participatingAgents;
 	private final Random random;
 	
 	private BufferedWriter panicPeopleWriter;
@@ -69,14 +71,20 @@ public class PopulationAdministration implements BeforeMobsimListener, AfterMobs
 		this.scenario = scenario;
 		this.panicPeople = new HashSet<Id>();
 		this.participatingHouseholds = new HashSet<Id>();
+		this.participatingAgents = new HashSet<Id>();
 		this.random = MatsimRandom.getLocalInstance();
 	}
 	
 	public void selectParticipatingHouseholds(double share) {
 		participatingHouseholds.clear();
 		
-		for (Id id : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().keySet()) {
-			if (this.random.nextDouble() <= share) participatingHouseholds.add(id);
+//		for (Id id : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().keySet()) {
+		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
+			Id householdId = household.getId();
+			if (this.random.nextDouble() <= share) {
+				participatingHouseholds.add(householdId);
+				participatingAgents.addAll(household.getMemberIds());
+			}
 		}
 	}
 	
@@ -94,6 +102,10 @@ public class PopulationAdministration implements BeforeMobsimListener, AfterMobs
 	
 	public boolean isHouseholdParticipating(Id householdId) {
 		return participatingHouseholds.contains(householdId);
+	}
+	
+	public boolean isAgentParticipating(Id agentId) {
+		return participatingAgents.contains(agentId);
 	}
 	
 	@Override
