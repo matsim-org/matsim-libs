@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
@@ -20,8 +21,10 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
+import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class ParkingStrategyManager implements BeforeMobsimListener, MobsimInitializedListener {
 
@@ -33,11 +36,13 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 	private int iteration;
 
 	private TwoHashMapsConcatenated<Id, Integer, String> legModeActivityTypes;
+	private final ParkingPersonalBetas parkingPersonalBetas;
 
 	public ParkingStrategyManager(ParkingStrategyActivityMapperFW strategyActivityMapper,
-			Collection<ParkingStrategy> parkingStrategies) {
+			Collection<ParkingStrategy> parkingStrategies, ParkingPersonalBetas parkingPersonalBetas) {
 		this.strategyActivityMapper = strategyActivityMapper;
 		this.parkingStrategies = parkingStrategies;
+		this.parkingPersonalBetas = parkingPersonalBetas;
 		currentlySelectedParkingStrategies = new TwoHashMapsConcatenated<Id, Integer, ParkingStrategy>();
 		agents = new HashMap<Id, ExperimentalBasicWithindayAgent>();
 		legModeActivityTypes = new TwoHashMapsConcatenated<Id, Integer, String>();
@@ -56,9 +61,14 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 		if (this.iteration == 0) {
 			// assign strategies per leg at random
+			
 			for (ExperimentalBasicWithindayAgent agent : agents.values()) {
 				Plan selectedPlan = agent.getSelectedPlan();
 
+				if (selectedPlan.getPerson().getId().equals(new IdImpl(304))){
+					System.out.println();
+				}
+				
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 					PlanElement planElement = selectedPlan.getPlanElements().get(i);
 					if (selectedPlan.getPlanElements().get(i) instanceof LegImpl) {
@@ -194,6 +204,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			if (j == nextInt) {
 				selectedParkingStrategy = parkingStrategy;
 			}
+			j++;
 		}
 
 		getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
@@ -226,6 +237,10 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 	public TwoHashMapsConcatenated<Id, Integer, ParkingStrategy> getCurrentlySelectedParkingStrategies() {
 		return currentlySelectedParkingStrategies;
+	}
+
+	public ParkingPersonalBetas getParkingPersonalBetas() {
+		return parkingPersonalBetas;
 	}
 
 }

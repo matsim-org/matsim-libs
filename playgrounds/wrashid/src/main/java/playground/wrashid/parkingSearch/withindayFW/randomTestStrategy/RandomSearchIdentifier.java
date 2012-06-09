@@ -62,14 +62,24 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 		 * time step.
 		 */
 		//Set<Id> linkEnteredAgents = this.parkingAgentsTracker.getLinkEnteredAgents();
-		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(this);
 		Set<PlanBasedWithinDayAgent> identifiedAgents = new HashSet<PlanBasedWithinDayAgent>();
+		
+		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(this);
+		
+		if (true || this.getIdentifierFactory()==null && searchingAgentsAssignedToThisIdentifier==null){
+			return identifiedAgents;
+		} else {
+			//System.out.println();
+		}
+		
+		
+		
 		
 		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
 			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
 			
-			if (isAgentAssignedToThisIdentifierCurrently(agent.getId(),agent.getCurrentPlanElementIndex())){
-				
+			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
+				parkingAgentsTracker.getSearchStartTime().put(agentId, parkingAgentsTracker.getLastCarMovementRegistered().get(agentId));
 			}
 			
 			/*

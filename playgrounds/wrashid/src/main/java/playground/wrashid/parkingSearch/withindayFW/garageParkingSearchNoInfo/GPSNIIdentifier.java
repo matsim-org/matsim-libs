@@ -61,11 +61,22 @@ public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitia
 		 * Get all agents that are searching and have entered a new link in the last
 		 * time step.
 		 */
-		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(this);
 		Set<PlanBasedWithinDayAgent> identifiedAgents = new HashSet<PlanBasedWithinDayAgent>();
+		
+		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(this);
+		
+		if (true || this.getIdentifierFactory()==null && searchingAgentsAssignedToThisIdentifier==null){
+			return identifiedAgents;
+		} else {
+			//System.out.println();
+		}
 		
 		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
 			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
+			
+			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
+				parkingAgentsTracker.getSearchStartTime().put(agentId, parkingAgentsTracker.getLastCarMovementRegistered().get(agentId));
+			}
 			
 			/*
 			 * If the agent has not selected a parking facility yet.

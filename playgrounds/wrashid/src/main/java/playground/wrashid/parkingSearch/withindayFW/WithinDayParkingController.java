@@ -65,6 +65,7 @@ import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
+import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener,
 		BeforeMobsimListener {
@@ -90,10 +91,12 @@ public class WithinDayParkingController extends WithinDayController implements S
 	}
 
 	protected void initParkingStrategyFactories() {
+		ParkingPersonalBetas parkingPersonalBetas=new ParkingPersonalBetas(this.scenarioData, null);
+		
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
 		Collection<ParkingStrategy> parkingStrategies = new LinkedList<ParkingStrategy>();
 		ParkingStrategyManager parkingStrategyManager = new ParkingStrategyManager(parkingStrategyActivityMapperFW,
-				parkingStrategies);
+				parkingStrategies,parkingPersonalBetas);
 		parkingAgentsTracker.setParkingStrategyManager(parkingStrategyManager);
 
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(

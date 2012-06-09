@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class HashMapHashSetConcat<KeyClass,ValueClass> {
 
-	HashMap<KeyClass, HashSet<ValueClass>> map;
+	HashMap<KeyClass, HashSet<ValueClass>> map=new HashMap<KeyClass, HashSet<ValueClass>>();
 	
 	public void put(KeyClass id,ValueClass value){
 		if (!map.containsKey(id)) {
@@ -42,6 +42,10 @@ public class HashMapHashSetConcat<KeyClass,ValueClass> {
 	
 	public Set<ValueClass> getValueSet(KeyClass id){
 		return map.get(id);
+	}
+	
+	public boolean removeValue(KeyClass id,ValueClass value){
+		return map.get(id).remove(value);
 	}
 	
 }
