@@ -34,8 +34,15 @@ import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriter;
 import com.vividsolutions.jts.geom.Point;
 
 /**
+ * The spatial grid saves the data values of a study area in a matrix.
+ * Intern the matrix is mirrored horizontal.
+ * The methods getValue and setValue compensate the mirroring process (so altogether the class works consistent).
+ * In contrast to the methods above the method getMirroredValue(int row, int col) returns the intern mirrored value.
+ * 
+ * 
  * @author illenberger
  * @author thomas
+ * @author tthunig
  */
 public class SpatialGrid{
 	
@@ -105,6 +112,12 @@ public class SpatialGrid{
 		return matrix[row].length;
 	}
 
+	/**
+	 * independent of the intern representation (mirrored) this method returns the initial value at the given point
+	 *  
+	 * @param point
+	 * @return the initial value at the given point
+	 */
 	public double getValue(Point point) {
 		if(isInBounds(point))
 			return getValue(point.getX(), point.getY());
@@ -116,6 +129,13 @@ public class SpatialGrid{
 		return Double.NaN;
 	}
 	
+	/**
+	 * independent of the intern representation (mirrored) this method returns the initial value at the given point (x, y)
+	 * 
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @return the initial value at the point (x, y)
+	 */
 	public double getValue(double x, double y){
 		if(isInBounds(x, y))
 			return matrix[getRow(y)][getColumn(x)];
@@ -126,6 +146,13 @@ public class SpatialGrid{
 		return Double.NaN;
 	}
 	
+	/**
+	 * independent of the intern representation (mirrored) this method sets the given value at the initial point if it lies in the bounds of the study area
+	 * 
+	 * @param value
+	 * @param point
+	 * @return true if the point lies in the bounds of the study area, false otherwise
+	 */
 	public boolean setValue(double value, Point point) {
 		if(isInBounds(point)) {
 			matrix[getRow(point.getY())][getColumn(point.getX())] = value;
@@ -143,16 +170,28 @@ public class SpatialGrid{
 		return (x >= minX && x <= maxX && y >= minY && y <= maxY);
 	}
 	
+	/**
+	 * returns the value at matrix[row][col] so the mirrored intern representation 
+	 * 
+	 * @param row the row number
+	 * @param col the column number
+	 * @return the value at matrix[row][col]
+	 */
 	@Deprecated
-	public double getUnmirroredValue(int row, int col) {
+	public double getMirroredValue(int row, int col) {
 		return matrix[row][col];
 	}
 	
-	public double getValue(int row, int col){
-		return matrix[matrix.length-1-row][col];
-	}
-	
-	public boolean setValue(int row, int col, double value) {
+	/**
+	 * sets the value at matrix[row][col] so the value in the mirrored intern representation
+	 * 
+	 * @param row the row number
+	 * @param col the column number
+	 * @param value the value at matrix[row][col]
+	 * @return true if the row and column numbers lie in the bounds, false otherwise
+	 */
+	@Deprecated
+	private boolean setMirroredValue(int row, int col, double value) {
 		if(row < matrix.length) {
 			if(col < matrix[row].length) {
 				matrix[row][col] = value;
@@ -163,14 +202,33 @@ public class SpatialGrid{
 			return false;
 	}
 	
+	/**
+	 * returns the row number of the y coordinate in the intern representation (mirrored)
+	 * 
+	 * @param yCoord the y coordinate
+	 * @return the row number of the y coordinate 
+	 */
 	public int getRow(double yCoord) {
 		return matrix.length - 1 - (int)Math.floor((yCoord - minY) / resolution);
 	}
 	
+	/**
+	 * returns the column number of the x coordinate in the intern representation
+	 * 
+	 * @param xCoord the x coordinate
+	 * @return the column number of the x coordinate
+	 */
 	public int getColumn(double xCoord) {
 		return (int)Math.floor((xCoord - minX) / resolution);
 	}
 	
+	/**
+	 * independent of the intern representation (mirrored) this method returns the initial data as a matrix (remirrored)
+	 * for example the value at (xmin, ymin) will be at the bottom left corner of the returned matrix
+	 * hence it fits with the coordinate system if you plot the matrix
+	 * 
+	 * @return the initial data as a matrix
+	 */
 	public double[][] getMatrix(){
 		return flip(matrix);
 	}
@@ -222,7 +280,7 @@ public class SpatialGrid{
 						xCoord = Double.parseDouble(header[i]);
 						value = Double.parseDouble(parts[i]);
 						
-						sg.setValue(sg.getRow(yCoord), sg.getColumn(xCoord), value);
+						sg.setMirroredValue(sg.getRow(yCoord), sg.getColumn(xCoord), value);
 					}
 				}
 			}
