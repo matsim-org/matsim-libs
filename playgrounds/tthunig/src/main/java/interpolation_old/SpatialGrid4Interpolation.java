@@ -35,6 +35,7 @@ public class SpatialGrid4Interpolation {
 	}
 	
 	private void initTestSpatialGrid(final SpatialGrid spatialGrid){
+		GeometryFactory factory= new GeometryFactory();
 		
 		int rows = spatialGrid.getNumRows();
 		int columns = spatialGrid.getNumCols(0);
@@ -43,9 +44,9 @@ public class SpatialGrid4Interpolation {
 			for(int col = 0; col < columns; col++){
 				
 				if(col == (columns / 2) && row == (rows / 2 - 1))
-					spatialGrid.setValue(row, col, 100.);
+					spatialGrid.setValue(100., factory.createPoint(new Coordinate(spatialGrid.getXmin()+row*spatialGrid.getResolution(), spatialGrid.getYmin()+col*spatialGrid.getResolution())));
 				else
-					spatialGrid.setValue(row, col, 1.);
+					spatialGrid.setValue(1., factory.createPoint(new Coordinate(spatialGrid.getXmin()+row*spatialGrid.getResolution(), spatialGrid.getYmin()+col*spatialGrid.getResolution())));
 			}
 		}
 	}
@@ -68,7 +69,7 @@ public class SpatialGrid4Interpolation {
 			
 		for(int row = 0; row < sg.getNumRows(); row++){
 			for(int col = 0; col < sg.getNumCols(0); col++){
-				System.out.print( sg.getValue(row, col) + " " );
+				System.out.print( sg.getMirroredValue(row, col) + " " );
 			}
 			System.out.println();
 		}

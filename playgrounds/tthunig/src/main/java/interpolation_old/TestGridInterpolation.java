@@ -1,8 +1,13 @@
 package interpolation_old;
 
+import interpolation.Interpolation;
+
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
@@ -43,10 +48,11 @@ public class TestGridInterpolation {
 		log.info("interpolating...");
 		Interpolation interpolation = new Interpolation(sg, interpolationMethod, expForIDW);
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
+		GeometryFactory factory = new GeometryFactory();
 		// calculate new values for higher resolution
 		for (double y = sg.getYmin(); y <= sg.getYmax(); y = y+ sg.getResolution()/2) {
 			for (double x = sg.getXmin(); x <= sg.getXmax(); x = x+ sg.getResolution()/2) {
-				sg_new.setValue(sg_new.getRow(y), sg_new.getColumn(x), interpolation.interpolate(x, y));
+				sg_new.setValue(interpolation.interpolate(x, y), factory.createPoint(new Coordinate(x, y)));
 			}
 		}
 		
