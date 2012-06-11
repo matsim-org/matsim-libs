@@ -31,6 +31,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -56,14 +60,15 @@ public class MyAmenitySink implements Sink {
 	private Map<Long, NodeContainer> nodeMap;
 	private Map<Long, WayContainer> wayMap;
 	private Map<Long, RelationContainer> relationMap;
-	private ActivityFacilitiesImpl amenities;
-	private ObjectAttributes amenityAttributes;
+	private ActivityFacilitiesImpl facilities;
+	private ObjectAttributes facilityAttributes;
 	private Map<Id,Integer> educationLevelMap;
 	
 	private int errorCounter = 0;
 	private int warningCounter = 0;
 	private int educationCounter = 0;
 	private int leisureCounter = 0;
+	private int shoppingCounter = 0;
 	private int otherCounter = 0;
 	
 	public MyAmenitySink(CoordinateTransformation ct) {
@@ -72,8 +77,8 @@ public class MyAmenitySink implements Sink {
 		this.wayMap = new HashMap<Long, WayContainer>();
 		this.relationMap = new HashMap<Long, RelationContainer>();
 		
-		amenities = new ActivityFacilitiesImpl("Amenities");
-		amenityAttributes = new ObjectAttributes();
+		facilities = new ActivityFacilitiesImpl("Amenities");
+		facilityAttributes = new ObjectAttributes();
 		
 		/* Keep track of the different education level facilities. */
 		educationLevelMap = new HashMap<Id, Integer>();
@@ -97,6 +102,7 @@ public class MyAmenitySink implements Sink {
 		for(long n : nodeMap.keySet()){
 			Node node = nodeMap.get(n).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(node.getTags()).buildMap();
+			/* Check amenities */
 			String amenity = tags.get("amenity");
 			if(amenity != null){
 				String activityType = getActivityType(amenity);
@@ -112,11 +118,42 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
-				ActivityFacilityImpl af = amenities.createFacility(new IdImpl(node.getId()), coord);
-				af.setDesc(name);
-				af.createActivityOption(activityType);
+				Id newId = new IdImpl(node.getId());
+				ActivityFacilityImpl af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = facilities.createFacility(newId, coord);					
+					af.setDesc(name);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOptionImpl ao = af.createActivityOption(activityType);
+				setFacilityDetails(ao);
 				nodeFacilities++;
 			}
+			/* Check shops */
+			String shops = tags.get("shop");
+			if(shops != null){
+				String name = tags.get("name");
+				if(name == null){
+					log.warn("      ---> Shop " + n + " without a name.");
+				}
+
+				/* Facility identified. Now get the centroid of all members. */ 
+				Coord coord = ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
+				Id newId = new IdImpl(node.getId());
+				ActivityFacilityImpl af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = facilities.createFacility(newId, coord);					
+					af.setDesc(name);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOptionImpl ao = af.createActivityOption("s");
+				setFacilityDetails(ao);
+				shoppingCounter++;
+				nodeFacilities++;
+			}
+			
 		}
 		
 		/* Second, check for way features. */
@@ -139,11 +176,41 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = getWayCentroid(way);
-				ActivityFacilityImpl af = amenities.createFacility(new IdImpl(way.getId()), coord);
-				af.setDesc(name);
-				af.createActivityOption(activityType);
+				Id newId = new IdImpl(way.getId());
+				ActivityFacilityImpl af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = facilities.createFacility(newId, coord);					
+					af.setDesc(name);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOptionImpl ao = af.createActivityOption(activityType);
+				setFacilityDetails(ao);
 				wayFacilities++;
 			}					
+			/* Check shops */
+			String shops = tags.get("shop");
+			if(shops != null){
+				String name = tags.get("name");
+				if(name == null){
+					log.warn("      ---> Shop " + w + " without a name.");
+				}
+
+				/* Facility identified. Now get the centroid of all members. */ 
+				Coord coord = getWayCentroid(way);
+				Id newId = new IdImpl(way.getId());
+				ActivityFacilityImpl af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = facilities.createFacility(newId, coord);					
+					af.setDesc(name);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOptionImpl ao = af.createActivityOption("s");
+				setFacilityDetails(ao);
+				shoppingCounter++;
+				nodeFacilities++;
+			}
 		}
 		
 		/* Thirdly, check for relation. */
@@ -166,11 +233,41 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = getRelationCentroid(relationMap.get(r).getEntity());
-				ActivityFacilityImpl school = amenities.createFacility(new IdImpl(relation.getId()), coord);
-				school.setDesc(name);
-				school.createActivityOption(activityType);
+				Id newId = new IdImpl(relation.getId());
+				ActivityFacilityImpl af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = facilities.createFacility(newId, coord);					
+					af.setDesc(name);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOptionImpl ao = af.createActivityOption(activityType);
+				setFacilityDetails(ao);
 				relationFacilities++;
 			}					
+			/* Check shops */
+			String shops = tags.get("shop");
+			if(shops != null){
+				String name = tags.get("name");
+				if(name == null){
+					log.warn("      ---> Shop " + r + " without a name.");
+				}
+
+				/* Facility identified. Now get the centroid of all members. */ 
+				Coord coord = getRelationCentroid(relationMap.get(r).getEntity());
+				Id newId = new IdImpl(relation.getId());
+				ActivityFacilityImpl af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = facilities.createFacility(newId, coord);					
+					af.setDesc(name);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOptionImpl ao = af.createActivityOption("s");
+				setFacilityDetails(ao);
+				shoppingCounter++;
+				nodeFacilities++;
+			}
 		}
 		log.info("------------------------------------------------");
 		log.info("Facilities parsed:");
@@ -181,6 +278,7 @@ public class MyAmenitySink implements Sink {
 		log.info("Done creating facilities.");
 		log.info("  education: " + educationCounter);
 		log.info("  leisure  : " + leisureCounter);
+		log.info("  shopping : " + shoppingCounter);
 		log.info("  other    : " + otherCounter);
 		log.info("------------------------------------------------");
 		log.info("Level of education:");
@@ -195,12 +293,47 @@ public class MyAmenitySink implements Sink {
 	}
 	
 	
+	private void setFacilityDetails(ActivityOptionImpl ao){
+		if(ao.getType().equalsIgnoreCase("s")){
+			double r1 = MatsimRandom.getRandom().nextDouble();
+			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
+			double r2 = MatsimRandom.getRandom().nextDouble();
+			double closingtime = Math.round(r2)*54000 + (1-Math.round(r2))*68400; // either 17:00 or 19:00
+			ao.addOpeningTime(new OpeningTimeImpl(DayType.wkday, starttime, closingtime));
+			
+			double r3 = MatsimRandom.getRandom().nextDouble();
+			double capacity = (200 + r3*800) / 10; // random surface between 200 and 1000 m^2.
+			ao.setCapacity(capacity);
+		} else if(ao.getType().equalsIgnoreCase("l")){
+			double r1 = MatsimRandom.getRandom().nextDouble();
+			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
+			double r2 = MatsimRandom.getRandom().nextDouble();
+			double closingtime = Math.round(r2)*64800 + (1-Math.round(r2))*79200; // either 18:00 or 22:00
+			ao.addOpeningTime(new OpeningTimeImpl(DayType.wkday, starttime, closingtime));
+			
+			double r3 = MatsimRandom.getRandom().nextDouble();
+			double capacity = (50 + r3*1950) / 10; // random surface between 50 and 2000 m^2.
+			ao.setCapacity(capacity);
+		} else{
+			double r1 = MatsimRandom.getRandom().nextDouble();
+			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
+			double r2 = MatsimRandom.getRandom().nextDouble();
+			double closingtime = Math.round(r2)*54000 + (1-Math.round(r2))*68400; // either 17:00 or 19:00
+			ao.addOpeningTime(new OpeningTimeImpl(DayType.wkday, starttime, closingtime));
+			
+			double r3 = MatsimRandom.getRandom().nextDouble();
+			double capacity = (200 + r3*800) / 10; // random number between 200 and 1000 m^2.
+			ao.setCapacity(capacity);
+		}
+	}
+	
+	
 	/**
 	 * Return the education facilities parsed.
 	 * @return
 	 */
 	public ActivityFacilitiesImpl getFacilities(){
-		return amenities;
+		return facilities;
 	}
 	
 	
@@ -209,7 +342,7 @@ public class MyAmenitySink implements Sink {
 	 * @return
 	 */
 	public ObjectAttributes getFacilityAttributes(){
-		return this.amenityAttributes;
+		return this.facilityAttributes;
 	}
 	
 	
@@ -407,7 +540,7 @@ public class MyAmenitySink implements Sink {
 					amenity.equalsIgnoreCase("college") ||
 					amenity.equalsIgnoreCase("university")){
 			educationCounter++;
-			return "education";
+			return "e";
 		/* LEISURE */
 		} else if(
 				/* Sustenance */
@@ -427,7 +560,7 @@ public class MyAmenitySink implements Sink {
 					/* Other */
 					amenity.equalsIgnoreCase("brothel")){
 			leisureCounter++;
-			return "leisure";
+			return "l";
 		/* OTHER */
 		} else if(
 				amenity.equalsIgnoreCase("library") ||
@@ -450,9 +583,9 @@ public class MyAmenitySink implements Sink {
 				amenity.equalsIgnoreCase("townhall")						
 				){
 			otherCounter++;
-			return "other";
+			return "t";
 		}
-		return "other";
+		return "t";
 	}
 	
 	private void getEducationLevel(String facilityName){

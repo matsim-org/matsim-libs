@@ -42,13 +42,13 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class MyMultizoneReader {
+public class MyMultiFeatureReader {
 
 	private List<MyZone> zones;
-	private final Logger log = Logger.getLogger(MyMultizoneReader.class);
+	private final Logger log = Logger.getLogger(MyMultiFeatureReader.class);
 	
 	
-	public MyMultizoneReader(){
+	public MyMultiFeatureReader(){
 
 	}
 	

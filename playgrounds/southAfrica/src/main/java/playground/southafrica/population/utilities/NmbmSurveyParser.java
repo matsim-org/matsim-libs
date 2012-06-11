@@ -40,6 +40,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -55,18 +56,19 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
-import playground.southafrica.utilities.gis.MyMultizoneReader;
+import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
 public class NmbmSurveyParser {
 	private final static Logger LOG = Logger.getLogger(NmbmSurveyParser.class);
 	private Scenario sc;
 	private Households households;
-	private MyMultizoneReader zones;
+	private MyMultiFeatureReader zones;
 	private ObjectAttributes householdAttributes;
 	private ObjectAttributes personAttributes;
 	private Map<Id, Integer> locationlessPersons;
 	private Map<String, Integer> locationlessType;
 	private boolean removeNullLocationPersons = true;
+	private QuadTree<Coord> spot5QT;
 
 	/**
 	 * Creates a MATSim population from the 2004 travel survey done for Nelson 
@@ -123,8 +125,8 @@ public class NmbmSurveyParser {
 			String line = br.readLine(); /* Header */
 			while((line = br.readLine()) != null){
 				String[] sa = line.split(",");
-				String enu = sa[0];
-				String hhNo = sa[1];
+				int enu = Integer.parseInt(sa[0]);
+				int hhNo = Integer.parseInt(sa[1]);
 				String zone = sa[2];
 				String subzone = sa[3];
 				Integer numberOfPeople = Integer.parseInt(sa[4]);
@@ -137,7 +139,7 @@ public class NmbmSurveyParser {
 				}
 				
 				/* Create the household. */
-				Id id = new IdImpl(enu + "_" + hhNo);
+				Id id = new IdImpl(String.format("%03d%03d", enu, hhNo));
 				Household hh = this.households.getFactory().createHousehold(id);
 				hh.setIncome(income);
 				
@@ -195,9 +197,9 @@ public class NmbmSurveyParser {
 			String line = br.readLine(); /* Header */
 			while((line = br.readLine()) != null){
 				String[] sa = line.split(",");
-				String enu = sa[0];
-				String hhn = sa[1];
-				String hhPerson = sa[2];
+				int enu = Integer.parseInt(sa[0]);
+				int hhn = Integer.parseInt(sa[1]);
+				int hhPerson = Integer.parseInt(sa[2]);
 				String gender = sa[3].equalsIgnoreCase("Male") ? "m" : "f";
 				int age = Integer.parseInt(sa[4]);
 				boolean isEmployed = this.isEmployed(Integer.parseInt(sa[5]));
@@ -215,7 +217,7 @@ public class NmbmSurveyParser {
 				
 				String mode = getMode(Integer.parseInt(sa[14]));
 
-				Id personId = new IdImpl(enu + "_" + hhn + "_" + hhPerson);
+				Id personId = new IdImpl(String.format("%03d%03d%03d", enu, hhn, hhPerson));
 
 				/* Process person if it doesn't yet exist TODO This must be fixed - should not occur. */
 				if(!population.getPersons().containsKey(personId)){
@@ -225,7 +227,7 @@ public class NmbmSurveyParser {
 							population.addPerson(person);
 							
 							/* Add person to household. */
-							Id hhId = new IdImpl(enu + "_" + String.valueOf(hhn));
+							Id hhId = new IdImpl(String.format("%03d%03d", enu, hhn));
 							if(!households.getHouseholds().containsKey(hhId)){
 								LOG.error("Could not find the household " + hhId.toString());
 							}
@@ -360,7 +362,7 @@ public class NmbmSurveyParser {
 	}
 	
 	/**
-	 * Selects a random point inside a 500m radius around the previous activity 
+	 * Selects a random point inside a 1000m radius around the previous activity 
 	 * in the plan. 
 	 * @param coord
 	 * @return
@@ -559,7 +561,6 @@ public class NmbmSurveyParser {
 	
 	
 	private Coord getCoord(String zone){
-		//FIXME Must fix this once we have coordinates for the zones.
 		MyZone mz = this.zones.getZone(new IdImpl(zone));
 		if(mz == null){
 			return null;
@@ -571,13 +572,43 @@ public class NmbmSurveyParser {
 
 	
 	private void parseZones(String filename){
-		this.zones = new MyMultizoneReader();
+		this.zones = new MyMultiFeatureReader();
 		try {
 			this.zones.readMultizoneShapefile(filename, 1);
 		} catch (IOException e) {
 			Gbl.errorMsg("Could not parse shapefile.");
 		}
 	}
+	
+	/**
+	 * Building a {@link QuadTree} from the Spot 5 satellite image facilities.
+	 * @param filename
+	 * @return
+	 */
+	private QuadTree<Coord> buildSpot5QuadTree(String filename){
+
+		/* READ THE SPOT Facilities */
+		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
+		List<Coord> spot5Coords = mfr.readCoords(filename);
+		LOG.info("Number of Spot 5 facilities: " + spot5Coords.size());
+		
+		double xMin = Double.POSITIVE_INFINITY;
+		double xMax = Double.NEGATIVE_INFINITY;
+		double yMin = Double.POSITIVE_INFINITY;
+		double yMax = Double.NEGATIVE_INFINITY;
+		for(Coord c : spot5Coords){
+			xMin = Math.min(xMin, c.getX());
+			xMax = Math.max(xMax, c.getX());
+			yMin = Math.min(yMin, c.getY());
+			yMax = Math.max(yMax, c.getY());
+		}
+		QuadTree<Coord> qt = new QuadTree<Coord>(xMin, yMin, xMax, yMax);
+		for(Coord c : spot5Coords){
+			qt.put(c.getX(), c.getY(), c);
+		}		
+		return qt;
+	}
+
 	
 }
 
