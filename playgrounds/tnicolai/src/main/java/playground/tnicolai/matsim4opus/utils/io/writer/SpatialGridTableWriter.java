@@ -33,20 +33,45 @@ public class SpatialGridTableWriter {
 	
 	public static final String separator = "\t";
 
+//	public void write(SpatialGrid grid, String file) throws IOException {
+//		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+//		
+//		for(int j = 0; j < grid.getNumCols(0); j++) {
+//			writer.write(SpatialGridTableWriter.separator);
+//			writer.write(String.valueOf(grid.getXmin() + j * grid.getResolution()));
+//		}
+//		writer.newLine();
+//		
+//		for(int i = grid.getNumRows() - 1; i >=0 ; i--) {
+//			writer.write(String.valueOf(grid.getYmax() - i * grid.getResolution()));
+//			for(int j = 0; j < grid.getNumCols(i); j++) {
+//				writer.write(SpatialGridTableWriter.separator);
+//				Double val = grid.getMirroredValue(i, j);
+//				if(!Double.isNaN(val))
+//					writer.write(String.valueOf(val));
+//				else
+//					writer.write("NA");
+//			}
+//			writer.newLine();
+//		}
+//		writer.flush();
+//		writer.close();
+//	}
+	
 	public void write(SpatialGrid grid, String file) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
-		for(int j = 0; j < grid.getNumCols(0); j++) {
+		for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
 			writer.write(SpatialGridTableWriter.separator);
-			writer.write(String.valueOf(grid.getXmin() + j * grid.getResolution()));
+			writer.write(String.valueOf(x));
 		}
 		writer.newLine();
 		
-		for(int i = grid.getNumRows() - 1; i >=0 ; i--) {
-			writer.write(String.valueOf(grid.getYmax() - i * grid.getResolution()));
-			for(int j = 0; j < grid.getNumCols(i); j++) {
+		for(double y = grid.getYmin(); y <= grid.getYmax() ; y += grid.getResolution()) {
+			writer.write(String.valueOf(y));
+			for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
 				writer.write(SpatialGridTableWriter.separator);
-				Double val = grid.getValue(i, j);
+				Double val = grid.getValue(x, y);
 				if(!Double.isNaN(val))
 					writer.write(String.valueOf(val));
 				else
