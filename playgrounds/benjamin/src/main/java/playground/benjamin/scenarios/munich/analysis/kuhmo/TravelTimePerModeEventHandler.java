@@ -83,6 +83,7 @@ public class TravelTimePerModeEventHandler implements AgentArrivalEventHandler, 
 		}
 		this.mode2personId2DepartureTime.put(legMode, personId2DepartureTime);
 
+		// calculating the number of trips...
 		for(UserGroup userGroup : UserGroup.values()){
 			if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
 				Map<String, Double> mode2noOfTrips;

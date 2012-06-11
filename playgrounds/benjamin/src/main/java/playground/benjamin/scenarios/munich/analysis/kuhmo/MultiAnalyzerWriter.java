@@ -28,6 +28,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
 
 import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
@@ -40,23 +41,66 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class MultiAnalyzerWriter {
 	private static final Logger logger = Logger.getLogger(MultiAnalyzerWriter.class);
 
-	String outputPath;
+	File outputDir;
 	String runName;
 	EmissionUtils emissionUtils;
 	PersonFilter personFilter;
 
 	public MultiAnalyzerWriter(String outputPath){
-		this.outputPath = outputPath;
+		this.outputDir = new File(outputPath + "analysis");
+		this.outputDir.mkdir();
+		
 		emissionUtils = new EmissionUtils();
 		personFilter = new PersonFilter();
 	}
 
-	public void writeWelfareTollInformation() {
+	public void writeWelfareTollInformation(String configFile, Population pop, Map<Id,Double> personId2Toll) {
+		String fileName = this.outputDir + "/welfareTollInformation_" + runName + ".txt";
+		File file = new File(fileName);
+		
+		UserWelfareCalculator userWelfareCalculator = new UserWelfareCalculator(configFile);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
+			bw.write("\t users \t toll payers \t user logsum [EUR] \t toll payments [EUR]");
+			bw.newLine();
+
+			for(UserGroup userGroup : UserGroup.values()){
+				bw.write(userGroup.toString());
+				
+				Population userGroupPop = personFilter.getPopulation(pop, userGroup);
+
+				double userWelfareOfGroup = userWelfareCalculator.calculateLogsum(userGroupPop);
+				int personWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
+				logger.warn(runName + ": users with no valid plan (all scores ``== null'' or ``<= 0.0'') in group " + userGroup + " : " + personWithNoValidPlanCnt);
+				
+				double tollRevenueOfGroup = 0.0;
+				int groupSize = 0;
+
+				for(Id personId : personId2Toll.keySet()){
+					if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
+						tollRevenueOfGroup += personId2Toll.get(personId);
+						groupSize++;
+					}
+				}
+				// need to take the absolute value since money events are negative from the users' perspective.
+				double absoluteTollRevenueUserGroup = Math.abs(tollRevenueOfGroup);
+				String row = "\t" + userGroupPop.getPersons().size() + "\t" + groupSize + "\t" + userWelfareOfGroup + "\t" + absoluteTollRevenueUserGroup;
+				bw.write(row);
+				bw.newLine();
+				userWelfareCalculator.reset();
+			}
+			bw.close();
+			logger.info("Finished writing output to " + fileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void writeEmissionInformation(SortedMap<UserGroup, SortedMap<String, Double>> group2TotalEmissions){
-		File file = new File(this.outputPath + "emissionInformation_" + runName + ".txt");
+		String fileName = this.outputDir + "/emissionInformation_" + runName + ".txt";
+		File file = new File(fileName);
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -76,21 +120,21 @@ public class MultiAnalyzerWriter {
 				}
 				bw.newLine();
 			}
-			//	    bw.flush();
 			bw.close();
+			logger.info("Finished writing output to " + fileName);
 		} catch (IOException e) {
-
+			e.printStackTrace();
 		}
 	}
 
 	public void writeCarDistanceInformation(Map<Id, Double> personId2CarDistance, Map<UserGroup, Double> userGroup2carTrips) {
-		String fileName = this.outputPath + "carDistanceInformation_" + runName + ".txt";
+		String fileName = this.outputDir + "/carDistanceInformation_" + runName + ".txt";
 		File file = new File(fileName);
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-			bw.write("\t car users \t # of car departures \t total car distance [km] \t avg car distance per car user [km] \t avg car distance per car departure [km]");
+			bw.write("\t car users \t car departures \t total car distance [km] \t avg car distance per car user [km] \t avg car distance per car departure [km]");
 			bw.newLine();
 
 			for(UserGroup userGroup : UserGroup.values()){
@@ -112,18 +156,18 @@ public class MultiAnalyzerWriter {
 			bw.close();
 			logger.info("Finished writing output to " + fileName);
 		} catch (IOException e) {
-
+			e.printStackTrace();
 		}
 	}
 
 	public void writeAvgTTInformation(Map<String, Map<Id, Double>> mode2personId2TravelTime, Map<UserGroup, Map<String, Double>> userGroup2mode2noOfTrips) {
-		String fileName = this.outputPath + "avgTTInformation_" + runName + ".txt";
+		String fileName = this.outputDir + "/avgTTInformation_" + runName + ".txt";
 		File file = new File(fileName);
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-			bw.write("\t mode \t users \t # of departures \t total travelTime [min] \t avg travelTime per user [min] \t avg travelTime per departure [min]");
+			bw.write("\t mode \t users \t departures \t total travelTime [min] \t avg travelTime per user [min] \t avg travelTime per departure [min]");
 			bw.newLine();
 
 			for(UserGroup userGroup : UserGroup.values()){
@@ -166,7 +210,7 @@ public class MultiAnalyzerWriter {
 			bw.close();
 			logger.info("Finished writing output to " + fileName);
 		} catch (IOException e) {
-
+			e.printStackTrace();
 		}
 	}
 	

@@ -48,6 +48,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 	private final Network network;
 	private final PersonFilter personFilter;
 	
+	// the following is not neccessary any more...see below
 	private Map<Id, Id> personId2departureLinkId;
 	private Map<Id, Double> depArrOnSameLinkCnt;
 	
@@ -57,6 +58,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		this.network = network;
 		this.personFilter = new PersonFilter();
 		
+		// the following is not neccessary any more...see below
 		this.personId2departureLinkId = new HashMap<Id, Id>();
 		this.depArrOnSameLinkCnt = new HashMap<Id, Double>();
 	}
@@ -68,6 +70,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		logger.info("resetting personId2CarDistance to " + this.personId2CarDistance + " ...");
 		logger.info("resetting userGroup2carTrips to " + this.userGroup2carTrips + " ...");
 		
+		// the following is not neccessary any more...see below
 		this.personId2departureLinkId = new HashMap<Id, Id>();
 		this.depArrOnSameLinkCnt = new HashMap<Id, Double>();
 	}
@@ -89,8 +92,10 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 	
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {		
+		// the following is not neccessary any more...see below
 		personId2departureLinkId.put(event.getPersonId(), event.getLinkId());
 
+		// calculating the number of trips...
 		if(event.getLegMode().equals(TransportMode.car)){
 			Id personId = event.getPersonId();
 			for(UserGroup userGroup : UserGroup.values()){
@@ -105,7 +110,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 				}
 			}
 			
-			// in order to get the number of car users right...
+			// in order to get the number of car users right...see below
 			if(this.personId2CarDistance.get(personId) == null){
 				this.personId2CarDistance.put(personId, 0.0);
 			} else {
@@ -114,6 +119,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		}
 	}
 	
+	// the following is not neccessary any more...see above
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		Id personId = event.getPersonId();
@@ -137,6 +143,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		}
 	}
 
+	// the following is not neccessary any more...see above
 	protected Map<Id, Double> getDepArrOnSameLinkCnt() {
 		return depArrOnSameLinkCnt;
 	}

@@ -39,12 +39,10 @@ import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonWarmEventHandler;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
-import playground.benjamin.utils.BkNumberUtils;
 
 /**
  * @author benjamin
@@ -53,201 +51,84 @@ import playground.benjamin.utils.BkNumberUtils;
 public class MultiAnalyzer {
 	private static final Logger logger = Logger.getLogger(MultiAnalyzer.class);
 
+
+	private static String [] cases = {
+		"baseCase_ctd" ,
+		"policyCase_zone30" ,
+		"policyCase_pricing" ,
+//		"policyCase_pricing_x5" ,
+//		"policyCase_pricing_x10" ,
+	};
+	
+	private static String runDirectoryStub = "../../runs-svn/detEval/kuhmo/output/output_";
 //	private static String initialIterationNo = "1000";
 	private static String finalIterationNo = "1500";
-
-	private static String baseCaseName = "ctd";
-	private static String policyCaseName = "zone30";
-//	private static String policyCaseName = "pricing";
-//	private static String policyCaseName = "pricing_x5";
-//	private static String policyCaseName = "pricing_x10";
-
-	private static String runDirectory1 = "../../runs-svn/detEval/kuhmo/output/output_baseCase_" + baseCaseName + "/";
-	private static String runDirectory2 = "../../runs-svn/detEval/kuhmo/output/output_policyCase_" + policyCaseName + "/";
-	private static String netFile = runDirectory1 + "output_network.xml.gz";
-	private static String configFile = runDirectory1 + "output_config.xml.gz";
-
-	private static String plansFile1 = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
-	private static String plansFile2 = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
-
-	private static String eventsFile1 = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
-	private static String eventsFile2 = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
-
-	private static String emissionEventsFile1 = runDirectory1 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
-	private static String emissionEventsFile2 = runDirectory2 + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
-
-	private final PersonFilter personFilter;
-	private final int decimalPlace;
+	private static String netFile;
+	private static String configFile;
+	private static String plansFile;
+	private static String eventsFile;
+	private static String emissionEventsFile;
 
 	private final MultiAnalyzerWriter writer;
 
 	MultiAnalyzer(){
-		this.personFilter = new PersonFilter();
-		this.decimalPlace = 3;
-		this.writer = new MultiAnalyzerWriter(runDirectory1);
+		this.writer = new MultiAnalyzerWriter(runDirectoryStub + cases[0] + "/");
 	}
 
 	private void run() {
-//		calculateUserWelfareChangeAndTollRevenueByUserGroup(netFile, configFile, plansFile1, plansFile2, eventsFile2);
 		
-		calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile1, baseCaseName);
-		calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile2, policyCaseName);
-		
-//		calculateEmissionChangesByUserGroup(emissionEventsFile1, emissionEventsFile2);
+		for(String caseName : cases){
+			
+			String runDirectory = runDirectoryStub + caseName + "/";
+			netFile = runDirectory + "output_network.xml.gz";
+			configFile = runDirectory + "output_config.xml.gz";
+			plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
+			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
+			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
+			
+			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
+			calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile, caseName);
+			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
+		}
 	}
 
-	private void calculateUserWelfareChangeAndTollRevenueByUserGroup(String netFile, String configFile, String initialPlansFile, String finalPlansFile, String finalEventsFile) {
-		UserWelfareCalculator userWelfareCalculator = new UserWelfareCalculator(configFile);
+	private void calculateUserWelfareAndTollRevenueStatisticsByUserGroup(String netFile, String configFile, String plansFile, String eventsFile, String runName) {
 
-		Scenario initialScenario = loadScenario(netFile, initialPlansFile);
-		Scenario finalScenario = loadScenario(netFile, finalPlansFile);
-		Population initialPop = initialScenario.getPopulation();
-		Population finalPop = finalScenario.getPopulation();
+		Scenario scenario = loadScenario(netFile, plansFile);
+		Population pop = scenario.getPopulation();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
 		MoneyEventHandler moneyEventHandler = new MoneyEventHandler();
 		eventsManager.addHandler(moneyEventHandler);
-		eventsReader.parse(finalEventsFile);
+		eventsReader.parse(eventsFile);
 
 		Map<Id, Double> personId2Toll = moneyEventHandler.getPersonId2TollMap();
-		
-//		writer.setRunName(policyCaseName);
-//		writer.writeWelfareInformation(initialPop, personId2Toll);
-		
-		
-		for(UserGroup userGroup : UserGroup.values()){
-			Population initialUserGroupPop = personFilter.getPopulation(initialPop, userGroup);
-			Population finalUserGroupPop = personFilter.getPopulation(finalPop, userGroup);
 
-			double initialUserWelfare = userWelfareCalculator.calculateLogsum(initialUserGroupPop);
-			int initialPersonWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
-			userWelfareCalculator.reset();
-
-			double finalUserWelfare = userWelfareCalculator.calculateLogsum(finalUserGroupPop);
-			int finalPersonWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
-			userWelfareCalculator.reset();
-
-			double userWelfareDiff = finalUserWelfare - initialUserWelfare;
-			double userWelfareDiffPct = 100. * (userWelfareDiff / initialUserWelfare);
-
-			System.out.println("\n*******************************************************************");
-			System.out.println("VALUES FOR " + userGroup);
-			System.out.println("*******************************************************************");
-			System.out.println("Final user welfare:\t\t" + BkNumberUtils.roundDouble(finalUserWelfare, decimalPlace));
-			System.out.println("Initial user welfare:\t\t" + BkNumberUtils.roundDouble(initialUserWelfare, decimalPlace));
-			System.out.println("===================================================================");
-			System.out.println("Change in user welfare:\t\t" + BkNumberUtils.roundDouble(userWelfareDiff, decimalPlace) 
-					+ " or " + BkNumberUtils.roundDouble(userWelfareDiffPct, decimalPlace) + "%");
-			System.out.println("*******************************************************************");
-			System.out.println("Final users with no valid plan (all scores ``== null'' or ``<= 0.0''):\t" + initialPersonWithNoValidPlanCnt);
-			System.out.println("Initial users with no valid plan (all scores ``== null'' or ``<= 0.0''):\t" + finalPersonWithNoValidPlanCnt);
-			System.out.println("*******************************************************************\n");
-
-			double tollRevenueFromGroup = 0.0;
-			int groupSize = 0;
-
-			for(Id personId : personId2Toll.keySet()){
-				if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
-					tollRevenueFromGroup += personId2Toll.get(personId);
-					groupSize++;
-				}
-			}
-			// need to take the absolute value since money events are negative from the users' perspective.
-			double absoluteTollRevenueUserGroup = Math.abs(tollRevenueFromGroup);
-			System.out.println("Toll revenue from ``" + userGroup + "'' (" + groupSize + " toll payers):\t" + 
-					BkNumberUtils.roundDouble(absoluteTollRevenueUserGroup, decimalPlace));
-		}
-
-		double initialUserWelfare = userWelfareCalculator.calculateLogsum(initialPop);
-		int initialPersonWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
-		userWelfareCalculator.reset();
-
-		double finalUserWelfare = userWelfareCalculator.calculateLogsum(finalPop);
-		int finalPersonWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
-		userWelfareCalculator.reset();
-
-		double userWelfareDiff = finalUserWelfare - initialUserWelfare;
-		double userWelfareDiffPct = 100 * (userWelfareDiff / initialUserWelfare);
-
-		System.out.println("\n*******************************************************************");
-		System.out.println("VALUES FOR WHOLE POPULATION");
-		System.out.println("*******************************************************************");
-		System.out.println("Final user welfare:\t\t" + BkNumberUtils.roundDouble(finalUserWelfare, decimalPlace));
-		System.out.println("Initial user welfare:\t\t" + BkNumberUtils.roundDouble(initialUserWelfare, decimalPlace));
-		System.out.println("===================================================================");
-		System.out.println("Change in user welfare:\t\t" + BkNumberUtils.roundDouble(userWelfareDiff, decimalPlace) 
-				+ " or " + BkNumberUtils.roundDouble(userWelfareDiffPct, decimalPlace) + "%");
-		System.out.println("*******************************************************************");
-		System.out.println("Final users with no valid plan (all scores ``== null'' or ``<= 0.0''):\t" + initialPersonWithNoValidPlanCnt);
-		System.out.println("Initial users with no valid plan (all scores ``== null'' or ``<= 0.0''):\t" + finalPersonWithNoValidPlanCnt);
-		System.out.println("*******************************************************************\n");
-		
-		double tollRevenue = 0.0;
-		for(Id personId : personId2Toll.keySet()){
-			tollRevenue += personId2Toll.get(personId);
-		}
-		double absoluteTollRevenue = Math.abs(tollRevenue);
-		System.out.println("===================================================================");
-		System.out.println("Total toll revenue from " + personId2Toll.size() + " toll payers:\t\t" +
-				BkNumberUtils.roundDouble(absoluteTollRevenue, decimalPlace));
-		System.out.println("*******************************************************************\n");
+		writer.setRunName(runName);
+		writer.writeWelfareTollInformation(configFile, pop, personId2Toll);
 	}
 
-	private void calculateEmissionChangesByUserGroup(String initialEmissionEventsFile, String finalEmissionEventsFile) {
+	private void calculateEmissionStatisticsByUserGroup(String emissionEventsFile, String runName) {
 		EmissionUtils summarizer = new EmissionUtils();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		
 		EmissionsPerPersonWarmEventHandler warmHandler = new EmissionsPerPersonWarmEventHandler();
 		EmissionsPerPersonColdEventHandler coldHandler = new EmissionsPerPersonColdEventHandler();
+		
 		eventsManager.addHandler(warmHandler);
 		eventsManager.addHandler(coldHandler);
-		emissionReader.parse(finalEmissionEventsFile);
+		emissionReader.parse(emissionEventsFile);
 
-		Map<Id, Map<WarmPollutant, Double>> person2FinalWarmEmissions = warmHandler.getWarmEmissionsPerPerson();
-		Map<Id, Map<ColdPollutant, Double>> person2FinalColdEmissions = coldHandler.getColdEmissionsPerPerson();
-		Map<Id, SortedMap<String, Double>> person2FinalTotalEmissions = summarizer.sumUpEmissionsPerId(person2FinalWarmEmissions, person2FinalColdEmissions);
-		SortedMap<UserGroup, SortedMap<String, Double>> group2FinalTotalEmissions = summarizer.getEmissionsPerGroup(person2FinalTotalEmissions);
+		Map<Id, Map<WarmPollutant, Double>> person2warmEmissions = warmHandler.getWarmEmissionsPerPerson();
+		Map<Id, Map<ColdPollutant, Double>> person2coldEmissions = coldHandler.getColdEmissionsPerPerson();
+		Map<Id, SortedMap<String, Double>> person2totalEmissions = summarizer.sumUpEmissionsPerId(person2warmEmissions, person2coldEmissions);
+		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = summarizer.getEmissionsPerGroup(person2totalEmissions);
 
-		writer.setRunName(policyCaseName);
-		writer.writeEmissionInformation(group2FinalTotalEmissions);
-
-		warmHandler.reset(0);
-		coldHandler.reset(0);
-		emissionReader.parse(initialEmissionEventsFile);
-
-		Map<Id, Map<WarmPollutant, Double>> person2InitialWarmEmissions = warmHandler.getWarmEmissionsPerPerson();
-		Map<Id, Map<ColdPollutant, Double>> person2InitialColdEmissions = coldHandler.getColdEmissionsPerPerson();
-		Map<Id, SortedMap<String, Double>> person2InitialTotalEmissions = summarizer.sumUpEmissionsPerId(person2InitialWarmEmissions, person2InitialColdEmissions);
-		SortedMap<UserGroup, SortedMap<String, Double>> group2InitialTotalEmissions = summarizer.getEmissionsPerGroup(person2InitialTotalEmissions);
-
-		writer.setRunName(baseCaseName);
-		writer.writeEmissionInformation(group2InitialTotalEmissions);
-
-		for(UserGroup userGroup : group2FinalTotalEmissions.keySet()){
-			System.out.println("\n*******************************************************************");
-			System.out.println("VALUES FOR " + userGroup);
-			System.out.println("*******************************************************************");
-			Map<String, Double> pollutant2FinalEmissions = group2FinalTotalEmissions.get(userGroup);
-			for(String pollutant : pollutant2FinalEmissions.keySet()){
-				double pollutantDiff = BkNumberUtils.roundDouble(pollutant2FinalEmissions.get(pollutant) - group2InitialTotalEmissions.get(userGroup).get(pollutant), decimalPlace);
-				double pollutantDiffPct = BkNumberUtils.roundDouble(100 * (pollutantDiff / group2InitialTotalEmissions.get(userGroup).get(pollutant)), decimalPlace);
-				System.out.println("Final emissions for " + pollutant + ":\t" 
-						+ BkNumberUtils.roundDouble(pollutant2FinalEmissions.get(pollutant), decimalPlace) + " [ Change: " + pollutantDiff + " or " + pollutantDiffPct + "% ]");
-			}
-		}
-		SortedMap<String, Double> overallFinalTotalEmissions = summarizer.getTotalEmissions(person2FinalTotalEmissions);
-		SortedMap<String, Double> overallInitialTotalEmissions = summarizer.getTotalEmissions(person2InitialTotalEmissions);
-		System.out.println("\n*******************************************************************");
-		System.out.println("VALUES FOR WHOLE POPULATION");
-		System.out.println("*******************************************************************");
-		for(String pollutant : overallFinalTotalEmissions.keySet()){
-			double pollutantDiff = BkNumberUtils.roundDouble(overallFinalTotalEmissions.get(pollutant) - overallInitialTotalEmissions.get(pollutant), decimalPlace);
-			double pollutantDiffPct = BkNumberUtils.roundDouble(100 * (pollutantDiff / overallInitialTotalEmissions.get(pollutant)), decimalPlace);
-			System.out.println("Final emissions for " + pollutant + ":\t" 
-					+ BkNumberUtils.roundDouble(overallFinalTotalEmissions.get(pollutant), decimalPlace) + " [ Change: " + pollutantDiff + " or " + pollutantDiffPct + "% ]");
-		}
+		writer.setRunName(runName);
+		writer.writeEmissionInformation(group2totalEmissions);
 	}
 
 	private void calculateDistanceTimeStatisticsByUserGroup(String netFile, String eventsFile, String runName) {
@@ -262,7 +143,6 @@ public class MultiAnalyzer {
 
 		eventsManager.addHandler(carDistanceEventHandler);
 		eventsManager.addHandler(ttHandler);
-
 		eventsReader.parse(eventsFile);
 		
 		Map<Id, Double> personId2carDistance = carDistanceEventHandler.getPersonId2CarDistance();
@@ -270,7 +150,7 @@ public class MultiAnalyzer {
 		Map<String, Map<Id, Double>> mode2personId2TravelTime = ttHandler.getMode2personId2TravelTime();
 		Map<UserGroup, Map<String, Double>> userGroup2mode2noOfTrips = ttHandler.getUserGroup2mode2noOfTrips();
 		
-		logger.warn("number of car users in distance map (users with departure events): " + personId2carDistance.size());
+		logger.warn(runName + ": number of car users in distance map (users with departure events): " + personId2carDistance.size());
 //		int depArrOnSameLinkCnt = carDistanceEventHandler.getDepArrOnSameLinkCnt().size();
 //		logger.warn("number of car users with two activities followed one by another on the same link: +" + depArrOnSameLinkCnt);
 //		int personIsDrivingADistance = 0;
@@ -281,8 +161,8 @@ public class MultiAnalyzer {
 //				personIsDrivingADistance ++;
 //			}
 //		}
-//		logger.warn("number of car users with two activities followed one by another on the same link BUT driving to other acts: -" + personIsDrivingADistance);
-		logger.warn("number of car users in traveltime map (users with departure and arrival events): " + mode2personId2TravelTime.get(TransportMode.car).size());
+//		logger.warn(runName + ": number of car users with two activities followed one by another on the same link BUT driving to other acts: -" + personIsDrivingADistance);
+		logger.warn(runName + ": number of car users in traveltime map (users with departure and arrival events): " + mode2personId2TravelTime.get(TransportMode.car).size());
 		
 		
 		writer.setRunName(runName);
