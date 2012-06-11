@@ -143,8 +143,13 @@ public class SpatialGrid{
 		return (x >= minX && x <= maxX && y >= minY && y <= maxY);
 	}
 	
-	public double getValue(int row, int col) {
+	@Deprecated
+	public double getUnmirroredValue(int row, int col) {
 		return matrix[row][col];
+	}
+	
+	public double getValue(int row, int col){
+		return matrix[matrix.length-1-row][col];
 	}
 	
 	public boolean setValue(int row, int col, double value) {
