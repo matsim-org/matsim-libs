@@ -61,19 +61,19 @@ class InverseDistanceWeighting {
 		if (xDif==0){
 			if (yDif==0){
 				//known value
-				return sg.getMatrix()[sg.getRow(yCoord)][sg.getColumn(xCoord)];
+				return sg.getValue(xCoord, yCoord);
 			}
 		}
 		
 		//z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp)
-		double[][] weights= new double[sg.getMatrix().length][sg.getMatrix()[0].length];
 		double value=0;
+		double currentWeight=1;
 		double weightsum=0;
-		for (int i=0; i<weights.length; i++){
-			for (int j=0; j<weights[0].length; j++){
-				weights[i][j]= Math.pow(distance(sg.getXmin()+j*sg.getResolution(), sg.getYmin()+i*sg.getResolution(), xCoord, yCoord), exp);
-				value+= sg.getMatrix()[i][j]/weights[i][j];
-				weightsum+= 1/weights[i][j];
+		for (int row=0; row<sg.getNumRows(); row++){
+			for (int col=0; col<sg.getNumCols(0); col++){
+				currentWeight= Math.pow(distance(sg.getXmin()+col*sg.getResolution(), sg.getYmax()-row*sg.getResolution(), xCoord, yCoord), exp);
+				value+= sg.getValue(xCoord, yCoord)/currentWeight;
+				weightsum+= 1/currentWeight;
 			}
 		}
 		return value/weightsum;		
@@ -123,7 +123,7 @@ class InverseDistanceWeighting {
 		if (xDif==0){
 			if (yDif==0){
 				//known value
-				return sg.getMatrix()[sg.getRow(yCoord)][sg.getColumn(xCoord)];
+				return sg.getValue(xCoord, yCoord);
 			}
 		}
 		
@@ -140,21 +140,14 @@ class InverseDistanceWeighting {
 		//interpolation on the boundary
 		if (xCoord == sg.getXmax()){
 			//consider only 2 neighbors (left and right)
-			return (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]/d11
-					+ sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]/d12) 
-					/ (1/d11 + 1/d12);
+			return (sg.getValue(x1, y1)/d11 + sg.getValue(x1, y2)/d12) / (1/d11 + 1/d12);
 		}
 		if (yCoord == sg.getYmax()){
 			//consider only 2 neighbors (up and down)
-			return (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]/d11
-					+ sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]/d21) 
-					/ 1/11 + 1/d21;
+			return (sg.getValue(x1, y1)/d11 + sg.getValue(x2, y1)/d21) / 1/11 + 1/d21;
 		}
 		
-		double value= (
-				+ sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]/d12 
-				+ sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]/d21 
-				+ sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x2)]/d22) 
+		double value= (sg.getValue(x1, y1)/d11 + sg.getValue(x1, y2)/d12 + sg.getValue(x2, y1)/d21 + sg.getValue(x2, y2)/d22) 
 				/ (1/d11 + 1/d12 + 1/d21 + 1/d22);
 		return value;
 	}

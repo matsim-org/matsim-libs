@@ -60,16 +60,16 @@ class BiLinearInterpolator {
 		if (xDif==0){
 			if (yDif==0){
 				//xWeigt=yWeight=0
-				return sg.getMatrix()[sg.getRow(yCoord)][sg.getColumn(xCoord)];
+				return sg.getValue(xCoord, yCoord);
 			}
 			//xWeight=0
-			return sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]*(1-yWeight) + sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]*yWeight;
+			return sg.getValue(x1, y1)*(1-yWeight) + sg.getValue(x1, y2)*yWeight;
 		}
 		if (yDif==0){
 			//yWeight=0
-			return sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]*(1-xWeight) + sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]*xWeight;
+			return sg.getValue(x1, y1)*(1-xWeight) + sg.getValue(x2, y1)*xWeight;
 		}
 		
-		return (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x1)]*(1-yWeight) + sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x1)]*yWeight) * (1-xWeight) + (sg.getMatrix()[sg.getRow(y1)][sg.getColumn(x2)]*(1-yWeight) + sg.getMatrix()[sg.getRow(y2)][sg.getColumn(x2)]*yWeight) * xWeight;
+		return (sg.getValue(x1, y1)*(1-yWeight) + sg.getValue(x1, y2)*yWeight) * (1-xWeight) + (sg.getValue(x2, y1)*(1-yWeight) + sg.getValue(x2, y2)*yWeight) * xWeight;
 	}
 }

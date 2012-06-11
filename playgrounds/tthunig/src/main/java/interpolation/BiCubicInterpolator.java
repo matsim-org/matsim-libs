@@ -30,9 +30,9 @@ class BiCubicInterpolator {
 		this.sg= sg;
 		
 		//create default coordinates for interpolation and compatible array of values
-		double[] x_default= coord(0, sg.getMatrix()[0].length-1, 1);
-		double[] y_default= coord(0, sg.getMatrix().length-1, 1);
-		double[][] mirroredValues= flip(sg.getMatrix());
+		double[] x_default= coord(0, sg.getNumCols(0)-1, 1);
+		double[] y_default= coord(0, sg.getNumRows()-1, 1);
+		double[][] mirroredValues= sg.getMatrix();
 		
 		BivariateRealGridInterpolator interpolator = new BicubicSplineInterpolator();
 		try {
@@ -93,6 +93,7 @@ class BiCubicInterpolator {
 	 * @param matrix
 	 * @return the horizontal mirrored matrix
 	 */
+	@Deprecated
 	private static double[][] flip(double[][] matrix) {
 		double[][] flip= new double[matrix.length][matrix[0].length];
 		for (int i=0; i<flip.length; i++){
