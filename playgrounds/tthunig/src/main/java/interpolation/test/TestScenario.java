@@ -4,10 +4,10 @@ import interpolation.Interpolation;
 
 import org.apache.log4j.Logger;
 
+import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
  * class for testing the implemented interpolation methods visually
@@ -38,7 +38,7 @@ public class TestScenario {
 		
 		testOneMethod(sg, Interpolation.BILINEAR);
 		testOneMethod(sg, Interpolation.BICUBIC);
-		testOneMethod(sg, Interpolation.INVERSE_DISTANCE_WEIGHTING_EXPERIMENTAL);
+		testOneMethod(sg, Interpolation.INVERSE_DISTANCE_WEIGHTING);
 		
 		log.info("done");
 	}
