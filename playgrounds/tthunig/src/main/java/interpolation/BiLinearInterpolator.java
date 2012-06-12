@@ -3,11 +3,11 @@ package interpolation;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
- * implements bilinear interpolation
- * uses linear spline interpolation with separation: first horizontal then vertical
- * own implementation (no suitable implementation found)
+ * Implements bilinear interpolation.
+ * Uses linear spline interpolation with separation: first horizontal then vertical.
+ * Own implementation (no suitable implementation found).
  * 
- * requires values on a grid, either as double[][] or as SpatialGrid
+ * Requires values on a SpatialGrid.
  * 
  * @author tthunig
  *
@@ -17,7 +17,7 @@ class BiLinearInterpolator {
 	private SpatialGrid sg = null;
 	
 	/**
-	 * prepares bilinear interpolation
+	 * Prepares bilinear interpolation.
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 */
@@ -26,7 +26,7 @@ class BiLinearInterpolator {
 	}
 	
 	/**
-	 * interpolates the value on a arbitrary point with bilinear interpolation
+	 * Interpolates the value on a arbitrary point with bilinear interpolation.
 	 * 
 	 * @param xCoord the x-coordinate of the point to interpolate
 	 * @param yCoord the y-coordinate of the point to interpolate
@@ -37,8 +37,8 @@ class BiLinearInterpolator {
 	}
 	
 	/**
-	 * interpolates the value on a arbitrary point with bilinear interpolation
-	 * requires values on a grid as SpatialGrid
+	 * Interpolates the value on a arbitrary point with bilinear interpolation.
+	 * Requires values on a grid as SpatialGrid.
 	 * 
 	 * @param sg the values on the grid as SpatialGrid
 	 * @param xCoord the x-coordinate of the point to interpolate

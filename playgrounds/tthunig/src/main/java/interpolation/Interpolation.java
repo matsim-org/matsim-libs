@@ -6,23 +6,22 @@ import org.matsim.api.core.v01.Coord;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
- * wrapper class for interpolation
- * interpolates the value at one point from grid data as SpatialGrid
- * offers bilinear interpolation, bicubic spline interpolation and inverse distance weighting
+ * Wrapper class for interpolation.
+ * Interpolates the value at one point from grid data as SpatialGrid.
+ * Offers bilinear interpolation, bicubic spline interpolation and inverse distance weighting.
  * 
- * bilinear interpolation:
- * 	uses linear spline interpolation with separation (first horizontal then vertical). own implementation.
+ * Bilinear interpolation:
+ * 	Uses linear spline interpolation with separation (first horizontal then vertical). Own implementation.
  * 
- * bicubic spline interpolation:
- * 	uses BicubicSplineInterpolator from apache (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html).
- * 	wave effect occurs.
+ * Bicubic spline interpolation:
+ * 	Uses BicubicSplineInterpolator from apache (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html).
+ * 	Wave effect occurs.
  * 
- * inverse distance weighting:
- * 	please do not use (experimental version)!
- *  uses inverse distance weighting for the 4 nearest known values. own implementation.
- *  not useful for accessibility interpolation because peaks and valleys occur.
- *  for more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
- *  or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (in german)
+ * Inverse distance weighting:
+ *  Uses inverse distance weighting for the 4 nearest known values. Own implementation.
+ *  Peaks and valleys occur.
+ *  For more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
+ *  or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (in German).
  * 
  * @author tthunig
  *
@@ -33,36 +32,36 @@ public class Interpolation {
 	
 	public static final int BILINEAR = 0;
 	public static final int BICUBIC = 1;
-	/** please do not use (experimental version) **/
-	public static final int INVERSE_DISTANCE_WEIGHTING_EXPERIMENTAL = 2;
+	public static final int INVERSE_DISTANCE_WEIGHTING = 2;
 	
 	private SpatialGrid sg = null;
 	private BiCubicInterpolator biCubicInterpolator = null;
 	private BiLinearInterpolator biLinearInterpolator = null;
+	private InverseDistanceWeighting inverseDistanceWeighting = null;
 	
-	/** only necessary for the inverse distance weighting method **/
+	/** exponent only necessary for the inverse distance weighting method **/
 	private double exp = 1.;
 	private int interpolationMethod = -1;
 	
 	/**
-	 * prepares interpolation with the selected interpolation method
+	 * Prepares interpolation with the selected interpolation method.
 	 * 
-	 * if inverse distance weighting is chosen, the exponent for weights will be the default value 1
+	 * If inverse distance weighting is chosen, the exponent for weights will be the default value 1.
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @param method the interpolation method
 	 */
 	public Interpolation(SpatialGrid sg, final int method ){
-	
+		
 		this(sg, method, 1);
 	}
 	
 	/**
-	 * prepares interpolation with the selected interpolation method
+	 * Prepares interpolation with the selected interpolation method.
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @param method the interpolation method
-	 * @param exp the exponent for weights. only considered if interpolation method is inverse distance weighting
+	 * @param exp the exponent for weights. only considered if interpolation method is inverse distance weighting. standard values are one or two.
 	 */
 	public Interpolation(SpatialGrid sg, final int method, final double exp ){
 		
@@ -77,14 +76,14 @@ public class Interpolation {
 			log.info("Preparing bicubic interpolation ...");
 			this.biCubicInterpolator = new BiCubicInterpolator(this.sg);
 		}
-		if(this.interpolationMethod == INVERSE_DISTANCE_WEIGHTING_EXPERIMENTAL){
-			log.warn("Please do not use IDW (experimental version)!");
-			log.warn("IDW interpolation not useful for accessibility interpolation.");
+		if(this.interpolationMethod == INVERSE_DISTANCE_WEIGHTING){
+			log.info("Preparing interpolation with the inverse distance weighting method ...");
+			this.inverseDistanceWeighting = new InverseDistanceWeighting(this.sg);
 		}
 	}
 
 	/**
-	 * interpolates the value at the given coordinate
+	 * Interpolates the value at the given coordinate.
 	 * 
 	 * @param coord
 	 * @return the interpolated value
@@ -97,7 +96,7 @@ public class Interpolation {
 	}
 	
 	/**
-	 * interpolates the value at the given coordinate (x,y)
+	 * Interpolates the value at the given coordinate (x,y)
 	 * 
 	 * @param x the x-coordinate
 	 * @param y the y-coordinate
@@ -106,9 +105,9 @@ public class Interpolation {
 	public double interpolate(double x, double y){
 		
 		switch(this.interpolationMethod){
-		case 0: return biLinearInterpolator.biLinearInterpolation(x, y);
-		case 1: return biCubicInterpolator.biCubicInterpolation(x, y);
-		case 2: return InverseDistanceWeighting.fourNeighborsIDW(this.sg, x, y, exp);		
+		case 0: return this.biLinearInterpolator.biLinearInterpolation(x, y);
+		case 1: return this.biCubicInterpolator.biCubicInterpolation(x, y);
+		case 2: return this.inverseDistanceWeighting.inverseDistanceWeighting(x, y, this.exp);		
 		}
 		return Double.NaN;
 	}	

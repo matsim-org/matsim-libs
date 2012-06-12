@@ -3,118 +3,52 @@ package interpolation;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
- * implements inverse distance weighting for interpolation. own implementation (no suitable implementation found).
- * requires values on a SpatialGrid
+ * Implements inverse distance weighting for interpolation. Own implementation (no suitable implementation found).
  * 
- * please do not use (experimental version)!
- * not useful for accessibility interpolation because peaks and valleys occur.
- * for more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
- * or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (german)
+ * Requires values on a SpatialGrid.
+ * 
+ * Problem: Peaks and valleys occur.
+ * 
+ * For more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
+ * or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (German).
  * 
  * @author tthunig
  *
  */
-@Deprecated
 class InverseDistanceWeighting {
 
+	private SpatialGrid sg = null;
+	
 	/**
-	 * interpolates a value at the given point (xCoord, yCoord) with the standard inverse distance weighting
-	 * z(u_0)= Sum((1/d_i)*z(u_i)) / Sum (1/d_i)
-	 * uses myAllValuesIDWFactor(SpatialGrid sg, double xCoord, double yCoord, double factor) with factor 1
+	 * Prepares the interpolation with the inverse distance weighting method.
 	 * 
-	 * @param sg the SpatialGrid with the known values
-	 * @param xCoord
-	 * @param yCoord
-	 * @return interpolated value at (xCoord, yCoord)
+	 * @param sg the SpatialGrid to interpolate
 	 */
-	static double allValuesIDW(SpatialGrid sg, double xCoord, double yCoord){
-		return allValuesIDW(sg, xCoord, yCoord, 1);
+	InverseDistanceWeighting(SpatialGrid sg){
+		this.sg= sg;
 	}
 	
 	/**
-	 * interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with squared weights
-	 * z(u_0)= Sum((1/d_i^2)*z(u_i)) / Sum (1/d_i^2)
-	 * uses myAllValuesIDWFactor(SpatialGrid sg, double xCoord, double yCoord, double factor) with factor 2
+	 * Interpolates the value on a arbitrary point with inverse distance weighting.
+	 * Considers only four neighboring values because this method needs less time for calculation than considering all known values and the result is not much different.
 	 * 
-	 * @param sg the SpatialGrid with the known values
-	 * @param xCoord
-	 * @param yCoord
-	 * @return interpolated value at (xCoord, yCoord)
+	 * @param xCoord the x-coordinate of the point to interpolate
+	 * @param yCoord the y-coordinate of the point to interpolate
+	 * @param exponent the exponent for the inverse distance weighting
+	 * @return interpolated value on the point (xCoord, yCoord)	 * 
 	 */
-	static double allValuesIDWSquare(SpatialGrid sg, double xCoord, double yCoord){
-		return allValuesIDW(sg, xCoord, yCoord, 2);
+	double inverseDistanceWeighting(double xCoord, double yCoord, double exponent){
+		return fourNeighborsIDW(this.sg, xCoord, yCoord, exponent);
 	}
 	
 	/**
-	 * interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with variable power of weights
-	 * z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp)
+	 * Interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with variable power of weights. 
+	 * Considers only four neighboring values.
 	 * 
 	 * @param sg the SpatialGrid with the known values
 	 * @param xCoord
 	 * @param yCoord
-	 * @param exp the exponent for the weights
-	 * @return interpolated value at (xCoord, yCoord)
-	 */
-	static double allValuesIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
-		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
-		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
-		if (xDif==0){
-			if (yDif==0){
-				//known value
-				return sg.getValue(xCoord, yCoord);
-			}
-		}
-		
-		//z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp)
-		double value=0;
-		double currentWeight=1;
-		double weightsum=0;
-		for (int row=0; row<sg.getNumRows(); row++){
-			for (int col=0; col<sg.getNumCols(0); col++){
-				currentWeight= Math.pow(distance(sg.getXmin()+col*sg.getResolution(), sg.getYmax()-row*sg.getResolution(), xCoord, yCoord), exp);
-				value+= sg.getValue(xCoord, yCoord)/currentWeight;
-				weightsum+= 1/currentWeight;
-			}
-		}
-		return value/weightsum;		
-	}
-	
-	/**
-	 * interpolates a value at the given point (xCoord, yCoord) with the standard inverse distance weighting
-	 * considers only 4 neighboring values
-	 * uses my4NeighborsIDWFactor(SpatialGrid sg, double xCoord, double yCoord, double factor) with factor 1
-	 * 
-	 * @param sg the SpatialGrid with the known values
-	 * @param xCoord
-	 * @param yCoord
-	 * @return interpolated value at (xCoord, yCoord)
-	 */
-	static double fourNeighborsIDW(SpatialGrid sg, double xCoord, double yCoord){
-		return fourNeighborsIDW(sg, xCoord, yCoord, 1);
-	}
-	
-	/**
-	 * interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with squared weights
-	 * considers only 4 neighboring values
-	 * uses my4NeighborsIDWFactor(SpatialGrid sg, double xCoord, double yCoord, double factor) with factor 2
-	 * 
-	 * @param sg the SpatialGrid with the known values
-	 * @param xCoord
-	 * @param yCoord
-	 * @return interpolated value at (xCoord, yCoord)
-	 */
-	static double fourNeighborsIDWSquare(SpatialGrid sg, double xCoord, double yCoord){
-		return fourNeighborsIDW(sg, xCoord, yCoord, 2);
-	}
-	
-	/**
-	 * interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with variable power of weights 
-	 * considers only 4 neighboring values
-	 * 
-	 * @param sg the SpatialGrid with the known values
-	 * @param xCoord
-	 * @param yCoord
-	 * @param exp the exponent for the weights
+	 * @param exp the exponent for the weights. standard values are one or two.
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
 	static double fourNeighborsIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
@@ -153,7 +87,7 @@ class InverseDistanceWeighting {
 	}
 	
 	/**
-	 * calculates the distance between two given points in the plane
+	 * Calculates the distance between two given points in the plane.
 	 * 
 	 * @param x1 the x-coordinate of point 1
 	 * @param y1 the y-coordinate of point 1
@@ -163,6 +97,41 @@ class InverseDistanceWeighting {
 	 */
 	private static double distance(double x1, double y1, double x2, double y2) {
 		return Math.sqrt((y2-y1)*(y2-y1) + (x2-x1)*(x2-x1));
+	}
+	
+	/**
+	 * Interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with variable power of weights:
+	 * z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp).
+	 * Needs more time for calculation than fourNeighborsIDW and the result is not much different.
+	 * 
+	 * @param sg the SpatialGrid with the known values
+	 * @param xCoord
+	 * @param yCoord
+	 * @param exp the exponent for the weights. standard values are one or two.
+	 * @return interpolated value at (xCoord, yCoord)
+	 */
+	static double allValuesIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
+		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
+		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
+		if (xDif==0){
+			if (yDif==0){
+				//known value
+				return sg.getValue(xCoord, yCoord);
+			}
+		}
+		
+		//z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp)
+		double value=0;
+		double currentWeight=1;
+		double weightsum=0;
+		for (int row=0; row<sg.getNumRows(); row++){
+			for (int col=0; col<sg.getNumCols(0); col++){
+				currentWeight= Math.pow(distance(sg.getXmin()+col*sg.getResolution(), sg.getYmax()-row*sg.getResolution(), xCoord, yCoord), exp);
+				value+= sg.getValue(xCoord, yCoord)/currentWeight;
+				weightsum+= 1/currentWeight;
+			}
+		}
+		return value/weightsum;		
 	}
 	
 }
