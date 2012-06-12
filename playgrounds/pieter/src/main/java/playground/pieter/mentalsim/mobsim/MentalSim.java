@@ -29,12 +29,18 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.ActivityEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -64,12 +70,15 @@ public class MentalSim implements Mobsim {
 
 	private final ExecutorService executor;
 	private TravelTimeCalculator linkTravelTimes;
+	private boolean linkEvents = false;
 
 	public MentalSim(Scenario sc, EventsManager eventsManager) {
 		this.sc = sc;
 		this.eventManager = eventsManager;
 		int numThreads = Integer.parseInt(sc.getConfig().getParam("global",
 				"numberOfThreads"));
+		linkEvents = Boolean.parseBoolean(sc.getConfig().getParam("MentalSim",
+				"linkEvents"));
 		executor = Executors.newFixedThreadPool(numThreads);
 
 		threads = new SimThread[numThreads];
@@ -167,32 +176,48 @@ public class MentalSim implements Mobsim {
 						 * If this is not the first activity, then there must
 						 * exist a leg before.
 						 */
-						Leg prevLeg = (Leg) elements.get(idx - 1);
-						double travelTime=0.0;
 						
-						if(prevLeg.getMode().equals(TransportMode.car)){
-							try{
+						Leg prevLeg = (Leg) elements.get(idx - 1);
+						double travelTime = 0.0;
+						if (prevLeg.getMode().equals(TransportMode.car)) {
+							try {
 								NetworkRoute croute = (NetworkRoute) prevLeg.getRoute();
-								travelTime = calcRouteTravelTime(croute,
-										prevEndTime, linkTravelTimes, network);						
-								
-							}catch(NullPointerException ne){
-								Logger.getLogger(this.getClass()).error("No route for car plan. Continuing with next plan");
+								if(linkEvents){
+									
+									travelTime = calcRouteTravelTime(croute,
+											prevEndTime, linkTravelTimes, network, eventQueue, plan.getPerson().getId());
+								}else{
+									travelTime = calcRouteTravelTime(croute,
+											prevEndTime, linkTravelTimes, network);
+
+								}
+
+							} catch (NullPointerException ne) {
+								Logger.getLogger(this.getClass())
+										.error("No route for car plan. Continuing with next plan");
 								continue;
 							}
-						}else{
+						} else {
 							try {
-								GenericRoute route = (GenericRoute) prevLeg.getRoute();
-								 travelTime = route.getTravelTime();
+								GenericRoute route = (GenericRoute) prevLeg
+										.getRoute();
+								travelTime = route.getTravelTime();
 							} catch (NullPointerException e) {
-								Logger.getLogger(this.getClass()).error("No route for pt plan. Continuing with next plan");
+								Logger.getLogger(this.getClass())
+										.error("No route for pt plan. Continuing with next plan");
 								continue;
 							}
 						}
-						
 
 						travelTime = Math.max(MIN_LEG_DURATION, travelTime);
 						double arrivalTime = travelTime + prevEndTime;
+
+						/*
+						 * Make sure that the activity does not end before the
+						 * agent arrives.
+						 */
+						actEndTime = Math.max(arrivalTime + MIN_ACT_DURATION,
+								actEndTime);
 						/*
 						 * If act end time is not specified...
 						 */
@@ -201,13 +226,8 @@ public class MentalSim implements Mobsim {
 									"I think this is discuraged.");
 						}
 						/*
-						 * Make sure that the activity does not end before the
-						 * agent arrives.
-						 */
-						actEndTime = Math.max(arrivalTime + MIN_ACT_DURATION,
-								actEndTime);
-						/*
-						 * Send arrival and activity start events.
+						 * Send  arrival and activity
+						 * start events.
 						 */
 						AgentArrivalEvent arrivalEvent = new AgentArrivalEventImpl(
 								arrivalTime, plan.getPerson().getId(),
@@ -249,6 +269,53 @@ public class MentalSim implements Mobsim {
 
 		}
 
+		private double calcRouteTravelTime(NetworkRoute route,
+				double startTime, TravelTime travelTime, Network network, Queue<Event> eventQueue, Id agentId) {
+			double tt = 0;
+			if (route.getStartLinkId() != route.getEndLinkId()) {
+				Id startLink = route.getStartLinkId();
+				double linkEnterTime = startTime;
+				AgentWait2LinkEvent wait2Link = new AgentWait2LinkEventImpl(linkEnterTime, agentId, startLink, agentId);
+				LinkEnterEvent linkEnterEvent = null;
+				LinkLeaveEvent linkLeaveEvent = new LinkLeaveEventImpl(++linkEnterTime, agentId, startLink, agentId);
+				eventQueue.add(wait2Link);
+				eventQueue.add(linkLeaveEvent);
+				double linkLeaveTime = linkEnterTime;
+				List<Id> ids = route.getLinkIds();
+				for (int i = 0; i < ids.size(); i++) {
+					Id link = ids.get(i);
+					linkEnterTime = linkLeaveTime + 1;
+					linkEnterEvent = new LinkEnterEventImpl(
+							linkEnterTime,
+							agentId, link,
+							agentId);
+					eventQueue.add(linkEnterEvent);
+
+					double linkTime = travelTime.getLinkTravelTime(
+							network.getLinks().get(link), startTime);
+					tt += Math.max(linkTime,1.0);
+					
+					linkLeaveTime = Math.max(
+							linkEnterTime + 1,
+							linkEnterTime + linkTime);
+					linkLeaveEvent = new LinkLeaveEventImpl(
+							linkLeaveTime,
+							agentId, link, agentId);
+					eventQueue.add(linkLeaveEvent);
+					
+					tt += travelTime.getLinkTravelTime(
+							network.getLinks().get(ids.get(i)), startTime);
+					tt++;// 1 sec for each node
+				}
+				tt += travelTime
+						.getLinkTravelTime(
+								network.getLinks().get(route.getEndLinkId()),
+								startTime);
+			}
+
+			return tt;
+		}
+		
 		private double calcRouteTravelTime(NetworkRoute route,
 				double startTime, TravelTime travelTime, Network network) {
 			double tt = 0;
