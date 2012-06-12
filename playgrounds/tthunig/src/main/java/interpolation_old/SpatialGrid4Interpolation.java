@@ -67,9 +67,9 @@ public class SpatialGrid4Interpolation {
 		
 		logger.info("The SpatialGrid looks like :");
 			
-		for(int row = 0; row < sg.getNumRows(); row++){
-			for(int col = 0; col < sg.getNumCols(0); col++){
-				System.out.print( sg.getMirroredValue(row, col) + " " );
+		for(double y= sg.getYmax(); y >= sg.getYmin(); y--){
+			for(double x= sg.getXmin(); x <= sg.getXmax(); x++){
+				System.out.print( sg.getValue(x, y) + " " );
 			}
 			System.out.println();
 		}
