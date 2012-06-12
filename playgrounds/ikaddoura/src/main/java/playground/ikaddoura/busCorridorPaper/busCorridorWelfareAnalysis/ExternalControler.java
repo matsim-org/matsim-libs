@@ -144,6 +144,7 @@ class ExternalControler {
 				info.setFare(this.fare);
 				info.setCapacity(this.capacity);
 				info.setNumberOfBuses(this.numberOfBuses);
+				info.setHeadway(vsw.getHeadway());
 				info.setOperatorCosts(operator.getCosts());
 				info.setOperatorRevenue(analysis.getRevenue());
 				info.setUsersLogSum(users.getLogSum());

@@ -43,6 +43,8 @@ public class VehicleScheduleWriter {
 	int busSeats;
 	int standingRoom;
 	
+	private double headway;
+	
 	public VehicleScheduleWriter(int numberOfBuses, int capacity, Network network, String outputDir) {
 		this.numberOfBuses = numberOfBuses;
 		this.capacity = capacity;
@@ -85,5 +87,11 @@ public class VehicleScheduleWriter {
 		
 		generator.writeScheduleFile();
 		generator.writeVehicleFile();
+		
+		this.headway = generator.getHeadway();
+	}
+
+	public double getHeadway() {
+		return headway;
 	}
 }

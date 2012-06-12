@@ -82,6 +82,8 @@ public class VehicleScheduleGenerator {
 	private double accessSeconds;
 	private double scheduleSpeed;
 	
+	private double headway;
+		
 	List<Id> vehicleIDs = new ArrayList<Id>();
 	
 	TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
@@ -244,8 +246,8 @@ public class VehicleScheduleGenerator {
 		log.info("RouteTravelTime: "+ Time.writeTime(routeTravelTime, Time.TIMEFORMAT_HHMMSS));
 		double umlaufzeit = (routeTravelTime + this.pausenzeit) * 2.0;
 		log.info("Umlaufzeit: "+ Time.writeTime(umlaufzeit, Time.TIMEFORMAT_HHMMSS));
-		double takt = umlaufzeit / this.numberOfBuses;
-		log.info("Takt: "+ Time.writeTime(takt, Time.TIMEFORMAT_HHMMSS));
+		this.headway = umlaufzeit / this.numberOfBuses;
+		log.info("Takt: "+ Time.writeTime(this.headway, Time.TIMEFORMAT_HHMMSS));
 		
 		int routeNr = 0;
 		for (Id routeId : routeId2transitRoute.keySet()){
@@ -265,7 +267,7 @@ public class VehicleScheduleGenerator {
 				Departure departure = sf.createDeparture(new IdImpl(depNr), departureTime);
 				departure.setVehicleId(vehicleIDs.get(vehicleIndex));
 				routeId2transitRoute.get(routeId).addDeparture(departure);
-				departureTime = departureTime + takt;
+				departureTime = departureTime + this.headway;
 				depNr++;
 				if (vehicleIndex == this.numberOfBuses - 1){
 					vehicleIndex = 0;
@@ -404,5 +406,9 @@ public class VehicleScheduleGenerator {
 
 	public void setPausenzeit(double pausenzeit) {
 		this.pausenzeit = pausenzeit;
+	}
+
+	public double getHeadway() {
+		return headway;
 	}
 }

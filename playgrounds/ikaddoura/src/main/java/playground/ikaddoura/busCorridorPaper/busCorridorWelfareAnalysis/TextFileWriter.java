@@ -22,12 +22,13 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; fare (AUD) ; capacity (pers/veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; SumOfWaitingTimes";
+	    String zeile1 = "ITERATION ; NumberOfBuses ; headway (hh:mm:ss) ; fare (AUD) ; capacity (pers/veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; SumOfWaitingTimes (sec)";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
 	    for (Integer iteration : extIt2information.keySet()){
 	    	double numberOfBuses = extIt2information.get(iteration).getNumberOfBuses();
+	    	String headway = Time.writeTime(extIt2information.get(iteration).getHeadway(), Time.TIMEFORMAT_HHMMSS);
 	    	double costs = extIt2information.get(iteration).getOperatorCosts();
 	    	double revenue = extIt2information.get(iteration).getOperatorRevenue();
 	    	double operatorProfit = extIt2information.get(iteration).getOperatorProfit();
@@ -38,9 +39,9 @@ public class TextFileWriter {
 	    	double walkLegs = extIt2information.get(iteration).getNumberOfWalkLegs();
 	    	double fare = extIt2information.get(iteration).getFare();
 	    	double capacity = extIt2information.get(iteration).getCapacity();
-	    	String waitTime = Time.writeTime(extIt2information.get(iteration).getSumOfWaitingTimes(), Time.TIMEFORMAT_HHMMSS);
+	    	double waitTime = extIt2information.get(iteration).getSumOfWaitingTimes();
 	    	
-	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+waitTime;
+	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+waitTime;
 	
 	    	bw.write(zeile);
 	        bw.newLine();

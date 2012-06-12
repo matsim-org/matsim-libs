@@ -28,6 +28,7 @@ public class ExtItInformation {
 	private double fare;
 	private double capacity;
 	private double numberOfBuses;
+	private double headway;
 	
 	private double operatorCosts;
 	private double operatorRevenue;
@@ -125,4 +126,13 @@ public class ExtItInformation {
 	protected double getWelfare() {
 		return this.getOperatorProfit() + this.usersLogSum;
 	}
+
+	public void setHeadway(double headway) {
+		this.headway = headway;
+	}
+
+	public double getHeadway() {
+		return headway;
+	}
+	
 }
