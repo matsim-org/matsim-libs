@@ -88,8 +88,8 @@ public class PConfigGroup extends Module{
 	
 	// Defaults
 	private String pIdentifier = "p_";
-	private double minX = Double.MIN_VALUE;	
-	private double minY = Double.MIN_VALUE;	
+	private double minX = -Double.MAX_VALUE;
+	private double minY = -Double.MAX_VALUE;	
 	private double maxX = Double.MAX_VALUE;
 	private double maxY = Double.MAX_VALUE;
 	private String coopType = BasicCooperative.COOP_NAME;
