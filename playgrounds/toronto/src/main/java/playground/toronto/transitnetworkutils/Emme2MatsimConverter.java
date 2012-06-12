@@ -65,7 +65,9 @@ import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
  *	'-a [String inSystem] [String outSystem]' = Allows converting from one 
  *		coordinate system to another. [inSystem] = the coordinate system to 
  *		convert form. [outSystem] = the coordinate system to convert to. 
- *		Coordinate systems must match those defined in MGC.java.
+ *		Coordinate systems must match those defined in MGC.java. This procedure
+ *		is stable (and working) but create a large number of errors and warnings.
+ *		These can safely be ignored.
  *
  *	'-b' = Flag for re-drawing special lanes.
  *
@@ -80,6 +82,9 @@ import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
  *		EMME turn restrictions file. [removeUTurns] is a boolean flag to remove
  *		U-turns from the network. [linkSep] is the desired link separation (m).
  *		[expRad] is the expansion radius (m).
+ *
+ *	'-f [shapeFileName]' = Exports links to ArcGIS shapefile format using the Link2ESRIShape
+ *		method. Does not export nodes at the moment.
  *
  * @author pkucirek
  *
@@ -143,7 +148,9 @@ public class Emme2MatsimConverter {
 			writeLinks2ESRI(filename);
 		}
 		
-		writeNetworkXML(args[1]);
+		String[] path = args[0].split("\\\\|/");
+		String outputfile = args[1] + "/" + path[path.length - 1].replace(".211",".xml");
+		writeNetworkXML(outputfile);
 		
 	}
 	
@@ -242,7 +249,7 @@ public class Emme2MatsimConverter {
 			}
 			
 			if(isReadingNodes){
-				String[] cells = line.split(" ");
+				String[] cells = line.split("\\s+");
 				if (cells.length != 8){
 					if (!line.trim().isEmpty()) System.err.println("WARN: Skipped line \"" + line + "\", invalid number of arguments.");
 					
@@ -263,7 +270,7 @@ public class Emme2MatsimConverter {
 				//0 1    2     3      4      5  6 7  8 9  10
 				//a 251 10274 0.12 chifedjv 106 2 90 0 40 9999
 				
-				String[] cells = line.split(" ");
+				String[] cells = line.split("\\s+");
 				if (cells.length != 11){
 					if (!line.trim().isEmpty()) System.err.println("WARN: Skipped line \"" + line + "\", invalid number of arguments.");
 					
@@ -552,61 +559,66 @@ public class Emme2MatsimConverter {
 	}
 	
 	private static void printHelp(){
-		 System.out.println(" This class converts an EMME .211 file into a MATSim XML network");
-		 System.out.println(" file. Performs several fixes, and also allows several options.");
-		 System.out.println(" DOES NOT HANDLE TRANSIT (not enough detail in the EMME transit ");
-		 System.out.println(" network definition to convert one-to-one).");
-		 System.out.println(" ");
-		 System.out.println(" ACTIONS PERFORMED BY THIS CLASS:");
-		 System.out.println(" 		(in order)");
-		 System.out.println(" 	0. Read in an EMME network file (.211), converting the EMME modes to");
-		 System.out.println(" 		a comma-separated list for MATSim and flagging special links. It");
-		 System.out.println(" 		also converts the speed limits from km/hr to m/s and changes link");
-		 System.out.println(" 		length from km to m.");
-		 System.out.println("  1. Re-draw special lanes [optional]: Identifies links that are part ");
-		 System.out.println("  	of special lanes and re-draws them in their proper position. ");
-		 System.out.println("  	Applies to streetcar ROWs like Spadina, as well as HOV");
-		 System.out.println("  	lanes. HOV lanes are given a type \"HOV\" for future handling");
-		 System.out.println("  	of HOV lanes to be implemented. ");
-		 System.out.println("  2. Exclude virtual links [optional]: Removes centroid connectors and ");
-		 System.out.println("  	walk-transfer links from the network. ");
-		 System.out.println("  3. Add turn restrictions [optional]:  Calls procedures from the ManeuverCreation");
-		 System.out.println("  	package (which also has a stand-alone main() method)");
-		 System.out.println("  4. Convert coordinates [optional]: Converts the coordinates (of NODES ONLY) ");
-		 System.out.println("  	from one coordinate system to another (MUST BE SPECIFIED IN");
-		 System.out.println("  	MGC.java). Currently works FROM WGS84 to NAD17N, but does NOT");
-		 System.out.println("  	work in the other direction.");
-		 System.out.println("  5. Choke network capacity [optional]: Reduces the network capacity by a user");
-		 System.out.println("  	specified factor.");
-		 System.out.println("  6. Finally, it outputs the MATSim network to a user-speicifed XML file.");
-		 System.out.println(" ");
-		 System.out.println(" ARGS: ");
-		 System.out.println(" 	- [0] inputFileName = the file location of the .211 file to be converted");
-		 System.out.println(" 	- [1] outputFolder = the folder location to export the file to. File will");
-		 System.out.println(" 		be named to [args[0]].xml");
-		 System.out.println(" ");
-		 System.out.println(" 	The remaining args can be in any order.");
-		 System.out.println(" ");
-		 System.out.println("	'-a [String inSystem] [String outSystem]' = Allows converting from one ");
-		 System.out.println("		coordinate system to another. [inSystem] = the coordinate system to ");
-		 System.out.println("		convert form. [outSystem] = the coordinate system to convert to. ");
-		 System.out.println("		Coordinate systems must match those defined in MGC.java.");
-		 System.out.println("");
-		 System.out.println("	'-b' = Flag for re-drawing special lanes.");
-		 System.out.println("");
-		 System.out.println("	'-c' = Flag for excluding virtual links.");
-		 System.out.println("");
-		 System.out.println("	'-d [Double factor]' = Allows 'choking' the capacity of roads on the");
-		 System.out.println("		network. [factor] = a factor to multiply the capacity of each link");
-		 System.out.println("		by.");
-		 System.out.println("");
-		 System.out.println("	'-e [turnsFileName] [removeUTurns] [linkSep] [expRad]' = Adds turn restrictions ");
-		 System.out.println("		to the network. [turnsFileName] is the name of the file which specifies the ");
-		 System.out.println("		EMME turn restrictions file. [removeUTurns] is a boolean flag to remove");
-		 System.out.println("		U-turns from the network. [linkSep] is the desired link separation (m).");
-		 System.out.println("		[expRad] is the expansion radius (m).");
-		 System.out.println("");
-		 System.out.println(" @author pkucirek");
+		System.out.println(" This class which converts an EMME .211 file into a MATSim XML network");
+		System.out.println(" file. Performs several fixes, and also allows several options.");
+		System.out.println(" DOES NOT HANDLE TRANSIT (not enough detail in the EMME transit ");
+		System.out.println(" network definition to convert one-to-one).");
+		System.out.println(" ");
+		System.out.println(" ACTIONS PERFORMED BY THIS CLASS:");
+		System.out.println(" 		(in order)");
+		System.out.println(" 	0. Read in an EMME network file (.211), converting the EMME modes to");
+		System.out.println(" 		a comma-separated list for MATSim and flagging special links. It");
+		System.out.println(" 		also converts the speed limits from km/hr to m/s and changes link");
+		System.out.println(" 		length from km to m.");
+		System.out.println("  1. Re-draw special lanes [optional]: Identifies links that are part ");
+		System.out.println("  	of special lanes and re-draws them in their proper position. ");
+		System.out.println("  	Applies to streetcar ROWs like Spadina, as well as HOV");
+		System.out.println("  	lanes. HOV lanes are given a type \"HOV\" for future handling");
+		System.out.println("  	of HOV lanes to be implemented. ");
+		System.out.println("  2. Exclude virtual links [optional]: Removes centroid connectors and ");
+		System.out.println("  	walk-transfer links from the network. ");
+		System.out.println("  3. Add turn restrictions [optional]:  Calls procedures from the ManeuverCreation");
+		System.out.println("  	package (which also has a stand-alone main() method)");
+		System.out.println("  4. Convert coordinates [optional]: Converts the coordinates (of NODES ONLY) ");
+		System.out.println("  	from one coordinate system to another (MUST BE SPECIFIED IN");
+		System.out.println("  	MGC.java). Currently works FROM WGS84 to NAD17N, but does NOT");
+		System.out.println("  	work in the other direction.");
+		System.out.println("  5. Choke network capacity [optional]: Reduces the network capacity by a user");
+		System.out.println("  	specified factor.");
+		System.out.println("  6. Finally, it outputs the MATSim network to a user-speicifed XML file.");
+		System.out.println(" ");
+		System.out.println(" ARGS: ");
+		System.out.println(" 	- [0] inputFileName = the file location of the .211 file to be converted");
+		System.out.println(" 	- [1] outputFolder = the folder location to export the file to. File will");
+		System.out.println(" 		be named to [args[0]].xml");
+		System.out.println(" ");
+		System.out.println(" 	The remaining args can be in any order.");
+		System.out.println(" ");
+		System.out.println("	'-a [String inSystem] [String outSystem]' = Allows converting from one ");
+		System.out.println("		coordinate system to another. [inSystem] = the coordinate system to ");
+		System.out.println("		convert form. [outSystem] = the coordinate system to convert to. ");
+		System.out.println("		Coordinate systems must match those defined in MGC.java. This procedure");
+		System.out.println("		is stable (and working) but create a large number of errors and warnings.");
+		System.out.println("		These can safely be ignored.");
+		System.out.println("");
+		System.out.println("	'-b' = Flag for re-drawing special lanes.");
+		System.out.println("");
+		System.out.println("	'-c' = Flag for excluding virtual links.");
+		System.out.println("");
+		System.out.println("	'-d [Double factor]' = Allows 'choking' the capacity of roads on the");
+		System.out.println("		network. [factor] = a factor to multiply the capacity of each link");
+		System.out.println("		by.");
+		System.out.println("");
+		System.out.println("	'-e [turnsFileName] [removeUTurns] [linkSep] [expRad]' = Adds turn restrictions ");
+		System.out.println("		to the network. [turnsFileName] is the name of the file which specifies the ");
+		System.out.println("		EMME turn restrictions file. [removeUTurns] is a boolean flag to remove");
+		System.out.println("		U-turns from the network. [linkSep] is the desired link separation (m).");
+		System.out.println("		[expRad] is the expansion radius (m).");
+		System.out.println("");
+		System.out.println("	'-f [shapeFileName]' = Exports links to ArcGIS shapefile format using the Link2ESRIShape");
+		System.out.println("		method. Does not export nodes at the moment.");
+		System.out.println("");
+		System.out.println(" @author pkucirek");
 	}
 	
 	
