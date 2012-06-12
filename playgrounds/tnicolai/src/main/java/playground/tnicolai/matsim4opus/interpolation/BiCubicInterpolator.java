@@ -9,7 +9,11 @@ import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpola
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
- * interpolates data on a SpatialGrid with bicubic spline interpolation from apache (http://commons.apache.org)
+ * Interpolates data on a SpatialGrid with bicubic spline interpolation from apache (http://commons.apache.org).
+ * 
+ * Requires values on a SpatialGrid.
+ * 
+ * Problem: Wave effect occurs.
  * 
  * @author tthunig
  *
@@ -21,7 +25,8 @@ class BiCubicInterpolator {
 	private SpatialGrid sg = null;
 	
 	/**
-	 * constructor
+	 * Prepares bicubic spline interpolation:
+	 * Generates interpolation function with BicubicSplineInterpolator from apache (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html).
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 */
@@ -29,9 +34,9 @@ class BiCubicInterpolator {
 		this.sg= sg;
 		
 		//create default coordinates for interpolation and compatible array of values
-		double[] x_default= coord(0, sg.getMatrix()[0].length-1, 1);
-		double[] y_default= coord(0, sg.getMatrix().length-1, 1);
-		double[][] mirroredValues= flip(sg.getMatrix());
+		double[] x_default= coord(0, sg.getNumCols(0)-1, 1);
+		double[] y_default= coord(0, sg.getNumRows()-1, 1);
+		double[][] mirroredValues= sg.getMatrix();
 		
 		BivariateRealGridInterpolator interpolator = new BicubicSplineInterpolator();
 		try {
@@ -42,7 +47,7 @@ class BiCubicInterpolator {
 	}
 	
 	/**
-	 * interpolates the value on a arbitrary point with bicubic spline interpolation from apache
+	 * Interpolates the value on a arbitrary point with bicubic spline interpolation from apache.
 	 * 
 	 * @param xCoord the x-coordinate of the point to interpolate
 	 * @param yCoord the y-coordinate of the point to interpolate
@@ -58,7 +63,7 @@ class BiCubicInterpolator {
 	}
 	
 	/**
-	 * transforms a given coordinate into their default value in the system of base coordinates (0,1,...)
+	 * Transforms a given coordinate into their default value in the system of base coordinates (0,1,...).
 	 * 
 	 * @param coord 
 	 * @param min the minimum value for this coordinate where a value is known at
@@ -70,7 +75,7 @@ class BiCubicInterpolator {
 	}
 
 	/**
-	 * creates a coordinate vector
+	 * Creates a coordinate vector.
 	 * 
 	 * @param min the minimum coordinate
 	 * @param max the maximum coordinate
@@ -87,11 +92,12 @@ class BiCubicInterpolator {
 	}
 	
 	/**
-	 * flips the given matrix horizontal
+	 * Flips the given matrix horizontal.
 	 * 
 	 * @param matrix
 	 * @return the horizontal mirrored matrix
 	 */
+	@Deprecated
 	private static double[][] flip(double[][] matrix) {
 		double[][] flip= new double[matrix.length][matrix[0].length];
 		for (int i=0; i<flip.length; i++){
