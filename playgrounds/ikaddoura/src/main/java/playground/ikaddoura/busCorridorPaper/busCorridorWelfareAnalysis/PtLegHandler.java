@@ -82,11 +82,10 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 			} else {
 				waitingTime =  event.getTime() - personId2AgentDepartureTime.get(personId);
 			}
-			
-			// headway = 5 min
-			// wartezeit = 12 min 
-			// --> 12/5 = 2 Busse
-			if (waitingTime >= this.headway){
+//			
+//			System.out.println("Headway --------------> " + this.headway);
+//			System.out.println("WaitingTime --------------> " + waitingTime);
+			if (waitingTime > this.headway){
 				this.numberOfWaitingTimesMoreThanHeadway++;
 			}
 			

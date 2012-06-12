@@ -64,7 +64,7 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
 		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_timeChoice";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_timeChoice";
 		
 //		op1 = OptimizationParameter1.FARE;
 //		op1 = OptimizationParameter1.CAPACITY;
@@ -73,8 +73,8 @@ class ExternalControler {
 //		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
 		
-		lastExternalIterationParam1 = 3;
-		lastExternalIterationParam2 = 2;
+		lastExternalIterationParam1 = 10;
+		lastExternalIterationParam2 = 10;
 				
 		incrBusNumber = 1;
 		incrFare = -0.25;

@@ -52,8 +52,8 @@ public class VehicleScheduleWriter {
 		this.outputDir = outputDir;
 		
 		this.length = 0.1184 * this.capacity + 5.2152;   // see linear regression analysis in "BusCostsEstimations.xls"
-		this.busSeats = (int) (this.capacity * 0.7);     // for future functionality (e.g. disutility for standing in bus)
-		this.standingRoom = (int) (this.capacity * 0.3); // for future functionality (e.g. disutility for standing in bus)
+		this.busSeats = (int) (this.capacity * 1.);     // for future functionality (e.g. disutility for standing in bus)
+		this.standingRoom = (int) (this.capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 	}
 
 	public void writeTransitVehiclesAndSchedule() throws IOException {
