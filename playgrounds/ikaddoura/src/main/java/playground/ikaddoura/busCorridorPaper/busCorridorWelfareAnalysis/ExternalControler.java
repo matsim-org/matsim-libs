@@ -73,8 +73,8 @@ class ExternalControler {
 //		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
 		
-		lastExternalIterationParam1 = 20;
-		lastExternalIterationParam2 = 20;
+		lastExternalIterationParam1 = 3;
+		lastExternalIterationParam2 = 2;
 				
 		incrBusNumber = 1;
 		incrFare = -0.25;
@@ -164,9 +164,10 @@ class ExternalControler {
 					if(op1.equals(OptimizationParameter1.NUMBER_OF_BUSES)) this.numberOfBuses = this.numberOfBuses + incrBusNumber;
 				}
 				log.info("************* EXTERNAL ITERATION (1) " + extItParam1 + " ENDS *************");
+				this.it2information.put(iterationCounter, info);
 				iterationCounter++;
-				this.it2information.put(iterationCounter, info);		
 				textWriter.write(outputExternalIterationDirPath, this.it2information);
+				textWriter.writeMatrices(outputExternalIterationDirPath, this.it2information);
 			}
 			
 			// settings for next external iteration (optimization parameter 2)
@@ -176,10 +177,9 @@ class ExternalControler {
 					this.numberOfBuses = 1;
 				}
 				if(op2.equals(OptimizationParameter2.NUMBER_OF_BUSES)){
-					this.fare = -0.;
 					this.numberOfBuses = this.numberOfBuses + incrBusNumber;
+					this.fare = -0.;
 				}
-				
 			}
 			log.info("************* EXTERNAL ITERATION (2) " + extItParam2 + " ENDS *************");
 		}
