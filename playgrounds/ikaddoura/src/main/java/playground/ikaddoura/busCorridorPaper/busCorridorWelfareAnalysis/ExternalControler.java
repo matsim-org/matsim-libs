@@ -128,7 +128,7 @@ class ExternalControler {
 				VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, sc.getNetwork(), directoryExtItParam2Param1);
 				vsw.writeTransitVehiclesAndSchedule();
 				
-				InternalControler internalControler = new InternalControler(sc, directoryExtItParam2Param1, this.fare);
+				InternalControler internalControler = new InternalControler(sc, directoryExtItParam2Param1, this.fare, vsw.getHeadway());
 				internalControler.run();
 	
 				operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
@@ -152,6 +152,7 @@ class ExternalControler {
 				info.setNumberOfPtLegs(analysis.getSumOfPtLegs());
 				info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
 				info.setSumOfWaitingTimes(internalControler.getSumOfWaitingTimes());
+				info.setNumberOfWaitingTimesMoreThanHeadway(internalControler.getNumberOfWaitingTimesMoreThanHeadway());
 				
 				this.extIt2information.put(extItParam1, info);
 				

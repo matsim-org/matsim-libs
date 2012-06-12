@@ -22,7 +22,7 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; headway (hh:mm:ss) ; fare (AUD) ; capacity (pers/veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; SumOfWaitingTimes (sec)";
+	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; SumOfWaitingTimes (sec) ; WaitingTime > Headway (trips)";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -40,8 +40,9 @@ public class TextFileWriter {
 	    	double fare = extIt2information.get(iteration).getFare();
 	    	double capacity = extIt2information.get(iteration).getCapacity();
 	    	double waitTime = extIt2information.get(iteration).getSumOfWaitingTimes();
+	    	double waitingTimeMoreThanHeadway = extIt2information.get(iteration).getNumberOfWaitingTimesMoreThanHeadway();
 	    	
-	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+waitTime;
+	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+waitTime+" ; "+waitingTimeMoreThanHeadway;
 	
 	    	bw.write(zeile);
 	        bw.newLine();

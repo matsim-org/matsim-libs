@@ -38,6 +38,7 @@ public class ExtItInformation {
 	private double numberOfPtLegs;
 	private double numberOfWalkLegs;
 	private double sumOfWaitingTimes;
+	private int numberOfWaitingTimesMoreThanHeadway;
 	
 	protected double getFare() {
 		return fare;
@@ -133,6 +134,15 @@ public class ExtItInformation {
 
 	public double getHeadway() {
 		return headway;
+	}
+
+	public void setNumberOfWaitingTimesMoreThanHeadway(
+			int numberOfWaitingTimesMoreThanHeadway) {
+		this.numberOfWaitingTimesMoreThanHeadway = numberOfWaitingTimesMoreThanHeadway;
+	}
+
+	public int getNumberOfWaitingTimesMoreThanHeadway() {
+		return numberOfWaitingTimesMoreThanHeadway;
 	}
 	
 }

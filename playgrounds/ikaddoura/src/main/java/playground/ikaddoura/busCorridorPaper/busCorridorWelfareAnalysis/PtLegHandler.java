@@ -46,15 +46,26 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 	private final Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2InVehicleTime = new HashMap<Id, Double>();
+	private int numberOfWaitingTimesMoreThanHeadway;
 	
 	private final Map <Id, Boolean> personId2IsEgress = new HashMap<Id, Boolean>();
 	
+	private final double headway;
+	
+	/**
+	 * @param headway
+	 */
+	public PtLegHandler(double headway) {
+		this.headway = headway;
+	}
+
 	@Override
 	public void reset(int iteration) {
 		personId2WaitingTime.clear();
 		personId2PersonEntersVehicleTime.clear();
 		personId2AgentDepartureTime.clear();
 		personId2InVehicleTime.clear();
+		this.numberOfWaitingTimesMoreThanHeadway = 0;
 	}
 	
 	@Override
@@ -70,6 +81,13 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 				throw new RuntimeException("Person " + personId + " is entering vehicle " + vehId + " without having departed from an activity. Aborting...");
 			} else {
 				waitingTime =  event.getTime() - personId2AgentDepartureTime.get(personId);
+			}
+			
+			// headway = 5 min
+			// wartezeit = 12 min 
+			// --> 12/5 = 2 Busse
+			if (waitingTime >= this.headway){
+				this.numberOfWaitingTimesMoreThanHeadway++;
 			}
 			
 			if (personId2WaitingTime.get(personId) == null){
@@ -144,6 +162,10 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 
 	public Map<Id, Boolean> getPersonId2IsEgress() {
 		return personId2IsEgress;
+	}
+
+	public int getNumberOfAgentsWaitingMoreThanHeadway() {
+		return numberOfWaitingTimesMoreThanHeadway;
 	}
 	
 
