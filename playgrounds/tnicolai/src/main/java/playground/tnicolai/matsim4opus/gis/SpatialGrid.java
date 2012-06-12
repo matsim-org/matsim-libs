@@ -178,7 +178,7 @@ public class SpatialGrid{
 	 * @return the value at matrix[row][col]
 	 */
 	@Deprecated
-	public double getMirroredValue(int row, int col) {
+	private double getMirroredValue(int row, int col) {
 		return matrix[row][col];
 	}
 	
