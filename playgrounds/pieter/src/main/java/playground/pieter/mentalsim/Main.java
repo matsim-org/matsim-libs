@@ -16,15 +16,15 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Controler c = new MentalSimControler(args);
+		MentalSimControler c = new MentalSimControler(args);
 //		Controler c = new Controler(args);
 		c.setOverwriteFiles(true);
 		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
 //		execution order of these iteration start listeners is in reverse order of adding them to the controler
-//		c.addControlerListener(new MentalSimInit());
-		c.addControlerListener(new MobSimSwitcher(c));
 		c.addControlerListener(new SimpleAnnealer());
-		c.addControlerListener(new ScoreResetStrategyModuleAppender());
+//		c.addControlerListener(new MentalSimInit(c));
+		c.addControlerListener(new MobSimSwitcher(c));
+		c.addControlerListener(new ScoreResetStrategyModuleAppender(c));
 		
 		c.run();
 		System.exit(0);

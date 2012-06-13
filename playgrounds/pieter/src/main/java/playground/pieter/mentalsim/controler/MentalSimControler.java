@@ -59,13 +59,16 @@ public class MentalSimControler extends Controler {
 			// fake.setEmployed(pax.getEmployed);
 			fake.setLicence(pax.getLicense());
 			Plan plan = pax.copySelectedPlan();
+			plan.setScore(0.0);
 			fake.addPlan(plan);
 			fake.setSelectedPlan(plan);
+			
 			fake.setSex(pax.getSex());
 			// fake.setTravelCards(pax.getTravelcards());
 			subsetPopulation.addPerson(fake);
 		}
 		this.getScenario().setPopulation(subsetPopulation);
+		this.population = subsetPopulation;
 		Logger.getLogger("MentalSimControler").error(
 				"Replaced the population with "
 						+ subsetPopulation.getPersons().size()
@@ -89,6 +92,7 @@ public class MentalSimControler extends Controler {
 			original.setSelectedPlan(plan);
 		}
 		this.getScenario().setPopulation(originalPopulation);
+		this.population = originalPopulation;
 		Logger.getLogger("MentalSimControler").error(
 				"Replaced the original population with "
 						+ originalPopulation.getPersons().size() + " persons.");

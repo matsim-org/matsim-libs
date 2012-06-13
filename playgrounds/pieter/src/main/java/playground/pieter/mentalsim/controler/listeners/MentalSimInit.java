@@ -1,6 +1,7 @@
 package playground.pieter.mentalsim.controler.listeners;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -31,46 +32,46 @@ public class MentalSimInit implements ControlerListener,
 	final static String CONFIG_MODULE_NAME = "MentalSim";
 	final static String POP_SWAP_ITERS = "populationSwapIters";
 	final static String OFFLINE_PLAN_SIZE = "maxOfflineAgentPlanMemorySize";
+	MentalSimControler controler;
+	static boolean fakePopulationActive=false;
+
+	public MentalSimInit(MentalSimControler c) {
+		this.controler = c;
+	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
-		MentalSimControler controler = ((MentalSimControler) event
-				.getControler());
-
-		int fullMobSimIterationFrequency = Integer.parseInt(controler
-				.getConfig().getParam(CONFIG_MODULE_NAME, POP_SWAP_ITERS));
-
 		int iterationsFromStart = event.getIteration()
-				- event.getControler().getFirstIteration();
-		// only start replacing the population from the 2nd iter onwards
-		if ((iterationsFromStart - 1) % fullMobSimIterationFrequency == 0
-				&& iterationsFromStart > 0) {
+				- controler.getFirstIteration();
+		
+		if (!MobSimSwitcher.expensiveIter && !fakePopulationActive) {
 			controler
 					.createSubSetAndStoreOriginalPopulation(SimpleAnnealer.currentProportion);
+			fakePopulationActive = true;
 		}
 		// only start restoring the original population from the 3rd iter
 		// onwards
-		if (iterationsFromStart % fullMobSimIterationFrequency == 0
-				&& iterationsFromStart > 3) {
+		if (iterationsFromStart>1 && fakePopulationActive && MobSimSwitcher.expensiveIter) {
 			controler
 					.restoreOriginalPopulationAndReturnSubSetPlan(new ExpBetaPlanSelector(
 							new PlanCalcScoreConfigGroup()));
 			controler.getStrategyManager().setMaxPlansPerAgent(
 					Integer.parseInt(controler.getConfig().getParam("strategy",
 							"maxAgentPlanMemorySize")));
+			fakePopulationActive = false;
 		}
 		// we want to execute plans with only non-selector re-planning
 		// strategies operating, so need to set that proportion for all
 		// MentalSim iterations
-		if (iterationsFromStart % fullMobSimIterationFrequency != 0) {
-			SimpleAnnealer.anneal(event, 0.99999);
-			String maxOfflineAgentPlanMemorySize = controler.getConfig()
-					.getParam(CONFIG_MODULE_NAME, POP_SWAP_ITERS);
-			if (maxOfflineAgentPlanMemorySize != null) {
-				controler.getStrategyManager().setMaxPlansPerAgent(
-						Integer.parseInt(maxOfflineAgentPlanMemorySize));
-			}
-		}
+//		if (iterationsFromStart % fullMobSimIterationFrequency != 0) {
+//			SimpleAnnealer.anneal(event, 0.99999);
+//			String maxOfflineAgentPlanMemorySize = controler.getConfig()
+//					.getParam(CONFIG_MODULE_NAME, POP_SWAP_ITERS);
+//			if (maxOfflineAgentPlanMemorySize != null) {
+//				controler.getStrategyManager().setMaxPlansPerAgent(
+//						Integer.parseInt(maxOfflineAgentPlanMemorySize));
+//			}
+//		}
 	}
 }

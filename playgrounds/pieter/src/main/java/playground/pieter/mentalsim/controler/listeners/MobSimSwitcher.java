@@ -107,8 +107,8 @@ public class MobSimSwitcher implements ControlerListener,
 
 	public boolean checkExpensiveIter() {
 		double iterationsFromStart = controler.getIterationNumber() - startIter;
-		if (iterationsFromStart > 0 && iterationsFromStart % 2 == 0
-				&& controler.getIterationNumber() < endIter && switchCount > 0) {
+//		if (iterationsFromStart > 0 && iterationsFromStart % 2 == 0
+				if( controler.getIterationNumber() < endIter && switchCount > 0) {
 			// double slope = (double) (startRate - endRate)
 			// / (startIter - endIter);
 			// currentRate = startRate
