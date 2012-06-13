@@ -221,7 +221,8 @@ public final class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(tam);
 			} else if (name.equals("TransitTimeAllocationMutator_ReRoute")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
-				strategy.addStrategyModule(new TransitTimeAllocationMutator(config));
+				strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				strategy.addStrategyModule(new TimeAllocationMutator(config));
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (name.equals("TransitSubtourModeChoice")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
