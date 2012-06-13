@@ -46,10 +46,10 @@ public class PopulationAdministration implements BeforeMobsimListener, AfterMobs
 
 	private static final String newLine = "\n";
 
-	private static final String panicFileName = "panicPeople.txt.gz";
-	private static final String nonPanicFileName = "nonPanicPeople.txt.gz";
-	private static final String participatingHouseholdsFileName = "participatingHouseholds.txt.gz";
-	private static final String nonParticipatingHouseholdsFileName = "nonParticipatingHouseholds.txt.gz";
+	public static final String panicFileName = "panicPeople.txt.gz";
+	public static final String nonPanicFileName = "nonPanicPeople.txt.gz";
+	public static final String participatingHouseholdsFileName = "participatingHouseholds.txt.gz";
+	public static final String nonParticipatingHouseholdsFileName = "nonParticipatingHouseholds.txt.gz";
 	
 	private final Scenario scenario;
 	private final Set<Id> panicPeople;
@@ -96,8 +96,36 @@ public class PopulationAdministration implements BeforeMobsimListener, AfterMobs
 		}
 	}
 	
+	public boolean addPersonInPanic(Id personId) {
+		return panicPeople.add(personId);
+	}
+	
+	public boolean removePersonInPanic(Id personId) {
+		return panicPeople.remove(personId);
+	}
+	
 	public boolean isPersonInPanic(Id personId) {
 		return panicPeople.contains(personId);
+	}
+	
+	public boolean addHouseholdParticipating(Id householdId) {
+		
+		Household household = ((ScenarioImpl) scenario).getHouseholds().getHouseholds().get(householdId);
+		if (household != null) {
+			participatingHouseholds.add(householdId);
+			participatingAgents.addAll(household.getMemberIds());
+			return true;
+		} else return false;
+	}
+	
+	public boolean removeHouseholdParticipating(Id householdId) {
+		
+		Household household = ((ScenarioImpl) scenario).getHouseholds().getHouseholds().get(householdId);
+		if (household != null) {
+			participatingHouseholds.remove(householdId);
+			participatingAgents.removeAll(household.getMemberIds());
+			return true;
+		} else return false;
 	}
 	
 	public boolean isHouseholdParticipating(Id householdId) {
