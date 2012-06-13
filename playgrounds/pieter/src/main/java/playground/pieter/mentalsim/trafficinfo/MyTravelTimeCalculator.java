@@ -24,7 +24,7 @@ public class MyTravelTimeCalculator extends TravelTimeCalculator {
 
 	@Override
 	public void reset(int iteration) {
-		if (iteration % MobSimSwitcher.expensiveSimIters == 0) {
+		if (MobSimSwitcher.expensiveIter) {
 			Logger.getLogger(this.getClass()).error("Calling reset on traveltimecalc");
 			super.reset(iteration);
 		}

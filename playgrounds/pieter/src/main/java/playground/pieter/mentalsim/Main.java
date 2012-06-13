@@ -22,7 +22,7 @@ public class Main {
 		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
 //		execution order of these iteration start listeners is in reverse order of adding them to the controler
 //		c.addControlerListener(new MentalSimInit());
-		c.addControlerListener(new MobSimSwitcher());
+		c.addControlerListener(new MobSimSwitcher(c));
 		c.addControlerListener(new SimpleAnnealer());
 		c.addControlerListener(new ScoreResetStrategyModuleAppender());
 		
