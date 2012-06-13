@@ -109,26 +109,30 @@ public class WilnaIPFWriter {
 	}
 	
 	private static int getHouseholdIncomeCode(Income income){
-		double incomeDouble = income.getIncome();
-		if(incomeDouble == 0){
-			return 1;
-		} else if(incomeDouble <= 7200){
-			return 3;
-		} else if(incomeDouble <= 26152){
-			return 5;
-		} else if(incomeDouble <= 108612){
-			return 7;
-		} else if(incomeDouble <= 434446){
-			return 9;
-		} else if(incomeDouble <= 1737786){
-			return 11;
-		} else if(incomeDouble <= 4915200){
-			return 12;
-		} else{
+		if(income != null){
+			double incomeDouble = income.getIncome();
+			if(incomeDouble == 0){
+				return 1;
+			} else if(incomeDouble <= 7200){
+				return 3;
+			} else if(incomeDouble <= 26152){
+				return 5;
+			} else if(incomeDouble <= 108612){
+				return 7;
+			} else if(incomeDouble <= 434446){
+				return 9;
+			} else if(incomeDouble <= 1737786){
+				return 11;
+			} else if(incomeDouble <= 4915200){
+				return 12;			
+			} else {
+				return 13;
+			}
+		} else {
 			return 13;
 		}
 	}
-
+	
 	private static int getRelationshipCode(String type){
 		if(type.equalsIgnoreCase("Head")){
 			return 1;
