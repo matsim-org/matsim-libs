@@ -53,8 +53,11 @@ public abstract class WithinDayReplannerFactory<T extends Identifier> {
 	 * has been created. Is there any way to force this???
 	 */
 	public final void initNewInstance(WithinDayReplanner<? extends Identifier> replanner) {
-		replanner.setReplanningProbability(this.replanningProbability);
 		replanner.setAbstractMultithreadedModule(this.abstractMultithreadedModule);
+	}
+	
+	public final double getReplanningProbability() {
+		return this.replanningProbability;
 	}
 	
 	public final ReplanningManager getReplanningManager() {

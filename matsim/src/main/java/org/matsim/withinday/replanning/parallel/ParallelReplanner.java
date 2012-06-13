@@ -22,9 +22,12 @@ package org.matsim.withinday.replanning.parallel;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -46,6 +49,16 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 
+	/*
+	 * All replanners from the same type can either share one queue that contains all 
+	 * ReplanningTasks or use a separate queue per replanner object. A shared queue
+	 * should result in a better load balancing but also might become a bottleneck when
+	 * many threads are accessing it at the same time. When using a shared queue, a 
+	 * LinkedBlockingQueue is used. Otherwise, each replanner uses a LinkedList.
+	 * Both approaches should produce the same simulation results.
+	 */
+	private final boolean shareReplannerQueue = false;
+	
 	protected int numOfThreads = 1;	// use by default only one thread
 	protected Set<T> replannerFactories = new LinkedHashSet<T>();
 	protected ReplanningRunnable[] replanningRunnables;
@@ -130,8 +143,8 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 
 		try {
 			// set current time
-			for (ReplanningRunnable replannerThread : replanningRunnables) {
-				replannerThread.setTime(time);
+			for (ReplanningRunnable replanningRunnable : replanningRunnables) {
+				replanningRunnable.setTime(time);
 			}
 
 			this.timeStepStartBarrier.await();
@@ -176,23 +189,31 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	public final void addWithinDayReplannerFactory(T factory) {
 		this.replannerFactories.add(factory);
 
-		for (ReplanningRunnable replanningThread : this.replanningRunnables) {
-			WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
-			replanningThread.addWithinDayReplanner(newInstance);
+		if (shareReplannerQueue) {
+			Queue<ReplanningTask> queue = new LinkedBlockingQueue<ReplanningTask>();
+			for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
+				WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+				replanningRunnable.addWithinDayReplanner(newInstance, queue);
+			}
+		} else {
+			for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
+				WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+				replanningRunnable.addWithinDayReplanner(newInstance, new LinkedList<ReplanningTask>());
+			}
 		}
 	}
 
 	public final void removeWithinDayReplannerFactory(T factory) {
 		this.replannerFactories.remove(factory);
 		
-		for (ReplanningRunnable replanningThread : this.replanningRunnables) {
-			replanningThread.removeWithinDayReplanner(factory.getId());
+		for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
+			replanningRunnable.removeWithinDayReplanner(factory.getId());
 		}
 	}
 	
 	public final void resetReplanners() {
-		for (ReplanningRunnable replanningThread : this.replanningRunnables) {
-			replanningThread.resetReplanners();
+		for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
+			replanningRunnable.resetReplanners();
 		}
 	}
 	
@@ -200,7 +221,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 		return Collections.unmodifiableSet(this.replannerFactories);
 	}
 
-	public final void addReplanningTask(ReplanningTask replanningTask) {
+	public final void addReplanningTask(ReplanningTask replanningTask) {	
 		this.replanningRunnables[this.roundRobin % this.numOfThreads].addReplanningTask(replanningTask);
 		this.roundRobin++;
 	}

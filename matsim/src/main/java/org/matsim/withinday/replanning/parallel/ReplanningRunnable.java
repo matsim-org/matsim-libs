@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningThread.java
+ * ReplanningRunnable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,10 @@
 
 package org.matsim.withinday.replanning.parallel;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -59,7 +60,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	 *  Threads. Each agents has references to the original Replanners,
 	 *  so we have to identify the corresponding clone! 
 	 */
-	protected Map<Id, WithinDayReplanner<? extends Identifier>> withinDayReplanners = new TreeMap<Id, WithinDayReplanner<? extends Identifier>>();
+	protected Map<Id, WithinDayReplanner<? extends Identifier>> withinDayReplanners = new HashMap<Id, WithinDayReplanner<? extends Identifier>>();
 	
 	/*
 	 * Use one List of ReplanningTasks per WithinDayReplanner. By doing so
@@ -68,7 +69,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	 * different Replanners on different Threads could try to replan the
 	 * same Agent.
 	 */
-	protected Map<Id, List<ReplanningTask>> replanningTasks = new TreeMap<Id, List<ReplanningTask>>();
+	protected Map<Id, Queue<ReplanningTask>> replanningTasks = new TreeMap<Id, Queue<ReplanningTask>>();
 	protected WithinDayReplanner<Identifier> withinDayReplanner;
 	protected EventsManager eventsManager;
 	
@@ -101,13 +102,13 @@ public abstract class ReplanningRunnable implements Runnable {
 	}
 
 	public final void addReplanningTask(ReplanningTask replanningTask) {
-		List<ReplanningTask> list = this.replanningTasks.get(replanningTask.getWithinDayReplannerId());
-		list.add(replanningTask);
+		Queue<ReplanningTask> queue = this.replanningTasks.get(replanningTask.getWithinDayReplannerId());
+		queue.add(replanningTask);
 	}
 	
-	public final void addWithinDayReplanner(WithinDayReplanner<? extends Identifier> withinDayReplanner) {
+	public final void addWithinDayReplanner(WithinDayReplanner<? extends Identifier> withinDayReplanner, Queue<ReplanningTask> queue) {
 		this.withinDayReplanners.put(withinDayReplanner.getId(), withinDayReplanner);
-		this.replanningTasks.put(withinDayReplanner.getId(), new ArrayList<ReplanningTask>());
+		this.replanningTasks.put(withinDayReplanner.getId(), queue);
 	}
 	
 	public final void removeWithinDayReplanner(Id replannerId) {
@@ -122,7 +123,7 @@ public abstract class ReplanningRunnable implements Runnable {
 		}
 	}
 	
-	public void afterSim() {
+	public final void afterSim() {
 		this.simulationRunning = false;
 	}
 	
@@ -130,58 +131,57 @@ public abstract class ReplanningRunnable implements Runnable {
 	 * Typical Replanner Implementations should be able to use 
 	 * this method without any Changes.
 	 */
-	private void doReplanning() throws InterruptedException, BrokenBarrierException {
+	private final void doReplanning() throws InterruptedException, BrokenBarrierException {
 
-		for (List<ReplanningTask> list : this.replanningTasks.values()) {
+		for (Entry<Id, Queue<ReplanningTask>> entry : this.replanningTasks.entrySet()) {
 			
-			for (ReplanningTask replanningTask : list) {
-				Id id = replanningTask.getWithinDayReplannerId();
+			Id withinDayReplannerId = entry.getKey();
+			Queue<ReplanningTask> queue = entry.getValue();
+			
+			WithinDayReplanner<? extends Identifier> withinDayReplanner = this.withinDayReplanners.get(withinDayReplannerId);
+			
+			if (withinDayReplannerId == null) {
+				log.error("WithinDayReplanner Id is null!");
+				continue;
+			} else if (withinDayReplanner == null) {
+				log.error("WithinDayReplanner is null!");
+				continue;
+			}
+			
+			ReplanningTask replanningTask = null;
+			while (true) {
+				replanningTask = queue.poll();
+				
+				// if no more elements are left in the queue, end while loop
+				if (replanningTask == null) break;
+
 				PlanBasedWithinDayAgent withinDayAgent = replanningTask.getAgentToReplan();
-				
-				if (id == null) {
-					log.error("WithinDayReplanner Id is null!");
-					return;
-				}
-				
+								
 				if (withinDayAgent == null) {
 					log.error("WithinDayAgent is null!");
-					return;
+					continue;
 				}
-
-				WithinDayReplanner<? extends Identifier> withinDayReplanner = this.withinDayReplanners.get(id);
-
-				if (withinDayReplanner != null) {
-					/*
-					 * Check whether the current Agent should be replanned based on the 
-					 * replanning probability. If not, continue with the next one.
-					 */
-					if (!withinDayReplanner.replanAgent()) continue;
-					
-					withinDayReplanner.setTime(time);
-					boolean replanningSuccessful = withinDayReplanner.doReplanning(withinDayAgent);
-					
-					if (!replanningSuccessful) {
-						log.error("Replanning was not successful! Replanner " + withinDayReplanner.getClass().toString() + 
-								", time " + Time.writeTime(time) + ", agent " + withinDayAgent.getId());
-					}
-					else {
-						/*
-						 * If the EventsManager is not null, we create an entry for the events log file.
-						 */
-						if (eventsManager != null) {
-							ReplanningEvent replanningEvent = new ReplanningEventImpl(time, withinDayAgent.getId(), 
-									withinDayReplanner.getClass().getSimpleName());
-							eventsManager.processEvent(replanningEvent);
-						}
-						
-						counter.incCounter();
-					}
+				
+				withinDayReplanner.setTime(time);
+				boolean replanningSuccessful = withinDayReplanner.doReplanning(withinDayAgent);
+				
+				if (!replanningSuccessful) {
+					log.error("Replanning was not successful! Replanner " + withinDayReplanner.getClass().toString() + 
+							", time " + Time.writeTime(time) + ", agent " + withinDayAgent.getId());
 				}
 				else {
-					log.error("WithinDayReplanner is null!");
+					/*
+					 * If the EventsManager is not null, we create an entry for the events log file.
+					 */
+					if (eventsManager != null) {
+						ReplanningEvent replanningEvent = new ReplanningEventImpl(time, withinDayAgent.getId(), 
+								withinDayReplanner.getClass().getSimpleName());
+						eventsManager.processEvent(replanningEvent);
+					}
+					
+					counter.incCounter();
 				}
 			}
-			list.clear();
 			
 			/*
 			 * Wait here until all Threads have ended the replanning for the

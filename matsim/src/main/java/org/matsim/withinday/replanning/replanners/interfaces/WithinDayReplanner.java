@@ -20,11 +20,8 @@
 
 package org.matsim.withinday.replanning.replanners.interfaces;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -42,46 +39,22 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 	protected final Id id;
 	protected final Scenario scenario;
 	protected final InternalInterface internalInterface;
-	private final Random random;
 	
 	protected AbstractMultithreadedModule abstractMultithreadedModule;
 	protected PlanAlgorithm routeAlgo;
 	protected double time = Time.UNDEFINED_TIME;
-	
-	private double replanningProbability = 1.0;
 
 	public WithinDayReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
 		this.id = id;
 		this.scenario = scenario;
 		this.internalInterface = internalInterface;
-		
-		this.random = MatsimRandom.getLocalInstance();
 	}
 	
 	public abstract boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent);
 
-	/*
-	 * Based on a random number it is decided whether an agent should
-	 * do a replanning or not.
-	 * number <= replanningProbability: do replanning 
-	 * else: no replanning
-	 */
-	public final boolean replanAgent() {
-		double rand = random.nextDouble();
-		if (rand <= replanningProbability) return true;
-		else return false;
-	}
 	
 	public final Id getId() {
 		return this.id;
-	}
-	
-	public final double getReplanningProbability() {
-		return this.replanningProbability;
-	}
-	
-	public final void setReplanningProbability(double probability) {
-		this.replanningProbability = probability;
 	}
 	
 	public final double getTime() {
