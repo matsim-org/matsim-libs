@@ -4,10 +4,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -17,12 +19,12 @@ import org.matsim.core.utils.misc.Time;
 public class TextFileWriter {
 	private final static Logger log = Logger.getLogger(TextFileWriter.class);
 
-	public void write(String directoryExtItParam, SortedMap<Integer, ExtItInformation> extIt2information) {
+	public void writeExtItData(String directoryExtItParam, SortedMap<Integer, ExtItInformation> extIt2information) {
 		File file = new File(directoryExtItParam+"/extItData.txt");
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; SumOfWaitingTimes (sec) ; WaitingTime > Headway (trips)";
+	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; SumOfWaitingTimes (sec) ; WaitingTime > Headway (trips), MissedBusses";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -41,8 +43,9 @@ public class TextFileWriter {
 	    	double capacity = extIt2information.get(iteration).getCapacity();
 	    	double waitTime = extIt2information.get(iteration).getSumOfWaitingTimes();
 	    	double waitingTimeMoreThanHeadway = extIt2information.get(iteration).getNumberOfWaitingTimesMoreThanHeadway();
+	    	double missedBusses = extIt2information.get(iteration).getNumberOfMissedVehicles();
 	    	
-	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+waitTime+" ; "+waitingTimeMoreThanHeadway;
+	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+waitTime+" ; "+waitingTimeMoreThanHeadway+" ; "+missedBusses;
 	
 	    	bw.write(zeile);
 	        bw.newLine();
@@ -111,5 +114,87 @@ public class TextFileWriter {
 	    log.info("Textfile written to "+file.toString());
     
 	    } catch (IOException e) {}		
+	}
+
+	public void writeDataTransitStops(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
+		String path = directoryExtItParam2Param1 + "/transitStopData/";
+		File directory = new File(path);
+		directory.mkdirs();
+
+		File file = new File(path + "/transitStopData.txt");
+			
+		try {
+		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		    
+		String zeile0 = "TransitStopsData of external iteration " + extItParam1 + ":";
+		bw.write(zeile0);
+		bw.newLine();
+		    
+		String zeile1 = "TransitStopId ; SumOfWaitingTime (sec) ; AverageWaitingTime (sec) ; WaitingTime > Headway (trips) ; MissedVehicles";
+		bw.write(zeile1);
+		bw.newLine();
+		
+		for (FacilityInfo facilityInfo : extIt2information.get(extItParam1).getFacilityId2facilityInfos().values()){
+		    	
+			Id facilityId = facilityInfo.getFacilityId();
+	    	Double avgWaitTime = facilityInfo.getAvgWaitingTime();
+	    	Double sumWaitTime = facilityInfo.getSumOfWaitingTimes();
+	    	int waitTimeMoreThanHeadway = facilityInfo.getNumberOfWaitingTimesMoreThanHeadway();
+	    	int missedVehicles = facilityInfo.getNumberOfMissedVehicles();
+	    	
+	    	String zeile = facilityId + " ; " + sumWaitTime + " ; " + avgWaitTime + " ; " + waitTimeMoreThanHeadway + " ; " + missedVehicles;
+	
+	    	bw.write(zeile);
+	        bw.newLine();
+		 }
+		
+		 bw.flush();
+		 bw.close();
+		 log.info("Textfile written to "+file.toString());
+	    
+		 } catch (IOException e) {}		
+	}
+
+	public void writeDataEachTransitStop(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
+		String path = directoryExtItParam2Param1 + "/transitStopData/";
+		File directory = new File(path);
+		directory.mkdirs();
+		
+		for (FacilityInfo facilityInfo : extIt2information.get(extItParam1).getFacilityId2facilityInfos().values()) {
+			
+			File file = new File(path + "/transitStopData_" + facilityInfo.getFacilityId().toString() + ".txt");
+			
+			try {
+			    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			    
+			    String zeile0 = "TransitStopData of TransitStopFacility " + facilityInfo.getFacilityId().toString() + " (External iteration " + extItParam1 + "):";
+			    bw.write(zeile0);
+			    bw.newLine();
+			    
+			    String zeile1 = "WaitingTimeId ; DayTime (sec) ; WaitingTime (sec)";
+			    bw.write(zeile1);
+			    bw.newLine();
+			   			   	
+			    for (Id waitingTimeId : facilityInfo.getWaitingEvent2DayTime().keySet()){
+			    				    	
+			    	Double dayTime = facilityInfo.getWaitingEvent2DayTime().get(waitingTimeId);
+			    	Double waitingTime = facilityInfo.getWaitingEvent2WaitingTime().get(waitingTimeId);
+			    			    	
+			    	String zeile = waitingTimeId + " ; " + dayTime + " ; " + waitingTime;
+			
+			    	bw.write(zeile);
+			        bw.newLine();
+			    }
+			
+			    bw.flush();
+			    bw.close();
+			    log.info("Textfile written to "+file.toString());
+		    
+			    } catch (IOException e) {}		
+			
+			
+			
+		}
+		
 	}
 }

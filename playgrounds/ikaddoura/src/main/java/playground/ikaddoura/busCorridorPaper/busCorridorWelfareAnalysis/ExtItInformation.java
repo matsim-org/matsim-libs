@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+
 /**
  * @author benjamin
  *
@@ -39,6 +44,8 @@ public class ExtItInformation {
 	private double numberOfWalkLegs;
 	private double sumOfWaitingTimes;
 	private int numberOfWaitingTimesMoreThanHeadway;
+	private int numberOfMissedVehicles;
+	private Map <Id, FacilityInfo> facilityId2facilityInfos = new HashMap<Id, FacilityInfo>();
 	
 	protected double getFare() {
 		return fare;
@@ -143,6 +150,22 @@ public class ExtItInformation {
 
 	public int getNumberOfWaitingTimesMoreThanHeadway() {
 		return numberOfWaitingTimesMoreThanHeadway;
+	}
+
+	public void setNumberOfMissedVehicles(int numberOfMissedVehicles) {
+		this.numberOfMissedVehicles = numberOfMissedVehicles;
+	}
+
+	public int getNumberOfMissedVehicles() {
+		return numberOfMissedVehicles;
+	}
+
+	public void setFacilityId2facilityInfos(Map <Id, FacilityInfo> facilityId2facilityInfos) {
+		this.facilityId2facilityInfos = facilityId2facilityInfos;
+	}
+	
+	public Map <Id, FacilityInfo> getFacilityId2facilityInfos() {
+		return facilityId2facilityInfos;
 	}
 	
 }

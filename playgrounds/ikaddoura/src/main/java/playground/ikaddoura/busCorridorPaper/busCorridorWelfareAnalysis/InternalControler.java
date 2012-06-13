@@ -23,7 +23,10 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -138,4 +141,13 @@ public class InternalControler {
 	public int getNumberOfWaitingTimesMoreThanHeadway() {
 		return this.ptLegHandler.getNumberOfAgentsWaitingMoreThanHeadway();
 	}
+	
+	public int getNumberOfMissedVehicles(){
+		return this.ptLegHandler.getNumberOfMissedVehicles();
+	}
+
+	public Map<Id, FacilityInfo> getFacilityId2FacilityInfo(){
+		return this.ptLegHandler.getFacilityId2facilityInfos();
+	}
+	
 }

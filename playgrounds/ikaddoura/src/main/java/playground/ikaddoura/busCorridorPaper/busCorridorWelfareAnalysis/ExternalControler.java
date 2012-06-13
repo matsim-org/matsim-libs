@@ -64,17 +64,16 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
 		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_timeChoice";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
 		
 //		op1 = OptimizationParameter1.FARE;
 //		op1 = OptimizationParameter1.CAPACITY;
 		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
+		lastExternalIterationParam1 = 2;
 		
 //		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
-		
-		lastExternalIterationParam1 = 10;
-		lastExternalIterationParam2 = 10;
+		lastExternalIterationParam2 = 1;
 				
 		incrBusNumber = 1;
 		incrFare = -0.25;
@@ -117,7 +116,7 @@ class ExternalControler {
 			for (int extItParam1 = 0; extItParam1 <= lastExternalIterationParam1 ; extItParam1++){
 				log.info("************* EXTERNAL ITERATION (1) " + extItParam1 + " BEGINS *************");
 
-				String directoryExtItParam2Param1 = directoryExtItParam2 + "/extITERS/extIt " + extItParam2 + "." + extItParam1;
+				String directoryExtItParam2Param1 = directoryExtItParam2 + "/extITERS/extIt" + extItParam2 + "." + extItParam1;
 				File directory = new File(directoryExtItParam2Param1);
 				directory.mkdirs();
 	
@@ -153,10 +152,14 @@ class ExternalControler {
 				info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
 				info.setSumOfWaitingTimes(internalControler.getSumOfWaitingTimes());
 				info.setNumberOfWaitingTimesMoreThanHeadway(internalControler.getNumberOfWaitingTimesMoreThanHeadway());
+				info.setNumberOfMissedVehicles(internalControler.getNumberOfMissedVehicles());
+				info.setFacilityId2facilityInfos(internalControler.getFacilityId2FacilityInfo());
 				
 				this.extIt2information.put(extItParam1, info);
 				
-				textWriter.write(directoryExtItParam2, this.extIt2information);
+				textWriter.writeExtItData(directoryExtItParam2, this.extIt2information);
+				textWriter.writeDataTransitStops(directoryExtItParam2Param1, this.extIt2information, extItParam1);
+				textWriter.writeDataEachTransitStop(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				chartWriter.write(directoryExtItParam2, this.extIt2information);
 				
 				// settings for next external iteration (optimization parameter 1)
@@ -168,7 +171,7 @@ class ExternalControler {
 				log.info("************* EXTERNAL ITERATION (1) " + extItParam1 + " ENDS *************");
 				this.it2information.put(iterationCounter, info);
 				iterationCounter++;
-				textWriter.write(outputExternalIterationDirPath, this.it2information);
+				textWriter.writeExtItData(outputExternalIterationDirPath, this.it2information);
 				textWriter.writeMatrices(outputExternalIterationDirPath, this.it2information);
 			}
 			
@@ -187,6 +190,8 @@ class ExternalControler {
 		}
 	}
 
+//	***************************************************************************************************************************
+	
 	private void setDefaultParameters() {
 		if (op1 != null && op2 == null){
 			if (lastExternalIterationParam2 != 0) {
@@ -204,7 +209,7 @@ class ExternalControler {
 				this.numberOfBuses = 5;
 			} else if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES)){
 				this.fare = -3.;
-				this.capacity = 50;
+				this.capacity = 1;
 				this.numberOfBuses = 1;
 			}
 		}
