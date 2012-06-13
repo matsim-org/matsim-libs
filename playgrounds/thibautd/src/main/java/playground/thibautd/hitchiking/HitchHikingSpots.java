@@ -38,22 +38,35 @@ public class HitchHikingSpots {
 	public HitchHikingSpots(
 			final Collection<Id> hitchHikableLinks,
 			final Network network) {
+		this( network , getHitchHikableLinks( hitchHikableLinks , network ) );
+	}
+
+	public HitchHikingSpots(
+			final Network network,
+			final Collection<Link> hitchHikableLinks) {
 		this.quadTree = buildQt( hitchHikableLinks , network );
 	}
 
-	private static QuadTree<Link> buildQt(
+	private static Collection<Link> getHitchHikableLinks(
 			final Collection<Id> hitchHikableLinkIds,
+			final Network network) {
+		List<Link> hitchHikableLinks = new ArrayList<Link>(); 
+		for (Id id : hitchHikableLinkIds) {
+			Link l = network.getLinks().get( id );
+			hitchHikableLinks.add( l );
+		}
+		return hitchHikableLinks;
+	}
+
+	private static QuadTree<Link> buildQt(
+			final Collection<Link> hitchHikableLinks,
 			final Network network) {
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
 
-		List<Link> hitchHikableLinks = new ArrayList<Link>(); 
-		for (Id id : hitchHikableLinkIds) {
-			Link l = network.getLinks().get( id );
-			hitchHikableLinks.add( l );
-
+		for (Link l : hitchHikableLinks) {
 			Coord c = l.getCoord();
 			double x = c.getX();
 			double y = c.getY();

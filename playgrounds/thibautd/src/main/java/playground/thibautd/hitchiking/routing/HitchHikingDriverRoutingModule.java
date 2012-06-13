@@ -112,8 +112,7 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 			final Coord destination,
 			final Collection<Link> closeSpots,
 			final double distanceBudget) {
-		// XXX: order!
-		List<Id> doSpots = new ArrayList<Id>();
+		List<IdWithDistance> doSpots = new ArrayList<IdWithDistance>();
 		Coord origin = puSpot.getCoord();
 		for (Link l : closeSpots) {
 			if (l != puSpot) {
@@ -121,12 +120,28 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 				+ CoordUtils.calcDistance( l.getCoord() , destination );
 
 				if (dist < distanceBudget) {
-					doSpots.add( l.getId() );
+					doSpots.add( new IdWithDistance( l.getId() , dist ) );
 				}
 			}
 		}
 
-		return doSpots;
+		// order in ascending order of distance
+		Collections.sort(
+				doSpots,
+				new Comparator<IdWithDistance>() {
+					@Override
+					public int compare(
+						final IdWithDistance first,
+						final IdWithDistance second) {
+						return first.id.compareTo( second.id );
+					}
+				});
+
+		List<Id> ids = new ArrayList<Id>();
+		for (IdWithDistance id : doSpots) {
+			ids.add( id.id );
+		}
+		return ids;
 	}
 
 	private static Link getPuSpot(
@@ -151,6 +166,16 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
 		return EmptyStageActivityTypes.INSTANCE;
+	}
+
+	private static class IdWithDistance {
+		private final Id id;
+		private final double distance;
+
+		private IdWithDistance(final Id id, final double distance) {
+			this.id = id;
+			this.distance = distance;
+		}
 	}
 }
 
