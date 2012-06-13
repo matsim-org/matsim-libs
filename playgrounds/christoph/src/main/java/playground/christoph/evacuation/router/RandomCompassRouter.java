@@ -59,10 +59,19 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 	
 	@Override
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, final Person person, final Vehicle vehicle) {
-		return findRoute(fromNode, toNode, person, vehicle);
+		return findRoute(fromNode, toNode, startTime, person, vehicle);
 	}
 	
-	private Path findRoute(Node fromNode, Node toNode, final Person person, final Vehicle vehicle) {
+	private Path findRoute(Node fromNode, Node toNode, double startTime, final Person person, final Vehicle vehicle) {
+		
+		/*
+		 * Set a new seed in the random object which only depends on the
+		 * person's id and the current time. Therefore the created random numbers
+		 * do not depend on the order in which routes are created.
+		 */
+//		random.setSeed((long) (person.getId().hashCode() + startTime));
+		random.setSeed(person.getId().hashCode() + ((int) startTime));
+		
 		Node previousNode = null;
 		Node currentNode = fromNode;
 		Link currentLink;
