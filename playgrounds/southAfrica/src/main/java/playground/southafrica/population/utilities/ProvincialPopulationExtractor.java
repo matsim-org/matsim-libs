@@ -118,7 +118,7 @@ public class ProvincialPopulationExtractor {
 			boolean inProvince = false;
 			int index = 0;
 			while(!inProvince && index < provincialCodes.size()){
-				if(id.toString().startsWith(provincialCodes.get(index))){
+				if(((String)cr.getHouseholdAttributes().getAttribute(id.toString(), "provinceCode")).equalsIgnoreCase(provincialCodes.get(index))){
 					inProvince = true;
 				} else{
 					index++;
@@ -142,10 +142,10 @@ public class ProvincialPopulationExtractor {
 						cr.getPersonAttributes().getAttribute(id.toString(), "relationship"));
 				personAttributes.putAttribute(id.toString(), "school", 
 						cr.getPersonAttributes().getAttribute(id.toString(), "school"));
-				personCounter.incCounter();
 			}
-			personCounter.printCounter();
+			personCounter.incCounter();
 		}
+		personCounter.printCounter();
 		
 		writePopulationAndAttributes(outputFolder);
 	}
