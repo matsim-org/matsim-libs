@@ -311,7 +311,13 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 	protected double getPerformanceScore(
 			final String actType,
 			final double duration) {
-		double typicalDuration = ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
+		double typicalDuration;
+		if (plan.getPerson() instanceof PersonImpl && ((PersonImpl) plan.getPerson()).getDesires() != null) {
+			typicalDuration = ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
+		}
+		else {
+			typicalDuration = params.utilParams.get( actType ).getTypicalDuration();
+		}
 
 		if (typicalDuration < 0) {
 			if (actType.equals( JointActingTypes.PICK_UP ) ||
