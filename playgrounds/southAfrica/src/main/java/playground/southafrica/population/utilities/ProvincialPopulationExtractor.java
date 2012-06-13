@@ -38,14 +38,13 @@ public class ProvincialPopulationExtractor {
 		String networkFile = args[0];
 		String inputfolder = args[1];
 		String outputFolder = args[2];
-		int numberOfThreads = Integer.parseInt(args[3]);
 		List<String> startCodes = new ArrayList<String>();
-		for(int i = 4; i < args.length; i++){
+		for(int i = 3; i < args.length; i++){
 			startCodes.add(args[i]);
 		}
 		
 		ProvincialPopulationExtractor ppe = new ProvincialPopulationExtractor();
-		ppe.extractProvince(networkFile, startCodes, inputfolder, outputFolder, numberOfThreads);
+		ppe.extractProvince(networkFile, startCodes, inputfolder, outputFolder);
 		
 		Header.printFooter();
 	}
@@ -57,7 +56,7 @@ public class ProvincialPopulationExtractor {
 		this.personAttributes = new ObjectAttributes();
 	}
 	
-	public void extractProvince(String network, List<String> provincialCodes, String inputFolder, String outputFolder, int threads3){
+	public void extractProvince(String network, List<String> provincialCodes, String inputFolder, String outputFolder){
 		Census2001SampleReader cr = new Census2001SampleReader();
 		cr.parse(inputFolder);
 		
