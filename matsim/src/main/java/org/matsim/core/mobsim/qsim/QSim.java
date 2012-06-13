@@ -148,7 +148,7 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		@Override
-		public synchronized void rescheduleActivityEnd(MobsimAgent agent) {
+		public void rescheduleActivityEnd(MobsimAgent agent) {
 			QSim.this.activityEngine.rescheduleActivityEnd(agent);
 		}
 
