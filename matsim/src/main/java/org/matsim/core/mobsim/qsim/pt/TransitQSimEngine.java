@@ -195,6 +195,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 			log.error("pt-agent doesn't know to what transit stop to go. Removing agent from simulation. Agent " + planAgent.getId().toString());
 			this.qSim.getAgentCounter().decLiving();
 			this.qSim.getAgentCounter().incLost();
+			return;
 		}
 		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
 		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
