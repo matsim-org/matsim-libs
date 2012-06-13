@@ -78,6 +78,7 @@ public class ProvincialPopulationExtractor {
 				}
 			}
 			if(inProvince){
+				/* Copy the household */
 				Household hh = cr.getHouseholds().getHouseholds().get(id);
 				households.getHouseholds().put(id, hh);
 				
@@ -105,47 +106,32 @@ public class ProvincialPopulationExtractor {
 						cr.getHouseholdAttributes().getAttribute(id.toString(), "provinceName"));
 				householdAttributes.putAttribute(id.toString(), "eaType", 
 						cr.getHouseholdAttributes().getAttribute(id.toString(), "eaType"));
+				
+				/* Copy the members of the household */
+				for(Id memberId : hh.getMemberIds()){
+					Person p = cr.getScenario().getPopulation().getPersons().get(memberId);
+					sc.getPopulation().addPerson(p);
+					
+					personAttributes.putAttribute(memberId.toString(), "income", 
+							cr.getPersonAttributes().getAttribute(memberId.toString(), "income"));
+					personAttributes.putAttribute(memberId.toString(), "mainPlaceOfWork", 
+							cr.getPersonAttributes().getAttribute(memberId.toString(), "mainPlaceOfWork"));
+					personAttributes.putAttribute(memberId.toString(), "modeToMain", 
+							cr.getPersonAttributes().getAttribute(memberId.toString(), "modeToMain"));
+					personAttributes.putAttribute(memberId.toString(), "quarterType", 
+							cr.getPersonAttributes().getAttribute(memberId.toString(), "quarterType"));
+					personAttributes.putAttribute(memberId.toString(), "race", 
+							cr.getPersonAttributes().getAttribute(memberId.toString(), "race"));
+					personAttributes.putAttribute(memberId.toString(), "relationship", 
+							cr.getPersonAttributes().getAttribute(memberId.toString(), "relationship"));
+					personAttributes.putAttribute(memberId.toString(), "school", 
+							cr.getPersonAttributes().getAttribute(memberId.toString(), "school"));
+				}
 			}
 			householdCounter.incCounter();
 		}
 		householdCounter.printCounter();
-		
-		/* Persons */
-		LOG.info("Evaluating households in province code(s)...");
-		Counter personCounter = new Counter("   persons evaluated # ");
-		for(Id id : cr.getScenario().getPopulation().getPersons().keySet()){
-			boolean inProvince = false;
-			int index = 0;
-			while(!inProvince && index < provincialCodes.size()){
-				if(((String)cr.getHouseholdAttributes().getAttribute(id.toString(), "provinceCode")).equalsIgnoreCase(provincialCodes.get(index))){
-					inProvince = true;
-				} else{
-					index++;
-				}
-			}
-			if(inProvince){
-				Person p = cr.getScenario().getPopulation().getPersons().get(id);
-				sc.getPopulation().addPerson(p);
 				
-				personAttributes.putAttribute(id.toString(), "income", 
-						cr.getPersonAttributes().getAttribute(id.toString(), "income"));
-				personAttributes.putAttribute(id.toString(), "mainPlaceOfWork", 
-						cr.getPersonAttributes().getAttribute(id.toString(), "mainPlaceOfWork"));
-				personAttributes.putAttribute(id.toString(), "modeToMain", 
-						cr.getPersonAttributes().getAttribute(id.toString(), "modeToMain"));
-				personAttributes.putAttribute(id.toString(), "quarterType", 
-						cr.getPersonAttributes().getAttribute(id.toString(), "quarterType"));
-				personAttributes.putAttribute(id.toString(), "race", 
-						cr.getPersonAttributes().getAttribute(id.toString(), "race"));
-				personAttributes.putAttribute(id.toString(), "relationship", 
-						cr.getPersonAttributes().getAttribute(id.toString(), "relationship"));
-				personAttributes.putAttribute(id.toString(), "school", 
-						cr.getPersonAttributes().getAttribute(id.toString(), "school"));
-			}
-			personCounter.incCounter();
-		}
-		personCounter.printCounter();
-		
 		writePopulationAndAttributes(outputFolder);
 	}
 	
