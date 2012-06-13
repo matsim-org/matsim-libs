@@ -109,6 +109,9 @@ public class IatbrPlanBuilder {
 		/* Read network */
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
 		nr.parse(sc.getConfig().network().getInputFile());
+		LOG.info("Number of links: " + sc.getNetwork().getLinks().size());
+		LOG.info("Number of nodes: " + sc.getNetwork().getNodes().size());
+
 		/* Read plans */
 		PopulationReaderMatsimV5 pr = new PopulationReaderMatsimV5(sc);
 		pr.parse(plansFile);
@@ -120,6 +123,8 @@ public class IatbrPlanBuilder {
 		 * when executing. */
 		FacilitiesWriter fw = new FacilitiesWriter(activityFacilities);
 		fw.write(sc.getConfig().facilities().getInputFile());
+		/* Report on the facility statistics. */
+		reportFacilities(activityFacilities);
 		
 		/* Write the population to the same file as what the config specifies. 
 		 * This is necessary since the controller will later read in this file 
@@ -155,9 +160,37 @@ public class IatbrPlanBuilder {
 		ConfigUtils.loadConfig(configRun, configFile);		
 		controler = new Controler(configRun);
 		controler.setOverwriteFiles(true);
-		controler.run();
+//		controler.run();
 		
 		Header.printFooter();
+	}
+	
+	private static void reportFacilities(ActivityFacilitiesImpl facilities){
+		int s = 0;
+		int l = 0;
+		int o = 0;
+		int h = 0;
+		int w = 0;
+		int e = 0;
+		for(Id id : facilities.getFacilities().keySet()){
+			ActivityFacilityImpl  af = (ActivityFacilityImpl) facilities.getFacilities().get(id);
+			for(String ao : af.getActivityOptions().keySet()){
+				if(ao.equalsIgnoreCase("h")){ h++;
+				} else if(ao.equalsIgnoreCase("w")){ w++;
+				} else if(ao.startsWith("e")){ e++;
+				} else if(ao.equalsIgnoreCase("s")){ s++;
+				} else if(ao.equalsIgnoreCase("l")){ l++;
+				} else if(ao.equalsIgnoreCase("t")){ o++;
+				}
+			}
+		}
+		LOG.info("Number of facilities catering for:");
+		LOG.info("   home     : " + h);
+		LOG.info("   work     : " + w);
+		LOG.info("   education: " + e);
+		LOG.info("   shopping : " + s);
+		LOG.info("   leisure  : " + l);
+		LOG.info("   other    : " + o);
 	}
 	
 	

@@ -12,6 +12,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
@@ -64,6 +65,8 @@ public class ProvincialPopulationExtractor {
 		nr.parse(network);
 		
 		/* Households */
+		LOG.info("Evaluating households in province code(s)...");
+		Counter householdCounter = new Counter("   households evaluated # ");
 		for(Id id : cr.getHouseholds().getHouseholds().keySet()){
 			boolean inProvince = false;
 			int index = 0;
@@ -102,10 +105,14 @@ public class ProvincialPopulationExtractor {
 						cr.getHouseholdAttributes().getAttribute(id.toString(), "provinceName"));
 				householdAttributes.putAttribute(id.toString(), "eaType", 
 						cr.getHouseholdAttributes().getAttribute(id.toString(), "eaType"));
-	}
+			}
+			householdCounter.incCounter();
 		}
+		householdCounter.printCounter();
 		
 		/* Persons */
+		LOG.info("Evaluating households in province code(s)...");
+		Counter personCounter = new Counter("   persons evaluated # ");
 		for(Id id : cr.getScenario().getPopulation().getPersons().keySet()){
 			boolean inProvince = false;
 			int index = 0;
@@ -134,7 +141,9 @@ public class ProvincialPopulationExtractor {
 						cr.getPersonAttributes().getAttribute(id.toString(), "relationship"));
 				personAttributes.putAttribute(id.toString(), "school", 
 						cr.getPersonAttributes().getAttribute(id.toString(), "school"));
+				personCounter.incCounter();
 			}
+			personCounter.printCounter();
 		}
 		
 		writePopulationAndAttributes(outputFolder);
