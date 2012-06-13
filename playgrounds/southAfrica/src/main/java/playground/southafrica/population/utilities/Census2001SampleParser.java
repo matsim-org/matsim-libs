@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
@@ -125,7 +126,7 @@ public class Census2001SampleParser {
 			}
 		}
 		counter.printCounter();
-		LOG.info("Done parsing households.");
+		LOG.info("Done parsing households (" + householdMap.size() + ").");
 	}
 	
 	/**
@@ -134,7 +135,14 @@ public class Census2001SampleParser {
 	 * <ul>
 	 * 		<li> Serial number - position 1, 9 characters;
 	 * 		<li> Municipality (code) - position 10, 3 characters;
+	 * 		<li> Municipality name - position 13, 26 characters;
+	 * 		<li> Magisterial district (code) - position 39, 3 characters;
+	 * 		<li> Magisterial name - position 42, 19 characters;
 	 * 		<li> District council (code) - position 61, 3 characters;
+	 * 		<li> District council name - position 64, 47 characters;
+	 * 		<li> Province (code) - position 111, 1 character;
+	 * 		<li> Province name - position 112, 17 characters;
+	 * 		<li> EA type (code) - position 129, 1 characters;
 	 * </ul> 
 	 * @param filename filename absolute path of the file containing the GEOGRAPHY data
 	 * 		  set.
@@ -148,9 +156,20 @@ public class Census2001SampleParser {
 			while((line = br.readLine()) != null){
 				String serial = line.substring(0, 9);
 				String municipalCode = line.substring(9, 12);
+				String municipalName = line.substring(12, 38);
+				String magisterialCode = line.substring(38, 41); 
+				String magisterialName = line.substring(41, 60); 
 				String districtCode = line.substring(60, 63);
+				String districtName = line.substring(63, 110); 
+				String provinceCode = line.substring(110, 111);
+				String provinceName = line.substring(111, 128);
+				String eaType = line.substring(128, 129);
 				
-				geographyMap.put(new IdImpl(serial), municipalCode + "," + districtCode);
+				geographyMap.put(new IdImpl(serial), municipalCode + "," + municipalName + "," + 
+						magisterialCode + "," + magisterialName + "," + 
+						districtCode + "," + districtName + "," + 
+						provinceCode + "," + provinceName + "," +
+						eaType);
 				counter.incCounter();
 			}
 		} catch (IOException e) {
@@ -165,7 +184,7 @@ public class Census2001SampleParser {
 			}
 		}
 		counter.printCounter();
-		LOG.info("Done parsing geography.");
+		LOG.info("Done parsing geography (" + geographyMap.size() + ").");
 	}
 	
 	
@@ -243,7 +262,7 @@ public class Census2001SampleParser {
 			}
 		}
 		counter.printCounter();
-		LOG.info("Done parsing persons.");
+		LOG.info("Done parsing persons (" + personMap.size() + ").");
 	}
 	
 	
@@ -295,6 +314,7 @@ public class Census2001SampleParser {
 			/* Add to household */
 			Id hid = new IdImpl(pid.toString().split("_")[0]);
 			if(!this.households.getHouseholds().containsKey(hid)){
+				/* Household data */
 				String[] hsa = householdMap.get(hid).split(",");
 				int hhSize = Integer.parseInt(hsa[0]);
 				String dwellingType = hsa[1];
@@ -309,10 +329,56 @@ public class Census2001SampleParser {
 				householdAttributes.putAttribute(hid.toString(), "dwellingType", dwellingType);
 				householdAttributes.putAttribute(hid.toString(), "householdSize", hhSize);
 				householdAttributes.putAttribute(hid.toString(), "population", hhPopulation);
+				
+				/* Geography data */
+				String[] gsa = geographyMap.get(hid).split(",");
+				String municipalCode = gsa[0];
+				String municipalName = gsa[1];
+				String magisterialCode = gsa[2];
+				String magisterialName = gsa[3]; 
+				String districtCode = gsa[4];
+				String districtName = gsa[5];
+				String provinceCode = gsa[6];
+				String provinceName = gsa[7];
+				String eaType = gsa[8];
+				householdAttributes.putAttribute(hid.toString(), "municipalCode", municipalCode);
+				householdAttributes.putAttribute(hid.toString(), "municipalName", correctCase(municipalName));
+				householdAttributes.putAttribute(hid.toString(), "magisterialCode", magisterialCode);
+				householdAttributes.putAttribute(hid.toString(), "magisterialName", correctCase(magisterialName));
+				householdAttributes.putAttribute(hid.toString(), "districtCode", districtCode);
+				householdAttributes.putAttribute(hid.toString(), "districtName", correctCase(districtName));
+				householdAttributes.putAttribute(hid.toString(), "provinceCode", provinceCode);
+				householdAttributes.putAttribute(hid.toString(), "provinceName", correctCase(provinceName));
+				householdAttributes.putAttribute(hid.toString(), "eaType", eaType);
+
 				this.households.getHouseholds().put(hid, hh);
 			}
 			this.households.getHouseholds().get(hid).getMemberIds().add(pid);
 		}		
+		/* Validate: */
+		LOG.info("================================================================");
+		LOG.info("Validating the population and households");
+		LOG.info("----------------------------------------------------------------");
+		LOG.info("Person map: " + personMap.size());
+		LOG.info("Household map: " + householdMap.size());
+		LOG.info("----------------------------------------------------------------");
+		LOG.info("Population size: " + sc.getPopulation().getPersons().size());
+		LOG.info("Number of households: " + households.getHouseholds().size());
+		LOG.info("================================================================");
+	}
+	
+	private String correctCase(String s){
+		s.toLowerCase();
+		String newS = "";
+		String[] sa = s.split(" ");
+		for(String ss : sa){
+			if(!ss.equalsIgnoreCase("of")){
+				ss.substring(0,1).toUpperCase();
+				newS += ss + " ";
+			}
+		}
+		String rNew = newS.substring(0, newS.length()-1);
+		return rNew;
 	}
 	
 	

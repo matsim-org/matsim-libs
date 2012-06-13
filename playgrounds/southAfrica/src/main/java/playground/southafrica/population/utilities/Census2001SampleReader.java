@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -16,7 +15,7 @@ import playground.southafrica.utilities.Header;
 public class Census2001SampleReader {
 	private static final Logger LOG = Logger.getLogger(Census2001SampleParser.class);
 	private Scenario sc;
-	private HouseholdsImpl households;
+	private HouseholdsImpl households = new HouseholdsImpl();
 	private ObjectAttributes householdAttributes = new ObjectAttributes();
 	private ObjectAttributes personAttributes = new ObjectAttributes();
 
@@ -39,24 +38,45 @@ public class Census2001SampleReader {
 	
 	public void parse(String inputfolder){
 		/* Read population. */
+		LOG.info("Reading population...");
 		PopulationReaderMatsimV5 pr = new PopulationReaderMatsimV5(this.sc);
 		pr.parse(inputfolder + "Population.xml");
 		
 		/* Read population attributes. */
-		ObjectAttributes populationAttributes = new ObjectAttributes();
-		ObjectAttributesXmlReader oar1 = new ObjectAttributesXmlReader(populationAttributes);
+		LOG.info("Reading person attributes...");
+		ObjectAttributesXmlReader oar1 = new ObjectAttributesXmlReader(personAttributes);
 		oar1.parse(inputfolder + "PersonAttributes.xml");
 		
 		/* Read households */
-		households = new HouseholdsImpl();
+		LOG.info("Reading households...");
 		HouseholdsReaderV10 hhr = new HouseholdsReaderV10(households);
 		hhr.parse(inputfolder + "Households.xml");
 		
 		/* Read household attributes. */ 
-		ObjectAttributes householdAttributes = new ObjectAttributes();
+		LOG.info("Reading household attributes...");
 		ObjectAttributesXmlReader oar2 = new ObjectAttributesXmlReader(householdAttributes);
-		oar1.parse(inputfolder + "householdAttributes.xml");
+		oar2.parse(inputfolder + "HouseholdAttributes.xml");
 
+		LOG.info("================================================================");
+		LOG.info("Population size: " + sc.getPopulation().getPersons().size());
+		LOG.info("Number of households: " + households.getHouseholds().size());
+		LOG.info("================================================================");
 	}
 
+	public Scenario getScenario() {
+		return sc;
+	}
+	
+	public HouseholdsImpl getHouseholds() {
+		return households;
+	}
+	
+	public ObjectAttributes getHouseholdAttributes() {
+		return householdAttributes;
+	}
+	
+	public ObjectAttributes getPersonAttributes() {
+		return personAttributes;
+	}
+	
 }
