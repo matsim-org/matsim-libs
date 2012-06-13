@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -34,34 +35,54 @@ public class TransitLineRemover {
 	private static final Logger log = Logger.getLogger(TransitLineRemover.class);
 
 	public static void main(String[] args) {
-		final String SCHEDULEFILE = "e:/_shared-svn/andreas/paratransit/input/txl/remove/transitSchedule_orig.xml.gz";
-		final String NETWORKFILE  = "e:/_shared-svn/andreas/paratransit/input/txl/remove/network.final.xml.gz";
-		final String FILTERED_SCHEDULE_FILE = "e:/_shared-svn/andreas/paratransit/input/txl/remove/transitSchedule.xml.gz";
-		final String DELETED_LINES = "e:/_shared-svn/andreas/paratransit/input/txl/remove/transitSchedule_deleted.xml.gz";
+		final String SCHEDULEFILE = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_basecase.xml.gz";
+		final String NETWORKFILE  = "e:/_shared-svn/andreas/paratransit/input/trb_2012/network.final.xml.gz";
+		final String NO_TXL_SCHEDULE_FILE = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_noTxlBusLines.xml.gz";
+		final String TXL_BUS_LINES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_onlyTxlBusLines.xml.gz";
+		final String NO_BVG_BUSES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_noBvgBusLines.xml.gz";
 		
 		Coord minCoord = new CoordImpl(4587744.0, 5824664.0);
 		Coord maxCoord = new CoordImpl(4588400.0, 5825400.0);
 		
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitSchedule transitSchedule = builder.createTransitSchedule();
+		TransitSchedule baseCaseTransitSchedule = builder.createTransitSchedule();
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
-		new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(SCHEDULEFILE);
+		new TransitScheduleReaderV1(baseCaseTransitSchedule, network, scenario).readFile(SCHEDULEFILE);
 		
-		Set<Id> stopsInArea = TransitLineRemover.getStopIdsWithinArea(transitSchedule, minCoord, maxCoord);
-		Set<Id> linesToRemove = TransitLineRemover.getLinesServingTheseStops(transitSchedule, stopsInArea);
+		// Move one stop to a new link (wrong matching in original model)
+		for (TransitStopFacility stop : baseCaseTransitSchedule.getFacilities().values()) {
+			if (stop.getId().toString().equalsIgnoreCase("202070.1")) {
+				log.info("Moving stop facility " + stop.getId() + " " + stop.getName() + " from link " + stop.getLinkId() + "...");
+				stop.setLinkId(new IdImpl("108036"));
+				log.info("... to link " + stop.getLinkId());
+			}
+		}
 		
-		TransitSchedule filteredTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(transitSchedule, linesToRemove);
-		new TransitScheduleWriterV1(filteredTransitSchedule).write(FILTERED_SCHEDULE_FILE);
+		
+		Set<Id> stopsInArea = TransitLineRemover.getStopIdsWithinArea(baseCaseTransitSchedule, minCoord, maxCoord);
+		Set<Id> linesToRemove = TransitLineRemover.getLinesServingTheseStops(baseCaseTransitSchedule, stopsInArea);
+		
+		TransitSchedule noTxlTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, linesToRemove);
+		new TransitScheduleWriterV1(noTxlTransitSchedule).write(NO_TXL_SCHEDULE_FILE);
 		
 		Set<Id> linesToKeep = new TreeSet<Id>();
-		for (Id lineId : filteredTransitSchedule.getTransitLines().keySet()) {
+		for (Id lineId : noTxlTransitSchedule.getTransitLines().keySet()) {
 			linesToKeep.add(lineId);
 		}
-		TransitSchedule removedTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(transitSchedule, linesToKeep);
-		new TransitScheduleWriterV1(removedTransitSchedule).write(DELETED_LINES);
+		TransitSchedule txlBusLinesTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, linesToKeep);
+		new TransitScheduleWriterV1(txlBusLinesTransitSchedule).write(TXL_BUS_LINES);
+		
+		Set<Id> buslines = new TreeSet<Id>();
+		for (Id lineId : baseCaseTransitSchedule.getTransitLines().keySet()) {
+			if (lineId.toString().contains("-B-")) {
+				buslines.add(lineId);
+			}
+		}
+		TransitSchedule noBvgBusLinesSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, buslines);
+		new TransitScheduleWriterV1(noBvgBusLinesSchedule).write(NO_BVG_BUSES);
 	}
 	
 	public static Set<Id> getLinesServingTheseStops(TransitSchedule transitSchedule, Set<Id> stopIds){
