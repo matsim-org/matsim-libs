@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Stefan Schroeder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
+ ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
 import org.matsim.contrib.freight.vrp.basics.Delivery;
@@ -7,7 +19,8 @@ import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
-public class ConstraintManager {
+
+public class ConstraintManager implements TourActivityRecorder {
 	
 	private Vehicle vehicle;
 	
@@ -17,9 +30,9 @@ public class ConstraintManager {
 	
 	private Delivery delivery;
 	
-	private boolean isContinue = false;
+	private boolean continueWithNextIndex = false;
 	
-	private boolean isBreak = false;
+	private boolean breakInsertionProcedure = false;
 
 	boolean fine = true;
 
@@ -35,8 +48,24 @@ public class ConstraintManager {
 		this.pickup = pickup;
 		this.delivery = delivery;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourActivityRecorder#initialiseRecorder(org.matsim.contrib.freight.vrp.basics.Vehicle, org.matsim.contrib.freight.vrp.basics.Tour, org.matsim.contrib.freight.vrp.basics.Pickup, org.matsim.contrib.freight.vrp.basics.Delivery)
+	 */
+	@Override
+	public void initialiseRecorder(Vehicle v, Tour t, Pickup pickup2insert, Delivery delivery2insert){
+		reset();
+		this.vehicle = v;
+		this.tour = t;
+		this.pickup = pickup2insert;
+		this.delivery = delivery2insert;
+	}
 
 		
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourActivityRecorder#reset()
+	 */
+	@Override
 	public void reset(){
 		fine = true;
 	}
@@ -54,25 +83,33 @@ public class ConstraintManager {
 	}
 
 
-	public void informInsertionStarts() {
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourActivityRecorder#informInsertionProcedureStarts()
+	 */
+	@Override
+	public void insertionProcedureStarts() {
 		if(tour.costs.totalLoad + pickup.getCapacityDemand() > vehicle.getCapacity()){
-			isBreak = true;
+			breakInsertionProcedure = true;
 		}
 		
 	}
 
-	public void informPickupIterationStarts(int pickupIndex) {
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourActivityRecorder#pickupInsertionAt(int)
+	 */
+	@Override
+	public void pickupInsertionAt(int pickupIndex) {
 		resetContinueAndBreak();
 		recordOuterLoad(pickupIndex);
 		currentPickupIndex = pickupIndex;
 		if(outerLoadRecorder + pickup.getCapacityDemand() > vehicle.getCapacity()){
-			isContinue = true;
+			continueWithNextIndex = true;
 		}
 		if(!feasable(pickupIndex)){
-			isContinue = true;
+			continueWithNextIndex = true;
 		}
 		if(!sequenceFeasable(pickupIndex)){
-			isBreak = true;
+			breakInsertionProcedure = true;
 		}
 		currentLoad = outerLoadRecorder + pickup.getCapacityDemand();
 	}
@@ -86,8 +123,8 @@ public class ConstraintManager {
 
 
 	private void resetContinueAndBreak() {
-		isContinue = false;
-		isBreak = false;
+		continueWithNextIndex = false;
+		breakInsertionProcedure = false;
 	}
 
 
@@ -101,7 +138,11 @@ public class ConstraintManager {
 		return tour.getActivities().get(i);
 	}
 
-	public void informDeliveryIterationStarts(int deliveryIndex) {
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourActivityRecorder#deliveryInsertionAt(int)
+	 */
+	@Override
+	public void deliveryInsertionAt(int deliveryIndex) {
 		resetContinueAndBreak();
 		if(deliveryIndex != currentPickupIndex){
 			if(getActivity(deliveryIndex-1) instanceof JobActivity){
@@ -109,10 +150,10 @@ public class ConstraintManager {
 			}
 		}
 		if(currentLoad > vehicle.getCapacity()){
-			isBreak = true;
+			breakInsertionProcedure = true;
 		}
 		if(!delSequenceFeasable(deliveryIndex)){
-			isContinue = true;
+			continueWithNextIndex = true;
 		}
 		
 	}
@@ -124,28 +165,20 @@ public class ConstraintManager {
 		return true;
 	}
 
-
-	public void informDeliveryIterationEnds(int deliveryIndex) {
-		// TODO Auto-generated method stub
-		
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourActivityRecorder#canWeContinueWithNextIndex()
+	 */
+	@Override
+	public boolean continueWithNextIndex() {
+		return continueWithNextIndex;
 	}
 
-	public void informPickupIterationEnds(int pickupIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void informInsertionEnds() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public boolean isContinue() {
-		return isContinue;
-	}
-
-	public boolean isBreak() {
-		return isBreak;
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourActivityRecorder#canWeBreakInsertionProcedure()
+	 */
+	@Override
+	public boolean finishInsertionProcedure() {
+		return breakInsertionProcedure;
 	}
 
 }

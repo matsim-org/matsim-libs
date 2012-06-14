@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Stefan Schroeder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
+ ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.ArrayList;
@@ -10,11 +22,13 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.AvgDistanceBetweenJobs;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RadialRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RandomRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.SchrimpfsRRThresholdFunction;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryOfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculator;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryJIFFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
-import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -53,7 +67,7 @@ public class DistributionTourWithTimeWindowsAlgoFactory implements RuinAndRecrea
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution) {
 		TourCostAndTWProcessor tourCostProcessor = new TourCostAndTWProcessor(vrp.getCosts());
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,vrp.getCosts().getCostParams(), 
-				new DistributionOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints()));
+				new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);
@@ -88,7 +102,7 @@ public class DistributionTourWithTimeWindowsAlgoFactory implements RuinAndRecrea
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, TourPlan initialSolution) {
 		TourCostAndTWProcessor tourCostProcessor = new TourCostAndTWProcessor(vrp.getCosts());
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,vrp.getCosts().getCostParams(), 
-				new DistributionOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints()));
+				new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);
@@ -104,7 +118,7 @@ public class DistributionTourWithTimeWindowsAlgoFactory implements RuinAndRecrea
 		radialRuin.setRandom(random);
 		
 		RandomRuin randomRuin = new RandomRuin(vrp);
-		randomRuin.setFractionOfAllNodes2beRuined(0.5);
+		randomRuin.setFractionOfAllNodes2beRuined(0.4);
 		randomRuin.setRandom(random);
 		
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(radialRuin, 0.5);

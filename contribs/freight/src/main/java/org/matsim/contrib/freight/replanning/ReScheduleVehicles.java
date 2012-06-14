@@ -9,7 +9,7 @@ import org.matsim.contrib.freight.carrier.CarrierFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.vrp.DTWSolverFactory;
-import org.matsim.contrib.freight.vrp.ShipmentBasedVRPSolver;
+import org.matsim.contrib.freight.vrp.DTWSolver;
 import org.matsim.contrib.freight.vrp.algorithms.rr.DistributionTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
@@ -34,7 +34,7 @@ public class ReScheduleVehicles implements CarrierPlanStrategyModule{
 	public void handleActor(Carrier carrier) {	
 //		ShipmentBasedVRPSolver vrpSolver = new ShipmentBasedVRPSolver(new CarrierFactory().getShipments(carrier.getContracts()), 
 //				new CarrierFactory().getVehicles(carrier.getCarrierCapabilities()), costs, network, new InitialSolution());
-		ShipmentBasedVRPSolver vrpSolver = new ShipmentBasedVRPSolver(new CarrierFactory().getShipments(carrier.getContracts()), 
+		DTWSolver vrpSolver = new DTWSolver(new CarrierFactory().getShipments(carrier.getContracts()), 
 				new CarrierFactory().getVehicles(carrier.getCarrierCapabilities()), costs, network, carrier.getSelectedPlan());
 		vrpSolver.setRuinAndRecreateFactory(new DistributionTourWithTimeWindowsAlgoFactory());
 		vrpSolver.setGlobalConstraints(new PickORDeliveryCapacityAndTWConstraint());

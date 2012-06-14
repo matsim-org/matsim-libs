@@ -1,19 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2011 Stefan Schroeder.
+ * Copyright (c) 2011 Stefan Schroeder.
  * eMail: stefan.schroeder@kit.edu
  * 
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * 
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- * 
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
@@ -23,7 +18,7 @@ import java.util.List;
 
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 
 
@@ -40,15 +35,15 @@ public class VrpUtils {
 	}
 	
 	public static RRSolution copySolution(RRSolution solution, VehicleRoutingProblem vrp, RRTourAgentFactory tourAgentFactory){
-		List<RRTourAgent> agents = new ArrayList<RRTourAgent>();
-		for(RRTourAgent agent : solution.getTourAgents()){
+		List<RRDriverAgent> agents = new ArrayList<RRDriverAgent>();
+		for(RRDriverAgent agent : solution.getTourAgents()){
 			VrpTourBuilder tourBuilder = new VrpTourBuilder();
 			Vehicle vehicle = agent.getVehicle();
 			for(TourActivity tourAct : agent.getTour().getActivities()){
 				tourBuilder.scheduleActivity(tourAct);
 			}
 			Tour tour = tourBuilder.build();
-			RRTourAgent newTourAgent = tourAgentFactory.createTourAgent(tour, vehicle);
+			RRDriverAgent newTourAgent = tourAgentFactory.createTourAgent(tour, vehicle);
 			agents.add(newTourAgent);
 		}
 		return new RRSolution(agents);  

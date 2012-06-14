@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Stefan Schroeder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
+ ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.ArrayList;
@@ -9,7 +21,8 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.AvgBeelineDistanceBetwe
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RadialRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RandomRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.SchrimpfsRRThresholdFunction;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryOfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryJIFFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.basics.TourPlan;
@@ -48,7 +61,7 @@ public class PickupAndDeliveryTourWithTimeWindowsAlgoFactory implements RuinAndR
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution) {
 		TourCostAndTWProcessor tourCostProcessor = new TourCostAndTWProcessor(vrp.getCosts());
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,
-				vrp.getCosts().getCostParams(), new PickupAndDeliveryOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints()));
+				vrp.getCosts().getCostParams(), new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new PickupAndDeliveryJIFFactory()));
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);

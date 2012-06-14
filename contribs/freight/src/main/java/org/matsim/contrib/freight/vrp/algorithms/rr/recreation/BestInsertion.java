@@ -1,19 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2011 Stefan Schroeder.
+ * Copyright (c) 2011 Stefan Schroeder.
  * eMail: stefan.schroeder@kit.edu
  * 
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * 
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- * 
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.recreation;
 
@@ -23,8 +18,9 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent.Offer;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.Offer;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProvider;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 
@@ -57,15 +53,15 @@ public class BestInsertion implements RecreationStrategy{
 				return;
 			}		
 			Offer bestOffer = new Offer(null,Double.MAX_VALUE,Double.MAX_VALUE);
-			for(RRTourAgent agent : tentativeSolution.getTourAgents()){
-				Offer o = agent.requestService(unassignedJob, bestOffer.getMarginalCosts());
+			for(RRDriverAgent agent : tentativeSolution.getTourAgents()){
+				Offer o = agent.requestService(unassignedJob, bestOffer.getPrice());
 				if(o.getPrice() < bestOffer.getPrice()){
 					bestOffer = o;
 				}
 			}
-			if(!isNull(bestOffer.getTourAgent())){
-				currentResult += bestOffer.getMarginalCosts();
-				bestOffer.getTourAgent().offerGranted(unassignedJob);
+			if(!isNull(bestOffer.getServiceProvider())){
+				currentResult += bestOffer.getPrice();
+				bestOffer.getServiceProvider().offerGranted(unassignedJob);
 			}
 			else{
 				throw new IllegalStateException("given the vehicles, could not create a valid solution");
@@ -74,7 +70,7 @@ public class BestInsertion implements RecreationStrategy{
 		}
 	}
 
-	private boolean isNull(RRTourAgent tourAgent) {
-		return (tourAgent == null);
+	private boolean isNull(ServiceProvider sp) {
+		return (sp == null);
 	}
 }

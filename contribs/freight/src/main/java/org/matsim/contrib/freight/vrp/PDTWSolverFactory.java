@@ -18,7 +18,7 @@ public class PDTWSolverFactory implements VRPSolverFactory{
 
 	@Override
 	public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
-		ShipmentBasedVRPSolver rrSolver = new ShipmentBasedVRPSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
+		DTWSolver rrSolver = new DTWSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
 		PickupAndDeliveryTourWithTimeWindowsAlgoFactory ruinAndRecreateFactory = new PickupAndDeliveryTourWithTimeWindowsAlgoFactory();
 		rrSolver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 		rrSolver.setnOfWarmupIterations(20);

@@ -46,7 +46,7 @@ import org.matsim.contrib.freight.replanning.SelectBestPlan;
 import org.matsim.contrib.freight.vrp.DTWSolverFactory;
 import org.matsim.contrib.freight.vrp.NetworkTransportCosts;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
-import org.matsim.contrib.freight.vrp.basics.CarrierCostParams;
+import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -73,7 +73,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationEndsListener {
 
-	public static class MyCarrierCostParams extends CarrierCostParams {
+	public static class MyCarrierCostParams extends DriverCostParams {
 
 		public static double transportCost_per_second = 50.0/(60.0*60.0);
 		

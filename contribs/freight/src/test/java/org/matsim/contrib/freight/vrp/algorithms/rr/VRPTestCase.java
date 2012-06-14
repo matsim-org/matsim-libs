@@ -23,8 +23,11 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculator;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
@@ -133,10 +136,10 @@ public class VRPTestCase extends TestCase{
 		return new InitialSolution().createInitialSolution(vrp);
 	}
 	
-	protected RRTourAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
+	protected RRDriverAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
 		
 		return new RRTourAgentFactory(tourStatusProcessor, vrp.getCosts().getCostParams(), 
-				new DistributionOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints())).createTourAgent(tour1, vehicle);
+				new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory()))).createTourAgent(tour1, vehicle);
 	}
 	
 	private Coordinate makeCoord(int i, int j) {

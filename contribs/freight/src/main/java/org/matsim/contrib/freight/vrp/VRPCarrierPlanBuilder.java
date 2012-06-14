@@ -23,6 +23,7 @@ public class VRPCarrierPlanBuilder {
 	private Network network;
 	private VRPSolverFactory vrpSolverFactory;
 	private Costs costs;
+	
 	public VRPCarrierPlanBuilder(CarrierCapabilities caps, Collection<CarrierContract> contracts, Network network, Costs costs) {
 		super();
 		this.costs = costs;

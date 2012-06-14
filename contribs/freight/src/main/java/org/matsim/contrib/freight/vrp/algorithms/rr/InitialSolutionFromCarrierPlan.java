@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Stefan Schroeder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
+ ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.ArrayList;
@@ -6,7 +18,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Tour;
@@ -27,7 +39,7 @@ public class InitialSolutionFromCarrierPlan implements InitialSolutionFactory{
 
 	@Override
 	public RRSolution createInitialSolution(VehicleRoutingProblem vrp) {
-		List<RRTourAgent> agents = new ArrayList<RRTourAgent>();
+		List<RRDriverAgent> agents = new ArrayList<RRDriverAgent>();
 		
 		for(ScheduledTour sTour : plan.getScheduledTours()){
 			tourAgentFactory.createTourAgent(getTour(sTour), getVehicle(sTour.getVehicle().getVehicleId(),vrp));

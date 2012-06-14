@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Stefan Schroeder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
+ ******************************************************************************/
 /* *********************************************************************** *
  * project: org.matsim.*
  * IniSolution.java
@@ -26,12 +38,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.BestInsertion;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculator;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
-import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
+import org.matsim.contrib.freight.vrp.basics.DriverCostFunction;
 import org.matsim.contrib.freight.vrp.basics.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Tour;
@@ -58,19 +73,19 @@ public class InitialSolution implements InitialSolutionFactory {
 	}
 
 	private RRSolution createEmptySolution(VehicleRoutingProblem vrp) {
-		Collection<RRTourAgent> emptyTours = new ArrayList<RRTourAgent>();
+		Collection<RRDriverAgent> emptyTours = new ArrayList<RRDriverAgent>();
 		TourStatusProcessor statusProcessor = new TourCostAndTWProcessor(vrp.getCosts());
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(statusProcessor, vrp.getCosts().getCostParams(), 
-				new DistributionOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints()));
+				new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
 		for (Vehicle vehicle : vrp.getVehicles()) { 
-			RRTourAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory);
+			RRDriverAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory);
 			emptyTours.add(tourAgent);
 		}
 		return new RRSolution(emptyTours);
 	}
 
 
-	private RRTourAgent createTourAgent(Vehicle vehicle, String vehicleLocationId, RRTourAgentFactory tourAgentFactory) {
+	private RRDriverAgent createTourAgent(Vehicle vehicle, String vehicleLocationId, RRTourAgentFactory tourAgentFactory) {
 		VrpTourBuilder tourBuilder = new VrpTourBuilder();
 		tourBuilder.scheduleStart(vehicleLocationId, vehicle.getEarliestDeparture(), Double.MAX_VALUE);
 		tourBuilder.scheduleEnd(vehicleLocationId, 0.0, vehicle.getLatestArrival());

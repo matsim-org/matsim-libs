@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
-import org.matsim.contrib.freight.vrp.basics.CarrierCostParams;
+import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
@@ -194,7 +194,7 @@ public class TDCosts implements Costs {
 		}
 
 		@Override
-		public CarrierCostParams getCostParams() {
+		public DriverCostParams getCostParams() {
 			// TODO Auto-generated method stub
 			return null;
 		}

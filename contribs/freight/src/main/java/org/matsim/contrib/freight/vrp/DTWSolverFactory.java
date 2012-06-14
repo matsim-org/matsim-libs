@@ -37,7 +37,7 @@ public class DTWSolverFactory implements VRPSolverFactory{
 	@Override
 	public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
 		verifyDistributionProblem(shipments,carrierVehicles);
-		ShipmentBasedVRPSolver rrSolver = new ShipmentBasedVRPSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
+		DTWSolver rrSolver = new DTWSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
 		DistributionTourWithTimeWindowsAlgoFactory ruinAndRecreateFactory = new DistributionTourWithTimeWindowsAlgoFactory();
 		addListeners(ruinAndRecreateFactory);
 		rrSolver.setRuinAndRecreateFactory(ruinAndRecreateFactory);

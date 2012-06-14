@@ -27,8 +27,8 @@ import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
-import org.matsim.contrib.freight.vrp.basics.CarrierCostParams;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
+import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
 import org.matsim.contrib.freight.vrp.basics.CostParams;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
@@ -109,8 +109,8 @@ public class RuinAndRecreateTest extends TestCase{
 			}
 
 			@Override
-			public CarrierCostParams getCostParams() {
-				return new CarrierCostParams(1.0,1.0,0,0,0,0);			}
+			public DriverCostParams getCostParams() {
+				return new DriverCostParams(1.0,1.0,0,0,0,0);			}
 
 		};
 		vrpBuilder = new VrpBuilder(costs, new PickORDeliveryCapacityAndTWConstraint());
@@ -140,7 +140,7 @@ public class RuinAndRecreateTest extends TestCase{
 
 	private Collection<Tour> getTours(RRSolution solution) {
 		List<Tour> tours = new ArrayList<Tour>();
-		for(RRTourAgent a : solution.getTourAgents()){
+		for(RRDriverAgent a : solution.getTourAgents()){
 			tours.add(a.getTour());
 		}
  		return tours;

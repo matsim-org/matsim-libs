@@ -1,19 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2011 Stefan Schroeder.
+ * Copyright (c) 2011 Stefan Schroeder.
  * eMail: stefan.schroeder@kit.edu
  * 
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * 
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- * 
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
@@ -23,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.OfferMaker.OfferData;
+import org.matsim.contrib.freight.vrp.basics.DriverCostFunction;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
@@ -39,44 +35,10 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
  *
  */
 
-public class RRTourAgent {
+public class RRDriverAgent implements ServiceProvider{
 	
 
-	public static class Offer {
-		
-		private RRTourAgent agent;
-		
-		private double price;
-		
-		private double marginalCosts;
-
-		public Offer(RRTourAgent agent, double price, double mc) {
-			super();
-			this.agent = agent;
-			this.price = price;
-			this.marginalCosts = mc;
-		}
-
-		public double getMarginalCosts() {
-			return marginalCosts;
-		}
-
-		public RRTourAgent getTourAgent() {
-			return agent;
-		}
-
-		public double getPrice() {
-			return price;
-		}
-		
-		@Override
-		public String toString() {
-			return "currentTour=" + agent + "; marginalInsertionCosts=" + price;
-		}
-		
-	}
-	
-	private static Logger logger = Logger.getLogger(RRTourAgent.class);
+	private static Logger logger = Logger.getLogger(RRDriverAgent.class);
 	
 	private Tour tour;
 	
@@ -90,7 +52,7 @@ public class RRTourAgent {
 	
 	private Map<String, Job> jobs = new HashMap<String, Job>();
 	
-	private CarrierCostFunction costFunction;
+	private DriverCostFunction driverCostFunction;
 
 	private OfferMaker offerMaker;
 
@@ -101,11 +63,11 @@ public class RRTourAgent {
 	}
 
 
-	public RRTourAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, CarrierCostFunction carrierCostFunction) {
+	public RRDriverAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, DriverCostFunction driverCostFunction) {
 		super();
 		this.tour = tour;
 		this.tourActivityStatusUpdater=tourStatusProcessor;
-		this.costFunction = carrierCostFunction;
+		this.driverCostFunction = driverCostFunction;
 		this.vehicle = vehicle;
 		id = vehicle.getId();
 		iniJobs();
@@ -137,7 +99,7 @@ public class RRTourAgent {
 	private double cost(Tour tour){
 		if(isActive(tour)){
 			double cost = 0.0;
-			cost+=costFunction.costParams.cost_per_vehicle;
+			cost+=driverCostFunction.driverCostParams.fixCost_per_vehicleService;
 			cost+=tour.getTourStats().transportCosts;
 			return cost;
 		}

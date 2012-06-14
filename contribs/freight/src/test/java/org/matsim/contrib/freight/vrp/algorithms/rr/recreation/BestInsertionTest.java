@@ -24,10 +24,13 @@ import java.util.List;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistributionOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculator;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
-import org.matsim.contrib.freight.vrp.basics.CarrierCostFunction;
+import org.matsim.contrib.freight.vrp.basics.DriverCostFunction;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -38,9 +41,9 @@ public class BestInsertionTest extends VRPTestCase{
 	
 	VehicleRoutingProblem vrp;
 	
-	RRTourAgent tourAgent1;
+	RRDriverAgent tourAgent1;
 	
-	RRTourAgent tourAgent2;
+	RRDriverAgent tourAgent2;
 	
 	RRSolution solution;
 	
@@ -62,7 +65,7 @@ public class BestInsertionTest extends VRPTestCase{
 		tourBuilder.scheduleDelivery(s1);
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
 		RRTourAgentFactory rrTourAgentFactory = new RRTourAgentFactory(tourStatusProcessor, 
-				vrp.getCosts().getCostParams(), new DistributionOfferMaker(vrp.getCosts(), constraints));
+				vrp.getCosts().getCostParams(), new JobOfferMaker(vrp.getCosts(), constraints, new DistribJIFFactory(new LocalMCCalculatorFactory())));
 
 		tourAgent1 = rrTourAgentFactory.createTourAgent(tourBuilder.build(), vrp.getVehicles().iterator().next());
 		
@@ -74,7 +77,7 @@ public class BestInsertionTest extends VRPTestCase{
 		anotherTourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
 		tourAgent2 = rrTourAgentFactory.createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
 		
-		Collection<RRTourAgent> agents = new ArrayList<RRTourAgent>();
+		Collection<RRDriverAgent> agents = new ArrayList<RRDriverAgent>();
 		agents.add(tourAgent1);
 		agents.add(tourAgent2);
 		solution = new RRSolution(agents);

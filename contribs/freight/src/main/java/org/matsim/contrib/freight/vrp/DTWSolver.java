@@ -30,7 +30,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.End;
@@ -50,9 +50,9 @@ import org.matsim.contrib.freight.vrp.constraints.Constraints;
 import org.matsim.core.basic.v01.IdImpl;
 
 
-public class ShipmentBasedVRPSolver implements VRPSolver{
+public class DTWSolver implements VRPSolver{
 	
-	private static Logger logger = Logger.getLogger(ShipmentBasedVRPSolver.class);
+	private static Logger logger = Logger.getLogger(DTWSolver.class);
 	
 	private MatSim2VRP matsim2vrp;
 	
@@ -80,7 +80,7 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 	
 	private boolean iniSolutionWithSolutionFactory = false;
 
-	public ShipmentBasedVRPSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Costs costs, Network network, InitialSolutionFactory iniSolutionFactory) {
+	public DTWSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Costs costs, Network network, InitialSolutionFactory iniSolutionFactory) {
 		super();
 		this.shipments = shipments;
 		this.network = network;
@@ -91,7 +91,7 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 		this.matsim2vrp = new MatSim2VRP();
 	}
 	
-	public ShipmentBasedVRPSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Costs costs, Network network, CarrierPlan iniPlan) {
+	public DTWSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Costs costs, Network network, CarrierPlan iniPlan) {
 		super();
 		this.shipments = shipments;
 		this.network = network;
@@ -147,7 +147,7 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 
 	private Collection<Tour> getTours(RRSolution solution) {
 		List<Tour> tours = new ArrayList<Tour>();
-		for(RRTourAgent a : solution.getTourAgents()){
+		for(RRDriverAgent a : solution.getTourAgents()){
 			tours.add(a.getTour());
 		}
 		return tours;
@@ -198,7 +198,7 @@ public class ShipmentBasedVRPSolver implements VRPSolver{
 	 */
 	private Collection<ScheduledTour> makeScheduledVehicleTours(RRSolution rrSolution) {
 		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
-		for(RRTourAgent a : rrSolution.getTourAgents()){
+		for(RRDriverAgent a : rrSolution.getTourAgents()){
 			if(!a.isActive()){
 				continue;
 			}

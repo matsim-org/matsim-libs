@@ -1,6 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Stefan Schroeder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
+ ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 
 public class RuinAndRecreateReport implements RuinAndRecreateListener{
 
@@ -27,7 +39,7 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 	
 	private double getTime() {
 		double time = 0.0;
-		for(RRTourAgent t : bestSolution.getTourAgents()){
+		for(RRDriverAgent t : bestSolution.getTourAgents()){
 			if(t.getTour().getActivities().size()>2){
 				time+=t.getTour().costs.transportTime;
 			}
@@ -37,7 +49,7 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 
 	private double getGenCosts(){
 		double dist = 0.0;
-		for(RRTourAgent t : bestSolution.getTourAgents()){
+		for(RRDriverAgent t : bestSolution.getTourAgents()){
 			if(t.getTour().getActivities().size()>2){
 				dist+=t.getTour().costs.transportCosts;
 			}
@@ -47,7 +59,7 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 	
 	private int getActiveTours() {
 		int nOfTours = 0;
-		for(RRTourAgent t : bestSolution.getTourAgents()){
+		for(RRDriverAgent t : bestSolution.getTourAgents()){
 			if(t.getTour().getActivities().size()>2){
 				nOfTours++;
 			}
