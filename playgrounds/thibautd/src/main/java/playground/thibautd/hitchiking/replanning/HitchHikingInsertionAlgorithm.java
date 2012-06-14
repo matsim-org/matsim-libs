@@ -34,10 +34,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
-import playground.thibautd.hitchiking.routing.HitchHikingDriverRoutingModule;
-import playground.thibautd.hitchiking.routing.HitchHikingPassengerRoutingModule;
 import playground.thibautd.router.ActivityWrapperFacility;
-import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.TripRouter;
 
 /**
@@ -75,7 +72,7 @@ public class HitchHikingInsertionAlgorithm implements PlanAlgorithm {
 			Leg trip = (Leg) structure.next();
 			Activity destination = (Activity) structure.next();
 
-			if ( TransportMode.car.equals( trip.getMode() ) ) {
+			if ( canBeDriver && TransportMode.car.equals( trip.getMode() ) ) {
 				carOds.add( new Od( origin , destination , now ) );
 			}
 			else if ( TransportMode.pt.equals( trip.getMode() ) ) {

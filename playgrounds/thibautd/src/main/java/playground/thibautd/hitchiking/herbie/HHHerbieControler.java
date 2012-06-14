@@ -26,13 +26,16 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.pt.router.TransitRouterConfig;
 
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
+import herbie.running.scoring.TravelScoringFunction;
 
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
+import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.hitchiking.run.HitchHikingControler;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
 
@@ -88,16 +91,16 @@ public class HHHerbieControler extends HitchHikingControler {
 
 		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
 		// if some parts of the code use this method, everything should be consistent.
-		//setTransitRouterFactory(
-		//		new HerbieTransitRouterFactory( 
-		//			getScenario().getTransitSchedule(),
-		//			new TransitRouterConfig(
-		//				config.planCalcScore(),
-		//				config.plansCalcRoute(),
-		//				config.transitRouter(),
-		//				config.vspExperimental()),
-		//			herbieConfigGroup,
-		//			new TravelScoringFunction( params, herbieConfigGroup ) ) );
+		setTransitRouterFactory(
+				new HerbieTransitRouterFactory( 
+					getScenario().getTransitSchedule(),
+					new TransitRouterConfig(
+						config.planCalcScore(),
+						config.plansCalcRoute(),
+						config.transitRouter(),
+						config.vspExperimental()),
+					herbieConfigGroup,
+					new TravelScoringFunction( params, herbieConfigGroup ) ) );
 	}
 	
 	
