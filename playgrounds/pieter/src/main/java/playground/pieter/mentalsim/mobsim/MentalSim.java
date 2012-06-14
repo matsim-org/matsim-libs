@@ -284,7 +284,7 @@ public class MentalSim implements Mobsim {
 				List<Id> ids = route.getLinkIds();
 				for (int i = 0; i < ids.size(); i++) {
 					Id link = ids.get(i);
-					linkEnterTime = linkLeaveTime + 1;
+					linkEnterTime = linkLeaveTime;
 					linkEnterEvent = new LinkEnterEventImpl(
 							linkEnterTime,
 							agentId, link,
@@ -305,14 +305,18 @@ public class MentalSim implements Mobsim {
 					
 					tt += travelTime.getLinkTravelTime(
 							network.getLinks().get(ids.get(i)), startTime);
-					tt++;// 1 sec for each node
+//					tt++;// 1 sec for each node
 				}
 				tt += travelTime
 						.getLinkTravelTime(
 								network.getLinks().get(route.getEndLinkId()),
 								startTime);
 			}
-
+			LinkEnterEventImpl linkEnterEvent = new LinkEnterEventImpl(
+					tt,
+					agentId, route.getEndLinkId(),
+					agentId);
+			eventQueue.add(linkEnterEvent);
 			return tt;
 		}
 		

@@ -31,32 +31,39 @@ import playground.pieter.mentalsim.mobsim.MentalSimFactory;
 public class MobSimSwitcher implements ControlerListener,
 		IterationStartsListener {
 	public static boolean expensiveIter = true;
-	final private String START_RATE = "startRate";
-	final private String END_RATE = "endRate";
-	final private String RATE_CHANGE = "rateChange";
-	final private String START_ITER = "startIter";
-	final private String END_ITER = "endIter";
-	final private String DOUBLE_EVERY_N = "doubleEveryNExpensiveIters";
-	private int doubleEveryNExpensiveIters = 1;
-	private int switchCount = 0;
-	private int currentRate = 1;
-	private int startRate = 1;
-	private int endRate = 1;
+	final static String START_RATE = "startRate";
+	final static String END_RATE = "endRate";
+	final static String SWITCH_TYPE = "switchType";
+	final static String START_ITER = "startIter";
+	final static String END_ITER = "endIter";
+	final static String INCREASE_EVERY_N = "increaseEveryNExpensiveIters";
+	private int increaseEveryNExpensiveIters = 1;
+	private int expensiveIterCount = 0;
+	private int cheapIterCount = 0;
+	private int currentRate = 0;
+	private int startRate = 0;
+	private int endRate = 0;
 	private int startIter;
 	private int endIter;
 	private Controler controler;
+
+	private enum SwitchType {
+		incrementing, doubling
+	}
+
+	private SwitchType switchType = SwitchType.incrementing;
 	Logger log = Logger.getLogger(this.getClass());
 
 	public MobSimSwitcher(Controler c) {
 		this.controler = c;
 		if (c.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
 			startRate = Math.max(
-					1,
+					0,
 					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
 							START_RATE)));
 		if (c.getConfig().getParam("MobSimSwitcher", END_RATE) != null)
 			endRate = Math.max(
-					1,
+					0,
 					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
 							END_RATE)));
 		currentRate = startRate;
@@ -73,11 +80,17 @@ public class MobSimSwitcher implements ControlerListener,
 					endIter,
 					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
 							END_ITER)));
-		if (c.getConfig().getParam("MobSimSwitcher", DOUBLE_EVERY_N) != null)
-			doubleEveryNExpensiveIters = Math.max(
-					doubleEveryNExpensiveIters,
+		if (c.getConfig().getParam("MobSimSwitcher", INCREASE_EVERY_N) != null)
+			increaseEveryNExpensiveIters = Math.max(
+					increaseEveryNExpensiveIters,
 					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
-							DOUBLE_EVERY_N)));
+							INCREASE_EVERY_N)));
+		String rc = c.getConfig().getParam("MobSimSwitcher", SWITCH_TYPE);
+		if (rc == null) {
+			switchType = SwitchType.incrementing;
+		} else if (rc.equals("doubling")) {
+			switchType = SwitchType.doubling;
+		}
 
 	}
 
@@ -95,6 +108,8 @@ public class MobSimSwitcher implements ControlerListener,
 					// controler.setMobsimFactory(new MentalSimFactory(ttcalc));
 				} else if (mobsim.equals("jdeqsim")) {
 					controler.setMobsimFactory(new JDEQSimulationFactory());
+				} else {
+					controler.setMobsimFactory(new QueueSimulationFactory());
 				}
 			} else {
 				controler.setMobsimFactory(new QueueSimulationFactory());
@@ -106,27 +121,38 @@ public class MobSimSwitcher implements ControlerListener,
 	}
 
 	public boolean checkExpensiveIter() {
-		double iterationsFromStart = controler.getIterationNumber() - startIter;
-//		if (iterationsFromStart > 0 && iterationsFromStart % 2 == 0
-				if( controler.getIterationNumber() < endIter && switchCount > 0) {
-			// double slope = (double) (startRate - endRate)
-			// / (startIter - endIter);
-			// currentRate = startRate
-			// + (int) Math.floor(slope * iterationsFromStart);
-			// double the currentRate of switching
-			if (switchCount % doubleEveryNExpensiveIters == 0) {
-				if (currentRate < endRate) {
+		
+		if (controler.getIterationNumber() == controler.getLastIteration()){
+			MobSimSwitcher.expensiveIter = true;			
+			return expensiveIter;
+		}
+		if (controler.getIterationNumber() < endIter && expensiveIterCount > 0) {
 
-					currentRate *= 2;
+			if (expensiveIterCount == increaseEveryNExpensiveIters) {
+				if (currentRate < endRate) {
+					if (switchType.equals(SwitchType.doubling)) {
+						currentRate *= 2;
+
+					} else {
+						currentRate++;
+					}
 				}
-				switchCount = 0;
+				expensiveIterCount = 0;
 			}
 		}
-		MobSimSwitcher.expensiveIter = iterationsFromStart % currentRate == 0;
-		if (MobSimSwitcher.expensiveIter)
-			switchCount++;
-		if (controler.getIterationNumber() == controler.getLastIteration())
-			MobSimSwitcher.expensiveIter = true;
+		if (expensiveIter && cheapIterCount == 0
+				&& controler.getIterationNumber() > startIter) {
+			expensiveIter = false;
+			cheapIterCount++;
+			return expensiveIter;
+		}
+		if (cheapIterCount >= currentRate - 1) {
+			expensiveIter = true;
+			cheapIterCount = 0;
+			expensiveIterCount++;
+			return expensiveIter;
+		}
+		cheapIterCount++; //will only reach if expensiveIter==true and less than currentRate cheapIters
 		return expensiveIter;
 	}
 

@@ -8,14 +8,14 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.pieter.mentalsim.replanning.MyDoNothinPlanStrategyModule;
+import playground.pieter.mentalsim.replanning.MyDoNothingPlanStrategyModule;
 
-public class MyDoNothinPlanStrategy implements PlanStrategy {
+public class MyDoNothingPlanStrategy implements PlanStrategy {
 	PlanStrategy planStrategyDelegate = null;
 	
-	public MyDoNothinPlanStrategy(Controler controler) {
+	public MyDoNothingPlanStrategy(Controler controler) {
 	    planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector() );
-	    MyDoNothinPlanStrategyModule mod = new MyDoNothinPlanStrategyModule(controler) ;
+	    MyDoNothingPlanStrategyModule mod = new MyDoNothingPlanStrategyModule(controler) ;
 	    addStrategyModule(mod) ;
 	}
 

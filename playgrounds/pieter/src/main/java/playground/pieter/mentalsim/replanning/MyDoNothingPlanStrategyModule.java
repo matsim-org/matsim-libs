@@ -4,11 +4,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 
-public class MyDoNothinPlanStrategyModule implements PlanStrategyModule {
+public class MyDoNothingPlanStrategyModule implements PlanStrategyModule {
 
 
 
-	public MyDoNothinPlanStrategyModule(Controler controler) {
+	public MyDoNothingPlanStrategyModule(Controler controler) {
 		// TODO Auto-generated constructor stub
 	}
 
