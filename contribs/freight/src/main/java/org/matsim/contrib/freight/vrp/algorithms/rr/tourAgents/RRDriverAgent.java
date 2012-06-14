@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.OfferMaker.OfferData;
 import org.matsim.contrib.freight.vrp.basics.DriverCostFunction;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
+import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
@@ -52,7 +53,9 @@ public class RRDriverAgent implements ServiceProvider{
 	
 	private Map<String, Job> jobs = new HashMap<String, Job>();
 	
-	private DriverCostFunction driverCostFunction;
+//	private DriverCostFunction driverCostFunction;
+	
+	private DriverCostParams driverCostParams;
 
 	private OfferMaker offerMaker;
 
@@ -63,11 +66,11 @@ public class RRDriverAgent implements ServiceProvider{
 	}
 
 
-	public RRDriverAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, DriverCostFunction driverCostFunction) {
+	public RRDriverAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, DriverCostParams driverCostParams) {
 		super();
 		this.tour = tour;
 		this.tourActivityStatusUpdater=tourStatusProcessor;
-		this.driverCostFunction = driverCostFunction;
+		this.driverCostParams = driverCostParams;
 		this.vehicle = vehicle;
 		id = vehicle.getId();
 		iniJobs();
@@ -99,7 +102,7 @@ public class RRDriverAgent implements ServiceProvider{
 	private double cost(Tour tour){
 		if(isActive(tour)){
 			double cost = 0.0;
-			cost+=driverCostFunction.driverCostParams.fixCost_per_vehicleService;
+			cost+=driverCostParams.fixCost_per_vehicleService;
 			cost+=tour.getTourStats().transportCosts;
 			return cost;
 		}

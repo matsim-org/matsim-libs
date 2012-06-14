@@ -12,7 +12,6 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
-import org.matsim.contrib.freight.vrp.basics.DriverCostFunction;
 import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -41,7 +40,7 @@ public class RRTourAgentFactory {
 	}
 
 	public RRDriverAgent createTourAgent(Tour tour, Vehicle vehicle) {
-		RRDriverAgent tourAgent = new RRDriverAgent(vehicle, tour, tourStatusProcessor, new DriverCostFunction(carrierCostParams));
+		RRDriverAgent tourAgent = new RRDriverAgent(vehicle, tour, tourStatusProcessor, carrierCostParams);
 		tourAgent.setOfferMaker(offerMaker);
 		return tourAgent;
 	}

@@ -61,7 +61,6 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 	
 	private void route(Collection<ScheduledTour> scheduledTours) {
 		for(ScheduledTour tour : scheduledTours){
-			logger.info("tour of " + tour.getVehicle().getVehicleId());
 			double currTime = tour.getDeparture();
 			Id prevLink = tour.getTour().getStartLinkId();
 			Leg prevLeg = null;
@@ -97,7 +96,6 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 			return;
 		}
 		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getDepartureTime(), null, null);
-		logger.info("cost " + path.travelCost);
 		prevLeg.setExpectedTransportTime(path.travelTime);
 		Route route = createRoute(fromLinkId,path,toLinkId);
 		prevLeg.setRoute(route);

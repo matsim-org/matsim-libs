@@ -26,23 +26,35 @@ public class DTWSolverFactory implements VRPSolverFactory{
 
 	private Random random = MatsimRandom.getRandom();
 	
+	private int iterations = 200;
+	
+	private int warmupIterations = 20;
+	
 	public DTWSolverFactory() {
 
 	}
 	
+	public DTWSolverFactory(int iterations, int warmupIterations) {
+		super();
+		this.iterations = iterations;
+		this.warmupIterations = warmupIterations;
+	}
+
+
+
 	public void setRandom(Random random) {
 		this.random = random;
 	}
 
 	@Override
-	public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
+	public VRPSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
 		verifyDistributionProblem(shipments,carrierVehicles);
 		DTWSolver rrSolver = new DTWSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
 		DistributionTourWithTimeWindowsAlgoFactory ruinAndRecreateFactory = new DistributionTourWithTimeWindowsAlgoFactory();
 		addListeners(ruinAndRecreateFactory);
 		rrSolver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
-		rrSolver.setnOfWarmupIterations(20);
-		rrSolver.setnOfIterations(200);
+		rrSolver.setnOfWarmupIterations(warmupIterations);
+		rrSolver.setnOfIterations(iterations);
 		PickORDeliveryCapacityAndTWConstraint constraints = new PickORDeliveryCapacityAndTWConstraint();
 		rrSolver.setGlobalConstraints(constraints);
 		

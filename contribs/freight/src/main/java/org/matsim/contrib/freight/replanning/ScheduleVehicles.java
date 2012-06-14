@@ -5,7 +5,6 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
 import org.matsim.contrib.freight.vrp.VRPSolverFactory;
 import org.matsim.contrib.freight.vrp.basics.Costs;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 
 public class ScheduleVehicles implements CarrierPlanStrategyModule{
 
@@ -15,17 +14,11 @@ public class ScheduleVehicles implements CarrierPlanStrategyModule{
 
 	private Costs costs;
 	
-	private LeastCostPathCalculator router;
-	
 	public ScheduleVehicles(Network network, Costs costs, VRPSolverFactory vrpSolverFactory) {
 		super();
 		this.network = network;
 		this.costs = costs;
 		this.vrpSolverFactory = vrpSolverFactory;
-	}
-
-	public void setRouter(LeastCostPathCalculator router) {
-		this.router = router;
 	}
 
 	@Override

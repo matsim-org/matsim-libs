@@ -186,7 +186,7 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 		planStrat_reSchedule.addModule(new ReRouteVehicles(router, event.getControler().getNetwork()));
 		
 		ScheduleVehicles vehicleRouter = new ScheduleVehicles(event.getControler().getNetwork(), costs, new DTWSolverFactory());
-		vehicleRouter.setRouter(router);
+		
 		
 		CarrierPlanStrategy planStrat_schedule = new CarrierPlanStrategy();
 		planStrat_schedule.addModule(new MemorizeSelectedPlan());
