@@ -109,8 +109,8 @@ public class PStrategyManager {
 		} else if(name.equals(RandomRouteEndExtension.STRATEGY_NAME)){
 			strategy = new RandomRouteEndExtension(settings.getParametersAsArrayList());
 		}else if(name.equals(RandomRouteStartExtension.STRATEGY_NAME)){
-			strategy = new RouteEnvelopeExtension(settings.getParametersAsArrayList());
-		}else if(name.equals(RandomRouteStartExtension.STRATEGY_NAME)){
+			strategy = new RandomRouteStartExtension(settings.getParametersAsArrayList());
+		}else if(name.equals(RouteEnvelopeExtension.STRATEGY_NAME)){
 			strategy = new RouteEnvelopeExtension(settings.getParametersAsArrayList());
 		}else if (name.equals(TimeReduceDemand.STRATEGY_NAME)) {
 			TimeReduceDemand strat = new TimeReduceDemand(settings.getParametersAsArrayList());
