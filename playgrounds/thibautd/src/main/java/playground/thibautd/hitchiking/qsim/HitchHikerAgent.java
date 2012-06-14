@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -48,6 +49,7 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	private final MobsimDriverPassengerAgent delegate;
 	private final TripRouter router;
 	private final PassengerQueuesManager manager;
+	private final EventsManager events;
 
 	private HitchHikingHandler hitchHiker = null;
 
@@ -57,10 +59,12 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	public HitchHikerAgent(
 			final MobsimDriverPassengerAgent delegate,
 			final TripRouter router,
-			final PassengerQueuesManager manager) {
+			final PassengerQueuesManager manager,
+			final EventsManager events) {
 		this.delegate = delegate;
 		this.router = router;
 		this.manager = manager;
+		this.events = events;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -146,6 +150,7 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 					this,
 					router,
 					manager,
+					events,
 					(HitchHikingDriverRoute) route,
 					now);
 		}

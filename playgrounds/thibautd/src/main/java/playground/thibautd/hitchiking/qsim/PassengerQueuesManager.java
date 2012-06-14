@@ -22,13 +22,17 @@ package playground.thibautd.hitchiking.qsim;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.qsim.events.PassengerEndsWaitingEvent;
 import playground.thibautd.hitchiking.qsim.events.PassengerStartsWaitingEvent;
 import playground.thibautd.hitchiking.qsim.PassengerQueuesPerLink.Queue;
@@ -36,7 +40,10 @@ import playground.thibautd.hitchiking.qsim.PassengerQueuesPerLink.Queue;
 /**
  * @author thibautd
  */
-public class PassengerQueuesManager implements MobsimEngine {
+public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
+	private static final Logger log =
+		Logger.getLogger(PassengerQueuesManager.class);
+
 	private final PassengerQueuesPerLink queues = new PassengerQueuesPerLink();
 	private EventsManager events;
 	private InternalInterface internalInterface = null;
@@ -45,7 +52,19 @@ public class PassengerQueuesManager implements MobsimEngine {
 		this.events = events;
 	}
 
-	public void passengerArrivesAndWaits(
+	@Override
+	public boolean handleDeparture(
+			final double now,
+			final MobsimAgent agent,
+			final Id linkId) {
+		if (agent.getMode().equals( HitchHikingConstants.PASSENGER_MODE ) ) {
+			passengerArrivesAndWaits( agent , now , linkId , agent.getDestinationLinkId() );
+			return true;
+		}
+		return false;
+	}
+
+	private void passengerArrivesAndWaits(
 			final MobsimAgent passenger,
 			final double now,
 			final Id link,
@@ -110,8 +129,8 @@ public class PassengerQueuesManager implements MobsimEngine {
 
 	@Override
 	public void afterSim() {
-		// TODO Auto-generated method stub
-		
+		log.info( "state of passengers at the end of the iteration:" );
+		queues.logStatus();
 	}
 
 	@Override

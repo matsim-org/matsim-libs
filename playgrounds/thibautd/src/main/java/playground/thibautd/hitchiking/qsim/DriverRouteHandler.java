@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
@@ -48,6 +49,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 	private final PassengerQueuesManager queuesManager;
 	private final TripRouter router;
 	private final HitchHikerAgent agent;
+	private final EventsManager events;
 
 	private Stage stage = Stage.ACCESS;
 	private double now;
@@ -62,6 +64,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 			final HitchHikerAgent agent,
 			final TripRouter router,
 			final PassengerQueuesManager manager,
+			final EventsManager events,
 			final HitchHikingDriverRoute route,
 			final double now) {
 		this.agent = agent;
@@ -69,6 +72,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 		this.queuesManager = manager;
 		this.route = route;
 		this.now = now;
+		this.events = events;
 
 		performAccess();
 	}
@@ -171,6 +175,10 @@ public class DriverRouteHandler implements HitchHikingHandler {
 	}
 
 	private boolean performPickUp() {
+		events.processEvent(
+				events.getFactory().createAgentArrivalEvent(
+						now, agent.getId(), route.getPickUpLinkId(), TransportMode.car));
+
 		Tuple<Id, Collection<MobsimAgent>> destAndPassengers =
 			queuesManager.getPassengersFromFirstNonEmptyQueue(
 					now,

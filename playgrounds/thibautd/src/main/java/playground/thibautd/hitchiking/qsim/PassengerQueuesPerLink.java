@@ -26,6 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
@@ -33,6 +35,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
  * @author thibautd
  */
 public class PassengerQueuesPerLink {
+	private static final Logger log =
+		Logger.getLogger(PassengerQueuesPerLink.class);
+
 	private final Map<Id, QueuesPerDestination> queuesPerLink = new HashMap<Id, QueuesPerDestination>();
 
 	public synchronized QueuesPerDestination getQueuesAtLink(final Id link) {
@@ -44,6 +49,27 @@ public class PassengerQueuesPerLink {
 		}
 
 		return qs;
+	}
+
+	public void logStatus() {
+		int nLocationsWithWaitingAgents = 0;
+		int nWaitingAgents = 0;
+
+		for (QueuesPerDestination queues : queuesPerLink.values()) {
+			boolean thereWereAgents = false;
+			for (Queue queue : queues.queues.values()) {
+				int size = queue.size();
+				if (size > 0) {
+					nWaitingAgents += size;
+					thereWereAgents = true;
+				}
+			}
+			if (thereWereAgents) {
+				nLocationsWithWaitingAgents++;
+			}
+		}
+
+		log.info( nWaitingAgents+" agents waiting at "+nLocationsWithWaitingAgents );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -76,6 +102,7 @@ public class PassengerQueuesPerLink {
 
 			int count = 0;
 			while (count < nAgents && queue.size() > 0) {
+				count++;
 				agents.add( queue.removeFirst() );
 			}
 

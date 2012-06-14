@@ -44,12 +44,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
-import playground.thibautd.router.TripRouterFactory;
 
 /**
  * @author thibautd
@@ -110,11 +108,13 @@ public class HitchHikingQsimFactory implements MobsimFactory {
 		// set specific engine
 		PassengerQueuesManager queuesManager = new PassengerQueuesManager( eventsManager );
 		qSim.addMobsimEngine( queuesManager );
+		qSim.addDepartureHandler( queuesManager );
         AgentFactory agentFactory =
 			new HitchHikerAgentFactory(
 					new TransitAgentFactory(qSim),
 					controler.getTripRouterFactory().createTripRouter(),
-					queuesManager );
+					queuesManager,
+					eventsManager);
 
         if (sc.getConfig().scenario().isUseTransit()) {
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);

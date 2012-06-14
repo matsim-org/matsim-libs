@@ -22,6 +22,7 @@ package playground.thibautd.hitchiking.routing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -49,14 +50,17 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 	private final RoutingModule ptRoutingModule;
 	private final ModeRouteFactory routeFactory;
 	private final HitchHikingSpots spots;
+	private final Random random;
 
 	public HitchHikingPassengerRoutingModule(
 			final RoutingModule ptRoutingModule,
 			final HitchHikingSpots spots,
-			final ModeRouteFactory factory) {
+			final ModeRouteFactory factory,
+			final Random random) {
 		this.ptRoutingModule = ptRoutingModule;
 		this.routeFactory = factory;
 		this.spots = spots;
+		this.random = random;
 	}
 
 	@Override

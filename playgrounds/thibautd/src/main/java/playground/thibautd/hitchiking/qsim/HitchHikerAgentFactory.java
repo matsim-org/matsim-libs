@@ -20,6 +20,7 @@
 package playground.thibautd.hitchiking.qsim;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 
@@ -32,14 +33,17 @@ public class HitchHikerAgentFactory implements AgentFactory {
 	private final TransitAgentFactory factory;
 	private final TripRouter router;
 	private final PassengerQueuesManager queuesManager;
+	private final EventsManager events;
 
 	public HitchHikerAgentFactory(
 			final TransitAgentFactory f,
 			final TripRouter router,
-			final PassengerQueuesManager queuesManager) {
+			final PassengerQueuesManager queuesManager,
+			final EventsManager events) {
 		this.factory = f;
 		this.router = router;
 		this.queuesManager = queuesManager;
+		this.events = events;
 	}
 
 	@Override
@@ -47,7 +51,8 @@ public class HitchHikerAgentFactory implements AgentFactory {
 		return new HitchHikerAgent(
 				factory.createMobsimAgentFromPerson( p ),
 				router,
-				queuesManager);
+				queuesManager,
+				events);
 	}
 }
 
