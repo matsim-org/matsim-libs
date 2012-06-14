@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -66,6 +67,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 			final Person person) {
 		Link puSpot = spots.getNearestSpot( fromFacility.getCoord() );
 		Link doSpot = spots.getNearestSpot( toFacility.getCoord() );
+		double distance = CoordUtils.calcDistance( puSpot.getCoord() , doSpot.getCoord() );
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
@@ -76,11 +78,12 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 					person ) );
 
 		Leg leg = new LegImpl( HitchHikingConstants.PASSENGER_MODE );
-		leg.setRoute(
-				routeFactory.createRoute(
+		Route route = routeFactory.createRoute(
 					HitchHikingConstants.PASSENGER_MODE,
 					puSpot.getId(),
-					doSpot.getId()) );
+					doSpot.getId());
+		route.setDistance( distance );
+		leg.setRoute( route );
 
 		trip.add( leg );
 
@@ -89,7 +92,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 
 		egressDeparture = egressDeparture == Time.UNDEFINED_TIME ?
 			CoordUtils.calcDistance( fromFacility.getCoord() , doSpot.getCoord() ) * BEEFLY_ESTIMATED_SPEED :
-			egressDeparture + CoordUtils.calcDistance( puSpot.getCoord() , doSpot.getCoord() ) * BEEFLY_ESTIMATED_SPEED;
+			egressDeparture + distance * BEEFLY_ESTIMATED_SPEED;
 
 		trip.addAll( ptRoutingModule.calcRoute(
 					new LinkFacility( doSpot ),
