@@ -28,6 +28,8 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 
+import playground.thibautd.hitchiking.HitchHikingConstants;
+
 /**
  * Uses the plan elements from the plan rather than the ones constructed from the
  * events (equivalent to the "old approach").
@@ -38,6 +40,7 @@ public class PlanBasedLegScoringFunction implements BasicScoring, LegScoring {
 	private final Plan plan;
 	private final LegScoringFunction delegate;
 	private PlanElement currentLeg = null;
+	private int legsToSkip = 0;
 	private Iterator<PlanElement> planIterator = null;
 
 	public PlanBasedLegScoringFunction(
@@ -76,11 +79,23 @@ public class PlanBasedLegScoringFunction implements BasicScoring, LegScoring {
 
 	@Override
 	public void startLeg(final double time, final Leg leg) {
-		do {
-			// go to next leg
-			currentLeg = planIterator.next();
+		// increadibly ugly!
+		if (legsToSkip <= 0) {
+			do {
+				// go to next leg
+				currentLeg = planIterator.next();
+			}
+			while ( !(currentLeg instanceof Leg) );
 		}
-		while ( !(currentLeg instanceof Leg) );
+		legsToSkip--;
+
+		if (((Leg) currentLeg).getMode().equals( HitchHikingConstants.DRIVER_MODE )) {
+			legsToSkip = 2;
+		}
+
+		if (legsToSkip >= 0) {
+			currentLeg = leg;
+		}
 
 		delegate.startLeg(time, (Leg) currentLeg);
 	}

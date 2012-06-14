@@ -163,6 +163,10 @@ public class DriverRouteHandler implements HitchHikingHandler {
 			return false;
 		}
 		else {
+			events.processEvent(
+					events.getFactory().createAgentArrivalEvent(
+							now, agent.getId(), currentDestination, HitchHikingConstants.DRIVER_MODE));
+
 			return true;
 		}
 	}
