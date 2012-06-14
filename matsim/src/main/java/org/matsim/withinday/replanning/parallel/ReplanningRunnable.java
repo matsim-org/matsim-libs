@@ -147,6 +147,9 @@ public abstract class ReplanningRunnable implements Runnable {
 				log.error("WithinDayReplanner is null!");
 				continue;
 			}
+
+			// set time once per replanner and time step
+			withinDayReplanner.setTime(time);
 			
 			ReplanningTask replanningTask = null;
 			while (true) {
@@ -162,7 +165,6 @@ public abstract class ReplanningRunnable implements Runnable {
 					continue;
 				}
 				
-				withinDayReplanner.setTime(time);
 				boolean replanningSuccessful = withinDayReplanner.doReplanning(withinDayAgent);
 				
 				if (!replanningSuccessful) {

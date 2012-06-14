@@ -57,7 +57,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	 * LinkedBlockingQueue is used. Otherwise, each replanner uses a LinkedList.
 	 * Both approaches should produce the same simulation results.
 	 */
-	private final boolean shareReplannerQueue = false;
+	private final boolean shareReplannerQueue = true;
 	
 	protected int numOfThreads = 1;	// use by default only one thread
 	protected Set<T> replannerFactories = new LinkedHashSet<T>();
