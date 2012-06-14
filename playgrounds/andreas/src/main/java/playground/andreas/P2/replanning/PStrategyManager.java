@@ -38,6 +38,7 @@ import playground.andreas.P2.replanning.modules.RandomStartTimeAllocator;
 import playground.andreas.P2.replanning.modules.RectangleHullRouteExtension;
 import playground.andreas.P2.replanning.modules.ReduceStopsToBeServed;
 import playground.andreas.P2.replanning.modules.ReduceTimeServed;
+import playground.andreas.P2.replanning.modules.RouteEnvelopeExtension;
 import playground.andreas.P2.replanning.modules.TimeReduceDemand;
 import playground.andreas.P2.replanning.modules.deprecated.IncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.deprecated.RemoveAllVehiclesButOne;
@@ -108,7 +109,9 @@ public class PStrategyManager {
 		} else if(name.equals(RandomRouteEndExtension.STRATEGY_NAME)){
 			strategy = new RandomRouteEndExtension(settings.getParametersAsArrayList());
 		}else if(name.equals(RandomRouteStartExtension.STRATEGY_NAME)){
-			strategy = new RandomRouteStartExtension(settings.getParametersAsArrayList());
+			strategy = new RouteEnvelopeExtension(settings.getParametersAsArrayList());
+		}else if(name.equals(RandomRouteStartExtension.STRATEGY_NAME)){
+			strategy = new RouteEnvelopeExtension(settings.getParametersAsArrayList());
 		}else if (name.equals(TimeReduceDemand.STRATEGY_NAME)) {
 			TimeReduceDemand strat = new TimeReduceDemand(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
