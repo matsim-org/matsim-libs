@@ -87,7 +87,7 @@ public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy
 		}else{
 			// create a new plan 
 			PPlan oldPlan = cooperative.getBestPlan();
-			PPlan newPlan = new PPlan(oldPlan.getId());
+			PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
 			newPlan.setStartTime(oldPlan.getStartTime());
 			newPlan.setEndTime(oldPlan.getEndTime());
 			//insert the new stop at the correct point (minimum average Distance from the subroute to the new Stop) in the sequence of stops 2 serve

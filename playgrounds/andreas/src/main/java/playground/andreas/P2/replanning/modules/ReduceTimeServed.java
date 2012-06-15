@@ -92,7 +92,7 @@ public class ReduceTimeServed extends PStrategy implements PPlanStrategy, Transi
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
 		newPlan.setStartTime(timeToBeServed.getFirst());

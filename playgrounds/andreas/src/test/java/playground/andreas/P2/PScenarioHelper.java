@@ -402,7 +402,7 @@ class Route2111to2333 implements PPlanStrategy{
 		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
 		stops.add(startStop);
 		stops.add(endStop);
-		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		PPlan newPlan = new PPlan(id, this.getName(), stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
 		return newPlan;
 	}
@@ -412,8 +412,7 @@ class Route2111to2333 implements PPlanStrategy{
 	 */
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Route2111to2333";
 	}
 }
 
@@ -437,7 +436,7 @@ class Route2333to2111 implements PPlanStrategy{
 		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
 		stops.add(startStop);
 		stops.add(endStop);
-		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		PPlan newPlan = new PPlan(id, this.getName(), stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
 		return newPlan;
 	}
@@ -447,8 +446,7 @@ class Route2333to2111 implements PPlanStrategy{
 	 */
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Route2333to2111";
 	}
 }
 
@@ -472,7 +470,7 @@ class Route2414to3444 implements PPlanStrategy{
 		ArrayList<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
 		stops.add(startStop);
 		stops.add(endStop);
-		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		PPlan newPlan = new PPlan(id, this.getName(), stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
 		return newPlan;
 	}
@@ -482,8 +480,7 @@ class Route2414to3444 implements PPlanStrategy{
 	 */
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Route2414to3444";
 	}
 }
 
@@ -510,7 +507,7 @@ class Route2111to1314to4443 implements PPlanStrategy{
 		stops.add(startStop);
 		stops.add(middleStop);
 		stops.add(endStop);
-		PPlan newPlan = new PPlan(id, stops, startTime, endTime); 
+		PPlan newPlan = new PPlan(id, this.getName(), stops, startTime, endTime); 
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, stops, new IdImpl(cooperative.getCurrentIteration())));
 		return newPlan;
 	}
@@ -520,7 +517,6 @@ class Route2111to1314to4443 implements PPlanStrategy{
 	 */
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Route2111to1314to4443";
 	}
 }

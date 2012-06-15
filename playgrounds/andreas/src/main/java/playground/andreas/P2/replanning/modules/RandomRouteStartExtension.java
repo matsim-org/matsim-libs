@@ -88,7 +88,7 @@ public class RandomRouteStartExtension extends PStrategy implements PPlanStrateg
 		
 		this.initQuadTree(cooperative);
 		PPlan oldPlan = cooperative.getBestPlan();
-		PPlan newPlan = new PPlan(oldPlan.getId());
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
 		newPlan.setStartTime(oldPlan.getStartTime());
 		newPlan.setEndTime(oldPlan.getEndTime());
 		

@@ -59,7 +59,7 @@ public class MaxRandomEndTimeAllocator extends PStrategy implements PPlanStrateg
 		}
 		
 		// enough vehicles to test, change endTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
 		

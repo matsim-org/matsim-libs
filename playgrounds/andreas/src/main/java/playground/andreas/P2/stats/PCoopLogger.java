@@ -81,7 +81,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 			log.info("enabled");
 			this.pCoopLoggerWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pCoopLogger.txt"));
 			try {
-				this.pCoopLoggerWriter.write("iter\tcoop\tstatus\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
+				this.pCoopLoggerWriter.write("iter\tcoop\tstatus\tplan\tcreator\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -99,42 +99,41 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				// get all plans
 				List<PPlan> plans = cooperative.getAllPlans();
 				
-				double coopPax = 0.0;
-				double coopVeh = 0.0;
-				double coopScore = 0.0;				
-
 				for (PPlan plan : plans) {
-					coopPax += plan.getTripsServed();
-					coopVeh += plan.getNVehicles();
-					coopScore += plan.getScore();
-				}
-				
-				String startTime = Time.writeTime(cooperative.getBestPlan().getStartTime());
-				String endTime = Time.writeTime(cooperative.getBestPlan().getEndTime());
-				
-				ArrayList<Id> stopsServed = new ArrayList<Id>();
-				for (TransitStopFacility stop : cooperative.getBestPlan().getStopsToBeServed()) {
-					stopsServed.add(stop.getId());
-				}
-				
-				ArrayList<Id> linksServed = new ArrayList<Id>();
-				for (TransitRoute route : cooperative.getBestPlan().getLine().getRoutes().values()) {
-					linksServed.add(route.getRoute().getStartLinkId());
-					for (Id linkId : route.getRoute().getLinkIds()) {
-						linksServed.add(linkId);
+					double coopPax = plan.getTripsServed();
+					double coopVeh = plan.getNVehicles();
+					double coopScore = plan.getScore();
+					
+					String startTime = Time.writeTime(plan.getStartTime());
+					String endTime = Time.writeTime(plan.getEndTime());
+					
+					ArrayList<Id> stopsServed = new ArrayList<Id>();
+					for (TransitStopFacility stop : plan.getStopsToBeServed()) {
+						stopsServed.add(stop.getId());
 					}
-					linksServed.add(route.getRoute().getEndLinkId());
-					// we only need to parse this information once
-					break;
+					
+					ArrayList<Id> linksServed = new ArrayList<Id>();
+					for (TransitRoute route : plan.getLine().getRoutes().values()) {
+						linksServed.add(route.getRoute().getStartLinkId());
+						for (Id linkId : route.getRoute().getLinkIds()) {
+							linksServed.add(linkId);
+						}
+						linksServed.add(route.getRoute().getEndLinkId());
+						// we only need to parse this information once
+						break;
+					}
+					
+					try {
+						this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getCoopState() + "\t" + plan.getId() + "\t" 
+								+ plan.getCreator() + "\t" + (int) coopVeh + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" 
+								+ startTime + "\t" + endTime + "\t" + stopsServed + "\t" + linksServed + "\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 				}
 				
-				try {
-					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getCoopState() + "\t" + (int) coopVeh + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" + startTime + "\t" + endTime 
-							+ "\t" + stopsServed + "\t" + linksServed + "\n");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 			
 			try {

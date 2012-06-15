@@ -59,7 +59,7 @@ public class RandomStartTimeAllocator extends PStrategy implements PPlanStrategy
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
 		// get a valid new start time

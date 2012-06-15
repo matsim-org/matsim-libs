@@ -89,7 +89,7 @@ public class AddRandomStop extends PStrategy implements PPlanStrategy{
 		}
 						
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
 		newPlan.setStopsToBeServed(newStopsToBeServed);
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());

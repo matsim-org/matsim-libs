@@ -153,7 +153,7 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 			}
 		}
 		
-		PPlan plan = new PPlan(id, stopsToBeServed, startTime, endTime);
+		PPlan plan = new PPlan(id, this.getName(), stopsToBeServed, startTime, endTime);
 		plan.setNVehicles(nVehicles);
 		return plan;
 	}

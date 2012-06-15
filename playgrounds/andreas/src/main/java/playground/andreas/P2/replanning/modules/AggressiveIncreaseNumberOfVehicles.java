@@ -67,7 +67,7 @@ public class AggressiveIncreaseNumberOfVehicles extends PStrategy implements PPl
 		}
 			
 		// vehicles were bought - create plan
-		PPlan plan = new PPlan(cooperative.getBestPlan().getId(), cooperative.getBestPlan().getStopsToBeServed(), cooperative.getBestPlan().getStartTime(), cooperative.getBestPlan().getEndTime());
+		PPlan plan = new PPlan(cooperative.getBestPlan().getId(), this.getName(), cooperative.getBestPlan().getStopsToBeServed(), cooperative.getBestPlan().getStartTime(), cooperative.getBestPlan().getEndTime());
 		plan.setScore(cooperative.getBestPlan().getScore());
 		plan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), plan.getStartTime(), plan.getEndTime(), vehicleBought, plan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 		return plan;

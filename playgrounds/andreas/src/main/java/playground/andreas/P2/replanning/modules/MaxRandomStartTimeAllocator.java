@@ -59,7 +59,7 @@ public class MaxRandomStartTimeAllocator extends PStrategy implements PPlanStrat
 		}
 		
 		// enough vehicles to test, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
 		// get a valid new start time

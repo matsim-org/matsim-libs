@@ -51,7 +51,7 @@ public class RemoveAllVehiclesButOne extends PStrategy implements PPlanStrategy{
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), cooperative.getBestPlan());
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName(), cooperative.getBestPlan());
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 
 		return newPlan;

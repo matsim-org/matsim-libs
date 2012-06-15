@@ -92,7 +92,7 @@ public class StopReduceDemand extends PStrategy implements PPlanStrategy, Vehicl
 		}
 				
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
 		newPlan.setStopsToBeServed(stopsToBeServed);
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
