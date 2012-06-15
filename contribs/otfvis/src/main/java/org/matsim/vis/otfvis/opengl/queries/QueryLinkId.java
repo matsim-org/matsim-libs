@@ -54,7 +54,7 @@ public class QueryLinkId extends AbstractQuery {
 
 	public static class Result implements OTFQueryResult {
 
-		public Map<CoordImpl, String> linkIds = new HashMap<CoordImpl, String>();
+		public Map<Coord, String> linkIds = new HashMap<Coord, String>();
 
 		@Override
 		public void remove() {
