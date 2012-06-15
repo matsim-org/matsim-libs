@@ -30,15 +30,17 @@ public class RandomCompassRouterFactory implements LeastCostPathCalculatorFactor
 
 	private final boolean tabuSearch;
 	private final double compassProbability;
+	private final AcosProvider acosProvider;
 	
 	public RandomCompassRouterFactory(boolean tabuSearch, double compassProbability) {
 		this.tabuSearch = tabuSearch;
 		this.compassProbability = compassProbability;
+		this.acosProvider = new AcosProvider();
 	}
 	
 	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelDisutility travelCosts, TravelTime travelTimes) {
-		return new RandomCompassRouter(network, tabuSearch, compassProbability);
+		return new RandomCompassRouter(network, tabuSearch, compassProbability, acosProvider);
 	}
 }
