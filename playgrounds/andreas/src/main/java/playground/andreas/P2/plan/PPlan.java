@@ -195,6 +195,10 @@ public class PPlan {
 
 	public boolean isSameButVehSize(PPlan testPlan) {
 		
+		if (testPlan.getStopsToBeServed().size() != this.getStopsToBeServed().size()) {
+			return false;
+		}
+		
 		for (int i = 0; i < this.stopsToBeServed.size(); i++) {
 			if(!this.stopsToBeServed.get(i).getId().toString().equalsIgnoreCase(testPlan.getStopsToBeServed().get(i).getId().toString())){
 				return false;
