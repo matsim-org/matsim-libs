@@ -47,7 +47,9 @@ import org.matsim.vis.otfvis.opengl.queries.QueryAgentEvents;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentId;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPTBus;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
+import org.matsim.vis.otfvis.opengl.queries.QueryLinkById;
 import org.matsim.vis.otfvis.opengl.queries.QueryLinkId;
+import org.matsim.vis.otfvis.opengl.queries.QueryNodeById;
 import org.matsim.vis.otfvis.opengl.queries.QuerySpinne;
 import org.matsim.vis.otfvis.opengl.queries.QuerySpinneNOW;
 
@@ -85,7 +87,9 @@ public class OTFQueryControl implements OTFQueryHandler {
 											"linkSpinneALL", "show Spinne of ALL traffic",
 											QuerySpinne.class), new QueryEntry("linkSpinneNOW",
 													"show Spinne of all veh on the link NOW",
-													QuerySpinneNOW.class)));
+													QuerySpinneNOW.class), 
+													new QueryEntry("linkById", "show link(s) by comma separated link id", QueryLinkById.class),
+													new QueryEntry("nodeById", "show node(s) by comma separated node id", QueryNodeById.class)));
 
 	private final OTFVisConfigGroup config;
 
