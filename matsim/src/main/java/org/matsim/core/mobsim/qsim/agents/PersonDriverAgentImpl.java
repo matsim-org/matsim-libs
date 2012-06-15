@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -312,7 +313,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	 */
 	void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
-		String activityDurationInterpretation = this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation();
+		ActivityDurationInterpretation activityDurationInterpretation = this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation();
 		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 
 		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {

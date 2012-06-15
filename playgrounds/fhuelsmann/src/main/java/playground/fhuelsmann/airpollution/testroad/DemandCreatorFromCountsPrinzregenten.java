@@ -40,7 +40,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
 
 import playground.benjamin.utils.CheckingTabularFileHandler;
 
@@ -153,8 +153,12 @@ public class DemandCreatorFromCountsPrinzregenten {
 	}*/
 
 	private static void fuzzifyTimes(Population population) {
-		PlanMutateTimeAllocation planMutateTimeAllocation = new PlanMutateTimeAllocation(1 * 60, new Random(4711));
-		planMutateTimeAllocation.setUseActivityDurations(false);
+		PlanMutateTimeAllocationSimplified planMutateTimeAllocation = new PlanMutateTimeAllocationSimplified(1 * 60, new Random(4711));
+
+//		planMutateTimeAllocation.setUseActivityDurations(false);
+		// the meaning of this statement is now subsumed in the selection of the "simplified" class above.  kai, jun'12
+
+
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getPlans().iterator().next();
 			planMutateTimeAllocation.run(plan);
@@ -163,7 +167,7 @@ public class DemandCreatorFromCountsPrinzregenten {
 	}
 
 	private static Population generatePopulation(String laneFile1, String laneFile2, String laneFile3) {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = sc.getPopulation();
 
 		SortedMap<Integer, Double> endTime2NoOfVehiclesLane1 = getEndTime2NoOfVehicles(laneFile1);

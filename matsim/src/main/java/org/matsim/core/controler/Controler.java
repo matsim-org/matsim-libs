@@ -53,6 +53,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
@@ -632,7 +633,7 @@ public class Controler extends AbstractController {
 
 		if (!this.config
 				.vspExperimental().getActivityDurationInterpretation()
-				.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME)) {
+				.equals(ActivityDurationInterpretation.minOfDurationAndEndTime)) {
 			addControlerListener(new VspPlansCleaner());
 		}
 

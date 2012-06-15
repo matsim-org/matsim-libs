@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.ActivityImpl;
@@ -36,7 +37,7 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class VspPlansCleaner implements BeforeMobsimListener {
-
+	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Population pop = event.getControler().getScenario().getPopulation();
@@ -51,19 +52,19 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 					Activity act = (Activity) pe ;
 					
 					if ( config.vspExperimental().getActivityDurationInterpretation()
-							.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
+							.equals(ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
 						
 						// person stays at the activity either until its duration is over or until its end time, whatever comes first
 						// do nothing
 						
 					} else if ( config.vspExperimental().getActivityDurationInterpretation()
-							.equals(VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
+							.equals(ActivityDurationInterpretation.endTimeOnly ) ) {
 						
 						// always set duration to undefined:
 						act.setMaximumDuration( Time.UNDEFINED_TIME ) ;
 						
 					} else if ( config.vspExperimental().getActivityDurationInterpretation()
-							.equals(VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION ) ) {
+							.equals(ActivityDurationInterpretation.tryEndTimeThenDuration ) ) {
 						
 						// set duration to undefined if there is an activity end time:
 						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {

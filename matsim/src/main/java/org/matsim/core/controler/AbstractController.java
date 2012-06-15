@@ -64,7 +64,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author nagel
  *
  */
-public abstract class AbstractController {
+public abstract class AbstractController implements Runnable {
 
 	protected static final Logger log = Logger.getLogger(Controler.class);
 	/**

@@ -41,7 +41,6 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final Double mutationRange;
 	private final Random random;
-	private boolean useActivityDurations;
 
 	public PlanMutateTimeAllocation(final int mutationRange, final Random random) {
 		this.mutationRange = new Double(mutationRange);
@@ -85,7 +84,7 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-					if (this.useActivityDurations) {
+//					if (this.useActivityDurations) {
 						if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 							// mutate the durations of all 'middle' activities
 							act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
@@ -100,19 +99,19 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 							act.setEndTime(newEndTime);
 							now = newEndTime;
 						}
-					} 
-					else {
-						if (act.getEndTime() == Time.UNDEFINED_TIME) {
-							throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
-						}
-						double newEndTime = mutateTime(act.getEndTime());
-						if (newEndTime < now) {
-							newEndTime = now;
-						}
-						act.setEndTime(newEndTime);
-						now = newEndTime;
-					}
-				// handle last activity
+//					} 
+//					else {
+//						if (act.getEndTime() == Time.UNDEFINED_TIME) {
+//							throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
+//						}
+//						double newEndTime = mutateTime(act.getEndTime());
+//						if (newEndTime < now) {
+//							newEndTime = now;
+//						}
+//						act.setEndTime(newEndTime);
+//						now = newEndTime;
+//					}
+//				// handle last activity
 				} else {
 
 					// assume that there will be no delay between arrival time and activity start time
@@ -152,9 +151,9 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 		return t;
 	}
 
-	public void setUseActivityDurations(boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
-	}
+//	public void setUseActivityDurations(boolean useActivityDurations) {
+//		this.useActivityDurations = useActivityDurations;
+//	}
 
 	
 }

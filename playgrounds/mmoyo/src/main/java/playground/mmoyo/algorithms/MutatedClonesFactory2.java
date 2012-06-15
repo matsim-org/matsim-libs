@@ -29,7 +29,7 @@ public class MutatedClonesFactory2 {
 		PlanAlgorithm[] mutatorArray = new PlanAlgorithm[20];
 		for (int i=0; i<20;i++){
 			mutatorArray[i]= new PlanMutateTimeAllocation(7200,MatsimRandom.getLocalInstance());
-			((PlanMutateTimeAllocation)mutatorArray[i]).setUseActivityDurations(true);
+//			((PlanMutateTimeAllocation)mutatorArray[i]).setUseActivityDurations(true);
 		}
 		
 		List<Person> newPersonList = new ArrayList<Person>();

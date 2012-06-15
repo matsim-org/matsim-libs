@@ -30,7 +30,7 @@ public class ClonMutator {
 		PlanAlgorithm[] mutatorArray = new PlanAlgorithm[max];
 		for (int i=0; i<max;i++){
 			mutatorArray[i]= new PlanMutateTimeAllocation(mutRange,MatsimRandom.getLocalInstance());
-			((PlanMutateTimeAllocation)mutatorArray[i]).setUseActivityDurations(true);
+//			((PlanMutateTimeAllocation)mutatorArray[i]).setUseActivityDurations(true);
 		}
 		
 		//mutate clones according to diff mutation seed

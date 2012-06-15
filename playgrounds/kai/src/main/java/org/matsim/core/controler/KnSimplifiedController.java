@@ -94,7 +94,8 @@ public class KnSimplifiedController extends AbstractController {
 		this.config = this.scenarioData.getConfig();
 
 	}
-	private void run() {
+	@Override
+	public void run() {
 		setUpOutputDir(); // output dir needs to be before logging
 		initEvents(); // yy I do not understand why events need to be before logging
 		initLogging(); // logging needs to be early

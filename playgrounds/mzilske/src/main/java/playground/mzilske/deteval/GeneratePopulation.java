@@ -38,7 +38,7 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income.IncomePeriod;
-import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -145,8 +145,11 @@ public class GeneratePopulation {
 	}
 
 	private void mutateTimes() {
-		PlanMutateTimeAllocation planMutateTimeAllocation = new PlanMutateTimeAllocation(15 * 60, random);
-		planMutateTimeAllocation.setUseActivityDurations(false);
+		PlanMutateTimeAllocationSimplified planMutateTimeAllocation = new PlanMutateTimeAllocationSimplified(15 * 60, random);
+
+//		planMutateTimeAllocation.setUseActivityDurations(false);
+		// replaced this by completely separate class.  results will not be fully backwards compatible.  kai, jun'12
+
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getPlans().iterator().next();
 			planMutateTimeAllocation.run(plan);

@@ -83,14 +83,16 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Deprecated
 	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
+	
+	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, endTimeOnly } ;
 
-	public static final String MIN_OF_DURATION_AND_END_TIME="minOfDurationAndEndTime" ;
-	public static final String TRY_END_TIME_THEN_DURATION="tryEndTimeThenDuration" ;
-	public static final String END_TIME_ONLY="endTimeOnly" ;
+//	public static final String MIN_OF_DURATION_AND_END_TIME="minOfDurationAndEndTime" ;
+//	public static final String TRY_END_TIME_THEN_DURATION="tryEndTimeThenDuration" ;
+//	public static final String END_TIME_ONLY="endTimeOnly" ;
 
 	//	@Deprecated
 	//	private boolean useActivityDurations = true;
-	private String activityDurationInterpretation = MIN_OF_DURATION_AND_END_TIME ;
+	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.minOfDurationAndEndTime ;
 
 	// ---
 
@@ -208,8 +210,14 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
 				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
-		map.put(ACTIVITY_DURATION_INTERPRETATION, "String: " + MIN_OF_DURATION_AND_END_TIME + "', '" + TRY_END_TIME_THEN_DURATION
-				+ "', '" + END_TIME_ONLY + "'") ;
+		
+		StringBuilder str = new StringBuilder() ;
+		for ( ActivityDurationInterpretation itp : ActivityDurationInterpretation.values() ) {
+			str.append( " " + itp.toString() ) ;
+		}
+		map.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
+				+ ActivityDurationInterpretation.minOfDurationAndEndTime.toString() + " will internally use a different " +
+						"(simpler) version of the TimeAllocationMutator.") ;
 
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not yet implemented) will remove plan attributes that are presumably not used, such as " +
 		"activityStartTime. default=false") ;
@@ -243,12 +251,12 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
 			//			this.setUseActivityDurations(Boolean.parseBoolean(value));
 			if ( Boolean.parseBoolean(value) ) {
-				setActivityDurationInterpretation( MIN_OF_DURATION_AND_END_TIME ) ;
+				setActivityDurationInterpretation( ActivityDurationInterpretation.minOfDurationAndEndTime ) ;
 			} else {
-				setActivityDurationInterpretation( END_TIME_ONLY ) ;
+				setActivityDurationInterpretation( ActivityDurationInterpretation.endTimeOnly ) ;
 			}
 		} else if ( ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
-			setActivityDurationInterpretation(value) ;
+			setActivityDurationInterpretation(ActivityDurationInterpretation.valueOf(value)) ;
 		} else if ( REMOVING_UNNECESSARY_PLAN_ATTRIBUTES.equalsIgnoreCase(key)) {
 			setRemovingUnneccessaryPlanAttributes(Boolean.parseBoolean(value)) ;
 		} else if ( COLORING.equalsIgnoreCase(key) ) {
@@ -295,7 +303,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		//		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
-		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation()) ;
+		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation().toString()) ;
 
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, Boolean.toString(isRemovingUnneccessaryPlanAttributes()) ) ;
 
@@ -411,11 +419,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	//		this.offsetWalk = offsetWalk;
 	//	}
 
-	public String getActivityDurationInterpretation() {
+	public ActivityDurationInterpretation getActivityDurationInterpretation() {
 		return this.activityDurationInterpretation;
 	}
 
-	public void setActivityDurationInterpretation(final String activityDurationInterpretation) {
+	public void setActivityDurationInterpretation(final ActivityDurationInterpretation activityDurationInterpretation) {
 		this.activityDurationInterpretation = activityDurationInterpretation;
 	}
 

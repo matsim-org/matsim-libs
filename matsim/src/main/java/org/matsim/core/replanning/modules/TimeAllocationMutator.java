@@ -23,10 +23,11 @@ package org.matsim.core.replanning.modules;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
 
 /**
  * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
@@ -44,7 +45,8 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	private final static Logger log = Logger.getLogger(TimeAllocationMutator.class);
 
 	private Double mutationRange = null;
-	private boolean useActivityDurations = true;
+//	private boolean useActivityDurations = true;
+	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.minOfDurationAndEndTime ;
 
 	/**
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
@@ -67,15 +69,15 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 			throw new RuntimeException("found mutationRange==null; don't know what that means; throwing exception ...") ;
 		}
 
-		if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
-			useActivityDurations = true ;
-		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
-			useActivityDurations = false ;
-		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION ) ) {
-			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
-		} else {
-			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;
-		}
+//		if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
+//			useActivityDurations = true ;
+//		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.endTimeOnly ) ) {
+//			useActivityDurations = false ;
+//		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.tryEndTimeThenDuration ) ) {
+//			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
+//		} else {
+//			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;
+//		}
 	}
 
 	/**
@@ -94,8 +96,14 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(mutationRange, MatsimRandom.getLocalInstance());
-		pmta.setUseActivityDurations(this.useActivityDurations);
+		PlanAlgorithm pmta ;
+		switch( this.activityDurationInterpretation ) {
+		case minOfDurationAndEndTime:
+			pmta = new PlanMutateTimeAllocation(mutationRange, MatsimRandom.getLocalInstance());
+			break ;
+		default:
+			pmta = new PlanMutateTimeAllocationSimplified(mutationRange, MatsimRandom.getLocalInstance());
+		}
 		return pmta;
 	}
 

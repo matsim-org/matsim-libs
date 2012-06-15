@@ -23,6 +23,7 @@ package playground.ikaddoura.parkAndRide.pRstrategy;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -58,11 +59,11 @@ public class ParkAndRideTimeAllocationMutator extends AbstractMultithreadedModul
 			this.mutationRange = Integer.parseInt(range);
 			log.info("mutation range = " + this.mutationRange);
 		}
-		if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
+		if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
 			useActivityDurations = true ;
-		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.END_TIME_ONLY ) ) {
+		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.endTimeOnly ) ) {
 			useActivityDurations = false ;
-		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION ) ) {
+		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.tryEndTimeThenDuration ) ) {
 			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
 		} else {
 			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;

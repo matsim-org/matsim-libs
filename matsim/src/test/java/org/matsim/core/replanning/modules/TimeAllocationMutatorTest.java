@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -50,7 +51,12 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	public void testMutationRangeDefault() {
 		Config config = loadConfig(null);
 		config.global().setNumberOfThreads(0);
-		runMutationRangeTest(new TimeAllocationMutator(config), 1800);
+		for ( ActivityDurationInterpretation activityDurationInterpretation : ActivityDurationInterpretation.values() ) {
+			config.vspExperimental().setActivityDurationInterpretation(activityDurationInterpretation) ;
+			// Note: the different activity duration interpretations internall call different PlanMutateTimeAllocation classes.
+			// Maybe should be more explicit? How? kai, jun'12
+			runMutationRangeTest(new TimeAllocationMutator(config), 1800);
+		}
 	}
 
 	/**
@@ -61,16 +67,22 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	public void testMutationRangeConfig() {
 		Config config = loadConfig(null);
 		config.global().setNumberOfThreads(0);
+		for ( ActivityDurationInterpretation activityDurationInterpretation : ActivityDurationInterpretation.values() ) {
+			config.vspExperimental().setActivityDurationInterpretation(activityDurationInterpretation) ;
+			// Note: the different activity duration interpretations internall call different PlanMutateTimeAllocation classes.
+			// Maybe should be more explicit? How? kai, jun'12
 
-		// test smaller value than default
-//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "900");
-		config.timeAllocationMutator().setMutationRange( 900. ) ;
-		runMutationRangeTest(new TimeAllocationMutator(config), 900);
+			// test smaller value than default
+			//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "900");
+			config.timeAllocationMutator().setMutationRange( 900. ) ;
+			runMutationRangeTest(new TimeAllocationMutator(config), 900);
 
-		// test bigger value than default
-//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
-		config.timeAllocationMutator().setMutationRange(2700.) ;
-		runMutationRangeTest(new TimeAllocationMutator(config), 2700);
+			// test bigger value than default
+			//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
+			config.timeAllocationMutator().setMutationRange(2700.) ;
+			runMutationRangeTest(new TimeAllocationMutator(config), 2700);
+
+		}
 	}
 
 	/**
@@ -81,18 +93,23 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	public void testMutationRangeParam() {
 		Config config = loadConfig(null);
 		config.global().setNumberOfThreads(0);
+		for ( ActivityDurationInterpretation activityDurationInterpretation : ActivityDurationInterpretation.values() ) {
+			config.vspExperimental().setActivityDurationInterpretation(activityDurationInterpretation) ;
+			// Note: the different activity duration interpretations internall call different PlanMutateTimeAllocation classes.
+			// Maybe should be more explicit? How? kai, jun'12
 
-		// test smaller value than default
-		runMutationRangeTest(new TimeAllocationMutator(config, 750), 750);
+			// test smaller value than default
+			runMutationRangeTest(new TimeAllocationMutator(config, 750), 750);
 
-		// test bigger value than default
+			// test bigger value than default
 
-		// I found the following line.  presumably, it deliberately sets the config to a different value
-		// than what is used in the constructor.  ???  kai, jun'12
-//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
-		config.timeAllocationMutator().setMutationRange(2700.) ;
-		
-		runMutationRangeTest(new TimeAllocationMutator(config, 7200), 7200);
+			// I found the following line.  presumably, it deliberately sets the config to a different value
+			// than what is used in the constructor.  ???  kai, jun'12
+			//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
+			config.timeAllocationMutator().setMutationRange(2700.) ;
+
+			runMutationRangeTest(new TimeAllocationMutator(config, 7200), 7200);
+		}
 	}
 
 	/**

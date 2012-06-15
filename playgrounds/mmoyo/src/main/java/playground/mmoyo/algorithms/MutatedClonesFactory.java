@@ -33,7 +33,7 @@ public class MutatedClonesFactory extends AbstractPersonAlgorithm{
 		PlanAlgorithm[] mutatorArray = new PlanAlgorithm[cloneNum];
 		for (int i=0; i<cloneNum;i++){
 			mutatorArray[i]= new PlanMutateTimeAllocation(mutRange,MatsimRandom.getLocalInstance());
-			((PlanMutateTimeAllocation)mutatorArray[i]).setUseActivityDurations(true);
+//			((PlanMutateTimeAllocation)mutatorArray[i]).setUseActivityDurations(true);
 		}	
 	}
 	
