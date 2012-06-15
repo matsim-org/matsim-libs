@@ -43,6 +43,7 @@ public class PPlan {
 	private final static Logger log = Logger.getLogger(PPlan.class);
 	
 	private final Id id;
+	private final String creator;
 
 	private TransitLine line;
 	private double score = Double.NaN;
@@ -56,19 +57,22 @@ public class PPlan {
 
 	private Set<Id> vehicleIds;
 	
-	public PPlan(Id id) {
+	public PPlan(Id id, String creator) {
 		this.id = id;
+		this.creator = creator;
 	}
 	
-	public PPlan(Id id, ArrayList<TransitStopFacility> stopsToBeServed, double startTime, double endTime){
+	public PPlan(Id id, String creator, ArrayList<TransitStopFacility> stopsToBeServed, double startTime, double endTime){
 		this.id = id;
+		this.creator = creator;
 		this.stopsToBeServed = stopsToBeServed;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
 	
-	public PPlan(Id id, PPlan oldPlan){
+	public PPlan(Id id, String creator, PPlan oldPlan){
 		this.id = id;
+		this.creator = creator;
 		this.stopsToBeServed = oldPlan.getStopsToBeServed();
 		this.startTime = oldPlan.getStartTime();
 		this.endTime = oldPlan.getEndTime();
@@ -107,7 +111,11 @@ public class PPlan {
 	}
 
 	public Id getId() {
-		return id;
+		return this.id;
+	}
+	
+	public String getCreator() {
+		return this.creator;
 	}
 
 	public TransitLine getLine(){
@@ -167,6 +175,10 @@ public class PPlan {
 
 	public double getScorePerVehicle() {
 		return (this.score / this.vehicleIds.size());
+	}
+	
+	public double getPlannedScorePerVehicle(){
+		return (this.score / this.nVehicles);
 	}
 
 	public Set<Id> getVehicleIds() {
