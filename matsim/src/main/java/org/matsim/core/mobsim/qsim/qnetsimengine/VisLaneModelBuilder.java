@@ -23,8 +23,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -34,9 +36,12 @@ import org.matsim.vis.vecmathutils.VectorUtils;
 /**
  * @author dgrether
  */
-public class OTFLaneModelBuilder {
+public class VisLaneModelBuilder {
+	
+//	private static final Logger log = Logger.getLogger(VisLaneModelBuilder.class);
 
-	public void recalculatePositions(OTFLinkWLanes linkData, SnapshotLinkWidthCalculator linkWidthCalculator) {
+	public void recalculatePositions(VisLinkWLanes linkData, SnapshotLinkWidthCalculator linkWidthCalculator) {
+//		log.error("recalculatePositions...");
 		double linkWidth = linkWidthCalculator.calculateLinkWidth(linkData.getNumberOfLanes()) ;
 		linkData.setLinkWidth(linkWidth);
 		Point2D.Double linkStartCenter = this.calculatePointOnLink(linkData, 0.0, 0.5);
@@ -46,14 +51,17 @@ public class OTFLaneModelBuilder {
 			double x = linkData.getLinkEnd().x + (0.5 * linkWidth * linkData.getLinkOrthogonalVector().x);
 			double y = linkData.getLinkEnd().y + (0.5 * linkWidth * linkData.getLinkOrthogonalVector().y);
 			linkData.setLinkEndCenterPoint(new Point2D.Double(x, y));
+//			log.error("link " + linkData.getLinkId() + " without lanes starts at " + linkData.getLinkStartCenterPoint() + " and ends at " + x + " " + y + " but " + linkData.getLinkEnd());
 		}
 		else {
 			double numberOfLinkParts = (2 * linkData.getMaximalAlignment()) + 2;
-			for (OTFLane lane : linkData.getLaneData().values()){
+//			log.error("link with lanes " + linkData.getLinkId() + " starts at " + linkData.getLinkStart() + " and ends at " + linkData.getLinkEnd());
+			for (VisLane lane : linkData.getLaneData().values()){
 				double horizontalFraction = 0.5 - (lane.getAlignment() / numberOfLinkParts);
 				Point2D.Double laneStart = calculatePointOnLink(linkData, lane.getStartPosition(), horizontalFraction);
 				Point2D.Double laneEnd = calculatePointOnLink(linkData, lane.getEndPosition(), horizontalFraction);
 				lane.setStartEndPoint(laneStart, laneEnd);
+//				log.error("lane " + lane.getId() + " starts at " + laneStart + " ends at " + laneEnd);
 				if (lane.getNumberOfLanes() >= 2.0){
 					double noLanesFloor = Math.floor(lane.getNumberOfLanes());
 					double laneOffset = - noLanesFloor / 2 * linkWidthCalculator.getLaneWidth();
@@ -71,7 +79,7 @@ public class OTFLaneModelBuilder {
 		}
 	}
 	
-	private Point2D.Double calculatePointOnLink(final OTFLinkWLanes laneLinkData, final double position, final double horizontalFraction) {
+	private Point2D.Double calculatePointOnLink(final VisLinkWLanes laneLinkData, final double position, final double horizontalFraction) {
 		Point2D.Double lenghtPoint = this.calcPoint(laneLinkData.getLinkStart(), laneLinkData.getNormalizedLinkVector(), position);
 		return this.calcPoint(lenghtPoint, laneLinkData.getLinkOrthogonalVector(), horizontalFraction * laneLinkData.getLinkWidth());
 	}
@@ -83,13 +91,13 @@ public class OTFLaneModelBuilder {
 	}
 	
 	
-	private OTFLane createOTFLane(LaneData20 laneData, QLane qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
+	private VisLane createOTFLane(LaneData20 laneData, QLane qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
 		String id = laneData.getId().toString();
 		double startPosition = (linkLength -  laneData.getStartsAtMeterFromLinkEnd()) * linkScale * linkLengthCorrectionFactor;
-//		log.error("lane " + qLane.getId() + " starts at: " + startPoint);
 		double endPosition = startPosition + (qlane.getLength() *  linkScale * linkLengthCorrectionFactor);
+//		log.error("lane " + qlane.getId() + " starts at: " + startPosition + " and ends at : " +endPosition);
 		int alignment = laneData.getAlignment();
-		OTFLane lane = new OTFLane(id);
+		VisLane lane = new VisLane(id);
 		lane.setStartPosition(startPosition);
 		lane.setEndPosition(endPosition);
 		lane.setAlignment(alignment);
@@ -97,21 +105,21 @@ public class OTFLaneModelBuilder {
 		return lane;
 	}
 	
-	public void connect(Map<String, OTFLinkWLanes> otfNetwork){
-		for (OTFLinkWLanes otfLink : otfNetwork.values()){
+	public void connect(Map<String, VisLinkWLanes> otfNetwork){
+		for (VisLinkWLanes otfLink : otfNetwork.values()){
 			if (otfLink.getLaneData() == null || otfLink.getLaneData().isEmpty()){
 				if (otfLink.getToLinkIds() != null){
 					for (Id toLinkId : otfLink.getToLinkIds()){
-						OTFLinkWLanes toLink = otfNetwork.get(toLinkId.toString());
+						VisLinkWLanes toLink = otfNetwork.get(toLinkId.toString());
 						otfLink.addToLink(toLink);
 					}
 				}
 			}
 			else {
-				for (OTFLane otfLane : otfLink.getLaneData().values()){
+				for (VisLane otfLane : otfLink.getLaneData().values()){
 					if (otfLane.getToLinkIds() != null) {
 						for (Id toLinkId : otfLane.getToLinkIds()){
-							OTFLinkWLanes toLink = otfNetwork.get(toLinkId.toString());
+							VisLinkWLanes toLink = otfNetwork.get(toLinkId.toString());
 							otfLane.addToLink(toLink);
 						}
 					}
@@ -120,9 +128,15 @@ public class OTFLaneModelBuilder {
 		}
 	}
 
-	public OTFLinkWLanes createOTFLinkWLanes(VisLink link, double nodeOffsetMeter, LanesToLinkAssignment20 l2l) {
-		Point2D.Double linkStart = new Point2D.Double(link.getLink().getFromNode().getCoord().getX(), link.getLink().getFromNode().getCoord().getY());
-		Point2D.Double linkEnd =  new Point2D.Double(link.getLink().getToNode().getCoord().getX(), link.getLink().getToNode().getCoord().getY());
+	public VisLinkWLanes createOTFLinkWLanes(CoordinateTransformation transform, VisLink link, double nodeOffsetMeter, LanesToLinkAssignment20 l2l) {
+//		log.error("");
+//		log.error("link " + link.getLink().getId() + " ... ");
+//		log.debug("  fromNode: " + link.getLink().getFromNode().getId() + " coord: " + link.getLink().getFromNode().getCoord());
+//		log.debug("  toNode: " + link.getLink().getToNode().getId() + " coord: " + link.getLink().getToNode().getCoord());
+		Coord linkStartCoord = transform.transform(link.getLink().getFromNode().getCoord());
+		Coord linkEndCoord = transform.transform(link.getLink().getToNode().getCoord());
+		Point2D.Double linkStart = new Point2D.Double(linkStartCoord.getX(), linkStartCoord.getY());
+		Point2D.Double linkEnd =  new Point2D.Double(linkEndCoord.getX(), linkEndCoord.getY());
 		
 		//calculate length and normal
 		Point2D.Double deltaLink = new Point2D.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
@@ -145,8 +159,9 @@ public class OTFLaneModelBuilder {
 		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
 		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
 		Point2D.Double scaledLinkStart = scaledLink.getFirst();
+//		log.error("scaledLinkStart: " + scaledLinkStart + " end: " + scaledLinkEnd);
 		
-		OTFLinkWLanes lanesLinkData = new OTFLinkWLanes(link.getLink().getId().toString());
+		VisLinkWLanes lanesLinkData = new VisLinkWLanes(link.getLink().getId().toString());
 		lanesLinkData.setLinkStartEndPoint(scaledLinkStart, scaledLinkEnd);
 		lanesLinkData.setNormalizedLinkVector(deltaLinkNorm);
 		lanesLinkData.setLinkOrthogonalVector(normalizedOrthogonal);
@@ -156,7 +171,7 @@ public class OTFLaneModelBuilder {
 			int maxAlignment = 0;
 			for (LaneData20 lane : l2l.getLanes().values()){
 				QLane ql = this.getQLane(lane.getId(), (QLinkLanesImpl)link);
-				OTFLane visLane = this.createOTFLane(lane, ql, link.getLink().getLength(), linkScale, linkLengthCorrectionFactor);
+				VisLane visLane = this.createOTFLane(lane, ql, link.getLink().getLength(), linkScale, linkLengthCorrectionFactor);
 				lanesLinkData.addLaneData(visLane);
 				if (visLane.getAlignment() > maxAlignment) {
 					maxAlignment = visLane.getAlignment();
@@ -165,10 +180,10 @@ public class OTFLaneModelBuilder {
 			lanesLinkData.setMaximalAlignment(maxAlignment);
 			//connect the lanes
 			for (LaneData20 lane : l2l.getLanes().values()){
-				OTFLane otfLane = lanesLinkData.getLaneData().get(lane.getId().toString());
+				VisLane otfLane = lanesLinkData.getLaneData().get(lane.getId().toString());
 				if (lane.getToLaneIds() != null){
 					for (Id toLaneId : lane.getToLaneIds()){
-						OTFLane otfToLane = lanesLinkData.getLaneData().get(toLaneId.toString());
+						VisLane otfToLane = lanesLinkData.getLaneData().get(toLaneId.toString());
 						otfLane.addToLane(otfToLane);
 					}
 				}

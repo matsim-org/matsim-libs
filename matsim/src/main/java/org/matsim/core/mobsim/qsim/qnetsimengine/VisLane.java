@@ -37,26 +37,26 @@ import org.matsim.signalsystems.model.SignalGroupState;
 /**
  * @author dgrether
  */
-public class OTFLane implements Serializable {
+public class VisLane implements Serializable {
 	
 	private String id = null;
 	private double endPosition;
 	private double startPosition;
 	private int alignment;
 	private double numberOfLanes;
-	private List<OTFLane> toLanes = null;
+	private List<VisLane> toLanes = null;
 	private SignalGroupState state = null;
 	private Point2D.Double startPoint = null;
 	private Point2D.Double endPoint = null;
-	private Map<String, OTFSignal> signals = null;
+	private Map<String, VisSignal> signals = null;
 	private List<Id> toLinkIds;
-	private transient List<OTFLinkWLanes> toLinksData = null;
+	private transient List<VisLinkWLanes> toLinksData = null;
 	private double euklideanDistance;
 	private CoordImpl startCoord;
 	private Coord endCoord; 
 	private Map<Integer, Tuple<Coord, Coord>> drivingLaneMap = null;
 	
-	public OTFLane(String id) {
+	public VisLane(String id) {
 		this.id = id;
 	}
 	
@@ -110,16 +110,16 @@ public class OTFLane implements Serializable {
 		return this.state ;
 	}
 
-	public void addToLink(OTFLinkWLanes toLink) {
+	public void addToLink(VisLinkWLanes toLink) {
 		if (this.toLinksData == null) {
-			this.toLinksData = new ArrayList<OTFLinkWLanes>();
+			this.toLinksData = new ArrayList<VisLinkWLanes>();
 		}
 		this.toLinksData.add(toLink);
 	}
 
-	public void addToLane(OTFLane toLane) {
+	public void addToLane(VisLane toLane) {
 		if (this.toLanes == null){
-			this.toLanes = new ArrayList<OTFLane>();
+			this.toLanes = new ArrayList<VisLane>();
 		}
 		this.toLanes.add(toLane);
 	}
@@ -167,19 +167,19 @@ public class OTFLane implements Serializable {
 		return this.endCoord;
 	}
 
-	public void addSignal(OTFSignal signal) {
+	public void addSignal(VisSignal signal) {
 		if (this.signals == null){
-			this.signals = new HashMap<String, OTFSignal>();
+			this.signals = new HashMap<String, VisSignal>();
 		}
 		this.signals.put(signal.getId(), signal);
 	}
 	
-	public Map<String, OTFSignal> getSignals(){
+	public Map<String, VisSignal> getSignals(){
 		return this.signals;
 	}
 
 	
-	public List<OTFLinkWLanes> getToLinks() {
+	public List<VisLinkWLanes> getToLinks() {
 		return toLinksData;
 	}
 	
@@ -193,7 +193,7 @@ public class OTFLane implements Serializable {
 		return toLinkIds ;
 	}
 	
-	public List<OTFLane> getToLanes() {
+	public List<VisLane> getToLanes() {
 		return toLanes;
 	}
 

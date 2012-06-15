@@ -37,7 +37,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author dgrether
  *
  */
-public class OTFLinkWLanes implements Serializable{
+public class VisLinkWLanes implements Serializable{
 
 	private Point2D.Double linkStart = null;
 	private Point2D.Double linkEnd = null;
@@ -45,19 +45,19 @@ public class OTFLinkWLanes implements Serializable{
 	private Point2D.Double linkOrthogonalVector;
 	private double numberOfLanes = 1.0;
 	private int maximalAlignment = 0;
-	private Map<String, OTFLane> laneData =  null;
+	private Map<String, VisLane> laneData =  null;
 	private String id = null;
 	private double linkWidth;
 	private Point2D.Double linkStartCenterPoint = null;
 	private Point2D.Double linkEndCenterPoint = null;
-	private Map<String, OTFSignal> signals = null;
+	private Map<String, VisSignal> signals = null;
 	private ArrayList<Id> toLinkIds;
-	private transient List<OTFLinkWLanes> toLinks = null;
+	private transient List<VisLinkWLanes> toLinks = null;
 	private CoordImpl startCoord;
 	private CoordImpl endCoord;
 	private double euklideanDistance;
 	
-	public OTFLinkWLanes(String id){
+	public VisLinkWLanes(String id){
 		this.id = id;
 	}
 	
@@ -108,25 +108,25 @@ public class OTFLinkWLanes implements Serializable{
 		return this.maximalAlignment;
 	}
 	
-	public void addLaneData(OTFLane laneData){
+	public void addLaneData(VisLane laneData){
 		if (this.laneData == null){
-			this.laneData = new HashMap<String, OTFLane>();
+			this.laneData = new HashMap<String, VisLane>();
 		}
 		this.laneData .put(laneData.getId(), laneData);
 	}
 	
-	public Map<String, OTFLane> getLaneData(){
+	public Map<String, VisLane> getLaneData(){
 		return this.laneData;
 	}
 
-	public void addSignal(OTFSignal signal) {
+	public void addSignal(VisSignal signal) {
 		if (this.signals == null){
-			this.signals = new HashMap<String, OTFSignal>();
+			this.signals = new HashMap<String, VisSignal>();
 		}
 		this.signals.put(signal.getId(), signal);
 	}
 	
-	public Map<String, OTFSignal> getSignals(){
+	public Map<String, VisSignal> getSignals(){
 		return this.signals;
 	}
 	
@@ -177,14 +177,14 @@ public class OTFLinkWLanes implements Serializable{
 		return this.linkEndCenterPoint;
 	}
 	
-	public void addToLink(OTFLinkWLanes link){
+	public void addToLink(VisLinkWLanes link){
 		if (this.toLinks == null){
-			this.toLinks = new ArrayList<OTFLinkWLanes>();
+			this.toLinks = new ArrayList<VisLinkWLanes>();
 		}
 		this.toLinks.add(link);
 	}
 
-	public List<OTFLinkWLanes> getToLinks() {
+	public List<VisLinkWLanes> getToLinks() {
 		return this.toLinks ;
 	}
 	

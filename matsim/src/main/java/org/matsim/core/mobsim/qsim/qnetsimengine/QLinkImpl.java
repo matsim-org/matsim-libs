@@ -43,6 +43,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -777,15 +779,16 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 */
 	class VisDataImpl implements VisData {
 
-		private OTFLaneModelBuilder laneModelBuilder = null;
-		private OTFLinkWLanes otfLink = null;
+		private VisLaneModelBuilder laneModelBuilder = null;
+		private VisLinkWLanes otfLink = null;
 
 		private VisDataImpl() {
 			double nodeOffset = QLinkImpl.this.network.simEngine.getMobsim().getScenario().getConfig().otfVis().getNodeOffset(); 
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
-				laneModelBuilder = new OTFLaneModelBuilder();
-				otfLink = laneModelBuilder.createOTFLinkWLanes(QLinkImpl.this, nodeOffset, null);
+				laneModelBuilder = new VisLaneModelBuilder();
+				CoordinateTransformation transformation = new IdentityTransformation();
+				otfLink = laneModelBuilder.createOTFLinkWLanes(transformation, QLinkImpl.this, nodeOffset, null);
 				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.network.getLinkWidthCalculator();
 				laneModelBuilder.recalculatePositions(otfLink, linkWidthCalculator);
 			}

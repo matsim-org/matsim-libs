@@ -784,7 +784,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 * @author dgrether
 	 */
 	class VisDataImpl implements VisData {
-		OTFLane visLane ;
+		VisLane visLane ;
 		
 		VisDataImpl(){
 		}
@@ -862,7 +862,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 //		return this.bufferStorageCapacity ;
 //	}
 
-	void setOTFLane(OTFLane otfLane) {
+	void setOTFLane(VisLane otfLane) {
 		this.visdata.visLane = otfLane;
 	}
 

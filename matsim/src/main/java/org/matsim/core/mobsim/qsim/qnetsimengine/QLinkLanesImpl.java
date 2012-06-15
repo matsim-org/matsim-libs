@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -425,19 +427,20 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 *
 	 */
 	class VisDataImpl implements VisData {
-		private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
-		private OTFLinkWLanes otfLink;
+		private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
+		private VisLinkWLanes otfLink;
 
 		VisDataImpl(){
 			double nodeOffset = QLinkLanesImpl.this.network.simEngine.getMobsim().getScenario().getConfig().otfVis().getNodeOffset();
 			if (nodeOffset != 0){
 				 nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 			}
-			otfLink = laneModelBuilder.createOTFLinkWLanes(QLinkLanesImpl.this, nodeOffset, QLinkLanesImpl.this.lanesToLinkAssignment);
+			CoordinateTransformation transformation = new IdentityTransformation();
+			otfLink = laneModelBuilder.createOTFLinkWLanes(transformation, QLinkLanesImpl.this, nodeOffset, QLinkLanesImpl.this.lanesToLinkAssignment);
 			SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.network.getLinkWidthCalculator();
 			laneModelBuilder.recalculatePositions(otfLink, linkWidthCalculator);
 			for (QLane  ql : QLinkLanesImpl.this.queueLanes){
-				OTFLane otfLane = otfLink.getLaneData().get(ql.getId().toString());
+				VisLane otfLane = otfLink.getLaneData().get(ql.getId().toString());
 				ql.setOTFLane(otfLane);
 			}
 		}

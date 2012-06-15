@@ -30,14 +30,14 @@ import org.matsim.signalsystems.model.SignalGroupState;
  * @author dgrether
  *
  */
-public class OTFSignal implements Serializable {
+public class VisSignal implements Serializable {
 
 	private String id;
 	private SignalGroupState state;
-	private List<OTFLinkWLanes> turningMoveRestrictions = null;
+	private List<VisLinkWLanes> turningMoveRestrictions = null;
 	private String systemId;
 	
-	public OTFSignal(String systemId, String signalId) {
+	public VisSignal(String systemId, String signalId) {
 		this.systemId = systemId;
 		this.id = signalId;
 	}
@@ -58,13 +58,13 @@ public class OTFSignal implements Serializable {
 		return this.state;
 	}
 	
-	public List<OTFLinkWLanes> getTurningMoveRestrictions(){
+	public List<VisLinkWLanes> getTurningMoveRestrictions(){
 		return this.turningMoveRestrictions;
 	}
 
-	public void addTurningMoveRestriction(OTFLinkWLanes toLink) {
+	public void addTurningMoveRestriction(VisLinkWLanes toLink) {
 		if (this.turningMoveRestrictions == null){
-			this.turningMoveRestrictions = new ArrayList<OTFLinkWLanes>();
+			this.turningMoveRestrictions = new ArrayList<VisLinkWLanes>();
 		}
 		this.turningMoveRestrictions.add(toLink);
 	}
