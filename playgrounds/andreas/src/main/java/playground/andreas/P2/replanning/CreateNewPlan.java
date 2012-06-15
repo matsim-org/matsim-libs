@@ -66,9 +66,9 @@ public class CreateNewPlan extends PStrategy implements PPlanStrategy{
 			stopsToBeServed.add(stop1);
 			stopsToBeServed.add(stop2);
 			
-			newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration() + "-init"), this.getName(), stopsToBeServed, startTime, endTime); 
+			newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration() + "_init"), this.getName(), stopsToBeServed, startTime, endTime); 
 			
-			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(new IdImpl(cooperative.getId().toString() + "-init"), newPlan.getStartTime(), newPlan.getEndTime(), 1, stopsToBeServed, new IdImpl(cooperative.getCurrentIteration() + "-init")));
+			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(new IdImpl(cooperative.getId().toString() + "_init"), newPlan.getStartTime(), newPlan.getEndTime(), 1, stopsToBeServed, new IdImpl(cooperative.getCurrentIteration() + "_init")));
 		} while (cooperative.getFranchise().planRejected(newPlan));		
 
 		return newPlan;

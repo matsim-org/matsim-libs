@@ -184,7 +184,7 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		PPlan newPlan = this.lineId2PlanMap.get(cooperative.getId());		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(new IdImpl(cooperative.getId().toString() + "-init"), newPlan.getStartTime(), newPlan.getEndTime(), newPlan.getNVehicles(), newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration() + "-init")));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(new IdImpl(cooperative.getId().toString() + "_init"), newPlan.getStartTime(), newPlan.getEndTime(), newPlan.getNVehicles(), newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration() + "_init")));
 		return newPlan;
 	}
 
