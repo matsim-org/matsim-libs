@@ -83,6 +83,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 
+import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaActivityCounter;
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
@@ -194,6 +195,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	 */
 	protected EvacuationTimePicture evacuationTimePicture;
 	protected AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
+	protected AgentsInEvacuationAreaActivityCounter agentsInEvacuationAreaActivityCounter;
 	
 	static final Logger log = Logger.getLogger(EvacuationControler.class);
 
@@ -424,7 +426,13 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 					this.popAdmin, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
-			this.events.addHandler(agentsInEvacuationAreaCounter);	
+			this.events.addHandler(agentsInEvacuationAreaCounter);
+			
+			agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(this.scenarioData, coordAnalyzer.createInstance(), 
+					this.popAdmin, scaleFactor);
+			this.addControlerListener(agentsInEvacuationAreaActivityCounter);
+			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaActivityCounter);
+			this.events.addHandler(agentsInEvacuationAreaActivityCounter);
 		}
 		
 		/*

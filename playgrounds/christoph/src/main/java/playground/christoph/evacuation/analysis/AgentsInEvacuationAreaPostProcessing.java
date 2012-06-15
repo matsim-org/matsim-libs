@@ -154,6 +154,13 @@ public class AgentsInEvacuationAreaPostProcessing {
 		mobsimListeners.add(agentsInEvacuationAreaCounter);
 		eventsManager.addHandler(agentsInEvacuationAreaCounter);
 		
+		// Initialize AgentsInEvacuationAreaActivityCounter
+		AgentsInEvacuationAreaActivityCounter agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(scenario,
+				coordAnalyzer.createInstance(), popAdmin, scaleFactor);
+		controlerListeners.add(agentsInEvacuationAreaActivityCounter);
+		mobsimListeners.add(agentsInEvacuationAreaActivityCounter);
+		eventsManager.addHandler(agentsInEvacuationAreaActivityCounter);
+		
 		// MobsimInitializedListener
 		MobsimInitializedEvent<Mobsim> mobsimInitializedEvent = new MobsimInitializedEventImpl<Mobsim>(null);
 		for(MobsimListener mobsimListener : mobsimListeners) {
