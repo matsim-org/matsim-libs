@@ -86,7 +86,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		}
 		controler.addControlerListener(new PStats(this.pBox, pConfig));
 		controler.addControlerListener(new PCoopLogger(this.pBox, pConfig));
-		controler.addControlerListener(new GexfPStat(pConfig));
+		controler.addControlerListener(new GexfPStat(pConfig, false));
+		controler.addControlerListener(new GexfPStat(pConfig, true));
 	}
 
 	@Override

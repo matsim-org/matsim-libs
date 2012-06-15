@@ -87,6 +87,7 @@ public class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, I
 	private CountPCoopHandler coopHandler;
 	private String pIdentifier;
 	private int getWriteGexfStatsInterval;
+	private boolean writeCoopInDetail;
 
 	private HashMap<Id,XMLEdgeContent> edgeMap;
 	private HashMap<Id,XMLAttvaluesContent> linkAttributeValueContentMap;
@@ -100,8 +101,9 @@ public class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, I
 	private XMLAttributesContent edgeAttributeContentsContainer;
 
 
-	public GexfPStat(PConfigGroup pConfig){
+	public GexfPStat(PConfigGroup pConfig, boolean writeCoopInDetail){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
+		this.writeCoopInDetail = writeCoopInDetail;
 		this.pIdentifier = pConfig.getPIdentifier();
 		this.lastLineIds = new TreeSet<String>();
 		
@@ -165,7 +167,11 @@ public class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, I
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration(), this.globalPaxHandler, this.coopHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPStat.FILENAME));
+				if (writeCoopInDetail) {
+					this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "pStat_detail.gexf.gz"));
+				} else {
+					this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPStat.FILENAME));
+				}
 			}			
 		}		
 	}
@@ -173,7 +179,11 @@ public class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, I
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPStat.FILENAME));
+			if (writeCoopInDetail) {
+				this.write(event.getControler().getControlerIO().getOutputFilename("pStat_detail.gexf.gz"));
+			} else {
+				this.write(event.getControler().getControlerIO().getOutputFilename(GexfPStat.FILENAME));
+			}
 		}		
 	}
 
@@ -252,74 +262,76 @@ public class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, I
 			this.linkId2CoopIdsFromLastIteration.put(linkEntry.getKey(), coopsForLink);
 		}
 		
-		Set<String> currentLineIds = this.globalPaxHandler.getLineIds();
-		// finish all cooperatives who do not exist anymore
-		for (String lineId : this.lastLineIds) {
-			if (!currentLineIds.contains(lineId)) {
-				// does not exist anymore - terminate
-				
-				for (Entry<Id, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
+		if (writeCoopInDetail) {
+			Set<String> currentLineIds = this.globalPaxHandler.getLineIds();
+			// finish all cooperatives who do not exist anymore
+			for (String lineId : this.lastLineIds) {
+				if (!currentLineIds.contains(lineId)) {
+					// does not exist anymore - terminate
+
+					for (Entry<Id, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
+						if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()) != null){
+							if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId) != null){
+								// There is already an entry
+								if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId).intValue() == 0) {
+									// was already zero - ignore
+									continue;
+								}
+							}
+						}
+
+						XMLAttvalue attValue = new XMLAttvalue();
+						attValue.setFor(lineId);
+						attValue.setValue(Integer.toString(0));
+						attValue.setStart(Double.toString(iteration));
+						linkEntry.getValue().getAttvalue().add(attValue);
+					}
+				}
+			}
+
+			// add new attribute for all new cooperatives
+			for (String lineId : currentLineIds) {
+				if (!this.lastLineIds.contains(lineId)) {
+					// new cooperative - create new attribute
+					XMLAttributeContent attributeContent = new XMLAttributeContent();
+					attributeContent.setId(lineId);
+					attributeContent.setTitle(lineId);
+					attributeContent.setType(XMLAttrtypeType.FLOAT);
+					this.edgeAttributeContentsContainer.getAttribute().add(attributeContent);
+				}
+			}
+
+			// add count values for current line ids
+			for (Entry<Id, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
+
+				for (String lineId : currentLineIds) {
+					int countForLinkAndLineId = paxHandler.getPaxCountForLinkId(linkEntry.getKey(), lineId);
+
 					if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()) != null){
 						if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId) != null){
 							// There is already an entry
-							if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId).intValue() == 0) {
-								// was already zero - ignore
+							if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId).intValue() == countForLinkAndLineId) {
+								// same as last iteration - ignore
 								continue;
 							}
 						}
 					}
-					
-					XMLAttvalue attValue = new XMLAttvalue();
-					attValue.setFor(lineId);
-					attValue.setValue(Integer.toString(0));
-					attValue.setStart(Double.toString(iteration));
-					linkEntry.getValue().getAttvalue().add(attValue);
-				}
-			}
-		}
-		
-		// add new attribute for all new cooperatives
-		for (String lineId : currentLineIds) {
-			if (!this.lastLineIds.contains(lineId)) {
-				// new cooperative - create new attribute
-				XMLAttributeContent attributeContent = new XMLAttributeContent();
-				attributeContent.setId(lineId);
-				attributeContent.setTitle(lineId);
-				attributeContent.setType(XMLAttrtypeType.FLOAT);
-				this.edgeAttributeContentsContainer.getAttribute().add(attributeContent);
-			}
-		}
-		
-		// add count values for current line ids
-		for (Entry<Id, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
-			
-			for (String lineId : currentLineIds) {
-				int countForLinkAndLineId = paxHandler.getPaxCountForLinkId(linkEntry.getKey(), lineId);
-				
-				if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()) != null){
-					if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId) != null){
-						// There is already an entry
-						if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId).intValue() == countForLinkAndLineId) {
-							// same as last iteration - ignore
-							continue;
-						}
+
+					XMLAttvalue attributeContent = new XMLAttvalue();
+					attributeContent.setFor(lineId);
+					attributeContent.setValue(Integer.toString(countForLinkAndLineId));
+					attributeContent.setStart(Double.toString(iteration));
+
+					linkEntry.getValue().getAttvalue().add(attributeContent);
+
+					if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()) == null) {
+						this.linkId2LineId2CountsFromLastIteration.put(linkEntry.getKey(), new HashMap<String, Integer>());
 					}
+					this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).put(lineId, countForLinkAndLineId);				
 				}
-				
-				XMLAttvalue attributeContent = new XMLAttvalue();
-				attributeContent.setFor(lineId);
-				attributeContent.setValue(Integer.toString(countForLinkAndLineId));
-				attributeContent.setStart(Double.toString(iteration));
-				
-				linkEntry.getValue().getAttvalue().add(attributeContent);
-				
-				if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()) == null) {
-					this.linkId2LineId2CountsFromLastIteration.put(linkEntry.getKey(), new HashMap<String, Integer>());
-				}
-				this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).put(lineId, countForLinkAndLineId);				
 			}
+			this.lastLineIds = currentLineIds;
 		}
-		this.lastLineIds = currentLineIds;
 	}
 
 	public void write(String filename) {
