@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.lanes.vis;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.signalsystems.vis.VisSignal;
 
 
 /**

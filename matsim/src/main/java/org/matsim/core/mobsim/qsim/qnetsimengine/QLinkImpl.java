@@ -47,6 +47,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.lanes.vis.VisLaneModelBuilder;
+import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;

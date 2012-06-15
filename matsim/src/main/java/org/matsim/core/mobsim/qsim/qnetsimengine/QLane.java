@@ -50,6 +50,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.vis.VisLane;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;

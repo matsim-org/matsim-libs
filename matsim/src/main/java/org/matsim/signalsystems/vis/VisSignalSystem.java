@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFSignalGroup
+ * OTFSignalSystem
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.signalsystems.vis;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.matsim.signalsystems.model.SignalGroupState;
-
 
 /**
  * @author dgrether
  *
  */
-public class VisSignalGroup {
-
-	private String id;
-	private Map<String, VisSignal> signalPositions = new HashMap<String, VisSignal>();
-	private String systemId;
+public class VisSignalSystem {
 	
-	public VisSignalGroup(String signalSystemId, String id){
-		this.systemId = signalSystemId;
+	private String id;
+	private Map<String, VisSignalGroup> signalGroups = new HashMap<String, VisSignalGroup>();
+
+	public VisSignalSystem(String id){
 		this.id = id;
 	}
-	
+
 	public String getId() {
 		return this.id;
 	}
+
+	public void addOTFSignalGroup(VisSignalGroup group){
+		this.signalGroups.put(group.getId(), group);
+	}
 	
-	public String getSignalSystemId(){
-		return this.systemId;
-	}
-
-	public void setState(SignalGroupState state) {
-		for (VisSignal p : this.signalPositions.values()){
-			p.setState(state);
-		}
-	}
-
-	public void addSignal(VisSignal signal) {
-		this.signalPositions.put(signal.getId(), signal);
-	}
-
-	public Map<String, VisSignal> getSignals() {
-		return this.signalPositions;
+	public Map<String, VisSignalGroup> getOTFSignalGroups(){
+		return this.signalGroups;
 	}
 	
 }
