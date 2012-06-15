@@ -22,9 +22,11 @@ package org.matsim.signalsystems.otfvis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLane;
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLinkWLanes;
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFSignal;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignalGroup;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLane;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLinkWLanes;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignal;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignalSystem;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -49,20 +51,20 @@ public class OTFSignalReader extends OTFLaneReader {
 		int noSignalSystems = in.getInt();
 		for (int i = 0; i < noSignalSystems; i++){
 			String systemId = ByteBufferUtils.getString(in);
-			OTFSignalSystem otfsystem = new OTFSignalSystem(systemId);
+			VisSignalSystem otfsystem = new VisSignalSystem(systemId);
 			this.drawer.addOTFSignalSystem(otfsystem);
 			
 			int noGroups = in.getInt();
 			for (int j = 0; j < noGroups; j++){
 				String groupId = ByteBufferUtils.getString(in);
-				OTFSignalGroup otfgroup = new OTFSignalGroup(systemId, groupId);
+				VisSignalGroup otfgroup = new VisSignalGroup(systemId, groupId);
 				otfsystem.addOTFSignalGroup(otfgroup);
 				int noSignals = in.getInt();
 				for (int k = 0; k < noSignals; k++){
 					String signalId = ByteBufferUtils.getString(in);
 					String linkId = ByteBufferUtils.getString(in);
-					OTFLinkWLanes link = this.drawer.getLanesLinkData().get(linkId);
-					OTFSignal signal = new OTFSignal(systemId, signalId);
+					VisLinkWLanes link = this.drawer.getLanesLinkData().get(linkId);
+					VisSignal signal = new VisSignal(systemId, signalId);
 					otfgroup.addSignal(signal);
 					int noLanes = in.getInt();
 					if (noLanes == 0){
@@ -71,14 +73,14 @@ public class OTFSignalReader extends OTFLaneReader {
 					else {
 						for (int l = 0; l < noLanes; l++){
 							String laneId = ByteBufferUtils.getString(in);
-							OTFLane laneData = link.getLaneData().get(laneId);
+							VisLane laneData = link.getLaneData().get(laneId);
 							laneData.addSignal(signal);
 						}
 					}
 					int noTurningMoveRestrictions = in.getInt();
 					for (int l = 0; l < noTurningMoveRestrictions; l++){
 						String toLinkId = ByteBufferUtils.getString(in);
-						OTFLinkWLanes toLink = this.drawer.getLanesLinkData().get(toLinkId);
+						VisLinkWLanes toLink = this.drawer.getLanesLinkData().get(toLinkId);
 						signal.addTurningMoveRestriction(toLink);
 					}
 				}

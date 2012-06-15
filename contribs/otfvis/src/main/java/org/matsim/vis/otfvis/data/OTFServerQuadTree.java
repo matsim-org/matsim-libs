@@ -59,8 +59,7 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 	private double easting;
 	private double northing;
 
-	private static double offsetEast;
-	private static double offsetNorth;
+	private  static OTFTransformation otfTransformation = null;
 	private static CoordinateTransformation transformation = new IdentityTransformation();
 
 	public OTFServerQuadTree(Network network) {
@@ -88,8 +87,8 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 		this.maxEasting +=1;
 		this.maxNorthing +=1;
 
-		offsetEast = this.minEasting;
-		offsetNorth = this.minNorthing;
+		otfTransformation = new OTFTransformation(transformation, this.minEasting, this.minNorthing);
+//		log.debug("offsetEast: " + offsetEast + " offsetNorth: " + offsetNorth + " " + transformation);
 		this.easting = this.maxEasting - this.minEasting;
 		this.northing = this.maxNorthing - this.minNorthing;
 		// set top node
@@ -173,26 +172,34 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 	}
 
 	// Internally we hold the coordinates from 0,0 to max -min .. to optimize use of float in visualizer
+	@Override
 	public double getMaxEasting() {
 		return this.maxEasting;
 	}
 
+	@Override
 	public double getMaxNorthing() {
 		return this.maxNorthing;
 	}
 
+	@Override
 	public double getMinEasting() {
 		return this.minEasting;
 	}
 
+	@Override
 	public double getMinNorthing() {
 		return this.minNorthing;
 	}
 
 	public static Point2D.Double transform(Coord coord) {
-		Coord transformedCoord = transformation.transform(coord);
-		Point2D.Double result = new Point2D.Double(transformedCoord.getX() - offsetEast, transformedCoord.getY() - offsetNorth);
+		Coord transformedCoord = otfTransformation.transform(coord);
+		Point2D.Double result = new Point2D.Double(transformedCoord.getX(), transformedCoord.getY());
 		return result;
+	}
+	
+	public static OTFTransformation getOTFTransformation(){
+		return otfTransformation;
 	}
 
 	public static void setTransformation(CoordinateTransformation transformation) {

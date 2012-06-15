@@ -26,12 +26,12 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLane;
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLaneModelBuilder;
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLinkWLanes;
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFSignal;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLane;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLaneModelBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLinkWLanes;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignal;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignalSystem;
 import org.matsim.signalsystems.model.SignalGroupState;
-import org.matsim.signalsystems.otfvis.io.OTFSignalSystem;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
@@ -50,9 +50,9 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	private static final double quadSizeLaneStart = 3.5;
 	private static final double quadSizeLaneEnd = 4;
 
-	private Map<String, OTFLinkWLanes> lanesLinkData =  new HashMap<String, OTFLinkWLanes>();
+	private Map<String, VisLinkWLanes> lanesLinkData =  new HashMap<String, VisLinkWLanes>();
 	
-	private Map<String, OTFSignalSystem> signalSystems = new HashMap<String, OTFSignalSystem>();
+	private Map<String, VisSignalSystem> signalSystems = new HashMap<String, VisSignalSystem>();
 
 	private enum Color {LANECOLOR, GREEN, REDYELLOW, YELLOW, RED};
 	
@@ -60,7 +60,7 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	
 	private int glNetList = -1;
 	
-	private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
+	private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
 	
 	@Override
 	public void onDraw(GL gl) {
@@ -75,7 +75,7 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		}
 		gl.glCallList(this.glNetList);
 		
-		for (OTFLinkWLanes laneLinkData : this.lanesLinkData.values()){
+		for (VisLinkWLanes laneLinkData : this.lanesLinkData.values()){
 			this.drawLinkEndsAndSignals(gl, laneLinkData);
 		}
 	}
@@ -88,16 +88,16 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	private void updateNetList(GL gl){
 		this.glNetList = gl.glGenLists(glListName);
 		gl.glNewList(this.glNetList, GL.GL_COMPILE);
-		for (OTFLinkWLanes laneLinkData : this.lanesLinkData.values()){
+		for (VisLinkWLanes laneLinkData : this.lanesLinkData.values()){
 			this.drawLink(gl, laneLinkData);
 		}
 		gl.glEndList();
 	}
 	
 
-	private void drawLinkEndsAndSignals(GL gl, OTFLinkWLanes link) {
+	private void drawLinkEndsAndSignals(GL gl, VisLinkWLanes link) {
 		if (link.getLaneData() != null) {
-			for (OTFLane ld : link.getLaneData().values()){
+			for (VisLane ld : link.getLaneData().values()){
 				if (ld.getSignals() != null){
 					this.drawSignals(gl, ld.getSignals(), ld.getEndPoint(), link.getLinkOrthogonalVector(), ld.getToLinks());
 				}
@@ -120,12 +120,12 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		}
 	}
 
-	private void drawLink(GL gl, OTFLinkWLanes link){
+	private void drawLink(GL gl, VisLinkWLanes link){
 		//draw a rect around linkStart
 		this.setColor(gl, Color.LANECOLOR);
 		this.drawQuad(gl, link.getLinkStartCenterPoint(), quadSizeLinkStart);
 		if (link.getLaneData() != null) { //draw the lanes
-			for (OTFLane ld : link.getLaneData().values()){
+			for (VisLane ld : link.getLaneData().values()){
 				this.drawLane(gl, ld, link);
 			}
 		}
@@ -134,11 +134,11 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		}
 	}
 	
-	private void drawSignals(GL gl, Map<String, OTFSignal> signals, Point2D.Double point, Point2D.Double ortho, List<OTFLinkWLanes> toLinks){
+	private void drawSignals(GL gl, Map<String, VisSignal> signals, Point2D.Double point, Point2D.Double ortho, List<VisLinkWLanes> toLinks){
 		double dist = signals.size() - 1;
 		Point2D.Double startPoint = this.laneModelBuilder.calcPoint(point, ortho, (quadSizeLinkEnd * -dist));
 		int i = 0;
-		for (OTFSignal signal : signals.values()){
+		for (VisSignal signal : signals.values()){
 			i++;
 			if (SignalGroupState.GREEN.equals(signal.getSignalGroupState())) {
 				setColor(gl, Color.GREEN);
@@ -170,16 +170,16 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
 		linkWidthCalculator.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
-		for (OTFLinkWLanes linkData : this.lanesLinkData.values()){
+		for (VisLinkWLanes linkData : this.lanesLinkData.values()){
 			this.laneModelBuilder.recalculatePositions(linkData, linkWidthCalculator);
 		}
 	}
 
-	private void drawLaneEnd(GL gl, OTFLane ld){
+	private void drawLaneEnd(GL gl, VisLane ld){
 		this.setColor(gl, Color.LANECOLOR);
 		this.drawQuad(gl, ld.getEndPoint(), quadSizeLaneEnd);
 		if (!(ld.getToLanes() == null || ld.getToLanes().isEmpty())){
-			for (OTFLane toLane : ld.getToLanes()){
+			for (VisLane toLane : ld.getToLanes()){
 				this.drawVertex(gl, ld.getEndPoint(), toLane.getStartPoint(), 1.0f);
 			}
 		}
@@ -187,7 +187,7 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	}
 	
 
-	private void drawLane(GL gl, OTFLane ld, OTFLinkWLanes laneLinkData){
+	private void drawLane(GL gl, VisLane ld, VisLinkWLanes laneLinkData){
 		//draw lane start
 		this.setColor(gl, Color.LANECOLOR);
 		this.drawQuad(gl, ld.getStartPoint(), quadSizeLaneStart);
@@ -196,9 +196,9 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	}
 
 	
-	private void drawToLinks(GL gl, Point2D.Double fromPoint, List<OTFLinkWLanes> toLinks) {
+	private void drawToLinks(GL gl, Point2D.Double fromPoint, List<VisLinkWLanes> toLinks) {
 		if (!(toLinks == null || toLinks.isEmpty())){
-			for (OTFLinkWLanes toLink : toLinks){
+			for (VisLinkWLanes toLink : toLinks){
 				this.drawVertex(gl, fromPoint, toLink.getLinkStartCenterPoint(), 1.0f);
 			}
 		}
@@ -247,11 +247,11 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	}
 
 
-	public void addLaneLinkData(OTFLinkWLanes laneLinkData){
+	public void addLaneLinkData(VisLinkWLanes laneLinkData){
 		this.lanesLinkData.put(laneLinkData.getLinkId(), laneLinkData);
 	}
 	
-	public Map<String, OTFLinkWLanes> getLanesLinkData(){
+	public Map<String, VisLinkWLanes> getLanesLinkData(){
 		return this.lanesLinkData;
 	}
 
@@ -259,7 +259,7 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		this.signalSystems.get(systemId).getOTFSignalGroups().get(groupId).setState(state);
 	}
 
-	public void addOTFSignalSystem(OTFSignalSystem otfsystem) {
+	public void addOTFSignalSystem(VisSignalSystem otfsystem) {
 		this.signalSystems .put(otfsystem.getId(), otfsystem);
 	}
 	

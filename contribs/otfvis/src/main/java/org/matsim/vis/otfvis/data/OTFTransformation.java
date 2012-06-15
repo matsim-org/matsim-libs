@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFSignalSystem
+ * OTFTransformation
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.otfvis.io;
+package org.matsim.vis.otfvis.data;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 
 /**
+ * Simple delegate implementation, that encapsulates offsets for OTFVis.
  * @author dgrether
  *
  */
-public class OTFSignalSystem {
-	
-	private String id;
-	private Map<String, OTFSignalGroup> signalGroups = new HashMap<String, OTFSignalGroup>();
+class OTFTransformation implements CoordinateTransformation {
 
-	public OTFSignalSystem(String id){
-		this.id = id;
+	private CoordinateTransformation delegate;
+	private double offsetNorth = 0.0;
+	private double offsetEast = 0.0;
+
+	OTFTransformation(CoordinateTransformation transformation, double offsetEast, double offsetNorth) {
+		this.delegate = transformation;
+		this.offsetEast = offsetEast;
+		this.offsetNorth = offsetNorth;
 	}
 
-	public String getId() {
-		return this.id;
+	@Override
+	public Coord transform(Coord coord) {
+		Coord c = this.delegate.transform(coord);
+		Coord c2 = new CoordImpl(c.getX() - this.offsetEast, c.getY() - this.offsetNorth);
+		return c2;
 	}
-
-	public void addOTFSignalGroup(OTFSignalGroup group){
-		this.signalGroups.put(group.getId(), group);
-	}
-	
-	public Map<String, OTFSignalGroup> getOTFSignalGroups(){
-		return this.signalGroups;
-	}
-	
 }

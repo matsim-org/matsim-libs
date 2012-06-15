@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.config.groups.OTFVisConfigGroup;
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLinkWLanes;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLaneModelBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLinkWLanes;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -42,7 +44,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 
 	private final transient LaneDefinitions20 lanes;
 	
-	private transient OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
+	private transient VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
 
 	private OTFVisConfigGroup otfVisConfig;
 	
@@ -61,7 +63,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 			if (this.lanes != null){
 				l2l = this.lanes.getLanesToLinkAssignments().get(visLink.getLink().getId());
 			}
-			OTFLinkWLanes otfLink = this.laneModelBuilder.createOTFLinkWLanes(visLink, otfVisConfig.getNodeOffset(), l2l);
+			VisLinkWLanes otfLink = this.laneModelBuilder.createOTFLinkWLanes(OTFServerQuadTree.getOTFTransformation(), visLink, otfVisConfig.getNodeOffset(), l2l);
 			//write link data
 			ByteBufferUtils.putObject(out, otfLink);
 		}

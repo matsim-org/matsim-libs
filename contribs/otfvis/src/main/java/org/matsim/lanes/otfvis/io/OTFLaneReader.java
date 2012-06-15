@@ -22,8 +22,8 @@ package org.matsim.lanes.otfvis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLaneModelBuilder;
-import org.matsim.core.mobsim.qsim.qnetsimengine.OTFLinkWLanes;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLaneModelBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VisLinkWLanes;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -38,7 +38,7 @@ public class OTFLaneReader extends OTFDataReader {
 	
 	protected OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
 
-	private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
+	private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
 	
 	public OTFLaneReader(){
 	}
@@ -48,7 +48,7 @@ public class OTFLaneReader extends OTFDataReader {
 		int noLinks = in.getInt();
 		for (int i = 0; i < noLinks; i++){
 			//read link data
-			OTFLinkWLanes lanesLinkData = (OTFLinkWLanes) ByteBufferUtils.getObject(in);
+			VisLinkWLanes lanesLinkData = (VisLinkWLanes) ByteBufferUtils.getObject(in);
 			this.drawer.addLaneLinkData(lanesLinkData);
 		}
 		this.laneModelBuilder.connect(this.drawer.getLanesLinkData());
