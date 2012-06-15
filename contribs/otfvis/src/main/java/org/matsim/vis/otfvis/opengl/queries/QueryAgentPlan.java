@@ -124,14 +124,15 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					Link link = net.getLinks().get(act.getLinkId());
 					coord = link.getCoord();
 				}
-				result.acts.add(new MyInfoText((float) coord.getX(),
-						(float) coord.getY(), act.getType()));
+				Coord c2 = OTFServerQuadTree.getOTFTransformation().transform(coord);
+				result.acts.add(new MyInfoText((float) c2.getX(),
+						(float) c2.getY(), act.getType()));
 			}
 		}
 		if ( includeRoutes ) {
-			QueryAgentUtils.buildRoute(plan, result, agentId, net, QueryAgentUtils.Level.ROUTES ); 
+			QueryAgentUtils.buildRoute(plan, result, agentId, net, QueryAgentUtils.Level.ROUTES, OTFServerQuadTree.getOTFTransformation() ); 
 		} else {
-			QueryAgentUtils.buildRoute(plan, result, agentId, net, QueryAgentUtils.Level.PLANELEMENTS ); 
+			QueryAgentUtils.buildRoute(plan, result, agentId, net, QueryAgentUtils.Level.PLANELEMENTS, OTFServerQuadTree.getOTFTransformation() ); 
 		}
 		result.hasPlan = true;
 	}
@@ -277,10 +278,10 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private void calcOffsetIfNecessary(OTFOGLDrawer drawer) {
 			if (this.calcOffset == true) {
 				this.calcOffset = false;
-				for (int i = 0; i < this.vertex.length; i += 2) {
-					this.vertex[i] -= (float) drawer.getQuad().offsetEast;
-					this.vertex[i + 1] -= (float) drawer.getQuad().offsetNorth;
-				}
+//				for (int i = 0; i < this.vertex.length; i += 2) {
+//					this.vertex[i] -= (float) drawer.getQuad().offsetEast;
+//					this.vertex[i + 1] -= (float) drawer.getQuad().offsetNorth;
+//				}
 				this.vert = BufferUtil.copyFloatBuffer(FloatBuffer
 						.wrap(this.vertex));
 				this.cols = BufferUtil.copyByteBuffer(ByteBuffer
@@ -292,7 +293,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			activityTexts = new ArrayList<InfoText>();
 			for (MyInfoText activityEntry : this.acts ) {
 				InfoText activityText = new InfoText(
-						activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth);
+						activityEntry.name, activityEntry.east, activityEntry.north);
 				activityText.setAlpha(0.5f);
 				activityText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 				this.activityTexts.add(activityText);

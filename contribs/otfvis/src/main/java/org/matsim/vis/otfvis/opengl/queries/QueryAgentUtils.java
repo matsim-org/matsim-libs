@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -36,8 +37,9 @@ public class QueryAgentUtils {
 	 * @param agentId
 	 * @param net
 	 * @param level -- level at which plan should be plotted, i.e. if route should be included or not.
+	 * @param otfTransform 
 	 */
-	static void buildRoute(Plan plan, QueryAgentPlan.Result result, Id agentId, Network net, Level level) {
+	static void buildRoute(Plan plan, QueryAgentPlan.Result result, Id agentId, Network net, Level level, CoordinateTransformation otfTransform) {
 		// reducing visibility to avoid proliferation.  kai, jan'11
 		
 		myLevel = level ;
@@ -81,9 +83,11 @@ public class QueryAgentUtils {
 					coord = new CoordImpl(pi.getEasting(), pi.getNorthing());
 					log.info( " east: " + pi.getEasting() + " north: " + pi.getNorthing() );
 				}
+				coord = otfTransform.transform(coord);
 				setCoord(pos++, coord, actColor, result);
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg) o;
+				Coord coord;
 				if (leg.getMode().equals(TransportMode.car)) {
 					if ( level==Level.ROUTES ) {
 						Node last = null;
@@ -91,10 +95,12 @@ public class QueryAgentUtils {
 							Link driven = net.getLinks().get(linkId);
 							Node node = driven.getFromNode();
 							last = driven.getToNode();
-							setCoord(pos++, node.getCoord(), carColor, result);
+							coord = otfTransform.transform(node.getCoord());
+							setCoord(pos++, coord, carColor, result);
 						}
 						if (last != null) {
-							setCoord(pos++, last.getCoord(), carColor, result);
+							coord = otfTransform.transform(last.getCoord());
+							setCoord(pos++, coord, carColor, result);
 						}
 					} else if ( level==Level.PLANELEMENTS ) {
 						setColor( pos - 1, carColor, result ) ;

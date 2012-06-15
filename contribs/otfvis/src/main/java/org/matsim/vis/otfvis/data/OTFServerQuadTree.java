@@ -198,7 +198,7 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 		return result;
 	}
 	
-	public static OTFTransformation getOTFTransformation(){
+	public static CoordinateTransformation getOTFTransformation(){
 		return otfTransformation;
 	}
 
