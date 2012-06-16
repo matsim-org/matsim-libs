@@ -22,14 +22,14 @@ package org.matsim.signalsystems.otfvis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignalGroup;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisLane;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisLinkWLanes;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignal;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignalSystem;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.lanes.vis.VisLane;
+import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signalsystems.vis.VisSignal;
+import org.matsim.signalsystems.vis.VisSignalGroup;
+import org.matsim.signalsystems.vis.VisSignalSystem;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
 /**

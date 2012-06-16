@@ -26,12 +26,12 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisLane;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisLaneModelBuilder;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisLinkWLanes;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignal;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VisSignalSystem;
+import org.matsim.lanes.vis.VisLane;
+import org.matsim.lanes.vis.VisLaneModelBuilder;
+import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signalsystems.vis.VisSignal;
+import org.matsim.signalsystems.vis.VisSignalSystem;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
