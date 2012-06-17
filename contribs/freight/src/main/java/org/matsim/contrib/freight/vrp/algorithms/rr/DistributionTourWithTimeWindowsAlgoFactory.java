@@ -23,7 +23,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RadialRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RandomRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.SchrimpfsRRThresholdFunction;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobDistribOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculator;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryJIFFactory;
@@ -67,7 +67,7 @@ public class DistributionTourWithTimeWindowsAlgoFactory implements RuinAndRecrea
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution) {
 		TourCostAndTWProcessor tourCostProcessor = new TourCostAndTWProcessor(vrp.getCosts());
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,vrp.getCosts().getCostParams(), 
-				new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
+				new JobDistribOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);
@@ -102,7 +102,7 @@ public class DistributionTourWithTimeWindowsAlgoFactory implements RuinAndRecrea
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, TourPlan initialSolution) {
 		TourCostAndTWProcessor tourCostProcessor = new TourCostAndTWProcessor(vrp.getCosts());
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,vrp.getCosts().getCostParams(), 
-				new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
+				new JobDistribOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);

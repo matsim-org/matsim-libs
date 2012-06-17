@@ -16,10 +16,10 @@ package org.matsim.contrib.freight.vrp.basics;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 
 
 /**
@@ -35,15 +35,11 @@ public class VrpUtils {
 	}
 	
 	public static RRSolution copySolution(RRSolution solution, VehicleRoutingProblem vrp, RRTourAgentFactory tourAgentFactory){
-		List<RRDriverAgent> agents = new ArrayList<RRDriverAgent>();
-		for(RRDriverAgent agent : solution.getTourAgents()){
-			VrpTourBuilder tourBuilder = new VrpTourBuilder();
+		List<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
+		for(ServiceProviderAgent agent : solution.getTourAgents()){
 			Vehicle vehicle = agent.getVehicle();
-			for(TourActivity tourAct : agent.getTour().getActivities()){
-				tourBuilder.scheduleActivity(tourAct);
-			}
-			Tour tour = tourBuilder.build();
-			RRDriverAgent newTourAgent = tourAgentFactory.createTourAgent(tour, vehicle);
+			Tour newTour = new Tour(agent.getTour());
+			RRDriverAgent newTourAgent = tourAgentFactory.createTourAgent(newTour, vehicle);
 			agents.add(newTourAgent);
 		}
 		return new RRSolution(agents);  

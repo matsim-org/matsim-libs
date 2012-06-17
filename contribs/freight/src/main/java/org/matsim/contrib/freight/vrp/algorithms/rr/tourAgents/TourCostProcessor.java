@@ -47,7 +47,7 @@ public class TourCostProcessor implements TourStatusProcessor{
 	
 	@Override
 	public void process(Tour tour){
-		tour.getTourStats().reset();
+		tour.tourData.reset();
 		if(tour.isEmpty()){
 			return;
 		}
@@ -61,8 +61,8 @@ public class TourCostProcessor implements TourStatusProcessor{
 			}
 			updateLoad(tour, prevAct, currAct);
 			
-			tour.getTourStats().transportCosts += (costs.getTransportCost(prevAct.getLocationId(),currAct.getLocationId(), 0.0));
-			tour.getTourStats().transportTime  += costs.getTransportTime(prevAct.getLocationId(),currAct.getLocationId(), 0.0);
+			tour.tourData.transportCosts += (costs.getTransportCost(prevAct.getLocationId(),currAct.getLocationId(), 0.0));
+			tour.tourData.transportTime  += costs.getTransportTime(prevAct.getLocationId(),currAct.getLocationId(), 0.0);
 			
 			prevAct = currAct;
 		}
@@ -72,7 +72,7 @@ public class TourCostProcessor implements TourStatusProcessor{
 		if(currAct instanceof JobActivity){
 			currAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currAct).getCapacityDemand());
 			if(currAct instanceof Pickup){
-				tour.getTourStats().totalLoad += ((Pickup) currAct).getCapacityDemand();
+				tour.tourData.totalLoad += ((Pickup) currAct).getCapacityDemand();
 			}
 		}
 		else{

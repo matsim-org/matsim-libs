@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
 import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
@@ -27,7 +29,7 @@ import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
 public class RRUtils {
 	
 	public static RRSolution createSolution(VehicleRoutingProblem vrp, TourPlan tourPlan, RRTourAgentFactory tourAgentFactory){
-		List<RRDriverAgent> agents = new ArrayList<RRDriverAgent>();
+		List<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
 		LinkedList<Vehicle> vehicles = new LinkedList<Vehicle>(vrp.getVehicles());
 		for(VehicleRoute r : tourPlan.getVehicleRoutes()){
 			agents.add(createTourAgent(r, tourAgentFactory));
@@ -55,7 +57,7 @@ public class RRUtils {
 
 	public static TourPlan createTourPlan(RRSolution rrSolution){
 		List<VehicleRoute> routes = new ArrayList<VehicleRoute>();
-		for(RRDriverAgent a : rrSolution.getTourAgents()){
+		for(TourAgent a : rrSolution.getTourAgents()){
 			routes.add(new VehicleRoute(a.getTour(),a.getVehicle()));
 		}
 		return new TourPlan(routes);

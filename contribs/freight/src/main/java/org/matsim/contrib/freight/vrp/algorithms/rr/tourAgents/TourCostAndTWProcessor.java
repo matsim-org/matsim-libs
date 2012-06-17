@@ -78,8 +78,8 @@ public class TourCostAndTWProcessor implements TourStatusProcessor{
 			double earliestOperationStartTime = Math.max(currentAct.getEarliestOperationStartTime(), earliestArrTimeAtCurrAct);
 			currentAct.setEarliestOperationStartTime(earliestOperationStartTime);
 	
-			tour.getTourStats().transportCosts += (this.costs.getTransportCost(prevAct.getLocationId(), currentAct.getLocationId(), startTimeAtPrevAct));
-			tour.getTourStats().transportTime += transportTime;
+			tour.tourData.transportCosts += (this.costs.getTransportCost(prevAct.getLocationId(), currentAct.getLocationId(), startTimeAtPrevAct));
+			tour.tourData.transportTime += transportTime;
 			
 			prevAct = currentAct;
 		}
@@ -110,7 +110,7 @@ public class TourCostAndTWProcessor implements TourStatusProcessor{
 		if(currentAct instanceof JobActivity){
 			currentAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currentAct).getCapacityDemand());
 			if(currentAct instanceof Pickup){
-				tour.getTourStats().totalLoad += ((Pickup) currentAct).getCapacityDemand();
+				tour.tourData.totalLoad += ((Pickup) currentAct).getCapacityDemand();
 			}
 		}
 		else{
@@ -119,7 +119,7 @@ public class TourCostAndTWProcessor implements TourStatusProcessor{
 	}
 
 	private void reset(Tour tour) {
-		tour.getTourStats().reset();
+		tour.tourData.reset();
 	}
 
 	private double getTransportTime(TourActivity act1, TourActivity act2, double departureTime) {

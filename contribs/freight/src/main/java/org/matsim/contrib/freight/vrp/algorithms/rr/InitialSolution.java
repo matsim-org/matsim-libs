@@ -39,20 +39,21 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.BestInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculator;
+
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobDistribOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
-import org.matsim.contrib.freight.vrp.basics.DriverCostFunction;
 import org.matsim.contrib.freight.vrp.basics.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
+import org.opengis.webservice.capability.ServiceProvider;
 
 public class InitialSolution implements InitialSolutionFactory {
 
@@ -61,10 +62,10 @@ public class InitialSolution implements InitialSolutionFactory {
 	@Override
 	public RRSolution createInitialSolution(VehicleRoutingProblem vrp) {
 		logger.info("create initial solution.");
-		RRSolution solution = createEmptySolution(vrp);
+		List<ServiceProviderAgent> serviceProviders = createEmptyServiceProviders(vrp);
 		BestInsertion bestInsertion = new BestInsertion();
-		bestInsertion.run(solution, getUnassignedJobs(vrp), Double.MAX_VALUE);
-		return solution;
+		bestInsertion.recreate(serviceProviders, getUnassignedJobs(vrp));
+		return new RRSolution(serviceProviders);
 	}
 
 	private List<Job> getUnassignedJobs(VehicleRoutingProblem vrp) {
@@ -72,16 +73,16 @@ public class InitialSolution implements InitialSolutionFactory {
 		return jobs;
 	}
 
-	private RRSolution createEmptySolution(VehicleRoutingProblem vrp) {
-		Collection<RRDriverAgent> emptyTours = new ArrayList<RRDriverAgent>();
+	private List<ServiceProviderAgent> createEmptyServiceProviders(VehicleRoutingProblem vrp) {
+		List<ServiceProviderAgent> emptyTours = new ArrayList<ServiceProviderAgent>();
 		TourStatusProcessor statusProcessor = new TourCostAndTWProcessor(vrp.getCosts());
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(statusProcessor, vrp.getCosts().getCostParams(), 
-				new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
+				new JobDistribOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
 		for (Vehicle vehicle : vrp.getVehicles()) { 
 			RRDriverAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory);
 			emptyTours.add(tourAgent);
 		}
-		return new RRSolution(emptyTours);
+		return emptyTours;
 	}
 
 

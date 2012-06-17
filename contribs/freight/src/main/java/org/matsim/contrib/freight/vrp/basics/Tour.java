@@ -22,29 +22,39 @@ import java.util.LinkedList;
 
 public class Tour {
 	
-	public static class TourStats {
+	public static class TourData {
 		public double transportTime;
 		public double transportCosts;
-		public double serviceTime;
-		public double waitingTime;
-		public double totalDutyTime;
 		public int totalLoad;
 		
 		public void reset() {
 			transportTime=0.0;
 			transportCosts=0.0;
-			serviceTime=0.0;
-			waitingTime=0.0;
-			totalDutyTime=0.0;
 			totalLoad=0;
 		}
 		
 	}
 	
-	private LinkedList<TourActivity> tourActivities = new LinkedList<TourActivity>();
+	private final LinkedList<TourActivity> tourActivities = new LinkedList<TourActivity>();
 
-	public TourStats costs = new TourStats();
+	public TourData tourData = new TourData();
 	
+	public Tour(Tour tour2copy){
+		VrpTourBuilder tourBuilder = new VrpTourBuilder();
+		for(TourActivity tourAct : tour2copy.getActivities()){
+			tourBuilder.copyAndScheduleActivity(tourAct);
+		}
+		Tour t = tourBuilder.build();
+		this.tourActivities.addAll(t.getActivities());
+		this.tourData.transportCosts = tour2copy.tourData.transportCosts;
+		this.tourData.transportTime = tour2copy.tourData.transportTime;
+		this.tourData.totalLoad = tour2copy.tourData.totalLoad;
+	}
+	
+	public Tour() {
+		super();
+	}
+
 	public LinkedList<TourActivity> getActivities() {
 		return tourActivities;
 	}
@@ -59,13 +69,9 @@ public class Tour {
 		for(TourActivity c : tourActivities){
 			tour += "[" + c.getType() + "@" + c.getLocationId() + "@" + c.getEarliestOperationStartTime() + "-" + c.getLatestOperationStartTime() + "]";
 		}
-		tour += "[totalDutyTime=" + costs.totalDutyTime + "][transportTime=" + costs.transportTime + "][waitingTime="+costs.waitingTime+"][serviceTime=" + costs.serviceTime + 
-			"][generalizedCosts=" + costs.transportCosts + "]"; 
+		tour += "[transportTime=" + tourData.transportTime +  
+			"][transportCosts=" + tourData.transportCosts + "]"; 
 		return tour;
-	}
-
-	public TourStats getTourStats() {
-		return costs;
 	}
 
 }

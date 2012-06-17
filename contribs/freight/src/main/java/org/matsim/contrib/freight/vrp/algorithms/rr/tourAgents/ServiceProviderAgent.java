@@ -2,7 +2,7 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
 import org.matsim.contrib.freight.vrp.basics.Job;
 
-public interface ServiceProvider {
+public interface ServiceProviderAgent extends TourAgent{
 	
 	public String getId();
 	

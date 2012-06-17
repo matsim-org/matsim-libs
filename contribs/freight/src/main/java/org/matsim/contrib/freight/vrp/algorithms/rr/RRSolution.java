@@ -15,7 +15,8 @@ package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.Collection;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
 
 /**
  * 
@@ -25,29 +26,31 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 
 public class RRSolution {
 	
-	private Collection<RRDriverAgent> tourAgents;
+	private Collection<ServiceProviderAgent> tourAgents;
 	
 	private double score = 0.0;
 	
 	private boolean solutionSet = false;
 	
-	public RRSolution(Collection<RRDriverAgent> tourAgents) {
+	public RRSolution(Collection<ServiceProviderAgent> tourAgents) {
 		super();
 		this.tourAgents = tourAgents;
 	}
+	
+	
 	
 	public double getResult() {
 		if(solutionSet){
 			return score;
 		}
 		double total = 0.0;
-		for(RRDriverAgent a : tourAgents){
+		for(TourAgent a : tourAgents){
 			total += a.getTourCost();
 		}
 		return total;
 	}
 
-	public Collection<RRDriverAgent> getTourAgents(){
+	public Collection<ServiceProviderAgent> getTourAgents(){
 		return tourAgents;
 	}
 

@@ -13,9 +13,10 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.recreation;
 
 
-import java.util.List;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
+import java.util.Collection;
+
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 
 
@@ -27,6 +28,11 @@ import org.matsim.contrib.freight.vrp.basics.Job;
 
 public interface RecreationStrategy {
 	
-	public void run(RRSolution tentativeSolution, List<Job> unassignedJobs, double upperBound);
+	/**
+	 * Assigns the unassigned jobs to service-providers  
+	 * @param serviceProviders
+	 * @param unassignedJobs
+	 */
+	public void recreate(Collection<? extends ServiceProviderAgent> serviceProviders, Collection<Job> unassignedJobs);
 
 }

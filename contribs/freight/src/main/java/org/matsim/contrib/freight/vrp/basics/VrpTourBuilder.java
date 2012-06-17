@@ -29,7 +29,7 @@ public class VrpTourBuilder {
 		tour = new Tour();
 	}
 	
-	public void scheduleStart(String locationId, double earliestDeparture, double latestDeparture){
+	public Start scheduleStart(String locationId, double earliestDeparture, double latestDeparture){
 		if(tourStarted){
 			throw new IllegalStateException("tour has already started");
 		}
@@ -38,9 +38,10 @@ public class VrpTourBuilder {
 		start.setLatestOperationStartTime(latestDeparture);
 		tourStarted = true;
 		tour.getActivities().add(start);
+		return start;
 	}
 	
-	public void scheduleEnd(String locationId, double earliestArrival, double latestArrival){
+	public End scheduleEnd(String locationId, double earliestArrival, double latestArrival){
 		if(!tourStarted){
 			throw new IllegalStateException("tour must start before end");
 		}
@@ -52,43 +53,51 @@ public class VrpTourBuilder {
 		end.setLatestOperationStartTime(latestArrival);
 		tour.getActivities().add(end);
 		tourEnded = true;
+		return end;
 	}
 
-	public void schedulePickup(Shipment shipment){
+	public Pickup schedulePickup(Shipment shipment){
 		if(openShipments.contains(shipment)){
 			throw new IllegalStateException("shipment already picked up");
 		}
 		Pickup pickup = new Pickup(shipment);
 		openShipments.add(shipment);
 		tour.getActivities().add(pickup);
+		return pickup;
 	}
 	
-	public void scheduleDelivery(Shipment shipment){
+	public Delivery scheduleDelivery(Shipment shipment){
 		if(!openShipments.contains(shipment)){
 			throw new IllegalStateException("shipment must be picked up first");
 		}
 		Delivery delivery = new Delivery(shipment);
 		openShipments.remove(shipment);
 		tour.getActivities().add(delivery);
+		return delivery;
 	}
 	
 	public void scheduleService(Service service){
 		
 	}
 	
-	public void scheduleActivity(TourActivity activity){
+	public TourActivity copyAndScheduleActivity(TourActivity activity){
+		TourActivity ta = null;
 		if(activity instanceof Start){
-			scheduleStart(activity.getLocationId(), activity.getEarliestOperationStartTime(), activity.getLatestOperationStartTime());
+			ta = scheduleStart(activity.getLocationId(), activity.getEarliestOperationStartTime(), activity.getLatestOperationStartTime());
 		}
-		if(activity instanceof End){
-			scheduleEnd(activity.getLocationId(), activity.getEarliestOperationStartTime(), activity.getLatestOperationStartTime());
+		else if(activity instanceof End){
+			ta = scheduleEnd(activity.getLocationId(), activity.getEarliestOperationStartTime(), activity.getLatestOperationStartTime());
 		}
-		if(activity instanceof Pickup){
-			schedulePickup((Shipment)((Pickup) activity).getJob());
+		else if(activity instanceof Pickup){
+			ta = schedulePickup((Shipment)((Pickup) activity).getJob());
 		}
-		if(activity instanceof Delivery){
-			scheduleDelivery((Shipment)((Delivery) activity).getJob());
+		else if(activity instanceof Delivery){
+			ta = scheduleDelivery((Shipment)((Delivery) activity).getJob());
 		}
+		else{
+			throw new IllegalStateException("does not support tourActivity " + activity.toString());
+		}
+		return ta;
 		
 	}
 	

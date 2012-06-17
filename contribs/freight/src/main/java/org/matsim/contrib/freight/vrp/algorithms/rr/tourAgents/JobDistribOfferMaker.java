@@ -26,7 +26,7 @@ import org.matsim.core.utils.misc.Counter;
  * calculates best marginal insertion cost for the single depot distribution problem and returns an 
  * an data-object 'OfferData' with these costs and the corresponding insertion indices.
  */
-public class JobOfferMaker implements OfferMaker{
+public class JobDistribOfferMaker implements OfferMaker{
 	
 	private Costs costs;
 	
@@ -34,7 +34,7 @@ public class JobOfferMaker implements OfferMaker{
 	
 	private JobInsertionFinderFactory jifFactory;
 
-	public JobOfferMaker(Costs costs, Constraints constraints, JobInsertionFinderFactory jifFactory) {
+	public JobDistribOfferMaker(Costs costs, Constraints constraints, JobInsertionFinderFactory jifFactory) {
 		super();
 		this.costs = costs;
 		this.jifFactory = jifFactory;
@@ -61,7 +61,7 @@ public class JobOfferMaker implements OfferMaker{
 	}
 	
 	private boolean preCheck(Tour tour, Shipment shipment, Vehicle vehicle) {
-		if(tour.getTourStats().totalLoad + shipment.getSize() > vehicle.getCapacity()){
+		if(tour.tourData.totalLoad + shipment.getSize() > vehicle.getCapacity()){
 			return false;
 		}
 		return true;

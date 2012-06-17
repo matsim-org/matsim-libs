@@ -2,17 +2,17 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
 public class Offer {
 	
-	private ServiceProvider serviceProvider;
+	private ServiceProviderAgent serviceProvider;
 	
 	private double price;
 	
-	public Offer(ServiceProvider serviceProvider, double price, double mc) {
+	public Offer(ServiceProviderAgent serviceProvider, double price, double mc) {
 		super();
 		this.serviceProvider = serviceProvider;
 		this.price = price;
 	}
 
-	public ServiceProvider getServiceProvider() {
+	public ServiceProviderAgent getServiceProvider() {
 		return serviceProvider;
 	}
 

@@ -88,7 +88,7 @@ public class ConstraintManager implements TourActivityRecorder {
 	 */
 	@Override
 	public void insertionProcedureStarts() {
-		if(tour.costs.totalLoad + pickup.getCapacityDemand() > vehicle.getCapacity()){
+		if(tour.tourData.totalLoad + pickup.getCapacityDemand() > vehicle.getCapacity()){
 			breakInsertionProcedure = true;
 		}
 		

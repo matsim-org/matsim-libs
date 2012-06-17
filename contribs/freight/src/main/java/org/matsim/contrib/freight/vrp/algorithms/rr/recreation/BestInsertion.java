@@ -12,15 +12,15 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.recreation;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.Offer;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProvider;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 
@@ -45,22 +45,18 @@ public class BestInsertion implements RecreationStrategy{
 	}
 
 	@Override
-	public void run(RRSolution tentativeSolution, List<Job> unassignedJobs, double upperBound) {
-		Collections.shuffle(unassignedJobs,random);
-		double currentResult = tentativeSolution.getResult();
-		for(Job unassignedJob : unassignedJobs){
-			if(currentResult >= upperBound){
-				return;
-			}		
+	public void recreate(Collection<? extends ServiceProviderAgent> serviceProviders, Collection<Job> unassignedJobs) {
+		List<Job> unassignedJobList = new ArrayList<Job>(unassignedJobs);
+		Collections.shuffle(unassignedJobList,random);
+		for(Job unassignedJob : unassignedJobList){
 			Offer bestOffer = new Offer(null,Double.MAX_VALUE,Double.MAX_VALUE);
-			for(RRDriverAgent agent : tentativeSolution.getTourAgents()){
-				Offer o = agent.requestService(unassignedJob, bestOffer.getPrice());
+			for(ServiceProviderAgent sp : serviceProviders){
+				Offer o = sp.requestService(unassignedJob, bestOffer.getPrice());
 				if(o.getPrice() < bestOffer.getPrice()){
 					bestOffer = o;
 				}
 			}
 			if(!isNull(bestOffer.getServiceProvider())){
-				currentResult += bestOffer.getPrice();
 				bestOffer.getServiceProvider().offerGranted(unassignedJob);
 			}
 			else{
@@ -70,7 +66,9 @@ public class BestInsertion implements RecreationStrategy{
 		}
 	}
 
-	private boolean isNull(ServiceProvider sp) {
+	private boolean isNull(ServiceProviderAgent sp) {
 		return (sp == null);
 	}
+
+	
 }

@@ -13,6 +13,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 
 public class RuinAndRecreateReport implements RuinAndRecreateListener{
 
@@ -39,9 +40,9 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 	
 	private double getTime() {
 		double time = 0.0;
-		for(RRDriverAgent t : bestSolution.getTourAgents()){
+		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
 			if(t.getTour().getActivities().size()>2){
-				time+=t.getTour().costs.transportTime;
+				time+=t.getTour().tourData.transportTime;
 			}
 		}
 		return time;
@@ -49,9 +50,9 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 
 	private double getGenCosts(){
 		double dist = 0.0;
-		for(RRDriverAgent t : bestSolution.getTourAgents()){
+		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
 			if(t.getTour().getActivities().size()>2){
-				dist+=t.getTour().costs.transportCosts;
+				dist+=t.getTour().tourData.transportCosts;
 			}
 		}
 		return dist;
@@ -59,7 +60,7 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 	
 	private int getActiveTours() {
 		int nOfTours = 0;
-		for(RRDriverAgent t : bestSolution.getTourAgents()){
+		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
 			if(t.getTour().getActivities().size()>2){
 				nOfTours++;
 			}

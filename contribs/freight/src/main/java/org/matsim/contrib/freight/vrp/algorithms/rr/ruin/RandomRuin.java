@@ -17,11 +17,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -58,7 +57,7 @@ public class RandomRuin implements RuinStrategy {
 	}
 
 	@Override
-	public void run(RRSolution initialSolution) {
+	public Collection<Job> ruin(Collection<? extends ServiceProviderAgent> serviceProviders) {
 		clear();
 		int nOfJobs2BeRemoved = selectNuOfJobs2BeRemoved();
 		LinkedList<Job> availableJobs = new LinkedList<Job>(vrp.getJobs().values());
@@ -66,13 +65,14 @@ public class RandomRuin implements RuinStrategy {
 			Job job = pickRandomJob(availableJobs);
 			unassignedJobs.add(job);
 			availableJobs.remove(job);
-			agentsRemove(initialSolution.getTourAgents(),job);
+			agentsRemove(serviceProviders,job);
 		}
+		return unassignedJobs;
 	}
 
-	private void agentsRemove(Collection<RRDriverAgent> agents, Job job) {
-		for(RRDriverAgent a : agents){
-			if(a.removeJob(job)){
+	private void agentsRemove(Collection<? extends ServiceProviderAgent> agents, Job job) {
+		for(ServiceProviderAgent sp : agents){
+			if(sp.removeJob(job)){
 				return;
 			}
 		}
@@ -95,9 +95,5 @@ public class RandomRuin implements RuinStrategy {
 		unassignedJobs.clear();
 	}
 
-	@Override
-	public List<Job> getUnassignedJobs() {
-		return unassignedJobs;
-	}
 
 }

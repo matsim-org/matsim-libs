@@ -18,8 +18,8 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -39,7 +39,7 @@ public class InitialSolutionFromCarrierPlan implements InitialSolutionFactory{
 
 	@Override
 	public RRSolution createInitialSolution(VehicleRoutingProblem vrp) {
-		List<RRDriverAgent> agents = new ArrayList<RRDriverAgent>();
+		List<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
 		
 		for(ScheduledTour sTour : plan.getScheduledTours()){
 			tourAgentFactory.createTourAgent(getTour(sTour), getVehicle(sTour.getVehicle().getVehicleId(),vrp));

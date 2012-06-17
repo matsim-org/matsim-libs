@@ -21,6 +21,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.RecreationStrateg
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinStrategy;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.ThresholdFunction;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
@@ -155,8 +156,8 @@ public class RuinAndRecreate {
 
 	private void ruinAndRecreate(RRSolution solution, double upperBound) {
 		RuinStrategy ruinStrategy = ruinStrategyManager.getRandomStrategy();
-		ruinStrategy.run(solution);
-		recreationStrategy.run(solution,ruinStrategy.getUnassignedJobs(), upperBound);
+		Collection<Job> unassignedJobs = ruinStrategy.ruin(solution.getTourAgents());
+		recreationStrategy.recreate(solution.getTourAgents(),unassignedJobs);
 	}
 
 	private void randomWalk(int nOfIterations) {

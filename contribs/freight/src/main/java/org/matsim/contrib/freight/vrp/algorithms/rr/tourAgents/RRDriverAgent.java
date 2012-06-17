@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.OfferMaker.OfferData;
-import org.matsim.contrib.freight.vrp.basics.DriverCostFunction;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
 import org.matsim.contrib.freight.vrp.basics.Job;
@@ -36,7 +35,7 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
  *
  */
 
-public class RRDriverAgent implements ServiceProvider{
+public class RRDriverAgent implements ServiceProviderAgent {
 	
 
 	private static Logger logger = Logger.getLogger(RRDriverAgent.class);
@@ -103,7 +102,7 @@ public class RRDriverAgent implements ServiceProvider{
 		if(isActive(tour)){
 			double cost = 0.0;
 			cost+=driverCostParams.fixCost_per_vehicleService;
-			cost+=tour.getTourStats().transportCosts;
+			cost+=tour.tourData.transportCosts;
 			return cost;
 		}
 		else{

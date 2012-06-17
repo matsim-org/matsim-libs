@@ -22,15 +22,16 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.End;
@@ -147,7 +148,7 @@ public class DTWSolver implements VRPSolver{
 
 	private Collection<Tour> getTours(RRSolution solution) {
 		List<Tour> tours = new ArrayList<Tour>();
-		for(RRDriverAgent a : solution.getTourAgents()){
+		for(TourAgent a : solution.getTourAgents()){
 			tours.add(a.getTour());
 		}
 		return tours;
@@ -198,7 +199,7 @@ public class DTWSolver implements VRPSolver{
 	 */
 	private Collection<ScheduledTour> makeScheduledVehicleTours(RRSolution rrSolution) {
 		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
-		for(RRDriverAgent a : rrSolution.getTourAgents()){
+		for(TourAgent a : rrSolution.getTourAgents()){
 			if(!a.isActive()){
 				continue;
 			}
