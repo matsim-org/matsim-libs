@@ -25,12 +25,11 @@ import java.util.List;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculator;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobDistribOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
-import org.matsim.contrib.freight.vrp.basics.DriverCostFunction;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -41,9 +40,9 @@ public class BestInsertionTest extends VRPTestCase{
 	
 	VehicleRoutingProblem vrp;
 	
-	RRDriverAgent tourAgent1;
+	ServiceProviderAgent tourAgent1;
 	
-	RRDriverAgent tourAgent2;
+	ServiceProviderAgent tourAgent2;
 	
 	RRSolution solution;
 	
@@ -65,9 +64,9 @@ public class BestInsertionTest extends VRPTestCase{
 		tourBuilder.scheduleDelivery(s1);
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
 		RRTourAgentFactory rrTourAgentFactory = new RRTourAgentFactory(tourStatusProcessor, 
-				vrp.getCosts().getCostParams(), new JobOfferMaker(vrp.getCosts(), constraints, new DistribJIFFactory(new LocalMCCalculatorFactory())));
+				vrp.getCosts().getCostParams(), new JobDistribOfferMaker(vrp.getCosts(), constraints, new DistribJIFFactory(new LocalMCCalculatorFactory())));
 
-		tourAgent1 = rrTourAgentFactory.createTourAgent(tourBuilder.build(), vrp.getVehicles().iterator().next());
+		tourAgent1 = rrTourAgentFactory.createAgent(tourBuilder.build(), vrp.getVehicles().iterator().next(), costs);
 		
 		VrpTourBuilder anotherTourBuilder = new VrpTourBuilder();
 		Shipment s2 = createShipment("2", makeId(10,0), makeId(0,0));
@@ -75,9 +74,9 @@ public class BestInsertionTest extends VRPTestCase{
 		anotherTourBuilder.schedulePickup(s2);
 		anotherTourBuilder.scheduleDelivery(s2);
 		anotherTourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		tourAgent2 = rrTourAgentFactory.createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
+		tourAgent2 = rrTourAgentFactory.createAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next(), costs);
 		
-		Collection<RRDriverAgent> agents = new ArrayList<RRDriverAgent>();
+		Collection<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
 		agents.add(tourAgent1);
 		agents.add(tourAgent2);
 		solution = new RRSolution(agents);
@@ -91,23 +90,23 @@ public class BestInsertionTest extends VRPTestCase{
 	
 
 	public void testSizeOfNewSolution(){
-		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs);
 		assertEquals(2, solution.getTourAgents().size());
 	}
 	
 	public void testNuOfActivitiesOfAgent1(){
-		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs);
 		assertEquals(6, tourAgent1.getTour().getActivities().size());
 	}
 	
 	public void testNuOfActivitiesOfAgent2(){
-		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs);
 		assertEquals(4, tourAgent2.getTour().getActivities().size());
 	}
 	
 	public void testMarginalCostOfInsertion(){
 		double oldCost = solution.getResult();
-		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs);
 		double newCost = solution.getResult();
 		assertEquals(4.0,newCost-oldCost);
 	}
@@ -115,7 +114,7 @@ public class BestInsertionTest extends VRPTestCase{
 	public void testTotalCost(){
 		double oldCost = solution.getResult();
 		assertEquals(240.0,oldCost);
-		bestInsertion.run(solution, unassignedJobs, Double.MAX_VALUE);
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs);
 		double newCost = solution.getResult();
 		assertEquals(244.0,newCost);
 	}

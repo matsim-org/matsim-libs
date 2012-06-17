@@ -16,11 +16,14 @@ import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.PickupAndDeliveryTourAlgoFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateAlgorithmFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.ServiceProviderFactoryFinder;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
+import org.matsim.contrib.freight.vrp.basics.VRPSchema;
 import org.matsim.contrib.freight.vrp.constraints.PickAndDeliveryCapacityAndTWConstraint;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -35,7 +38,8 @@ public class RRVRPSolverTest extends TestCase{
 		@Override
 		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
 			DTWSolver solver = new DTWSolver(shipments, carrierVehicles,costs, network, new InitialSolution());
-			PickupAndDeliveryTourAlgoFactory ruinAndRecreateFactory = new PickupAndDeliveryTourAlgoFactory();
+			ServiceProviderFactory spFactory = new ServiceProviderFactoryFinder().getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
+			RuinAndRecreateAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateAlgorithmFactory(spFactory);
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 			solver.setGlobalConstraints(new PickAndDeliveryCapacityAndTWConstraint());
 			solver.setnOfWarmupIterations(20);

@@ -18,11 +18,13 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
 
+import java.util.Collection;
 import java.util.Collections;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
@@ -48,29 +50,29 @@ public class RandomRuinTest extends VRPTestCase{
 	}
 
 	public void testSizeOfRuinedSolution(){
-		randomRuin.run(solution);
+		randomRuin.ruin(solution.getTourAgents());
 		assertEquals(2, solution.getTourAgents().size());
 	}
 	
 	public void testRemainingSolution(){
 		int nOfRemainingActivities = 0;
-		for(RRDriverAgent a : solution.getTourAgents()){
+		for(ServiceProviderAgent a : solution.getTourAgents()){
 			nOfRemainingActivities += a.getTour().getActivities().size();
 		}
 		assertEquals(10,nOfRemainingActivities);
-		randomRuin.run(solution);
+		randomRuin.ruin(solution.getTourAgents());
 		nOfRemainingActivities = 0;
-		for(RRDriverAgent a : solution.getTourAgents()){
+		for(ServiceProviderAgent a : solution.getTourAgents()){
 			nOfRemainingActivities += a.getTour().getActivities().size();
 		}
 		assertEquals(8,nOfRemainingActivities);
 	}
 	
 	public void testWhetherJobInUnassignedJobListIsReallyAnUnassignedJob(){
-		randomRuin.run(solution);
-		Job unassignedJob = randomRuin.getUnassignedJobs().iterator().next();
+		Collection<Job> unassignedJobs = randomRuin.ruin(solution.getTourAgents());
+		Job unassignedJob = unassignedJobs.iterator().next();
 		boolean jobFoundInAgentsTour = false;
-		for(RRDriverAgent a : solution.getTourAgents()){
+		for(ServiceProviderAgent a : solution.getTourAgents()){
 			for(TourActivity act : a.getTour().getActivities()){
 				if(act instanceof JobActivity){
 					if(((JobActivity) act).getJob().equals(unassignedJob)){
@@ -83,13 +85,13 @@ public class RandomRuinTest extends VRPTestCase{
 	}
 	
 	public void testNuOfUnassignedJobs(){
-		randomRuin.run(solution);
-		assertEquals(1,randomRuin.getUnassignedJobs().size());
+		Collection<Job> unassignedJobs = randomRuin.ruin(solution.getTourAgents());
+		assertEquals(1,unassignedJobs.size());
 	}
 	
 	public void testRandomRuinWithNoCustomer(){
 		try{
-			randomRuin.run(new RRSolution(Collections.EMPTY_LIST));
+			randomRuin.ruin(Collections.EMPTY_LIST);
 			assertTrue(true);
 		}
 		catch(Exception e){

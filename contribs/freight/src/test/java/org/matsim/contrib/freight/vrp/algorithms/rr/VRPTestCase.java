@@ -24,13 +24,12 @@ import junit.framework.TestCase;
 
 import org.junit.Ignore;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculator;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobDistribOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Locations;
@@ -136,10 +135,10 @@ public class VRPTestCase extends TestCase{
 		return new InitialSolution().createInitialSolution(vrp);
 	}
 	
-	protected RRDriverAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
+	protected ServiceProviderAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
 		
 		return new RRTourAgentFactory(tourStatusProcessor, vrp.getCosts().getCostParams(), 
-				new JobOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory()))).createTourAgent(tour1, vehicle);
+				new JobDistribOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory()))).createAgent(tour1, vehicle, costs);
 	}
 	
 	private Coordinate makeCoord(int i, int j) {

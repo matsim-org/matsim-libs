@@ -104,7 +104,7 @@ public class TourCostAndTWProcessorTest extends VRPTestCase{
 	
 	public void testCalculatedTimeWithTDCost(){
 		tdTourStatusProcessor.process(tour);
-		assertEquals((10.0+10.0+5.0+5.0), tour.costs.transportTime);
+		assertEquals((10.0+10.0+5.0+5.0), tour.tourData.transportTime);
 	}
 
 	public void testEarliestArrStart(){

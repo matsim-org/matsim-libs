@@ -64,22 +64,22 @@ public class TourCostProcessorTest extends VRPTestCase{
 	
 	public void testCalculatedCosts(){
 		statusUpdater.process(tour);
-		assertEquals(40.0, tour.costs.transportCosts);
+		assertEquals(40.0, tour.tourData.transportCosts);
 	}
 	
 	public void testCalculatedTime(){
 		statusUpdater.process(tour);
-		assertEquals(40.0, tour.costs.transportTime);
+		assertEquals(40.0, tour.tourData.transportTime);
 	}
 	
 	public void testCalculatedCostsForAnotherTour(){
 		statusUpdater.process(anotherTour);
-		assertEquals(38.0, anotherTour.costs.transportCosts);
+		assertEquals(38.0, anotherTour.tourData.transportCosts);
 	}
 	
 	public void testCalculatedTimeForAnotherTour(){
 		statusUpdater.process(anotherTour);
-		assertEquals(38.0, anotherTour.costs.transportTime);
+		assertEquals(38.0, anotherTour.tourData.transportTime);
 	}
 
 }

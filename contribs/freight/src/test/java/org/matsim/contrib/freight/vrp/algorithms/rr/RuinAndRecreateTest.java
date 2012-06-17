@@ -27,12 +27,14 @@ import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
-import org.matsim.contrib.freight.vrp.basics.CostParams;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.ServiceProviderFactoryFinder;
 import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.VRPSchema;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
@@ -58,6 +60,8 @@ public class RuinAndRecreateTest extends TestCase{
 	Costs costs;
 	
 	VrpBuilder vrpBuilder;
+	
+	ServiceProviderFactory spFactory;
 	
 	public void setUp(){
 		Logger.getRootLogger().setLevel(Level.INFO);
@@ -120,6 +124,8 @@ public class RuinAndRecreateTest extends TestCase{
 					VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE), VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
 		}
 		
+		spFactory = new ServiceProviderFactoryFinder().getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION);
+		
 		RandomNumberGeneration.reset();
 	}
 	
@@ -128,7 +134,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new RuinAndRecreateAlgorithmFactory(spFactory).createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		int active = getActiveVehicles(getTours(algo.getSolution()));
 		assertEquals(2,active);
@@ -140,7 +146,7 @@ public class RuinAndRecreateTest extends TestCase{
 
 	private Collection<Tour> getTours(RRSolution solution) {
 		List<Tour> tours = new ArrayList<Tour>();
-		for(RRDriverAgent a : solution.getTourAgents()){
+		for(ServiceProviderAgent a : solution.getTourAgents()){
 			tours.add(a.getTour());
 		}
  		return tours;
@@ -151,13 +157,13 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new RuinAndRecreateAlgorithmFactory(spFactory).createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		
 		Collection<Tour> solution = getTours(algo.getSolution());
 		int solVal = 0;
 		for(Tour t : solution){
-			solVal += t.costs.transportCosts;
+			solVal += t.tourData.transportCosts;
 		}
 		assertEquals(397,solVal);
  	}
@@ -169,7 +175,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("4","0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("5","0", 16));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new RuinAndRecreateAlgorithmFactory(spFactory).createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		int active = getActiveVehicles(getTours(algo.getSolution()));
 		assertEquals(3,active);
@@ -182,13 +188,13 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("4", "0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("5", "0", 16));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new DistributionTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new RuinAndRecreateAlgorithmFactory(spFactory).createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		
 		Collection<Tour> solution = getTours(algo.getSolution());
 		int solVal = 0;
 		for(Tour t : solution){
-			solVal += t.costs.transportCosts;
+			solVal += t.tourData.transportCosts;
 		}
 		assertEquals(solVal,445);
 	}
