@@ -44,7 +44,7 @@ public class RRDriverAgent implements ServiceProviderAgent {
 	
 	private String id;
 	
-	private Vehicle vehicle;
+	private final Vehicle vehicle;
 
 	private TourStatusProcessor tourActivityStatusUpdater;
 
@@ -65,7 +65,7 @@ public class RRDriverAgent implements ServiceProviderAgent {
 	}
 
 
-	public RRDriverAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, DriverCostParams driverCostParams) {
+	public RRDriverAgent(final Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, DriverCostParams driverCostParams) {
 		super();
 		this.tour = tour;
 		this.tourActivityStatusUpdater=tourStatusProcessor;
@@ -120,7 +120,7 @@ public class RRDriverAgent implements ServiceProviderAgent {
 		syncTour();
 		OfferData offerData = offerMaker.makeOffer(vehicle,tour,job,bestKnownPrice);
 		memorize(offerData);
-		return new Offer(this,offerData.offer.price,offerData.offer.price);
+		return new Offer(this,offerData.offer.price);
 	}
 
 	private void memorize(OfferData offerData) {

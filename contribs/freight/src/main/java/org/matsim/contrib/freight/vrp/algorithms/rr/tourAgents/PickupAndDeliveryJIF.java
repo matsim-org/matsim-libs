@@ -21,7 +21,7 @@ import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
-public class PickupAndDeliveryJIF implements JobInsertionFinder {
+class PickupAndDeliveryJIF implements JobInsertionFinder {
 
 	private Costs costs;
 	private Vehicle vehicle;
@@ -29,7 +29,7 @@ public class PickupAndDeliveryJIF implements JobInsertionFinder {
 	
 	private TourActivityRecorder activityRecorder;
 
-	public PickupAndDeliveryJIF(Costs costs, Vehicle vehicle, Tour tour) {
+	PickupAndDeliveryJIF(Costs costs, Vehicle vehicle, Tour tour) {
 		this.costs = costs;
 		this.vehicle = vehicle;
 		this.tour = tour;

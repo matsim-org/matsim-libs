@@ -33,27 +33,25 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.BestInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
-
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobDistribOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
-import org.opengis.webservice.capability.ServiceProvider;
 
 public class InitialSolution implements InitialSolutionFactory {
 
@@ -79,19 +77,19 @@ public class InitialSolution implements InitialSolutionFactory {
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(statusProcessor, vrp.getCosts().getCostParams(), 
 				new JobDistribOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory())));
 		for (Vehicle vehicle : vrp.getVehicles()) { 
-			RRDriverAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory);
+			ServiceProviderAgent tourAgent = createTourAgent(vehicle, vehicle.getLocationId(), tourAgentFactory, vrp.getCosts());
 			emptyTours.add(tourAgent);
 		}
 		return emptyTours;
 	}
 
 
-	private RRDriverAgent createTourAgent(Vehicle vehicle, String vehicleLocationId, RRTourAgentFactory tourAgentFactory) {
+	private ServiceProviderAgent createTourAgent(Vehicle vehicle, String vehicleLocationId, ServiceProviderFactory tourAgentFactory, Costs costs) {
 		VrpTourBuilder tourBuilder = new VrpTourBuilder();
 		tourBuilder.scheduleStart(vehicleLocationId, vehicle.getEarliestDeparture(), Double.MAX_VALUE);
 		tourBuilder.scheduleEnd(vehicleLocationId, 0.0, vehicle.getLatestArrival());
 		Tour tour = tourBuilder.build();
-		return tourAgentFactory.createTourAgent(tour, vehicle);
+		return tourAgentFactory.createAgent(tour, vehicle, costs);
 	}
 	
 }

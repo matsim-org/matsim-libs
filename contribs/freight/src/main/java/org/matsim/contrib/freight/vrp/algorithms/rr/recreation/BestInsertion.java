@@ -34,7 +34,7 @@ import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
  *
  */
 
-public class BestInsertion implements RecreationStrategy{
+public final class BestInsertion implements RecreationStrategy{
 	
 	private Logger logger = Logger.getLogger(BestInsertion.class);
 	
@@ -49,7 +49,7 @@ public class BestInsertion implements RecreationStrategy{
 		List<Job> unassignedJobList = new ArrayList<Job>(unassignedJobs);
 		Collections.shuffle(unassignedJobList,random);
 		for(Job unassignedJob : unassignedJobList){
-			Offer bestOffer = new Offer(null,Double.MAX_VALUE,Double.MAX_VALUE);
+			Offer bestOffer = new Offer(null,Double.MAX_VALUE);
 			for(ServiceProviderAgent sp : serviceProviders){
 				Offer o = sp.requestService(unassignedJob, bestOffer.getPrice());
 				if(o.getPrice() < bestOffer.getPrice()){

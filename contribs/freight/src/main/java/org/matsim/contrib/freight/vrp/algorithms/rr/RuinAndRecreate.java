@@ -20,7 +20,8 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.RecreationStrategy;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinStrategy;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.ThresholdFunction;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -37,7 +38,7 @@ import org.matsim.contrib.freight.vrp.basics.VrpUtils;
  *
  */
 
-public class RuinAndRecreate {
+public final class RuinAndRecreate {
 	
 	private static Logger logger = Logger.getLogger(RuinAndRecreate.class);
 	
@@ -61,7 +62,7 @@ public class RuinAndRecreate {
 	
 	private Double initialThreshold = 0.0;
 	
-	private RRTourAgentFactory tourAgentFactory;
+	private ServiceProviderFactory tourAgentFactory;
 
 	private Collection<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
 	
@@ -85,7 +86,7 @@ public class RuinAndRecreate {
 		this.recreationStrategy = recreationStrategy;
 	}
 
-	public void setTourAgentFactory(RRTourAgentFactory tourAgentFactory) {
+	public void setTourAgentFactory(ServiceProviderFactory tourAgentFactory) {
 		this.tourAgentFactory = tourAgentFactory;
 	}
 

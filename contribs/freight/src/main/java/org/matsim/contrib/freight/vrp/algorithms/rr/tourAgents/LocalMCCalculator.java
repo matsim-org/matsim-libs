@@ -15,11 +15,11 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 
-public class LocalMCCalculator implements MarginalInsertionCostsCalculator {
+class LocalMCCalculator implements MarginalInsertionCostsCalculator {
 
 	private Costs costs;
 
-	public LocalMCCalculator(Costs costs) {
+	LocalMCCalculator(Costs costs) {
 		super();
 		this.costs = costs;
 	}

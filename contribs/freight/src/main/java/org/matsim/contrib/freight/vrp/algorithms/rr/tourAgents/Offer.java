@@ -6,7 +6,7 @@ public class Offer {
 	
 	private double price;
 	
-	public Offer(ServiceProviderAgent serviceProvider, double price, double mc) {
+	public Offer(ServiceProviderAgent serviceProvider, double price) {
 		super();
 		this.serviceProvider = serviceProvider;
 		this.price = price;

@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
 
 
 /**
@@ -34,12 +34,12 @@ public class VrpUtils {
 		return new Vehicle(id, locationId, vehicleCapacity);
 	}
 	
-	public static RRSolution copySolution(RRSolution solution, VehicleRoutingProblem vrp, RRTourAgentFactory tourAgentFactory){
+	public static RRSolution copySolution(RRSolution solution, VehicleRoutingProblem vrp, ServiceProviderFactory tourAgentFactory){
 		List<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
 		for(ServiceProviderAgent agent : solution.getTourAgents()){
 			Vehicle vehicle = agent.getVehicle();
 			Tour newTour = new Tour(agent.getTour());
-			RRDriverAgent newTourAgent = tourAgentFactory.createTourAgent(newTour, vehicle);
+			ServiceProviderAgent newTourAgent = tourAgentFactory.createAgent(newTour, vehicle, vrp.getCosts());
 			agents.add(newTourAgent);
 		}
 		return new RRSolution(agents);  

@@ -13,10 +13,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.vrp.algorithms.rr.DistributionTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateAlgorithmFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.ServiceProviderFactoryFinder;
 import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.VRPSchema;
 import org.matsim.contrib.freight.vrp.constraints.PickORDeliveryCapacityAndTWConstraint;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -49,8 +52,9 @@ public class DTWSolverFactory implements VRPSolverFactory{
 	@Override
 	public VRPSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
 		verifyDistributionProblem(shipments,carrierVehicles);
+		ServiceProviderFactory spFactory = new ServiceProviderFactoryFinder().getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
 		DTWSolver rrSolver = new DTWSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
-		DistributionTourWithTimeWindowsAlgoFactory ruinAndRecreateFactory = new DistributionTourWithTimeWindowsAlgoFactory();
+		RuinAndRecreateAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateAlgorithmFactory(spFactory);
 		addListeners(ruinAndRecreateFactory);
 		rrSolver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 		rrSolver.setnOfWarmupIterations(warmupIterations);
@@ -82,7 +86,7 @@ public class DTWSolverFactory implements VRPSolverFactory{
 		
 	}
 
-	private void addListeners(DistributionTourWithTimeWindowsAlgoFactory ruinAndRecreateFactory) {
+	private void addListeners(RuinAndRecreateAlgorithmFactory ruinAndRecreateFactory) {
 		for(RuinAndRecreateListener l : listeners){
 			ruinAndRecreateFactory.addRuinAndRecreateListener(l);
 		}

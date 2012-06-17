@@ -10,8 +10,14 @@
  * Contributors:
  *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
-package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
+package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories;
 
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.OfferMaker;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
+import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -24,7 +30,7 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
  *
  */
 
-public class RRTourAgentFactory {
+public class RRTourAgentFactory implements ServiceProviderFactory{
 
 	private TourStatusProcessor tourStatusProcessor;
 	
@@ -39,7 +45,7 @@ public class RRTourAgentFactory {
 		this.offerMaker = offerMaker;
 	}
 
-	public RRDriverAgent createTourAgent(Tour tour, Vehicle vehicle) {
+	public ServiceProviderAgent createAgent(Tour tour, Vehicle vehicle, Costs costs) {
 		RRDriverAgent tourAgent = new RRDriverAgent(vehicle, tour, tourStatusProcessor, carrierCostParams);
 		tourAgent.setOfferMaker(offerMaker);
 		return tourAgent;

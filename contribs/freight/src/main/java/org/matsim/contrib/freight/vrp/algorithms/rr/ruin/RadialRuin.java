@@ -23,13 +23,12 @@ import java.util.Random;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
-public class RadialRuin implements RuinStrategy{
+public final class RadialRuin implements RuinStrategy{
 	
 	static class ReferencedJob {
 		private Job job;

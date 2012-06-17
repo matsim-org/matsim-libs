@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
@@ -32,7 +31,7 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
  *
  */
 
-public class RandomRuin implements RuinStrategy {
+public final class RandomRuin implements RuinStrategy {
 
 	
 	private Logger logger = Logger.getLogger(RandomRuin.class);

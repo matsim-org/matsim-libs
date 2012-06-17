@@ -23,8 +23,8 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RandomRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.SchrimpfsRRThresholdFunction;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobDistribOfferMaker;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryJIFFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 

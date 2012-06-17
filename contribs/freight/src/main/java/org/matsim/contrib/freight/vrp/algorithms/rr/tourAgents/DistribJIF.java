@@ -23,7 +23,7 @@ import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
-public class DistribJIF implements JobInsertionFinder{
+class DistribJIF implements JobInsertionFinder{
 
 	private Vehicle veh;
 	
@@ -33,7 +33,7 @@ public class DistribJIF implements JobInsertionFinder{
 	
 	private MCCalculatorFactory mcCalculatorFactory;
 	
-	public DistribJIF(Costs costs, Vehicle veh, Tour tour) {
+	DistribJIF(Costs costs, Vehicle veh, Tour tour) {
 		super();
 		this.veh = veh;
 		this.tour = tour;
@@ -41,7 +41,7 @@ public class DistribJIF implements JobInsertionFinder{
 		mcCalculatorFactory = new LocalMCCalculatorFactory();
 	}
 
-	public void setMcCalculatorFactory(MCCalculatorFactory mcCalculatorFactory) {
+	void setMcCalculatorFactory(MCCalculatorFactory mcCalculatorFactory) {
 		this.mcCalculatorFactory = mcCalculatorFactory;
 	}
 
