@@ -155,7 +155,23 @@ public class SpatialGrid{
 	 */
 	public boolean setValue(double value, Point point) {
 		if(isInBounds(point)) {
-			matrix[getRow(point.getY())][getColumn(point.getX())] = value;
+			setValue(value, point.getX(), point.getY());
+			return true;
+		} else
+			return false;
+	}
+	
+	/**
+	 * independent of the intern representation (mirrored) this method sets the given value at the initial point if it lies in the bounds of the study area
+	 * 
+	 * @param value
+	 * @param x the x coordinate of the point to set
+	 * @param y the y coordinate of the point to set
+	 * @return true if the point lies in the bounds of the study area, false otherwise
+	 */
+	public boolean setValue(double value, double x, double y){
+		if (isInBounds(x, y)){
+			matrix[getRow(y)][getColumn(x)] = value;
 			return true;
 		} else
 			return false;
