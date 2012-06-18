@@ -90,6 +90,9 @@ public class MultiPlanCooperative extends AbstractCooperative{
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
 		this.currentIteration = iteration;
 		
+		// remember the best plan from the last iteration
+		this.getBestPlan();
+		
 		// First, balance the budget
 		if(this.budget < 0){
 			// insufficient, sell vehicles
@@ -112,26 +115,13 @@ public class MultiPlanCooperative extends AbstractCooperative{
 		}
 		// distribute them among the plans
 		while (numberOfNewVehicles > 0) {
-			PPlan bestPlan = null;
-			// find plan with best score per vehicle
-			for (PPlan plan : this.plans) {
-				if (bestPlan == null) {
-					bestPlan = plan;
-				} else {
-					if (plan.getPlannedScorePerVehicle() > bestPlan.getPlannedScorePerVehicle()) {
-						bestPlan = plan;
-					}
-				}
-			}
-
 			// add one vehicle to best plan
-			bestPlan.setNVehicles(bestPlan.getNVehicles() + 1);
+			this.findBestPlanAndAddOneVehicle(this.plans);
 			numberOfNewVehicles--;
 		}
 
 		
 		// Third, replan
-		this.getBestPlan();
 		if (this.bestPlan != null) {
 			PPlanStrategy strategy = pStrategyManager.chooseStrategy();
 			PPlan newPlan = strategy.run(this);
@@ -155,7 +145,64 @@ public class MultiPlanCooperative extends AbstractCooperative{
 			}
 		}
 		
-		// Fourth, reinitialize all plan
+//		// Fourth, redistribute vehicles from plans with one vehicle only
+//		List<PPlan> plansToKeep = new LinkedList<PPlan>();
+//		int numberOfVehiclesToRedistribute = 0;
+//		for (PPlan plan : this.plans) {
+//			if (plan.getPlannedScorePerVehicle() < 0 && plan.getNVehicles() == 1) {
+//				// this plan will not make any profit, drop it
+//				numberOfVehiclesToRedistribute += plan.getNVehicles();
+//			} else {
+//				// keep the plan
+//				plansToKeep.add(plan);
+//			}
+//		}
+//		if (plansToKeep.size() > 0) {
+//			this.plans = plansToKeep;
+//		}
+//		while (numberOfVehiclesToRedistribute > 0) {
+//			this.findBestPlanAndAddOneVehicle(this.plans);
+//			numberOfVehiclesToRedistribute--;
+//		}
+		
+		
+		// Fourth, redistribute vehicles from plans with negative score
+		List<PPlan> plansToKeep = new LinkedList<PPlan>();
+		int numberOfVehiclesToRedistribute = 0;
+		for (PPlan plan : this.plans) {
+			if (plan.getPlannedScorePerVehicle() < 0) {
+				// negative score, remove one vehicle from plan
+				plan.setNVehicles(plan.getNVehicles() - 1);
+				numberOfVehiclesToRedistribute++;
+				if (plan.getNVehicles() > 0) {
+					plansToKeep.add(plan);
+				}
+			} else {
+				// keep the plan
+				plansToKeep.add(plan);
+			}
+		}
+		if (plansToKeep.size() > 0) {
+			this.plans = plansToKeep;
+		}
+		while (numberOfVehiclesToRedistribute > 0) {
+			this.findBestPlanAndAddOneVehicle(this.plans);
+			numberOfVehiclesToRedistribute--;
+		}
+		
+		// remove all plans with no vehicles
+		plansToKeep = new LinkedList<PPlan>();
+		for (PPlan plan : this.plans) {
+			if (plan.getNVehicles() > 0) {
+				plansToKeep.add(plan);
+			}
+		}
+		if (plansToKeep.size() == 0) {
+			log.error("Removed too many plans. There was at least one plan with no vehicles associated with.");
+			log.error(this.plans.toString());
+		}
+		
+		// Fifth, reinitialize all plans
 		for (PPlan plan : this.plans) {
 			plan.setLine(this.routeProvider.createTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), plan.getNVehicles(), plan.getStopsToBeServed(), plan.getId()));
 		}
@@ -164,7 +211,7 @@ public class MultiPlanCooperative extends AbstractCooperative{
 	}
 	
 	/**
-	 * Find plan with worst score per vehicle. Removes one vehicle. Removes the whole plan, if no vehicle is left.
+	 * Find plan with the worst score per vehicle. Removes one vehicle. Removes the whole plan, if no vehicle is left.
 	 * 
 	 * @param plans
 	 * @return
@@ -187,6 +234,28 @@ public class MultiPlanCooperative extends AbstractCooperative{
 		if (worstPlan.getNVehicles() == 0) {
 			this.plans.remove(worstPlan);
 		}
+	}
+	
+	/**
+	 * Find plan with the best score per vehicle. Add one vehicle.
+	 * 
+	 * @param plans
+	 * @return
+	 */
+	private void findBestPlanAndAddOneVehicle(List<PPlan> plans){
+		PPlan bestPlan = null;
+		for (PPlan plan : this.plans) {
+			if (bestPlan == null) {
+				bestPlan = plan;
+			} else {
+				if (plan.getPlannedScorePerVehicle() > bestPlan.getPlannedScorePerVehicle()) {
+					bestPlan = plan;
+				}
+			}
+		}
+		
+		// add one vehicle
+		bestPlan.setNVehicles(bestPlan.getNVehicles() + 1);
 	}
 	
 }
