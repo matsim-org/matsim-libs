@@ -23,9 +23,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.vsptelematics.ha1.RouteTTObserver;
-
-
 
 /**
  * @author dgrether
