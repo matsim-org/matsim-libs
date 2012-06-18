@@ -3,6 +3,7 @@ package playground.pieter.mentalsim;
 import org.matsim.core.controler.Controler;
 
 import playground.pieter.mentalsim.controler.MentalSimControler;
+import playground.pieter.mentalsim.controler.listeners.ExpensiveSimScoreWriter;
 import playground.pieter.mentalsim.controler.listeners.MentalSimSubSetSimulationListener;
 import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
 import playground.pieter.mentalsim.controler.listeners.ScoreResetStrategyModuleAppender;
@@ -26,7 +27,7 @@ public class Main {
 		c.addControlerListener(new SimpleAnnealer());
 		c.addControlerListener(new MobSimSwitcher(c));
 		c.addControlerListener(new ScoreResetStrategyModuleAppender(c));
-		
+		c.addControlerListener(new ExpensiveSimScoreWriter(c));
 		c.run();
 		System.exit(0);
 		

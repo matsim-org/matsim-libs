@@ -1,5 +1,7 @@
 package playground.pieter.mentalsim.controler.listeners;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -39,13 +41,14 @@ public class MobSimSwitcher implements ControlerListener,
 	final static String END_ITER = "endIter";
 	final static String INCREASE_EVERY_N = "increaseEveryNExpensiveIters";
 	private int increaseEveryNExpensiveIters = 1;
-	private int expensiveIterCount = 0;
+	private static int expensiveIterCount = 0;
 	private int cheapIterCount = 0;
 	private int currentRate = 0;
 	private int startRate = 0;
 	private int endRate = 0;
 	private int startIter;
 	private int endIter;
+	static ArrayList<Integer> expensiveIters = new ArrayList<Integer>();
 	private MentalSimControler controler;
 
 	private enum SwitchType {
@@ -94,6 +97,11 @@ public class MobSimSwitcher implements ControlerListener,
 		}
 
 	}
+
+	public static ArrayList<Integer> getExpensiveIters() {
+		return expensiveIters;
+	}
+
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
@@ -149,11 +157,13 @@ public class MobSimSwitcher implements ControlerListener,
 		}
 		if (cheapIterCount >= currentRate - 1) {
 			expensiveIter = true;
+			this.expensiveIters.add(controler.getIterationNumber());
 			cheapIterCount = 0;
 			expensiveIterCount++;
 			return expensiveIter;
 		}
 		if(expensiveIter){
+			this.expensiveIters.add(controler.getIterationNumber());
 			expensiveIterCount++;
 		}else{
 			cheapIterCount++; 

@@ -122,7 +122,8 @@ public class SimpleAnnealer implements IterationStartsListener,
 			else
 				currentProportion = currentIter * slope + startProportion;
 		}
-		anneal(event, Math.max(currentProportion,endProportion));
+		currentProportion = Math.max(currentProportion,endProportion);
+		anneal(event, currentProportion);
 	}
 
 	/**
