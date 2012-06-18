@@ -11,6 +11,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+import playground.pieter.mentalsim.controler.MentalSimControler;
 import playground.pieter.mentalsim.mobsim.MentalSimFactory;
 
 /**
@@ -45,7 +46,7 @@ public class MobSimSwitcher implements ControlerListener,
 	private int endRate = 0;
 	private int startIter;
 	private int endIter;
-	private Controler controler;
+	private MentalSimControler controler;
 
 	private enum SwitchType {
 		incrementing, doubling
@@ -54,7 +55,7 @@ public class MobSimSwitcher implements ControlerListener,
 	private SwitchType switchType = SwitchType.incrementing;
 	Logger log = Logger.getLogger(this.getClass());
 
-	public MobSimSwitcher(Controler c) {
+	public MobSimSwitcher(MentalSimControler c) {
 		this.controler = c;
 		if (c.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
 			startRate = Math.max(
@@ -115,8 +116,8 @@ public class MobSimSwitcher implements ControlerListener,
 				controler.setMobsimFactory(new QueueSimulationFactory());
 			}
 		} else {
-			log.info("Running a cheap iteration with fake simulation");
-			controler.setMobsimFactory(new MentalSimFactory(ttcalc));
+			log.info("Running a cheap iteration with mental simulation");
+			controler.setMobsimFactory(new MentalSimFactory(ttcalc,controler));
 		}
 	}
 
@@ -152,7 +153,12 @@ public class MobSimSwitcher implements ControlerListener,
 			expensiveIterCount++;
 			return expensiveIter;
 		}
-		cheapIterCount++; //will only reach if expensiveIter==true and less than currentRate cheapIters
+		if(expensiveIter){
+			expensiveIterCount++;
+		}else{
+			cheapIterCount++; 
+			
+		}
 		return expensiveIter;
 	}
 

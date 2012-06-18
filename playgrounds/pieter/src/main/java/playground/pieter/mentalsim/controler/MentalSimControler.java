@@ -1,106 +1,147 @@
 package playground.pieter.mentalsim.controler;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import playground.pieter.mentalsim.replanning.MentalSimSubSetSimulationStrategyManager;
 
 /**
  * @author fouriep
  * 
  */
 public class MentalSimControler extends Controler {
-	private PopulationImpl originalPopulation;
-	private PopulationImpl subsetPopulation;
-
-	public Population getOriginalPopulation() {
-		return originalPopulation;
+	
+	private ObjectAttributes agentsMarkedForMentalSim = new ObjectAttributes();
+	public static String AGENT_ATT = "mentalsimAgent";
+	boolean simulateSubsetPersonsOnly = false;
+	public boolean isSimulateSubsetPersonsOnly() {
+		return simulateSubsetPersonsOnly;
 	}
 
-	public void setOriginalPopulation(PopulationImpl originalPopulation) {
-		this.originalPopulation = originalPopulation;
+
+
+	public void setSimulateSubsetPersonsOnly(boolean simulateSubsetPersonsOnly) {
+		this.simulateSubsetPersonsOnly = simulateSubsetPersonsOnly;
 	}
+
+	@Override
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = null;
+		if(simulateSubsetPersonsOnly){
+			manager = new MentalSimSubSetSimulationStrategyManager(this);
+		}else{
+			manager = new StrategyManager();
+		}
+		
+		StrategyManagerConfigLoader.load(this, manager);
+		return manager;
+	}
+
+
+	public ObjectAttributes getAgentsMarkedForMentalSim() {
+		return agentsMarkedForMentalSim;
+	}
+
+
 
 	/**
 	 * @param samplingProbability
-	 *            Samples persons for cloning. Only the selected plan of the
+	 *            Samples persons for mental simulation. Only the selected plan of the
 	 *            agent is cloned. The original population is stored for later
 	 *            retrieval.
 	 */
-	public void createSubSetAndStoreOriginalPopulation(
+	public void markMentalSimAgents(
 			double samplingProbability) {
-		originalPopulation = (PopulationImpl) this.getPopulation();
-		PopulationFactoryImpl popfac = (PopulationFactoryImpl) this.population
-				.getFactory();
-		subsetPopulation = new PopulationImpl(
-				(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils
-						.createConfig()));
-		for (Person p : originalPopulation.getPersons().values()) {
+		agentsMarkedForMentalSim.clear();
+		for (Person p : this.getPopulation().getPersons().values()) {
 			PersonImpl pax = (PersonImpl) p;
-			// sample persons for cloning
-			if (Math.random() > samplingProbability) {
-				continue;
+			// remember the person's original plans
+			if (MatsimRandom.getRandom().nextDouble() <= samplingProbability) {
+				ArrayList<Plan> originalPlans = new ArrayList<Plan>();
+				for(Plan plan:p.getPlans()){
+					originalPlans.add(plan);
+				}
+				agentsMarkedForMentalSim.putAttribute(p.getId().toString(), AGENT_ATT,originalPlans);
 			}
-			PersonImpl fake = (PersonImpl) popfac.createPerson(new IdImpl(
-					"fake" + p.getId().toString()));
-			fake.setAge(pax.getAge());
-			fake.setCarAvail(pax.getCarAvail());
-			// fake.setCustomAttributes(pax.getCustomAttributes());
-			// fake.setDesires(pax.getDesires());
-			// fake.setEmployed(pax.getEmployed);
-			fake.setLicence(pax.getLicense());
-			Plan plan = pax.copySelectedPlan();
-			plan.setScore(0.0);
-			fake.addPlan(plan);
-			fake.setSelectedPlan(plan);
-			
-			fake.setSex(pax.getSex());
-			// fake.setTravelCards(pax.getTravelcards());
-			subsetPopulation.addPerson(fake);
+
 		}
-		this.getScenario().setPopulation(subsetPopulation);
-		this.population = subsetPopulation;
-		Logger.getLogger("MentalSimControler").error(
-				"Replaced the population with "
-						+ subsetPopulation.getPersons().size()
-						+ " FAKE persons.");
+
 	}
 
-	/**
-	 * @param selector
-	 *            selects a plan from the subset population according to the
-	 *            selector scheme, then copies that plan to the original
-	 *            population, and sets it as the selected plan
-	 */
-	public void restoreOriginalPopulationAndReturnSubSetPlan(
-			PlanSelector selector) {
-		for (Person p : subsetPopulation.getPersons().values()) {
-			PersonImpl pax = (PersonImpl) p;
-			PersonImpl original = (PersonImpl) originalPopulation.getPersons()
-					.get(new IdImpl(pax.getId().toString().substring(4)));
-			Plan plan = selector.selectPlan(pax);
-			original.addPlan(plan);
-			original.setSelectedPlan(plan);
-		}
-		this.getScenario().setPopulation(originalPopulation);
-		this.population = originalPopulation;
-		Logger.getLogger("MentalSimControler").error(
-				"Replaced the original population with "
-						+ originalPopulation.getPersons().size() + " persons.");
-	}
+
 
 	public MentalSimControler(String[] args) {
 		super(args);
-		// TODO Auto-generated constructor stub
+//		initializeObjectAttributes();
+	}
+
+
+
+
+
+	/**
+	 * @param planSelector
+	 * <p> 
+	 * checks the plans for this person against the ones stored in the objectattributes list.
+	 * creates a fake person, then maps the mentalsim plans to the fake person.
+	 * performs selection according to the plan selection scheme, then passes the original set of plans back to the person, along with the selected mentalsim plan
+	 * 
+	 */
+	public void stripOutMentalSimPlansExceptSelected(
+			PlanSelector planSelector) {
+		for (Person pax : this.getPopulation().getPersons().values()) {
+			PersonImpl p = (PersonImpl) pax;
+			ArrayList<Plan> originalPlans = (ArrayList<Plan>) agentsMarkedForMentalSim.getAttribute(p.getId().toString(), AGENT_ATT);
+			if(originalPlans==null){
+				//skip this person
+				continue;
+			}
+			
+			Person fakePerson = this.getPopulation().getFactory().createPerson(new IdImpl(p.getId().toString()+"FFF"));
+//			ArrayList<Plan> mentalSimPlans = new ArrayList<Plan>();
+			for(Plan plan:p.getPlans()){
+				if(!originalPlans.contains(plan)){
+					fakePerson.addPlan(plan);
+//					mentalSimPlans.add(plan);
+				}
+			}
+			
+			p.getPlans().clear();
+			
+
+			for(Plan originalPlan:originalPlans){
+				p.addPlan(originalPlan);
+			}
+			Plan mentalPlan = planSelector.selectPlan(fakePerson);
+			if(mentalPlan!=null){
+				p.addPlan(mentalPlan);
+				p.setSelectedPlan(mentalPlan);
+			}else{
+				Logger.getLogger(this.getClass()).warn("oooh! couldn't swop back!!");
+			}
+			
+
+		}
+		
 	}
 
 }

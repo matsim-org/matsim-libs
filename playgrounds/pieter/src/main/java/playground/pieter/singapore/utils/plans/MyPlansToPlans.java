@@ -74,10 +74,10 @@ public class MyPlansToPlans {
 //		pca.run(pop);
 //		new PlansSetMode().run(pop);
 
-//		new PlansStripOutTransitPlans().run(pop);
-//		PopulationWriter popwriter = new PopulationWriter(pop,
-//				scenario.getNetwork());
-//		popwriter.write(args[1]);
+		new PlansStripOutTransitPlans().run(pop);
+		PopulationWriter popwriter = new PopulationWriter(pop,
+				scenario.getNetwork());
+		popwriter.write(args[1]);
 		
 //		new PlansSubsampler().run(scenario, args[1], 0.04);
 //		System.out.println("done.");

@@ -49,6 +49,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+import playground.pieter.mentalsim.controler.MentalSimControler;
 import playground.pieter.mentalsim.util.CollectionUtils;
 
 /**
@@ -71,6 +72,7 @@ public class MentalSim implements Mobsim {
 	private final ExecutorService executor;
 	private TravelTimeCalculator linkTravelTimes;
 	private boolean linkEvents = false;
+	private MentalSimControler controler;
 
 	public MentalSim(Scenario sc, EventsManager eventsManager) {
 		this.sc = sc;
@@ -89,23 +91,32 @@ public class MentalSim implements Mobsim {
 	}
 
 	public MentalSim(Scenario sc2, EventsManager eventsManager,
-			PersonalizableTravelTime ttcalc) {
+			PersonalizableTravelTime ttcalc, MentalSimControler c) {
 		this(sc2, eventsManager);
 		this.linkTravelTimes = (TravelTimeCalculator) ttcalc;
+		this.controler = c;
 	}
 
 	public void run() {
 
 		Collection<Plan> plans = new LinkedHashSet<Plan>();
 		for (Person p : sc.getPopulation().getPersons().values()) {
-			// if (Math.random() < 0.1)
-			if (p.getSelectedPlan().getScore() == 0.0) {
+			if (controler.isSimulateSubsetPersonsOnly()) {
+				if (controler.getAgentsMarkedForMentalSim().getAttribute(
+						p.getId().toString(), controler.AGENT_ATT) != null){
+					plans.add(p.getSelectedPlan());					
+				}
+			} else {
 
-				plans.add(p.getSelectedPlan());
+				if (p.getSelectedPlan().getScore() == 0.0) {
+
+					plans.add(p.getSelectedPlan());
+				}
 			}
-			
+
 		}
-		Logger.getLogger(this.getClass()).error("Executing "+plans.size()+" plans in mental simulation.");
+		Logger.getLogger(this.getClass()).error(
+				"Executing " + plans.size() + " plans in mental simulation.");
 
 		Network network = sc.getNetwork();
 
@@ -176,19 +187,23 @@ public class MentalSim implements Mobsim {
 						 * If this is not the first activity, then there must
 						 * exist a leg before.
 						 */
-						
+
 						Leg prevLeg = (Leg) elements.get(idx - 1);
 						double travelTime = 0.0;
 						if (prevLeg.getMode().equals(TransportMode.car)) {
 							try {
-								NetworkRoute croute = (NetworkRoute) prevLeg.getRoute();
-								if(linkEvents){
-									
+								NetworkRoute croute = (NetworkRoute) prevLeg
+										.getRoute();
+								if (linkEvents) {
+
 									travelTime = calcRouteTravelTime(croute,
-											prevEndTime, linkTravelTimes, network, eventQueue, plan.getPerson().getId());
-								}else{
+											prevEndTime, linkTravelTimes,
+											network, eventQueue, plan
+													.getPerson().getId());
+								} else {
 									travelTime = calcRouteTravelTime(croute,
-											prevEndTime, linkTravelTimes, network);
+											prevEndTime, linkTravelTimes,
+											network);
 
 								}
 
@@ -226,8 +241,7 @@ public class MentalSim implements Mobsim {
 									"I think this is discuraged.");
 						}
 						/*
-						 * Send  arrival and activity
-						 * start events.
+						 * Send arrival and activity start events.
 						 */
 						AgentArrivalEvent arrivalEvent = new AgentArrivalEventImpl(
 								arrivalTime, plan.getPerson().getId(),
@@ -270,14 +284,17 @@ public class MentalSim implements Mobsim {
 		}
 
 		private double calcRouteTravelTime(NetworkRoute route,
-				double startTime, TravelTime travelTime, Network network, Queue<Event> eventQueue, Id agentId) {
+				double startTime, TravelTime travelTime, Network network,
+				Queue<Event> eventQueue, Id agentId) {
 			double tt = 0;
 			if (route.getStartLinkId() != route.getEndLinkId()) {
 				Id startLink = route.getStartLinkId();
 				double linkEnterTime = startTime;
-				AgentWait2LinkEvent wait2Link = new AgentWait2LinkEventImpl(linkEnterTime, agentId, startLink, agentId);
+				AgentWait2LinkEvent wait2Link = new AgentWait2LinkEventImpl(
+						linkEnterTime, agentId, startLink, agentId);
 				LinkEnterEvent linkEnterEvent = null;
-				LinkLeaveEvent linkLeaveEvent = new LinkLeaveEventImpl(++linkEnterTime, agentId, startLink, agentId);
+				LinkLeaveEvent linkLeaveEvent = new LinkLeaveEventImpl(
+						++linkEnterTime, agentId, startLink, agentId);
 				eventQueue.add(wait2Link);
 				eventQueue.add(linkLeaveEvent);
 				double linkLeaveTime = linkEnterTime;
@@ -285,41 +302,35 @@ public class MentalSim implements Mobsim {
 				for (int i = 0; i < ids.size(); i++) {
 					Id link = ids.get(i);
 					linkEnterTime = linkLeaveTime;
-					linkEnterEvent = new LinkEnterEventImpl(
-							linkEnterTime,
-							agentId, link,
-							agentId);
+					linkEnterEvent = new LinkEnterEventImpl(linkEnterTime,
+							agentId, link, agentId);
 					eventQueue.add(linkEnterEvent);
 
-					double linkTime = travelTime.getLinkTravelTime(
-							network.getLinks().get(link), startTime);
-					tt += Math.max(linkTime,1.0);
-					
-					linkLeaveTime = Math.max(
-							linkEnterTime + 1,
-							linkEnterTime + linkTime);
-					linkLeaveEvent = new LinkLeaveEventImpl(
-							linkLeaveTime,
+					double linkTime = travelTime.getLinkTravelTime(network
+							.getLinks().get(link), startTime);
+					tt += Math.max(linkTime, 1.0);
+
+					linkLeaveTime = Math.max(linkEnterTime + 1, linkEnterTime
+							+ linkTime);
+					linkLeaveEvent = new LinkLeaveEventImpl(linkLeaveTime,
 							agentId, link, agentId);
 					eventQueue.add(linkLeaveEvent);
-					
+
 					tt += travelTime.getLinkTravelTime(
 							network.getLinks().get(ids.get(i)), startTime);
-//					tt++;// 1 sec for each node
+					// tt++;// 1 sec for each node
 				}
 				tt += travelTime
 						.getLinkTravelTime(
 								network.getLinks().get(route.getEndLinkId()),
 								startTime);
 			}
-			LinkEnterEventImpl linkEnterEvent = new LinkEnterEventImpl(
-					tt,
-					agentId, route.getEndLinkId(),
-					agentId);
+			LinkEnterEventImpl linkEnterEvent = new LinkEnterEventImpl(tt,
+					agentId, route.getEndLinkId(), agentId);
 			eventQueue.add(linkEnterEvent);
 			return tt;
 		}
-		
+
 		private double calcRouteTravelTime(NetworkRoute route,
 				double startTime, TravelTime travelTime, Network network) {
 			double tt = 0;
