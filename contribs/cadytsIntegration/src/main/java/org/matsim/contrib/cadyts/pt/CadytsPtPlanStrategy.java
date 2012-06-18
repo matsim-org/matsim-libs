@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -209,7 +210,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 				String outputFormat = ((PtCountsConfigGroup) config.getModule(PtCountsConfigGroup.GROUP_NAME)).getOutputFormat();
 				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-					ControlerIO ctlIO = controler.getControlerIO();
+					OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
 
 					String filename = ctlIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
 					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(),
@@ -221,7 +222,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 					kmlWriter.writeFile(filename);
 				}
 				if (outputFormat.contains("txt") || outputFormat.contains("all")) {
-					ControlerIO ctlIO = controler.getControlerIO();
+					OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
 					ccaBoard.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareBoarding.txt"));
 					ccaAlight.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareAlighting.txt"));
 					ccaOccupancy.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
