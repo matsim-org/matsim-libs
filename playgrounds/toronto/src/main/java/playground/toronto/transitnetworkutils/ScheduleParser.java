@@ -25,11 +25,11 @@ import org.matsim.core.utils.collections.Tuple;
  * @author pkucirek
  */
 
-public class ScheduleConverter {
+public class ScheduleParser {
 	
 	private ArrayList<ScheduledRoute> routes;
 	
-	public ScheduleConverter(){
+	public ScheduleParser(){
 		this.routes = new ArrayList<ScheduledRoute>();
 	}
 			

@@ -14,7 +14,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import playground.toronto.transitnetworkutils.ScheduleConverter;
+import playground.toronto.transitnetworkutils.ScheduleParser;
 import playground.toronto.transitnetworkutils.ScheduledRoute;
 
 import org.matsim.api.core.v01.Coord;

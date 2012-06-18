@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.toronto;
+package playground.toronto.demand;
 
 import java.util.Iterator;
 

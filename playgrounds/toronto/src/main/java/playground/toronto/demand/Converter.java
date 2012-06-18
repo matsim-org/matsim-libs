@@ -1,4 +1,4 @@
-package playground.toronto;
+package playground.toronto.demand;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

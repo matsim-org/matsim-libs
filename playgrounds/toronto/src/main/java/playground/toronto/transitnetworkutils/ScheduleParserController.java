@@ -1,27 +1,16 @@
 package playground.toronto.transitnetworkutils;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import org.matsim.core.config.ConfigUtils;
-
-
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import GTFS2PTSchedule.GTFS2MATSimTransitSchedule;
-
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.router.util.PreProcessDijkstra;;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
 
 
 
@@ -45,6 +34,12 @@ public class ScheduleParserController {
 		final String GOSTOPSNAME = "C:\\Users\\Peter Work\\Desktop\\NETWORK DATA\\Parsing\\gostops_withReferences.txt";
 		//final String GOROUTESNAME = "C:\\Users\\Peter Admin\\Desktop\\NETWORK DATA\\Parsing\\goroutes.txt";
 		
+		//TTC schedule files
+		final String TTCSTREETCARSCHEDULE = "C:/Users/Peter Work/Desktop/NETWORK DATA/OPERATOR DATA/TTC/TTC GTFS Current/streetcar/streetcar_schedule.xml";
+		final String TTCOUTPUTSCHEDULE = "C:/Users/Peter Work/Desktop/NETWORK DATA/OPERATOR DATA/TTC/TTC GTFS Current/streetcar/new_streetcar_schedule.xml";
+		final String TTCGTFSFOLDER = "C:/Users/Peter Work/Desktop/NETWORK DATA/OPERATOR DATA/TTC/TTC GTFS Current/streetcar";
+		final String TESTNETWORKFILE = "C:/Users/Peter Work/Desktop/NETWORK DATA/MATSIM NETWORK/GTFS/tempnTemp.xml";
+		
 		//Other operator files
 		final String BRAMPTONSCHEDULEFILENAME = "C:\\Users\\Peter Work\\Desktop\\NETWORK DATA\\OPERATOR DATA\\Brampton\\Brampton2006.csv";
 		final String HSRSCHEDULENAME = "C:\\Users\\Peter Work\\Desktop\\NETWORK DATA\\Parsing\\Hamilton 2006 Weekday Schedule.csv";
@@ -58,7 +53,22 @@ public class ScheduleParserController {
 		//Other files
 		final String configname = "C:\\Users\\Peter Work\\Desktop\\NETWORK DATA\\MATSIM NETWORK\\testconfig.xml";	
 		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(TESTNETWORKFILE);
+		
+		Nodes2ESRIShape f = new Nodes2ESRIShape(network, "C:/Users/Peter Work/Desktop/NETWORK DATA/MAPS/SHAPEFILES/streetcar_nodes.shp", TransformationFactory.WGS84);
+		f.write();
+		
+		Links2ESRIShape e = new Links2ESRIShape(network, "C:/Users/Peter Work/Desktop/NETWORK DATA/MAPS/SHAPEFILES/streetcarnetwork.shp", TransformationFactory.WGS84);
+		e.write();
+		
+		TransitScheduleUtils.PostProcessGTFS(TTCSTREETCARSCHEDULE, TTCGTFSFOLDER, TTCOUTPUTSCHEDULE);
+		
 		Config config = ConfigUtils.loadConfig(configname);
+		
+		//TransitScheduleUtils.AggregateDepartureTimes(schedule, outFile)
+		
 		
 		/*
 		Scenario s = ScenarioUtils.loadScenario(config);

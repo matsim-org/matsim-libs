@@ -7,7 +7,7 @@
 //	Chains are defined as a chain of trips that starts at home (mode H or L) and ends at home (mode H or L)
 //	In the case where there are non-drive trips within an otherwise drive chain, a pure drive chain can be obtained by simply removing those non-drive trips
 
-package playground.toronto;
+package playground.toronto.demand;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

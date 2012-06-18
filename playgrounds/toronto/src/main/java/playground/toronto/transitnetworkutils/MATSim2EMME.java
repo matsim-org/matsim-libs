@@ -1,4 +1,4 @@
-package playground.toronto;
+package playground.toronto.transitnetworkutils;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

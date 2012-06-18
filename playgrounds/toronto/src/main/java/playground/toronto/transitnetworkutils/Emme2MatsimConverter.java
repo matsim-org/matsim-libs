@@ -448,8 +448,7 @@ public class Emme2MatsimConverter {
 				if (l.getType().equals("Streetcar ROW")) hasOutgoingTransitLink = true;
 			}
 			for (Link l : outgoingTransfers) linksToRemove.add(l.getId());
-			
-			//TODO write code to handle different LRT cases.
+	
 			
 			//Migrate start/end nodes to correct position.
 			//Four situations are handled:

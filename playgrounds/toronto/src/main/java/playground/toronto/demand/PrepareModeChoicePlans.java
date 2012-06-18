@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.toronto;
+package playground.toronto.demand;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
