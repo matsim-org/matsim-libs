@@ -37,7 +37,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -287,8 +287,8 @@ public class CountsScaleFactorLab {
 			ControlerConfigGroup ctlCG = config.controler();
 
 			int iteration = ctlCG.getFirstIteration();
-			ControlerIO ctlIO = new ControlerIO(ctlCG.getOutputDirectory(),
-					new IdImpl(ctlCG.getRunId()));
+			OutputDirectoryHierarchy ctlIO = new OutputDirectoryHierarchy(ctlCG.getOutputDirectory(),
+					new IdImpl(ctlCG.getRunId()), false);
 
 			// String filename = ctlIO.getIterationFilename(iteration, "sf"
 			// + scaleFactor + "_countscompare" + ".kmz");

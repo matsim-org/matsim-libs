@@ -22,7 +22,7 @@ package playground.jbischoff.BAsignals;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -67,7 +67,7 @@ public class CottbusLiveVis {
 		((PopulationImpl)scenario.getPopulation()).runAlgorithms();
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
+		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(scenario.getConfig().controler().getOutputDirectory(), false);
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			AdaptiveControllHead adaptiveControllHead = new AdaptiveControllHead();

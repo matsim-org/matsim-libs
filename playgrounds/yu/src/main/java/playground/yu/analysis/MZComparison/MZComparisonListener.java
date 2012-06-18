@@ -21,7 +21,7 @@ package playground.yu.analysis.MZComparison;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -47,7 +47,7 @@ public class MZComparisonListener implements IterationEndsListener,
 		if (iter % 100 == 0) {
 
 			Controler ctl = event.getControler();
-			ControlerIO ctlIO = ctl.getControlerIO();
+			OutputDirectoryHierarchy ctlIO = ctl.getControlerIO();
 			Population pop = ctl.getPopulation();
 
 			MZComparisonData mzcd = new MZComparisonData(ctl.getScenario()

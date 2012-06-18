@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -168,7 +168,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	
 			}
 
-	public void writeData(Scenario sc, ControlerIO controlerIO) {
+	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO) {
 		SignalsData data = sc.getScenarioElement(SignalsData.class);
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
 	}

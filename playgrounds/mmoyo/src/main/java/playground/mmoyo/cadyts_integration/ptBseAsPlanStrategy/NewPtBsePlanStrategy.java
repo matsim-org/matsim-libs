@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -252,7 +252,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy, IterationEndsListener
 
 				String outputFormat = config.findParam("ptCounts", "outputformat");
 				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-					ControlerIO ctlIO = controler.getControlerIO();
+					OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
 
 					String filename = ctlIO.getIterationFilename(iter, "ptBseCountscompare.kmz");
 					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(),

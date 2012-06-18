@@ -20,7 +20,7 @@
 package playground.gregor.sim2d_v2.controller;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -69,7 +69,7 @@ public class Sim2DSignalsControllerListener implements SignalsControllerListener
 		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO());
 	}
 	
-	public void writeData(Scenario sc, ControlerIO controlerIO){
+	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
 		SignalsData data = sc.getScenarioElement(SignalsData.class);
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
 	}

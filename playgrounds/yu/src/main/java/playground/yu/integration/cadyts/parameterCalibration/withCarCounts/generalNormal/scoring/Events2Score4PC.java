@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
@@ -204,7 +204,7 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		if (iteration <= ctlCfg.getLastIteration()
 				&& iteration > ctlCfg.getLastIteration() - 100) {
 			// outputCalcDetail = true;
-			ControlerIO ctlIO = new ControlerIO(ctlCfg.getOutputDirectory());
+			OutputDirectoryHierarchy ctlIO = new OutputDirectoryHierarchy(ctlCfg.getOutputDirectory(), false);
 			writer = new SimpleWriter(ctlIO.getIterationFilename(iteration,
 					"scoreCalcDetails.log.gz"));
 

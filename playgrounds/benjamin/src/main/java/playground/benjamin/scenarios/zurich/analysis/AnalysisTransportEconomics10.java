@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -73,8 +73,8 @@ public class AnalysisTransportEconomics10 {
 		
 		String outputPath1 = BkPaths.RUNSSVN + runid1String;
 		String outputPath2 = BkPaths.RUNSSVN + runid2String;
-		ControlerIO io1 = new ControlerIO(outputPath1, runid1);
-		ControlerIO io2 = new ControlerIO(outputPath2, runid2);
+		OutputDirectoryHierarchy io1 = new OutputDirectoryHierarchy(outputPath1, runid1, false);
+		OutputDirectoryHierarchy io2 = new OutputDirectoryHierarchy(outputPath2, runid2, false);
 		
 
 		netfile = io1.getOutputFilename("output_network") + ".xml.gz";

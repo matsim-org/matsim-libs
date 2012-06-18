@@ -76,7 +76,7 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 		this.timePerIterationMap.put(event.getIteration(), this.eventHandler.getAverageOverallTripDuration());
 		
 		if(event.getIteration() % 10 == 0 && event.getIteration() > 0) {
-			this.currentOutputPath = event.getControler().getControlerIO().getOutputPath()+"/ITERS/it."+event.getIteration()+"/";
+			this.currentOutputPath = event.getControler().getControlerIO().getIterationPath(event.getIteration());
 			generateStandardAnalysis(event.getControler());
 		}
 	}

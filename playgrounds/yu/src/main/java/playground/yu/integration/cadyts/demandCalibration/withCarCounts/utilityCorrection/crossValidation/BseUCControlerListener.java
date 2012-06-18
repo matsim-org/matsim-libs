@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -91,7 +91,7 @@ public class BseUCControlerListener implements StartupListener,
 						.getLinkCostOffsets();
 
 				Controler ctl = event.getControler();
-				ControlerIO ctlIO = ctl.getControlerIO();
+				OutputDirectoryHierarchy ctlIO = ctl.getControlerIO();
 				Network net = ctl.getNetwork();
 
 				new BseLinkCostOffsetsXMLFileIO(net).write(ctlIO

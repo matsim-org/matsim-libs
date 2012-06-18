@@ -19,7 +19,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -73,13 +73,13 @@ public class DgOTFVisReplayLastIteration {
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(newConfigFile);
-		ControlerIO oldConfControlerIO;
+		OutputDirectoryHierarchy oldConfControlerIO;
 		if (config.controler().getRunId() != null) {
-			oldConfControlerIO = new ControlerIO(currentDirectory, new IdImpl(config.controler()
-					.getRunId()));
+			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, new IdImpl(config.controler()
+					.getRunId()), false);
 		}
 		else {
-			oldConfControlerIO = new ControlerIO(currentDirectory);
+			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, false);
 		}
 		config.network().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		config.plans()
@@ -120,7 +120,7 @@ public class DgOTFVisReplayLastIteration {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		Scenario sc = loader.loadScenario();
 		EventsManager events = EventsUtils.createEventsManager();
-		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
+		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(sc.getConfig().controler().getOutputDirectory(), false);
 		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(sc, events);
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
 			SignalEngine engine = new QSimSignalEngine(

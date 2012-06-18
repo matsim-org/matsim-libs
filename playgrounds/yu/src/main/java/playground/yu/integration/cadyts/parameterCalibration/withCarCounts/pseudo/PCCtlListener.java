@@ -35,7 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -95,7 +95,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void initializeCalibrator(Controler ctl) {
 		Config config = ctl.getConfig();
-		ControlerIO ctlIO = ctl.getControlerIO();
+		OutputDirectoryHierarchy ctlIO = ctl.getControlerIO();
 
 		// SETTING "parameter calibration" parameters
 		String parameterDimensionStr = config.findParam(BSE_CONFIG_MODULE_NAME,
@@ -164,7 +164,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	}
 
 	private void initializeOutput(Controler ctl) {
-		ControlerIO ctlIO = ctl.getControlerIO();
+		OutputDirectoryHierarchy ctlIO = ctl.getControlerIO();
 		{
 			writer = new SimpleWriter(ctlIO.getOutputFilename("parameters.log"));
 			StringBuffer sb = new StringBuffer("iter");
@@ -278,7 +278,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		Config config = ctl.getConfig();
 		int iter = event.getIteration();
 		int firstIter = ctl.getFirstIteration();
-		ControlerIO io = ctl.getControlerIO();
+		OutputDirectoryHierarchy io = ctl.getControlerIO();
 		// ***************************************************
 		calibrator.setFlowAnalysisFile(io.getIterationFilename(iter,
 				"flowAnalysis.log"));
@@ -321,7 +321,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		writer.close();
 
 		Controler ctl = event.getControler();
-		ControlerIO ctlIO = ctl.getControlerIO();
+		OutputDirectoryHierarchy ctlIO = ctl.getControlerIO();
 		int firstIter = ctl.getFirstIteration(), lastIter = ctl
 				.getLastIteration();
 

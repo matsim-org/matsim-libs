@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class ItsumoSim extends ExternalMobsim {
 
 	protected static final String CONFIG_MODULE = "itsumo";
-	private ControlerIO controlerio;
+	private OutputDirectoryHierarchy controlerio;
 	private Integer iteration;
 
 	public ItsumoSim(final Scenario scenario, final EventsManager events) {
@@ -180,7 +180,7 @@ public class ItsumoSim extends ExternalMobsim {
 	}
 
 	@Override
-	public void setControlerIO(final ControlerIO controlerIO) {
+	public void setControlerIO(final OutputDirectoryHierarchy controlerIO) {
 		this.controlerio = controlerIO;
 	}
 

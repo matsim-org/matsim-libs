@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -87,7 +87,7 @@ public class BseUCControlerListener implements StartupListener,
 		int iter = event.getIteration();
 		if (iter % 10 == 0) {
 			Controler ctl = event.getControler();
-			ControlerIO io = ctl.getControlerIO();
+			OutputDirectoryHierarchy io = ctl.getControlerIO();
 			try {
 				DynamicData<Link> linkCostOffsets = calibrator
 						.getLinkCostOffsets();
@@ -146,7 +146,7 @@ public class BseUCControlerListener implements StartupListener,
 			System.out.println("BSE:\tregressionInertia\t=\t"
 					+ regressionInertia);
 		}
-		ControlerIO ctlIO = controler.getControlerIO();
+		OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
 		// ----------------------------------------------------------
 		calibrator = new MATSimUtilityModificationCalibrator<Link>(ctlIO
 				.getOutputFilename("calibration.log"), MatsimRandom

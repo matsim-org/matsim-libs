@@ -3,7 +3,7 @@ package playground.wrashid.parkingSearch.planLevel.strc2010;
 import java.io.File;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
@@ -47,7 +47,7 @@ public class RunSeries {
 			public void notifyStartup(StartupEvent event) {
 				String outputFolder=getOutputFolderFullPath(GlobalRegistry.runNumber);
 				Controler controler= event.getControler();
-				ControlerIO controlerIO=new ControlerIO(outputFolder);
+				OutputDirectoryHierarchy controlerIO=new OutputDirectoryHierarchy(outputFolder, false);
 				
 				//TODO: write tests for this, which fail when the variable or method names change (and as such can be easily adapted).
 				

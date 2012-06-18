@@ -559,11 +559,11 @@ public class MarathonController extends WithinDayController implements StartupLi
 		
 		CoordAnalyzer innerAnalyzer = new CoordAnalyzer(innerBuffer);
 		GisDebugger.addGeometry(innerBuffer, "inner Buffer");
-		GisDebugger.dump(this.getControlerIO().getOutputPath() + "/affectedAreaInnerBuffer.shp");
+		GisDebugger.dump(this.getControlerIO().getOutputFilename("affectedAreaInnerBuffer.shp"));
 		
 		CoordAnalyzer outerAnalyzer = new CoordAnalyzer(outerBuffer);
 		GisDebugger.addGeometry(outerBuffer, "outer Buffer");
-		GisDebugger.dump(this.getControlerIO().getOutputPath() + "/affectedAreaOuterBuffer.shp");
+		GisDebugger.dump(this.getControlerIO().getOutputFilename("/affectedAreaOuterBuffer.shp"));
 		
 		this.bufferedCoordAnalyzer = new CoordAnalyzer(innerBuffer);
 		

@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
@@ -56,7 +56,7 @@ public class CommuterGenerator {
 
 		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_car_only.xml.gz";
 //		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_all_modes.xml.gz";
-		IOUtils.initOutputDirLogging(populationOutputDirectory, null);
+		OutputDirectoryLogging.initLoggingWithOutputDirectory(populationOutputDirectory);
 		
 		Config config1 = ConfigUtils.createConfig();
 		config1.network().setInputFile(networkFile);
@@ -108,7 +108,7 @@ public class CommuterGenerator {
 		.write("work", shapeFilename, MGC.getCRS(TransformationFactory.WGS84_UTM33N));
 		
 		log.info("done!");
-		IOUtils.closeOutputDirLogging();
+		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 
 }

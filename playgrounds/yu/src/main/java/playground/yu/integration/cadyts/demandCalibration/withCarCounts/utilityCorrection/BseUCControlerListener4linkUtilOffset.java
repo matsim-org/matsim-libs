@@ -42,7 +42,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -119,7 +119,7 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 		int iter = event.getIteration();
 		Controler ctl = event.getControler();
 
-		ControlerIO io = ctl.getControlerIO();
+		OutputDirectoryHierarchy io = ctl.getControlerIO();
 		if (iter % 10 == 0) {
 			try {
 				DynamicData<Link> linkCostOffsets = calibrator

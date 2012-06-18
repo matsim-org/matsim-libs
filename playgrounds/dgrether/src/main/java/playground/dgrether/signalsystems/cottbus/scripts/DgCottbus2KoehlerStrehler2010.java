@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -79,7 +79,7 @@ public class DgCottbus2KoehlerStrehler2010 {
 	private static double endTime = 9.5 * 3600.0;
 	
 	public static void main(String[] args) throws IOException {
-		IOUtils.initOutputDirLogging(outputDirectory, null);
+		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 		/*TODO add time support in respect to:
 		 * network capacity creation: document
 		*/
@@ -104,7 +104,7 @@ public class DgCottbus2KoehlerStrehler2010 {
 		
 		new DgKoehlerStrehler2010ModelWriter().write(ksNet, commodities, name, description, modelOutfile);
 		writeStats(ksNet, commodities);
-		IOUtils.closeOutputDirLogging();
+		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 	
 	public static void writeStats(DgKSNetwork ksNet, DgCommodities commodities){

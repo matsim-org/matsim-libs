@@ -29,7 +29,7 @@ import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
@@ -80,11 +80,11 @@ public class DgCottbusSignalPlanChartGenerator {
 //		endSecond = 900.0;
 //		
 		//skript
-		ControlerIO io = null;
+		OutputDirectoryHierarchy io = null;
 		if (runId != null) 
-			io = new ControlerIO(baseDir, runId);
+			io = new OutputDirectoryHierarchy(baseDir, runId, false);
 		else
-			io = new ControlerIO(baseDir);
+			io = new OutputDirectoryHierarchy(baseDir, false);
 		
 		String eventsFilename = io.getIterationFilename(iteration, "events.xml.gz");
 		

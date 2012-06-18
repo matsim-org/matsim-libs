@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -194,7 +194,7 @@ public class QVProfilControlerListener implements StartupListener,
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		Controler ctl = event.getControler();
-		ControlerIO io = ctl.getControlerIO();
+		OutputDirectoryHierarchy io = ctl.getControlerIO();
 
 		SimpleWriter indexWriter = new SimpleWriter(
 				io.getOutputFilename("linkIdIndex.log"));

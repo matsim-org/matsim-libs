@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -77,7 +77,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 	private final Network 							network;
 	protected PrintStream 							stream;
 	boolean 										printing = false;
-	protected ControlerIO 							controlerIO;
+	protected OutputDirectoryHierarchy 							controlerIO;
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructor

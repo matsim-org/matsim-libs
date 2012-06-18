@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -77,7 +77,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private final double					LC_MINIMUM_TIME = 1.0;
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final Knowledges 				knowledges;
-	private	ControlerIO						controlerIO;
+	private	OutputDirectoryHierarchy						controlerIO;
 	private boolean 						printing = false;
 	private PrintStream 					stream;
 

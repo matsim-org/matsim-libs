@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
@@ -128,7 +128,7 @@ public class DBSimulation implements ObservableMobsim {
 	private final Set<String> notTeleportedModes = new HashSet<String>();
 
 	private Integer iterationNumber = null;
-	private ControlerIO controlerIO;
+	private OutputDirectoryHierarchy controlerIO;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems

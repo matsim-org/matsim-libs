@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -92,9 +93,7 @@ public class RunCountPossibleSharedRides {
 			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
 			Logger.getRootLogger().addAppender(appender);
 
-			IOUtils.initOutputDirLogging(
-				config.controler().getOutputDirectory(),
-				appender.getLogEvents());
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(config.controler().getOutputDirectory());
 		} catch (IOException e) {
 			//log.error("could not create log file");
 			// do NOT continue without proper logging!
@@ -140,7 +139,7 @@ public class RunCountPossibleSharedRides {
 
 		log.info("RunCountPossibleSharedRides... DONE");
 
-		IOUtils.closeOutputDirLogging();
+		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 }
 

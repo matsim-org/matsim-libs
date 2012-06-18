@@ -20,18 +20,30 @@
 
 package org.matsim.core.controler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -39,6 +51,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
@@ -57,6 +70,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
@@ -66,64 +80,83 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
  * @author nagel
  *
  */
-public class KnSimplifiedController extends AbstractController {
-	
-	public final IterationStopWatch stopwatch = new IterationStopWatch();
+public class KnSimplifiedController implements Runnable {
 
-	public Config config  ;
+	private static Logger log = Logger.getLogger(KnSimplifiedController.class);
+
+	private OutputDirectoryHierarchy controlerIO;
+
+	private final IterationStopWatch stopwatch = new IterationStopWatch();
+
+	private Config config;
+
+	private Scenario scenarioData = null ;
+
 	private Network network  ;
 	private Population population  ;
-	
+	/**
+	 * This instance encapsulates all behavior concerning the
+	 * ControlerEvents/Listeners
+	 */
+	private ControlerListenerManager controlerListenerManager = new ControlerListenerManager(null);
+
 	private CalcLegTimes legTimes;
 
-	
+	private OutputDirectoryLogging matsimLogging;
+
+	private Thread shutdownHook = new Thread() {
+		@Override
+		public void run() {
+			log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
+			shutdown(true);
+			log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
+		}
+	};
+
+	private EventsManager eventsManager;
+
+
 	// ############################################################################################################################
 	// ############################################################################################################################
 	//	stuff that is related to the control flow	
-	
+
 	KnSimplifiedController() {
-		
+		OutputDirectoryLogging.catchLogEntries();
 		Config cfg = ConfigUtils.createConfig() ;
 		cfg.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		checkConfigConsistencyAndWriteToLog("Complete config dump after reading the config file:");
-
 		this.scenarioData = (ScenarioImpl) ScenarioUtils.loadScenario( cfg ) ;
-		
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 		this.config = this.scenarioData.getConfig();
-
+		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 	}
+	
 	@Override
 	public void run() {
-		setUpOutputDir(); // output dir needs to be before logging
-		initEvents(); // yy I do not understand why events need to be before logging
-		initLogging(); // logging needs to be early
+		this.controlerIO = new OutputDirectoryHierarchy(this.scenarioData.getConfig().controler().getOutputDirectory(), false); // output dir needs to be before logging
+		this.eventsManager = EventsUtils.createEventsManager(config); // yy I do not understand why events need to be before logging
+		OutputDirectoryLogging.initLogging(this.controlerIO); // logging needs to be early
 		setUp(); // setup needs to be after events since most things need events
 		loadCoreListeners();
-
 		this.controlerListenerManager.fireControlerStartupEvent();
-		
-		this.checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
-
+		checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
 		doIterations();
-
 		shutdown(false);
 	}
+
 	/**
 	 * Initializes the Controler with the parameters from the configuration.
 	 * This method is called after the configuration is loaded, and after the
 	 * scenario data (network, population) is read.
 	 */
 	private void setUp() {
-		
 		// add a couple of useful event handlers:
-		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
-
+		this.eventsManager.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.legTimes = new CalcLegTimes();
-		this.events.addHandler(legTimes);
-
+		this.eventsManager.addHandler(legTimes);
 	}
+
 	/**
 	 * The order how the listeners are added is very important! As
 	 * dependencies between different listeners exist or listeners may read
@@ -136,9 +169,12 @@ public class KnSimplifiedController extends AbstractController {
 	 */
 	private void loadCoreListeners() {
 
+		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenarioData, controlerIO);
+		this.controlerListenerManager.addControlerListener(dumpDataAtEnd);
+		
 		final PlansScoring plansScoring = buildPlansScoring();
 		this.controlerListenerManager.addControlerListener(plansScoring);
-		
+
 		final StrategyManager strategyManager = buildStrategyManager() ;
 		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
@@ -146,11 +182,36 @@ public class KnSimplifiedController extends AbstractController {
 				this.config.controler().getWritePlansInterval(), this.stopwatch, this.controlerIO );
 		this.controlerListenerManager.addCoreControlerListener(plansDumping);
 
-		final EventsHandling eventsHandling = new EventsHandling(this.events,
+		this.controlerListenerManager.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
+		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) this.eventsManager,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
-				this.controlerIO, this.legTimes );
+				this.controlerIO );
 		this.controlerListenerManager.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
+	}
+	/**
+	 * Design decisions:
+	 * <ul>
+	 * <li>I extracted this method since it is now called <i>twice</i>: once
+	 * directly after reading, and once before the iterations start. The second
+	 * call seems more important, but I wanted to leave the first one there in
+	 * case the program fails before that config dump. Might be put into the
+	 * "unexpected shutdown hook" instead. kai, dec'10
+	 * </ul>
+	 * 
+	 * @param message
+	 *            the message that is written just before the config dump
+	 */
+	private final void checkConfigConsistencyAndWriteToLog(final String message) {
+		log.info(message);
+		String newline = System.getProperty("line.separator");// use native line endings for logfile
+		StringWriter writer = new StringWriter();
+		new ConfigWriter(this.scenarioData.getConfig()).writeStream(new PrintWriter(writer), newline);
+		log.info(newline + newline + writer.getBuffer().toString());
+		log.info("Complete config dump done.");
+		log.info("Checking consistency of config...");
+		this.scenarioData.getConfig().checkConsistency();
+		log.info("Checking consistency of config done.");
 	}
 
 	private void doIterations() {
@@ -171,12 +232,12 @@ public class KnSimplifiedController extends AbstractController {
 
 		for (int iteration = firstIteration; iteration <= lastIteration; iteration++ ) {
 			this.stopwatch.setCurrentIteration(iteration) ;
-			
+
 			log.info(divider);
 			log.info(marker + "ITERATION " + iteration + " BEGINS");
 			this.stopwatch.setCurrentIteration(iteration);
 			this.stopwatch.beginOperation("iteration");
-			makeIterationPath(iteration);
+			this.controlerIO.createIterationDirectory(iteration);
 			resetRandomNumbers(iteration);
 
 			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
@@ -203,14 +264,28 @@ public class KnSimplifiedController extends AbstractController {
 			log.info(divider);
 		}
 	}
-	
+
+	private final void shutdown(final boolean unexpected) {
+		this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
+		OutputDirectoryLogging.closeOutputDirLogging();
+	}
+
+	private void resetRandomNumbers(int iteration) {
+		MatsimRandom.reset(this.scenarioData.getConfig().global().getRandomSeed()
+				+ iteration);
+		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
+		// "not-randomness" is the first
+		// draw...
+		// Fixme [kn] this should really be ten thousand draws instead of just
+		// one
+	}
 	// ############################################################################################################################
 	// ############################################################################################################################
 	//	stuff that is related to the configuration of matsim  	
-	
+
 	private PlansScoring buildPlansScoring() {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
-		final PlansScoring plansScoring = new PlansScoring( this.scenarioData, this.events, scoringFunctionFactory );
+		final PlansScoring plansScoring = new PlansScoring( this.scenarioData, this.eventsManager, scoringFunctionFactory );
 		return plansScoring;
 	}
 
@@ -230,6 +305,19 @@ public class KnSimplifiedController extends AbstractController {
 		}
 		return strategyManager ;
 	}
+
+
+	private final AbstractMultithreadedModule wrapPlanAlgo(final PlanAlgorithm planAlgo) {
+		// wrap it into the AbstractMultithreadedModule:
+		final AbstractMultithreadedModule router = new AbstractMultithreadedModule(this.scenarioData.getConfig().global().getNumberOfThreads()) {
+			@Override
+			public PlanAlgorithm getPlanAlgoInstance() {
+				return planAlgo ;
+			}
+		};
+		return router;
+	}
+
 	private PlansCalcRoute createRoutingAlgorithm() {
 		// factory to generate routes:
 		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
@@ -237,22 +325,23 @@ public class KnSimplifiedController extends AbstractController {
 		// travel time:
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.events.addHandler(travelTime);
+		this.eventsManager.addHandler(travelTime);
 
 		// travel disutility (generalized cost)
 		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
-		
+
 		// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
 		// times (e.g. for car router, pt router, ...)
 		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
-		
+
 		// plug it together
 		final PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelDisutility, 
 				travelTime, leastCostPathFactory, routeFactory);
 		return plansCalcRoute;
 	}
-	protected void runMobSim(int iteration) {
-		QSim simulation = new QSim( this.scenarioData, this.events ) ;
+	
+	private void runMobSim(int iteration) {
+		QSim simulation = new QSim( this.scenarioData, this.eventsManager ) ;
 		if (config.controler().getWriteSnapshotsInterval() != 0 && iteration % config.controler().getWriteSnapshotsInterval() == 0) {
 			// yyyy would be nice to have the following encapsulated in some way:
 			// === begin ===
@@ -268,7 +357,7 @@ public class KnSimplifiedController extends AbstractController {
 		Mobsim sim = simulation;
 		sim.run();
 	}
-	
+
 	// ############################################################################################################################
 	// ############################################################################################################################
 	public static void main( String[] args ) {

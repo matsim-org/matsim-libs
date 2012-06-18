@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
@@ -112,8 +113,8 @@ public class WardropTest {
 		log.info("");
 		log.info("Done!");
 
-		IOUtils.closeOutputDirLogging();
-		IOUtils.renameFile("C:\\" + IOUtils.LOGFILE, "C:\\WardropLog.log");
+		OutputDirectoryLogging.closeOutputDirLogging();
+		IOUtils.renameFile("C:\\" + OutputDirectoryLogging.LOGFILE, "C:\\WardropLog.log");
 	}
 
 	/**
@@ -123,7 +124,7 @@ public class WardropTest {
 		Logger.getRootLogger().removeAppender(collectLogMessagesAppender);
 		try
 		{
-			IOUtils.initOutputDirLogging("C:\\", collectLogMessagesAppender.getLogEvents());
+			OutputDirectoryLogging.initLoggingWithOutputDirectory("C:\\");
 		}
 		catch (IOException e)
 		{

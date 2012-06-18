@@ -11,7 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -85,7 +85,7 @@ public class HybridVis {
 
 
 
-		ControlerIO controlerIO = new ControlerIO(config.controler().getOutputDirectory());
+		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), false);
 		QSim qSim = (QSim) new HybridQ2DMobsimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());

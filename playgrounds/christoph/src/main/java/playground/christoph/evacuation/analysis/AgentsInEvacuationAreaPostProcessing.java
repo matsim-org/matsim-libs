@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -219,7 +219,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 	 */
 	private static class DummyController extends Controler {
 
-		private final ControlerIO controlerIO;
+		private final OutputDirectoryHierarchy controlerIO;
 		
 		public DummyController(Scenario scenario) {
 			super(scenario);
@@ -229,14 +229,14 @@ public class AgentsInEvacuationAreaPostProcessing {
 				outputPath = outputPath.substring(0, outputPath.length() - 1);
 			}
 			if (this.scenarioData.getConfig().controler().getRunId() != null) {
-				this.controlerIO = new ControlerIO(outputPath, scenario.createId(this.scenarioData.getConfig().controler().getRunId()));
+				this.controlerIO = new OutputDirectoryHierarchy(outputPath, scenario.createId(this.scenarioData.getConfig().controler().getRunId()), false);
 			} else {
-				this.controlerIO = new ControlerIO(outputPath);
+				this.controlerIO = new OutputDirectoryHierarchy(outputPath, false);
 			}
 		}
 		
 		@Override
-		public ControlerIO getControlerIO() {
+		public OutputDirectoryHierarchy getControlerIO() {
 			return this.controlerIO;
 		}
 		

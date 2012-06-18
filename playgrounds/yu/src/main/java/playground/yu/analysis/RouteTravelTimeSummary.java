@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.Vector;
 
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -105,7 +105,7 @@ public class RouteTravelTimeSummary implements AfterMobsimListener,
 				"Iteration", "Route travel time"), routeUserNbChart = new XYLineChart(
 				"Route User Number", "Iteration", "Route user number");
 
-		ControlerIO ctlIO = event.getControler().getControlerIO();
+		OutputDirectoryHierarchy ctlIO = event.getControler().getControlerIO();
 
 		SimpleWriter travTimeWriter = new SimpleWriter(
 				ctlIO.getOutputFilename("routeTravelTime.log")), routeUserNbWriter = new SimpleWriter(
