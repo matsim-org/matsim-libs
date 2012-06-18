@@ -49,7 +49,6 @@ public class CollectLogMessagesAppender extends AppenderSkeleton {
 	@Override
 	public void close() {
 		this.logEvents.clear();
-		this.logEvents = null;
 		this.closed = true;
 	}
 
