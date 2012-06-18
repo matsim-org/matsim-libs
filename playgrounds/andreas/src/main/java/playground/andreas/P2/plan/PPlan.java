@@ -178,7 +178,11 @@ public class PPlan {
 	}
 	
 	public double getPlannedScorePerVehicle(){
-		return (this.score / this.nVehicles);
+		if (this.nVehicles == 0) {
+			return 0.0;
+		} else {
+			return (this.score / this.nVehicles);
+		}
 	}
 
 	public Set<Id> getVehicleIds() {
