@@ -99,10 +99,19 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				// get all plans
 				List<PPlan> plans = cooperative.getAllPlans();
 				
+				double coopPax = 0.0;
+				double coopVeh = 0.0;
+				double coopScore = 0.0;
+				
 				for (PPlan plan : plans) {
-					double coopPax = plan.getTripsServed();
-					double coopVeh = plan.getNVehicles();
-					double coopScore = plan.getScore();
+					double planPax = plan.getTripsServed();
+					coopPax += planPax;
+					
+					double planVeh = plan.getNVehicles();
+					coopVeh += planVeh;
+					
+					double planScore = plan.getScore();
+					coopScore += planScore;
 					
 					String startTime = Time.writeTime(plan.getStartTime());
 					String endTime = Time.writeTime(plan.getEndTime());
@@ -125,13 +134,21 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 					
 					try {
 						this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getCoopState() + "\t" + plan.getId() + "\t" 
-								+ plan.getCreator() + "\t" + (int) coopVeh + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" 
+								+ plan.getCreator() + "\t" + (int) planVeh + "\t" + (int) planPax + "\t" + planScore + "\t" + cooperative.getBudget() + "\t" 
 								+ startTime + "\t" + endTime + "\t" + stopsServed + "\t" + linksServed + "\n");
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+				}
+				
+				try {
+					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getCoopState() + "\t" + "===" + "\t" 
+							+ "TOTAL" + "\t" + (int) coopVeh + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" 
+							+ "===" + "\t" + "===" + "\t" + "===" + "\t" + "===" + "\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				
 			}
