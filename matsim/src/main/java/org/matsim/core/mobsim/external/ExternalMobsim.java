@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -65,7 +65,7 @@ public class ExternalMobsim implements Mobsim {
 	private static final Logger log = Logger.getLogger(ExternalMobsim.class);
 
 	private Integer iterationNumber = null;
-	protected ControlerIO controlerIO;
+	protected OutputDirectoryHierarchy controlerIO;
 
 
 	public ExternalMobsim(final Scenario scenario, final EventsManager events) {
@@ -200,7 +200,7 @@ public class ExternalMobsim implements Mobsim {
 		this.iterationNumber = iterationNumber;
 	}
 
-	public void setControlerIO(ControlerIO controlerIO) {
+	public void setControlerIO(OutputDirectoryHierarchy controlerIO) {
 		this.controlerIO = controlerIO;
 	}
 

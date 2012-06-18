@@ -1,0 +1,193 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * OutputDirectoryHierarchy.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package org.matsim.core.controler;
+
+import java.io.File;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+/**
+ * 
+ * Represents the directory hierarchy where the MATSim output goes in.
+ * 
+ * @author dgrether, michaz
+ *
+ */
+public class OutputDirectoryHierarchy {
+	
+	private static final String DIRECTORY_ITERS = "ITERS";
+	
+	private static Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
+	
+	private Id runId = null;
+	
+	private final String outputPath;
+	
+	private boolean overwriteFiles = false;
+	
+	public OutputDirectoryHierarchy(String outputPath, boolean overwriteFiles) {
+		this(outputPath, null, overwriteFiles);
+	}
+	
+	/**
+	 * 
+	 * @param runId the runId, may be null
+	 * @param overwriteFiles overwrite existing files instead of crashing
+	 * @param outputDirectory the path to the output directory
+	 */
+	public OutputDirectoryHierarchy(String outputPath, Id runId, boolean overwriteFiles){
+		this.overwriteFiles = overwriteFiles;
+		if (outputPath.endsWith("/")) {
+			outputPath = outputPath.substring(0, outputPath.length() - 1);
+		}
+		this.outputPath = outputPath;
+		this.runId = runId;	
+		this.createDirectories();
+	}
+		
+	/**
+	 * Returns the path to a directory where temporary files can be stored.
+	 *
+	 * @return path to a temp-directory.
+	 */
+	public final String getTempPath() {
+		return outputPath + "/tmp";
+	}
+
+	/**
+	 * Returns the path to the specified iteration directory. The directory path
+	 * does not include the trailing '/'.
+	 *
+	 * @param iteration
+	 *            the iteration the path to should be returned
+	 * @return path to the specified iteration directory
+	 */
+	public final String getIterationPath(final int iteration) {
+		return outputPath + "/" + DIRECTORY_ITERS + "/it." + iteration;
+	}
+
+	/**
+	 * Returns the complete filename to access an iteration-file with the given
+	 * basename.
+	 *
+	 * @param filename
+	 *            the basename of the file to access
+	 * @return complete path and filename to a file in a iteration directory. if rundId is set then it is prefixed with it
+	 */
+	public final String getIterationFilename(final int iteration, final String filename) {
+		StringBuilder s = new StringBuilder(getIterationPath(iteration));
+		s.append('/');
+		if (runId != null) {
+			s.append(runId);
+			s.append('.');
+		}
+		s.append(iteration);
+		s.append(".");
+		s.append(filename);
+		return s.toString();
+	}
+	
+	/**
+	 * Returns the complete filename to access a file in the output-directory.
+	 *
+	 * @param filename
+	 *            the basename of the file to access
+	 * @return complete path and filename to a file, if set prefixed with the runId,  in the output-directory
+	 */
+	public final String getOutputFilename(final String filename) {
+		StringBuilder s = new StringBuilder(outputPath);
+		s.append('/');
+		if (runId != null) {
+			s.append(runId);
+			s.append('.');
+		}
+		s.append(filename);
+		return s.toString();
+	}
+
+	
+	public String getOutputPath() {
+		return outputPath;
+	}
+
+	/**
+	 * Creates the path where all iteration-related data should be stored.
+	 * 
+	 * @param iteration
+	 */
+	public final void createIterationDirectory(final int iteration) {
+		File dir = new File(getIterationPath(iteration));
+		if (!dir.mkdir()) {
+			if (this.overwriteFiles && dir.exists()) {
+				log.info("Iteration directory "
+						+ getIterationPath(iteration)
+						+ " exists already.");
+			} else {
+				log.warn("Could not create iteration directory "
+						+ getIterationPath(iteration) + ".");
+			}
+		}
+	}
+	
+	private void createDirectories() {
+		File outputDir = new File(outputPath);
+		if (outputDir.exists()) {
+			if (outputDir.isFile()) {
+				throw new RuntimeException("Cannot create output directory. "
+						+ outputPath + " is a file and cannot be replaced by a directory.");
+			}
+			if (outputDir.list().length > 0) {
+				if (overwriteFiles) {
+					System.out.flush();
+					log.warn("###########################################################");
+					log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
+					log.warn("### " + outputPath);
+					log.warn("###########################################################");
+					System.err.flush();
+				} else {
+					// the directory is not empty, we do not overwrite any
+					// files!
+					throw new RuntimeException(
+							"The output directory " + outputPath
+							+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
+				}
+			}
+		} else {
+			if (!outputDir.mkdirs()) {
+				throw new RuntimeException(
+						"The output directory path " + outputPath
+						+ " could not be created. Check pathname and permissions!");
+			}
+		}
+	
+		File tmpDir = new File(getTempPath());
+		if (!tmpDir.mkdir() && !tmpDir.exists()) {
+			throw new RuntimeException("The tmp directory "
+					+ getTempPath() + " could not be created.");
+		}
+		File itersDir = new File(outputPath + "/" + Controler.DIRECTORY_ITERS);
+		if (!itersDir.mkdir() && !itersDir.exists()) {
+			throw new RuntimeException("The iterations directory "
+					+ (outputPath + "/" + Controler.DIRECTORY_ITERS)
+					+ " could not be created.");
+		}
+	}
+	
+}

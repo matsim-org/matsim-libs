@@ -82,6 +82,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		config.network().setInputFile(netFileName);
 		config.plans().setInputFile(this.getClassInputDirectory() + "plans2.xml");
 		final Controler controler = new Controler(config);
+		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.addControlerListener(new StartupListener() {

@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -51,10 +52,10 @@ public class IOUtilsTest {
 	public void testInitOutputDirLogging() throws IOException {
 		System.out.println(utils.getOutputDirectory());
 		String outDir = utils.getOutputDirectory();
-		IOUtils.initOutputDirLogging(outDir, null);
+		OutputDirectoryLogging.initLoggingWithOutputDirectory(outDir);
 
-		File l = new File(outDir + IOUtils.LOGFILE);
-		File errorLog = new File(outDir + IOUtils.WARNLOGFILE);
+		File l = new File(outDir + OutputDirectoryLogging.LOGFILE);
+		File errorLog = new File(outDir + OutputDirectoryLogging.WARNLOGFILE);
 		Assert.assertNotNull(l);
 		Assert.assertNotNull(errorLog);
 		Assert.assertTrue(l.exists());

@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.PopulationWriter;
@@ -46,12 +46,12 @@ public class PlansDumping implements BeforeMobsimListener {
 	private Scenario sc ;
 	private int writePlansInterval, firstIteration ; 
 	private IterationStopWatch stopwatch ;
-	private ControlerIO controlerIO;
+	private OutputDirectoryHierarchy controlerIO;
 	
 	boolean calledViaOldConstructor = false ;
 	
 	public PlansDumping(Scenario sc, int firstIteration, int writePlansInterval, IterationStopWatch stopwatch, 
-			ControlerIO controlerIO ) {
+			OutputDirectoryHierarchy controlerIO ) {
 		this.sc = sc ;
 		this.firstIteration = firstIteration ;
 		this.writePlansInterval = writePlansInterval ;

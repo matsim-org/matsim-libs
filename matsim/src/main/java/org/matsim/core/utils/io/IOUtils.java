@@ -49,9 +49,7 @@ public class IOUtils {
 
 	private static final String GZ = ".gz";
 
-	public static final String LOGFILE = "logfile.log";
 
-	public static final String WARNLOGFILE = "logfileWarningsErrors.log";
 	
 	public static final Charset CHARSET_UTF8 = Charset.forName("UTF8");
 	public static final Charset CHARSET_WINDOWS_ISO88591 = Charset.forName("ISO-8859-1");
@@ -60,74 +58,8 @@ public class IOUtils {
 
 	private final static Logger log = Logger.getLogger(IOUtils.class);
 
-	/**
-	 * Call this method to create 2 log4j logfiles in the output directory specified as parameter.
-	 * The first logfile contains all messages the second only those above log Level.WARN (Priority.WARN).
-	 * After the end of the programm run it is strongly recommended to close the file logger by calling
-	 * the method closeOutputDirLogging().
-	 *
-	 * @param outputDirectory the outputdirectory to create the files, whithout seperator at the end.
-	 * @param logEvents List of LoggingEvents, may be null, contains log information which should be written
-	 * to the files, e.g. LoggingEvents which occurred before the files can be created.
-	 * @throws IOException
-	 * @see IOUtils#closeOutputDirLogging()
-	 * @author dgrether
-	 */
-	public static void initOutputDirLogging(final String outputDirectory, final List<LoggingEvent> logEvents) throws IOException {
-		IOUtils.initOutputDirLogging(outputDirectory, logEvents, null);
-	}
 
-	/**
-	 * Can be used to add a prefix (e.g. specifying the runId) to the logfiles
-	 * @see IOUtils#initOutputDirLogging(String, List);
-	 */
-	public static void initOutputDirLogging(final String outputDirectory, final List<LoggingEvent> logEvents, final String runIdPrefix) throws IOException {
-		String prefix = runIdPrefix;
-		if (prefix == null) {
-			prefix = "";
-		}
-		else{
-			prefix = prefix + ".";
-		}
-		Logger root = Logger.getRootLogger();
-		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
-				System.getProperty("file.separator") + prefix + LOGFILE);
-		appender.setName(LOGFILE);
-		root.addAppender(appender);
-		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
-				System.getProperty("file.separator") + prefix + WARNLOGFILE);
-		warnErrorAppender.setName(WARNLOGFILE);
-		warnErrorAppender.setThreshold(Level.WARN);
-//		LevelRangeFilter filter = new LevelRangeFilter();
-//		filter.setLevelMax(Level.ALL);
-//		filter.setAcceptOnMatch(true);
-//		filter.setLevelMin(Level.WARN);
-//		warnErrorAppender.addFilter(filter);
-		root.addAppender(warnErrorAppender);
-		if (logEvents != null) {
-			for (LoggingEvent e : logEvents) {
-				appender.append(e);
-				if (e.getLevel().isGreaterOrEqual(Level.WARN)) {
-					warnErrorAppender.append(e);
-				}
-			}
-		}
-	}
 
-	/**
-	 * Call this method to close the log file streams opened by a call of IOUtils.initOutputDirLogging().
-	 * This avoids problems concerning open streams after the termination of the program.
-	 * @see IOUtils#initOutputDirLogging(String, List)
-	 */
-	public static void closeOutputDirLogging() {
-		Logger root = Logger.getRootLogger();
-		Appender app = root.getAppender(LOGFILE);
-		root.removeAppender(app);
-		app.close();
-		app = root.getAppender(WARNLOGFILE);
-		root.removeAppender(app);
-		app.close();
-	}
 
 	/**
 	 * Tries to open the specified file for reading and returns a BufferedReader for it.

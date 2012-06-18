@@ -20,7 +20,7 @@
 package org.matsim.signalsystems.data;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesWriter10;
 import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesData;
@@ -61,7 +61,7 @@ public class SignalsScenarioWriter {
 	public SignalsScenarioWriter(){
 	}
 	
-	public SignalsScenarioWriter(final ControlerIO controlerIo){
+	public SignalsScenarioWriter(final OutputDirectoryHierarchy controlerIo){
 		this.pathToSignalSystemsOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_SYSTEMS);
 		this.pathToSignalGroupsOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_GROUPS);
 		this.pathToSignalControlOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_CONTROL);

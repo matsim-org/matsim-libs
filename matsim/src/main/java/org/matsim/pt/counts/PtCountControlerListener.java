@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -147,7 +147,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 
 				String outputFormat = this.config.findParam(MODULE_NAME, "outputformat");
 				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-					ControlerIO ctlIO=controler.getControlerIO();
+					OutputDirectoryHierarchy ctlIO=controler.getControlerIO();
 
 					String filename = ctlIO.getIterationFilename(iter, "ptcountscompare.kmz");
 					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), ccaAlight.getComparison(), ccaOccupancy.getComparison(),
@@ -158,7 +158,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 					kmlWriter.writeFile(filename);
 				}
 				if (outputFormat.contains("txt") || outputFormat.contains("all")) {
-					ControlerIO ctlIO=controler.getControlerIO();
+					OutputDirectoryHierarchy ctlIO=controler.getControlerIO();
 					
 					if (ccaBoard != null) {
 						ccaBoard.write(ctlIO.getIterationFilename(iter, "simCountCompareBoarding.txt"));

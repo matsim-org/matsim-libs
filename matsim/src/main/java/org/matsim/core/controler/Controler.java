@@ -20,6 +20,9 @@
 
 package org.matsim.core.controler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -27,6 +30,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Layout;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
@@ -43,25 +47,31 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
+import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -141,7 +151,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
  * 
  * @author mrieser
  */
-public class Controler extends AbstractController {
+public class Controler {
 
 	public static final String DIRECTORY_ITERS = "ITERS";
 	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
@@ -159,6 +169,9 @@ public class Controler extends AbstractController {
 		Init, Running, Shutdown, Finished
 	}
 
+	protected static final Logger log = Logger.getLogger(Controler.class);
+
+	
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
@@ -166,6 +179,11 @@ public class Controler extends AbstractController {
 
 	/** The Config instance the Controler uses. */
 	protected final Config config;
+	/** The Config instance the Controler uses. */
+	protected ScenarioImpl scenarioData = null ;
+
+	protected EventsManagerImpl events = null ;
+	
 	private final String configFileName;
 	private final String dtdFileName;
 
@@ -177,6 +195,12 @@ public class Controler extends AbstractController {
 	private TravelDisutility travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
+	
+	/**
+	 * This instance encapsulates all behavior concerning the
+	 * ControlerEvents/Listeners
+	 */
+	private ControlerListenerManager controlerListenerManager = new ControlerListenerManager(null);
 
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is
@@ -219,6 +243,22 @@ public class Controler extends AbstractController {
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 	// for tests
+	private boolean overwriteFiles;
+
+	protected volatile Throwable uncaughtException;
+	
+
+	protected ControlerState state = ControlerState.Init;
+
+	protected OutputDirectoryHierarchy controlerIO;
+	protected boolean dumpDataAtEnd = true;
+	
+	private Thread shutdownHook = new Thread() {
+		@Override
+		public void run() {
+			shutdown(true);
+		}
+	};
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
@@ -247,8 +287,22 @@ public class Controler extends AbstractController {
 	}
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config, final Scenario scenario) {
-		super() ;
-		
+		Gbl.printSystemInfo();
+		Gbl.printBuildInfo();
+		log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
+
+		// make sure we know about any exceptions that lead to abortion of the
+		// program
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				log.warn("Getting uncaught Exception in Thread " + t.getName(), e);
+				uncaughtException = e;
+			}
+		});
+
+		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
+		OutputDirectoryLogging.catchLogEntries();
 		this.controlerListenerManager = new ControlerListenerManager(this) ;
 
 		this.configFileName = configFileName;
@@ -305,12 +359,21 @@ public class Controler extends AbstractController {
 			log.warn("setting up the transit config _after_ the config dump :-( ...");
 			setupTransitSimulation();
 		}
-		initEvents();
-		initLogging();
+		this.events = (EventsManagerImpl) EventsUtils.createEventsManager(config);
+		OutputDirectoryLogging.initLogging(controlerIO);
 		loadData();
 		setUp();
 		loadCoreListeners();
 		loadControlerListeners();
+	}
+	
+	private void setUpOutputDir() {
+		String outputPath = this.scenarioData.getConfig().controler().getOutputDirectory();
+		if (this.scenarioData.getConfig().controler().getRunId() != null) {
+			this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.createId(this.scenarioData.getConfig().controler().getRunId()), this.overwriteFiles);
+		} else {
+			this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.overwriteFiles);
+		}
 	}
 
 	private final void setupMultiModalSimulation() {
@@ -367,7 +430,7 @@ public class Controler extends AbstractController {
 			log.info(marker + "ITERATION " + this.iteration + " BEGINS");
 			this.stopwatch.setCurrentIteration(this.iteration);
 			this.stopwatch.beginOperation("iteration");
-			makeIterationPath(this.iteration);
+			this.controlerIO.createIterationDirectory(this.iteration);
 			resetRandomNumbers(this.iteration);
 
 			this.controlerListenerManager
@@ -394,6 +457,16 @@ public class Controler extends AbstractController {
 			log.info(divider);
 		}
 		this.iteration = null;
+	}
+	
+	protected void resetRandomNumbers(int iteration) {
+		MatsimRandom.reset(this.scenarioData.getConfig().global().getRandomSeed()
+				+ iteration);
+		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
+		// "not-randomness" is the first
+		// draw...
+		// Fixme [kn] this should really be ten thousand draws instead of just
+		// one
 	}
 
 	/**
@@ -515,6 +588,32 @@ public class Controler extends AbstractController {
 	}
 
 	/**
+	 * Design decisions:
+	 * <ul>
+	 * <li>I extracted this method since it is now called <i>twice</i>: once
+	 * directly after reading, and once before the iterations start. The second
+	 * call seems more important, but I wanted to leave the first one there in
+	 * case the program fails before that config dump. Might be put into the
+	 * "unexpected shutdown hook" instead. kai, dec'10
+	 * </ul>
+	 * 
+	 * @param message
+	 *            the message that is written just before the config dump
+	 */
+	protected final void checkConfigConsistencyAndWriteToLog(final String message) {
+		log.info(message);
+		String newline = System.getProperty("line.separator");// use native line endings for logfile
+		StringWriter writer = new StringWriter();
+		new ConfigWriter(this.scenarioData.getConfig()).writeStream(new PrintWriter(writer), newline);
+		log.info(newline + newline + writer.getBuffer().toString());
+		log.info("Complete config dump done.");
+		log.info("Checking consistency of config...");
+		this.scenarioData.getConfig().checkConsistency();
+		log.info("Checking consistency of config done.");
+	}
+	
+	
+	/**
 	 * Load all the required data. Currently, this only loads the Scenario if it
 	 * was not given in the Constructor.
 	 */
@@ -568,6 +667,10 @@ public class Controler extends AbstractController {
 		 * IMPORTANT: The execution order is reverse to the order the listeners
 		 * are added to the list.
 		 */
+		
+		if (this.dumpDataAtEnd) {
+			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, controlerIO));
+		}
 
 		// the default handling of plans
 		this.plansScoring = new PlansScoring( this.scenarioData, this.events, this.scoringFunctionFactory );
@@ -583,8 +686,10 @@ public class Controler extends AbstractController {
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
 				this.stopwatch, this.controlerIO ));
 
+		
+		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
 		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(), 
-				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO(), this.getLegTimes() )); 
+				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() )); 
 		// must be last being added (=first being executed)
 	}
 
@@ -779,16 +884,6 @@ public class Controler extends AbstractController {
 		this.overwriteFiles = overwrite;
 	}
 
-	/**
-	 * Returns whether the Controler is currently allowed to overwrite files in
-	 * the output directory.
-	 * 
-	 * @return true if the Controler is currently allowed to overwrite files in
-	 *         the output directory, false if not.
-	 */
-	public final boolean getOverwriteFiles() {
-		return this.overwriteFiles;
-	}
 
 	/**
 	 * Sets in which iterations events should be written to a file. If set to
@@ -977,6 +1072,39 @@ public class Controler extends AbstractController {
 		return plansCalcRoute;
 	}
 
+	public final void shutdown(final boolean unexpected) {
+		// yyyy needs to be public since some people are using it from the outside (???).  kai, jun'12
+		
+		ControlerState oldState = this.state;
+		this.state = ControlerState.Shutdown;
+		if (oldState == ControlerState.Running) {
+			if (unexpected) {
+				log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
+			} else {
+				log.info("S H U T D O W N   ---   start regular shutdown.");
+			}
+			if (this.uncaughtException != null) {
+				log.warn(
+						"Shutdown probably caused by the following Exception.", this.uncaughtException);
+			}
+			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
+			if (unexpected) {
+				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
+			} else {
+				log.info("S H U T D O W N   ---   regular shutdown completed.");
+			}
+			try {
+				// I think this is not necessary. Objections? michaz 2012
+				Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
+			} catch (IllegalStateException e) {
+				log.info("Cannot remove shutdown hook. " + e.getMessage());
+			}
+			this.shutdownHook = null; // important for test cases to free the
+			// memory
+			OutputDirectoryLogging.closeOutputDirLogging();
+		}
+	}
+	
 	/*
 	 * ===================================================================
 	 * Informational methods
@@ -1102,7 +1230,7 @@ public class Controler extends AbstractController {
 		return this.multiModalTravelTimeFactory;
 	}
 
-	public ControlerIO getControlerIO() {
+	public OutputDirectoryHierarchy getControlerIO() {
 		return this.controlerIO;
 	}
 
