@@ -22,7 +22,6 @@ package org.matsim.core.controler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -34,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -70,8 +68,6 @@ import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -151,7 +147,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
  * 
  * @author mrieser
  */
-public class Controler {
+public class Controler extends AbstractController {
 
 	public static final String DIRECTORY_ITERS = "ITERS";
 	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
@@ -165,25 +161,18 @@ public class Controler {
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
 
-	enum ControlerState {
-		Init, Running, Shutdown, Finished
-	}
-
 	protected static final Logger log = Logger.getLogger(Controler.class);
 
-	
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	Integer iteration = null;
 
-	/** The Config instance the Controler uses. */
 	protected final Config config;
-	/** The Config instance the Controler uses. */
 	protected ScenarioImpl scenarioData = null ;
 
 	protected EventsManagerImpl events = null ;
-	
+
 	private final String configFileName;
 	private final String dtdFileName;
 
@@ -195,12 +184,7 @@ public class Controler {
 	private TravelDisutility travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
-	
-	/**
-	 * This instance encapsulates all behavior concerning the
-	 * ControlerEvents/Listeners
-	 */
-	private ControlerListenerManager controlerListenerManager = new ControlerListenerManager(null);
+
 
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is
@@ -216,7 +200,6 @@ public class Controler {
 	/* package */VolumesAnalyzer volumes = null;
 
 	private boolean createGraphs = true;
-	public final IterationStopWatch stopwatch = new IterationStopWatch();
 	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
 	private RoadPricing roadPricing = null;
@@ -239,26 +222,12 @@ public class Controler {
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
 
-//	/* package */volatile Throwable uncaughtException = null; // package-private
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
-	// for tests
-	private boolean overwriteFiles;
 
-	protected volatile Throwable uncaughtException;
-	
-
-	protected ControlerState state = ControlerState.Init;
-
-	protected OutputDirectoryHierarchy controlerIO;
 	protected boolean dumpDataAtEnd = true;
-	
-	private Thread shutdownHook = new Thread() {
-		@Override
-		public void run() {
-			shutdown(true);
-		}
-	};
+	private boolean overwriteFiles = false;
+
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
@@ -287,28 +256,8 @@ public class Controler {
 	}
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config, final Scenario scenario) {
-		Gbl.printSystemInfo();
-		Gbl.printBuildInfo();
-		log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
-
-		// make sure we know about any exceptions that lead to abortion of the
-		// program
-		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread t, Throwable e) {
-				log.warn("Getting uncaught Exception in Thread " + t.getName(), e);
-				uncaughtException = e;
-			}
-		});
-
-		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
-		OutputDirectoryLogging.catchLogEntries();
-		this.controlerListenerManager = new ControlerListenerManager(this) ;
-
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
-
-		// now do other stuff
 		if (scenario != null) {
 			this.scenarioLoaded = true;
 			this.scenarioData = (ScenarioImpl) scenario;
@@ -331,27 +280,18 @@ public class Controler {
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
-		
 	}
 
 	/**
 	 * Starts the simulation.
 	 */
 	public void run() {
-		if (this.state == ControlerState.Init) {
-			init();
-			this.controlerListenerManager.fireControlerStartupEvent();
-			this.checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
-			doIterations();
-			shutdown(false);
-		} else {
-			log.error("Controler in wrong state to call 'run()'. Expected state: <Init> but was <" + this.state + ">");
-		}
+		init();
+		run(config, overwriteFiles);
 	}
 
 	private void init() {
 		loadConfig();
-		setUpOutputDir();
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			setupMultiModalSimulation();
 		}
@@ -360,20 +300,8 @@ public class Controler {
 			setupTransitSimulation();
 		}
 		this.events = (EventsManagerImpl) EventsUtils.createEventsManager(config);
-		OutputDirectoryLogging.initLogging(controlerIO);
 		loadData();
 		setUp();
-		loadCoreListeners();
-		loadControlerListeners();
-	}
-	
-	private void setUpOutputDir() {
-		String outputPath = this.scenarioData.getConfig().controler().getOutputDirectory();
-		if (this.scenarioData.getConfig().controler().getRunId() != null) {
-			this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.createId(this.scenarioData.getConfig().controler().getRunId()), this.overwriteFiles);
-		} else {
-			this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.overwriteFiles);
-		}
 	}
 
 	private final void setupMultiModalSimulation() {
@@ -408,7 +336,10 @@ public class Controler {
 		// transit-enabled mobsim. kai, nov'11
 	}
 
-	private void doIterations() {
+
+
+	@Override
+	protected void prepareForSim() {
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
@@ -417,56 +348,17 @@ public class Controler {
 				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
 			}
 		});
-
-		int firstIteration = this.config.controler().getFirstIteration();
-		int lastIteration = this.config.controler().getLastIteration();
-		this.state = ControlerState.Running;
-		String divider = "###################################################";
-		String marker = "### ";
-
-		for (this.iteration = firstIteration; (this.iteration <= lastIteration)
-				&& (this.state == ControlerState.Running); this.iteration++) {
-			log.info(divider);
-			log.info(marker + "ITERATION " + this.iteration + " BEGINS");
-			this.stopwatch.setCurrentIteration(this.iteration);
-			this.stopwatch.beginOperation("iteration");
-			this.controlerIO.createIterationDirectory(this.iteration);
-			resetRandomNumbers(this.iteration);
-
-			this.controlerListenerManager
-			.fireControlerIterationStartsEvent(this.iteration);
-			if (this.iteration > firstIteration) {
-				this.stopwatch.beginOperation("replanning");
-				this.controlerListenerManager.fireControlerReplanningEvent(this.iteration);
-				this.stopwatch.endOperation("replanning");
-			}
-			this.controlerListenerManager.fireControlerBeforeMobsimEvent(this.iteration);
-			this.stopwatch.beginOperation("mobsim");
-			resetRandomNumbers(this.iteration);
-			runMobSim();
-			this.stopwatch.endOperation("mobsim");
-			log.info(marker + "ITERATION " + this.iteration + " fires after mobsim event");
-			this.controlerListenerManager.fireControlerAfterMobsimEvent(this.iteration);
-			log.info(marker + "ITERATION " + this.iteration + " fires scoring event");
-			this.controlerListenerManager.fireControlerScoringEvent(this.iteration);
-			log.info(marker + "ITERATION " + this.iteration + " fires iteration end event");
-			this.controlerListenerManager.fireControlerIterationEndsEvent(this.iteration);
-			this.stopwatch.endOperation("iteration");
-			this.stopwatch.write(this.controlerIO.getOutputFilename("stopwatch.txt"));
-			log.info(marker + "ITERATION " + this.iteration + " ENDS");
-			log.info(divider);
-		}
-		this.iteration = null;
 	}
-	
-	protected void resetRandomNumbers(int iteration) {
-		MatsimRandom.reset(this.scenarioData.getConfig().global().getRandomSeed()
-				+ iteration);
-		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
-		// "not-randomness" is the first
-		// draw...
-		// Fixme [kn] this should really be ten thousand draws instead of just
-		// one
+
+	@Override
+	protected void runMobSim(int iteration) {
+		this.iteration = iteration;
+		runMobSim();
+	}
+
+	protected void runMobSim() {
+		Mobsim sim = getNewMobsim();
+		sim.run();
 	}
 
 	/**
@@ -611,8 +503,8 @@ public class Controler {
 		this.scenarioData.getConfig().checkConsistency();
 		log.info("Checking consistency of config done.");
 	}
-	
-	
+
+
 	/**
 	 * Load all the required data. Currently, this only loads the Scenario if it
 	 * was not given in the Constructor.
@@ -667,7 +559,7 @@ public class Controler {
 		 * IMPORTANT: The execution order is reverse to the order the listeners
 		 * are added to the list.
 		 */
-		
+
 		if (this.dumpDataAtEnd) {
 			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, controlerIO));
 		}
@@ -686,11 +578,14 @@ public class Controler {
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
 				this.stopwatch, this.controlerIO ));
 
-		
+
 		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
 		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(), 
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() )); 
 		// must be last being added (=first being executed)
+		
+
+		loadControlerListeners();
 	}
 
 	/**
@@ -809,17 +704,14 @@ public class Controler {
 			if (config.multiModal().isMultiModalSimulationEnabled()) {
 				log.info("Using MultiModalMobsim...");
 				QSim qSim = (QSim) simulation;
-	        	MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimeFactory);
-	        	qSim.addMobsimEngine(multiModalEngine);
-	        	qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalEngine, config.multiModal()));
+				MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimeFactory);
+				qSim.addMobsimEngine(multiModalEngine);
+				qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalEngine, config.multiModal()));
 			}
 		}
 	}
 
-	protected void runMobSim() {
-		Mobsim sim = getNewMobsim();
-		sim.run();
-	}
+	
 
 	/*
 	 * ===================================================================
@@ -1072,39 +964,6 @@ public class Controler {
 		return plansCalcRoute;
 	}
 
-	public final void shutdown(final boolean unexpected) {
-		// yyyy needs to be public since some people are using it from the outside (???).  kai, jun'12
-		
-		ControlerState oldState = this.state;
-		this.state = ControlerState.Shutdown;
-		if (oldState == ControlerState.Running) {
-			if (unexpected) {
-				log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
-			} else {
-				log.info("S H U T D O W N   ---   start regular shutdown.");
-			}
-			if (this.uncaughtException != null) {
-				log.warn(
-						"Shutdown probably caused by the following Exception.", this.uncaughtException);
-			}
-			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
-			if (unexpected) {
-				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
-			} else {
-				log.info("S H U T D O W N   ---   regular shutdown completed.");
-			}
-			try {
-				// I think this is not necessary. Objections? michaz 2012
-				Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
-			} catch (IllegalStateException e) {
-				log.info("Cannot remove shutdown hook. " + e.getMessage());
-			}
-			this.shutdownHook = null; // important for test cases to free the
-			// memory
-			OutputDirectoryLogging.closeOutputDirLogging();
-		}
-	}
-	
 	/*
 	 * ===================================================================
 	 * Informational methods
@@ -1262,7 +1121,7 @@ public class Controler {
 	public void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
 		this.mobsimFactoryRegister.register(mobsimName, mobsimFactory);
 	}
-	
+
 	public void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {
 		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
 	}
