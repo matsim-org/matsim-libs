@@ -53,6 +53,7 @@ import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
+import playground.andreas.P2.plan.RandomStopProvider;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
@@ -70,8 +71,9 @@ public class PScenarioHelper {
 		
 		PConfigGroup pC = new PConfigGroup();
 		Cooperative coop = new BasicCooperative(new IdImpl(pC.getPIdentifier() + 1), pC, new PFranchise(pC.getUseFranchise()));
+		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, sC.getPopulation(), sC.getTransitSchedule());
 		
-		PRouteProvider rP = new ComplexCircleScheduleProvider(sC.getTransitSchedule(), sC.getNetwork(), 0);
+		PRouteProvider rP = new ComplexCircleScheduleProvider(sC.getTransitSchedule(), sC.getNetwork(), randomStopProvider, 0);
 		
 		coop.init(rP, new CreateNewPlan(new ArrayList<String>()), 0, 0.0);
 		
@@ -332,7 +334,8 @@ public class PScenarioHelper {
 		
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), 10);
+		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10);
 	
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
 		coop.init(prov, new Route2111to2333(sched, conf.getPIdentifier()), 0, 0.0);
@@ -346,7 +349,8 @@ public class PScenarioHelper {
 		
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), 10);
+		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10);
 	
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
 		coop.init(prov, new Route2333to2111(sched, conf.getPIdentifier()), 0, 0.0);
@@ -360,7 +364,8 @@ public class PScenarioHelper {
 		
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), 10);
+		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10);
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
 		coop.init(prov, new Route2414to3444(sched, conf.getPIdentifier()), 0, 0.0);
 		
@@ -373,7 +378,8 @@ public class PScenarioHelper {
 		
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), 10);
+		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10);
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise()));
 		coop.init(prov, new Route2111to1314to4443(sched, conf.getPIdentifier()), 0, 0.0);
 		

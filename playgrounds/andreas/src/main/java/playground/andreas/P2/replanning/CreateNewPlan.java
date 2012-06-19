@@ -56,10 +56,10 @@ public class CreateNewPlan extends PStrategy implements PPlanStrategy{
 			double startTime = MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime());
 			double endTime = startTime + cooperative.getMinOperationTime() + MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime() - startTime);
 			
-			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop();
-			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop();
+			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
+			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			while(stop1.getId() == stop2.getId()){
-				stop2 = cooperative.getRouteProvider().getRandomTransitStop();
+				stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			}
 			
 			ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();

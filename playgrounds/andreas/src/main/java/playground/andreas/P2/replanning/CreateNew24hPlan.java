@@ -55,10 +55,10 @@ public class CreateNew24hPlan extends PStrategy implements PPlanStrategy{
 			double startTime = 0.0;
 			double endTime = 24 * 3600.0;
 			
-			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop();
-			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop();
+			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
+			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			while(stop1.getId() == stop2.getId()){
-				stop2 = cooperative.getRouteProvider().getRandomTransitStop();
+				stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			}
 			
 			ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();

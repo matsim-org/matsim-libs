@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -60,9 +59,10 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	private Network net;
 	private LeastCostPathCalculator routingAlgo;
 	private TransitSchedule scheduleWithStopsOnly;
+	private RandomStopProvider randomStopProvider;
 	private HashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
 	
-	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, int iteration) {
+	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
@@ -77,6 +77,8 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 				this.linkId2StopFacilityMap.put(stop.getLinkId(), stop);
 			}
 		}
+		
+		this.randomStopProvider = randomStopProvider;
 	}
 
 	@Override
@@ -172,15 +174,8 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	}
 
 	@Override
-	public TransitStopFacility getRandomTransitStop(){
-		int i = this.scheduleWithStopsOnly.getFacilities().size();
-		for (TransitStopFacility stop : this.scheduleWithStopsOnly.getFacilities().values()) {
-			if(MatsimRandom.getRandom().nextDouble() < 1.0 / i){
-				return stop;
-			}
-			i--;
-		}
-		return null;
+	public TransitStopFacility getRandomTransitStop(int currentIteration){
+		return this.randomStopProvider.getRandomTransitStop(currentIteration);
 	}
 
 	@Override

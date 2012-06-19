@@ -29,7 +29,7 @@ public interface PRouteProvider {
 	
 	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId);
 
-	public TransitStopFacility getRandomTransitStop();
+	public TransitStopFacility getRandomTransitStop(int currentIteration);
 	
 	public Collection<TransitStopFacility> getAllPStops();
 

@@ -66,7 +66,7 @@ public class AddRandomStop extends PStrategy implements PPlanStrategy{
 		
 		TransitStopFacility newStop;
 		do {
-			newStop  = cooperative.getRouteProvider().getRandomTransitStop();
+			newStop  = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 		} while (stopsInService.contains(newStop.getId()));
 		
 		TransitStopFacility nearestStop = null;
