@@ -24,7 +24,7 @@ public class NetworkCapacityChanger {
 		for (Link l : scenario.getNetwork().getLinks().values()) {
 			// only apply rules to car links
 			l.setLength(Math.max(l.getLength()*1000,getEuclidean(l.getFromNode().getCoord(),l.getToNode().getCoord())));
-			l.setFreespeed(8*l.getCapacity()/Math.max(1, l.getNumberOfLanes())/l.getLength()/7.5);
+			l.setFreespeed(Math.max(17,Math.min(32,8*l.getCapacity()/Math.max(1, l.getNumberOfLanes())/l.getLength()/7.5)));
 
 
 		}
