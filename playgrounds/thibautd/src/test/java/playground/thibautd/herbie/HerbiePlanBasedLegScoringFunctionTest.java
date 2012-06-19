@@ -89,6 +89,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	private HerbieConfigGroup ktiConfigGroup;
 	private ActivityFacilitiesImpl facilities;
 
+	// /////////////////////////////////////////////////////////////////////////
+	// construction(s)
+	// /////////////////////////////////////////////////////////////////////////
 	@Parameters
 	public static Collection<Object[]> data() {
 		return Arrays.asList( 
@@ -97,46 +100,6 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 				new Object[] {getPtPlanTransfer()},
 				new Object[] {getWalkPlan()});
 	}
-
-	public HerbiePlanBasedLegScoringFunctionTest(final Plan plan) {
-		this.plan = plan;
-	}
-
-	@Before
-	public void init() {
-		initConfig();
-		initNetwork();
-		//initPlans();
-		initFacilities();
-	}
-
-	private void initFacilities() {
-		facilities = new ActivityFacilitiesImpl();
-		ActivityFacilityImpl fac = facilities.createFacility( new IdImpl( "h" ) , new CoordImpl( 0 , 0 ) );
-		fac.createActivityOption( "h" ).addOpeningTime( new OpeningTimeImpl( DayType.wk , 0 , 24 * 3600 ) );
-		fac = facilities.createFacility( new IdImpl( "w" ) , new CoordImpl( 0 , 0 ) );
-		fac.createActivityOption( "w" ).addOpeningTime( new OpeningTimeImpl( DayType.wk , 7 , 20 * 3600 ) );
-	}
-
-	private void initConfig() {
-		config = ConfigUtils.createConfig();
-		ktiConfigGroup = new HerbieConfigGroup();
-		config.addModule( HerbieConfigGroup.GROUP_NAME , ktiConfigGroup );
-		config.planCalcScore().setMarginalUtlOfDistanceWalk( -1 );
-		config.planCalcScore().setMarginalUtlOfDistanceOther( -1 );
-		config.planCalcScore().setMonetaryDistanceCostRateCar( -1 );
-		config.planCalcScore().setMonetaryDistanceCostRatePt( -1 );
-		params = new CharyparNagelScoringParameters( config.planCalcScore() );
-	}
-
-	//private void initPlans() {
-	//	testPlans = new ArrayList<Plan>();
-
-	//	testPlans.add( getCarPlan() );
-	//	testPlans.add( getPtPlanTransfer() );
-	//	testPlans.add( getPtPlanNoTransfer() );
-	//	testPlans.add( getWalkPlan() );
-	//}
 
 	private static Plan getCarPlan() {
 		PersonImpl person = new PersonImpl( new IdImpl( "jojo" ) );
@@ -284,6 +247,50 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		return plan;
 	}
 
+	public HerbiePlanBasedLegScoringFunctionTest(final Plan plan) {
+		this.plan = plan;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// tests
+	// /////////////////////////////////////////////////////////////////////////
+	@Before
+	public void init() {
+		initConfig();
+		initNetwork();
+		//initPlans();
+		initFacilities();
+	}
+
+	private void initFacilities() {
+		facilities = new ActivityFacilitiesImpl();
+		ActivityFacilityImpl fac = facilities.createFacility( new IdImpl( "h" ) , new CoordImpl( 0 , 0 ) );
+		fac.createActivityOption( "h" ).addOpeningTime( new OpeningTimeImpl( DayType.wk , 0 , 24 * 3600 ) );
+		fac = facilities.createFacility( new IdImpl( "w" ) , new CoordImpl( 0 , 0 ) );
+		fac.createActivityOption( "w" ).addOpeningTime( new OpeningTimeImpl( DayType.wk , 7 , 20 * 3600 ) );
+	}
+
+	private void initConfig() {
+		config = ConfigUtils.createConfig();
+		ktiConfigGroup = new HerbieConfigGroup();
+		config.addModule( HerbieConfigGroup.GROUP_NAME , ktiConfigGroup );
+		config.planCalcScore().setMarginalUtlOfDistanceWalk( -5 );
+		config.planCalcScore().setMarginalUtlOfDistanceOther( -9 );
+		config.planCalcScore().setMonetaryDistanceCostRateCar( -1 );
+		config.planCalcScore().setMonetaryDistanceCostRatePt( -2 );
+		params = new CharyparNagelScoringParameters( config.planCalcScore() );
+	}
+
+	//private void initPlans() {
+	//	testPlans = new ArrayList<Plan>();
+
+	//	testPlans.add( getCarPlan() );
+	//	testPlans.add( getPtPlanTransfer() );
+	//	testPlans.add( getPtPlanNoTransfer() );
+	//	testPlans.add( getWalkPlan() );
+	//}
+
+
 	private void initNetwork() {
 		NetworkImpl nImpl = (NetworkImpl) ScenarioUtils.createScenario( config ).getNetwork();
 		Node n1 = nImpl.createAndAddNode( new IdImpl( 1 ) , new CoordImpl( 0 , 0 ) );
@@ -366,36 +373,34 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 				facilities,
 				network);
 
-		//for (Plan plan : testPlans) {
-			for (int until=1; until < plan.getPlanElements().size(); until++) {
-				ScoringFunction planBased = planBasedScoringFunctionFactory.createNewScoringFunction( plan );
-				ScoringFunction base = baseScoringFunctionFactory.createNewScoringFunction( plan );
-		
-				// test all "partial" scores, to track where it fails
-				int c = 0;
-				for (PlanElement pe : plan.getPlanElements().subList(0,until)) {
-					c++;
-					if (pe instanceof Leg) {
-						planBased.handleLeg( (Leg) pe );
-						base.handleLeg( (Leg) pe );
-					}
-					else {
-						planBased.handleActivity( (Activity) pe );
-						base.handleActivity( (Activity) pe );
-					}
+		for (int until=1; until < plan.getPlanElements().size(); until++) {
+			ScoringFunction planBased = planBasedScoringFunctionFactory.createNewScoringFunction( plan );
+			ScoringFunction base = baseScoringFunctionFactory.createNewScoringFunction( plan );
+	
+			// test all "partial" scores, to track where it fails
+			int c = 0;
+			for (PlanElement pe : plan.getPlanElements().subList(0,until)) {
+				c++;
+				if (pe instanceof Leg) {
+					planBased.handleLeg( (Leg) pe );
+					base.handleLeg( (Leg) pe );
 				}
-				if (c==0) throw new RuntimeException( "nothing tested!" );
-
-				planBased.finish();
-				base.finish();
-
-				Assert.assertEquals(
-						"wrong score for "+plan.getPlanElements().subList(0,until),
-						base.getScore(),
-						planBased.getScore(),
-						MatsimTestUtils.EPSILON);
+				else {
+					planBased.handleActivity( (Activity) pe );
+					base.handleActivity( (Activity) pe );
+				}
 			}
-		//}
+			if (c==0) throw new RuntimeException( "nothing tested!" );
+
+			planBased.finish();
+			base.finish();
+
+			Assert.assertEquals(
+					"wrong score for "+plan.getPlanElements().subList(0,until),
+					base.getScore(),
+					planBased.getScore(),
+					MatsimTestUtils.EPSILON);
+		}
 	}
 
 	private static class FakeFacility implements TransitStopFacility {
