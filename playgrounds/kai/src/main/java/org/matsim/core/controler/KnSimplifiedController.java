@@ -25,7 +25,6 @@ import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -35,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
@@ -43,7 +43,6 @@ import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -60,7 +59,6 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
@@ -80,17 +78,15 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
  * @author nagel
  *
  */
-public class KnSimplifiedController implements Runnable {
+public class KnSimplifiedController extends AbstractController {
 
 	private static Logger log = Logger.getLogger(KnSimplifiedController.class);
 
-	private OutputDirectoryHierarchy controlerIO;
-
-	private final IterationStopWatch stopwatch = new IterationStopWatch();
-
 	private Config config;
 
-	private Scenario scenarioData = null ;
+	private Scenario scenarioData = null ;	
+
+	private EventsManager eventsManager;
 
 	private Network network  ;
 	private Population population  ;
@@ -98,63 +94,29 @@ public class KnSimplifiedController implements Runnable {
 	 * This instance encapsulates all behavior concerning the
 	 * ControlerEvents/Listeners
 	 */
-	private ControlerListenerManager controlerListenerManager = new ControlerListenerManager(null);
 
 	private CalcLegTimes legTimes;
-
-	private OutputDirectoryLogging matsimLogging;
-
-	private Thread shutdownHook = new Thread() {
-		@Override
-		public void run() {
-			log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
-			shutdown(true);
-			log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
-		}
-	};
-
-	private EventsManager eventsManager;
-
 
 	// ############################################################################################################################
 	// ############################################################################################################################
 	//	stuff that is related to the control flow	
 
-	KnSimplifiedController() {
-		OutputDirectoryLogging.catchLogEntries();
-		Config cfg = ConfigUtils.createConfig() ;
-		cfg.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
+
+	
+	public void run() {
+		this.config = ConfigUtils.createConfig() ;
+		this.config.addQSimConfigGroup(new QSimConfigGroup());
+		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		checkConfigConsistencyAndWriteToLog("Complete config dump after reading the config file:");
-		this.scenarioData = (ScenarioImpl) ScenarioUtils.loadScenario( cfg ) ;
+		this.scenarioData = ScenarioUtils.loadScenario(this.config) ;
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
-		this.config = this.scenarioData.getConfig();
-		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
-	}
-	
-	@Override
-	public void run() {
-		this.controlerIO = new OutputDirectoryHierarchy(this.scenarioData.getConfig().controler().getOutputDirectory(), false); // output dir needs to be before logging
-		this.eventsManager = EventsUtils.createEventsManager(config); // yy I do not understand why events need to be before logging
-		OutputDirectoryLogging.initLogging(this.controlerIO); // logging needs to be early
-		setUp(); // setup needs to be after events since most things need events
-		loadCoreListeners();
-		this.controlerListenerManager.fireControlerStartupEvent();
-		checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
-		doIterations();
-		shutdown(false);
-	}
-
-	/**
-	 * Initializes the Controler with the parameters from the configuration.
-	 * This method is called after the configuration is loaded, and after the
-	 * scenario data (network, population) is read.
-	 */
-	private void setUp() {
+		this.eventsManager = EventsUtils.createEventsManager(config); 
 		// add a couple of useful event handlers:
 		this.eventsManager.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.legTimes = new CalcLegTimes();
 		this.eventsManager.addHandler(legTimes);
+		super.run(config);
 	}
 
 	/**
@@ -167,7 +129,7 @@ public class KnSimplifiedController implements Runnable {
 	 * IMPORTANT: The execution order is reverse to the order the listeners
 	 * are added to the list.
 	 */
-	private void loadCoreListeners() {
+	protected void loadCoreListeners() {
 
 		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenarioData, controlerIO);
 		this.controlerListenerManager.addControlerListener(dumpDataAtEnd);
@@ -179,13 +141,13 @@ public class KnSimplifiedController implements Runnable {
 		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
 		final PlansDumping plansDumping = new PlansDumping( this.scenarioData, this.config.controler().getFirstIteration(), 
-				this.config.controler().getWritePlansInterval(), this.stopwatch, this.controlerIO );
+				this.config.controler().getWritePlansInterval(), stopwatch, controlerIO );
 		this.controlerListenerManager.addCoreControlerListener(plansDumping);
 
 		this.controlerListenerManager.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
-		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) this.eventsManager,
+		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) eventsManager,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
-				this.controlerIO );
+				controlerIO );
 		this.controlerListenerManager.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
 	}
@@ -206,79 +168,16 @@ public class KnSimplifiedController implements Runnable {
 		log.info(message);
 		String newline = System.getProperty("line.separator");// use native line endings for logfile
 		StringWriter writer = new StringWriter();
-		new ConfigWriter(this.scenarioData.getConfig()).writeStream(new PrintWriter(writer), newline);
+		new ConfigWriter(this.config).writeStream(new PrintWriter(writer), newline);
 		log.info(newline + newline + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 		log.info("Checking consistency of config...");
-		this.scenarioData.getConfig().checkConsistency();
+		this.config.checkConsistency();
 		log.info("Checking consistency of config done.");
 	}
 
-	private void doIterations() {
-		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(createRoutingAlgorithm(), KnSimplifiedController.this.scenarioData);
-			}
-		});
 
-		int firstIteration = this.config.controler().getFirstIteration();
-		int lastIteration = this.config.controler().getLastIteration();
-		String divider = "###################################################";
-		String marker = "### ";
 
-		for (int iteration = firstIteration; iteration <= lastIteration; iteration++ ) {
-			this.stopwatch.setCurrentIteration(iteration) ;
-
-			log.info(divider);
-			log.info(marker + "ITERATION " + iteration + " BEGINS");
-			this.stopwatch.setCurrentIteration(iteration);
-			this.stopwatch.beginOperation("iteration");
-			this.controlerIO.createIterationDirectory(iteration);
-			resetRandomNumbers(iteration);
-
-			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
-			if (iteration > firstIteration) {
-				this.stopwatch.beginOperation("replanning");
-				this.controlerListenerManager.fireControlerReplanningEvent(iteration);
-				this.stopwatch.endOperation("replanning");
-			}
-			this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
-			this.stopwatch.beginOperation("mobsim");
-			resetRandomNumbers(iteration);
-			runMobSim(iteration);
-			log.error("will not work without mobsim; aborting ...") ; System.exit(-1) ;
-			this.stopwatch.endOperation("mobsim");
-			log.info(marker + "ITERATION " + iteration + " fires after mobsim event");
-			this.controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
-			log.info(marker + "ITERATION " + iteration + " fires scoring event");
-			this.controlerListenerManager.fireControlerScoringEvent(iteration);
-			log.info(marker + "ITERATION " + iteration + " fires iteration end event");
-			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
-			this.stopwatch.endOperation("iteration");
-			this.stopwatch.write(this.controlerIO.getOutputFilename("stopwatch.txt"));
-			log.info(marker + "ITERATION " + iteration + " ENDS");
-			log.info(divider);
-		}
-	}
-
-	private final void shutdown(final boolean unexpected) {
-		this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
-		OutputDirectoryLogging.closeOutputDirLogging();
-	}
-
-	private void resetRandomNumbers(int iteration) {
-		MatsimRandom.reset(this.scenarioData.getConfig().global().getRandomSeed()
-				+ iteration);
-		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
-		// "not-randomness" is the first
-		// draw...
-		// Fixme [kn] this should really be ten thousand draws instead of just
-		// one
-	}
 	// ############################################################################################################################
 	// ############################################################################################################################
 	//	stuff that is related to the configuration of matsim  	
@@ -340,7 +239,19 @@ public class KnSimplifiedController implements Runnable {
 		return plansCalcRoute;
 	}
 	
-	private void runMobSim(int iteration) {
+	protected void prepareForSim() {
+		checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
+		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				return new PersonPrepareForSim(createRoutingAlgorithm(), KnSimplifiedController.this.scenarioData);
+			}
+		});
+	}
+	
+	protected void runMobSim(int iteration) {
 		QSim simulation = new QSim( this.scenarioData, this.eventsManager ) ;
 		if (config.controler().getWriteSnapshotsInterval() != 0 && iteration % config.controler().getWriteSnapshotsInterval() == 0) {
 			// yyyy would be nice to have the following encapsulated in some way:
@@ -348,7 +259,7 @@ public class KnSimplifiedController implements Runnable {
 			SnapshotWriterManager manager = new SnapshotWriterManager(config);
 			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
 			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-			String fileName = this.controlerIO.getIterationFilename(iteration, baseFileName);
+			String fileName = controlerIO.getIterationFilename(iteration, baseFileName);
 			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
 			manager.addSnapshotWriter(snapshotWriter);
 			// === end ===
