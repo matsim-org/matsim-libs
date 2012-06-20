@@ -33,20 +33,20 @@ public class ParkingPersonalBetas {
 
 	public ParkingPersonalBetas(ScenarioImpl scenario, HashMap<Id, Double> houseHoldIncome) {
 		this.scenario = scenario;
-		
-		if (this.houseHoldIncome==null){
-			houseHoldIncome=new HashMap<Id, Double>();
-			
-			for (Id personId:scenario.getPopulation().getPersons().keySet()){
-				if (MatsimRandom.getRandom().nextBoolean()){
+
+		if (this.houseHoldIncome == null) {
+			houseHoldIncome = new HashMap<Id, Double>();
+
+			for (Id personId : scenario.getPopulation().getPersons().keySet()) {
+				if (MatsimRandom.getRandom().nextBoolean()) {
 					houseHoldIncome.put(personId, 4000.0);
 				} else {
 					houseHoldIncome.put(personId, 8000.0);
-					
+
 				}
 			}
 		}
-		
+
 		this.houseHoldIncome = houseHoldIncome;
 	}
 
@@ -55,20 +55,28 @@ public class ParkingPersonalBetas {
 		// person.getSex();
 
 		double income = houseHoldIncome.get(personId);
-		return -(1 / 2.77) * 0.129 * Math.pow((income / 7000), -0.089)/60;
+		return -1.0* -0.135 * (-0.1) / -0.056 * -0.135 * Math.pow((income / 7000), -0.1);
 	}
 
 	public double getParkingSearchTimeBeta(Id personId, double activityDurationInSeconds) {
-		double income = houseHoldIncome.get(personId);
-		return -(1 / 2.77) * 0.6 * getParkingCostBeta(personId) * Math.pow(activityDurationInSeconds / 60 / 135, -0.336)
-				* Math.pow((income / 7000), 0.079)/60;
+		PersonImpl person = (PersonImpl)scenario.getPopulation().getPersons().get(personId);
+		
+		int isMale=1;
+		if (person.getSex()!=null){
+			isMale=!person.getSex().contains("f")?1:0;
+		}
+		return -1.0*-0.135 * (-0.1) / -0.056 * -0.135 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.1012*isMale));
 	}
 
 	public double getParkingWalkTimeBeta(Id personId, double activityDurationInSeconds) {
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getPersons().get(personId);
-		// person.getAge();
-		// person.getSex();
-		return -(1 / 2.77) * 0.117;
+		PersonImpl person = (PersonImpl)scenario.getPopulation().getPersons().get(personId);
+		
+		int isMale=1;
+		if (person.getSex()!=null){
+			isMale=!person.getSex().contains("f")?1:0;
+		}
+		int age=person.getAge();
+		return -1.0*-0.108 * (-0.1) / -0.056 * -0.108*60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236);
 	}
 
 }

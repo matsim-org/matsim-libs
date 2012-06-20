@@ -38,6 +38,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 
 /**
@@ -81,12 +82,7 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 		}
 	}
 
-	public double getSumBothParkingWalkDurationsInSecond(Id personId) {
-		
-		if (firstParkingWalkTmp.get(personId)==null || secondParkingWalkTmp.get(personId)==null){
-			System.out.println();
-		}		
-		
+	public double getSumBothParkingWalkDurationsInSecond(Id personId) {	
 		return firstParkingWalkTmp.get(personId) + secondParkingWalkTmp.get(personId);
 	}
 
@@ -107,9 +103,19 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 			return;
 		}
 		
+		
+		
 		double durationFirstWalk = GeneralLib.getIntervalDuration(firstParkingWalkTmp.get(personId), event.getTime());
 		double durationSecondWalk = GeneralLib.getIntervalDuration(secondParkingWalkTmp.get(personId), event.getTime());
 
+		if (firstParkingWalkTmp.get(personId)==event.getTime()){
+			durationFirstWalk=0.0;
+		}
+		
+		if (secondParkingWalkTmp.get(personId)==event.getTime()){
+			durationSecondWalk=0.0;
+		}
+		
 		updateWalkTimeTmpVariables(event.getLegMode(), personId, executedPlan, planElementIndex, durationFirstWalk, durationSecondWalk);
 	}
 
