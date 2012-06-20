@@ -287,9 +287,8 @@ public class TripsPrism {
 			DistanceAndDuration access = getTravelTime(
 					getOriginLink( driverTrip ),
 					getOriginLink( passengerTrip ));
-			DistanceAndDuration egress = getTravelTime(
-					getDestinationLink( passengerTrip ),
-					getDestinationLink( driverTrip ));
+
+			if (access.duration > maxTravelTime) continue;
 
 			// use free flow even if better estimates can be obtained from the record
 			// for car trips, for consistency reasons
@@ -307,6 +306,14 @@ public class TripsPrism {
 						passengerTrip.getEstimatedNetworkDistance(),
 						passengerTrip.getEstimatedNetworkDuration());
 			}
+
+			if (access.duration + jointSection.duration > maxTravelTime) {
+				continue;
+			}
+
+			DistanceAndDuration egress = getTravelTime(
+					getDestinationLink( passengerTrip ),
+					getDestinationLink( driverTrip ));
 
 			if (access.duration + jointSection.duration + egress.duration > maxTravelTime) {
 				// detour is too important
@@ -357,8 +364,12 @@ public class TripsPrism {
 						driverTrip,
 						direct.distance,
 						direct.duration,
-						access.distance + jointSection.distance + egress.distance,
-						access.duration + jointSection.duration + egress.duration,
+						access.distance,
+						jointSection.distance,
+						egress.distance,
+						access.duration,
+						jointSection.duration,
+						egress.duration,
 						Math.max( 0 , minTimeWindow ) / 2d));
 		}
 
@@ -551,8 +562,12 @@ public class TripsPrism {
 		private final Record driverRecord;
 		private final double directDriverDist;
 		private final double directDriverFreeFlowDur;
+		private final double driverAccessDist;
 		private final double driverJointDist;
+		private final double driverEgressDist;
+		private final double driverAccessDur;
 		private final double driverJointDur;
+		private final double driverEgressDur;
 		private final double minTimeWindow;
 
 		private PassengerRecord(
@@ -560,15 +575,23 @@ public class TripsPrism {
 				final Record driverRecord,
 				final double directDriverDist,
 				final double directDriverFreeFlowDur,
+				final double driverAccessDist,
 				final double driverJointDist,
+				final double driverEgressDist,
+				final double driverAccessDur,
 				final double driverJointDur,
+				final double driverEgressDur,
 				final double minTimeWindow) {
 			this.passengerRecord = passengerRecord;
 			this.driverRecord = driverRecord;
 			this.directDriverDist = directDriverDist;
 			this.directDriverFreeFlowDur = directDriverFreeFlowDur;
+			this.driverAccessDist = driverAccessDist;
 			this.driverJointDist = driverJointDist;
+			this.driverEgressDist = driverEgressDist;
+			this.driverAccessDur = driverAccessDur;
 			this.driverJointDur = driverJointDur;
+			this.driverEgressDur = driverEgressDur;
 			this.minTimeWindow = minTimeWindow;
 		}
 
@@ -598,6 +621,22 @@ public class TripsPrism {
 
 		public double getMinTimeWindow() {
 			return minTimeWindow;
+		}
+
+		public double getDriverAccessDist() {
+			return driverAccessDist;
+		}
+
+		public double getDriverEgressDist() {
+			return driverEgressDist;
+		}
+
+		public double getDriverAccessDur() {
+			return driverAccessDur;
+		}
+
+		public double getDriverEgressDur() {
+			return driverEgressDur;
 		}
 	}
 }

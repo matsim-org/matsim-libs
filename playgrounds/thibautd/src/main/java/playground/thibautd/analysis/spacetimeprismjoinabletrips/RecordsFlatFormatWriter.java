@@ -51,7 +51,17 @@ public class RecordsFlatFormatWriter {
 			this.writer = IOUtils.getBufferedWriter( outFile );
 
 			log.info( "opening "+outFile+":" );
-			writer.write( "driverRecordId\tpassengerRecordId\tdirectDriverDist\tdirectDriverDur\tjointDriverDist\tjointDriverDur\tminTimeWindow" );
+			writer.write( "driverRecordId\t"
+					+"passengerRecordId\t"
+					+"directDriverDist\t"
+					+"directDriverDur\t"
+					+"accessDriverDist\t"
+					+"jointDriverDist\t"
+					+"egressDriverDist\t"
+					+"accessDriverDur\t"
+					+"jointDriverDur\t"
+					+"egressDriverDur\t"
+					+"minTimeWindow" );
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
@@ -78,8 +88,12 @@ public class RecordsFlatFormatWriter {
 					passengerTrip.getPassengerRecord().getTripId()+"\t"+
 					passengerTrip.getDirectDriverDist()+"\t"+
 					passengerTrip.getDirectDriverFreeFlowDur()+"\t"+
+					passengerTrip.getDriverAccessDist()+"\t"+
 					passengerTrip.getDriverJointDist()+"\t"+
+					passengerTrip.getDriverEgressDist()+"\t"+
+					passengerTrip.getDriverAccessDur()+"\t"+
 					passengerTrip.getDriverJointDur()+"\t"+
+					passengerTrip.getDriverEgressDur()+"\t"+
 					passengerTrip.getMinTimeWindow());
 		}
 		catch (IOException e) {
@@ -107,7 +121,6 @@ public class RecordsFlatFormatWriter {
 						r.getDestinationLink()+"\t"+
 						r.getDepartureTime()+"\t"+
 						r.getArrivalTime());
-
 			}
 			counter.printCounter();
 
