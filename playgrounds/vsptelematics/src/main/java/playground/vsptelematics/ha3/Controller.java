@@ -38,8 +38,14 @@ public class Controller {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		Config config = ConfigUtils.loadConfig(args[0]);
+		run(config);
+//		computeSolution(args[0]);
+	}
+	
+	private static void computeSolution(String c){
 		for (int i = 0; i <= 10; i = i + 1){
-			Config config = ConfigUtils.loadConfig(args[0]);
+			Config config = ConfigUtils.loadConfig(c);
 			String rate;
 			if ( i < 10)
 				rate = "0." + Integer.toString(i);
@@ -51,6 +57,7 @@ public class Controller {
 			config.controler().setOutputDirectory(outdir);
 			run(config);
 		}
+		
 	}
 	
 	public static void run(Config config){
