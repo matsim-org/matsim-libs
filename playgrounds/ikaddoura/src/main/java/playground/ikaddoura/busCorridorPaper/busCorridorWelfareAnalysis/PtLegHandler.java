@@ -79,6 +79,7 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 		facilityId2facilityInfos.clear();
 		this.numberOfWaitingTimesMoreThanHeadway = 0;
 		this.waitingTimeCounter = 0;
+		this.numberOfMissedVehicles = 0;
 	}
 	
 	@Override
@@ -105,20 +106,21 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 			}
 			
 			// analyze waitingTime
-			System.out.println("Headway --------------> " + this.headway);
-			System.out.println("WaitingTime ----------> " + waitingTime);
+//			System.out.println("Headway --------------> " + this.headway);
+//			System.out.println("WaitingTime ----------> " + waitingTime);
 			if (waitingTime > this.headway){
+//				System.out.println("Total number of missed buses: " + this.numberOfMissedVehicles);
 				this.numberOfWaitingTimesMoreThanHeadway++;
 				int missed = (int) (waitingTime / this.headway);
-				System.out.println("Missed Busses --------> " + missed);
+//				System.out.println("Missed Busses --------> " + missed);
 				this.numberOfMissedVehicles = this.numberOfMissedVehicles + missed;
+//				System.out.println("New total number of missed buses: " + this.numberOfMissedVehicles);
 			}
 			
 			// save waitingTime per stop
 			Id currentFacilityId = this.busId2currentFacilityId.get(vehId);
-			System.out.println("Current TransitStopFacilityId of bus " + vehId + ": " + currentFacilityId);
+//			System.out.println("Current TransitStopFacilityId of bus " + vehId + ": " + currentFacilityId);
 			if (this.facilityId2facilityInfos.get(currentFacilityId) == null){
-				System.out.println("A");
 				FacilityInfo facilityInfo = new FacilityInfo();
 				SortedMap<Id, Double> waitingEvent2WaitingTime = new TreeMap<Id, Double>();
 				SortedMap<Id, Double> waitingEvent2DayTime = new TreeMap<Id, Double>();
@@ -138,7 +140,6 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 				this.facilityId2facilityInfos.put(currentFacilityId, facilityInfo);
 				
 			} else {
-				System.out.println("B");
 				FacilityInfo facilityInfo = this.facilityId2facilityInfos.get(currentFacilityId);
 				SortedMap<Id, Double> waitingEvent2WaitingTime = facilityInfo.getWaitingEvent2WaitingTime();
 				SortedMap<Id, Double> waitingEvent2DayTime = facilityInfo.getWaitingEvent2DayTime();
