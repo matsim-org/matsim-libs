@@ -22,7 +22,6 @@ package playground.thibautd.analysis.spacetimeprismjoinabletrips;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +67,6 @@ public class TripsPrism {
 	private final Network network;
 
 	// caches
-	private final Map<Od, DistanceAndDuration> freeFlowsDistanceAndDurations = new TreeMap<Od, DistanceAndDuration>();
 	private final Map<Od, DistanceAndDuration> freeFlowsDistanceAndDurationsBetweenNodes = new TreeMap<Od, DistanceAndDuration>();
 
 	private final LeastCostPathCalculator shortPathAlgo;
@@ -162,8 +160,8 @@ public class TripsPrism {
 		double detourTime = maximumDetourTimeFraction * initialTravelTime;
 		double radius = (initialTravelTime + Math.min( detourTime, timeWindowWidth )) * maxBeeFlySpeed / 2;
 
-		Link origLink = network.getLinks().get( driverTrip.getOriginLink() );
-		Link destLink = network.getLinks().get( driverTrip.getDestinationLink() );
+		Link origLink = getOriginLink( driverTrip );
+		Link destLink = getDestinationLink( driverTrip );
 		Coord center = getCenter( origLink.getCoord() , destLink.getCoord() );
 
 		// restricted origins
@@ -238,7 +236,7 @@ public class TripsPrism {
 			double remainingDistance = maxDistance;
 			Record passengerRecord = iterator.next();
 
-			Coord passengerOrigin = network.getLinks().get( passengerRecord.getOriginLink() ).getCoord();
+			Coord passengerOrigin = getOriginLink( passengerRecord ).getCoord();
 			remainingDistance -= CoordUtils.calcDistance( passengerOrigin , driverOrigin );
 
 			if (remainingDistance < 0) {
@@ -246,7 +244,7 @@ public class TripsPrism {
 				continue;
 			}
 
-			Coord passengerDestination = network.getLinks().get( passengerRecord.getDestinationLink() ).getCoord();
+			Coord passengerDestination = getDestinationLink( passengerRecord ).getCoord();
 			remainingDistance -= CoordUtils.calcDistance( passengerDestination , passengerOrigin );
 
 			if (remainingDistance < 0) {
@@ -287,17 +285,28 @@ public class TripsPrism {
 			}
 
 			DistanceAndDuration access = getTravelTime(
-					driverTrip.getOriginLink(),
-					passengerTrip.getOriginLink());
+					getOriginLink( driverTrip ),
+					getOriginLink( passengerTrip ));
 			DistanceAndDuration egress = getTravelTime(
-					passengerTrip.getDestinationLink(),
-					driverTrip.getDestinationLink());
+					getDestinationLink( passengerTrip ),
+					getDestinationLink( driverTrip ));
 
 			// use free flow even if better estimates can be obtained from the record
 			// for car trips, for consistency reasons
-			DistanceAndDuration jointSection = getTravelTime(
-					passengerTrip.getOriginLink(),
-					passengerTrip.getDestinationLink() );
+			DistanceAndDuration jointSection;
+			
+			if (passengerTrip.getEstimatedNetworkDistance() < 0) {
+				jointSection = getTravelTime(
+					getOriginLink( passengerTrip ),
+					getDestinationLink( passengerTrip ) );
+				passengerTrip.setEstimatedNetworkDistance( jointSection.distance );
+				passengerTrip.setEstimatedNetworkDuration( jointSection.duration );
+			}
+			else {
+				jointSection = new DistanceAndDuration(
+						passengerTrip.getEstimatedNetworkDistance(),
+						passengerTrip.getEstimatedNetworkDuration());
+			}
 
 			if (access.duration + jointSection.duration + egress.duration > maxTravelTime) {
 				// detour is too important
@@ -327,7 +336,21 @@ public class TripsPrism {
 			if (minTimeWindow > timeWindow) continue;
 
 			// if we arrive here, the current record is valid: retain it.
-			DistanceAndDuration direct = getTravelTime( driverTrip.getOriginLink() , driverTrip.getDestinationLink() );
+			DistanceAndDuration direct;
+			
+			if (driverTrip.getEstimatedNetworkDistance() < 0) {
+				direct = getTravelTime(
+					getOriginLink( driverTrip ),
+					getDestinationLink( driverTrip ) );
+				driverTrip.setEstimatedNetworkDistance( direct.distance );
+				driverTrip.setEstimatedNetworkDuration( direct.duration );
+			}
+			else {
+				direct = new DistanceAndDuration(
+						driverTrip.getEstimatedNetworkDistance(),
+						driverTrip.getEstimatedNetworkDuration());
+			}
+
 			prism.add(
 					new PassengerRecord(
 						passengerTrip,
@@ -346,35 +369,47 @@ public class TripsPrism {
 		return prism;
 	}
 
+	private Link getOriginLink( final Record r ) {
+		Link l = r.getOriginLinkRef();
+
+		if (l == null) {
+			l = network.getLinks().get( r.getOriginLink() );
+			r.setOriginLinkRef( l );
+		} 
+
+		return l;
+	}
+
+	private Link getDestinationLink( final Record r ) {
+		Link l = r.getDestinationLinkRef();
+
+		if (l == null) {
+			l = network.getLinks().get( r.getDestinationLink() );
+			r.setDestinationLinkRef( l );
+		} 
+
+		return l;
+	}
+
 	private DistanceAndDuration getTravelTime(
-			final Id originLink,
-			final Id destinationLink) {
-		Od od = new Od( originLink , destinationLink );
-		DistanceAndDuration estimate = freeFlowsDistanceAndDurations.get( od ) ;
+			final Link o,
+			final Link d) {
+		DistanceAndDuration estimate = getTravelTimeBetweenNodes(
+				o.getToNode(),
+				d.getFromNode());
+		double tt = estimate.duration;
+		double dist = estimate.distance;
 
-		if (estimate == null) {
-			Link o = network.getLinks().get( originLink );
-			Link d = network.getLinks().get( destinationLink );
-			estimate = getTravelTimeBetweenNodes(
-					o.getToNode(),
-					d.getFromNode());
-			double tt = estimate.duration;
-			double dist = estimate.distance;
-
-			if (departureIsOnStartOfLink) {
-				tt += o.getLength() / o.getFreespeed();
-				dist += o.getLength();
-			}
-			if (!arrivalIsOnStartOfLink) {
-				tt += d.getLength() / d.getFreespeed();
-				dist += d.getLength();
-			}
-
-			estimate = new DistanceAndDuration( dist , tt );
-			freeFlowsDistanceAndDurations.put( od , estimate );
+		if (departureIsOnStartOfLink) {
+			tt += o.getLength() / o.getFreespeed();
+			dist += o.getLength();
+		}
+		if (!arrivalIsOnStartOfLink) {
+			tt += d.getLength() / d.getFreespeed();
+			dist += d.getLength();
 		}
 
-		return estimate;
+		return new DistanceAndDuration( dist , tt );
 	}
 
 	private DistanceAndDuration getTravelTimeBetweenNodes(
@@ -401,8 +436,6 @@ public class TripsPrism {
 
 		return estimate;
 	}
-
-
 
 	private static Coord getCenter(
 			final Coord coord1,
@@ -470,13 +503,16 @@ public class TripsPrism {
 	// classes
 	// /////////////////////////////////////////////////////////////////////////
 	private static class Od implements Comparable<Od> {
-		public final Id origin, destination;
+		// this is use for caching in a tree map: comparison should
+		// be as efficient as possible. Storing as strings removes
+		// the cost of repetidly unboxing ids without loss of information.
+		private final String origin, destination;
 
 		public Od(
 				final Id origin,
 				final Id destination) {
-			this.origin = origin;
-			this.destination = destination;
+			this.origin = origin.toString();
+			this.destination = destination.toString();
 		}
 
 		@Override
@@ -486,13 +522,14 @@ public class TripsPrism {
 				((Od) other).destination.equals( destination );
 		}
 
+		@Override
 		public int hashCode() {
 			return origin.hashCode() + 1000 * destination.hashCode();
 		}
 
 		@Override
-		public int compareTo(final Od other) {
-			int comp = origin.compareTo( other.origin );
+		public final int compareTo(final Od other) {
+			final int comp = origin.compareTo( other.origin );
 			return comp == 0 ? destination.compareTo( other.destination ) : comp;
 		}
 	}

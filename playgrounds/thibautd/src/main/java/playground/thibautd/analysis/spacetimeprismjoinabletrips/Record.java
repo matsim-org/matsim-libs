@@ -21,6 +21,7 @@
 package playground.thibautd.analysis.spacetimeprismjoinabletrips;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author thibautd
@@ -52,6 +53,9 @@ public class Record {
 		this.arrivalTime = arrivalTime;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// getters
+	// /////////////////////////////////////////////////////////////////////////
 	public int getNumberOfTripInAgentPlan() {
 		return this.tripNr;
 	}
@@ -89,6 +93,51 @@ public class Record {
 		return this.tripMode;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// package private getters/setters: hack to reduce the number of table
+	// lookups in the network
+	// /////////////////////////////////////////////////////////////////////////
+	private Link originLinkRef = null;
+	private Link destinationLinkRef = null;
+
+	Link getOriginLinkRef() {
+		return originLinkRef;
+	}
+
+	Link getDestinationLinkRef() {
+		return destinationLinkRef;
+	}
+
+	void setOriginLinkRef(final Link l) {
+		this.originLinkRef = l;
+	}
+
+	void setDestinationLinkRef(final Link l) {
+		this.destinationLinkRef = l;
+	}
+
+	private double estimatedNetworkDistance = -1;
+	private double estimatedNetworkDuration = -1;
+
+	double getEstimatedNetworkDuration() {
+		return estimatedNetworkDuration;
+	}
+
+	void setEstimatedNetworkDuration(final double estimatedNetworkDuration) {
+		this.estimatedNetworkDuration = estimatedNetworkDuration;
+	}
+
+	double getEstimatedNetworkDistance() {
+		return estimatedNetworkDistance;
+	}
+
+	void setEstimatedNetworkDistance(final double estimatedNetworkDistance) {
+		this.estimatedNetworkDistance = estimatedNetworkDistance;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// equals
+	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public boolean equals(final Object other) {
 		return other instanceof Record &&
