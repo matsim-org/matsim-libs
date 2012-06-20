@@ -140,6 +140,7 @@ public abstract class OutputDirectoryLogging {
 				}
 			}
 			collectLogMessagesAppender.close();
+			collectLogMessagesAppender = null;
 		}
 	}
 
