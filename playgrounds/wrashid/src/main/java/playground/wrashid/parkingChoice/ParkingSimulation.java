@@ -154,7 +154,7 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 				parkingArrivalEH.handleEvent(new ParkingArrivalEvent(event, selectedParking));
 			}
 		} else {
-			DebugLib.traceAgent(personId);
+			//DebugLib.traceAgent(personId);
 		}
 
 	}
@@ -220,7 +220,7 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	@Override
 	// TODO: remove method after debugging is over.
 	public void handleEvent(AgentStuckEvent event) {
-		DebugLib.traceAgent(event.getPersonId());
+		//DebugLib.traceAgent(event.getPersonId());
 		Person person = controler.getPopulation().getPersons().get(event.getPersonId());
 		if (parkingManager.considerForParking(event.getPersonId())){
 			parkingManager.initializePersonForParking(person);

@@ -130,7 +130,7 @@ public class Charger implements ActivityStartEventHandler, AgentArrivalEventHand
 				
 				
 				if (chargingMode==null || chargingMode.equalsIgnoreCase("dumbCharging") || chargingDuration == parkingDuration){
-					DebugLib.traceAgent(personId);
+					//DebugLib.traceAgent(personId);
 					double batteryChargedInJoule = chargingDuration * chargingPowerInterface.getChargingPowerInWatt(actType);
 					double startSOCInJoule = vehicleSOC.getSocInJoule();
 					vehicleSOC.chargeVehicle(vehicleEnergyConsumptionModel, batteryChargedInJoule);

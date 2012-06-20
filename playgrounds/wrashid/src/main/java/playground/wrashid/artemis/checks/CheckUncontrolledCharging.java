@@ -45,7 +45,7 @@ public class CheckUncontrolledCharging {
 			double parkingDeparturetime = parkingTimes.getDouble(j, 2);
 
 			do {
-				DebugLib.traceAgent(new IdImpl(chargingLogAgentId));
+				//DebugLib.traceAgent(new IdImpl(chargingLogAgentId));
 
 				
 

@@ -175,15 +175,31 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		
 		return parkingFacility.getId();
 	}
+	
+	public Id getClosestFreeParkingFacilityNotOnLink(Coord coord, Id linkId){
+		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
+		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		
+		// if parking full or on specified link, try finding other free parkings in the quadtree
+		while (facilityCapacities.get(parkingFacility.getId())<=0 || parkingFacility.getLinkId().equals(linkId)){
+			removeFullParkingFromQuadTree(tmpList, parkingFacility);
+			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		}
+		
+		resetParkingFacilitiesQuadTree(tmpList);
+		
+		return parkingFacility.getId();
+	}
+	
 
 	private void removeFullParkingFromQuadTree(LinkedList<ActivityFacility> tmpList, ActivityFacility parkingFacility) {
 		tmpList.add(parkingFacility);
-		parkingFacilities.remove(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getX(), parkingFacility);
+		parkingFacilities.remove(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getY(), parkingFacility);
 	}
 
 	private void resetParkingFacilitiesQuadTree(LinkedList<ActivityFacility> tmpList) {
 		for (ActivityFacility parking:tmpList){
-			parkingFacilities.put(parking.getCoord().getX(), parking.getCoord().getX(), parking);
+			parkingFacilities.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 		}
 	}
 
@@ -199,6 +215,25 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 
 	public ParkingCostCalculator getParkingCostCalculator() {
 		return parkingCostCalculator;
+	}
+
+	public Id getClosestParkingFacility(Coord coord) {		
+		return parkingFacilities.get(coord.getX(), coord.getY()).getId();
+	}
+	
+	public Id getClosestParkingFacilityNotOnLink(Coord coord, Id linkId) {		
+		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
+		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		
+		// if parking full or on specified link, try finding other free parkings in the quadtree
+		while (parkingFacility.getLinkId().equals(linkId)){
+			removeFullParkingFromQuadTree(tmpList, parkingFacility);
+			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		}
+		
+		resetParkingFacilitiesQuadTree(tmpList);
+		
+		return parkingFacility.getId();
 	}
 
 }

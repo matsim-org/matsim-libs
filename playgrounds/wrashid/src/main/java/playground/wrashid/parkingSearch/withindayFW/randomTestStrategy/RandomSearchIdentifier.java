@@ -34,8 +34,9 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 
 public class RandomSearchIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
@@ -66,7 +67,7 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 		
 		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(this);
 		
-		if (true || this.getIdentifierFactory()==null && searchingAgentsAssignedToThisIdentifier==null){
+		if (this.getIdentifierFactory()==null && searchingAgentsAssignedToThisIdentifier==null){
 			return identifiedAgents;
 		} else {
 			//System.out.println();
@@ -78,7 +79,13 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
 			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
 			
+			if (agents.get(agentId).getCurrentPlanElementIndex()==3){
+				//DebugLib.traceAgent(agentId);
+			}
+			
 			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
+				//System.out.println(agents.get(agentId).getCurrentPlanElementIndex());
+				//DebugLib.traceAgent(agentId);
 				parkingAgentsTracker.getSearchStartTime().put(agentId, parkingAgentsTracker.getLastCarMovementRegistered().get(agentId));
 			}
 			
@@ -109,11 +116,6 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 		return identifiedAgents;
 	}
 	
-	private boolean isAgentAssignedToThisIdentifierCurrently(Id agentId, int currentPlanElementIndex) {
-		ParkingStrategy parkingStrategy = parkingAgentsTracker.getParkingStrategyManager().getCurrentlySelectedParkingStrategies().get(agentId,currentPlanElementIndex);
-		
-		return parkingStrategy.getIdentifier()==this;
-	}
 
 
 	/*

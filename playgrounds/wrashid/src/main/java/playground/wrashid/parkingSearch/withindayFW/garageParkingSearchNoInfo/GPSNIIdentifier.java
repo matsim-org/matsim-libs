@@ -34,8 +34,9 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.ParkingAgentsTracker;
 
 public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
 	
@@ -57,6 +58,8 @@ public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitia
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 
+		
+		
 		/*
 		 * Get all agents that are searching and have entered a new link in the last
 		 * time step.
@@ -65,7 +68,7 @@ public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitia
 		
 		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(this);
 		
-		if (true || this.getIdentifierFactory()==null && searchingAgentsAssignedToThisIdentifier==null){
+		if (this.getIdentifierFactory()==null && searchingAgentsAssignedToThisIdentifier==null){
 			return identifiedAgents;
 		} else {
 			//System.out.println();
@@ -74,7 +77,14 @@ public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitia
 		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
 			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
 			
+			if (agents.get(agentId).getCurrentPlanElementIndex()==3){
+				//DebugLib.traceAgent(agentId);
+			}
+			
 			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
+				//System.out.println(agents.get(agentId).getCurrentPlanElementIndex());
+				DebugLib.traceAgent(agentId);
+				
 				parkingAgentsTracker.getSearchStartTime().put(agentId, parkingAgentsTracker.getLastCarMovementRegistered().get(agentId));
 			}
 			

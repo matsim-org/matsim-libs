@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RandomSearchReplannerFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,34 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW.randomTestStrategy;
+package playground.wrashid.parkingSearch.withindayFW.parkingTracker;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.ParkingAgentsTracker;
+/**
+ * If we have car1-park1-walk1-act-walk2-park2-car2, this class needs to capture
+ * the activity start time of park1.
+ * 
+ * @author wrashid
+ * 
+ */
+public class UpdatePreviousParkingArrivalTime implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
+	private ParkingAgentsTracker parkingAgentsTracker;
 
-	private final Scenario scenario;
-	private final ParkingAgentsTracker parkingAgentsTracker;
-	
-	public RandomSearchReplannerFactory(ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
-			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
-		
-		this.scenario = scenario;
+	public UpdatePreviousParkingArrivalTime(ParkingAgentsTracker parkingAgentsTracker) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
 	}
 
 	@Override
-	public RandomSearchReplanner createReplanner() {
-		RandomSearchReplanner replanner = new RandomSearchReplanner(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), parkingAgentsTracker);
-		super.initNewInstance(replanner);
-		return replanner;
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

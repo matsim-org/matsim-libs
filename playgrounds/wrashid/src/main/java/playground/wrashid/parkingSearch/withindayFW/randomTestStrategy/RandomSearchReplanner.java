@@ -40,7 +40,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.wrashid.parkingSearch.withindayFW.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.ParkingAgentsTracker;
 
 /**
  * 
@@ -188,6 +189,8 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 				editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),
 						withinDayAgent.getCurrentPlanElementIndex() + 2, routeAlgo);
 			}
+			
+			InsertParkingActivities.updateNextParkingActivityIfNeededAndRoute(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
 		}
 
 		withinDayAgent.resetCaches();

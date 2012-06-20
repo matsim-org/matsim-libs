@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Id;
 public class DebugLib {
 
 	public static void traceAgent(Id personId){
-		if (personId.toString().equalsIgnoreCase("1470986")){
+		if (personId.toString().equalsIgnoreCase("195")){
 			emptyFunctionForSettingBreakPoint();
 		}
 	}
@@ -28,6 +28,10 @@ public class DebugLib {
 	
 	public static void stopSystemAndReportInconsistency(){
 		throw new Error("system is in inconsistent state");
+	}
+	
+	public static void stopSystemWithError(){
+		stopSystemAndReportInconsistency();
 	}
 
 	public static void criticalTODO(){
