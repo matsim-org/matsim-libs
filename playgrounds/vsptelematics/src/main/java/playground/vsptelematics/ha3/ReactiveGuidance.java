@@ -160,12 +160,12 @@ public class ReactiveGuidance extends AbstractGuidance implements Guidance {
 		String line = time + "\t" + this.vehOn1 + "\t" + this.vehOn2 + "\t" + avgTT1 + "\t" + avgTT2 + "\t";
 		if (avgTT1 <= avgTT2) {
 			this.guidance = id2;
-			log.error("  guidance 1 ");
+//			log.error("  guidance 1 ");
 			line = line.concat("1");
 		}
 		else {
 			this.guidance = id3;
-			log.error("  guidance 2 ");
+//			log.error("  guidance 2 ");
 			line = line.concat("2");
 		}
 		try {
