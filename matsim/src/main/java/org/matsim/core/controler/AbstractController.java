@@ -90,6 +90,12 @@ public abstract class AbstractController {
 	
 	public final void shutdown(final boolean unexpected) {
 		this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
+		try {
+			Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
+		} catch (IllegalStateException e) {
+			log.info("Cannot remove shutdown hook. " + e.getMessage());
+		}
+		this.shutdownHook = null; // important for test cases to free the memory
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 
