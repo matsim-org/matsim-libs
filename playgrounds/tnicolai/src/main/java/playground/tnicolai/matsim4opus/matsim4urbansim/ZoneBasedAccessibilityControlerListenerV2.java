@@ -3,18 +3,17 @@ package playground.tnicolai.matsim4opus.matsim4urbansim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
@@ -86,10 +85,6 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
-		Scenario sc = controler.getScenario();
-		
-		double walkSpeedMeterPerSec = sc.getConfig().plansCalcRoute().getWalkSpeed();
-		this.walkSpeedMeterPerHour = walkSpeedMeterPerSec * 3600.;
 		
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		// get the congested car travel time (in seconds)
@@ -127,11 +122,14 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
+				LinkImpl nearestLink = network.getNearestLink(coordFromZone);
 				// captures the distance (as walk time) between a zone centroid and its nearest node
-				double offsetDistance2NearestNode_meter = NetworkUtil.getDistance2Node(network.getNearestLink(coordFromZone), 
+				double offsetDistance2NearestNode_meter = NetworkUtil.getDistance2Node(nearestLink, 
 																					   coordFromZone, 
 																					   fromNode);
 				double offsetWalkTime2NearestNode_h		= offsetDistance2NearestNode_meter / this.walkSpeedMeterPerHour;
+				double offsetDistance2NearestLink_meter = NetworkUtil.getOrthogonalDistance2NearestLink(nearestLink, coordFromZone);
+				double offsetWalkTime2NearestLink_h 	= offsetDistance2NearestLink_meter / this.walkSpeedMeterPerHour;
 				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
 				// Euclidean Distance (measuring point 2 nearest node):
 				// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
@@ -162,9 +160,9 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					double congestedCarTravelTime_h = (arrivalTime - depatureTime) / 3600.;
 
 					// for debugging car accessibility
-					carTT = getAsUtilCar(betaCarTT, congestedCarTravelTime_h, betaWalkTT, offsetWalkTime2NearestNode_h);
-					carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, offsetWalkTime2NearestNode_h * offsetWalkTime2NearestNode_h);
-					carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2NearestNode_h));
+					carTT = getAsUtilCar(betaCarTT, congestedCarTravelTime_h, betaWalkTT, offsetWalkTime2NearestLink_h);
+					carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, offsetWalkTime2NearestLink_h * offsetWalkTime2NearestLink_h);
+					carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2NearestLink_h));
 					
 					carTD = getAsUtilCar(betaCarTD, travelDistance_meter, betaWalkTD, offsetDistance2NearestNode_meter);
 					carTDPower = getAsUtilCar(betaCarTDPower, travelDistance_meter * travelDistance_meter, betaWalkTDPower, offsetDistance2NearestNode_meter * offsetDistance2NearestNode_meter);
@@ -188,12 +186,12 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 									   carLnTC ));
 					
 					// for debugging walk accessibility
-					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + offsetWalkTime2NearestNode_h);
-					walkTTPower = getAsUtilWalk(betaWalkTTPower, Math.pow( walkTravelTime_h+offsetWalkTime2NearestNode_h, 2));
+					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + offsetWalkTime2NearestLink_h);
+					walkTTPower = getAsUtilWalk(betaWalkTTPower, walkTravelTime_h*walkTravelTime_h + offsetWalkTime2NearestLink_h*offsetWalkTime2NearestLink_h );
 					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + offsetWalkTime2NearestNode_h ));
 					
 					walkTD = getAsUtilWalk(betaWalkTD, travelDistance_meter + offsetDistance2NearestNode_meter);
-					walkTDPower = getAsUtilWalk(betaWalkTDPower, Math.pow( travelDistance_meter + offsetDistance2NearestNode_meter, 2));
+					walkTDPower = getAsUtilWalk(betaWalkTDPower, travelDistance_meter*travelDistance_meter + offsetDistance2NearestNode_meter*offsetDistance2NearestNode_meter);
 					walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + offsetDistance2NearestNode_meter));
 					
 					walkTC 		= 0.;	// since MATSim doesn't gives monetary costs yet 

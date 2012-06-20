@@ -100,51 +100,6 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 	@Override
 	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
 		
-		// The following lines register what should be executed _after_ the iterations are done:			
-//
-//		
-//		// old cell-based accessibility method
-//		//if(computeCellBasedAccessibility){
-//		if(false){
-//
-//			SpatialGrid congestedTravelTimeAccessibilityGrid;
-//			SpatialGrid freespeedTravelTimeAccessibilityGrid;
-//			SpatialGrid walkTravelTimeAccessibilityGrid;
-//			ZoneLayer<CounterObject>  measuringPoints;
-//			String fileExtension;
-//			
-//			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
-//			if(aggregatedOpportunities == null)
-//				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
-//			
-//			if (computeCellBasedAccessibilitiesNetwork) {
-//				fileExtension = CellBasedAccessibilityControlerListener.NETWORK;
-//				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
-//																			   nwBoundaryBox.getBoundingBox(),
-//																			   srid);
-//				congestedTravelTimeAccessibilityGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//				freespeedTravelTimeAccessibilityGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//				walkTravelTimeAccessibilityGrid		 = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//			}
-//			else{
-//				fileExtension = CellBasedAccessibilityControlerListener.SHAPE_FILE;
-//				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
-//				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
-//																				   boundary, 
-//																				   srid);
-//				congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//				freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//				walkTravelTimeAccessibilityGrid      = GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//			} 
-//			
-//			controler.addControlerListener( new CellBasedAccessibilityControlerListener(measuringPoints, 
-//																							 aggregatedOpportunities,
-//																							 congestedTravelTimeAccessibilityGrid, 
-//																							 freespeedTravelTimeAccessibilityGrid, 
-//																							 walkTravelTimeAccessibilityGrid,
-//																							 fileExtension,
-//																							 benchmark) );
-//		}
 	}
 	
 	/**

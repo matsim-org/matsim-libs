@@ -59,6 +59,7 @@ public class AccessibilityControlerListenerTemplate{
 		   walkTT, walkTTPower, walkLnTT, walkTD, walkTDPower, walkLnTD, walkTC, walkTCPower, walkLnTC;
 	
 	protected double depatureTime;
+	protected double walkSpeedMeterPerSecond = -1;
 	protected double walkSpeedMeterPerHour = -1;
 	Benchmark benchmark;
 
@@ -100,7 +101,8 @@ public class AccessibilityControlerListenerTemplate{
 		
 		useRawSum		= module.isUseRawSumsWithoutLn();
 		logitScaleParameter = module.getLogitScaleParameter();
-		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		walkSpeedMeterPerSecond = scenario.getConfig().plansCalcRoute().getWalkSpeed();
+		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 3600.;
 		
 		betaCarTT 	   	= module.getBetaCarTravelTime();
 		betaCarTTPower	= module.getBetaCarTravelTimePower2();
@@ -133,7 +135,7 @@ public class AccessibilityControlerListenerTemplate{
 		log.info("Computing and writing grid based accessibility measures with following settings:" );
 		log.info("Returning raw sum (not logsum): " + useRawSum);
 		log.info("Logit Scale Parameter: " + logitScaleParameter);
-		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour);
+		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + "("+this.walkSpeedMeterPerSecond+"meter/s)");
 		log.info("Depature time (in seconds): " + depatureTime);
 		log.info("Beta Car Travel Time: " + betaCarTT );
 		log.info("Beta Car Travel Time Power2: " + betaCarTTPower );

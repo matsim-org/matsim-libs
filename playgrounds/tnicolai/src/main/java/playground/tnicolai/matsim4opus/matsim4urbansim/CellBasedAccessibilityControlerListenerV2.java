@@ -7,7 +7,6 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -138,10 +137,6 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
-		Scenario sc = controler.getScenario();
-		
-		double walkSpeedMeterPerSec = sc.getConfig().plansCalcRoute().getWalkSpeed();
-		this.walkSpeedMeterPerHour = walkSpeedMeterPerSec * 3600.;
 		
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		// get the congested car travel time (in seconds)
@@ -184,13 +179,13 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				LinkImpl nearestLink = network.getNearestLink(coordFromZone);
 				// captures the distance (as walk time) between a zone centroid and its nearest node
-				double walkOffsetDistance2NearestNode_meter = NetworkUtil.getDistance2Node(nearestLink, 
+				double offsetDistance2NearestNode_meter = NetworkUtil.getDistance2Node(nearestLink, 
 																					   point, 
 																					   fromNode);
-				double walkOffsetWalkTime2NearestNode_h		= walkOffsetDistance2NearestNode_meter / this.walkSpeedMeterPerHour;
+				double offsetWalkTime2NearestNode_h		= offsetDistance2NearestNode_meter / this.walkSpeedMeterPerHour;
 				
-				double carOffsetWalkTime2NearestLink_meter 	= NetworkUtil.getOrthogonalDistance2NearestLink(nearestLink, point);
-				double carOffsetWalkTime2NearestLink_h 		= carOffsetWalkTime2NearestLink_meter / this.walkSpeedMeterPerHour;
+				double offsetDistance2NearestLink_meter = NetworkUtil.getOrthogonalDistance2NearestLink(nearestLink, point);
+				double offsetWalkTime2NearestLink_h 	= offsetDistance2NearestLink_meter / this.walkSpeedMeterPerHour;
 				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
 				// Euclidean Distance (measuring point 2 nearest node):
 				// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
@@ -221,13 +216,13 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					double congestedCarTravelTime_h = (arrivalTime - depatureTime) / 3600.;
 					
 					// for debugging car accessibility
-					carTT = getAsUtilCar(betaCarTT, congestedCarTravelTime_h, betaWalkTT, carOffsetWalkTime2NearestLink_h);
-					carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, carOffsetWalkTime2NearestLink_h * carOffsetWalkTime2NearestLink_h);
-					carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(carOffsetWalkTime2NearestLink_h));
+					carTT = getAsUtilCar(betaCarTT, congestedCarTravelTime_h, betaWalkTT, offsetWalkTime2NearestLink_h);
+					carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, offsetWalkTime2NearestLink_h * offsetWalkTime2NearestLink_h);
+					carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2NearestLink_h));
 					
-					carTD = getAsUtilCar(betaCarTD, travelDistance_meter, betaWalkTD, carOffsetWalkTime2NearestLink_meter);
-					carTDPower = getAsUtilCar(betaCarTDPower, travelDistance_meter * travelDistance_meter, betaWalkTDPower, carOffsetWalkTime2NearestLink_meter * carOffsetWalkTime2NearestLink_meter);
-					carLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter), betaWalkLnTD, Math.log(carOffsetWalkTime2NearestLink_meter));
+					carTD = getAsUtilCar(betaCarTD, travelDistance_meter, betaWalkTD, offsetDistance2NearestNode_meter); // carOffsetWalkTime2NearestLink_meter
+					carTDPower = getAsUtilCar(betaCarTDPower, travelDistance_meter * travelDistance_meter, betaWalkTDPower, offsetDistance2NearestNode_meter * offsetDistance2NearestNode_meter);
+					carLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter), betaWalkLnTD, Math.log(offsetDistance2NearestNode_meter));
 					
 					carTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
 					carTCPower 	= 0.;	// since MATSim doesn't gives monetary costs jet 
@@ -247,13 +242,13 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 									   carLnTC ));
 					
 					// for debugging walk accessibility
-					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + walkOffsetWalkTime2NearestNode_h);
-					walkTTPower = getAsUtilWalk(betaWalkTTPower, Math.pow( walkTravelTime_h+walkOffsetWalkTime2NearestNode_h, 2));
-					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + walkOffsetWalkTime2NearestNode_h ));
+					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + offsetWalkTime2NearestLink_h);
+					walkTTPower = getAsUtilWalk(betaWalkTTPower, walkTravelTime_h*walkTravelTime_h + offsetWalkTime2NearestLink_h*offsetWalkTime2NearestLink_h );
+					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + offsetWalkTime2NearestNode_h ));
 					
-					walkTD = getAsUtilWalk(betaWalkTD, travelDistance_meter + walkOffsetDistance2NearestNode_meter);
-					walkTDPower = getAsUtilWalk(betaWalkTDPower, Math.pow( travelDistance_meter + walkOffsetDistance2NearestNode_meter, 2));
-					walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + walkOffsetDistance2NearestNode_meter));
+					walkTD = getAsUtilWalk(betaWalkTD, travelDistance_meter + offsetDistance2NearestNode_meter);
+					walkTDPower = getAsUtilWalk(betaWalkTDPower, travelDistance_meter*travelDistance_meter + offsetDistance2NearestNode_meter*offsetDistance2NearestNode_meter);
+					walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + offsetDistance2NearestNode_meter));
 					
 					walkTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
 					walkTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
