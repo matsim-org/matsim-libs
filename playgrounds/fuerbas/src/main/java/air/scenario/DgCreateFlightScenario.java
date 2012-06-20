@@ -21,15 +21,27 @@
 package air.scenario;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import air.analysis.DgNet2Shape;
 
-
 /**
- * @author dgrether
+ * @author dgrether, sfuerbas
  *
  */
+
 public class DgCreateFlightScenario {
+	
+	public static enum Direction {INBOUND, OUTBOUND, BOTH};
+	
+	public static final Map<String, Direction> filter = new HashMap<String, Direction>();
+	static {
+		filter.put("FRA", Direction.BOTH);
+		filter.put("TXL", Direction.INBOUND);
+		filter.put("MUC", Direction.OUTBOUND);
+		filter.put("JFK", Direction.BOTH);
+	}
 	
 	public static void createWorldFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception {
 //		String baseDirectory = "/media/data/work/repos/"
@@ -42,6 +54,7 @@ public class DgCreateFlightScenario {
 		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
+		airScheduleBuilder.filter.putAll(filter);
 		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, utcOffsetfile);
 
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
@@ -113,8 +126,6 @@ public class DgCreateFlightScenario {
 		DgNet2Shape.writeNetwork2Shape(networkFilename, shapeFileDirectoryname + SfAirNetworkBuilder.NETWORK_FILENAME + ".shp");
 	}
 
-	
-	
 	/**
 	 * @param args
 	 */
