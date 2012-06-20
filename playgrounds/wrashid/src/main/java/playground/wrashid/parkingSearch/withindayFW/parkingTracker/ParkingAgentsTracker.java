@@ -290,10 +290,9 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			int planElementIndex = agent.getCurrentPlanElementIndex();
 
 			if (agents.get(personId).getCurrentPlanElementIndex() == 9) {
-				
-				
-				Activity nextAct=(Activity) executedPlan.getPlanElements().get(planElementIndex+1);
-				DebugLib.traceAgent(personId);
+
+				Activity nextAct = (Activity) executedPlan.getPlanElements().get(planElementIndex + 1);
+				//DebugLib.traceAgent(personId);
 			}
 
 			// TwoHashMapsConcatenated<Id, Integer, ParkingStrategy>
@@ -339,7 +338,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		super.handleEvent(event);
 
 		if (agents.get(event.getPersonId()).getCurrentPlanElementIndex() == 9) {
-			DebugLib.traceAgent(event.getPersonId());
+			//DebugLib.traceAgent(event.getPersonId());
 		}
 
 		Id personId = event.getPersonId();
@@ -368,7 +367,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		Id personId = event.getPersonId();
 
 		if (agents.get(personId).getCurrentPlanElementIndex() == 9) {
-			DebugLib.traceAgent(personId);
+			//DebugLib.traceAgent(personId);
 		}
 
 		getLastCarMovementRegistered().put(personId, event.getTime());
@@ -409,14 +408,14 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
 		if (agents.get(personId).getCurrentPlanElementIndex() == 3) {
-			//DebugLib.traceAgent(personId);
+			// DebugLib.traceAgent(personId);
 		}
-		
-		if (parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, planElementIndex)==null){
+
+		if (parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, planElementIndex) == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
-		
-		if (parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, planElementIndex).getIdentifier()==null){
+
+		if (parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, planElementIndex).getIdentifier() == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
 
@@ -499,6 +498,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	// }
 
 	private void updateParkingScoreDuringDay(ActivityEndEvent event) {
+		double parkingScore = 0.0;
+
 		Id personId = event.getPersonId();
 
 		double parkingArrivalTime = lastCarArrivalTimeAtParking.getTime(personId);
@@ -509,12 +510,12 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		// parking cost scoring
 
-		updateParkingCostScore(personId, parkingArrivalTime, parkingDuration, facilityId, parkingPersonalBetas);
+		parkingScore += getParkingCostScore(personId, parkingArrivalTime, parkingDuration, facilityId, parkingPersonalBetas);
 
 		// parking walk time
 
 		double walkingTimeTotalInMinutes = parkingWalkTimesDuringDay.getSumBothParkingWalkDurationsInSecond(personId) / 60.0;
-		updateWalkScore(personId, activityDuration, parkingPersonalBetas, walkingTimeTotalInMinutes);
+		parkingScore +=getWalkScore(personId, activityDuration, parkingPersonalBetas, walkingTimeTotalInMinutes);
 
 		// parking search time
 
@@ -534,57 +535,82 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		double parkingSearchTimeInMinutes = GeneralLib.getIntervalDuration(this.getSearchStartTime().get(personId),
 				parkingArrivalTime) / 60;
-		updateSearchTimeScore(personId, activityDuration, parkingPersonalBetas, parkingSearchTimeInMinutes);
+		parkingScore += getSearchTimeScore(personId, activityDuration, parkingPersonalBetas, parkingSearchTimeInMinutes);
+
+		parkingIterationScoreSum.incrementBy(personId, parkingScore);
+		
+		Integer previousCarLegPlanElementIndex=getIndexOfPreviousCarLeg(personId);
+		parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, previousCarLegPlanElementIndex).putScore(personId, previousCarLegPlanElementIndex, parkingScore);
 
 		// System.out.println(agents.get(personId).getCurrentPlanElementIndex());
-		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
+		//Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
 		// DebugLib.traceAgent(personId);
 		// reset search time
 		getSearchStartTime().remove(personId);
 
+
+		DebugLib.traceAgent(personId);
+	}
+
+	private Integer getIndexOfPreviousCarLeg(Id personId) {
+		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
+		Plan executedPlan = agent.getSelectedPlan();
+		int planElementIndex = agent.getCurrentPlanElementIndex();
 		
+		for (int i=planElementIndex;i>0;i--){
+			List<PlanElement> planElements = executedPlan.getPlanElements();
+			if (planElements.get(i) instanceof Leg){
+				Leg leg=(Leg) planElements.get(i);
+				
+				if (leg.getMode().equals(TransportMode.car)){
+					return i;
+				}
+			}
+		}
 		
+		DebugLib.stopSystemAndReportInconsistency("this is not allowed to happen - assumption broken");
+		return null;
 	}
 
 	private void updateNextParkingActivityIfNeeded(Id personId) {
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
-		
+
 		Activity currentParking = (Activity) executedPlan.getPlanElements().get(planElementIndex);
 		Activity nextParking = (Activity) executedPlan.getPlanElements().get(planElementIndex + 2);
-		
-		if (currentParking.getLinkId()==nextParking.getLinkId()){
-			Id newParkingFacilityId = getParkingInfrastructure().getClosestParkingFacilityNotOnLink(currentParking.getCoord(), currentParking.getLinkId());
-			Activity newParkingAct = InsertParkingActivities.createParkingActivity(scenario,newParkingFacilityId);
+
+		if (currentParking.getLinkId() == nextParking.getLinkId()) {
+			Id newParkingFacilityId = getParkingInfrastructure().getClosestParkingFacilityNotOnLink(currentParking.getCoord(),
+					currentParking.getLinkId());
+			Activity newParkingAct = InsertParkingActivities.createParkingActivity(scenario, newParkingFacilityId);
 			executedPlan.getPlanElements().remove(planElementIndex + 2);
-			executedPlan.getPlanElements().add(planElementIndex + 2,newParkingAct);
+			executedPlan.getPlanElements().add(planElementIndex + 2, newParkingAct);
 		}
-		
+
 	}
 
-	private void updateSearchTimeScore(Id personId, double activityDuration, ParkingPersonalBetas parkingPersonalBetas,
+	private double getSearchTimeScore(Id personId, double activityDuration, ParkingPersonalBetas parkingPersonalBetas,
 			double parkingSearchTimeInMinutes) {
-		parkingIterationScoreSum.incrementBy(personId, parkingPersonalBetas.getParkingSearchTimeBeta(personId, activityDuration)
-				* parkingSearchTimeInMinutes);
+		return parkingPersonalBetas.getParkingSearchTimeBeta(personId, activityDuration) * parkingSearchTimeInMinutes;
 	}
 
-	private void updateWalkScore(Id personId, double activityDuration, ParkingPersonalBetas parkingPersonalBetas,
+	private double getWalkScore(Id personId, double activityDuration, ParkingPersonalBetas parkingPersonalBetas,
 			double walkingTimeTotalInMinutes) {
-		parkingIterationScoreSum.incrementBy(personId, parkingPersonalBetas.getParkingWalkTimeBeta(personId, activityDuration)
-				* walkingTimeTotalInMinutes);
+
+		return parkingPersonalBetas.getParkingWalkTimeBeta(personId, activityDuration) * walkingTimeTotalInMinutes;
+
 	}
 
-	private void updateParkingCostScore(Id personId, double parkingArrivalTime, double parkingDuration, Id facilityId,
+	private double getParkingCostScore(Id personId, double parkingArrivalTime, double parkingDuration, Id facilityId,
 			ParkingPersonalBetas parkingPersonalBetas) {
 		Double parkingCost = getParkingInfrastructure().getParkingCostCalculator().getParkingCost(facilityId, parkingArrivalTime,
 				parkingDuration);
 
-		if (parkingCost==null){
+		if (parkingCost == null) {
 			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
 		}
-		
-		parkingIterationScoreSum.incrementBy(personId, parkingPersonalBetas.getParkingCostBeta(personId) * parkingCost);
+		return parkingPersonalBetas.getParkingCostBeta(personId) * parkingCost;
 	}
 
 	@Override
@@ -600,6 +626,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	}
 
 	private void processScoreOfLastParking(Id personId) {
+		double parkingScore = 0.0;
+		
 		Double parkingArrivalTime = lastCarArrivalTimeAtParking.getTime(personId);
 		double lastActivityDurationOfDay = durationOfLastParkingOfDay.getDuration(personId);
 
@@ -607,20 +635,47 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		// parking cost scoring
 
-		updateParkingCostScore(personId, parkingArrivalTime, lastActivityDurationOfDay, getLastParkingFacilityIdOfDay(personId),
+		parkingScore+= getParkingCostScore(personId, parkingArrivalTime, lastActivityDurationOfDay, getLastParkingFacilityIdOfDay(personId),
 				parkingPersonalBetas);
 
 		// parking walk time
 
 		double walkingTimeTotalInMinutes = walkDurationFirstAndLastOfDay.getDuration(personId) / 60.0;
-		updateWalkScore(personId, lastActivityDurationOfDay, parkingPersonalBetas, walkingTimeTotalInMinutes);
+		parkingScore += getWalkScore(personId, lastActivityDurationOfDay, parkingPersonalBetas, walkingTimeTotalInMinutes);
 
 		// parking search time
 
 		double parkingSearchTimeInMinutes = GeneralLib.getIntervalDuration(this.getSearchStartTime().get(personId),
 				parkingArrivalTime) / 60;
-		updateSearchTimeScore(personId, lastActivityDurationOfDay, parkingPersonalBetas, parkingSearchTimeInMinutes);
+		parkingScore += getSearchTimeScore(personId, lastActivityDurationOfDay, parkingPersonalBetas, parkingSearchTimeInMinutes);
 
+		parkingIterationScoreSum.incrementBy(personId, parkingScore);
+		
+		Integer lastCarLegIndexOfDay=getLastCarLegIndexOfDay(personId);
+		parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, lastCarLegIndexOfDay).putScore(personId, lastCarLegIndexOfDay, parkingScore);
+		
+	}
+
+	private Integer getLastCarLegIndexOfDay(Id personId) {
+		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
+		Plan executedPlan = agent.getSelectedPlan();
+		int planElementIndex = agent.getCurrentPlanElementIndex();
+		
+		List<PlanElement> planElements = executedPlan.getPlanElements();
+		//-4 should is the first possible index of a car leg, starting from the end of day
+		for (int i=planElements.size()-4;i>0;i--){
+			
+			if (planElements.get(i) instanceof Leg){
+				Leg leg=(Leg) planElements.get(i);
+				
+				if (leg.getMode().equals(TransportMode.car)){
+					return i;
+				}
+			}
+		}
+		
+		DebugLib.stopSystemAndReportInconsistency("this is not allowed to happen - assumption broken");
+		return null;
 	}
 
 	private Id getLastParkingFacilityIdOfDay(Id personId) {
@@ -653,7 +708,6 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	public void handleEvent(ActivityStartEvent event) {
 		super.handleEvent(event);
 
-
 		if (!event.getActType().equalsIgnoreCase("parking")) {
 			previousNonParkingActivityStartTime.put(event.getPersonId(), event.getTime());
 		}
@@ -671,16 +725,15 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				firstParkingWalkTimeOfDay.put(event.getPersonId(), walkDuration);
 				didUseCarOnce.add(event.getPersonId());
 			}
-			
+
 			Activity nextAct = (Activity) executedPlan.getPlanElements().get(planElementIndex + 2);
 
 			if (nextAct.getType().equalsIgnoreCase("parking")) {
-				// if current parking activity linkId==next parking activity link Id => change link Id of next parking activity!
-				//updateNextParkingActivityIfNeeded(event.getPersonId());
+				// if current parking activity linkId==next parking activity
+				// link Id => change link Id of next parking activity!
+				// updateNextParkingActivityIfNeeded(event.getPersonId());
 			}
-			
-			
-			
+
 		}
 	}
 

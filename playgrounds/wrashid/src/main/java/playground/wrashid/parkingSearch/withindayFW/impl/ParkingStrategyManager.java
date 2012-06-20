@@ -88,6 +88,8 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 			for (ExperimentalBasicWithindayAgent agent : agents.values()) {
 
+				DebugLib.traceAgent(agent.getId());
+				
 				Plan selectedPlan = agent.getSelectedPlan();
 
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
@@ -135,6 +137,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 											if (j == nextInt) {
 												selectedParkingStrategy = parkingStrategy;
 											}
+											j++;
 										}
 
 										getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
@@ -160,19 +163,25 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 		}
 	}
 
-	private void selectStrategyWithHighestScore(ExperimentalBasicWithindayAgent agent, int i, ActivityImpl activity) {
+	private void selectStrategyWithHighestScore(ExperimentalBasicWithindayAgent agent, int legPlanElementIndex, ActivityImpl activity) {
 		Collection<ParkingStrategy> parkingStrategies = strategyActivityMapper.getParkingStrategies(agent.getId(),
 				activity.getType());
 
 		ParkingStrategy selectedParkingStrategy = null;
-		double bestStrategyScore = Double.MIN_VALUE;
+		double bestStrategyScore = Double.NEGATIVE_INFINITY ;
 		for (ParkingStrategy parkingStrategy : parkingStrategies) {
-			if (parkingStrategy.getScore(agent.getId(), i) > bestStrategyScore) {
+			if (agent.getId().toString().equalsIgnoreCase("303")){
+				System.out.println(parkingStrategy.getScore(agent.getId(), 3));
+			}
+			
+			if (parkingStrategy.getScore(agent.getId(), legPlanElementIndex) > bestStrategyScore) {
 				selectedParkingStrategy = parkingStrategy;
 			}
 		}
+		
+		
 
-		getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
+		getCurrentlySelectedParkingStrategies().put(agent.getId(), legPlanElementIndex, selectedParkingStrategy);
 	}
 
 	private void tidyUpUnusedStrategyScores(ExperimentalBasicWithindayAgent agent, int i) {
@@ -200,7 +209,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 		ParkingStrategy selectedParkingStrategy = null;
 		int j = 0;
 		for (ParkingStrategy parkingStrategy : parkingStrategies) {
-			parkingStrategy.putScore(agent.getId(), i, Double.MIN_VALUE);
+			parkingStrategy.putScore(agent.getId(), i, Double.NEGATIVE_INFINITY );
 			if (j == nextInt) {
 				selectedParkingStrategy = parkingStrategy;
 			}

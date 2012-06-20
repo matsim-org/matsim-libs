@@ -227,6 +227,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 10000.0, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
+		this.addControlerListener(parkingAgentsTracker);
 
 		insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
 

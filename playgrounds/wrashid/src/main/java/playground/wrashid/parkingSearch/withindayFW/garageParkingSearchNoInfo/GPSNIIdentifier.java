@@ -83,7 +83,7 @@ public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitia
 			
 			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
 				//System.out.println(agents.get(agentId).getCurrentPlanElementIndex());
-				DebugLib.traceAgent(agentId);
+				//DebugLib.traceAgent(agentId);
 				
 				parkingAgentsTracker.getSearchStartTime().put(agentId, parkingAgentsTracker.getLastCarMovementRegistered().get(agentId));
 			}
