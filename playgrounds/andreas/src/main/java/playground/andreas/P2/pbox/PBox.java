@@ -122,7 +122,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
 		// init route provider
-		this.routeProvider = this.initRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly);
+		this.routeProvider = this.initRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly, event.getControler().getControlerIO().getOutputPath());
 
 		// init initial set of cooperatives
 		this.initInitialCooperatives(event.getControler().getFirstIteration(), this.pConfig.getNumberOfCooperatives());
@@ -193,9 +193,9 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));		
 	}
 
-	private PRouteProvider initRouteProvider(Network network, Population population, PConfigGroup pConfig, TransitSchedule pStopsOnly) {
+	private PRouteProvider initRouteProvider(Network network, Population population, PConfigGroup pConfig, TransitSchedule pStopsOnly, String outputDir) {
 		
-		RandomStopProvider randomStopProvider = new RandomStopProvider(pConfig, population, pStopsOnly);
+		RandomStopProvider randomStopProvider = new RandomStopProvider(pConfig, population, pStopsOnly, outputDir);
 		
 		if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)){
 			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0);

@@ -19,6 +19,8 @@
 
 package playground.andreas.P2.plan;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -52,13 +55,17 @@ public class RandomStopProvider {
 
 	private Population population;
 	private TransitSchedule pStopsOnly;
+
+	private String outputDir;
+
 	
-	public RandomStopProvider(PConfigGroup pConfig, Population population, TransitSchedule pStopsOnly){
+	public RandomStopProvider(PConfigGroup pConfig, Population population, TransitSchedule pStopsOnly, String outputDir){
 		this.gridSize = pConfig.getRandomStopProviderGridSize();
 		this.lastIteration = -1;
 		
 		this.population = population;
 		this.pStopsOnly = pStopsOnly;
+		this.outputDir = outputDir;		
 	}
 	
 	private void updateWeights(){
@@ -119,6 +126,7 @@ public class RandomStopProvider {
 	public TransitStopFacility getRandomTransitStop(int currentIteration) {
 		if (lastIteration != currentIteration) {
 			this.updateWeights();
+			this.writeToFile(currentIteration);
 			lastIteration = currentIteration;
 		}
 		
@@ -148,6 +156,24 @@ public class RandomStopProvider {
 		return null;
 	}
 	
+	private void writeToFile(int currentIteration) {
+		if (this.outputDir == null) {
+			return;
+		}
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + currentIteration + ".stopId2stopWeight.txt.gz");
+			writer.write("# stop id; weight"); writer.newLine();
+			for (Entry<TransitStopFacility, Double> stopEntry : this.stops2Weight.entrySet()) {
+				writer.write(stopEntry.getKey().getId().toString() + "; " + stopEntry.getValue().toString()); writer.newLine();
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private String getGridNodeIdForAct(Coord coord){
 		int xSlot = (int) (coord.getX() / this.gridSize);
 		int ySlot = (int) (coord.getY() / this.gridSize);

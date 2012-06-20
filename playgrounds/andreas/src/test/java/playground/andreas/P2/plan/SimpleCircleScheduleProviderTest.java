@@ -105,7 +105,7 @@ public class SimpleCircleScheduleProviderTest {
 		
 		ScenarioImpl scenario = (ScenarioImpl) PScenarioHelper.createTestNetwork();
 		PConfigGroup pC = new PConfigGroup();
-		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, scenario.getPopulation(), scenario.getTransitSchedule());
+		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, scenario.getPopulation(), scenario.getTransitSchedule(), null);
 		
 		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), randomStopProvider, 10);
 		
