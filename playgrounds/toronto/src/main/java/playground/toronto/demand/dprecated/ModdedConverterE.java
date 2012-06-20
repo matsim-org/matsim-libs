@@ -1,4 +1,4 @@
-package playground.toronto.demand;
+package playground.toronto.demand.dprecated;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,8 +41,10 @@ import playground.balmermi.world.ZoneLayer;
  *											    (output statistics at the end)
  *							- shifted TASHA time by -4 hours in order to correspond with MATSim simulation time [0-23 hour]
  *
+ * June 2012: This class is considered obsolete. Use demand.CreatePlansFromTrips instead.
  */
-public class ModdedConverter {
+@Deprecated
+public class ModdedConverterE {
 	public static class ZoneXY {
 		private final String zoneId, x, y;
 
@@ -92,7 +95,7 @@ public class ModdedConverter {
 
 	private String tmpPersonId = "";
 	private String tmpHhldId = "";
-	private String tmpType = "";
+	private String tmpType = "H";
 	private String tmpTripId = "";
 	private double tmpEndTime;
 	private boolean tmpGotH = false;
@@ -103,7 +106,7 @@ public class ModdedConverter {
 
 	private Coord tmpHome = null;
 
-	public ModdedConverter() {
+	public ModdedConverterE() {
 	}
 
 	public static double convertTime(final String endingS) {
@@ -133,10 +136,11 @@ public class ModdedConverter {
 				tabs[7]="H";
 			}
 
+
 			String tripId = tabs[0] + "-" + tabs[1] + "-" + tabs[2];
 			String mode = tabs[16];
 			if(!this.tmpTripId.equals(tripId)&&mode.equals("0")){
-				String personId = tabs[0] + "-" + tabs[1];
+				String personId = tabs[0] + "-" + tabs[1] + "-" + tabs[17];
 				String hhldId = tabs[0];
 				double endTime;
 				try {
@@ -155,12 +159,12 @@ public class ModdedConverter {
 						if ((tabs[4].equals("H"))&&this.tmpGotH) { //if the trip starts at home and home coordinate has been set
 							tmpCoord = this.tmpHome;
 						}else if((tabs[4].equals("H"))&&!this.tmpGotH){ // if the trip starts at home but home coordinate hasn't been set
-							tmpCoord = getRandomCoordInZone(tabs[6]);
+							tmpCoord = getRandomCoordInZone(new IdImpl(tabs[6]));
 							this.tmpHome = tmpCoord;
 							this.tmpGotH = true;
 						}
 						else{ //if the trip starts away from home
-							tmpCoord = getRandomCoordInZone(tabs[6]);
+							tmpCoord = getRandomCoordInZone(new IdImpl(tabs[6]));
 						}
 						this.tmpType = tabs[7];
 						ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[4], tmpCoord);
@@ -183,15 +187,16 @@ public class ModdedConverter {
 							if ((this.tmpTabs[7].equals("H"))&&this.tmpGotH) { // the person's last trip ends at home and home coordinate has already been set
 								tmpCoord2 = this.tmpHome;
 							}else if ((this.tmpTabs[7].equals("H"))&&!this.tmpGotH){ // the person's last trip ends at home but home coordinate hasn't been set
-								tmpCoord2 = getRandomCoordInZone(this.tmpTabs[9]);
+								tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
 								this.tmpHome = tmpCoord2;
 								this.tmpGotH = true;
 							}else{ //the person's last trip does not end at home
-								tmpCoord2 = getRandomCoordInZone(this.tmpTabs[9]);
+								tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
 								this.count2+=1;
-								System.out.println(personId);
+								System.out.println(this.tmpPersonId);
 							}
 							ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[7], tmpCoord2);
+
 						}
 
 						PersonImpl p = new PersonImpl(new IdImpl(personId));
@@ -201,19 +206,19 @@ public class ModdedConverter {
 						this.tmpType = tabs[4];
 						Coord tmpCoord3;
 						if (!this.tmpHhldId.equals(hhldId)&&this.tmpType.equals("H")) {  //1st person of a household start first trip from home
-							this.tmpHome = getRandomCoordInZone(tabs[6]);
+							this.tmpHome = getRandomCoordInZone(new IdImpl(tabs[6]));
 							tmpCoord3 = this.tmpHome;
 							this.tmpGotH = true;
 						}else if (this.tmpHhldId.equals(hhldId)&&this.tmpType.equals("H")){ //other people of the same household start first trip from home
 							tmpCoord3 = this.tmpHome;
 							this.tmpGotH = true;
 						}else if (this.tmpHhldId.equals(hhldId)&&!this.tmpType.equals("H")){ //other people of the same household start first trip away from home
-							tmpCoord3 = getRandomCoordInZone(tabs[6]);
+							tmpCoord3 = getRandomCoordInZone(new IdImpl(tabs[6]));
 							this.tmpGotH = true;
 							this.count1 += 1;
 							System.out.println(personId);
 						}else{ //1st person of a household start first trip away from home
-							tmpCoord3 = getRandomCoordInZone(tabs[6]);
+							tmpCoord3 = getRandomCoordInZone(new IdImpl(tabs[6]));
 							this.tmpGotH = false;
 							this.count1 += 1;
 							System.out.println(personId);
@@ -241,33 +246,35 @@ public class ModdedConverter {
 				}
 			}
 		}else{
-			Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
-			PlanImpl tmpPl = (PlanImpl) p.getSelectedPlan();
 
-			LegImpl leg = tmpPl.createAndAddLeg(TransportMode.car);
+			Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+			Plan tmpPl = p.getSelectedPlan();
+
+
+			LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 			Coord tmpCoord2;
 			if ((this.tmpTabs[7].equals("H"))&&this.tmpGotH) {
 				tmpCoord2 = this.tmpHome;
 			}else if ((this.tmpTabs[7].equals("H"))&&!this.tmpGotH){
-				tmpCoord2 = getRandomCoordInZone(this.tmpTabs[9]);
+				tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
 				this.tmpHome = tmpCoord2;
 				this.tmpGotH = true;
 			}else{
-				tmpCoord2 = getRandomCoordInZone(this.tmpTabs[9]);
+				tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
 				this.count2+=1;
 				System.out.println(this.tmpPersonId);
 			}
-			ActivityImpl lastAct = tmpPl.createAndAddActivity(this.tmpTabs[7], tmpCoord2);
+			ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[7], tmpCoord2);
 			System.out.println("# of chains that do not start at home: " + this.count1);
 			System.out.println("# of chains that do not end at home: " + this.count2);
 		}
 	}
 
-	private Coord getRandomCoordInZone(final String zoneId) {
+	private Coord getRandomCoordInZone(final Id zoneId) {
 		return WorldUtils.getRandomCoordInZone(
-				(Zone) this.zones.getLocation(new IdImpl(zoneId)), this.zones);
+				(Zone) this.zones.getLocation(zoneId), this.zones);
 	}
 
 	public void createZones() {
@@ -283,16 +290,14 @@ public class ModdedConverter {
 	}
 
 	public static void main(final String[] args) {
-		String oldPlansFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\fout_modechoices_good.txt";
-		String newPlansFilename = "C:\\Thesis_HJY\\matsim\\output\\ConvertPlan\\plans.xml.gz";
+		String oldPlansFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\fout_modechoices_recleaned.txt";
+		String newPlansFilename = "C:\\Thesis_HJY\\matsim\\output\\ConvertPlan\\plansE.xml.gz";
 		String zoneFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\centroids.txt";
-
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		ModdedConverter c = new ModdedConverter();
+		ModdedConverterE c = new ModdedConverterE();
 
 		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones")));
-
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
 
 		// reading zone.txt "zone,x,y" ...
@@ -336,7 +341,7 @@ public class ModdedConverter {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
 			PopulationWriter writer = new PopulationWriter(c.pop, scenario.getNetwork());
 			writer.writeStartPlans(newPlansFilename);
-			String line;
+			String line;// = reader.readLine();
 			do {
 				line = reader.readLine();
 				if (line != null) {

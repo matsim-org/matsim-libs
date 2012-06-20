@@ -1,4 +1,4 @@
-package playground.toronto.demand;
+package playground.toronto.demand.dprecated;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -34,7 +34,10 @@ import playground.balmermi.world.ZoneLayer;
 
 /**
  * @author yu
+ * 
+ * June 2012: This class is considered obsolete. Use demand.CreatePlansFromTrips instead.
  */
+@Deprecated
 public class Converter {
 	public static class ZoneXY {
 		private final String zoneId, x, y;

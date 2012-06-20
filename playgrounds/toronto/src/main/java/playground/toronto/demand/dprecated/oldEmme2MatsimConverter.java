@@ -1,4 +1,4 @@
-package playground.toronto.transitnetworkutils;
+package playground.toronto.demand.dprecated;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -89,7 +89,8 @@ import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
  * @author pkucirek
  *
  */
-public class Emme2MatsimConverter {
+@Deprecated
+public class oldEmme2MatsimConverter {
 
 	private static CoordinateTransformation coordinateTransformation;
 	private static NetworkImpl network;
@@ -98,7 +99,10 @@ public class Emme2MatsimConverter {
 	public static void main(String[] args) throws Exception{
 		List<String> args1 =  Arrays.asList(args);
 		
-		if(!(args1.size() >= 2 ) || (args1.contains("-h") || (args1.contains("help")))) printHelp();
+		if(!(args1.size() >= 2 ) || (args1.contains("-h") || (args1.contains("help")))){ 
+			printHelp();
+			return;
+		}
 		boolean isConvertingCoords = args1.contains("-a");
 		boolean isReDrawingLanes = args1.contains("-b");
 		boolean isRemovingVirtualLinks = args1.contains("-c");
@@ -324,9 +328,6 @@ public class Emme2MatsimConverter {
 		
 	}
 	
-	/**
-	 * Currently broken, something with my WKT definition of NAD83_UTM17N doesn't work. But should work for other jurisdictions.
-	 */
 	private static void convertCoordinates(){
 		for(Node n : network.getNodes().values()){
 			coordinateTransformation.transform(n.getCoord());
