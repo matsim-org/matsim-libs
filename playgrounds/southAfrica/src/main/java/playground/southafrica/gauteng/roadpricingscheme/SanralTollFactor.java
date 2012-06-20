@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
 public abstract class SanralTollFactor {
-	private final static int carStartId = 1;
+	private final static int carStartId = 0;
 	private final static int carEndId = 157517;
 	private final static int comStartId = 1000000;
 	private final static int comEndId = 1009999;
