@@ -25,8 +25,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.vsptelematics.ha2.RouteTTObserver;
-
 
 /**
  * @author dgrether
@@ -73,12 +71,12 @@ public class Controller {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				Controler con = event.getControler();
-				final RouteTTObserver observer = new RouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
-				con.addControlerListener(observer);
-				con.getEvents().addHandler(observer);
 				double equipmentFraction = Double.parseDouble(event.getControler().getConfig().getParam("telematics", "equipmentRate"));
 				String type = event.getControler().getConfig().getParam("telematics", "infotype");
-				GuidanceMobsimFactory mobsimFactory = new GuidanceMobsimFactory(type, equipmentFraction, event.getControler().getControlerIO().getOutputFilename("guidance.txt"));
+				final GuidanceRouteTTObserver observer = new GuidanceRouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
+				con.addControlerListener(observer);
+				con.getEvents().addHandler(observer);
+				GuidanceMobsimFactory mobsimFactory = new GuidanceMobsimFactory(type, equipmentFraction, event.getControler().getControlerIO().getOutputFilename("guidance.txt"), observer);
 				event.getControler().addControlerListener(mobsimFactory);
 				event.getControler().setMobsimFactory(mobsimFactory);
 			}});

@@ -41,12 +41,14 @@ public class GuidanceAgentFactory implements AgentFactory {
 	private double equipmentFraction;
 	private Random random;
 	private Guidance guidance;
+	private GuidanceRouteTTObserver ttObserver;
 
-	public GuidanceAgentFactory(final Netsim simulation, double equipmentFraction, Guidance guidance) {
+	public GuidanceAgentFactory(final Netsim simulation, double equipmentFraction, Guidance guidance, GuidanceRouteTTObserver ttObserver) {
 		this.simulation = simulation;
 		this.equipmentFraction = equipmentFraction;
 		this.random = MatsimRandom.getLocalInstance();
 		this.guidance = guidance;
+		this.ttObserver = ttObserver;
 	}
 	
 	@Override
@@ -55,9 +57,11 @@ public class GuidanceAgentFactory implements AgentFactory {
 		MobsimDriverAgent agent = null;
 		if (r < equipmentFraction){
 			agent = new GuidanceWithindayAgent(p, this.simulation, this.guidance);
+			this.ttObserver.addGuidedAgentId(p.getId());
 		}
 		else {
 			agent = new PersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation); 
+			this.ttObserver.addUnGuidedAgentId(p.getId());
 		}
 		return agent;
 	}

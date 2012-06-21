@@ -48,11 +48,13 @@ public class GuidanceMobsimFactory implements MobsimFactory, ShutdownListener {
 	private Guidance guidance = null;
 	private String type;
 	private String outfile;
+	private GuidanceRouteTTObserver ttObserver;
 
-	public GuidanceMobsimFactory(String type, double equipmentFraction, String outfile) {
+	public GuidanceMobsimFactory(String type, double equipmentFraction, String outfile, GuidanceRouteTTObserver ttObserver) {
 		this.equipmentFraction = equipmentFraction;
 		this.type = type;
 		this.outfile = outfile;
+		this.ttObserver = ttObserver;
 	}
 	
 	private void initGuidance(Network network){
@@ -93,7 +95,7 @@ public class GuidanceMobsimFactory implements MobsimFactory, ShutdownListener {
 		this.initGuidance(sc.getNetwork());
 		eventsManager.addHandler(this.guidance);
 		qSim.addQueueSimulationListeners(this.guidance);
-		AgentFactory agentFactory = new GuidanceAgentFactory(qSim, equipmentFraction, this.guidance);
+		AgentFactory agentFactory = new GuidanceAgentFactory(qSim, equipmentFraction, this.guidance, this.ttObserver);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory,
 				qSim);
 		qSim.addAgentSource(agentSource);
