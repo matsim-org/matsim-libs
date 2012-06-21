@@ -120,7 +120,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 	}
 	
 	public int getFreeCapacity(Id facilityId) {
-		return facilityCapacities.get(facilityId);
+		return facilityCapacities.get(facilityId)-reservedCapcities.get(facilityId);
 	}
 
 	public void parkVehicle(Id facilityId) {
