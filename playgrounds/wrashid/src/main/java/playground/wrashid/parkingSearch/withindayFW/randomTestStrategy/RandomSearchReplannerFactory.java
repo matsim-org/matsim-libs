@@ -25,7 +25,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 
 public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
 

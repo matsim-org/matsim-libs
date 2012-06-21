@@ -19,44 +19,35 @@
 
 package playground.wrashid.parkingSearch.withindayFW.parkingTracker;
 
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import java.util.HashMap;
 
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
-/**
- * If we have car1-park1-walk1-act-walk2-park2-car2, this class needs to capture
- * the activity start time of park1.
- * 
- * @author wrashid
- * 
- */
-public class UpdatePreviousParkingArrivalTime implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class CaptureFirstCarDepartureTimeOfDay implements AgentDepartureEventHandler {
 
-	private ParkingAgentsTracker parkingAgentsTracker;
-
-	public UpdatePreviousParkingArrivalTime(ParkingAgentsTracker parkingAgentsTracker) {
-		this.parkingAgentsTracker = parkingAgentsTracker;
+	HashMap<Id, Double> firstCarDepartureTime;
+	
+	public CaptureFirstCarDepartureTimeOfDay(){
+		firstCarDepartureTime=new HashMap<Id, Double>();
 	}
-
+	
+	public Double getTime(Id agentId){
+		return firstCarDepartureTime.get(agentId);
+	}
+	
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
+		firstCarDepartureTime.clear();
 	}
 
 	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		// TODO Auto-generated method stub
-
+	public void handleEvent(AgentDepartureEvent event) {
+		Id personId = event.getPersonId();
+		if (!firstCarDepartureTime.containsKey(personId)){
+			firstCarDepartureTime.put(personId, event.getTime());
+		}
 	}
 
 }

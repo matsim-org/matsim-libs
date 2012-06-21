@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withinday;
+package playground.wrashid.parkingSearch.withindayFW.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -208,6 +208,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		
 		for (Id facilityId : facilityToLinkMapping.keySet()) {
 			// set initial capacity
+			// TODO: read in proper facility capacity!
 			facilityCapacities.set(facilityId, 1000);
 			reservedCapcities.set(facilityId, 0);
 		}

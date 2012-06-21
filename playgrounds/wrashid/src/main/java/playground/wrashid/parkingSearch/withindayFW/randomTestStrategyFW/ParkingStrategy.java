@@ -6,7 +6,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
-import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 public class ParkingStrategy {
 

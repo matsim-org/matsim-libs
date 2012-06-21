@@ -34,7 +34,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
-import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 /**
  * Creates agents for the QSim. Agents' vehicles are add to the parking

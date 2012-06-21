@@ -44,6 +44,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.utils.EditRoutes;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 public class InsertParkingActivities implements PlanAlgorithm {
 

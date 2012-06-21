@@ -46,7 +46,7 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 	private Map<Id, Integer> lastParkingActivityPlanElemIndex;
 	private Map<Id, Double> activityDurationTmpValue;
 
-	CaptureLastActivityDurationOfDay(Map<Id, ExperimentalBasicWithindayAgent> agents,
+	public CaptureLastActivityDurationOfDay(Map<Id, ExperimentalBasicWithindayAgent> agents,
 			Map<Id, Integer> firstParkingActivityPlanElemIndex, Map<Id, Integer> lastParkingActivityPlanElemIndex) {
 		this.agents = agents;
 		this.firstParkingActivityPlanElemIndex = firstParkingActivityPlanElemIndex;

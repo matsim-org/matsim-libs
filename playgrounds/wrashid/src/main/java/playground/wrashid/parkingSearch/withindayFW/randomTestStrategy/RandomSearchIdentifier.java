@@ -35,8 +35,8 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 import playground.wrashid.lib.DebugLib;
-import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 
 public class RandomSearchIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {

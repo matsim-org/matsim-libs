@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW.parkingTracker;
+package playground.wrashid.parkingSearch.withindayFW.core;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -74,9 +74,15 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.obj.event.EventHandlerCodeSeparator;
 import playground.wrashid.parkingChoice.ParkingManager;
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
-import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureDurationOfLastParkingOfDay;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureFirstCarDepartureTimeOfDay;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureLastActivityDurationOfDay;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureParkingWalkTimesDuringDay;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CapturePreviousActivityDurationDuringDay;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureWalkDurationOfFirstAndLastOfDay;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateEndTimeOfPreviousActivity;
+import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateLastParkingArrivalTime;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
@@ -99,7 +105,6 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	private final Scenario scenario;
 	private final double distance;
-
 	private ParkingOccupancyStats parkingOccupancy;
 	private final Set<Id> carLegAgents;
 	private final Set<Id> searchingAgents;
@@ -125,13 +130,6 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	private Map<Id, Double> endTimeOfPreviousActivity = new HashMap<Id, Double>();
 
 	private Map<Id, Double> firstParkingWalkTimeOfDay = new HashMap<Id, Double>();
-	private Map<Id, Double> lastParkingWalkTimeOfDay = new HashMap<Id, Double>();
-
-	private Map<Id, Double> durationFirstParkingWalkOfDay = new HashMap<Id, Double>();
-	private Map<Id, Double> durationLastParkingWalkOfDay = new HashMap<Id, Double>();
-
-	private Map<Id, Double> firstCarDepartureTimeOfDay = new HashMap<Id, Double>();
-	// private CaptureFacilityIdOfLastParking lastParkingFacilityIdOfDay;
 
 	private Map<Id, Integer> firstParkingActivityPlanElemIndex = new HashMap<Id, Integer>();
 	private Map<Id, Integer> lastParkingActivityPlanElemIndex = new HashMap<Id, Integer>();
@@ -142,6 +140,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	private CapturePreviousActivityDurationDuringDay previousActivityDurationDuringDay;
 
 	private CaptureLastActivityDurationOfDay durationOfLastActivityOfDay;
+	private CaptureFirstCarDepartureTimeOfDay firstCarDepartureTimeOfDay;
 
 	/**
 	 * Tracks agents' car legs and check whether they have to start their
@@ -207,6 +206,9 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		this.durationOfLastActivityOfDay = new CaptureLastActivityDurationOfDay(agents, firstParkingActivityPlanElemIndex,
 				lastParkingActivityPlanElemIndex);
 		addHandler(this.durationOfLastActivityOfDay);
+		
+		this.firstCarDepartureTimeOfDay= new CaptureFirstCarDepartureTimeOfDay();
+		addHandler(this.firstCarDepartureTimeOfDay);
 	}
 
 	public Set<Id> getSearchingAgents() {
@@ -563,7 +565,6 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		getSearchStartTime().remove(personId);
 
 		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime);
-		
 
 		DebugLib.traceAgent(personId);
 	}

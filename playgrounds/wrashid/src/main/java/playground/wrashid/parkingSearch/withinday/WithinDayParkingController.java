@@ -45,6 +45,7 @@ import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.parkingSearch.mobsim.ParkingQSimFactory;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener {
 

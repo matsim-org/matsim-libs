@@ -43,7 +43,7 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 	private final Map<Id, Integer> firstParkingActivityPlanElemIndex;
 	private final Map<Id, Integer> lastParkingActivityPlanElemIndex;
 
-	CaptureWalkDurationOfFirstAndLastOfDay(Map<Id, ExperimentalBasicWithindayAgent> agents,
+	public CaptureWalkDurationOfFirstAndLastOfDay(Map<Id, ExperimentalBasicWithindayAgent> agents,
 			Map<Id, Integer> firstParkingActivityPlanElemIndex, Map<Id, Integer> lastParkingActivityPlanElemIndex) {
 		this.agents = agents;
 		this.firstParkingActivityPlanElemIndex = firstParkingActivityPlanElemIndex;

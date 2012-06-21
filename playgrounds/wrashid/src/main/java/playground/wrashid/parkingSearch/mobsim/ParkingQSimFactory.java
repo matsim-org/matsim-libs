@@ -40,7 +40,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
-import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 /**
  * This class is basically a copy of QSimFactory but instead of a

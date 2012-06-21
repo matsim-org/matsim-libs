@@ -38,7 +38,7 @@ public class UpdateLastParkingArrivalTime implements AgentArrivalEventHandler {
 	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
 	private final Map<Id, Double> lastParkingArrivalTime;
 
-	UpdateLastParkingArrivalTime(Map<Id, ExperimentalBasicWithindayAgent> agents) {
+	public UpdateLastParkingArrivalTime(Map<Id, ExperimentalBasicWithindayAgent> agents) {
 		this.agents = agents;
 		this.lastParkingArrivalTime = new HashMap<Id, Double>();
 	}

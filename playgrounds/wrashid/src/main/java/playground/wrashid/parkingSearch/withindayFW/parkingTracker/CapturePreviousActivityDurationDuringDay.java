@@ -49,7 +49,7 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 	private Map<Id, Integer> lastParkingActivityPlanElemIndex;
 	private Map<Id, Double> activityDurationTmpValue;
 
-	CapturePreviousActivityDurationDuringDay(Map<Id, ExperimentalBasicWithindayAgent> agents,
+	public CapturePreviousActivityDurationDuringDay(Map<Id, ExperimentalBasicWithindayAgent> agents,
 			Map<Id, Integer> firstParkingActivityPlanElemIndex, Map<Id, Integer> lastParkingActivityPlanElemIndex) {
 		this.agents = agents;
 		this.firstParkingActivityPlanElemIndex = firstParkingActivityPlanElemIndex;
