@@ -4,7 +4,7 @@
 
 <!-- Author: Christoph Dobler -->
 
-<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation, duringLegRerouting, pickupAgents, fuzzyTravelTimes, informAgents)>
+<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation, duringLegRerouting, pickupAgents, fuzzyTravelTimes, informAgents, roadConditions)>
 
 <!ELEMENT evacuationTime	EMPTY>
 <!ATTLIST evacuationTime
@@ -73,3 +73,8 @@
 <!ELEMENT informAgents	EMPTY>
 <!ATTLIST informAgents
 			rayleighSigma		CDATA	#REQUIRED>
+			
+<!ELEMENT roadConditions	EMPTY>
+<!ATTLIST roadConditions
+			capacityFactor		CDATA	#REQUIRED
+			speedFactor			CDATA	#REQUIRED>

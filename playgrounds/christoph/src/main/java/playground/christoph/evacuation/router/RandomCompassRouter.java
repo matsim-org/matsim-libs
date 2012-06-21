@@ -244,7 +244,7 @@ public class RandomCompassRouter implements IntermodalLeastCostPathCalculator {
 		 */
 		if (nextLinkNode.equals(toNode)) return 0.0;
 		
-		double cosPhi = (v1x*v2x + v1y*v2y)/(Math.sqrt(Math.pow(v1x,2) + Math.pow(v1y,2)) * Math.sqrt(Math.pow(v2x,2) + Math.pow(v2y,2)));
+		double cosPhi = (v1x*v2x + v1y*v2y)/(Math.sqrt(v1x*v1x + v1y*v1y) * Math.sqrt(v2x*v2x + v2y*v2y));
 		
 //		double phi = Math.acos(cosPhi);
 		double phi = acosProvider.getAcos(cosPhi);

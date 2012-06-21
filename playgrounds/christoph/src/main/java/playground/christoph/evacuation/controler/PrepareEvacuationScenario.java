@@ -43,6 +43,7 @@ import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 /**
  * Prepares a scenario to be used in an evacuation simulation.
  * <ul>
+ * 	<li>adapt network capacities and speeds</li>
  * 	<li>connect facilities to network</li>
  * 	<li>add exit links to network</li>
  * 	<li>add pickup facilities</li>
@@ -56,6 +57,16 @@ public class PrepareEvacuationScenario {
 		Config config = scenario.getConfig();
 		Network network = scenario.getNetwork();
 		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities(); 
+		
+		/*
+		 * Adapt network capacities and speeds.
+		 * So far we do not support time dependent capacities/speeds.
+		 */
+		for (Link link : network.getLinks().values()) {
+
+			if (EvacuationConfig.capacityFactor != 1.0) link.setCapacity(link.getCapacity() * EvacuationConfig.capacityFactor);
+			if (EvacuationConfig.speedFactor != 1.0) link.setFreespeed(link.getFreespeed() * EvacuationConfig.speedFactor);
+		}
 		
 		// connect facilities to links
 		new WorldConnectLocations(config).connectFacilitiesWithLinks(facilities, (NetworkImpl) network);

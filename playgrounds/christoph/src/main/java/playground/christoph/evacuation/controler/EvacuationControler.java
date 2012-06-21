@@ -259,10 +259,11 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
 		legModeChecker.printStatistics();
-		
+				
 		/*
 		 * Prepare the scenario:
 		 * 	- connect facilities to network
+		 *  - adapt network capacities and speeds
 		 * 	- add exit links to network
 		 * 	- add pickup facilities
 		 *  - add z Coordinates to network

@@ -48,6 +48,9 @@ public class EvacuationConfig {
 	
 	public static double informAgentsRayleighSigma = 300.0;
 	
+	public static double capacityFactor = 1.0;
+	public static double speedFactor = 1.0;
+	
 	/*
 	 * Analysis modules
 	 */
@@ -88,5 +91,7 @@ public class EvacuationConfig {
 		log.info("create evacuation time picture:\t" + createEvacuationTimePicture);
 		log.info("count agents in evacuation are:\t" + countAgentsInEvacuationArea);
 		log.info("sigma for inform-agents Rayleigh function:\t" + informAgentsRayleighSigma);
+		log.info("Network capacity factor:\t" + capacityFactor);
+		log.info("Network speed factor:\t" + speedFactor);
 	}
 }

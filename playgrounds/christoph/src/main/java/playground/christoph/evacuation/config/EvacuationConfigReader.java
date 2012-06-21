@@ -48,6 +48,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String PICKUPAGENTS = "pickupagents";
 	public static String FUZZYTRAVELTIMES = "fuzzytraveltimes";
 	public static String INFORMAGENTS = "informagents";
+	public static String ROADCONDITIONS = "roadconditions";
 	
 	public static String TIME = "time";
 	public static String X = "x";
@@ -67,7 +68,9 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String BEHAVIOUR = "behaviour";
 	public static String ENABLED = "enabled";
 	public static String RAYLEIGHSIGMA = "rayleighSigma";
-	
+	public static String CAPACITYFACTOR = "capacityFactor";
+	public static String SPEEDFACTOR = "speedFactor";
+		
 	private String path = "";
 	private boolean readVehicleFleet = false;
 	private boolean readEvacuationArea = false;
@@ -159,6 +162,18 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			double value = Double.valueOf(atts.getValue(RAYLEIGHSIGMA));
 			if (value < 0.1) value = 0.1;
 			EvacuationConfig.informAgentsRayleighSigma = value;
+		} else if (ROADCONDITIONS.equalsIgnoreCase(name)) {
+			double value;
+			
+			value = Double.valueOf(atts.getValue(CAPACITYFACTOR));
+			if (value < 0.0) value = 1.0;
+			else if (value > 1.0) log.warn("Network capacity factor > 1.0 was found: " + value);
+			EvacuationConfig.capacityFactor = value;
+			
+			value = Double.valueOf(atts.getValue(SPEEDFACTOR));
+			if (value < 0.0) value = 1.0;
+			else if (value > 1.0) log.warn("Network speed factor > 1.0 was found: " + value);
+			EvacuationConfig.speedFactor = value;			
 		} else {
 			log.warn("Ignoring startTag: " + name);
 		}

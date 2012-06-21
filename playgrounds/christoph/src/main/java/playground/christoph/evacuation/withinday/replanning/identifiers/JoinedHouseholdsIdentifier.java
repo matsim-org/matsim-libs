@@ -408,7 +408,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		if (rand == 0.0) return 0.0;
 		else if (rand > upperLimit) rand = upperLimit;
 		
-		return Math.floor(Math.sqrt(-2 * Math.pow(sigma, 2) * Math.log(1 - rand)));	
+		return Math.floor(Math.sqrt(-2 * sigma*sigma * Math.log(1 - rand)));	
 	}
 	
 	/*
