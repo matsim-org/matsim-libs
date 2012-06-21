@@ -233,7 +233,7 @@ public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnd
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(this.gexfContainer, bufout);
 			bufout.close();
-			log.info("Output written to " + filename);
+//			log.info("Output written to " + filename);
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {

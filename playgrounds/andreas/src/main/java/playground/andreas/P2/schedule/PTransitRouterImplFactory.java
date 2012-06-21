@@ -50,6 +50,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.stats.GexfPStat;
+import playground.andreas.P2.stats.GexfPStatLight;
 import playground.andreas.P2.stats.Line2GexfPStat;
 import playground.andreas.P2.stats.PCoopLogger;
 import playground.andreas.P2.stats.PStats;
@@ -89,6 +90,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		controler.addControlerListener(new PCoopLogger(this.pBox, pConfig));
 		controler.addControlerListener(new GexfPStat(pConfig, false));
 //		controler.addControlerListener(new GexfPStat(pConfig, true));
+		controler.addControlerListener(new GexfPStatLight(pConfig));
 		controler.addControlerListener(new Line2GexfPStat(pConfig));
 	}
 
