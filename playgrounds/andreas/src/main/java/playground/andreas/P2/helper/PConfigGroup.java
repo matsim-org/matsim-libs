@@ -112,7 +112,7 @@ public class PConfigGroup extends Module{
 	private boolean logCoops = false;
 	private int writeGexfStatsInterval = 0;
 	private String routeProvider = "SimpleCircleScheduleProvider";
-	private double randomStopProviderGridSize = 0.0;
+	private double randomStopProviderGridSize = Double.MAX_VALUE;
 	private boolean useAdaptiveNumberOfCooperatives = false;
 	private double shareOfCooperativesWithProfit = 0.50;
 	private boolean reRouteAgentsStuck = false;
