@@ -75,6 +75,8 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". To Few vehicles.");
 			return null;
 		}
 		
@@ -89,7 +91,8 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 		// draw a random stop from the candidates-list
 		TransitStopFacility newStop = this.drawStop(newHullInteriorStops);
 		if(newStop == null){
-			log.error("can not create a new route for cooperative " + cooperative.getId() + ", because there is no unused stop in the convex hull of the old route. returning old plan...");
+			log.error("can not create a new route for cooperative " + cooperative.getId() + " in iteration " + cooperative.getCurrentIteration() +
+					", because there is no unused stop in the convex hull of the old route.");
 			return null;
 		}else{
 			// create a new plan 
@@ -111,7 +114,8 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 																		new IdImpl(cooperative.getCurrentIteration())));
 			
 			if(cooperative.getFranchise().planRejected(newPlan)){
-				// plan is rejected by franchise system
+				log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+						cooperative.getCurrentIteration() + ". rejected by franchise.");
 				return null;
 			}
 			
@@ -130,7 +134,8 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 		List<List<TransitStopFacility>> subrouteFacilities = this.findSubroutes(cooperative, newStop);
 		List<Double> avDist = calcAvDist(subrouteFacilities, newStop);
 		if(avDist.size() > cooperative.getBestPlan().getStopsToBeServed().size()){
-			log.error("more subroutes then stops2Serve were found. can not create a new Route.");
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". more subroutes then expected were found.");
 			return null;
 		}
 		
@@ -232,9 +237,6 @@ public class RectangleHullRouteExtension extends PStrategy implements PPlanStrat
 		c[1] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(-1*height, normal)));
 		c[2] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(height, normal)));
 		c[3] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(-1*height, normal)));
-//		for(Coordinate cc: c){
-//			log.error(cc);
-//		}
 		
 		GeometryFactory f = new GeometryFactory();
 		return f.createMultiPoint(c).convexHull();

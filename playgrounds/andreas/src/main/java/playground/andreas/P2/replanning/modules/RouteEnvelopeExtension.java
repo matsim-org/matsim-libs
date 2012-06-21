@@ -71,6 +71,8 @@ public class RouteEnvelopeExtension extends PStrategy implements PPlanStrategy{
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". To Few vehicles.");
 			return null;
 		}
 		
@@ -85,7 +87,8 @@ public class RouteEnvelopeExtension extends PStrategy implements PPlanStrategy{
 		// draw a random stop from the candidates-list
 		TransitStopFacility newStop = this.drawStop(newEnvelopeInteriorStops);
 		if(newStop == null){
-			log.info("can not create a new route for cooperative " + cooperative.getId() + ", because there is no unused stop in the envelope of the old route. returning NULL...");
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". No unused stop in the envelope of the old route.");
 			return null;
 		}else{
 			// create a new plan 
@@ -107,7 +110,8 @@ public class RouteEnvelopeExtension extends PStrategy implements PPlanStrategy{
 																		new IdImpl(cooperative.getCurrentIteration())));
 			
 			if(cooperative.getFranchise().planRejected(newPlan)){
-				// plan is rejected by franchise system
+				log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+						cooperative.getCurrentIteration() + ". rejected by franchise.");
 				return null;
 			}
 			
@@ -126,7 +130,8 @@ public class RouteEnvelopeExtension extends PStrategy implements PPlanStrategy{
 		List<List<TransitStopFacility>> subrouteFacilities = this.findSubroutes(cooperative, newStop);
 		List<Double> avDist = calcAvDist(subrouteFacilities, newStop);
 		if(avDist.size() > cooperative.getBestPlan().getStopsToBeServed().size()){
-			log.error("more subroutes then stops2Serve were found. can not create a new Route.");
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". more subroutes then expected were found.");
 			return null;
 		}
 		

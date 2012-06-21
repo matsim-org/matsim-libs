@@ -71,7 +71,7 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 			if((d >= 0.0) && (d <= 1.0)){
 				this.distanceFactor = d; 
 			}else{
-				log.error("the parameter should be a double between 0.0 and 1.0... set the distancefactor to 0.5");
+				log.warn("the parameter should be a double between 0.0 and 1.0... set the distancefactor to 0.5");
 				this.distanceFactor = 0.5;
 			}
 		}
@@ -83,6 +83,8 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		if (cooperative.getBestPlan().getNVehicles() <= 1) {
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". to few vehicles.");
 			return null;
 		}
 		
@@ -105,7 +107,8 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 																	new IdImpl(cooperative.getCurrentIteration())));
 		
 		if(cooperative.getFranchise().planRejected(newPlan)){
-			// plan is rejected by franchise system
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". rejected by franchise.");
 			return null;
 		}
 		
@@ -118,10 +121,6 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 	 * @return
 	 */
 	private List<TransitStopFacility> createNewStopsToServe(Cooperative cooperative, QuadTree<TransitStopFacility> tree) {
-		if (cooperative.getBestPlan().getNVehicles() <= 1) {
-			return null;
-		}
-		
 		List<TransitStopFacility> stops2serve = new ArrayList<TransitStopFacility>();
 		stops2serve.addAll(cooperative.getBestPlan().getStopsToBeServed());
 		
@@ -141,14 +140,16 @@ public class RandomRouteEndExtension extends PStrategy implements PPlanStrategy{
 		Integer indexStopInGreatestDistance = findStopInGreatestDistance(stops2serve);
 		if(indexStopInGreatestDistance == null){
 			// normally this should not happen, because there have to be at least 2 stops...
-			log.error("can not find a second stop. returning original stops2serve...");
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". can not find a second stop");
 			stops2serve = null;
 		}else{
 			//find candidate-stops which are within a specified area and not served already...
 			Collection<TransitStopFacility> candidates = findCandidates(alreadyServed, stops2serve.get(indexStopInGreatestDistance));
 			if(candidates.size() == 0){
 				// should only happen if the end of the route is at the periphery of the network
-				log.error("there is no unserved stop within the specified distance. can not add a new stop. returning original stops2serve...");
+				log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+						cooperative.getCurrentIteration() + ". No unserved stop within the specified distance.");
 				stops2serve = null;
 			}else{
 				stops2serve = addCandidate(candidates, stops2serve, indexStopInGreatestDistance);
