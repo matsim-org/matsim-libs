@@ -145,11 +145,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public final void notifyMoveOverNode(Id newLinkId) {
-		if (! this.cachedNextLinkId.equals(newLinkId)) {
+		if (!newLinkId.equals(this.cachedNextLinkId)) {
 			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " +
 					"anyway ...") ;
 		}
-		this.currentLinkId = this.cachedNextLinkId;
+		this.currentLinkId = newLinkId;
 		this.currentLinkIdIndex++;
 		this.cachedNextLinkId = null; //reset cached nextLink
 	}
