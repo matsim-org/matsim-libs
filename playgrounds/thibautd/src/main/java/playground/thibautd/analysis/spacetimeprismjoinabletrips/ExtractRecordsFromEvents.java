@@ -50,8 +50,8 @@ public class ExtractRecordsFromEvents {
 	// private static final Level LOG_LEVEL = Level.TRACE;
 	private static final Level LOG_LEVEL = Level.DEBUG;
 
-	private static final double DETOUR_FRAC = 0.50;
-	private static final double TIME_WINDOW_RADIUS = 0.5 * 3600;
+	private static final double DETOUR_FRAC = 0.25;
+	private static final double TIME_WINDOW_RADIUS = 0.25 * 3600;
 
 	public static void main(final String[] args) {
 		String networkFile = args[0];
@@ -66,8 +66,8 @@ public class ExtractRecordsFromEvents {
 		Network network = getNetwork( networkFile );
 		TripsPrism prism = new TripsPrism( records , network );
 
-		RecordsFlatFormatWriter.writeRecords( records , outPrefix+"records.dat" );
-		RecordsFlatFormatWriter writer = new RecordsFlatFormatWriter( outPrefix+"passengerTrips.dat" );
+		RecordsFlatFormatWriter.writeRecords( records , outPrefix+"records.dat.gz" );
+		RecordsFlatFormatWriter writer = new RecordsFlatFormatWriter( outPrefix+"passengerTrips.dat.gz" );
 		Counter counter = new Counter( "--- searching passengers for record # " );
 		for (Record record : records) {
 			counter.incCounter();
