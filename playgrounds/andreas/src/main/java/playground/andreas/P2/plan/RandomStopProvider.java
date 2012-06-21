@@ -20,6 +20,7 @@
 package playground.andreas.P2.plan;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -124,10 +125,10 @@ public class RandomStopProvider {
 
 
 	public TransitStopFacility getRandomTransitStop(int currentIteration) {
-		if (lastIteration != currentIteration) {
+		if (this.lastIteration != currentIteration) {
 			this.updateWeights();
 			this.writeToFile(currentIteration);
-			lastIteration = currentIteration;
+			this.lastIteration = currentIteration;
 		}
 		
 		if (this.totalWeight == 0.0) {
@@ -161,7 +162,13 @@ public class RandomStopProvider {
 			return;
 		}
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + currentIteration + ".stopId2stopWeight.txt.gz");
+			if (this.lastIteration == -1) {
+				// init output dir
+				this.outputDir = this.outputDir + "/" + "stopId2stopWeight" + "/";
+				new File(this.outputDir).mkdir();
+			}
+			
+			BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + currentIteration + ".stopId2stopWeight.txt.gz");
 			writer.write("# stop id; weight"); writer.newLine();
 			for (Entry<TransitStopFacility, Double> stopEntry : this.stops2Weight.entrySet()) {
 				writer.write(stopEntry.getKey().getId().toString() + "; " + stopEntry.getValue().toString()); writer.newLine();
