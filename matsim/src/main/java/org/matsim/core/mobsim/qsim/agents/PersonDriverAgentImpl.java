@@ -55,6 +55,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
+	private static int expectedLinkWarnCount = 0;
+	
 	final Person person;
 
 	private MobsimVehicle vehicle;
@@ -145,9 +147,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public final void notifyMoveOverNode(Id newLinkId) {
-		if (!newLinkId.equals(this.cachedNextLinkId)) {
+		if (expectedLinkWarnCount < 10 && !newLinkId.equals(this.cachedNextLinkId)) {
 			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " +
-					"anyway ...") ;
+					"anyway ... This warning is suppressed after the first 10 warnings.") ;
+			expectedLinkWarnCount++;
 		}
 		this.currentLinkId = newLinkId;
 		this.currentLinkIdIndex++;
