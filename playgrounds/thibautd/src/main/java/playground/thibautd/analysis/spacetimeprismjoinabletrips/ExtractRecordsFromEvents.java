@@ -67,7 +67,7 @@ public class ExtractRecordsFromEvents {
 		TripsPrism prism = new TripsPrism( records , network );
 
 		RecordsFlatFormatWriter.writeRecords( records , outPrefix+"records.dat" );
-		RecordsFlatFormatWriter writer = new RecordsFlatFormatWriter( outPrefix+"passengerTrips.dat" );
+		RecordsFlatFormatWriter writer = new RecordsFlatFormatWriter( outPrefix+"passengerTrips.dat.gz" );
 		Counter counter = new Counter( "--- searching passengers for record # " );
 		for (Record record : records) {
 			counter.incCounter();
