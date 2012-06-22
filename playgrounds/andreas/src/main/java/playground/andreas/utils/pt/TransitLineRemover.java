@@ -40,6 +40,7 @@ public class TransitLineRemover {
 		final String NO_TXL_SCHEDULE_FILE = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_noTxlBusLines.xml.gz";
 		final String TXL_BUS_LINES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_onlyTxlBusLines.xml.gz";
 		final String NO_BVG_BUSES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_noBvgBusLines.xml.gz";
+		final String ONLY_BVG_BUSES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_onlyBvgBusLines.xml.gz";
 		
 		Coord minCoord = new CoordImpl(4587744.0, 5824664.0);
 		Coord maxCoord = new CoordImpl(4588400.0, 5825400.0);
@@ -83,6 +84,15 @@ public class TransitLineRemover {
 		}
 		TransitSchedule noBvgBusLinesSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, buslines);
 		new TransitScheduleWriterV1(noBvgBusLinesSchedule).write(NO_BVG_BUSES);
+		
+		Set<Id> noBuslines = new TreeSet<Id>();
+		for (Id lineId : baseCaseTransitSchedule.getTransitLines().keySet()) {
+			if (!lineId.toString().contains("-B-")) {
+				noBuslines.add(lineId);
+			}
+		}
+		TransitSchedule onlyBvgBusLinesSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, noBuslines);
+		new TransitScheduleWriterV1(onlyBvgBusLinesSchedule).write(ONLY_BVG_BUSES);
 	}
 	
 	public static Set<Id> getLinesServingTheseStops(TransitSchedule transitSchedule, Set<Id> stopIds){
