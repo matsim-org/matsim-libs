@@ -69,8 +69,9 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
@@ -619,7 +620,8 @@ public class CreateMarathonPopulation {
 
 		MultiModalTravelTimeWrapper wrapper = multiModalTravelTimeFactory.createTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(wrapper, scenario.getConfig().planCalcScore());
-		Dijkstra dijkstra = new FastDijkstra(network, cost, wrapper);
+		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
+		Dijkstra dijkstra = (Dijkstra) routerFactory.createPathCalculator(network, cost, wrapper);
 		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), wrapper, dijkstra);
 		
 		Counter counterRemove = new Counter("persons to remove ");

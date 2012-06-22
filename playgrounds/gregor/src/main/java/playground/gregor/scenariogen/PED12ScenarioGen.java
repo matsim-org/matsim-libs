@@ -1243,7 +1243,12 @@ public class PED12ScenarioGen {
 		for (int i = 0; i < stair.size(); i++) {
 			coords[i] = stair.get(i);
 		}
-
+//		Coordinate [] coords = new Coordinate[2*stair.size()];
+//		for (int i = 0; i < stair.size(); i++) {
+//			coords[i] = stair.get(i);
+//			coords[2*stair.size() - 1 - i] = stair.get(i);
+//		}
+//		
 		LineString ls = geofac.createLineString(coords);
 		GisDebugger.addGeometry(ls, string);
 

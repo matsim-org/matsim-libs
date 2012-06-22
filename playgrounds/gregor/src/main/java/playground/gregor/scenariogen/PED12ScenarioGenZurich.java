@@ -67,8 +67,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -125,7 +126,7 @@ public class PED12ScenarioGenZurich {
 		// load zurich scenario
 		Config zurichConfig = ConfigUtils.createConfig();
 		zurichConfig.network().setInputFile(zurichNetwork);
-		zurichConfig.plans().setInputFile(zurichPopulation);
+//		zurichConfig.plans().setInputFile(zurichPopulation);
 		Scenario zurichScenario = ScenarioUtils.loadScenario(zurichConfig);
 				
 		// convert zurich network to multi-modal network
@@ -322,7 +323,8 @@ public class PED12ScenarioGenZurich {
 
 		MultiModalTravelTimeWrapper wrapper = multiModalTravelTimeFactory.createTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(wrapper, scenario.getConfig().planCalcScore());
-		Dijkstra dijkstra = new FastDijkstra(network, cost, wrapper);
+		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
+		Dijkstra dijkstra = (Dijkstra) routerFactory.createPathCalculator(network, cost, wrapper);
 		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), wrapper, dijkstra);
 		
 		Counter removedPersons = new Counter ("removed persons: ");
@@ -382,7 +384,8 @@ public class PED12ScenarioGenZurich {
 		Network network = scenario.getNetwork();
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs, scenario.getConfig().planCalcScore());
-		Dijkstra dijkstra = new FastDijkstra(network, cost, fs);
+		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
+		Dijkstra dijkstra = (Dijkstra) routerFactory.createPathCalculator(network, cost, fs);
 		Set<String> modes = new HashSet<String>();
 		modes.add(TransportMode.walk);
 		modes.add("walk2d");
