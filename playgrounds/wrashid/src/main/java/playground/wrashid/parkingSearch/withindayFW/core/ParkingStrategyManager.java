@@ -202,7 +202,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 				activity.getType());
 
 		if (parkingStrategies.size()==0){
-			System.out.println();
+			DebugLib.stopSystemAndReportInconsistency("for activity: '" + activity.getType() + "' no parking strategy set");
 		}
 		
 		int nextInt = MatsimRandom.getRandom().nextInt(parkingStrategies.size());

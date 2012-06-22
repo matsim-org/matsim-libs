@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.ClassUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -68,9 +69,10 @@ import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSea
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener,
-		BeforeMobsimListener {
+public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener {
 
+	protected static int currentScenarioId=2;
+	
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
@@ -150,55 +152,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 
 	}
 
-	/*
-	 * protected void initIdentifiers() {
-	 * 
-	 * this.randomSearchIdentifier = new
-	 * RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure);
-	 * this.getFixedOrderSimulationListener().addSimulationListener(this.
-	 * randomSearchIdentifier); }
-	 */
 
-	/*
-	 * New Routers for the Replanning are used instead of using the controler's.
-	 * By doing this every person can use a personalised Router.
-	 */
-	/*
-	 * protected void initReplanners() {
-	 * 
-	 * LeastCostPathCalculatorFactory factory = new
-	 * AStarLandmarksFactory(this.network, new
-	 * FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-	 * ModeRouteFactory routeFactory = ((PopulationFactoryImpl)
-	 * this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
-	 * 
-	 * // create a copy of the MultiModalTravelTimeWrapperFactory and set the
-	 * TravelTimeCollector for car mode MultiModalTravelTimeWrapperFactory
-	 * timeFactory = new MultiModalTravelTimeWrapperFactory(); for
-	 * (Entry<String, PersonalizableTravelTimeFactory> entry :
-	 * this.getMultiModalTravelTimeWrapperFactory
-	 * ().getPersonalizableTravelTimeFactories().entrySet()) {
-	 * timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(),
-	 * entry.getValue()); }
-	 * timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car,
-	 * super.getTravelTimeCollectorFactory());
-	 * 
-	 * TravelDisutilityFactory costFactory = new
-	 * OnlyTimeDependentTravelCostCalculatorFactory();
-	 * 
-	 * AbstractMultithreadedModule router = new ReplanningModule(config,
-	 * network, costFactory, timeFactory, factory, routeFactory);
-	 * 
-	 * 
-	 * 
-	 * this.randomSearchReplannerFactory = new
-	 * RandomSearchReplannerFactory(this.getReplanningManager(), router, 1.0,
-	 * this.scenarioData, parkingAgentsTracker);
-	 * this.randomSearchReplannerFactory
-	 * .addIdentifier(this.randomSearchIdentifier);
-	 * this.getReplanningManager().addDuringLegReplannerFactory
-	 * (this.randomSearchReplannerFactory); }
-	 */
 	/*
 	 * When the Controller Startup Event is created, the EventsManager has
 	 * already been initialized. Therefore we can initialize now all Objects,
@@ -295,28 +249,5 @@ public class WithinDayParkingController extends WithinDayController implements S
 		System.exit(0);
 	}
 
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		// TODO: here the parking strategy selection should happen
-		// ("parking replanning appropriate word?")
 
-		// TODO: check, if plan changed or mode changed of plan => must reset
-		// all replanning for that parking activity
-
-		double probabilityOfHighScoreStrategy = 0.9;
-
-		if (event.getIteration() > 0) {
-
-			// TODO: make function, which gives back for given agentId and
-			// activity the set of parking strategy objects back.
-			// these objects have not only the strategies in them, but also the
-			// score of each strategy
-
-			// a strategy should be general, so that it can be shared among
-			// people (only small variable part per Agent, which is stored in
-			// HashMap in strategy).
-
-		}
-
-	}
 }
