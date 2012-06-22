@@ -135,21 +135,34 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 		endTime = Math.min(endTime, 24 * 3600.0);
 		
 		// current planned headway in case number of vehicles is not changed
-		int headway = (int) (longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset() + (longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset())) / vehicleIds.size(); 
+		double departureOffset = 0.0;
+		if (longestRouteH != null) {
+			departureOffset += longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset();
+		}
+		
+		if (longestRouteR != null) {
+			departureOffset += longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset();
+		}
+		
+		int headway = (int) (departureOffset) / vehicleIds.size(); 
 		// set headway to a minimum of 1min
 		headway = Math.max(60, headway);
 		// resulting number of vehicles with the new headway
-		int nVehicles = (int) (longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset() + (longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset())) / headway;
+		int nVehicles = (int) (departureOffset) / headway;
 		
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
-		for (TransitRouteStop routeStop : longestRouteH.getStops()) {
-			if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
-				stopsToBeServed.add(routeStop.getStopFacility());
+		if (longestRouteH != null) {
+			for (TransitRouteStop routeStop : longestRouteH.getStops()) {
+				if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
+					stopsToBeServed.add(routeStop.getStopFacility());
+				}
 			}
 		}
-		for (TransitRouteStop routeStop : longestRouteR.getStops()) {
-			if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
-				stopsToBeServed.add(routeStop.getStopFacility());
+		if (longestRouteR != null) {
+			for (TransitRouteStop routeStop : longestRouteR.getStops()) {
+				if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
+					stopsToBeServed.add(routeStop.getStopFacility());
+				}
 			}
 		}
 		
