@@ -210,10 +210,10 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		LinkedList<Cooperative> initialCoops = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
 			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(firstIteration));
-			cooperatives.add(cooperative);
+			initialCoops.add(cooperative);
 		}
 		
-		for (Cooperative cooperative : this.cooperatives) {
+		for (Cooperative cooperative : initialCoops) {
 			cooperative.init(this.routeProvider, this.initialStrategy, firstIteration, this.pConfig.getInitialBudget());
 			cooperative.replan(this.strategyManager, firstIteration);
 		}
