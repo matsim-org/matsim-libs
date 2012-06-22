@@ -73,8 +73,8 @@ public class RblMerger {
 		String eventsFromTransitScheduleOutFilename = "F:/bvg4/output/eventsFromTransitScheduleOut.xml";
 		
 		Set<String> onlyTakeDeparturesFromTheseRblDates = new TreeSet<String>();
-		onlyTakeDeparturesFromTheseRblDates.add("4811");
-		
+		onlyTakeDeparturesFromTheseRblDates.add("4811");		
+
 		double timeBinSize = Double.MAX_VALUE;
 		
 		String[] fahrtDataFilenames = new String[]{
@@ -100,7 +100,47 @@ public class RblMerger {
 		
 		String rblStopsDumpFilename = "F:/bvg4/output/rblStopsDumpFile.txt";
 		String filteredTransitScheduleDumpFilename = "F:/bvg4/output/filteredTransitScheduleDumpFile.txt";
-				
+
+		// BVG Model 10% sample
+//		String scenBase = "D:/balmermi/documents/eclipse/input/BVG/scen0008/";
+//		String rawBase = "D:/balmermi/documents/eclipse/input/BVG/stability/raw/delivery_cleaned/";
+//		String inBase = "D:/balmermi/documents/eclipse/input/BVG/stability/";
+//		String outBase = "D:/balmermi/documents/eclipse/output/BVG/stability/ist/";
+//		String networkFilename = scenBase+"network/network.final.xml.gz";
+//		String transitScheduleInFilename = scenBase+"network/transitSchedule.xml.gz";
+//		String stopNamesMapFilename = inBase+"ist20120404/stopNameMap.csv";
+//		String newStopsFilename = inBase+"ist20120404/newStops.csv";
+//		String statsOutFilename = outBase+"stats.ist.txt";
+//		String transitScheduleOutFilename = outBase+"transitSchedule.ist.xml";
+//		String vehiclesOutFilename = outBase+"vehicles.ist.xml";
+//		String eventsFromTransitScheduleOutFilename = outBase+"events.transitSchedule.ist.xml";
+//		Set<String> onlyTakeDeparturesFromTheseRblDates = new TreeSet<String>();
+//		onlyTakeDeparturesFromTheseRblDates.add("4811");
+////		double timeBinSize = Double.MAX_VALUE;
+//		double timeBinSize = 3600.0;
+//		String[] fahrtDataFilenames = new String[]{
+//				rawBase+"IST_und_SOLL_03-05-Januar2012/fahrt_ist_187_478847894790csv.lst",
+//				rawBase+"IST_und_SOLL_10-12-Januar2012/fahrt_ist_187_479547964797.csv.lst", 
+//				rawBase+"IST_und_SOLL_17-19-Januar2012/fahrt_ist_187_480248034805csv.lst", 
+//				rawBase+"IST_und_SOLL_24-26-Januar2012/fahrt_ist_187_481148124814csv.lst",
+//				rawBase+"IST_und_SOLL_03-05-Januar2012/fahrt_ist_M41_478847894790csv.lst",
+//				rawBase+"IST_und_SOLL_10-12-Januar2012/fahrt_ist_M41_479547964797.csv.lst", 
+//				rawBase+"IST_und_SOLL_17-19-Januar2012/fahrt_ist_M41_480248034805csv.lst", 
+//				rawBase+"IST_und_SOLL_24-26-Januar2012/fahrt_ist_M41_481148124814csv.lst"
+//		};
+//		String[] fahrzeitDataFilenames = new String[]{
+//				rawBase+"IST_und_SOLL_03-05-Januar2012/fahrzeit_ist_187_478847894790csv.lst",
+//				rawBase+"IST_und_SOLL_10-12-Januar2012/fahrzeit_ist_187_479547964797.csv.lst", 
+//				rawBase+"IST_und_SOLL_17-19-Januar2012/fahrzeit_ist_187_480248034805csv.lst", 
+//				rawBase+"IST_und_SOLL_24-26-Januar2012/fahrzeit_ist_187_481148124814csv.lst",
+//				rawBase+"IST_und_SOLL_03-05-Januar2012/fahrzeit_ist_M41_478847894790csv.lst",
+//				rawBase+"IST_und_SOLL_10-12-Januar2012/fahrzeit_ist_M41_479547964797.csv.lst", 
+//				rawBase+"IST_und_SOLL_17-19-Januar2012/fahrzeit_ist_M41_480248034805csv.lst", 
+//				rawBase+"IST_und_SOLL_24-26-Januar2012/fahrzeit_ist_M41_481148124814csv.lst"
+//		};
+//		String rblStopsDumpFilename = outBase+"rblStopsDump.ist.txt";
+//		String filteredTransitScheduleDumpFilename = outBase+"filteredTransitScheduleDump.ist.txt";
+		// done. (BVG Model 10% sample)
 		
 		RblMerger rblMerger = new RblMerger();	
 		rblMerger.init(networkFilename, transitScheduleInFilename);
@@ -112,8 +152,8 @@ public class RblMerger {
 		fahrzeitEvents = rblMerger.addFahrtInfoToFahrzeitEvents(fahrtEvents, fahrzeitEvents, false);
 
 		// Only for debug information
-//		rblMerger.dumpRblStops(rblStopsDumpFile, fahrzeitEvents);
-//		rblMerger.dumpFilteredTransitSchedule(filteredTransitScheduleDumpFile, fahrtEvents);
+		rblMerger.dumpRblStops(rblStopsDumpFilename, fahrzeitEvents);
+		rblMerger.dumpFilteredTransitSchedule(filteredTransitScheduleDumpFilename, fahrtEvents);
 		
 		fahrzeitEvents = rblMerger.substituteStopNames(stopNamesMapFilename, fahrzeitEvents, false);
 		HashMap<Id,Map<Id,Map<Id,Map<Id,StopStatsContainer>>>> line2route2stop2StatsMap = rblMerger.accumulateData(fahrzeitEvents, timeBinSize);
