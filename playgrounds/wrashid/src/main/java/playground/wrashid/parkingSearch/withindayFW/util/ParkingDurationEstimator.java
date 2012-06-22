@@ -32,11 +32,11 @@ import playground.wrashid.lib.GeneralLib;
 public class ParkingDurationEstimator {
 
 	
-	public Double estimateParkingDurationLastParkingOfDay(double arrivalTime , double firstCarDepartureTimeOfDay){
+	public static Double estimateParkingDurationLastParkingOfDay(double arrivalTime , double firstCarDepartureTimeOfDay){
 		return GeneralLib.getIntervalDuration(arrivalTime, firstCarDepartureTimeOfDay);
 	}
 	
-	public double estimateParkingDurationDuringDay(double currentTime, List<PlanElement> planElements, int currentCarLegPlanElementIndex){
+	public static double estimateParkingDurationDuringDay(double currentTime, List<PlanElement> planElements, int currentCarLegPlanElementIndex){
 		double estimatedActduration = 0;
 		for (int i=currentCarLegPlanElementIndex+1;i<planElements.size(); i++){
 

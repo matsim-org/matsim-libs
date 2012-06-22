@@ -79,10 +79,6 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
 			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
 			
-			if (agents.get(agentId).getCurrentPlanElementIndex()==3){
-				//DebugLib.traceAgent(agentId);
-			}
-			
 			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
 				//System.out.println(agents.get(agentId).getCurrentPlanElementIndex());
 				//DebugLib.traceAgent(agentId);
@@ -93,6 +89,18 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 			 * If the agent has not selected a parking facility yet.
 			 */
 			if (requiresReplanning(agent)) {
+				
+				
+				
+				// get all parking within 1000m (of destination) or at least on parking, if that set is empty.
+				
+				// assign scores to each of the parking variants.
+				
+				// select best parking.
+				
+				// adapt driving in such a way, that 
+				
+				
 				Id linkId = agent.getCurrentLinkId();
 				Id facilityId = parkingInfrastructure.getFreeParkingFacilityOnLink(linkId,"streetParking");
 				if (facilityId != null) {

@@ -30,6 +30,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
@@ -85,19 +87,45 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 				parkingFacilities.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 				
 				// add the facility to the facilitiesOnLinkMapping
-				List<Id> list = parkingFacilitiesOnLinkMapping.get(facility.getLinkId());
-				if (list == null) {
-					list = new ArrayList<Id>();
-					parkingFacilitiesOnLinkMapping.put(facility.getLinkId(), list);
+				
+				Id linkId = facility.getLinkId();
+				Id facilityId = facility.getId();
+				assignFacilityToLink(linkId, facilityId);
+				
+				Id oppositeDirectionLinkId = getOppositeDirectionLinkId(linkId,scenario);
+				if (oppositeDirectionLinkId!=null){
+					assignFacilityToLink(oppositeDirectionLinkId, facilityId);
 				}
-				list.add(facility.getId());
 				
 				// add the facility to the facilityToLinkMapping
-				facilityToLinkMapping.put(facility.getId(), facility.getLinkId());
+				facilityToLinkMapping.put(facilityId, linkId);
 			}
 		}
 		
 		this.parkingTypes=parkingTypes;
+	}
+
+	private void assignFacilityToLink(Id linkId, Id facilityId) {
+		List<Id> list = parkingFacilitiesOnLinkMapping.get(linkId);
+		if (list == null) {
+			list = new ArrayList<Id>();
+			parkingFacilitiesOnLinkMapping.put(linkId, list);
+		}
+		list.add(facilityId);
+	}
+
+	private Id getOppositeDirectionLinkId(Id linkId, Scenario scenario) {
+		Link link = scenario.getNetwork().getLinks().get(linkId);
+		Node toNode = link.getToNode();
+		Node fromNode = link.getFromNode();
+		
+		for (Link tmpLink: scenario.getNetwork().getNodes().get(fromNode.getId()).getInLinks().values()){
+			if (tmpLink.getFromNode()==toNode){
+				return tmpLink.getId();
+			}
+		}
+		
+		return null;
 	}
 
 	@Override
