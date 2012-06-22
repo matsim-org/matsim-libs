@@ -34,7 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -72,7 +74,8 @@ public class ComposedLinkFactory implements LinkFactory {
 				return link.getLength()/link.getFreespeed();
 			}
 		};
-		leastCostPathCalculator = new FastDijkstra(baseNetwork, travelMinCost, timeFunction, preProcessData);
+		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory(preProcessData);
+		leastCostPathCalculator = (FastDijkstra) routerFactory.createPathCalculator(baseNetwork, travelMinCost, timeFunction);
 		Set<String> modes = new HashSet<String>();
 		modes.add(mode);
 		leastCostPathCalculator.setModeRestriction(modes);

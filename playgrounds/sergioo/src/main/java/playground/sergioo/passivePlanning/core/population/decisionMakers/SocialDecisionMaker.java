@@ -20,10 +20,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.Household;
@@ -226,7 +227,8 @@ public class SocialDecisionMaker implements TypeOfActivityDecisionMaker, StartTi
 		for(String mode:knownTravelTimes.keySet()) {
 			travelMinCostSimple.setMode(mode);
 			travelTimeSimple.setMode(mode);
-			LeastCostPathCalculator leastCostPathCalculator = new FastDijkstra(scenario.getSimplerNetwork(mode), travelMinCostSimple, travelTimeSimple);
+			LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
+			LeastCostPathCalculator leastCostPathCalculator = routerFactory.createPathCalculator(scenario.getSimplerNetwork(mode), travelMinCostSimple, travelTimeSimple); 
 			Path path = leastCostPathCalculator.calcLeastCostPath(((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(startLink.getCoord()).getFromNode(), ((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(endLink.getCoord()).getToNode(), time, null, null);
 			if(path.travelTime<minTime) {
 				minTime = path.travelTime;

@@ -21,33 +21,62 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastAStarLandmarks;
+import org.matsim.core.router.FastRouterDelegateFactory;
+import org.matsim.core.router.FastRouterType;
+import org.matsim.core.router.PointerFastRouterDelegateFactory;
 
 /**
  * @author cdobler
  */
 public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
-	private PreProcessLandmarks preProcessData;
+	private final FastRouterType fastRouterType;
+	private final PreProcessLandmarks preProcessData;
+	private final RoutingNetworkFactory routingNetworkFactory;
+	private RoutingNetwork routingNetwork;
 	
-	public FastAStarLandmarksFactory() {
-		// Nothing to do.
+	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc) {
+		this(network, fsttc, FastRouterType.ARRAY);
 	}
 	
-	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc){
-		processNetwork(network, fsttc);
-	}
-
-	public void processNetwork(Network network, final TravelDisutility fsttc) {
-		synchronized (this) {
-				this.preProcessData = new PreProcessLandmarks(fsttc);
-				this.preProcessData.run(network);
+	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc,
+			FastRouterType fastRouterType) {
+		this.preProcessData = new PreProcessLandmarks(fsttc);
+		this.preProcessData.run(network);
+		
+		this.fastRouterType = fastRouterType;
+		
+		if (fastRouterType == FastRouterType.ARRAY) {
+			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
+		} else if (fastRouterType == FastRouterType.POINTER) {			
+			this.routingNetworkFactory = new PointerRoutingNetworkFactory(preProcessData);
+		} else {
+			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
 	}
-	
+
 	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelDisutility travelCosts, TravelTime travelTimes) {
-		return new FastAStarLandmarks(network, this.preProcessData, travelCosts, travelTimes);
+		
+		FastRouterDelegateFactory fastRouterFactory = null;
+		RoutingNetwork rn = null;
+		
+		if (fastRouterType == FastRouterType.ARRAY) {		
+			if (this.routingNetwork == null) {
+				this.routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			}
+			rn = this.routingNetwork;
+			fastRouterFactory = new ArrayFastRouterDelegateFactory();
+		} else if (fastRouterType == FastRouterType.POINTER) {
+			// Create a new instance since routing data is stored in the network!
+			rn = this.routingNetworkFactory.createRoutingNetwork(network);
+			fastRouterFactory = new PointerFastRouterDelegateFactory();			
+		}		
+		
+		return new FastAStarLandmarks(network, this.preProcessData, travelCosts, travelTimes, 1,
+				rn, fastRouterFactory);
 	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RoutingNetworkFactory.java
+ * ArrayFastRouterDelegateFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,18 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.NodeDataFactory;
+import org.matsim.core.router.util.RoutingNetwork;
 
-public interface RoutingNetworkFactory extends NetworkFactory {
-	
-	public RoutingNetwork createRoutingNetwork(Network network);
-	
-	public RoutingNetworkNode createRoutingNetworkNode(Node node, int numOutLinks);
-	
-	public RoutingNetworkLink createRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode);
+public class PointerFastRouterDelegateFactory implements FastRouterDelegateFactory {
+
+	@Override
+	public PointerFastRouterDelegate createFastRouterDelegate(Dijkstra dijkstra,
+			NodeDataFactory nodeDataFactory, RoutingNetwork routingNetwork) {
+		return new PointerFastRouterDelegate(dijkstra, nodeDataFactory);
+	}
 }

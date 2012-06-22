@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RoutingNetworkFactory.java
+ * PointerRoutingNetworkLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,15 +21,10 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
 
-public interface RoutingNetworkFactory extends NetworkFactory {
-	
-	public RoutingNetwork createRoutingNetwork(Network network);
-	
-	public RoutingNetworkNode createRoutingNetworkNode(Node node, int numOutLinks);
-	
-	public RoutingNetworkLink createRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode);
+public class ArrayRoutingNetworkLink extends AbstractRoutingNetworkLink {
+
+	/*package*/ ArrayRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode) {
+		super(link, fromNode, toNode);
+	}
 }

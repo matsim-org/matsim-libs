@@ -20,82 +20,18 @@
 
 package org.matsim.core.router.util;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.PreProcessDijkstra.DeadEndData;
 
-public class RoutingNetworkNode implements Node {
-
-	private final Node node;
-	private RoutingNetworkLink[] outLinks;
+public interface RoutingNetworkNode extends Node {
 	
-	private DeadEndData deadEndData;
-	private NodeData nodeData;
+	public Node getNode();
+
+	public void setOutLinksArray(RoutingNetworkLink[] outLinks);
 	
-	/*package*/ RoutingNetworkNode(Node node) {
-		this.node = node;
-	}
+	public RoutingNetworkLink[] getOutLinksArray();
+
+	public void setDeadEndData(DeadEndData deadEndData);
 	
-	public Node getNode() {
-		return node;
-	}
-
-	public void setOutLinksArray(RoutingNetworkLink[] outLinks) {
-		this.outLinks = outLinks;
-	}
-	
-	public RoutingNetworkLink[] getOutLinksArray() {
-		return this.outLinks;
-	}
-
-	public void setDeadEndData(DeadEndData deadEndData) {
-		this.deadEndData = deadEndData;
-	}
-	
-	public DeadEndData getDeadEndData() {
-		return this.deadEndData;
-	}
-
-	public void setNodeData(NodeData nodeData) {
-		this.nodeData = nodeData;
-	}
-	
-	public NodeData getNodeData() {
-		return this.nodeData;
-	}
-	
-	public Id getId() {
-		return node.getId();
-	}
-
-	@Override
-	public Coord getCoord() {
-		return node.getCoord();
-	}
-
-	@Override
-	public boolean addInLink(Link link) {
-		throw new RuntimeException("Not supported operation!");
-	}
-
-	@Override
-	public boolean addOutLink(Link link) {
-		throw new RuntimeException("Not supported operation!");
-	}
-
-	@Override
-	public Map<Id, ? extends Link> getInLinks() {
-		throw new RuntimeException("Not supported operation!");
-	}
-
-
-	@Override
-	public Map<Id, ? extends Link> getOutLinks() {
-		throw new RuntimeException("Not supported operation!");
-	}
-	
+	public DeadEndData getDeadEndData();
 }

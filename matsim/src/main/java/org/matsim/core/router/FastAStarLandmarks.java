@@ -27,7 +27,6 @@ import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.AStarNodeDataFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.RoutingNetwork;
-import org.matsim.core.router.util.RoutingNetworkFactory;
 import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -50,25 +49,25 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
 
-	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-			final TravelDisutility costFunction, final TravelTime timeFunction) {
-		this(network, preProcessData, costFunction, timeFunction, 1);
-	}
+//	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
+//			final TravelDisutility costFunction, final TravelTime timeFunction) {
+//		this(network, preProcessData, costFunction, timeFunction, 1);
+//	}
+
+//	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
+//			final TravelTime timeFunction) {
+//		this(network, preProcessData, preProcessData.getCostFunction(), timeFunction, 1);
+//	}
 
 	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-			final TravelTime timeFunction) {
-		this(network, preProcessData, preProcessData.getCostFunction(), timeFunction, 1);
-	}
-
-	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor) {
+			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
+			final RoutingNetwork routingNetwork, final FastRouterDelegateFactory fastRouterFactory) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 
-		this.routingNetwork = new RoutingNetworkFactory().createRoutingNetwork(network);
-		this.routingNetwork.setPreProcessDijkstra(preProcessData);
+		this.routingNetwork = routingNetwork;
+		this.fastRouter = fastRouterFactory.createFastRouterDelegate(this, new AStarNodeDataFactory(), routingNetwork);
+		
 		this.nodeData.clear();
-
-		this.fastRouter = new FastRouterDelegate(this, new AStarNodeDataFactory());
 	}
 
 	/*
@@ -78,6 +77,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
 		
+		this.fastRouter.initialize();
 		this.routingNetwork.initialize();
 		
 		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());

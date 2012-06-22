@@ -13,8 +13,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.FastDijkstra;
+import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -93,7 +94,8 @@ public class ComposedNode implements Node {
 				return link.getLength()/link.getFreespeed();
 			}
 		};
-		LeastCostPathCalculator leastCostPathCalculator = new FastDijkstra(subNetwork, travelMinCost, timeFunction, preProcessData);
+		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory(preProcessData);
+		LeastCostPathCalculator leastCostPathCalculator = routerFactory.createPathCalculator(subNetwork, travelMinCost, timeFunction);
 		for(Link inLink:inLinks)
 			for(Link outLink:outLinks)
 				if(leastCostPathCalculator.calcLeastCostPath(inLink.getToNode(), outLink.getFromNode(), 0, null, null) == null)

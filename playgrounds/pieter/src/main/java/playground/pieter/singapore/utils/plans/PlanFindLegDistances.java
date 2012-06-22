@@ -2,46 +2,34 @@ package playground.pieter.singapore.utils.plans;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.FastAStarLandmarks;
-import org.matsim.core.router.util.PreProcessEuclidean;
-import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.pt.router.TransitActsRemover;
 import org.matsim.vehicles.Vehicle;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-import playground.pieter.singapore.hits.HITSAnalyser;
 
 public class PlanFindLegDistances {
 	ScenarioImpl scenario;
@@ -49,7 +37,6 @@ public class PlanFindLegDistances {
 	NetworkImpl network;
 	ModeRouteFactory routeFactory;
 	DataBaseAdmin dba;
-	private PreProcessLandmarks preProcessData;
 	private FastAStarLandmarks leastCostPathCalculator;
 
 	public PlanFindLegDistances(Scenario scenario, DataBaseAdmin dba) {
@@ -72,8 +59,7 @@ public class PlanFindLegDistances {
 				return link.getLength();
 			}
 		};
-		preProcessData = new PreProcessLandmarks(travelMinCost);
-		preProcessData.run(network);
+
 		TravelTime timeFunction = new TravelTime() {
 
 			public double getLinkTravelTime(Link link, double time) {
@@ -81,8 +67,8 @@ public class PlanFindLegDistances {
 			}
 		};
 
-		leastCostPathCalculator = new FastAStarLandmarks(network, preProcessData,
-				timeFunction);
+		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory(network, travelMinCost);
+		leastCostPathCalculator = (FastAStarLandmarks) routerFactory.createPathCalculator(network, travelMinCost, timeFunction);
 		this.dba = dba;
 		routeFactory = ((PopulationFactoryImpl) scenario.getPopulation()
 				.getFactory()).getModeRouteFactory();

@@ -2,7 +2,6 @@ package playground.sergioo.EventAnalysisTools;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,26 +10,21 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.router.AStarEuclidean;
-import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class Main {
@@ -86,7 +80,8 @@ public class Main {
 				return link.getLength()/link.getFreespeed();
 			}
 		};
-		LeastCostPathCalculator leastCostPathCalculator = new FastDijkstra(scenario.getNetwork(), travelMinCost, timeFunction, preProcessData);
+		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory(preProcessData);
+		LeastCostPathCalculator leastCostPathCalculator = routerFactory.createPathCalculator(scenario.getNetwork(), travelMinCost, timeFunction);
 		BufferedReader reader = new BufferedReader(new FileReader(new File("./data/MTZ_Shortest_Path_Yanding.txt")));
 		PrintWriter writer = new PrintWriter(new File("./data/MTZ_Shortest_Path_Yanding_Full.txt"));
 		String line=reader.readLine();

@@ -27,7 +27,6 @@ import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.DijkstraNodeDataFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.RoutingNetwork;
-import org.matsim.core.router.util.RoutingNetworkFactory;
 import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -50,23 +49,19 @@ public class FastDijkstra extends Dijkstra {
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
 	
-	public FastDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
-		this(network, costFunction, timeFunction, null);
-	}
-
 	/*
 	 * Create the routing network here and clear the nodeData map 
 	 * which is not used by this implementation.
 	 */
 	public FastDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
-			final PreProcessDijkstra preProcessData) {
+			final PreProcessDijkstra preProcessData, final RoutingNetwork routingNetwork, 
+			final FastRouterDelegateFactory fastRouterFactory) {
 		super(network, costFunction, timeFunction, preProcessData);
 		
-		this.routingNetwork = new RoutingNetworkFactory().createRoutingNetwork(network);
-		this.routingNetwork.setPreProcessDijkstra(preProcessData);
+		this.routingNetwork = routingNetwork;
+		this.fastRouter = fastRouterFactory.createFastRouterDelegate(this, new DijkstraNodeDataFactory(), routingNetwork);
+
 		this.nodeData.clear();
-				
-		this.fastRouter = new FastRouterDelegate(this, new DijkstraNodeDataFactory());
 	}
 		
 	/*
@@ -76,6 +71,7 @@ public class FastDijkstra extends Dijkstra {
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
 		
+		this.fastRouter.initialize();
 		this.routingNetwork.initialize();
 		
 		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());

@@ -21,25 +21,62 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastDijkstra;
+import org.matsim.core.router.FastRouterDelegateFactory;
+import org.matsim.core.router.FastRouterType;
+import org.matsim.core.router.PointerFastRouterDelegateFactory;
 
 public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
-
+	
+	private final FastRouterType fastRouterType;
 	private final PreProcessDijkstra preProcessData;
-
+	private final RoutingNetworkFactory routingNetworkFactory;
+	private RoutingNetwork routingNetwork;
+	
 	public FastDijkstraFactory() {
-		this.preProcessData = null;
+		this(null, FastRouterType.ARRAY);
 	}
-
+	
+	public FastDijkstraFactory(FastRouterType fastRouterType) {
+		this(null, fastRouterType);
+	}
+	
 	public FastDijkstraFactory(final PreProcessDijkstra preProcessData) {
+		this(preProcessData, FastRouterType.ARRAY);
+	}
+	
+	public FastDijkstraFactory(final PreProcessDijkstra preProcessData, FastRouterType fastRouterType) {
 		this.preProcessData = preProcessData;
+		this.fastRouterType = fastRouterType;
+		
+		if (fastRouterType == FastRouterType.ARRAY) {
+			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
+		} else if (fastRouterType == FastRouterType.POINTER) {			
+			this.routingNetworkFactory = new PointerRoutingNetworkFactory(preProcessData);
+		} else {
+			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
+		}
 	}
 
 	@Override
 	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		if (this.preProcessData == null) {
-			return new FastDijkstra(network, travelCosts, travelTimes);
-		}
-		return new FastDijkstra(network, travelCosts, travelTimes, preProcessData);
+		
+		FastRouterDelegateFactory fastRouterFactory = null;
+		RoutingNetwork rn = null;
+		
+		if (fastRouterType == FastRouterType.ARRAY) {		
+			if (this.routingNetwork == null) {
+				this.routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			}
+			rn = this.routingNetwork;
+			fastRouterFactory = new ArrayFastRouterDelegateFactory();
+		} else if (fastRouterType == FastRouterType.POINTER) {
+			// Create a new instance since routing data is stored in the network!
+			rn = this.routingNetworkFactory.createRoutingNetwork(network);
+			fastRouterFactory = new PointerFastRouterDelegateFactory();			
+		}		
+		
+		return new FastDijkstra(network, travelCosts, travelTimes, preProcessData, rn, fastRouterFactory);
 	}
 }

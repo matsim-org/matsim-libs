@@ -143,8 +143,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		
-		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		this.toHomeFacilityRouter = new ReplanningModule(config, scenario.getNetwork(), costFactory, timeFactory, factory, routeFactory);
+		LeastCostPathCalculatorFactory toHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+		this.toHomeFacilityRouter = new ReplanningModule(config, scenario.getNetwork(), costFactory, timeFactory, toHomeFactory, routeFactory);
 
 		/*
 		 * Create a subnetwork that only contains the Evacuation area plus some exit nodes.
@@ -260,7 +260,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		 * the travel time collector does not know them. 
 		 */
 		TravelTimeWrapperFactory wrapperTimeFactory = new TravelTimeWrapperFactory(timeFactory);
-		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, wrapperTimeFactory, factory, routeFactory);
+		LeastCostPathCalculatorFactory fromHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, wrapperTimeFactory, fromHomeFactory, routeFactory);
 	}
 	
 	/*

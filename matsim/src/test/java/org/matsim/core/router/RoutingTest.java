@@ -77,6 +77,26 @@ public class RoutingTest extends MatsimTestCase {
 				return new FastDijkstraFactory();
 			}
 		});
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "FastDijkstra";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new FastDijkstraFactory(FastRouterType.ARRAY);
+			}
+		});
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "FastDijkstra";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new FastDijkstraFactory(FastRouterType.POINTER);
+			}
+		});
 	}
 	
 	public void testDijkstraPruneDeadEnds() {
@@ -107,6 +127,30 @@ public class RoutingTest extends MatsimTestCase {
 				return new FastDijkstraFactory(preProcessData);
 			}
 		});
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "FastDijkstraPruneDeadends";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
+				preProcessData.run(network);
+				return new FastDijkstraFactory(preProcessData, FastRouterType.ARRAY);
+			}
+		});
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "FastDijkstraPruneDeadends";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
+				preProcessData.run(network);
+				return new FastDijkstraFactory(preProcessData, FastRouterType.POINTER);
+			}
+		});
 	}
 	
 	public void testAStarEuclidean() {
@@ -131,6 +175,26 @@ public class RoutingTest extends MatsimTestCase {
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new FastAStarEuclideanFactory(network, costCalc);
+			}
+		});
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "FastAStarEuclidean";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new FastAStarEuclideanFactory(network, costCalc, FastRouterType.ARRAY);
+			}
+		});
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "FastAStarEuclidean";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new FastAStarEuclideanFactory(network, costCalc, FastRouterType.POINTER);
 			}
 		});
 	}
@@ -159,8 +223,28 @@ public class RoutingTest extends MatsimTestCase {
 				return new FastAStarLandmarksFactory(network, costCalc);
 			}
 		});
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "FastAStarLandmarks";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new FastAStarLandmarksFactory(network, costCalc, FastRouterType.ARRAY);
+			}
+		});
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "FastAStarLandmarks";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new FastAStarLandmarksFactory(network, costCalc, FastRouterType.POINTER);
+			}
+		});
 	}
-	
+
 	private void doTest(final RouterProvider provider) {
 		Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
 
