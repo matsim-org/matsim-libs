@@ -42,11 +42,11 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
  */
 public class ParkAndRidePlanMutateTimeAllocation implements PlanAlgorithm {
 
-	private final int mutationRange;
+	private final Double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations;
 
-	public ParkAndRidePlanMutateTimeAllocation(final int mutationRange, final Random random) {
+	public ParkAndRidePlanMutateTimeAllocation(final Double mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
 		this.random = random;
 	}

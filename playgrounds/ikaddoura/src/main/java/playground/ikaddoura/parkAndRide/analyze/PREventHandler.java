@@ -23,25 +23,36 @@
  */
 package playground.ikaddoura.parkAndRide.analyze;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class PREventHandler implements LinkEnterEventHandler, ActivityEndEventHandler  {
+public class PREventHandler implements LinkEnterEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler {
 	private Network network;
 	private Map<Id, Integer> linkId2cars = new HashMap<Id, Integer>();
 	private Map<Id, Integer> linkId2prActs = new HashMap<Id, Integer>();
-
+	private Map<Id, List<Double>> linkId2prEndTimes = new HashMap<Id, List<Double>>();
+	
+	private int ptLegs;
+	private int carLegs;
+	private int stuckEvents;
 	
 	public PREventHandler(Network network) {
 		this.network = network;
@@ -61,23 +72,34 @@ public class PREventHandler implements LinkEnterEventHandler, ActivityEndEventHa
 			} else {
 				int increasedCarNumber = this.linkId2cars.get(linkId) + 1;
 				this.linkId2cars.put(linkId, increasedCarNumber);
-			}	
+			}
 		} else {
 			// no car!
 		}
 	}
-
+	
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		Id linkId = event.getLinkId();
 		if (event.getActType().toString().equals("parkAndRide")){
-			System.out.println(event.toString());
+			
 			if (this.linkId2prActs.get(linkId) == null){
 				this.linkId2prActs.put(linkId, 1);
 			} else {
 				int increasedPrActs = this.linkId2prActs.get(linkId) + 1;
 				this.linkId2prActs.put(linkId, increasedPrActs);
 			}
+			
+			if (this.linkId2prEndTimes.get(linkId) == null){
+				List<Double> prEndTimes = new ArrayList<Double>();
+				prEndTimes.add(event.getTime());
+				this.linkId2prEndTimes.put(linkId, prEndTimes);
+			} else {
+				List<Double> prEndTimes = this.linkId2prEndTimes.get(linkId);
+				prEndTimes.add(event.getTime());
+				this.linkId2prEndTimes.put(linkId, prEndTimes);
+			}
+			
 		}
 	}
 	
@@ -88,5 +110,39 @@ public class PREventHandler implements LinkEnterEventHandler, ActivityEndEventHa
 	public Map<Id, Integer> getLinkId2prActs() {
 		return linkId2prActs;
 	}
+	
+	public int getPtLegs() {
+		return ptLegs;
+	}
+
+	public int getCarLegs() {
+		return carLegs;
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+		if(event.getPersonId().toString().contains("person")){
+			if (event.getLegMode().toString().equals(TransportMode.pt)){
+				this.ptLegs++;
+			}
+			if (event.getLegMode().toString().equals(TransportMode.car)){
+				this.carLegs++;
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		stuckEvents++;
+	}
+	
+	public int getStuckEvents() {
+		return stuckEvents;
+	}
+
+	public Map<Id, List<Double>> getLinkId2prEndTimes() {
+		return linkId2prEndTimes;
+	}
+	
 	
 }

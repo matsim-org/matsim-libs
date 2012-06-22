@@ -118,10 +118,9 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 		
 		if (act.getType().toString().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
 			
-//			double penalty = -200;
-			
-			double penalty = this.config.getUtilityOfLineSwitch() * 3.0;
-			System.out.println("******************************* Park'n'Ride penalty: " + penalty);
+			double penalty = 0.;
+//			double penalty = this.config.getUtilityOfLineSwitch() * 3.0;
+//			System.out.println("******************************* Park'n'Ride penalty: " + penalty);
 			tmpScore += penalty;
 		}
 

@@ -42,13 +42,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class NetworkAddPRMain {
 	
 	// input
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/test_network.xml";
-	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/input/scheduleFile.xml";
-	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/input/vehiclesFile.xml";
+	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_network.xml";
+	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_schedule.xml";
+	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_vehicles.xml";
 	
 	// output
-	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/input/parkAndRideFacilities.txt";
-	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/input/parkAndRideNetwork.xml";
+	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRfacilities.txt";
+	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRnetwork.xml";
 	
 	private double extensionRadius = 100;
 	private int maxSearchSteps = 50;

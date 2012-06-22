@@ -45,8 +45,8 @@ import playground.ikaddoura.parkAndRide.pRscoring.ParkAndRideScoringFunctionFact
  */
 public class ParkAndRideMain {
 	
-	static String configFile = "../../shared-svn/studies/ihab/parkAndRide/input/config.xml";
-	static String prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/input/parkAndRideFacilities.txt";
+	static String configFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_config.xml";
+	static String prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRfacilities.txt";
 	
 	public static void main(String[] args) {
 		ParkAndRideMain main = new ParkAndRideMain();

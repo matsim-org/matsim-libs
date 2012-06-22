@@ -76,15 +76,15 @@ public class ParkAndRideControlerListener implements StartupListener {
 
 		StrategyManager manager = this.controler.getStrategyManager() ;
 	
-		manager.addStrategy(strategyAddRemove, 100.0);
-		manager.addChangeRequest(90, strategyAddRemove, 0);
+		manager.addStrategy(strategyAddRemove, 0.05);
+		manager.addChangeRequest(500, strategyAddRemove, 0.);
 				
-		manager.addStrategy(strategyChangeLocation, 0.0);
-		manager.addChangeRequest(90, strategyChangeLocation, 0);
+		manager.addStrategy(strategyChangeLocation, 0.05);
+		manager.addChangeRequest(500, strategyChangeLocation, 0.);
 		
-		manager.addStrategy(strategyTimeAllocation, 0.0);
-		manager.addChangeRequest(90, strategyTimeAllocation, 0);
-
+		manager.addStrategy(strategyTimeAllocation, 0.1);
+		manager.addChangeRequest(500, strategyTimeAllocation, 0.);
+		
 	}
 
 }

@@ -22,12 +22,12 @@ package playground.ikaddoura.parkAndRide.pRstrategy;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.replanning.TransitPlanMutateTimeAllocation;
 
 /**
  * Copy/Paste of TransitTimeAllocationMutator, that calls ParkAndRidePlanMutateTimeAllocation instead
@@ -41,7 +41,7 @@ public class ParkAndRideTimeAllocationMutator extends AbstractMultithreadedModul
 
 	private final static Logger log = Logger.getLogger(TimeAllocationMutator.class);
 
-	private int mutationRange = 1800;
+	private Double mutationRange = 1800.;
 	private boolean useActivityDurations = true;
 
 	/**
@@ -52,13 +52,14 @@ public class ParkAndRideTimeAllocationMutator extends AbstractMultithreadedModul
 	 */
 	public ParkAndRideTimeAllocationMutator(Config config) {
 		super(config.global());
-		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
-		if (range == null) {
-			log.info("No mutation range defined in the config file. Using default of " + this.mutationRange + " sec.");
-		} else {
-			this.mutationRange = Integer.parseInt(range);
-			log.info("mutation range = " + this.mutationRange);
-		}
+//		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
+//		if (range == null) {
+//			log.info("No mutation range defined in the config file. Using default of " + this.mutationRange + " sec.");
+//		} else {
+//			this.mutationRange = Integer.parseInt(range);
+//			log.info("mutation range = " + this.mutationRange);
+//		}
+		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
 		if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
 			useActivityDurations = true ;
 		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.endTimeOnly ) ) {
@@ -77,17 +78,17 @@ public class ParkAndRideTimeAllocationMutator extends AbstractMultithreadedModul
 	 */
 	public ParkAndRideTimeAllocationMutator(Config config, final int mutationRange) {
 		super(config.global());
-		this.mutationRange = mutationRange;
+		this.mutationRange = new Double(mutationRange);
+	}
+	public ParkAndRideTimeAllocationMutator(Config config, final Double mutationRange) {
+		super(config.global());
+		this.mutationRange = mutationRange ;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		ParkAndRidePlanMutateTimeAllocation pmta = new ParkAndRidePlanMutateTimeAllocation(this.mutationRange, MatsimRandom.getLocalInstance());
+		TransitPlanMutateTimeAllocation pmta = new TransitPlanMutateTimeAllocation(this.mutationRange, MatsimRandom.getLocalInstance());
 		pmta.setUseActivityDurations(this.useActivityDurations);
 		return pmta;
 	}
-
-//	public void setUseActivityDurations(final boolean useActivityDurations) {
-//		this.useActivityDurations = useActivityDurations;
-//	}
 }

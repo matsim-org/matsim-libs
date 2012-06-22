@@ -23,6 +23,7 @@
  */
 package playground.ikaddoura.parkAndRide.analyze;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -38,9 +39,10 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class PREventReader {
 	
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/prNetwork.xml";
-	static String eventFile = "../../shared-svn/studies/ihab/parkAndRide/output4PRcap20_run3/ITERS/it.100/100.events.xml.gz";
-
+	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRnetwork_2.xml";
+	static String eventFile = "../../shared-svn/studies/ihab/parkAndRide/output/testScenario_test6/ITERS/it.1000/1000.events.xml.gz";
+//	static String prTimesFile = "../../shared-svn/studies/ihab/parkAndRide/output/prTimes.txt";
+	
 	public static void main(String[] args) {
 		PREventReader reader = new PREventReader();
 		reader.run();
@@ -61,9 +63,22 @@ public class PREventReader {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		
-		System.out.println(linkHandler.getLinkId2cars().toString());
-		System.out.println(linkHandler.getLinkId2prActs().toString());
-
+		int prUsers = 0;
+		System.out.println();
+		System.out.println("************************");
+		for (Id id : linkHandler.getLinkId2prActs().keySet()){
+			System.out.println(id + ": " + (int) (linkHandler.getLinkId2prActs().get(id)/2.0) + " Users");
+			prUsers = prUsers + (int) (linkHandler.getLinkId2prActs().get(id)/2.0);
+		}
+		System.out.println("************************");		
+		System.out.println("PR-Users: " + prUsers);
+		System.out.println("Pt-Users: " + (int) (linkHandler.getPtLegs()/2.0));
+		System.out.println("Only-Car-Legs: " + (int) (linkHandler.getCarLegs()/2.0 - prUsers));
+		System.out.println("Stucking Agents: " + linkHandler.getStuckEvents());
+		System.out.println("************************");
+		
+//		PRTimesWriter prTimesWriter = new PRTimesWriter();
+//		prTimesWriter.write(linkHandler.getLinkId2prEndTimes(), prTimesFile);
 	}
 
 }
