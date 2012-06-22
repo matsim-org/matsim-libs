@@ -25,9 +25,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 
 /**
  * @author nagel
@@ -76,7 +76,10 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
 //			problem = true ;
 			log.warn("timeAllocationMutator mutationRange < 7200; vsp defaults is 7200.  This will be more strictly" +
-					" enforced in the future.") ;
+					" enforced in the future. This means you have to add the following lines to your config file: ") ;
+			System.out.println("<module name=\"TimeAllocationMutator\">");
+			System.out.println("	<param name=\"mutationRange\" value=\"7200.0\" />");
+			System.out.println("</module>");
 		}
 		
 		// pseudo-pt über Distanz, nicht ptSpeedFactor
