@@ -30,6 +30,7 @@ public class AccessibilityControlerListenerTemplate{
 	protected AggregateObject2NearestNode[] aggregatedOpportunities;
 	
 	// storing the accessibility results
+	protected SpatialGrid freeSpeedGrid;
 	protected SpatialGrid carGrid;
 	protected SpatialGrid walkGrid;
 	
@@ -56,7 +57,8 @@ public class AccessibilityControlerListenerTemplate{
 	protected double betaWalkLnTC;
 	
 	protected double carTT, carTTPower, carLnTT, carTD, carTDPower, carLnTD, carTC, carTCPower, carLnTC,
-		   walkTT, walkTTPower, walkLnTT, walkTD, walkTDPower, walkLnTD, walkTC, walkTCPower, walkLnTC;
+		   walkTT, walkTTPower, walkLnTT, walkTD, walkTDPower, walkLnTD, walkTC, walkTCPower, walkLnTC,
+		   freeTT, freeTTPower, freeLnTT, freeTD, freeTDPower, freeLnTD, freeTC, freeTCPower, freeLnTC;
 	
 	protected double depatureTime;
 	protected double walkSpeedMeterPerSecond = -1;
@@ -135,7 +137,7 @@ public class AccessibilityControlerListenerTemplate{
 		log.info("Computing and writing grid based accessibility measures with following settings:" );
 		log.info("Returning raw sum (not logsum): " + useRawSum);
 		log.info("Logit Scale Parameter: " + logitScaleParameter);
-		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + "("+this.walkSpeedMeterPerSecond+"meter/s)");
+		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + " ("+this.walkSpeedMeterPerSecond+"meter/s)");
 		log.info("Depature time (in seconds): " + depatureTime);
 		log.info("Beta Car Travel Time: " + betaCarTT );
 		log.info("Beta Car Travel Time Power2: " + betaCarTTPower );

@@ -54,19 +54,19 @@ public class OrthogonalDistance {
 		double distance1_2 = NetworkUtil.getDistance2Node(link1, new CoordImpl(10., -10.), link1.getToNode()); // distance point2link=10 + distance intersection2Node=1010
 		Assert.assertEquals(1020.0, distance1_2);
 		System.out.println(distance1_2 + " distance1_2");
-		double distance1_3 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(10., -10.), link1.getToNode()); // distance point2link=10 + distance intersection2Node=1010
-		Assert.assertEquals(1020.0, distance1_3);
-		System.out.println(distance1_3 + " distance1_3");
-		Assert.assertEquals(distance1_2, distance1_3);
+//		double distance1_3 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(10., -10.), link1.getToNode()); // distance point2link=10 + distance intersection2Node=1010
+//		Assert.assertEquals(1020.0, distance1_3);
+//		System.out.println(distance1_3 + " distance1_3");
+//		Assert.assertEquals(distance1_2, distance1_3);
 		
 		double distance2 = NetworkUtil.getOrthogonalDistance2NearestLink(link2, new CoordImpl(1500, 0));
 		System.out.println(distance2);
 		
 		double distance2_1 = NetworkUtil.getDistance2Node(link2, new CoordImpl(1500, 0), link2.getToNode());
 		System.out.println(distance2_1 + " distance2_1");
-		double distance2_2 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(1500, 0), link2.getToNode());
-		System.out.println(distance2_2 + " distance2_2");
-		Assert.assertEquals(distance2_1, distance2_2);
+//		double distance2_2 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(1500, 0), link2.getToNode());
+//		System.out.println(distance2_2 + " distance2_2");
+//		Assert.assertEquals(distance2_1, distance2_2);
 		
 		double distance3 = NetworkUtil.getOrthogonalDistance2NearestLink(link3,new CoordImpl(1111, 2222));
 		Assert.assertEquals(222.0, distance3);
@@ -80,10 +80,10 @@ public class OrthogonalDistance {
 		double distance5 = NetworkUtil.getDistance2Node(link1, new CoordImpl(100., 500.), link1.getToNode());
 		Assert.assertEquals(600.0, distance5);
 		System.out.println(distance5 + " distance5");
-		double distance5_1 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100., 500.), link1.getToNode());
-		Assert.assertEquals(600.0, distance5_1);
-		System.out.println(distance5_1 + " distance5_1");
-		Assert.assertEquals(distance5, distance5_1);
+//		double distance5_1 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100., 500.), link1.getToNode());
+//		Assert.assertEquals(600.0, distance5_1);
+//		System.out.println(distance5_1 + " distance5_1");
+//		Assert.assertEquals(distance5, distance5_1);
 		
 		double distance6 = NetworkUtil.getDistance2Node(link1, new CoordImpl(-150., -500.), link1.getToNode());
 		Assert.assertEquals(1650.0, distance6);

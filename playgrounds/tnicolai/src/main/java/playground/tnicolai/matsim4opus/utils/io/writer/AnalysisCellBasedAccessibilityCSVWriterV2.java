@@ -33,6 +33,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 										   InternalConstants.NEARESTNODE_ID + "," +
 										   InternalConstants.NEARESTNODE_X_COORD + "," +
 										   InternalConstants.NEARESTNODE_Y_COORD + "," + 
+										   InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
 										   InternalConstants.ACCESSIBILITY_BY_CAR + "," +
 										   InternalConstants.ACCESSIBILITY_BY_WALK);
 			accessibilityDataWriter.newLine();
@@ -54,6 +55,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	public void write(Zone<CounterObject> startZone, 
 							 Coord coordFromZone,
 							 Node node, 
+							 double freeSpeedAccessibility,
 							 double carAccessibility, 
 							 double walkAccessibility){
 		
@@ -65,6 +67,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 										   node.getId() + "," + 
 										   node.getCoord().getX() + "," +  
 										   node.getCoord().getY() + "," + 
+										   freeSpeedAccessibility + "," +
 										   carAccessibility + "," + 
 										   walkAccessibility );
 			accessibilityDataWriter.newLine();

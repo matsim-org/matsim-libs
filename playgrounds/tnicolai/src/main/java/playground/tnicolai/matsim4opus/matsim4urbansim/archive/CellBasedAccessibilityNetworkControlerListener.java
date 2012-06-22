@@ -52,7 +52,7 @@ import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWal
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
 import com.vividsolutions.jts.geom.Point;
@@ -187,7 +187,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 		double betaWalkMin = betaWalkHour / 60.; // get utility per minute.
 
 		try{
-			AnalysisCellBasedAccessibilityCSVWriter accCsvWriter = new AnalysisCellBasedAccessibilityCSVWriter(fileExtension);
+			AnalysisCellBasedAccessibilityCSVWriterV2 accCsvWriter = new AnalysisCellBasedAccessibilityCSVWriterV2(fileExtension);
 			
 			log.info("Computing and writing grid based accessibility measures with following settings:" );
 			log.info("Departure time (in seconds): " + depatureTime);

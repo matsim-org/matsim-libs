@@ -1,7 +1,5 @@
 package playground.tnicolai.matsim4opus.utils.network;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -11,6 +9,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.tnicolai.matsim4opus.utils.helperObjects.Distances;
+
 import com.vividsolutions.jts.geom.Point;
 
 public class NetworkUtil {
@@ -19,6 +19,10 @@ public class NetworkUtil {
 	private static final Logger log = Logger.getLogger(NetworkUtil.class);
 	
 	public static double meterPerSecWalkSpeed = 1.38888889; // 1,38888889 m/s corresponds to 5km/h
+	
+	public static long euclidianCounter = 0;
+	public static long othogonalCounter = 0;
+	public static long totalCounter = 0;
 
 	/**
 	 * returns the orthogonal distance between a point and a network link (a straight line)
@@ -140,9 +144,9 @@ public class NetworkUtil {
 	 * @param link
 	 * @param point
 	 * @param destinationNode
-	 * @return
+	 * @return Distances
 	 */
-	public static double  getDistance2NodeV2(LinkImpl link, Coord point, Node destinationNode){
+	public static Distances  getDistance2NodeV2(LinkImpl link, Coord point, Node destinationNode){
 		return getDistance2NodeV2(link, point.getX(), point.getY(), destinationNode);
 	}
 	
@@ -153,13 +157,15 @@ public class NetworkUtil {
 	 * @param link
 	 * @param point
 	 * @param destinationNode
-	 * @return
+	 * @return Distances
 	 */
-	public static double  getDistance2NodeV2(LinkImpl link, Point point, Node destinationNode){
+	public static Distances  getDistance2NodeV2(LinkImpl link, Point point, Node destinationNode){
 		return getDistance2NodeV2(link, point.getX(), point.getY(), destinationNode);
 	}
 	
-	private static double getDistance2NodeV2(LinkImpl link, double pointx, double pointy, Node destinationNode){
+	private static Distances getDistance2NodeV2(LinkImpl link, double pointx, double pointy, Node destinationNode){
+		
+		Distances d = new Distances();
 		
 		// line A B
 		double ax = link.getFromNode().getCoord().getX();
@@ -186,31 +192,41 @@ public class NetworkUtil {
 		
 		// TEST 
 		// is bax or bay == 0?
-		double lambdax = (intersectionx-ax)/bax;
-		double lambday = (intersectiony-ay)/bay;
+		double lambdax = vectorx/bax; // vectorx = intersectionx-ax
+		double lambday = vectory/bay; // vectory = intersectiony-ay
+		double lambdaxInt = Math.rint( lambdax * 1000);
+		double lambdayInt = Math.rint( lambday * 1000);
+		
+		totalCounter++;
 		
 		if(bax == 0 && 0 <= lambday && lambday <= 1){ // for vertical links
 			// test if lambday is true for x and y
 			double testx = ax + (lambday * bax);
 			double testy = ay + (lambday * bay);
-			if(testx == intersectionx && testy == intersectiony)
+			if(testx == intersectionx && testy == intersectiony){
+				othogonalCounter++;
 				return orthogonalDistancePlusLinkIntersection(pointx, pointy,
 						destinationNode, intersectionx, intersectiony);
+			}
 		}
 		else if(bay == 0 && 0 <= lambdax && lambdax <= 1){ // for horizontal links
 			// test if lambdax is true for x and y
 			double testx = ax + (lambdax * bax);
 			double testy = ay + (lambday * bay);
-			if(testx == intersectionx && testy == intersectiony)
+			if(testx == intersectionx && testy == intersectiony){
+				othogonalCounter++;
 				return orthogonalDistancePlusLinkIntersection(pointx, pointy,
 						destinationNode, intersectionx, intersectiony);
+			}
 		}
 		// hier liegt der Schnittpunkt "intersection auf der geraden (link)
-		else if(lambdax == lambday && 0 <= lambdax && lambdax <= 1 ){
+		else if(lambdaxInt == lambdayInt && 0 <= lambdax && lambdax <= 1 ){
+			othogonalCounter++;
 			return orthogonalDistancePlusLinkIntersection(pointx, pointy,
 					destinationNode, intersectionx, intersectiony);
 		}
 		
+		euclidianCounter++;
 		return getEuclidianDistance(pointx, pointy, destinationNode.getCoord().getX(), destinationNode.getCoord().getY());
 		
 		// TEST
@@ -229,13 +245,18 @@ public class NetworkUtil {
 	 * @param intersectiony
 	 * @return
 	 */
-	private static double orthogonalDistancePlusLinkIntersection(double pointx,
-			double pointy, Node destinationNode, double intersectionx,
-			double intersectiony) {
-		// return orthogonal distance + distance from intersection to nearest node			
+	private static Distances orthogonalDistancePlusLinkIntersection(double pointx,
+																double pointy, 
+																Node destinationNode, 
+																double intersectionx,
+																double intersectiony) {
+		Distances d = new Distances();
 		double distancePoint2Link = Math.sqrt( (pointx-intersectionx)*(pointx-intersectionx) + (pointy-intersectiony)*(pointy-intersectiony));
 		double distanceIntersection2Node = Math.sqrt( (intersectionx - destinationNode.getCoord().getX())*(intersectionx - destinationNode.getCoord().getX()) + (intersectiony - destinationNode.getCoord().getY())*(intersectiony - destinationNode.getCoord().getY()) );
-		return distancePoint2Link + distanceIntersection2Node;
+		d.setDisatancePoint2Road(distancePoint2Link);
+		d.setDistanceRoad2Node(distanceIntersection2Node);
+		return d;
+		//		return distancePoint2Link + distanceIntersection2Node;
 	}
 
 	/**
@@ -263,42 +284,20 @@ public class NetworkUtil {
 	 * @param y1
 	 * @param x2
 	 * @param y2
-	 * @return distance
+	 * @return Distances
 	 */
-	public static double getEuclidianDistance(double x1, double y1, double x2, double y2){
+	public static Distances getEuclidianDistance(double x1, double y1, double x2, double y2){
+		
+		Distances d = new Distances();
 		
 		double xDiff = x1 - x2;
 		double yDiff = y1 - y2;
 		double distance =  Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
+		d.setDisatancePoint2Road(distance);
 		
-		return distance;
+		return d;
 	}
 	
-	/**
-	 * returns the walk time for a given euclidean distance
-	 * @param origin
-	 * @param destination
-	 * @return walk time in seconds
-	 */
-	public static double getEuclideanDistanceAsWalkTimeInSeconds(Coord origin, Coord destination){
-		
-		double distance = getEuclidianDistance(origin, destination);
-		return distance / meterPerSecWalkSpeed;
-	}
-	
-	/**
-	 *  returns the walk time for a given euclidean distance
-	 * @param x1
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 * @return walk time in seconds
-	 */
-	public static double getEuclideanDistanceAsWalkTimeInSeconds(double x1, double y1, double x2, double y2){
-		
-		double distance = getEuclidianDistance(x1, y1, x2, y2);
-		return distance / meterPerSecWalkSpeed;
-	}
 	
 	/**
 	 * testing above methods
@@ -333,16 +332,16 @@ public class NetworkUtil {
 		LinkImpl link3 = (LinkImpl) network.createAndAddLink(new IdImpl("3"), node3, node4, 1000, 1, 3600, 1);
 		LinkImpl link4 = (LinkImpl) network.createAndAddLink(new IdImpl("4"), node4, node5, 2800, 1, 3600, 1);
 
-		double distance1 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, 0), node1);
-		log.info(distance1 + " distance1");
+		Distances distance1 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, 0), node1);
+		log.info(distance1.getDisatancePoint2Road() + distance1.getDistanceRoad2Node() + " distance1");
 		
-		double distance2 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, -10), node1);
-		log.info(distance2 + " distance2");
+		Distances distance2 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, -10), node1);
+		log.info(distance2.getDisatancePoint2Road() + distance2.getDistanceRoad2Node() + " distance2");
 		
-		double distance3 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(100, 1000), node2);
-		log.info(distance3 + " distance3");
+		Distances distance3 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(100, 1000), node2);
+		log.info(distance3.getDisatancePoint2Road() + distance3.getDistanceRoad2Node() + " distance3");
 		
-		double distance4 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(-100, 1000), node2);
-		log.info(distance4 + " distance4");
+		Distances distance4 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(-100, 1000), node2);
+		log.info(distance4.getDisatancePoint2Road() + distance4.getDistanceRoad2Node() + " distance4");
 	}
 }

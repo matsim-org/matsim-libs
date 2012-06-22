@@ -52,6 +52,7 @@ public class UrbanSimParcelCSVWriter {
 			
 			// create header
 			parcelWriter.write( InternalConstants.PARCEL_ID + "," +
+								InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
 								InternalConstants.ACCESSIBILITY_BY_CAR + "," +
 								InternalConstants.ACCESSIBILITY_BY_WALK);
 			parcelWriter.newLine();
@@ -66,17 +67,21 @@ public class UrbanSimParcelCSVWriter {
 	/**
 	 * writing the parcel data (accessibilities) to csv file
 	 * @param node
+	 * @param freeSpeedAccessibility
 	 * @param carAccessibility
 	 * @param walkAccessibility
 	 */
 	public static void write(Id parcelID,
+							 double freeSpeedAccessibility,
 							 double carAccessibility, 
 							 double walkAccessibility){
 		
 		try{
 			assert(UrbanSimParcelCSVWriter.parcelWriter != null);
 			parcelWriter.write( parcelID + "," + 
-								carAccessibility);
+								freeSpeedAccessibility + "," +
+								carAccessibility + "," +
+								walkAccessibility);
 			parcelWriter.newLine();
 		}
 		catch(Exception e){

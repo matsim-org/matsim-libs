@@ -140,9 +140,9 @@ public class SpatialGrid{
 		if(isInBounds(x, y))
 			return matrix[getRow(y)][getColumn(x)];
 		
-		log.warn("This point lies outside the boundary!!!");
-		log.warn("Boundary: xmin:"+this.minX+", ymin:"+ this.minY+", xmax:"+this.maxX+", maxy:"+this.maxY);
-		log.warn("Point: x:"+x+ ", y:"+y);
+//		log.warn("This point lies outside the boundary!!!");
+//		log.warn("Boundary: xmin:"+this.minX+", ymin:"+ this.minY+", xmax:"+this.maxX+", maxy:"+this.maxY);
+//		log.warn("Point: x:"+x+ ", y:"+y);
 		return Double.NaN;
 	}
 	
