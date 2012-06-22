@@ -64,19 +64,19 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
 		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_timeChoice_TEST2";
 		
 //		op1 = OptimizationParameter1.FARE;
 //		op1 = OptimizationParameter1.CAPACITY;
 		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
-		lastExternalIterationParam1 = 2;
+		lastExternalIterationParam1 = 5;
 		
 //		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
-		lastExternalIterationParam2 = 1;
+		lastExternalIterationParam2 = 5;
 				
-		incrBusNumber = 1;
-		incrFare = -0.25;
+		incrBusNumber = 2;
+		incrFare = -1.0;
 		incrCapacity = 4;
 		
 //		ToDo: adjust arguments for cluster runs		
@@ -209,7 +209,7 @@ class ExternalControler {
 				this.numberOfBuses = 5;
 			} else if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES)){
 				this.fare = -3.;
-				this.capacity = 1;
+				this.capacity = 50;
 				this.numberOfBuses = 1;
 			}
 		}
