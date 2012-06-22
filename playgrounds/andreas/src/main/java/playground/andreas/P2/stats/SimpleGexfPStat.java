@@ -100,7 +100,7 @@ public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnd
 		this.outputFilename = outputDir + lineId + "_" + SimpleGexfPStat.FILENAME;
 		
 		if (this.getWriteGexfStatsInterval > 0) {
-			log.info("enabled");
+			log.info("enabled log for line" + lineId);
 
 			this.gexfFactory = new ObjectFactory();
 			this.gexfContainer = this.gexfFactory.createXMLGexfContent();
