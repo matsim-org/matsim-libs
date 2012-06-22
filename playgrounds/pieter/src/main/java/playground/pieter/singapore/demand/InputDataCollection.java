@@ -72,7 +72,7 @@ public class InputDataCollection implements Serializable {
 		this.diverseScriptProperties = diverseScriptProperties;
 		this.scenario = scenario;
 		facilitiesReader = new MatsimFacilitiesReader(this.scenario);
-		readSecondaryActFrequencies();
+		loadSecondaryActFrequencies();
 		loadLandUsetoHITSType();
 		loadWorkLandUseSecondaryActCapacities();
 		loadData(facilitiesAllInOneXML);
@@ -83,7 +83,7 @@ public class InputDataCollection implements Serializable {
 		createFacilityIdtoDescriptionLookup();
 	}
 
-	private void readSecondaryActFrequencies() {
+	private void loadSecondaryActFrequencies() {
 		inputLog.info("Loading secondary act frequencies");
 		String secondaryActFrequenciesTable = diverseScriptProperties
 				.getProperty("secondaryActFrequenciesTable");

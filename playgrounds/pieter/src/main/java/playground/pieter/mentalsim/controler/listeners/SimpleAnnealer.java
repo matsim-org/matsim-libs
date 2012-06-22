@@ -143,7 +143,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			String strategyName = strategy.toString().toLowerCase();
 			double weight = stratMan.getWeights().get(
 					strategies.indexOf(strategy));
-			if (strategyName.contains("selector")
+			if ((strategyName.contains("selector")||strategyName.contains("expbetaplanchanger"))
 					&& !strategyName.contains("_")
 			// so no other strategies except the selector in the
 			// string produced by current planstrategy implementation

@@ -9,25 +9,21 @@ import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
 import playground.pieter.mentalsim.controler.listeners.ScoreResetStrategyModuleAppender;
 import playground.pieter.mentalsim.controler.listeners.SimpleAnnealer;
 import playground.pieter.mentalsim.trafficinfo.MyTTCalcFactory;
+import playground.pieter.router.util.StochasticRouterFactory;
 
 
-public class Main {
+public class NoMentalSim {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MentalSimControler c = new MentalSimControler(args);
-//		Controler c = new Controler(args);
+		Controler c = new Controler(args);
 		c.setOverwriteFiles(true);
-		c.setSimulateSubsetPersonsOnly(false);
-		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
-//		execution order of these iteration start listeners is in reverse order of adding them to the controler
-		c.addControlerListener(new MentalSimSubSetSimulationListener(c));
-		c.addControlerListener(new SimpleAnnealer());
-		c.addControlerListener(new MobSimSwitcher(c));
-		c.addControlerListener(new ScoreResetStrategyModuleAppender(c));
-		c.addControlerListener(new ExpensiveSimScoreWriter(c));
+//		c.addControlerListener(new SimpleAnnealer());
+		StochasticRouterFactory str = new StochasticRouterFactory();
+		str.setBeta(0.0000001);
+		c.setLeastCostPathCalculatorFactory(str);
 		c.run();
 		System.exit(0);
 		
