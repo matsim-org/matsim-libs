@@ -124,17 +124,13 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// init route provider
 		this.routeProvider = this.initRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly, event.getControler().getControlerIO().getOutputPath());
 
-		// init initial set of cooperatives
-		this.initInitialCooperatives(event.getControler().getFirstIteration(), this.pConfig.getNumberOfCooperatives());
-		
-		for (Cooperative cooperative : this.cooperatives) {
-			cooperative.init(this.routeProvider, this.initialStrategy, event.getControler().getFirstIteration(), this.pConfig.getInitialBudget());
-			cooperative.replan(this.strategyManager, event.getControler().getFirstIteration());
-		}
-		
 		// init additional cooperatives from a given transit schedule file
 		LinkedList<Cooperative> coopsFromSchedule = new CreateCooperativeFromSchedule(this.cooperativeFactory, this.routeProvider, this.pConfig).run();
 		this.cooperatives.addAll(coopsFromSchedule);	
+
+		// init initial set of cooperatives - reduced by the number of preset coops
+		LinkedList<Cooperative> initialCoops = this.initInitialCooperatives(event.getControler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
+		this.cooperatives.addAll(initialCoops);
 		
 		// collect the transit schedules from all cooperatives
 		this.pTransitSchedule = new PTransitScheduleImpl(this.pStopsOnly.getFactory());
@@ -209,12 +205,19 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}
 	}
 
-	private void initInitialCooperatives(int iteration, int numberOfCooperatives) {
-		this.cooperatives = new LinkedList<Cooperative>();
+	private LinkedList<Cooperative> initInitialCooperatives(int firstIteration, int numberOfCooperatives) {
+		LinkedList<Cooperative> initialCoops = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
-			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
+			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(firstIteration));
 			cooperatives.add(cooperative);
-		}		
+		}
+		
+		for (Cooperative cooperative : this.cooperatives) {
+			cooperative.init(this.routeProvider, this.initialStrategy, firstIteration, this.pConfig.getInitialBudget());
+			cooperative.replan(this.strategyManager, firstIteration);
+		}
+		
+		return initialCoops;
 	}
 
 	private void handleBankruptCopperatives(int iteration) {
