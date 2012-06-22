@@ -97,7 +97,9 @@ public class CreateStopsForAllCarLinks {
 			if(link.getAllowedModes().contains(TransportMode.car)){
 				stopsAdded += addStopOnLink(link);
 			}
-		}		
+		}
+		
+		log.info("Added " + stopsAdded + " additional stops for paratransit services");
 	}
 	
 	private int addStopOnLink(Link link) {
@@ -110,6 +112,10 @@ public class CreateStopsForAllCarLinks {
 		}
 		
 		if (linkHasAlreadyAFormalPTStopFromTheGivenSchedule(link)) {
+			return 0;
+		}
+		
+		if (link.getFreespeed() >= this.pConfigGroup.getSpeedLimitForStops()) {
 			return 0;
 		}
 

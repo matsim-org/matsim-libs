@@ -76,6 +76,7 @@ public class PConfigGroup extends Module{
 	private static final String LOGCOOPS = "logCoops";
 	private static final String WRITE_GEXF_STATS_INTERVAL = "writeGexfStatsInterval";
 	private static final String ROUTE_PROVIDER = "routeProvider";
+	private static final String SPEED_LIMIT_FOR_STOPS = "speedLimitForStops";
 	private static final String RANDOM_STOP_PROVIDER_GRID_SIZE = "randomStopProviderGridSize";
 	private static final String USE_ADAPTIVE_NUMBER_OF_COOPERATIVES = "useAdaptiveNumberOfCooperatives";
 	private static final String SHARE_OF_COOPERATIVES_WITH_PROFIT = "shareOfCooperativesWithProfit";
@@ -112,6 +113,7 @@ public class PConfigGroup extends Module{
 	private boolean logCoops = false;
 	private int writeGexfStatsInterval = 0;
 	private String routeProvider = "SimpleCircleScheduleProvider";
+	private double speedLimitForStops = Double.MAX_VALUE;
 	private double randomStopProviderGridSize = Double.MAX_VALUE;
 	private boolean useAdaptiveNumberOfCooperatives = false;
 	private double shareOfCooperativesWithProfit = 0.50;
@@ -181,6 +183,8 @@ public class PConfigGroup extends Module{
 			this.writeGexfStatsInterval = Integer.parseInt(value);
 		} else if (ROUTE_PROVIDER.equals(key)){
 			this.routeProvider = value;
+		} else if (SPEED_LIMIT_FOR_STOPS.equals(key)){
+				this.speedLimitForStops = Double.parseDouble(value);
 		} else if (RANDOM_STOP_PROVIDER_GRID_SIZE.equals(key)){
 			this.randomStopProviderGridSize = Double.parseDouble(value);
 		} else if (USE_ADAPTIVE_NUMBER_OF_COOPERATIVES.equals(key)){
@@ -235,6 +239,7 @@ public class PConfigGroup extends Module{
 		map.put(LOGCOOPS, Boolean.toString(this.logCoops));
 		map.put(WRITE_GEXF_STATS_INTERVAL, Integer.toString(this.writeGexfStatsInterval));
 		map.put(ROUTE_PROVIDER, this.routeProvider);
+		map.put(SPEED_LIMIT_FOR_STOPS, Double.toString(this.speedLimitForStops));
 		map.put(RANDOM_STOP_PROVIDER_GRID_SIZE, Double.toString(this.randomStopProviderGridSize));
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, Boolean.toString(this.useAdaptiveNumberOfCooperatives));
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, Double.toString(this.shareOfCooperativesWithProfit));
@@ -278,6 +283,7 @@ public class PConfigGroup extends Module{
 		map.put(LOGCOOPS, "will log coops individually if set to true");
 		map.put(WRITE_GEXF_STATS_INTERVAL, "number of iterations the gexf output gets updated. Set to zero to turn this feature off");
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
+		map.put(SPEED_LIMIT_FOR_STOPS, "Link cannot serve as paratransit stop, if its speed limit is equal or higher than the limit set here. Default is +INF");
 		map.put(RANDOM_STOP_PROVIDER_GRID_SIZE, "The grid size (length and height) for aggregating activities. 0.0 turns of this features");
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, "Target share of profitable cooperatives - Set " + USE_ADAPTIVE_NUMBER_OF_COOPERATIVES + "=true to enable this feature");
@@ -387,6 +393,10 @@ public class PConfigGroup extends Module{
 	
 	public String getRouteProvider(){
 		return this.routeProvider;
+	}
+	
+	public double getSpeedLimitForStops(){
+		return this.speedLimitForStops;
 	}
 	
 	public double getRandomStopProviderGridSize(){
