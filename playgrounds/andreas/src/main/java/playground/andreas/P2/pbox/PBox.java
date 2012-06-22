@@ -125,6 +125,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.routeProvider = this.initRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly, event.getControler().getControlerIO().getOutputPath());
 
 		// init additional cooperatives from a given transit schedule file
+		this.cooperatives = new LinkedList<Cooperative>();
 		LinkedList<Cooperative> coopsFromSchedule = new CreateCooperativeFromSchedule(this.cooperativeFactory, this.routeProvider, this.pConfig).run();
 		this.cooperatives.addAll(coopsFromSchedule);	
 

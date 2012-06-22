@@ -129,10 +129,13 @@ public class RandomStopProvider {
 			this.updateWeights();
 			this.writeToFile(currentIteration);
 			this.lastIteration = currentIteration;
+			
+			if (this.totalWeight == 0.0) {
+				log.info("No weights found. Probably no population given. Falling back to old behavior.");
+			}
 		}
 		
 		if (this.totalWeight == 0.0) {
-			log.info("No weights found. Probably to population given. Falling back to old behavior.");
 			// old version
 			int i = this.pStopsOnly.getFacilities().size();
 			for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
