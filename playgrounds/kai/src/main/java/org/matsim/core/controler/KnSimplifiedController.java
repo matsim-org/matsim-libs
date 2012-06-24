@@ -20,8 +20,6 @@
 
 package org.matsim.core.controler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
@@ -32,7 +30,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
@@ -50,7 +47,6 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
@@ -68,7 +64,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
@@ -80,9 +75,9 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
  */
 public class KnSimplifiedController extends AbstractController {
 
-	private static Logger log = Logger.getLogger(KnSimplifiedController.class);
+	public static Logger log = Logger.getLogger(KnSimplifiedController.class);
 
-	private Config config;
+	public Config config;
 
 	private Scenario scenarioData = null ;	
 
@@ -107,7 +102,7 @@ public class KnSimplifiedController extends AbstractController {
 		this.config = ConfigUtils.createConfig() ;
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-		checkConfigConsistencyAndWriteToLog("Complete config dump after reading the config file:");
+		checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
 		this.scenarioData = ScenarioUtils.loadScenario(this.config) ;
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
@@ -155,37 +150,6 @@ public class KnSimplifiedController extends AbstractController {
 		this.controlerListenerManager.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
 	}
-	/**
-	 * Design decisions:
-	 * <ul>
-	 * <li>I extracted this method since it is now called <i>twice</i>: once
-	 * directly after reading, and once before the iterations start. The second
-	 * call seems more important, but I wanted to leave the first one there in
-	 * case the program fails before that config dump. Might be put into the
-	 * "unexpected shutdown hook" instead. kai, dec'10
-	 * </ul>
-	 * 
-	 * @param message
-	 *            the message that is written just before the config dump
-	 */
-	private final void checkConfigConsistencyAndWriteToLog(final String message) {
-		log.info(message);
-		String newline = System.getProperty("line.separator");// use native line endings for logfile
-		StringWriter writer = new StringWriter();
-		new ConfigWriter(this.config).writeStream(new PrintWriter(writer), newline);
-		log.info(newline + newline + writer.getBuffer().toString());
-		log.info("Complete config dump done.");
-		log.info("Checking consistency of config...");
-		this.config.checkConsistency();
-		log.info("Checking consistency of config done.");
-	}
-
-
-
-	// ############################################################################################################################
-	// ############################################################################################################################
-	//	stuff that is related to the configuration of matsim  	
-
 	private PlansScoring buildPlansScoring() {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
 		final PlansScoring plansScoring = new PlansScoring( this.scenarioData, this.eventsManager, scoringFunctionFactory );
@@ -203,23 +167,12 @@ public class KnSimplifiedController extends AbstractController {
 		}
 		{
 			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
-			strategy.addStrategyModule(wrapPlanAlgo( this.createRoutingAlgorithm() )) ;
+			strategy.addStrategyModule(wrapPlanAlgo( this.createRoutingAlgorithm(), this.scenarioData.getConfig().global().getNumberOfThreads() )) ;
 			strategyManager.addStrategy(strategy, 0.1) ;
 		}
 		return strategyManager ;
 	}
 
-
-	private final AbstractMultithreadedModule wrapPlanAlgo(final PlanAlgorithm planAlgo) {
-		// wrap it into the AbstractMultithreadedModule:
-		final AbstractMultithreadedModule router = new AbstractMultithreadedModule(this.scenarioData.getConfig().global().getNumberOfThreads()) {
-			@Override
-			public PlanAlgorithm getPlanAlgoInstance() {
-				return planAlgo ;
-			}
-		};
-		return router;
-	}
 
 	private PlansCalcRoute createRoutingAlgorithm() {
 		// factory to generate routes:
@@ -240,12 +193,14 @@ public class KnSimplifiedController extends AbstractController {
 		// plug it together
 		final PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelDisutility, 
 				travelTime, leastCostPathFactory, routeFactory);
+		
+		// return it:
 		return plansCalcRoute;
 	}
 	
 	@Override
 	protected void prepareForSim() {
-		checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
+		checkConfigConsistencyAndWriteToLog(this.config, "Config dump before doIterations:");
 		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@SuppressWarnings("synthetic-access")

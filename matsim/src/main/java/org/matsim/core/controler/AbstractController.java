@@ -1,12 +1,17 @@
 package org.matsim.core.controler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 public abstract class AbstractController {
 	
@@ -14,6 +19,24 @@ public abstract class AbstractController {
 
 //	private Config config;
 	
+	/**Helper class to wrap a standard plan algo into a multithreaded plan algo.
+	 * 
+	 * @param planAlgo
+	 * @param numberOfThreads
+	 * @return
+	 */
+	protected static final AbstractMultithreadedModule wrapPlanAlgo(final PlanAlgorithm planAlgo, int numberOfThreads) {
+		// wrap it into the AbstractMultithreadedModule:
+		final AbstractMultithreadedModule router = new AbstractMultithreadedModule(numberOfThreads) {
+			@Override
+			public PlanAlgorithm getPlanAlgoInstance() {
+				return planAlgo ;
+			}
+		};
+		return router;
+	}
+
+
 	protected OutputDirectoryHierarchy controlerIO;
 
 	/**
@@ -147,6 +170,33 @@ public abstract class AbstractController {
 			log.info(divider);
 		}
 	}
+
+
+	/**
+	 * Design decisions:
+	 * <ul>
+	 * <li>I extracted this method since it is now called <i>twice</i>: once
+	 * directly after reading, and once before the iterations start. The second
+	 * call seems more important, but I wanted to leave the first one there in
+	 * case the program fails before that config dump. Might be put into the
+	 * "unexpected shutdown hook" instead. kai, dec'10
+	 * </ul>
+	 * @param config TODO
+	 * @param message
+	 *            the message that is written just before the config dump
+	 */
+	protected final void checkConfigConsistencyAndWriteToLog(Config config,
+			final String message) {
+				log.info(message);
+				String newline = System.getProperty("line.separator");// use native line endings for logfile
+				StringWriter writer = new StringWriter();
+				new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
+				log.info(newline + newline + writer.getBuffer().toString());
+				log.info("Complete config dump done.");
+				log.info("Checking consistency of config...");
+				config.checkConsistency();
+				log.info("Checking consistency of config done.");
+			}
 
 
 	
