@@ -51,6 +51,8 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
+
 public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(InsertParkingActivitiesTest.class);
