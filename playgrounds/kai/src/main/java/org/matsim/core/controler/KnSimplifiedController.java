@@ -120,11 +120,14 @@ public class KnSimplifiedController extends AbstractController {
 	}
 
 	/**
-	 * The order how the listeners are added is very important! As
+	 * The order how the listeners are added may be important! As
 	 * dependencies between different listeners exist or listeners may read
-	 * and write to common variables, the order is important. Example: The
+	 * and write to common variables, the order is important. 
+	 * <br/> 
+	 * The example given in the old Controler was: The
 	 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
-	 * turn is used by the PlansScoring-Listener.
+	 * turn is used by the PlansScoring-Listener. I would argue that such dependencies are not necessary with the
+	 * code as designed her: One could first define the scoring function completely, and then add it where needed. kai, jun'12
 	 * <br/>
 	 * IMPORTANT: The execution order is reverse to the order the listeners
 	 * are added to the list.

@@ -12,10 +12,13 @@ public abstract class AbstractController {
 	
 	private static Logger log = Logger.getLogger(AbstractController.class);
 
-	private Config config;
+//	private Config config;
 	
 	protected OutputDirectoryHierarchy controlerIO;
 
+	/**
+	 * This was  public in the design that I found. kai, jul'12
+	 */
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
 	
 	protected ControlerListenerManager controlerListenerManager;
@@ -60,8 +63,8 @@ public abstract class AbstractController {
 	}
 	
 
-	private void resetRandomNumbers(int iteration) {
-		MatsimRandom.reset(config.global().getRandomSeed() + iteration);
+	private void resetRandomNumbers(long seed, int iteration) {
+		MatsimRandom.reset(seed + iteration);
 		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
 		// "not-randomness" is the first
 		// draw...
@@ -69,24 +72,23 @@ public abstract class AbstractController {
 		// one
 	}
 	
-	public final void run(@SuppressWarnings("hiding") Config config) {
+	public final void run(Config config) {
 		run(config, false);
 	}
 	
-	public final void run(@SuppressWarnings("hiding") Config config, boolean overwriteFiles, Controler controler) {
+	public final void run(Config config, boolean overwriteFiles, Controler controler) {
 		run(config, overwriteFiles);
 	}
 
 
-	public final void run(@SuppressWarnings("hiding") Config config, boolean overwriteFiles) {
-		this.config = config;
+	public final void run(Config config, boolean overwriteFiles) {
 		this.controlerIO = new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), overwriteFiles); // output dir needs to be before logging
 		OutputDirectoryLogging.initLogging(this.controlerIO); // logging needs to be early
 		loadCoreListeners();
 		this.controlerListenerManager.fireControlerStartupEvent();
 		// make sure all routes are calculated.
 		prepareForSim();
-		doIterations();
+		doIterations(config.controler().getFirstIteration(), config.controler().getLastIteration(), config.global().getRandomSeed());
 		shutdown(false);
 	}
 	
@@ -107,10 +109,8 @@ public abstract class AbstractController {
 	
 	protected abstract void prepareForSim();
 	
-	private void doIterations() {
+	private void doIterations(int firstIteration, int lastIteration, long rndSeed) {
 
-		int firstIteration = config.controler().getFirstIteration();
-		int lastIteration = config.controler().getLastIteration();
 		String divider = "###################################################";
 		String marker = "### ";
 
@@ -122,7 +122,7 @@ public abstract class AbstractController {
 			this.stopwatch.setCurrentIteration(iteration);
 			this.stopwatch.beginOperation("iteration");
 			this.controlerIO.createIterationDirectory(iteration);
-			resetRandomNumbers(iteration);
+			resetRandomNumbers(rndSeed, iteration);
 
 			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
 			if (iteration > firstIteration) {
@@ -132,7 +132,7 @@ public abstract class AbstractController {
 			}
 			this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
 			this.stopwatch.beginOperation("mobsim");
-			resetRandomNumbers(iteration);
+			resetRandomNumbers(rndSeed, iteration);
 			runMobSim(iteration);
 			this.stopwatch.endOperation("mobsim");
 			log.info(marker + "ITERATION " + iteration + " fires after mobsim event");
