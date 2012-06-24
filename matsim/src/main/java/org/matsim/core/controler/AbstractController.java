@@ -24,6 +24,7 @@ public abstract class AbstractController {
 	protected volatile Throwable uncaughtException;
 	
 	private Thread shutdownHook = new Thread() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void run() {
 			log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
@@ -41,6 +42,7 @@ public abstract class AbstractController {
 		// make sure we know about any exceptions that lead to abortion of the
 		// program
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
 				log.warn("Getting uncaught Exception in Thread " + t.getName(), e);
@@ -67,16 +69,16 @@ public abstract class AbstractController {
 		// one
 	}
 	
-	public final void run(Config config) {
+	public final void run(@SuppressWarnings("hiding") Config config) {
 		run(config, false);
 	}
 	
-	public final void run(Config config, boolean overwriteFiles, Controler controler) {
+	public final void run(@SuppressWarnings("hiding") Config config, boolean overwriteFiles, Controler controler) {
 		run(config, overwriteFiles);
 	}
 
 
-	public final void run(Config config, boolean overwriteFiles) {
+	public final void run(@SuppressWarnings("hiding") Config config, boolean overwriteFiles) {
 		this.config = config;
 		this.controlerIO = new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), overwriteFiles); // output dir needs to be before logging
 		OutputDirectoryLogging.initLogging(this.controlerIO); // logging needs to be early
