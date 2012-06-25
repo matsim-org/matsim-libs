@@ -105,7 +105,7 @@ public class TransitConfigGroup extends Module {
 		Map<String, String> comments = super.getComments();
 		comments.put(TRANSIT_SCHEDULE_FILE, "Input file containing the transit schedule to be simulated.");
 		comments.put(VEHICLES_FILE, "Input file containing the vehicles used by the departures in the transit schedule.");
-		comments.put(TRANSIT_MODES, "Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt,bus,train,tram'.");
+		comments.put(TRANSIT_MODES, "Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt'.");
 		return comments;
 	}
 
