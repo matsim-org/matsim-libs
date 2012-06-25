@@ -39,7 +39,7 @@ import org.matsim.core.utils.misc.Time;
 import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;
 
-public class LaggedActivityScoringFunction extends ActivityScoringFunction {
+public class SurpriceActivityScoringFunction extends ActivityScoringFunction {
 	
 	private CharyparNagelScoringParameters params;
 	private double income;
@@ -48,7 +48,7 @@ public class LaggedActivityScoringFunction extends ActivityScoringFunction {
 	private DayType day;
 	private Plan plan;
 		
-	public LaggedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
+	public SurpriceActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
 			ActivityFacilities facilities, double income, String day) {
 		super(params);
 		super.reset();

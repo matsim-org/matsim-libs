@@ -37,7 +37,7 @@ import playground.anhorni.surprice.Surprice;
 /**
  * anhorni
  */
-public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
+public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
 	protected double score;
 	private double lastTime;
@@ -60,7 +60,7 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
     private double constantBike;
     private double constantWalk;    
 
-    public LaggedLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
+    public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
     		String day, double income) {
 		this.params = params;
         this.network = network;

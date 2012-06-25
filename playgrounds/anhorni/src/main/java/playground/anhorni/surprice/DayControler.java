@@ -22,7 +22,7 @@ package playground.anhorni.surprice;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import playground.anhorni.surprice.scoring.LaggedScoringFunctionFactory;
+import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
 
 public class DayControler extends Controler {
 	
@@ -41,7 +41,7 @@ public class DayControler extends Controler {
 	protected void setUp() {
 	    super.setUp();	
 	    	    
-	  	LaggedScoringFunctionFactory scoringFunctionFactory = new LaggedScoringFunctionFactory(
+	  	SurpriceScoringFunctionFactory scoringFunctionFactory = new SurpriceScoringFunctionFactory(
 	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.incomes);	  		
 	  	this.setScoringFunctionFactory(scoringFunctionFactory);
 	  	

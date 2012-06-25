@@ -29,14 +29,14 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.anhorni.surprice.AgentMemories;
 
-public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory{
+public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory{
 	
 	private final Controler controler;
 	private AgentMemories memories = new AgentMemories();
 	private String day;
 	private ObjectAttributes incomes;
 
-	public LaggedScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
+	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
 			AgentMemories memories, String day, ObjectAttributes incomes) {
 		super(configGroup, network);
 		this.controler = controler;
@@ -48,12 +48,12 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 	public ScoringFunction createNewScoringFunction(Plan plan) {			
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		LaggedActivityScoringFunction scoringFunction = new LaggedActivityScoringFunction(
+		SurpriceActivityScoringFunction scoringFunction = new SurpriceActivityScoringFunction(
 				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(),
 				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"), this.day);
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		
-		scoringFunctionAccumulator.addScoringFunction(new LaggedLegScoringFunction(
+		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
 				super.getParams(), controler.getNetwork(), controler.getConfig(),
 				this.memories.getMemory(plan.getPerson().getId()),
 				this.day,
