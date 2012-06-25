@@ -21,15 +21,10 @@ package playground.wrashid.parkingSearch.withindayFW;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.ClassUtils;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -42,16 +37,11 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
-import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
-import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIIdentifier;
-import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
 import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice.HUPCIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice.HUPCReplannerFactory;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchIdentifier;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
@@ -107,7 +97,7 @@ public class HUPCController extends WithinDayParkingController  {
 		this.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
 
-		
+		this.getReplanningManager().setEventsManager(this.getEvents());
 	
 	}
 	

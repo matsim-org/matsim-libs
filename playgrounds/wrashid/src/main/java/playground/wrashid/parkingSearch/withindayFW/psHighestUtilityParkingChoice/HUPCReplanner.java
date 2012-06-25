@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -38,7 +37,6 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
@@ -68,6 +66,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
+		DebugLib.traceAgent(withinDayAgent.getId());
 		Plan plan = withinDayAgent.getSelectedPlan();
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 
@@ -99,6 +98,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		
+		
 		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
 		editRoutes.replanCurrentLegRoute(withinDayAgent.getSelectedPlan(), currentLegIndex, currentLinkIndex, routeAlgo, time);
 		
@@ -120,7 +120,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 	private Integer getSecondParkingActIndex(PlanBasedWithinDayAgent withinDayAgent) {
 		List<PlanElement> planElements = withinDayAgent.getSelectedPlan().getPlanElements();
 
-		for (int i = withinDayAgent.getCurrentPlanElementIndex(); i < planElements.size(); i++) {
+		for (int i = withinDayAgent.getCurrentPlanElementIndex() + 2; i < planElements.size(); i++) {
 			if (planElements.get(i) instanceof Activity) {
 				Activity act = (Activity) planElements.get(i);
 				if (act.getType().equalsIgnoreCase("parking")) {
