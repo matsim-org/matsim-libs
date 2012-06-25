@@ -21,6 +21,7 @@
 package playground.wrashid.parkingSearch.withindayFW.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -40,6 +41,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
@@ -53,8 +55,10 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 	private final IntegerValueHashMap<Id> facilityCapacities;	// remaining capacity
 	private final HashMap<String, HashSet<Id>> parkingTypes;
 	private final ParkingCostCalculator parkingCostCalculator;
+	private final Scenario scenario;
 	
 	public ParkingInfrastructure(Scenario scenario, HashMap<String, HashSet<Id>> parkingTypes, ParkingCostCalculator parkingCostCalculator) {
+		this.scenario = scenario;
 		this.parkingCostCalculator = parkingCostCalculator;
 		facilityCapacities = new IntegerValueHashMap<Id>();
 		reservedCapcities = new IntegerValueHashMap<Id>();
@@ -148,7 +152,13 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 	}
 	
 	public int getFreeCapacity(Id facilityId) {
-		return facilityCapacities.get(facilityId)-reservedCapcities.get(facilityId);
+		int freeCapacity = facilityCapacities.get(facilityId)-reservedCapcities.get(facilityId);
+		
+		if (freeCapacity<0){
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+		
+		return freeCapacity;
 	}
 
 	public void parkVehicle(Id facilityId) {
@@ -189,7 +199,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		}
 	}
 	
-	public Id getClosestFreeParkingFacility(Coord coord) {
+	public ActivityFacility getClosestFreeParkingFacility(Coord coord) {
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
 		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
 		
@@ -201,7 +211,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		
 		resetParkingFacilitiesQuadTree(tmpList);
 		
-		return parkingFacility.getId();
+		return ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(parkingFacility.getId());
 	}
 	
 	public Id getClosestFreeParkingFacilityNotOnLink(Coord coord, Id linkId){
@@ -264,5 +274,17 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		
 		return parkingFacility.getId();
 	}
-
+	
+	public Collection<ActivityFacility> getAllFreeParkingWithinDistance(double distance,Coord coord){
+		Collection<ActivityFacility> parkings = parkingFacilities.get(coord.getX(), coord.getY(),distance);
+		
+		for (ActivityFacility parking:parkings){
+			if (getFreeCapacity(parking.getId())==0){
+				parkings.remove(parking.getId());
+			}
+		}
+		
+		return parkings;
+	}
+	
 }

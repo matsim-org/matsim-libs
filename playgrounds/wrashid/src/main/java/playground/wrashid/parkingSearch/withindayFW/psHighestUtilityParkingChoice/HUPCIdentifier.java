@@ -20,12 +20,21 @@
 
 package playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
@@ -33,11 +42,16 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.utils.EditRoutes;
 
+import playground.wrashid.artemis.smartCharging.ChargingTime;
 import playground.wrashid.lib.DebugLib;
+import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.SortableMapObject;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
+import playground.wrashid.parkingSearch.withindayFW.util.ParkingDurationEstimator;
 
 public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
 	
@@ -79,49 +93,94 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
 			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
 			
-			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
-				//System.out.println(agents.get(agentId).getCurrentPlanElementIndex());
-				//DebugLib.traceAgent(agentId);
-				parkingAgentsTracker.getSearchStartTime().put(agentId, parkingAgentsTracker.getLastCarMovementRegistered().get(agentId));
-			}
+			Id personId =agent.getId();
+			Plan selectedPlan = agent.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+			Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
 			
 			/*
 			 * If the agent has not selected a parking facility yet.
 			 */
 			if (requiresReplanning(agent)) {
 				
+				markFlagForNoSearchTime(agentId);
 				
 				
 				// get all parking within 1000m (of destination) or at least on parking, if that set is empty.
+				Activity nextNonParkingAct=(Activity) selectedPlan.getPlanElements().get(currentPlanElementIndex+3);
 				
-				// assign scores to each of the parking variants.
+				Collection<ActivityFacility> parkings = parkingInfrastructure.getAllFreeParkingWithinDistance(1000, nextNonParkingAct.getCoord());
+				if (parkings.size()==0){
+					parkings.add(parkingInfrastructure.getClosestFreeParkingFacility(nextNonParkingAct.getCoord()));
+				}
 				
-				// select best parking.
 				
-				// adapt driving in such a way, that 
+				// get best parking
+				PriorityQueue<SortableMapObject<ActivityFacility>> priorityQueue = new PriorityQueue<SortableMapObject<ActivityFacility>>();
 				
 				
-				Id linkId = agent.getCurrentLinkId();
-				Id facilityId = parkingInfrastructure.getFreeParkingFacilityOnLink(linkId,"streetParking");
+				for (ActivityFacility parkingFacility:parkings){
+					double walkingDistance=GeneralLib.getDistance(parkingFacility.getCoord(), nextNonParkingAct.getCoord());
+					
+					double parkingDuration;
+					if (isLastParkingOfDay(personId)){
+						parkingDuration=ParkingDurationEstimator.estimateParkingDurationLastParkingOfDay(time, parkingAgentsTracker.getFirstCarDepartureTimeOfDay().getTime(agentId));
+					} else {
+						parkingDuration=ParkingDurationEstimator.estimateParkingDurationDuringDay(time, planElements, currentPlanElementIndex);
+					}
+					
+					double activityDuration=ParkingDurationEstimator.estimateParkingDurationDuringDay(time, planElements, currentPlanElementIndex);
+					double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration, GeneralLib.getWalkingTravelDuration(walkingDistance));
+					double costScore = parkingAgentsTracker.getParkingCostScore(personId,time , parkingDuration, parkingFacility.getId());
+					
+					priorityQueue.add(new SortableMapObject<ActivityFacility>(parkingFacility, walkScore+costScore));
+				}
+				
+				ActivityFacility bestParkingFacility = priorityQueue.poll().getKey();
+				
+				Id facilityId = bestParkingFacility.getId();
+				
 				if (facilityId != null) {
 					parkingInfrastructure.parkVehicle(facilityId);
 					parkingAgentsTracker.setSelectedParking(agentId, facilityId);
-					
-					//TODO: calc score - this score should be 
-					// this could be done in handler, when the parking is released + for last parking
-					// separate.
-					
-					// this score also needs to be set on the strategy (for the specific leg).
-					
-					
-					//calcScore();
+					identifiedAgents.add(agent);
 				}
 				
-				identifiedAgents.add(agent);
 			}
 		}
 		
 		return identifiedAgents;
+	}
+
+
+	private boolean isLastParkingOfDay(Id personId) {
+		PlanBasedWithinDayAgent agent = this.agents.get(personId);
+		
+		List<PlanElement> planElements = agent.getSelectedPlan().getPlanElements();
+		Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
+		
+		for (int i=planElements.size()-1;i>0;i--){
+			if (planElements.get(i) instanceof Leg){
+				Leg leg=(Leg) planElements.get(i);
+				
+				if (leg.getMode().equals(TransportMode.car) && i==currentPlanElementIndex){
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+		
+		DebugLib.stopSystemAndReportInconsistency("assumption broken");
+		
+		return false;
+	}
+
+
+	private void markFlagForNoSearchTime(Id agentId) {
+		if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
+			parkingAgentsTracker.getSearchStartTime().put(agentId, Double.NEGATIVE_INFINITY);
+		}
 	}
 	
 

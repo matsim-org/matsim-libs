@@ -43,6 +43,7 @@ import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.lib.DebugLib;
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIReplannerFactory;
@@ -54,8 +55,7 @@ import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSea
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public class HUPCController extends WithinDayParkingController implements StartupListener, ReplanningListener {
-
+public class HUPCController extends WithinDayParkingController  {
 	public HUPCController(String[] args) {
 		super(args);
 	}
@@ -111,15 +111,6 @@ public class HUPCController extends WithinDayParkingController implements Startu
 	
 	}
 	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		super.notifyStartup(event);
-	}
-
-	@Override
-	public void notifyReplanning(ReplanningEvent event) {
-		super.notifyReplanning(event);
-	}
 	
 	public static void main(String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -130,9 +121,11 @@ public class HUPCController extends WithinDayParkingController implements Startu
 		}
 		final HUPCController controller = new HUPCController(args);
 		controller.setOverwriteFiles(true);
+		GeneralLib.controler=controller;
 
 		controller.run();
 
+		
 		System.exit(0);
 	}
 

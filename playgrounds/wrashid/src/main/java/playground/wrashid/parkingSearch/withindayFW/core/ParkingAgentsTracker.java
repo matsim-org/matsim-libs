@@ -207,8 +207,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				lastParkingActivityPlanElemIndex);
 		addHandler(this.durationOfLastActivityOfDay);
 		
-		this.firstCarDepartureTimeOfDay= new CaptureFirstCarDepartureTimeOfDay();
-		addHandler(this.firstCarDepartureTimeOfDay);
+		this.setFirstCarDepartureTimeOfDay(new CaptureFirstCarDepartureTimeOfDay());
+		addHandler(this.getFirstCarDepartureTimeOfDay());
 	}
 
 	public Set<Id> getSearchingAgents() {
@@ -285,7 +285,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		if (event.getLegMode().equals(TransportMode.car)) {
 			Id personId = event.getPersonId();
 
-			getLastCarMovementRegistered().put(personId, event.getTime());
+			getLastCarMovementTime().put(personId, event.getTime());
 			
 			getParkingInfrastructure().unParkVehicle(lastParkingFacilityId.get(personId));
 
@@ -359,7 +359,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				.getCurrentlySelectedParkingStrategies();
 
 		if (event.getLegMode().equals(TransportMode.car)) {
-			getLastCarMovementRegistered().put(personId, event.getTime());
+			getLastCarMovementTime().put(personId, event.getTime());
 			activeReplanningIdentifiers.removeValue(currentlySelectedParkingStrategies.get(personId, planElementIndex)
 					.getIdentifier(), personId);
 		}
@@ -376,7 +376,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			//DebugLib.traceAgent(personId);
 		}
 
-		getLastCarMovementRegistered().put(personId, event.getTime());
+		getLastCarMovementTime().put(personId, event.getTime());
 		if (carLegAgents.contains(personId)) {
 			if (!searchingAgents.contains(personId)) {
 				Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
@@ -514,16 +514,15 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		double parkingDuration = GeneralLib.getIntervalDuration(lastCarArrivalTimeAtParking.getTime(personId), parkingDepartureTime);
 		double activityDuration = previousActivityDurationDuringDay.getDuration(personId);
 		Id parkingFacilityId = event.getFacilityId();
-		ParkingPersonalBetas parkingPersonalBetas = parkingStrategyManager.getParkingPersonalBetas();
 
 		// parking cost scoring
 
-		parkingScore += getParkingCostScore(personId, parkingArrivalTime, parkingDuration, parkingFacilityId, parkingPersonalBetas);
+		parkingScore += getParkingCostScore(personId, parkingArrivalTime, parkingDuration, parkingFacilityId);
 
 		// parking walk time
 
 		double walkingTimeTotalInMinutes = parkingWalkTimesDuringDay.getSumBothParkingWalkDurationsInSecond(personId) / 60.0;
-		parkingScore +=getWalkScore(personId, activityDuration, parkingPersonalBetas, walkingTimeTotalInMinutes);
+		parkingScore +=getWalkScore(personId, activityDuration, walkingTimeTotalInMinutes);
 
 		// parking search time
 
@@ -551,7 +550,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		}
 		
 		
-		parkingScore += getSearchTimeScore(personId, activityDuration, parkingPersonalBetas, parkingSearchTimeInMinutes);
+		parkingScore += getSearchTimeScore(personId, activityDuration, parkingSearchTimeInMinutes);
 
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
 		
@@ -611,20 +610,21 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	}
 
-	private double getSearchTimeScore(Id personId, double activityDuration, ParkingPersonalBetas parkingPersonalBetas,
-			double parkingSearchTimeInMinutes) {
+	public double getSearchTimeScore(Id personId, double activityDuration, double parkingSearchTimeInMinutes) {
+		ParkingPersonalBetas parkingPersonalBetas = parkingStrategyManager.getParkingPersonalBetas();
 		return parkingPersonalBetas.getParkingSearchTimeBeta(personId, activityDuration) * parkingSearchTimeInMinutes;
 	}
 
-	private double getWalkScore(Id personId, double activityDuration, ParkingPersonalBetas parkingPersonalBetas,
-			double walkingTimeTotalInMinutes) {
-
+	public double getWalkScore(Id personId, double activityDuration, double walkingTimeTotalInMinutes) {
+		ParkingPersonalBetas parkingPersonalBetas = parkingStrategyManager.getParkingPersonalBetas();
+		
 		return parkingPersonalBetas.getParkingWalkTimeBeta(personId, activityDuration) * walkingTimeTotalInMinutes;
 
 	}
 
-	private double getParkingCostScore(Id personId, double parkingArrivalTime, double parkingDuration, Id facilityId,
-			ParkingPersonalBetas parkingPersonalBetas) {
+	public double getParkingCostScore(Id personId, double parkingArrivalTime, double parkingDuration, Id facilityId) {
+		ParkingPersonalBetas parkingPersonalBetas = parkingStrategyManager.getParkingPersonalBetas();
+		
 		Double parkingCost = getParkingInfrastructure().getParkingCostCalculator().getParkingCost(facilityId, parkingArrivalTime,
 				parkingDuration);
 
@@ -654,23 +654,21 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		Double parkingArrivalTime = lastCarArrivalTimeAtParking.getTime(personId);
 		double lastActivityDurationOfDay = durationOfLastParkingOfDay.getDuration(personId);
 
-		ParkingPersonalBetas parkingPersonalBetas = parkingStrategyManager.getParkingPersonalBetas();
 
 		// parking cost scoring
 
-		parkingScore+= getParkingCostScore(personId, parkingArrivalTime, lastActivityDurationOfDay, getLastParkingFacilityIdOfDay(personId),
-				parkingPersonalBetas);
+		parkingScore+= getParkingCostScore(personId, parkingArrivalTime, lastActivityDurationOfDay, getLastParkingFacilityIdOfDay(personId));
 
 		// parking walk time
 
 		double walkingTimeTotalInMinutes = walkDurationFirstAndLastOfDay.getDuration(personId) / 60.0;
-		parkingScore += getWalkScore(personId, lastActivityDurationOfDay, parkingPersonalBetas, walkingTimeTotalInMinutes);
+		parkingScore += getWalkScore(personId, lastActivityDurationOfDay, walkingTimeTotalInMinutes);
 
 		// parking search time
 
 		double parkingSearchTimeInMinutes = GeneralLib.getIntervalDuration(this.getSearchStartTime().get(personId),
 				parkingArrivalTime) / 60;
-		parkingScore += getSearchTimeScore(personId, lastActivityDurationOfDay, parkingPersonalBetas, parkingSearchTimeInMinutes);
+		parkingScore += getSearchTimeScore(personId, lastActivityDurationOfDay, parkingSearchTimeInMinutes);
 
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
 		
@@ -772,7 +770,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		this.searchStartTime = searchStartTime;
 	}
 
-	public Map<Id, Double> getLastCarMovementRegistered() {
+	public Map<Id, Double> getLastCarMovementTime() {
 		return lastCarMovementRegistered;
 	}
 
@@ -782,6 +780,14 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	public ParkingInfrastructure getParkingInfrastructure() {
 		return parkingInfrastructure;
+	}
+
+	public CaptureFirstCarDepartureTimeOfDay getFirstCarDepartureTimeOfDay() {
+		return firstCarDepartureTimeOfDay;
+	}
+
+	public void setFirstCarDepartureTimeOfDay(CaptureFirstCarDepartureTimeOfDay firstCarDepartureTimeOfDay) {
+		this.firstCarDepartureTimeOfDay = firstCarDepartureTimeOfDay;
 	}
 
 }

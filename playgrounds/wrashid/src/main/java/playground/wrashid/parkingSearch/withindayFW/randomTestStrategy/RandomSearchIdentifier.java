@@ -86,7 +86,7 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
 				//System.out.println(agents.get(agentId).getCurrentPlanElementIndex());
 				//DebugLib.traceAgent(agentId);
-				parkingAgentsTracker.getSearchStartTime().put(agentId, parkingAgentsTracker.getLastCarMovementRegistered().get(agentId));
+				parkingAgentsTracker.getSearchStartTime().put(agentId, parkingAgentsTracker.getLastCarMovementTime().get(agentId));
 			}
 			
 			/*
@@ -107,9 +107,9 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 					
 					
 					//calcScore();
+					identifiedAgents.add(agent);
 				}
 				
-				identifiedAgents.add(agent);
 			}
 		}
 		

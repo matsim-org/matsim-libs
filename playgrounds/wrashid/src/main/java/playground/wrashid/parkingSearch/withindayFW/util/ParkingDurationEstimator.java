@@ -31,14 +31,17 @@ import playground.wrashid.lib.GeneralLib;
 
 public class ParkingDurationEstimator {
 
-	
-	public static Double estimateParkingDurationLastParkingOfDay(double arrivalTime , double firstCarDepartureTimeOfDay){
+	public static Double estimateParkingDurationLastParkingOfDay(double arrivalTime, double firstCarDepartureTimeOfDay) {
 		return GeneralLib.getIntervalDuration(arrivalTime, firstCarDepartureTimeOfDay);
 	}
-	
-	public static double estimateParkingDurationDuringDay(double currentTime, List<PlanElement> planElements, int currentCarLegPlanElementIndex){
+
+	// TODO: instead of this, we could also only consider the actual activity
+	// durations (without the walk legs/parking activity, to be consistent with
+	// the figures used elsewhere 
+	public static double estimateParkingDurationDuringDay(double currentTime, List<PlanElement> planElements,
+			int currentCarLegPlanElementIndex) {
 		double estimatedActduration = 0;
-		for (int i=currentCarLegPlanElementIndex+1;i<planElements.size(); i++){
+		for (int i = currentCarLegPlanElementIndex + 1; i < planElements.size(); i++) {
 
 			if (planElements.get(i) instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) planElements.get(i);
@@ -52,10 +55,10 @@ public class ParkingDurationEstimator {
 			} else {
 				Leg leg = (Leg) planElements.get(i);
 
-				if (leg.getMode().equals(TransportMode.car)){
+				if (leg.getMode().equals(TransportMode.car)) {
 					break;
 				}
-				
+
 				ActivityImpl prevAct = (ActivityImpl) planElements.get(i - 1);
 				ActivityImpl nextAct = (ActivityImpl) planElements.get(i + 1);
 				double distance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
@@ -66,7 +69,8 @@ public class ParkingDurationEstimator {
 				} else if (leg.getMode().equalsIgnoreCase("pt")) {
 					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
 				} else if (leg.getMode().equalsIgnoreCase("ride")) {
-					//as ride should disappear anyway, this the closest estimation,
+					// as ride should disappear anyway, this the closest
+					// estimation,
 					// which must not be correct for the algorithm to work.
 					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
 				} else {
@@ -76,9 +80,7 @@ public class ParkingDurationEstimator {
 
 		}
 		return estimatedActduration;
-		
-		
-		
+
 	}
-	
+
 }
