@@ -147,8 +147,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 			}
 		} else if (Constants.STOP.equals(name)) {
 			Id id = this.idf.createId(atts.getValue(Constants.REF_ID));
-			TransitStopFacility facility = this.schedule.getFacilities()
-					.get(id);
+			TransitStopFacility facility = this.schedule.getFacilities().get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(Constants.REF_ID));
 			}
